@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-static--multistatics-buoyfield",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.025919444444444446,
+          62.99496111111111
+        ],
+        [
+          0.02108611111111111,
+          62.99496111111111
+        ],
+        [
+          0.02108611111111111,
+          63.03612777777778
+        ],
+        [
+          -0.025919444444444446,
+          63.03612777777778
+        ],
+        [
+          -0.025919444444444446,
+          62.99496111111111
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.025919444444444446,
+    62.99496111111111,
+    0.02108611111111111,
+    63.03612777777778
+  ],
+  "properties": {
+    "title": "multistatics_buoyfield (multi-static)",
+    "datetime": "2014-12-12T12:00:00+00:00",
+    "description": "Domain: multi-static\nImported from MultiStatics/multistatics_buoyfield.rep",
+    "start_datetime": "2014-12-12T12:00:00+00:00",
+    "end_datetime": "2014-12-12T12:45:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "multistatics_buoyfield (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/multistatics_buoyfield.rep",
+      "title": "multistatics_buoyfield.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-multistatics_buoyfield": {
+      "href": "./assets/multistatics_buoyfield.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "multistatics_buoyfield.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/multistatics_buoyfield.rep",
+        "load_timestamp": "2026-03-21T10:15:00.453933Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--l1-ownshipsensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "L1_OwnshipSensor (satc)",
+    "datetime": "2026-03-21T10:15:02.076912+00:00",
+    "description": "Domain: satc\nImported from SATC/L1_OwnshipSensor.dsf"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "L1_OwnshipSensor (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipSensor.dsf",
+      "title": "L1_OwnshipSensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-L1_OwnshipSensor": {
+      "href": "./assets/L1_OwnshipSensor.dsf",
+      "type": "application/octet-stream",
+      "title": "L1_OwnshipSensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipSensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:02.079174Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

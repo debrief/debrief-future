@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "other-formats--bad-boat2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.59394722222222,
+          21.913313888888887
+        ],
+        [
+          -21.586852777777775,
+          21.913313888888887
+        ],
+        [
+          -21.586852777777775,
+          21.92915
+        ],
+        [
+          -21.59394722222222,
+          21.92915
+        ],
+        [
+          -21.59394722222222,
+          21.913313888888887
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.59394722222222,
+    21.913313888888887,
+    -21.586852777777775,
+    21.92915
+  ],
+  "properties": {
+    "title": "BAD_boat2 (other-formats)",
+    "datetime": "1995-12-12T05:19:00+00:00",
+    "description": "Domain: other-formats\nImported from other_formats/BAD_boat2.rep",
+    "start_datetime": "1995-12-12T05:19:00+00:00",
+    "end_datetime": "1995-12-12T05:34:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BAD_boat2 (other-formats)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/BAD_boat2.rep",
+      "title": "BAD_boat2.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BAD_boat2": {
+      "href": "./assets/BAD_boat2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BAD_boat2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/BAD_boat2.rep",
+        "load_timestamp": "2026-03-21T10:15:05.454865Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

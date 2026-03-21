@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-static--multistatic-vessel",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.0,
+          60.2
+        ],
+        [
+          0.5,
+          60.2
+        ],
+        [
+          0.5,
+          60.7
+        ],
+        [
+          -0.0,
+          60.7
+        ],
+        [
+          -0.0,
+          60.2
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.0,
+    60.2,
+    0.5,
+    60.7
+  ],
+  "properties": {
+    "title": "MultiStatic_Vessel (multi-static)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: multi-static\nImported from MultiStatics/MultiStatic_Vessel.rep",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "MultiStatic_Vessel (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/MultiStatic_Vessel.rep",
+      "title": "MultiStatic_Vessel.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-MultiStatic_Vessel": {
+      "href": "./assets/MultiStatic_Vessel.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "MultiStatic_Vessel.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/MultiStatic_Vessel.rep",
+        "load_timestamp": "2026-03-21T10:15:00.263969Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "other-formats-test-data-brt-import--all-tracks-use-current-heading",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.2687,
+          60.184755555555554
+        ],
+        [
+          -0.0,
+          60.184755555555554
+        ],
+        [
+          -0.0,
+          60.25
+        ],
+        [
+          -0.2687,
+          60.25
+        ],
+        [
+          -0.2687,
+          60.184755555555554
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.2687,
+    60.184755555555554,
+    -0.0,
+    60.25
+  ],
+  "properties": {
+    "title": "All Tracks Use Current Heading (other-formats/test-data/brt-import)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: other-formats/test-data/brt-import\nImported from other_formats/test_data/brt_import/All Tracks Use Current Heading.rep",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "All Tracks Use Current Heading (other-formats/test-data/brt-import)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/test_data/brt_import/All%20Tracks%20Use%20Current%20Heading.rep",
+      "title": "All Tracks Use Current Heading.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-All Tracks Use Current Heading": {
+      "href": "./assets/All Tracks Use Current Heading.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "All Tracks Use Current Heading.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/test_data/brt_import/All Tracks Use Current Heading.rep",
+        "load_timestamp": "2026-03-21T10:15:05.548565Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--source-2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0289292569,
+          -0.0068214947
+        ],
+        [
+          0.1979403367,
+          -0.0068214947
+        ],
+        [
+          0.1979403367,
+          0.1769367926
+        ],
+        [
+          0.0289292569,
+          0.1769367926
+        ],
+        [
+          0.0289292569,
+          -0.0068214947
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0289292569,
+    -0.0068214947,
+    0.1979403367,
+    0.1769367926
+  ],
+  "properties": {
+    "title": "source_2 (satc)",
+    "datetime": "1999-12-31T22:00:00+00:00",
+    "description": "Domain: satc\nImported from SATC_Test/source_2.rep",
+    "start_datetime": "1999-12-31T22:00:00+00:00",
+    "end_datetime": "2000-01-01T02:01:40+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "source_2 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/source_2.rep",
+      "title": "source_2.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-source_2": {
+      "href": "./assets/source_2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "source_2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/source_2.rep",
+        "load_timestamp": "2026-03-21T10:15:04.154176Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

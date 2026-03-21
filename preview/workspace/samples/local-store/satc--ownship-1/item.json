@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--ownship-1",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0119214169,
+          0.1820457141
+        ],
+        [
+          0.174582567,
+          0.1820457141
+        ],
+        [
+          0.174582567,
+          0.2910438396
+        ],
+        [
+          0.0119214169,
+          0.2910438396
+        ],
+        [
+          0.0119214169,
+          0.1820457141
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0119214169,
+    0.1820457141,
+    0.174582567,
+    0.2910438396
+  ],
+  "properties": {
+    "title": "ownship_1 (satc)",
+    "datetime": "1999-12-31T22:00:00+00:00",
+    "description": "Domain: satc\nImported from SATC_Test/ownship_1.rep",
+    "start_datetime": "1999-12-31T22:00:00+00:00",
+    "end_datetime": "2000-01-01T05:37:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "ownship_1 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_1.rep",
+      "title": "ownship_1.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-ownship_1": {
+      "href": "./assets/ownship_1.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "ownship_1.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_1.rep",
+        "load_timestamp": "2026-03-21T10:15:04.106068Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

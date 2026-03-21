@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--turn",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.78280833333333,
+          5.1585009
+        ],
+        [
+          30.933272222222225,
+          5.1585009
+        ],
+        [
+          30.933272222222225,
+          5.200725
+        ],
+        [
+          30.78280833333333,
+          5.200725
+        ],
+        [
+          30.78280833333333,
+          5.1585009
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.78280833333333,
+    5.1585009,
+    30.933272222222225,
+    5.200725
+  ],
+  "properties": {
+    "title": "turn (s2r)",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Domain: s2r\nImported from S2R/turn.rep",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "turn (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/turn.rep",
+      "title": "turn.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-turn": {
+      "href": "./assets/turn.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "turn.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/turn.rep",
+        "load_timestamp": "2026-03-21T10:15:01.853142Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

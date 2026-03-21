@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--midflow2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.8737112,
+          4.9211105
+        ],
+        [
+          30.0,
+          4.9211105
+        ],
+        [
+          30.0,
+          5.0
+        ],
+        [
+          29.8737112,
+          5.0
+        ],
+        [
+          29.8737112,
+          4.9211105
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.8737112,
+    4.9211105,
+    30.0,
+    5.0
+  ],
+  "properties": {
+    "title": "midflow2 (s2r)",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Domain: s2r\nImported from S2R/midflow2.dpf",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "midflow2 (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/midflow2.dpf",
+      "title": "midflow2.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-midflow2": {
+      "href": "./assets/midflow2.dpf",
+      "type": "application/octet-stream",
+      "title": "midflow2.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/midflow2.dpf",
+        "load_timestamp": "2026-03-21T10:15:01.692795Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

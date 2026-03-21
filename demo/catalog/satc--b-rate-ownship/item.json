@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--b-rate-ownship",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -153.26379444444444,
+          51.17722222222222
+        ],
+        [
+          -152.71352499999998,
+          51.17722222222222
+        ],
+        [
+          -152.71352499999998,
+          51.48948888888889
+        ],
+        [
+          -153.26379444444444,
+          51.48948888888889
+        ],
+        [
+          -153.26379444444444,
+          51.17722222222222
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -153.26379444444444,
+    51.17722222222222,
+    -152.71352499999998,
+    51.48948888888889
+  ],
+  "properties": {
+    "title": "B_Rate_Ownship (satc)",
+    "datetime": "1900-12-12T06:35:03.910000+00:00",
+    "description": "Domain: satc\nImported from SATC/B_Rate_Ownship.rep",
+    "start_datetime": "1900-12-12T06:35:03.910000+00:00",
+    "end_datetime": "1900-12-12T10:00:07.910000+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "B_Rate_Ownship (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Ownship.rep",
+      "title": "B_Rate_Ownship.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-B_Rate_Ownship": {
+      "href": "./assets/B_Rate_Ownship.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "B_Rate_Ownship.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Ownship.rep",
+        "load_timestamp": "2026-03-21T10:15:01.923331Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

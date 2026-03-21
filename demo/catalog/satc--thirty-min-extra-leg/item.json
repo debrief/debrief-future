@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--thirty-min-extra-leg",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0025667,
+          -0.0063056
+        ],
+        [
+          0.0294361,
+          -0.0063056
+        ],
+        [
+          0.0294361,
+          0.0512972
+        ],
+        [
+          0.0025667,
+          0.0512972
+        ],
+        [
+          0.0025667,
+          -0.0063056
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0025667,
+    -0.0063056,
+    0.0294361,
+    0.0512972
+  ],
+  "properties": {
+    "title": "thirty_min_extra_leg (satc)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: satc\nImported from SATC/thirty_min_extra_leg.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T12:35:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "thirty_min_extra_leg (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/thirty_min_extra_leg.dpf",
+      "title": "thirty_min_extra_leg.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-thirty_min_extra_leg": {
+      "href": "./assets/thirty_min_extra_leg.dpf",
+      "type": "application/octet-stream",
+      "title": "thirty_min_extra_leg.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/thirty_min_extra_leg.dpf",
+        "load_timestamp": "2026-03-21T10:15:02.180707Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

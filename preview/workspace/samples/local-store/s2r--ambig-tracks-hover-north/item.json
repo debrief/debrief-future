@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--ambig-tracks-hover-north",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.01,
+          59.97403333333334
+        ],
+        [
+          0.19741944444444443,
+          59.97403333333334
+        ],
+        [
+          0.19741944444444443,
+          60.4
+        ],
+        [
+          -0.01,
+          60.4
+        ],
+        [
+          -0.01,
+          59.97403333333334
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.01,
+    59.97403333333334,
+    0.19741944444444443,
+    60.4
+  ],
+  "properties": {
+    "title": "Ambig_tracks_hover_north (s2r)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: s2r\nImported from S2R/Ambig_tracks_hover_north.rep",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T13:40:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+      "title": "Ambig_tracks_hover_north.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Ambig_tracks_hover_north": {
+      "href": "./assets/Ambig_tracks_hover_north.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Ambig_tracks_hover_north.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+        "load_timestamp": "2026-03-21T10:15:01.443448Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

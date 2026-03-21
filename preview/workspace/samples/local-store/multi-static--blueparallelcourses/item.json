@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-static--blueparallelcourses",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.0,
+          60.2
+        ],
+        [
+          0.4,
+          60.2
+        ],
+        [
+          0.4,
+          60.4166667
+        ],
+        [
+          -0.0,
+          60.4166667
+        ],
+        [
+          -0.0,
+          60.2
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.0,
+    60.2,
+    0.4,
+    60.4166667
+  ],
+  "properties": {
+    "title": "BlueParallelCourses (multi-static)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: multi-static\nImported from MultiStatics/BlueParallelCourses.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T13:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BlueParallelCourses (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/BlueParallelCourses.dpf",
+      "title": "BlueParallelCourses.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BlueParallelCourses": {
+      "href": "./assets/BlueParallelCourses.dpf",
+      "type": "application/octet-stream",
+      "title": "BlueParallelCourses.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/BlueParallelCourses.dpf",
+        "load_timestamp": "2026-03-21T10:15:00.251853Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "core--bulk-red-tracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.010455555555555556,
+          -0.21599444444444446
+        ],
+        [
+          2.010752777777778,
+          -0.21599444444444446
+        ],
+        [
+          2.010752777777778,
+          2.0039
+        ],
+        [
+          -0.010455555555555556,
+          2.0039
+        ],
+        [
+          -0.010455555555555556,
+          -0.21599444444444446
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.010455555555555556,
+    -0.21599444444444446,
+    2.010752777777778,
+    2.0039
+  ],
+  "properties": {
+    "title": "BULK_RED_TRACKS (core)",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Domain: core\nImported from BULK_RED_TRACKS.rep",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T20:13:14+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BULK_RED_TRACKS (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_RED_TRACKS.rep",
+      "title": "BULK_RED_TRACKS.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BULK_RED_TRACKS": {
+      "href": "./assets/BULK_RED_TRACKS.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BULK_RED_TRACKS.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_RED_TRACKS.rep",
+        "load_timestamp": "2026-03-21T10:15:00.068787Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

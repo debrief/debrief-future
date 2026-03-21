@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--2648-target-plot",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.13801666666666668,
+          0.16666666666666666
+        ],
+        [
+          0.423875,
+          0.16666666666666666
+        ],
+        [
+          0.423875,
+          3.745277777777778
+        ],
+        [
+          -0.13801666666666668,
+          3.745277777777778
+        ],
+        [
+          -0.13801666666666668,
+          0.16666666666666666
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.13801666666666668,
+    0.16666666666666666,
+    0.423875,
+    3.745277777777778
+  ],
+  "properties": {
+    "title": "2648_target_plot (s2r)",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Domain: s2r\nImported from S2R/2648_target_plot.rep",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-13T12:13:14+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "2648_target_plot (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2648_target_plot.rep",
+      "title": "2648_target_plot.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-2648_target_plot": {
+      "href": "./assets/2648_target_plot.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "2648_target_plot.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2648_target_plot.rep",
+        "load_timestamp": "2026-03-21T10:15:01.024883Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

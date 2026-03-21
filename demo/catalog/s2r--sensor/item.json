@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--sensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "sensor (s2r)",
+    "datetime": "2026-03-21T10:15:01.788590+00:00",
+    "description": "Domain: s2r\nImported from S2R/sensor.dsf"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sensor (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/sensor.dsf",
+      "title": "sensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sensor": {
+      "href": "./assets/sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:01.791735Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

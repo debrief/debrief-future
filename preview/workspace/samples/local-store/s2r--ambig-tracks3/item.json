@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--ambig-tracks3",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.2881556,
+          60.2396139
+        ],
+        [
+          0.5999861,
+          60.2396139
+        ],
+        [
+          0.5999861,
+          60.4822278
+        ],
+        [
+          0.2881556,
+          60.4822278
+        ],
+        [
+          0.2881556,
+          60.2396139
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.2881556,
+    60.2396139,
+    0.5999861,
+    60.4822278
+  ],
+  "properties": {
+    "title": "Ambig_tracks3 (s2r)",
+    "datetime": "2010-01-12T12:08:00+00:00",
+    "description": "Domain: s2r\nImported from S2R/Ambig_tracks3.dpf",
+    "start_datetime": "2010-01-12T12:08:00+00:00",
+    "end_datetime": "2010-01-12T15:54:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks3 (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks3.dpf",
+      "title": "Ambig_tracks3.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Ambig_tracks3": {
+      "href": "./assets/Ambig_tracks3.dpf",
+      "type": "application/octet-stream",
+      "title": "Ambig_tracks3.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks3.dpf",
+        "load_timestamp": "2026-03-21T10:15:01.431588Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,1259 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "dec7c88d-5c96-45d4-bc8b-ae9521be5bda",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.002777777777776,
+            -0.06666666666666667
+          ],
+          [
+            -29.99826369059747,
+            0.041036117749308
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 2.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:13:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7461a050-2114-4265-8ec9-222b09c5ab41",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.005552777777776,
+            -0.06436111111111112
+          ],
+          [
+            -30.00254289746806,
+            0.04339420132586563
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 1.6,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:14:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "95e890d3-4846-47c0-aebc-7ab962ac006d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.01055277777778,
+            -0.06436111111111112
+          ],
+          [
+            -30.00547482444362,
+            0.04331656136053495
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 2.7,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:16:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9da10ad5-675e-40bd-933c-ed7562e09ed5",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.015552777777778,
+            -0.06436111111111112
+          ],
+          [
+            -30.008408623029666,
+            0.04319923401559207
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 3.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:17:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bbb54088-5ee7-4499-afd0-706f90955764",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.01867777777778,
+            -0.06180555555555556
+          ],
+          [
+            -30.01228470468246,
+            0.0458020435738478
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 3.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:19:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d512f854-73d0-4f6d-9909-21d0e4b3b423",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.019477777777777,
+            -0.052672222222222224
+          ],
+          [
+            -30.024367789344197,
+            0.05501414893739489
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -2.6,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:21:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f484d1fe-d67f-4db4-bd0c-92f0517943d8",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.019913888888887,
+            -0.04769166666666667
+          ],
+          [
+            -30.032677526257697,
+            0.059347374810861574
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -6.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:23:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d0dc23aa-5080-4af3-96b9-979027f4bc19",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.02035,
+            -0.04271111111111111
+          ],
+          [
+            -30.042578269064673,
+            0.06276955562641442
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -11.9,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:24:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "da698608-3507-4e4e-b4d7-e1df1c58e7ad",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.02078611111111,
+            -0.03773055555555556
+          ],
+          [
+            -30.054276211397863,
+            0.06473251289156451
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -18.1,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:26:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3e337ba7-6d8f-43c1-b229-dace683085cb",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.021294444444443,
+            -0.031919444444444445
+          ],
+          [
+            -30.07006571065219,
+            0.06421395795640508
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -26.9,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:28:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7c20ccec-af17-4801-b29e-982bcc8d8044",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.023747222222223,
+            -0.02671111111111111
+          ],
+          [
+            -30.084338322358793,
+            0.062445975587548073
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -34.2,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:29:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "97615498-b2a5-4fbc-9fb7-cae319db2251",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.02624722222222,
+            -0.022380555555555556
+          ],
+          [
+            -30.096826546368902,
+            0.05909843860552669
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -40.9,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:31:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a88eabd9-c594-4d0f-8b0a-1b6721758d3c",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.028747222222222,
+            -0.01805
+          ],
+          [
+            -30.110716967461173,
+            0.05195877272693321
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -49.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:32:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dcc02d1a-f776-4166-8855-f16a62bea012",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.03166388888889,
+            -0.013
+          ],
+          [
+            -30.129677126307246,
+            0.03187396251459589
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -65.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:34:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b1c790b7-9d1a-48a5-9212-22fae2911801",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.03558611111111,
+            -0.010880555555555557
+          ],
+          [
+            -30.140360924417354,
+            0.014467138993771434
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -76.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:36:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "23864f73-4cd5-4425-81c8-2e12e55f3165",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.041419444444447,
+            -0.010880555555555557
+          ],
+          [
+            -30.148738378963422,
+            -0.000735929613926269
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -84.6,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:37:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "264ba58a-0a11-4fce-a916-18a46ae91c06",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.04725277777778,
+            -0.010880555555555557
+          ],
+          [
+            -30.154378318964934,
+            -0.02289661005138655
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -96.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:39:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "12b2ab04-4f6c-41db-b177-7557ed2d80bf",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.05308611111111,
+            -0.010880555555555557
+          ],
+          [
+            -30.152460509409085,
+            -0.052653705370730136
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -112.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:41:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "02a5b40d-3a0d-4bd7-8141-29d3f83d84a9",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.058919444444445,
+            -0.010880555555555557
+          ],
+          [
+            -30.137757430230263,
+            -0.0843981653359183
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -133.0,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:43:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "62e9d0b4-90c9-4427-ba1d-1ba146579ba4",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.064752777777777,
+            -0.010880555555555557
+          ],
+          [
+            -30.114026719779297,
+            -0.10675727563726209
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -152.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:44:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "782b85ca-43cd-4ff0-afc8-a518eb795d69",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.070586111111112,
+            -0.010880555555555557
+          ],
+          [
+            -30.09189304721709,
+            -0.11655118163766716
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -168.6,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:46:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0576a6ac-b941-459e-b239-790e3371475d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.012611111111111111
+          ],
+          [
+            -30.08372712654596,
+            -0.12007614888327726
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -175.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:48:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2d6c27ea-0f99-45b3-b463-bab4819f05a3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.018444444444444444
+          ],
+          [
+            -30.109474044463802,
+            -0.12067121288205127
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -161.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:50:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9aa96354-9d01-458b-8c0e-e21d888ff97f",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.023444444444444445
+          ],
+          [
+            -30.13476678884088,
+            -0.11333511875998538
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -146.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:51:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c4a363ce-3254-4407-8812-61fc0a6b88e3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.028444444444444446
+          ],
+          [
+            -30.15736125918197,
+            -0.09831004642753438
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -130.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:53:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "43d87a4e-01f8-4803-a40a-54e6c6c71a19",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.03344444444444444
+          ],
+          [
+            -30.172565754697708,
+            -0.07985239595090818
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -115.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:54:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8a8e370a-a4fe-4599-9cc3-72ac8468787e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.03927777777777778
+          ],
+          [
+            -30.18090274680273,
+            -0.060769110988399086
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -101.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:56:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "12322cbd-f581-4887-be0b-9d8a9b5bcdc3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.04427777777777778
+          ],
+          [
+            -30.182964218418814,
+            -0.04897983175176295
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -92.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:57:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "271cac4c-1a8e-49fb-9d65-c61f854507b1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.05011111111111111
+          ],
+          [
+            -30.18260596032826,
+            -0.04015380739786335
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -84.7,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T12:59:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "405ef224-49c3-4c46-bbee-70e377f267b1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.05594444444444445
+          ],
+          [
+            -30.1810862951145,
+            -0.035375742104177293
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -79.0,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:01:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1fa879a4-6953-49c3-953e-f548ad7f3938",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.06177777777777778
+          ],
+          [
+            -30.179295717037594,
+            -0.033514481481601195
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -74.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:03:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "976f7770-3652-4931-a918-d4fe63c96b9e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.06761111111111111
+          ],
+          [
+            -30.177496284056772,
+            -0.0334065128640656
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -71.5,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:04:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7c1a9016-38ab-4014-a45c-6757091d2799",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.07344444444444444
+          ],
+          [
+            -30.175839437399087,
+            -0.03463774576100379
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -68.9,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:06:44+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1c67e013-33ea-4cc0-9522-c3ae71e9fc6e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.07844444444444444
+          ],
+          [
+            -30.174570874800338,
+            -0.03649791730033309
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -67.1,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:08:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5daf3ad5-fc57-4831-b3f4-8a0f17c8343e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.08427777777777777
+          ],
+          [
+            -30.173282785371693,
+            -0.03940381526318188
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -65.4,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:09:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fcb09352-5043-4215-a10d-18f390bbf104",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.08927777777777778
+          ],
+          [
+            -30.172239498810377,
+            -0.042191706448165604
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -64.1,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:11:29+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "027c594d-d973-4777-a63d-3944c194a53c",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.09427777777777777
+          ],
+          [
+            -30.17131770859143,
+            -0.04533880906708281
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -63.0,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:12:59+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c45a7fdb-c5a8-4f7a-a248-07d565be5302",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -30.075269444444444,
+            -0.0951111111111111
+          ],
+          [
+            -30.171146296625572,
+            -0.04583716999806468
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": -62.8,
+        "range": 12000.0,
+        "sensor_type": "Plain",
+        "timestamp": "2010-01-12T13:13:14+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    }
+  ]
+}

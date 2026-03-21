@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r-freq--multitonalfreqplot",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.0228075,
+          60.0862845
+        ],
+        [
+          0.2,
+          60.0862845
+        ],
+        [
+          0.2,
+          60.3311742
+        ],
+        [
+          -0.0228075,
+          60.3311742
+        ],
+        [
+          -0.0228075,
+          60.0862845
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.0228075,
+    60.0862845,
+    0.2,
+    60.3311742
+  ],
+  "properties": {
+    "title": "MultiTonalFreqPlot (s2r/freq)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Domain: s2r/freq\nImported from S2R/freq/MultiTonalFreqPlot.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "MultiTonalFreqPlot (s2r/freq)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/freq/MultiTonalFreqPlot.dpf",
+      "title": "MultiTonalFreqPlot.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-MultiTonalFreqPlot": {
+      "href": "./assets/MultiTonalFreqPlot.dpf",
+      "type": "application/octet-stream",
+      "title": "MultiTonalFreqPlot.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/freq/MultiTonalFreqPlot.dpf",
+        "load_timestamp": "2026-03-21T10:15:01.499907Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "demo-analysis--analysis1-areas",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.93165,
+          21.864075
+        ],
+        [
+          -21.471280555555555,
+          21.864075
+        ],
+        [
+          -21.471280555555555,
+          22.20677222222222
+        ],
+        [
+          -21.93165,
+          22.20677222222222
+        ],
+        [
+          -21.93165,
+          21.864075
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.93165,
+    21.864075,
+    -21.471280555555555,
+    22.20677222222222
+  ],
+  "properties": {
+    "title": "Analysis1_Areas (demo/analysis)",
+    "datetime": "2026-03-21T10:15:00.150245+00:00",
+    "description": "Domain: demo/analysis\nImported from Demo/Analysis/Analysis1_Areas.rep"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Analysis1_Areas (demo/analysis)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis1_Areas.rep",
+      "title": "Analysis1_Areas.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Analysis1_Areas": {
+      "href": "./assets/Analysis1_Areas.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Analysis1_Areas.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis1_Areas.rep",
+        "load_timestamp": "2026-03-21T10:15:00.151677Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

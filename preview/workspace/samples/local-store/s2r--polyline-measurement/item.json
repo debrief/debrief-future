@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r--polyline-measurement",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.1405326560429756,
+          1.0
+        ],
+        [
+          9.222780846073459,
+          1.0
+        ],
+        [
+          9.222780846073459,
+          5.137472731943945
+        ],
+        [
+          -0.1405326560429756,
+          5.137472731943945
+        ],
+        [
+          -0.1405326560429756,
+          1.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.1405326560429756,
+    1.0,
+    9.222780846073459,
+    5.137472731943945
+  ],
+  "properties": {
+    "title": "Polyline_Measurement (s2r)",
+    "datetime": "2017-11-09T05:00:00+00:00",
+    "description": "Domain: s2r\nImported from S2R/Polyline_Measurement.rep",
+    "start_datetime": "2017-11-09T05:00:00+00:00",
+    "end_datetime": "2017-11-09T11:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Polyline_Measurement (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Polyline_Measurement.rep",
+      "title": "Polyline_Measurement.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Polyline_Measurement": {
+      "href": "./assets/Polyline_Measurement.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Polyline_Measurement.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Polyline_Measurement.rep",
+        "load_timestamp": "2026-03-21T10:15:01.462395Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

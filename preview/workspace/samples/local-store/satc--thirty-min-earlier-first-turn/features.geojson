@@ -1,0 +1,2992 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "320ec1bd-dccc-4b72-a033-25d81e802fc3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.0215972,
+            0.0512972
+          ],
+          [
+            0.0215972,
+            0.0503722
+          ],
+          [
+            0.0215972,
+            0.0494444
+          ],
+          [
+            0.0215972,
+            0.0485194
+          ],
+          [
+            0.0215972,
+            0.0475944
+          ],
+          [
+            0.0215972,
+            0.0466667
+          ],
+          [
+            0.0215972,
+            0.0457417
+          ],
+          [
+            0.0215972,
+            0.0448167
+          ],
+          [
+            0.0215972,
+            0.0438889
+          ],
+          [
+            0.0215972,
+            0.0429639
+          ],
+          [
+            0.0215972,
+            0.0420389
+          ],
+          [
+            0.0215972,
+            0.0411111
+          ],
+          [
+            0.0215972,
+            0.0401861
+          ],
+          [
+            0.0212917,
+            0.0393306
+          ],
+          [
+            0.0205167,
+            0.0388583
+          ],
+          [
+            0.019625,
+            0.0386111
+          ],
+          [
+            0.0187306,
+            0.0383667
+          ],
+          [
+            0.0178389,
+            0.0381194
+          ],
+          [
+            0.0169444,
+            0.037875
+          ],
+          [
+            0.0160528,
+            0.0376278
+          ],
+          [
+            0.0151611,
+            0.0373833
+          ],
+          [
+            0.0142667,
+            0.0371361
+          ],
+          [
+            0.013375,
+            0.0368917
+          ],
+          [
+            0.0124833,
+            0.0366444
+          ],
+          [
+            0.0115889,
+            0.0364
+          ],
+          [
+            0.0106972,
+            0.0361528
+          ],
+          [
+            0.0098056,
+            0.0359056
+          ],
+          [
+            0.0089111,
+            0.0356611
+          ],
+          [
+            0.0080194,
+            0.0354139
+          ],
+          [
+            0.0071278,
+            0.0351694
+          ],
+          [
+            0.0062333,
+            0.0349222
+          ],
+          [
+            0.0053417,
+            0.0346778
+          ],
+          [
+            0.0044472,
+            0.0344306
+          ],
+          [
+            0.0035556,
+            0.0341861
+          ],
+          [
+            0.0028139,
+            0.0336639
+          ],
+          [
+            0.0025667,
+            0.0327889
+          ],
+          [
+            0.0026778,
+            0.0318694
+          ],
+          [
+            0.0027889,
+            0.03095
+          ],
+          [
+            0.0029028,
+            0.0300306
+          ],
+          [
+            0.0030139,
+            0.0291139
+          ],
+          [
+            0.003125,
+            0.0281944
+          ],
+          [
+            0.0032361,
+            0.027275
+          ],
+          [
+            0.00335,
+            0.0263556
+          ],
+          [
+            0.0034611,
+            0.0254361
+          ],
+          [
+            0.0035722,
+            0.0245167
+          ],
+          [
+            0.0036861,
+            0.0235972
+          ],
+          [
+            0.0040917,
+            0.0227861
+          ],
+          [
+            0.0049194,
+            0.0224139
+          ],
+          [
+            0.0058444,
+            0.0224444
+          ],
+          [
+            0.0067694,
+            0.0224861
+          ],
+          [
+            0.0076944,
+            0.022525
+          ],
+          [
+            0.0086194,
+            0.0225639
+          ],
+          [
+            0.0095444,
+            0.0226056
+          ],
+          [
+            0.0104694,
+            0.0226444
+          ],
+          [
+            0.0113944,
+            0.0226861
+          ],
+          [
+            0.0123194,
+            0.022725
+          ],
+          [
+            0.0132444,
+            0.0227639
+          ],
+          [
+            0.0141694,
+            0.0228056
+          ],
+          [
+            0.0150944,
+            0.0228444
+          ],
+          [
+            0.0160222,
+            0.0228861
+          ],
+          [
+            0.0169472,
+            0.022925
+          ],
+          [
+            0.0178722,
+            0.0229639
+          ],
+          [
+            0.0187972,
+            0.0230056
+          ],
+          [
+            0.0197222,
+            0.0230444
+          ],
+          [
+            0.0206472,
+            0.0230833
+          ],
+          [
+            0.0215722,
+            0.023125
+          ],
+          [
+            0.0224972,
+            0.0231639
+          ],
+          [
+            0.0234222,
+            0.0232056
+          ],
+          [
+            0.0243472,
+            0.0232444
+          ],
+          [
+            0.0252722,
+            0.0232833
+          ],
+          [
+            0.0261972,
+            0.023325
+          ],
+          [
+            0.0271222,
+            0.0233639
+          ],
+          [
+            0.0280472,
+            0.0234056
+          ],
+          [
+            0.0289139,
+            0.0231361
+          ],
+          [
+            0.0294167,
+            0.0223806
+          ],
+          [
+            0.0294361,
+            0.0214583
+          ],
+          [
+            0.0294083,
+            0.0205306
+          ],
+          [
+            0.0293778,
+            0.0196056
+          ],
+          [
+            0.02935,
+            0.0186806
+          ],
+          [
+            0.0293194,
+            0.0177556
+          ],
+          [
+            0.0292889,
+            0.0168306
+          ],
+          [
+            0.0292611,
+            0.0159056
+          ],
+          [
+            0.0292306,
+            0.0149778
+          ],
+          [
+            0.0292028,
+            0.0140528
+          ],
+          [
+            0.0291722,
+            0.0131278
+          ],
+          [
+            0.0291444,
+            0.0122028
+          ],
+          [
+            0.0291139,
+            0.0112778
+          ],
+          [
+            0.0290833,
+            0.0103528
+          ],
+          [
+            0.0290556,
+            0.009425
+          ],
+          [
+            0.029025,
+            0.0085
+          ],
+          [
+            0.0289972,
+            0.007575
+          ],
+          [
+            0.0289667,
+            0.00665
+          ],
+          [
+            0.0289361,
+            0.005725
+          ],
+          [
+            0.0289083,
+            0.0048
+          ],
+          [
+            0.0288778,
+            0.0038722
+          ],
+          [
+            0.02885,
+            0.0029472
+          ],
+          [
+            0.0288194,
+            0.0020222
+          ],
+          [
+            0.0287917,
+            0.0010972
+          ],
+          [
+            0.0287611,
+            0.0001722
+          ],
+          [
+            0.0287306,
+            -0.0007528
+          ],
+          [
+            0.0287028,
+            -0.0016806
+          ],
+          [
+            0.0286722,
+            -0.0026056
+          ],
+          [
+            0.0286444,
+            -0.0035306
+          ],
+          [
+            0.0286139,
+            -0.0044556
+          ],
+          [
+            0.0285833,
+            -0.0053806
+          ],
+          [
+            0.0285556,
+            -0.0063056
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "SENSOR",
+        "platform_name": "SENSOR",
+        "track_type": "CONTACT",
+        "start_time": "2010-01-12T12:00:00+00:00",
+        "end_time": "2010-01-12T12:35:00+00:00",
+        "positions": [
+          {
+            "time": "2010-01-12T12:00:00+00:00",
+            "course": 180.0,
+            "speed": 9.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:00:20+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:00:40+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:00+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:20+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:40+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:00+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:20+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:40+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:00+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:20+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:40+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:00+00:00",
+            "course": 180.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:20+00:00",
+            "course": 219.3,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:40+00:00",
+            "course": 253.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:20+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:40+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:00+00:00",
+            "course": 254.6,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:20+00:00",
+            "course": 215.3,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:40+00:00",
+            "course": 176.0,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:00+00:00",
+            "course": 173.07,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:20+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:40+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:00+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:20+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:40+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:00+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:20+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:40+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:00+00:00",
+            "course": 173.06,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:20+00:00",
+            "course": 133.76,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:40+00:00",
+            "course": 94.46,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:00+00:00",
+            "course": 87.55,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:20+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:40+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:00+00:00",
+            "course": 87.53,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:20+00:00",
+            "course": 126.83,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:40+00:00",
+            "course": 166.13,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:00+00:00",
+            "course": 181.76,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:20+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:40+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:35:00+00:00",
+            "course": 181.82,
+            "speed": 10.0,
+            "depth": -0.0
+          }
+        ],
+        "style": {
+          "line": {
+            "color": "#808080"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#808080",
+            "color": "#808080"
+          }
+        },
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT5M",
+        "label_interval": "PT15M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b4d080e2-10ee-4e70-a14c-1062faf0f772",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -116.6,
+        "time": "2010-01-12T12:00:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c2856383-7780-43cc-84b2-4209011baf48",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -115.0,
+        "time": "2010-01-12T12:00:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "45659d5f-9822-4ade-9605-a5a4a1e3a1ba",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -111.7,
+        "time": "2010-01-12T12:01:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3763aaba-6cee-4315-a34e-5c2f5d9bc6bd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -108.2,
+        "time": "2010-01-12T12:01:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6fe7c5a6-f8ce-4fc0-8773-23447872a3d1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -106.4,
+        "time": "2010-01-12T12:02:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4d3cf2fd-37dd-4716-bc56-faa5ac175563",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -102.7,
+        "time": "2010-01-12T12:02:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "791c408d-9f53-4b9c-815f-d7acbcbec186",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -93.6,
+        "time": "2010-01-12T12:04:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5148d735-a61d-459b-a1e9-9b9b67560964",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -96.8,
+        "time": "2010-01-12T12:05:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a45f7223-ea87-4ae5-be90-46ba53c08320",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -99.7,
+        "time": "2010-01-12T12:05:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "800b722c-aae6-4a0f-aa39-66bb286c09e5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -107.8,
+        "time": "2010-01-12T12:06:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "31fcbadc-2649-4795-8d3a-40bfd5e04789",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -113.5,
+        "time": "2010-01-12T12:06:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3a886b78-50f1-4bb7-8d5e-951cbd13553a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -120.8,
+        "time": "2010-01-12T12:06:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "701a11c8-f5e3-454e-a2e7-ebd8a4ac92a5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -141.3,
+        "time": "2010-01-12T12:07:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ccb94464-667c-4c00-8f7a-3ecd1eca32a3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -168.4,
+        "time": "2010-01-12T12:08:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ce1e7104-7fcc-41b3-928c-7a5496451276",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 178.6,
+        "time": "2010-01-12T12:08:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d0f98216-6f84-47e5-b7db-6986b09a80cf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 166.9,
+        "time": "2010-01-12T12:08:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "87261b68-f205-4d80-a6b5-d66fc5023dfc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 156.6,
+        "time": "2010-01-12T12:09:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7b1dc86c-32a7-4d52-b826-11b886e706bb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 147.8,
+        "time": "2010-01-12T12:09:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "35d99f01-de49-45d1-bc4e-c5d54b6a2e20",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 140.4,
+        "time": "2010-01-12T12:09:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e1baa75a-65b3-4ce1-b265-8f14311c384f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 134.2,
+        "time": "2010-01-12T12:10:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d6a5cad5-d59a-41df-9bf5-5d9a996e0303",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 128.9,
+        "time": "2010-01-12T12:10:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2caf1e9e-5d50-4c79-b64e-d16af51b2d0a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 124.6,
+        "time": "2010-01-12T12:10:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5b4a302c-c6df-40b3-bae1-b4497795f33e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 121.2,
+        "time": "2010-01-12T12:11:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aff4b853-a8f3-42fc-8ef8-e65cbb6ae178",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 114.2,
+        "time": "2010-01-12T12:11:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "56869461-d0ce-4c6e-8ead-59eca3ccdbcf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 108.4,
+        "time": "2010-01-12T12:12:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f603541c-e710-4a72-a563-6068caced0fb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 105.5,
+        "time": "2010-01-12T12:12:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b102c1a4-6b18-4adc-a598-fc9637892ade",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 97.5,
+        "time": "2010-01-12T12:13:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "76294370-94d5-48af-bd8f-fa14a8d14a01",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 90.2,
+        "time": "2010-01-12T12:14:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "399cab37-7f67-4543-9b98-9f051e306a57",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 86.2,
+        "time": "2010-01-12T12:15:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a22fe715-47c3-4c6a-a438-9dff980c6635",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 86.1,
+        "time": "2010-01-12T12:15:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a63445ed-86e8-4fd4-8f1a-00dc589ca690",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 89.2,
+        "time": "2010-01-12T12:16:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e2fde78c-6a59-4f81-8053-9b3c1ca54dfa",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 97.3,
+        "time": "2010-01-12T12:17:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eb794a3d-f6ce-4d82-84d4-c0803e47c7b5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 102.4,
+        "time": "2010-01-12T12:18:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9bafaa7f-9268-4fa2-a5c8-d394687622b2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 108.4,
+        "time": "2010-01-12T12:19:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8bdeb298-3dfa-49d1-aca0-efdd164d7401",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 119.1,
+        "time": "2010-01-12T12:20:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ae8b5162-012b-4992-a05d-f4ea2b9ea98c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 123.4,
+        "time": "2010-01-12T12:20:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b4de9e0e-dddc-42f7-8575-a31596037971",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 134.4,
+        "time": "2010-01-12T12:21:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b0d2b11e-494a-4d7c-bfb0-47f71c4e6e1f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 148.3,
+        "time": "2010-01-12T12:21:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "18f24390-621d-495c-ad1d-37c5e5a6839c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 156.0,
+        "time": "2010-01-12T12:22:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "258630d9-cf1f-4807-b0be-bd9f54230bd9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 163.7,
+        "time": "2010-01-12T12:22:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "31974342-1720-49b3-ab67-645af4b7c92d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": 170.7,
+        "time": "2010-01-12T12:22:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8c9bebbb-2279-4907-af7e-7c8da76d814b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -177.2,
+        "time": "2010-01-12T12:23:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8e1dcd90-b269-4e69-9eea-062b783e1404",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -163.9,
+        "time": "2010-01-12T12:24:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cd369354-4156-465c-a9bb-fc492f59293b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -160.3,
+        "time": "2010-01-12T12:25:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "73b00271-599c-4388-8fa8-37ed5d105fb0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -158.4,
+        "time": "2010-01-12T12:26:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e17656e8-88d3-4766-9ffc-c58692c17331",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -157.7,
+        "time": "2010-01-12T12:26:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "167eae26-0c0d-44e7-9d57-78e4c955b769",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -156.1,
+        "time": "2010-01-12T12:27:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "16d0c466-9467-40d9-9bfb-a010936b6e19",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -155.2,
+        "time": "2010-01-12T12:27:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d37f2b2c-328e-44ad-b1d3-af237d31ad2e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -153.1,
+        "time": "2010-01-12T12:28:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9d3cb1ed-7ef0-4ece-94f4-d93f99a0a296",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -150.8,
+        "time": "2010-01-12T12:28:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8121ba01-6d0c-41ba-927f-c592cb7f4eb4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -147.9,
+        "time": "2010-01-12T12:29:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8d85f59d-ca4a-4c52-80df-7626df4dba5f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -142.5,
+        "time": "2010-01-12T12:30:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d6eaa4df-009a-4d26-a600-edec274be374",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -140.4,
+        "time": "2010-01-12T12:30:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "beb53a3d-a45b-47d9-a25a-d64683c1a997",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -137.9,
+        "time": "2010-01-12T12:31:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "127a584d-5122-40ee-b2e0-77f17cc4ffc7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -135.3,
+        "time": "2010-01-12T12:31:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8e0fc02b-4ec1-447f-9eac-9e6f8a7ffe92",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -129.0,
+        "time": "2010-01-12T12:32:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "40a6c5ab-0014-4028-8c90-261b7397328b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -125.4,
+        "time": "2010-01-12T12:32:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "732bf23e-d66d-4d5e-8071-622a33e6d872",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -116.9,
+        "time": "2010-01-12T12:33:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9578daf7-c3bd-4f62-9880-bd46d9da8152",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -95.4,
+        "time": "2010-01-12T12:34:20+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "260a8854-a86e-47c8-9227-93151768aac9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -89.4,
+        "time": "2010-01-12T12:34:40+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fe10eebc-2bb6-498e-b69c-64f8d5930f96",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "sensor_name": "Plain",
+        "bearing": -83.4,
+        "time": "2010-01-12T12:35:00+00:00",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e98c8270-2b15-418a-a93b-97f125f47aa3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.0108,
+            0.0458972
+          ],
+          [
+            0.0108,
+            0.0453417
+          ],
+          [
+            0.0108,
+            0.0447861
+          ],
+          [
+            0.0108,
+            0.0442306
+          ],
+          [
+            0.0108,
+            0.043675
+          ],
+          [
+            0.0108,
+            0.0431194
+          ],
+          [
+            0.0108,
+            0.0425639
+          ],
+          [
+            0.0108,
+            0.0420083
+          ],
+          [
+            0.0108,
+            0.0414528
+          ],
+          [
+            0.0108,
+            0.0408972
+          ],
+          [
+            0.0108,
+            0.0403417
+          ],
+          [
+            0.0108,
+            0.0397861
+          ],
+          [
+            0.0108,
+            0.0392306
+          ],
+          [
+            0.0108,
+            0.038675
+          ],
+          [
+            0.0108,
+            0.0381194
+          ],
+          [
+            0.0108,
+            0.0375639
+          ],
+          [
+            0.0108,
+            0.0370083
+          ],
+          [
+            0.0108,
+            0.0364528
+          ],
+          [
+            0.0108,
+            0.0358972
+          ],
+          [
+            0.0108,
+            0.0353417
+          ],
+          [
+            0.0108,
+            0.0347861
+          ],
+          [
+            0.0108,
+            0.0342306
+          ],
+          [
+            0.0108,
+            0.033675
+          ],
+          [
+            0.0108,
+            0.0331194
+          ],
+          [
+            0.0108,
+            0.0325639
+          ],
+          [
+            0.0108,
+            0.0320083
+          ],
+          [
+            0.0108417,
+            0.0314528
+          ],
+          [
+            0.0109694,
+            0.0309139
+          ],
+          [
+            0.0111778,
+            0.0304
+          ],
+          [
+            0.0114639,
+            0.029925
+          ],
+          [
+            0.0118194,
+            0.0294972
+          ],
+          [
+            0.0122306,
+            0.029125
+          ],
+          [
+            0.0126556,
+            0.0287667
+          ],
+          [
+            0.0130778,
+            0.0284083
+          ],
+          [
+            0.0135028,
+            0.0280472
+          ],
+          [
+            0.0139278,
+            0.0276889
+          ],
+          [
+            0.01435,
+            0.0273306
+          ],
+          [
+            0.014775,
+            0.0269694
+          ],
+          [
+            0.0151972,
+            0.0266111
+          ],
+          [
+            0.0156222,
+            0.0262528
+          ],
+          [
+            0.0160444,
+            0.0258917
+          ],
+          [
+            0.0164694,
+            0.0255333
+          ],
+          [
+            0.0168944,
+            0.025175
+          ],
+          [
+            0.0173167,
+            0.0248139
+          ],
+          [
+            0.0177417,
+            0.0244556
+          ],
+          [
+            0.0181639,
+            0.0240972
+          ],
+          [
+            0.0185889,
+            0.0237389
+          ],
+          [
+            0.0190111,
+            0.0233778
+          ],
+          [
+            0.0194361,
+            0.0230194
+          ],
+          [
+            0.0198611,
+            0.0226611
+          ],
+          [
+            0.0202833,
+            0.0223
+          ],
+          [
+            0.0207083,
+            0.0219417
+          ],
+          [
+            0.0211306,
+            0.0215833
+          ],
+          [
+            0.0215556,
+            0.0212222
+          ],
+          [
+            0.0219778,
+            0.0208639
+          ],
+          [
+            0.0224028,
+            0.0205056
+          ],
+          [
+            0.0228278,
+            0.0201444
+          ],
+          [
+            0.02325,
+            0.0197861
+          ],
+          [
+            0.023675,
+            0.0194278
+          ],
+          [
+            0.0240972,
+            0.0190667
+          ],
+          [
+            0.0245222,
+            0.0187083
+          ],
+          [
+            0.0249167,
+            0.0183194
+          ],
+          [
+            0.0252472,
+            0.0178722
+          ],
+          [
+            0.0255028,
+            0.0173806
+          ],
+          [
+            0.0256806,
+            0.0168556
+          ],
+          [
+            0.0257778,
+            0.0163083
+          ],
+          [
+            0.0257889,
+            0.0157528
+          ],
+          [
+            0.0257694,
+            0.0151972
+          ],
+          [
+            0.02575,
+            0.0146417
+          ],
+          [
+            0.0257306,
+            0.0140861
+          ],
+          [
+            0.0257111,
+            0.0135333
+          ],
+          [
+            0.0256917,
+            0.0129778
+          ],
+          [
+            0.0256722,
+            0.0124222
+          ],
+          [
+            0.0256528,
+            0.0118667
+          ],
+          [
+            0.0256333,
+            0.0113111
+          ],
+          [
+            0.0256139,
+            0.0107556
+          ],
+          [
+            0.0255944,
+            0.0102
+          ],
+          [
+            0.025575,
+            0.0096444
+          ],
+          [
+            0.0255556,
+            0.0090917
+          ],
+          [
+            0.0255361,
+            0.0085361
+          ],
+          [
+            0.0255167,
+            0.0079806
+          ],
+          [
+            0.0255,
+            0.007425
+          ],
+          [
+            0.0254806,
+            0.0068694
+          ],
+          [
+            0.0254611,
+            0.0063139
+          ],
+          [
+            0.0254417,
+            0.0057583
+          ],
+          [
+            0.0254222,
+            0.0052028
+          ],
+          [
+            0.0254028,
+            0.00465
+          ],
+          [
+            0.0253833,
+            0.0040944
+          ],
+          [
+            0.0253639,
+            0.0035389
+          ],
+          [
+            0.0253444,
+            0.0029833
+          ],
+          [
+            0.025325,
+            0.0024278
+          ],
+          [
+            0.0253056,
+            0.0018722
+          ],
+          [
+            0.0252861,
+            0.0013167
+          ],
+          [
+            0.0252667,
+            0.0007611
+          ],
+          [
+            0.0252472,
+            0.0002056
+          ],
+          [
+            0.0252278,
+            -0.0003472
+          ],
+          [
+            0.0252083,
+            -0.0009028
+          ],
+          [
+            0.0251889,
+            -0.0014583
+          ],
+          [
+            0.0251694,
+            -0.0020139
+          ],
+          [
+            0.02515,
+            -0.0025694
+          ],
+          [
+            0.0251306,
+            -0.003125
+          ],
+          [
+            0.0251111,
+            -0.0036806
+          ],
+          [
+            0.0250917,
+            -0.0042361
+          ],
+          [
+            0.0250722,
+            -0.0047889
+          ],
+          [
+            0.0250528,
+            -0.0053444
+          ],
+          [
+            0.0250333,
+            -0.0059
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "SUBJECT",
+        "platform_name": "SUBJECT",
+        "track_type": "CONTACT",
+        "start_time": "2010-01-12T12:00:00+00:00",
+        "end_time": "2010-01-12T12:35:00+00:00",
+        "positions": [
+          {
+            "time": "2010-01-12T12:00:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:00:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:00:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:01:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:02:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:03:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:04:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:05:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:06:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:07:40+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:00+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:20+00:00",
+            "course": 180.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:08:40+00:00",
+            "course": 171.16,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:00+00:00",
+            "course": 162.31,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:20+00:00",
+            "course": 153.47,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:09:40+00:00",
+            "course": 144.63,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:00+00:00",
+            "course": 135.79,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:20+00:00",
+            "course": 130.34,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:10:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:11:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:12:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:13:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:14:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:15:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:16:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:17:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:18:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:20+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:19:40+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:00+00:00",
+            "course": 130.28,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:20+00:00",
+            "course": 139.13,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:20:40+00:00",
+            "course": 147.97,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:00+00:00",
+            "course": 156.81,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:20+00:00",
+            "course": 165.65,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:21:40+00:00",
+            "course": 174.5,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:00+00:00",
+            "course": 181.96,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:22:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:23:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:24:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:25:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:26:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:27:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:28:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:29:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:30:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:31:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:32:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:33:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:20+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:34:40+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          },
+          {
+            "time": "2010-01-12T12:35:00+00:00",
+            "course": 182.0,
+            "speed": 6.0,
+            "depth": -0.0
+          }
+        ],
+        "style": {
+          "line": {
+            "color": "#808080"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#808080",
+            "color": "#808080"
+          }
+        },
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT5M",
+        "label_interval": "PT15M"
+      }
+    }
+  ]
+}

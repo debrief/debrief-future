@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc--tug-1",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0311565919,
+          -0.006830494
+        ],
+        [
+          0.2267058057,
+          -0.006830494
+        ],
+        [
+          0.2267058057,
+          0.1770600835
+        ],
+        [
+          0.0311565919,
+          0.1770600835
+        ],
+        [
+          0.0311565919,
+          -0.006830494
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0311565919,
+    -0.006830494,
+    0.2267058057,
+    0.1770600835
+  ],
+  "properties": {
+    "title": "tug_1 (satc)",
+    "datetime": "1999-12-31T22:00:00+00:00",
+    "description": "Domain: satc\nImported from SATC_Test/tug_1.rep",
+    "start_datetime": "1999-12-31T22:00:00+00:00",
+    "end_datetime": "2000-01-01T05:37:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "tug_1 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/tug_1.rep",
+      "title": "tug_1.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-tug_1": {
+      "href": "./assets/tug_1.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "tug_1.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/tug_1.rep",
+        "load_timestamp": "2026-03-21T10:15:04.174314Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

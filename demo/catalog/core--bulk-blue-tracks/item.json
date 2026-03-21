@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "core--bulk-blue-tracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.040402777777777774,
+          -0.0
+        ],
+        [
+          0.03963888888888889,
+          -0.0
+        ],
+        [
+          0.03963888888888889,
+          0.22360833333333335
+        ],
+        [
+          -0.040402777777777774,
+          0.22360833333333335
+        ],
+        [
+          -0.040402777777777774,
+          -0.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.040402777777777774,
+    -0.0,
+    0.03963888888888889,
+    0.22360833333333335
+  ],
+  "properties": {
+    "title": "BULK_BLUE_TRACKS (core)",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Domain: core\nImported from BULK_BLUE_TRACKS.rep",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T20:13:14+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BULK_BLUE_TRACKS (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_BLUE_TRACKS.rep",
+      "title": "BULK_BLUE_TRACKS.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BULK_BLUE_TRACKS": {
+      "href": "./assets/BULK_BLUE_TRACKS.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BULK_BLUE_TRACKS.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_BLUE_TRACKS.rep",
+        "load_timestamp": "2026-03-21T10:14:59.585189Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}
