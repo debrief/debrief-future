@@ -9,6 +9,8 @@ from __future__ import annotations
 import logging
 import re
 import time
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -73,6 +75,79 @@ def _detect_domain(file_path: Path, source_dir: Path) -> str:
         return "/".join([domain, *sub_parts])
 
     return domain
+
+
+def _duration_ms_to_iso8601(duration_ms: float) -> str:
+    """Convert milliseconds to ISO 8601 duration string (e.g., PT0.3S)."""
+    seconds = duration_ms / 1000.0
+    if seconds == int(seconds):
+        return f"PT{int(seconds)}S"
+    formatted = f"{seconds:.6f}".rstrip("0").rstrip(".")
+    return f"PT{formatted}S"
+
+
+def _build_provenance_entry(
+    *,
+    tool: str,
+    tool_version: str,
+    feature_id: str,
+    parse_time_ms: float,
+    activity_id: str,
+    timestamp: str,
+) -> dict[str, Any]:
+    """Build a PROV-aligned LogEntry dict for an imported feature.
+
+    Matches the LogEntry schema from shared/schemas/src/linkml/log-entry.yaml.
+    Source file provenance is recorded at the STAC asset level via add_asset().
+    """
+    return {
+        "activity_id": activity_id,
+        "timestamp": timestamp,
+        "was_generated_by": {
+            "tool": tool,
+            "tool_version": tool_version,
+            "parameters": [],
+        },
+        "used": [],
+        "generated": [feature_id],
+        "execution_duration": _duration_ms_to_iso8601(parse_time_ms),
+    }
+
+
+def _attach_provenance(
+    features: list[dict[str, Any]],
+    *,
+    handler_name: str,
+    handler_version: str,
+    source_file_rel: str,
+    parse_time_ms: float,
+) -> None:
+    """Attach PROV LogEntry to each feature in-place.
+
+    All features from the same file share one activity_id
+    (they were produced by the same parse operation).
+    """
+    activity_id = str(uuid.uuid4())
+    timestamp = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+
+    # Derive a kebab-case tool name from the handler name
+    # e.g. "Debrief REP Format" -> "rep-parser"
+    parts = handler_name.lower().split()
+    ext = parts[1] if len(parts) >= 2 else parts[0]
+    tool = f"{ext}-parser"
+
+    for feature in features:
+        feature_id = str(feature.get("id", "unknown"))
+        entry = _build_provenance_entry(
+            tool=tool,
+            tool_version=handler_version,
+            feature_id=feature_id,
+            parse_time_ms=parse_time_ms,
+            activity_id=activity_id,
+            timestamp=timestamp,
+        )
+        props = feature.setdefault("properties", {})
+        props["provenance"] = [entry]
 
 
 def _count_feature_kinds(features: list[dict[str, Any]]) -> tuple[int, int, int]:
@@ -163,6 +238,15 @@ def import_legacy_data(
                 )
                 result.files_succeeded += 1
                 continue
+
+            # Attach PROV lineage to each feature (Constitution III.1)
+            _attach_provenance(
+                parse_result.features,
+                handler_name=parse_result.handler,
+                handler_version=parse_result.handler_version,
+                source_file_rel=file_rel,
+                parse_time_ms=parse_result.parse_time_ms,
+            )
 
             # Determine plot metadata
             domain = _detect_domain(source_file, source_dir)

@@ -184,6 +184,7 @@ class DPFHandler(BaseHandler):
                 source_file=source_file,
                 parse_time_ms=(time.perf_counter() - start) * 1000,
                 handler=self.name,
+                handler_version=self.version,
             )
 
         ns = _detect_namespace(root)
@@ -200,6 +201,7 @@ class DPFHandler(BaseHandler):
                 source_file=source_file,
                 parse_time_ms=(time.perf_counter() - start) * 1000,
                 handler=self.name,
+                handler_version=self.version,
             )
 
         layers = session.find(_tag("layers", ns))
@@ -213,6 +215,7 @@ class DPFHandler(BaseHandler):
                 source_file=source_file,
                 parse_time_ms=(time.perf_counter() - start) * 1000,
                 handler=self.name,
+                handler_version=self.version,
             )
 
         # Parse tracks (including composite_track which extends track)
@@ -234,6 +237,7 @@ class DPFHandler(BaseHandler):
             source_file=source_file,
             parse_time_ms=elapsed_ms,
             handler=self.name,
+            handler_version=self.version,
         )
 
     def _parse_track(

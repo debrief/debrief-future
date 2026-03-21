@@ -366,6 +366,7 @@ class REPHandler(BaseHandler):
             encoding="utf-8",  # Will be set by caller if different
             parse_time_ms=elapsed_ms,
             handler=self.name,
+            handler_version=self.version,
         )
 
     def _parse_position(self, match: re.Match[str], line_number: int) -> ParsedPosition | None:
