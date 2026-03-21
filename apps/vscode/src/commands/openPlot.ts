@@ -382,7 +382,7 @@ export function createOpenPlotCommand(
             // for features created/removed during replay
             const updatedNames: Record<string, string> = {};
             for (const f of updatedData.features) {
-              const props = (f.properties ?? {}) as Record<string, unknown>;
+              const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
               const name = (props.name ?? props.title ?? String(f.id)) as string;
               updatedNames[String(f.id)] = name;
             }
@@ -437,7 +437,7 @@ export function createOpenPlotCommand(
     if (logPanelProvider) {
       const featureNames: Record<string, string> = {};
       for (const f of plotData.features) {
-        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
         const name = (props.name ?? props.title ?? String(f.id)) as string;
         featureNames[String(f.id)] = name;
       }

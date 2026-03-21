@@ -71,7 +71,7 @@ export class StacService {
         catalog === null ||
         typeof catalog !== 'object' ||
         !('type' in catalog) ||
-        catalog.type !== 'Catalog'
+        (catalog.type !== 'Catalog' && catalog.type !== 'Collection')
       ) {
         return Promise.resolve({
           valid: false,
@@ -170,6 +170,7 @@ export class StacService {
         if (item) {
           const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
           const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
+          const props = item.properties as Record<string, unknown>;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -180,6 +181,11 @@ export class StacService {
             bbox: item.bbox ?? null,
             startDatetime,
             endDatetime,
+            vesselClasses: (props['debrief:vessel_classes'] as string[] | undefined) ?? [],
+            tags: (props['debrief:tags'] as string[] | undefined) ?? [],
+            featureTags: (props['debrief:feature_tags'] as string[] | undefined) ?? [],
+            nationalities: (props['debrief:nationalities'] as string[] | undefined) ?? [],
+            trackNames: (props['debrief:track_names'] as string[] | undefined) ?? [],
           });
         }
       }
@@ -355,7 +361,7 @@ export class StacService {
               label_interval: props.label_interval as string | undefined,
               position_style_overrides: props.position_style_overrides,
             },
-          } as DebriefFeature);
+          } as unknown as DebriefFeature);
           trackCount++;
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION

@@ -9,8 +9,9 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { StacBrowser } from '@debrief/components';
-import type { CatalogOverviewItem, StacBrowserItem } from '@debrief/components';
+import { StacBrowser, parseTaxonomy } from '@debrief/components';
+import type { CatalogOverviewItem, StacBrowserItem, RawTaxonomy } from '@debrief/components';
+import rawTaxonomy from '../../../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -20,6 +21,7 @@ declare function acquireVsCodeApi(): {
 };
 
 const vscode = acquireVsCodeApi();
+const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
 interface CatalogData {
   id: string;
@@ -28,16 +30,16 @@ interface CatalogData {
   items: CatalogOverviewItem[];
 }
 
-/** Map CatalogOverviewItem to StacBrowserItem by adding empty extension fields. */
+/** Map CatalogOverviewItem to StacBrowserItem using extension fields when available. */
 function toStacBrowserItem(item: CatalogOverviewItem): StacBrowserItem {
   return {
     ...item,
-    vesselClasses: [],
-    tags: [],
-    featureTags: [],
+    vesselClasses: item.vesselClasses ?? [],
+    tags: item.tags ?? [],
+    featureTags: item.featureTags ?? [],
     author: null,
-    trackNames: [],
-    nationalities: [],
+    trackNames: item.trackNames ?? [],
+    nationalities: item.nationalities ?? [],
     collection: null,
     modified: null,
   };
@@ -89,7 +91,7 @@ function CatalogOverviewApp(): React.ReactElement {
   return (
     <StacBrowser
       items={browserItems}
-      taxonomy={[]}
+      taxonomy={VESSEL_TAXONOMY}
       onItemSelect={handleItemSelect}
     />
   );

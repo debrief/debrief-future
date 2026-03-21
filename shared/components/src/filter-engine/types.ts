@@ -27,6 +27,16 @@ export interface CatalogOverviewItem {
   startDatetime: string | null;
   /** Range end datetime (ISO 8601) */
   endDatetime: string | null;
+  /** Vessel taxonomy paths from debrief:vessel_classes */
+  vesselClasses?: readonly string[];
+  /** Plot-level tags from debrief:tags */
+  tags?: readonly string[];
+  /** Feature-level tags from debrief:feature_tags */
+  featureTags?: readonly string[];
+  /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
+  nationalities?: readonly string[];
+  /** Track platform names from debrief:track_names */
+  trackNames?: readonly string[];
 }
 
 /** All supported metadata filter types from SRD Section 4.4 */

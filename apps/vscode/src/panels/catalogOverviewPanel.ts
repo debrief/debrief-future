@@ -149,6 +149,11 @@ export class CatalogOverviewPanel {
       datetime: item.datetime ?? null,
       startDatetime: item.startDatetime ?? null,
       endDatetime: item.endDatetime ?? null,
+      vesselClasses: item.vesselClasses ?? [],
+      tags: item.tags ?? [],
+      featureTags: item.featureTags ?? [],
+      nationalities: item.nationalities ?? [],
+      trackNames: item.trackNames ?? [],
     }));
 
     this.postMessage({

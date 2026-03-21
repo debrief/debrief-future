@@ -281,10 +281,10 @@ export class MapPanel {
     const fid = (f: { id?: string; properties?: { id?: string } | Record<string, unknown> | null }): string =>
       String(f.id ?? (f.properties as Record<string, unknown> | null)?.['id'] ?? '');
     const updatedMap = new Map(
-      layer.features.features.map((f) => [fid(f as { id?: string; properties?: Record<string, unknown> | null }), f as DebriefFeature])
+      layer.features.features.map((f) => [fid(f as { id?: string; properties?: Record<string, unknown> | null }), f as unknown as DebriefFeature])
     );
     this.currentFeatures = this.currentFeatures.map(
-      (f: DebriefFeature) => updatedMap.get(fid(f as { id?: string; properties?: Record<string, unknown> | null })) ?? f
+      (f: DebriefFeature) => updatedMap.get(fid(f as unknown as { id?: string; properties?: Record<string, unknown> | null })) ?? f
     );
 
     this.postMessage({
@@ -567,7 +567,7 @@ export class MapPanel {
       (f: DebriefFeature) => String(f.id) === featureId
     );
     if (feature !== undefined) {
-      return (feature.properties as Record<string, unknown>).kind as string;
+      return (feature.properties as unknown as Record<string, unknown>).kind as string;
     }
 
     // Check individual features inside result layers
@@ -825,7 +825,7 @@ export class MapPanel {
     for (const rl of this.resultLayers) {
       if (!rl.artifactHref) {
         for (const f of rl.features.features) {
-          allFeatures.push(f as DebriefFeature);
+          allFeatures.push(f as unknown as DebriefFeature);
         }
       }
     }
@@ -976,7 +976,7 @@ export class MapPanel {
       id: feature.id,
       geometry: feature.geometry,
       properties: drawnProps,
-    } as DebriefFeature;
+    } as unknown as DebriefFeature;
     this.currentFeatures = [...this.currentFeatures, drawnFeature];
     console.warn('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
 
@@ -1052,7 +1052,7 @@ export class MapPanel {
       (f: DebriefFeature) => String(f.id) === trackId
     );
     const props = feature !== undefined
-      ? (feature.properties as Record<string, unknown>)
+      ? (feature.properties as unknown as Record<string, unknown>)
       : undefined;
     const style = props?.style as Record<string, unknown> | undefined;
     const lineStyle = style?.line as Record<string, unknown> | undefined;

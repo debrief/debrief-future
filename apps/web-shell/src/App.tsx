@@ -33,7 +33,8 @@ import {
   PanelWorkspace,
   PanelContextProvider,
   createDefaultRegistry,
-  PANEL_CHART
+  PANEL_CHART,
+  parseTaxonomy,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
@@ -61,8 +62,12 @@ import {
   resetSessionStore,
   type DisplayMode as StoreDisplayMode,
 } from '@debrief/session-state';
+import type { RawTaxonomy } from '@debrief/components';
 import type { GeoJSONFeature } from '@debrief/utils';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
+import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
+
+const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
 // Map between session-state DisplayMode ('normal'|'snailTrail') and
 // components DisplayMode ('full'|'trail') — the two enums diverged historically.
@@ -178,12 +183,12 @@ export default function App() {
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
-      vesselClasses: [],
-      tags: [],
-      featureTags: [],
+      vesselClasses: item.vesselClasses ?? [],
+      tags: item.tags ?? [],
+      featureTags: item.featureTags ?? [],
       author: null,
-      trackNames: [],
-      nationalities: [],
+      trackNames: item.trackNames ?? [],
+      nationalities: item.nationalities ?? [],
       collection: null,
       modified: null,
     }));
@@ -1184,7 +1189,7 @@ export default function App() {
         <main className="web-shell__main">
           <StacBrowser
             items={catalogItems}
-            taxonomy={[]}
+            taxonomy={VESSEL_TAXONOMY}
             onItemSelect={handlePlotSelect}
             className="web-shell__catalog"
           />
