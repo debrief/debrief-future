@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--otherownship-trimmed",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     44.630652777777776
   ],
   "properties": {
-    "title": "OtherOwnship_Trimmed (satc)",
+    "title": "Silent Resolve: Otherownship Trimmed",
     "datetime": "2011-03-21T22:08:02.380000+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/OtherOwnship_Trimmed.rep",
+    "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HNoMS Truxtun.",
     "start_datetime": "2011-03-21T22:08:02.380000+00:00",
-    "end_datetime": "2011-03-22T04:47:54.870000+00:00"
+    "end_datetime": "2011-03-22T04:47:54.870000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "prosecution",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HNoMS Truxtun"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
   },
   "links": [
     {

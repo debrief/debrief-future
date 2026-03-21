@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--source-2",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,30 @@
     0.1769367926
   ],
   "properties": {
-    "title": "source_2 (satc)",
+    "title": "Silent Resolve: Source 2",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/source_2.rep",
+    "description": "Silent Resolve: Source 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Hamburg.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
-    "end_datetime": "2000-01-01T02:01:40+00:00"
+    "end_datetime": "2000-01-01T02:01:40+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "force-protection",
+      "harbour-ops",
+      "prosecution",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "FGS Hamburg"
+    ],
+    "debrief:nationalities": [
+      "DE"
+    ]
   },
   "links": [
     {

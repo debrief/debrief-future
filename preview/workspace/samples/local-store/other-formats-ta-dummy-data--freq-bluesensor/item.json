@@ -1,14 +1,30 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "other-formats-ta-dummy-data--freq-bluesensor",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Freq_BlueSensor (other-formats/ta-dummy-data)",
+    "title": "Talisman Sabre: Freq Bluesensor",
     "datetime": "2026-03-21T10:15:05.458349+00:00",
-    "description": "Domain: other-formats/ta-dummy-data\nImported from other_formats/TA_DUMMY_DATA/Freq_BlueSensor.dsf"
+    "description": "Talisman Sabre: Freq Bluesensor \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 226 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "certification",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

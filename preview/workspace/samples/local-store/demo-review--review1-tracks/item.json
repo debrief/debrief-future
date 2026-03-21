@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "demo-review--review1-tracks",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,34 @@
     26.454141666666665
   ],
   "properties": {
-    "title": "Review1_Tracks (demo/review)",
+    "title": "Joint Warrior: Review1 Tracks",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Domain: demo/review\nImported from Demo/Review/Review1_Tracks.rep",
+    "description": "Joint Warrior: Review1 Tracks \u2014 Analysis and review exercise in the North Atlantic. 2 platform track(s) recorded including USS Bretagne, HNoMS Richmond. Multi-national participation: NO, US.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
-    "end_datetime": "1970-01-03T04:17:25+00:00"
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "certification",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "track-merge"
+    ],
+    "debrief:track_names": [
+      "USS Bretagne",
+      "HNoMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "US"
+    ]
   },
   "links": [
     {

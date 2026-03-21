@@ -1,14 +1,31 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "demo-review--review3-sensor2",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Review3_Sensor2 (demo/review)",
+    "title": "Joint Warrior: Review3 Sensor2",
     "datetime": "2026-03-21T10:15:00.190918+00:00",
-    "description": "Domain: demo/review\nImported from Demo/Review/Review3_Sensor2.dsf"
+    "description": "Joint Warrior: Review3 Sensor2 \u2014 Analysis and review exercise in the North Atlantic. 15 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "escort",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "towed-array",
+      "zig-zag"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

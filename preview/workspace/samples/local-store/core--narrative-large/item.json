@@ -1,14 +1,29 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--narrative-large",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "narrative_large (core)",
+    "title": "Saxon Warrior: Narrative Large",
     "datetime": "2026-03-21T10:15:05.229999+00:00",
-    "description": "Domain: core\nImported from narrative_large.rep"
+    "description": "Saxon Warrior: Narrative Large \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 4795 narrative entries.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "AAW",
+      "boarding",
+      "certification",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

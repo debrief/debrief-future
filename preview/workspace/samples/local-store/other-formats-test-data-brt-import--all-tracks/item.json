@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "other-formats-test-data-brt-import--all-tracks",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,34 @@
     60.25
   ],
   "properties": {
-    "title": "All Tracks (other-formats/test-data/brt-import)",
+    "title": "Talisman Sabre: All Tracks",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: other-formats/test-data/brt-import\nImported from other_formats/test_data/brt_import/All Tracks.rep",
+    "description": "Talisman Sabre: All Tracks \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. 31 sensor contact(s) logged. Multi-national participation: GB, JP.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00"
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "mine-clearance",
+      "missile-firing",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "HMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "JP"
+    ]
   },
   "links": [
     {

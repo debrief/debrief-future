@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--ambig-tracks2",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,39 @@
     60.4822278
   ],
   "properties": {
-    "title": "Ambig_tracks2 (s2r)",
+    "title": "Dynamic Mongoose: Ambig Tracks2",
     "datetime": "2010-01-12T12:08:00+00:00",
-    "description": "Domain: s2r\nImported from S2R/Ambig_tracks2.rep",
+    "description": "Dynamic Mongoose: Ambig Tracks2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 4 platform track(s) recorded including Contact Alpha, HMS Richmond, Contact Alpha and 1 other(s). 242 sensor contact(s) logged. Multi-national participation: FR, GB.",
     "start_datetime": "2010-01-12T12:08:00+00:00",
-    "end_datetime": "2010-01-12T15:54:00+00:00"
+    "end_datetime": "2010-01-12T15:54:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "escort",
+      "harbour-ops",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "HMS Richmond",
+      "Contact Alpha",
+      "HMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB"
+    ]
   },
   "links": [
     {

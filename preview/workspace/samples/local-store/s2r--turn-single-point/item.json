@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--turn-single-point",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,29 @@
     5.1826388888888895
   ],
   "properties": {
-    "title": "turn_single_point (s2r)",
+    "title": "Dynamic Mongoose: Turn Single Point",
     "datetime": "2009-04-22T18:02:54.410000+00:00",
-    "description": "Domain: s2r\nImported from S2R/turn_single_point.rep",
+    "description": "Dynamic Mongoose: Turn Single Point \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HMCS Hessen.",
     "start_datetime": "2009-04-22T18:02:54.410000+00:00",
-    "end_datetime": "2009-04-22T18:02:54.410000+00:00"
+    "end_datetime": "2009-04-22T18:02:54.410000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "boarding",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMCS Hessen"
+    ],
+    "debrief:nationalities": [
+      "CA"
+    ]
   },
   "links": [
     {

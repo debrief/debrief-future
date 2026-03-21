@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--buoy-test-track",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,39 @@
     22.142258333333334
   ],
   "properties": {
-    "title": "buoy_test_track (multi-static)",
+    "title": "Formidable Shield: Buoy Test Track",
     "datetime": "1995-12-12T05:03:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/buoy_test_track.rep",
+    "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNLMS Somerset, HMS Iron Duke and 1 other(s). Multi-national participation: GB, NL, US.",
     "start_datetime": "1995-12-12T05:03:00+00:00",
-    "end_datetime": "1995-12-12T11:45:00+00:00"
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "force-protection",
+      "multi-national",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [
+      "HMS Collingwood",
+      "HNLMS Somerset",
+      "HMS Iron Duke",
+      "USS Gonzalez"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NL",
+      "US"
+    ]
   },
   "links": [
     {

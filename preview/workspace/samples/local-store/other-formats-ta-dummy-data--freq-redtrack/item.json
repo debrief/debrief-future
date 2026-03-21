@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "other-formats-ta-dummy-data--freq-redtrack",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,28 @@
     60.258975
   ],
   "properties": {
-    "title": "Freq_RedTrack (other-formats/ta-dummy-data)",
+    "title": "Talisman Sabre: Freq Redtrack",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: other-formats/ta-dummy-data\nImported from other_formats/TA_DUMMY_DATA/Freq_RedTrack.rep",
+    "description": "Talisman Sabre: Freq Redtrack \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00"
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "MCM",
+      "SAR",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
   },
   "links": [
     {

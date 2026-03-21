@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--offsettracks",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,37 @@
     60.7
   ],
   "properties": {
-    "title": "OffsetTracks (multi-static)",
+    "title": "Formidable Shield: Offsettracks",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/OffsetTracks.dpf",
+    "description": "Formidable Shield: Offsettracks \u2014 Multi-static sonar exercise in the North Atlantic. 3 platform track(s) recorded including HNLMS Languedoc, HMS Tromp, Contact Alpha. 18 sensor contact(s) logged. Multi-national participation: GB, NL.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T13:00:00+00:00"
+    "end_datetime": "2010-01-12T13:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "surveillance",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "HNLMS Languedoc",
+      "HMS Tromp",
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NL"
+    ]
   },
   "links": [
     {

@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--tug-1",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     0.1770600835
   ],
   "properties": {
-    "title": "tug_1 (satc)",
+    "title": "Silent Resolve: Tug 1",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/tug_1.rep",
+    "description": "Silent Resolve: Tug 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HNoMS Languedoc.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
-    "end_datetime": "2000-01-01T05:37:00+00:00"
+    "end_datetime": "2000-01-01T05:37:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "force-protection",
+      "gunnery",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HNoMS Languedoc"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
   },
   "links": [
     {

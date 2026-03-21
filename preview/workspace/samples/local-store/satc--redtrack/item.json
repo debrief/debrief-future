@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--redtrack",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,32 @@
     -0.0
   ],
   "properties": {
-    "title": "RedTrack (satc)",
+    "title": "Silent Resolve: Redtrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Domain: satc\nImported from SATC/RedTrack.rep",
+    "description": "Silent Resolve: Redtrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-12T13:13:14+00:00"
+    "end_datetime": "2010-01-12T13:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "multi-national",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "minefield",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
   },
   "links": [
     {

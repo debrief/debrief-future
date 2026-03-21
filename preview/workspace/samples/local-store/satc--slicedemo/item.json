@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--slicedemo",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,36 @@
     57.18628611111111
   ],
   "properties": {
-    "title": "SliceDemo (satc)",
+    "title": "Silent Resolve: Slicedemo",
     "datetime": "2001-01-01T14:00:47.812000+00:00",
-    "description": "Domain: satc\nImported from SATC/SliceDemo.rep",
+    "description": "Silent Resolve: Slicedemo \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Richmond. 315 sensor contact(s) logged.",
     "start_datetime": "2001-01-01T14:00:47.812000+00:00",
-    "end_datetime": "2001-01-01T18:00:49.546000+00:00"
+    "end_datetime": "2001-01-01T18:00:49.546000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "boarding",
+      "prosecution",
+      "surveillance",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "prosecution",
+      "sonar-contact",
+      "sprint-and-drift",
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "HDMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "DK"
+    ]
   },
   "links": [
     {

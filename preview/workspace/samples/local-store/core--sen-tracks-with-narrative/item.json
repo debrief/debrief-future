@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--sen-tracks-with-narrative",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,34 @@
     54.47309
   ],
   "properties": {
-    "title": "sen_tracks_with_narrative (core)",
+    "title": "Saxon Warrior: Sen Tracks With Narrative",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Domain: core\nImported from sen_tracks_with_narrative.dpf",
+    "description": "Saxon Warrior: Sen Tracks With Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including USS Truxtun, FS Andrea Doria. 6 narrative entries. Multi-national participation: FR, US.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
-    "end_datetime": "1970-01-03T04:17:25+00:00"
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "mine-clearance",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Truxtun",
+      "FS Andrea Doria"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "US"
+    ]
   },
   "links": [
     {

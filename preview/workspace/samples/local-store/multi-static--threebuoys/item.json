@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--threebuoys",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,40 @@
     60.3
   ],
   "properties": {
-    "title": "ThreeBuoys (multi-static)",
+    "title": "Formidable Shield: Threebuoys",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/ThreeBuoys.dpf",
+    "description": "Formidable Shield: Threebuoys \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HNLMS Portland, HMS Westminster, USS Aquitaine and 1 other(s). 15 sensor contact(s) logged. Multi-national participation: GB, NL, US.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T13:30:00+00:00"
+    "end_datetime": "2010-01-12T13:30:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/corvette/visby",
+      "surface/warship/frigate/fremm"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "gunnery",
+      "multi-national",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "HNLMS Portland",
+      "HMS Westminster",
+      "USS Aquitaine",
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NL",
+      "US"
+    ]
   },
   "links": [
     {

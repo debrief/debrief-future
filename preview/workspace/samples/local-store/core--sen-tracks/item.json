@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--sen-tracks",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,32 @@
     26.454141666666665
   ],
   "properties": {
-    "title": "sen_tracks (core)",
+    "title": "Saxon Warrior: Sen Tracks",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Domain: core\nImported from sen_tracks.rep",
+    "description": "Saxon Warrior: Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Dauntless, FGS Gonzalez. Multi-national participation: DE, FR.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
-    "end_datetime": "1970-01-03T04:17:25+00:00"
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "boarding",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "FS Dauntless",
+      "FGS Gonzalez"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "FR"
+    ]
   },
   "links": [
     {

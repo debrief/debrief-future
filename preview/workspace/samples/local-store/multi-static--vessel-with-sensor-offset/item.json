@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--vessel-with-sensor-offset",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,40 @@
     60.33229166666667
   ],
   "properties": {
-    "title": "Vessel_with_Sensor_Offset (multi-static)",
+    "title": "Formidable Shield: Vessel With Sensor Offset",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/Vessel_with_Sensor_Offset.rep",
+    "description": "Formidable Shield: Vessel With Sensor Offset \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including Contact Alpha, HMS Richmond, Contact Alpha and 1 other(s). 1352 sensor contact(s) logged. Multi-national participation: FR, GB.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00"
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "harbour-ops",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "datum",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "HMS Richmond",
+      "Contact Alpha",
+      "HMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB"
+    ]
   },
   "links": [
     {

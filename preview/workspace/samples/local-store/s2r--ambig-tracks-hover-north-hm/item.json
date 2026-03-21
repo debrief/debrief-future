@@ -1,14 +1,33 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--ambig-tracks-hover-north-hm",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Ambig_tracks_hover_north_HM (s2r)",
+    "title": "Dynamic Mongoose: Ambig Tracks Hover North Hm",
     "datetime": "2026-03-21T10:15:01.446750+00:00",
-    "description": "Domain: s2r\nImported from S2R/Ambig_tracks_hover_north_HM.dsf"
+    "description": "Dynamic Mongoose: Ambig Tracks Hover North Hm \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 121 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "MCM",
+      "certification",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "minefield",
+      "passive-search",
+      "sonar-contact",
+      "zig-zag"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

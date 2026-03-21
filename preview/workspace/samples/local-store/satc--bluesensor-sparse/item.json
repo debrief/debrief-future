@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--bluesensor-sparse",
   "geometry": {
     "type": "Polygon",
@@ -37,9 +39,23 @@
     0.06473251289156451
   ],
   "properties": {
-    "title": "BlueSensor_sparse (satc)",
+    "title": "Silent Resolve: Bluesensor Sparse",
     "datetime": "2026-03-21T10:15:01.947763+00:00",
-    "description": "Domain: satc\nImported from SATC/BlueSensor_sparse.rep"
+    "description": "Silent Resolve: Bluesensor Sparse \u2014 Semi-auto track construction exercise in the Norwegian Sea. 38 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "prosecution",
+      "sonar-contact",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

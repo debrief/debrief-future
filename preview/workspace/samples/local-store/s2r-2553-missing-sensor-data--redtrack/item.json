@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r-2553-missing-sensor-data--redtrack",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,29 @@
     60.27423611111111
   ],
   "properties": {
-    "title": "RedTrack (s2r/2553-missing-sensor-data)",
+    "title": "Dynamic Mongoose: Redtrack",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: s2r/2553-missing-sensor-data\nImported from S2R/2553_missing_sensor_data/RedTrack.rep",
+    "description": "Dynamic Mongoose: Redtrack \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00"
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "boarding",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
   },
   "links": [
     {

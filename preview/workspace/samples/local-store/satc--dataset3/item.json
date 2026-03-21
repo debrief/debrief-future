@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--dataset3",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,30 @@
     0.0
   ],
   "properties": {
-    "title": "Dataset3 (satc)",
+    "title": "Silent Resolve: Dataset3",
     "datetime": "2016-10-10T12:00:00+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/Dataset3.rep",
+    "description": "Silent Resolve: Dataset3 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Sutherland.",
     "start_datetime": "2016-10-10T12:00:00+00:00",
-    "end_datetime": "2016-10-12T10:20:56+00:00"
+    "end_datetime": "2016-10-12T10:20:56+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "gunnery",
+      "mine-clearance",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "HDMS Sutherland"
+    ],
+    "debrief:nationalities": [
+      "DK"
+    ]
   },
   "links": [
     {

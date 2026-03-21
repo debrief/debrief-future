@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--turn",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,38 @@
     5.200725
   ],
   "properties": {
-    "title": "turn (s2r)",
+    "title": "Dynamic Mongoose: Turn",
     "datetime": "2009-04-22T17:59:58.490000+00:00",
-    "description": "Domain: s2r\nImported from S2R/turn.rep",
+    "description": "Dynamic Mongoose: Turn \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Tromp, FS Languedoc. 51 sensor contact(s) logged. Multi-national participation: FR, US.",
     "start_datetime": "2009-04-22T17:59:58.490000+00:00",
-    "end_datetime": "2009-04-22T19:10:22.390000+00:00"
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/type212",
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "force-protection",
+      "harbour-ops",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact",
+      "sprint-and-drift",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Tromp",
+      "FS Languedoc"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "US"
+    ]
   },
   "links": [
     {

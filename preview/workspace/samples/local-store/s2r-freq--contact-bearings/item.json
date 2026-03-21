@@ -1,14 +1,31 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r-freq--contact-bearings",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Contact_bearings (s2r/freq)",
+    "title": "Dynamic Mongoose: Contact Bearings",
     "datetime": "2026-03-21T10:15:01.469527+00:00",
-    "description": "Domain: s2r/freq\nImported from S2R/freq/Contact_bearings.dsf"
+    "description": "Dynamic Mongoose: Contact Bearings \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 53 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "missile-firing",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact",
+      "towed-array"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

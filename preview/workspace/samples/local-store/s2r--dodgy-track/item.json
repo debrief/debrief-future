@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--dodgy-track",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,30 @@
     26.437475
   ],
   "properties": {
-    "title": "dodgy_track (s2r)",
+    "title": "Dynamic Mongoose: Dodgy Track",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Domain: s2r\nImported from S2R/dodgy_track.rep",
+    "description": "Dynamic Mongoose: Dodgy Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Evertsen.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
-    "end_datetime": "1970-01-03T04:17:25+00:00"
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/type212"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "surveillance",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Evertsen"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
   },
   "links": [
     {

@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "demo-trialsplanning--trialsplanning3-hits",
   "geometry": {
     "type": "Polygon",
@@ -37,9 +39,19 @@
     0.0015527777777777777
   ],
   "properties": {
-    "title": "TrialsPlanning3_hits (demo/trialsplanning)",
+    "title": "Joint Warrior: Trialsplanning3 Hits",
     "datetime": "2026-03-21T10:15:00.193773+00:00",
-    "description": "Domain: demo/trialsplanning\nImported from Demo/TrialsPlanning/TrialsPlanning3_hits.rep"
+    "description": "Joint Warrior: Trialsplanning3 Hits \u2014 Analysis and review exercise in the North Atlantic.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "certification",
+      "force-protection",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

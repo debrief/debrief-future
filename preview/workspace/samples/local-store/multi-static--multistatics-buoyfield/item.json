@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--multistatics-buoyfield",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,43 @@
     63.03612777777778
   ],
   "properties": {
-    "title": "multistatics_buoyfield (multi-static)",
+    "title": "Formidable Shield: Multistatics Buoyfield",
     "datetime": "2014-12-12T12:00:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/multistatics_buoyfield.rep",
+    "description": "Formidable Shield: Multistatics Buoyfield \u2014 Multi-static sonar exercise in the North Atlantic. 5 platform track(s) recorded including FS Gonzalez, ITS Lancaster, HNLMS Auvergne and 2 other(s). Multi-national participation: FR, GB, IT, NL, US.",
     "start_datetime": "2014-12-12T12:00:00+00:00",
-    "end_datetime": "2014-12-12T12:45:00+00:00"
+    "end_datetime": "2014-12-12T12:45:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "boarding",
+      "force-protection",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "FS Gonzalez",
+      "ITS Lancaster",
+      "HNLMS Auvergne",
+      "HMS Somerset",
+      "USS Mahan"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB",
+      "IT",
+      "NL",
+      "US"
+    ]
   },
   "links": [
     {

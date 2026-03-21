@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--polyline-measurement",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     5.137472731943945
   ],
   "properties": {
-    "title": "Polyline_Measurement (s2r)",
+    "title": "Dynamic Mongoose: Polyline Measurement",
     "datetime": "2017-11-09T05:00:00+00:00",
-    "description": "Domain: s2r\nImported from S2R/Polyline_Measurement.rep",
+    "description": "Dynamic Mongoose: Polyline Measurement \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HMCS Laboon.",
     "start_datetime": "2017-11-09T05:00:00+00:00",
-    "end_datetime": "2017-11-09T11:00:00+00:00"
+    "end_datetime": "2017-11-09T11:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "force-protection",
+      "replenishment",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMCS Laboon"
+    ],
+    "debrief:nationalities": [
+      "CA"
+    ]
   },
   "links": [
     {

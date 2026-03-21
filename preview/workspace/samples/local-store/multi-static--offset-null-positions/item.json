@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "multi-static--offset-null-positions",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,37 @@
     60.18
   ],
   "properties": {
-    "title": "Offset_null_positions (multi-static)",
+    "title": "Formidable Shield: Offset Null Positions",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Domain: multi-static\nImported from MultiStatics/Offset_null_positions.rep",
+    "description": "Formidable Shield: Offset Null Positions \u2014 Multi-static sonar exercise in the North Atlantic. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. 200 sensor contact(s) logged. Multi-national participation: GB, NO.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T12:33:20+00:00"
+    "end_datetime": "2010-01-12T12:33:20+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "replenishment",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact",
+      "sprint-and-drift",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "HMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NO"
+    ]
   },
   "links": [
     {

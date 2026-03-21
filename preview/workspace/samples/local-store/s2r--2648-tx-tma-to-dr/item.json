@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--2648-tx-tma-to-dr",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,34 @@
     3.8304599
   ],
   "properties": {
-    "title": "2648_tx_TMA_to_DR (s2r)",
+    "title": "Dynamic Mongoose: 2648 Tx Tma To Dr",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Domain: s2r\nImported from S2R/2648_tx_TMA_to_DR.dpf",
+    "description": "Dynamic Mongoose: 2648 Tx Tma To Dr \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including FS Kent. 709 sensor contact(s) logged.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-13T12:13:14+00:00"
+    "end_datetime": "2010-01-13T12:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "force-protection",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "passive-search",
+      "sonar-contact",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "FS Kent"
+    ],
+    "debrief:nationalities": [
+      "FR"
+    ]
   },
   "links": [
     {

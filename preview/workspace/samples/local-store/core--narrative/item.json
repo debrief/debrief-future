@@ -1,14 +1,30 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--narrative",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "narrative (core)",
+    "title": "Saxon Warrior: Narrative",
     "datetime": "2026-03-21T10:15:04.463002+00:00",
-    "description": "Domain: core\nImported from narrative.rep"
+    "description": "Saxon Warrior: Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 19 narrative entries.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "AAW",
+      "certification",
+      "escort",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "torpedo-run"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

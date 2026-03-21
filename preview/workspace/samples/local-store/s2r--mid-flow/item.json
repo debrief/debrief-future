@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--mid-flow",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,33 @@
     5.0
   ],
   "properties": {
-    "title": "mid_flow (s2r)",
+    "title": "Dynamic Mongoose: Mid Flow",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Domain: s2r\nImported from S2R/mid_flow.dpf",
+    "description": "Dynamic Mongoose: Mid Flow \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Somerset. 53 sensor contact(s) logged.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
-    "end_datetime": "2009-07-22T05:40:04+00:00"
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "mine-clearance",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "prosecution",
+      "sonar-contact",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HNoMS Somerset"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
   },
   "links": [
     {

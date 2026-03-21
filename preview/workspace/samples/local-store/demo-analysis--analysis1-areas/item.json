@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "demo-analysis--analysis1-areas",
   "geometry": {
     "type": "Polygon",
@@ -37,9 +39,22 @@
     22.20677222222222
   ],
   "properties": {
-    "title": "Analysis1_Areas (demo/analysis)",
+    "title": "Joint Warrior: Analysis1 Areas",
     "datetime": "2026-03-21T10:15:00.150245+00:00",
-    "description": "Domain: demo/analysis\nImported from Demo/Analysis/Analysis1_Areas.rep"
+    "description": "Joint Warrior: Analysis1 Areas \u2014 Analysis and review exercise in the North Atlantic.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "AAW",
+      "boarding",
+      "certification",
+      "force-protection",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

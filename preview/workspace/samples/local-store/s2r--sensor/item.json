@@ -1,14 +1,31 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--sensor",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "sensor (s2r)",
+    "title": "Dynamic Mongoose: Sensor",
     "datetime": "2026-03-21T10:15:01.788590+00:00",
-    "description": "Domain: s2r\nImported from S2R/sensor.dsf"
+    "description": "Dynamic Mongoose: Sensor \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 52 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "harbour-ops",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact",
+      "towed-array"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--shapes",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,57 @@
     22.25
   ],
   "properties": {
-    "title": "shapes (core)",
+    "title": "Saxon Warrior: Shapes",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Domain: core\nImported from shapes.rep",
+    "description": "Saxon Warrior: Shapes \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 14 platform track(s) recorded including USS Languedoc, FS Northumberland, FGS Cole and 11 other(s). 10 sensor contact(s) logged. 4 narrative entries. Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T07:16:00+00:00"
+    "end_datetime": "1995-12-12T07:16:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/destroyer/type45",
+      "surface/warship/frigate/fremm",
+      "surface/warship/frigate/type26",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "SAR",
+      "certification",
+      "force-protection",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "sonar-contact",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Languedoc",
+      "FS Northumberland",
+      "FGS Cole",
+      "HMS Laboon",
+      "USS Aquitaine",
+      "FS De Zeven Provincien",
+      "FGS Portland",
+      "HMS Bergamini",
+      "USS Westminster",
+      "FS Dragon",
+      "FGS Andrea Doria",
+      "HMS Roosevelt",
+      "USS Kent",
+      "FS Roald Amundsen"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "FR",
+      "GB",
+      "US"
+    ]
   },
   "links": [
     {

@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--legs-20",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,37 @@
     1.1225333333333334
   ],
   "properties": {
-    "title": "legs_20 (s2r)",
+    "title": "Dynamic Mongoose: Legs 20",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Domain: s2r\nImported from S2R/legs_20.rep",
+    "description": "Dynamic Mongoose: Legs 20 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Roosevelt, FS Cole. 835 sensor contact(s) logged. Multi-national participation: FR, US.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-14T00:13:14+00:00"
+    "end_datetime": "2010-01-14T00:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland",
+      "subsurface/submarine/ssk/type212"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "harbour-ops",
+      "missile-firing",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact",
+      "towed-array"
+    ],
+    "debrief:track_names": [
+      "USS Roosevelt",
+      "FS Cole"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "US"
+    ]
   },
   "links": [
     {

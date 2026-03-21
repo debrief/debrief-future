@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--third-party-track",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,28 @@
     27.425486111111113
   ],
   "properties": {
-    "title": "third_party_track (s2r)",
+    "title": "Dynamic Mongoose: Third Party Track",
     "datetime": "1970-01-03T01:44:25+00:00",
-    "description": "Domain: s2r\nImported from S2R/third_party_track.rep",
+    "description": "Dynamic Mongoose: Third Party Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including FS Provence.",
     "start_datetime": "1970-01-03T01:44:25+00:00",
-    "end_datetime": "1970-01-03T01:51:25+00:00"
+    "end_datetime": "1970-01-03T01:51:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "FS Provence"
+    ],
+    "debrief:nationalities": [
+      "FR"
+    ]
   },
   "links": [
     {

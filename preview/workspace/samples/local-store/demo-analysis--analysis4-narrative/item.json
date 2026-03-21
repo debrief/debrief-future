@@ -1,14 +1,31 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "demo-analysis--analysis4-narrative",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Analysis4_Narrative (demo/analysis)",
+    "title": "Joint Warrior: Analysis4 Narrative",
     "datetime": "2026-03-21T10:15:00.173026+00:00",
-    "description": "Domain: demo/analysis\nImported from Demo/Analysis/Analysis4_Narrative.rep"
+    "description": "Joint Warrior: Analysis4 Narrative \u2014 Analysis and review exercise in the North Atlantic. 21 narrative entries.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "amphibious",
+      "certification",
+      "harbour-ops",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "helicopter-ops",
+      "intercept"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

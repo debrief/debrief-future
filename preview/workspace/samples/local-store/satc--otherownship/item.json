@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--otherownship",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     44.630652777777776
   ],
   "properties": {
-    "title": "OtherOwnship (satc)",
+    "title": "Silent Resolve: Otherownship",
     "datetime": "2011-03-21T22:08:02.380000+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/OtherOwnship.rep",
+    "description": "Silent Resolve: Otherownship \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Bretagne.",
     "start_datetime": "2011-03-21T22:08:02.380000+00:00",
-    "end_datetime": "2011-03-23T20:29:03.160000+00:00"
+    "end_datetime": "2011-03-23T20:29:03.160000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "amphibious",
+      "missile-firing",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "FGS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "DE"
+    ]
   },
   "links": [
     {

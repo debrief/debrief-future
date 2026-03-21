@@ -1,14 +1,33 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--b-rate-sensor",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "B_Rate_Sensor (satc)",
+    "title": "Silent Resolve: B Rate Sensor",
     "datetime": "2026-03-21T10:15:01.928670+00:00",
-    "description": "Domain: satc\nImported from SATC/B_Rate_Sensor.dsf"
+    "description": "Silent Resolve: B Rate Sensor \u2014 Semi-auto track construction exercise in the Norwegian Sea. 218 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "boarding",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "sonar-contact",
+      "sprint-and-drift",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

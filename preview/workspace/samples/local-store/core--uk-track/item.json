@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--uk-track",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     51.814049999999995
   ],
   "properties": {
-    "title": "uk_track (core)",
+    "title": "Saxon Warrior: Uk Track",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Domain: core\nImported from uk_track.rep",
+    "description": "Saxon Warrior: Uk Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FGS Mason.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T11:41:00+00:00"
+    "end_datetime": "1995-12-12T11:41:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "SAR",
+      "boarding",
+      "escort",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "prosecution",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "FGS Mason"
+    ],
+    "debrief:nationalities": [
+      "DE"
+    ]
   },
   "links": [
     {

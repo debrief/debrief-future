@@ -1,14 +1,32 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r-2553-missing-sensor-data--bluesensorbrg",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "BlueSensorBrg (s2r/2553-missing-sensor-data)",
+    "title": "Dynamic Mongoose: Bluesensorbrg",
     "datetime": "2026-03-21T10:15:00.461389+00:00",
-    "description": "Domain: s2r/2553-missing-sensor-data\nImported from S2R/2553_missing_sensor_data/BlueSensorBrg.dsf"
+    "description": "Dynamic Mongoose: Bluesensorbrg \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 145 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "SAR",
+      "gunnery",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "depth-charge",
+      "sonar-contact",
+      "torpedo-run",
+      "towed-array"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--old-turn-example",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,38 @@
     5.212115
   ],
   "properties": {
-    "title": "old_turn_example (satc)",
+    "title": "Silent Resolve: Old Turn Example",
     "datetime": "2009-04-22T17:59:58.490000+00:00",
-    "description": "Domain: satc\nImported from SATC/old_turn_example.dpf",
+    "description": "Silent Resolve: Old Turn Example \u2014 Semi-auto track construction exercise in the Norwegian Sea. 2 platform track(s) recorded including HDMS De Ruyter, HMS Somerset. 26 sensor contact(s) logged. Multi-national participation: DK, GB.",
     "start_datetime": "2009-04-22T17:59:58.490000+00:00",
-    "end_datetime": "2009-04-22T19:10:22.390000+00:00"
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar",
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "escort",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "prosecution",
+      "radar-detection",
+      "sonar-contact",
+      "sprint-and-drift",
+      "track-merge"
+    ],
+    "debrief:track_names": [
+      "HDMS De Ruyter",
+      "HMS Somerset"
+    ],
+    "debrief:nationalities": [
+      "DK",
+      "GB"
+    ]
   },
   "links": [
     {

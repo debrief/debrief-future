@@ -1,14 +1,28 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--sen-ssk-sensor",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "sen_ssk_sensor (core)",
+    "title": "Saxon Warrior: Sen Ssk Sensor",
     "datetime": "2026-03-21T10:15:06.048641+00:00",
-    "description": "Domain: core\nImported from sen_ssk_sensor.dsf"
+    "description": "Saxon Warrior: Sen Ssk Sensor \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 15 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "missile-firing",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

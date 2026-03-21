@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--2648-target-plot",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,32 @@
     3.745277777777778
   ],
   "properties": {
-    "title": "2648_target_plot (s2r)",
+    "title": "Dynamic Mongoose: 2648 Target Plot",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Domain: s2r\nImported from S2R/2648_target_plot.rep",
+    "description": "Dynamic Mongoose: 2648 Target Plot \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Auvergne. 8511 sensor contact(s) logged.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-13T12:13:14+00:00"
+    "end_datetime": "2010-01-13T12:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "replenishment",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "datum",
+      "passive-search",
+      "sonar-contact",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Auvergne"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
   },
   "links": [
     {

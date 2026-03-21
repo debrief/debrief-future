@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "core--sample-lots-of-sensors",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,35 @@
     12.1862861
   ],
   "properties": {
-    "title": "sample_lots_of_sensors (core)",
+    "title": "Saxon Warrior: Sample Lots Of Sensors",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Domain: core\nImported from sample_lots_of_sensors.dpf",
+    "description": "Saxon Warrior: Sample Lots Of Sensors \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including USS Somerset, FS Roosevelt. 13310 sensor contact(s) logged. 19 narrative entries. Multi-national participation: FR, US.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T11:45:00+00:00"
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "force-protection",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "USS Somerset",
+      "FS Roosevelt"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "US"
+    ]
   },
   "links": [
     {

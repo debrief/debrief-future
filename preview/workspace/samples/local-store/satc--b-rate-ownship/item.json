@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--b-rate-ownship",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     51.48948888888889
   ],
   "properties": {
-    "title": "B_Rate_Ownship (satc)",
+    "title": "Silent Resolve: B Rate Ownship",
     "datetime": "1900-12-12T06:35:03.910000+00:00",
-    "description": "Domain: satc\nImported from SATC/B_Rate_Ownship.rep",
+    "description": "Silent Resolve: B Rate Ownship \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
     "start_datetime": "1900-12-12T06:35:03.910000+00:00",
-    "end_datetime": "1900-12-12T10:00:07.910000+00:00"
+    "end_datetime": "1900-12-12T10:00:07.910000+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "force-protection",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMS Defender"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
   },
   "links": [
     {

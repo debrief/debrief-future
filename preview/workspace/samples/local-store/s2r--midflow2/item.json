@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "s2r--midflow2",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,31 @@
     5.0
   ],
   "properties": {
-    "title": "midflow2 (s2r)",
+    "title": "Dynamic Mongoose: Midflow2",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Domain: s2r\nImported from S2R/midflow2.dpf",
+    "description": "Dynamic Mongoose: Midflow2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Hamburg. 42 sensor contact(s) logged.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
-    "end_datetime": "2009-07-22T05:40:04+00:00"
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "HNoMS Hamburg"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
   },
   "links": [
     {

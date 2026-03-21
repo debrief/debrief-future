@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--ownship-1",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,28 @@
     0.2910438396
   ],
   "properties": {
-    "title": "ownship_1 (satc)",
+    "title": "Silent Resolve: Ownship 1",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/ownship_1.rep",
+    "description": "Silent Resolve: Ownship 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
-    "end_datetime": "2000-01-01T05:37:00+00:00"
+    "end_datetime": "2000-01-01T05:37:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "HMS Defender"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
   },
   "links": [
     {

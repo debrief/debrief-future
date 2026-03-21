@@ -1,14 +1,28 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "other-formats-ta-dummy-data--freq-bluesensor-nopos",
   "geometry": null,
   "bbox": null,
   "properties": {
-    "title": "Freq_BlueSensor_NoPos (other-formats/ta-dummy-data)",
+    "title": "Talisman Sabre: Freq Bluesensor Nopos",
     "datetime": "2026-03-21T10:15:05.467645+00:00",
-    "description": "Domain: other-formats/ta-dummy-data\nImported from other_formats/TA_DUMMY_DATA/Freq_BlueSensor_NoPos.dsf"
+    "description": "Talisman Sabre: Freq Bluesensor Nopos \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 226 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {

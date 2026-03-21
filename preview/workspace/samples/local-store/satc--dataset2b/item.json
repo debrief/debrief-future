@@ -1,7 +1,9 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
   "id": "satc--dataset2b",
   "geometry": {
     "type": "Polygon",
@@ -37,11 +39,32 @@
     0.0
   ],
   "properties": {
-    "title": "Dataset2b (satc)",
+    "title": "Silent Resolve: Dataset2B",
     "datetime": "2000-01-01T22:35:01+00:00",
-    "description": "Domain: satc\nImported from SATC_Test/Dataset2b.rep",
+    "description": "Silent Resolve: Dataset2B \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Truxtun.",
     "start_datetime": "2000-01-01T22:35:01+00:00",
-    "end_datetime": "2000-01-02T06:22:00+00:00"
+    "end_datetime": "2000-01-02T06:22:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/type212"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "escort",
+      "missile-firing",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "HMS Truxtun"
+    ],
+    "debrief:nationalities": [
+      "SE"
+    ]
   },
   "links": [
     {
