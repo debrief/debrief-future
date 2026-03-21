@@ -152,7 +152,7 @@ export function createExecuteToolCommand(
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
-        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
         const { provenance: _p, ...restProps } = props;
         return {
           featureId: String(f.id),

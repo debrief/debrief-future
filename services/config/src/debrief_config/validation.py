@@ -53,7 +53,9 @@ def validate_stac_catalog(path: Path | str) -> None:
 
     # Check type is Catalog or Collection (Collections are a valid superset of Catalogs)
     if data.get("type") not in ("Catalog", "Collection"):
-        raise InvalidCatalogError(str(path), f"type must be 'Catalog' or 'Collection', got '{data.get('type')}'")
+        raise InvalidCatalogError(
+            str(path), f"type must be 'Catalog' or 'Collection', got '{data.get('type')}'"
+        )
 
     # Check links is an array
     if not isinstance(data.get("links"), list):

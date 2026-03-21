@@ -87,7 +87,7 @@ export type LayerItem =
 export function getFeatureId(item: LayerItem): string | undefined {
   switch (item.type) {
     case 'feature':
-      return String((item.feature as FeatureBase).id);
+      return String((item.feature as unknown as FeatureBase).id);
     case 'result':
       return item.layer.id;
     default:
@@ -299,7 +299,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       if (element.id === 'source') {
         return Promise.resolve(
           (this.features as unknown as FeatureBase[]).map(
-            (feature): LayerItem => ({ type: 'feature', feature: feature as DebriefFeature })
+            (feature): LayerItem => ({ type: 'feature', feature: feature as unknown as DebriefFeature })
           )
         );
       }

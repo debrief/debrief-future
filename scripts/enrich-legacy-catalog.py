@@ -28,22 +28,63 @@ STAC_EXTENSIONS = ["https://debrief.info/stac-extensions/debrief/v1.0.0/schema.j
 # ---------------------------------------------------------------------------
 
 TAGS = [
-    "ASW", "SAR", "MCM", "escort", "transit", "gunnery", "missile-firing",
-    "EW", "amphibious", "multi-national", "training", "certification",
-    "force-protection", "harbour-ops", "replenishment", "AAW", "NGFS",
-    "boarding", "surveillance", "mine-clearance",
+    "ASW",
+    "SAR",
+    "MCM",
+    "escort",
+    "transit",
+    "gunnery",
+    "missile-firing",
+    "EW",
+    "amphibious",
+    "multi-national",
+    "training",
+    "certification",
+    "force-protection",
+    "harbour-ops",
+    "replenishment",
+    "AAW",
+    "NGFS",
+    "boarding",
+    "surveillance",
+    "mine-clearance",
 ]
 
 FEATURE_TAGS = [
-    "sonar-contact", "datum", "prosecution", "track-merge",
-    "visual-sighting", "radar-detection", "towed-array", "helicopter-ops",
-    "torpedo-run", "depth-charge", "minefield", "intercept",
-    "zig-zag", "sprint-and-drift", "passive-search", "active-search",
+    "sonar-contact",
+    "datum",
+    "prosecution",
+    "track-merge",
+    "visual-sighting",
+    "radar-detection",
+    "towed-array",
+    "helicopter-ops",
+    "torpedo-run",
+    "depth-charge",
+    "minefield",
+    "intercept",
+    "zig-zag",
+    "sprint-and-drift",
+    "passive-search",
+    "active-search",
 ]
 
 NATIONALITIES_POOL = [
-    "GB", "US", "FR", "DE", "NO", "SE", "IT", "NL", "DK", "ES",
-    "CA", "AU", "JP", "KR", "IN",
+    "GB",
+    "US",
+    "FR",
+    "DE",
+    "NO",
+    "SE",
+    "IT",
+    "NL",
+    "DK",
+    "ES",
+    "CA",
+    "AU",
+    "JP",
+    "KR",
+    "IN",
 ]
 
 VESSEL_CLASSES = {
@@ -80,38 +121,126 @@ VESSEL_CLASSES = {
 }
 
 TRACK_NAME_PREFIXES: dict[str, list[str]] = {
-    "GB": ["HMS"], "US": ["USS"], "FR": ["FS"], "DE": ["FGS"],
-    "NO": ["HNoMS"], "SE": ["HMS"], "IT": ["ITS"], "NL": ["HNLMS"],
-    "DK": ["HDMS"], "ES": ["SPS"], "CA": ["HMCS"], "AU": ["HMAS"],
-    "JP": ["JS"], "KR": ["ROKS"], "IN": ["INS"],
+    "GB": ["HMS"],
+    "US": ["USS"],
+    "FR": ["FS"],
+    "DE": ["FGS"],
+    "NO": ["HNoMS"],
+    "SE": ["HMS"],
+    "IT": ["ITS"],
+    "NL": ["HNLMS"],
+    "DK": ["HDMS"],
+    "ES": ["SPS"],
+    "CA": ["HMCS"],
+    "AU": ["HMAS"],
+    "JP": ["JS"],
+    "KR": ["ROKS"],
+    "IN": ["INS"],
 }
 
 SHIP_NAMES = [
-    "Argyll", "Sutherland", "Portland", "Westminster", "Kent", "Lancaster",
-    "Richmond", "Somerset", "Northumberland", "Iron Duke", "Defender",
-    "Diamond", "Dragon", "Duncan", "Dauntless", "Mahan", "Cole", "Carney",
-    "Roosevelt", "Mason", "Bainbridge", "Truxtun", "Gonzalez", "Laboon",
-    "Ramage", "Aquitaine", "Provence", "Languedoc", "Auvergne", "Bretagne",
-    "Sachsen", "Hamburg", "Hessen", "Fridtjof Nansen", "Roald Amundsen",
-    "Otto Sverdrup", "Visby", "Helsingborg", "Andrea Doria", "Bergamini",
-    "De Zeven Provincien", "Tromp", "De Ruyter", "Evertsen",
+    "Argyll",
+    "Sutherland",
+    "Portland",
+    "Westminster",
+    "Kent",
+    "Lancaster",
+    "Richmond",
+    "Somerset",
+    "Northumberland",
+    "Iron Duke",
+    "Defender",
+    "Diamond",
+    "Dragon",
+    "Duncan",
+    "Dauntless",
+    "Mahan",
+    "Cole",
+    "Carney",
+    "Roosevelt",
+    "Mason",
+    "Bainbridge",
+    "Truxtun",
+    "Gonzalez",
+    "Laboon",
+    "Ramage",
+    "Aquitaine",
+    "Provence",
+    "Languedoc",
+    "Auvergne",
+    "Bretagne",
+    "Sachsen",
+    "Hamburg",
+    "Hessen",
+    "Fridtjof Nansen",
+    "Roald Amundsen",
+    "Otto Sverdrup",
+    "Visby",
+    "Helsingborg",
+    "Andrea Doria",
+    "Bergamini",
+    "De Zeven Provincien",
+    "Tromp",
+    "De Ruyter",
+    "Evertsen",
 ]
 
 EXERCISE_NAMES = [
-    "Neptune Strike", "Baltic Shield", "Cold Response", "Formidable Shield",
-    "Trident Juncture", "Northern Coasts", "Dynamic Mongoose", "Saxon Warrior",
-    "Joint Warrior", "Steadfast Defender", "Ocean Shield", "Sea Breeze",
-    "Talisman Sabre", "Malabar Horizon", "Iron Resolve", "Bright Star",
-    "Argonaut Dawn", "Cerberus Gate", "Vigilant Mariner", "Cobra Warrior",
-    "Griffin Strike", "Tempest Anvil", "Aurora Borealis", "Silent Resolve",
-    "Thunder Forge", "Poseidon Guard", "Vanguard Horizon", "Triton Sweep",
-    "Aegis Lance", "Storm Petrel", "Boreas Shield", "Atlas Venture",
-    "Coral Sabre", "Halcyon Dawn", "Meridian Watch", "Polaris Star",
-    "Sceptre Tide", "Zenith Wave", "Barracuda Surge", "Condor Flight",
-    "Dragon Hammer", "Eagle Resolve", "Falcon Reach", "Harrier Sprint",
-    "Javelin Thrust", "Kestrel Eye", "Lancer Sweep", "Osprey Watch",
-    "Raptor Chase", "Sierra Storm", "Talon Strike", "Wolf Pack Alpha",
-    "Bastion Wall", "Citadel Peak", "Dagger Point",
+    "Neptune Strike",
+    "Baltic Shield",
+    "Cold Response",
+    "Formidable Shield",
+    "Trident Juncture",
+    "Northern Coasts",
+    "Dynamic Mongoose",
+    "Saxon Warrior",
+    "Joint Warrior",
+    "Steadfast Defender",
+    "Ocean Shield",
+    "Sea Breeze",
+    "Talisman Sabre",
+    "Malabar Horizon",
+    "Iron Resolve",
+    "Bright Star",
+    "Argonaut Dawn",
+    "Cerberus Gate",
+    "Vigilant Mariner",
+    "Cobra Warrior",
+    "Griffin Strike",
+    "Tempest Anvil",
+    "Aurora Borealis",
+    "Silent Resolve",
+    "Thunder Forge",
+    "Poseidon Guard",
+    "Vanguard Horizon",
+    "Triton Sweep",
+    "Aegis Lance",
+    "Storm Petrel",
+    "Boreas Shield",
+    "Atlas Venture",
+    "Coral Sabre",
+    "Halcyon Dawn",
+    "Meridian Watch",
+    "Polaris Star",
+    "Sceptre Tide",
+    "Zenith Wave",
+    "Barracuda Surge",
+    "Condor Flight",
+    "Dragon Hammer",
+    "Eagle Resolve",
+    "Falcon Reach",
+    "Harrier Sprint",
+    "Javelin Thrust",
+    "Kestrel Eye",
+    "Lancer Sweep",
+    "Osprey Watch",
+    "Raptor Chase",
+    "Sierra Storm",
+    "Talon Strike",
+    "Wolf Pack Alpha",
+    "Bastion Wall",
+    "Citadel Peak",
+    "Dagger Point",
 ]
 
 # ---------------------------------------------------------------------------
@@ -211,12 +340,14 @@ def extract_features_metadata(features_path: Path) -> dict[str, Any]:
             has_sub_depth = any(p.get("depth", 0) > 10 for p in positions)
             if has_sub_depth:
                 has_depth = True
-            tracks.append({
-                "platform_id": platform_id,
-                "platform_name": props.get("platform_name", platform_id),
-                "n_positions": len(positions),
-                "has_depth": has_sub_depth,
-            })
+            tracks.append(
+                {
+                    "platform_id": platform_id,
+                    "platform_name": props.get("platform_name", platform_id),
+                    "n_positions": len(positions),
+                    "has_depth": has_sub_depth,
+                }
+            )
         elif kind in ("SENSOR_CONTACT", "SENSOR", "SENSOR2"):
             sensors += 1
         elif kind == "NARRATIVE":
@@ -540,13 +671,13 @@ def main() -> None:
             enriched = enrich_item(item_dir, exercise_name, rng)
             if enriched:
                 all_enriched.append(enriched)
-                print(f"    [{i+1:3d}] {item_dir_name} -> {exercise_name}")
+                print(f"    [{i + 1:3d}] {item_dir_name} -> {exercise_name}")
 
     # Update catalog summaries
     update_catalog_summaries(CATALOG_DIR, all_enriched)
 
     # Summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Enriched {len(all_enriched)} items")
 
     all_vc = set()

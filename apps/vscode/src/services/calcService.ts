@@ -667,7 +667,7 @@ print(json.dumps(tools))
     for (const id of featureIds) {
       const feature: DebriefFeature | undefined = allFeatures.find((f: DebriefFeature) => String(f.id) === id);
       if (feature !== undefined) {
-        const props = feature.properties as Record<string, unknown>;
+        const props = feature.properties as unknown as Record<string, unknown>;
         resolved.push({
           type: 'Feature',
           id: feature.id,

@@ -355,7 +355,7 @@ export class StacService {
               label_interval: props.label_interval as string | undefined,
               position_style_overrides: props.position_style_overrides,
             },
-          } as DebriefFeature);
+          } as unknown as DebriefFeature);
           trackCount++;
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
