@@ -26,6 +26,11 @@ def main() -> None:
     parser.add_argument("source_dir", type=Path, help="Path to legacy sample_data directory")
     parser.add_argument("catalog_path", type=Path, help="Path for output STAC catalog")
     parser.add_argument("--title", default="Debrief Legacy Sample Data", help="Catalog title")
+    parser.add_argument(
+        "--register",
+        action="store_true",
+        help="Register catalog with debrief-config so VS Code can discover it",
+    )
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
@@ -40,6 +45,21 @@ def main() -> None:
     try:
         result = import_legacy_data(args.source_dir, args.catalog_path, args.title)
         print(generate_report(result))
+
+        if args.register:
+            from debrief_config import register_store
+            from debrief_config.exceptions import StoreExistsError
+
+            try:
+                store = register_store(
+                    args.catalog_path.resolve(),
+                    args.title,
+                    notes="Imported from legacy sample data",
+                )
+                print(f"Registered store: {store.path}")
+            except StoreExistsError:
+                print(f"Store already registered: {args.catalog_path.resolve()}")
+
         sys.exit(0 if result.files_failed == 0 else 1)
     except (FileNotFoundError, FileExistsError) as e:
         print(f"Error: {e}", file=sys.stderr)
