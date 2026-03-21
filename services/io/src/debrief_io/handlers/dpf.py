@@ -177,9 +177,7 @@ class DPFHandler(BaseHandler):
         try:
             root = ET.fromstring(content)
         except ET.ParseError as e:
-            warnings.append(
-                ParseWarning(message=f"XML parse error: {e}", code="XML_PARSE_ERROR")
-            )
+            warnings.append(ParseWarning(message=f"XML parse error: {e}", code="XML_PARSE_ERROR"))
             return ParseResult(
                 features=[],
                 warnings=warnings,

@@ -71,10 +71,10 @@ class TestParseLocation:
 
     def test_long_location(self) -> None:
         xml = (
-            '<centre>'
+            "<centre>"
             '<longLocation LatDeg="12" LatMin="11" LatSec="10.630" LatHem="N"'
             ' LongDeg="11" LongMin="41" LongSec="52.370" LongHem="W" Depth="0.0"/>'
-            '</centre>'
+            "</centre>"
         )
         elem = ET.fromstring(xml)
         result = _parse_location(elem, None)

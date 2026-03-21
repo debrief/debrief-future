@@ -151,9 +151,7 @@ def import_legacy_data(
 
             # Collect parse warnings
             for w in parse_result.warnings:
-                result.warnings.append(
-                    ImportWarning(file=file_rel, code=w.code, message=w.message)
-                )
+                result.warnings.append(ImportWarning(file=file_rel, code=w.code, message=w.message))
 
             if not parse_result.features:
                 result.warnings.append(
@@ -199,9 +197,7 @@ def import_legacy_data(
 
         except Exception as e:
             logger.error("Failed to import %s: %s", file_rel, e)
-            result.errors.append(
-                ImportFileError(file=file_rel, error=str(e))
-            )
+            result.errors.append(ImportFileError(file=file_rel, error=str(e)))
             result.files_failed += 1
 
     result.duration_seconds = time.perf_counter() - start_time

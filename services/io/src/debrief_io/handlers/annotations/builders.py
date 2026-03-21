@@ -332,7 +332,6 @@ def build_circle(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -406,7 +405,6 @@ def build_rectangle(line: str, line_number: int, filename: str) -> dict[str, Any
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -469,7 +467,6 @@ def build_line(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-
         },
     }
 
@@ -574,7 +571,6 @@ def build_vector(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-
         },
     }
 
@@ -632,7 +628,6 @@ def build_text(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "text": text,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-
         },
     }
 
@@ -705,7 +700,6 @@ def build_polygon(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -771,7 +765,6 @@ def build_polyline(line: str, line_number: int, filename: str) -> dict[str, Any]
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-
         },
     }
 
@@ -857,7 +850,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-
             },
         }
     else:
@@ -925,7 +917,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-
             },
         }
 
@@ -989,7 +980,6 @@ def build_timetext(line: str, line_number: int, filename: str) -> dict[str, Any]
             "timestamp": timestamp.iso_string if timestamp else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-
         },
     }
 
@@ -1057,7 +1047,6 @@ def build_periodtext(line: str, line_number: int, filename: str) -> dict[str, An
             "time_end": time_end.iso_string if time_end else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-
         },
     }
 
@@ -1161,7 +1150,6 @@ def build_wheel(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -1260,7 +1248,6 @@ def build_dynamic_rect(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -1354,7 +1341,6 @@ def build_dynamic_circle(line: str, line_number: int, filename: str) -> dict[str
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -1441,7 +1427,6 @@ def build_dynamic_poly(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-
         },
     }
 
@@ -1483,10 +1468,7 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
 
     # Check if the track name (3rd token) is quoted
     all_tokens = content.split()
-    has_quoted_track = (
-        len(all_tokens) >= 3
-        and all_tokens[2].startswith('"')
-    )
+    has_quoted_track = len(all_tokens) >= 3 and all_tokens[2].startswith('"')
 
     if has_quoted_track:
         # Quoted track name: ;SENSOR: 951212 050200 "NELSON" @A ...
@@ -1733,7 +1715,6 @@ def build_sensor2(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-
         },
     }
 
@@ -1824,7 +1805,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_line_style(symbol),
-
             },
         }
     else:
@@ -1927,7 +1907,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-
             },
         }
 
@@ -1966,6 +1945,5 @@ def build_tracksplit(line: str, line_number: int, filename: str) -> dict[str, An
             "kind": "TRACKSPLIT",
             "track_id": track_id,
             "timestamp": timestamp.iso_string if timestamp else None,
-
         },
     }

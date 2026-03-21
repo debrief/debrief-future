@@ -65,7 +65,9 @@ class TestDSFParsing:
 
     def test_sensor_with_null_position(self) -> None:
         handler = DSFHandler()
-        content = ";SENSOR: 951212 055200 SUBMARINE @B NULL 180.5 8000.0 TOWED_ARRAY towed contact\n"
+        content = (
+            ";SENSOR: 951212 055200 SUBMARINE @B NULL 180.5 8000.0 TOWED_ARRAY towed contact\n"
+        )
         result = handler.parse(content, "test.dsf")
 
         assert len(result.features) == 1
@@ -105,7 +107,9 @@ class TestDSFParsing:
 
     def test_blank_lines_skipped(self) -> None:
         handler = DSFHandler()
-        content = "\n\n;SENSOR2: 951212 055200.000 SUB @B NULL 180.5 8000.0 150.0 NULL TA contact\n\n"
+        content = (
+            "\n\n;SENSOR2: 951212 055200.000 SUB @B NULL 180.5 8000.0 150.0 NULL TA contact\n\n"
+        )
         result = handler.parse(content, "blanks.dsf")
 
         unknown = [w for w in result.warnings if w.code == "UNKNOWN_RECORD"]
