@@ -5,6 +5,8 @@
  */
 
 import type { MCPToolDefinition } from '../../../services/toolService';
+import type { TrackFeature } from '@debrief/schemas';
+import type { SafeFeature } from '@debrief/utils';
 
 // ============================================================
 // TYPES
@@ -24,14 +26,7 @@ export interface SensorModelZone {
 }
 
 export interface SensorModel {
-  getDetectionZones(track: GeoJSONFeature): SensorModelZone[];
-}
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
+  getDetectionZones(track: TrackFeature): SensorModelZone[];
 }
 
 // ============================================================
@@ -55,7 +50,7 @@ const INTERVAL_PRESETS: Record<string, [number, number, number]> = {
 // ============================================================
 
 class DefaultSensorModel implements SensorModel {
-  getDetectionZones(_track: GeoJSONFeature): SensorModelZone[] {
+  getDetectionZones(_track: TrackFeature): SensorModelZone[] {
     return [
       { distance_nm: 3.0, likelihood_pct: 75, name: '75%' },
       { distance_nm: 6.0, likelihood_pct: 50, name: '50%' },
@@ -243,12 +238,12 @@ function generateBufferPolygon(trackCoords: number[][], distanceNm: number): num
   return ring;
 }
 
-function findTrackFeature(features: GeoJSONFeature[]): GeoJSONFeature {
+function findTrackFeature(features: TrackFeature[]): TrackFeature {
   if (features.length === 0) {
     throw new Error('No track features found in input');
   }
   for (const feature of features) {
-    if (feature.properties?.kind === 'TRACK') {
+    if (feature.properties.kind === 'TRACK') {
       return feature;
     }
   }
@@ -289,10 +284,10 @@ function generateUUID(): string {
 // ============================================================
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: TrackFeature[],
   params: BufferZoneParams,
   sensorModel?: SensorModel,
-): GeoJSONFeature[] {
+): SafeFeature[] {
   // Find the track
   const track = findTrackFeature(features);
   const trackId = (track.id ?? 'unknown') as string;
@@ -366,7 +361,7 @@ export function execute(
   const label = `Generated 3 detection zones (${zoneNames}) for track`;
 
   // Build single MultiPolygon feature
-  const feature: GeoJSONFeature = {
+  const feature: SafeFeature = {
     type: 'Feature',
     id: `zone-${generateUUID()}`,
     geometry: {

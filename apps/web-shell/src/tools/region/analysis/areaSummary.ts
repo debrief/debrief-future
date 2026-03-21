@@ -5,13 +5,8 @@
  */
 
 import type { MCPToolDefinition } from '../../../services/toolService';
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
+import type { DebriefFeature } from '@debrief/schemas';
+import type { GeoJSONFeature } from '@debrief/utils';
 
 type Position = number[];
 
@@ -65,7 +60,7 @@ function flattenCoords(coords: unknown): Position[] {
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: DebriefFeature[],
   params: Record<string, unknown>,
 ): GeoJSONFeature[] {
   const includeCentroid = params?.include_centroid !== false;

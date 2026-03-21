@@ -5,18 +5,9 @@
  * A feature is "modified" if its JSON serialisation differs between old and new.
  */
 
-export interface GeoJSONFeature {
-  type: "Feature";
-  id?: string | number;
-  geometry: unknown;
-  properties: Record<string, unknown> | null;
-  [key: string]: unknown;
-}
+import type { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
 
-export interface GeoJSONFeatureCollection {
-  type: "FeatureCollection";
-  features: GeoJSONFeature[];
-}
+export type { GeoJSONFeature, GeoJSONFeatureCollection };
 
 export interface ModifiedEntry {
   /** Feature ID */

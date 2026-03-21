@@ -6,12 +6,18 @@
 import { describe, it, expect } from 'vitest';
 import { execute, toolDefinition } from '../bufferZoneGenerator';
 import type { SensorModel, SensorModelZone } from '../bufferZoneGenerator';
+import type { TrackFeature } from '@debrief/schemas';
 
 // ============================================================
 // Test fixtures
 // ============================================================
 
-const SIMPLE_TRACK = {
+// Cast helper: test fixtures use minimal shapes; TrackFeature requires full schema properties
+function asTrack(obj: unknown): TrackFeature {
+  return obj as TrackFeature;
+}
+
+const SIMPLE_TRACK = asTrack({
   type: 'Feature' as const,
   id: 'track-001',
   geometry: {
@@ -23,9 +29,9 @@ const SIMPLE_TRACK = {
     ],
   },
   properties: { kind: 'TRACK', name: 'HMS Test' },
-};
+});
 
-const SINGLE_POINT_TRACK = {
+const SINGLE_POINT_TRACK = asTrack({
   type: 'Feature' as const,
   id: 'track-single',
   geometry: {
@@ -33,9 +39,10 @@ const SINGLE_POINT_TRACK = {
     coordinates: [[-4.5, 50.2, 0, 1705305600000]],
   },
   properties: { kind: 'TRACK', name: 'Single Point' },
-};
+});
 
-const NON_TRACK_FEATURE = {
+// NON_TRACK_FEATURE is intentionally not a track; cast to TrackFeature to satisfy execute signature
+const NON_TRACK_FEATURE = asTrack({
   type: 'Feature' as const,
   id: 'circle-001',
   geometry: {
@@ -43,19 +50,23 @@ const NON_TRACK_FEATURE = {
     coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
   },
   properties: { kind: 'CIRCLE', name: 'Test Circle' },
-};
+});
 
 // ============================================================
 // Helpers
 // ============================================================
 
+/** Helper type: SafeFeature with guaranteed non-null properties/geometry for test assertions. */
+type AssertedFeature = {
+  type: string;
+  id?: string | number;
+  geometry: { type: string; coordinates: unknown };
+  properties: Record<string, unknown>;
+};
+
 /** Run the tool and return convenient accessors. */
 function run(track = SIMPLE_TRACK, params = {}, sensorModel?: SensorModel) {
-  const result = execute(
-    [track as unknown as Parameters<typeof execute>[0][0]],
-    params,
-    sensorModel,
-  );
+  const result = execute([track], params, sensorModel) as unknown as AssertedFeature[];
   const feature = result[0];
   const zones = feature.properties.zones as Array<Record<string, unknown>>;
   const multiCoords = feature.geometry.coordinates as number[][][][];
@@ -326,18 +337,18 @@ describe('buffer-zone-generator error handling', () => {
   });
 
   it('skips non-TRACK features and uses first TRACK', () => {
-    const result = execute([NON_TRACK_FEATURE, SIMPLE_TRACK], {});
+    const result = execute([NON_TRACK_FEATURE, SIMPLE_TRACK], {}) as unknown as AssertedFeature[];
     expect(result).toHaveLength(1);
     expect(result[0].properties['debrief:sourceFeatures']).toEqual(['track-001']);
   });
 
   it('throws on track with empty coordinates', () => {
-    const emptyTrack = {
+    const emptyTrack = asTrack({
       type: 'Feature' as const,
       id: 'track-empty',
       geometry: { type: 'LineString', coordinates: [] },
       properties: { kind: 'TRACK', name: 'Empty' },
-    };
+    });
     expect(() => execute([emptyTrack], {})).toThrow('Track has no coordinates');
   });
 });
@@ -356,7 +367,7 @@ const goldenOutput = JSON.parse(readFileSync(resolve(GOLDEN_DIR, 'buffer-zone-ge
 describe('buffer-zone-generator golden example', () => {
   it('produces exact coordinate match with Python golden output', () => {
     const track = goldenInput.features[0];
-    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {});
+    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {}) as unknown as AssertedFeature[];
 
     // Both return a list with 1 MultiPolygon feature
     expect(result).toHaveLength(goldenOutput.length);
@@ -406,7 +417,7 @@ describe('buffer-zone-generator golden example', () => {
 
   it('has correct provenance annotations', () => {
     const track = goldenInput.features[0];
-    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {});
+    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {}) as unknown as AssertedFeature[];
 
     const goldenFeature = goldenOutput[0];
     const tsFeature = result[0];

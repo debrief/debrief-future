@@ -4,6 +4,7 @@
  */
 
 import type { MCPToolDefinition } from '../../../services/toolService';
+import type { GeoJSONFeature } from '@debrief/utils';
 
 export interface MoveShapeParams {
   direction?: number;
@@ -48,13 +49,6 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:outputKind': 'mutation/shape/translated',
   },
 };
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
 
 const EARTH_RADIUS_KM = 6371.0;
 const ANNOTATION_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);

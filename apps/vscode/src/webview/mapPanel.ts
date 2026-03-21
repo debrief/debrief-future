@@ -1184,14 +1184,17 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
-        type: 'Feature' as const,
-        geometry: {
-          type: f.geometry.type,
-          coordinates: f.geometry.coordinates as number[] | number[][],
-        },
-        properties: f.properties,
-      }));
+      const safeFeatures = parseResult.features.flatMap((f: GeoJSONFeature) => {
+        if (!f.geometry) { return []; }
+        return [{
+          type: 'Feature' as const,
+          geometry: {
+            type: f.geometry.type,
+            coordinates: f.geometry.coordinates as number[] | number[][],
+          },
+          properties: f.properties,
+        }];
+      });
 
       await stacService.addFeatures(
         currentStore.path,

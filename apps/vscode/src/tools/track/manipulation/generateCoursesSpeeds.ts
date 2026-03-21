@@ -5,6 +5,7 @@
  * using Haversine distance and great-circle bearing formulas.
  */
 
+import type { TrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 const EARTH_RADIUS_NM = 3440.065;
@@ -77,15 +78,8 @@ interface Position {
   [key: string]: unknown;
 }
 
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: number[][] };
-  properties: Record<string, unknown>;
-}
-
-export function execute(features: GeoJSONFeature[]): GeoJSONFeature[] {
-  const modified: GeoJSONFeature[] = [];
+export function execute(features: TrackFeature[]): TrackFeature[] {
+  const modified: TrackFeature[] = [];
 
   for (const feature of features) {
     const props = feature.properties ?? {};
@@ -93,7 +87,7 @@ export function execute(features: GeoJSONFeature[]): GeoJSONFeature[] {
       continue;
     }
 
-    const coords = feature.geometry?.coordinates ?? [];
+    const coords = feature.geometry.coordinates as number[][];
     const positions = (props.positions as Position[]) ?? [];
     const n = positions.length;
 

@@ -1,0 +1,140 @@
+=== task verify output ===
+Date: 2026-03-20T23:45:03Z
+Branch: claude/speckit-technical-debt-9rBMj
+SHA: 6b87908
+
+--- Step 1: Python Lint (ruff) ---
+warning: The following rules have been removed and ignoring them has no effect:
+    - ANN101
+    - ANN102
+
+All checks passed!
+
+--- Step 2: TypeScript Lint (ESLint) ---
+
+> debrief-future@0.0.0 lint /home/user/debrief-future
+> pnpm -r lint
+
+Scope: 8 of 9 workspace projects
+shared/config-ts lint$ eslint src --ext .ts
+shared/utils lint$ eslint src --ext .ts
+shared/config-ts lint: /home/user/debrief-future/shared/config-ts/src/config.ts
+shared/config-ts lint:    8:29  warning  'Config' is defined but never used          @typescript-eslint/no-unused-vars
+shared/config-ts lint:   10:22  warning  'readConfigSync' is defined but never used  @typescript-eslint/no-unused-vars
+shared/config-ts lint: /home/user/debrief-future/shared/config-ts/src/storage.ts
+shared/config-ts lint:   8:10  warning  'ConfigCorruptError' is defined but never used  @typescript-eslint/no-unused-vars
+shared/config-ts lint:   9:25  warning  'getLockFile' is defined but never used         @typescript-eslint/no-unused-vars
+shared/config-ts lint: ✖ 4 problems (0 errors, 4 warnings)
+shared/config-ts lint: Done
+shared/utils lint: Done
+apps/loader lint$ eslint src --ext .ts,.tsx
+services/session-state lint$ eslint src --ext .ts
+shared/components lint$ eslint src --ext .ts,.tsx
+services/session-state lint: /home/user/debrief-future/services/session-state/src/log/branchService.ts
+services/session-state lint:    16:3   warning  'GeoJsonFeature' is defined but never used    @typescript-eslint/no-unused-vars
+services/session-state lint:   341:17  warning  'nextRef' is assigned a value but never used  @typescript-eslint/no-unused-vars
+services/session-state lint: /home/user/debrief-future/services/session-state/src/log/logService.ts
+services/session-state lint:   192:7   warning  '_options' is defined but never used     @typescript-eslint/no-unused-vars
+services/session-state lint:   685:22  warning  '_activityId' is defined but never used  @typescript-eslint/no-unused-vars
+services/session-state lint: /home/user/debrief-future/services/session-state/src/persistence/load.ts
+services/session-state lint:   9:10  warning  'DEFAULT_TEMPORAL_SLICE' is defined but never used  @typescript-eslint/no-unused-vars
+services/session-state lint:   9:34  warning  'DEFAULT_FEATURES_SLICE' is defined but never used  @typescript-eslint/no-unused-vars
+services/session-state lint:   9:58  warning  'createEmptySelection' is defined but never used    @typescript-eslint/no-unused-vars
+services/session-state lint: /home/user/debrief-future/services/session-state/src/server/sse.ts
+services/session-state lint:   52:7  warning  'eventId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+services/session-state lint: /home/user/debrief-future/services/session-state/src/store/index.ts
+services/session-state lint:   100:29  warning  Don't use `Function` as a type. The `Function` type accepts any function-like value.
+services/session-state lint: It provides no type safety when calling the function, which can be a common source of bugs.
+services/session-state lint: It also accepts things like class declarations, which will throw at runtime as they will not be called with `new`.
+services/session-state lint: If you are expecting the function to accept certain arguments, you should explicitly define the function shape  @typescript-eslint/ban-types
+services/session-state lint: ✖ 9 problems (0 errors, 9 warnings)
+apps/loader lint: Done
+services/session-state lint: Done
+shared/components lint: /home/user/debrief-future/shared/components/src/CascadingMenu/CascadingMenu.tsx
+shared/components lint:   180:6  warning  React Hook useEffect has missing dependencies: 'getEnabledIndex' and 'getItemIndex'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+shared/components lint:   429:6  warning  React Hook useEffect has missing dependencies: 'getEnabledIndex' and 'getItemIndex'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+shared/components lint: /home/user/debrief-future/shared/components/src/CascadingMenu/SearchableCascadingMenu.tsx
+shared/components lint:   42:6  warning  React Hook useCallback has a missing dependency: 'menuProps'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+shared/components lint: /home/user/debrief-future/shared/components/src/LayersToolbar/RunDropdown.tsx
+shared/components lint:   30:9  warning  The 'labels' object makes the dependencies of useMemo Hook (at line 101) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'labels' in its own useMemo() Hook  react-hooks/exhaustive-deps
+shared/components lint: /home/user/debrief-future/shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx
+shared/components lint:   551:6  warning  React Hook useEffect has missing dependencies: 'drawingMode', 'fitPadding', 'onDrawingModeChange', 'onShapeCreated', 'showFitButton', 'showZoomControls', and 'visibleBounds'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+shared/components lint: /home/user/debrief-future/shared/components/src/MapView/PositionSymbolsLayer.tsx
+shared/components lint:   123:9  warning  The 'defaultStyle' logical expression could make the dependencies of useMemo Hook (at line 142) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'defaultStyle' in its own useMemo() Hook  react-hooks/exhaustive-deps
+shared/components lint: /home/user/debrief-future/shared/components/src/PanelWorkspace/PanelWorkspace.tsx
+shared/components lint:   129:6  warning  React Hook useEffect has missing dependencies: 'contextWrapper', 'debouncedSave', and 'registry'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+shared/components lint: ✖ 7 problems (0 errors, 7 warnings)
+shared/components lint: Done
+apps/web-shell lint$ eslint src --ext .ts,.tsx
+apps/vscode prelint$ pnpm --filter @debrief/session-state build && pnpm --filter @debrief/utils build
+apps/vscode prelint: > @debrief/session-state@0.1.0 build /home/user/debrief-future/services/session-state
+apps/vscode prelint: > tsup
+apps/vscode prelint: CLI Building entry: src/index.ts, src/standalone.ts
+apps/vscode prelint: CLI Using tsconfig: tsconfig.json
+apps/vscode prelint: CLI tsup v8.5.1
+apps/vscode prelint: CLI Using tsup config: /home/user/debrief-future/services/session-state/tsup.config.ts
+apps/vscode prelint: CLI Target: es2022
+apps/vscode prelint: CLI Cleaning output folder
+apps/vscode prelint: ESM Build start
+apps/vscode prelint: CJS Build start
+apps/vscode prelint: CJS dist/index.cjs          90.30 KB
+apps/vscode prelint: CJS dist/standalone.cjs     29.23 KB
+apps/vscode prelint: CJS dist/index.cjs.map      215.98 KB
+apps/vscode prelint: CJS dist/standalone.cjs.map 88.67 KB
+apps/vscode prelint: CJS ⚡️ Build success in 110ms
+apps/vscode prelint: ESM dist/index.js          84.85 KB
+apps/vscode prelint: ESM dist/standalone.js     27.94 KB
+apps/vscode prelint: ESM dist/index.js.map      211.21 KB
+apps/vscode prelint: ESM dist/standalone.js.map 88.63 KB
+apps/vscode prelint: ESM ⚡️ Build success in 120ms
+apps/vscode prelint: DTS Build start
+apps/web-shell lint: /home/user/debrief-future/apps/web-shell/src/App.tsx
+apps/web-shell lint:   346:22  warning  '_' is assigned a value but never used                                                                      @typescript-eslint/no-unused-vars
+apps/web-shell lint:   503:37  warning  '_p' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+apps/web-shell lint:   818:31  warning  '_p' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+apps/web-shell lint:   941:6   warning  React Hook useCallback has a missing dependency: 'store'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+apps/web-shell lint: /home/user/debrief-future/apps/web-shell/src/mocks/calcService.ts
+apps/web-shell lint:   288:5  warning  Move function declaration to function body root  no-inner-declarations
+apps/web-shell lint: ✖ 5 problems (0 errors, 5 warnings)
+apps/web-shell lint: Done
+apps/vscode prelint: DTS ⚡️ Build success in 3453ms
+apps/vscode prelint: DTS dist/standalone.d.ts  13.00 B
+apps/vscode prelint: DTS dist/index.d.ts       48.48 KB
+apps/vscode prelint: DTS dist/standalone.d.cts 13.00 B
+apps/vscode prelint: DTS dist/index.d.cts      48.48 KB
+apps/vscode prelint: > @debrief/utils@0.1.0 build /home/user/debrief-future/shared/utils
+apps/vscode prelint: > tsc
+apps/vscode prelint: Done
+apps/vscode lint$ eslint src --ext ts
+apps/vscode lint: Done
+
+--- Step 3: Python Typecheck (pyright) ---
+0 errors, 0 warnings, 0 informations
+
+--- Step 4: TypeScript Typecheck (tsc) ---
+services/session-state typecheck: Done
+apps/loader typecheck: Done
+shared/components typecheck: Done
+apps/web-shell typecheck$ tsc --noEmit
+apps/web-shell typecheck: Done
+
+--- Step 5: Python Tests (pytest) ---
+services/calc/tests/tools/track/styling/test_label_interval.py .....     [ 99%]
+services/calc/tests/tools/track/styling/test_set_track_color.py ......   [ 99%]
+services/calc/tests/tools/track/styling/test_symbol_interval.py .....    [100%]
+
+======================= 1123 passed, 1 skipped in 4.01s ========================
+
+--- Step 6: TypeScript Tests (vitest) ---
+apps/vscode test:  ✓ tests/unit/stacTreeProvider.test.ts  (8 tests) 24ms
+apps/vscode test:  ✓ tests/unit/symbolInterval.test.ts  (5 tests) 18ms
+apps/vscode test:  ✓ tests/unit/ioService.test.ts  (6 tests) 6ms
+apps/vscode test:  ✓ tests/unit/storeValidation.test.ts  (10 tests) 10ms
+apps/vscode test:  ✓ tests/unit/temporalConversion.test.ts  (5 tests) 11ms
+apps/vscode test:  Test Files  20 passed (20)
+apps/vscode test:       Tests  335 passed (335)
+apps/vscode test:    Start at  23:47:16
+apps/vscode test:    Duration  3.48s (transform 1.08s, setup 413ms, collect 1.79s, tests 354ms, environment 5ms, prepare 2.56s)
+apps/vscode test: Done
+
+=== ALL STEPS PASSED ===

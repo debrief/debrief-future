@@ -387,99 +387,16 @@ export interface ToolExecutionResult {
 }
 
 // ---------------------------------------------------------------------------
-// MCP Content Types (#041 Tool Results Architecture)
+// MCP Content Types — canonical definitions in @debrief/utils/mcp-types
 // ---------------------------------------------------------------------------
-
-/**
- * Debrief-specific annotations on MCP content items.
- */
-export interface DebriefAnnotations {
-  'debrief:resultType': string;
-  'debrief:sourceFeatures': string[];
-  'debrief:label': string;
-  'debrief:href'?: string;
-  'debrief:deletedFeatures'?: string[];
-  'debrief:toolVersion'?: string;
-  'debrief:modifiedFeatures'?: Array<{ featureId: string; changedProperties: Record<string, { previousValue: unknown; newValue: unknown }> }>;
-  'debrief:createdFeatures'?: string[];
-  'debrief:createdAssets'?: Array<{ resultId: string; path: string; mimeType?: string }>;
-  'debrief:parameters'?: Record<string, { value: unknown; default: boolean; tunable: boolean }>;
-}
-
-/**
- * A single MCP content item (resource, text, or image).
- */
-export interface MCPContentItem {
-  type: 'resource' | 'text' | 'image';
-  resource?: { uri: string; mimeType: string; text: string };
-  text?: string;
-  data?: string;
-  mimeType?: string;
-  annotations: DebriefAnnotations;
-}
-
-/**
- * Successful MCP tool response with content array.
- */
-export interface MCPToolResponse {
-  content: MCPContentItem[];
-  duration_ms: number;
-}
-
-/**
- * MCP error response with structured error data.
- */
-export interface MCPErrorResponse {
-  error: {
-    code: number;
-    message: string;
-    data: {
-      'debrief:errorCategory': string;
-      'debrief:affectedFeatures': string[];
-    };
-  };
-  duration_ms?: number;
-}
-
-/**
- * Selection requirement in MCP annotation format.
- */
-export interface MCPSelectionRequirement {
-  /** Feature kind (e.g., "TRACK", "POINT") */
-  kind: string;
-  /** Minimum count required */
-  min: number;
-  /** Maximum count allowed (absent = no limit) */
-  max?: number;
-}
-
-/**
- * MCP tool definition with Debrief-specific annotations.
- * Represents a tool as returned by MCP tools/list response.
- * Both Python and TypeScript tool libraries produce this format.
- */
-export interface MCPToolDefinition {
-  /** Tool identifier (kebab-case) */
-  name: string;
-  /** Human-readable description */
-  description: string;
-  /** JSON Schema for tool input parameters */
-  inputSchema: {
-    type: 'object';
-    properties: Record<string, unknown>;
-  };
-  /** MCP annotations with Debrief extensions */
-  annotations: {
-    /** Selection requirements for this tool */
-    'debrief:selectionRequirements': MCPSelectionRequirement[];
-    /** Tool category (e.g., "track/styling") */
-    'debrief:category': string;
-    /** Semantic version */
-    'debrief:version': string;
-    /** Output kind identifier */
-    'debrief:outputKind': string;
-  };
-}
+export type {
+  DebriefAnnotations,
+  MCPContentItem,
+  MCPToolResponse,
+  MCPErrorResponse,
+  MCPSelectionRequirement,
+  MCPToolDefinition,
+} from '@debrief/utils';
 
 /**
  * Create a default layer style for results

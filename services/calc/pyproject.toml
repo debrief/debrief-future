@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 dependencies = [
-    "pydantic>=2.0.0",
+    "pydantic>=2.12.5",
     "debrief-schemas",
 ]
 
@@ -42,3 +42,6 @@ packages = ["debrief_calc"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+
+[tool.coverage.report]
+fail_under = 80

@@ -308,7 +308,7 @@ export function MapView({
       } else {
         expanded.push({
           ...f,
-          geometry: { ...f.geometry, coordinates: f.geometry.coordinates },
+          geometry: f.geometry ? { ...f.geometry, coordinates: f.geometry.coordinates } : { type: 'Point', coordinates: [0, 0] },
         } as GeoJSON.Feature);
       }
     }

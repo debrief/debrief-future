@@ -31,7 +31,7 @@ import {
 } from '../types/tool';
 import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
-import type { DebriefFeature } from '@debrief/components';
+import type { DebriefFeature } from '@debrief/schemas';
 
 const execFileAsync = promisify(execFile);
 

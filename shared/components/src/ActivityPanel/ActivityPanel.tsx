@@ -376,8 +376,8 @@ export function ActivityPanel({
       setInfoDialogState({
         featureId: feature.id,
         featureName: getFeatureLabel(feature),
-        geometryType: feature.geometry.type,
-        coordinates: feature.geometry.coordinates as number[] | number[][] | number[][][] | number[][][][],
+        geometryType: feature.geometry?.type ?? 'None',
+        coordinates: (feature.geometry?.coordinates ?? []) as number[] | number[][] | number[][][] | number[][][][],
         position: { x: rect.right + 4, y: rect.top },
       });
     },

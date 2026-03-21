@@ -3,6 +3,7 @@
  * Sets the time interval for displaying labels on track positions.
  */
 
+import type { TrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface LabelIntervalParams {
@@ -27,13 +28,6 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
-
 interface DefaultPositionStyle {
   show_symbol?: boolean;
   symbol?: string;
@@ -42,26 +36,25 @@ interface DefaultPositionStyle {
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: TrackFeature[],
   params: LabelIntervalParams,
-): GeoJSONFeature[] {
+): TrackFeature[] {
   const interval = params.interval || 'PT15M';
 
-  const modified: GeoJSONFeature[] = [];
+  const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties ?? {};
-    if (props.kind !== 'TRACK') {
+    const props = feature.properties as unknown as Record<string, unknown>;
+    if (props['kind'] !== 'TRACK') {
       continue;
     }
 
-    const dps: DefaultPositionStyle = (props.default_position_style as DefaultPositionStyle) ?? {
+    const dps: DefaultPositionStyle = (props['default_position_style'] as DefaultPositionStyle) ?? {
       show_symbol: true, symbol: 'circle', show_label: false,
     };
     dps.show_label = true;
     dps.label_interval = interval;
-    props.default_position_style = dps;
-    feature.properties = props;
+    props['default_position_style'] = dps;
 
     modified.push(feature);
   }
