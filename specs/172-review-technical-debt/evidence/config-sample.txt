@@ -1,0 +1,60 @@
+Configuration Sample: Unified Dependency Versions
+===================================================
+
+TypeScript Dependencies (pnpm workspace)
+-----------------------------------------
+
+@storybook/react: ^8.4.0 (all packages)
+@typescript-eslint/parser: ^6.21.0 (all packages)
+@typescript-eslint/eslint-plugin: ^6.21.0 (all packages)
+eslint: ^8.57.1 (all packages)
+eslint-plugin-react: ^7.37.5 (all packages)
+@types/leaflet: ^1.9.8 (shared/components)
+
+Python Dependencies (uv workspace)
+------------------------------------
+
+pydantic: >=2.12.5 (all services)
+ruff: >=0.8.0 (all services)
+
+ESLint Configurations Added
+-----------------------------
+
+shared/config-ts/.eslintrc.cjs:
+  extends: eslint:recommended, @typescript-eslint/recommended
+  env: node
+  rules: no-explicit-any (error), no-unused-vars (warn)
+
+shared/utils/.eslintrc.cjs:
+  extends: eslint:recommended, @typescript-eslint/recommended
+  env: node
+  rules: no-explicit-any (error)
+
+apps/web-shell/.eslintrc.cjs:
+  extends: eslint:recommended, @typescript-eslint/recommended, react, react-hooks
+  env: browser
+  rules: no-explicit-any (error), react/prop-types (off), no-unused-vars (warn)
+
+services/session-state/.eslintrc.cjs:
+  extends: eslint:recommended, @typescript-eslint/recommended
+  env: node
+  rules: no-explicit-any (error), ban-types (warn), no-unused-vars (warn)
+
+Coverage Thresholds Added
+--------------------------
+
+services/config/pyproject.toml:
+  [tool.coverage.report] fail_under = 80
+
+services/calc/pyproject.toml:
+  [tool.coverage.report] fail_under = 80
+
+Python Workspace Members Added
+-------------------------------
+
+pyproject.toml members:
+  + "services/debrief-tools"
+  + "services/session-state-py"
+
+ruff.toml known-first-party:
+  + "debrief_cli"

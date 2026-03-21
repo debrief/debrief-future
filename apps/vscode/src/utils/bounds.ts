@@ -23,7 +23,10 @@ export function calculateBounds(features: GeoJSONFeature[]): Bounds | null {
   let maxLat = -Infinity;
 
   for (const feature of features) {
-    const coords = extractCoordinates(feature.geometry);
+    if (!feature.geometry) {
+      continue;
+    }
+    const coords = extractCoordinates(feature.geometry as { type: string; coordinates: number[] | number[][] | number[][][] });
     for (const [lon, lat] of coords) {
       minLon = Math.min(minLon, lon);
       minLat = Math.min(minLat, lat);

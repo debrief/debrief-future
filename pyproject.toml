@@ -12,6 +12,8 @@ members = [
     "services/config",
     "services/calc",
     "services/cli",
+    "services/debrief-tools",
+    "services/session-state-py",
 ]
 
 [tool.uv.sources]

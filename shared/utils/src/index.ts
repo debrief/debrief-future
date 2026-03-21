@@ -48,3 +48,13 @@ export type {
   PositionStyleOverride,
   ResolvedPositionStyle,
 } from './types.js';
+
+// MCP types
+export type {
+  DebriefAnnotations,
+  MCPContentItem,
+  MCPToolResponse,
+  MCPErrorResponse,
+  MCPSelectionRequirement,
+  MCPToolDefinition,
+} from './mcp-types.js';

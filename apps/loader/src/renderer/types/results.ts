@@ -2,6 +2,10 @@
  * Operation result types.
  */
 
+import type { GeoJSONFeature } from '@debrief/utils';
+
+export type { GeoJSONFeature };
+
 /**
  * Error codes for categorization.
  */
@@ -72,19 +76,6 @@ export interface ParseResult {
     timestamp: string;
     sourceHash: string;
   };
-}
-
-/**
- * GeoJSON Feature type (simplified).
- */
-export interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string | number;
-  geometry: {
-    type: string;
-    coordinates: unknown;
-  };
-  properties: Record<string, unknown>;
 }
 
 /**

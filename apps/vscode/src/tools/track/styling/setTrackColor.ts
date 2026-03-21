@@ -3,6 +3,7 @@
  * Sets the display color for track features.
  */
 
+import type { TrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface SetTrackColorParams {
@@ -27,41 +28,33 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
-
 interface TrackStyle {
   line?: { stroke?: boolean; color?: string; weight?: number; opacity?: number };
   point?: Record<string, unknown>;
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: TrackFeature[],
   params: SetTrackColorParams,
-): GeoJSONFeature[] {
+): TrackFeature[] {
   const { color } = params;
   if (!color) {
     throw new Error('color parameter is required');
   }
 
-  const modified: GeoJSONFeature[] = [];
+  const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties ?? {};
-    if (props.kind !== 'TRACK') {
+    const props = feature.properties as unknown as Record<string, unknown>;
+    if (props['kind'] !== 'TRACK') {
       continue;
     }
 
-    const style = (props.style as TrackStyle) ?? {};
+    const style = (props['style'] as TrackStyle) ?? {};
     const line = style.line ?? { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 };
     line.color = color;
     style.line = line;
-    props.style = style;
-    feature.properties = props;
+    props['style'] = style;
 
     modified.push(feature);
   }

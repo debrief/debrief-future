@@ -6,13 +6,8 @@
  */
 
 import type { MCPToolDefinition } from '../../../services/toolService';
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
+import type { TrackFeature } from '@debrief/schemas';
+import type { GeoJSONFeature } from '@debrief/utils';
 
 const EARTH_RADIUS_NM = 3440.065;
 
@@ -70,21 +65,24 @@ export const toolDefinition: MCPToolDefinition = {
 };
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: TrackFeature[],
   _params: Record<string, unknown>,
 ): GeoJSONFeature[] {
   const tracks = features.filter(
-    f => f.properties?.kind === 'TRACK' && f.geometry?.type === 'LineString',
+    f => f.properties.kind === 'TRACK' && f.geometry.type === 'LineString',
   );
   if (tracks.length < 2) throw new Error('Requires at least 2 track features');
 
   const [track1, track2] = tracks;
   const coords1 = track1.geometry.coordinates as number[][];
   const coords2 = track2.geometry.coordinates as number[][];
-  const times1 = track1.properties?.times as number[] | undefined;
-  const times2 = track2.properties?.times as number[] | undefined;
-  const name1 = (track1.properties?.name ?? track1.id ?? 'Track 1') as string;
-  const name2 = (track2.properties?.name ?? track2.id ?? 'Track 2') as string;
+  // Access legacy wire-format 'times' and 'name' properties via cast
+  const props1 = track1.properties as unknown as Record<string, unknown>;
+  const props2 = track2.properties as unknown as Record<string, unknown>;
+  const times1 = props1.times as number[] | undefined;
+  const times2 = props2.times as number[] | undefined;
+  const name1 = ((props1.name ?? props1.platform_name ?? track1.id ?? 'Track 1') as string);
+  const name2 = ((props2.name ?? props2.platform_name ?? track2.id ?? 'Track 2') as string);
 
   // Build time-series by zipping coordinates by index
   const len = Math.min(coords1.length, coords2.length);

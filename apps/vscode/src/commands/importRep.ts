@@ -240,14 +240,17 @@ async function createNewPlotFromRep(
 
       // Merge all features
       const allFeatures = parseResults.flatMap((r) =>
-        r.features.map((f: GeoJSONFeature) => ({
-          type: 'Feature' as const,
-          geometry: {
-            type: f.geometry.type,
-            coordinates: f.geometry.coordinates as number[] | number[][],
-          },
-          properties: f.properties,
-        }))
+        r.features.flatMap((f: GeoJSONFeature) => {
+          if (!f.geometry) { return []; }
+          return [{
+            type: 'Feature' as const,
+            geometry: {
+              type: f.geometry.type,
+              coordinates: f.geometry.coordinates as number[] | number[][],
+            },
+            properties: f.properties,
+          }];
+        })
       );
 
       if (allFeatures.length === 0) {
@@ -402,14 +405,17 @@ async function importRepFile(
 
         // Store features
         progress.report({ message: 'Storing features...' });
-        const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
-          type: 'Feature' as const,
-          geometry: {
-            type: f.geometry.type,
-            coordinates: f.geometry.coordinates as number[] | number[][],
-          },
-          properties: f.properties,
-        }));
+        const safeFeatures = parseResult.features.flatMap((f: GeoJSONFeature) => {
+          if (!f.geometry) { return []; }
+          return [{
+            type: 'Feature' as const,
+            geometry: {
+              type: f.geometry.type,
+              coordinates: f.geometry.coordinates as number[] | number[][],
+            },
+            properties: f.properties,
+          }];
+        });
 
         await stacService.addFeatures(storePath, itemPath, safeFeatures);
 

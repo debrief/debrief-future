@@ -24,11 +24,18 @@ export function getFeatureLabel(feature: DebriefFeature): string {
     );
   } else if (isMultiPointFeature(feature) || isMultiPolygonFeature(feature)) {
     return feature.properties.label || feature.id || 'Unnamed Feature';
-  } else {
-    // ReferenceLocation: name; Legacy: label
+  } else if (isReferenceLocation(feature)) {
     return (
       feature.properties.name ||
       (props.label as string) ||
+      feature.id ||
+      'Unnamed Feature'
+    );
+  } else {
+    // Annotation types: use label if present, fall back to ID
+    return (
+      (props.label as string) ||
+      (props.name as string) ||
       feature.id ||
       'Unnamed Feature'
     );

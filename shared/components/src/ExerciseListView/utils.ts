@@ -226,9 +226,9 @@ export function extractLineCoordinates(fc: GeoJSONFeatureCollection): number[][]
   for (const feature of fc.features) {
     const geom = feature.geometry;
     if (geom.type === 'LineString') {
-      lines.push(geom.coordinates);
+      lines.push(geom.coordinates as number[][]);
     } else if (geom.type === 'MultiLineString') {
-      for (const line of geom.coordinates) {
+      for (const line of geom.coordinates as number[][][]) {
         lines.push(line);
       }
     }

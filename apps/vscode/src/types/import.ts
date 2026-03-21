@@ -1,6 +1,7 @@
 /**
  * Import Error Types - Error classes for REP file import operations
  */
+import type { SafeFeature } from '@debrief/utils';
 
 /**
  * Error thrown when a file has already been imported to the same STAC item
@@ -68,7 +69,7 @@ export class StacStorageError extends Error {
  * Parse result from IoService
  */
 export interface ParseResult {
-  features: GeoJSONFeature[];
+  features: SafeFeature[];
   warnings: ParseWarning[];
   sourceFile: string;
   encoding: string;
@@ -85,19 +86,10 @@ export interface ParseWarning {
   code: string;
 }
 
-// GeoJSON types — structurally identical to @debrief/utils canonical definitions (T02)
-// Kept local to avoid ESLint no-unsafe-argument false positives with re-exports
-export interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: {
-    type: string;
-    coordinates: number[] | number[][] | number[][][];
-  };
-  properties: Record<string, unknown> | null;
-}
-
 export interface GeoJSONFeatureCollection {
   type: 'FeatureCollection';
-  features: GeoJSONFeature[];
+  features: SafeFeature[];
 }
+
+// Re-exported alias so existing importers can continue to use GeoJSONFeature
+export type { SafeFeature as GeoJSONFeature } from '@debrief/utils';

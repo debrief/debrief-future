@@ -37,7 +37,7 @@ export interface AssociatedFile {
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
-} from '@debrief/components';
+} from '@debrief/schemas';
 
 // Canonical Safe GeoJSON types from @debrief/utils (T02)
 import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';

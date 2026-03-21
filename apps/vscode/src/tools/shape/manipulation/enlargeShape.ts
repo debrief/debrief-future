@@ -5,6 +5,7 @@
  * Spec: shared/tools/shape/manipulation/enlarge-shape.1.0.md
  */
 
+import type { DebriefFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface EnlargeShapeParams {
@@ -50,13 +51,6 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:outputKind': 'mutation/shape/scaled',
   },
 };
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
 
 const ANNOTATION_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
@@ -135,9 +129,9 @@ function scaleCoordsList(
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: DebriefFeature[],
   params: EnlargeShapeParams,
-): GeoJSONFeature[] {
+): DebriefFeature[] {
   const scaleFactor = params.scale_factor ?? 3.0;
   const origin = params.origin ?? null;
 
@@ -145,17 +139,20 @@ export function execute(
     throw new Error('scale_factor must be >= 0');
   }
 
-  const modified: GeoJSONFeature[] = [];
+  const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties ?? {};
-    const kind = props.kind as string;
+    const props = feature.properties as unknown as Record<string, unknown>;
+    const kind = props['kind'] as string;
 
     if (!ANNOTATION_KINDS.has(kind)) {
       continue;
     }
 
-    const geometry = feature.geometry;
+    const geometry = feature.geometry as { type: string; coordinates: unknown } | undefined;
+    if (!geometry) {
+      continue;
+    }
 
     // Determine scaling origin
     const scalingOrigin = origin ?? computeCentroid(geometry);
@@ -174,8 +171,8 @@ export function execute(
       geometry.coordinates = polyCoords.map((ring) =>
         scaleCoordsList(ring, scalingOrigin, scaleFactor),
       );
-      if (kind === 'CIRCLE' && props.center !== undefined) {
-        props.center = scaleCoordinate(props.center as number[], scalingOrigin, scaleFactor);
+      if (kind === 'CIRCLE' && props['center'] !== undefined) {
+        props['center'] = scaleCoordinate(props['center'] as number[], scalingOrigin, scaleFactor);
       }
     } else if (kind === 'LINE') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
@@ -183,8 +180,8 @@ export function execute(
       geometry.coordinates = scaleCoordinate(coords as number[], scalingOrigin, scaleFactor);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
-      if (props.origin !== undefined) {
-        props.origin = scaleCoordinate(props.origin as number[], scalingOrigin, scaleFactor);
+      if (props['origin'] !== undefined) {
+        props['origin'] = scaleCoordinate(props['origin'] as number[], scalingOrigin, scaleFactor);
       }
     }
 

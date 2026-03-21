@@ -37,8 +37,8 @@ grep -r 'mcp>=' --include='pyproject.toml' .
 
 | Dependency | Versions found | Severity |
 |------------|---------------|----------|
-| `@sparticuz/chromium` | ^131.0.1 (root) vs ^143.0.4 (web-shell) | **Critical** — 12 major versions apart |
-| `@playwright/test` | ^1.40.0 (components, loader) vs ^1.57.0 (root, web-shell) | **High** — API changes between versions |
+| `@sparticuz/chromium` | ^131.0.1 (root) vs ^143.0.4 (web-shell) | ✅ **Resolved** — aligned across all packages |
+| `@playwright/test` | ^1.40.0 (components, loader) vs ^1.57.0 (root, web-shell) | ✅ **Resolved** — aligned across all packages |
 | `typescript` | ^5.0.0 (shared/components/diff) vs ^5.3.x (everywhere else) | **High** — type definition incompatibility |
 | `@typescript-eslint/parser` | ^6.13.0 vs ^6.21.0 | Medium |
 | `@storybook/react` | ^8.0.0 vs ^8.4.0 | Medium |
@@ -101,7 +101,12 @@ grep 'members' pyproject.toml
 | noUncheckedIndexedAccess | true | true | not set | not set |
 | noImplicitOverride | true | not set | not set | not set |
 
-**No shared base tsconfig exists.** Each package defines its own compiler options independently.
+✅ **Partially resolved:** A shared `tsconfig.base.json` now exists at the monorepo root.
+All packages should extend it rather than redeclaring common options independently.
+`noUncheckedIndexedAccess` has been intentionally relaxed in the base config — packages
+that need stricter array-access checking should re-enable it locally rather than relying
+on the base. The table above reflects the state before the base config was introduced;
+re-run the detection commands to identify any packages that still don't extend the base.
 
 **ESLint configs are inconsistent:**
 
@@ -808,6 +813,285 @@ grep -rn 'import.*functionName' --include='*.ts' --include='*.tsx' .
 
 ---
 
+## 11. Logging Hygiene
+
+### What to check
+
+When `console.log`, `console.warn`, and `console.error` are mixed with a structured logger
+(e.g., a named logger, `vscode.window.showErrorMessage`, or a Python `logging` call),
+two problems arise: log output is unpredictable in different environments, and structured
+log fields (timestamps, severity, request IDs) are lost for ad-hoc calls.
+
+Look for:
+
+- Raw `console.*` calls in production code (as opposed to test files)
+- Python `print()` statements in service code that should use `logging`
+- Inconsistent log levels for the same class of event (one path logs an error, an equivalent
+  path silently swallows it)
+- Missing log statements at important decision points (tool invocation, file I/O, MCP
+  request handling)
+
+### Why it matters
+
+Inconsistent logging makes it hard to diagnose failures in production or demo environments.
+In a thick-service architecture, Python services run as subprocesses and their stdout/stderr
+is the primary observability mechanism. Unstructured output makes log aggregation and
+filtering impractical.
+
+### How to fix
+
+1. Audit `console.*` usage across TypeScript source (excluding tests and Storybook stories):
+   ```bash
+   grep -rn 'console\.\(log\|warn\|error\|info\|debug\)' \
+     --include='*.ts' --include='*.tsx' apps/ shared/ services/ \
+     | grep -v node_modules | grep -v '\.test\.' | grep -v '\.stories\.'
+   ```
+
+2. Audit `print()` usage in Python service code (excluding tests):
+   ```bash
+   grep -rn '^\s*print(' --include='*.py' services/ \
+     | grep -v __pycache__ | grep -v '/test'
+   ```
+
+3. For each hit, determine whether a structured alternative is appropriate:
+   - TypeScript (VS Code extension): replace with `vscode.window.showErrorMessage` for
+     user-facing messages, or a named logger exported from a shared `logger.ts` module
+   - TypeScript (web-shell, components): replace with a logger that can be silenced in tests
+   - Python services: replace `print()` with `import logging; logger = logging.getLogger(__name__)`
+
+4. Establish a project convention in a `docs/logging-conventions.md` file so all contributors
+   know which logger to use in each layer.
+
+### What to capture for resolution
+
+- **File path and line number** of each inconsistent logging call
+- **Layer** (service, extension host, webview, test) — different conventions apply
+- **Whether context is lost** (e.g., no request ID, no feature ID) that would be needed
+  to trace a failure
+- **Proposed replacement** and the logging convention it follows
+
+---
+
+## 12. Workspace Membership Drift
+
+### What to check
+
+In a monorepo with multiple workspace managers (`uv` for Python, `pnpm` for TypeScript),
+it is possible for a package directory to exist on disk but not be registered in the
+workspace manifest. Such packages are invisible to workspace-level commands (`uv run`,
+`pnpm -r`) and their dependencies may not be installed or deduplicated correctly.
+
+Look for:
+
+- Directories under `services/` or `shared/` that contain a `pyproject.toml` but are not
+  listed in the root `pyproject.toml` `[tool.uv.workspace]` members
+- Directories under `apps/` or `shared/` that contain a `package.json` but are not matched
+  by the root `pnpm-workspace.yaml` globs
+- Packages listed in the workspace manifest that no longer exist on disk (stale entries)
+
+### Why it matters
+
+A package absent from the workspace will not be picked up by `pnpm -r test` or `uv run pytest`,
+meaning its tests never run in CI. Its dependencies are installed independently rather than
+being hoisted and deduplicated, which can reintroduce the version skew described in Section 1.
+
+### How to fix
+
+```bash
+# Python: list workspace members declared vs directories that have pyproject.toml
+grep -A50 '\[tool.uv.workspace\]' pyproject.toml | grep '"'
+find . -name 'pyproject.toml' -not -path '*/node_modules/*' \
+  -not -path '*/.venv/*' -not -name './pyproject.toml'
+
+# TypeScript: check pnpm workspace globs
+cat pnpm-workspace.yaml
+find . -name 'package.json' -not -path '*/node_modules/*' \
+  -not -name './package.json' | sort
+```
+
+Compare the two lists. Any directory with a manifest file that is not covered by the
+workspace declaration should be added. Any workspace entry with no corresponding directory
+should be removed.
+
+### What to capture for resolution
+
+- **Package path** and whether it is registered in `uv` workspace, `pnpm` workspace, or both
+- **Whether it has tests** — an unregistered package with tests is a silent CI gap
+- **Whether its dependencies appear in lockfiles** (`uv.lock`, `pnpm-lock.yaml`) — absence
+  indicates it was never properly installed
+- **Fix**: add the missing glob or explicit entry to the workspace manifest, then run
+  `uv sync` / `pnpm install` to update lockfiles
+
+---
+
+## 13. Error Boundary Coverage
+
+### What to check
+
+React error boundaries prevent an unhandled exception in one component subtree from
+crashing the entire application. Without them, a rendering error in a map overlay, chart
+panel, or tool result display will take down the whole UI.
+
+Look for:
+
+- Top-level component trees (panel roots, view roots) that are not wrapped in an error boundary
+- Error boundaries that exist but render no fallback UI (silent failure)
+- Error boundaries that exist only in Storybook stories but not in production wrappers
+- Async data-fetching hooks that reject without a boundary to catch the resulting render error
+
+### Why it matters
+
+In a thick-service architecture, services can fail independently. If the chart renderer
+throws because a Vega-Lite spec has an unexpected shape, or if the map layer throws
+because a GeoJSON feature is malformed, the error should be contained to that panel —
+not propagate to kill the session view.
+
+### How to fix
+
+```bash
+# Find existing error boundary implementations
+grep -rn 'componentDidCatch\|ErrorBoundary' \
+  --include='*.ts' --include='*.tsx' apps/ shared/ | grep -v node_modules
+
+# Find panel / view root components (likely candidates for boundary placement)
+find apps/ shared/ -name '*Panel*.tsx' -o -name '*View*.tsx' \
+  -o -name '*Workspace*.tsx' | grep -v node_modules | grep -v '\.test\.'
+
+# Check which roots are wrapped
+grep -rn '<ErrorBoundary' --include='*.tsx' apps/ shared/ | grep -v node_modules
+```
+
+For each panel or view root identified, confirm it is either wrapped in an `<ErrorBoundary>`
+or is itself an error boundary class component. Ensure the fallback renders a meaningful
+message (component name, retry option) rather than `null`.
+
+### What to capture for resolution
+
+- **Component name and file path** of each panel/view root
+- **Whether an error boundary wraps it** (yes / no / partial)
+- **Fallback quality** — does the boundary render useful UI or silently hide the failure?
+- **Proposed boundary placement** — wrapping at the panel level is usually the right
+  granularity; wrapping every leaf component adds noise without benefit
+
+---
+
+## 14. Deprecated Code Tracking
+
+### What to check
+
+As APIs evolve, functions and types are deprecated in favour of replacements. Without
+tracking, deprecated code accumulates until it becomes difficult to remove because too
+many callers depend on it. This section covers both **internal deprecations** (within
+this codebase) and **external deprecations** (upstream library APIs).
+
+Look for:
+
+- `@deprecated` JSDoc tags in TypeScript source
+- Python `warnings.warn(..., DeprecationWarning)` calls in service code
+- Imports of known-deprecated upstream APIs (e.g., VS Code API members marked deprecated
+  in their type definitions)
+- Old file format handlers or schema fields that have known replacements but haven't been
+  removed yet
+
+### Why it matters
+
+Deprecated internal APIs that are never removed become permanent. Every new developer who
+discovers them is uncertain whether to use them or the replacement. Deprecated upstream
+APIs may be removed in future library versions, creating sudden breakage.
+
+### How to fix
+
+```bash
+# Find internal deprecation markers
+grep -rn '@deprecated\|DeprecationWarning\|warnings\.warn' \
+  --include='*.ts' --include='*.tsx' --include='*.py' \
+  apps/ shared/ services/ | grep -v node_modules | grep -v __pycache__
+
+# Find VS Code API deprecated usage (check tsc output with --noEmitOnError off)
+pnpm --filter @debrief/vscode exec tsc --noEmit 2>&1 | grep 'deprecated'
+
+# Find deprecated imports from known libraries
+grep -rn 'from.*@types/leaflet\|from.*leaflet' --include='*.ts' --include='*.tsx' \
+  apps/ shared/ | grep -v node_modules
+# Then cross-reference with the library's CHANGELOG for deprecated members
+```
+
+For each deprecated item found, record the replacement and set a removal milestone.
+Internal deprecations should target removal within two feature cycles of the deprecation
+being introduced.
+
+### What to capture for resolution
+
+- **Symbol name** and **file path** of the deprecated definition
+- **All callers** — files that import or call the deprecated symbol
+- **Replacement API** — what callers should use instead
+- **Removal target** — which milestone or sprint the deprecated code should be deleted
+- **Whether callers have been migrated** — if all callers already use the replacement,
+  the deprecated definition can be deleted immediately
+
+---
+
+## 15. Cross-Layer Import Violations
+
+### What to check
+
+The architecture mandates that service code must never import from UI component libraries,
+and that domain logic must not live in frontend layers. This is stricter than Section 3
+(Cross-Layer Architectural Violations) — this section provides detection commands and
+capture criteria specifically for enforcing the import boundary at the module level.
+
+Violations occur when:
+
+- A Python service imports any UI framework (`tkinter`, `PyQt`, browser-only packages)
+- A TypeScript service module (under `apps/*/src/services/`) imports from `@debrief/components`
+  or any React component package
+- A file in `services/` imports from `apps/`
+- A file in `shared/components/` imports from `apps/` (shared components must not depend
+  on application-specific code)
+
+### Why it matters
+
+Services that import UI code cannot be tested without a rendering environment. They also
+cannot be reused across frontends (VS Code and web-shell) without dragging in the UI
+dependency. The "services never touch UI" principle exists precisely so that Python and
+TypeScript services remain independently testable and frontend-agnostic.
+
+### How to fix
+
+```bash
+# TypeScript service files importing UI packages
+grep -rn "from '@debrief/components'\|from 'react'\|from 'react-leaflet'" \
+  apps/vscode/src/services/ apps/web-shell/src/services/ \
+  shared/utils/src/ | grep -v node_modules | grep -v '\.test\.'
+
+# Python services importing anything UI-related
+grep -rn '^import tkinter\|^from tkinter\|^import PyQt\|^import wx' \
+  --include='*.py' services/ | grep -v __pycache__
+
+# shared/components importing from apps/
+grep -rn "from '.*apps/" --include='*.ts' --include='*.tsx' shared/components/ \
+  | grep -v node_modules
+
+# services/ importing from apps/
+grep -rn "from '.*apps/" --include='*.ts' shared/ services/ | grep -v node_modules
+```
+
+For each violation, the fix is to extract the shared logic into a service or shared utility,
+then have both the service and the UI layer import from the shared location. The service
+must not take the UI type as a parameter — pass primitives or schema-defined types instead.
+
+### What to capture for resolution
+
+- **File path and line number** of the violating import
+- **The imported symbol** and what it is used for
+- **Direction** — service→UI, shared-component→app, or service→app
+- **Proposed extraction point** — where the shared logic should move so neither side
+  violates the boundary
+- **Test impact** — can the service currently be tested in isolation? If not, resolving
+  this violation is a prerequisite for meaningful unit tests
+
+---
+
 ## Assessment Process
 
 ### Running a full audit
@@ -839,12 +1123,27 @@ grep -rn 'import.*functionName' --include='*.ts' --include='*.tsx' .
 10. **Dead code** — Use `knip` or `ts-prune` for TypeScript. For Python, `vulture` can
     identify unused code.
 
+11. **Logging hygiene** — Run the console/print grep commands from Section 11. Identify
+    which calls belong in a structured logger and which (if any) are acceptable as-is.
+
+12. **Workspace membership drift** — Compare workspace manifests against on-disk directories.
+    Ensure every package with a `pyproject.toml` or `package.json` is registered.
+
+13. **Error boundary coverage** — List all panel and view root components, then verify each
+    is wrapped in an `<ErrorBoundary>`. Note missing or silent boundaries.
+
+14. **Deprecated code** — Search for `@deprecated` and `DeprecationWarning`. For each,
+    confirm a migration path exists and set a removal milestone.
+
+15. **Cross-layer import violations** — Run the import-boundary checks from Section 15.
+    Flag any service file that imports UI code or any shared-component that imports from apps.
+
 ### Recording findings
 
 For each finding, create a record with:
 
 ```yaml
-category: "dependency-skew | config-drift | architecture-violation | type-duplication | api-inconsistency | state-fragmentation | test-gap | suppression | todo | dead-code"
+category: "dependency-skew | config-drift | architecture-violation | type-duplication | api-inconsistency | state-fragmentation | test-gap | suppression | todo | dead-code | logging-hygiene | workspace-drift | error-boundary | deprecated-code | cross-layer-import"
 severity: "critical | high | medium | low"
 file_paths:
   - path/to/file1.ts:42

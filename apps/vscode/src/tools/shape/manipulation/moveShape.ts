@@ -3,6 +3,7 @@
  * Translates annotation shapes by compass bearing and distance using great-circle math.
  */
 
+import type { DebriefFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface MoveShapeParams {
@@ -48,13 +49,6 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:outputKind': 'mutation/shape/translated',
   },
 };
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
 
 const EARTH_RADIUS_KM = 6371.0;
 const ANNOTATION_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
@@ -105,7 +99,7 @@ function translateCoordsList(
   return coords.map((c) => translateCoordinate(c, bearingDeg, distanceKm));
 }
 
-export function execute(features: GeoJSONFeature[], params: MoveShapeParams): GeoJSONFeature[] {
+export function execute(features: DebriefFeature[], params: MoveShapeParams): DebriefFeature[] {
   const direction = ((params.direction ?? 90) % 360 + 360) % 360;
   const distanceKm = params.distance_km ?? 5;
 
@@ -115,20 +109,23 @@ export function execute(features: GeoJSONFeature[], params: MoveShapeParams): Ge
 
   // Zero distance is a no-op
   if (distanceKm === 0) {
-    return features.filter((f) => ANNOTATION_KINDS.has(f.properties?.kind as string));
+    return features.filter((f) => ANNOTATION_KINDS.has((f.properties as unknown as Record<string, unknown>)['kind'] as string));
   }
 
-  const modified: GeoJSONFeature[] = [];
+  const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties ?? {};
-    const kind = props.kind as string;
+    const props = feature.properties as unknown as Record<string, unknown>;
+    const kind = props['kind'] as string;
 
     if (!ANNOTATION_KINDS.has(kind)) {
       continue;
     }
 
-    const geometry = feature.geometry;
+    const geometry = feature.geometry as { type: string; coordinates: unknown } | undefined;
+    if (!geometry) {
+      continue;
+    }
     const coords = geometry.coordinates;
 
     if (kind === 'CIRCLE' || kind === 'RECTANGLE') {
@@ -137,8 +134,8 @@ export function execute(features: GeoJSONFeature[], params: MoveShapeParams): Ge
       geometry.coordinates = polyCoords.map((ring) =>
         translateCoordsList(ring, direction, distanceKm),
       );
-      if (kind === 'CIRCLE' && props.center !== undefined && props.center !== null) {
-        props.center = translateCoordinate(props.center as number[], direction, distanceKm);
+      if (kind === 'CIRCLE' && props['center'] !== undefined && props['center'] !== null) {
+        props['center'] = translateCoordinate(props['center'] as number[], direction, distanceKm);
       }
     } else if (kind === 'LINE') {
       geometry.coordinates = translateCoordsList(coords as number[][], direction, distanceKm);
@@ -146,8 +143,8 @@ export function execute(features: GeoJSONFeature[], params: MoveShapeParams): Ge
       geometry.coordinates = translateCoordinate(coords as number[], direction, distanceKm);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = translateCoordsList(coords as number[][], direction, distanceKm);
-      if (props.origin !== undefined && props.origin !== null) {
-        props.origin = translateCoordinate(props.origin as number[], direction, distanceKm);
+      if (props['origin'] !== undefined && props['origin'] !== null) {
+        props['origin'] = translateCoordinate(props['origin'] as number[], direction, distanceKm);
       }
     }
 

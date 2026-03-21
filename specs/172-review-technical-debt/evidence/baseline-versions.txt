@@ -1,0 +1,77 @@
+Baseline Dependency Versions (pre-alignment)
+=============================================
+
+Captured: 2026-03-20
+
+@storybook/*:
+  - apps/loader/package.json: @storybook/addon-a11y@^8.0.0, @storybook/addon-actions@^8.0.0, @storybook/addon-controls@^8.0.0, @storybook/addon-essentials@^8.0.0, @storybook/react@^8.0.0, @storybook/react-vite@^8.0.0, storybook@^8.0.0
+  - shared/components/package.json: @storybook/addon-a11y@^8.4.0, @storybook/addon-essentials@^8.4.0, @storybook/addon-interactions@^8.4.0, @storybook/addon-links@^8.4.0, @storybook/blocks@^8.4.0, @storybook/react@^8.4.0, @storybook/react-vite@^8.4.0, @storybook/test@^8.4.0, storybook@^8.4.0
+
+eslint:
+  - apps/loader/package.json: ^8.55.0
+  - apps/vscode/package.json: ^8.55.0
+  - shared/components/package.json: ^8.57.1
+
+@typescript-eslint/eslint-plugin:
+  - apps/loader/package.json: ^6.13.0
+  - apps/vscode/package.json: ^6.13.0
+  - shared/components/package.json: ^6.21.0
+
+@typescript-eslint/parser:
+  - apps/loader/package.json: ^6.13.0
+  - apps/vscode/package.json: ^6.13.0
+  - shared/components/package.json: ^6.21.0
+
+eslint-plugin-react:
+  - apps/loader/package.json: ^7.33.0
+  - shared/components/package.json: ^7.37.5
+
+@types/leaflet:
+  - apps/vscode/package.json: ^1.9.8
+  - apps/web-shell/package.json: ^1.9.0
+  - shared/components/package.json: ^1.9.0
+
+pydantic:
+  - pyproject.toml (root): >=2.12.5
+  - services/stac/pyproject.toml: >=2.0.0
+  - services/io/pyproject.toml: >=2.0.0
+  - services/config/pyproject.toml: >=2.0.0
+  - services/calc/pyproject.toml: >=2.0.0
+  - shared/schemas/pyproject.toml: >=2.0.0
+
+ruff:
+  - pyproject.toml (root): >=0.8.0
+  - services/stac/pyproject.toml: >=0.1.0
+  - shared/schemas/pyproject.toml: >=0.1.0
+
+ANALYSIS NOTES
+==============
+
+Storybook: Inconsistency detected
+  - apps/loader uses @8.0.0 minimum
+  - shared/components uses @8.4.0 minimum
+  - Recommend aligning to @8.4.0+ across all packages
+
+ESLint: Minor version inconsistencies
+  - apps/loader and apps/vscode: ^8.55.0
+  - shared/components: ^8.57.1
+  - Recommend aligning to ^8.57.1+
+
+@typescript-eslint: Plugin/parser inconsistencies
+  - apps/loader and apps/vscode: ^6.13.0
+  - shared/components: ^6.21.0
+  - Recommend aligning to ^6.21.0+
+
+@types/leaflet: Minor version variation
+  - apps/vscode: ^1.9.8
+  - apps/web-shell and shared/components: ^1.9.0
+  - Recommend aligning to ^1.9.8
+
+Pydantic: Ranges wide but generally consistent
+  - Root and services: >=2.0.0 to >=2.12.5
+  - Recommend pinning to >=2.12.5+ for consistency
+
+Ruff: Wide range inconsistency
+  - Root requires >=0.8.0
+  - Services require >=0.1.0
+  - Recommend aligning to >=0.8.0+ across all pyproject.toml files
