@@ -15,6 +15,8 @@ __version__ = "0.1.0"
 from debrief_io.exceptions import ParseError, UnsupportedFormatError, ValidationError
 
 # Register built-in handlers
+from debrief_io.handlers.dpf import DPFHandler
+from debrief_io.handlers.dsf import DSFHandler
 from debrief_io.handlers.rep import REPHandler
 from debrief_io.models import HandlerInfo, ParseResult, ParseWarning
 from debrief_io.parser import parse, parse_rep
@@ -26,6 +28,8 @@ from debrief_io.registry import (
 )
 
 register_handler(".rep", REPHandler)
+register_handler(".dpf", DPFHandler)
+register_handler(".dsf", DSFHandler)
 
 __all__ = [
     "__version__",

@@ -1,0 +1,125 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "multi-static--vessel-with-sensor-offset",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.0342577,
+          60.0862845
+        ],
+        [
+          0.25,
+          60.0862845
+        ],
+        [
+          0.25,
+          60.33229166666667
+        ],
+        [
+          -0.0342577,
+          60.33229166666667
+        ],
+        [
+          -0.0342577,
+          60.0862845
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.0342577,
+    60.0862845,
+    0.25,
+    60.33229166666667
+  ],
+  "properties": {
+    "title": "Formidable Shield: Vessel With Sensor Offset",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Formidable Shield: Vessel With Sensor Offset \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including Contact Alpha, HMS Richmond, Contact Alpha and 1 other(s). 1352 sensor contact(s) logged. Multi-national participation: FR, GB.",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "harbour-ops",
+      "multi-national",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "datum",
+      "passive-search",
+      "radar-detection",
+      "sonar-contact",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "HMS Richmond",
+      "Contact Alpha",
+      "HMS Richmond"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Vessel_with_Sensor_Offset (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Vessel_with_Sensor_Offset.rep",
+      "title": "Vessel_with_Sensor_Offset.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Vessel_with_Sensor_Offset": {
+      "href": "./assets/Vessel_with_Sensor_Offset.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Vessel_with_Sensor_Offset.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Vessel_with_Sensor_Offset.rep",
+        "load_timestamp": "2026-03-21T10:15:00.423408Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

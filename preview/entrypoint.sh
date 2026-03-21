@@ -25,7 +25,7 @@ if [ ! -f "${DEBRIEF_CONFIG_FILE}" ]; then
     {
       "id": "store-preview-sample",
       "path": "/workspace/preview/samples/local-store",
-      "displayName": "Sample Maritime Data",
+      "displayName": "Debrief Legacy Sample Data",
       "status": "available"
     }
   ],

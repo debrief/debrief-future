@@ -31,6 +31,10 @@ from typing import Any
 from debrief_io.handlers.annotations.parser import is_annotation_line, parse_annotations
 from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
+from debrief_io.symbology import get_color
+
+# Default CSS color when symbol parsing fails
+_DEFAULT_COLOR = "#808080"  # grey
 
 
 def calculate_position_style_intervals(duration_hours: float) -> tuple[str, str]:
@@ -82,24 +86,34 @@ def parse_timestamp(date_str: str, time_str: str) -> datetime:
     """Parse REP timestamp into datetime.
 
     Args:
-        date_str: Date in YYMMDD format
+        date_str: Date in YYMMDD or YYYYMMDD format
         time_str: Time in HHMMSS.SSS format
 
     Returns:
         datetime object in UTC timezone
     """
-    # Parse date
-    year = int(date_str[0:2])
-    month = int(date_str[2:4])
-    day = int(date_str[4:6])
-
-    # Convert 2-digit year (50+ = 1900s, <50 = 2000s)
-    if year >= 50:
-        year += 1900
+    # Parse date — support both 6-digit (YYMMDD) and 8-digit (YYYYMMDD)
+    if len(date_str) == 8:
+        year = int(date_str[0:4])
+        month = int(date_str[4:6])
+        day = int(date_str[6:8])
     else:
-        year += 2000
+        year = int(date_str[0:2])
+        month = int(date_str[2:4])
+        day = int(date_str[4:6])
+        # Convert 2-digit year (50+ = 1900s, <50 = 2000s)
+        if year >= 50:
+            year += 1900
+        else:
+            year += 2000
 
-    # Parse time
+    # Parse time — pad to 6 digits if only 5 (single-digit hour)
+    t = time_str.split(".")[0]
+    frac = time_str.split(".")[1] if "." in time_str else None
+    if len(t) == 5:
+        t = "0" + t
+    time_str = f"{t}.{frac}" if frac else t
+
     hour = int(time_str[0:2])
     minute = int(time_str[2:4])
     second_part = time_str[4:]
@@ -160,9 +174,6 @@ class TrackBuilder:
         # Build coordinates array [lon, lat]
         coordinates = [[p.lon, p.lat] for p in self.positions]
 
-        # Build times array (epoch ms, parallel to coordinates)
-        times = [int(p.timestamp.timestamp() * 1000) for p in self.positions]
-
         # Build positions array with temporal/kinematic metadata only
         # Coordinates are NOT included - they live in geometry.coordinates[i]
         # Position at index i corresponds to coordinate at index i
@@ -182,6 +193,9 @@ class TrackBuilder:
         duration_hours = (end_time - start_time).total_seconds() / 3600
         symbol_interval, label_interval = calculate_position_style_intervals(duration_hours)
 
+        # Derive color from the first position's symbol code
+        css_color = _resolve_symbol_color(self.positions[0].symbol)
+
         return {
             "type": "Feature",
             "id": str(uuid.uuid4()),
@@ -193,11 +207,21 @@ class TrackBuilder:
                 "kind": "TRACK",
                 "platform_id": self.platform_id,
                 "platform_name": self.platform_id,
-                "track_type": "CONTACT",  # Default, can be overridden
-                "times": times,  # Required for track identification
+                "track_type": "CONTACT",
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
                 "positions": positions_data,
+                "style": {
+                    "line": {
+                        "color": css_color,
+                    },
+                    "point": {
+                        "shape": "circle",
+                        "radius": 3.0,
+                        "fill_color": css_color,
+                        "color": css_color,
+                    },
+                },
                 "default_position_style": {
                     "show_symbol": False,
                     "symbol": "circle",
@@ -207,6 +231,18 @@ class TrackBuilder:
                 "label_interval": label_interval,
             },
         }
+
+
+def _resolve_symbol_color(symbol: str) -> str:
+    """Extract CSS color from a REP symbol string like @A, @B, etc."""
+    # Symbol format: prefix + color code letter (e.g., @A, @B@00, BA10)
+    for ch in symbol:
+        if ch.isalpha() and ch.isupper():
+            try:
+                return get_color(ch)
+            except (KeyError, ValueError):
+                pass
+    return _DEFAULT_COLOR
 
 
 class REPHandler(BaseHandler):
@@ -222,15 +258,15 @@ class REPHandler(BaseHandler):
     # Symbol formats: @A, @A@00, @BA10, BBA10, @C[SYMBOL=missile], @B[LAYER=LIGHT_TRACKS]
     POSITION_PATTERN = re.compile(
         r"^\s*"
-        r"(\d{6})\s+"  # Date YYMMDD
-        r"(\d{6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS
+        r"(\d{6,8})\s+"  # Date YYMMDD or YYYYMMDD
+        r"(\d{5,6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS (5-6 digits: H may be single)
         r'(?:"([^"]+)"|(\S+))\s+'  # Track name (quoted or unquoted)
-        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,]+\])?)\s+"  # Symbol (various formats inc. @@)
-        r"(\d+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS
-        r"(\d+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS
-        r"([\d.]+)\s+"  # Course
-        r"([\d.]+)\s+"  # Speed
-        r"(\d+)"  # Depth
+        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,.]+\])?)\s+"  # Symbol (@A, SC, VC, @A[LAYER=x])
+        r"(-?[\d.]+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS (degrees may be negative/fractional)
+        r"(-?[\d.]+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS (degrees may be negative/fractional)
+        r"(-?[\d.]+)\s+"  # Course (may be negative)
+        r"(-?[\d.]+)\s+"  # Speed (may be negative)
+        r"(-?[\d.]+)"  # Depth (may be negative or fractional)
         r"(?:\s+(.+))?"  # Optional label
         r"\s*$"
     )

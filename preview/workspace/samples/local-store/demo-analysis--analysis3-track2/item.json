@@ -1,0 +1,116 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "demo-analysis--analysis3-track2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.812722222222224,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          22.142258333333334
+        ],
+        [
+          -21.812722222222224,
+          22.142258333333334
+        ],
+        [
+          -21.812722222222224,
+          21.894219444444445
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.812722222222224,
+    21.894219444444445,
+    -21.57275,
+    22.142258333333334
+  ],
+  "properties": {
+    "title": "Joint Warrior: Analysis3 Track2",
+    "datetime": "1995-12-12T05:03:00+00:00",
+    "description": "Joint Warrior: Analysis3 Track2 \u2014 Analysis and review exercise in the North Atlantic. 1 platform track(s) recorded including HMS Collingwood.",
+    "start_datetime": "1995-12-12T05:03:00+00:00",
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "SAR",
+      "certification",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMS Collingwood"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Analysis3_Track2 (demo/analysis)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis3_Track2.rep",
+      "title": "Analysis3_Track2.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Analysis3_Track2": {
+      "href": "./assets/Analysis3_Track2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Analysis3_Track2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis3_Track2.rep",
+        "load_timestamp": "2026-03-21T10:15:00.170570Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

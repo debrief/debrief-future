@@ -1,0 +1,113 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "s2r--third-party-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          51.40026944444444,
+          27.405430555555554
+        ],
+        [
+          51.413580555555555,
+          27.405430555555554
+        ],
+        [
+          51.413580555555555,
+          27.425486111111113
+        ],
+        [
+          51.40026944444444,
+          27.425486111111113
+        ],
+        [
+          51.40026944444444,
+          27.405430555555554
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    51.40026944444444,
+    27.405430555555554,
+    51.413580555555555,
+    27.425486111111113
+  ],
+  "properties": {
+    "title": "Dynamic Mongoose: Third Party Track",
+    "datetime": "1970-01-03T01:44:25+00:00",
+    "description": "Dynamic Mongoose: Third Party Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including FS Provence.",
+    "start_datetime": "1970-01-03T01:44:25+00:00",
+    "end_datetime": "1970-01-03T01:51:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "FS Provence"
+    ],
+    "debrief:nationalities": [
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "third_party_track (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/third_party_track.rep",
+      "title": "third_party_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-third_party_track": {
+      "href": "./assets/third_party_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "third_party_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/third_party_track.rep",
+        "load_timestamp": "2026-03-21T10:15:01.811875Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

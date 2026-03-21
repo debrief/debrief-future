@@ -1,0 +1,116 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "s2r--nonsuch-otg",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.873711111111113,
+          4.921111111111111
+        ],
+        [
+          30.0,
+          4.921111111111111
+        ],
+        [
+          30.0,
+          5.0
+        ],
+        [
+          29.873711111111113,
+          5.0
+        ],
+        [
+          29.873711111111113,
+          4.921111111111111
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.873711111111113,
+    4.921111111111111,
+    30.0,
+    5.0
+  ],
+  "properties": {
+    "title": "Dynamic Mongoose: Nonsuch Otg",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Dynamic Mongoose: Nonsuch Otg \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS De Zeven Provincien.",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "radar-detection",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [
+      "HNoMS De Zeven Provincien"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "nonsuch_otg (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/nonsuch_otg.rep",
+      "title": "nonsuch_otg.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-nonsuch_otg": {
+      "href": "./assets/nonsuch_otg.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "nonsuch_otg.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/nonsuch_otg.rep",
+        "load_timestamp": "2026-03-21T10:15:01.785765Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

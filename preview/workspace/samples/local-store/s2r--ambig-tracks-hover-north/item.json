@@ -1,0 +1,121 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "s2r--ambig-tracks-hover-north",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.01,
+          59.97403333333334
+        ],
+        [
+          0.19741944444444443,
+          59.97403333333334
+        ],
+        [
+          0.19741944444444443,
+          60.4
+        ],
+        [
+          -0.01,
+          60.4
+        ],
+        [
+          -0.01,
+          59.97403333333334
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.01,
+    59.97403333333334,
+    0.19741944444444443,
+    60.4
+  ],
+  "properties": {
+    "title": "Dynamic Mongoose: Ambig Tracks Hover North",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Dynamic Mongoose: Ambig Tracks Hover North \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. 102 sensor contact(s) logged. Multi-national participation: CA, GB.",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T13:40:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "force-protection",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact",
+      "sprint-and-drift",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMS Richmond",
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "CA",
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+      "title": "Ambig_tracks_hover_north.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Ambig_tracks_hover_north": {
+      "href": "./assets/Ambig_tracks_hover_north.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Ambig_tracks_hover_north.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+        "load_timestamp": "2026-03-21T10:15:01.443448Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

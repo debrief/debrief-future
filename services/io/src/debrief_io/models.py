@@ -128,3 +128,33 @@ class ParseResult(BaseModel):
 
         self.warnings.extend(schema_warnings)
         return schema_warnings
+
+
+class ImportWarning(BaseModel):
+    """Non-fatal issue encountered during batch import."""
+
+    file: str
+    code: str
+    message: str
+
+
+class ImportFileError(BaseModel):
+    """Fatal error for a single file during batch import."""
+
+    file: str
+    error: str
+
+
+class ImportResult(BaseModel):
+    """Result of a batch import operation."""
+
+    catalog_path: str
+    files_processed: int = 0
+    files_succeeded: int = 0
+    files_failed: int = 0
+    total_tracks: int = 0
+    total_sensors: int = 0
+    total_narratives: int = 0
+    warnings: list[ImportWarning] = Field(default_factory=list)
+    errors: list[ImportFileError] = Field(default_factory=list)
+    duration_seconds: float = 0.0

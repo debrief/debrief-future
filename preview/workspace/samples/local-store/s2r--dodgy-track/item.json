@@ -1,0 +1,115 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "s2r--dodgy-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          51.38124722222222,
+          26.101755555555556
+        ],
+        [
+          51.79861388888889,
+          26.101755555555556
+        ],
+        [
+          51.79861388888889,
+          26.437475
+        ],
+        [
+          51.38124722222222,
+          26.437475
+        ],
+        [
+          51.38124722222222,
+          26.101755555555556
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    51.38124722222222,
+    26.101755555555556,
+    51.79861388888889,
+    26.437475
+  ],
+  "properties": {
+    "title": "Dynamic Mongoose: Dodgy Track",
+    "datetime": "1970-01-03T01:34:25+00:00",
+    "description": "Dynamic Mongoose: Dodgy Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Evertsen.",
+    "start_datetime": "1970-01-03T01:34:25+00:00",
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/type212"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "surveillance",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "USS Evertsen"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "dodgy_track (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/dodgy_track.rep",
+      "title": "dodgy_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-dodgy_track": {
+      "href": "./assets/dodgy_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "dodgy_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/dodgy_track.rep",
+        "load_timestamp": "2026-03-21T10:15:01.467889Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

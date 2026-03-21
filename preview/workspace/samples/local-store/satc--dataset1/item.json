@@ -1,0 +1,115 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--dataset1",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "properties": {
+    "title": "Silent Resolve: Dataset1",
+    "datetime": "2016-10-10T12:00:00+00:00",
+    "description": "Silent Resolve: Dataset1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Visby.",
+    "start_datetime": "2016-10-10T12:00:00+00:00",
+    "end_datetime": "2016-10-10T19:37:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "prosecution",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HMS Visby"
+    ],
+    "debrief:nationalities": [
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Dataset1 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset1.rep",
+      "title": "Dataset1.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Dataset1": {
+      "href": "./assets/Dataset1.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Dataset1.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset1.rep",
+        "load_timestamp": "2026-03-21T10:15:02.623241Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

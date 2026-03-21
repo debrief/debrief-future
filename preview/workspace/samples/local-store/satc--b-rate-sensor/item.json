@@ -1,0 +1,80 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--b-rate-sensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "Silent Resolve: B Rate Sensor",
+    "datetime": "2026-03-21T10:15:01.928670+00:00",
+    "description": "Silent Resolve: B Rate Sensor \u2014 Semi-auto track construction exercise in the Norwegian Sea. 218 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "boarding",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "sonar-contact",
+      "sprint-and-drift",
+      "track-merge",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "B_Rate_Sensor (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Sensor.dsf",
+      "title": "B_Rate_Sensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-B_Rate_Sensor": {
+      "href": "./assets/B_Rate_Sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "B_Rate_Sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:01.935001Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

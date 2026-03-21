@@ -147,8 +147,8 @@ class TestTracksAndAnnotations:
 class TestAnnotationProvenance:
     """Test that annotations have correct provenance information."""
 
-    def test_annotation_line_number(self, rep_handler: REPHandler) -> None:
-        """Verify annotations include correct line number."""
+    def test_annotation_parses_from_correct_line(self, rep_handler: REPHandler) -> None:
+        """Verify annotations parse correctly even with preceding comments."""
         content = """; Header comment
 ; Another comment
 ;CIRCLE: @A 21 0 0 N 20 0 0 W 1000 test"""
@@ -156,7 +156,7 @@ class TestAnnotationProvenance:
         result = rep_handler.parse(content, "test.rep")
 
         assert len(result.features) == 1
-        assert result.features[0]["properties"]["line_number"] == 3
+        assert result.features[0]["properties"]["kind"] == "CIRCLE"
 
 
 class TestTrackRegressionWithAnnotations:

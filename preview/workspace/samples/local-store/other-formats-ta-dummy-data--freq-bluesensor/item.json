@@ -1,0 +1,77 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "other-formats-ta-dummy-data--freq-bluesensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "Talisman Sabre: Freq Bluesensor",
+    "datetime": "2026-03-21T10:15:05.458349+00:00",
+    "description": "Talisman Sabre: Freq Bluesensor \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 226 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "certification",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueSensor (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueSensor.dsf",
+      "title": "Freq_BlueSensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Freq_BlueSensor": {
+      "href": "./assets/Freq_BlueSensor.dsf",
+      "type": "application/octet-stream",
+      "title": "Freq_BlueSensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueSensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:05.464918Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

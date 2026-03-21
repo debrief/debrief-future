@@ -1,0 +1,78 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--sen-missing-host-sensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "Saxon Warrior: Sen Missing Host Sensor",
+    "datetime": "2026-03-21T10:15:06.040590+00:00",
+    "description": "Saxon Warrior: Sen Missing Host Sensor \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 95 sensor contact(s) logged.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "harbour-ops",
+      "missile-firing",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sen_missing_host_sensor (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
+      "title": "sen_missing_host_sensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sen_missing_host_sensor": {
+      "href": "./assets/sen_missing_host_sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_missing_host_sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:06.044969Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

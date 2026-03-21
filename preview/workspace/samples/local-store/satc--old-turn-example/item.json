@@ -1,0 +1,123 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--old-turn-example",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.7566036,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.1649972
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.7566036,
+    5.1649972,
+    30.9332722,
+    5.212115
+  ],
+  "properties": {
+    "title": "Silent Resolve: Old Turn Example",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Silent Resolve: Old Turn Example \u2014 Semi-auto track construction exercise in the Norwegian Sea. 2 platform track(s) recorded including HDMS De Ruyter, HMS Somerset. 26 sensor contact(s) logged. Multi-national participation: DK, GB.",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar",
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "escort",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "prosecution",
+      "radar-detection",
+      "sonar-contact",
+      "sprint-and-drift",
+      "track-merge"
+    ],
+    "debrief:track_names": [
+      "HDMS De Ruyter",
+      "HMS Somerset"
+    ],
+    "debrief:nationalities": [
+      "DK",
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "old_turn_example (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/old_turn_example.dpf",
+      "title": "old_turn_example.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-old_turn_example": {
+      "href": "./assets/old_turn_example.dpf",
+      "type": "application/octet-stream",
+      "title": "old_turn_example.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/old_turn_example.dpf",
+        "load_timestamp": "2026-03-21T10:15:02.160249Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

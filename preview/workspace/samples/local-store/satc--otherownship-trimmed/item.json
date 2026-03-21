@@ -1,0 +1,116 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--otherownship-trimmed",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.410166666666665,
+          44.14557222222222
+        ],
+        [
+          -21.101244444444447,
+          44.14557222222222
+        ],
+        [
+          -21.101244444444447,
+          44.630652777777776
+        ],
+        [
+          -21.410166666666665,
+          44.630652777777776
+        ],
+        [
+          -21.410166666666665,
+          44.14557222222222
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.410166666666665,
+    44.14557222222222,
+    -21.101244444444447,
+    44.630652777777776
+  ],
+  "properties": {
+    "title": "Silent Resolve: Otherownship Trimmed",
+    "datetime": "2011-03-21T22:08:02.380000+00:00",
+    "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HNoMS Truxtun.",
+    "start_datetime": "2011-03-21T22:08:02.380000+00:00",
+    "end_datetime": "2011-03-22T04:47:54.870000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "prosecution",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "towed-array",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "HNoMS Truxtun"
+    ],
+    "debrief:nationalities": [
+      "NO"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "OtherOwnship_Trimmed (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/OtherOwnship_Trimmed.rep",
+      "title": "OtherOwnship_Trimmed.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-OtherOwnship_Trimmed": {
+      "href": "./assets/OtherOwnship_Trimmed.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "OtherOwnship_Trimmed.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/OtherOwnship_Trimmed.rep",
+        "load_timestamp": "2026-03-21T10:15:04.069172Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

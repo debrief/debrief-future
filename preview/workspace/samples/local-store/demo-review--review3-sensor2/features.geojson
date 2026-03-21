@@ -1,0 +1,215 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "7aed3b9c-d9b9-4dd2-bfa5-657d858a48c9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:05:25+00:00",
+        "bearing": -85.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "38bf5a71-d743-45c6-a3e9-6d533cbfaf1c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:06:25+00:00",
+        "bearing": -85.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1e711321-a501-4ab0-b008-a1f5537659cf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:07:25+00:00",
+        "bearing": -85.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b5b80774-8e0c-46ca-9ea0-b5e1f7a57a16",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:08:25+00:00",
+        "bearing": -85.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cad70c9c-cac7-475b-b65b-49cf0b40bef4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:09:25+00:00",
+        "bearing": -85.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e19aec52-0d94-45f1-9c63-a2241df3fa6c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:10:25+00:00",
+        "bearing": -86.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8797c7de-a764-4eb7-b528-f8f17b664e47",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:11:25+00:00",
+        "bearing": -86.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0f9f14d4-7616-46d9-9052-5f851b9cd066",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:12:25+00:00",
+        "bearing": -86.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4b715cdf-2581-4772-9834-9977833b049d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:13:25+00:00",
+        "bearing": -87.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9ab05e44-5f08-492c-ba44-c3e0b985e79e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:14:25+00:00",
+        "bearing": -87.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e64e50d8-b8ba-4bec-abfc-f9d29ab2fa11",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:15:25+00:00",
+        "bearing": -87.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ba5cff3f-021c-464d-8a2f-4ed0c5d472b8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:16:25+00:00",
+        "bearing": -88.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "09bbdcc4-88e5-4395-b867-c536eb1517a2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:17:25+00:00",
+        "bearing": -88.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d0c67bca-48e1-4375-97bc-859e9d18e514",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:18:25+00:00",
+        "bearing": -89.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4f776e45-5df0-4986-9e1a-e308b043cb37",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "New_SSK",
+        "time": "1970-01-03T03:19:25+00:00",
+        "bearing": -89.0,
+        "range": 0.0,
+        "sensor_name": "New_SSK_BB",
+        "label": "some message"
+      }
+    }
+  ]
+}

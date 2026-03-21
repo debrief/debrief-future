@@ -1,0 +1,124 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "multi-static--buoy-test-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.8399,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          22.142258333333334
+        ],
+        [
+          -21.8399,
+          22.142258333333334
+        ],
+        [
+          -21.8399,
+          21.894219444444445
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.8399,
+    21.894219444444445,
+    -21.57275,
+    22.142258333333334
+  ],
+  "properties": {
+    "title": "Formidable Shield: Buoy Test Track",
+    "datetime": "1995-12-12T05:03:00+00:00",
+    "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNLMS Somerset, HMS Iron Duke and 1 other(s). Multi-national participation: GB, NL, US.",
+    "start_datetime": "1995-12-12T05:03:00+00:00",
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "force-protection",
+      "multi-national",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [
+      "HMS Collingwood",
+      "HNLMS Somerset",
+      "HMS Iron Duke",
+      "USS Gonzalez"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NL",
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "buoy_test_track (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/buoy_test_track.rep",
+      "title": "buoy_test_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-buoy_test_track": {
+      "href": "./assets/buoy_test_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "buoy_test_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/buoy_test_track.rep",
+        "load_timestamp": "2026-03-21T10:15:00.438517Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

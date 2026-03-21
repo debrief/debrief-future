@@ -29,7 +29,9 @@
       "path": "tests"
     }
   ],
-  "settings": {},
+  "settings": {
+    "debrief.stacCatalogPath": "preview/workspace/samples/local-store"
+  },
   "extensions": {
     "recommendations": [
       "ms-python.python",

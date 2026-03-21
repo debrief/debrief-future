@@ -20,6 +20,14 @@ from .parser import generate_feature_id
 from .symbols import ParsedSymbol, get_dash_array, parse_symbol
 from .timestamps import parse_timestamp
 
+# Default style for narrative entries (no spatial location, just a marker)
+_DEFAULT_NARRATIVE_STYLE: dict[str, Any] = {
+    "shape": "circle",
+    "radius": 3.0,
+    "fill_color": "#808080",
+    "color": "#808080",
+}
+
 
 def _extract_content_after_prefix(line: str) -> str:
     """Extract content after the annotation type prefix."""
@@ -222,13 +230,13 @@ def build_narrative(line: str, line_number: int, filename: str) -> dict[str, Any
     return {
         "type": "Feature",
         "id": generate_feature_id(),
-        "geometry": {"type": "Point", "coordinates": []},  # Empty point - no spatial location
+        "geometry": {"type": "Point", "coordinates": []},
         "properties": {
             "kind": "NARRATIVE",
             "time": ts.iso_string,
             "text": text,
             "track_id": track_name,
-            "line_number": line_number,
+            "style": _DEFAULT_NARRATIVE_STYLE,
         },
     }
 
@@ -324,7 +332,6 @@ def build_circle(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -398,7 +405,6 @@ def build_rectangle(line: str, line_number: int, filename: str) -> dict[str, Any
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -461,7 +467,6 @@ def build_line(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -566,7 +571,6 @@ def build_vector(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -624,7 +628,6 @@ def build_text(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "text": text,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -697,7 +700,6 @@ def build_polygon(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -763,7 +765,6 @@ def build_polyline(line: str, line_number: int, filename: str) -> dict[str, Any]
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -849,7 +850,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "line_number": line_number,
             },
         }
     else:
@@ -917,7 +917,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "line_number": line_number,
             },
         }
 
@@ -981,7 +980,6 @@ def build_timetext(line: str, line_number: int, filename: str) -> dict[str, Any]
             "timestamp": timestamp.iso_string if timestamp else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1049,7 +1047,6 @@ def build_periodtext(line: str, line_number: int, filename: str) -> dict[str, An
             "time_end": time_end.iso_string if time_end else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1153,7 +1150,6 @@ def build_wheel(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1252,7 +1248,6 @@ def build_dynamic_rect(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1346,7 +1341,6 @@ def build_dynamic_circle(line: str, line_number: int, filename: str) -> dict[str
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1433,51 +1427,87 @@ def build_dynamic_poly(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "line_number": line_number,
         },
     }
+
+
+def _parse_sensor_type_and_label(text: str) -> tuple[str | None, str | None]:
+    """Parse sensor type and label from remaining SENSOR text.
+
+    Handles both quoted and unquoted sensor types:
+        ``"Plain Cookie" FisherOne held on Plain Cookie``
+        ``s2_cookie SUBJECT held on s2_cookie``
+    """
+    if not text:
+        return None, None
+    text = text.strip()
+    if text.startswith('"'):
+        # Quoted sensor type
+        end = text.find('"', 1)
+        if end == -1:
+            return text[1:], None
+        sensor_type = text[1:end]
+        rest = text[end + 1 :].strip()
+        return sensor_type, rest or None
+    # Unquoted: first token is sensor_type, rest is label
+    parts = text.split(None, 1)
+    sensor_type = parts[0]
+    label = parts[1] if len(parts) > 1 else None
+    return sensor_type, label
 
 
 def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     """
     Build SensorAnnotation feature from SENSOR line.
 
-    Format: ;SENSOR: YYMMDD HHMMSS "TRACK_NAME" @A LAT LON BEARING RANGE SENSOR_TYPE LABEL
+    Formats:
+        ;SENSOR: YYMMDD HHMMSS "TRACK_NAME" @A LAT LON BEARING RANGE SENSOR_TYPE LABEL
+        ;SENSOR: YYMMDD HHMMSS TRACK_NAME @A LAT LON BEARING RANGE SENSOR_TYPE LABEL
     """
     content = _extract_content_after_prefix(line)
 
-    # Extract quoted track name
-    if '"' not in content:
+    # Check if the track name (3rd token) is quoted
+    all_tokens = content.split()
+    has_quoted_track = len(all_tokens) >= 3 and all_tokens[2].startswith('"')
+
+    if has_quoted_track:
+        # Quoted track name: ;SENSOR: 951212 050200 "NELSON" @A ...
+        before_quote = content.split('"')[0].strip()
+        track_id = content.split('"')[1]
+        after_quote = '"'.join(content.split('"')[2:]).strip()
+
+        time_parts = before_quote.split()
+        if len(time_parts) < 2:
+            raise AnnotationParseError(
+                "SENSOR requires timestamp before track name",
+                line_number=line_number,
+                code=ErrorCode.INVALID_TIMESTAMP,
+                filename=filename,
+                annotation_type="SENSOR",
+            )
+
+        time_str = f"{time_parts[0]} {time_parts[1]}"
+        timestamp = parse_timestamp(time_str)
+        parts = after_quote.split()
+    else:
+        # Unquoted track name: ;SENSOR: 951212 050200 NELSON @A ...
+        all_parts = content.split()
+        if len(all_parts) < 4:
+            raise AnnotationParseError(
+                "Incomplete SENSOR - expected timestamp, track name, symbol",
+                line_number=line_number,
+                code=ErrorCode.PARSE_ERROR,
+                filename=filename,
+                annotation_type="SENSOR",
+            )
+        time_str = f"{all_parts[0]} {all_parts[1]}"
+        timestamp = parse_timestamp(time_str)
+        track_id = all_parts[2]
+        parts = all_parts[3:]
+
+    if len(parts) < 2:
         raise AnnotationParseError(
-            "SENSOR requires quoted track name",
-            line_number=line_number,
-            code=ErrorCode.PARSE_ERROR,
-            filename=filename,
-            annotation_type="SENSOR",
-        )
-
-    before_quote = content.split('"')[0].strip()
-    track_id = content.split('"')[1]
-    after_quote = '"'.join(content.split('"')[2:]).strip()
-
-    # Parse timestamp from before quote
-    time_parts = before_quote.split()
-    if len(time_parts) < 2:
-        raise AnnotationParseError(
-            "SENSOR requires timestamp before track name",
-            line_number=line_number,
-            code=ErrorCode.INVALID_TIMESTAMP,
-            filename=filename,
-            annotation_type="SENSOR",
-        )
-
-    time_str = f"{time_parts[0]} {time_parts[1]}"
-    timestamp = parse_timestamp(time_str)
-
-    parts = after_quote.split()
-    if len(parts) < 11:  # symbol + 8 coords + bearing + range = 11
-        raise AnnotationParseError(
-            "Incomplete SENSOR - expected symbol, coords, bearing, range",
+            "Incomplete SENSOR - expected at least symbol and bearing data",
             line_number=line_number,
             code=ErrorCode.PARSE_ERROR,
             filename=filename,
@@ -1487,6 +1517,54 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     # Parse symbol
     symbol_str = parts[0]
     symbol = parse_symbol(symbol_str, line_number)
+
+    # Check for NULL coordinates (bearing-only sensor, position from parent track)
+    if len(parts) >= 2 and parts[1].upper() == "NULL":
+        # Format: @A NULL BEARING RANGE SENSOR_TYPE LABEL
+        # or:     @A NULL BEARING RANGE "Quoted Sensor" LABEL
+        try:
+            bearing = float(parts[2])
+            range_m = float(parts[3])
+        except (ValueError, IndexError) as err:
+            raise AnnotationParseError(
+                "Invalid bearing or range in NULL-position SENSOR",
+                line_number=line_number,
+                code=ErrorCode.PARSE_ERROR,
+                filename=filename,
+                annotation_type="SENSOR",
+            ) from err
+
+        # Parse remaining content after bearing/range for sensor_type and label
+        # Rejoin and handle quoted sensor types
+        remaining = " ".join(parts[4:]) if len(parts) > 4 else ""
+        sensor_type, label = _parse_sensor_type_and_label(remaining)
+
+        return {
+            "type": "Feature",
+            "id": generate_feature_id(),
+            "geometry": None,
+            "properties": {
+                "kind": "SENSOR_CONTACT",
+                "track_id": track_id,
+                "bearing": bearing,
+                "range": range_m,
+                "sensor_type": sensor_type,
+                "timestamp": timestamp.iso_string if timestamp else None,
+                "label": label,
+                "symbol": symbol.color_code,
+                "style": _build_line_style(symbol),
+            },
+        }
+
+    # Full coordinates path: symbol + 8 coord parts + bearing + range = 11 minimum
+    if len(parts) < 11:
+        raise AnnotationParseError(
+            "Incomplete SENSOR - expected symbol, coords, bearing, range",
+            line_number=line_number,
+            code=ErrorCode.PARSE_ERROR,
+            filename=filename,
+            annotation_type="SENSOR",
+        )
 
     # Parse observer coordinates
     coord_text = " ".join(parts[1:])
@@ -1553,7 +1631,6 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1638,7 +1715,6 @@ def build_sensor2(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "line_number": line_number,
         },
     }
 
@@ -1729,7 +1805,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_line_style(symbol),
-                "line_number": line_number,
             },
         }
     else:
@@ -1832,7 +1907,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "line_number": line_number,
             },
         }
 
@@ -1871,6 +1945,5 @@ def build_tracksplit(line: str, line_number: int, filename: str) -> dict[str, An
             "kind": "TRACKSPLIT",
             "track_id": track_id,
             "timestamp": timestamp.iso_string if timestamp else None,
-            "line_number": line_number,
         },
     }

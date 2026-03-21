@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plot xmlns="http://www.debrief.info/plot" Created="2024-01-15T10:00:00" Name="Test Plot" PlotId="test-001">
+  <details Text="A sample DPF for unit testing" />
+  <session>
+    <layers>
+      <track Name="NELSON" Symbol="ScaledSubmarine" ColorMode="PerFix"
+             Visible="true" NameVisible="true" PositionsVisible="true"
+             LineThickness="2" SensorsVisible="true" SolutionsVisible="true">
+        <TrackSegment Name="Positions" PlotRelative="false" Visible="true">
+          <fix Course="269.700" Dtg="951212 050000" Label="050000" Speed="2.000" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="22.1862861" Long="-21.6978806"/>
+            </centre>
+          </fix>
+          <fix Course="269.700" Dtg="951212 060000" Label="060000" Speed="2.500" Visible="true">
+            <centre>
+              <shortLocation Depth="10.000" Lat="22.1962861" Long="-21.7078806"/>
+            </centre>
+          </fix>
+          <fix Course="180.000" Dtg="951212 070000" Label="070000" Speed="3.000" Visible="true">
+            <centre>
+              <shortLocation Depth="5.000" Lat="22.2062861" Long="-21.7178806"/>
+            </centre>
+          </fix>
+        </TrackSegment>
+        <sensor Name="Sensor_A" TrackName="NELSON" Visible="true" LineThickness="1">
+          <sensor_contact Bearing="45.500" Dtg="951212 050500" Label="contact1"
+            HasAmbiguousBearing="false" HasFrequency="true" Frequency="150.0"
+            Visible="true" LabelShowing="true"/>
+          <sensor_contact Bearing="46.200" Dtg="951212 051000" Label="contact2"
+            HasAmbiguousBearing="true" AmbiguousBearing="226.200"
+            HasFrequency="false" Frequency="0.0"
+            Visible="true" LabelShowing="true"/>
+        </sensor>
+      </track>
+      <track Name="COLLINGWOOD" Symbol="ScaledFrigate" ColorMode="PerFix"
+             Visible="true" NameVisible="true" PositionsVisible="true"
+             LineThickness="1" SensorsVisible="true" SolutionsVisible="true">
+        <TrackSegment Name="Positions" PlotRelative="false" Visible="true">
+          <fix Course="90.000" Dtg="951212 050000" Label="050000" Speed="5.000" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="22.3000000" Long="-21.5000000"/>
+            </centre>
+          </fix>
+          <fix Course="92.000" Dtg="951212 060000" Label="060000" Speed="5.200" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="22.3100000" Long="-21.4000000"/>
+            </centre>
+          </fix>
+        </TrackSegment>
+      </track>
+      <narrative Name="Narratives">
+        <narrative_entry Dtg="951212 050000" Entry="Exercise commenced" Track="NELSON" Type="Narratives"/>
+        <narrative_entry Dtg="951212 060000" Entry="Contact detected" Track="COLLINGWOOD" Type="Narratives"/>
+      </narrative>
+    </layers>
+  </session>
+</plot>

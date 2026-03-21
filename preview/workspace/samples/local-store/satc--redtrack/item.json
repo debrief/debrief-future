@@ -1,0 +1,117 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--redtrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -30.119758333333333,
+          -0.07229166666666667
+        ],
+        [
+          -30.0,
+          -0.07229166666666667
+        ],
+        [
+          -30.0,
+          -0.0
+        ],
+        [
+          -30.119758333333333,
+          -0.0
+        ],
+        [
+          -30.119758333333333,
+          -0.07229166666666667
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -30.119758333333333,
+    -0.07229166666666667,
+    -30.0,
+    -0.0
+  ],
+  "properties": {
+    "title": "Silent Resolve: Redtrack",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Silent Resolve: Redtrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T13:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "multi-national",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "minefield",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "RedTrack (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/RedTrack.rep",
+      "title": "RedTrack.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-RedTrack": {
+      "href": "./assets/RedTrack.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "RedTrack.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/RedTrack.rep",
+        "load_timestamp": "2026-03-21T10:15:02.123089Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

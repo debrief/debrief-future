@@ -20,7 +20,7 @@ class TestBuildNarrative:
         assert result["properties"]["time"] == "1995-12-12T05:02:00+00:00"
         assert result["properties"]["track_id"] == "NEL_STYLE"
         assert result["properties"]["text"] == "comment text here"
-        assert result["properties"]["line_number"] == 1
+        assert result["properties"]["style"]["shape"] == "circle"
 
     def test_parse_narrative_empty_text(self) -> None:
         """Parse NARRATIVE with no text content."""

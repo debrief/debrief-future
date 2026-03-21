@@ -1,9 +1,8 @@
 {
-  "type": "Catalog",
-  "id": "debrief-test-catalog",
+  "type": "Collection",
   "stac_version": "1.0.0",
-  "description": "Sample STAC catalog for Debrief VS Code extension testing",
-  "title": "Test Maritime Data",
+  "id": "catalog",
+  "description": "Debrief analysis catalog",
   "links": [
     {
       "rel": "root",
@@ -17,15 +16,1238 @@
     },
     {
       "rel": "item",
-      "href": "./exercise-alpha/item.json",
-      "type": "application/json",
-      "title": "Exercise Alpha"
+      "href": "./core--bulk-blue-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "BULK_BLUE_TRACKS (core)"
     },
     {
       "rel": "item",
-      "href": "./training-run-1/item.json",
-      "type": "application/json",
-      "title": "Training Run 1"
+      "href": "./core--bulk-red-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "BULK_RED_TRACKS (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--colortest/item.json",
+      "type": "application/geo+json",
+      "title": "ColorTest (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis--analysis1-areas/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis1_Areas (demo/analysis)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis--analysis2-track1/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis2_Track1 (demo/analysis)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis--analysis3-track2/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis3_Track2 (demo/analysis)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis--analysis4-narrative/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis4_Narrative (demo/analysis)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review--review1-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "Review1_Tracks (demo/review)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review--review2-sensor1/item.json",
+      "type": "application/geo+json",
+      "title": "Review2_Sensor1 (demo/review)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review--review3-sensor2/item.json",
+      "type": "application/geo+json",
+      "title": "Review3_Sensor2 (demo/review)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-trialsplanning--trialsplanning3-hits/item.json",
+      "type": "application/geo+json",
+      "title": "TrialsPlanning3_hits (demo/trialsplanning)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-trialsplanning--trialsplanning3-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "TrialsPlanning3_sensor (demo/trialsplanning)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-trialsplanning--trialsplanning3-subject/item.json",
+      "type": "application/geo+json",
+      "title": "TrialsPlanning3_subject (demo/trialsplanning)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--dynamicshapesettest/item.json",
+      "type": "application/geo+json",
+      "title": "DynamicShapeSetTest (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--gapstesttrack/item.json",
+      "type": "application/geo+json",
+      "title": "GapsTestTrack (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--blueparallelcourses/item.json",
+      "type": "application/geo+json",
+      "title": "BlueParallelCourses (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--multistatic-vessel/item.json",
+      "type": "application/geo+json",
+      "title": "MultiStatic_Vessel (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--offsettracks/item.json",
+      "type": "application/geo+json",
+      "title": "OffsetTracks (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--offset-null-positions/item.json",
+      "type": "application/geo+json",
+      "title": "Offset_null_positions (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--sensor-offset-short/item.json",
+      "type": "application/geo+json",
+      "title": "Sensor_Offset_short (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--threebuoys/item.json",
+      "type": "application/geo+json",
+      "title": "ThreeBuoys (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--vessel-with-sensor-offset/item.json",
+      "type": "application/geo+json",
+      "title": "Vessel_with_Sensor_Offset (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--buoy-test-track/item.json",
+      "type": "application/geo+json",
+      "title": "buoy_test_track (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static--multistatics-buoyfield/item.json",
+      "type": "application/geo+json",
+      "title": "multistatics_buoyfield (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--plotwithgeotiff/item.json",
+      "type": "application/geo+json",
+      "title": "PlotWithGeoTiff (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-2553-missing-sensor-data--bluesensorbrg/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensorBrg (s2r/2553-missing-sensor-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-2553-missing-sensor-data--bluetrack/item.json",
+      "type": "application/geo+json",
+      "title": "BlueTrack (s2r/2553-missing-sensor-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-2553-missing-sensor-data--redtrack/item.json",
+      "type": "application/geo+json",
+      "title": "RedTrack (s2r/2553-missing-sensor-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-2553-missing-sensor-data--workingfreqplot/item.json",
+      "type": "application/geo+json",
+      "title": "WorkingFreqPlot (s2r/2553-missing-sensor-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--2648-target-plot/item.json",
+      "type": "application/geo+json",
+      "title": "2648_target_plot (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--2648-tx-tma-to-dr/item.json",
+      "type": "application/geo+json",
+      "title": "2648_tx_TMA_to_DR (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks2/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks2 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks3/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks3 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks-hover-north/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks-hover-north-hm/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north_HM (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--ambig-tracks-hover-north-ta/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north_TA (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--polyline-measurement/item.json",
+      "type": "application/geo+json",
+      "title": "Polyline_Measurement (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--dodgy-track/item.json",
+      "type": "application/geo+json",
+      "title": "dodgy_track (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-freq--contact-bearings/item.json",
+      "type": "application/geo+json",
+      "title": "Contact_bearings (s2r/freq)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-freq--multitonalfreqplot/item.json",
+      "type": "application/geo+json",
+      "title": "MultiTonalFreqPlot (s2r/freq)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-freq--twin-cpa/item.json",
+      "type": "application/geo+json",
+      "title": "Twin_cpa (s2r/freq)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-freq--osshipaa-3/item.json",
+      "type": "application/geo+json",
+      "title": "osshipaa_3 (s2r/freq)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-issue-1621--longer-track/item.json",
+      "type": "application/geo+json",
+      "title": "longer_track (s2r/issue-1621)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-issue-1621--shorter-os/item.json",
+      "type": "application/geo+json",
+      "title": "shorter_os (s2r/issue-1621)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--legs-20/item.json",
+      "type": "application/geo+json",
+      "title": "legs_20 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--mid-flow/item.json",
+      "type": "application/geo+json",
+      "title": "mid_flow (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--midflow2/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--midflow2a/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2a (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--midflow2b/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2b (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--nonsuch/item.json",
+      "type": "application/geo+json",
+      "title": "nonsuch (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--nonsuch-otg/item.json",
+      "type": "application/geo+json",
+      "title": "nonsuch_otg (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sensor (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-smooth-back-jumps--jumps/item.json",
+      "type": "application/geo+json",
+      "title": "jumps (s2r/smooth-back-jumps)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--third-party-track/item.json",
+      "type": "application/geo+json",
+      "title": "third_party_track (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--turn/item.json",
+      "type": "application/geo+json",
+      "title": "turn (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--turn-single-point/item.json",
+      "type": "application/geo+json",
+      "title": "turn_single_point (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r--twin-ownship-sensors/item.json",
+      "type": "application/geo+json",
+      "title": "twin_ownship_sensors (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--1936-verification/item.json",
+      "type": "application/geo+json",
+      "title": "1936_verification (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--b-rate-ownship/item.json",
+      "type": "application/geo+json",
+      "title": "B_Rate_Ownship (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--b-rate-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "B_Rate_Sensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--bluesensor/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--bluesensor-sparse/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensor_sparse (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--bluetrack/item.json",
+      "type": "application/geo+json",
+      "title": "BlueTrack (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--compositestraighttest/item.json",
+      "type": "application/geo+json",
+      "title": "CompositeStraightTest (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--deb-north-low-bearing-rate-s-turns/item.json",
+      "type": "application/geo+json",
+      "title": "Deb_North_Low_Bearing_Rate_s_turns (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--freqtracks/item.json",
+      "type": "application/geo+json",
+      "title": "FreqTracks (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--freqtracksquantized/item.json",
+      "type": "application/geo+json",
+      "title": "FreqTracksQuantized (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--l1-ownshipsensor/item.json",
+      "type": "application/geo+json",
+      "title": "L1_OwnshipSensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--l1-ownshiptrack/item.json",
+      "type": "application/geo+json",
+      "title": "L1_OwnshipTrack (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--l1-subjecttrack/item.json",
+      "type": "application/geo+json",
+      "title": "L1_SubjectTrack (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--l2-scenario/item.json",
+      "type": "application/geo+json",
+      "title": "L2_Scenario (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--mda-test/item.json",
+      "type": "application/geo+json",
+      "title": "MDA_Test (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--redtrack/item.json",
+      "type": "application/geo+json",
+      "title": "RedTrack (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--slicedemo/item.json",
+      "type": "application/geo+json",
+      "title": "SliceDemo (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--old-turn-example/item.json",
+      "type": "application/geo+json",
+      "title": "old_turn_example (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--thirty-min-earlier-first-turn/item.json",
+      "type": "application/geo+json",
+      "title": "thirty_min_earlier_first_turn (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--thirty-min-extra-leg/item.json",
+      "type": "application/geo+json",
+      "title": "thirty_min_extra_leg (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--thiry-min-one/item.json",
+      "type": "application/geo+json",
+      "title": "thiry_min_one (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--dataset1/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset1 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--dataset2b/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset2b (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--dataset3/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset3 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--otherownship/item.json",
+      "type": "application/geo+json",
+      "title": "OtherOwnship (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--otherownship-trimmed/item.json",
+      "type": "application/geo+json",
+      "title": "OtherOwnship_Trimmed (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--scenarioone-targetzig/item.json",
+      "type": "application/geo+json",
+      "title": "ScenarioOne_TargetZig (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--ownship-1/item.json",
+      "type": "application/geo+json",
+      "title": "ownship_1 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--ownship-2/item.json",
+      "type": "application/geo+json",
+      "title": "ownship_2 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--source-1/item.json",
+      "type": "application/geo+json",
+      "title": "source_1 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--source-2/item.json",
+      "type": "application/geo+json",
+      "title": "source_2 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc--tug-1/item.json",
+      "type": "application/geo+json",
+      "title": "tug_1 (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--boat1/item.json",
+      "type": "application/geo+json",
+      "title": "boat1 (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--boat1t/item.json",
+      "type": "application/geo+json",
+      "title": "boat1t (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--boat2/item.json",
+      "type": "application/geo+json",
+      "title": "boat2 (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--boattest/item.json",
+      "type": "application/geo+json",
+      "title": "boattest (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--lightweight-test-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "lightweight_test_tracks (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--narrative/item.json",
+      "type": "application/geo+json",
+      "title": "narrative (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--narrative2/item.json",
+      "type": "application/geo+json",
+      "title": "narrative2 (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--narrative-bulk/item.json",
+      "type": "application/geo+json",
+      "title": "narrative_bulk (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--narrative-large/item.json",
+      "type": "application/geo+json",
+      "title": "narrative_large (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--offset-times/item.json",
+      "type": "application/geo+json",
+      "title": "offset_times (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats--bad-boat2/item.json",
+      "type": "application/geo+json",
+      "title": "BAD_boat2 (other-formats)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-ta-dummy-data--freq-bluesensor/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueSensor (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-ta-dummy-data--freq-bluesensor-nopos/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueSensor_NoPos (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-ta-dummy-data--freq-bluetrack/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueTrack (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-ta-dummy-data--freq-redtrack/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_RedTrack (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-ta-dummy-data--lots-of-os-legs/item.json",
+      "type": "application/geo+json",
+      "title": "Lots_of_OS_Legs (other-formats/ta-dummy-data)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-test-data-brt-import--all-tracks-use-current-heading/item.json",
+      "type": "application/geo+json",
+      "title": "All Tracks Use Current Heading (other-formats/test-data/brt-import)"
+    },
+    {
+      "rel": "item",
+      "href": "./other-formats-test-data-brt-import--all-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "All Tracks (other-formats/test-data/brt-import)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--reverse-chrono/item.json",
+      "type": "application/geo+json",
+      "title": "reverse_chrono (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sample/item.json",
+      "type": "application/geo+json",
+      "title": "sample (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sample-lots-of-sensors/item.json",
+      "type": "application/geo+json",
+      "title": "sample_lots_of_sensors (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--samplescale/item.json",
+      "type": "application/geo+json",
+      "title": "samplescale (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-frig-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_frig_sensor (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-missing-host-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_missing_host_sensor (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-ssk-freq/item.json",
+      "type": "application/geo+json",
+      "title": "sen_ssk_freq (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-ssk-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_ssk_sensor (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "sen_tracks (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sen-tracks-with-narrative/item.json",
+      "type": "application/geo+json",
+      "title": "sen_tracks_with_narrative (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--shapes/item.json",
+      "type": "application/geo+json",
+      "title": "shapes (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sparse-track/item.json",
+      "type": "application/geo+json",
+      "title": "sparse_track (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--sparse-track-self-split/item.json",
+      "type": "application/geo+json",
+      "title": "sparse_track_self_split (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--split-sen-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "split_sen_tracks (core)"
+    },
+    {
+      "rel": "item",
+      "href": "./core--uk-track/item.json",
+      "type": "application/geo+json",
+      "title": "uk_track (core)"
     }
-  ]
+  ],
+  "title": "Debrief Legacy Sample Data",
+  "license": "proprietary",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -153.26379444444444,
+          -0.2503611111111111,
+          52.06401944444444,
+          63.03612777777778
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1900-12-12T06:35:03.910000+00:00",
+          "2026-03-21T10:15:06.117041+00:00"
+        ]
+      ]
+    }
+  },
+  "summaries": {
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland",
+      "subsurface/submarine/ssk/type212",
+      "subsurface/submarine/ssn/astute",
+      "subsurface/submarine/ssn/trafalgar",
+      "subsurface/submarine/ssn/virginia",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/destroyer/type45",
+      "surface/warship/frigate/fremm",
+      "surface/warship/frigate/type23",
+      "surface/warship/frigate/type26",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "ASW",
+      "EW",
+      "MCM",
+      "NGFS",
+      "SAR",
+      "amphibious",
+      "boarding",
+      "certification",
+      "escort",
+      "force-protection",
+      "gunnery",
+      "harbour-ops",
+      "mine-clearance",
+      "missile-firing",
+      "multi-national",
+      "prosecution",
+      "replenishment",
+      "surveillance",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "datum",
+      "depth-charge",
+      "helicopter-ops",
+      "intercept",
+      "minefield",
+      "passive-search",
+      "prosecution",
+      "radar-detection",
+      "sonar-contact",
+      "sprint-and-drift",
+      "torpedo-run",
+      "towed-array",
+      "track-merge",
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha",
+      "FGS Andrea Doria",
+      "FGS Auvergne",
+      "FGS Bainbridge",
+      "FGS Bergamini",
+      "FGS Bretagne",
+      "FGS Carney",
+      "FGS Cole",
+      "FGS De Zeven Provincien",
+      "FGS Defender",
+      "FGS Diamond",
+      "FGS Dragon",
+      "FGS Fridtjof Nansen",
+      "FGS Gonzalez",
+      "FGS Hamburg",
+      "FGS Iron Duke",
+      "FGS Kent",
+      "FGS Laboon",
+      "FGS Languedoc",
+      "FGS Mason",
+      "FGS Northumberland",
+      "FGS Portland",
+      "FGS Ramage",
+      "FGS Somerset",
+      "FGS Ssk_027",
+      "FGS Ssk_034",
+      "FGS Ssk_036",
+      "FGS Ssk_041",
+      "FGS Ssk_042",
+      "FGS Ssk_044",
+      "FGS Ssk_046",
+      "FGS Ssk_049",
+      "FGS Ssk_053",
+      "FGS Ssk_055",
+      "FGS Ssk_057",
+      "FGS Ssk_065",
+      "FGS Ssk_066",
+      "FGS Ssk_068",
+      "FGS Ssk_078",
+      "FGS Ssk_087",
+      "FGS Ssk_094",
+      "FGS Ssk_095",
+      "FGS Ssk_100",
+      "FGS Ssk_103",
+      "FGS Ssk_107",
+      "FGS Ssk_108",
+      "FGS Ssk_111",
+      "FGS Ssk_113",
+      "FGS Ssk_114",
+      "FGS Ssk_118",
+      "FGS Ssk_129",
+      "FGS Ssk_138",
+      "FGS Ssk_139",
+      "FGS Ssk_149",
+      "FGS Ssk_151",
+      "FGS Ssk_152",
+      "FGS Ssk_162",
+      "FGS Ssk_169",
+      "FGS Ssk_172",
+      "FGS Ssk_174",
+      "FGS Ssk_179",
+      "FGS Ssk_186",
+      "FGS Ssk_194",
+      "FGS Ssk_199",
+      "FGS Ssk_203",
+      "FGS Ssk_208",
+      "FGS Ssk_210",
+      "FGS Ssk_212",
+      "FGS Ssk_218",
+      "FGS Ssk_226",
+      "FGS Ssk_233",
+      "FGS Ssk_236",
+      "FGS Ssk_244",
+      "FGS Ssk_253",
+      "FGS Ssk_256",
+      "FGS Ssk_258",
+      "FGS Ssk_259",
+      "FGS Ssk_267",
+      "FGS Ssk_268",
+      "FGS Ssk_274",
+      "FGS Ssk_275",
+      "FGS Ssk_276",
+      "FGS Ssk_278",
+      "FGS Ssk_284",
+      "FGS Ssk_288",
+      "FGS Ssk_289",
+      "FGS Ssk_291",
+      "FGS Ssk_297",
+      "FS Andrea Doria",
+      "FS Aquitaine",
+      "FS Cole",
+      "FS Dauntless",
+      "FS De Ruyter",
+      "FS De Zeven Provincien",
+      "FS Defender",
+      "FS Diamond",
+      "FS Dragon",
+      "FS Duncan",
+      "FS Evertsen",
+      "FS Gonzalez",
+      "FS Hamburg",
+      "FS Helsingborg",
+      "FS Hessen",
+      "FS Iron Duke",
+      "FS Kent",
+      "FS Languedoc",
+      "FS Northumberland",
+      "FS Otto Sverdrup",
+      "FS Portland",
+      "FS Provence",
+      "FS Roald Amundsen",
+      "FS Roosevelt",
+      "FS Sachsen",
+      "FS Ssk_002",
+      "FS Ssk_013",
+      "FS Ssk_016",
+      "FS Ssk_019",
+      "FS Ssk_021",
+      "FS Ssk_022",
+      "FS Ssk_023",
+      "FS Ssk_025",
+      "FS Ssk_029",
+      "FS Ssk_035",
+      "FS Ssk_038",
+      "FS Ssk_039",
+      "FS Ssk_047",
+      "FS Ssk_052",
+      "FS Ssk_059",
+      "FS Ssk_060",
+      "FS Ssk_061",
+      "FS Ssk_063",
+      "FS Ssk_067",
+      "FS Ssk_074",
+      "FS Ssk_075",
+      "FS Ssk_076",
+      "FS Ssk_080",
+      "FS Ssk_088",
+      "FS Ssk_096",
+      "FS Ssk_098",
+      "FS Ssk_105",
+      "FS Ssk_112",
+      "FS Ssk_119",
+      "FS Ssk_122",
+      "FS Ssk_123",
+      "FS Ssk_124",
+      "FS Ssk_126",
+      "FS Ssk_131",
+      "FS Ssk_137",
+      "FS Ssk_140",
+      "FS Ssk_155",
+      "FS Ssk_159",
+      "FS Ssk_167",
+      "FS Ssk_170",
+      "FS Ssk_182",
+      "FS Ssk_185",
+      "FS Ssk_196",
+      "FS Ssk_207",
+      "FS Ssk_211",
+      "FS Ssk_215",
+      "FS Ssk_217",
+      "FS Ssk_221",
+      "FS Ssk_228",
+      "FS Ssk_232",
+      "FS Ssk_242",
+      "FS Ssk_243",
+      "FS Ssk_247",
+      "FS Ssk_250",
+      "FS Ssk_255",
+      "FS Ssk_257",
+      "FS Ssk_260",
+      "FS Ssk_265",
+      "FS Ssk_270",
+      "FS Ssk_279",
+      "FS Ssk_292",
+      "FS Ssk_295",
+      "FS Ssk_296",
+      "FS Ssk_300",
+      "FS Sutherland",
+      "FS Tromp",
+      "FS Truxtun",
+      "FS Visby",
+      "HDMS Bergamini",
+      "HDMS De Ruyter",
+      "HDMS Richmond",
+      "HDMS Sutherland",
+      "HMAS Sutherland",
+      "HMAS Truxtun",
+      "HMCS Hessen",
+      "HMCS Laboon",
+      "HMS Aquitaine",
+      "HMS Argyll",
+      "HMS Auvergne",
+      "HMS Bainbridge",
+      "HMS Bergamini",
+      "HMS Bretagne",
+      "HMS Cole",
+      "HMS Collingwood",
+      "HMS Dauntless",
+      "HMS De Ruyter",
+      "HMS Defender",
+      "HMS Diamond",
+      "HMS Helsingborg",
+      "HMS Hessen",
+      "HMS Iron Duke",
+      "HMS Laboon",
+      "HMS Lancaster",
+      "HMS Mahan",
+      "HMS Mason",
+      "HMS Nelson",
+      "HMS Northumberland",
+      "HMS Portland",
+      "HMS Provence",
+      "HMS Ramage",
+      "HMS Richmond",
+      "HMS Roosevelt",
+      "HMS Sachsen",
+      "HMS Somerset",
+      "HMS Ssk_004",
+      "HMS Ssk_006",
+      "HMS Ssk_012",
+      "HMS Ssk_014",
+      "HMS Ssk_020",
+      "HMS Ssk_040",
+      "HMS Ssk_043",
+      "HMS Ssk_048",
+      "HMS Ssk_051",
+      "HMS Ssk_056",
+      "HMS Ssk_069",
+      "HMS Ssk_070",
+      "HMS Ssk_077",
+      "HMS Ssk_081",
+      "HMS Ssk_082",
+      "HMS Ssk_085",
+      "HMS Ssk_086",
+      "HMS Ssk_089",
+      "HMS Ssk_097",
+      "HMS Ssk_099",
+      "HMS Ssk_101",
+      "HMS Ssk_106",
+      "HMS Ssk_121",
+      "HMS Ssk_125",
+      "HMS Ssk_127",
+      "HMS Ssk_128",
+      "HMS Ssk_130",
+      "HMS Ssk_132",
+      "HMS Ssk_142",
+      "HMS Ssk_143",
+      "HMS Ssk_147",
+      "HMS Ssk_148",
+      "HMS Ssk_153",
+      "HMS Ssk_160",
+      "HMS Ssk_161",
+      "HMS Ssk_164",
+      "HMS Ssk_166",
+      "HMS Ssk_178",
+      "HMS Ssk_180",
+      "HMS Ssk_181",
+      "HMS Ssk_187",
+      "HMS Ssk_188",
+      "HMS Ssk_189",
+      "HMS Ssk_193",
+      "HMS Ssk_195",
+      "HMS Ssk_204",
+      "HMS Ssk_205",
+      "HMS Ssk_216",
+      "HMS Ssk_219",
+      "HMS Ssk_220",
+      "HMS Ssk_224",
+      "HMS Ssk_231",
+      "HMS Ssk_235",
+      "HMS Ssk_241",
+      "HMS Ssk_263",
+      "HMS Ssk_272",
+      "HMS Ssk_277",
+      "HMS Ssk_280",
+      "HMS Ssk_281",
+      "HMS Ssk_283",
+      "HMS Ssk_285",
+      "HMS Ssk_286",
+      "HMS Ssk_287",
+      "HMS Ssk_299",
+      "HMS Tromp",
+      "HMS Truxtun",
+      "HMS Visby",
+      "HMS Westminster",
+      "HNLMS Auvergne",
+      "HNLMS Diamond",
+      "HNLMS Languedoc",
+      "HNLMS Portland",
+      "HNLMS Somerset",
+      "HNoMS Auvergne",
+      "HNoMS De Zeven Provincien",
+      "HNoMS Evertsen",
+      "HNoMS Hamburg",
+      "HNoMS Languedoc",
+      "HNoMS Richmond",
+      "HNoMS Somerset",
+      "HNoMS Sutherland",
+      "HNoMS Truxtun",
+      "INS Andrea Doria",
+      "INS Northumberland",
+      "INS Sachsen",
+      "ITS Lancaster",
+      "ITS Mason",
+      "JS Dragon",
+      "JS Fridtjof Nansen",
+      "USS Andrea Doria",
+      "USS Aquitaine",
+      "USS Argyll",
+      "USS Auvergne",
+      "USS Bretagne",
+      "USS Carney",
+      "USS Cole",
+      "USS Dauntless",
+      "USS De Zeven Provincien",
+      "USS Diamond",
+      "USS Duncan",
+      "USS Evertsen",
+      "USS Gonzalez",
+      "USS Helsingborg",
+      "USS Iron Duke",
+      "USS Kent",
+      "USS Laboon",
+      "USS Lancaster",
+      "USS Languedoc",
+      "USS Mahan",
+      "USS Portland",
+      "USS Provence",
+      "USS Richmond",
+      "USS Roald Amundsen",
+      "USS Roosevelt",
+      "USS Somerset",
+      "USS Ssk_001",
+      "USS Ssk_003",
+      "USS Ssk_005",
+      "USS Ssk_008",
+      "USS Ssk_009",
+      "USS Ssk_010",
+      "USS Ssk_015",
+      "USS Ssk_018",
+      "USS Ssk_024",
+      "USS Ssk_026",
+      "USS Ssk_028",
+      "USS Ssk_031",
+      "USS Ssk_032",
+      "USS Ssk_033",
+      "USS Ssk_045",
+      "USS Ssk_050",
+      "USS Ssk_062",
+      "USS Ssk_064",
+      "USS Ssk_079",
+      "USS Ssk_091",
+      "USS Ssk_093",
+      "USS Ssk_102",
+      "USS Ssk_115",
+      "USS Ssk_116",
+      "USS Ssk_117",
+      "USS Ssk_134",
+      "USS Ssk_136",
+      "USS Ssk_141",
+      "USS Ssk_144",
+      "USS Ssk_145",
+      "USS Ssk_154",
+      "USS Ssk_157",
+      "USS Ssk_163",
+      "USS Ssk_165",
+      "USS Ssk_171",
+      "USS Ssk_173",
+      "USS Ssk_176",
+      "USS Ssk_177",
+      "USS Ssk_190",
+      "USS Ssk_191",
+      "USS Ssk_192",
+      "USS Ssk_200",
+      "USS Ssk_201",
+      "USS Ssk_206",
+      "USS Ssk_213",
+      "USS Ssk_222",
+      "USS Ssk_225",
+      "USS Ssk_227",
+      "USS Ssk_229",
+      "USS Ssk_234",
+      "USS Ssk_237",
+      "USS Ssk_238",
+      "USS Ssk_240",
+      "USS Ssk_248",
+      "USS Ssk_251",
+      "USS Ssk_252",
+      "USS Ssk_262",
+      "USS Ssk_264",
+      "USS Ssk_266",
+      "USS Ssk_269",
+      "USS Ssk_282",
+      "USS Ssk_293",
+      "USS Ssk_294",
+      "USS Ssk_298",
+      "USS Tromp",
+      "USS Truxtun",
+      "USS Visby",
+      "USS Westminster"
+    ],
+    "debrief:nationalities": [
+      "AU",
+      "CA",
+      "DE",
+      "DK",
+      "FR",
+      "GB",
+      "IN",
+      "IT",
+      "JP",
+      "NL",
+      "NO",
+      "SE",
+      "US"
+    ]
+  }
 }

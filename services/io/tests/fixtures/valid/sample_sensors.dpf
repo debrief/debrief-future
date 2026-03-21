@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plot xmlns="http://www.debrief.info/plot" Created="2024-02-20T14:30:00" Name="Sensor Test" PlotId="sensor-test-001">
+  <session>
+    <layers>
+      <track Name="OSPREY" Symbol="ScaledFrigate" ColorMode="PerFix"
+             Visible="true" NameVisible="true" PositionsVisible="true"
+             LineThickness="1" SensorsVisible="true" SolutionsVisible="true">
+        <TrackSegment Name="Positions" PlotRelative="false" Visible="true">
+          <fix Course="0.000" Dtg="951212 054900" Label="054900" Speed="4.000" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="12.1850000" Long="-11.6972222"/>
+            </centre>
+          </fix>
+          <fix Course="5.000" Dtg="951212 055000" Label="055000" Speed="4.100" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="12.1950000" Long="-11.6972222"/>
+            </centre>
+          </fix>
+        </TrackSegment>
+        <sensor Name="sensor 3:90" TrackName="OSPREY" Visible="true" LineThickness="1">
+          <sensor_contact Bearing="32.757" Dtg="951212 054902.486"
+            Label="some label:" HasAmbiguousBearing="false"
+            HasFrequency="false" Frequency="0.000"
+            Visible="true" LabelShowing="true"/>
+          <sensor_contact Bearing="33.100" Dtg="951212 054930.000"
+            Label="another contact" HasAmbiguousBearing="false"
+            HasFrequency="false" Frequency="0.000"
+            Visible="true" LabelShowing="true"/>
+        </sensor>
+        <tma Name="TMA Solutions" TrackName="OSPREY" Visible="true" LineThickness="1">
+          <tma_solution Dtg="951212 055000" Label="TMA_001"
+            Course="180.0" Speed="5.0" Bearing="45.0" Depth="50.0"
+            Visible="true" SymbolShowing="true" EllipseShowing="true"
+            LabelShowing="true">
+            <centre>
+              <shortLocation Depth="50.0" Lat="12.2000000" Long="-11.7000000"/>
+            </centre>
+          </tma_solution>
+        </tma>
+      </track>
+    </layers>
+  </session>
+</plot>
