@@ -360,6 +360,7 @@ export class StacService {
               symbol_interval: props.symbol_interval as string | undefined,
               label_interval: props.label_interval as string | undefined,
               position_style_overrides: props.position_style_overrides,
+              provenance: props.provenance,
             },
           } as unknown as DebriefFeature);
           trackCount++;
@@ -377,6 +378,7 @@ export class StacService {
               name: (props.name as string) ?? `Location ${locationCount + 1}`,
               location_type: (props.locationType as string) ?? (props.location_type as string) ?? 'REFERENCE',
               style: { shape: 'circle', radius: 5, fill_color: '#ff0000', color: '#000000' },
+              provenance: props.provenance,
             },
           } as DebriefFeature);
           locationCount++;
