@@ -28,16 +28,16 @@ interface CatalogData {
   items: CatalogOverviewItem[];
 }
 
-/** Map CatalogOverviewItem to StacBrowserItem by adding empty extension fields. */
+/** Map CatalogOverviewItem to StacBrowserItem using extension fields when available. */
 function toStacBrowserItem(item: CatalogOverviewItem): StacBrowserItem {
   return {
     ...item,
-    vesselClasses: [],
-    tags: [],
-    featureTags: [],
+    vesselClasses: item.vesselClasses ?? [],
+    tags: item.tags ?? [],
+    featureTags: item.featureTags ?? [],
     author: null,
-    trackNames: [],
-    nationalities: [],
+    trackNames: item.trackNames ?? [],
+    nationalities: item.nationalities ?? [],
     collection: null,
     modified: null,
   };

@@ -178,12 +178,12 @@ export default function App() {
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
-      vesselClasses: [],
-      tags: [],
-      featureTags: [],
+      vesselClasses: item.vesselClasses ?? [],
+      tags: item.tags ?? [],
+      featureTags: item.featureTags ?? [],
       author: null,
-      trackNames: [],
-      nationalities: [],
+      trackNames: item.trackNames ?? [],
+      nationalities: item.nationalities ?? [],
       collection: null,
       modified: null,
     }));

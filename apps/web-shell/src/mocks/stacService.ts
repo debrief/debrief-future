@@ -22,6 +22,11 @@ interface StacItem {
     datetime?: string;
     start_datetime?: string;
     end_datetime?: string;
+    'debrief:vessel_classes'?: string[];
+    'debrief:tags'?: string[];
+    'debrief:feature_tags'?: string[];
+    'debrief:nationalities'?: string[];
+    'debrief:track_names'?: string[];
   };
 }
 
@@ -59,6 +64,11 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     datetime: item.properties.datetime ?? null,
     startDatetime: item.properties.start_datetime ?? null,
     endDatetime: item.properties.end_datetime ?? null,
+    vesselClasses: item.properties['debrief:vessel_classes'] ?? [],
+    tags: item.properties['debrief:tags'] ?? [],
+    featureTags: item.properties['debrief:feature_tags'] ?? [],
+    nationalities: item.properties['debrief:nationalities'] ?? [],
+    trackNames: item.properties['debrief:track_names'] ?? [],
   };
 }
 
