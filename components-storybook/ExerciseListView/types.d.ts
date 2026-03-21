@@ -1,5 +1,7 @@
 import { CatalogOverviewItem } from '../filter-engine/types';
+import { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
 
+export type { GeoJSONFeature, GeoJSONFeatureCollection };
 /** Exercise data for list view display. Extends CatalogOverviewItem with STAC extension metadata. */
 export interface ExerciseListItem extends CatalogOverviewItem {
     /** Vessel taxonomy paths from debrief:vessel_classes */
@@ -79,36 +81,5 @@ export interface SpatialThumbnailProps {
     readonly width?: number;
     /** Height in pixels. */
     readonly height?: number;
-}
-export type GeoJSONGeometry = {
-    type: 'Point';
-    coordinates: number[];
-} | {
-    type: 'MultiPoint';
-    coordinates: number[][];
-} | {
-    type: 'LineString';
-    coordinates: number[][];
-} | {
-    type: 'MultiLineString';
-    coordinates: number[][][];
-} | {
-    type: 'Polygon';
-    coordinates: number[][][];
-} | {
-    type: 'MultiPolygon';
-    coordinates: number[][][][];
-} | {
-    type: 'GeometryCollection';
-    geometries: GeoJSONGeometry[];
-};
-export interface GeoJSONFeature {
-    type: 'Feature';
-    geometry: GeoJSONGeometry;
-    properties: Record<string, unknown> | null;
-}
-export interface GeoJSONFeatureCollection {
-    type: 'FeatureCollection';
-    features: GeoJSONFeature[];
 }
 //# sourceMappingURL=types.d.ts.map
