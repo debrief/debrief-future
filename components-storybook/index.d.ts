@@ -1,4 +1,6 @@
 export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
+export { parseTaxonomy } from './filter-engine/taxonomy';
+export type { RawTaxonomy } from './filter-engine/taxonomy';
 export { StacBrowser } from './StacBrowser';
 export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
 export { TimelineView } from './TimelineView';
