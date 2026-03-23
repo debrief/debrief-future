@@ -37,6 +37,10 @@ export interface AssociatedFile {
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
+  TrackFeature,
+  ReferenceLocation,
+  LogEntry as SchemaLogEntry,
+  PositionStyleOverride,
 } from '@debrief/schemas';
 
 // Canonical Safe GeoJSON types from @debrief/utils (T02)
@@ -334,67 +338,77 @@ export class StacService {
           continue;
         }
 
+        // Preserve the GeoJSON top-level id — this is the canonical identifier
+        // that provenance generated[] references.  Never derive from properties.
+        const featureId = feature.id != null
+          ? String(feature.id)
+          : `feature-${features.length}`;
+
         if (geom.type === 'LineString' && props.times !== undefined && props.times !== null) {
           // Track: LineString with times array (epoch ms)
           const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
-          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `track-${trackCount}`;
           const positions = (props.positions as Array<{ time: string }>) ??
             times.map(t => ({ time: new Date(t).toISOString() }));
 
-          features.push({
+          // `times` is a runtime-only epoch-ms array used by MapView for temporal
+          // rendering — not part of the LinkML schema.  We type-extend rather than
+          // cast-away so the compiler still validates every schema field.
+          const track: TrackFeature & { properties: { times: number[] } } = {
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             properties: {
               kind: 'TRACK',
-              platform_id: id,
+              platform_id: featureId,
               platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
               track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
               start_time: times[0] !== undefined && times[0] !== 0 ? new Date(times[0]).toISOString() : '',
               end_time: times[times.length - 1] !== undefined && times[times.length - 1] !== 0 ? new Date(times[times.length - 1]!).toISOString() : '',
               positions,
               times,
-              style: { line: { color: (props.color as string) ?? '#0066cc' } },
-              default_position_style: props.default_position_style ?? { show_symbol: true, symbol: 'circle', show_label: false },
+              style: {
+                line: { color: (props.color as string) ?? '#0066cc' },
+                point: { shape: 'circle', radius: 3, fill: true, fill_color: (props.color as string) ?? '#0066cc', color: '#000000' },
+              },
+              default_position_style: (props.default_position_style as { show_symbol: boolean; symbol: string; show_label: boolean }) ?? { show_symbol: true, symbol: 'circle', show_label: false },
               symbol_interval: props.symbol_interval as string | undefined,
               label_interval: props.label_interval as string | undefined,
-              position_style_overrides: props.position_style_overrides,
-              provenance: props.provenance,
+              position_style_overrides: props.position_style_overrides as PositionStyleOverride[] | undefined,
+              provenance: props.provenance as SchemaLogEntry[] | undefined,
             },
-          } as unknown as DebriefFeature);
+          };
+          features.push(track);
           trackCount++;
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
-          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `location-${locationCount}`;
 
-          features.push({
+          const location: ReferenceLocation = {
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: { type: 'Point' as const, coordinates: pointCoords },
             properties: {
               kind: 'POINT',
               name: (props.name as string) ?? `Location ${locationCount + 1}`,
               location_type: (props.locationType as string) ?? (props.location_type as string) ?? 'REFERENCE',
               style: { shape: 'circle', radius: 5, fill_color: '#ff0000', color: '#000000' },
-              provenance: props.provenance,
+              provenance: props.provenance as SchemaLogEntry[] | undefined,
             },
-          } as DebriefFeature);
+          };
+          features.push(location);
           locationCount++;
         } else {
           // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY, etc.)
           const kind = props.kind as string | undefined;
           if (!kind) {
-            const featureId = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `annotation-${features.length}`;
             throw new Error(
               `Feature "${featureId}" is missing required "kind" property`,
             );
           }
-          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `annotation-${features.length}`;
           features.push({
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: geom,
             properties: { ...props, kind },
           } as DebriefFeature);
