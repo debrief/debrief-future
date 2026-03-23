@@ -6,6 +6,7 @@
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
+import { propsRecord } from '../../../utils/featureProps';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface EnlargeShapeParams {
@@ -142,7 +143,7 @@ export function execute(
   const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties as unknown as Record<string, unknown>;
+    const props = propsRecord(feature);
     const kind = props['kind'] as string;
 
     if (!ANNOTATION_KINDS.has(kind)) {

@@ -4,6 +4,7 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
+import { propsRecord } from '../../../utils/featureProps';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 const VALID_SYMBOLS = ['circle', 'square', 'diamond', 'triangle', 'cross'] as const;
@@ -75,7 +76,7 @@ export function execute(
   const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties as unknown as Record<string, unknown>;
+    const props = propsRecord(feature);
     if (props['kind'] !== 'TRACK') {
       continue;
     }
@@ -104,7 +105,7 @@ export function execute(
 
     // Update default_position_style so the PositionSymbolsLayer renderer
     // shows the chosen symbol shape on the map.
-    const dps = (props['default_position_style'] as Record<string, unknown>) ?? {};
+    const dps = (props['default_position_style'] ?? {}) as { [k: string]: unknown };
     dps['symbol'] = symbol;
     dps['show_symbol'] = true;
     props['default_position_style'] = dps;

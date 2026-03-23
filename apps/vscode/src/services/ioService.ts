@@ -175,7 +175,7 @@ except Exception as e:
     const output = await this.runPython('-c', script, filePath);
 
     try {
-      const result = JSON.parse(output) as Record<string, unknown>;
+      const result = JSON.parse(output) as { error?: unknown; [key: string]: unknown };
       if (result.error !== undefined && result.error !== null) {
         throw new Error(String(result.error));
       }

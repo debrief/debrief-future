@@ -38,6 +38,14 @@ interface FeatureBase {
   properties: Record<string, unknown>;
 }
 
+/**
+ * Narrow DebriefFeature to FeatureBase. All DebriefFeature variants are
+ * structurally compatible with FeatureBase; this helper provides a single
+ * audited cast site (ADR-011).
+ */
+// eslint-disable-next-line no-restricted-syntax
+const toBase = (f: DebriefFeature): FeatureBase => f as unknown as FeatureBase;
+
 /** Properties present after the isTrackFeature type-guard narrows. */
 interface TrackLike extends FeatureBase {
   properties: {
@@ -87,7 +95,7 @@ export type LayerItem =
 export function getFeatureId(item: LayerItem): string | undefined {
   switch (item.type) {
     case 'feature':
-      return String((item.feature as unknown as FeatureBase).id);
+      return String(toBase(item.feature).id);
     case 'result':
       return item.layer.id;
     default:
@@ -298,8 +306,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     if (element.type === 'header') {
       if (element.id === 'source') {
         return Promise.resolve(
-          (this.features as unknown as FeatureBase[]).map(
-            (feature): LayerItem => ({ type: 'feature', feature: feature as unknown as DebriefFeature })
+          this.features.map(
+            (feature): LayerItem => ({ type: 'feature', feature })
           )
         );
       }
@@ -348,7 +356,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   }
 
   private createFeatureItem(feature: DebriefFeature): vscode.TreeItem {
-    const f = feature as unknown as FeatureBase;
+    const f = toBase(feature);
     const props = f.properties;
     const kind = (props.kind as string) ?? 'UNKNOWN';
     const featureId = String(f.id);

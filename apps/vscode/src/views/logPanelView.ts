@@ -171,7 +171,7 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     timestamp: entry.timestamp,
     toolName: entry.wasGeneratedBy.tool,
     toolVersion: entry.wasGeneratedBy.toolVersion,
-    parameters: entry.wasGeneratedBy.parameters as Record<string, LogParameterValue>,
+    parameters: entry.wasGeneratedBy.parameters as { [k: string]: LogParameterValue },
     usedFeatureIds: entry.used,
     generatedFeatureIds: entry.generated,
     executionDuration: entry.executionDuration,
@@ -676,7 +676,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
     this._postMessage({
       type: 'replay:result',
-      payload: result as unknown as Record<string, unknown>,
+      payload: { ...result },
     });
   }
 

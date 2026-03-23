@@ -17,8 +17,8 @@ import type { DebriefFeature } from '@debrief/components';
  * objects are structurally compatible with Record<string, unknown>; this
  * helper provides a single cast site for that conversion.
  */
-// eslint-disable-next-line no-restricted-syntax
-export const propsRecord = (f: DebriefFeature): Record<string, unknown> => f.properties as Record<string, unknown>;
+// eslint-disable-next-line no-restricted-syntax -- single audited escape hatch (ADR-011)
+export const propsRecord = (f: DebriefFeature): Record<string, unknown> => f.properties as unknown as Record<string, unknown>;
 
 /**
  * Parse JSON string and return unknown for safe narrowing.

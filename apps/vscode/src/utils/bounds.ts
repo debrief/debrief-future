@@ -142,6 +142,7 @@ function extractCoordinates(geometry: {
     }
 
     case 'MultiPolygon': {
+      // eslint-disable-next-line no-restricted-syntax
       const polygons = geometry.coordinates as unknown as number[][][][];
       for (const polygon of polygons) {
         for (const ring of polygon) {

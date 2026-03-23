@@ -270,9 +270,9 @@ export class ConfigService {
       }
 
       // Migrate 'name' to 'displayName' (old format used 'name')
-      const storeAny = store as unknown as Record<string, unknown>;
+      const storeAny = store as StacStore & { name?: string };
       if (storeAny.name !== undefined && storeAny.name !== null && !store.displayName) {
-        store.displayName = storeAny.name as string;
+        store.displayName = storeAny.name;
         delete storeAny.name;
         needsSave = true;
       }

@@ -4,6 +4,7 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
+import { propsRecord } from '../../../utils/featureProps';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface LabelIntervalParams {
@@ -44,7 +45,7 @@ export function execute(
   const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties as unknown as Record<string, unknown>;
+    const props = propsRecord(feature);
     if (props['kind'] !== 'TRACK') {
       continue;
     }

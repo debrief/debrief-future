@@ -411,6 +411,7 @@ export class StacService {
               `Feature "${featureId}" is missing required "kind" property`,
             );
           }
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- annotation kind is dynamic
           const annotation: DebriefFeature = {
             type: 'Feature',
             id: featureId,
@@ -1210,6 +1211,7 @@ export class StacService {
 
       // Ensure properties exists
       if (!feature.properties) {
+        // eslint-disable-next-line no-restricted-syntax -- mutating SafeFeature at parse boundary
         (feature as unknown as Record<string, unknown>).properties = {};
       }
 
