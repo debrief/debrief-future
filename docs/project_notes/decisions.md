@@ -276,3 +276,55 @@ Each decision should include:
 - ❌ Minor inconsistency in tsconfig files (acceptable given different deployment targets)
 
 **Evidence:** `specs/172-review-technical-debt/evidence/`
+
+### ADR-010: JSON Wire Format Uses camelCase (2026-03-23)
+
+**Context:** Python services write JSON consumed by TypeScript frontends. LinkML schemas define fields in snake_case (Python convention). TypeScript expects camelCase (JavaScript convention). Without a single enforced convention, data is silently dropped at serialization boundaries — as demonstrated by the provenance data loss incident (see `docs/project_notes/failure-pattern-type-erasure-at-boundaries.md`).
+
+**Decision:** All JSON written to disk or sent over IPC uses **camelCase** keys. This is the wire format convention for the entire project.
+
+Implementation:
+1. LinkML schemas continue to define fields in snake_case (the source-of-truth naming)
+2. Generated Pydantic `ConfiguredBaseModel` must include `alias_generator = to_camel` (from `pydantic.alias_generators`) so that `serialize_by_alias = True` produces camelCase keys. **Current gap:** the generator does not yet add an alias generator — `by_alias=True` is a no-op. This must be fixed in the schema generation post-processing step (`shared/schemas/scripts/generate.py`).
+3. All Python code that produces JSON consumed by TypeScript **must** call `model_dump(mode="json", by_alias=True)` — never hand-build dicts
+4. TypeScript code reads camelCase natively — no transformation needed
+5. Python code that reads its own JSON uses `validate_by_name = True` to accept both forms
+
+**Alternatives Considered:**
+- snake_case everywhere → Rejected: TypeScript would need a camelCase transformer on every read, and STAC/GeoJSON properties already use mixed conventions externally. More pragmatically, the codebase already uses camelCase aliases and this formalises existing practice.
+- Per-service choice → Rejected: this is exactly the ambiguity that caused the incident.
+
+**Consequences:**
+- ✅ Single convention eliminates naming-mismatch bugs at serialization boundaries
+- ✅ Aligns with existing `ConfiguredBaseModel` configuration — no code changes needed for compliant services
+- ✅ TypeScript reads JSON natively without transformation
+- ❌ Python developers must remember `by_alias=True` on every `model_dump()` call (enforced by lint rule)
+- ❌ JSON on disk uses camelCase, which differs from Python attribute names — may confuse developers inspecting raw files
+
+**Triggered by:** Provenance data loss incident, March 2026
+
+### ADR-011: Type Assertions at Boundaries Require Human Approval (2026-03-23)
+
+**Context:** TypeScript `as` casts and Python `cast()` calls are developer assertions that bypass the type checker. When used at data boundaries (JSON parsing, file I/O, IPC), they create a gap where the compiler assumes type safety that doesn't exist. The provenance data loss incident was caused by `as Record<string, unknown>` masking a naming convention mismatch. Article XV of the Constitution prohibits `any` but does not address type assertions, which are equally dangerous at boundaries.
+
+**Decision:** Loose-type assertions are treated as **expert overrides** that require justification and human review.
+
+Specifically:
+1. **Banned patterns** (CI-enforced via ESLint):
+   - `as Record<string, unknown>` — type erasure; use a generated type or Zod schema instead
+   - `as unknown as T` — double-cast escape hatch; indicates a design problem
+   - `JSON.parse(...)` without subsequent validation — must be followed by a schema parse (Zod, type guard, or equivalent)
+2. **Restricted patterns** (require `// SAFETY: <justification>` comment and PR review approval):
+   - `as T` where `T` is a concrete type — acceptable only when the developer can prove the cast is safe (e.g., narrowing from a validated union)
+3. **Python equivalent**: `dict` literals must not duplicate the shape of a generated Pydantic model. If a model exists, use it.
+
+**Alternatives Considered:**
+- Ban all `as` casts → Rejected: some are legitimate (e.g., narrowing after a type guard check). The goal is to require justification, not prohibition.
+- Rely on code review alone → Rejected: reviewers miss casts in large diffs. CI enforcement catches them consistently.
+
+**Consequences:**
+- ✅ Type erasure at boundaries becomes visible and reviewable
+- ✅ Developers must justify why they're bypassing the type system
+- ✅ Encourages use of generated types and runtime validators (Zod, Pydantic)
+- ❌ Legitimate casts require a comment — minor friction
+- ❌ New ESLint rules may flag existing code that needs migration

@@ -30,6 +30,26 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/consistent-type-assertions': [
+      'warn',
+      {
+        assertionStyle: 'as',
+        objectLiteralTypeAssertions: 'never',
+      },
+    ],
+    'no-restricted-syntax': [
+      'warn',
+      {
+        selector: "TSAsExpression[typeAnnotation.typeName.name='Record']",
+        message:
+          'Do not cast to Record<string, unknown> — use a generated type or Zod schema. If no type exists, create one (ADR-011, Constitution XV.7).',
+      },
+      {
+        selector: 'TSAsExpression > TSUnknownKeyword',
+        message:
+          'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
+      },
+    ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },
 };

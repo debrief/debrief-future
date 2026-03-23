@@ -174,8 +174,52 @@ To find more instances of this pattern, look for:
 
 ---
 
+## Guardrails Implemented (March 2026)
+
+Six guardrails were implemented to prevent this class of bug from recurring:
+
+### 1. JSON Wire Convention Formalised (ADR-010)
+
+**All JSON on disk uses camelCase keys.** This is now a formal architectural decision. LinkML defines fields in snake_case; the Pydantic alias generator converts to camelCase on serialization. TypeScript reads camelCase natively.
+
+**Known gap:** The generated `ConfiguredBaseModel` does not yet include `alias_generator = to_camel`. Until this is added to `shared/schemas/scripts/generate.py`, `by_alias=True` is a no-op. The `test_provenance_roundtrip.py` tests are xfail until this is fixed.
+
+### 2. Hand-Built Dicts Banned at Boundaries
+
+Python service code must use the generated Pydantic models to construct schema types — not `dict` literals. If a generated model exists for the data shape, you must use it. Enforced by `test_boundary_enforcement.py::TestModelDumpByAlias`.
+
+### 3. ESLint Rules: Type Assertions at Boundaries
+
+New rules across all TypeScript packages:
+- `@typescript-eslint/consistent-type-assertions` with `objectLiteralTypeAssertions: never`
+- `no-restricted-syntax` banning `as Record<string, unknown>` and `as unknown` casts
+
+These fire at CI time and produce messages referencing ADR-011 and Constitution XV.7.
+
+### 4. Loose-Type Assertions Require Human Approval (ADR-011, Constitution XV.7)
+
+New constitutional clause: type assertions to loose types (`Record<string, unknown>`, `unknown`, `cast()`) are **expert overrides** requiring a `// SAFETY:` justification comment and explicit PR reviewer approval. If a generated type exists, you must use it. If none exists, create one.
+
+### 5. Round-Trip Golden Fixture Tests
+
+`shared/schemas/tests/test_provenance_roundtrip.py` tests that:
+- `LogEntry.model_dump(by_alias=True)` produces camelCase keys matching the TypeScript `LogEntry` interface
+- The Python→JSON→Python round-trip preserves all data
+- Documents the current snake_case output as a known gap (test will break when alias_generator is added — intentionally)
+
+### 6. Python model_dump() Enforcement
+
+`shared/schemas/tests/test_boundary_enforcement.py` scans service source files via AST analysis:
+- Flags `model_dump()` calls that don't include `by_alias=True`
+- Verifies `ConfiguredBaseModel` includes an `alias_generator`
+
+---
+
 ## Related
 
 - **ADR-002:** Schema-First with LinkML — establishes the principle this pattern violates
 - **ADR-008:** Schema-Validated Tool Inputs and Outputs — same class of issue in calc tools
+- **ADR-010:** JSON Wire Format Uses camelCase — formalises the naming convention
+- **ADR-011:** Type Assertions at Boundaries Require Human Approval — the approval gate
 - **Constitution Article II:** Schema Integrity — the governing principle
+- **Constitution Article XV §7:** Type assertions are expert overrides — the new clause
