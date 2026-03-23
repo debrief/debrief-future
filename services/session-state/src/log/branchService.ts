@@ -13,7 +13,6 @@ import type {
   BranchPointLocation,
   FileProvEntry,
   GeoJsonFeatureCollection,
-  GeoJsonFeature,
   SnapshotLinks,
 } from './types.js';
 import {
@@ -338,7 +337,7 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
           // Determine if this is the last entry (snapshot boundary) or arbitrary
           const snapSysRec = findSystemRecord(snapshotFc);
           const snapLinks = snapSysRec?.properties?.snapshotLinks as SnapshotLinks | null;
-          const nextRef = snapLinks?.next;
+          const _nextRef = snapLinks?.next;
 
           // It's a snapshot boundary if the snapshot has entries and
           // this entry is the "last" one captured (we check by seeing if there are

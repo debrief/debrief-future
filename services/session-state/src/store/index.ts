@@ -97,7 +97,7 @@ function createSnapshot(state: SessionStore): StateSnapshot {
 /**
  * Apply a snapshot to the store.
  */
-function applySnapshot(set: Function, snapshot: StateSnapshot): void {
+function applySnapshot(set: (partial: Partial<SessionStoreWithUndo>) => void, snapshot: StateSnapshot): void {
   set({
     currentTime: snapshot.currentTime,
     timeRange: snapshot.timeRange,
