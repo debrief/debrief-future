@@ -21,6 +21,8 @@ import type { LogPanelViewProvider } from '../views/logPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
+import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+import { propsRecord } from '../utils/featureProps';
 
 interface OpenPlotArgs {
   uri?: string;
