@@ -442,11 +442,6 @@ export function createOpenPlotCommand(
         featureNames[String(f.id)] = name;
       }
       logPanelProvider.setFeatureNames(featureNames);
-
-      // Refresh timeline now that logService, path resolvers, and feature names
-      // are all wired. The session-change event fires before these are set,
-      // so an explicit refresh is needed to display provenance correctly.
-      void logPanelProvider.refreshTimeline();
     }
 
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)

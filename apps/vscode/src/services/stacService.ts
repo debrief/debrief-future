@@ -338,7 +338,7 @@ export class StacService {
           // Track: LineString with times array (epoch ms)
           const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
-          const id = (props.id as string) ?? `track-${trackCount}`;
+          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `track-${trackCount}`;
           const positions = (props.positions as Array<{ time: string }>) ??
             times.map(t => ({ time: new Date(t).toISOString() }));
 
@@ -367,7 +367,7 @@ export class StacService {
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
-          const id = (props.id as string) ?? `location-${locationCount}`;
+          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `location-${locationCount}`;
 
           features.push({
             type: 'Feature',
@@ -386,12 +386,12 @@ export class StacService {
           // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY, etc.)
           const kind = props.kind as string | undefined;
           if (!kind) {
-            const featureId = (props.id as string) ?? `annotation-${features.length}`;
+            const featureId = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `annotation-${features.length}`;
             throw new Error(
               `Feature "${featureId}" is missing required "kind" property`,
             );
           }
-          const id = (props.id as string) ?? `annotation-${features.length}`;
+          const id = (feature.id != null ? String(feature.id) : null) ?? (props.id as string) ?? `annotation-${features.length}`;
           features.push({
             type: 'Feature',
             id,
