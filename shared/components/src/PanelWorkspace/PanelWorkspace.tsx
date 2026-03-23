@@ -126,6 +126,7 @@ export function PanelWorkspace({
       gl.destroy();
       glRef.current = null;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only initialize once on mount
 
   // Re-render all mounted panels when context wrapper changes

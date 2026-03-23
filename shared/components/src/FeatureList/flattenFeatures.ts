@@ -223,6 +223,7 @@ function flattenMultiPointChildren(
   featureId: string,
 ): void {
   // Schema types coordinates as number[] but runtime data is number[][] (Position[])
+  // eslint-disable-next-line no-restricted-syntax
   const coords = feature.geometry.coordinates as unknown as number[][];
   if (!coords || coords.length === 0) {
     items.push({
@@ -260,6 +261,7 @@ function flattenMultiPolygonChildren(
   featureId: string,
 ): void {
   // Schema types coordinates as number[] but runtime data is number[][][][] (Position[][][])
+  // eslint-disable-next-line no-restricted-syntax
   const coords = feature.geometry.coordinates as unknown as number[][][][];
   if (!coords || coords.length === 0) {
     items.push({

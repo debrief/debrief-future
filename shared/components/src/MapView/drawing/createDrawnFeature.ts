@@ -65,6 +65,7 @@ export function createDrawnFeature(
 
   if (mode === 'point') {
     const pointGeometry = geojson.geometry as GeoJSON.Point;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {
       type: 'Feature',
       id,
@@ -87,11 +88,13 @@ export function createDrawnFeature(
 
   if (mode === 'rectangle') {
     const polygonGeometry = geojson.geometry as GeoJSON.Polygon;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {
       type: 'Feature',
       id,
       geometry: {
         type: 'Polygon',
+        // eslint-disable-next-line no-restricted-syntax
         coordinates: polygonGeometry.coordinates as unknown as number[][][],
       },
       properties: {
@@ -111,11 +114,13 @@ export function createDrawnFeature(
     const ring = polygonGeometry.coordinates[0]!;
     // vertex_count = unique vertices, excluding the closure point
     const vertexCount = ring.length - 1;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {
       type: 'Feature',
       id,
       geometry: {
         type: 'Polygon',
+        // eslint-disable-next-line no-restricted-syntax
         coordinates: polygonGeometry.coordinates as unknown as number[][][],
       },
       properties: {
@@ -133,11 +138,13 @@ export function createDrawnFeature(
 
   if (mode === 'polyline') {
     const lineGeometry = geojson.geometry as GeoJSON.LineString;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {
       type: 'Feature',
       id,
       geometry: {
         type: 'LineString',
+        // eslint-disable-next-line no-restricted-syntax
         coordinates: lineGeometry.coordinates as unknown as number[][],
       },
       properties: {

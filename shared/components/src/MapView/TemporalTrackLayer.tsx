@@ -76,6 +76,7 @@ export function TemporalTrackLayer({
         layer.on('click', (e) => {
           const leafletEvent = e as L.LeafletMouseEvent;
           leafletEvent.originalEvent?.stopPropagation();
+          // eslint-disable-next-line no-restricted-syntax
           onClick(String(feature.id), leafletEvent.originalEvent as unknown as React.MouseEvent);
         });
       }
@@ -93,6 +94,7 @@ export function TemporalTrackLayer({
     <>
       <GeoJSON
         key={`${renderKey}-sel-${isSelected ? 1 : 0}`}
+        // eslint-disable-next-line no-restricted-syntax
         data={geojsonData as unknown as GeoJSON.GeoJsonObject}
         style={() => style}
         onEachFeature={onEachFeature}
@@ -101,6 +103,7 @@ export function TemporalTrackLayer({
         <TrackHighlightMarker
           position={markerLatLng}
           style={markerStyle}
+          // eslint-disable-next-line no-restricted-syntax
           tooltip={(feature.properties as unknown as Record<string, string>)?.name}
         />
       )}

@@ -29,6 +29,7 @@ export function calculateTimeExtent(
 
       // Fallback: derive from times array if start_time/end_time not present
       if (startTime === null || endTime === null) {
+        // eslint-disable-next-line no-restricted-syntax
         const props = feature.properties as unknown as Record<string, unknown>;
         const times = props.times as unknown[] | undefined;
         if (Array.isArray(times) && times.length > 0) {
@@ -52,6 +53,7 @@ export function calculateTimeExtent(
       }
     } else {
       // ReferenceLocation and other feature types may have various time properties
+      // eslint-disable-next-line no-restricted-syntax
       const props = feature.properties as unknown as Record<string, unknown>;
 
       // Check for valid_from/valid_until (schema properties)
@@ -346,6 +348,7 @@ export function resolvePositionStyle(
     }
 
     // Visual style overrides (from format menu per-position formatting)
+    // eslint-disable-next-line no-restricted-syntax
     const ov = override as Record<string, unknown>;
     if (typeof ov.fill_color === 'string') fillColor = ov.fill_color;
     if (typeof ov.stroke_color === 'string') strokeColor = ov.stroke_color;

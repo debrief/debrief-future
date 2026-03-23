@@ -177,6 +177,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedIndex, items, enabledItems, onSelect, onDismiss, selectableBranches]);
 
   const handleMouseEnter = useCallback((index: number, item: CascadingMenuItem) => {
@@ -426,6 +427,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, selectab
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlightedIndex, items, enabledItems, onSelect, onDismiss, selectableBranches]);
 
   const handleMouseEnter = useCallback((index: number, item: CascadingMenuItem) => {

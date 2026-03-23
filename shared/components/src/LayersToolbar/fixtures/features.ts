@@ -31,6 +31,7 @@ export function generateTracks(count: number): TrackFeature[] {
     id: `track-${i.toString().padStart(3, '0')}`,
     geometry: {
       type: 'LineString' as const,
+      // eslint-disable-next-line no-restricted-syntax
       coordinates: [[-5 + i * 0.1, 50], [-4 + i * 0.1, 51]] as unknown as number[][],
     },
     properties: {
@@ -65,6 +66,7 @@ export function generateLocations(count: number): ReferenceLocation[] {
     id: `ref-${i.toString().padStart(3, '0')}`,
     geometry: {
       type: 'Point' as const,
+      // eslint-disable-next-line no-restricted-syntax
       coordinates: [-3 + i * 0.1, 52 + i * 0.05] as unknown as number[],
     },
     properties: {

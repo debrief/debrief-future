@@ -28,6 +28,7 @@ export function isElectronEnvironment(): boolean {
 
   // Check for Electron's process object (avoid direct `process` reference
   // since @types/node is not available in this browser-targeted library)
+  // eslint-disable-next-line no-restricted-syntax
   const proc = (globalThis as Record<string, unknown>)['process'] as
     | { versions?: { electron?: string } }
     | undefined;
@@ -56,6 +57,7 @@ function getElectronAPI(): ElectronThemeAPI | null {
 
   // Check for exposed theme API
   if ('electronTheme' in window) {
+    // eslint-disable-next-line no-restricted-syntax
     return (window as unknown as { electronTheme: ElectronThemeAPI }).electronTheme;
   }
 

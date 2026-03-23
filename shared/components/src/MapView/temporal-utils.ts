@@ -102,7 +102,9 @@ export function extractTemporalData(
   // Must be a LineString
   if (feature.geometry.type !== 'LineString') return null;
 
+  // eslint-disable-next-line no-restricted-syntax
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
+  // eslint-disable-next-line no-restricted-syntax
   const times = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
 
   if (!times || !Array.isArray(times) || times.length === 0) return null;

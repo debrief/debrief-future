@@ -9,6 +9,7 @@ const trackWithPositions = {
   id: 'track-001',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {
@@ -24,6 +25,7 @@ const trackWithPositions = {
       { time: '2024-01-15T10:00:00Z' },
     ],
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as TrackFeature;
 
 const trackWithOverrides = {
@@ -31,6 +33,7 @@ const trackWithOverrides = {
   id: 'track-002',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {
@@ -49,6 +52,7 @@ const trackWithOverrides = {
       { label: 'End Marker' },
     ],
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as TrackFeature;
 
 const emptyTrack = {
@@ -56,6 +60,7 @@ const emptyTrack = {
   id: 'track-empty',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {
@@ -67,6 +72,7 @@ const emptyTrack = {
     end_time: '2024-01-15T12:00:00Z',
     positions: [],
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as TrackFeature;
 
 const compoundTrack = {
@@ -74,6 +80,7 @@ const compoundTrack = {
   id: 'track-compound',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {
@@ -106,6 +113,7 @@ const compoundTrack = {
       },
     ],
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as TrackFeature;
 
 const mockMultiPoint = {
@@ -120,6 +128,7 @@ const mockMultiPoint = {
     label: 'Bearing Fan',
     style: { shape: 'circle', radius: 5, fill: true, fillColor: '#ff0000', fillOpacity: 0.5, color: '#ff0000', weight: 1, opacity: 1 },
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as MultiPointFeature;
 
 const emptyMultiPoint = {
@@ -134,6 +143,7 @@ const emptyMultiPoint = {
     label: 'Empty MultiPoint',
     style: { shape: 'circle', radius: 5, fill: true, fillColor: '#ff0000', fillOpacity: 0.5, color: '#ff0000', weight: 1, opacity: 1 },
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as MultiPointFeature;
 
 const mockMultiPolygon = {
@@ -151,6 +161,7 @@ const mockMultiPolygon = {
     label: 'Zone Boundaries',
     style: { fill: true, fillColor: '#00ff00', fillOpacity: 0.3, color: '#00ff00', weight: 2, opacity: 0.8 },
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as MultiPolygonFeature;
 
 const mockRefLocation = {
@@ -158,6 +169,7 @@ const mockRefLocation = {
   id: 'ref-001',
   geometry: {
     type: 'Point',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [-3, 52] as unknown as number[],
   },
   properties: {
@@ -168,6 +180,7 @@ const mockRefLocation = {
     valid_until: '2024-01-15T23:59:59Z',
     style: { shape: 'circle', radius: 5, fill: true, fillColor: '#333', fillOpacity: 1, color: '#333', weight: 1, opacity: 1 },
   },
+// eslint-disable-next-line no-restricted-syntax
 } as unknown as ReferenceLocation;
 
 // ─── Tests ───────────────────────────────────────────────────────────
@@ -429,6 +442,7 @@ describe('flattenFeatures', () => {
       const largeTrack = {
         type: 'Feature',
         id: 'track-large',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'LineString', coordinates: [[-5, 50], [-4, 51]] as unknown as number[] },
         properties: {
           kind: 'TRACK',
@@ -439,6 +453,7 @@ describe('flattenFeatures', () => {
           end_time: positions[positions.length - 1]!.time,
           positions,
         },
+      // eslint-disable-next-line no-restricted-syntax
       } as unknown as TrackFeature;
 
       const start = performance.now();

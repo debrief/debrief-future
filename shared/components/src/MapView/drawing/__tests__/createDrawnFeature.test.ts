@@ -43,6 +43,7 @@ describe('createDrawnFeature', () => {
     it('preserves the clicked coordinates', () => {
       const result = createDrawnFeature(validPointGeojson, 'point');
       expect(result!.geometry.type).toBe('Point');
+      // eslint-disable-next-line no-restricted-syntax
       expect((result!.geometry as unknown as GeoJSON.Point).coordinates).toEqual([-4.1189, 50.3912]);
     });
 
@@ -99,6 +100,7 @@ describe('createDrawnFeature', () => {
     it('preserves the polygon geometry with closed ring', () => {
       const result = createDrawnFeature(validRectGeojson, 'rectangle');
       expect(result!.geometry.type).toBe('Polygon');
+      // eslint-disable-next-line no-restricted-syntax
       const coords = (result!.geometry as unknown as GeoJSON.Polygon).coordinates[0];
       expect(coords!.length).toBe(5);
       expect(coords![0]).toEqual(coords![coords!.length - 1]); // Closed ring
@@ -245,6 +247,7 @@ describe('createDrawnFeature', () => {
     it('preserves the LineString geometry', () => {
       const result = createDrawnFeature(validLineGeojson, 'polyline');
       expect(result!.geometry.type).toBe('LineString');
+      // eslint-disable-next-line no-restricted-syntax
       const coords = (result!.geometry as unknown as GeoJSON.LineString).coordinates;
       expect(coords.length).toBe(3);
     });
@@ -276,6 +279,7 @@ describe('createDrawnFeature', () => {
     it('returns null for invalid polyline (too few vertices)', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'LineString', coordinates: [[-4, 50]] } as unknown as GeoJSON.LineString,
         properties: {},
       };
@@ -314,6 +318,7 @@ describe('createDrawnFeature', () => {
         properties: {},
       };
       const result = createDrawnFeature(geojson, 'polygon');
+      // eslint-disable-next-line no-restricted-syntax
       const coords = (result!.geometry as unknown as GeoJSON.Polygon).coordinates[0];
       expect(coords[0]).toEqual(coords[coords.length - 1]);
     });
@@ -346,6 +351,7 @@ describe('createDrawnFeature', () => {
         properties: {},
       };
       const result = createDrawnFeature(geojson, 'polyline');
+      // eslint-disable-next-line no-restricted-syntax
       const coords = (result!.geometry as unknown as GeoJSON.LineString).coordinates;
       expect(coords).toHaveLength(3);
     });

@@ -45,6 +45,7 @@ function generateTrack(
       times,
       trackType: 'SURFACE',
     },
+  // eslint-disable-next-line no-restricted-syntax
   } as unknown as DebriefFeature;
 }
 

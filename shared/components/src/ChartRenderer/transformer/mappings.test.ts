@@ -16,6 +16,7 @@ describe('zone_histogram → bar chart', () => {
     if (!result.ok) return;
 
     // Should be a bar chart
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
     const mark = spec.mark;
     const markType = typeof mark === 'string' ? mark : (mark as { type: string })?.type;
@@ -27,6 +28,7 @@ describe('zone_histogram → bar chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
     expect(spec.title).toBe('Buffer Zone Point Distribution');
   });
@@ -36,7 +38,9 @@ describe('zone_histogram → bar chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
+    // eslint-disable-next-line no-restricted-syntax
     const encoding = spec.encoding as Record<string, { axis?: { title: string } }>;
     expect(encoding.x?.axis?.title).toBe('Zone');
     expect(encoding.y?.axis?.title).toBe('Count (points)');
@@ -47,6 +51,7 @@ describe('zone_histogram → bar chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
     const data = spec.data as { values: unknown[] };
     expect(data.values).toHaveLength(4);
@@ -61,6 +66,7 @@ describe('range_bearing_series → line chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
     const mark = spec.mark;
     const markType = typeof mark === 'string' ? mark : (mark as { type: string })?.type;
@@ -72,7 +78,9 @@ describe('range_bearing_series → line chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
+    // eslint-disable-next-line no-restricted-syntax
     const encoding = spec.encoding as Record<string, { type?: string }>;
     expect(encoding.x?.type).toBe('temporal');
   });
@@ -82,7 +90,9 @@ describe('range_bearing_series → line chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
+    // eslint-disable-next-line no-restricted-syntax
     const encoding = spec.encoding as Record<string, { field?: string }>;
     expect(encoding.color?.field).toBe('series');
   });
@@ -92,6 +102,7 @@ describe('range_bearing_series → line chart', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    // eslint-disable-next-line no-restricted-syntax
     const spec = result.spec as unknown as Record<string, unknown>;
     const data = spec.data as { values: unknown[] };
     // 6 points × 2 series = 12
@@ -120,6 +131,7 @@ describe('transformer error handling', () => {
   });
 
   it('returns invalid_schema for malformed datasets', () => {
+    // eslint-disable-next-line no-restricted-syntax
     const result = transformDataset(malformedFixture as unknown as DatasetEnvelope);
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -134,6 +146,7 @@ describe('transformer error handling', () => {
   });
 
   it('returns invalid_schema for null input', () => {
+    // eslint-disable-next-line no-restricted-syntax
     const result = transformDataset(null as unknown as DatasetEnvelope);
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -145,6 +158,7 @@ describe('transformer error handling', () => {
       type: 'zone_histogram',
       title: 'Test',
       data: [{ zone: 'A', count: 1 }],
+    // eslint-disable-next-line no-restricted-syntax
     } as unknown as DatasetEnvelope;
     const result = transformDataset(dataset);
     expect(result.ok).toBe(false);

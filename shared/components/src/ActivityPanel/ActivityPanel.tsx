@@ -395,14 +395,17 @@ export function ActivityPanel({
       let coordinates: number[] | number[][] | number[][][] | number[][][][];
 
       if (isTrackFeature(parentFeature) && displayItem.type === 'position') {
+        // eslint-disable-next-line no-restricted-syntax
         const coords = parentFeature.geometry.coordinates as unknown as number[][];
         geometryType = 'Point';
         coordinates = coords[displayItem.index] ?? [];
       } else if (isMultiPointFeature(parentFeature) && displayItem.type === 'point') {
+        // eslint-disable-next-line no-restricted-syntax
         const coords = parentFeature.geometry.coordinates as unknown as number[][];
         geometryType = 'Point';
         coordinates = coords[displayItem.index] ?? [];
       } else if (isMultiPolygonFeature(parentFeature) && displayItem.type === 'polygon') {
+        // eslint-disable-next-line no-restricted-syntax
         const coords = parentFeature.geometry.coordinates as unknown as number[][][][];
         geometryType = 'Polygon';
         coordinates = coords[displayItem.index] ?? [];
