@@ -106,8 +106,21 @@ export function assembleTimeline(
         continue;
       }
 
-      // First occurrence wins (dedup)
-      if (!seen.has(activityId)) {
+      // Dedup by activityId — merge generated[] across features that
+      // share the same activity (e.g. multi-track import from one file).
+      const existing = seen.get(activityId);
+      if (existing) {
+        // Merge generated IDs that aren't already listed
+        const gen = (entry as Record<string, unknown>).generated;
+        if (Array.isArray(gen)) {
+          const existingSet = new Set(existing.generated);
+          for (const id of gen) {
+            if (typeof id === 'string' && !existingSet.has(id)) {
+              existing.generated.push(id);
+            }
+          }
+        }
+      } else {
         seen.set(activityId, entry as unknown as LogEntry);
       }
     }

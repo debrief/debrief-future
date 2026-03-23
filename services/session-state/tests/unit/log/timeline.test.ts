@@ -48,14 +48,14 @@ describe('assembleTimeline', () => {
     expect(result[1].activityId).toBe('act-2');
   });
 
-  it('deduplicates on activityId (first occurrence wins)', () => {
+  it('deduplicates on activityId and merges generated arrays', () => {
     const result = assembleTimeline({
       features: [
         {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' } },
+              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' }, generated: ['feat-1'] },
             ],
           },
         },
@@ -63,7 +63,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' } },
+              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' }, generated: ['feat-2'] },
             ],
           },
         },
@@ -72,6 +72,33 @@ describe('assembleTimeline', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].activityId).toBe('shared-act');
+    expect(result[0].generated).toEqual(['feat-1', 'feat-2']);
+  });
+
+  it('does not duplicate generated IDs when merging', () => {
+    const result = assembleTimeline({
+      features: [
+        {
+          type: 'Feature',
+          properties: {
+            provenance: [
+              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
+            ],
+          },
+        },
+        {
+          type: 'Feature',
+          properties: {
+            provenance: [
+              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].generated).toEqual(['feat-1']);
   });
 
   it('sorts by timestamp ascending', () => {
