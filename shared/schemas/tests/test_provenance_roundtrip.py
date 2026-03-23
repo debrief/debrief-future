@@ -101,8 +101,14 @@ class TestProvenanceNamingConvention:
         entry = _make_log_entry()
         dumped = entry.model_dump(mode="json")
 
-        camel_case_keys = {"activityId", "wasGeneratedBy", "executionDuration",
-                           "generatedResultId", "inputState", "toolVersion"}
+        camel_case_keys = {
+            "activityId",
+            "wasGeneratedBy",
+            "executionDuration",
+            "generatedResultId",
+            "inputState",
+            "toolVersion",
+        }
         found_camel = camel_case_keys & set(dumped.keys())
         assert not found_camel, (
             f"Found camelCase keys in serialized LogEntry: {found_camel}. "

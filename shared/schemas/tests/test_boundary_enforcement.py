@@ -48,9 +48,7 @@ def _find_python_files(directory: Path) -> list[Path]:
     if not directory.exists():
         return []
     return [
-        p
-        for p in directory.rglob("*.py")
-        if "test" not in p.name and "__pycache__" not in str(p)
+        p for p in directory.rglob("*.py") if "test" not in p.name and "__pycache__" not in str(p)
     ]
 
 
@@ -78,7 +76,11 @@ def _find_by_alias_true_calls(source: str) -> list[tuple[int, str]]:
             continue
 
         for kw in node.keywords:
-            if kw.arg == "by_alias" and isinstance(kw.value, ast.Constant) and kw.value.value is True:
+            if (
+                kw.arg == "by_alias"
+                and isinstance(kw.value, ast.Constant)
+                and kw.value.value is True
+            ):
                 violations.append(
                     (
                         node.lineno,
@@ -127,8 +129,7 @@ class TestNoByAliasTrue:
         if violations:
             messages = [f"  Line {line}: {msg}" for line, msg in violations]
             pytest.fail(
-                f"{rel_path} uses by_alias=True which violates ADR-010:\n"
-                + "\n".join(messages)
+                f"{rel_path} uses by_alias=True which violates ADR-010:\n" + "\n".join(messages)
             )
 
 
