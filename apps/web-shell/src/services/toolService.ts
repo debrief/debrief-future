@@ -246,13 +246,13 @@ function validateToolOutput(
     } else if (provenance.length === 0) {
       errors.push({ featureIndex: i, error: 'Feature.properties.provenance must not be empty' });
     } else {
-      const latest = provenance[provenance.length - 1] as Record<string, unknown>;
+      const latest = provenance[provenance.length - 1] as { activityId?: unknown; timestamp?: unknown; wasGeneratedBy?: { tool?: unknown; toolVersion?: unknown } };
       if (!latest || typeof latest !== 'object') {
         errors.push({ featureIndex: i, error: 'provenance entry must be an object' });
       } else {
         if (!latest.activityId) errors.push({ featureIndex: i, error: 'provenance entry activityId is required' });
         if (!latest.timestamp) errors.push({ featureIndex: i, error: 'provenance entry timestamp is required' });
-        const wgb = latest.wasGeneratedBy as Record<string, unknown> | undefined;
+        const wgb = latest.wasGeneratedBy;
         if (!wgb) {
           errors.push({ featureIndex: i, error: 'provenance entry wasGeneratedBy is required' });
         } else {
@@ -344,7 +344,8 @@ interface ToolRegistryEntry {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function asToolFn(fn: (features: any[], params: any) => any[]): ToolExecuteFn {
-  return fn as unknown as ToolExecuteFn;
+  const wrapped: ToolExecuteFn = (features, params) => fn(features, params);
+  return wrapped;
 }
 
 /**
@@ -402,8 +403,8 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
       // argument, and the cast bridges the structural difference between this
       // module's SafeFeature (coordinates: unknown) and the tool's internal
       // SafeFeature (coordinates: number[][]).
-      execute: asToolFn((features: SafeFeature[], _params: Record<string, unknown>) =>
-        executeGenerateCourseSpeeds(features as unknown as Parameters<typeof executeGenerateCourseSpeeds>[0])),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      execute: asToolFn((features: any[]) => executeGenerateCourseSpeeds(features)),
     },
   ],
   [

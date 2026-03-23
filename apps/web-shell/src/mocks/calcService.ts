@@ -8,6 +8,7 @@
 import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
 import { extractParameters } from '@debrief/components';
+import type { SafeFeature } from '@debrief/utils';
 import { listTools, executeTool } from '../services/toolService';
 
 /** Feature with properties containing an id */
@@ -174,7 +175,7 @@ function isTrack(feature: Feature): boolean {
   return (
     feature.geometry?.type === 'LineString' &&
     feature.properties !== null &&
-    Array.isArray((feature.properties as Record<string, unknown>).times)
+    Array.isArray(feature.properties['times'])
   );
 }
 
@@ -233,6 +234,22 @@ function formatToolName(name: string): string {
     .join(' ');
 }
 
+/** Bridge geojson Feature[] to SafeFeature[] for executeTool. */
+function toSafeFeatures(features: Feature[]): SafeFeature[] {
+  return features.map(f => {
+    const geom: SafeFeature['geometry'] = f.geometry
+      ? { type: f.geometry.type, coordinates: (f.geometry as { coordinates: unknown }).coordinates }
+      : null;
+    const result: SafeFeature = {
+      type: 'Feature' as const,
+      ...(f.id != null ? { id: f.id as string | number } : {}),
+      geometry: geom,
+      properties: (f.properties ?? null) as SafeFeature['properties'],
+    };
+    return result;
+  });
+}
+
 /** IDs of styling tools from toolService */
 const stylingToolIds = new Set(listTools().map(t => t.name));
 
@@ -267,6 +284,24 @@ function translatePoint(lon: number, lat: number, distanceNm: number, bearingDeg
 }
 
 /**
+ * Recursively translate all coordinates by a given distance and bearing.
+ */
+function translateCoords(coords: unknown, distNm: number, dirDeg: number): unknown {
+  if (!Array.isArray(coords)) return coords;
+  if (typeof coords[0] === 'number') {
+    // It's a single [lon, lat, ?alt] position
+    const [newLon, newLat] = translatePoint(
+      coords[0] as number,
+      coords[1] as number,
+      distNm,
+      dirDeg,
+    );
+    return coords.length > 2 ? [newLon, newLat, coords[2]] : [newLon, newLat];
+  }
+  return coords.map(c => translateCoords(c, distNm, dirDeg));
+}
+
+/**
  * Move annotation features by distance and bearing.
  * Returns new features with translated coordinates.
  */
@@ -277,31 +312,17 @@ export function moveShapeFeatures(
 ): Feature[] {
   const results: Feature[] = [];
   for (const f of features) {
-    const kind = (f.properties as Record<string, unknown> | null)?.kind;
-    if (!kind || !MOVE_SHAPE_KINDS.has(kind as string)) continue;
+    const kind = f.properties?.['kind'];
+    if (!kind || typeof kind !== 'string' || !MOVE_SHAPE_KINDS.has(kind)) continue;
 
     const moved = JSON.parse(JSON.stringify(f)) as Feature;
     const geom = moved.geometry;
     if (!geom || !('coordinates' in geom)) continue;
 
-    // Recursively translate all coordinates
-    function translateCoords(coords: unknown): unknown {
-      if (!Array.isArray(coords)) return coords;
-      if (typeof coords[0] === 'number') {
-        // It's a single [lon, lat, ?alt] position
-        const [newLon, newLat] = translatePoint(
-          coords[0] as number,
-          coords[1] as number,
-          distanceNm,
-          directionDeg
-        );
-        return coords.length > 2 ? [newLon, newLat, coords[2]] : [newLon, newLat];
-      }
-      return coords.map(translateCoords);
-    }
-
     (geom as { coordinates: unknown }).coordinates = translateCoords(
-      (geom as { coordinates: unknown }).coordinates
+      (geom as { coordinates: unknown }).coordinates,
+      distanceNm,
+      directionDeg,
     );
 
     // Update center property if present (CIRCLE, etc.)
@@ -360,7 +381,7 @@ export function createMockCalcService(): MockCalcService {
         } else {
           for (const req of reqs) {
             const count = selectedFeatures.filter(
-              f => (f.properties as Record<string, unknown> | null)?.kind === req.kind
+              f => f.properties?.['kind'] === req.kind
             ).length;
             if (count >= (req.min ?? 1)) {
               applicable = true;
@@ -401,7 +422,7 @@ export function createMockCalcService(): MockCalcService {
           const params = collectedParams ?? defaultParams[toolId] ?? {};
           const response = executeTool(
             toolId,
-            selectedFeatures as unknown as Parameters<typeof executeTool>[1],
+            toSafeFeatures(selectedFeatures),
             params,
           );
           const item = response.content[0];
@@ -427,31 +448,33 @@ export function createMockCalcService(): MockCalcService {
               let displayMessage = String(label);
 
               for (const f of fc.features as Feature[]) {
-                const props = f.properties as Record<string, unknown> | null;
+                const props = f.properties;
 
                 // Extract dataset envelopes from __datasets property
-                if (props?.__datasets && Array.isArray(props.__datasets)) {
+                if (props?.['__datasets'] && Array.isArray(props['__datasets'])) {
+                  const dsArray = props['__datasets'] as Array<{ [key: string]: unknown }>;
                   const srcNames = (selectedFeatures
-                    .map(sf => ((sf.properties as Record<string, unknown>)?.name ?? sf.id ?? 'feature') as string)
+                    .map(sf => String(sf.properties?.['name'] ?? sf.id ?? 'feature'))
                     .map(n => n.toLowerCase().replace(/\s+/g, '-'))
                     .join('-'));
-                  for (let i = 0; i < (props.__datasets as unknown[]).length; i++) {
-                    const ds = (props.__datasets as Record<string, unknown>[])[i];
+                  for (let i = 0; i < dsArray.length; i++) {
                     datasets.push({
                       filename: `${toolId}-${srcNames}-${i + 1}.dataset.json`,
-                      envelope: ds,
+                      envelope: dsArray[i],
                     });
                   }
                   continue; // Don't add dataset carriers to map layers
                 }
 
                 // Build rich message for statistics features
-                if (props?.statistics) {
-                  const stats = props.statistics as Record<string, unknown>;
-                  const lines = Object.entries(stats)
-                    .map(([k, v]) => `  ${k.replace(/_/g, ' ')}: ${String(v)}`)
-                    .join('\n');
-                  displayMessage = `${String(props.name ?? label)}\n${lines}`;
+                if (props?.['statistics']) {
+                  const stats = props['statistics'];
+                  if (stats && typeof stats === 'object') {
+                    const lines = Object.entries(stats)
+                      .map(([k, v]) => `  ${k.replace(/_/g, ' ')}: ${String(v)}`)
+                      .join('\n');
+                    displayMessage = `${String(props['name'] ?? label)}\n${lines}`;
+                  }
                 }
 
                 mapFeatures.push(f);
@@ -492,7 +515,7 @@ export function createMockCalcService(): MockCalcService {
             const geom = track.geometry as LineString;
             const length = calculateTrackLength(geom.coordinates);
             totalLength += length;
-            const name = (track.properties as Record<string, unknown>)?.name ?? track.properties?.id ?? 'Unknown';
+            const name = track.properties?.['name'] ?? track.properties?.['id'] ?? 'Unknown';
             details.push(`${name}: ${(length / 1000).toFixed(2)} km`);
           }
 
