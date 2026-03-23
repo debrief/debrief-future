@@ -68,7 +68,7 @@ export class StacService {
       }
 
       const content = fs.readFileSync(catalogPath, 'utf-8');
-      const catalog = JSON.parse(content) as unknown;
+      const catalog: { type?: string } = JSON.parse(content);
 
       // Basic STAC catalog validation
       if (
@@ -174,7 +174,6 @@ export class StacService {
         if (item) {
           const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
           const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
-          const props = item.properties as Record<string, unknown>;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -185,11 +184,11 @@ export class StacService {
             bbox: item.bbox ?? null,
             startDatetime,
             endDatetime,
-            vesselClasses: (props['debrief:vessel_classes'] as string[] | undefined) ?? [],
-            tags: (props['debrief:tags'] as string[] | undefined) ?? [],
-            featureTags: (props['debrief:feature_tags'] as string[] | undefined) ?? [],
-            nationalities: (props['debrief:nationalities'] as string[] | undefined) ?? [],
-            trackNames: (props['debrief:track_names'] as string[] | undefined) ?? [],
+            vesselClasses: (item.properties['debrief:vessel_classes'] as string[] | undefined) ?? [],
+            tags: (item.properties['debrief:tags'] as string[] | undefined) ?? [],
+            featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
+            nationalities: (item.properties['debrief:nationalities'] as string[] | undefined) ?? [],
+            trackNames: (item.properties['debrief:track_names'] as string[] | undefined) ?? [],
           });
         }
       }
@@ -340,7 +339,7 @@ export class StacService {
 
         // Preserve the GeoJSON top-level id — this is the canonical identifier
         // that provenance generated[] references.  Never derive from properties.
-        const featureId = feature.id != null
+        const featureId = feature.id !== null && feature.id !== undefined
           ? String(feature.id)
           : `feature-${features.length}`;
 
