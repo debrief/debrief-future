@@ -5,9 +5,9 @@
  */
 
 import { resolve } from 'node:path';
-import { StoreRegistration, Config, PreferenceValue } from './types.js';
+import { StoreRegistration, PreferenceValue } from './types.js';
 import { StoreExistsError, StoreNotFoundError } from './errors.js';
-import { readConfig, readConfigSync, updateConfig } from './storage.js';
+import { readConfig, updateConfig } from './storage.js';
 import { validateStacCatalog } from './validation.js';
 
 /**
