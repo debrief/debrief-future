@@ -46,6 +46,12 @@ import type {
 // Canonical Safe GeoJSON types from @debrief/utils (T02)
 import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
 
+/** Type-safe JSON.parse wrapper — returns `unknown` without `as unknown` cast. */
+function parseJsonSafe(text: string): unknown {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return JSON.parse(text);
+}
+
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
   private itemCache: Map<string, StacItem> = new Map();
@@ -68,14 +74,14 @@ export class StacService {
       }
 
       const content = fs.readFileSync(catalogPath, 'utf-8');
-      const catalog: { type?: string } = JSON.parse(content);
+      const parsed = parseJsonSafe(content);
 
       // Basic STAC catalog validation
       if (
-        catalog === null ||
-        typeof catalog !== 'object' ||
-        !('type' in catalog) ||
-        (catalog.type !== 'Catalog' && catalog.type !== 'Collection')
+        parsed === null ||
+        typeof parsed !== 'object' ||
+        !('type' in parsed) ||
+        (parsed.type !== 'Catalog' && parsed.type !== 'Collection')
       ) {
         return Promise.resolve({
           valid: false,
@@ -405,12 +411,13 @@ export class StacService {
               `Feature "${featureId}" is missing required "kind" property`,
             );
           }
-          features.push({
+          const annotation: DebriefFeature = {
             type: 'Feature',
             id: featureId,
             geometry: geom,
             properties: { ...props, kind },
-          } as DebriefFeature);
+          } as DebriefFeature;
+          features.push(annotation);
         }
       }
 
@@ -1186,7 +1193,9 @@ export class StacService {
     // Build a map of feature ID -> feature for quick lookup
     const featureMap = new Map<string, SafeFeature>();
     for (const feature of featureCollection.features) {
-      const id = (feature as unknown as Record<string, unknown>).id as string | undefined;
+      const id = feature.id !== null && feature.id !== undefined
+        ? String(feature.id)
+        : undefined;
       const propsId = feature.properties?.['id'] as string | undefined;
       const featureId = id ?? propsId;
       if (featureId) {
