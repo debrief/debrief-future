@@ -277,29 +277,32 @@ Each decision should include:
 
 **Evidence:** `specs/172-review-technical-debt/evidence/`
 
-### ADR-010: JSON Wire Format Uses camelCase (2026-03-23)
+### ADR-010: JSON Wire Format Uses snake_case (2026-03-23)
 
-**Context:** Python services write JSON consumed by TypeScript frontends. LinkML schemas define fields in snake_case (Python convention). TypeScript expects camelCase (JavaScript convention). Without a single enforced convention, data is silently dropped at serialization boundaries — as demonstrated by the provenance data loss incident (see `docs/project_notes/failure-pattern-type-erasure-at-boundaries.md`).
+**Context:** Python services write JSON consumed by TypeScript frontends. LinkML schemas define fields in snake_case (Python convention). TypeScript conventionally uses camelCase (JavaScript convention). Without a single enforced convention, data is silently dropped at serialization boundaries — as demonstrated by the provenance data loss incident (see `docs/project_notes/failure-pattern-type-erasure-at-boundaries.md`).
 
-**Decision:** All JSON written to disk or sent over IPC uses **camelCase** keys. This is the wire format convention for the entire project.
+The project already has a pre-existing naming specification: **STAC** (SpatioTemporal Asset Catalogs). STAC uses snake_case throughout (`stac_version`, `stac_extensions`, `start_datetime`, `end_datetime`). GeoJSON properties also follow this convention. Since STAC is the storage backbone (ADR-003) and our JSON files on disk are STAC items, the wire format must align with STAC.
+
+**Decision:** All JSON written to disk or sent over IPC uses **snake_case** keys. This is the wire format convention for the entire project, matching the STAC specification.
 
 Implementation:
-1. LinkML schemas continue to define fields in snake_case (the source-of-truth naming)
-2. Generated Pydantic `ConfiguredBaseModel` must include `alias_generator = to_camel` (from `pydantic.alias_generators`) so that `serialize_by_alias = True` produces camelCase keys. **Current gap:** the generator does not yet add an alias generator — `by_alias=True` is a no-op. This must be fixed in the schema generation post-processing step (`shared/schemas/scripts/generate.py`).
-3. All Python code that produces JSON consumed by TypeScript **must** call `model_dump(mode="json", by_alias=True)` — never hand-build dicts
-4. TypeScript code reads camelCase natively — no transformation needed
-5. Python code that reads its own JSON uses `validate_by_name = True` to accept both forms
+1. LinkML schemas define fields in snake_case — this is the source-of-truth naming **and** the wire format
+2. Python `model_dump(mode="json")` outputs snake_case natively — no alias configuration needed
+3. TypeScript types generated from LinkML already use snake_case field names (in `@debrief/schemas`)
+4. TypeScript consumer code (session-state, components) must use the generated types with snake_case field names, not hand-written camelCase interfaces
+5. The `normaliseEntry()` snake→camel converter in `timeline.ts` is no longer needed and should be removed — TypeScript reads snake_case directly from the generated types
 
 **Alternatives Considered:**
-- snake_case everywhere → Rejected: TypeScript would need a camelCase transformer on every read, and STAC/GeoJSON properties already use mixed conventions externally. More pragmatically, the codebase already uses camelCase aliases and this formalises existing practice.
+- camelCase everywhere → Rejected: conflicts with STAC specification (the pre-existing naming standard in the project), requires alias_generator machinery in Pydantic, and means JSON files on disk don't match their governing spec.
 - Per-service choice → Rejected: this is exactly the ambiguity that caused the incident.
 
 **Consequences:**
 - ✅ Single convention eliminates naming-mismatch bugs at serialization boundaries
-- ✅ Aligns with existing `ConfiguredBaseModel` configuration — no code changes needed for compliant services
-- ✅ TypeScript reads JSON natively without transformation
-- ❌ Python developers must remember `by_alias=True` on every `model_dump()` call (enforced by lint rule)
-- ❌ JSON on disk uses camelCase, which differs from Python attribute names — may confuse developers inspecting raw files
+- ✅ Aligns with STAC specification — JSON files on disk are valid STAC items
+- ✅ Python reads/writes natively — no alias configuration needed
+- ✅ Generated TypeScript types already use snake_case — no transformation needed
+- ❌ TypeScript developers must use snake_case property access (`entry.activity_id` not `entry.activityId`) — unfamiliar in JS ecosystem but consistent with schema
+- ❌ Hand-written TypeScript types in session-state need migration to use generated types or snake_case field names
 
 **Triggered by:** Provenance data loss incident, March 2026
 

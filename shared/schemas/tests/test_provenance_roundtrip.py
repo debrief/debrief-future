@@ -1,16 +1,16 @@
 """
-Provenance round-trip test — validates Python→JSON→TypeScript naming convention.
+Provenance round-trip test — validates Python→JSON naming convention.
 
 This test exists because of the provenance data loss incident (March 2026):
 Python wrote snake_case keys, TypeScript expected camelCase, and provenance
 entries were silently dropped.
 
-The test verifies that LogEntry serialized from Python produces JSON with
-the camelCase keys that TypeScript consumers expect. If this test fails,
-data will be silently lost at the Python→TypeScript boundary.
+ADR-010 resolved this by adopting **snake_case** as the wire format, matching
+the STAC specification (the pre-existing naming standard in the project).
+TypeScript consumers must use snake_case field names from the generated types.
 
 See: docs/project_notes/failure-pattern-type-erasure-at-boundaries.md
-ADR-010: JSON Wire Format Uses camelCase
+ADR-010: JSON Wire Format Uses snake_case
 """
 
 import json
@@ -18,27 +18,24 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-import pytest
-
 # Import generated models
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import LogEntry, ParameterValue, WasGeneratedBy
 
-# The camelCase keys that TypeScript consumers expect.
-# Source: services/session-state/src/log/types.ts LogEntry interface.
-EXPECTED_CAMEL_CASE_KEYS = {
-    "activityId",
+# The snake_case keys that match the LinkML schema and STAC convention.
+# TypeScript consumers must use these names (ADR-010).
+EXPECTED_TOP_LEVEL_KEYS = {
+    "activity_id",
     "timestamp",
-    "wasGeneratedBy",
+    "was_generated_by",
     "used",
     "generated",
-    "executionDuration",
+    "execution_duration",
 }
 
-# Nested: WasGeneratedBy must also be camelCase
-EXPECTED_WGB_CAMEL_CASE_KEYS = {
+EXPECTED_WGB_KEYS = {
     "tool",
-    "toolVersion",
+    "tool_version",
     "parameters",
 }
 
@@ -62,54 +59,55 @@ def _make_log_entry() -> LogEntry:
 
 
 class TestProvenanceNamingConvention:
-    """Verify that Python-serialized provenance uses camelCase keys."""
+    """Verify that Python-serialized provenance uses snake_case keys (ADR-010)."""
 
-    @pytest.mark.xfail(
-        reason=(
-            "ConfiguredBaseModel lacks alias_generator — "
-            "model_dump(by_alias=True) produces snake_case. "
-            "Fix: add alias_generator=to_camel to generate.py post-processing (ADR-010)."
-        ),
-        strict=True,
-    )
-    def test_log_entry_json_keys_are_camel_case(self) -> None:
-        """LogEntry.model_dump(by_alias=True) must produce camelCase keys.
+    def test_log_entry_json_keys_are_snake_case(self) -> None:
+        """LogEntry.model_dump() must produce snake_case keys matching STAC convention.
 
-        This is the exact scenario that caused the provenance data loss incident:
-        Python wrote snake_case, TypeScript read camelCase, data was silently dropped.
+        This is the guardrail for the provenance data loss incident:
+        if keys don't match what TypeScript expects, data is silently dropped.
+        ADR-010 mandates snake_case everywhere, matching the STAC spec.
         """
         entry = _make_log_entry()
-        dumped = entry.model_dump(mode="json", by_alias=True)
+        dumped = entry.model_dump(mode="json")
 
-        # Top-level keys must be camelCase
-        for expected_key in EXPECTED_CAMEL_CASE_KEYS:
+        for expected_key in EXPECTED_TOP_LEVEL_KEYS:
             assert expected_key in dumped, (
-                f"Expected camelCase key '{expected_key}' not found in serialized LogEntry. "
+                f"Expected snake_case key '{expected_key}' not found in serialized LogEntry. "
                 f"Actual keys: {list(dumped.keys())}. "
-                "This means TypeScript consumers will silently drop this field."
+                "TypeScript consumers expect these exact keys (ADR-010)."
             )
 
-    @pytest.mark.xfail(
-        reason=(
-            "ConfiguredBaseModel lacks alias_generator — "
-            "model_dump(by_alias=True) produces snake_case. "
-            "Fix: add alias_generator=to_camel to generate.py post-processing (ADR-010)."
-        ),
-        strict=True,
-    )
-    def test_was_generated_by_json_keys_are_camel_case(self) -> None:
-        """Nested WasGeneratedBy must also use camelCase keys."""
+    def test_was_generated_by_json_keys_are_snake_case(self) -> None:
+        """Nested WasGeneratedBy must also use snake_case keys."""
         entry = _make_log_entry()
-        dumped = entry.model_dump(mode="json", by_alias=True)
+        dumped = entry.model_dump(mode="json")
 
-        wgb = dumped.get("wasGeneratedBy") or dumped.get("was_generated_by")
-        assert wgb is not None, "wasGeneratedBy/was_generated_by not found in serialized LogEntry"
+        wgb = dumped.get("was_generated_by")
+        assert wgb is not None, "was_generated_by not found in serialized LogEntry"
 
-        for expected_key in EXPECTED_WGB_CAMEL_CASE_KEYS:
+        for expected_key in EXPECTED_WGB_KEYS:
             assert expected_key in wgb, (
-                f"Expected camelCase key '{expected_key}' not found in WasGeneratedBy. "
+                f"Expected snake_case key '{expected_key}' not found in WasGeneratedBy. "
                 f"Actual keys: {list(wgb.keys())}."
             )
+
+    def test_no_camel_case_keys_in_output(self) -> None:
+        """Serialized JSON must not contain camelCase keys (ADR-010).
+
+        If camelCase keys appear, it means an alias_generator has been
+        incorrectly added or explicit aliases are leaking through.
+        """
+        entry = _make_log_entry()
+        dumped = entry.model_dump(mode="json")
+
+        camel_case_keys = {"activityId", "wasGeneratedBy", "executionDuration",
+                           "generatedResultId", "inputState", "toolVersion"}
+        found_camel = camel_case_keys & set(dumped.keys())
+        assert not found_camel, (
+            f"Found camelCase keys in serialized LogEntry: {found_camel}. "
+            "ADR-010 mandates snake_case wire format (matching STAC)."
+        )
 
     def test_log_entry_roundtrip_through_json(self) -> None:
         """LogEntry should survive Python → JSON string → Python round-trip."""
@@ -122,19 +120,3 @@ class TestProvenanceNamingConvention:
         assert entry.activity_id == entry2.activity_id
         assert entry.was_generated_by.tool == entry2.was_generated_by.tool
         assert entry.execution_duration == entry2.execution_duration
-
-    def test_snake_case_keys_present_in_current_output(self) -> None:
-        """Documents the current (broken) state: output uses snake_case.
-
-        This test will start failing when the alias_generator is added to
-        ConfiguredBaseModel — at that point, remove this test and un-xfail
-        the camelCase tests above.
-        """
-        entry = _make_log_entry()
-        dumped = entry.model_dump(mode="json", by_alias=True)
-
-        # Currently, keys are snake_case because no alias_generator is set
-        assert "activity_id" in dumped, (
-            "Expected snake_case key 'activity_id' — if this fails, the alias_generator "
-            "has been added! Remove this test and un-xfail the camelCase tests."
-        )

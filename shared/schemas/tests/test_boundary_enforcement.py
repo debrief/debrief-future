@@ -2,12 +2,12 @@
 Boundary enforcement tests — lint-like checks for serialization safety.
 
 Ensures that:
-1. model_dump() calls in service code include by_alias=True when producing
-   JSON consumed by TypeScript (ADR-010)
-2. Generated ConfiguredBaseModel includes an alias_generator so that
-   serialize_by_alias actually produces camelCase keys (ADR-010)
-3. Service code uses generated Pydantic models rather than hand-built dicts
+1. Service code uses generated Pydantic models rather than hand-built dicts
    for schema types (ADR-011, Constitution XV.7)
+2. Generated ConfiguredBaseModel does NOT include an alias_generator, so
+   JSON output uses snake_case matching the STAC specification (ADR-010)
+3. Service code does not use by_alias=True (which would produce camelCase
+   if aliases were ever added, violating ADR-010)
 
 These are AST-based static checks — no runtime execution of service code needed.
 """
@@ -33,8 +33,8 @@ GENERATED_INIT = (
 )
 
 # Service directories that produce JSON consumed by TypeScript.
-# Test code is excluded — tests may legitimately call model_dump() without
-# by_alias for internal assertions.
+# Test code is excluded — tests may legitimately call model_dump() in
+# various ways for internal assertions.
 SERVICE_SRC_DIRS = [
     SERVICES_DIR / "calc" / "debrief_calc",
     SERVICES_DIR / "stac" / "src" / "debrief_stac",
@@ -54,8 +54,12 @@ def _find_python_files(directory: Path) -> list[Path]:
     ]
 
 
-def _find_model_dump_calls(source: str) -> list[tuple[int, str]]:
-    """Find model_dump() calls and check whether they include by_alias=True.
+def _find_by_alias_true_calls(source: str) -> list[tuple[int, str]]:
+    """Find model_dump() calls that include by_alias=True.
+
+    ADR-010 mandates snake_case wire format (matching STAC). Using
+    by_alias=True would produce camelCase if aliases were ever added,
+    silently breaking the convention.
 
     Returns a list of (line_number, issue_description) for violations.
     """
@@ -68,26 +72,21 @@ def _find_model_dump_calls(source: str) -> list[tuple[int, str]]:
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
-        # Match: <expr>.model_dump(...)
         if not isinstance(node.func, ast.Attribute):
             continue
-        if node.func.attr != "model_dump":
+        if node.func.attr not in ("model_dump", "model_dump_json"):
             continue
 
-        # Check if by_alias=True is present
-        has_by_alias = False
         for kw in node.keywords:
             if kw.arg == "by_alias" and isinstance(kw.value, ast.Constant) and kw.value.value is True:
-                has_by_alias = True
-
-        if not has_by_alias:
-            violations.append(
-                (
-                    node.lineno,
-                    "model_dump() without by_alias=True — camelCase aliases will not "
-                    "be applied (ADR-010). Use model_dump(mode='json', by_alias=True).",
+                violations.append(
+                    (
+                        node.lineno,
+                        f"{node.func.attr}(by_alias=True) — ADR-010 mandates snake_case "
+                        "wire format (matching STAC). Remove by_alias=True so output uses "
+                        "the default snake_case field names.",
+                    )
                 )
-            )
 
     return violations
 
@@ -102,60 +101,52 @@ def _get_service_files() -> list[tuple[str, Path]]:
     return files
 
 
-# Files with known model_dump() violations that predate ADR-010.
-# Remove entries as each file is fixed.
-_KNOWN_MODEL_DUMP_VIOLATIONS = {
-    "services/calc/debrief_calc/models.py",
-    "services/stac/src/debrief_stac/assets.py",
-    "services/stac/src/debrief_stac/mcp_server.py",
+# Files with known by_alias=True calls that predate ADR-010.
+# These must be migrated to drop by_alias=True. Remove entries as fixed.
+_KNOWN_BY_ALIAS_VIOLATIONS = {
+    "services/calc/debrief_calc/provenance.py",
+    "services/config/src/debrief_config/storage.py",
 }
 
 
-class TestModelDumpByAlias:
-    """Verify that service code uses by_alias=True on model_dump() calls."""
+class TestNoByAliasTrue:
+    """Verify service code does not use by_alias=True (ADR-010: snake_case wire format)."""
 
     @pytest.mark.parametrize("rel_path,file_path", _get_service_files())
-    def test_model_dump_includes_by_alias(self, rel_path: str, file_path: Path) -> None:
-        """Service code model_dump() calls must include by_alias=True (ADR-010)."""
+    def test_model_dump_does_not_use_by_alias(self, rel_path: str, file_path: Path) -> None:
+        """Service code must not use by_alias=True — wire format is snake_case (ADR-010)."""
         source = file_path.read_text()
-        violations = _find_model_dump_calls(source)
+        violations = _find_by_alias_true_calls(source)
 
-        if violations and rel_path in _KNOWN_MODEL_DUMP_VIOLATIONS:
+        if violations and rel_path in _KNOWN_BY_ALIAS_VIOLATIONS:
             pytest.xfail(
-                f"{rel_path} has known model_dump() violations predating ADR-010 — "
-                "fix tracked as follow-up"
+                f"{rel_path} has known by_alias=True calls predating ADR-010 — "
+                "migration tracked as follow-up"
             )
 
         if violations:
             messages = [f"  Line {line}: {msg}" for line, msg in violations]
             pytest.fail(
-                f"{rel_path} has model_dump() calls without by_alias=True:\n"
+                f"{rel_path} uses by_alias=True which violates ADR-010:\n"
                 + "\n".join(messages)
             )
 
 
-class TestGeneratedAliasGenerator:
-    """Verify that the generated ConfiguredBaseModel has a camelCase alias generator."""
+class TestGeneratedSchemaConvention:
+    """Verify that generated ConfiguredBaseModel preserves snake_case output."""
 
-    @pytest.mark.xfail(
-        reason=(
-            "ConfiguredBaseModel lacks alias_generator — "
-            "fix tracked as follow-up in ADR-010"
-        ),
-        strict=True,
-    )
-    def test_configured_base_model_has_alias_generator(self) -> None:
-        """ConfiguredBaseModel must include alias_generator for camelCase (ADR-010).
+    def test_no_alias_generator_in_configured_base_model(self) -> None:
+        """ConfiguredBaseModel must NOT include alias_generator (ADR-010).
 
-        Without this, serialize_by_alias=True is a no-op and all JSON output
-        will use snake_case field names, breaking TypeScript consumers.
+        ADR-010 mandates snake_case wire format matching the STAC specification.
+        An alias_generator (e.g., to_camel) would silently convert output to
+        camelCase, breaking TypeScript consumers that expect snake_case.
         """
         if not GENERATED_INIT.exists():
             pytest.skip("Generated schemas not found — run generation first")
 
         content = GENERATED_INIT.read_text()
 
-        # Look for alias_generator in the ConfiguredBaseModel section
         config_match = re.search(
             r"class ConfiguredBaseModel.*?model_config\s*=\s*ConfigDict\((.*?)\)",
             content,
@@ -166,10 +157,9 @@ class TestGeneratedAliasGenerator:
         )
 
         config_block = config_match.group(1)
-        assert "alias_generator" in config_block, (
-            "ConfiguredBaseModel is missing alias_generator. "
-            "Without it, serialize_by_alias=True is a no-op and JSON output "
-            "will use snake_case keys instead of camelCase (ADR-010). "
-            "Fix: add alias_generator=to_camel to the post-processing in "
+        assert "alias_generator" not in config_block, (
+            "ConfiguredBaseModel has an alias_generator, which will convert output "
+            "to camelCase. ADR-010 mandates snake_case wire format (matching STAC). "
+            "Remove alias_generator from the post-processing in "
             "shared/schemas/scripts/generate.py"
         )

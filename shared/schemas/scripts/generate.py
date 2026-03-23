@@ -77,6 +77,8 @@ def generate_pydantic() -> bool:
             "from typing import (\n",
         )
 
+
+
         # Post-process: Fix GeoJSON coordinate types. LinkML generates flat
         # list[float] for all coordinate arrays, but GeoJSON requires nested
         # arrays whose depth varies by geometry type.

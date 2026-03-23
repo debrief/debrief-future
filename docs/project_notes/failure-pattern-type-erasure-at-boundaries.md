@@ -180,9 +180,9 @@ Six guardrails were implemented to prevent this class of bug from recurring:
 
 ### 1. JSON Wire Convention Formalised (ADR-010)
 
-**All JSON on disk uses camelCase keys.** This is now a formal architectural decision. LinkML defines fields in snake_case; the Pydantic alias generator converts to camelCase on serialization. TypeScript reads camelCase natively.
+**All JSON on disk uses snake_case keys**, matching the STAC specification (the pre-existing naming standard in the project). LinkML defines fields in snake_case, Python `model_dump()` outputs snake_case natively, and generated TypeScript types use snake_case field names.
 
-**Known gap:** The generated `ConfiguredBaseModel` does not yet include `alias_generator = to_camel`. Until this is added to `shared/schemas/scripts/generate.py`, `by_alias=True` is a no-op. The `test_provenance_roundtrip.py` tests are xfail until this is fixed.
+**Follow-up needed:** TypeScript consumer code in `session-state` and `LogPanel` currently uses hand-written camelCase interfaces. These must be migrated to use the generated snake_case types. Tracked as a separate task.
 
 ### 2. Hand-Built Dicts Banned at Boundaries
 
@@ -203,15 +203,15 @@ New constitutional clause: type assertions to loose types (`Record<string, unkno
 ### 5. Round-Trip Golden Fixture Tests
 
 `shared/schemas/tests/test_provenance_roundtrip.py` tests that:
-- `LogEntry.model_dump(by_alias=True)` produces camelCase keys matching the TypeScript `LogEntry` interface
+- `LogEntry.model_dump()` produces snake_case keys matching the STAC convention
+- No camelCase keys appear in serialized output
 - The Python→JSON→Python round-trip preserves all data
-- Documents the current snake_case output as a known gap (test will break when alias_generator is added — intentionally)
 
 ### 6. Python model_dump() Enforcement
 
 `shared/schemas/tests/test_boundary_enforcement.py` scans service source files via AST analysis:
-- Flags `model_dump()` calls that don't include `by_alias=True`
-- Verifies `ConfiguredBaseModel` includes an `alias_generator`
+- Flags `model_dump(by_alias=True)` calls that would produce camelCase (violating ADR-010)
+- Verifies `ConfiguredBaseModel` does NOT include an `alias_generator`
 
 ---
 
