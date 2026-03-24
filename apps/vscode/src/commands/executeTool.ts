@@ -19,6 +19,7 @@ import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/s
 import type { LogPanelViewProvider } from '../views/logPanelView';
 import type { ToolParameter } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
+import { propsRecord, parseJsonSafe } from '../utils/featureProps';
 
 /**
  * Known parameter type → values map.
@@ -104,9 +105,9 @@ export function createExecuteToolCommand(
     if (typeof toolIdOrMessage === 'string') {
       resolvedToolId = toolIdOrMessage;
     } else if (typeof toolIdOrMessage === 'object' && toolIdOrMessage !== null) {
-      resolvedToolId = (toolIdOrMessage as Record<string, unknown>).toolId as string
-        || (toolIdOrMessage as Record<string, unknown>).toolName as string;
-      toolParams = (toolIdOrMessage as Record<string, unknown>).params as Record<string, unknown> | undefined;
+      const msg = toolIdOrMessage as { toolId?: string; toolName?: string; params?: Record<string, unknown> };
+      resolvedToolId = msg.toolId || msg.toolName || '';
+      toolParams = msg.params;
     } else {
       return;
     }
@@ -152,13 +153,14 @@ export function createExecuteToolCommand(
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
-        const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+        const props = propsRecord(f);
         const { provenance: _p, ...restProps } = props;
-        return {
+        const state: InputFeatureState = {
           featureId: String(f.id),
-          geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
-          properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
+          geometry: parseJsonSafe(JSON.stringify(f.geometry)),
+          properties: parseJsonSafe(JSON.stringify(restProps)) as InputFeatureState['properties'],
         };
+        return state;
       });
     }
 

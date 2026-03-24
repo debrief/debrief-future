@@ -65,6 +65,7 @@ const sampleTrack: TrackFeature = {
   id: 'track-001',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {

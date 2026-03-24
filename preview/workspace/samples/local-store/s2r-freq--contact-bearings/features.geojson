@@ -13,7 +13,23 @@
         "range": 300.8,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0414"
+        "label": "0414",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4dcc99ef-2f15-4732-9a37-0706214ba394"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -28,7 +44,23 @@
         "range": 300.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0415"
+        "label": "0415",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8bee1248-b295-4dc2-bf91-11325eac08e7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -43,7 +75,23 @@
         "range": 300.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0416"
+        "label": "0416",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d3df3ddc-3a91-4262-8644-6df8e346a285"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -58,7 +106,23 @@
         "range": 300.5,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0418"
+        "label": "0418",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8080751b-9146-4ac8-8fff-186bcb984e4d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -73,7 +137,23 @@
         "range": 300.0,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0420"
+        "label": "0420",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0c62bed9-fb88-42d6-ba29-68cb537113c5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -88,7 +168,23 @@
         "range": 299.3,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0423"
+        "label": "0423",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7a428f6a-806e-46cd-a3a2-82146ad35271"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -103,7 +199,23 @@
         "range": 298.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0425"
+        "label": "0425",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a30d03e7-312a-4efc-aba6-e327e4dbdb6a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -118,7 +230,23 @@
         "range": 298.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0427"
+        "label": "0427",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "50a8e6b6-cade-47a6-9606-232764513731"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -133,7 +261,23 @@
         "range": 298.3,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0429"
+        "label": "0429",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1bd9c01f-5624-4223-a43e-f1256e18fcf4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -148,7 +292,23 @@
         "range": 298.0,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0431"
+        "label": "0431",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb959ccf-6d93-4f22-bc69-a753b37c6701"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -163,7 +323,23 @@
         "range": 297.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0434"
+        "label": "0434",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d2c36391-c90c-477c-bbb4-934adcfc34ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -178,7 +354,23 @@
         "range": 297.8,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0435"
+        "label": "0435",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ca6c0ccb-4efe-47fd-a0c1-2989aab30fd5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -193,7 +385,23 @@
         "range": 297.5,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0437"
+        "label": "0437",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "726341b6-9030-4509-a76c-18aaa7042a1f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -208,7 +416,23 @@
         "range": 297.0,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0440"
+        "label": "0440",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "023733a0-657a-4318-b4b3-45ac08160551"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -223,7 +447,23 @@
         "range": 296.5,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0441"
+        "label": "0441",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ae094da-71cf-4e41-ba01-7a910ec54bc5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -238,7 +478,23 @@
         "range": 296.2,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0442"
+        "label": "0442",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ec85c303-bb38-4de1-b940-9f71fcf5e0af"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -253,7 +509,23 @@
         "range": 295.8,
         "frequency": 50.06,
         "sensor_name": "Contact_bearings",
-        "label": "0443"
+        "label": "0443",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3be04339-8d97-413a-9a5a-7f130fa68b40"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -268,7 +540,23 @@
         "range": 295.5,
         "frequency": 50.06,
         "sensor_name": "Contact_bearings",
-        "label": "0443"
+        "label": "0443",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4bf3a9e-8f43-4e6f-ad2b-d88288cadfb5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -283,7 +571,23 @@
         "range": 293.5,
         "frequency": 50.23,
         "sensor_name": "Contact_bearings",
-        "label": "0444"
+        "label": "0444",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b26744b3-7a61-433e-b32f-b5c2bd857ebb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -298,7 +602,23 @@
         "range": 293.0,
         "frequency": 50.23,
         "sensor_name": "Contact_bearings",
-        "label": "0445"
+        "label": "0445",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9202b7bf-5c05-4f14-98f9-64bd8a10d4b0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -313,7 +633,23 @@
         "range": 292.8,
         "frequency": 50.16,
         "sensor_name": "Contact_bearings",
-        "label": "0446"
+        "label": "0446",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7dcb9caf-a0c4-454e-aff2-82eb5d2a8d2a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -328,7 +664,23 @@
         "range": 290.3,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0448"
+        "label": "0448",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "19cd8001-cb48-4a5c-8d2c-7710549de394"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -343,7 +695,23 @@
         "range": 289.0,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0449"
+        "label": "0449",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "714984da-9b03-40b1-b125-12ecea8c9081"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -358,7 +726,23 @@
         "range": 288.3,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0450"
+        "label": "0450",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "228c5f87-2bc4-4258-ac2e-c73ad3feb999"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -373,7 +757,23 @@
         "range": 288.0,
         "frequency": 49.92,
         "sensor_name": "Contact_bearings",
-        "label": "0452"
+        "label": "0452",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f8c9507e-14d1-4783-adf9-d5161b74876b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -388,7 +788,23 @@
         "range": 288.0,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0453"
+        "label": "0453",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "65367c6d-22ac-45a8-af20-e6236f003301"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -403,7 +819,23 @@
         "range": 288.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0454"
+        "label": "0454",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "97cdef53-d9c9-409d-8bfe-5b12492ecd47"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -418,7 +850,23 @@
         "range": 288.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0455"
+        "label": "0455",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fed7ae53-f8cd-4b31-9ea3-10d30d38f4d9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -433,7 +881,23 @@
         "range": 288.8,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0457"
+        "label": "0457",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "205849d1-314b-49db-bcdb-4efa7a0612ae"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -448,7 +912,23 @@
         "range": 289.8,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0458"
+        "label": "0458",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a6fd991f-2654-477b-8487-d939f66d872e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -463,7 +943,23 @@
         "range": 289.8,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0459"
+        "label": "0459",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "71d3b517-a642-482f-8abf-9bcd48a7b41c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -478,7 +974,23 @@
         "range": 291.0,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0500"
+        "label": "0500",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "24fede29-42fa-47a1-94c8-e602c4ad23cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -493,7 +1005,23 @@
         "range": 291.5,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0502"
+        "label": "0502",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a31dc00d-c535-45a7-9750-48071fa5c5fe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -508,7 +1036,23 @@
         "range": 292.3,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0503"
+        "label": "0503",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6fe9e976-8484-456a-a330-4c70afa4692b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -523,7 +1067,23 @@
         "range": 292.3,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0504"
+        "label": "0504",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8d749608-5b28-4a6d-9a45-ac7720ea3b27"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -538,7 +1098,23 @@
         "range": 293.0,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0506"
+        "label": "0506",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e39f0e93-fd6f-4c2c-bcf9-8548deffc232"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -553,7 +1129,23 @@
         "range": 293.5,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0507"
+        "label": "0507",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4d653e6-bf09-4ae5-abad-d3eabd3a3a81"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -568,7 +1160,23 @@
         "range": 294.0,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0509"
+        "label": "0509",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "392de84b-33be-4bbe-8b83-65ec3c372990"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -583,7 +1191,23 @@
         "range": 294.3,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0510"
+        "label": "0510",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "47e823e9-8b58-4092-8d8c-a0439b323209"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -598,7 +1222,23 @@
         "range": 294.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0512"
+        "label": "0512",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9a969b08-8824-4c2e-8389-4d02ef41a3e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -613,7 +1253,23 @@
         "range": 294.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0513"
+        "label": "0513",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4793beb8-7dc3-45fa-8e1d-e017ac488f98"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -628,7 +1284,23 @@
         "range": 294.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0514"
+        "label": "0514",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a7d8b71d-1019-4515-8a36-f6957f9df256"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -643,7 +1315,23 @@
         "range": 295.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0515"
+        "label": "0515",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32735616-2789-4393-a6e8-46a56f8d1a81"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -658,7 +1346,23 @@
         "range": 295.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0516"
+        "label": "0516",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "58316b4b-b518-4f7d-bce9-13fd0d821d65"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -673,7 +1377,23 @@
         "range": 295.8,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0518"
+        "label": "0518",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c2efe3c7-7b8d-4df5-b645-66a7b3653db8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -688,7 +1408,23 @@
         "range": 296.5,
         "frequency": 49.96,
         "sensor_name": "Contact_bearings",
-        "label": "0519"
+        "label": "0519",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3ccd2a9a-87e9-445b-9528-901286b01077"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -703,7 +1439,23 @@
         "range": 296.5,
         "frequency": 49.99,
         "sensor_name": "Contact_bearings",
-        "label": "0520"
+        "label": "0520",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "80326215-172b-47b5-8744-f4cfa04bebfa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -718,7 +1470,23 @@
         "range": 297.5,
         "frequency": 50.09,
         "sensor_name": "Contact_bearings",
-        "label": "0521"
+        "label": "0521",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e254a345-84a1-4bce-9fcd-5ead6d0b6d6f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -733,7 +1501,23 @@
         "range": 297.8,
         "frequency": 50.2,
         "sensor_name": "Contact_bearings",
-        "label": "0522"
+        "label": "0522",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1cdb54b2-c190-4362-a9e3-da5d363ae5c2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -748,7 +1532,23 @@
         "range": 298.3,
         "frequency": 50.2,
         "sensor_name": "Contact_bearings",
-        "label": "0523"
+        "label": "0523",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "419aae19-b154-41a7-a511-5648d3273ce5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -763,7 +1563,23 @@
         "range": 299.0,
         "frequency": 50.2,
         "sensor_name": "Contact_bearings",
-        "label": "0524"
+        "label": "0524",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4006cc23-ca84-4f33-bc7e-4f798ed2da8a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -778,7 +1594,23 @@
         "range": 299.5,
         "frequency": 50.2,
         "sensor_name": "Contact_bearings",
-        "label": "0525"
+        "label": "0525",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4d6536d-362f-46e9-82ab-b52d10cd11f8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -793,7 +1625,23 @@
         "range": 300.0,
         "frequency": 50.2,
         "sensor_name": "Contact_bearings",
-        "label": "0525"
+        "label": "0525",
+        "provenance": [
+          {
+            "activity_id": "82385597-dcd7-4547-8a0b-a3dcb4797940",
+            "timestamp": "2026-03-21T10:15:01.472252Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8b5b1154-45be-48f7-bc2e-273e0a4e877d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

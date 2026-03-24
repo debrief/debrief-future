@@ -290,4 +290,5 @@ class DSFHandler(BaseHandler):
             source_file=source_file,
             parse_time_ms=elapsed_ms,
             handler=self.name,
+            handler_version=self.version,
         )

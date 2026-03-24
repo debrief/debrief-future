@@ -128,6 +128,7 @@ export function loadLayout(
       return null;
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     const persisted = JSON.parse(serialized) as unknown;
 
     // Validate structure

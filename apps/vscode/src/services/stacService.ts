@@ -37,10 +37,20 @@ export interface AssociatedFile {
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
+  TrackFeature,
+  ReferenceLocation,
+  LogEntry as SchemaLogEntry,
+  PositionStyleOverride,
 } from '@debrief/schemas';
 
 // Canonical Safe GeoJSON types from @debrief/utils (T02)
 import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+
+/** Type-safe JSON.parse wrapper — returns `unknown` without `as unknown` cast. */
+function parseJsonSafe(text: string): unknown {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return JSON.parse(text);
+}
 
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
@@ -64,14 +74,14 @@ export class StacService {
       }
 
       const content = fs.readFileSync(catalogPath, 'utf-8');
-      const catalog = JSON.parse(content) as unknown;
+      const parsed = parseJsonSafe(content);
 
       // Basic STAC catalog validation
       if (
-        catalog === null ||
-        typeof catalog !== 'object' ||
-        !('type' in catalog) ||
-        (catalog.type !== 'Catalog' && catalog.type !== 'Collection')
+        parsed === null ||
+        typeof parsed !== 'object' ||
+        !('type' in parsed) ||
+        (parsed.type !== 'Catalog' && parsed.type !== 'Collection')
       ) {
         return Promise.resolve({
           valid: false,
@@ -170,7 +180,6 @@ export class StacService {
         if (item) {
           const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
           const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
-          const props = item.properties as Record<string, unknown>;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -181,11 +190,11 @@ export class StacService {
             bbox: item.bbox ?? null,
             startDatetime,
             endDatetime,
-            vesselClasses: (props['debrief:vessel_classes'] as string[] | undefined) ?? [],
-            tags: (props['debrief:tags'] as string[] | undefined) ?? [],
-            featureTags: (props['debrief:feature_tags'] as string[] | undefined) ?? [],
-            nationalities: (props['debrief:nationalities'] as string[] | undefined) ?? [],
-            trackNames: (props['debrief:track_names'] as string[] | undefined) ?? [],
+            vesselClasses: (item.properties['debrief:vessel_classes'] as string[] | undefined) ?? [],
+            tags: (item.properties['debrief:tags'] as string[] | undefined) ?? [],
+            featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
+            nationalities: (item.properties['debrief:nationalities'] as string[] | undefined) ?? [],
+            trackNames: (item.properties['debrief:track_names'] as string[] | undefined) ?? [],
           });
         }
       }
@@ -334,68 +343,82 @@ export class StacService {
           continue;
         }
 
+        // Preserve the GeoJSON top-level id — this is the canonical identifier
+        // that provenance generated[] references.  Never derive from properties.
+        const featureId = feature.id !== null && feature.id !== undefined
+          ? String(feature.id)
+          : `feature-${features.length}`;
+
         if (geom.type === 'LineString' && props.times !== undefined && props.times !== null) {
           // Track: LineString with times array (epoch ms)
           const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
-          const id = (props.id as string) ?? `track-${trackCount}`;
           const positions = (props.positions as Array<{ time: string }>) ??
             times.map(t => ({ time: new Date(t).toISOString() }));
 
-          features.push({
+          // `times` is a runtime-only epoch-ms array used by MapView for temporal
+          // rendering — not part of the LinkML schema.  We type-extend rather than
+          // cast-away so the compiler still validates every schema field.
+          const track: TrackFeature & { properties: { times: number[] } } = {
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             properties: {
               kind: 'TRACK',
-              platform_id: id,
+              platform_id: featureId,
               platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
               track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
               start_time: times[0] !== undefined && times[0] !== 0 ? new Date(times[0]).toISOString() : '',
               end_time: times[times.length - 1] !== undefined && times[times.length - 1] !== 0 ? new Date(times[times.length - 1]!).toISOString() : '',
               positions,
               times,
-              style: { line: { color: (props.color as string) ?? '#0066cc' } },
-              default_position_style: props.default_position_style ?? { show_symbol: true, symbol: 'circle', show_label: false },
+              style: {
+                line: { color: (props.color as string) ?? '#0066cc' },
+                point: { shape: 'circle', radius: 3, fill: true, fill_color: (props.color as string) ?? '#0066cc', color: '#000000' },
+              },
+              default_position_style: (props.default_position_style as { show_symbol: boolean; symbol: string; show_label: boolean }) ?? { show_symbol: true, symbol: 'circle', show_label: false },
               symbol_interval: props.symbol_interval as string | undefined,
               label_interval: props.label_interval as string | undefined,
-              position_style_overrides: props.position_style_overrides,
+              position_style_overrides: props.position_style_overrides as PositionStyleOverride[] | undefined,
+              provenance: props.provenance as SchemaLogEntry[] | undefined,
             },
-          } as unknown as DebriefFeature);
+          };
+          features.push(track);
           trackCount++;
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
-          const id = (props.id as string) ?? `location-${locationCount}`;
 
-          features.push({
+          const location: ReferenceLocation = {
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: { type: 'Point' as const, coordinates: pointCoords },
             properties: {
               kind: 'POINT',
               name: (props.name as string) ?? `Location ${locationCount + 1}`,
               location_type: (props.locationType as string) ?? (props.location_type as string) ?? 'REFERENCE',
               style: { shape: 'circle', radius: 5, fill_color: '#ff0000', color: '#000000' },
+              provenance: props.provenance as SchemaLogEntry[] | undefined,
             },
-          } as DebriefFeature);
+          };
+          features.push(location);
           locationCount++;
         } else {
           // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY, etc.)
           const kind = props.kind as string | undefined;
           if (!kind) {
-            const featureId = (props.id as string) ?? `annotation-${features.length}`;
             throw new Error(
               `Feature "${featureId}" is missing required "kind" property`,
             );
           }
-          const id = (props.id as string) ?? `annotation-${features.length}`;
-          features.push({
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- annotation kind is dynamic
+          const annotation: DebriefFeature = {
             type: 'Feature',
-            id,
+            id: featureId,
             geometry: geom,
             properties: { ...props, kind },
-          } as DebriefFeature);
+          } as DebriefFeature;
+          features.push(annotation);
         }
       }
 
@@ -1171,7 +1194,9 @@ export class StacService {
     // Build a map of feature ID -> feature for quick lookup
     const featureMap = new Map<string, SafeFeature>();
     for (const feature of featureCollection.features) {
-      const id = (feature as unknown as Record<string, unknown>).id as string | undefined;
+      const id = feature.id !== null && feature.id !== undefined
+        ? String(feature.id)
+        : undefined;
       const propsId = feature.properties?.['id'] as string | undefined;
       const featureId = id ?? propsId;
       if (featureId) {
@@ -1186,6 +1211,7 @@ export class StacService {
 
       // Ensure properties exists
       if (!feature.properties) {
+        // eslint-disable-next-line no-restricted-syntax -- mutating SafeFeature at parse boundary
         (feature as unknown as Record<string, unknown>).properties = {};
       }
 

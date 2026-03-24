@@ -69,6 +69,22 @@ import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-ta
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
+/** Bridge: cast Feature[] to DebriefFeature[] (structural overlap). */
+function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
+  return features as DebriefFeature[];
+}
+
+/** Extract indexable properties from a feature safely. */
+function featureProps(f: { properties: unknown }): { [key: string]: unknown } {
+  const p = f.properties;
+  if (p && typeof p === 'object') return p as { [key: string]: unknown };
+  return {};
+}
+
+/** Type alias for feature style objects (avoids Record<string, unknown> casts). */
+type StyleObj = { [key: string]: unknown };
+type OverridesObj = { [key: string]: StyleObj };
+
 // Map between session-state DisplayMode ('normal'|'snailTrail') and
 // components DisplayMode ('full'|'trail') — the two enums diverged historically.
 const toComponentMode = (m: StoreDisplayMode): ComponentDisplayMode =>
@@ -202,7 +218,7 @@ export default function App() {
 
   // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
-    return [...plotFeatures, ...(resultLayers as unknown as DebriefFeature[]), ...drawnFeatures];
+    return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
   }, [plotFeatures, resultLayers, drawnFeatures]);
 
   // Feature names map for LogPanel
@@ -348,8 +364,7 @@ export default function App() {
           features: { ...plot.features, features: updatedFeatures },
         };
       });
-      const { [aid]: _, ...rest } = prev;
-      return rest;
+      return Object.fromEntries(Object.entries(prev).filter(([key]) => key !== aid));
     });
   }, []);
 
@@ -468,7 +483,7 @@ export default function App() {
           ) as Feature[];
 
           // Build parameters with the tuned value applied
-          const tunedParams = unwrapParams(entry.parameters as Record<string, { value: unknown }>);
+          const tunedParams = unwrapParams(entry.parameters);
           tunedParams[parameter] = newValue;
 
           // Re-execute the tuned entry from the restored geometry
@@ -504,8 +519,8 @@ export default function App() {
 
               // Capture pre-execution state as updated inputState for this entry
               updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
-                const props = (f.properties ?? {}) as Record<string, unknown>;
-                const { provenance: _p, ...restProps } = props;
+                const props = (f.properties ?? {}) as { [key: string]: unknown };
+                const restProps = Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'provenance'));
                 return {
                   featureId: String(f.id),
                   geometry: JSON.parse(JSON.stringify(f.geometry)),
@@ -514,7 +529,7 @@ export default function App() {
               }));
 
               // Re-execute subsequent entry with its original parameters
-              const subParams = unwrapParams(nextEntry.parameters as Record<string, { value: unknown }>);
+              const subParams = unwrapParams(nextEntry.parameters);
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const subResponse = executeTool(nextEntry.toolName, featuresToReplay as any, subParams);
               const subFc = JSON.parse(subResponse.content[0]?.resource?.text ?? '{"features":[]}');
@@ -623,7 +638,7 @@ export default function App() {
             minimum: propSchema?.minimum ?? (type === 'number' ? 0 : null),
             maximum: propSchema?.maximum ?? (type === 'number' ? Number(param.value) * 3 : null),
             step: propSchema?.step ?? (type === 'number' ? 1 : null),
-            choices: hasEnum ? (propSchema!.enum as unknown[]) : null,
+            choices: hasEnum ? (propSchema!.enum ?? null) : null,
             paramType: propSchema?.['x-debrief-param-type'] ?? null,
           });
         }
@@ -819,8 +834,8 @@ export default function App() {
     // so we must snapshot the originals before the call.
     const inputState = replacesInPlace && selectedFeatures.length > 0
       ? selectedFeatures.map(f => {
-          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-          const { provenance: _p, ...restProps } = props;
+          const props = featureProps(f);
+          const restProps = Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'provenance'));
           return {
             featureId: String(f.id),
             geometry: JSON.parse(JSON.stringify(f.geometry)),
@@ -869,7 +884,7 @@ export default function App() {
 
       // Record last tool execution for single-step undo (#110)
       const resultIds = allResultLayers.map((layer, i) =>
-        String((layer as unknown as Record<string, unknown>).id ?? (layer.properties as Record<string, unknown> | null)?.id ?? `result-${activityCounter + 1}-${i}`)
+        String(layer.id ?? layer.properties?.['id'] ?? `result-${activityCounter + 1}-${i}`)
       );
       store.getState().setLastToolExecution({
         toolId,
@@ -881,7 +896,7 @@ export default function App() {
       if (currentPlot) {
         const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
         const sourceNames = selectedFeatures
-          .map(f => (f.properties as unknown as Record<string, unknown>)?.name ?? f.id ?? 'unknown')
+          .map(f => featureProps(f).name ?? f.id ?? 'unknown')
           .map(n => String(n).toLowerCase().replace(/\s+/g, '-'))
           .join('-');
 
@@ -915,7 +930,7 @@ export default function App() {
 
     const generatedIds = allResultLayers.length > 0
       ? allResultLayers.map((layer, i) =>
-          String((layer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}-${i}`))
+          String(layer.properties?.['id'] ?? `result-${nextId}-${i}`))
       : [];
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
@@ -943,7 +958,7 @@ export default function App() {
     }
 
     setLogEntries(prev => [entry, ...prev]);
-  }, [selectedFeatures, activityCounter, currentPlot, handleFileSelect]);
+  }, [selectedFeatures, activityCounter, currentPlot, handleFileSelect, store]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -974,13 +989,13 @@ export default function App() {
         const targetIds = new Set(featureIds);
 
         // Helper: apply a style property to a feature-level style object
-        const applyStyleProperty = (style: Record<string, unknown>, prop: string, val: unknown): Record<string, unknown> => {
+        const applyStyleProperty = (style: StyleObj, prop: string, val: unknown): StyleObj => {
           const result = { ...style };
           const dotIndex = prop.indexOf('.');
           if (dotIndex > 0) {
             const category = prop.slice(0, dotIndex);
             const field = prop.slice(dotIndex + 1);
-            const oldCategory = (result[category] ?? {}) as Record<string, unknown>;
+            const oldCategory = (result[category] ?? {}) as StyleObj;
             result[category] = { ...oldCategory, [field]: val };
           } else {
             result[prop] = val;
@@ -994,18 +1009,18 @@ export default function App() {
           const updatedFeatures = plot.features.features.map(f => {
             if (!targetIds.has(String(f.id))) return f;
 
-            const props = (f.properties ?? {}) as Record<string, unknown>;
+            const props = (f.properties ?? {}) as { [key: string]: unknown };
 
             // Per-position override: write to position_style_overrides[index]
             if (isPointOverride && positionIndex !== undefined) {
-              const overrides = { ...(props.position_style_overrides ?? {}) as Record<string, Record<string, unknown>> };
+              const overrides = { ...(props.position_style_overrides ?? {}) as OverridesObj };
               const key = String(positionIndex);
               overrides[key] = { ...(overrides[key] ?? {}), [property]: value };
               return { ...f, properties: { ...props, position_style_overrides: overrides } };
             }
 
             // Feature-level style change
-            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const oldStyle = (props.style ?? {}) as StyleObj;
             const newStyle = applyStyleProperty(oldStyle, property, value);
             return { ...f, properties: { ...props, style: newStyle } };
           });
@@ -1022,14 +1037,12 @@ export default function App() {
             prev.map(f => {
               if (!targetIds.has(f.id)) return f;
 
-              const props = f.properties as unknown as Record<string, unknown>;
-              const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+              const props = featureProps(f);
+              const oldStyle = (props.style ?? {}) as StyleObj;
               const newStyle = applyStyleProperty(oldStyle, property, value);
-
-              return {
-                ...f,
-                properties: { ...props, style: newStyle },
-              } as unknown as DebriefFeature;
+              return Object.assign({}, f, {
+                properties: { ...f.properties, style: newStyle },
+              });
             }),
           );
         }

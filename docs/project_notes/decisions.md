@@ -276,3 +276,58 @@ Each decision should include:
 - ❌ Minor inconsistency in tsconfig files (acceptable given different deployment targets)
 
 **Evidence:** `specs/172-review-technical-debt/evidence/`
+
+### ADR-010: JSON Wire Format Uses snake_case (2026-03-23)
+
+**Context:** Python services write JSON consumed by TypeScript frontends. LinkML schemas define fields in snake_case (Python convention). TypeScript conventionally uses camelCase (JavaScript convention). Without a single enforced convention, data is silently dropped at serialization boundaries — as demonstrated by the provenance data loss incident (see `docs/project_notes/failure-pattern-type-erasure-at-boundaries.md`).
+
+The project already has a pre-existing naming specification: **STAC** (SpatioTemporal Asset Catalogs). STAC uses snake_case throughout (`stac_version`, `stac_extensions`, `start_datetime`, `end_datetime`). GeoJSON properties also follow this convention. Since STAC is the storage backbone (ADR-003) and our JSON files on disk are STAC items, the wire format must align with STAC.
+
+**Decision:** All JSON written to disk or sent over IPC uses **snake_case** keys. This is the wire format convention for the entire project, matching the STAC specification.
+
+Implementation:
+1. LinkML schemas define fields in snake_case — this is the source-of-truth naming **and** the wire format
+2. Python `model_dump(mode="json")` outputs snake_case natively — no alias configuration needed
+3. TypeScript types generated from LinkML already use snake_case field names (in `@debrief/schemas`)
+4. TypeScript consumer code (session-state, components) must use the generated types with snake_case field names, not hand-written camelCase interfaces
+5. The `normaliseEntry()` snake→camel converter in `timeline.ts` is no longer needed and should be removed — TypeScript reads snake_case directly from the generated types
+
+**Alternatives Considered:**
+- camelCase everywhere → Rejected: conflicts with STAC specification (the pre-existing naming standard in the project), requires alias_generator machinery in Pydantic, and means JSON files on disk don't match their governing spec.
+- Per-service choice → Rejected: this is exactly the ambiguity that caused the incident.
+
+**Consequences:**
+- ✅ Single convention eliminates naming-mismatch bugs at serialization boundaries
+- ✅ Aligns with STAC specification — JSON files on disk are valid STAC items
+- ✅ Python reads/writes natively — no alias configuration needed
+- ✅ Generated TypeScript types already use snake_case — no transformation needed
+- ❌ TypeScript developers must use snake_case property access (`entry.activity_id` not `entry.activityId`) — unfamiliar in JS ecosystem but consistent with schema
+- ❌ Hand-written TypeScript types in session-state need migration to use generated types or snake_case field names
+
+**Triggered by:** Provenance data loss incident, March 2026
+
+### ADR-011: Type Assertions at Boundaries Require Human Approval (2026-03-23)
+
+**Context:** TypeScript `as` casts and Python `cast()` calls are developer assertions that bypass the type checker. When used at data boundaries (JSON parsing, file I/O, IPC), they create a gap where the compiler assumes type safety that doesn't exist. The provenance data loss incident was caused by `as Record<string, unknown>` masking a naming convention mismatch. Article XV of the Constitution prohibits `any` but does not address type assertions, which are equally dangerous at boundaries.
+
+**Decision:** Loose-type assertions are treated as **expert overrides** that require justification and human review.
+
+Specifically:
+1. **Banned patterns** (CI-enforced via ESLint):
+   - `as Record<string, unknown>` — type erasure; use a generated type or Zod schema instead
+   - `as unknown as T` — double-cast escape hatch; indicates a design problem
+   - `JSON.parse(...)` without subsequent validation — must be followed by a schema parse (Zod, type guard, or equivalent)
+2. **Restricted patterns** (require `// SAFETY: <justification>` comment and PR review approval):
+   - `as T` where `T` is a concrete type — acceptable only when the developer can prove the cast is safe (e.g., narrowing from a validated union)
+3. **Python equivalent**: `dict` literals must not duplicate the shape of a generated Pydantic model. If a model exists, use it.
+
+**Alternatives Considered:**
+- Ban all `as` casts → Rejected: some are legitimate (e.g., narrowing after a type guard check). The goal is to require justification, not prohibition.
+- Rely on code review alone → Rejected: reviewers miss casts in large diffs. CI enforcement catches them consistently.
+
+**Consequences:**
+- ✅ Type erasure at boundaries becomes visible and reviewable
+- ✅ Developers must justify why they're bypassing the type system
+- ✅ Encourages use of generated types and runtime validators (Zod, Pydantic)
+- ❌ Legitimate casts require a comment — minor friction
+- ❌ New ESLint rules may flag existing code that needs migration

@@ -305,7 +305,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "1a6848b7-ac26-402e-afde-af887fcf25bb",
+            "timestamp": "2026-03-21T10:15:06.102177Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "58dfd534-53fb-4a8e-89cb-c114765f8d37"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

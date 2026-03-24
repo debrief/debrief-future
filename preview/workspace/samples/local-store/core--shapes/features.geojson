@@ -205,7 +205,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "46f936da-ad5e-43aa-a993-8f825e0458ff"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -218,7 +234,23 @@
         "sensor_name": "Plain",
         "bearing": -13.9,
         "time": "1995-12-12T05:11:00+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "37cc0b1a-b38d-4b3c-ac72-cda585af14ef"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -239,7 +271,23 @@
         "label": "800x300",
         "course": 12.0,
         "speed": 4.0,
-        "depth": 100.0
+        "depth": 100.0,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "70130956-103a-45d7-9138-11afb2e4c375"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -260,7 +308,23 @@
         "label": "800x400",
         "course": 12.0,
         "speed": 4.0,
-        "depth": 100.0
+        "depth": 100.0,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a489e13a-6528-47bb-b23a-8f3ccc752910"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -281,7 +345,23 @@
         "label": "800x300",
         "course": 12.0,
         "speed": 4.0,
-        "depth": 100.0
+        "depth": 100.0,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "760a7bc8-dcd2-4645-94e0-c2767a8804b8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -302,7 +382,23 @@
         "label": "1000x400",
         "course": 12.0,
         "speed": 4.0,
-        "depth": 100.0
+        "depth": 100.0,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "30d03927-308d-47ca-b2d0-63bf51bfec70"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -389,7 +485,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "75b038a8-be64-449e-a463-26ad2132ea84"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -404,7 +516,23 @@
         "time": "1995-12-12T05:14:00+00:00",
         "label": "Contact_bearings 0414",
         "ambiguous_bearing": 300.8,
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "51f958d9-93e7-49a9-b780-d758b58ecef3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -419,7 +547,23 @@
         "time": "1995-12-12T05:15:00+00:00",
         "label": "LABEL",
         "ambiguous_bearing": 300.8,
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3c398ba3-4961-4ec0-9169-3d013ee0af32"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -434,7 +578,23 @@
         "time": "1995-12-12T05:16:00+00:00",
         "label": "LABEL",
         "ambiguous_bearing": 300.8,
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "388a02d3-b96e-4e1a-b2ec-a35f8804ea21"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -449,7 +609,23 @@
         "time": "1995-12-12T05:17:00+00:00",
         "label": "",
         "ambiguous_bearing": 300.8,
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3de35d02-65cc-4b01-8381-feaa2b2b25d6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -536,7 +712,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "54a17278-55bb-43e2-8887-00b87a7eefad"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -643,7 +835,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "651b604a-63a0-43ff-a4e5-042a20f242ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -655,7 +863,23 @@
         "track": "NEL_STYLE",
         "entry": "comment 3",
         "type": "",
-        "time": "1995-12-12T05:02:00+00:00"
+        "time": "1995-12-12T05:02:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6ca786bb-ec74-42e5-bfb1-6bc75eb252c6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -667,7 +891,23 @@
         "track": "NEL_STYLE",
         "entry": "Mk Rge BAAA R121212",
         "type": "GenComment2",
-        "time": "1995-12-12T05:05:00+00:00"
+        "time": "1995-12-12T05:05:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "185c6008-ec53-4d20-be72-49133e3244ee"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -784,7 +1024,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1c578544-273b-4744-acdf-cbe8a6d36557"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -991,7 +1247,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a69daf62-bcf5-4cc1-908d-4d664edfc167"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1078,7 +1350,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "75ccfad5-9ee4-4f2b-ab85-4d03e65f6b6c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1165,7 +1453,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2e295cb4-f7ae-46da-a108-4824e84a155b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1272,7 +1576,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2bc92867-ba0a-46e1-89a4-9c97e751cff3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1349,7 +1669,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "40d7df72-c197-41bb-8e87-9189c1d7db21"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1436,7 +1772,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2c47e332-16e4-4271-92c5-cc6d642d285f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1513,7 +1865,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "25e0a96c-5408-4848-8dfe-9e77906167d8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1590,7 +1958,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "89695170-a2d6-40fe-9aa2-03ddc5e9f488"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1667,7 +2051,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c613dee7-e4c7-4c65-bb8d-c4c43bfce465"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1712,7 +2112,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "89df6662-25d0-40cd-a6e8-7a6feac691e3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1740,7 +2156,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b076246c-216b-4a7e-8204-548e80c485fb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1774,7 +2206,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "847d48f6-a12e-43ae-ac00-e13b3fe73992"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1936,7 +2384,23 @@
           "color": "#FFFF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3a4c8fdc-c1c0-4675-8b83-a2a42fc797cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2098,7 +2562,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b8d5b29b-79b7-40e5-ba56-5832e9f4627a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2260,7 +2740,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5016bd08-cb62-4194-825a-463be9785772"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2423,7 +2919,23 @@
           "weight": 1,
           "opacity": 1.0,
           "dash_array": "1, 3"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eddf8623-4d9e-4149-b8b3-94275434081a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2586,7 +3098,23 @@
           "weight": 2,
           "opacity": 1.0,
           "dash_array": "5, 3, 1, 3"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3ef43cc9-2e26-46e9-96c4-3123a590124c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2749,7 +3277,23 @@
           "weight": 3,
           "opacity": 1.0,
           "dash_array": "5, 5"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d9048931-01d5-4e3f-a620-81692f3ad1ab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2912,7 +3456,23 @@
           "weight": 4,
           "opacity": 1.0,
           "dash_array": "10, 5"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9e438e36-3c96-4529-9f4f-6263d8371c80"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3074,7 +3634,23 @@
           "color": "#FFA500",
           "weight": 5,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2ca33c72-0b39-498b-b0ef-49544e97e5d6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3101,7 +3677,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d48161d3-696c-4bff-a6c9-91a76ed42a10"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3128,7 +3720,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ceeffe34-35bf-4936-b57b-11ff6a4ae74b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3155,7 +3763,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "69a32d12-2e46-4d50-80d2-533e27c8e1ea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3182,7 +3806,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5af49b1-98d3-47dc-8dbb-570715a8506c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3209,7 +3849,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0c875bce-8683-4c93-bd76-ae03eb17da7a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3236,7 +3892,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cff6a562-9ea0-4030-9a2c-a443ee70b0ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3263,7 +3935,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "288f5979-a5db-4282-8fad-6de7754915ea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3290,7 +3978,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "948da70a-777b-4d66-bd85-22df476a98e7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3317,7 +4021,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c81cd14b-8889-4376-8b1e-ce652b043a66"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3344,7 +4064,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9815547c-cb46-42cb-b1ec-cf5447395d7a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3371,7 +4107,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ab505a97-4cbc-47c5-a05f-b5487cb089f8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3398,7 +4150,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d1a0232c-dd19-4b42-9898-9bfb895400e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3425,7 +4193,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "050e3476-8adf-4a2d-b17e-17be023152e7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3452,7 +4236,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c85719a3-66b3-427e-b0b6-98ca35d8dac8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3479,7 +4279,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5d7e0cb7-b5ec-4d65-8abb-85842034ac4a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3506,7 +4322,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6056771f-3b3d-447f-b11a-140347f02fae"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3533,7 +4365,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "90afe103-769e-4512-a148-9acf5c5e2d57"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3560,7 +4408,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "58d28276-dd50-45ee-9294-d7fc3edaacaf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3587,7 +4451,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1396f6fa-fde9-46c4-b54d-fb7cd705d75e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3614,7 +4494,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "15d25683-09a9-4479-9619-a7b5e0f27f8f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3641,7 +4537,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ac54ab97-965d-4053-8025-da155e1759ba"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3668,7 +4580,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "881593ef-b8cb-4297-bacc-8c7eba40cb8c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3695,7 +4623,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b19a0f9a-cd79-4157-a109-2b6b214d1753"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3722,7 +4666,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "50f8ee47-0d2a-42f1-8c95-8685046cdfbf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3749,7 +4709,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84bb8d48-e079-454e-99d3-a1e218a30527"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3776,7 +4752,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bd0a0a8e-81af-4372-bfbd-f1d2bc38ed47"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3803,7 +4795,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4273f94-e7df-4142-9b83-37d98181b63e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3831,7 +4839,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "anomaly"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a35f2868-a831-4840-bac2-53d753870edc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3859,7 +4883,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "bottomed_mine"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a2f39eb9-ffa4-4f02-b232-78eee692a52d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3887,7 +4927,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "cleared"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9b9fe33f-94c9-414d-8f61-3afa853507b5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3915,7 +4971,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "countermeasure"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "98464e69-ea70-4faf-92ca-3c60e530bd22"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3943,7 +5015,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "decoy"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "16473db8-9931-47d4-90cf-3bbafae15e03"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3971,7 +5059,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "decoy_aw"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3fb9a0c6-979b-4e87-ac4a-9b0eec77587f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3999,7 +5103,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "decoy_uw"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78ecc297-c10c-4135-825a-544d33b5fbbc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4027,7 +5147,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "enemy_subsurface"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fa3e8b8a-8c48-40a4-9e76-17cd6555fe84"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4055,7 +5191,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "flagged_marker"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2b8ef27a-5b5d-408b-8f65-065759d3cc3e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4083,7 +5235,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "floating_mine"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c869cca3-b9a4-48f3-a375-d6972135146f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4111,7 +5279,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "friend_air"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1959250b-fa4d-4775-a53c-e3b410832c5c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4139,7 +5323,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "highlights_1"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "157d996a-c988-4673-a862-0b80eff8efe8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4167,7 +5367,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "usv_5"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f0973138-4e16-40cf-b828-e82da7298686"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4195,7 +5411,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "highlights_2"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "18cc8b5f-6433-4e38-8d30-738335ff1978"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4223,7 +5455,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "jammer"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eb241974-c47f-4638-b1b1-d76cce775735"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4251,7 +5499,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "mine_like_object"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "20ac8c03-fdc6-431d-a7e3-74e54d145167"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4279,7 +5543,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "moored_mine"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "68d00743-226e-40a3-9327-ef9b28b2e6e0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4307,7 +5587,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "tagged_marker"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6dbd030f-8dc2-4cb3-adbe-0464d7a8fc29"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4335,7 +5631,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "torpedo"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4086eaa6-4745-4424-8ec3-3a83cf023b0a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4363,7 +5675,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "uav_1"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "38471c68-284a-4fac-a0b5-d00b0f963c7e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4391,7 +5719,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "uav_2"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "474cd15a-2b15-46b3-8804-e1bf26236f4b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4419,7 +5763,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "usv_1"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2fa6a046-88fc-4466-a0cc-3d166a0b4f81"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4447,7 +5807,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "usv_2"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3530d93e-446c-405d-8889-dfb750a5930c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4475,7 +5851,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "usv_3"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8b88d6c1-5c84-44d5-a4bd-557a468109f8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4503,7 +5895,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "usv_4"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "afb4f2ae-d0ea-42bd-97c3-be53e31e29b6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4531,7 +5939,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "wreck"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d7e4f92f-45a3-4aa1-a1d0-7d939daacdd6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4559,7 +5983,23 @@
           "weight": 1,
           "opacity": 1.0,
           "legacy_style": "xxx_contact"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6a36623a-9834-490c-bb50-2375b51c6b12"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4586,7 +6026,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6c46a00b-5d51-44f2-8c05-0f9ac704f09c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4613,7 +6069,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "08d7d162-dd6a-418d-9cfd-18e4a7941893"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4640,7 +6112,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0efc8f3a-b973-4d04-98dd-6b0999f13aef"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4805,7 +6293,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f536fa3e-9596-4f28-bcf1-71182d440a3c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4970,7 +6474,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ebd9c09f-2ba3-4a67-9438-6ffefa8aeba5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5135,7 +6655,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "70677cb3-845d-4805-96e6-bcc712bc609e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5300,7 +6836,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "da5ec937-c743-4aea-81f0-e3538ee579bf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5465,7 +7017,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cdc9037f-2529-4300-9ab8-e5c97693a48a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5630,7 +7198,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b1b52536-9480-4fd8-bd69-5be6b05a15d5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5796,7 +7380,23 @@
           "color": "#800080",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4836c6cf-87e8-43fa-a829-b7655772e997"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5839,7 +7439,23 @@
           "weight": 3,
           "opacity": 1.0,
           "dash_array": "1, 3"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0c6d792b-5826-4875-a711-6854766bd7e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5872,7 +7488,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af01310e-6d9e-469d-a196-549da2f8342e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6170,7 +7802,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d2853ad1-fc6b-44d2-b36c-86a97cd903b9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6198,7 +7846,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "73bb45ed-662c-45f9-83ef-defde9889a6c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6227,7 +7891,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a0ef83b3-7a2b-4791-9f7d-4b002107fa66"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6256,7 +7936,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fdccdece-9acb-473b-b653-e2bd26de0a48"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6276,7 +7972,23 @@
           "radius": 3.0,
           "fill_color": "#808080",
           "color": "#808080"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b9288b09-cd30-4b63-b494-369597093a72"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6296,7 +8008,23 @@
           "radius": 3.0,
           "fill_color": "#808080",
           "color": "#808080"
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c6266826-2ff4-41cc-bed8-53a01bc4aa5d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6343,7 +8071,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9db646ed-9ebd-4bdc-8351-51aa90585143"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6390,7 +8134,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b9e54680-eee9-4d98-8227-700a9200eb4d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6437,7 +8197,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d3d052c8-745e-4e3f-bd31-692a7875d3ff"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6484,7 +8260,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bb1f5265-a4b9-4749-aff7-4879d8a60523"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6531,7 +8323,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "670aacad-294f-41ca-9355-e6e4e417b907"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6578,7 +8386,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e1cdec8b-742e-45dd-a2d6-2e19ebb757fe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6625,7 +8449,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "97763484-103d-4333-8066-ae80a52a2f6d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6672,7 +8512,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6f5e55f4-5256-46f0-b1e5-5e714c85f821"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6719,7 +8575,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1df756ab-f7c5-4cfa-b309-220a6e26f26a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6766,7 +8638,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ebd7c82a-3634-4fa8-9470-3d9610b98ef2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6813,7 +8701,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "56f39695-ce3f-471a-af76-a8705a7c27eb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6977,7 +8881,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b6659f04-2df4-4761-ad05-d8ff71d8b4f5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7141,7 +9061,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b7382c47-aa6f-45d9-a87e-51af7785ba39"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7305,7 +9241,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9e330b26-2243-4c3f-9ea9-8f92eeb9702a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7352,7 +9304,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0a79a30b-db0c-4a30-aaf9-2020d5861627"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7399,7 +9367,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "42e69852-9d77-4cdc-9def-0ef84f97c16c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7447,7 +9431,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0d4878ac-2c20-4768-9ad8-3bfc20aa671f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7495,7 +9495,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f4cec010-b8ac-4883-8288-b3a92fc5128e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7542,7 +9558,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "89f9a18e-cc86-4b1f-9242-b21a3514c8f0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7589,7 +9621,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "da8c6e8f-f194-493d-853f-2d297442542a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7636,7 +9684,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "00f32edf-62de-48f8-8c00-9b4d386b2e5b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7683,7 +9747,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "531056cd-fae7-4e43-8d87-047857979f4e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7730,7 +9810,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "100141ef-abf7-43ec-8efa-bef2a8872565"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7777,7 +9873,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eae786e3-6c2a-4b5d-a7e3-d0f410c64ade"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7824,7 +9936,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "94acdfbd-4a45-46d5-9dc7-4ac0b931003b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7871,7 +9999,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "17a4c1fb-46ef-438e-b4ab-e00de3ac5944"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7918,7 +10062,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "73455cfa-bb0a-49f5-9dea-3b9fce648694"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -7965,7 +10125,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b1036c0d-c680-42af-9f91-2b7fa9a56c32"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8012,7 +10188,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5952b07-c08c-45a4-a4bd-90d0c6c70732"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8059,7 +10251,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "66adfc68-b9af-40f0-9078-b819bc812e04"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8106,7 +10314,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "52d2aaf8-5605-4323-9a07-dce4656a1851"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8270,7 +10494,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32683c66-16ee-49b8-a194-67400e868aa6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8434,7 +10674,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ef9aafd7-074b-4aff-9968-8b498483ee17"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8598,7 +10854,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3719dd24-87b5-460e-99a2-7da6d2002cc2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8645,7 +10917,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d28ebfbb-7ef4-409e-b04b-ab8c9c8ff10d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8692,7 +10980,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "93e79fe9-fd1c-4dc4-88e4-0e2ec5a34f00"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8862,7 +11166,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b72aa31-863a-4d51-8c29-aa781ec198f1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9032,7 +11352,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e0a6ecad-880b-497a-bb8f-109055b4d118"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9202,7 +11538,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "88880a0f-3a6c-4c8e-b10c-5cbd71a9dc44"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9372,7 +11724,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "67fc9b2b-17b2-4368-a99e-14a4f15d0281"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9542,7 +11910,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "74776b52-fdbd-480c-88ac-33172208d729"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9552,7 +11936,23 @@
       "properties": {
         "kind": "TRACKSPLIT",
         "track_id": "NEL_STYLE2",
-        "timestamp": "1995-12-12T05:02:10+00:00"
+        "timestamp": "1995-12-12T05:02:10+00:00",
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0755a612-0f7d-45cb-8a85-15d47254233e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9585,7 +11985,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "acd7e3a2-276c-4694-838d-24b6b9ccd2de"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9608,7 +12024,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "60e2a844-fc15-410f-a822-8815bdefa68e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9631,7 +12063,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c037c1c1-60ae-4135-96a0-ef10bf81f956"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9654,7 +12102,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "88a37f64-b275-4d06-854d-dc08bf740959"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9677,7 +12141,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "950ff0d3-44d3-420a-845a-0ce2ab1688ea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9704,7 +12184,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5e43b59-64e2-4317-9549-bbaf999c847b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9732,7 +12228,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "edf68d8e-a8df-45ce-ad40-4fb5dbaa23e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9761,7 +12273,23 @@
           "color": "#FFFF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e8ec6e72-04c2-4fde-933f-baab7a7ed47f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9788,7 +12316,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8f7b188e-0c4f-4977-9fcf-d3fcf3f4c1e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9815,7 +12359,23 @@
           "color": "#FFA500",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b792203b-0a2e-411f-9a75-2868ea42ddb9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9842,7 +12402,23 @@
           "color": "#800080",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "5e9feed9-f426-496d-a2f2-f4f56565ab24",
+            "timestamp": "2026-03-21T10:15:06.096220Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9cfb84c0-e28a-4d24-8121-49be4b9a1372"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

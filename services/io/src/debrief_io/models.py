@@ -103,6 +103,9 @@ class ParseResult(BaseModel):
     handler: str
     """Name of handler that processed the file."""
 
+    handler_version: str = "0.0.0"
+    """Semantic version of the handler that processed the file."""
+
     def schema_validate_features(self) -> list[ParseWarning]:
         """Run schema validation on parsed features (warn-and-continue).
 

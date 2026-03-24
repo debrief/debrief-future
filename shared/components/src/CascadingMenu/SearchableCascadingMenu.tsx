@@ -39,6 +39,7 @@ export const SearchableCascadingMenu: React.FC<SearchableCascadingMenuProps> = (
   const handleDismiss = useCallback(() => {
     setQuery('');
     menuProps.onDismiss();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuProps.onDismiss]);
 
   // Focus search input on mount

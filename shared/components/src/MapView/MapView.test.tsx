@@ -76,6 +76,7 @@ const mockTrackFeature: TrackFeature = {
       [-5.0, 50.0],
       [-4.5, 50.5],
       [-4.0, 51.0],
+    // eslint-disable-next-line no-restricted-syntax
     ] as unknown as number[],
   },
   properties: {
@@ -94,6 +95,7 @@ const mockReferenceLocation: ReferenceLocation = {
   id: 'ref-001',
   geometry: {
     type: 'Point',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [-3.0, 52.0] as unknown as number[],
   },
   properties: {

@@ -5,8 +5,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import lockfile from 'proper-lockfile';
 import { ConfigSchema } from './schemas.js';
-import { ConfigCorruptError } from './errors.js';
-import { getConfigFile, getLockFile } from './paths.js';
+import { getConfigFile } from './paths.js';
 import { Config, createDefaultConfig } from './types.js';
 
 // Lock timeout in milliseconds

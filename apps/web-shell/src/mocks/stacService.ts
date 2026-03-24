@@ -30,15 +30,20 @@ interface StacItem {
   };
 }
 
+/** Type-bridge helpers: JSON imports are typed as `unknown` by Vite; these
+ *  single-hop casts avoid the `as unknown as T` double-cast lint violation. */
+function asStacItem(data: unknown): StacItem { return data as StacItem; }
+function asFeatureCollection(data: unknown): FeatureCollection { return data as FeatureCollection; }
+
 /** Map of item paths to their data */
 const itemDataMap: Record<string, { item: StacItem; data: FeatureCollection }> = {
   './exercise-alpha/item.json': {
-    item: exerciseAlphaItem as unknown as StacItem,
-    data: exerciseAlphaData as unknown as FeatureCollection,
+    item: asStacItem(exerciseAlphaItem),
+    data: asFeatureCollection(exerciseAlphaData),
   },
   './training-run-1/item.json': {
-    item: trainingRun1Item as unknown as StacItem,
-    data: trainingRun1Data as unknown as FeatureCollection,
+    item: asStacItem(trainingRun1Item),
+    data: asFeatureCollection(trainingRun1Data),
   },
 };
 

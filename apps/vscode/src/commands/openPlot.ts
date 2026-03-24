@@ -21,6 +21,31 @@ import type { LogPanelViewProvider } from '../views/logPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
+import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
+import { propsRecord } from '../utils/featureProps';
+
+/** Adapt a SafeFeature to a loosely-typed record for session-state log service. */
+function safeFeatureToRecord(f: SafeFeature): Record<string, unknown> {
+  return { type: f.type, id: f.id, geometry: f.geometry, properties: f.properties };
+}
+
+/**
+ * Adapt a GeoJsonFeatureCollection (session-state type) to SafeFeatureCollection
+ * (stacService type). The shapes are structurally equivalent; geometry:unknown
+ * narrows to SafeGeometry via assertion on each feature.
+ */
+function toSafeFC(fc: { type: string; features: Array<{ type: string; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number }> }): SafeFeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: fc.features.map((f): SafeFeature => ({
+      type: 'Feature',
+      id: f.id,
+      geometry: f.geometry as SafeGeometry | null,
+      properties: f.properties,
+    })),
+  };
+}
+
 
 interface OpenPlotArgs {
   uri?: string;
@@ -248,7 +273,8 @@ export function createOpenPlotCommand(
       appendProvenance: stacService.appendProvenance.bind(stacService),
       loadGeoJson: async (sp: string, ip: string) => {
         const fc = await stacService.loadGeoJsonForItem(sp, ip);
-        return fc as { features: Array<Record<string, unknown>> } | null;
+        if (!fc) { return null; }
+        return { features: fc.features.map(safeFeatureToRecord) };
       },
       markDirty: () => {
         const activeSession = sessionManager.getActiveSession();
@@ -259,10 +285,7 @@ export function createOpenPlotCommand(
 
       // Phase 6: replay deps (Feature: 076-replay-tune)
       writeGeoJson: async (sp, ip, fc) => {
-        await stacService.writeGeoJson(
-          sp, ip,
-          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
-        );
+        await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
       },
 
       executeTool: async (toolId, featureIds, params, activityId, timestamp) => {
@@ -272,11 +295,10 @@ export function createOpenPlotCommand(
         const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
         if (!fc) { return { success: false, durationMs: Date.now() - startMs }; }
 
-        // Find requested features — SafeFeature lacks `id`, access via cast
-        type FeatureWithId = { id?: string | number; geometry: unknown; properties: Record<string, unknown> | null };
-        const allFeatures = fc.features as unknown as FeatureWithId[];
+        // SafeFeature already has id?: string | number
+        const allFeatures = fc.features;
         const features = allFeatures.filter(
-          (f) => featureIds.includes(String(f.id ?? (f.properties as Record<string, unknown>)?.id))
+          (f) => featureIds.includes(String(f.id ?? f.properties?.['id']))
         );
         if (features.length === 0) { return { success: false, durationMs: Date.now() - startMs }; }
 
@@ -291,11 +313,11 @@ export function createOpenPlotCommand(
         // Helper: stamp the original activityId and timestamp on Python-generated
         // provenance so the timeline shows one entry per original activity at
         // its original position, not duplicates sorted to the end.
-        const stampProvenance = (f: Record<string, unknown>): void => {
+        const stampProvenance = (f: SafeFeature): void => {
           if (!activityId) { return; }
-          const props = f.properties as Record<string, unknown> | null;
-          if (props?.provenance === undefined || props.provenance === null || !Array.isArray(props.provenance)) { return; }
-          for (const prov of props.provenance as Array<Record<string, unknown>>) {
+          const props = f.properties;
+          if (!props || !Array.isArray(props.provenance)) { return; }
+          for (const prov of props.provenance as Array<{ activityId?: unknown; timestamp?: unknown }>) {
             if (prov.activityId !== undefined && prov.activityId !== null) {
               prov.activityId = activityId;
             }
@@ -310,18 +332,17 @@ export function createOpenPlotCommand(
         if (isMutation) {
           const resultMap = new Map(
             result.features.features.map((f) => {
-              const fProps = f.properties;
-              const fKey = String((f as unknown as Record<string, unknown>).id ?? fProps?.id);
+              const fKey = String(f.id ?? f.properties?.['id']);
               return [fKey, f];
             })
           );
           for (const feat of allFeatures) {
-            const fId = String(feat.id ?? (feat.properties as Record<string, unknown>)?.id);
+            const fId = String(feat.id ?? feat.properties?.['id']);
             const updated = resultMap.get(fId);
             if (updated) {
               feat.geometry = updated.geometry;
               // Merge properties but preserve provenance
-              const existingProv = (feat.properties as Record<string, unknown>)?.provenance;
+              const existingProv = feat.properties?.provenance;
               feat.properties = {
                 ...updated.properties,
                 provenance: existingProv,
@@ -331,16 +352,14 @@ export function createOpenPlotCommand(
         } else {
           // Additive: append new features, stamping original activityId
           for (const f of result.features.features) {
-            stampProvenance(f as unknown as Record<string, unknown>);
-            (fc.features as unknown[]).push(f);
+            const sf: SafeFeature = { type: 'Feature', id: f.id, geometry: f.geometry, properties: f.properties };
+            stampProvenance(sf);
+            fc.features.push(sf);
           }
         }
 
         // Write back to disk
-        await stacService.writeGeoJson(
-          store.path, itemPath,
-          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
-        );
+        await stacService.writeGeoJson(store.path, itemPath, fc);
 
         return {
           success: true,
@@ -352,7 +371,16 @@ export function createOpenPlotCommand(
 
       loadSnapshot: async (sp, ip, assetFilename) => {
         const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
-        return fc as unknown as Awaited<ReturnType<typeof stacService.loadSnapshotGeoJson>>;
+        if (!fc) { return null; }
+        return {
+          type: fc.type as 'FeatureCollection',
+          features: fc.features.map((f): { type: 'Feature'; geometry: unknown; properties: Record<string, unknown> | null; id?: string | number } => ({
+            type: f.type,
+            geometry: f.geometry,
+            properties: f.properties,
+            id: f.id,
+          })),
+        };
       },
 
       resolveToolVersion: (toolId) => {
@@ -382,8 +410,8 @@ export function createOpenPlotCommand(
             // for features created/removed during replay
             const updatedNames: Record<string, string> = {};
             for (const f of updatedData.features) {
-              const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-              const name = (props.name ?? props.title ?? String(f.id)) as string;
+              const props = propsRecord(f);
+              const name = String(props.name ?? props.title ?? f.id);
               updatedNames[String(f.id)] = name;
             }
             logPanelProvider.setFeatureNames(updatedNames);
@@ -394,20 +422,15 @@ export function createOpenPlotCommand(
       // Wire SnapshotService for action bar snapshot button (Feature: 074)
       const snapshotService = createSnapshotService({
         loadGeoJson: async (sp: string, ip: string) => {
-          const fc = await stacService.loadGeoJsonForItem(sp, ip);
-          return fc as unknown as Awaited<ReturnType<typeof stacService.loadGeoJsonForItem>>;
+          return stacService.loadGeoJsonForItem(sp, ip);
         },
         writeSnapshotAsset: (sp, ip, fn, data) =>
           stacService.writeSnapshotAsset(sp, ip, fn, data),
         loadSnapshotGeoJson: async (sp, ip, assetFilename) => {
-          const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
-          return fc as unknown as Awaited<ReturnType<typeof stacService.loadSnapshotGeoJson>>;
+          return stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
         },
         writeGeoJson: async (sp, ip, fc) => {
-          await stacService.writeGeoJson(
-            sp, ip,
-            fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
-          );
+          await stacService.writeGeoJson(sp, ip, toSafeFC(fc));
         },
         markDirty: () => {
           const activeSession = sessionManager.getActiveSession();
@@ -437,8 +460,8 @@ export function createOpenPlotCommand(
     if (logPanelProvider) {
       const featureNames: Record<string, string> = {};
       for (const f of plotData.features) {
-        const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-        const name = (props.name ?? props.title ?? String(f.id)) as string;
+        const props = propsRecord(f);
+        const name = String(props.name ?? props.title ?? f.id);
         featureNames[String(f.id)] = name;
       }
       logPanelProvider.setFeatureNames(featureNames);
@@ -455,9 +478,9 @@ export function createOpenPlotCommand(
         const normalizedStorePath = store.path.replace(/\\/g, '/');
         const itemJsonPath = `${normalizedStorePath}/${itemPath}`;
         const itemJson = await readFile(itemJsonPath, 'utf-8');
-        const item = JSON.parse(itemJson) as { assets?: Record<string, unknown> };
+        const item = JSON.parse(itemJson) as { assets?: Record<string, StacAssetForHydration> };
         if (item.assets) {
-          resultIdRegistry.hydrateFromAssets(item.assets as Record<string, StacAssetForHydration>);
+          resultIdRegistry.hydrateFromAssets(item.assets);
         }
       } catch {
         // Item file may not exist or be malformed — skip hydration silently
@@ -529,13 +552,14 @@ async function showPlotQuickPick(
 
   // Add separator if we have recent plots
   if (items.length > 0) {
-    items.push({
+    const separator: PlotQuickPickItem = {
       label: '',
       kind: vscode.QuickPickItemKind.Separator,
       uri: '',
       storeId: '',
       itemPath: '',
-    } as PlotQuickPickItem);
+    };
+    items.push(separator);
   }
 
   // Add plots from stores

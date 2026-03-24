@@ -3345,7 +3345,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6034ae87-00b8-46f2-80ed-505fae71392e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6742,7 +6758,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "306975b1-199d-4ffb-bde9-f7bde3207f3b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6770,7 +6802,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1a0c63c1-0952-45cd-aff8-87fa1b93e6f5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6799,7 +6847,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e7e3510e-33a5-47b2-98ea-2c91ff3a7eac"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6828,7 +6892,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "722e90c1-812b-4a72-9aa5-620c16bb8266"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6857,7 +6937,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "549a8801-e32e-49d6-83c0-9c04b85bc3be"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6886,7 +6982,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1b18408b-d69f-45c9-bcf7-e8f8b295813e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6913,7 +7025,23 @@
           "color": "#00FF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "50c95cf9-53ef-475a-b20a-37d2a502bb1c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6940,7 +7068,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43e8fd82-a2aa-4d75-9e16-a4e12ea32909"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -6967,7 +7111,23 @@
           "color": "#FFFF00",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "f95a2a90-c144-4b63-a4a9-c85915419ac5",
+            "timestamp": "2026-03-21T10:15:05.449488Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "03730e4d-8bae-4a13-b6e9-2d2e092dca16"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

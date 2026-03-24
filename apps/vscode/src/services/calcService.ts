@@ -32,6 +32,7 @@ import {
 import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { DebriefFeature } from '@debrief/schemas';
+import { propsRecord } from '../utils/featureProps';
 
 const execFileAsync = promisify(execFile);
 
@@ -667,11 +668,11 @@ print(json.dumps(tools))
     for (const id of featureIds) {
       const feature: DebriefFeature | undefined = allFeatures.find((f: DebriefFeature) => String(f.id) === id);
       if (feature !== undefined) {
-        const props = feature.properties as unknown as Record<string, unknown>;
+        const props = propsRecord(feature);
         resolved.push({
           type: 'Feature',
           id: feature.id,
-          geometry: feature.geometry as unknown,
+          geometry: feature.geometry,
           properties: {
             ...props,
             id: feature.id,

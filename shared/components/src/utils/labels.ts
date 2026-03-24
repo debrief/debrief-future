@@ -11,6 +11,7 @@ import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygo
  */
 export function getFeatureLabel(feature: DebriefFeature): string {
   // Access properties with type assertion to handle legacy data formats
+  // eslint-disable-next-line no-restricted-syntax
   const props = feature.properties as unknown as Record<string, unknown>;
 
   if (isTrackFeature(feature)) {
@@ -106,6 +107,7 @@ export function getFeatureColor(feature: DebriefFeature): string {
   }
 
   // Check for explicit color in properties.style.color (annotations, multi-geometry)
+  // eslint-disable-next-line no-restricted-syntax
   const props = feature.properties as unknown as Record<string, unknown>;
   const style = props.style as Record<string, unknown> | undefined;
   if (style?.color && typeof style.color === 'string') {

@@ -64,9 +64,18 @@ type AssertedFeature = {
   properties: Record<string, unknown>;
 };
 
+/** Assert that SafeFeature[] have non-null properties/geometry for test access. */
+function assertFeatures(features: import('@debrief/utils').SafeFeature[]): AssertedFeature[] {
+  return features.map(f => {
+    if (!f.properties) throw new Error('Expected non-null properties');
+    if (!f.geometry) throw new Error('Expected non-null geometry');
+    return { type: f.type, id: f.id, geometry: f.geometry as AssertedFeature['geometry'], properties: f.properties };
+  });
+}
+
 /** Run the tool and return convenient accessors. */
 function run(track = SIMPLE_TRACK, params = {}, sensorModel?: SensorModel) {
-  const result = execute([track], params, sensorModel) as unknown as AssertedFeature[];
+  const result = assertFeatures(execute([track], params, sensorModel));
   const feature = result[0];
   const zones = feature.properties.zones as Array<Record<string, unknown>>;
   const multiCoords = feature.geometry.coordinates as number[][][][];
@@ -138,7 +147,11 @@ describe('buffer-zone-generator basic generation (US1)', () => {
 
   it('zones have purple/red/orange styles', () => {
     const { zones } = run();
-    const styles = zones.map((z) => z.style as Record<string, unknown>);
+    const styles = zones.map((z) => {
+      const style = z.style;
+      if (!style || typeof style !== 'object') throw new Error('Expected style object');
+      return style as { color?: string; [key: string]: unknown };
+    });
     expect(styles[0].color).toBe('#9C27B0'); // purple
     expect(styles[1].color).toBe('#F44336'); // red
     expect(styles[2].color).toBe('#FF9800'); // orange
@@ -337,7 +350,7 @@ describe('buffer-zone-generator error handling', () => {
   });
 
   it('skips non-TRACK features and uses first TRACK', () => {
-    const result = execute([NON_TRACK_FEATURE, SIMPLE_TRACK], {}) as unknown as AssertedFeature[];
+    const result = assertFeatures(execute([NON_TRACK_FEATURE, SIMPLE_TRACK], {}));
     expect(result).toHaveLength(1);
     expect(result[0].properties['debrief:sourceFeatures']).toEqual(['track-001']);
   });
@@ -367,7 +380,7 @@ const goldenOutput = JSON.parse(readFileSync(resolve(GOLDEN_DIR, 'buffer-zone-ge
 describe('buffer-zone-generator golden example', () => {
   it('produces exact coordinate match with Python golden output', () => {
     const track = goldenInput.features[0];
-    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {}) as unknown as AssertedFeature[];
+    const result = assertFeatures(execute([asTrack(track)], {}));
 
     // Both return a list with 1 MultiPolygon feature
     expect(result).toHaveLength(goldenOutput.length);
@@ -417,7 +430,7 @@ describe('buffer-zone-generator golden example', () => {
 
   it('has correct provenance annotations', () => {
     const track = goldenInput.features[0];
-    const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {}) as unknown as AssertedFeature[];
+    const result = assertFeatures(execute([asTrack(track)], {}));
 
     const goldenFeature = goldenOutput[0];
     const tsFeature = result[0];

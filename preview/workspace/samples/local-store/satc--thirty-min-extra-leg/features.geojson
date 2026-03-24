@@ -1095,7 +1095,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b8965027-7732-4c2e-822b-e8bf876a6ca8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1108,7 +1124,23 @@
         "sensor_name": "Plain",
         "bearing": -115.0,
         "time": "2010-01-12T12:00:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e5d36175-8d2e-4db4-9208-40807ac2fc2c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1121,7 +1153,23 @@
         "sensor_name": "Plain",
         "bearing": -113.3,
         "time": "2010-01-12T12:00:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6eaa597a-3129-45ee-a709-8196e88f91d9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1134,7 +1182,23 @@
         "sensor_name": "Plain",
         "bearing": -109.9,
         "time": "2010-01-12T12:01:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e52cd4cf-d0d4-4da4-b415-a5e003dedefe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1147,7 +1211,23 @@
         "sensor_name": "Plain",
         "bearing": -108.2,
         "time": "2010-01-12T12:01:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "40da0aaf-a3dd-4cd8-917d-a6b84ee73356"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1160,7 +1240,23 @@
         "sensor_name": "Plain",
         "bearing": -104.6,
         "time": "2010-01-12T12:02:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5df97018-6775-4b5d-850f-bf566d3b79a3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1173,7 +1269,23 @@
         "sensor_name": "Plain",
         "bearing": -100.8,
         "time": "2010-01-12T12:03:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3091b5d5-bfa0-4f26-b28c-f76fda7a9215"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1186,7 +1298,23 @@
         "sensor_name": "Plain",
         "bearing": -93.6,
         "time": "2010-01-12T12:04:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5203ac04-cfcb-47d6-9104-51447507b8b3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1199,7 +1327,23 @@
         "sensor_name": "Plain",
         "bearing": -96.8,
         "time": "2010-01-12T12:05:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "005245df-7c6d-4de9-9c2b-31caf9abe389"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1212,7 +1356,23 @@
         "sensor_name": "Plain",
         "bearing": -103.3,
         "time": "2010-01-12T12:05:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5b5f926-a8b6-4f86-a8e8-0815e67ce170"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1225,7 +1385,23 @@
         "sensor_name": "Plain",
         "bearing": -107.8,
         "time": "2010-01-12T12:06:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "de5e592b-907b-4bd4-b4a7-d96ff2be2ba0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1238,7 +1414,23 @@
         "sensor_name": "Plain",
         "bearing": -154.5,
         "time": "2010-01-12T12:07:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fb49ab3b-a900-4083-a7ea-057d78302805"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1251,7 +1443,23 @@
         "sensor_name": "Plain",
         "bearing": -168.4,
         "time": "2010-01-12T12:08:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dd338a51-dc44-4eee-866e-3a09c54593ac"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1264,7 +1472,23 @@
         "sensor_name": "Plain",
         "bearing": 178.6,
         "time": "2010-01-12T12:08:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ea8de8c0-8e92-49b5-a261-1c3add7f207b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1277,7 +1501,23 @@
         "sensor_name": "Plain",
         "bearing": 156.6,
         "time": "2010-01-12T12:09:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "586104ab-c6db-475c-80f0-9dcbff53264d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1290,7 +1530,23 @@
         "sensor_name": "Plain",
         "bearing": 147.8,
         "time": "2010-01-12T12:09:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36cc8d56-0c88-473c-a5b3-eab43eafd0ba"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1303,7 +1559,23 @@
         "sensor_name": "Plain",
         "bearing": 140.4,
         "time": "2010-01-12T12:09:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1a88587c-21bc-4e12-929a-6dd2a439b765"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1316,7 +1588,23 @@
         "sensor_name": "Plain",
         "bearing": 124.6,
         "time": "2010-01-12T12:10:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d7873df4-8846-45a0-9e89-7820c34a8baf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1329,7 +1617,23 @@
         "sensor_name": "Plain",
         "bearing": 117.7,
         "time": "2010-01-12T12:11:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "603423b3-9f68-4e1f-9395-3eb2745fe361"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1342,7 +1646,23 @@
         "sensor_name": "Plain",
         "bearing": 114.2,
         "time": "2010-01-12T12:11:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "017d33d5-c161-4a19-982c-d3c4d7e87296"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1355,7 +1675,23 @@
         "sensor_name": "Plain",
         "bearing": 108.4,
         "time": "2010-01-12T12:12:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c7aecd25-895d-4288-91d1-51066ad4e431"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1368,7 +1704,23 @@
         "sensor_name": "Plain",
         "bearing": 105.5,
         "time": "2010-01-12T12:12:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5d0131bf-ef90-4616-a0c0-d4b621f8fb76"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1381,7 +1733,23 @@
         "sensor_name": "Plain",
         "bearing": 97.5,
         "time": "2010-01-12T12:13:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dd5fc0ab-8c58-4407-9ba7-e5f3e1eb6fd0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1394,7 +1762,23 @@
         "sensor_name": "Plain",
         "bearing": 95.0,
         "time": "2010-01-12T12:14:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "453f6b6f-2485-46d6-9a7d-265c95bf3745"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1407,7 +1791,23 @@
         "sensor_name": "Plain",
         "bearing": 92.6,
         "time": "2010-01-12T12:14:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2e881482-00ae-42ad-9cb8-3e4f8a5170b9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1420,7 +1820,23 @@
         "sensor_name": "Plain",
         "bearing": 86.2,
         "time": "2010-01-12T12:15:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fe2e4be8-faa6-476f-9d6b-fd2fcc314b31"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1433,7 +1849,23 @@
         "sensor_name": "Plain",
         "bearing": 87.6,
         "time": "2010-01-12T12:16:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fff5177d-34cc-40af-9f7e-9c3de616b859"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1446,7 +1878,23 @@
         "sensor_name": "Plain",
         "bearing": 89.2,
         "time": "2010-01-12T12:16:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ca18298f-86d0-47d9-8683-65ca6d81b149"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1459,7 +1907,23 @@
         "sensor_name": "Plain",
         "bearing": 93.0,
         "time": "2010-01-12T12:17:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a015c1ad-413e-4f06-8563-60b1fc2788f6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1472,7 +1936,23 @@
         "sensor_name": "Plain",
         "bearing": 95.0,
         "time": "2010-01-12T12:17:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b9371303-f20d-4d03-9cd3-73204648b1f2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1485,7 +1965,23 @@
         "sensor_name": "Plain",
         "bearing": 102.4,
         "time": "2010-01-12T12:18:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6a2864d6-764d-451b-95af-c5ec58a18e2a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1498,7 +1994,23 @@
         "sensor_name": "Plain",
         "bearing": 105.3,
         "time": "2010-01-12T12:18:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dcbefdcf-b798-473e-b4c9-758bbd145e4a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1511,7 +2023,23 @@
         "sensor_name": "Plain",
         "bearing": 115.3,
         "time": "2010-01-12T12:19:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d2ffe3b3-f8f1-43e3-82e8-c440e1fdda82"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1524,7 +2052,23 @@
         "sensor_name": "Plain",
         "bearing": 128.5,
         "time": "2010-01-12T12:20:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "24f267b6-e029-4ee6-bbab-c2de7f229b8d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1537,7 +2081,23 @@
         "sensor_name": "Plain",
         "bearing": 134.4,
         "time": "2010-01-12T12:21:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "55a12020-c6e5-437b-ba61-1049d8308754"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1550,7 +2110,23 @@
         "sensor_name": "Plain",
         "bearing": 141.1,
         "time": "2010-01-12T12:21:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "befea12e-4de2-4b31-be69-a19948c88872"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1563,7 +2139,23 @@
         "sensor_name": "Plain",
         "bearing": 170.7,
         "time": "2010-01-12T12:22:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e0cfb676-5a42-4fea-a3b5-f2b327103886"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1576,7 +2168,23 @@
         "sensor_name": "Plain",
         "bearing": 177.1,
         "time": "2010-01-12T12:23:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "843a8a8b-2eee-4863-b426-948a6c388c50"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1589,7 +2197,23 @@
         "sensor_name": "Plain",
         "bearing": -177.2,
         "time": "2010-01-12T12:23:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "28d6f60b-24df-4761-adc6-96dab5c7c2fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1602,7 +2226,23 @@
         "sensor_name": "Plain",
         "bearing": -172.2,
         "time": "2010-01-12T12:23:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fdf6dfb7-0fe6-447d-b780-5771020ad97e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1615,7 +2255,23 @@
         "sensor_name": "Plain",
         "bearing": -163.9,
         "time": "2010-01-12T12:24:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "460907af-9bad-4088-80f5-065051c9ef40"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1628,7 +2284,23 @@
         "sensor_name": "Plain",
         "bearing": -160.3,
         "time": "2010-01-12T12:25:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8c173be2-48b7-4848-99b8-246056433966"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1641,7 +2313,23 @@
         "sensor_name": "Plain",
         "bearing": -158.4,
         "time": "2010-01-12T12:26:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6064f911-3bcf-42e8-9f40-de0703efd74a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1654,7 +2342,23 @@
         "sensor_name": "Plain",
         "bearing": -156.9,
         "time": "2010-01-12T12:26:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7fbbc3d7-33dd-4cee-9193-d3ebfe5320f7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1667,7 +2371,23 @@
         "sensor_name": "Plain",
         "bearing": -155.2,
         "time": "2010-01-12T12:27:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "53ad7fa7-b48c-4703-ac3c-801ea5755c27"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1680,7 +2400,23 @@
         "sensor_name": "Plain",
         "bearing": -153.1,
         "time": "2010-01-12T12:28:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b0a56f3-0aad-4048-bb15-9cf54e3cb6d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1693,7 +2429,23 @@
         "sensor_name": "Plain",
         "bearing": -149.4,
         "time": "2010-01-12T12:29:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4a01493b-097d-4edf-bbd8-c3af5f89eb20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1706,7 +2458,23 @@
         "sensor_name": "Plain",
         "bearing": -146.3,
         "time": "2010-01-12T12:29:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ba3d0f9d-7c9f-4986-8aa5-e7f0fc2495b1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1719,7 +2487,23 @@
         "sensor_name": "Plain",
         "bearing": -142.5,
         "time": "2010-01-12T12:30:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b62e2531-e815-4e8f-b8a9-7258ac1aeec7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1732,7 +2516,23 @@
         "sensor_name": "Plain",
         "bearing": -140.4,
         "time": "2010-01-12T12:30:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4d88b0c7-e277-4581-a42d-2968327dc3fd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1745,7 +2545,23 @@
         "sensor_name": "Plain",
         "bearing": -132.3,
         "time": "2010-01-12T12:31:40+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c7d72457-0f95-4c27-9cac-e92d49e41e34"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1758,7 +2574,23 @@
         "sensor_name": "Plain",
         "bearing": -125.4,
         "time": "2010-01-12T12:32:20+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c730771b-2d4b-4af3-85fa-58450394c1e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1771,7 +2603,23 @@
         "sensor_name": "Plain",
         "bearing": -116.9,
         "time": "2010-01-12T12:33:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4f0df518-2c7c-4d1b-b755-29784de92df0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1784,7 +2632,23 @@
         "sensor_name": "Plain",
         "bearing": -101.2,
         "time": "2010-01-12T12:34:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2aed5b04-1da4-4eeb-876a-5bee7c9385ce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1797,7 +2661,23 @@
         "sensor_name": "Plain",
         "bearing": -83.4,
         "time": "2010-01-12T12:35:00+00:00",
-        "label": "Cookie SUBJECT held on Plain Cookie"
+        "label": "Cookie SUBJECT held on Plain Cookie",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bab97317-0c4c-4057-938e-aa268f0b3790"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2894,7 +3774,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "0e8e0cc4-d189-422e-bd41-61431bf7e7b4",
+            "timestamp": "2026-03-21T10:15:02.180707Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b50f9a39-9115-44c1-a8d1-b3df687a2ce9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

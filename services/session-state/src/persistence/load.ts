@@ -6,7 +6,6 @@
 import { readFile } from 'fs/promises';
 import type { SessionStoreApi } from '../store/index.js';
 import type { SessionState } from '../types/index.js';
-import { DEFAULT_TEMPORAL_SLICE, DEFAULT_FEATURES_SLICE, createEmptySelection } from '../types/index.js';
 import { isVersionCompatible, isFutureVersion, migrateSession } from './schema.js';
 
 /**

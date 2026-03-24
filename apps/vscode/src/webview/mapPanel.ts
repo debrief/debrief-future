@@ -40,6 +40,7 @@ import { calculateBounds, mergeBounds } from '../utils/bounds';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
+import { propsRecord } from '../utils/featureProps';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -278,13 +279,14 @@ export class MapPanel {
   public updatePlotFeatures(layer: ResultLayer): void {
     // Update in-memory currentFeatures so subsequent tool executions
     // (via getFeatures/resolveFeatures) see the mutated geometry.
-    const fid = (f: { id?: string; properties?: { id?: string } | Record<string, unknown> | null }): string =>
-      String(f.id ?? (f.properties as Record<string, unknown> | null)?.['id'] ?? '');
+    const fid = (f: { id?: string | number; properties?: unknown }): string =>
+      String(f.id ?? (f.properties as { [k: string]: unknown } | null)?.['id'] ?? '');
     const updatedMap = new Map(
-      layer.features.features.map((f) => [fid(f as { id?: string; properties?: Record<string, unknown> | null }), f as unknown as DebriefFeature])
+      // eslint-disable-next-line no-restricted-syntax
+      layer.features.features.map((f) => [fid(f), f as unknown as DebriefFeature])
     );
     this.currentFeatures = this.currentFeatures.map(
-      (f: DebriefFeature) => updatedMap.get(fid(f as unknown as { id?: string; properties?: Record<string, unknown> | null })) ?? f
+      (f: DebriefFeature) => updatedMap.get(fid(f)) ?? f
     );
 
     this.postMessage({
@@ -567,7 +569,7 @@ export class MapPanel {
       (f: DebriefFeature) => String(f.id) === featureId
     );
     if (feature !== undefined) {
-      return (feature.properties as unknown as Record<string, unknown>).kind as string;
+      return propsRecord(feature).kind as string;
     }
 
     // Check individual features inside result layers
@@ -576,14 +578,16 @@ export class MapPanel {
         // Layer-level match — inspect first feature for kind
         const firstFeature = rl.features.features[0];
         if (firstFeature) {
-          const kind = (firstFeature.properties ?? {} as Record<string, unknown>)['kind'];
+          const emptyProps: { [k: string]: unknown } = {};
+          const kind = (firstFeature.properties ?? emptyProps)['kind'];
           return (typeof kind === 'string' ? kind : undefined) ?? 'RESULT';
         }
         return 'RESULT';
       }
       for (const f of rl.features.features) {
         if (String(f.id) === featureId) {
-          const kind = (f.properties ?? {} as Record<string, unknown>)['kind'];
+          const emptyProps: { [k: string]: unknown } = {};
+          const kind = (f.properties ?? emptyProps)['kind'];
           return (typeof kind === 'string' ? kind : undefined) ?? 'RESULT';
         }
       }
@@ -825,6 +829,7 @@ export class MapPanel {
     for (const rl of this.resultLayers) {
       if (!rl.artifactHref) {
         for (const f of rl.features.features) {
+          // eslint-disable-next-line no-restricted-syntax -- SafeFeature → DebriefFeature bridge
           allFeatures.push(f as unknown as DebriefFeature);
         }
       }
@@ -971,12 +976,14 @@ export class MapPanel {
       name: feature.name,
       label: feature.label,
     };
-    const drawnFeature = {
+    const drawnFeatureObj = {
       type: 'Feature' as const,
       id: feature.id,
       geometry: feature.geometry,
       properties: drawnProps,
-    } as unknown as DebriefFeature;
+    };
+    // eslint-disable-next-line no-restricted-syntax -- drawn feature → DebriefFeature bridge
+    const drawnFeature = drawnFeatureObj as unknown as DebriefFeature;
     this.currentFeatures = [...this.currentFeatures, drawnFeature];
     console.warn('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
 
@@ -1052,10 +1059,10 @@ export class MapPanel {
       (f: DebriefFeature) => String(f.id) === trackId
     );
     const props = feature !== undefined
-      ? (feature.properties as unknown as Record<string, unknown>)
+      ? propsRecord(feature)
       : undefined;
-    const style = props?.style as Record<string, unknown> | undefined;
-    const lineStyle = style?.line as Record<string, unknown> | undefined;
+    const style = props?.style as { [k: string]: unknown } | undefined;
+    const lineStyle = style?.line as { [k: string]: unknown } | undefined;
     const currentColor = (lineStyle?.color as string) ?? (style?.color as string) ?? '#377eb8';
 
     const result = await vscode.window.showInputBox({

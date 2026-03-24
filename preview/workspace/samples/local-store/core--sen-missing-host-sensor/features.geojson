@@ -12,7 +12,23 @@
         "bearing": 80.0,
         "range": 12496.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1f85c292-c21e-4513-ba05-1fe8a007d781"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -26,7 +42,23 @@
         "bearing": 78.0,
         "range": 11678.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8a241dce-5f45-422f-986d-817f640317d4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -40,7 +72,23 @@
         "bearing": 77.0,
         "range": 10866.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2af8addc-1494-42e4-8811-4d45686f55be"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -54,7 +102,23 @@
         "bearing": 75.0,
         "range": 10062.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4a73d4c-1a5e-4429-ab83-434961f1a6b0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -68,7 +132,23 @@
         "bearing": 73.0,
         "range": 9265.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8315dc24-97b3-4487-9ac9-81cb287cc1ab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -82,7 +162,23 @@
         "bearing": 71.0,
         "range": 8479.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3db6a1a5-f76d-4afb-8697-92eb1823cd81"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -96,7 +192,23 @@
         "bearing": 69.0,
         "range": 7704.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "018b6fbc-2045-4562-9d57-0f71987adc6f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -110,7 +222,23 @@
         "bearing": 66.0,
         "range": 6943.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b1101aa0-94e5-4875-bc20-2ca45fdbed1e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -124,7 +252,23 @@
         "bearing": 63.0,
         "range": 6198.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "35e7eeeb-6f42-45e4-923e-1369b2166920"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -138,7 +282,23 @@
         "bearing": 59.0,
         "range": 5475.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "334df1d8-e05f-4f2b-a565-c1ba58f89b57"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -152,7 +312,23 @@
         "bearing": 55.0,
         "range": 4777.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5f113d3a-d4a2-4056-8963-9107f3e1f2ec"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -166,7 +342,23 @@
         "bearing": 49.0,
         "range": 4112.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb02feea-bf3c-4f0d-950f-e11579a1a1a5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -180,7 +372,23 @@
         "bearing": 42.0,
         "range": 3491.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7a0ce40c-ff1f-4e1d-b646-80cadb93d825"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -194,7 +402,23 @@
         "bearing": 33.0,
         "range": 2934.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a2df8a75-adc6-410f-b041-c4d128cf7f98"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -208,7 +432,23 @@
         "bearing": 21.0,
         "range": 2458.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ced79a35-382f-45f6-b056-b52a17129d9b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -222,7 +462,23 @@
         "bearing": 7.0,
         "range": 2089.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a241959a-f111-47ea-8ac2-6b8dec408166"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -236,7 +492,23 @@
         "bearing": -9.0,
         "range": 1840.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1afe189d-42cd-4fd0-90ca-c97fba525594"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -250,7 +522,23 @@
         "bearing": -26.0,
         "range": 1695.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9e3ec795-2124-40ff-95dc-3a42b2b3d825"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -264,7 +552,23 @@
         "bearing": -40.0,
         "range": 1633.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "52e01f84-845b-4bb1-8cf3-b8fc40b8b8b9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -278,7 +582,23 @@
         "bearing": -50.0,
         "range": 1607.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "76a319cd-d2c9-44bb-861c-160ebea8a72b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -292,7 +612,23 @@
         "bearing": -56.0,
         "range": 1596.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1de6a893-e28d-4271-a8b5-320716100594"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -306,7 +642,23 @@
         "bearing": -59.0,
         "range": 1596.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b8187b7a-1d64-44c0-90bd-ee6cf7d0e25c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -320,7 +672,23 @@
         "bearing": -60.0,
         "range": 1613.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "67b613eb-4c89-4742-918a-a94734145900"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -334,7 +702,23 @@
         "bearing": -60.0,
         "range": 1648.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4c30fc3-3491-4a85-8f0b-4b37cc9d0da9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -348,7 +732,23 @@
         "bearing": -60.0,
         "range": 1701.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f624bff4-d806-4993-8bf6-e013ebabc676"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -362,7 +762,23 @@
         "bearing": -60.0,
         "range": 1772.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4bd1fdf9-cccb-4294-ad02-d13e0d429ca6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -376,7 +792,23 @@
         "bearing": -60.0,
         "range": 1859.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3a115056-96af-478d-945c-24b7eec3dfe9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -390,7 +822,23 @@
         "bearing": -60.0,
         "range": 1945.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5de4f1d-87f4-4d8d-b613-4d45eb5c967f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -404,7 +852,23 @@
         "bearing": -60.0,
         "range": 2031.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "de868113-6031-4619-83ff-288e9f68441e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -418,7 +882,23 @@
         "bearing": -60.0,
         "range": 2117.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "85af93c6-0b72-4e72-a762-0126375d1995"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -432,7 +912,23 @@
         "bearing": -60.0,
         "range": 2203.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6471e980-f3b3-4b57-b612-d0a4702d40fc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -446,7 +942,23 @@
         "bearing": -60.0,
         "range": 2289.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "741a3e0c-f31f-4f05-a868-8864fee9802e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -460,7 +972,23 @@
         "bearing": -60.0,
         "range": 2375.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "13a73bb7-20a3-4224-bd82-f193dddaec7a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -474,7 +1002,23 @@
         "bearing": -60.0,
         "range": 2461.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ba7deab8-ffb5-47b1-af09-8753de5d755d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -488,7 +1032,23 @@
         "bearing": -60.0,
         "range": 2547.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "173f6b78-b48b-4d24-b343-b78f05c5cb8c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -502,7 +1062,23 @@
         "bearing": -60.0,
         "range": 2633.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5030d6d-342a-4660-8504-32c28a9faebf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -516,7 +1092,23 @@
         "bearing": -60.0,
         "range": 2719.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f9cd549f-f940-447f-b23d-99d2fa163dcf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -530,7 +1122,23 @@
         "bearing": -60.0,
         "range": 2805.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e9101f4e-ee7d-46a9-bda2-0a5adc375fae"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -544,7 +1152,23 @@
         "bearing": -60.0,
         "range": 2891.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "867e0e3b-7985-4928-ab40-125a54a3b756"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -558,7 +1182,23 @@
         "bearing": -60.0,
         "range": 2977.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5d91ddc-a963-4575-b6ac-5cbadd6932d1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -572,7 +1212,23 @@
         "bearing": -60.0,
         "range": 3063.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6d9999d9-04b8-4977-97eb-0f6d089f9022"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -586,7 +1242,23 @@
         "bearing": -60.0,
         "range": 3134.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "53828244-9605-4789-a372-6b2c792b11a5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -600,7 +1272,23 @@
         "bearing": -60.0,
         "range": 3189.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2b5ff193-9e40-4334-a219-d7cd3c2d2ad1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -614,7 +1302,23 @@
         "bearing": -60.0,
         "range": 3226.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "282312b7-3bb5-4b06-b07b-cf4e5f8d946e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -628,7 +1332,23 @@
         "bearing": -60.0,
         "range": 3245.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "91dca3fd-a664-4aab-aa6b-bfdf6d726c25"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -642,7 +1362,23 @@
         "bearing": -60.0,
         "range": 3245.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "acd85694-8f53-49d1-a7f4-e6bd7ee9924c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -656,7 +1392,23 @@
         "bearing": -60.0,
         "range": 3223.0,
         "sensor_name": "Frigate_Optic",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3e746fd8-df43-4b12-a12e-61c5d932c467"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -670,7 +1422,23 @@
         "bearing": 80.0,
         "speed": 12496.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e8a74063-7abd-47bf-8d3c-ae977792fd9a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -684,7 +1452,23 @@
         "bearing": 78.0,
         "speed": 11678.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b6189f91-a965-4145-88dd-21ad4843c63a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -698,7 +1482,23 @@
         "bearing": 77.0,
         "speed": 10866.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5a06b33d-71eb-4819-8593-f6f97a84937b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -712,7 +1512,23 @@
         "bearing": 75.0,
         "speed": 10062.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2f90ec2e-2310-4067-8e9e-f65ed5c7fcca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -726,7 +1542,23 @@
         "bearing": 73.0,
         "speed": 9265.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8254bc17-7b42-4e18-b99f-0af53bb56c34"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -740,7 +1572,23 @@
         "bearing": 71.0,
         "speed": 8479.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "69354456-0e08-4ebf-b481-9dee13fbec7e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -754,7 +1602,23 @@
         "bearing": 69.0,
         "speed": 7704.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bcc5040b-0bd7-4a26-a2a1-924d9e6424fe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -768,7 +1632,23 @@
         "bearing": 66.0,
         "speed": 6943.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "01925d9f-f3a0-432f-bf8b-7b70a32d041b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -782,7 +1662,23 @@
         "bearing": 63.0,
         "speed": 6198.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ab8ddae5-78df-41e3-8338-b4f8bd8bafed"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -796,7 +1692,23 @@
         "bearing": 59.0,
         "speed": 5475.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "47e3b1f3-90a2-419a-a058-8d9a64d22c62"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -810,7 +1722,23 @@
         "bearing": 55.0,
         "speed": 4777.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "015f861a-7ac4-4454-9a38-840098e772c6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -824,7 +1752,23 @@
         "bearing": 49.0,
         "speed": 4112.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b874f4d4-78f1-4add-a1e9-161b657d9b17"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -838,7 +1782,23 @@
         "bearing": 42.0,
         "speed": 3491.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36eee0ec-79b6-478f-8f21-8bd37301b042"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -852,7 +1812,23 @@
         "bearing": 33.0,
         "speed": 2934.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7020396b-dfad-4047-8e08-ae05e698320e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -866,7 +1842,23 @@
         "bearing": 21.0,
         "speed": 2458.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "17e1381b-e0fa-4977-8521-8893083bdf13"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -880,7 +1872,23 @@
         "bearing": 7.0,
         "speed": 2089.0,
         "sensor_name": "Frigate_Optic2",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "02398ce9-91d0-4648-9ee5-44cd187844ee"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -895,7 +1903,23 @@
         "range": 160.0,
         "speed": 12496.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5566bd68-a58a-4328-86e6-02d68013fa77"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -910,7 +1934,23 @@
         "range": 160.0,
         "speed": 11678.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2519eb81-1e57-4424-8cd4-700dbf7b4bc3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -925,7 +1965,23 @@
         "range": 165.0,
         "speed": 10866.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7a083e5b-cb33-4722-9bd2-e0bae0f723d7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -940,7 +1996,23 @@
         "range": 165.0,
         "speed": 10062.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9eb2de9f-160f-44e7-99f6-7e28b279935f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -955,7 +2027,23 @@
         "range": 165.0,
         "speed": 9265.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0d6e0533-52d1-487d-aa0a-717a90d856f3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -970,7 +2058,23 @@
         "range": 165.0,
         "speed": 8479.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6112dd3d-6fde-44e8-82a8-cb75eadc9fe3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -985,7 +2089,23 @@
         "range": 180.0,
         "speed": 7704.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cf9b60f9-be9b-4498-a501-ed931a826fe3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1000,7 +2120,23 @@
         "range": 180.0,
         "speed": 6943.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a4d35e64-5ea1-46ab-a201-7780e9ab7124"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1015,7 +2151,23 @@
         "range": 180.0,
         "speed": 6198.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2111ddfa-e476-4a63-bd56-91808f94c471"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1030,7 +2182,23 @@
         "range": 170.0,
         "speed": 5475.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0f7a0202-10f3-449f-b365-02263de635a3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1045,7 +2213,23 @@
         "range": 170.0,
         "speed": 4777.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "87d4fa44-f363-48cb-be2c-7d18256c2a12"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1060,7 +2244,23 @@
         "range": 170.0,
         "speed": 4112.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d74cf9ff-9a30-48b2-a004-f9995edffb7c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1075,7 +2275,23 @@
         "range": 200.0,
         "speed": 3491.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a521e75e-78be-4eea-bf26-21798632b6bd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1090,7 +2306,23 @@
         "range": 205.0,
         "speed": 2934.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3d71eebe-fb29-40a7-90b4-87bad64ccd60"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1105,7 +2337,23 @@
         "range": 220.0,
         "speed": 2458.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7e634eda-3b51-43e8-b07d-12195ab58c59"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1120,7 +2368,23 @@
         "range": 230.0,
         "speed": 2089.0,
         "sensor_name": "Frigate_Optic3",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4e1f27b8-1dbd-437d-89ae-bc074c275cd3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1136,7 +2400,23 @@
         "frequency": 77.0,
         "speed": 12496.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b6dc6693-2bde-438b-b4f4-d22a701dcc2c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1152,7 +2432,23 @@
         "frequency": 77.0,
         "speed": 11678.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "57fc34ce-f934-4e90-9545-d6a8c0699da9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1168,7 +2464,23 @@
         "frequency": 78.0,
         "speed": 10866.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "71a34973-abd6-4188-b718-afc10c2f8575"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1184,7 +2496,23 @@
         "frequency": 79.0,
         "speed": 10062.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e5bf5c14-924b-4332-b866-6f7e6b9db082"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1200,7 +2528,23 @@
         "frequency": 79.0,
         "speed": 9265.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7b0b6a37-862f-453b-ba72-4fb5be7d0616"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1216,7 +2560,23 @@
         "frequency": 79.0,
         "speed": 8479.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1c96b06d-88f0-4ffe-993c-9a0eced5d0cd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1232,7 +2592,23 @@
         "frequency": 80.0,
         "speed": 7704.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fe42c7a5-0978-4d76-a9be-4d3a784a6558"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1248,7 +2624,23 @@
         "frequency": 79.0,
         "speed": 6943.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3ded3435-15f1-426f-bc8c-174b3de7dc6a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1264,7 +2656,23 @@
         "frequency": 79.0,
         "speed": 6198.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2d39c234-aabe-430c-ab1f-8ee1f56bf03b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1280,7 +2688,23 @@
         "frequency": 78.0,
         "speed": 5475.0,
         "sensor_name": "Frigate_Optic4",
-        "label": "some message"
+        "label": "some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "34138676-4561-4a9b-a07c-9b2777351503"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1296,7 +2720,23 @@
         "frequency": 78.0,
         "speed": 4777.0,
         "sensor_name": "\"Frigate",
-        "label": "Optic5\" some message"
+        "label": "Optic5\" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dbe660ca-8db0-4581-a7e2-ceff1978ebbc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1312,7 +2752,23 @@
         "frequency": 77.0,
         "speed": 4112.0,
         "sensor_name": "\"Frigate",
-        "label": "Optic5\" some message"
+        "label": "Optic5\" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3343a0e5-3bdb-483f-8b4e-c2b47e08c326"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1328,7 +2784,23 @@
         "frequency": 77.0,
         "speed": 3491.0,
         "sensor_name": "\"Frigate",
-        "label": "Optic5\" some message"
+        "label": "Optic5\" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "81706df7-8807-4cbb-94d5-4422d7025c4c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1343,7 +2815,23 @@
         "range": 205.0,
         "frequency": 76.0,
         "speed": 2934.0,
-        "label": "Frigate Optic5\" some message"
+        "label": "Frigate Optic5\" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eadefcd0-6f40-428a-911f-c63ab54b2ed3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1359,7 +2847,23 @@
         "frequency": 76.0,
         "speed": 2458.0,
         "sensor_name": "\"Frigate",
-        "label": "Optic5\" some message"
+        "label": "Optic5\" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b66c2210-c222-4cc5-aba7-e3ae6087858c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1374,7 +2878,23 @@
         "range": 230.0,
         "frequency": 76.0,
         "speed": 2089.0,
-        "label": "Frigate Optic5 \" some message"
+        "label": "Frigate Optic5 \" some message",
+        "provenance": [
+          {
+            "activity_id": "0e4cdea4-b4b8-4c8b-8515-58ca9d278ca9",
+            "timestamp": "2026-03-21T10:15:06.044969Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7557c78b-625c-4b08-b594-147a7ee54b10"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

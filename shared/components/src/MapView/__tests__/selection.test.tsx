@@ -75,6 +75,7 @@ const createTrack = (id: string, name: string): TrackFeature => ({
   id,
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
   },
   properties: {

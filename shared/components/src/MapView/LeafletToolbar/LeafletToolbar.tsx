@@ -548,6 +548,7 @@ export function LeafletToolbar({
       control.remove();
       controlRef.current = null;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, position]);
 
   // Update control props when they change (including drawingMode for US3)

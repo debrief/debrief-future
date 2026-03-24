@@ -116,9 +116,9 @@ export function execute(
   }
 
   // Duration from properties.times (epoch ms array, legacy wire format)
-  const props = track.properties as unknown as Record<string, unknown>;
+  const legacyProps = track.properties as typeof track.properties & { name?: string; platform_name?: string; times?: number[] };
   let durationHours = 0;
-  const times = props.times as number[] | undefined;
+  const times = legacyProps.times;
   if (times && times.length >= 2) {
     durationHours = (times[times.length - 1] - times[0]) / (1000 * 60 * 60);
   }
@@ -133,7 +133,7 @@ export function execute(
   const centroidLon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
   const centroidLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
 
-  const trackName = ((props.name ?? props.platform_name ?? track.id ?? 'Unknown') as string);
+  const trackName = String(legacyProps.name ?? legacyProps.platform_name ?? track.id ?? 'Unknown');
 
   return [{
     type: 'Feature',

@@ -26,6 +26,7 @@ function makeTrack(): DebriefFeature {
       positions: [],
       style: { line: { color: '#0066cc' }, point: { shape: 'circle', radius: 5, fill_color: '#0066cc', color: '#0066cc' } },
     },
+  // eslint-disable-next-line no-restricted-syntax
   } as unknown as DebriefFeature;
 }
 
@@ -34,7 +35,9 @@ function applyStyleChange(
   property: string,
   value: string | number,
 ): DebriefFeature {
+  // eslint-disable-next-line no-restricted-syntax
   const props = feature.properties as unknown as Record<string, unknown>;
+  // eslint-disable-next-line no-restricted-syntax
   const oldStyle = (props.style ?? {}) as Record<string, unknown>;
   const newStyle = { ...oldStyle };
 
@@ -42,6 +45,7 @@ function applyStyleChange(
   if (dotIndex > 0) {
     const category = property.slice(0, dotIndex);
     const field = property.slice(dotIndex + 1);
+    // eslint-disable-next-line no-restricted-syntax
     const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
     newStyle[category] = { ...oldCategory, [field]: value };
   } else {
@@ -51,6 +55,7 @@ function applyStyleChange(
   return {
     ...feature,
     properties: { ...props, style: newStyle },
+  // eslint-disable-next-line no-restricted-syntax
   } as unknown as DebriefFeature;
 }
 
@@ -71,8 +76,11 @@ describe('Format menu colour change diagnostic', () => {
     const updated = applyStyleChange(track, 'line.color', '#CC0000');
 
     // Verify runtime structure
+    // eslint-disable-next-line no-restricted-syntax
     const props = updated.properties as unknown as Record<string, unknown>;
+    // eslint-disable-next-line no-restricted-syntax
     const style = props.style as Record<string, unknown>;
+    // eslint-disable-next-line no-restricted-syntax
     const line = style.line as Record<string, unknown>;
     expect(line.color).toBe('#CC0000');
   });

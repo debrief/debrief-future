@@ -645,7 +645,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "14095ba1-4e8d-45d0-a070-4332d2a35630"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1292,7 +1308,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d896818-e521-42fe-818b-4512cc59e51d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1315,7 +1347,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1553bf6b-2a9f-4488-8036-2b2cf4fce8d1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1338,7 +1386,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7d65f4a2-7e46-42db-b9e8-8c5ab407d4d2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1361,7 +1425,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ebee8e04-3d0a-4052-8796-48321286fd76"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1384,7 +1464,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "29ecadf3-ba02-4472-adbc-7d151cce72a8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1407,7 +1503,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dd2b8318-5631-4d80-94fa-6223018ba9b6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1430,7 +1542,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32dddf5c-0823-4671-8bb0-8f073bf31fcd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1453,7 +1581,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ef83ac2-6073-42b2-87c2-cba9e9cab9dd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1476,7 +1620,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6d4caf90-51c7-4378-8fa6-2ba596936e3c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1499,7 +1659,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d7bf42ae-ae81-4d6b-af9b-81e38cfe6df7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1522,7 +1698,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a8ec782a-e7a6-4d6e-8f94-55bc0e65e331"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1545,7 +1737,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aec76e9c-6f16-42ab-8a13-23ed1d3e53e9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1568,7 +1776,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eb49c3e8-cdbc-4565-9d11-6cd508ca3cad"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1591,7 +1815,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5b754f0a-3fdd-4ef9-b82d-64dcf44c1f94"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1614,7 +1854,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cdb8b50e-4c85-4333-ba17-bdc1f9c60640"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1637,7 +1893,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b60d3e5-6a4b-4e8f-ac3e-b4906523d8eb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1660,7 +1932,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "be6658f6-e9fe-4ec4-8231-1526d0399142"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1683,7 +1971,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "946f69d6-718b-481b-a9b4-85091070212f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1706,7 +2010,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "570d570d-8db4-445d-95a0-563c3f76aa01"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1729,7 +2049,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a3637dd2-2818-446d-b0cf-18b58a72fe4a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1752,7 +2088,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ae017b38-7382-4a17-bf2a-4d56b6e0b283"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1775,7 +2127,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f996742c-ca7b-40cb-8ec3-5625bd69435b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1798,7 +2166,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "35cd8f5f-e62c-4d95-a0bc-abb26f528ded"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1821,7 +2205,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "07c5f0c0-0003-4fe1-9ff0-b588de1cf14f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1844,7 +2244,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0273af28-55d3-4c6f-b2bb-b3cd35140efe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1867,7 +2283,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ef029021-7769-4227-8a00-8f2bc73dae35"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1890,7 +2322,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "50a67af0-8612-468e-adbf-151751634db2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1913,7 +2361,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "18ec8bc2-0c0e-4cf3-93e3-7542764b9eeb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1936,7 +2400,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8b5dc2ee-c95b-4293-a19b-3e85627cec17"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1959,7 +2439,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "afdb3e71-d07c-4aea-8178-44a0444dfb7a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1982,7 +2478,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "52efe0b6-f5c4-4b93-a69e-fbf1dd77638a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2005,7 +2517,23 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "adf13a6d-5351-41cd-ae69-b6f9f3179502",
+            "timestamp": "2026-03-21T10:15:05.548565Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "48e4e66f-8a75-4ee5-b6e2-6b0c21ea6009"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

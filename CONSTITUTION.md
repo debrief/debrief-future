@@ -189,6 +189,7 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 4. **Schema types are canonical** — types generated from LinkML schemas must be fully typed with no `Any`/`any` in the output. Generated types are production code and meet the same standards.
 5. **Type boundaries are explicit** — every point where untyped data enters the system (JSON parsing, external API responses, user input) must validate through a typed model before the data is used in application code.
 6. **CI enforces compliance** — type checking for all languages must run as a required CI step. PRs with type violations cannot be merged.
+7. **Type assertions are expert overrides** — casting to a loose type (`as Record<string, unknown>`, `as unknown as T`, `cast()`) at a data boundary is an assertion that the type system cannot verify. These require a `// SAFETY:` justification comment and explicit human reviewer approval in the PR. If a generated type or runtime validator exists for the data shape, you must use it instead. If neither exists, create one — the need for a cast usually means a type is missing from the schema.
 
 ---
 
@@ -201,4 +202,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.3 — February 2026*
+*Document version: 1.4 — March 2026*

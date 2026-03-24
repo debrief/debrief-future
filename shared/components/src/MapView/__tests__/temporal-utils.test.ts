@@ -80,6 +80,7 @@ interface TestFeatureInput {
 
 describe('extractTemporalData', () => {
   it('returns null for feature without geometry', () => {
+    // eslint-disable-next-line no-restricted-syntax
     expect(extractTemporalData({ geometry: null, properties: {} } as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
@@ -89,6 +90,7 @@ describe('extractTemporalData', () => {
       geometry: { type: 'Point', coordinates: [[0, 0]] },
       properties: { times: [1000] },
     };
+    // eslint-disable-next-line no-restricted-syntax
     expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
@@ -98,6 +100,7 @@ describe('extractTemporalData', () => {
       geometry: { type: 'LineString', coordinates: [[-4, 50]] },
       properties: { name: 'test' },
     };
+    // eslint-disable-next-line no-restricted-syntax
     expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
@@ -107,6 +110,7 @@ describe('extractTemporalData', () => {
       geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
       properties: { times: [1000] },
     };
+    // eslint-disable-next-line no-restricted-syntax
     expect(() => extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('mismatched arrays');
   });
 
@@ -124,6 +128,7 @@ describe('extractTemporalData', () => {
         times: [1000, 2000, 3000],
       },
     };
+    // eslint-disable-next-line no-restricted-syntax
     const result = extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0]);
 
     expect(result).toEqual({
@@ -147,6 +152,7 @@ describe('extractTemporalData', () => {
         times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
       },
     };
+    // eslint-disable-next-line no-restricted-syntax
     expect(() => extractTemporalData(featureWithStringTimes as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('non-numeric times');
   });
 });

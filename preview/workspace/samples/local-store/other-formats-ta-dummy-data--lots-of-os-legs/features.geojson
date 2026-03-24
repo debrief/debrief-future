@@ -1395,7 +1395,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5250689-c95f-498b-a4ed-e2f75ca2cfc4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1512,7 +1528,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "11e32319-977f-4e30-850a-c33d349e8c62"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1619,7 +1651,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cd9e9eaf-15ec-449b-a3e1-0b784947d308"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1686,7 +1734,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "08bbaf79-2d29-493c-afa2-27ef788738eb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1753,7 +1817,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3272dda8-c26a-4516-b358-c900c7ba6cc0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1820,7 +1900,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e42f6dd5-c756-412f-8755-7003cf4e7428"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1887,7 +1983,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e424582c-324a-4d09-967e-251285be3a33"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1964,7 +2076,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "05df1ee7-9c3d-4078-9623-429f9d5e3740"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2031,7 +2159,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "782d9ae0-feb0-46c7-8a4f-caa38e59b449"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2088,7 +2232,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "47d4e82a-a297-4b05-9c5f-bb2dcd979f22"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3205,7 +3365,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "dc8e2ba6-61ab-4193-a44a-8cd904d6ca6d",
+            "timestamp": "2026-03-21T10:15:05.536595Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c006e32d-21a5-43fd-a768-297b9c337a7f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

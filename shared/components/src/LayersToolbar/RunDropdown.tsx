@@ -27,6 +27,7 @@ export function RunDropdown({
   onRunAction,
   labels: labelOverrides,
 }: RunDropdownProps) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const labels = { ...DEFAULT_LABELS, ...labelOverrides };
 
   const categories = useMemo<MenuCategory[]>(() => {
@@ -74,6 +75,7 @@ export function RunDropdown({
       // Group by tool category
       const grouped = new Map<string, typeof activeTools>();
       for (const match of activeTools) {
+        // eslint-disable-next-line no-restricted-syntax
         const cat = ((match.tool as unknown as Record<string, unknown>)['category'] as string) ?? 'Other';
         const existing = grouped.get(cat) ?? [];
         grouped.set(cat, [...existing, match]);

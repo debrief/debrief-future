@@ -64,6 +64,11 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
+/** Access legacy wire-format properties (times, name, platform_name) on a TrackFeature. */
+function getLegacyProps(track: TrackFeature): typeof track.properties & { name?: string; platform_name?: string; times?: number[] } {
+  return track.properties as typeof track.properties & { name?: string; platform_name?: string; times?: number[] };
+}
+
 export function execute(
   features: TrackFeature[],
   _params: Record<string, unknown>,
@@ -76,13 +81,13 @@ export function execute(
   const [track1, track2] = tracks;
   const coords1 = track1.geometry.coordinates as number[][];
   const coords2 = track2.geometry.coordinates as number[][];
-  // Access legacy wire-format 'times' and 'name' properties via cast
-  const props1 = track1.properties as unknown as Record<string, unknown>;
-  const props2 = track2.properties as unknown as Record<string, unknown>;
-  const times1 = props1.times as number[] | undefined;
-  const times2 = props2.times as number[] | undefined;
-  const name1 = ((props1.name ?? props1.platform_name ?? track1.id ?? 'Track 1') as string);
-  const name2 = ((props2.name ?? props2.platform_name ?? track2.id ?? 'Track 2') as string);
+  // Access legacy wire-format 'times' and 'name' properties
+  const legacyProps1 = getLegacyProps(track1);
+  const legacyProps2 = getLegacyProps(track2);
+  const times1 = legacyProps1.times;
+  const times2 = legacyProps2.times;
+  const name1 = String(legacyProps1.name ?? legacyProps1.platform_name ?? track1.id ?? 'Track 1');
+  const name2 = String(legacyProps2.name ?? legacyProps2.platform_name ?? track2.id ?? 'Track 2');
 
   // Build time-series by zipping coordinates by index
   const len = Math.min(coords1.length, coords2.length);

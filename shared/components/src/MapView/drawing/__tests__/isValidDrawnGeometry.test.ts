@@ -27,6 +27,7 @@ describe('isValidDrawnGeometry', () => {
     it('returns false for missing coordinates', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'Point', coordinates: [] } as unknown as GeoJSON.Point,
         properties: {},
       };
@@ -45,6 +46,7 @@ describe('isValidDrawnGeometry', () => {
     it('returns false for null geometry', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: null as unknown as GeoJSON.Geometry,
         properties: {},
       };
@@ -125,6 +127,7 @@ describe('isValidDrawnGeometry', () => {
     it('returns false for empty rings', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'Polygon', coordinates: [] } as unknown as GeoJSON.Polygon,
         properties: {},
       };
@@ -181,6 +184,7 @@ describe('isValidDrawnGeometry', () => {
     it('returns false for empty rings', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'Polygon', coordinates: [] } as unknown as GeoJSON.Polygon,
         properties: {},
       };
@@ -225,6 +229,7 @@ describe('isValidDrawnGeometry', () => {
     it('returns false for polyline with only 1 vertex', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
+        // eslint-disable-next-line no-restricted-syntax
         geometry: { type: 'LineString', coordinates: [[-4, 50]] } as unknown as GeoJSON.LineString,
         properties: {},
       };

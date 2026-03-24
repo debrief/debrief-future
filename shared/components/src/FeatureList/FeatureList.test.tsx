@@ -26,6 +26,7 @@ const mockTrackFeature: TrackFeature = {
   id: 'track-001',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-5.0, 50.0], [-4.0, 51.0]] as unknown as number[],
   },
   properties: {
@@ -44,6 +45,7 @@ const mockTrack2: TrackFeature = {
   id: 'track-002',
   geometry: {
     type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [[-4.5, 50.5], [-3.5, 51.5]] as unknown as number[],
   },
   properties: {
@@ -62,6 +64,7 @@ const mockReferenceLocation: ReferenceLocation = {
   id: 'ref-001',
   geometry: {
     type: 'Point',
+    // eslint-disable-next-line no-restricted-syntax
     coordinates: [-3.0, 52.0] as unknown as number[],
   },
   properties: {
@@ -85,6 +88,7 @@ function generateManyFeatures(count: number): TrackFeature[] {
     id: `track-${i.toString().padStart(4, '0')}`,
     geometry: {
       type: 'LineString' as const,
+      // eslint-disable-next-line no-restricted-syntax
       coordinates: [[-5 + i * 0.01, 50], [-4 + i * 0.01, 51]] as unknown as number[],
     },
     properties: {

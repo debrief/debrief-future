@@ -27,7 +27,23 @@
           "color": "#FF00FF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "c1b29307-3823-47e6-928f-69354c04ac82",
+            "timestamp": "2026-03-21T10:15:00.195216Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e6d6d731-23f3-42cc-a21d-d60cbf2c7413"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -56,7 +72,23 @@
           "color": "#00FFFF",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "c1b29307-3823-47e6-928f-69354c04ac82",
+            "timestamp": "2026-03-21T10:15:00.195216Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5dad60e2-435e-46c7-a2e7-68462dce8e6f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -85,7 +117,23 @@
           "color": "#800080",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "c1b29307-3823-47e6-928f-69354c04ac82",
+            "timestamp": "2026-03-21T10:15:00.195216Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "39ce821c-2f91-4cdd-a362-801eb58d4ee3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

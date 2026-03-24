@@ -605,7 +605,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a13cf7cd-3fd0-449a-be7a-8b4fb55a4edd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -618,7 +634,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 162.6,
         "time": "2010-01-12T12:00:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c146e552-a8dd-453d-af1a-1c346a7adfe1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -631,7 +663,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 162.3,
         "time": "2010-01-12T12:00:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5838ccbd-058f-4a61-9d50-9705a36b5cf5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -644,7 +692,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 162.1,
         "time": "2010-01-12T12:00:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "64deeda3-45fe-4830-b6a6-490da37027bb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -657,7 +721,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 161.8,
         "time": "2010-01-12T12:01:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3562fa87-afd1-49cc-a4ca-9d022763253b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -670,7 +750,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 161.5,
         "time": "2010-01-12T12:01:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c92f4594-ea57-494e-82be-a9dc746650c7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -683,7 +779,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 161.2,
         "time": "2010-01-12T12:01:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "471efcf7-f553-4606-9610-7de6ceb87083"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -696,7 +808,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 160.9,
         "time": "2010-01-12T12:02:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "66f457ac-69ad-443c-88c8-7c518b9519ba"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -709,7 +837,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 160.6,
         "time": "2010-01-12T12:02:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e02f5190-20ae-404b-a5fb-26a948c5d4bc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -722,7 +866,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 160.2,
         "time": "2010-01-12T12:02:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "63fb07c2-670f-4add-9259-1f507f397392"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -735,7 +895,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 159.9,
         "time": "2010-01-12T12:03:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0d240c54-9fcb-4f5d-a532-29213c421443"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -748,7 +924,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 159.5,
         "time": "2010-01-12T12:03:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9dca9a51-c101-464b-ad54-b883c0a9790d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -761,7 +953,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 159.1,
         "time": "2010-01-12T12:03:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1e3b2507-1a14-4c56-827f-4b23532cf998"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -774,7 +982,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 158.7,
         "time": "2010-01-12T12:04:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "452f2831-831a-4f73-8f57-2cfbdb9aa54a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -787,7 +1011,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 158.3,
         "time": "2010-01-12T12:04:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ef75ceb-cc7a-4df3-83d8-e1f501ce169e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -800,7 +1040,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 157.8,
         "time": "2010-01-12T12:04:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4ee91cb8-1f4c-4c70-af3f-bac7eb7e3e87"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -813,7 +1069,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 157.4,
         "time": "2010-01-12T12:05:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ebb2a136-bcea-41db-9ac9-33b2f639a9f6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -826,7 +1098,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 156.9,
         "time": "2010-01-12T12:05:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1aac02df-9fdb-4157-bcfc-700f590d4ed4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -839,7 +1127,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 156.3,
         "time": "2010-01-12T12:05:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "df7775e7-b78c-4a76-bff3-3fbefb62b10a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -852,7 +1156,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 155.8,
         "time": "2010-01-12T12:06:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d09ed1b3-9a6f-4755-a573-d8ed99a5fa2e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -865,7 +1185,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 155.2,
         "time": "2010-01-12T12:06:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f242d72b-102d-4977-a94b-826eec66eca6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -878,7 +1214,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 154.5,
         "time": "2010-01-12T12:06:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "55a6810f-2977-4d15-b94f-2d862cd3f099"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -891,7 +1243,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 153.8,
         "time": "2010-01-12T12:07:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "097319d7-c5bd-4892-b023-560be083186c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -904,7 +1272,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 153.1,
         "time": "2010-01-12T12:07:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b626bef3-f8d6-4207-8153-af8317851391"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -917,7 +1301,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 152.4,
         "time": "2010-01-12T12:07:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d0227402-ffb5-4d3d-9095-64b3731b495d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -930,7 +1330,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 151.5,
         "time": "2010-01-12T12:08:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "07d7a87b-cdc2-40c5-acc1-45f20210006b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -943,7 +1359,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 150.6,
         "time": "2010-01-12T12:08:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "61a2fd15-7e9c-43b0-8ce8-994cbf048a38"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -956,7 +1388,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 149.7,
         "time": "2010-01-12T12:08:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb59e021-ee86-4782-b4ba-d98f21948128"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -969,7 +1417,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 148.7,
         "time": "2010-01-12T12:09:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b5a804f0-7625-4a15-b106-e76a9caf164b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -982,7 +1446,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 147.6,
         "time": "2010-01-12T12:09:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fab524f3-7944-4a35-88fc-025ceee1bca1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -995,7 +1475,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 146.4,
         "time": "2010-01-12T12:09:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "02475a6d-84d2-415b-b337-cd877f1dfe39"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1008,7 +1504,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 145.1,
         "time": "2010-01-12T12:10:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0aabafee-ce3b-465c-864c-7a39454b0a88"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1021,7 +1533,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 143.7,
         "time": "2010-01-12T12:10:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "004e04a8-e938-447d-a59b-c2ce90158aba"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1034,7 +1562,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 142.2,
         "time": "2010-01-12T12:10:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d25d5c64-9ce4-436e-9eea-17a335397625"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1047,7 +1591,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 140.5,
         "time": "2010-01-12T12:11:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af6b548b-e477-4011-accd-43cda4d1d314"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1060,7 +1620,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 138.7,
         "time": "2010-01-12T12:11:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a985473d-3914-42b2-8b99-6ecb19e41938"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1073,7 +1649,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 136.7,
         "time": "2010-01-12T12:11:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "82316224-a608-419f-b6c3-8fa4fc436e92"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1086,7 +1678,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 134.5,
         "time": "2010-01-12T12:12:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "791f4744-2156-4ce4-a8f5-13c2ec25753f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1099,7 +1707,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 132.1,
         "time": "2010-01-12T12:12:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c09338c0-2b07-44c2-987d-f0b1842f7ce9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1112,7 +1736,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 129.4,
         "time": "2010-01-12T12:12:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "948dcf5e-9703-4f40-87d1-31193e2aa289"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1125,7 +1765,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 126.5,
         "time": "2010-01-12T12:13:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5f1d639e-6647-4858-bff5-f84493c7c52a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1138,7 +1794,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 123.3,
         "time": "2010-01-12T12:13:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5af4dc38-9fe6-4991-b566-2847f65a09c7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1151,7 +1823,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 119.8,
         "time": "2010-01-12T12:13:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3bd7c9e8-d5fe-45e2-89ae-1e23d6dc29da"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1164,7 +1852,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 115.9,
         "time": "2010-01-12T12:14:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7dccee2e-8874-4833-840b-2b77bd2d2024"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1177,7 +1881,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 111.7,
         "time": "2010-01-12T12:14:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "59d33a3f-b183-4097-b7d7-fef8f6930a04"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1190,7 +1910,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 107.2,
         "time": "2010-01-12T12:14:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ffdd1360-0290-4664-ae6a-e75590ade74f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1203,7 +1939,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 102.3,
         "time": "2010-01-12T12:15:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "44c55de6-471d-41f5-a522-f6b46236ea3f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1216,7 +1968,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 97.2,
         "time": "2010-01-12T12:15:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1e541452-6686-4063-a035-b6830628f2e1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1229,7 +1997,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 91.9,
         "time": "2010-01-12T12:15:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dcea052f-fd30-4a19-ac79-9a6c611b6464"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1242,7 +2026,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 86.4,
         "time": "2010-01-12T12:16:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "234ea575-62c6-486e-81ac-a7a454ed425e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1255,7 +2055,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 80.9,
         "time": "2010-01-12T12:16:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4e26b399-03de-4b75-9162-5d2dc030b3f2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1268,7 +2084,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 75.5,
         "time": "2010-01-12T12:16:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78b2d836-ad5e-4ef0-9c82-c29891a79aa6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1281,7 +2113,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 70.2,
         "time": "2010-01-12T12:17:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d1712cc3-f316-4676-8624-6f626d2891d6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1294,7 +2142,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 65.2,
         "time": "2010-01-12T12:17:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2acc2872-c810-4582-ab5e-aab87f96cc20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1307,7 +2171,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 60.5,
         "time": "2010-01-12T12:17:40+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "54176ce2-848d-47b3-950e-d34c36af5ab3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1320,7 +2200,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 56.1,
         "time": "2010-01-12T12:18:00+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bf75ce09-372c-4974-93dd-8705568afed3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1333,7 +2229,23 @@
         "sensor_name": "BOW_BRG",
         "bearing": 52.0,
         "time": "2010-01-12T12:18:20+00:00",
-        "label": "SUBJECT held on BOW_BRG"
+        "label": "SUBJECT held on BOW_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5a9c8c7d-cb15-4196-a2a2-b45bb4413ce6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1346,7 +2258,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 166.1,
         "time": "2010-01-12T12:00:05+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9db6db8b-b86d-4385-a7ea-e7288a7466da"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1359,7 +2287,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 166.0,
         "time": "2010-01-12T12:00:25+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "51ecefd7-69fb-46cf-89bf-896bb2f30871"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1372,7 +2316,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 165.8,
         "time": "2010-01-12T12:00:45+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6dba1155-ea9b-4061-8ba7-0524ca479fc8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1385,7 +2345,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 165.6,
         "time": "2010-01-12T12:01:05+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32568aa8-4484-4d85-ab15-cda25a3e145a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1398,7 +2374,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 165.5,
         "time": "2010-01-12T12:01:25+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "14cd3a87-ccb0-461c-ae54-1d794ba99583"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1411,7 +2403,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 165.3,
         "time": "2010-01-12T12:01:45+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af88d0c7-4607-4bcf-b493-7113b2083a64"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1424,7 +2432,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 165.1,
         "time": "2010-01-12T12:02:05+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d3ff4275-4e16-46d2-a1dd-6665d0a5ee49"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1437,7 +2461,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 164.9,
         "time": "2010-01-12T12:02:25+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d65424d6-acff-4053-8d0f-3b3dedc0656f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1450,7 +2490,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 164.7,
         "time": "2010-01-12T12:02:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6d512a56-c67b-4ad7-9912-e43e4efb5595"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1463,7 +2519,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 164.4,
         "time": "2010-01-12T12:03:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "85f0679f-688d-4c2e-93c0-86dba7dba766"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1476,7 +2548,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 164.2,
         "time": "2010-01-12T12:03:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bb84d73c-81cb-4d86-a495-45418dde45f5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1489,7 +2577,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 164.0,
         "time": "2010-01-12T12:03:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "737c28d3-48b6-4bda-8fa0-6deb87da82b6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1502,7 +2606,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 163.7,
         "time": "2010-01-12T12:04:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bc4e3ddf-c8b6-4a1f-87e6-0ea32e894de3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1515,7 +2635,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 163.4,
         "time": "2010-01-12T12:04:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7d001e7e-4ad3-4460-98db-386cfb0a376a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1528,7 +2664,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 163.2,
         "time": "2010-01-12T12:04:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c10b150e-b659-46bc-a4bd-e1c6fa4ddbd6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1541,7 +2693,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 162.9,
         "time": "2010-01-12T12:05:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3e833996-101e-4cf4-adaf-d56cad5fb86b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1554,7 +2722,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 162.6,
         "time": "2010-01-12T12:05:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "113ad189-b948-4de4-b02a-477bb8d0e841"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1567,7 +2751,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 162.2,
         "time": "2010-01-12T12:05:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c744d9b5-56e2-4d5b-b1c4-3651c39c296b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1580,7 +2780,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 161.9,
         "time": "2010-01-12T12:06:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "94f0be43-8844-4a5c-9805-31ce4f6a96bf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1593,7 +2809,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 161.5,
         "time": "2010-01-12T12:06:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2f0537ba-9958-417d-b825-b89993f22d6e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1606,7 +2838,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 161.1,
         "time": "2010-01-12T12:06:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2ae272ac-867d-42da-8c5e-c32b4775ac93"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1619,7 +2867,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 160.7,
         "time": "2010-01-12T12:07:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "350b9a33-fc6f-4932-a19d-60e1a555899e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1632,7 +2896,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 160.3,
         "time": "2010-01-12T12:07:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "76a3eecd-1a0a-4515-9f31-4174168f1cb0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1645,7 +2925,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 159.9,
         "time": "2010-01-12T12:07:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c8fed8b1-dacc-402d-a0e5-ca8b8bf59f99"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1658,7 +2954,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 159.4,
         "time": "2010-01-12T12:08:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "66f9993b-cab1-482c-8921-1751958e9d84"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1671,7 +2983,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 158.9,
         "time": "2010-01-12T12:08:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b87371cc-c108-4e7a-a355-37d7035843b4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1684,7 +3012,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 158.3,
         "time": "2010-01-12T12:08:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "75194330-7ed3-404d-98f6-4edb8a0beeca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1697,7 +3041,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 157.7,
         "time": "2010-01-12T12:09:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dd9673d7-91f3-4c76-9e4a-3d117c596256"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1710,7 +3070,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 157.1,
         "time": "2010-01-12T12:09:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3a9887d2-3551-4bc0-b904-c8fed8a07c3e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1723,7 +3099,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 156.4,
         "time": "2010-01-12T12:09:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a2d75a3a-0ec3-486b-9639-960f0fefb58a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1736,7 +3128,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 155.7,
         "time": "2010-01-12T12:10:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "76017e9d-6b48-48fe-8925-eefb8b493654"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1749,7 +3157,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 154.9,
         "time": "2010-01-12T12:10:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36e5eb8a-d469-424c-a098-9934b5fce82e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1762,7 +3186,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 154.0,
         "time": "2010-01-12T12:10:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cc80ebb7-cd28-4786-91e7-f21e1220a14d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1775,7 +3215,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 153.1,
         "time": "2010-01-12T12:11:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "96a9ed1d-e03f-4d83-b0ee-e0cf71379149"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1788,7 +3244,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 152.1,
         "time": "2010-01-12T12:11:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0837d3d5-0151-4f37-8dc3-b632670fb27c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1801,7 +3273,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 151.0,
         "time": "2010-01-12T12:11:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "403c98e9-39fc-43a5-be6c-9f3153662a73"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1814,7 +3302,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 149.8,
         "time": "2010-01-12T12:12:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af9dc729-b0c1-43c3-9497-24b8ea2b48fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1827,7 +3331,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 148.5,
         "time": "2010-01-12T12:12:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d07b30ba-a231-4ec1-ab19-470b7652881a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1840,7 +3360,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 147.0,
         "time": "2010-01-12T12:12:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0be10506-3749-4cb9-9f53-731e0c901919"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1853,7 +3389,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 145.4,
         "time": "2010-01-12T12:13:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d748d985-16a1-41fa-a549-b04f980630fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1866,7 +3418,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 143.6,
         "time": "2010-01-12T12:13:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "977359d4-a0d5-4aae-826b-539d2c7c138f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1879,7 +3447,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 141.5,
         "time": "2010-01-12T12:13:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84dcd980-2d51-4b70-b545-38ff896a4543"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1892,7 +3476,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 139.3,
         "time": "2010-01-12T12:14:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d8b23e55-575e-41e0-ba7c-1f961a88f09a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1905,7 +3505,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 136.8,
         "time": "2010-01-12T12:14:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "434c47a5-7e95-42ec-805b-15ed1a8de575"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1918,7 +3534,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 133.9,
         "time": "2010-01-12T12:14:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a58a9bcd-5a3c-40ec-8a3a-f773c79e2048"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1931,7 +3563,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 130.7,
         "time": "2010-01-12T12:15:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5db7406a-d0dd-409f-b8fe-f9c4e1bed334"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1944,7 +3592,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 127.0,
         "time": "2010-01-12T12:15:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f803f0b1-e04d-4c50-87f4-4027f8366a4b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1957,7 +3621,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 122.8,
         "time": "2010-01-12T12:15:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b19476de-03d4-43d0-a8c3-cc0b6d57f0e3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1970,7 +3650,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 118.2,
         "time": "2010-01-12T12:16:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af4f8195-cbfc-4cea-9ca9-21a94ee43c02"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1983,7 +3679,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 112.9,
         "time": "2010-01-12T12:16:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "48765032-08f8-4b38-96c3-b60c9aeee15c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1996,7 +3708,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 107.1,
         "time": "2010-01-12T12:16:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aff2d96b-6df2-4a6a-9414-2b3ef6c3e498"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2009,7 +3737,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 100.8,
         "time": "2010-01-12T12:17:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "99cf07b3-5b79-46c1-a563-99110d4215e4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2022,7 +3766,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 94.0,
         "time": "2010-01-12T12:17:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5870298-3ced-4d21-80a8-acb24b736409"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2035,7 +3795,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 87.0,
         "time": "2010-01-12T12:17:40+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4cec72de-0411-4ce3-88e1-1c65538cbd47"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2048,7 +3824,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 79.9,
         "time": "2010-01-12T12:18:00+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36bdf49c-31c0-4f02-908b-6be0f0f3d32f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2061,7 +3853,23 @@
         "sensor_name": "TAIL_BRG",
         "bearing": 72.9,
         "time": "2010-01-12T12:18:20+00:00",
-        "label": "SUBJECT held on TAIL_BRG"
+        "label": "SUBJECT held on TAIL_BRG",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "da76c30b-93ec-4bec-9752-338f0640a1b4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2658,7 +4466,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "13905466-2825-4613-b72b-4e029f9b12c6",
+            "timestamp": "2026-03-21T10:15:00.297951Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4d62efc5-a5da-4626-bb47-1cf374b6bc9b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

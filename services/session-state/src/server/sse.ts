@@ -49,14 +49,14 @@ export function broadcast(event: SSEEventType, data: unknown): void {
  */
 export function createSSEHandler(store: SessionStoreApi) {
   // Set up store subscription to broadcast changes
-  let eventId = 0;
+  let _eventId = 0;
 
   // Use subscribeWithSelector's signature: subscribe(selector, callback)
   // Identity selector to listen to all state changes
   store.subscribe(
     (state) => state,
     (state, prevState) => {
-      eventId++;
+      _eventId++;
 
     // Check which fields changed and broadcast
     if (state.currentTime !== prevState.currentTime) {

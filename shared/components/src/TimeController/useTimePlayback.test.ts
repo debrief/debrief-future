@@ -16,6 +16,7 @@ beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', mockRAF);
   vi.stubGlobal('cancelAnimationFrame', mockCancelRAF);
   mockRAF.mockImplementation((callback: FrameRequestCallback) => {
+    // eslint-disable-next-line no-restricted-syntax
     return setTimeout(() => callback(performance.now()), 16) as unknown as number;
   });
 });

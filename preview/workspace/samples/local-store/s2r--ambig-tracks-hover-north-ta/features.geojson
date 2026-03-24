@@ -12,7 +12,23 @@
         "bearing": 0.71,
         "range": 179.29,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6f61fb94-8f98-47ea-9683-443ea86a454c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -26,7 +42,23 @@
         "bearing": 0.59,
         "range": 179.41,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "475d6afb-18fe-4bb6-95a5-f9998c8af288"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -40,7 +72,23 @@
         "bearing": 0.59,
         "range": 179.41,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "464cd0a5-14ab-4e46-8484-cc750665302e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -54,7 +102,23 @@
         "bearing": 359.59,
         "range": 179.41,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "210208e9-d25c-48cd-8756-c13bc046bc17"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -68,7 +132,23 @@
         "bearing": 0.58,
         "range": 179.42,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "73ce2d13-85ce-4ede-9995-e3bb1f3f5cb7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -82,7 +162,23 @@
         "bearing": 0.58,
         "range": 179.42,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a5c59475-4b31-45c1-9118-5a696e067cc8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -96,7 +192,23 @@
         "bearing": 0.58,
         "range": 179.42,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c93b558f-f62a-4e4a-8302-1faf50c04f5a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -110,7 +222,23 @@
         "bearing": 0.57,
         "range": 179.43,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4ac50ef-4a42-4338-ae33-a7d0b8ef85a7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -124,7 +252,23 @@
         "bearing": 0.57,
         "range": 179.43,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6a4f80c1-df17-41e8-ae7c-292ee7e16114"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -138,7 +282,23 @@
         "bearing": 0.57,
         "range": 179.43,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4c53a33d-e1ec-4b6b-8d1b-c845cdf648d6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -152,7 +312,23 @@
         "bearing": 0.56,
         "range": 179.44,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dbf15a02-b6b8-4c65-9039-7e556aa68ddf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -166,7 +342,23 @@
         "bearing": 359.59,
         "range": 179.44,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d8684fc-cc2a-4ab5-8e8e-f720f07f5246"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -180,7 +372,23 @@
         "bearing": 358.59,
         "range": 179.44,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2adf7174-b07e-4e2c-beaa-2788bc07c1f4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -194,7 +402,23 @@
         "bearing": 357.59,
         "range": 179.45,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "79741a2a-c2f7-4531-91ba-1a3f3f879fdd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -208,7 +432,23 @@
         "bearing": 0.55,
         "range": 179.45,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "17c33fae-a3e8-40a6-a39e-d1b77e675bdb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -222,7 +462,23 @@
         "bearing": 0.54,
         "range": 179.46,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a7328213-d5f8-46db-85c4-6e23d89e04fe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -236,7 +492,23 @@
         "bearing": 0.54,
         "range": 179.46,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a48b4d71-791c-4612-9936-372de8358f46"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -250,7 +522,23 @@
         "bearing": 0.54,
         "range": 179.46,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1dbfa215-8861-412e-9f4b-2c30a5da8af2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -264,7 +552,23 @@
         "bearing": 357.59,
         "range": 179.47,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0a1c877b-90b8-412b-990c-531a1618a1ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -278,7 +582,23 @@
         "bearing": 358.59,
         "range": 179.47,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2e183651-914d-4df7-8d50-ab102901da32"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -292,7 +612,23 @@
         "bearing": 359.59,
         "range": 179.47,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9f6fa810-c26e-4d91-9a3c-759f9bf4394d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -306,7 +642,23 @@
         "bearing": 0.52,
         "range": 179.48,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "815ed5d3-2e64-4890-9350-7610b945ce0f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -320,7 +672,23 @@
         "bearing": 0.52,
         "range": 179.48,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0e10ac32-9e4b-465b-9cdd-784bb32b8ece"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -334,7 +702,23 @@
         "bearing": 0.51,
         "range": 179.49,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8b605e39-13da-4725-b54d-65c1578c145f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -348,7 +732,23 @@
         "bearing": 0.51,
         "range": 179.49,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "153e8497-c9b4-42f7-b708-61c6b86dbeaa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -362,7 +762,23 @@
         "bearing": 0.51,
         "range": 179.49,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0839f050-dbcd-429f-98e0-f96ffdc1828d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -376,7 +792,23 @@
         "bearing": 0.26,
         "range": 179.74,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4c6b25c6-270f-4296-9dc6-18f4c6b7c2ff"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -390,7 +822,23 @@
         "bearing": 359.58,
         "range": 180.42,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d24848af-2163-4eba-b876-9d9bd5cc768b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -404,7 +852,23 @@
         "bearing": 358.62,
         "range": 181.38,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7a75e952-9a93-446c-bc4a-0357290b3058"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -418,7 +882,23 @@
         "bearing": 357.64,
         "range": 182.36,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4d530894-aa83-4b81-a5a0-edb40617df05"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -432,7 +912,23 @@
         "bearing": 356.65,
         "range": 183.35,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a2937c1b-e875-4fce-a5c7-8370549d6deb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -446,7 +942,23 @@
         "bearing": 355.71,
         "range": 252.67,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "456be292-e256-453a-b0fc-12af5e55a61b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -460,7 +972,23 @@
         "bearing": 354.95,
         "range": 321.81,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ed9f412e-af6e-4e02-9ca6-a78e86542616"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -474,7 +1002,23 @@
         "bearing": 354.47,
         "range": 30.68,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9df7f146-01cf-4546-9dc0-bf60c86352cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -488,7 +1032,23 @@
         "bearing": 354.25,
         "range": 99.28,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4dfad92-7183-4017-bd9c-522661f5ae2a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -502,7 +1062,23 @@
         "bearing": 354.3,
         "range": 167.62,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3861e900-3222-4722-8f8f-6cbf98a24e72"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -516,7 +1092,23 @@
         "bearing": 354.74,
         "range": 213.43,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b6c3fd88-6536-4c8b-b142-faebf7e83399"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -530,7 +1122,23 @@
         "bearing": 355.53,
         "range": 214.79,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b0fbea4b-798c-4901-9392-efd44c40dc49"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -544,7 +1152,23 @@
         "bearing": 356.45,
         "range": 213.88,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "804ebf9f-3309-4420-9a4d-226a53d885af"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -558,7 +1182,23 @@
         "bearing": 357.37,
         "range": 212.96,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f56acb1a-f7fa-40e1-96b1-951134737c35"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -572,7 +1212,23 @@
         "bearing": 358.29,
         "range": 212.03,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "66d5a0ee-5dbe-4fd6-b830-ca25b798b4c0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -586,7 +1242,23 @@
         "bearing": 359.22,
         "range": 211.1,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d685f88-2e1f-4f5f-8896-a46e982db8e4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -600,7 +1272,23 @@
         "bearing": 0.16,
         "range": 210.17,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6177ab2f-3744-4f89-9ede-ed0f4d4d4bb6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -614,7 +1302,23 @@
         "bearing": 1.1,
         "range": 140.84,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b5d91579-0b14-43d8-98e5-2764f48b8e5b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -628,7 +1332,23 @@
         "bearing": 1.95,
         "range": 71.61,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c5f8c4f5-dd27-42d3-8d1e-453fd927cf61"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -642,7 +1362,23 @@
         "bearing": 2.56,
         "range": 2.61,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5cff0f55-2405-41e6-bc88-5f149e0a6be2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -656,7 +1392,23 @@
         "bearing": 2.94,
         "range": 330.06,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bee380b1-4682-478b-b4a1-4b17ba523463"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -670,7 +1422,23 @@
         "bearing": 3.27,
         "range": 328.79,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "12ba26ba-f4ee-43d9-9e8f-ba5f39ab6867"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -684,7 +1452,23 @@
         "bearing": 3.61,
         "range": 328.46,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9ac14f82-835e-441f-8294-e6c5046ce7f2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -698,7 +1482,23 @@
         "bearing": 3.93,
         "range": 328.13,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4fee046d-9951-461c-9cb3-417f3966d4dc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -712,7 +1512,23 @@
         "bearing": 4.25,
         "range": 327.81,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7e6b2054-ebf7-43b1-b33c-297d35627f7e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -726,7 +1542,23 @@
         "bearing": 4.57,
         "range": 327.5,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "86151c65-5247-41fc-868d-2e6a0e42a3c0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -740,7 +1572,23 @@
         "bearing": 4.88,
         "range": 327.19,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c0b88883-1ee8-47db-8331-1271fcb225dc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -754,7 +1602,23 @@
         "bearing": 5.18,
         "range": 326.88,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8beb7140-dab2-48db-906f-a84e4bb2f65d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -768,7 +1632,23 @@
         "bearing": 5.61,
         "range": 34.84,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6502ba47-b411-4782-b359-6c80f38e0096"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -782,7 +1662,23 @@
         "bearing": 6.26,
         "range": 102.57,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a6cc58f8-76d5-4fc7-9f53-aa9289f88ecb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -796,7 +1692,23 @@
         "bearing": 7.07,
         "range": 168.4,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "edd78599-c4bb-4adf-8657-c950fd4559f8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -810,7 +1722,23 @@
         "bearing": 7.89,
         "range": 170.41,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32f80135-3ef9-40f1-955f-698238f40d94"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -824,7 +1752,23 @@
         "bearing": 8.54,
         "range": 169.77,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "907d875d-d271-4622-9094-3c5973955d0c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -838,7 +1782,23 @@
         "bearing": 9.16,
         "range": 169.14,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1dbed463-e13a-46b7-b720-359680bb76a3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -852,7 +1812,23 @@
         "bearing": 9.79,
         "range": 168.51,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c6d6a1c1-496c-4ce3-b1e7-b2eae492d9e6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -866,7 +1842,23 @@
         "bearing": 10.43,
         "range": 167.87,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5accb37a-9906-461f-b853-60032ac65914"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -880,7 +1872,23 @@
         "bearing": 11.08,
         "range": 167.22,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b90cd2c-f0ad-4e41-a206-2a941f631e05"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -894,7 +1902,23 @@
         "bearing": 11.73,
         "range": 166.57,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c07ab292-6258-4560-b595-d784e4ba943f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -908,7 +1932,23 @@
         "bearing": 12.39,
         "range": 165.91,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ba630537-3371-493a-92c1-ff3527e7ba92"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -922,7 +1962,23 @@
         "bearing": 13.06,
         "range": 165.25,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b1859c8-fc61-413e-a8fa-3e4bf9cf45ce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -936,7 +1992,23 @@
         "bearing": 13.73,
         "range": 164.57,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b6c3263-ff9d-40de-917c-50f51edcbf34"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -950,7 +2022,23 @@
         "bearing": 14.35,
         "range": 95.57,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "52c0c231-4ad5-4e9b-9f83-e487e5b823d8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -964,7 +2052,23 @@
         "bearing": 14.78,
         "range": 26.76,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4def6b19-10d6-41ba-8ca9-5fb661659a82"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -978,7 +2082,23 @@
         "bearing": 15.03,
         "range": 10.98,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4bf7857-b50f-47d0-8727-caca4f21ddd1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -992,7 +2112,23 @@
         "bearing": 15.27,
         "range": 10.51,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7dc3f583-86e9-47a6-941c-cb5d5e52d9b6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1006,7 +2142,23 @@
         "bearing": 15.52,
         "range": 10.27,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "17e4a9f5-49bc-4f1f-8ccf-93e8ca965bf4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1020,7 +2172,23 @@
         "bearing": 15.76,
         "range": 10.03,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1ed18929-d864-40d1-aed0-8d50dec0452b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1034,7 +2202,23 @@
         "bearing": 16.0,
         "range": 9.79,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "676d4f8a-8076-4f17-ac37-a15b9bd2749a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1048,7 +2232,23 @@
         "bearing": 16.24,
         "range": 9.55,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0fd8c387-15c4-45b3-886b-99a657f4bc7d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1062,7 +2262,23 @@
         "bearing": 16.48,
         "range": 9.31,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "414a2b7d-3fb2-4ec1-ad20-c4cc9ace201a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1076,7 +2292,23 @@
         "bearing": 16.72,
         "range": 9.07,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "975b8431-0e6f-4488-8c55-9c2f10baf812"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1090,7 +2322,23 @@
         "bearing": 17.06,
         "range": 42.94,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a47d9dc0-9f0d-4b71-9863-2264a76a0249"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1104,7 +2352,23 @@
         "bearing": 17.43,
         "range": 43.48,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "96059deb-87c0-422f-a206-ce638ae7c04f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1118,7 +2382,23 @@
         "bearing": 17.8,
         "range": 43.11,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "457280cd-cb25-4bc8-8ae0-c7d62076e2b1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1132,7 +2412,23 @@
         "bearing": 18.17,
         "range": 42.74,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1c2f8ee7-3468-4884-b2d9-04a9c926ca0f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1146,7 +2442,23 @@
         "bearing": 18.54,
         "range": 42.37,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2da09a75-b480-40f3-b0a0-6207ba7f2448"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1160,7 +2472,23 @@
         "bearing": 18.9,
         "range": 42.01,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "336fd6be-a085-46e8-9bae-fd7fc53cc948"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1174,7 +2502,23 @@
         "bearing": 19.27,
         "range": 41.64,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f8993f7a-9834-4f34-82a8-d10b324fda9b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1188,7 +2532,23 @@
         "bearing": 19.64,
         "range": 41.27,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8081df7a-b298-451a-b62b-babf3145650c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1202,7 +2562,23 @@
         "bearing": 20.0,
         "range": 40.91,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "48a2f82a-f407-4833-9488-9740b0a42a7d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1216,7 +2592,23 @@
         "bearing": 20.36,
         "range": 40.54,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e4db7950-dbf1-4f73-8268-286b619be045"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1230,7 +2622,23 @@
         "bearing": 20.6,
         "range": 331.93,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f06fd279-c8ec-4751-aa50-d0bda90e6f8b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1244,7 +2652,23 @@
         "bearing": 20.62,
         "range": 289.73,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c23d8f48-1fc3-4982-b767-6d0302009990"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1258,7 +2682,23 @@
         "bearing": 20.6,
         "range": 287.39,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e14f083e-d054-474b-a08e-54b08d72e4d7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1272,7 +2712,23 @@
         "bearing": 20.57,
         "range": 287.41,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3a052300-d0af-483f-ae4b-d67426abbd53"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1286,7 +2742,23 @@
         "bearing": 20.55,
         "range": 287.43,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5b6844f9-84c2-482f-87c8-eb73a88f0def"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1300,7 +2772,23 @@
         "bearing": 20.52,
         "range": 287.46,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a99da3f5-a923-4ed4-a8db-49311511cf65"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1314,7 +2802,23 @@
         "bearing": 20.5,
         "range": 287.48,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0647a9f0-3fb5-47c6-ab3b-1001944cfebb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1328,7 +2832,23 @@
         "bearing": 20.58,
         "range": 355.78,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "adb8ac81-74af-4c52-a3d8-ff825ccd4264"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1342,7 +2862,23 @@
         "bearing": 20.89,
         "range": 44.7,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fa900071-6d43-4624-95bd-ebd9159e6201"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1356,7 +2892,23 @@
         "bearing": 21.28,
         "range": 45.8,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "093b7257-5b2b-43c2-acfa-2a6a513731d7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1370,7 +2922,23 @@
         "bearing": 21.66,
         "range": 45.42,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fdc8600e-8a4e-4748-9705-481a230b7860"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1384,7 +2952,23 @@
         "bearing": 22.05,
         "range": 45.04,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36f3539c-9ebc-41bd-bf78-37ebbb606f82"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1398,7 +2982,23 @@
         "bearing": 22.43,
         "range": 44.65,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "babeb7a4-eada-42d8-a281-ff3b7262d4a0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1412,7 +3012,23 @@
         "bearing": 22.81,
         "range": 44.27,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f61dc40d-8483-46a9-8712-d9ad84228618"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1426,7 +3042,23 @@
         "bearing": 23.19,
         "range": 43.89,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f3b5df7b-d4a2-4adb-9092-c53778ad1f1b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1440,7 +3072,23 @@
         "bearing": 23.57,
         "range": 43.52,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "760cf033-2229-489f-a276-e7a765ac8545"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1454,7 +3102,23 @@
         "bearing": 23.94,
         "range": 43.14,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6e8460f4-90e7-4201-96c3-de2c0b86fa86"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1468,7 +3132,23 @@
         "bearing": 24.32,
         "range": 42.76,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "21e536d4-9bc2-48fe-b620-4f4c5dc90bf6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1482,7 +3162,23 @@
         "bearing": 24.69,
         "range": 42.39,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1ed46fdc-e89e-4915-bb3a-43f62fc74882"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1496,7 +3192,23 @@
         "bearing": 25.07,
         "range": 42.02,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f17d685d-ef58-4371-9da4-85f0ec4822fc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1510,7 +3222,23 @@
         "bearing": 25.31,
         "range": 333.39,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "75e9e16b-18b9-44eb-ab73-b43e5472e5eb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1524,7 +3252,23 @@
         "bearing": 25.35,
         "range": 287.64,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1b0f7d11-1f19-4faf-805d-b1f5f11991b5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1538,7 +3282,23 @@
         "bearing": 25.34,
         "range": 285.89,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6b618571-076d-466f-b707-c3cde335a8e2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1552,7 +3312,23 @@
         "bearing": 25.32,
         "range": 285.9,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "19507913-4dbc-407b-842f-7e920ee2e816"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1566,7 +3342,23 @@
         "bearing": 25.31,
         "range": 285.91,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5acaa059-9ebe-4037-9212-1c6895f27be4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1580,7 +3372,23 @@
         "bearing": 25.3,
         "range": 285.93,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8f7e9083-6c47-43cf-8ddc-7271b181dc65"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1594,7 +3402,23 @@
         "bearing": 25.29,
         "range": 285.94,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "42041fe5-046a-4c31-8bc4-f0d8a0beccbd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1608,7 +3432,23 @@
         "bearing": 25.28,
         "range": 285.95,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "408662a1-c2da-442a-b614-b533e1104158"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1622,7 +3462,23 @@
         "bearing": 25.26,
         "range": 285.96,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9aa8e6a9-2bb1-43cc-8265-38e1599a6a2f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1636,7 +3492,23 @@
         "bearing": 25.25,
         "range": 285.97,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6dc0fe8d-14fb-4e4a-b57a-210876ddf54a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1650,7 +3522,23 @@
         "bearing": 25.34,
         "range": 354.27,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d8f7967b-add2-4948-849a-d1ebcc57c506"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1664,7 +3552,23 @@
         "bearing": 25.65,
         "range": 46.91,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d063f87-a267-4b95-bdd9-990a86e1d9ec"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1678,7 +3582,23 @@
         "bearing": 26.06,
         "range": 51.0,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b64c8d4b-2ae6-4fbd-9dd5-665d3172685d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1692,7 +3612,23 @@
         "bearing": 26.47,
         "range": 50.63,
         "sensor_name": "TA",
-        "label": "SUBJECT held on TA"
+        "label": "SUBJECT held on TA",
+        "provenance": [
+          {
+            "activity_id": "e9d62bd4-e6cf-4898-9c9c-144e325a9ddf",
+            "timestamp": "2026-03-21T10:15:01.457396Z",
+            "was_generated_by": {
+              "tool": "dsf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f2ceb7e0-cf4a-4443-bc57-740d359ce5ea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

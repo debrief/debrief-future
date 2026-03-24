@@ -1675,7 +1675,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "cc46d9e1-969c-46f7-b6a1-5b97f32e5eb8",
+            "timestamp": "2026-03-21T10:15:00.183835Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "31b6d8a4-2c65-41e2-b471-87e9cd5baa43"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3352,7 +3368,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "cc46d9e1-969c-46f7-b6a1-5b97f32e5eb8",
+            "timestamp": "2026-03-21T10:15:00.183835Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "de70cb6a-be8e-4608-8122-d4d343782f08"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

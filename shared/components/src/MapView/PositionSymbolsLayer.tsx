@@ -109,6 +109,7 @@ export function PositionSymbolsLayer({
   // Memoize positions and coordinates to stabilize useMemo dependencies
   const positions = useMemo(() => props.positions ?? [], [props.positions]);
   const coordinates = useMemo(
+    // eslint-disable-next-line no-restricted-syntax
     () => (feature.geometry.coordinates as unknown as Array<[number, number]>) ?? [],
     [feature.geometry.coordinates]
   );
@@ -117,9 +118,11 @@ export function PositionSymbolsLayer({
   // Fall back to style.point (set by apply-symbol-style tool) when
   // default_position_style is absent.
   const explicitDps = props.default_position_style;
+  // eslint-disable-next-line no-restricted-syntax
   const pointStyle = (props.style as unknown as Record<string, unknown> | undefined)?.point as
     | Record<string, unknown>
     | undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const defaultStyle: PositionStyle = explicitDps ?? (
     pointStyle?.shape
       ? { show_symbol: true, symbol: pointStyle.shape as string, show_label: false }

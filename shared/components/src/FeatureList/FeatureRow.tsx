@@ -80,6 +80,7 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
  * Get the type label for a feature.
  */
 function getFeatureType(feature: DebriefFeature): string {
+  // eslint-disable-next-line no-restricted-syntax
   const props = feature.properties as unknown as Record<string, unknown>;
 
   if (isTrackFeature(feature)) {
@@ -114,6 +115,7 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
     let end: string | undefined = feature.properties.end_time;
 
     if (!start || !end) {
+      // eslint-disable-next-line no-restricted-syntax
       const props = feature.properties as unknown as Record<string, unknown>;
       const times = props.times as unknown[] | undefined;
       if (Array.isArray(times) && times.length > 0) {
@@ -182,14 +184,17 @@ export function FeatureRow({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      // eslint-disable-next-line no-restricted-syntax
       onClick(e as unknown as React.MouseEvent);
     }
     if (e.key === 'ArrowRight' && isExpandable && !isExpanded && onToggleExpand) {
       e.preventDefault();
+      // eslint-disable-next-line no-restricted-syntax
       onToggleExpand(e as unknown as React.MouseEvent);
     }
     if (e.key === 'ArrowLeft' && isExpandable && isExpanded && onToggleExpand) {
       e.preventDefault();
+      // eslint-disable-next-line no-restricted-syntax
       onToggleExpand(e as unknown as React.MouseEvent);
     }
   };
@@ -248,6 +253,7 @@ export function FeatureRow({
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.stopPropagation();
+              // eslint-disable-next-line no-restricted-syntax
               onFormatClick(e as unknown as React.MouseEvent, feature);
             }
           }}
@@ -274,6 +280,7 @@ export function FeatureRow({
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.stopPropagation();
+              // eslint-disable-next-line no-restricted-syntax
               onChildFormatClick(e as unknown as React.MouseEvent, displayItem);
             }
           }}
@@ -299,6 +306,7 @@ export function FeatureRow({
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.stopPropagation();
+              // eslint-disable-next-line no-restricted-syntax
               onInfoClick(e as unknown as React.MouseEvent, feature);
             }
           }}
@@ -325,6 +333,7 @@ export function FeatureRow({
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.stopPropagation();
+              // eslint-disable-next-line no-restricted-syntax
               onChildInfoClick(e as unknown as React.MouseEvent, displayItem);
             }
           }}
@@ -354,6 +363,7 @@ export function FeatureRow({
           title="Click for feature details"
           onClick={(e) => {
             e.stopPropagation();
+            // eslint-disable-next-line no-restricted-syntax
             const props = feature.properties as unknown as Record<string, unknown>;
             const lines = [`id: ${String(feature.id)}`];
             for (const [k, v] of Object.entries(props)) {

@@ -4,6 +4,7 @@
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
+import { propsRecord } from '../../../utils/featureProps';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface MoveShapeParams {
@@ -109,13 +110,13 @@ export function execute(features: DebriefFeature[], params: MoveShapeParams): De
 
   // Zero distance is a no-op
   if (distanceKm === 0) {
-    return features.filter((f) => ANNOTATION_KINDS.has((f.properties as unknown as Record<string, unknown>)['kind'] as string));
+    return features.filter((f) => ANNOTATION_KINDS.has(propsRecord(f)['kind'] as string));
   }
 
   const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = feature.properties as unknown as Record<string, unknown>;
+    const props = propsRecord(feature);
     const kind = props['kind'] as string;
 
     if (!ANNOTATION_KINDS.has(kind)) {

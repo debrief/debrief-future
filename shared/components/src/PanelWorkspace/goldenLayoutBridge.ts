@@ -79,6 +79,7 @@ export function createBindHandler(
       );
       mountedPanels.set(container, {
         root,
+        // eslint-disable-next-line no-restricted-syntax
         props: { container: container as unknown, isPopout: false, panelId: 'unknown' },
         componentType,
       });
@@ -89,6 +90,7 @@ export function createBindHandler(
     const panelId = `${componentType}-${panelIdCounter}`;
 
     const props: PanelProps = {
+      // eslint-disable-next-line no-restricted-syntax
       container: container as unknown,
       isPopout: container.layoutManager.isSubWindow,
       panelId,

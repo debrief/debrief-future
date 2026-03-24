@@ -135,7 +135,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5dec329f-cad5-4141-8f03-64765742bba0",
+            "timestamp": "2026-03-21T10:15:06.113382Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ff1f90d5-815f-48ee-b0ee-1ffe820bde94"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -252,7 +268,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "5dec329f-cad5-4141-8f03-64765742bba0",
+            "timestamp": "2026-03-21T10:15:06.113382Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "14b5b5f0-080b-4b8c-8cae-08f8713efa28"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1749,7 +1781,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "5dec329f-cad5-4141-8f03-64765742bba0",
+            "timestamp": "2026-03-21T10:15:06.113382Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "04b568d2-5292-4ee7-9422-c2897ba866d5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

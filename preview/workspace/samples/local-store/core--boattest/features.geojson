@@ -3045,7 +3045,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "aa6bf6aa-39f8-44d1-a082-fb5679b12602",
+            "timestamp": "2026-03-21T10:15:04.219719Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3280105b-c9af-4d2f-ba20-46980710c927"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

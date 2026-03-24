@@ -5,7 +5,7 @@
  * Pure function — collects, deduplicates, sorts.
  */
 
-import type { LogEntry } from './types.js';
+import type { LogEntry, ParameterValue, WasGeneratedBy } from './types.js';
 
 /**
  * Normalise a provenance value to an array.
@@ -16,6 +16,49 @@ function normaliseProvenance(raw: unknown): unknown[] {
   if (Array.isArray(raw)) return raw;
   if (typeof raw === 'object') return [raw];
   return [];
+}
+
+/**
+ * Normalise a single provenance entry from snake_case (Python-generated)
+ * to camelCase (TypeScript LogEntry format).
+ *
+ * Python importers (debrief-io) write provenance with snake_case keys:
+ *   activity_id, was_generated_by, execution_duration, tool_version
+ * TypeScript consumers expect camelCase:
+ *   activityId, wasGeneratedBy, executionDuration, toolVersion
+ *
+ * Entries already in camelCase are passed through unchanged.
+ */
+export function normaliseEntry(raw: Record<string, unknown>): Record<string, unknown> {
+  // Already camelCase — pass through
+  if (raw.activityId !== undefined) return raw;
+
+  // Snake_case entry from Python — convert
+  if (raw.activity_id === undefined) return raw;
+
+  const wgb = raw.was_generated_by as Record<string, unknown> | undefined;
+  const wasGeneratedBy: WasGeneratedBy | undefined = wgb
+    ? {
+        tool: (wgb.tool as string) ?? 'unknown',
+        toolVersion: (wgb.tool_version as string) ?? (wgb.toolVersion as string) ?? '',
+        parameters: (wgb.parameters as Record<string, ParameterValue>) ?? {},
+      }
+    : undefined;
+
+  return {
+    activityId: raw.activity_id,
+    timestamp: raw.timestamp,
+    ...(wasGeneratedBy ? { wasGeneratedBy } : {}),
+    used: raw.used ?? [],
+    generated: raw.generated ?? [],
+    executionDuration: raw.execution_duration ?? raw.executionDuration ?? 'PT0S',
+    generatedResultId: raw.generated_result_id ?? raw.generatedResultId ?? null,
+    tune: raw.tune ?? null,
+    deleted: raw.deleted,
+    disabled: raw.disabled,
+    rationale: raw.rationale,
+    inputState: raw.input_state ?? raw.inputState ?? null,
+  };
 }
 
 /**
@@ -54,7 +97,7 @@ export function assembleTimeline(
 
     const entries = normaliseProvenance(props.provenance);
     for (const raw of entries) {
-      const entry = raw as Record<string, unknown>;
+      const entry = normaliseEntry(raw as Record<string, unknown>);
       const activityId = entry.activityId;
       if (typeof activityId !== 'string' || activityId.length === 0) continue;
 
@@ -63,8 +106,21 @@ export function assembleTimeline(
         continue;
       }
 
-      // First occurrence wins (dedup)
-      if (!seen.has(activityId)) {
+      // Dedup by activityId — merge generated[] across features that
+      // share the same activity (e.g. multi-track import from one file).
+      const existing = seen.get(activityId);
+      if (existing) {
+        // Merge generated IDs that aren't already listed
+        const gen = (entry as Record<string, unknown>).generated;
+        if (Array.isArray(gen)) {
+          const existingSet = new Set(existing.generated);
+          for (const id of gen) {
+            if (typeof id === 'string' && !existingSet.has(id)) {
+              existing.generated.push(id);
+            }
+          }
+        }
+      } else {
         seen.set(activityId, entry as unknown as LogEntry);
       }
     }

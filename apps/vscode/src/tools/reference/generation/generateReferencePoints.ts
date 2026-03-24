@@ -126,7 +126,8 @@ function buildMultiPointFeature(
   metadata: PointMetadataEntry[],
   name: string,
 ): DebriefFeature {
-  return {
+  // Build via variable with type annotation to avoid object-literal assertion (ADR-011)
+  const feature: { type: 'Feature'; id: string; geometry: { type: string; coordinates: number[][] }; properties: Record<string, unknown> } = {
     type: 'Feature',
     id: featureId,
     geometry: {
@@ -144,7 +145,9 @@ function buildMultiPointFeature(
       },
       pointMetadata: metadata,
     },
-  } as unknown as DebriefFeature;
+  };
+  // eslint-disable-next-line no-restricted-syntax
+  return feature as unknown as DebriefFeature;
 }
 
 /**
