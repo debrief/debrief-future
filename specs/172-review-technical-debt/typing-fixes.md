@@ -1,8 +1,10 @@
-# Typing Fix List: Approach C — LinkML-Derived Types at Every Boundary
+# Typing Fix List: Approach C — LinkML-Derived Types from Cradle to Grave
 
 **Feature:** 172-review-technical-debt
 **Date:** 2026-03-24
-**Approach:** All domain data typed via LinkML-generated Pydantic (Python) and TypeScript interfaces. Hand-written duplicates replaced with imports from `@debrief/schemas` / `debrief_schemas`.
+**Approach:** All domain data strongly typed via LinkML-generated Pydantic (Python) and TypeScript interfaces throughout its entire lifecycle — not just at service boundaries. Every function that creates, transforms, reads from, or writes to a domain object must use the generated type. `dict[str, Any]`, `Record<string, unknown>`, and `as` casts on domain data are defects, not conveniences.
+
+**Motivation:** We have experienced multiple serious defects from reading or writing invalid object properties. These bugs survive because data spends most of its life as untyped dicts or `unknown` records. The compiler and Pydantic can only catch what they can see — if domain data is typed as `dict[str, Any]`, a misspelled property name, a missing field, or a wrong type is invisible until it causes a runtime failure downstream.
 
 ---
 
@@ -164,67 +166,129 @@ These data shapes are used in the codebase and cross service/serialization bound
 
 ---
 
-## Part E: Untyped / Weakly-Typed Boundaries (Runtime Validation Needed)
+## Part E: Untyped Domain Data Throughout Lifecycle
 
-### E1. Python MCP `call_tool()` — arguments are untyped `dict`
-- **File:** `services/calc/debrief_calc/mcp/server.py:99`
-- **Current:** `async def call_tool(name: str, arguments: dict) -> list[TextContent]`
-- **Issue:** `arguments` is an untyped dict. The `features` key contains GeoJSON features as raw dicts.
-- **Action:** Parse `arguments["features"]` through `FEATURE_MODEL_MAP` validation (from `debrief_schemas.validation`) before passing to the executor. This already happens inside the executor (`_schema_validate_features`) but as warn-and-continue — promote to fail-fast at the MCP boundary.
+The problem is not just at boundaries. Domain data spends most of its life as `dict[str, Any]`, `Record<string, unknown>`, or `unknown` — meaning the compiler and Pydantic are blind to misspelled property names, missing fields, and wrong types. The bugs we've experienced come from *internal logic* reading or writing invalid properties, not just from malformed data crossing a wire.
 
-### E2. Python tool functions return `list[dict[str, Any]]`
-- **Files:** All 7 tool modules in `services/calc/debrief_calc/tools/`
-- **Current:** Every tool handler returns `list[dict[str, Any]]`
-- **Issue:** The executor does schema validation post-hoc (`_schema_validate_features` at line 125) but it's warn-and-continue
-- **Action:** Change tool return type annotations to `list[TrackFeature | MultiPointFeature | ...]` or use a `DebriefFeature` union. Have the executor validate via Pydantic before returning. Gradual migration: start with the executor boundary, then tighten individual tools.
-
-### E3. TypeScript `JSON.parse() as` casts — no runtime validation
-- **Files:**
-  - `calcService.ts:601` — `JSON.parse(stdout.trim()) as MCPToolDefinition[]`
-  - `calcService.ts:650` — `JSON.parse(stdout.trim()) as Tool[]`
-  - `calcService.ts:733,799` — `JSON.parse(stdout.trim()) as MCPToolResponse | MCPErrorResponse`
-  - `calcService.ts:755,857` — `JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number]`
-  - `stacService.ts:656` — `JSON.parse(content) as StacCatalog`
-  - `stacService.ts:680` — `JSON.parse(content) as StacItem`
-  - `stacService.ts:700` — `JSON.parse(content) as SafeFeatureCollection`
-  - `configService.ts:240` — `JSON.parse(content) as DebriefConfig`
-- **Issue:** `as` is a compile-time assertion with zero runtime checking. Malformed JSON silently becomes a typed object.
-- **Action:** Create a thin validation layer. For feature data: `JSON.parse` → `SafeFeature` → validate with type guards from `@debrief/schemas/unions.ts` → `DebriefFeature`. For MCP responses: add a Zod schema or manual shape check for `MCPToolResponse`.
-
-### E4. Python `result_builder.py` — accepts `list[dict]`
-- **File:** `services/calc/debrief_calc/result_builder.py:17-22`
-- **Current:** `def build_mutation(features: list[dict], ...)` — features are untyped dicts
-- **Action:** Change to `list[dict[str, Any]]` minimum, or better: accept Pydantic models and call `.model_dump()` internally.
-
-### E5. Python `debrief_io/types.py` — `Feature = dict[str, Any]`
+### E1. Root Cause: `Feature = dict[str, Any]` type alias
 - **File:** `services/io/src/debrief_io/types.py:21`
-- **Comment says:** "Runtime: validated against debrief-schemas Pydantic models at the parser output boundary (warn-and-continue)"
-- **Action:** Change the type alias to a `TypeAlias` of the Pydantic `DebriefFeature` union (once one exists). The actual parsers can still return dicts internally but the public API should declare the validated type.
+- **Impact:** This alias is the canonical return type for all parsed features. Every downstream consumer (calc tools, STAC storage, provenance) inherits the weakness.
+- **Action:** Replace with a `DebriefFeature` union type from `debrief_schemas`. Parsers can build dicts internally but must validate and return Pydantic models at their public API.
 
-### E6. STAC service MCP server — returns `dict[str, Any]`
-- **File:** `services/stac/src/debrief_stac/mcp_server.py`
-- **Issue:** STAC operations return raw dicts for catalog/item/collection data
-- **Action:** For feature collections read from STAC assets, validate through `FEATURE_MODEL_MAP` before returning. For STAC metadata (items, catalogs), keep as dicts (these follow the STAC spec, not Debrief schema).
+### E2. All 14 calc tool functions return `list[dict[str, Any]]`
+Every tool handler in `services/calc/debrief_calc/tools/` returns untyped dicts:
+- `area_summary.py`, `range_bearing.py`, `track_stats.py`
+- `track/styling/symbol_interval.py`, `label_interval.py`, `apply_symbol_style.py`, `set_track_color.py`
+- `track/manipulation/generate_courses_speeds.py`
+- `shape/manipulation/move_shape.py`, `enlarge_shape.py`
+- `reference/generation.py` (4 entry points), `reference/classification.py`
+- `sensor/detection/buffer_zone_generator.py`
 
-### E7. `featureProps.ts` double-cast escape hatch
+**Impact:** A tool can return `{"properties": {"knid": "TRACK"}}` (note typo) and no checker catches it until a downstream consumer reads the wrong key at runtime.
+**Action:** Each tool returns typed Pydantic models. The `@tool` decorator or executor validates the return.
+
+### E3. 30+ untyped `feature.get("properties", {}).get(...)` access patterns
+Internal logic throughout the calc service reads feature data via dict access instead of typed attribute access:
+- `validation.py:58,119,189` — `feature.get("properties")`
+- `provenance.py:160` — `feature.get("properties", {})`
+- `executor.py:249` — same pattern
+- `tools/reference/classification.py:79,101,104` — `props.get("pointMetadata", [])`, `zone_feature.get("properties", {}).get("zones", [])`
+- `tools/track/styling/symbol_interval.py:42-43`, `label_interval.py:42`, `apply_symbol_style.py:72`, `set_track_color.py:44`
+- `tools/track/manipulation/generate_courses_speeds.py:72`
+- `tools/shape/manipulation/move_shape.py:128`, `enlarge_shape.py:146`
+- `tools/track_stats.py:179`
+- `tools/sensor/detection/buffer_zone_generator.py:192`
+- `tools/range_bearing.py:54,108`
+
+**Impact:** Every `.get()` returns `Any`. A misspelled key returns `None` silently. No IDE autocomplete, no type checker help.
+**Action:** Once tools receive and return Pydantic models, these become `feature.properties.platform_name` — typed, autocompleted, and checked.
+
+### E4. `result_builder.py` accepts and returns bare dicts
+- **File:** `services/calc/debrief_calc/result_builder.py`
+- `build_mutation(features: list[dict], ...)` — lines 18, 22
+- `build_addition(features: list[dict], ...)` — lines 50, 54
+- `build_artifact(...)` returns `dict` — lines 86, 114
+- `build_response(...)` returns `list[dict]` — lines 156, 171
+- **Action:** Accept Pydantic models, call `.model_dump()` for JSON serialization internally.
+
+### E5. `featureProps.ts` — deliberate escape hatch used everywhere
 - **File:** `apps/vscode/src/utils/featureProps.ts:21`
-- **Pattern:** `(feature as unknown as Record<string, unknown>)` — bypasses type safety to access nested properties
-- **Used by:** 4+ files for accessing `feature.properties.X`
-- **Action:** Replace with proper type narrowing. After validation, the feature should be typed as `TrackFeature` etc., making `.properties.platform_name` directly accessible without casts.
+- `propsRecord = (f: DebriefFeature) => f.properties as unknown as Record<string, unknown>`
+- Used by `stacService.ts`, `mapPanel.ts`, and indirectly by all tools
+- **Impact:** This exists *because* feature properties are typed as a union — accessing `.platform_name` requires narrowing to `TrackFeature` first, which nobody does. So instead they cast to `Record<string, unknown>` and lose all type safety.
+- **Action:** Eliminate. Callers must narrow via `isTrackFeature(f)` / `isReferenceLocation(f)` type guards before accessing properties. The type guards already exist in `@debrief/schemas/unions.ts`.
 
-### E8. VS Code webview message passing
-- **Files:** `apps/vscode/src/webview/messages.ts`
-- **Pattern:** Messages carry `SafeFeatureCollection` payloads with `unknown` coordinates
-- **Action:** The webview boundary is internal to the extension process (no serialization across processes). Lower priority. But the message types should reference `DebriefFeature[]` rather than `SafeFeature[]` once the extension host validates features on load.
+### E6. TypeScript tools mutate properties without type narrowing
+Throughout `apps/vscode/src/tools/` and `apps/web-shell/src/tools/`:
+- **Track styling:** `applySymbolStyle.ts:60-121` — `delete feature.properties.style...` without narrowing
+- **Track styling:** `labelInterval.ts:50-105` — mutates `feature.properties.default_position_style`
+- **Track styling:** `setTrackColor.ts:43-73` — accesses `feature.properties.style` and `feature.properties.platform_id`
+- **Track styling:** `symbolInterval.ts` — same pattern
+- **Reference tools:** `generateReferencePoints.ts:134-135` — `feature.properties.name as string`
+- **Reference tools:** `pointInZoneClassifier.ts:96` — `const props = feature.properties` (implicitly untyped)
+- **Sensor tools:** `bufferZoneGenerator.ts:246` — `feature.properties.kind === 'TRACK'` without narrowing
+- **Shape tools:** `moveShape.ts:118,188` — `const props = feature.properties ?? {}`
 
-### E9. Layout persistence — JSON.parse without validation
-- **File:** `apps/vscode/src/services/layoutPersistence.ts:132` (approx)
-- **Issue:** Reads persisted layout JSON without validation
-- **Action:** Add Zod or manual validation for the small layout schema. Not a schema-derived type issue (layout is infrastructure).
+**Impact:** A renamed or restructured property in the schema won't produce a compile error here.
+**Action:** Every tool function signature declares the specific feature type it accepts (`TrackFeature`, `ReferenceLocation`, etc.). The compiler then checks all property access.
+
+### E7. TypeScript `JSON.parse() as` casts — zero runtime checking
+- `calcService.ts:601` — `JSON.parse(stdout) as MCPToolDefinition[]`
+- `calcService.ts:650` — `JSON.parse(stdout) as Tool[]`
+- `calcService.ts:733,799` — `JSON.parse(stdout) as MCPToolResponse | MCPErrorResponse`
+- `calcService.ts:755,857` — `JSON.parse(item.resource.text) as SafeFeature`
+- `stacService.ts:656` — `JSON.parse(content) as StacCatalog`
+- `stacService.ts:680` — `JSON.parse(content) as StacItem`
+- `stacService.ts:700` — `JSON.parse(content) as SafeFeatureCollection`
+- `configService.ts:240` — `JSON.parse(content) as DebriefConfig`
+
+**Impact:** `as` is a compile-time lie. Malformed data silently becomes a typed object.
+**Action:** `JSON.parse` → validate with type guard or Zod → typed result. For features: use `isTrackFeature()` etc. from `@debrief/schemas`.
+
+### E8. TypeScript `unknown` → domain data casts in internal logic
+These are not boundary crossings — they are internal logic using casts instead of types:
+- `mapPanel.ts:286` — `f as unknown as DebriefFeature`
+- `mapPanel.ts:833` — `allFeatures.push(f as unknown as DebriefFeature)`
+- `mapPanel.ts:986` — `drawnFeatureObj as unknown as DebriefFeature`
+- `mapPanel.ts:1021` — `geometry: feature.geometry as { type: string; coordinates: unknown }`
+- `stacService.ts:1215` — `(feature as unknown as Record<string, unknown>).properties = {}`
+- `logService.ts:293,303` — `fc as unknown as GeoJsonFeatureCollection`
+- `logService.ts:330` — `fid(f as unknown as Record<string, unknown>)`
+- `entryBuilder.ts:110` — `params as unknown as Record<string, ParameterValue>`
+- `web/mapView.tsx:255` — `feature.properties as Record<string, unknown>`
+
+**Impact:** Each cast is a place where the actual data shape may not match the asserted type. These are the locations where our property-access bugs originate.
+**Action:** Trace data flow back to its origin. If data is properly typed from creation, these casts become unnecessary. The few remaining deserialization points should use validation, not casts.
+
+### E9. STAC features module — unvalidated read from disk
+- **File:** `services/stac/src/debrief_stac/features.py:71`
+- `fc: GeoJSONFeatureCollection = json.load(f)` — raw JSON into a type alias for `dict[str, Any]`
+- `_calculate_bbox(fc["features"])` — unvalidated list access
+- Validation exists on write (`_validate_feature()` at line 57-58) but not on read
+- **Impact:** Corrupted or hand-edited JSON files are loaded as valid data.
+- **Action:** Validate on read through `FEATURE_MODEL_MAP`. Fail-fast on invalid features.
+
+### E10. MCP server functions return `dict[str, Any]` (both calc and STAC)
+- `services/calc/debrief_calc/mcp/server.py:99` — `call_tool(name: str, arguments: dict)`
+- `services/stac/src/debrief_stac/mcp_server.py` — 16+ handler functions all return `dict[str, Any]`
+- `services/calc/debrief_calc/cli.py:64` — `params: dict = request.get("params", {})`
+- `services/io/src/debrief_io/cli.py:28,66` — all CLI handlers
+- **Action:** MCP handlers should receive validated Pydantic models and return typed responses.
+
+### E11. Python session-state client returns bare dicts
+- `services/session-state-py/src/debrief_session/client.py:51,126` — `_call_tool()` returns bare `dict`
+- Lines 137, 158 — input data created as dict with untyped key-value pairs
+- **Action:** Return typed Pydantic session-state models.
+
+### E12. VS Code webview message payloads
+- `apps/vscode/src/webview/messages.ts` — messages carry `SafeFeatureCollection` with `unknown` coordinates
+- `messages.ts:239` — `coordinates: unknown`
+- `messages.ts:383` — `trackData: unknown` (actually a GeoJSON FeatureCollection)
+- **Action:** Once the extension host validates features on load, message types should use `DebriefFeature[]` not `SafeFeature[]`.
 
 ---
 
-## Part F: snake_case / camelCase Boundary Friction
+## Part F: snake_case / camelCase Convention
 
 ### F1. STAC service property key conversion
 - **File:** `apps/vscode/src/services/stacService.ts:127-145` (approx)
@@ -252,32 +316,42 @@ These data shapes are used in the codebase and cross service/serialization bound
 10. **Delete** `toolService.ts` LogEntry → import from `@debrief/schemas` (C4)
 11. **Delete** Python calc `models.py` provenance duplicates → import from `debrief_schemas` (D1, D2)
 
-### Phase 3: Tighten boundaries (runtime validation changes)
-12. **Promote** executor schema validation from warn-and-continue to fail-fast (E1, E2)
-13. **Add** TS validation layer between `JSON.parse` and typed consumption (E3)
-14. **Tighten** `result_builder.py` signatures (E4)
-15. **Replace** `Feature = dict[str, Any]` alias (E5)
-16. **Eliminate** `featureProps.ts` double-cast (E7)
+### Phase 3: Strongly type internal logic (the big win)
+12. **Kill** `Feature = dict[str, Any]` — replace with `DebriefFeature` union (E1)
+13. **Retype** all 14 calc tool functions to return Pydantic models (E2)
+14. **Retype** all tool function parameters to accept specific feature types (E2, E3)
+15. **Retype** `result_builder.py` to accept Pydantic models (E4)
+16. **Retype** TS tool functions to declare specific feature types, not `DebriefFeature` (E6)
+17. **Eliminate** `featureProps.ts` escape hatch — require type narrowing via `isTrackFeature()` etc. (E5)
+18. **Eliminate** `as unknown as` casts on domain data throughout TS (E8)
+19. **Retype** STAC features module to validate on read, not just write (E9)
 
-### Phase 4: Migration (larger changes)
-17. **Migrate** `services/session-state/src/types/` to generated types (B1 consumer)
-18. **Migrate** `services/session-state-py/` to generated types (D3)
-19. **Migrate** `ChartRenderer/types.ts` to generated `DatasetEnvelope` (A5 consumer)
-20. **Replace** hand-written `StacItemSummary` / `CatalogOverviewItem` with generated types (A2a, A3 consumers)
+### Phase 4: Validate at entry points
+20. **Add** TS validation after `JSON.parse` — type guards or Zod before domain data enters the type system (E7)
+21. **Promote** executor schema validation from warn-and-continue to fail-fast (E10)
+22. **Retype** MCP/CLI handler signatures to use Pydantic request/response models (E10)
+23. **Retype** session-state client to return Pydantic models (E11)
+24. **Retype** webview message payloads to use `DebriefFeature[]` (E12)
+
+### Phase 5: Remaining migrations
+25. **Migrate** `services/session-state/src/types/` to generated types (B1 consumer)
+26. **Migrate** `services/session-state-py/` to generated types (D3)
+27. **Migrate** `ChartRenderer/types.ts` to generated `DatasetEnvelope` (A5 consumer)
+28. **Replace** hand-written `StacItemSummary` / `CatalogOverviewItem` with generated types (A2a, A3 consumers)
 
 ---
 
 ## Summary Statistics
 
-| Category | Count | Risk |
-|----------|-------|------|
-| A. Missing from LinkML (need adding) | 5 (1 excluded: STAC base types) | High — blocks everything downstream |
-| B. In LinkML, not generated to TS | 4 | High — blocks Phase 2 |
-| C. TS duplicates of generated types | 4 groups | Medium — straightforward delete-and-import |
-| D. Python duplicates of generated types | 3 groups | Medium — straightforward delete-and-import |
-| E. Untyped/weakly-typed boundaries | 9 | High — runtime validation gaps |
-| F. Case convention friction | 1 | Low — standardise on snake_case |
+| Category | Count | Locations | Risk |
+|----------|-------|-----------|------|
+| A. Missing from LinkML (need adding) | 5 (1 excluded: STAC base types) | 6 files | High — blocks everything downstream |
+| B. In LinkML, not generated to TS | 4 | generator config | High — blocks Phase 2 |
+| C. TS duplicates of generated types | 4 groups | ~10 files | Medium — straightforward delete-and-import |
+| D. Python duplicates of generated types | 3 groups | ~5 files | Medium — straightforward delete-and-import |
+| E. Untyped domain data throughout lifecycle | 12 categories | **~150 locations** | **Critical — source of property-access bugs** |
+| F. Case convention friction | 1 | ~3 files | Low — standardise on snake_case |
 
-**Total distinct fixes:** 30+
-**Estimated items that change runtime behaviour:** 9 (all in Part E)
-**Estimated items that are compile-time only:** 21+ (Parts A, B, C, D)
+**Total distinct fixes:** ~150+ locations across 28 work items
+**Part E alone:** ~100 locations in Python (tool functions, executor, provenance, STAC, CLI) + ~50 locations in TypeScript (services, tools, webview, map panel)
+**Root cause:** `dict[str, Any]` / `Record<string, unknown>` used for domain data, making the type system blind to invalid property access
