@@ -19,37 +19,47 @@
 
 ---
 
-## Part A: Types That Don't Exist in LinkML (Need New Schema or Intentional Exclusion)
+## Part A: Types That Don't Exist in LinkML (Need Adding)
 
-These data shapes are used in the codebase but have no LinkML definition. For each, decide whether to add to LinkML or formally mark as "infrastructure-only".
+These data shapes are used in the codebase and cross service/serialization boundaries, but have no LinkML definition. Under Approach C, if data crosses a boundary it needs a schema. The only exception is types that follow an external specification (STAC base types).
 
-### A1. `Plot` / STAC Item metadata wrapper
+### A1. `Plot` / STAC Item metadata wrapper — **Add to LinkML**
 - **Used in:** `apps/vscode/src/types/plot.ts:19-49`
 - **Shape:** `{ id, title, datetime, itemPath, catalogId, sourcePath, bbox, timeExtent, trackCount, locationCount }`
-- **Assessment:** This is a STAC Item projection for UI display. It is **not domain data** — it's metadata about a STAC Item. The STAC spec itself defines Item structure. **Exclude from LinkML.** Keep as hand-written TS type.
-- **Action:** None. Leave as-is but move to a shared location if used by more than one app.
+- **Crosses:** stacService → VS Code UI, stacService → webview, persisted to workspace state
+- **Assessment:** This is our projection of a STAC Item — our fields, our shape, our boundary. It should be schema-defined.
+- **Action:** Add `PlotSummary` (or similar) to LinkML. Generate into both Python and TypeScript. Replace hand-written type.
 
-### A2. `StacItemSummary` / `StacCollection` / `StacCatalog` / STAC infrastructure types
+### A2. STAC base types (`StacCatalog`, `StacCollection`, `StacItem`) — **Exclude from LinkML**
 - **Used in:** `apps/vscode/src/types/stac.ts:1-261`
-- **Assessment:** These are STAC specification types, not Debrief domain types. **Exclude from LinkML.** Consider using `@stac-ts/core` or a shared hand-written STAC types module.
-- **Action:** None. These are legitimately hand-written.
+- **Assessment:** These follow the external STAC specification. Defining them in LinkML would create a maintenance burden tracking upstream spec changes. Use `@stac-ts/core` or a shared hand-written STAC types module.
+- **Action:** Keep as hand-written. Consider adopting a published STAC type package.
 
-### A3. `CatalogOverviewItem` / `StacBrowserItem`
+### A2a. `StacItemSummary` / Debrief-specific STAC projections — **Add to LinkML**
+- **Used in:** `apps/vscode/src/types/stac.ts:56-98`
+- **Shape:** Includes `vessel_classes`, `tags`, `featureTags`, `nationalities`, `trackNames` — fields from our `StacExtensionProperties` schema, plus UI metadata (`id`, `title`, `datetime`, `featureCount`).
+- **Crosses:** stacService → tree view, stacService → filter engine, stacService → exercise list
+- **Assessment:** This is our domain vocabulary projected for UI consumption. The embedded fields already exist in LinkML (`stac-extension.yaml`), but the wrapping structure doesn't. It should.
+- **Action:** Add `StacItemSummary` to LinkML (possibly alongside A1's `PlotSummary` in a new `stac-views.yaml` module). Generate and replace hand-written versions.
+
+### A3. `CatalogOverviewItem` / `StacBrowserItem` — **Add to LinkML**
 - **Used in:** `shared/components/src/filter-engine/types.ts:15-93`
-- **Shape:** Includes `vessel_classes`, `tags`, `nationalities`, `trackNames` — metadata from the `StacExtensionProperties` schema type.
-- **Assessment:** These are UI projections of STAC extension metadata. The extension properties themselves are in LinkML (`stac-extension.yaml`). The wrapping structures are UI infrastructure.
-- **Action:** None (intentional UI types), but ensure the embedded fields (vessel_classes etc.) reference the generated `StacExtensionProperties` field types rather than redefining them.
+- **Shape:** Includes `vessel_classes`, `tags`, `nationalities`, `trackNames` — metadata from `StacExtensionProperties`.
+- **Crosses:** filter-engine boundary (used by FilterBar, ExerciseListView, STAC browser)
+- **Assessment:** These carry domain metadata across component boundaries. They should derive from the same schema as `StacExtensionProperties`.
+- **Action:** Add to LinkML. These may unify with A2a (`StacItemSummary`) — investigate whether one schema type can serve both.
 
-### A4. `ResultsSlice` / `BrowserFilterSlice`
+### A4. `ResultsSlice` / `BrowserFilterSlice` — **Add to LinkML**
 - **Used in:** `services/session-state/src/types/results.ts`, `browser-filter.ts`
-- **Assessment:** These are Zustand store slices added after the LinkML session-state schema was written. They represent tool result layer state and STAC browser filter state — UI concerns, not domain data.
-- **Action:** If these stabilise, add to `session-state.yaml`. For now, leave as hand-written.
+- **Assessment:** The other session-state slices (temporal, spatial, features, document) are already in `session-state.yaml`. These two were added later and just never got schema definitions. There's no principled reason for the gap — it's an oversight.
+- **Action:** Add to `session-state.yaml`. Generate alongside the other slices.
 
-### A5. `DatasetEnvelope` (ChartRenderer)
+### A5. `DatasetEnvelope` (ChartRenderer) — **Reconcile with LinkML**
 - **Used in:** `shared/components/src/ChartRenderer/types.ts:31-42`
 - **Nearest schema type:** `DatasetEntry` in `tool-result.yaml`
 - **Divergence:** Schema `DatasetEntry.series[].data` is `float[]`, while TS `DatasetEnvelope.data` is `Record<string, unknown>[]` and `series[].data` is `Record<string, unknown>[]`. These are **structurally different**.
-- **Action:** Reconcile `DatasetEntry` schema with actual runtime shape. The schema appears to predate the implementation. Update LinkML `tool-result.yaml` to match the actual data shape, then generate and import.
+- **Assessment:** The schema predates the implementation and has drifted. The implementation is the truth — update the schema to match.
+- **Action:** Update `DatasetEntry` in `tool-result.yaml` to match the actual runtime shape. Rename to `DatasetEnvelope` for consistency. Generate and replace hand-written version.
 
 ---
 
@@ -225,29 +235,35 @@ These data shapes are used in the codebase but have no LinkML definition. For ea
 
 ## Execution Order (Recommended)
 
-### Phase 1: Foundation (no runtime changes)
-1. **Extend TS generator** to emit session-state and tool-result types (B1, B2)
-2. **Reconcile** `DatasetEntry` schema vs `DatasetEnvelope` implementation (A5)
-3. **Verify** provenance types are generated in TS (B4)
+### Phase 0: Schema completeness (LinkML additions)
+1. **Add** `PlotSummary` to LinkML (A1)
+2. **Add** `StacItemSummary` and related Debrief-specific STAC projections (A2a, A3)
+3. **Add** `ResultsSlice` / `BrowserFilterSlice` to `session-state.yaml` (A4)
+4. **Reconcile** `DatasetEntry` schema with `DatasetEnvelope` implementation (A5)
+
+### Phase 1: Generator (no runtime changes)
+5. **Extend TS generator** to emit session-state, tool-result, and new A-types (B1, B2)
+6. **Verify** provenance types are generated in TS (B4)
 
 ### Phase 2: Delete duplicates (low risk, compile-time only)
-4. **Delete** `plot.ts` feature types → import from `@debrief/schemas` (C1)
-5. **Delete** `utils/types.ts` duplicates → import from `@debrief/schemas` (C2)
-6. **Delete** `LogPanel/types.ts` duplicates → import from `@debrief/schemas` (C3)
-7. **Delete** `toolService.ts` LogEntry → import from `@debrief/schemas` (C4)
-8. **Delete** Python calc `models.py` provenance duplicates → import from `debrief_schemas` (D1, D2)
+7. **Delete** `plot.ts` feature types → import from `@debrief/schemas` (C1)
+8. **Delete** `utils/types.ts` duplicates → import from `@debrief/schemas` (C2)
+9. **Delete** `LogPanel/types.ts` duplicates → import from `@debrief/schemas` (C3)
+10. **Delete** `toolService.ts` LogEntry → import from `@debrief/schemas` (C4)
+11. **Delete** Python calc `models.py` provenance duplicates → import from `debrief_schemas` (D1, D2)
 
 ### Phase 3: Tighten boundaries (runtime validation changes)
-9. **Promote** executor schema validation from warn-and-continue to fail-fast (E1, E2)
-10. **Add** TS validation layer between `JSON.parse` and typed consumption (E3)
-11. **Tighten** `result_builder.py` signatures (E4)
-12. **Replace** `Feature = dict[str, Any]` alias (E5)
-13. **Eliminate** `featureProps.ts` double-cast (E7)
+12. **Promote** executor schema validation from warn-and-continue to fail-fast (E1, E2)
+13. **Add** TS validation layer between `JSON.parse` and typed consumption (E3)
+14. **Tighten** `result_builder.py` signatures (E4)
+15. **Replace** `Feature = dict[str, Any]` alias (E5)
+16. **Eliminate** `featureProps.ts` double-cast (E7)
 
 ### Phase 4: Migration (larger changes)
-14. **Migrate** `services/session-state/src/types/` to generated types (B1 consumer)
-15. **Migrate** `services/session-state-py/` to generated types (D3)
-16. **Migrate** `ChartRenderer/types.ts` to generated `DatasetEntry` (A5 consumer)
+17. **Migrate** `services/session-state/src/types/` to generated types (B1 consumer)
+18. **Migrate** `services/session-state-py/` to generated types (D3)
+19. **Migrate** `ChartRenderer/types.ts` to generated `DatasetEnvelope` (A5 consumer)
+20. **Replace** hand-written `StacItemSummary` / `CatalogOverviewItem` with generated types (A2a, A3 consumers)
 
 ---
 
@@ -255,7 +271,7 @@ These data shapes are used in the codebase but have no LinkML definition. For ea
 
 | Category | Count | Risk |
 |----------|-------|------|
-| A. Missing from LinkML (intentional) | 5 | Low — keep as infrastructure types |
+| A. Missing from LinkML (need adding) | 5 (1 excluded: STAC base types) | High — blocks everything downstream |
 | B. In LinkML, not generated to TS | 4 | High — blocks Phase 2 |
 | C. TS duplicates of generated types | 4 groups | Medium — straightforward delete-and-import |
 | D. Python duplicates of generated types | 3 groups | Medium — straightforward delete-and-import |
@@ -264,4 +280,4 @@ These data shapes are used in the codebase but have no LinkML definition. For ea
 
 **Total distinct fixes:** 30+
 **Estimated items that change runtime behaviour:** 9 (all in Part E)
-**Estimated items that are compile-time only:** 21+ (Parts B, C, D)
+**Estimated items that are compile-time only:** 21+ (Parts A, B, C, D)
