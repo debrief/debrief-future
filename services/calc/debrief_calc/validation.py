@@ -5,7 +5,6 @@ Provides functions to validate GeoJSON structures and tool outputs
 against the Debrief schema requirements.
 """
 
-from typing import Any
 
 from debrief_calc.exceptions import ValidationError
 from debrief_calc.models import GeoJSONFeatureDict

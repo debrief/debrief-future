@@ -1214,7 +1214,7 @@ export class StacService {
         feature.properties = {};
       }
 
-      const props = feature.properties!;
+      const props = feature.properties;
       // Normalise provenance to array (FR-006: handle legacy single-object format)
       let existing = props['provenance'];
       if (existing === undefined || existing === null) {

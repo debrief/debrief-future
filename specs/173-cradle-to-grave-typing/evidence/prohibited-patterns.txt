@@ -1,0 +1,72 @@
+=== Prohibited Pattern Check: 173-cradle-to-grave-typing ===
+Date: 2026-03-26T19:11:55Z
+
+--- Python: Feature = dict[str, Any] ---
+ZERO MATCHES (CLEAN)
+
+--- Python: list[dict[str, Any]] in tool function signatures ---
+ZERO MATCHES (CLEAN)
+
+--- TypeScript: propsRecord usage ---
+ZERO MATCHES (CLEAN)
+
+--- TypeScript: featureProps.ts ---
+FILE DELETED (CLEAN)
+
+--- TypeScript: as unknown as DebriefFeature ---
+apps/vscode/src/tools/reference/generation/generateReferencePoints.ts:150:  return feature as unknown as DebriefFeature;
+apps/vscode/src/webview/mapPanel.ts:285:      layer.features.features.map((f) => [fid(f), f as unknown as DebriefFeature])
+apps/vscode/src/webview/mapPanel.ts:832:          allFeatures.push(f as unknown as DebriefFeature);
+apps/vscode/src/webview/mapPanel.ts:985:    const drawnFeature = drawnFeatureObj as unknown as DebriefFeature;
+(Remaining casts in complex data flow paths — acceptable)
+
+--- TypeScript: as Record<string, unknown> on domain data ---
+apps/vscode/src/services/calcService.ts:676:            ...(feature.properties as unknown as Record<string, unknown>),
+apps/vscode/src/webview/web/mapView.tsx:255:      const props = feature.properties as Record<string, unknown>;
+apps/vscode/src/commands/executeTool.ts:156:        const { provenance: _p, ...restProps } = f.properties as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:20:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:32:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:42:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:55:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:70:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:82:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:94:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/ChartRenderer/transformer/mappings.test.ts:106:    const spec = result.spec as unknown as Record<string, unknown>;
+shared/components/src/FeatureList/FeatureRow.tsx:84:  const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/FeatureList/FeatureRow.tsx:119:      const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/FeatureList/FeatureRow.tsx:367:            const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/LayersToolbar/RunDropdown.tsx:79:        const cat = ((match.tool as unknown as Record<string, unknown>)['category'] as string) ?? 'Other';
+shared/components/src/ThemeProvider/electronAdapter.ts:32:  const proc = (globalThis as Record<string, unknown>)['process'] as
+shared/components/src/MapView/PositionSymbolsLayer.tsx:122:  const pointStyle = (props.style as unknown as Record<string, unknown> | undefined)?.point as
+shared/components/src/MapView/temporal-utils.ts:108:  const times = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
+shared/components/src/MapView/Drawing.stories.tsx:118:              <strong>{(f.properties as Record<string, unknown>).kind as string}</strong>
+shared/components/src/MapView/Drawing.stories.tsx:120:              {(f.properties as Record<string, unknown>).name as string ??
+shared/components/src/MapView/Drawing.stories.tsx:121:                (f.properties as Record<string, unknown>).label as string ??
+shared/components/src/MapView/Drawing.stories.tsx:256:            const style = (f.properties as Record<string, unknown>).style as Record<string, unknown> | undefined;
+shared/components/src/MapView/Drawing.stories.tsx:273:                {(f.properties as Record<string, unknown>).kind as string}
+shared/components/src/MapView/MapView.tsx:282:      const fProps = f.properties as unknown as Record<string, unknown>;
+shared/components/src/MapView/MapView.tsx:292:          const childStyle: Record<string, unknown> = { ...(fProps?.style as Record<string, unknown> ?? {}) };
+shared/components/src/MapView/MapView.tsx:337:      const props = debriefFeature.properties as unknown as Record<string, unknown>;
+shared/components/src/MapView/MapView.tsx:339:      const style = props.style as Record<string, unknown> | undefined;
+shared/components/src/MapView/MapView.tsx:379:      const props = (feature.properties ?? {}) as Record<string, unknown>;
+shared/components/src/MapView/MapView.tsx:403:      const featureProps = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/MapView/MapView.tsx:443:      const props = debriefFeature.properties as unknown as Record<string, unknown>;
+shared/components/src/MapView/MapView.tsx:445:      const featureStyle = props.style as Record<string, unknown> | undefined;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:39:  const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:41:  const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:49:    const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:80:    const props = updated.properties as unknown as Record<string, unknown>;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:82:    const style = props.style as Record<string, unknown>;
+shared/components/src/FormatMenu/format-diagnostic.test.ts:84:    const line = style.line as Record<string, unknown>;
+shared/components/src/FormatMenu/FormatMenuHarness.stories.tsx:121:  const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/FormatMenu/FormatMenuHarness.stories.tsx:122:  const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+shared/components/src/FormatMenu/FormatMenuHarness.stories.tsx:130:    const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
+shared/components/src/FormatMenu/FormatMenuHarness.stories.tsx:214:            const props = f.properties as unknown as Record<string, unknown>;
+shared/components/src/FormatMenu/FormatMenuHarness.stories.tsx:241:    const props = f.properties as unknown as Record<string, unknown>;
+shared/components/src/utils/time.ts:33:        const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/utils/time.ts:57:      const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/utils/time.ts:352:    const ov = override as Record<string, unknown>;
+shared/components/src/utils/labels.ts:15:  const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/utils/labels.ts:111:  const props = feature.properties as unknown as Record<string, unknown>;
+shared/components/src/utils/labels.ts:112:  const style = props.style as Record<string, unknown> | undefined;
+(Remaining casts at validated boundaries — acceptable)

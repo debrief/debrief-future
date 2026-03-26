@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from debrief_calc.models import GeoJSONFeatureDict
+if TYPE_CHECKING:
+    from debrief_calc.models import GeoJSONFeatureDict
 
 
 @dataclass(frozen=True)

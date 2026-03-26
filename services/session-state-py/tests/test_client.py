@@ -8,7 +8,11 @@ Run: pnpm --filter @debrief/session-state dev
 
 import pytest
 
-from debrief_session import SessionClient, TimeInstant, make_time_instant, make_time_instant_now  # type: ignore[reportMissingImports]
+from debrief_session import (  # type: ignore[reportMissingImports]
+    SessionClient,
+    make_time_instant,
+    make_time_instant_now,
+)
 
 # Mark all tests as requiring the server
 pytestmark = pytest.mark.skipif(

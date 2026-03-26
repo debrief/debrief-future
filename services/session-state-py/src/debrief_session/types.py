@@ -26,14 +26,9 @@ from debrief_schemas import (
     ViewportPolygon,
 )
 
-__all_from_schemas__ = [
-    "FeatureSelection",
-    "TemporalSlice",
-    "TimeFilter",
-    "TimeInstant",
-    "TimeRange",
-    "TimeStep",
-    "ViewportPolygon",
+__all__ = [
+    "FeatureSelection", "TemporalSlice", "TimeFilter", "TimeInstant",
+    "TimeRange", "TimeStep", "ViewportPolygon",
 ]
 
 

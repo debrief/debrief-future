@@ -618,7 +618,7 @@ class TestLogEntry:
         fixture = FIXTURES_ROOT / "log-entry" / "valid" / "tool-invocation.json"
         raw = json.loads(fixture.read_text())
 
-        def to_snake(d: Any) -> Any:
+        def to_snake(d: Any) -> Any:  # noqa: ANN401
             if isinstance(d, dict):
                 result = {}
                 for k, v in d.items():
@@ -693,7 +693,7 @@ class TestLogEntry:
             LogEntry.model_validate(data)
 
 
-def _camel_to_snake_dict(d: Any) -> Any:
+def _camel_to_snake_dict(d: Any) -> Any:  # noqa: ANN401
     """Recursively convert camelCase dict keys to snake_case for generated model ingestion."""
     import re as _re
     if isinstance(d, dict):

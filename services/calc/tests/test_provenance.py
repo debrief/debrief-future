@@ -1,5 +1,6 @@
 """Unit tests for debrief-calc provenance module."""
 
+import json as _json_module
 from datetime import UTC, datetime
 
 from debrief_calc.models import InputFeatureState, LogEntry, ParameterValue, Provenance, SourceRef
@@ -308,9 +309,6 @@ class TestSetOutputKind:
         set_output_kind(feature, "addition/feature")
 
         assert feature["properties"]["kind"] == "ZONE"
-
-
-import json as _json_module
 
 
 class TestInputFeatureState:

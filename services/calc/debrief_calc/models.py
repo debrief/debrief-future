@@ -26,14 +26,7 @@ from typing import Any, TypeAlias
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-# Type alias for GeoJSON feature dicts flowing through the tool pipeline.
-# These are raw dicts (not Pydantic models) because tool functions mutate
-# them in place and return them for JSON serialization via MCP.
-GeoJSONFeatureDict: TypeAlias = dict[str, Any]
-
-# Re-export generated provenance and system-record models from debrief_schemas.
-# These are the canonical definitions; hand-written duplicates have been removed.
-from debrief_schemas import (
+from debrief_schemas import (  # noqa: TC001 — re-exported, needed at runtime
     BranchRecord,
     FileProvEntry,
     InputFeatureState,
@@ -46,17 +39,16 @@ from debrief_schemas import (
     WasGeneratedBy,
 )
 
-__all_from_schemas__ = [
-    "BranchRecord",
-    "FileProvEntry",
-    "InputFeatureState",
-    "LogEntry",
-    "ParameterValue",
-    "SnapshotLinks",
-    "SnapshotRef",
-    "SystemRecordProperties",
-    "TuneAnnotation",
-    "WasGeneratedBy",
+# Type alias for GeoJSON feature dicts flowing through the tool pipeline.
+# These are raw dicts (not Pydantic models) because tool functions mutate
+# them in place and return them for JSON serialization via MCP.
+GeoJSONFeatureDict: TypeAlias = dict[str, Any]
+
+# Re-exports from debrief_schemas (canonical definitions)
+__all__ = [
+    "BranchRecord", "FileProvEntry", "InputFeatureState", "LogEntry",
+    "ParameterValue", "SnapshotLinks", "SnapshotRef", "SystemRecordProperties",
+    "TuneAnnotation", "WasGeneratedBy",
 ]
 
 
