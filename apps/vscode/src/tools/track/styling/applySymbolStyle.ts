@@ -63,8 +63,15 @@ export function execute(
       continue;
     }
 
-    // TrackProperties.style is typed as TrackStyle { line: LineProperties; point: PointProperties }
-    const point = feature.properties.style.point;
+    // eslint-disable-next-line no-restricted-syntax -- defensive: features may lack nested style objects
+    const props = feature.properties as unknown as Record<string, unknown>;
+    const style = (props['style'] as { line?: { color?: string }; point?: Record<string, unknown> }) ?? {};
+    const point = style.point ?? {
+      shape: 'square', radius: 4, fill: true,
+      fill_color: '#3388ff', fill_opacity: 0.8,
+      stroke: true, color: '#ffffff', weight: 1, opacity: 1.0,
+    };
+
     point.shape = symbol;
     if (radius !== undefined) {
       point.radius = radius;
@@ -72,14 +79,19 @@ export function execute(
 
     if (fill_color !== undefined) {
       point.fill_color = fill_color;
-    } else if (!point.fill_color && feature.properties.style.line.color) {
-      point.fill_color = feature.properties.style.line.color;
+    } else if (!point.fill_color && style.line?.color) {
+      point.fill_color = style.line.color;
     }
+
+    style.point = point;
+    props['style'] = style;
 
     // Update default_position_style so the PositionSymbolsLayer renderer
     // shows the chosen symbol shape on the map.
-    feature.properties.default_position_style.symbol = symbol;
-    feature.properties.default_position_style.show_symbol = true;
+    const dps = (props['default_position_style'] ?? {}) as Record<string, unknown>;
+    dps['symbol'] = symbol;
+    dps['show_symbol'] = true;
+    props['default_position_style'] = dps;
 
     modified.push(feature);
   }

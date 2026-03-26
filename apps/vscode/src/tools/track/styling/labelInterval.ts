@@ -42,10 +42,14 @@ export function execute(
       continue;
     }
 
-    // Set label display on the default_position_style (schema-typed PositionStyle)
-    feature.properties.default_position_style.show_label = true;
-    // label_interval is a top-level TrackProperties field
-    feature.properties.label_interval = interval;
+    // eslint-disable-next-line no-restricted-syntax -- defensive: features may lack default_position_style
+    const props = feature.properties as unknown as Record<string, unknown>;
+    const dps = (props['default_position_style'] ?? {
+      show_symbol: true, symbol: 'circle', show_label: false,
+    }) as Record<string, unknown>;
+    dps['show_label'] = true;
+    dps['label_interval'] = interval;
+    props['default_position_style'] = dps;
 
     modified.push(feature);
   }

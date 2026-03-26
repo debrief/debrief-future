@@ -45,8 +45,13 @@ export function execute(
       continue;
     }
 
-    // TrackProperties.style is already typed as TrackStyle with line: LineProperties
-    feature.properties.style.line.color = color;
+    // eslint-disable-next-line no-restricted-syntax -- defensive: features may lack nested style objects
+    const props = feature.properties as unknown as Record<string, unknown>;
+    const style = (props['style'] as { line?: Record<string, unknown> }) ?? {};
+    const line = style.line ?? { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 };
+    line.color = color;
+    style.line = line;
+    props['style'] = style;
 
     modified.push(feature);
   }
