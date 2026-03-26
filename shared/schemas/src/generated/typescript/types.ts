@@ -326,6 +326,80 @@ export enum VesselDomainEnum {
     /** Vessel domain not determined or not applicable */
     unknown = "unknown",
 };
+/**
+* Current state of time playback
+*/
+export enum PlaybackStateEnum {
+    
+    /** Playback is stopped */
+    stopped = "stopped",
+    /** Playback is running */
+    playing = "playing",
+    /** Playback is paused */
+    paused = "paused",
+};
+/**
+* Track visualization display mode
+*/
+export enum DisplayModeEnum {
+    
+    /** Standard track display */
+    normal = "normal",
+    /** Trail showing recent positions */
+    snailTrail = "snailTrail",
+};
+/**
+* Units for time step navigation
+*/
+export enum TimeUnitEnum {
+    
+    /** Milliseconds */
+    millisecond = "millisecond",
+    /** Seconds */
+    second = "second",
+    /** Minutes */
+    minute = "minute",
+    /** Hours */
+    hour = "hour",
+    /** Days */
+    day = "day",
+};
+/**
+* How addresses in a selection path level are interpreted (Feature 053)
+*/
+export enum AddressingMode {
+    
+    /** Address is a string identifier */
+    id = "id",
+    /** Address is a numeric position index */
+    index = "index",
+};
+/**
+* Top-level result type categories
+*/
+export enum ResultTopType {
+    
+    /** Modification of existing features (e.g., track smoothing) */
+    mutation = "mutation",
+    /** Creation of new features (e.g., analysis results) */
+    addition = "addition",
+    /** Removal of features (e.g., outlier deletion) */
+    deletion = "deletion",
+    /** Non-GeoJSON outputs (e.g., plots, reports) */
+    artifact = "artifact",
+};
+/**
+* Categories of tool execution errors
+*/
+export enum ErrorCategory {
+    
+    /** User-provided input failed validation */
+    invalid_input = "invalid_input",
+    /** Algorithm encountered unrecoverable error */
+    algorithm_failure = "algorithm_failure",
+    /** Required feature or data not found */
+    resource_not_found = "resource_not_found",
+};
 
 
 /**
@@ -1353,6 +1427,435 @@ export interface StacExtensionProperties {
     /** Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
  */
     nationalities?: string[],
+}
+
+
+/**
+ * Temporal extent of a plot expressed as ISO 8601 strings. Used within PlotSummary and StacItemSummary for lightweight display without the full epoch+iso dual representation of TimeInstant.
+
+ */
+export interface PlotTimeExtent {
+    /** Start of time extent (ISO 8601) */
+    start: string,
+    /** End of time extent (ISO 8601) */
+    end: string,
+}
+
+
+/**
+ * Projection of a STAC Item for UI consumption (e.g., browser tree rows). Carries only the fields required for listing and opening a plot, derived from the STAC Item plus its debrief: extension properties. Replaces the Plot interface from apps/vscode/src/types/plot.ts as the canonical summary type.
+
+ */
+export interface PlotSummary {
+    /** STAC Item ID */
+    id: string,
+    /** Plot title from STAC metadata */
+    title: string,
+    /** Creation/capture timestamp (ISO 8601) */
+    datetime: string,
+    /** Path to item.json relative to store root */
+    item_path: string,
+    /** Parent catalog identifier */
+    catalog_id: string,
+    /** Original source file path (for provenance) */
+    source_path?: string,
+    /** Geographic bounding box as [west, south, east, north] */
+    bbox?: number[],
+    /** Temporal extent of the plot (start/end ISO 8601 strings) */
+    time_extent?: PlotTimeExtent,
+    /** Number of tracks in this plot */
+    track_count?: number,
+    /** Number of reference locations in this plot */
+    location_count?: number,
+}
+
+
+/**
+ * Minimal STAC Item projection for browser tree display and metadata filtering. Unifies StacItemSummary (apps/vscode/src/types/stac.ts) and CatalogOverviewItem (shared/components/src/filter-engine/types.ts) into a single canonical summary type that carries both navigation fields and the full set of debrief: extension properties needed for filtering.
+
+ */
+export interface StacItemSummary {
+    /** STAC Item ID */
+    id: string,
+    /** Item title */
+    title: string,
+    /** Single datetime (ISO 8601) — fallback when start/end not available */
+    datetime?: string,
+    /** Path to item.json relative to store root */
+    item_path: string,
+    /** Parent catalog identifier */
+    catalog_id: string,
+    /** Parent store identifier (needed for URI construction) */
+    store_id: string,
+    /** Geographic bounding box as [west, south, east, north] */
+    bbox?: number[],
+    /** Range start datetime (ISO 8601) */
+    start_datetime?: string,
+    /** Range end datetime (ISO 8601) */
+    end_datetime?: string,
+    /** Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.
+ */
+    vessel_classes?: string[],
+    /** Plot-level tags from debrief:tags */
+    tags?: string[],
+    /** Feature-level tags from debrief:feature_tags */
+    feature_tags?: string[],
+    /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
+ */
+    nationalities?: string[],
+    /** Track platform names from debrief:track_names */
+    track_names?: string[],
+}
+
+
+/**
+ * A point in time with dual representations (FR-032, FR-033)
+ */
+export interface TimeInstant {
+    /** Milliseconds since Unix epoch */
+    epoch: number,
+    /** ISO 8601 UTC format string */
+    iso: string,
+}
+
+
+/**
+ * A temporal interval with inclusive start and end
+ */
+export interface TimeRange {
+    /** Start of interval */
+    start: TimeInstant,
+    /** End of interval */
+    end: TimeInstant,
+}
+
+
+/**
+ * Constraints on the visible time window
+ */
+export interface TimeFilter {
+    /** Filter start (null = unbounded) */
+    start?: TimeInstant,
+    /** Filter end (null = unbounded) */
+    end?: TimeInstant,
+}
+
+
+/**
+ * Step size for discrete time navigation (FR-008)
+ */
+export interface TimeStep {
+    /** Numeric step value */
+    value: number,
+    /** Unit of the step */
+    unit: string,
+}
+
+
+/**
+ * A geographic coordinate [longitude, latitude]
+ */
+export interface Coordinate {
+    /** Longitude in degrees (-180 to 180) */
+    longitude: number,
+    /** Latitude in degrees (-90 to 90) */
+    latitude: number,
+}
+
+
+/**
+ * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+ */
+export interface ViewportPolygon {
+    /** Four corners in clockwise order [NW, NE, SE, SW] */
+    coordinates: Coordinate[],
+}
+
+
+/**
+ * Named nesting level within a feature hierarchy (Feature 053, FR-010). Defines how addresses at this level are interpreted.
+ */
+export interface LevelDefinition {
+    /** Level identifier used in selection paths */
+    name: string,
+    /** How addresses at this level are interpreted */
+    addressingMode: string,
+    /** Human-readable description */
+    description?: string,
+}
+
+
+/**
+ * Set of selected feature identifiers with metadata (FR-017). featureIds accepts selection path strings: forward-slash-separated segments following RFC 6901 escaping. A single-segment path is a flat feature ID (backward compatible). Feature 053.
+ */
+export interface FeatureSelection {
+    /** Selected feature paths. Each entry is a forward-slash-separated selection path (e.g. "track-001/positions/4") or a flat feature ID. */
+    featureIds: string[],
+    /** Primary selection path for properties display */
+    primary?: string,
+    /** When selection was made */
+    timestamp: TimeInstant,
+}
+
+
+/**
+ * Time-related state including navigation, playback, and filtering
+ */
+export interface TemporalSlice {
+    /** Current playback/display time (FR-005) */
+    currentTime?: TimeInstant,
+    /** Full temporal extent of loaded data (FR-006) */
+    timeRange?: TimeRange,
+    /** Optional visible time window constraint (FR-007) */
+    timeFilter?: TimeFilter,
+    /** Step size for discrete navigation (FR-008) */
+    stepSize: TimeStep,
+    /** Playback speed multiplier 0.1-100x (FR-009) */
+    playbackRate: number,
+    /** Current playback state - ephemeral (FR-010) */
+    playbackState: string,
+    /** Track visualization mode (FR-011) */
+    displayMode: string,
+}
+
+
+/**
+ * Geographic view state for the map display
+ */
+export interface SpatialSlice {
+    /** Visible map area as 4-corner polygon (FR-012) */
+    viewport?: ViewportPolygon,
+    /** Map rotation in degrees 0-360 (FR-013) */
+    rotation: number,
+}
+
+
+/**
+ * Feature selection and visibility state
+ */
+export interface FeaturesSlice {
+    /** Reference to external feature collection (FR-016) */
+    featureCollectionUri?: string,
+    /** Currently selected features (FR-017) */
+    selection: FeatureSelection,
+    /** Features hidden from display (FR-018) */
+    hiddenFeatureIds?: string[],
+}
+
+
+/**
+ * Editor lifecycle state including dirty tracking and undo history
+ */
+export interface DocumentSlice {
+    /** Unsaved changes exist - ephemeral (FR-020) */
+    dirty: boolean,
+    /** Last save location */
+    savePath?: string,
+}
+
+
+/**
+ * GeoJSON geometry object (type + coordinates pair)
+ */
+export interface GeoJSONGeometry {
+    /** GeoJSON geometry type (e.g., Point, LineString, Polygon) */
+    type: string,
+}
+
+
+/**
+ * GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
+
+ */
+export interface GeoJSONFeature {
+    /** GeoJSON object type — always "Feature" */
+    type: string,
+    /** Optional feature identifier (string or numeric, stored as string) */
+    id?: string,
+    /** GeoJSON geometry object */
+    geometry: GeoJSONGeometry,
+}
+
+
+/**
+ * Record of the last tool execution, enabling single-step undo. Feature 110-tool-level-undo-gap.
+
+ */
+export interface LastToolExecution {
+    /** Identifier of the tool that was executed */
+    tool_id: string,
+    /** IDs of the source features the tool operated on */
+    source_feature_ids: string[],
+    /** IDs of the result layers produced by the tool */
+    result_layer_ids: string[],
+}
+
+
+/**
+ * Accumulated tool result layers and last-execution record for undo support. Features 109-unify-result-layer-lifecycle and 110-tool-level-undo-gap.
+
+ */
+export interface ResultsSlice {
+    /** Accumulated tool result features */
+    result_layers: GeoJSONFeature[],
+    /** Last tool execution record for single-step undo */
+    last_tool_execution?: LastToolExecution,
+}
+
+
+/**
+ * Multi-axis filter state for the STAC browser panel. Manages the metadata filter expression plus active flags for spatial (viewport) and temporal (timeline) filter axes. Feature 132-three-view-sync. Note: spatial bounds and temporal range live in SpatialSlice/TemporalSlice; this slice only tracks the metadata expression and axis-activation flags.
+
+ */
+export interface BrowserFilterSlice {
+    /** Set of exercise IDs passing the current metadata filter. Absent/null means all items pass (no filter applied).
+ */
+    metadata_filtered_ids?: string[],
+    /** Serialised CQL2 filter expression from the filter bar, stored as an opaque JSON object (Record<string, unknown>). Absent/null means no filter is active. Stored for debugging and round-trip serialisation.
+ */
+    metadata_expression?: string,
+    /** Whether the map viewport is used as a spatial filter */
+    spatial_filter_active: boolean,
+    /** Whether the timeline range is used as a temporal filter */
+    temporal_filter_active: boolean,
+}
+
+
+/**
+ * Root entity containing all session state slices (FR-001, FR-002)
+ */
+export interface SessionState {
+    /** Schema version for persistence compatibility (FR-026) */
+    schemaVersion: string,
+    /** Time-related state */
+    temporal: TemporalSlice,
+    /** Geographic view state */
+    spatial: SpatialSlice,
+    /** Feature-related state */
+    features: FeaturesSlice,
+    /** Editor state */
+    document: DocumentSlice,
+}
+
+
+/**
+ * Persisted session file format (FR-024)
+ */
+export interface SessionFile {
+    /** JSON Schema URI */
+    $schema?: string,
+    /** Schema version */
+    version: string,
+    /** When the session was saved */
+    savedAt: string,
+    /** Temporal state (excluding ephemeral playbackState) */
+    temporal: TemporalSlice,
+    /** Spatial state */
+    spatial: SpatialSlice,
+    /** Features state */
+    features: FeaturesSlice,
+}
+
+
+/**
+ * Slash-delimited hierarchical type path. Format: {top_type}/{domain}/{specific_type} Example: mutation/track/smoothed
+
+ */
+export interface ResultTypePath {
+    /** Full hierarchical path */
+    path: string,
+}
+
+
+/**
+ * Annotations for MCP tool result content items. All results MUST include resultType, sourceFeatures, and label. Deletions MUST include deletedFeatures. Artifacts MUST include href.
+
+ */
+export interface ToolResultAnnotations {
+    /** Hierarchical result type (e.g., mutation/track/smoothed) */
+    resultType: string,
+    /** IDs of input features used to generate this result */
+    sourceFeatures: string[],
+    /** Human-readable description of the result */
+    label: string,
+    /** Relative path to artifact file (REQUIRED for artifacts) */
+    href?: string,
+    /** IDs of features removed (REQUIRED for deletions) */
+    deletedFeatures?: string[],
+}
+
+
+/**
+ * Axis label and type metadata for a dataset chart
+ */
+export interface DatasetAxisMetadata {
+    /** Human-readable axis label (e.g., "Time", "Range") */
+    label: string,
+    /** Axis data type (temporal, quantitative) */
+    type: string,
+    /** Units for the axis values (e.g., "m", "°") */
+    units?: string,
+}
+
+
+/**
+ * Chart metadata for a dataset entry
+ */
+export interface DatasetMetadata {
+    /** X-axis metadata */
+    xAxis: DatasetAxisMetadata,
+    /** Y-axis metadata */
+    yAxis: DatasetAxisMetadata,
+}
+
+
+/**
+ * A single structured data record within a series or flat dataset. Fields are open-ended (the axes are described by DatasetMetadata) to accommodate any combination of x/y/series-key values produced by tools. At minimum one of x_value or y_value is expected, but additional domain-specific fields (e.g., "zone", "bearing", "time") are allowed.
+
+ */
+export interface DatasetDataPoint {
+    /** Primary independent-axis value serialised as a string. For temporal axes this is an ISO 8601 datetime; for quantitative axes it is a decimal string; for nominal/ordinal axes it is the category label.
+ */
+    x_value?: string,
+    /** Primary dependent-axis value serialised as a string (decimal or label).
+ */
+    y_value?: string,
+    /** Series discriminator for multi-series datasets (e.g., track name). Absent for single-series (flat) datasets.
+ */
+    series_key?: string,
+}
+
+
+/**
+ * A named data series within a multi-series dataset. Replaces the earlier float[] data field with a list of structured DatasetDataPoint records to match the runtime DataSeries shape from shared/components/src/ChartRenderer/types.ts (Record<string, unknown>[]).
+
+ */
+export interface DatasetSeries {
+    /** Series display name (shown in chart legend) */
+    name: string,
+    /** Array of structured data records for this series. Each record carries open x/y/domain fields; see DatasetDataPoint.
+ */
+    data_points: DatasetDataPoint[],
+}
+
+
+/**
+ * Standard envelope for all tool result datasets, matching the runtime DatasetEnvelope interface from shared/components/src/ChartRenderer/types.ts. Exactly one of data_points (flat/single-series) or series (multi-series) should be populated per instance.
+
+ */
+export interface DatasetEntry {
+    /** Dataset subtype identifier (e.g., "zone_histogram", "range_bearing_series") */
+    type: string,
+    /** Human-readable chart title */
+    title: string,
+    /** Axis definitions and display hints */
+    metadata: DatasetMetadata,
+    /** Flat array of structured data records for histograms and single-series charts. Corresponds to DatasetEnvelope.data (Record<string, unknown>[]). Absent when series is populated.
+ */
+    data_points?: DatasetDataPoint[],
+    /** Named data series for multi-line/multi-series charts. Corresponds to DatasetEnvelope.series (DataSeries[]). Absent when data_points is populated.
+ */
+    series?: DatasetSeries[],
 }
 
 
