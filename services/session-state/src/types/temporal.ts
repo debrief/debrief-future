@@ -8,6 +8,10 @@
  * A point in time with dual representations (FR-032, FR-033).
  * Retained as a utility type for MCP tool I/O and persistence boundaries.
  * No longer used in TemporalSlice, TimeRange, or TimeFilter interfaces.
+ *
+ * Schema equivalent: @debrief/schemas#TimeInstant (identical shape).
+ * Not imported directly because @debrief/schemas is not in this package's
+ * dependencies and the shape is identical — no migration value.
  */
 export interface TimeInstant {
   /** Milliseconds since Unix epoch */
@@ -54,6 +58,12 @@ export function isoToEpoch(iso: string): number {
 /**
  * A temporal interval with inclusive start and end.
  * Uses plain epoch milliseconds (Review Decision 5C).
+ *
+ * Schema equivalent: @debrief/schemas#TimeRange
+ * Not migrated: generated TimeRange uses { start: TimeInstant, end: TimeInstant }
+ * while this type stores plain epoch milliseconds (Review Decision 5C). The
+ * epoch-only representation was chosen to avoid redundancy in hot-path
+ * state updates.
  */
 export interface TimeRange {
   start: number;
@@ -63,6 +73,10 @@ export interface TimeRange {
 /**
  * Constraints on the visible time window.
  * Uses plain epoch milliseconds (Review Decision 5C).
+ *
+ * Schema equivalent: @debrief/schemas#TimeFilter
+ * Not migrated: generated TimeFilter uses { start?: TimeInstant, end?: TimeInstant }
+ * while this type uses nullable numbers (Review Decision 5C).
  */
 export interface TimeFilter {
   start: number | null;
@@ -76,6 +90,10 @@ export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day';
 
 /**
  * Step size for discrete time navigation (FR-008).
+ *
+ * Schema equivalent: @debrief/schemas#TimeStep
+ * Not migrated: generated TimeStep uses { value: number, unit: string } while
+ * this type constrains unit to the TimeUnit literal union for type safety.
  */
 export interface TimeStep {
   value: number;
@@ -96,6 +114,12 @@ export type DisplayMode = 'normal' | 'snailTrail';
 /**
  * Temporal state slice (FR-005 through FR-011).
  * Uses plain epoch milliseconds for currentTime (Review Decision 5C).
+ *
+ * Schema equivalent: @debrief/schemas#TemporalSlice
+ * Not migrated: generated TemporalSlice uses TimeInstant objects for
+ * currentTime/timeRange/timeFilter, and string literals for playbackState/
+ * displayMode. This type uses epoch numbers (Review Decision 5C) and
+ * discriminated union literals for type safety.
  */
 export interface TemporalSlice {
   /** Current playback/display time as epoch milliseconds (FR-005) */

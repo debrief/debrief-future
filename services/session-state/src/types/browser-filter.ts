@@ -9,6 +9,14 @@
 
 /**
  * Browser filter state fields.
+ *
+ * Schema equivalent: @debrief/schemas#BrowserFilterSlice
+ * Not migrated: generated BrowserFilterSlice uses snake_case field names
+ * (metadata_filtered_ids, metadata_expression, spatial_filter_active,
+ * temporal_filter_active), uses string[] vs ReadonlySet<string> for
+ * metadataFilteredIds, and serialises metadataExpression as a string rather
+ * than Record<string, unknown>. These are structural divergences driven by
+ * Zustand and JSON Schema limitations.
  */
 export interface BrowserFilterSlice {
   /** Set of exercise IDs passing the current metadata filter. null = all pass. */

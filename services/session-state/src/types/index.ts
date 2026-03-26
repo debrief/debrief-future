@@ -46,6 +46,11 @@ export type SessionStore = TemporalSlice &
 
 /**
  * Grouped session state for API responses and persistence.
+ *
+ * Schema equivalent: @debrief/schemas#SessionState
+ * Not migrated: generated SessionState includes schemaVersion and lacks the
+ * results slice. The slice types themselves also differ (see individual slice
+ * comments). @debrief/schemas is not in this package's dependencies.
  */
 export interface SessionState {
   temporal: TemporalSlice;

@@ -52,6 +52,14 @@ export interface Catalog {
 
 /**
  * A STAC Item summary (minimal info for tree display)
+ *
+ * Schema equivalent: @debrief/schemas#StacItemSummary
+ * Not migrated: the generated StacItemSummary uses snake_case field names
+ * (item_path, catalog_id, store_id, start_datetime, end_datetime,
+ * vessel_classes, feature_tags, track_names) while this type uses camelCase.
+ * All consumers (stacService, stacTreeProvider, catalogOverviewPanel) depend
+ * on camelCase field access. Rename would require coordinated update across
+ * all consumers.
  */
 export interface StacItemSummary {
   /** STAC Item ID */

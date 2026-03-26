@@ -13,6 +13,11 @@ import { createTimeInstant } from './temporal.js';
  * segments following RFC 6901 escaping. A single-segment path (e.g., "track-001")
  * is a flat feature ID (backward compatible). Multi-segment paths identify child
  * elements (e.g., "track-001/positions/4").
+ *
+ * Schema equivalent: @debrief/schemas#FeatureSelection
+ * Not migrated: generated FeatureSelection has primary as optional (primary?)
+ * while this type uses explicit null (primary: string | null) for Zustand
+ * store compatibility. The shapes are otherwise identical.
  */
 export interface FeatureSelection {
   /** Selected feature paths (or flat IDs for backward compatibility) */
@@ -50,6 +55,11 @@ export function createSelection(
 
 /**
  * Features state slice (FR-016 through FR-019).
+ *
+ * Schema equivalent: @debrief/schemas#FeaturesSlice
+ * Not migrated: generated FeaturesSlice lacks styleVersion (ephemeral UI
+ * counter used to trigger re-renders on style changes, Feature 097). Also
+ * uses optional hiddenFeatureIds (hiddenFeatureIds?) vs required array here.
  */
 export interface FeaturesSlice {
   /** Reference to external feature collection (FR-016) */

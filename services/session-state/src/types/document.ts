@@ -6,6 +6,11 @@
 /**
  * Document state slice (FR-020 through FR-023).
  * Tracks editor lifecycle including dirty flag and undo history.
+ *
+ * Schema equivalent: @debrief/schemas#DocumentSlice
+ * Close match: generated DocumentSlice has savePath as optional (savePath?)
+ * while this type uses explicit null (savePath: string | null). Shape is
+ * otherwise identical.
  */
 export interface DocumentSlice {
   /** Unsaved changes exist - ephemeral (FR-020) */
