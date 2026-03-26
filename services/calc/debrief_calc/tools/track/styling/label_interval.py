@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 
@@ -24,7 +24,7 @@ from debrief_calc.registry import tool
         ),
     ],
 )
-def label_interval(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def label_interval(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Set the time interval for displaying labels on track positions.
 

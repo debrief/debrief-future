@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from debrief_calc.models import (
+    GeoJSONFeatureDict,
     InputFeatureState,
     LogEntry,
     ParameterValue,
@@ -41,7 +42,7 @@ def _duration_ms_to_iso8601(duration_ms: float) -> str:
 def create_log_entry(
     tool_name: str,
     tool_version: str,
-    source_features: list[dict[str, Any]],
+    source_features: list[GeoJSONFeatureDict],
     parameters: dict[str, Any] | None = None,
     duration_ms: float = 0.0,
     generated: list[str] | None = None,
@@ -101,9 +102,9 @@ def create_log_entry(
 
 
 def attach_log_entry(
-    feature: dict[str, Any],
+    feature: GeoJSONFeatureDict,
     log_entry: LogEntry,
-) -> dict[str, Any]:
+) -> GeoJSONFeatureDict:
     """
     Attach a PROV-aligned Log entry to a GeoJSON feature.
 
@@ -145,7 +146,7 @@ def attach_log_entry(
 def create_provenance(
     tool_name: str,
     tool_version: str,
-    source_features: list[dict[str, Any]],
+    source_features: list[GeoJSONFeatureDict],
     parameters: dict[str, Any] | None = None,
     timestamp: datetime | None = None,
 ) -> Provenance:
@@ -170,7 +171,7 @@ def create_provenance(
     )
 
 
-def attach_provenance(feature: dict[str, Any], provenance: Provenance) -> dict[str, Any]:
+def attach_provenance(feature: GeoJSONFeatureDict, provenance: Provenance) -> GeoJSONFeatureDict:
     """
     Deprecated: Use attach_log_entry() instead.
 
@@ -190,7 +191,7 @@ def attach_provenance(feature: dict[str, Any], provenance: Provenance) -> dict[s
     return feature
 
 
-def set_output_kind(feature: dict[str, Any], kind: str) -> dict[str, Any]:
+def set_output_kind(feature: GeoJSONFeatureDict, kind: str) -> GeoJSONFeatureDict:
     """
     Set the kind attribute on a feature's properties.
 

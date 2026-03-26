@@ -6,7 +6,7 @@
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
-import { propsRecord } from '../../../utils/featureProps';
+import { isAnnotationFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface EnlargeShapeParams {
@@ -143,8 +143,11 @@ export function execute(
   const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = propsRecord(feature);
-    const kind = props['kind'] as string;
+    if (!isAnnotationFeature(feature)) {
+      continue;
+    }
+
+    const kind = feature.properties.kind;
 
     if (!ANNOTATION_KINDS.has(kind)) {
       continue;
@@ -172,8 +175,11 @@ export function execute(
       geometry.coordinates = polyCoords.map((ring) =>
         scaleCoordsList(ring, scalingOrigin, scaleFactor),
       );
-      if (kind === 'CIRCLE' && props['center'] !== undefined) {
-        props['center'] = scaleCoordinate(props['center'] as number[], scalingOrigin, scaleFactor);
+      if (kind === 'CIRCLE') {
+        const circleProps = feature.properties as { center?: number[] };
+        if (circleProps.center !== undefined) {
+          circleProps.center = scaleCoordinate(circleProps.center, scalingOrigin, scaleFactor);
+        }
       }
     } else if (kind === 'LINE') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
@@ -181,8 +187,9 @@ export function execute(
       geometry.coordinates = scaleCoordinate(coords as number[], scalingOrigin, scaleFactor);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
-      if (props['origin'] !== undefined) {
-        props['origin'] = scaleCoordinate(props['origin'] as number[], scalingOrigin, scaleFactor);
+      const vectorProps = feature.properties as { origin?: number[] };
+      if (vectorProps.origin !== undefined) {
+        vectorProps.origin = scaleCoordinate(vectorProps.origin, scalingOrigin, scaleFactor);
       }
     }
 

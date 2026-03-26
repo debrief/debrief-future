@@ -74,7 +74,7 @@ class TestSessionClient:
 
     def test_set_viewport(self, client: SessionClient) -> None:
         """Test setting viewport."""
-        coordinates = [[-5, 55], [5, 55], [5, 50], [-5, 50]]
+        coordinates = [[-5.0, 55.0], [5.0, 55.0], [5.0, 50.0], [-5.0, 50.0]]
         result = client.set_viewport(coordinates)
         assert result["success"]
         assert result["viewport"]["coordinates"] == coordinates

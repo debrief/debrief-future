@@ -11,7 +11,7 @@ import math
 import time
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 # LCG PRNG constants (Numerical Recipes) — identical in Python and TypeScript
@@ -25,7 +25,7 @@ def _lcg_next(state: int) -> int:
     return (_LCG_MULTIPLIER * state + _LCG_INCREMENT) % _LCG_MODULUS
 
 
-def _extract_bounds_from_polygon(feature: dict[str, Any]) -> tuple[float, float, float, float]:
+def _extract_bounds_from_polygon(feature: GeoJSONFeatureDict) -> tuple[float, float, float, float]:
     """Extract bounding box [west, south, east, north] from a polygon feature."""
     geom = feature.get("geometry", {})
     coords = geom.get("coordinates", [[]])[0]  # outer ring
@@ -72,7 +72,7 @@ def _build_multipoint_feature(
     coordinates: list[list[float]],
     metadata: list[dict[str, Any]],
     name: str,
-) -> dict[str, Any]:
+) -> GeoJSONFeatureDict:
     """Build a MultiPoint GeoJSON Feature with parallel pointMetadata."""
     return {
         "type": "Feature",
@@ -107,7 +107,7 @@ def _grid_dimensions(count: int) -> tuple[int, int]:
 
 def _generate_grid(
     west: float, south: float, east: float, north: float, count: int
-) -> dict[str, Any]:
+) -> GeoJSONFeatureDict:
     """Generate a grid of evenly spaced reference points."""
     rows, cols = _grid_dimensions(count)
     effective_east = east + 360 if west > east else east
@@ -140,7 +140,7 @@ def _generate_grid(
 
 def _generate_scatter(
     west: float, south: float, east: float, north: float, count: int, seed: int | None
-) -> dict[str, Any]:
+) -> GeoJSONFeatureDict:
     """Generate a scatter of random reference points using LCG PRNG."""
     effective_east = east + 360 if west > east else east
 
@@ -197,7 +197,7 @@ def _generate_scatter(
 )
 def generate_reference_points(
     context: SelectionContext, params: dict[str, Any]
-) -> list[dict[str, Any]]:
+) -> list[GeoJSONFeatureDict]:
     """
     Generate a grid or scatter of reference points within a polygon's bounding box.
 

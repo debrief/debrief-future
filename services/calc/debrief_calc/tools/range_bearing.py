@@ -11,7 +11,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
 from debrief_calc.registry import tool
 
 
@@ -35,7 +35,7 @@ def _calculate_range(lon1: float, lat1: float, lon2: float, lat2: float) -> floa
     return c * 3440.065  # Earth radius in nm
 
 
-def _extract_coords(feature: dict[str, Any]) -> list[list[float]]:
+def _extract_coords(feature: GeoJSONFeatureDict) -> list[list[float]]:
     """Extract coordinate list from a feature geometry."""
     geom = feature.get("geometry", {})
     gtype = geom.get("type", "")
@@ -49,7 +49,7 @@ def _extract_coords(feature: dict[str, Any]) -> list[list[float]]:
     return coords
 
 
-def _extract_times(feature: dict[str, Any]) -> list[int] | None:
+def _extract_times(feature: GeoJSONFeatureDict) -> list[int] | None:
     """Extract epoch ms timestamps from properties.times."""
     props = feature.get("properties", {}) or {}
     times = props.get("times")
@@ -58,18 +58,18 @@ def _extract_times(feature: dict[str, Any]) -> list[int] | None:
     return None
 
 
-def _is_track(feature: dict[str, Any]) -> bool:
+def _is_track(feature: GeoJSONFeatureDict) -> bool:
     """Check if feature is a track (LineString with times)."""
     geom = feature.get("geometry", {})
     return geom.get("type") == "LineString" and _extract_times(feature) is not None
 
 
-def _is_point(feature: dict[str, Any]) -> bool:
+def _is_point(feature: GeoJSONFeatureDict) -> bool:
     geom = feature.get("geometry", {})
     return geom.get("type") == "Point"
 
 
-def _is_polygon(feature: dict[str, Any]) -> bool:
+def _is_polygon(feature: GeoJSONFeatureDict) -> bool:
     geom = feature.get("geometry", {})
     return geom.get("type") == "Polygon"
 
@@ -104,7 +104,7 @@ def _closest_point_on_polygon(
     return best_pt
 
 
-def _feature_name(feature: dict[str, Any], fallback: str) -> str:
+def _feature_name(feature: GeoJSONFeatureDict, fallback: str) -> str:
     props = feature.get("properties", {}) or {}
     return props.get("name") or props.get("label") or props.get("id", fallback)
 
@@ -117,7 +117,7 @@ def _feature_name(feature: dict[str, Any], fallback: str) -> str:
     context_type=ContextType.MULTI,
     parameters=[],
 )
-def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Calculate range and bearing time-series between two features.
 

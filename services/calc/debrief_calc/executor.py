@@ -23,6 +23,7 @@ from debrief_calc.exceptions import (
 )
 from debrief_calc.models import (
     ContextType,
+    GeoJSONFeatureDict,
     InputFeatureState,
     SelectionContext,
     Tool,
@@ -212,7 +213,7 @@ def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
         raise KindMismatchError(tool.name, tool.input_kinds, kinds)
 
 
-def _schema_validate_features(features: list[dict[str, Any]], tool_name: str) -> None:
+def _schema_validate_features(features: list[GeoJSONFeatureDict], tool_name: str) -> None:
     """Run schema validation on output features (warn-and-continue).
 
     Validates each feature that has a known ``kind`` against the Pydantic model
@@ -237,7 +238,7 @@ def _schema_validate_features(features: list[dict[str, Any]], tool_name: str) ->
 
 
 def _capture_input_state(
-    features: list[dict[str, Any]],
+    features: list[GeoJSONFeatureDict],
 ) -> list[InputFeatureState]:
     """Capture pre-operation geometry and spatial properties from input features."""
     import copy
@@ -263,7 +264,7 @@ def _capture_input_state(
 
 def _execute_handler(
     tool: Tool, context: SelectionContext, params: dict[str, Any]
-) -> list[dict[str, Any]]:
+) -> list[GeoJSONFeatureDict]:
     """Execute the tool handler and return output features."""
     if tool.handler is None:
         raise ExecutionError(tool.name, ValueError("Tool has no handler"))

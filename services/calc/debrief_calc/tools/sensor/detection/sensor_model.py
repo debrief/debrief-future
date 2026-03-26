@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+from debrief_calc.models import GeoJSONFeatureDict
+
 
 @dataclass(frozen=True)
 class SensorModelZone:
@@ -29,7 +31,7 @@ class SensorModel(Protocol):
     (like the stub) or use track properties to compute realistic zones.
     """
 
-    def get_detection_zones(self, track: dict[str, Any]) -> list[SensorModelZone]:
+    def get_detection_zones(self, track: GeoJSONFeatureDict) -> list[SensorModelZone]:
         """Return detection zone definitions for the given track.
 
         Args:
@@ -49,7 +51,7 @@ class DefaultSensorModel:
     SensorModel implementation for platform-specific sensor characteristics.
     """
 
-    def get_detection_zones(self, track: dict[str, Any]) -> list[SensorModelZone]:
+    def get_detection_zones(self, track: GeoJSONFeatureDict) -> list[SensorModelZone]:
         return [
             SensorModelZone(distance_nm=3.0, likelihood_pct=75, name="75%"),
             SensorModelZone(distance_nm=6.0, likelihood_pct=50, name="50%"),

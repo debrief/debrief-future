@@ -22,9 +22,14 @@ import re
 from collections.abc import Callable  # noqa: TC003 — Pydantic needs Callable at runtime
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, TypeAlias
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+# Type alias for GeoJSON feature dicts flowing through the tool pipeline.
+# These are raw dicts (not Pydantic models) because tool functions mutate
+# them in place and return them for JSON serialization via MCP.
+GeoJSONFeatureDict: TypeAlias = dict[str, Any]
 
 # Re-export generated provenance and system-record models from debrief_schemas.
 # These are the canonical definitions; hand-written duplicates have been removed.

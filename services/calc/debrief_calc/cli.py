@@ -21,7 +21,7 @@ import json
 import sys
 
 from debrief_calc.executor import run
-from debrief_calc.models import ContextType, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
 from debrief_calc.registry import registry
 from debrief_calc.result_builder import (
     build_addition,
@@ -32,7 +32,7 @@ from debrief_calc.result_builder import (
 )
 
 
-def _context_type_from_features(features: list) -> ContextType:
+def _context_type_from_features(features: list[GeoJSONFeatureDict]) -> ContextType:
     """Determine context type from feature count."""
     n = len(features)
     if n == 0:
@@ -42,7 +42,7 @@ def _context_type_from_features(features: list) -> ContextType:
     return ContextType.MULTI
 
 
-def _extract_source_ids(features: list) -> list[str]:
+def _extract_source_ids(features: list[GeoJSONFeatureDict]) -> list[str]:
     """Extract feature IDs from input features."""
     ids = []
     for f in features:

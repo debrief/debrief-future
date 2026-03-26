@@ -8,18 +8,23 @@ for each of the four result types: mutation, addition, deletion, artifact.
 import base64
 import json
 import re
+from typing import Any
 
+from debrief_calc.models import GeoJSONFeatureDict
 from debrief_calc.result_types import ResultTypePath
+
+# MCP content item — raw dict serialized as JSON over the wire.
+MCPContentItem = dict[str, Any]
 
 VALID_ERROR_CATEGORIES = {"invalid_input", "algorithm_failure", "resource_not_found"}
 
 
 def build_mutation(
-    features: list[dict],
+    features: list[GeoJSONFeatureDict],
     result_subtype: str,
     source_feature_ids: list[str],
     label: str,
-) -> list[dict]:
+) -> list[MCPContentItem]:
     """Build MCP ResourceContent items for mutation results."""
     if not features:
         raise ValueError("features must not be empty")
@@ -47,11 +52,11 @@ def build_mutation(
 
 
 def build_addition(
-    features: list[dict],
+    features: list[GeoJSONFeatureDict],
     result_subtype: str,
     source_feature_ids: list[str],
     label: str,
-) -> list[dict]:
+) -> list[MCPContentItem]:
     """Build MCP ResourceContent items for addition results."""
     if not features:
         raise ValueError("features must not be empty")
@@ -83,7 +88,7 @@ def build_deletion(
     result_subtype: str,
     source_feature_ids: list[str],
     label: str,
-) -> dict:
+) -> MCPContentItem:
     """Build MCP TextContent item for deletion results."""
     if not deleted_feature_ids:
         raise ValueError("deleted_feature_ids must not be empty")
@@ -111,7 +116,7 @@ def build_artifact(
     source_feature_ids: list[str],
     label: str,
     href: str,
-) -> dict:
+) -> MCPContentItem:
     """Build MCP content item for artifact results."""
     if not data:
         raise ValueError("data must not be empty")
@@ -153,7 +158,7 @@ def build_error(
     category: str,
     affected_feature_ids: list[str],
     code: int = -32000,
-) -> dict:
+) -> MCPContentItem:
     """Build MCP error response with Debrief metadata."""
     if category not in VALID_ERROR_CATEGORIES:
         raise ValueError(f"category must be one of {VALID_ERROR_CATEGORIES}, got: '{category}'")
@@ -168,7 +173,7 @@ def build_error(
     }
 
 
-def build_response(content_items: list[dict]) -> dict:
+def build_response(content_items: list[MCPContentItem]) -> MCPContentItem:
     """Build an MCP tool response containing one or more content items.
 
     Args:
