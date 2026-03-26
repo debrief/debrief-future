@@ -117,36 +117,87 @@ classes:
         range: DatasetAxisMetadata
         required: true
 
+  DatasetDataPoint:
+    description: >
+      A single structured data record within a series or flat dataset.
+      Fields are open-ended (the axes are described by DatasetMetadata) to
+      accommodate any combination of x/y/series-key values produced by tools.
+      At minimum one of x_value or y_value is expected, but additional
+      domain-specific fields (e.g., "zone", "bearing", "time") are allowed.
+    attributes:
+      x_value:
+        description: >
+          Primary independent-axis value serialised as a string.
+          For temporal axes this is an ISO 8601 datetime; for quantitative axes
+          it is a decimal string; for nominal/ordinal axes it is the category label.
+        range: string
+        required: false
+      y_value:
+        description: >
+          Primary dependent-axis value serialised as a string (decimal or label).
+        range: string
+        required: false
+      series_key:
+        description: >
+          Series discriminator for multi-series datasets (e.g., track name).
+          Absent for single-series (flat) datasets.
+        range: string
+        required: false
+
   DatasetSeries:
-    description: A named data series within a dataset
+    description: >
+      A named data series within a multi-series dataset.
+      Replaces the earlier float[] data field with a list of structured
+      DatasetDataPoint records to match the runtime DataSeries shape from
+      shared/components/src/ChartRenderer/types.ts (Record<string, unknown>[]).
     attributes:
       name:
-        description: Series display name
+        description: Series display name (shown in chart legend)
         range: string
         required: true
-      data:
-        description: Array of [timestamp, value] data points
-        range: float
+      data_points:
+        description: >
+          Array of structured data records for this series.
+          Each record carries open x/y/domain fields; see DatasetDataPoint.
+        range: DatasetDataPoint
         multivalued: true
+        required: true
+        inlined_as_list: true
 
   DatasetEntry:
-    description: A dataset entry containing time-series data for chart rendering
+    description: >
+      Standard envelope for all tool result datasets, matching the runtime
+      DatasetEnvelope interface from shared/components/src/ChartRenderer/types.ts.
+      Exactly one of data_points (flat/single-series) or series (multi-series)
+      should be populated per instance.
     attributes:
       type:
-        description: Dataset type identifier (e.g., "range_bearing_series")
+        description: Dataset subtype identifier (e.g., "zone_histogram", "range_bearing_series")
         range: string
         required: true
       title:
-        description: Human-readable dataset title
+        description: Human-readable chart title
         range: string
         required: true
       metadata:
-        description: Chart axis metadata
+        description: Axis definitions and display hints
         range: DatasetMetadata
         required: true
+      data_points:
+        description: >
+          Flat array of structured data records for histograms and single-series charts.
+          Corresponds to DatasetEnvelope.data (Record<string, unknown>[]).
+          Absent when series is populated.
+        range: DatasetDataPoint
+        multivalued: true
+        required: false
+        inlined_as_list: true
       series:
-        description: Data series array
+        description: >
+          Named data series for multi-line/multi-series charts.
+          Corresponds to DatasetEnvelope.series (DataSeries[]).
+          Absent when data_points is populated.
         range: DatasetSeries
         multivalued: true
-        required: true
+        required: false
         inlined_as_list: true

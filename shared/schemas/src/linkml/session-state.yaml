@@ -259,6 +259,100 @@ classes:
         description: Last save location
         range: string
 
+  GeoJSONGeometry:
+    description: GeoJSON geometry object (type + coordinates pair)
+    attributes:
+      type:
+        description: GeoJSON geometry type (e.g., Point, LineString, Polygon)
+        range: string
+        required: true
+
+  GeoJSONFeature:
+    description: >
+      GeoJSON Feature representation used for tool result layers.
+      Feature 109-unify-result-layer-lifecycle.
+    attributes:
+      type:
+        description: GeoJSON object type — always "Feature"
+        range: string
+        required: true
+      id:
+        description: Optional feature identifier (string or numeric, stored as string)
+        range: string
+        required: false
+      geometry:
+        description: GeoJSON geometry object
+        range: GeoJSONGeometry
+        required: true
+
+  LastToolExecution:
+    description: >
+      Record of the last tool execution, enabling single-step undo.
+      Feature 110-tool-level-undo-gap.
+    attributes:
+      tool_id:
+        description: Identifier of the tool that was executed
+        range: string
+        required: true
+      source_feature_ids:
+        description: IDs of the source features the tool operated on
+        range: string
+        multivalued: true
+        required: true
+      result_layer_ids:
+        description: IDs of the result layers produced by the tool
+        range: string
+        multivalued: true
+        required: true
+
+  ResultsSlice:
+    description: >
+      Accumulated tool result layers and last-execution record for undo support.
+      Features 109-unify-result-layer-lifecycle and 110-tool-level-undo-gap.
+    attributes:
+      result_layers:
+        description: Accumulated tool result features
+        range: GeoJSONFeature
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      last_tool_execution:
+        description: Last tool execution record for single-step undo
+        range: LastToolExecution
+        required: false
+
+  BrowserFilterSlice:
+    description: >
+      Multi-axis filter state for the STAC browser panel.
+      Manages the metadata filter expression plus active flags for
+      spatial (viewport) and temporal (timeline) filter axes.
+      Feature 132-three-view-sync.
+      Note: spatial bounds and temporal range live in SpatialSlice/TemporalSlice;
+      this slice only tracks the metadata expression and axis-activation flags.
+    attributes:
+      metadata_filtered_ids:
+        description: >
+          Set of exercise IDs passing the current metadata filter.
+          Absent/null means all items pass (no filter applied).
+        range: string
+        multivalued: true
+        required: false
+      metadata_expression:
+        description: >
+          Serialised CQL2 filter expression from the filter bar, stored as an
+          opaque JSON object (Record<string, unknown>). Absent/null means no
+          filter is active. Stored for debugging and round-trip serialisation.
+        range: string
+        required: false
+      spatial_filter_active:
+        description: Whether the map viewport is used as a spatial filter
+        range: boolean
+        required: true
+      temporal_filter_active:
+        description: Whether the timeline range is used as a temporal filter
+        range: boolean
+        required: true
+
 # ============================================================================
 # Root Entity
 # ============================================================================

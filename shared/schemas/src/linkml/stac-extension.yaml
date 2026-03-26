@@ -89,3 +89,148 @@ classes:
         required: false
         pattern: "^[A-Z]{2}$"
         slot_uri: debrief:nationalities
+
+  PlotTimeExtent:
+    description: >
+      Temporal extent of a plot expressed as ISO 8601 strings.
+      Used within PlotSummary and StacItemSummary for lightweight display
+      without the full epoch+iso dual representation of TimeInstant.
+    attributes:
+      start:
+        description: Start of time extent (ISO 8601)
+        range: string
+        required: true
+      end:
+        description: End of time extent (ISO 8601)
+        range: string
+        required: true
+
+  PlotSummary:
+    description: >
+      Projection of a STAC Item for UI consumption (e.g., browser tree rows).
+      Carries only the fields required for listing and opening a plot, derived
+      from the STAC Item plus its debrief: extension properties.
+      Replaces the Plot interface from apps/vscode/src/types/plot.ts as the
+      canonical summary type.
+    attributes:
+      id:
+        description: STAC Item ID
+        range: string
+        required: true
+      title:
+        description: Plot title from STAC metadata
+        range: string
+        required: true
+      datetime:
+        description: Creation/capture timestamp (ISO 8601)
+        range: string
+        required: true
+      item_path:
+        description: Path to item.json relative to store root
+        range: string
+        required: true
+      catalog_id:
+        description: Parent catalog identifier
+        range: string
+        required: true
+      source_path:
+        description: Original source file path (for provenance)
+        range: string
+        required: false
+      bbox:
+        description: Geographic bounding box as [west, south, east, north]
+        range: float
+        multivalued: true
+        required: false
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+      time_extent:
+        description: Temporal extent of the plot (start/end ISO 8601 strings)
+        range: PlotTimeExtent
+        required: false
+      track_count:
+        description: Number of tracks in this plot
+        range: integer
+        required: false
+        minimum_value: 0
+      location_count:
+        description: Number of reference locations in this plot
+        range: integer
+        required: false
+        minimum_value: 0
+
+  StacItemSummary:
+    description: >
+      Minimal STAC Item projection for browser tree display and metadata filtering.
+      Unifies StacItemSummary (apps/vscode/src/types/stac.ts) and
+      CatalogOverviewItem (shared/components/src/filter-engine/types.ts) into a
+      single canonical summary type that carries both navigation fields and the
+      full set of debrief: extension properties needed for filtering.
+    attributes:
+      id:
+        description: STAC Item ID
+        range: string
+        required: true
+      title:
+        description: Item title
+        range: string
+        required: true
+      datetime:
+        description: Single datetime (ISO 8601) — fallback when start/end not available
+        range: string
+        required: false
+      item_path:
+        description: Path to item.json relative to store root
+        range: string
+        required: true
+      catalog_id:
+        description: Parent catalog identifier
+        range: string
+        required: true
+      store_id:
+        description: Parent store identifier (needed for URI construction)
+        range: string
+        required: true
+      bbox:
+        description: Geographic bounding box as [west, south, east, north]
+        range: float
+        multivalued: true
+        required: false
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+      start_datetime:
+        description: Range start datetime (ISO 8601)
+        range: string
+        required: false
+      end_datetime:
+        description: Range end datetime (ISO 8601)
+        range: string
+        required: false
+      vessel_classes:
+        description: >
+          Vessel taxonomy paths from debrief:vessel_classes.
+          Inherited from StacExtensionProperties semantics.
+        range: string
+        multivalued: true
+        required: false
+      tags:
+        description: Plot-level tags from debrief:tags
+        range: string
+        multivalued: true
+        required: false
+      feature_tags:
+        description: Feature-level tags from debrief:feature_tags
+        range: string
+        multivalued: true
+        required: false
+      nationalities:
+        description: >
+          ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
+        range: string
+        multivalued: true
+        required: false
+      track_names:
+        description: Track platform names from debrief:track_names
+        range: string
+        multivalued: true
+        required: false

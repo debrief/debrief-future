@@ -658,7 +658,9 @@ class BaseFeatureProperties(ConfiguredBaseModel):
                        'PolyAnnotationProperties',
                        'SelectionRequirement',
                        'SystemRecordProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1231,7 +1233,9 @@ class TrackProperties(BaseFeatureProperties):
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1303,7 +1307,9 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: Union[GeoJSONLineString, GeoJSONMultiLineString] = Field(default=..., description="""Track path as LineString (simple) or MultiLineString (compound)""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONLineString'},
                     {'range': 'GeoJSONMultiLineString'}],
          'domain_of': ['TrackFeature',
@@ -1335,7 +1341,9 @@ class TrackFeature(ConfiguredBaseModel):
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
-                       'MultiPolygonFeature']} })
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
 
 
 class PointMetadataEntry(ConfiguredBaseModel):
@@ -1414,7 +1422,9 @@ class ReferenceLocationProperties(BaseFeatureProperties):
     valid_from: Optional[datetime ] = Field(default=None, description="""Start of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     valid_until: Optional[datetime ] = Field(default=None, description="""End of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     point_metadata: Optional[list[PointMetadataEntry]] = Field(default=[], description="""Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1460,7 +1470,9 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: Union[GeoJSONMultiPoint, GeoJSONPoint] = Field(default=..., description="""Location (Point) or reference point set (MultiPoint)""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONPoint'}, {'range': 'GeoJSONMultiPoint'}],
          'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1518,7 +1530,9 @@ class SystemStateProperties(ConfiguredBaseModel):
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
-                       'MultiPolygonFeature']} })
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
     selected_ids: Optional[list[str]] = Field(default=[], description="""Array of selected feature IDs - for selection state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
@@ -1567,7 +1581,9 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONEmptyPoint = Field(default=..., description="""Point geometry with empty coordinates for SYSTEM features""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1660,7 +1676,9 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1706,7 +1724,9 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONMultiPoint = Field(default=..., description="""MultiPoint geometry""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1736,7 +1756,9 @@ class MultiPointFeature(ConfiguredBaseModel):
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
-                       'MultiPolygonFeature']} })
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
 
 
 class MultiPolygonFeatureProperties(BaseFeatureProperties):
@@ -1790,7 +1812,9 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -1836,7 +1860,9 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONMultiPolygon = Field(default=..., description="""MultiPolygon geometry""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1866,7 +1892,9 @@ class MultiPolygonFeature(ConfiguredBaseModel):
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
-                       'MultiPolygonFeature']} })
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
 
 
 class LogEntry(ConfiguredBaseModel):
@@ -2026,7 +2054,9 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2072,7 +2102,9 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: Optional[GeoJSONPoint] = Field(default=None, description="""Optional display position (Point) or null""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2157,7 +2189,9 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2203,7 +2237,9 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONPolygon = Field(default=..., description="""Circle as Polygon (approximated with vertices, e.g., every 45 degrees)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2286,7 +2322,9 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2332,7 +2370,9 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONPolygon = Field(default=..., description="""Rectangle as Polygon (4 corners + close)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2415,7 +2455,9 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2461,7 +2503,9 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONLineString = Field(default=..., description="""Line as LineString (2 points)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2535,7 +2579,9 @@ class TextAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2581,7 +2627,9 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONPoint = Field(default=..., description="""Text display position""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2667,7 +2715,9 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2713,7 +2763,9 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONLineString = Field(default=..., description="""Vector as LineString (origin to computed endpoint)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2798,7 +2850,9 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     line_number: Optional[int] = Field(default=None, description="""Source line number for debugging""", json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
-    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
@@ -2844,7 +2898,9 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     geometry: GeoJSONPolygon = Field(default=..., description="""Polygon with user-defined vertices (closed ring)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2917,7 +2973,9 @@ class Tool(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'Tool']} })
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
     name: str = Field(default=..., description="""Human-readable name displayed in menus and panels. Should be concise (2-4 words).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
@@ -3094,16 +3152,22 @@ class StacExtensionProperties(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
 
     vessel_classes: Optional[list[str]] = Field(default=[], description="""Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:vessel_classes'} })
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:vessel_classes'} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties'],
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary'],
          'slot_uri': 'debrief:tags'} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:feature_tags'} })
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:feature_tags'} })
     track_names: Optional[list[str]] = Field(default=[], description="""Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:track_names'} })
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:track_names'} })
     nationalities: Optional[list[str]] = Field(default=[], description="""Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:nationalities'} })
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
+         'slot_uri': 'debrief:nationalities'} })
 
     @field_validator('vessel_classes')
     def pattern_vessel_classes(cls, v):
@@ -3130,6 +3194,101 @@ class StacExtensionProperties(ConfiguredBaseModel):
             err_msg = f"Invalid nationalities format: {v}"
             raise ValueError(err_msg)
         return v
+
+
+class PlotTimeExtent(ConfiguredBaseModel):
+    """
+    Temporal extent of a plot expressed as ISO 8601 strings. Used within PlotSummary and StacItemSummary for lightweight display without the full epoch+iso dual representation of TimeInstant.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    start: str = Field(default=..., description="""Start of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent']} })
+    end: str = Field(default=..., description="""End of time extent (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent']} })
+
+
+class PlotSummary(ConfiguredBaseModel):
+    """
+    Projection of a STAC Item for UI consumption (e.g., browser tree rows). Carries only the fields required for listing and opening a plot, derived from the STAC Item plus its debrief: extension properties. Replaces the Plot interface from apps/vscode/src/types/plot.ts as the canonical summary type.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    id: str = Field(default=..., description="""STAC Item ID""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
+    title: str = Field(default=..., description="""Plot title from STAC metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    datetime: str = Field(default=..., description="""Creation/capture timestamp (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    source_path: Optional[str] = Field(default=None, description="""Original source file path (for provenance)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
+    bbox: Optional[list[float]] = Field(default=None, description="""Geographic bounding box as [west, south, east, north]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
+    time_extent: Optional[PlotTimeExtent] = Field(default=None, description="""Temporal extent of the plot (start/end ISO 8601 strings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
+    track_count: Optional[int] = Field(default=None, description="""Number of tracks in this plot""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
+    location_count: Optional[int] = Field(default=None, description="""Number of reference locations in this plot""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
+
+
+class StacItemSummary(ConfiguredBaseModel):
+    """
+    Minimal STAC Item projection for browser tree display and metadata filtering. Unifies StacItemSummary (apps/vscode/src/types/stac.ts) and CatalogOverviewItem (shared/components/src/filter-engine/types.ts) into a single canonical summary type that carries both navigation fields and the full set of debrief: extension properties needed for filtering.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    id: str = Field(default=..., description="""STAC Item ID""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlotSummary',
+                       'StacItemSummary']} })
+    title: str = Field(default=..., description="""Item title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    datetime: Optional[str] = Field(default=None, description="""Single datetime (ISO 8601) — fallback when start/end not available""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
+    store_id: str = Field(default=..., description="""Parent store identifier (needed for URI construction)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
+    bbox: Optional[list[float]] = Field(default=None, description="""Geographic bounding box as [west, south, east, north]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary']} })
+    start_datetime: Optional[str] = Field(default=None, description="""Range start datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
+    end_datetime: Optional[str] = Field(default=None, description="""Range end datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
+    vessel_classes: Optional[list[str]] = Field(default=[], description="""Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags from debrief:tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'StacExtensionProperties',
+                       'StacItemSummary']} })
+    feature_tags: Optional[list[str]] = Field(default=[], description="""Feature-level tags from debrief:feature_tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
+    nationalities: Optional[list[str]] = Field(default=[], description="""ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
+    track_names: Optional[list[str]] = Field(default=[], description="""Track platform names from debrief:track_names""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
 
 
 # Model rebuild
@@ -3194,3 +3353,6 @@ BranchRecord.model_rebuild()
 BranchOrigin.model_rebuild()
 FileProvEntry.model_rebuild()
 StacExtensionProperties.model_rebuild()
+PlotTimeExtent.model_rebuild()
+PlotSummary.model_rebuild()
+StacItemSummary.model_rebuild()
