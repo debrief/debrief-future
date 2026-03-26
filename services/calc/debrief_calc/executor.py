@@ -241,6 +241,7 @@ def _capture_input_state(
 ) -> list[InputFeatureState]:
     """Capture pre-operation geometry and spatial properties from input features."""
     import copy
+    import json as _json
 
     states = []
     for feature in features:
@@ -249,11 +250,12 @@ def _capture_input_state(
         props = feature.get("properties", {})
         # Exclude provenance (append-only, never restored)
         spatial_props = {k: copy.deepcopy(v) for k, v in props.items() if k != "provenance"}
+        # Generated InputFeatureState uses snake_case field names and string geometry/properties
         states.append(
             InputFeatureState(
-                featureId=feature_id,
-                geometry=geometry,
-                properties=spatial_props if spatial_props else None,
+                feature_id=feature_id,
+                geometry=_json.dumps(geometry),
+                properties=_json.dumps(spatial_props) if spatial_props else None,
             )
         )
     return states

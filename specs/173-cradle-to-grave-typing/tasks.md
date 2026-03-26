@@ -45,13 +45,13 @@
 
 **Purpose**: Add missing domain types to LinkML so they can be generated into both Python and TypeScript. This phase BLOCKS all downstream work.
 
-- [ ] T001 Add `PlotSummary` class to LinkML schema `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T002 [P] Add `StacItemSummary` class to LinkML schema (unify with A3 `CatalogOverviewItem`) `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T003 [P] Add `ResultsSlice` and `BrowserFilterSlice` to session-state schema `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T004 [P] Reconcile `DatasetEntry` with `DatasetEnvelope` implementation — update schema to match runtime shape `shared/schemas/src/linkml/tool-result.yaml`
-- [ ] T005 Regenerate Python Pydantic models `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T006 Add `DebriefFeature` Python union type to debrief_schemas `shared/schemas/src/generated/python/debrief_schemas/unions.py`
-- [ ] T007 Run pyright and pytest to verify schema generation is clean
+- [x] T001 Add `PlotSummary` class to LinkML schema `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T002 [P] Add `StacItemSummary` class to LinkML schema (unify with A3 `CatalogOverviewItem`) `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T003 [P] Add `ResultsSlice` and `BrowserFilterSlice` to session-state schema `shared/schemas/src/linkml/session-state.yaml`
+- [x] T004 [P] Reconcile `DatasetEntry` with `DatasetEnvelope` implementation — update schema to match runtime shape `shared/schemas/src/linkml/tool-result.yaml`
+- [x] T005 Regenerate Python Pydantic models `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T006 Add `DebriefFeature` Python union type to debrief_schemas `shared/schemas/src/generated/python/debrief_schemas/unions.py`
+- [x] T007 Run pyright and pytest to verify schema generation is clean
 
 **Checkpoint**: All domain types now exist in LinkML. Pydantic models include `DebriefFeature` union.
 
@@ -61,12 +61,12 @@
 
 **Purpose**: Extend the TypeScript generator to emit session-state, tool-result, and newly added types. No runtime changes.
 
-- [ ] T008 Add `session-state` import to master schema `shared/schemas/src/linkml/debrief.yaml`
-- [ ] T009 [P] Add `tool-result` import to master schema `shared/schemas/src/linkml/debrief.yaml`
-- [ ] T010 Regenerate TypeScript types (session-state, tool-result, new A-types now included) `shared/schemas/src/generated/typescript/types.ts`
-- [ ] T011 Add type guards for new session-state types if needed `shared/schemas/src/generated/typescript/unions.ts`
-- [ ] T012 Verify provenance types (LogEntry, ParameterValue, InputFeatureState) are present in generated TS output
-- [ ] T013 Run pnpm typecheck and pnpm test to verify TS generation is clean
+- [x] T008 Add `session-state` import to master schema `shared/schemas/src/linkml/debrief.yaml`
+- [x] T009 [P] Add `tool-result` import to master schema `shared/schemas/src/linkml/debrief.yaml`
+- [x] T010 Regenerate TypeScript types (session-state, tool-result, new A-types now included) `shared/schemas/src/generated/typescript/types.ts`
+- [x] T011 Add type guards for new session-state types if needed `shared/schemas/src/generated/typescript/unions.ts`
+- [x] T012 Verify provenance types (LogEntry, ParameterValue, InputFeatureState) are present in generated TS output
+- [x] T013 Run pnpm typecheck and pnpm test to verify TS generation is clean
 
 **Checkpoint**: `@debrief/schemas` now exports all domain types. Round-trip evidence can be captured.
 

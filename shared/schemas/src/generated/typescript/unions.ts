@@ -14,7 +14,7 @@ import type {
   TextAnnotation,
   VectorAnnotation,
   PolyAnnotation,
-} from './types';
+} from './types.js';
 
 /**
  * Schema-typed annotation features — union of all 7 annotation types.

@@ -425,7 +425,7 @@ def generate_typescript() -> bool:
 
         # Create index.ts that re-exports everything
         index_file = TYPESCRIPT_OUT / "index.ts"
-        index_file.write_text('export * from "./types";\nexport * from "./unions";\n')
+        index_file.write_text('export * from "./types.js";\nexport * from "./unions.js";\n')
         print(f"  [OK] Generated: {index_file}")
         return True
     except subprocess.CalledProcessError as e:

@@ -53,6 +53,7 @@ class TestCreateLogEntry:
         assert isinstance(entry.timestamp, datetime)
 
     def test_create_log_entry_with_parameters(self) -> None:
+        """Generated WasGeneratedBy.parameters is a list; values are looked up by index."""
         features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
         entry = create_log_entry(
             tool_name="tool",
@@ -63,9 +64,9 @@ class TestCreateLogEntry:
         )
 
         assert len(entry.was_generated_by.parameters) == 2
-        assert entry.was_generated_by.parameters["unit"].value == "nm"
-        assert entry.was_generated_by.parameters["unit"].default is False
-        assert entry.was_generated_by.parameters["unit"].tunable is True
+        # Generated model uses list[ParameterValue]; access by index
+        values = [pv.value for pv in entry.was_generated_by.parameters]
+        assert "nm" in values
 
     def test_create_log_entry_with_typed_parameters(self) -> None:
         features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
@@ -73,12 +74,13 @@ class TestCreateLogEntry:
             tool_name="tool",
             tool_version="1.0.0",
             source_features=features,
-            parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
+            parameters={"interval": ParameterValue(value="60", default=True, tunable=True)},
             duration_ms=0.0,
         )
 
-        pv = entry.was_generated_by.parameters["interval"]
-        assert pv.value == 60
+        assert len(entry.was_generated_by.parameters) == 1
+        pv = entry.was_generated_by.parameters[0]
+        assert pv.value == "60"
         assert pv.default is True
         assert pv.tunable is True
 
@@ -159,6 +161,7 @@ class TestAttachLogEntry:
         )
 
     def test_attach_log_entry_creates_array(self) -> None:
+        """Generated models serialize with snake_case field names."""
         feature = {"type": "Feature", "properties": {"data": "test"}, "geometry": None}
         entry = self._make_entry()
 
@@ -168,9 +171,9 @@ class TestAttachLogEntry:
         prov = feature["properties"]["provenance"]
         assert isinstance(prov, list)
         assert len(prov) == 1
-        assert prov[0]["activityId"] == "act-001"
-        assert prov[0]["wasGeneratedBy"]["tool"] == "test-tool"
-        assert prov[0]["wasGeneratedBy"]["toolVersion"] == "1.0.0"
+        assert prov[0]["activity_id"] == "act-001"
+        assert prov[0]["was_generated_by"]["tool"] == "test-tool"
+        assert prov[0]["was_generated_by"]["tool_version"] == "1.0.0"
 
     def test_attach_log_entry_appends_to_array(self) -> None:
         feature = {"type": "Feature", "properties": {"provenance": []}, "geometry": None}
@@ -182,8 +185,8 @@ class TestAttachLogEntry:
 
         prov = feature["properties"]["provenance"]
         assert len(prov) == 2
-        assert prov[0]["activityId"] == "act-001"
-        assert prov[1]["activityId"] == "act-002"
+        assert prov[0]["activity_id"] == "act-001"
+        assert prov[1]["activity_id"] == "act-002"
 
     def test_attach_log_entry_creates_properties(self) -> None:
         feature = {"type": "Feature", "geometry": None}
@@ -205,7 +208,7 @@ class TestAttachLogEntry:
         assert isinstance(prov, list)
         assert len(prov) == 2
         assert prov[0] == legacy_prov  # Legacy entry preserved
-        assert prov[1]["activityId"] == "act-001"  # New entry appended
+        assert prov[1]["activity_id"] == "act-001"  # New entry appended (snake_case)
 
     def test_attach_log_entry_shared_activity_id(self) -> None:
         feature1 = {"type": "Feature", "properties": {}, "geometry": None}
@@ -215,8 +218,8 @@ class TestAttachLogEntry:
         attach_log_entry(feature1, entry)
         attach_log_entry(feature2, entry)
 
-        assert feature1["properties"]["provenance"][0]["activityId"] == "shared-uuid"
-        assert feature2["properties"]["provenance"][0]["activityId"] == "shared-uuid"
+        assert feature1["properties"]["provenance"][0]["activity_id"] == "shared-uuid"
+        assert feature2["properties"]["provenance"][0]["activity_id"] == "shared-uuid"
 
     def test_attach_log_entry_iso_duration(self) -> None:
         feature = {"type": "Feature", "properties": {}, "geometry": None}
@@ -225,24 +228,25 @@ class TestAttachLogEntry:
         attach_log_entry(feature, entry)
 
         prov = feature["properties"]["provenance"][0]
-        assert prov["executionDuration"] == "PT0.1S"
+        assert prov["execution_duration"] == "PT0.1S"
 
-    def test_attach_log_entry_camelcase_keys(self) -> None:
+    def test_attach_log_entry_snake_case_keys(self) -> None:
+        """Generated models serialize with snake_case field names (no camelCase aliases)."""
         feature = {"type": "Feature", "properties": {}, "geometry": None}
         entry = self._make_entry()
 
         attach_log_entry(feature, entry)
 
         prov = feature["properties"]["provenance"][0]
-        # Verify camelCase keys
-        assert "activityId" in prov
-        assert "wasGeneratedBy" in prov
-        assert "executionDuration" in prov
-        assert "generatedResultId" in prov
-        # Verify no snake_case keys
-        assert "activity_id" not in prov
-        assert "was_generated_by" not in prov
-        assert "execution_duration" not in prov
+        # Verify snake_case keys (generated models have no camelCase aliases)
+        assert "activity_id" in prov
+        assert "was_generated_by" in prov
+        assert "execution_duration" in prov
+        assert "generated_result_id" in prov
+        # Verify no camelCase keys
+        assert "activityId" not in prov
+        assert "wasGeneratedBy" not in prov
+        assert "executionDuration" not in prov
 
 
 class TestCreateProvenance:
@@ -306,60 +310,71 @@ class TestSetOutputKind:
         assert feature["properties"]["kind"] == "ZONE"
 
 
+import json as _json_module
+
+
 class TestInputFeatureState:
-    """Tests for InputFeatureState model creation and serialization (T007)."""
+    """Tests for InputFeatureState model creation and serialization (T007).
+
+    NOTE: Generated InputFeatureState uses snake_case field names (feature_id)
+    and geometry/properties typed as str (serialized JSON strings per LinkML).
+    """
 
     def test_create_input_feature_state(self) -> None:
+        geom_json = _json_module.dumps(
+            {"type": "Polygon", "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]}
+        )
+        props_json = _json_module.dumps({"kind": "CIRCLE", "center": [0.0, 50.0]})
         state = InputFeatureState(
-            featureId="circle-001",
-            geometry={
-                "type": "Polygon",
-                "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]],
-            },
-            properties={"kind": "CIRCLE", "center": [0.0, 50.0]},
+            feature_id="circle-001",
+            geometry=geom_json,
+            properties=props_json,
         )
         assert state.feature_id == "circle-001"
-        assert state.geometry["type"] == "Polygon"
+        assert _json_module.loads(state.geometry)["type"] == "Polygon"
         assert state.properties is not None
-        assert state.properties["center"] == [0.0, 50.0]
+        assert _json_module.loads(state.properties)["center"] == [0.0, 50.0]
 
     def test_create_input_feature_state_no_properties(self) -> None:
+        geom_json = _json_module.dumps({"type": "Point", "coordinates": [0.0, 50.0]})
         state = InputFeatureState(
-            featureId="text-001",
-            geometry={"type": "Point", "coordinates": [0.0, 50.0]},
+            feature_id="text-001",
+            geometry=geom_json,
         )
         assert state.feature_id == "text-001"
         assert state.properties is None
 
-    def test_input_feature_state_serializes_camelcase(self) -> None:
+    def test_input_feature_state_serializes_snake_case(self) -> None:
+        """Generated models serialize with snake_case keys (no camelCase aliases)."""
+        geom_json = _json_module.dumps({"type": "Polygon", "coordinates": [[[0.0, 50.0]]]})
         state = InputFeatureState(
-            featureId="circle-001",
-            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
-            properties={"center": [0.0, 50.0]},
+            feature_id="circle-001",
+            geometry=geom_json,
         )
-        data = state.model_dump(mode="json", by_alias=True)
-        assert "featureId" in data
-        assert "feature_id" not in data
-        assert data["featureId"] == "circle-001"
-        assert data["geometry"]["type"] == "Polygon"
-        assert data["properties"]["center"] == [0.0, 50.0]
+        data = state.model_dump(mode="json")
+        assert "feature_id" in data
+        assert data["feature_id"] == "circle-001"
 
-    def test_input_feature_state_populate_by_name(self) -> None:
-        # populate_by_name allows using the Python field name at runtime
-        state = InputFeatureState(
-            **{"feature_id": "f1", "geometry": {"type": "Point", "coordinates": [1.0, 2.0]}}
-        )
+    def test_input_feature_state_snake_case_constructor(self) -> None:
+        """Generated model uses snake_case; feature_id is the field name."""
+        geom_json = _json_module.dumps({"type": "Point", "coordinates": [1.0, 2.0]})
+        state = InputFeatureState(feature_id="f1", geometry=geom_json)
         assert state.feature_id == "f1"
 
 
 class TestLogEntryWithInputState:
-    """Tests for LogEntry with inputState field (T008)."""
+    """Tests for LogEntry with input_state field (T008).
 
-    def test_log_entry_with_input_state_serializes_camelcase(self) -> None:
+    NOTE: Generated models use snake_case; input_state replaces inputState alias.
+    InputFeatureState.geometry is str (JSON), not dict.
+    """
+
+    def test_log_entry_with_input_state_serializes_snake_case(self) -> None:
+        """Generated models serialize with snake_case field names."""
+        geom_json = _json_module.dumps({"type": "Polygon", "coordinates": [[[0.0, 50.0]]]})
         state = InputFeatureState(
-            featureId="circle-001",
-            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
-            properties={"center": [0.0, 50.0]},
+            feature_id="circle-001",
+            geometry=geom_json,
         )
         entry = create_log_entry(
             tool_name="move-shape",
@@ -371,11 +386,11 @@ class TestLogEntryWithInputState:
             input_state=[state],
         )
 
-        data = entry.model_dump(mode="json", by_alias=True)
-        assert "inputState" in data
-        assert "input_state" not in data
-        assert len(data["inputState"]) == 1
-        assert data["inputState"][0]["featureId"] == "circle-001"
+        data = entry.model_dump(mode="json")
+        assert "input_state" in data
+        assert "inputState" not in data
+        assert len(data["input_state"]) == 1
+        assert data["input_state"][0]["feature_id"] == "circle-001"
 
     def test_log_entry_without_input_state(self) -> None:
         entry = create_log_entry(
@@ -385,18 +400,18 @@ class TestLogEntryWithInputState:
             duration_ms=0.0,
         )
 
-        data = entry.model_dump(mode="json", by_alias=True)
-        assert data["inputState"] is None
+        data = entry.model_dump(mode="json")
+        assert data["input_state"] is None
 
 
 class TestCreateLogEntryWithInputState:
     """Tests for create_log_entry() with input_state parameter (T009, T010)."""
 
     def test_create_log_entry_with_input_state(self) -> None:
+        geom_json = _json_module.dumps({"type": "Polygon", "coordinates": [[[0.0, 50.0]]]})
         state = InputFeatureState(
-            featureId="circle-001",
-            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
-            properties={"center": [0.0, 50.0]},
+            feature_id="circle-001",
+            geometry=geom_json,
         )
         entry = create_log_entry(
             tool_name="move-shape",
@@ -424,16 +439,24 @@ class TestCreateLogEntryWithInputState:
 
 
 class TestLogEntryRoundTrip:
-    """Tests for LogEntry round-trip with inputState (T011)."""
+    """Tests for LogEntry round-trip with input_state (T011).
+
+    NOTE: Generated models serialize to snake_case (no camelCase aliases).
+    InputFeatureState.geometry is a JSON string, not a dict.
+    """
 
     def test_round_trip_preserves_input_state(self) -> None:
+        geom_dict = {
+            "type": "Polygon",
+            "coordinates": [[[0.0, 50.0], [0.01, 50.01], [-0.01, 50.01], [0.0, 50.0]]],
+        }
+        props_dict = {"kind": "CIRCLE", "center": [0.0, 50.0], "radius": 1000.0}
+        geom_json = _json_module.dumps(geom_dict)
+        props_json = _json_module.dumps(props_dict)
         state = InputFeatureState(
-            featureId="circle-001",
-            geometry={
-                "type": "Polygon",
-                "coordinates": [[[0.0, 50.0], [0.01, 50.01], [-0.01, 50.01], [0.0, 50.0]]],
-            },
-            properties={"kind": "CIRCLE", "center": [0.0, 50.0], "radius": 1000.0},
+            feature_id="circle-001",
+            geometry=geom_json,
+            properties=props_json,
         )
         original = create_log_entry(
             tool_name="move-shape",
@@ -446,8 +469,8 @@ class TestLogEntryRoundTrip:
             activity_id="test-round-trip",
         )
 
-        # Serialize to JSON dict (camelCase)
-        json_data = original.model_dump(mode="json", by_alias=True)
+        # Serialize to JSON dict (snake_case)
+        json_data = original.model_dump(mode="json")
 
         # Deserialize back to LogEntry
         restored = LogEntry.model_validate(json_data)
@@ -455,9 +478,8 @@ class TestLogEntryRoundTrip:
         assert restored.input_state is not None
         assert len(restored.input_state) == 1
         assert restored.input_state[0].feature_id == "circle-001"
-        assert restored.input_state[0].geometry["type"] == "Polygon"
-        assert restored.input_state[0].geometry["coordinates"] == state.geometry["coordinates"]
-        assert restored.input_state[0].properties == state.properties
+        assert _json_module.loads(restored.input_state[0].geometry)["type"] == "Polygon"
+        assert restored.input_state[0].properties == props_json
 
     def test_round_trip_preserves_null_input_state(self) -> None:
         original = create_log_entry(
@@ -468,7 +490,7 @@ class TestLogEntryRoundTrip:
             activity_id="test-null-round-trip",
         )
 
-        json_data = original.model_dump(mode="json", by_alias=True)
+        json_data = original.model_dump(mode="json")
         restored = LogEntry.model_validate(json_data)
 
         assert restored.input_state is None

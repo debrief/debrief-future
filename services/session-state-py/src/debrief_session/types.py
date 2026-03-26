@@ -1,108 +1,64 @@
 """
 Session state types for Python client.
 Feature: 024-document-session-state
+
+Types that exist in debrief_schemas are imported from there.
+Local types (SpatialSlice, FeaturesSlice, DocumentSlice, SessionState) are
+defined here as they are not (yet) in debrief_schemas.
+
+NOTE: The generated ConfiguredBaseModel uses extra="forbid" and snake_case field
+names without camelCase aliases. Callers must use snake_case constructors.
 """
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+# Import session-state types from generated debrief_schemas (source of truth).
+# These replace the previous hand-written duplicates.
+from debrief_schemas import (
+    FeatureSelection,
+    TemporalSlice,
+    TimeFilter,
+    TimeInstant,
+    TimeRange,
+    TimeStep,
+    ViewportPolygon,
+)
+
+__all_from_schemas__ = [
+    "FeatureSelection",
+    "TemporalSlice",
+    "TimeFilter",
+    "TimeInstant",
+    "TimeRange",
+    "TimeStep",
+    "ViewportPolygon",
+]
 
 
-class TimeInstant(BaseModel):
-    """A point in time with dual representations."""
+def make_time_instant(epoch: int) -> TimeInstant:
+    """Create a TimeInstant from epoch milliseconds.
 
-    epoch: int = Field(description="Milliseconds since Unix epoch")
-    iso: str = Field(description="ISO 8601 UTC format string")
-
-    @classmethod
-    def now(cls) -> "TimeInstant":
-        """Create a TimeInstant for the current time."""
-        dt = datetime.utcnow()
-        return cls(
-            epoch=int(dt.timestamp() * 1000),
-            iso=dt.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
-        )
-
-    @classmethod
-    def from_epoch(cls, epoch: int) -> "TimeInstant":
-        """Create a TimeInstant from epoch milliseconds."""
-        dt = datetime.utcfromtimestamp(epoch / 1000)
-        return cls(
-            epoch=epoch,
-            iso=dt.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
-        )
-
-
-class TimeRange(BaseModel):
-    """A temporal interval with inclusive start and end."""
-
-    start: TimeInstant
-    end: TimeInstant
-
-
-class TimeFilter(BaseModel):
-    """Constraints on the visible time window."""
-
-    start: TimeInstant | None = None
-    end: TimeInstant | None = None
-
-
-class TimeStep(BaseModel):
-    """Step size for discrete time navigation."""
-
-    value: float
-    unit: str = Field(description="millisecond|second|minute|hour|day")
-
-
-class Coordinate(BaseModel):
-    """A geographic coordinate."""
-
-    __root__: tuple[float, float]
-
-    def __init__(self, lon: float, lat: float, **kwargs: object) -> None:
-        super().__init__(__root__=(lon, lat), **kwargs)
-
-    @property
-    def longitude(self) -> float:
-        return self.__root__[0]
-
-    @property
-    def latitude(self) -> float:
-        return self.__root__[1]
-
-
-class ViewportPolygon(BaseModel):
-    """Geographic area as a 4-corner polygon."""
-
-    coordinates: list[list[float]] = Field(
-        description="Four corners [NW, NE, SE, SW] as [lon, lat] pairs"
+    Helper replacing the former TimeInstant.from_epoch() classmethod.
+    The generated TimeInstant (ConfiguredBaseModel) does not support classmethods.
+    """
+    dt = datetime.utcfromtimestamp(epoch / 1000)
+    return TimeInstant(
+        epoch=epoch,
+        iso=dt.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
     )
 
 
-class FeatureSelection(BaseModel):
-    """Set of selected feature identifiers."""
+def make_time_instant_now() -> TimeInstant:
+    """Create a TimeInstant for the current time.
 
-    featureIds: list[str] = Field(default_factory=list, alias="featureIds")
-    primary: str | None = None
-    timestamp: TimeInstant
-
-    class Config:
-        populate_by_name = True
-
-
-class TemporalSlice(BaseModel):
-    """Temporal state slice."""
-
-    currentTime: TimeInstant | None = Field(None, alias="currentTime")
-    timeRange: TimeRange | None = Field(None, alias="timeRange")
-    timeFilter: TimeFilter | None = Field(None, alias="timeFilter")
-    stepSize: TimeStep = Field(alias="stepSize")
-    playbackRate: float = Field(alias="playbackRate")
-    playbackState: str = Field(alias="playbackState")
-    displayMode: str = Field(alias="displayMode")
-
-    class Config:
-        populate_by_name = True
+    Helper replacing the former TimeInstant.now() classmethod.
+    """
+    dt = datetime.utcnow()
+    epoch = int(dt.timestamp() * 1000)
+    iso = dt.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    return TimeInstant(epoch=epoch, iso=iso)
 
 
 class SpatialSlice(BaseModel):
@@ -115,22 +71,20 @@ class SpatialSlice(BaseModel):
 class FeaturesSlice(BaseModel):
     """Features state slice."""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     featureCollectionUri: str | None = Field(None, alias="featureCollectionUri")
     selection: FeatureSelection
     hiddenFeatureIds: list[str] = Field(default_factory=list, alias="hiddenFeatureIds")
-
-    class Config:
-        populate_by_name = True
 
 
 class DocumentSlice(BaseModel):
     """Document state slice."""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     dirty: bool = False
     savePath: str | None = Field(None, alias="savePath")
-
-    class Config:
-        populate_by_name = True
 
 
 class SessionState(BaseModel):

@@ -58,6 +58,9 @@ import type {
   SafeFeature,
 } from '@debrief/utils';
 
+// T024: Import LogEntry from @debrief/schemas instead of defining locally
+import type { LogEntry } from '@debrief/schemas';
+
 import {
   toolDefinition as setTrackColorDef,
   execute as executeSetTrackColor,
@@ -141,20 +144,8 @@ function durationMsToIso8601(durationMs: number): string {
   return `PT${formatted}S`;
 }
 
-interface LogEntry {
-  activityId: string;
-  timestamp: string;
-  wasGeneratedBy: {
-    tool: string;
-    toolVersion: string;
-    parameters: Record<string, { value: unknown; default?: boolean; tunable?: boolean }>;
-  };
-  used: string[];
-  generated: string[];
-  executionDuration: string;
-  generatedResultId: string | null;
-  tune: null;
-}
+// T024: LogEntry type is now imported from @debrief/schemas (above).
+// Schema LogEntry uses snake_case field names and stores parameters as ParameterValue[].
 
 function createLogEntry(
   toolName: string,
@@ -163,24 +154,25 @@ function createLogEntry(
   params: Record<string, unknown>,
   durationMs: number,
 ): LogEntry {
-  const typedParams: Record<string, { value: unknown }> = {};
-  for (const [key, val] of Object.entries(params)) {
-    typedParams[key] = { value: val };
-  }
+  // T024: schema WasGeneratedBy.parameters is ParameterValue[] (array), not Record.
+  // Serialize parameter values to strings to match wire format.
+  const typedParams = Object.entries(params).map(([, val]) => ({
+    value: typeof val === 'string' ? val : JSON.stringify(val),
+  }));
 
   return {
-    activityId: generateUUID(),
+    activity_id: generateUUID(),
     timestamp: new Date().toISOString(),
-    wasGeneratedBy: {
+    was_generated_by: {
       tool: toolName,
-      toolVersion,
+      tool_version: toolVersion,
       parameters: typedParams,
     },
     used: sourceFeatureIds,
     generated: [],
-    executionDuration: durationMsToIso8601(durationMs),
-    generatedResultId: null,
-    tune: null,
+    execution_duration: durationMsToIso8601(durationMs),
+    generated_result_id: undefined,
+    tune: undefined,
   };
 }
 
@@ -246,18 +238,19 @@ function validateToolOutput(
     } else if (provenance.length === 0) {
       errors.push({ featureIndex: i, error: 'Feature.properties.provenance must not be empty' });
     } else {
-      const latest = provenance[provenance.length - 1] as { activityId?: unknown; timestamp?: unknown; wasGeneratedBy?: { tool?: unknown; toolVersion?: unknown } };
+      // T024: schema LogEntry uses snake_case field names
+      const latest = provenance[provenance.length - 1] as { activity_id?: unknown; timestamp?: unknown; was_generated_by?: { tool?: unknown; tool_version?: unknown } };
       if (!latest || typeof latest !== 'object') {
         errors.push({ featureIndex: i, error: 'provenance entry must be an object' });
       } else {
-        if (!latest.activityId) errors.push({ featureIndex: i, error: 'provenance entry activityId is required' });
+        if (!latest.activity_id) errors.push({ featureIndex: i, error: 'provenance entry activity_id is required' });
         if (!latest.timestamp) errors.push({ featureIndex: i, error: 'provenance entry timestamp is required' });
-        const wgb = latest.wasGeneratedBy;
+        const wgb = latest.was_generated_by;
         if (!wgb) {
-          errors.push({ featureIndex: i, error: 'provenance entry wasGeneratedBy is required' });
+          errors.push({ featureIndex: i, error: 'provenance entry was_generated_by is required' });
         } else {
-          if (!wgb.tool) errors.push({ featureIndex: i, error: 'wasGeneratedBy.tool is required' });
-          if (!wgb.toolVersion) errors.push({ featureIndex: i, error: 'wasGeneratedBy.toolVersion is required' });
+          if (!wgb.tool) errors.push({ featureIndex: i, error: 'was_generated_by.tool is required' });
+          if (!wgb.tool_version) errors.push({ featureIndex: i, error: 'was_generated_by.tool_version is required' });
         }
       }
     }

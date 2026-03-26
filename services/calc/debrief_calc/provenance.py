@@ -74,29 +74,29 @@ def create_log_entry(
         feature_id = feature.get("id", "unknown")
         used.append(str(feature_id))
 
-    # Convert flat parameters dict to ParameterValue dict
-    typed_params: dict[str, ParameterValue] = {}
+    # Convert flat parameters dict to list of ParameterValue (generated schema uses list)
+    typed_params: list[ParameterValue] = []
     if parameters is not None:
-        for key, val in parameters.items():
+        for val in parameters.values():
             if isinstance(val, ParameterValue):
-                typed_params[key] = val
+                typed_params.append(val)
             else:
-                typed_params[key] = ParameterValue(value=val)
+                typed_params.append(ParameterValue(value=str(val)))
 
     return LogEntry(
-        activityId=activity_id or str(uuid.uuid4()),
+        activity_id=activity_id or str(uuid.uuid4()),
         timestamp=timestamp or datetime.now(UTC),
-        wasGeneratedBy=WasGeneratedBy(
+        was_generated_by=WasGeneratedBy(
             tool=tool_name,
-            toolVersion=tool_version,
+            tool_version=tool_version,
             parameters=typed_params,
         ),
         used=used,
         generated=generated or [],
-        executionDuration=_duration_ms_to_iso8601(duration_ms),
-        generatedResultId=generated_result_id,
+        execution_duration=_duration_ms_to_iso8601(duration_ms),
+        generated_result_id=generated_result_id,
         tune=None,
-        inputState=input_state,
+        input_state=input_state,
     )
 
 
@@ -121,8 +121,8 @@ def attach_log_entry(
     if "properties" not in feature:
         feature["properties"] = {}
 
-    # Serialize using Pydantic with camelCase aliases
-    entry_dict = log_entry.model_dump(mode="json", by_alias=True)
+    # Serialize using Pydantic (generated models use snake_case field names)
+    entry_dict = log_entry.model_dump(mode="json")
 
     existing = feature["properties"].get("provenance")
 

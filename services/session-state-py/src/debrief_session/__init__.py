@@ -8,10 +8,16 @@ Python client for the Debrief session state MCP service.
 from .client import SessionClient
 from .types import (
     DocumentSlice,
-    FeatureSelection,
     FeaturesSlice,
     SessionState,
     SpatialSlice,
+    make_time_instant,
+    make_time_instant_now,
+)
+
+# Re-export generated types from debrief_schemas via types module
+from .types import (
+    FeatureSelection,
     TemporalSlice,
     TimeFilter,
     TimeInstant,
@@ -35,4 +41,6 @@ __all__ = [
     "FeaturesSlice",
     "DocumentSlice",
     "SessionState",
+    "make_time_instant",
+    "make_time_instant_now",
 ]
