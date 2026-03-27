@@ -256,10 +256,8 @@ export class StacService {
             if (geom.type === 'LineString') {
               trackCount++;
 
-              // Update time extent from track feature properties
+              // Update time extent from track start_time/end_time (schema-standard)
               const props = feature.properties ?? {};
-
-              // Prefer start_time/end_time on TRACK features (REP handler output)
               const startTime = props.start_time as string | undefined;
               const endTime = props.end_time as string | undefined;
               if (startTime && endTime) {
@@ -268,21 +266,6 @@ export class StacService {
                 }
                 if (endTime > timeExtent[1]) {
                   timeExtent[1] = endTime;
-                }
-              }
-
-              // Fallback: extract from times array (epoch ms)
-              const times = props.times as number[] | undefined;
-              if (times && times.length > 0) {
-                const firstTime = times[0]!;
-                const lastTime = times[times.length - 1]!;
-                const firstIso = new Date(firstTime).toISOString();
-                const lastIso = new Date(lastTime).toISOString();
-                if (firstIso < timeExtent[0]) {
-                  timeExtent[0] = firstIso;
-                }
-                if (lastIso > timeExtent[1]) {
-                  timeExtent[1] = lastIso;
                 }
               }
             } else if (geom.type === 'Point') {

@@ -999,7 +999,7 @@ describe('StacService', () => {
       expect(result!.locationCount).toBe(3);
     });
 
-    it('should calculate time extent from track times', async () => {
+    it('should calculate time extent from track start_time/end_time', async () => {
       const store = createMockStore();
       const item = createMockItem({
         properties: { datetime: '2024-06-01T00:00:00Z' },
@@ -1012,7 +1012,9 @@ describe('StacService', () => {
           type: 'Feature',
           geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
           properties: {
-            times: [1704067200000, 1735689599000],
+            kind: 'TRACK',
+            start_time: '2024-01-01T00:00:00Z',
+            end_time: '2024-12-31T23:59:59Z',
           },
         },
       ]);
@@ -1028,8 +1030,8 @@ describe('StacService', () => {
 
       const result = await service.loadPlot(store, 'items/plot.json');
 
-      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00.000Z');
-      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59.000Z');
+      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00Z');
+      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59Z');
     });
 
     it('should return null when item not found', async () => {
