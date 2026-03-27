@@ -179,6 +179,150 @@
       "title": "CircleAnnotationProperties",
       "type": "object"
     },
+    "DatasetAxisMetadata": {
+      "additionalProperties": false,
+      "description": "Axis label and type metadata for a dataset chart",
+      "properties": {
+        "label": {
+          "description": "Human-readable axis label (e.g., \"Time\", \"Range\")",
+          "type": "string"
+        },
+        "type": {
+          "description": "Axis data type (temporal, quantitative)",
+          "type": "string"
+        },
+        "units": {
+          "description": "Units for the axis values (e.g., \"m\", \"\u00b0\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "label",
+        "type"
+      ],
+      "title": "DatasetAxisMetadata",
+      "type": "object"
+    },
+    "DatasetDataPoint": {
+      "additionalProperties": false,
+      "description": "A single structured data record within a series or flat dataset. Fields are open-ended (the axes are described by DatasetMetadata) to accommodate any combination of x/y/series-key values produced by tools. At minimum one of x_value or y_value is expected, but additional domain-specific fields (e.g., \"zone\", \"bearing\", \"time\") are allowed.",
+      "properties": {
+        "series_key": {
+          "description": "Series discriminator for multi-series datasets (e.g., track name). Absent for single-series (flat) datasets.\n",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "x_value": {
+          "description": "Primary independent-axis value serialised as a string. For temporal axes this is an ISO 8601 datetime; for quantitative axes it is a decimal string; for nominal/ordinal axes it is the category label.\n",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "y_value": {
+          "description": "Primary dependent-axis value serialised as a string (decimal or label).\n",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "DatasetDataPoint",
+      "type": "object"
+    },
+    "DatasetEntry": {
+      "additionalProperties": false,
+      "description": "Standard envelope for all tool result datasets, matching the runtime DatasetEnvelope interface from shared/components/src/ChartRenderer/types.ts. Exactly one of data_points (flat/single-series) or series (multi-series) should be populated per instance.",
+      "properties": {
+        "data_points": {
+          "description": "Flat array of structured data records for histograms and single-series charts. Corresponds to DatasetEnvelope.data (Record<string, unknown>[]). Absent when series is populated.\n",
+          "items": {
+            "$ref": "#/$defs/DatasetDataPoint"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/$defs/DatasetMetadata",
+          "description": "Axis definitions and display hints"
+        },
+        "series": {
+          "description": "Named data series for multi-line/multi-series charts. Corresponds to DatasetEnvelope.series (DataSeries[]). Absent when data_points is populated.\n",
+          "items": {
+            "$ref": "#/$defs/DatasetSeries"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "title": {
+          "description": "Human-readable chart title",
+          "type": "string"
+        },
+        "type": {
+          "description": "Dataset subtype identifier (e.g., \"zone_histogram\", \"range_bearing_series\")",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "metadata"
+      ],
+      "title": "DatasetEntry",
+      "type": "object"
+    },
+    "DatasetMetadata": {
+      "additionalProperties": false,
+      "description": "Chart metadata for a dataset entry",
+      "properties": {
+        "xAxis": {
+          "$ref": "#/$defs/DatasetAxisMetadata",
+          "description": "X-axis metadata"
+        },
+        "yAxis": {
+          "$ref": "#/$defs/DatasetAxisMetadata",
+          "description": "Y-axis metadata"
+        }
+      },
+      "required": [
+        "xAxis",
+        "yAxis"
+      ],
+      "title": "DatasetMetadata",
+      "type": "object"
+    },
+    "DatasetSeries": {
+      "additionalProperties": false,
+      "description": "A named data series within a multi-series dataset. Replaces the earlier float[] data field with a list of structured DatasetDataPoint records to match the runtime DataSeries shape from shared/components/src/ChartRenderer/types.ts (Record<string, unknown>[]).",
+      "properties": {
+        "data_points": {
+          "description": "Array of structured data records for this series. Each record carries open x/y/domain fields; see DatasetDataPoint.\n",
+          "items": {
+            "$ref": "#/$defs/DatasetDataPoint"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "Series display name (shown in chart legend)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "data_points"
+      ],
+      "title": "DatasetSeries",
+      "type": "object"
+    },
     "DurationPresetEnum": {
       "description": "Common ISO 8601 duration presets for interval parameters",
       "enum": [
@@ -193,6 +337,16 @@
         "PT24H"
       ],
       "title": "DurationPresetEnum",
+      "type": "string"
+    },
+    "ErrorCategory": {
+      "description": "Categories of tool execution errors",
+      "enum": [
+        "invalid_input",
+        "algorithm_failure",
+        "resource_not_found"
+      ],
+      "title": "ErrorCategory",
       "type": "string"
     },
     "FeatureKindEnum": {
@@ -1196,6 +1350,107 @@
       "title": "ParameterValue",
       "type": "object"
     },
+    "PlotSummary": {
+      "additionalProperties": false,
+      "description": "Projection of a STAC Item for UI consumption (e.g., browser tree rows). Carries only the fields required for listing and opening a plot, derived from the STAC Item plus its debrief: extension properties. Replaces the Plot interface from apps/vscode/src/types/plot.ts as the canonical summary type.",
+      "properties": {
+        "bbox": {
+          "description": "Geographic bounding box as [west, south, east, north]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "catalog_id": {
+          "description": "Parent catalog identifier",
+          "type": "string"
+        },
+        "datetime": {
+          "description": "Creation/capture timestamp (ISO 8601)",
+          "type": "string"
+        },
+        "id": {
+          "description": "STAC Item ID",
+          "type": "string"
+        },
+        "item_path": {
+          "description": "Path to item.json relative to store root",
+          "type": "string"
+        },
+        "location_count": {
+          "description": "Number of reference locations in this plot",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_path": {
+          "description": "Original source file path (for provenance)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "time_extent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlotTimeExtent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Temporal extent of the plot (start/end ISO 8601 strings)"
+        },
+        "title": {
+          "description": "Plot title from STAC metadata",
+          "type": "string"
+        },
+        "track_count": {
+          "description": "Number of tracks in this plot",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "datetime",
+        "item_path",
+        "catalog_id"
+      ],
+      "title": "PlotSummary",
+      "type": "object"
+    },
+    "PlotTimeExtent": {
+      "additionalProperties": false,
+      "description": "Temporal extent of a plot expressed as ISO 8601 strings. Used within PlotSummary and StacItemSummary for lightweight display without the full epoch+iso dual representation of TimeInstant.",
+      "properties": {
+        "end": {
+          "description": "End of time extent (ISO 8601)",
+          "type": "string"
+        },
+        "start": {
+          "description": "Start of time extent (ISO 8601)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "PlotTimeExtent",
+      "type": "object"
+    },
     "PointMetadataEntry": {
       "additionalProperties": false,
       "description": "Metadata for a single point within a MultiPoint reference set. Entries are parallel to the MultiPoint coordinates array. Downstream tools (#081 classifier) extend entries with zone/color fields.",
@@ -1777,6 +2032,33 @@
       "title": "ResultCategoryEnum",
       "type": "string"
     },
+    "ResultTopType": {
+      "description": "Top-level result type categories",
+      "enum": [
+        "mutation",
+        "addition",
+        "deletion",
+        "artifact"
+      ],
+      "title": "ResultTopType",
+      "type": "string"
+    },
+    "ResultTypePath": {
+      "additionalProperties": false,
+      "description": "Slash-delimited hierarchical type path. Format: {top_type}/{domain}/{specific_type} Example: mutation/track/smoothed",
+      "properties": {
+        "path": {
+          "description": "Full hierarchical path",
+          "pattern": "^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "ResultTypePath",
+      "type": "object"
+    },
     "SegmentMetadata": {
       "additionalProperties": false,
       "description": "Per-segment metadata for compound tracks. Each segment corresponds to one LineString within a MultiLineString geometry. segments[i] describes geometry.coordinates[i].",
@@ -2159,6 +2441,124 @@
         }
       },
       "title": "StacExtensionProperties",
+      "type": "object"
+    },
+    "StacItemSummary": {
+      "additionalProperties": false,
+      "description": "Minimal STAC Item projection for browser tree display and metadata filtering. Unifies StacItemSummary (apps/vscode/src/types/stac.ts) and CatalogOverviewItem (shared/components/src/filter-engine/types.ts) into a single canonical summary type that carries both navigation fields and the full set of debrief: extension properties needed for filtering.",
+      "properties": {
+        "bbox": {
+          "description": "Geographic bounding box as [west, south, east, north]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "catalog_id": {
+          "description": "Parent catalog identifier",
+          "type": "string"
+        },
+        "datetime": {
+          "description": "Single datetime (ISO 8601) \u2014 fallback when start/end not available",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "end_datetime": {
+          "description": "Range end datetime (ISO 8601)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feature_tags": {
+          "description": "Feature-level tags from debrief:feature_tags",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "STAC Item ID",
+          "type": "string"
+        },
+        "item_path": {
+          "description": "Path to item.json relative to store root",
+          "type": "string"
+        },
+        "nationalities": {
+          "description": "ISO 3166-1 alpha-2 nationality codes from debrief:nationalities\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "start_datetime": {
+          "description": "Range start datetime (ISO 8601)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "store_id": {
+          "description": "Parent store identifier (needed for URI construction)",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Plot-level tags from debrief:tags",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "title": {
+          "description": "Item title",
+          "type": "string"
+        },
+        "track_names": {
+          "description": "Track platform names from debrief:track_names",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "vessel_classes": {
+          "description": "Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "item_path",
+        "catalog_id",
+        "store_id"
+      ],
+      "title": "StacItemSummary",
       "type": "object"
     },
     "SystemRecordProperties": {
@@ -2685,6 +3085,54 @@
       "title": "ToolParameter",
       "type": "object"
     },
+    "ToolResultAnnotations": {
+      "additionalProperties": false,
+      "description": "Annotations for MCP tool result content items. All results MUST include resultType, sourceFeatures, and label. Deletions MUST include deletedFeatures. Artifacts MUST include href.",
+      "properties": {
+        "deletedFeatures": {
+          "description": "IDs of features removed (REQUIRED for deletions)",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "href": {
+          "description": "Relative path to artifact file (REQUIRED for artifacts)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "description": "Human-readable description of the result",
+          "type": "string"
+        },
+        "resultType": {
+          "description": "Hierarchical result type (e.g., mutation/track/smoothed)",
+          "pattern": "^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$",
+          "type": "string"
+        },
+        "sourceFeatures": {
+          "description": "IDs of input features used to generate this result",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "resultType",
+        "sourceFeatures",
+        "label"
+      ],
+      "title": "ToolResultAnnotations",
+      "type": "object"
+    },
     "TrackFeature": {
       "additionalProperties": false,
       "description": "GeoJSON Feature representing a vessel track",
@@ -3092,11 +3540,11 @@
       "type": "object"
     }
   },
-  "$id": "https://debrief.info/schemas/debrief",
+  "$id": "https://debrief.info/schemas/debrief-jsonschema",
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "additionalProperties": true,
   "metamodel_version": "1.7.0",
-  "title": "debrief",
+  "title": "debrief_jsonschema",
   "type": "object",
   "version": null
 }

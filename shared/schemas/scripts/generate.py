@@ -19,8 +19,11 @@ SCHEMAS_ROOT = SCRIPT_DIR.parent
 LINKML_DIR = SCHEMAS_ROOT / "src" / "linkml"
 GENERATED_DIR = SCHEMAS_ROOT / "src" / "generated"
 
-# Source schema
+# Source schemas
 MASTER_SCHEMA = LINKML_DIR / "debrief.yaml"
+# JSON Schema uses a subset that excludes session-state (gen-json-schema bug
+# with Coordinate as multivalued class range).
+JSONSCHEMA_SCHEMA = LINKML_DIR / "debrief-jsonschema.yaml"
 
 # Output directories
 PYTHON_OUT = GENERATED_DIR / "python" / "debrief_schemas"
@@ -277,8 +280,9 @@ def generate_jsonschema() -> bool:
     """Generate JSON Schema from LinkML schema."""
     import json
 
-    if not MASTER_SCHEMA.exists():
-        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
+    schema_file = JSONSCHEMA_SCHEMA if JSONSCHEMA_SCHEMA.exists() else MASTER_SCHEMA
+    if not schema_file.exists():
+        print(f"  [FAIL] Schema not found: {schema_file}")
         return False
 
     JSONSCHEMA_OUT.mkdir(parents=True, exist_ok=True)
@@ -286,7 +290,7 @@ def generate_jsonschema() -> bool:
 
     cmd = [
         "gen-json-schema",
-        str(MASTER_SCHEMA),
+        str(schema_file),
     ]
 
     try:

@@ -5,7 +5,6 @@ Provides functions to validate GeoJSON structures and tool outputs
 against the Debrief schema requirements.
 """
 
-
 from debrief_calc.exceptions import ValidationError
 from debrief_calc.models import GeoJSONFeatureDict
 
@@ -161,7 +160,10 @@ def validate_tool_output(
                 wgb = latest.get("was_generated_by") or latest.get("wasGeneratedBy")
                 if wgb is None:
                     validation_errors.append(
-                        {"feature_index": i, "error": "provenance entry was_generated_by is required"}
+                        {
+                            "feature_index": i,
+                            "error": "provenance entry was_generated_by is required",
+                        }
                     )
                 elif isinstance(wgb, dict):
                     if "tool" not in wgb:
@@ -171,7 +173,10 @@ def validate_tool_output(
                     has_tool_version = "tool_version" in wgb or "toolVersion" in wgb
                     if not has_tool_version:
                         validation_errors.append(
-                            {"feature_index": i, "error": "was_generated_by.tool_version is required"}
+                            {
+                                "feature_index": i,
+                                "error": "was_generated_by.tool_version is required",
+                            }
                         )
 
     if validation_errors:

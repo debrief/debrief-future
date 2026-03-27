@@ -153,7 +153,8 @@ export function createExecuteToolCommand(
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
         // All DebriefFeature variants extend BaseFeatureProperties which includes provenance
-        const { provenance: _p, ...restProps } = f.properties as Record<string, unknown>;
+        // eslint-disable-next-line no-restricted-syntax -- stripping provenance for deep copy
+        const { provenance: _p, ...restProps } = f.properties as unknown as Record<string, unknown>;
         const state: InputFeatureState = {
           featureId: String(f.id),
           geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,

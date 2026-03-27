@@ -3906,7 +3906,7 @@ class SessionFile(ConfiguredBaseModel):
 
     schema: Optional[str] = Field(default=None, alias="$schema", description="""JSON Schema URI""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
     version: str = Field(default=..., description="""Schema version""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool', 'SessionFile']} })
-    savedAt: datetime  = Field(default=..., description="""When the session was saved""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
+    savedAt: str = Field(default=..., description="""When the session was saved (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
     temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })

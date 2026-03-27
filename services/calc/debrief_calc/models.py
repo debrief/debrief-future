@@ -46,9 +46,16 @@ GeoJSONFeatureDict: TypeAlias = dict[str, Any]
 
 # Re-exports from debrief_schemas (canonical definitions)
 __all__ = [
-    "BranchRecord", "FileProvEntry", "InputFeatureState", "LogEntry",
-    "ParameterValue", "SnapshotLinks", "SnapshotRef", "SystemRecordProperties",
-    "TuneAnnotation", "WasGeneratedBy",
+    "BranchRecord",
+    "FileProvEntry",
+    "InputFeatureState",
+    "LogEntry",
+    "ParameterValue",
+    "SnapshotLinks",
+    "SnapshotRef",
+    "SystemRecordProperties",
+    "TuneAnnotation",
+    "WasGeneratedBy",
 ]
 
 
@@ -93,7 +100,6 @@ class Provenance(BaseModel):
     )
 
 
-
 class PropertyDelta(BaseModel):
     """Captures the previous and new value of a single property change."""
 
@@ -118,7 +124,6 @@ class CreatedAsset(BaseModel):
     result_id: str = Field(..., description="Stable logical identity (e.g., bt_plot_001)")
     path: str = Field(..., description="Full versioned path (e.g., ./results/bt_plot_001_v2.png)")
     mime_type: str | None = Field(default=None, description="MIME type of the artifact")
-
 
 
 def _get_valid_param_types() -> set[str]:
@@ -460,5 +465,3 @@ class Tool(BaseModel):
             schema["x-debrief-param-type"] = param.param_type
 
         return schema
-
-

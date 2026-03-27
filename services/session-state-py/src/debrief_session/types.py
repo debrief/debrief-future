@@ -27,8 +27,13 @@ from debrief_schemas import (
 )
 
 __all__ = [
-    "FeatureSelection", "TemporalSlice", "TimeFilter", "TimeInstant",
-    "TimeRange", "TimeStep", "ViewportPolygon",
+    "FeatureSelection",
+    "TemporalSlice",
+    "TimeFilter",
+    "TimeInstant",
+    "TimeRange",
+    "TimeStep",
+    "ViewportPolygon",
 ]
 
 

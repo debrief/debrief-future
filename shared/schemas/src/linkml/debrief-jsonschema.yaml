@@ -1,0 +1,28 @@
+# JSON Schema generation master schema — excludes modules that are
+# incompatible with gen-json-schema (session-state uses Coordinate as
+# a multivalued class range which triggers a gen-json-schema bug).
+# Pydantic and TypeScript generators use debrief.yaml directly.
+
+id: https://debrief.info/schemas/debrief-jsonschema
+name: debrief_jsonschema
+title: Debrief Maritime Analysis Schemas (JSON Schema subset)
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  geojson: https://purl.org/geojson/vocab#
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+  - styling
+  - geojson
+  - annotations
+  - tool
+  - log-entry
+  - system-record
+  - stac-extension
+  - tool-result

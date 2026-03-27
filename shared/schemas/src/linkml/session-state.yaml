@@ -238,7 +238,7 @@ classes:
     attributes:
       featureCollectionUri:
         description: Reference to external feature collection (FR-016)
-        range: uri
+        range: string
       selection:
         description: Currently selected features (FR-017)
         range: FeatureSelection
@@ -392,15 +392,15 @@ classes:
     attributes:
       $schema:
         description: JSON Schema URI
-        range: uri
+        range: string
       version:
         description: Schema version
         range: string
         required: true
         pattern: "^\\d+\\.\\d+\\.\\d+$"
       savedAt:
-        description: When the session was saved
-        range: datetime
+        description: When the session was saved (ISO 8601)
+        range: string
         required: true
       temporal:
         description: Temporal state (excluding ephemeral playbackState)

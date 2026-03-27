@@ -696,6 +696,7 @@ class TestLogEntry:
 def _camel_to_snake_dict(d: Any) -> Any:  # noqa: ANN401
     """Recursively convert camelCase dict keys to snake_case for generated model ingestion."""
     import re as _re
+
     if isinstance(d, dict):
         result = {}
         for k, v in d.items():

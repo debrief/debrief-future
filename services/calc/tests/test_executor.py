@@ -371,6 +371,7 @@ class TestExecutorInputState:
 
         entry = prov[0]
         import json as _json
+
         assert "input_state" in entry
         assert entry["input_state"] is not None
         assert len(entry["input_state"]) == 1
@@ -427,6 +428,7 @@ class TestExecutorInputState:
         assert result.features is not None
 
         import json as _json
+
         entry = result.features[0]["properties"]["provenance"][0]
         input_state = entry["input_state"][0]
 
@@ -462,6 +464,7 @@ class TestMutationConvention:
         assert result.features is not None
 
         import json as _json
+
         entry = result.features[0]["properties"]["provenance"][0]
         assert entry["input_state"] is not None
         assert len(entry["input_state"]) == 1
@@ -505,6 +508,7 @@ class TestChainedMutations:
 
         # Verify first move's input_state has original coords
         import json as _json
+
         entry1 = moved_feature["properties"]["provenance"][0]
         assert _json.loads(entry1["input_state"][0]["geometry"])["coordinates"] == original_coords
 

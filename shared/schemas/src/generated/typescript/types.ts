@@ -1746,7 +1746,7 @@ export interface SessionFile {
     $schema?: string,
     /** Schema version */
     version: string,
-    /** When the session was saved */
+    /** When the session was saved (ISO 8601) */
     savedAt: string,
     /** Temporal state (excluding ephemeral playbackState) */
     temporal: TemporalSlice,
