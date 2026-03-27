@@ -174,12 +174,18 @@ export function PositionSymbolsLayer({
       const style = resolvedStyles[i];
       if (!style) continue;
 
-      // Check if this specific position is selected via its selection path
-      const isPositionSelected = isSelected ||
-        (selectedIds?.has(`${featureId}/positions/${i}`) ?? false);
+      // Check if this specific position is individually selected via its selection path
+      const isIndividuallySelected =
+        selectedIds?.has(`${featureId}/positions/${i}`) ?? false;
 
-      // Show symbol if it should be shown OR if this position is individually selected
-      const shouldShowSymbol = style.showSymbol || isPositionSelected;
+      // Show symbol if it should be shown OR if this position is individually selected.
+      // Parent track selection (isSelected) should NOT force-show hidden points —
+      // it only highlights points that are already visible.
+      const shouldShowSymbol = style.showSymbol || isIndividuallySelected;
+
+      // Apply selection highlight only to points that are actually visible
+      const isPositionSelected = isIndividuallySelected ||
+        (isSelected && shouldShowSymbol);
 
       // Skip if neither symbol nor label should be shown
       if (!shouldShowSymbol && !style.showLabel) continue;
