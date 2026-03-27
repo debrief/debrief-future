@@ -102,7 +102,8 @@ export function extractTemporalData(
   if (!isTrackFeature(feature)) return null;
 
   // After narrowing, geometry and positions are typed
-  // eslint-disable-next-line no-restricted-syntax — GeoJSON coordinates typed as number[]
+  // GeoJSON coordinates typed as number[] in schema but runtime is [number, number][]
+  // eslint-disable-next-line no-restricted-syntax
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
   const positions = feature.properties.positions;
 
