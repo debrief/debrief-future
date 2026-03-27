@@ -14,7 +14,7 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 
@@ -50,7 +50,7 @@ def _flatten_coords(coords: list) -> list[list[float]]:  # type: ignore[type-arg
     return result
 
 
-def _bounds_from_features(features: list[dict[str, Any]]) -> list[float] | None:
+def _bounds_from_features(features: list[GeoJSONFeatureDict]) -> list[float] | None:
     """Extract bounding box from feature coordinates (matching TS approach)."""
     min_lon = float("inf")
     min_lat = float("inf")
@@ -93,7 +93,7 @@ def _bounds_from_features(features: list[dict[str, Any]]) -> list[float] | None:
         )
     ],
 )
-def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Summarize a geographic region.
 

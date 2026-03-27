@@ -14,7 +14,7 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 
@@ -142,12 +142,12 @@ def _calculate_track_stats(
         )
     ],
 )
-def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Calculate statistics for a single track.
 
     Args:
-        context: SelectionContext with exactly one track feature
+        context: SelectionContext with exactly one track feature (TRACK kind)
         params: Optional parameters (distance_unit)
 
     Returns:
@@ -157,9 +157,9 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
     if distance_unit not in ("nm", "km", "mi"):
         raise ValueError(f"distance_unit must be one of: nm, km, mi (got '{distance_unit}')")
 
-    feature = context.features[0]
-    geometry = feature.get("geometry", {})
-    coordinates = geometry.get("coordinates", [])
+    feature: GeoJSONFeatureDict = context.features[0]
+    geometry: dict[str, Any] = feature.get("geometry", {})
+    coordinates: list[list[float]] = geometry.get("coordinates", [])
 
     stats = _calculate_track_stats(coordinates, distance_unit)
 
@@ -171,7 +171,7 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
     else:
         centroid = [0, 0]
 
-    result_feature = {
+    result_feature: GeoJSONFeatureDict = {
         "type": "Feature",
         "id": f"stats-{uuid.uuid4().hex[:8]}",
         "properties": {

@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { StacStore } from '../../src/types/stac';
-import type { Plot, Track, ReferenceLocation } from '../../src/types/plot';
+// T018: Track renamed to TrackViewModel; T019: update import
+import type { Plot, TrackViewModel, ReferenceLocationViewModel } from '../../src/types/plot';
+// Convenience aliases to avoid changing all existing test usages
+type Track = TrackViewModel;
+type ReferenceLocation = ReferenceLocationViewModel;
 
 /**
  * Integration tests for the plot loading workflow.

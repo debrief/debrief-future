@@ -454,25 +454,27 @@ export default function App() {
       };
 
       // Track updated inputState for subsequent entries replayed during propagation
-      const updatedInputStates = new Map<string, Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> }>>();
+      // T022: InputFeatureState now uses schema field names (feature_id, geometry/properties as JSON strings)
+      const updatedInputStates = new Map<string, Array<{ feature_id: string; geometry: string; properties?: string }>>();
 
       // Restore features from inputState and re-execute for mutation tools
       if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
-            entry.inputState!.map(is => [is.featureId, is])
+            entry.inputState!.map(is => [is.feature_id, is])
           );
           // Restore original geometry in the plot (pre-tuned-entry state)
+          // T022: schema InputFeatureState stores geometry/properties as JSON strings
           let currentFeatures = plot.features.features.map(f => {
             const saved = restoredMap.get(String(f.id));
             if (!saved) return f;
             return {
               ...f,
-              geometry: JSON.parse(JSON.stringify(saved.geometry)),
+              geometry: JSON.parse(saved.geometry) as Feature['geometry'],
               properties: {
                 ...(f.properties ?? {}),
-                ...JSON.parse(JSON.stringify(saved.properties ?? {})),
+                ...(saved.properties ? JSON.parse(saved.properties) as Record<string, unknown> : {}),
               },
             };
           });
@@ -511,20 +513,22 @@ export default function App() {
               if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
 
               // Only replay if this entry affects features that were modified
-              const affectedIds = new Set(nextEntry.inputState.map(is => is.featureId));
+              // T022: schema InputFeatureState uses feature_id (snake_case)
+              const affectedIds = new Set(nextEntry.inputState.map(is => is.feature_id));
               const featuresToReplay = currentFeatures.filter(f =>
                 affectedIds.has(String(f.id))
               ) as Feature[];
               if (featuresToReplay.length === 0) continue;
 
               // Capture pre-execution state as updated inputState for this entry
+              // T022: schema InputFeatureState stores geometry/properties as JSON strings
               updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
                 const props = (f.properties ?? {}) as { [key: string]: unknown };
                 const restProps = Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'provenance'));
                 return {
-                  featureId: String(f.id),
-                  geometry: JSON.parse(JSON.stringify(f.geometry)),
-                  properties: JSON.parse(JSON.stringify(restProps)),
+                  feature_id: String(f.id),
+                  geometry: JSON.stringify(f.geometry),
+                  properties: JSON.stringify(restProps),
                 };
               }));
 
@@ -556,9 +560,10 @@ export default function App() {
           if (e.activityId === activityId) {
             const updatedParams = { ...e.parameters };
             if (updatedParams[parameter]) {
+              // T022: schema ParameterValue.value is string (wire format); serialize if needed
               updatedParams[parameter] = {
                 ...updatedParams[parameter],
-                value: newValue,
+                value: typeof newValue === 'string' ? newValue : JSON.stringify(newValue),
               };
             }
             return {
@@ -832,14 +837,16 @@ export default function App() {
     // Capture pre-tool geometry for mutation tools BEFORE execution.
     // executeTool() mutates feature geometry and properties in-place,
     // so we must snapshot the originals before the call.
+    // T022: schema InputFeatureState uses feature_id (snake_case) and stores
+    // geometry/properties as JSON strings (wire format).
     const inputState = replacesInPlace && selectedFeatures.length > 0
       ? selectedFeatures.map(f => {
           const props = featureProps(f);
           const restProps = Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'provenance'));
           return {
-            featureId: String(f.id),
-            geometry: JSON.parse(JSON.stringify(f.geometry)),
-            properties: JSON.parse(JSON.stringify(restProps)),
+            feature_id: String(f.id),
+            geometry: JSON.stringify(f.geometry),
+            properties: JSON.stringify(restProps),
           };
         })
       : null;
@@ -940,7 +947,13 @@ export default function App() {
       timestamp: new Date().toISOString(),
       toolName: toolId,
       toolVersion: '1.0.0',
-      parameters: result.parameters ?? {},
+      // T022: schema ParameterValue.value is string; serialize non-string values
+      parameters: result.parameters
+        ? Object.fromEntries(Object.entries(result.parameters).map(([k, v]) => [
+            k,
+            { ...v, value: typeof v.value === 'string' ? v.value : JSON.stringify(v.value) },
+          ]))
+        : {},
       usedFeatureIds: usedIds,
       generatedFeatureIds: generatedIds,
       executionDuration: 'PT0.1S',

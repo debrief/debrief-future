@@ -4,7 +4,7 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
-import { propsRecord } from '../../../utils/featureProps';
+import { isTrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 const VALID_SYMBOLS = ['circle', 'square', 'diamond', 'triangle', 'cross'] as const;
@@ -41,23 +41,6 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-interface PointStyle {
-  shape?: string;
-  radius?: number;
-  fill?: boolean;
-  fill_color?: string;
-  fill_opacity?: number;
-  stroke?: boolean;
-  color?: string;
-  weight?: number;
-  opacity?: number;
-}
-
-interface TrackStyle {
-  line?: { color?: string };
-  point?: PointStyle;
-}
-
 export function execute(
   features: TrackFeature[],
   params: ApplySymbolStyleParams,
@@ -76,13 +59,13 @@ export function execute(
   const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = propsRecord(feature);
-    if (props['kind'] !== 'TRACK') {
+    if (!isTrackFeature(feature)) {
       continue;
     }
 
-    const style = (props['style'] as TrackStyle) ?? {};
-    const point: PointStyle = style.point ?? {
+    // Defensively handle missing style — real features from disk may lack it
+    const style = feature.properties.style ?? { line: {} };
+    const point = style.point ?? {
       shape: 'square', radius: 4, fill: true,
       fill_color: '#3388ff', fill_opacity: 0.8,
       stroke: true, color: '#ffffff', weight: 1, opacity: 1.0,
@@ -93,22 +76,21 @@ export function execute(
       point.radius = radius;
     }
 
-    const lineStyle = style.line as { color?: string } | undefined;
     if (fill_color !== undefined) {
       point.fill_color = fill_color;
-    } else if (!point.fill_color && lineStyle?.color) {
-      point.fill_color = lineStyle.color;
+    } else if (!point.fill_color && style.line?.color) {
+      point.fill_color = style.line.color;
     }
 
     style.point = point;
-    props['style'] = style;
+    feature.properties.style = style;
 
     // Update default_position_style so the PositionSymbolsLayer renderer
     // shows the chosen symbol shape on the map.
-    const dps = (props['default_position_style'] ?? {}) as { [k: string]: unknown };
-    dps['symbol'] = symbol;
-    dps['show_symbol'] = true;
-    props['default_position_style'] = dps;
+    const dps = feature.properties.default_position_style ?? { show_symbol: false, show_label: false };
+    dps.symbol = symbol;
+    dps.show_symbol = true;
+    feature.properties.default_position_style = dps;
 
     modified.push(feature);
   }

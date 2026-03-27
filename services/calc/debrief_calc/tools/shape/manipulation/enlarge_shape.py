@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 ANNOTATION_KINDS = {"CIRCLE", "RECTANGLE", "LINE", "TEXT", "VECTOR"}
 
 
-def compute_centroid(geometry: dict[str, Any]) -> list[float]:
+def compute_centroid(geometry: GeoJSONFeatureDict) -> list[float]:
     """
     Compute arithmetic mean of vertices as the geometric centroid.
 
@@ -113,7 +113,7 @@ def _scale_coords_list(
         ),
     ],
 )
-def enlarge_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def enlarge_shape(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Scale annotation shapes by a multiplicative factor relative to an origin.
 

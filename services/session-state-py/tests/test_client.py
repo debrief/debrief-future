@@ -8,7 +8,11 @@ Run: pnpm --filter @debrief/session-state dev
 
 import pytest
 
-from debrief_session import SessionClient, TimeInstant  # type: ignore[reportMissingImports]
+from debrief_session import (  # type: ignore[reportMissingImports]
+    SessionClient,
+    make_time_instant,
+    make_time_instant_now,
+)
 
 # Mark all tests as requiring the server
 pytestmark = pytest.mark.skipif(
@@ -74,7 +78,7 @@ class TestSessionClient:
 
     def test_set_viewport(self, client: SessionClient) -> None:
         """Test setting viewport."""
-        coordinates = [[-5, 55], [5, 55], [5, 50], [-5, 50]]
+        coordinates = [[-5.0, 55.0], [5.0, 55.0], [5.0, 50.0], [-5.0, 50.0]]
         result = client.set_viewport(coordinates)
         assert result["success"]
         assert result["viewport"]["coordinates"] == coordinates
@@ -93,17 +97,21 @@ class TestSessionClient:
 
 
 class TestTimeInstant:
-    """Test TimeInstant type."""
+    """Test TimeInstant type.
+
+    NOTE: Generated TimeInstant has no classmethods; use make_time_instant_now()
+    and make_time_instant() helpers instead.
+    """
 
     def test_now(self) -> None:
-        """Test creating TimeInstant for current time."""
-        now = TimeInstant.now()
+        """Test creating TimeInstant for current time via helper."""
+        now = make_time_instant_now()
         assert now.epoch > 0
         assert now.iso.endswith("Z")
 
     def test_from_epoch(self) -> None:
-        """Test creating TimeInstant from epoch."""
+        """Test creating TimeInstant from epoch via helper."""
         epoch = 1706097600000
-        instant = TimeInstant.from_epoch(epoch)
+        instant = make_time_instant(epoch)
         assert instant.epoch == epoch
         assert "2024-01-24" in instant.iso

@@ -677,6 +677,7 @@ name = "debrief-session"
 version = "0.1.0"
 source = { editable = "services/session-state-py" }
 dependencies = [
+    { name = "debrief-schemas" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
@@ -690,6 +691,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "debrief-schemas", editable = "shared/schemas" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },

@@ -19,7 +19,6 @@ import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/s
 import type { LogPanelViewProvider } from '../views/logPanelView';
 import type { ToolParameter } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-import { propsRecord, parseJsonSafe } from '../utils/featureProps';
 
 /**
  * Known parameter type → values map.
@@ -153,12 +152,12 @@ export function createExecuteToolCommand(
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
-        const props = propsRecord(f);
-        const { provenance: _p, ...restProps } = props;
+        // Deep-copy geometry and properties (minus provenance) for input state snapshot.
+        const { provenance: _p, ...restProps } = structuredClone(f.properties);
         const state: InputFeatureState = {
           featureId: String(f.id),
-          geometry: parseJsonSafe(JSON.stringify(f.geometry)),
-          properties: parseJsonSafe(JSON.stringify(restProps)) as InputFeatureState['properties'],
+          geometry: structuredClone(f.geometry),
+          properties: restProps,
         };
         return state;
       });

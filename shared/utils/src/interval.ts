@@ -155,7 +155,8 @@ export function resolvePositionStyle(
 
   return {
     showSymbol,
-    symbol,
+    // T020: schema PositionStyle.symbol is `string`; cast to the renderer union
+    symbol: symbol as ResolvedPositionStyle['symbol'],
     showLabel,
     label,
   };

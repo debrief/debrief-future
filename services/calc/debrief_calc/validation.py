@@ -5,12 +5,11 @@ Provides functions to validate GeoJSON structures and tool outputs
 against the Debrief schema requirements.
 """
 
-from typing import Any
-
 from debrief_calc.exceptions import ValidationError
+from debrief_calc.models import GeoJSONFeatureDict
 
 
-def validate_geojson(data: dict[str, Any]) -> list[str]:
+def validate_geojson(data: GeoJSONFeatureDict) -> list[str]:
     """
     Validate that data is a valid GeoJSON Feature or FeatureCollection.
 
@@ -44,7 +43,7 @@ def validate_geojson(data: dict[str, Any]) -> list[str]:
     return errors
 
 
-def _validate_feature(feature: dict[str, Any]) -> list[str]:
+def _validate_feature(feature: GeoJSONFeatureDict) -> list[str]:
     """Validate a single GeoJSON Feature."""
     errors = []
 
@@ -86,7 +85,7 @@ def _validate_feature(feature: dict[str, Any]) -> list[str]:
 
 
 def validate_tool_output(
-    features: list[dict[str, Any]], expected_kind: str, tool_name: str
+    features: list[GeoJSONFeatureDict], expected_kind: str, tool_name: str
 ) -> None:
     """
     Validate tool output features against requirements.
@@ -148,34 +147,43 @@ def validate_tool_output(
                     {"feature_index": i, "error": "provenance entry must be a dictionary"}
                 )
             else:
-                if "activityId" not in latest:
+                # Support both snake_case (generated models) and camelCase (legacy)
+                has_activity_id = "activity_id" in latest or "activityId" in latest
+                if not has_activity_id:
                     validation_errors.append(
-                        {"feature_index": i, "error": "provenance entry activityId is required"}
+                        {"feature_index": i, "error": "provenance entry activity_id is required"}
                     )
                 if "timestamp" not in latest:
                     validation_errors.append(
                         {"feature_index": i, "error": "provenance entry timestamp is required"}
                     )
-                wgb = latest.get("wasGeneratedBy")
+                wgb = latest.get("was_generated_by") or latest.get("wasGeneratedBy")
                 if wgb is None:
                     validation_errors.append(
-                        {"feature_index": i, "error": "provenance entry wasGeneratedBy is required"}
+                        {
+                            "feature_index": i,
+                            "error": "provenance entry was_generated_by is required",
+                        }
                     )
                 elif isinstance(wgb, dict):
                     if "tool" not in wgb:
                         validation_errors.append(
-                            {"feature_index": i, "error": "wasGeneratedBy.tool is required"}
+                            {"feature_index": i, "error": "was_generated_by.tool is required"}
                         )
-                    if "toolVersion" not in wgb:
+                    has_tool_version = "tool_version" in wgb or "toolVersion" in wgb
+                    if not has_tool_version:
                         validation_errors.append(
-                            {"feature_index": i, "error": "wasGeneratedBy.toolVersion is required"}
+                            {
+                                "feature_index": i,
+                                "error": "was_generated_by.tool_version is required",
+                            }
                         )
 
     if validation_errors:
         raise ValidationError(f"Tool '{tool_name}' produced invalid output", validation_errors)
 
 
-def validate_feature_kind(feature: dict[str, Any], accepted_kinds: list[str]) -> str | None:
+def validate_feature_kind(feature: GeoJSONFeatureDict, accepted_kinds: list[str]) -> str | None:
     """
     Check if a feature's kind is in the accepted list.
 

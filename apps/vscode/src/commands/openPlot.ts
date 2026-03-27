@@ -20,9 +20,22 @@ import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogPanelViewProvider } from '../views/logPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
+import type { DebriefFeature } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
 import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
-import { propsRecord } from '../utils/featureProps';
+
+/** Extract a display name from a DebriefFeature. Uses type-specific property names. */
+function featureDisplayName(f: DebriefFeature): string {
+  if (isTrackFeature(f)) {
+    return f.properties.platform_name ?? f.properties.platform_id ?? String(f.id);
+  }
+  if (isReferenceLocation(f)) {
+    return f.properties.name ?? String(f.id);
+  }
+  // Annotation types — use 'label' or fall back to id
+  const props = f.properties as { label?: string; name?: string; text?: string };
+  return props.label ?? props.name ?? props.text ?? String(f.id);
+}
 
 /** Adapt a SafeFeature to a loosely-typed record for session-state log service. */
 function safeFeatureToRecord(f: SafeFeature): Record<string, unknown> {
@@ -410,9 +423,7 @@ export function createOpenPlotCommand(
             // for features created/removed during replay
             const updatedNames: Record<string, string> = {};
             for (const f of updatedData.features) {
-              const props = propsRecord(f);
-              const name = String(props.name ?? props.title ?? f.id);
-              updatedNames[String(f.id)] = name;
+              updatedNames[String(f.id)] = featureDisplayName(f);
             }
             logPanelProvider.setFeatureNames(updatedNames);
           }
@@ -460,9 +471,7 @@ export function createOpenPlotCommand(
     if (logPanelProvider) {
       const featureNames: Record<string, string> = {};
       for (const f of plotData.features) {
-        const props = propsRecord(f);
-        const name = String(props.name ?? props.title ?? f.id);
-        featureNames[String(f.id)] = name;
+        featureNames[String(f.id)] = featureDisplayName(f);
       }
       logPanelProvider.setFeatureNames(featureNames);
     }

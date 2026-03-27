@@ -40,7 +40,6 @@ import { calculateBounds, mergeBounds } from '../utils/bounds';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
-import { propsRecord } from '../utils/featureProps';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -569,7 +568,7 @@ export class MapPanel {
       (f: DebriefFeature) => String(f.id) === featureId
     );
     if (feature !== undefined) {
-      return propsRecord(feature).kind as string;
+      return feature.properties.kind;
     }
 
     // Check individual features inside result layers
@@ -1058,12 +1057,11 @@ export class MapPanel {
     const feature: DebriefFeature | undefined = this.currentFeatures.find(
       (f: DebriefFeature) => String(f.id) === trackId
     );
-    const props = feature !== undefined
-      ? propsRecord(feature)
-      : undefined;
-    const style = props?.style as { [k: string]: unknown } | undefined;
-    const lineStyle = style?.line as { [k: string]: unknown } | undefined;
-    const currentColor = (lineStyle?.color as string) ?? (style?.color as string) ?? '#377eb8';
+    let currentColor = '#377eb8';
+    if (feature !== undefined && isTrackFeature(feature)) {
+      const lineColor = feature.properties.style.line.color;
+      currentColor = lineColor ?? currentColor;
+    }
 
     const result = await vscode.window.showInputBox({
       prompt: `Enter color for ${trackName}`,

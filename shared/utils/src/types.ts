@@ -2,6 +2,12 @@
  * Shared Type Definitions for @debrief/utils
  */
 
+// T020: Import PositionStyle, PositionStyleOverride from @debrief/schemas instead of defining locally
+import type { PositionStyle, PositionStyleOverride } from '@debrief/schemas';
+
+// Re-export for consumers that import from @debrief/utils
+export type { PositionStyle, PositionStyleOverride };
+
 /**
  * GeoJSON Feature type
  */
@@ -54,25 +60,6 @@ export interface SafeFeature {
 export interface SafeFeatureCollection {
   type: 'FeatureCollection';
   features: SafeFeature[];
-}
-
-/**
- * Position style configuration (matches schema PositionStyle)
- */
-export interface PositionStyle {
-  show_symbol: boolean;
-  symbol: 'circle' | 'square' | 'triangle';
-  show_label: boolean;
-}
-
-/**
- * Position style override (matches schema PositionStyleOverride)
- */
-export interface PositionStyleOverride {
-  show_symbol?: boolean;
-  symbol?: 'circle' | 'square' | 'triangle';
-  show_label?: boolean;
-  label?: string;
 }
 
 /**

@@ -6,7 +6,7 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 from debrief_calc.tools.sensor.detection.sensor_model import (
     DefaultSensorModel,
@@ -173,7 +173,7 @@ def generate_buffer_polygon(
     return ring
 
 
-def _find_track_feature(features: list[dict[str, Any]]) -> dict[str, Any]:
+def _find_track_feature(features: list[GeoJSONFeatureDict]) -> GeoJSONFeatureDict:
     """Find the first TRACK feature in the input list.
 
     Args:
@@ -301,7 +301,7 @@ def buffer_zone_generator(
     context: SelectionContext,
     params: dict[str, Any],
     sensor_model: SensorModel | None = None,
-) -> list[dict[str, Any]]:
+) -> list[GeoJSONFeatureDict]:
     """Generate detection buffer zones around a track.
 
     Args:
@@ -390,7 +390,7 @@ def buffer_zone_generator(
     label = f"Generated 3 detection zones ({zone_names}) for track"
 
     # Build single MultiPolygon feature
-    feature: dict[str, Any] = {
+    feature: GeoJSONFeatureDict = {
         "type": "Feature",
         "id": f"zone-{uuid.uuid4()}",
         "geometry": {

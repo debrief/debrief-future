@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 
@@ -36,7 +36,9 @@ from debrief_calc.registry import tool
         ),
     ],
 )
-def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def apply_symbol_style(
+    context: SelectionContext, params: dict[str, Any]
+) -> list[GeoJSONFeatureDict]:
     """
     Apply a symbol style to position markers on track features.
 

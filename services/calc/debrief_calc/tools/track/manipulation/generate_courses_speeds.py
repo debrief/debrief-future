@@ -6,7 +6,7 @@ import math
 from datetime import datetime
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
 from debrief_calc.registry import tool
 
 EARTH_RADIUS_NM = 3440.065
@@ -56,7 +56,7 @@ def _parse_timestamp(iso_str: str) -> float:
 )
 def generate_courses_speeds(
     context: SelectionContext, params: dict[str, Any]
-) -> list[dict[str, Any]]:
+) -> list[GeoJSONFeatureDict]:
     """Generate course and speed values for each position in track features.
 
     Args:
@@ -66,7 +66,7 @@ def generate_courses_speeds(
     Returns:
         List of modified track features with course/speed populated.
     """
-    modified: list[dict[str, Any]] = []
+    modified: list[GeoJSONFeatureDict] = []
 
     for feature in context.features:
         props = feature.get("properties", {})

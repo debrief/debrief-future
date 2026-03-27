@@ -275,14 +275,14 @@ class TestToolResult:
             duration_ms=10.0,
             tool_version="2.0.0",
             parameters={
-                "interval": ParameterValue(value=60, default=True, tunable=True),
+                "interval": ParameterValue(value="60", default=True, tunable=True),
             },
         )
         data = result.model_dump()
         restored = ToolResult.model_validate(data)
         assert restored.tool_version == "2.0.0"
         assert restored.parameters is not None
-        assert restored.parameters["interval"].value == 60
+        assert restored.parameters["interval"].value == "60"
         assert restored.parameters["interval"].default is True
 
 
@@ -442,11 +442,15 @@ class TestTool:
 
 
 class TestParameterValue:
-    """Tests for ParameterValue model."""
+    """Tests for ParameterValue model.
+
+    NOTE: Generated ParameterValue has value: str (per LinkML schema).
+    Non-string values should be converted to strings before creating ParameterValue.
+    """
 
     def test_create_basic_parameter_value(self) -> None:
-        pv = ParameterValue(value=60)
-        assert pv.value == 60
+        pv = ParameterValue(value="60")
+        assert pv.value == "60"
         assert pv.default is False
         assert pv.tunable is True
 
@@ -464,12 +468,11 @@ class TestParameterValue:
         with pytest.raises(PydanticValidationError):
             ParameterValue()  # type: ignore[reportCallIssue]
 
-    def test_parameter_value_accepts_any_type(self) -> None:
-        assert ParameterValue(value=42).value == 42
+    def test_parameter_value_accepts_string_type(self) -> None:
+        """Generated ParameterValue.value is str; numeric values become strings."""
+        assert ParameterValue(value="42").value == "42"
         assert ParameterValue(value="text").value == "text"
-        assert ParameterValue(value=True).value is True
-        assert ParameterValue(value=[1, 2, 3]).value == [1, 2, 3]
-        assert ParameterValue(value=None).value is None
+        assert ParameterValue(value="true").value == "true"
 
 
 class TestPropertyDelta:
@@ -552,20 +555,25 @@ class TestCreatedAsset:
 
 
 class TestLogEntry:
-    """Tests for LogEntry model."""
+    """Tests for LogEntry model.
+
+    NOTE: Generated models (debrief_schemas) use snake_case field names without
+    camelCase aliases. Constructor calls and serialization use snake_case.
+    Fixture loading uses a camelCase-to-snake_case adapter helper.
+    """
 
     def test_create_log_entry(self) -> None:
         entry = LogEntry(
-            activityId="550e8400-e29b-41d4-a716-446655440000",
+            activity_id="550e8400-e29b-41d4-a716-446655440000",
             timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
-            wasGeneratedBy=WasGeneratedBy(
+            was_generated_by=WasGeneratedBy(
                 tool="calculate-range",
-                toolVersion="1.0.0",
-                parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
+                tool_version="1.0.0",
+                parameters=[ParameterValue(value="60", default=True, tunable=True)],
             ),
             used=["track-alpha"],
             generated=["range-001"],
-            executionDuration="PT0.3S",
+            execution_duration="PT0.3S",
         )
         assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
         assert entry.was_generated_by.tool == "calculate-range"
@@ -576,32 +584,62 @@ class TestLogEntry:
     def test_log_entry_invalid_duration(self) -> None:
         with pytest.raises(PydanticValidationError):
             LogEntry(
-                activityId="test",
+                activity_id="test",
                 timestamp=datetime.now(UTC),
-                wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
+                was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters=[]),
                 used=[],
                 generated=[],
-                executionDuration="300ms",  # Invalid format
+                execution_duration="300ms",  # Invalid format
             )
 
-    def test_log_entry_serialization_camelcase(self) -> None:
+    def test_log_entry_serialization_snake_case(self) -> None:
+        """Generated models serialize with snake_case field names."""
         entry = LogEntry(
-            activityId="test-id",
+            activity_id="test-id",
             timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC),
-            wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
+            was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters=[]),
             used=[],
             generated=[],
-            executionDuration="PT1S",
+            execution_duration="PT1S",
         )
-        data = entry.model_dump(mode="json", by_alias=True)
-        assert "activityId" in data
-        assert "wasGeneratedBy" in data
-        assert "executionDuration" in data
-        assert "toolVersion" in data["wasGeneratedBy"]
+        data = entry.model_dump(mode="json")
+        assert "activity_id" in data
+        assert "was_generated_by" in data
+        assert "execution_duration" in data
+        assert "tool_version" in data["was_generated_by"]
 
     def test_log_entry_from_fixture(self) -> None:
+        """Fixtures use camelCase; convert to snake_case before validating.
+
+        Also converts ParameterValue.value to str since generated model uses str type.
+        """
+        import re as _re
+
         fixture = FIXTURES_ROOT / "log-entry" / "valid" / "tool-invocation.json"
-        data = json.loads(fixture.read_text())
+        raw = json.loads(fixture.read_text())
+
+        def to_snake(d: Any) -> Any:  # noqa: ANN401
+            if isinstance(d, dict):
+                result = {}
+                for k, v in d.items():
+                    snake_key = _re.sub(r"(?<=[a-z0-9])([A-Z])", r"_\1", k).lower()
+                    result[snake_key] = to_snake(v)
+                return result
+            if isinstance(d, list):
+                return [to_snake(i) for i in d]
+            return d
+
+        # Fixture parameters is a camelCase dict; convert to list for generated model
+        data = to_snake(raw)
+        params_dict = data.get("was_generated_by", {}).get("parameters", {})
+        if isinstance(params_dict, dict):
+            param_list = []
+            for pv in params_dict.values():
+                if isinstance(pv, dict) and not isinstance(pv.get("value"), str):
+                    pv = {**pv, "value": str(pv["value"])}
+                param_list.append(pv)
+            data["was_generated_by"]["parameters"] = param_list
+
         entry = LogEntry.model_validate(data)
         assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
         assert entry.was_generated_by.tool == "calculate-range"
@@ -609,34 +647,76 @@ class TestLogEntry:
         assert entry.execution_duration == "PT0.3S"
 
     def test_log_entry_roundtrip(self) -> None:
-        """SC-007: Round-trip test for LogEntry serialisation."""
-        fixture = FIXTURES_ROOT / "log-entry" / "valid" / "artifact-producing.json"
-        data = json.loads(fixture.read_text())
-        entry = LogEntry.model_validate(data)
-        serialized = entry.model_dump(mode="json", by_alias=True)
+        """SC-007: Round-trip test for LogEntry serialisation (snake_case)."""
+        entry = LogEntry(
+            activity_id="550e8400-e29b-41d4-a716-446655440000",
+            timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
+            was_generated_by=WasGeneratedBy(
+                tool="calculate-range",
+                tool_version="1.0.0",
+                parameters=[ParameterValue(value="60", default=True, tunable=True)],
+            ),
+            used=["track-alpha"],
+            generated=["range-001"],
+            execution_duration="PT0.3S",
+            generated_result_id="result-001",
+        )
+        serialized = entry.model_dump(mode="json")
         restored = LogEntry.model_validate(serialized)
         assert restored.activity_id == entry.activity_id
         assert restored.generated_result_id == entry.generated_result_id
         assert restored.was_generated_by.tool == entry.was_generated_by.tool
 
     def test_invalid_fixture_missing_activity_id(self) -> None:
-        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "missing-activity-id.json"
-        data = json.loads(fixture.read_text())
+        """Missing activity_id should fail validation."""
+        data = {
+            "timestamp": "2026-01-15T10:30:00Z",
+            "was_generated_by": {"tool": "t", "tool_version": "1.0", "parameters": []},
+            "used": [],
+            "generated": [],
+            "execution_duration": "PT1S",
+        }
         with pytest.raises(PydanticValidationError):
             LogEntry.model_validate(data)
 
     def test_invalid_fixture_bad_duration(self) -> None:
-        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "bad-duration-format.json"
-        data = json.loads(fixture.read_text())
+        """Bad execution_duration format should fail validation."""
+        data = {
+            "activity_id": "test",
+            "timestamp": "2026-01-15T10:30:00Z",
+            "was_generated_by": {"tool": "t", "tool_version": "1.0", "parameters": []},
+            "used": [],
+            "generated": [],
+            "execution_duration": "300ms",  # Invalid format
+        }
         with pytest.raises(PydanticValidationError):
             LogEntry.model_validate(data)
 
 
+def _camel_to_snake_dict(d: Any) -> Any:  # noqa: ANN401
+    """Recursively convert camelCase dict keys to snake_case for generated model ingestion."""
+    import re as _re
+
+    if isinstance(d, dict):
+        result = {}
+        for k, v in d.items():
+            snake_key = _re.sub(r"(?<=[a-z0-9])([A-Z])", r"_\1", k).lower()
+            result[snake_key] = _camel_to_snake_dict(v)
+        return result
+    if isinstance(d, list):
+        return [_camel_to_snake_dict(i) for i in d]
+    return d
+
+
 class TestSystemRecordProperties:
-    """Tests for system record models."""
+    """Tests for system record models.
+
+    NOTE: Generated models use snake_case field names; callers must use snake_case.
+    Fixtures use camelCase and need conversion before model_validate().
+    """
 
     def test_create_empty_system_record(self) -> None:
-        sr = SystemRecordProperties()
+        sr = SystemRecordProperties(kind="SYSTEM_RECORD", branches=[], provenance=[])
         assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is None
         assert sr.branches == []
@@ -644,8 +724,9 @@ class TestSystemRecordProperties:
 
     def test_system_record_with_snapshot_links(self) -> None:
         sr = SystemRecordProperties(
-            snapshotLinks=SnapshotLinks(
-                prev=SnapshotRef(asset="./snapshots/v1.geojson", provEntryCount=3),
+            kind="SYSTEM_RECORD",
+            snapshot_links=SnapshotLinks(
+                prev=SnapshotRef(asset="./snapshots/v1.geojson", prov_entry_count=3),
                 next=None,
             ),
         )
@@ -657,36 +738,39 @@ class TestSystemRecordProperties:
 
     def test_system_record_with_branches(self) -> None:
         sr = SystemRecordProperties(
+            kind="SYSTEM_RECORD",
             branches=[
                 BranchRecord(
-                    branchId="branch-001",
-                    branchedFrom="act-123",
-                    branchedAt=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
-                    targetAsset="./branches/branch-001/plot.geojson",
+                    branch_id="branch-001",
+                    branched_from="act-123",
+                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
+                    target_asset="./branches/branch-001/plot.geojson",
                 ),
             ],
         )
+        assert sr.branches is not None
         assert len(sr.branches) == 1
         assert sr.branches[0].branch_id == "branch-001"
 
     def test_system_record_from_empty_fixture(self) -> None:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "empty-system-record.json"
-        data = json.loads(fixture.read_text())
+        data = _camel_to_snake_dict(json.loads(fixture.read_text()))
         sr = SystemRecordProperties.model_validate(data)
         assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is None
-        assert sr.branches == []
 
     def test_system_record_from_populated_fixture(self) -> None:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "populated-system-record.json"
-        data = json.loads(fixture.read_text())
+        data = _camel_to_snake_dict(json.loads(fixture.read_text()))
         sr = SystemRecordProperties.model_validate(data)
         assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is not None
         assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.prov_entry_count == 5
+        assert sr.branches is not None
         assert len(sr.branches) == 1
         assert sr.branches[0].branch_id == "branch-001"
+        assert sr.provenance is not None
         assert len(sr.provenance) == 2
         assert sr.provenance[0].type == "snapshot"
         assert sr.provenance[1].type == "branch"
@@ -694,21 +778,21 @@ class TestSystemRecordProperties:
 
     def test_system_record_invalid_kind(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SystemRecordProperties(kind="not-system-record")
+            SystemRecordProperties(kind="not-system-record")  # type: ignore[arg-type]
 
     def test_file_prov_entry_invalid_type(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activityId="test",
-                type="invalid",
+                activity_id="test",
+                type="invalid",  # type: ignore[arg-type]
                 timestamp=datetime.now(UTC),
             )
 
     def test_file_prov_entry_invalid_direction(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activityId="test",
-                type="branch",
+                activity_id="test",
+                type="branch",  # type: ignore[arg-type]
                 timestamp=datetime.now(UTC),
-                direction="invalid",
+                direction="invalid",  # type: ignore[arg-type]
             )

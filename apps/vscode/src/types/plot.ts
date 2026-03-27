@@ -2,16 +2,33 @@
  * Plot-related type definitions for the Debrief VS Code Extension
  */
 
-// GeoJSON geometry types (self-contained to avoid external dependency)
-export interface LineString {
-  type: 'LineString';
-  coordinates: number[][];
-}
+// T014: Import and re-export schema feature types (TrackFeature, ReferenceLocation, PlotFeatureCollection)
+// T015: Import geometry types from @debrief/schemas instead of hand-writing LineString/Point
+// T016: Import PositionStyle, PositionStyleOverride from @debrief/schemas
+// T017: Import TimestampedPosition from @debrief/schemas
+import type {
+  GeoJSONLineString,
+  GeoJSONPoint,
+  PositionStyle,
+  PositionStyleOverride,
+  TimestampedPosition,
+  TrackFeature,
+  ReferenceLocation,
+  DebriefFeatureCollection,
+} from '@debrief/schemas';
 
-export interface Point {
-  type: 'Point';
-  coordinates: number[];
-}
+// T014: LocationFeature → SchemaReferenceLocation (matches schema type name ReferenceLocation)
+// T014: PlotFeatureCollection → DebriefFeatureCollection (schema's canonical collection type)
+export type {
+  GeoJSONLineString,
+  GeoJSONPoint,
+  PositionStyle,
+  PositionStyleOverride,
+  TimestampedPosition,
+  TrackFeature,
+  ReferenceLocation as SchemaReferenceLocation,
+  DebriefFeatureCollection as PlotFeatureCollection,
+};
 
 /**
  * A plot from a STAC catalog containing tracks and reference locations
@@ -49,57 +66,12 @@ export interface Plot {
 }
 
 /**
- * Position style configuration for track positions (Feature: 048)
+ * A track view model representing a vessel's movement over time.
+ * T018: Renamed from `Track` to `TrackViewModel` — this is a UI projection,
+ * not a schema type. It carries display state (visible, selected, color) not
+ * present in the schema TrackFeature.
  */
-export interface PositionStyle {
-  /** Whether to display a symbol at positions */
-  show_symbol: boolean;
-
-  /** Shape to use for position symbols */
-  symbol: 'circle' | 'square' | 'triangle';
-
-  /** Whether to display labels at positions */
-  show_label: boolean;
-}
-
-/**
- * Per-position style override (Feature: 048)
- */
-export interface PositionStyleOverride {
-  /** Override whether to show symbol */
-  show_symbol?: boolean;
-
-  /** Override symbol shape */
-  symbol?: 'circle' | 'square' | 'triangle';
-
-  /** Override whether to show label */
-  show_label?: boolean;
-
-  /** Custom label text */
-  label?: string;
-}
-
-/**
- * Position metadata (coordinates are in geometry.coordinates[i]) (Feature: 048)
- */
-export interface TimestampedPosition {
-  /** Position timestamp (ISO 8601) */
-  time: string;
-
-  /** Depth in meters (optional) */
-  depth?: number;
-
-  /** Course in degrees (0-360, optional) */
-  course?: number;
-
-  /** Speed in knots (optional) */
-  speed?: number;
-}
-
-/**
- * A track representing a vessel's movement over time
- */
-export interface Track {
+export interface TrackViewModel {
   /** Unique track ID within the plot */
   id: string;
 
@@ -110,7 +82,7 @@ export interface Track {
   platformType?: string;
 
   /** GeoJSON LineString geometry */
-  geometry: LineString;
+  geometry: GeoJSONLineString;
 
   /** Time values for each coordinate (epoch ms) */
   times: number[];
@@ -149,9 +121,11 @@ export interface Track {
 }
 
 /**
- * A reference location marking a significant point
+ * A reference location view model marking a significant point.
+ * UI projection carrying display state (visible, selected) not present
+ * in the schema ReferenceLocation (SchemaReferenceLocation).
  */
-export interface ReferenceLocation {
+export interface ReferenceLocationViewModel {
   /** Unique location ID within the plot */
   id: string;
 
@@ -162,7 +136,7 @@ export interface ReferenceLocation {
   locationType?: string;
 
   /** GeoJSON Point geometry */
-  geometry: Point;
+  geometry: GeoJSONPoint;
 
   /** Whether this location is currently visible */
   visible: boolean;
@@ -246,43 +220,6 @@ export interface RecentPlot {
 
   /** URI for quick open */
   uri: string;
-}
-
-/**
- * GeoJSON Feature for a track (self-contained to avoid any from geojson)
- */
-export interface TrackFeature {
-  type: 'Feature';
-  geometry: LineString;
-  properties: {
-    id: string;
-    name: string;
-    platformType?: string;
-    times: string[];
-    startTime: string;
-    endTime: string;
-  };
-}
-
-/**
- * GeoJSON Feature for a location (self-contained to avoid any from geojson)
- */
-export interface LocationFeature {
-  type: 'Feature';
-  geometry: Point;
-  properties: {
-    id: string;
-    name: string;
-    locationType?: string;
-  };
-}
-
-/**
- * GeoJSON FeatureCollection for a plot
- */
-export interface PlotFeatureCollection {
-  type: 'FeatureCollection';
-  features: Array<TrackFeature | LocationFeature>;
 }
 
 /**

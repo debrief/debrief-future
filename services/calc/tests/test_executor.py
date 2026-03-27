@@ -156,13 +156,13 @@ class TestRunSuccess:
         assert len(provenance) == 1
 
         entry = provenance[0]
-        assert "activityId" in entry
+        assert "activity_id" in entry
         assert "timestamp" in entry
-        assert "executionDuration" in entry
+        assert "execution_duration" in entry
 
-        wgb = entry["wasGeneratedBy"]
+        wgb = entry["was_generated_by"]
         assert wgb["tool"] == "track-stats"
-        assert wgb["toolVersion"] == "1.0.0"
+        assert wgb["tool_version"] == "1.0.0"
         assert entry["used"] == ["track-001"]
 
 
@@ -220,7 +220,12 @@ class TestCaptureInputState:
     """Tests for _capture_input_state helper (T012-T014)."""
 
     def test_captures_geometry_and_properties(self) -> None:
-        """T012: Captures geometry and non-provenance properties."""
+        """T012: Captures geometry and non-provenance properties.
+
+        Generated InputFeatureState stores geometry/properties as JSON strings.
+        """
+        import json as _json
+
         features = [
             {
                 "id": "circle-001",
@@ -241,14 +246,18 @@ class TestCaptureInputState:
 
         assert len(states) == 1
         assert states[0].feature_id == "circle-001"
-        assert states[0].geometry["type"] == "Polygon"
-        assert states[0].geometry["coordinates"] == [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]
+        geom = _json.loads(states[0].geometry)
+        assert geom["type"] == "Polygon"
+        assert geom["coordinates"] == [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]
         assert states[0].properties is not None
-        assert states[0].properties["center"] == [0.0, 50.0]
-        assert states[0].properties["kind"] == "CIRCLE"
+        props = _json.loads(states[0].properties)
+        assert props["center"] == [0.0, 50.0]
+        assert props["kind"] == "CIRCLE"
 
     def test_excludes_provenance(self) -> None:
         """T013: Excludes provenance from captured properties."""
+        import json as _json
+
         features = [
             {
                 "id": "f1",
@@ -264,8 +273,9 @@ class TestCaptureInputState:
 
         assert len(states) == 1
         assert states[0].properties is not None
-        assert "provenance" not in states[0].properties
-        assert states[0].properties["kind"] == "TEXT"
+        props = _json.loads(states[0].properties)
+        assert "provenance" not in props
+        assert props["kind"] == "TEXT"
 
     def test_handles_missing_id(self) -> None:
         """T014: Uses 'unknown' when feature has no id."""
@@ -283,6 +293,8 @@ class TestCaptureInputState:
 
     def test_deep_copies_geometry(self) -> None:
         """Verify geometry is deep-copied so mutations don't affect the snapshot."""
+        import json as _json
+
         features = [
             {
                 "id": "f1",
@@ -296,8 +308,8 @@ class TestCaptureInputState:
         # Mutate the original
         features[0]["geometry"]["coordinates"] = [99.0, 99.0]
 
-        # Snapshot should be unchanged
-        assert states[0].geometry["coordinates"] == [0.0, 50.0]
+        # Snapshot should be unchanged (geometry stored as JSON string)
+        assert _json.loads(states[0].geometry)["coordinates"] == [0.0, 50.0]
 
     def test_empty_properties_returns_none(self) -> None:
         """Properties is None when feature has no non-provenance properties."""
@@ -358,16 +370,18 @@ class TestExecutorInputState:
         assert len(prov) == 1
 
         entry = prov[0]
-        assert "inputState" in entry
-        assert entry["inputState"] is not None
-        assert len(entry["inputState"]) == 1
-        assert entry["inputState"][0]["featureId"] == "circle-001"
-        assert entry["inputState"][0]["geometry"]["type"] == "Polygon"
+        import json as _json
+
+        assert "input_state" in entry
+        assert entry["input_state"] is not None
+        assert len(entry["input_state"]) == 1
+        assert entry["input_state"][0]["feature_id"] == "circle-001"
+        assert _json.loads(entry["input_state"][0]["geometry"])["type"] == "Polygon"
 
     def test_non_mutation_tool_gets_null_input_state(
         self, single_track_context: SelectionContext
     ) -> None:
-        """T016: Non-mutation tool has inputState=null."""
+        """T016: Non-mutation tool has input_state=null."""
         result = run("track-stats", single_track_context)
 
         assert result.success is True
@@ -375,7 +389,7 @@ class TestExecutorInputState:
 
         prov = result.features[0]["properties"]["provenance"]
         entry = prov[0]
-        assert entry["inputState"] is None
+        assert entry["input_state"] is None
 
     def test_capture_happens_before_handler(self) -> None:
         """T017: InputState captures pre-mutation geometry (not post-mutation)."""
@@ -413,11 +427,13 @@ class TestExecutorInputState:
         assert result.success is True
         assert result.features is not None
 
-        entry = result.features[0]["properties"]["provenance"][0]
-        input_state = entry["inputState"][0]
+        import json as _json
 
-        # inputState center should be the ORIGINAL (pre-move), not the moved position
-        assert input_state["properties"]["center"] == original_center
+        entry = result.features[0]["properties"]["provenance"][0]
+        input_state = entry["input_state"][0]
+
+        # input_state center should be the ORIGINAL (pre-move), not the moved position
+        assert _json.loads(input_state["properties"])["center"] == original_center
 
         # The output feature's center should be DIFFERENT (moved East)
         output_center = result.features[0]["properties"]["center"]
@@ -447,23 +463,25 @@ class TestMutationConvention:
         assert result.success is True
         assert result.features is not None
 
+        import json as _json
+
         entry = result.features[0]["properties"]["provenance"][0]
-        assert entry["inputState"] is not None
-        assert len(entry["inputState"]) == 1
-        assert entry["inputState"][0]["featureId"] == "track-001"
-        assert entry["inputState"][0]["geometry"]["type"] == "LineString"
+        assert entry["input_state"] is not None
+        assert len(entry["input_state"]) == 1
+        assert entry["input_state"][0]["feature_id"] == "track-001"
+        assert _json.loads(entry["input_state"][0]["geometry"])["type"] == "LineString"
 
     def test_track_stats_gets_null_input_state(
         self, single_track_context: SelectionContext
     ) -> None:
-        """T026: track-stats (non-mutation tool) gets inputState=null."""
+        """T026: track-stats (non-mutation tool) gets input_state=null."""
         result = run("track-stats", single_track_context)
 
         assert result.success is True
         assert result.features is not None
 
         entry = result.features[0]["properties"]["provenance"][0]
-        assert entry["inputState"] is None
+        assert entry["input_state"] is None
 
 
 class TestChainedMutations:
@@ -488,9 +506,11 @@ class TestChainedMutations:
         assert result1.features is not None
         moved_feature = result1.features[0]
 
-        # Verify first move's inputState has original coords
+        # Verify first move's input_state has original coords
+        import json as _json
+
         entry1 = moved_feature["properties"]["provenance"][0]
-        assert entry1["inputState"][0]["geometry"]["coordinates"] == original_coords
+        assert _json.loads(entry1["input_state"][0]["geometry"])["coordinates"] == original_coords
 
         # Record the intermediate position (after first move)
         intermediate_coords = moved_feature["geometry"]["coordinates"][:]
@@ -509,8 +529,8 @@ class TestChainedMutations:
         prov = final_feature["properties"]["provenance"]
         assert len(prov) == 2
 
-        # Second entry's inputState should be the INTERMEDIATE position
+        # Second entry's input_state should be the INTERMEDIATE position
         entry2 = prov[1]
-        second_input_coords = entry2["inputState"][0]["geometry"]["coordinates"]
+        second_input_coords = _json.loads(entry2["input_state"][0]["geometry"])["coordinates"]
         assert second_input_coords[0] == pytest.approx(intermediate_coords[0], abs=0.001)
         assert second_input_coords[1] == pytest.approx(intermediate_coords[1], abs=0.001)

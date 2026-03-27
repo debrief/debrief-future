@@ -5,12 +5,22 @@
 
 /**
  * A geographic coordinate [longitude, latitude].
+ *
+ * Schema equivalent: @debrief/schemas#Coordinate
+ * Not migrated: generated Coordinate is { longitude: number, latitude: number }
+ * (an object) while this type is a tuple [number, number] matching GeoJSON
+ * coordinate conventions used throughout leaflet/GeoJSON consumers.
  */
 export type Coordinate = [number, number];
 
 /**
  * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013).
  * Coordinates are in clockwise order: [NW, NE, SE, SW].
+ *
+ * Schema equivalent: @debrief/schemas#ViewportPolygon
+ * Not migrated: generated ViewportPolygon uses Coordinate[] (object array) and
+ * lacks the zoom field. This type uses a fixed-length tuple of [number, number]
+ * tuples and retains zoom for view restoration.
  */
 export interface ViewportPolygon {
   coordinates: [Coordinate, Coordinate, Coordinate, Coordinate];
@@ -46,6 +56,10 @@ export function calculateViewportCenter(viewport: ViewportPolygon): Coordinate {
 
 /**
  * Spatial state slice (FR-012 through FR-015).
+ *
+ * Schema equivalent: @debrief/schemas#SpatialSlice
+ * Not migrated: generated SpatialSlice lacks drawingMode and drawingPaletteIndex
+ * (ephemeral UI-only fields), and uses the object-based Coordinate/ViewportPolygon.
  */
 export interface SpatialSlice {
   /** Visible map area as 4-corner polygon (FR-012) */

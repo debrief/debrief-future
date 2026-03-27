@@ -1209,13 +1209,12 @@ export class StacService {
       const feature = featureMap.get(featureId);
       if (!feature) { continue; }
 
-      // Ensure properties exists
+      // Ensure properties exists — SafeFeature.properties is Record<string, unknown> | null
       if (!feature.properties) {
-        // eslint-disable-next-line no-restricted-syntax -- mutating SafeFeature at parse boundary
-        (feature as unknown as Record<string, unknown>).properties = {};
+        feature.properties = {};
       }
 
-      const props = feature.properties!;
+      const props = feature.properties;
       // Normalise provenance to array (FR-006: handle legacy single-object format)
       let existing = props['provenance'];
       if (existing === undefined || existing === null) {

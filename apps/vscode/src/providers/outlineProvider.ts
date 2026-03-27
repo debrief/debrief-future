@@ -5,16 +5,18 @@
  */
 
 import * as vscode from 'vscode';
-import type { Track, ReferenceLocation } from '../types/plot';
+// T018: Track renamed to TrackViewModel; T019: update import
+// T019: ReferenceLocation (UI type) renamed to ReferenceLocationViewModel
+import type { TrackViewModel, ReferenceLocationViewModel } from '../types/plot';
 
 export class OutlineProvider implements vscode.DocumentSymbolProvider {
-  private tracks: Track[] = [];
-  private locations: ReferenceLocation[] = [];
+  private tracks: TrackViewModel[] = [];
+  private locations: ReferenceLocationViewModel[] = [];
 
   /**
    * Update data for outline
    */
-  setData(tracks: Track[], locations: ReferenceLocation[]): void {
+  setData(tracks: TrackViewModel[], locations: ReferenceLocationViewModel[]): void {
     this.tracks = tracks;
     this.locations = locations;
   }

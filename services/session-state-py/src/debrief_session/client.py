@@ -13,6 +13,7 @@ from .types import (
     SpatialSlice,
     TemporalSlice,
     TimeInstant,
+    make_time_instant,
 )
 
 
@@ -117,7 +118,8 @@ class SessionClient:
             input_data["iso"] = iso
 
         result = self._call_tool("session.setCurrentTime", input_data)
-        return TimeInstant(**result["currentTime"])
+        ct = result["currentTime"]
+        return make_time_instant(ct["epoch"])
 
     def set_viewport(
         self,

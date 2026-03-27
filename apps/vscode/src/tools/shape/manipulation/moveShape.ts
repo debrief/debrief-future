@@ -4,7 +4,7 @@
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
-import { propsRecord } from '../../../utils/featureProps';
+import { isAnnotationFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface MoveShapeParams {
@@ -110,14 +110,17 @@ export function execute(features: DebriefFeature[], params: MoveShapeParams): De
 
   // Zero distance is a no-op
   if (distanceKm === 0) {
-    return features.filter((f) => ANNOTATION_KINDS.has(propsRecord(f)['kind'] as string));
+    return features.filter((f) => isAnnotationFeature(f) && ANNOTATION_KINDS.has(f.properties.kind));
   }
 
   const modified: DebriefFeature[] = [];
 
   for (const feature of features) {
-    const props = propsRecord(feature);
-    const kind = props['kind'] as string;
+    if (!isAnnotationFeature(feature)) {
+      continue;
+    }
+
+    const kind = feature.properties.kind;
 
     if (!ANNOTATION_KINDS.has(kind)) {
       continue;
@@ -135,8 +138,11 @@ export function execute(features: DebriefFeature[], params: MoveShapeParams): De
       geometry.coordinates = polyCoords.map((ring) =>
         translateCoordsList(ring, direction, distanceKm),
       );
-      if (kind === 'CIRCLE' && props['center'] !== undefined && props['center'] !== null) {
-        props['center'] = translateCoordinate(props['center'] as number[], direction, distanceKm);
+      if (kind === 'CIRCLE') {
+        const circleProps = feature.properties as { center?: number[] };
+        if (circleProps.center !== undefined && circleProps.center !== null) {
+          circleProps.center = translateCoordinate(circleProps.center, direction, distanceKm);
+        }
       }
     } else if (kind === 'LINE') {
       geometry.coordinates = translateCoordsList(coords as number[][], direction, distanceKm);
@@ -144,8 +150,9 @@ export function execute(features: DebriefFeature[], params: MoveShapeParams): De
       geometry.coordinates = translateCoordinate(coords as number[], direction, distanceKm);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = translateCoordsList(coords as number[][], direction, distanceKm);
-      if (props['origin'] !== undefined && props['origin'] !== null) {
-        props['origin'] = translateCoordinate(props['origin'] as number[], direction, distanceKm);
+      const vectorProps = feature.properties as { origin?: number[] };
+      if (vectorProps.origin !== undefined && vectorProps.origin !== null) {
+        vectorProps.origin = translateCoordinate(vectorProps.origin, direction, distanceKm);
       }
     }
 

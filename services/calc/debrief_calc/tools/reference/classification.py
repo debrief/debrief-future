@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
 from debrief_calc.registry import tool
 
 # Default color for points outside all zones
@@ -60,7 +60,7 @@ def _get_zone_color(zone_info: dict[str, Any]) -> str:
 )
 def point_in_zone_classifier(
     context: SelectionContext, params: dict[str, Any]
-) -> list[dict[str, Any]]:
+) -> list[GeoJSONFeatureDict]:
     """
     Classify reference points by buffer zone membership.
 
@@ -72,8 +72,8 @@ def point_in_zone_classifier(
         List containing the classified MultiPoint GeoJSON Feature
     """
     # Find reference and zone features
-    ref_feature: dict[str, Any] | None = None
-    zone_feature: dict[str, Any] | None = None
+    ref_feature: GeoJSONFeatureDict | None = None
+    zone_feature: GeoJSONFeatureDict | None = None
 
     for feature in context.features:
         props = feature.get("properties", {})

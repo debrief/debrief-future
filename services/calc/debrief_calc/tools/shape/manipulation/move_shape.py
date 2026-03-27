@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 EARTH_RADIUS_KM = 6371.0
@@ -96,7 +96,7 @@ def _translate_coords_list(
         ),
     ],
 )
-def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
+def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """
     Translate annotation shapes by compass bearing and distance.
 

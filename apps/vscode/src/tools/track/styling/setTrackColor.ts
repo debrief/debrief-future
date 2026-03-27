@@ -4,7 +4,7 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
-import { propsRecord } from '../../../utils/featureProps';
+import { isTrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface SetTrackColorParams {
@@ -29,11 +29,6 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-interface TrackStyle {
-  line?: { stroke?: boolean; color?: string; weight?: number; opacity?: number };
-  point?: Record<string, unknown>;
-}
-
 export function execute(
   features: TrackFeature[],
   params: SetTrackColorParams,
@@ -46,16 +41,16 @@ export function execute(
   const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = propsRecord(feature);
-    if (props['kind'] !== 'TRACK') {
+    if (!isTrackFeature(feature)) {
       continue;
     }
 
-    const style = (props['style'] as TrackStyle) ?? {};
+    // Defensively handle missing style — real features from disk may lack it
+    const style = feature.properties.style ?? {};
     const line = style.line ?? { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 };
     line.color = color;
     style.line = line;
-    props['style'] = style;
+    feature.properties.style = style;
 
     modified.push(feature);
   }

@@ -405,10 +405,16 @@ class TestMoveShapeEdgeCases:
 
 
 class TestMoveShapeInputState:
-    """Tests for inputState capture via the executor (T018-T020)."""
+    """Tests for input_state capture via the executor (T018-T020).
+
+    NOTE: Generated models serialize with snake_case; input_state replaces inputState,
+    feature_id replaces featureId. geometry/properties are JSON strings.
+    """
 
     def test_circle_input_state_contains_original_center_and_geometry(self) -> None:
-        """T018: Circle inputState contains original center and polygon geometry."""
+        """T018: Circle input_state contains original center and polygon geometry."""
+        import json as _json
+
         feature = copy.deepcopy(CIRCLE_FEATURE)
         original_center = CIRCLE_FEATURE["properties"]["center"][:]
         original_coords = copy.deepcopy(CIRCLE_FEATURE["geometry"]["coordinates"])
@@ -420,17 +426,21 @@ class TestMoveShapeInputState:
         assert result.features is not None
 
         entry = result.features[0]["properties"]["provenance"][0]
-        assert entry["inputState"] is not None
-        assert len(entry["inputState"]) == 1
+        assert entry["input_state"] is not None
+        assert len(entry["input_state"]) == 1
 
-        state = entry["inputState"][0]
-        assert state["featureId"] == "circle-001"
-        assert state["geometry"]["type"] == "Polygon"
-        assert state["geometry"]["coordinates"] == original_coords
-        assert state["properties"]["center"] == original_center
+        state = entry["input_state"][0]
+        assert state["feature_id"] == "circle-001"
+        geom = _json.loads(state["geometry"])
+        props = _json.loads(state["properties"])
+        assert geom["type"] == "Polygon"
+        assert geom["coordinates"] == original_coords
+        assert props["center"] == original_center
 
     def test_vector_input_state_contains_original_origin(self) -> None:
-        """T019: Vector inputState contains original origin property."""
+        """T019: Vector input_state contains original origin property."""
+        import json as _json
+
         feature = copy.deepcopy(VECTOR_FEATURE)
         original_origin = VECTOR_FEATURE["properties"]["origin"][:]
         original_coords = copy.deepcopy(VECTOR_FEATURE["geometry"]["coordinates"])
@@ -442,13 +452,17 @@ class TestMoveShapeInputState:
         assert result.features is not None
 
         entry = result.features[0]["properties"]["provenance"][0]
-        state = entry["inputState"][0]
-        assert state["featureId"] == "vector-001"
-        assert state["geometry"]["coordinates"] == original_coords
-        assert state["properties"]["origin"] == original_origin
+        state = entry["input_state"][0]
+        assert state["feature_id"] == "vector-001"
+        geom = _json.loads(state["geometry"])
+        props = _json.loads(state["properties"])
+        assert geom["coordinates"] == original_coords
+        assert props["origin"] == original_origin
 
     def test_text_input_state_contains_original_point(self) -> None:
-        """T020: Text inputState contains original Point geometry."""
+        """T020: Text input_state contains original Point geometry."""
+        import json as _json
+
         feature = copy.deepcopy(TEXT_FEATURE)
         original_coords = TEXT_FEATURE["geometry"]["coordinates"][:]
 
@@ -459,7 +473,8 @@ class TestMoveShapeInputState:
         assert result.features is not None
 
         entry = result.features[0]["properties"]["provenance"][0]
-        state = entry["inputState"][0]
-        assert state["featureId"] == "text-001"
-        assert state["geometry"]["type"] == "Point"
-        assert state["geometry"]["coordinates"] == original_coords
+        state = entry["input_state"][0]
+        assert state["feature_id"] == "text-001"
+        geom = _json.loads(state["geometry"])
+        assert geom["type"] == "Point"
+        assert geom["coordinates"] == original_coords

@@ -23,6 +23,25 @@ from debrief_stac.types import (
 logger = logging.getLogger(__name__)
 
 
+def _schema_validate_on_read(features: list[GeoJSONFeature]) -> None:
+    """Run schema validation on features loaded from disk (warn-and-continue).
+
+    Validates each feature that has a known ``kind`` against the Pydantic model
+    from ``debrief_schemas.validation.FEATURE_MODEL_MAP``.  Schema failures are
+    logged as warnings rather than raising, to allow gradual adoption.
+    """
+    try:
+        from debrief_schemas.validation import SchemaValidationError, validate_feature
+    except ImportError:
+        return  # debrief-schemas not available
+
+    for i, feature in enumerate(features):
+        try:
+            validate_feature(feature, "catalog_read")
+        except SchemaValidationError as e:
+            logger.warning("Catalog read schema warning for feature[%d]: %s", i, e)
+
+
 def add_features(
     catalog_path: CatalogPath,
     plot_id: str,
@@ -69,6 +88,8 @@ def add_features(
         # Load existing
         with open(features_path) as f:
             fc: GeoJSONFeatureCollection = json.load(f)
+        # Schema-validate features loaded from disk (warn-and-continue)
+        _schema_validate_on_read(fc["features"])
     else:
         # Create new
         fc = {"type": "FeatureCollection", "features": []}
@@ -146,6 +167,9 @@ def update_features(
     with open(features_path) as f:
         fc: GeoJSONFeatureCollection = json.load(f)
 
+    # Schema-validate features loaded from disk (warn-and-continue)
+    _schema_validate_on_read(fc["features"])
+
     # Build lookup of updates by ID
     updates = {}
     for feat in features:
@@ -213,6 +237,9 @@ def delete_features(
 
     with open(features_path) as f:
         fc: GeoJSONFeatureCollection = json.load(f)
+
+    # Schema-validate features loaded from disk (warn-and-continue)
+    _schema_validate_on_read(fc["features"])
 
     ids_to_remove = set(feature_ids)
     original_count = len(fc["features"])

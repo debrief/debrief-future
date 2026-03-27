@@ -4,7 +4,7 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
-import { propsRecord } from '../../../utils/featureProps';
+import { isTrackFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface LabelIntervalParams {
@@ -29,13 +29,6 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-interface DefaultPositionStyle {
-  show_symbol?: boolean;
-  symbol?: string;
-  show_label?: boolean;
-  label_interval?: string;
-}
-
 export function execute(
   features: TrackFeature[],
   params: LabelIntervalParams,
@@ -45,17 +38,19 @@ export function execute(
   const modified: TrackFeature[] = [];
 
   for (const feature of features) {
-    const props = propsRecord(feature);
-    if (props['kind'] !== 'TRACK') {
+    if (!isTrackFeature(feature)) {
       continue;
     }
 
-    const dps: DefaultPositionStyle = (props['default_position_style'] as DefaultPositionStyle) ?? {
+    // Defensively handle missing default_position_style.
+    // label_interval is stored on default_position_style alongside show_label
+    // (runtime extension beyond the PositionStyle schema type).
+    const dps = feature.properties.default_position_style ?? {
       show_symbol: true, symbol: 'circle', show_label: false,
     };
     dps.show_label = true;
-    dps.label_interval = interval;
-    props['default_position_style'] = dps;
+    Object.assign(dps, { label_interval: interval });
+    feature.properties.default_position_style = dps;
 
     modified.push(feature);
   }
