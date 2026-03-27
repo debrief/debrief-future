@@ -199,14 +199,8 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[Geo
 
     # Build DatasetEnvelope series matching TS format
     series_name = f"{name1} → {name2}"
-    range_data = [
-        {"time": e["time"], "value": e["range_nm"]}
-        for e in series
-    ]
-    bearing_data = [
-        {"time": e["time"], "value": e["bearing_deg"]}
-        for e in series
-    ]
+    range_data = [{"time": e["time"], "value": e["range_nm"]} for e in series]
+    bearing_data = [{"time": e["time"], "value": e["bearing_deg"]} for e in series]
 
     range_dataset = {
         "type": "range_bearing_series",
