@@ -99,7 +99,11 @@ export class StacService {
   }
 
   /**
-   * List catalogs in a store
+   * List catalogs in a store.
+   *
+   * Returns catalogs immediately with `itemCount: -1` (unknown).
+   * Call {@link countItemsForCatalogs} afterwards to fill in counts
+   * and fire a tree refresh.
    */
   async listCatalogs(store: StacStore): Promise<Catalog[]> {
     const catalogs: Catalog[] = [];
@@ -110,14 +114,14 @@ export class StacService {
         return catalogs;
       }
 
-      // Root catalog counts as a catalog
+      // Root catalog — itemCount deferred
       catalogs.push({
         id: rootCatalog.id,
         title: rootCatalog.title ?? rootCatalog.id,
         description: rootCatalog.description,
         catalogPath: 'catalog.json',
         storeId: store.id,
-        itemCount: await this.countItems(store.path, rootCatalog),
+        itemCount: -1,
       });
 
       // Find child catalogs
@@ -136,10 +140,7 @@ export class StacService {
             description: childCatalog.description,
             catalogPath: link.href,
             storeId: store.id,
-            itemCount: await this.countItems(
-              path.dirname(childPath),
-              childCatalog
-            ),
+            itemCount: -1,
           });
         }
       }
@@ -148,6 +149,30 @@ export class StacService {
     }
 
     return catalogs;
+  }
+
+  /**
+   * Fill in `itemCount` for each catalog in-place.
+   * Designed to run in the background after the tree has already rendered.
+   */
+  async countItemsForCatalogs(
+    store: StacStore,
+    catalogs: Catalog[]
+  ): Promise<void> {
+    for (const catalog of catalogs) {
+      try {
+        const catalogPath = path.join(store.path, catalog.catalogPath);
+        const catalogData = await this.loadCatalogFromPath(catalogPath);
+        if (catalogData) {
+          catalog.itemCount = await this.countItems(
+            path.dirname(catalogPath),
+            catalogData
+          );
+        }
+      } catch {
+        // Leave itemCount as -1 on failure
+      }
+    }
   }
 
   /**
