@@ -52,14 +52,6 @@ export interface ResolvedPositionStyle {
     symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
     showLabel: boolean;
     labelText: string | null;
-    /** Per-position colour override from position_style_overrides (format menu) */
-    fillColor?: string;
-    /** Per-position stroke colour override */
-    strokeColor?: string;
-    /** Per-position radius override */
-    radius?: number;
-    /** Per-position fill opacity override */
-    fillOpacity?: number;
 }
 /**
  * Resolve the final styling for a position by applying the cascade:
