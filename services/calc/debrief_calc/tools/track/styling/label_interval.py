@@ -43,16 +43,12 @@ def label_interval(context: SelectionContext, params: dict[str, Any]) -> list[Ge
         if props.get("kind") != "TRACK":
             continue
 
-        dps = props.setdefault(
-            "default_position_style",
-            {
-                "show_symbol": True,
-                "symbol": "circle",
-                "show_label": False,
-            },
-        )
-        dps["show_label"] = True
-        dps["label_interval"] = interval
+        # Store label_interval as a top-level track property so the
+        # PositionSymbolsLayer renderer picks it up via props.label_interval.
+        # Do NOT set show_label=True on default_position_style — the interval
+        # mechanism in resolvePositionStyle() selectively enables labels only
+        # at positions that match the interval.
+        props["label_interval"] = interval
 
         modified.append(feature)
 

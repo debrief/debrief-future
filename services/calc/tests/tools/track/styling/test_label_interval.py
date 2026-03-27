@@ -57,7 +57,7 @@ class TestLabelInterval:
     """Golden example tests for the label-interval tool."""
 
     def test_basic_golden_example(self) -> None:
-        """Apply interval='PT15M'. Verify show_label=True and label_interval set."""
+        """Apply interval='PT15M'. Verify label_interval set as top-level property."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"interval": "PT15M"}
@@ -65,15 +65,16 @@ class TestLabelInterval:
         result = label_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
-        assert dps["show_label"] is True
-        assert dps["label_interval"] == "PT15M"
-        # Other default_position_style properties remain unchanged
+        props = result[0]["properties"]
+        assert props["label_interval"] == "PT15M"
+        # default_position_style must not be mutated
+        dps = props["default_position_style"]
+        assert dps["show_label"] is False
         assert dps["show_symbol"] is True
         assert dps["symbol"] == "circle"
 
     def test_no_existing_dps(self) -> None:
-        """Track with no default_position_style gets one with show_label=True."""
+        """Track with no default_position_style still gets label_interval set."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["default_position_style"]
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -82,27 +83,34 @@ class TestLabelInterval:
         result = label_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
-        assert dps["show_label"] is True
-        assert dps["label_interval"] == "PT10M"
-        # Defaults created by setdefault
-        assert dps["show_symbol"] is True
-        assert dps["symbol"] == "circle"
+        props = result[0]["properties"]
+        assert props["label_interval"] == "PT10M"
+        # No default_position_style should be created
+        assert "default_position_style" not in props
 
     def test_overwrites_existing(self) -> None:
         """Existing label_interval is replaced with the new value."""
         feature = copy.deepcopy(TRACK_FEATURE)
-        feature["properties"]["default_position_style"]["label_interval"] = "PT5M"
-        feature["properties"]["default_position_style"]["show_label"] = True
+        feature["properties"]["label_interval"] = "PT5M"
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"interval": "PT30M"}
 
         result = label_interval(context, params)
 
         assert len(result) == 1
+        assert result[0]["properties"]["label_interval"] == "PT30M"
+
+    def test_does_not_change_show_label_visibility(self) -> None:
+        """Setting label interval must not alter show_label on default_position_style."""
+        feature = copy.deepcopy(TRACK_FEATURE)
+        feature["properties"]["default_position_style"]["show_label"] = False
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        params = {"interval": "PT15M"}
+
+        result = label_interval(context, params)
+
         dps = result[0]["properties"]["default_position_style"]
-        assert dps["label_interval"] == "PT30M"
-        assert dps["show_label"] is True
+        assert dps["show_label"] is False
 
     def test_error_no_tracks(self) -> None:
         """Empty feature list raises ValueError."""
@@ -121,6 +129,4 @@ class TestLabelInterval:
         result = label_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
-        assert dps["show_label"] is True
-        assert dps["label_interval"] == "PT15M"
+        assert result[0]["properties"]["label_interval"] == "PT15M"
