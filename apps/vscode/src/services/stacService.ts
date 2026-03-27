@@ -236,8 +236,8 @@ export class StacService {
       // falling back to datetime for both bounds
       const fallback = item.properties.datetime;
       const timeExtent: [string, string] = [
-        item.properties.start_datetime ?? fallback,
-        item.properties.end_datetime ?? fallback,
+        (item.properties.start_datetime as string | undefined) ?? fallback,
+        (item.properties.end_datetime as string | undefined) ?? fallback,
       ];
 
       if (geoJsonAsset) {
