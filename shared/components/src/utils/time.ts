@@ -27,20 +27,17 @@ export function calculateTimeExtent(
       let startTime = parseTime(feature.properties.start_time);
       let endTime = parseTime(feature.properties.end_time);
 
-      // Fallback: derive from times array if start_time/end_time not present
+      // Fallback: derive from positions array if start_time/end_time not present
       if (startTime === null || endTime === null) {
         // eslint-disable-next-line no-restricted-syntax
         const props = feature.properties as unknown as Record<string, unknown>;
-        const times = props.times as unknown[] | undefined;
-        if (Array.isArray(times) && times.length > 0) {
-          // times can be ISO strings or milliseconds
-          const firstTime = times[0];
-          const lastTime = times[times.length - 1];
-          if (startTime === null && firstTime !== undefined) {
-            startTime = typeof firstTime === 'number' ? firstTime : parseTime(firstTime as string);
+        const positions = props.positions as Array<{ time: string }> | undefined;
+        if (Array.isArray(positions) && positions.length > 0) {
+          if (startTime === null && positions[0]?.time) {
+            startTime = parseTime(positions[0].time);
           }
-          if (endTime === null && lastTime !== undefined) {
-            endTime = typeof lastTime === 'number' ? lastTime : parseTime(lastTime as string);
+          if (endTime === null && positions[positions.length - 1]?.time) {
+            endTime = parseTime(positions[positions.length - 1]!.time);
           }
         }
       }

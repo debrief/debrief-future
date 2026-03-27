@@ -197,7 +197,13 @@ export class AnalysisPage {
    * Click on a layer to select it.
    */
   async selectLayer(layer: Locator): Promise<void> {
-    await layer.click();
+    // Click the content area to avoid the expand button (which has stopPropagation)
+    const content = layer.locator('.debrief-feature-row__content');
+    if (await content.count() > 0) {
+      await content.click();
+    } else {
+      await layer.click();
+    }
   }
 
   /**

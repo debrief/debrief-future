@@ -42,7 +42,8 @@ async function selectTrack(page: import('@playwright/test').Page) {
   const row = page.locator('.debrief-feature-row:has-text("HMS Defender")');
   const target =
     (await row.count()) > 0 ? row : page.locator('.debrief-feature-row').first();
-  await target.click();
+  // Click the content area to avoid the expand button (stopPropagation)
+  await target.locator('.debrief-feature-row__content').click();
   await page.waitForTimeout(200);
 }
 

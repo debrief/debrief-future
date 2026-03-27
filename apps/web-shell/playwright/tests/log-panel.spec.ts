@@ -23,7 +23,8 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
   const target = (await featureRow.count()) > 0
     ? featureRow
     : page.locator('.debrief-feature-row').first();
-  await target.click();
+  // Click the content area to avoid the expand button (stopPropagation)
+  await target.locator('.debrief-feature-row__content').click();
   await page.waitForTimeout(200);
 }
 

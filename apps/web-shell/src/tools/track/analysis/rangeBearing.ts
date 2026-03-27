@@ -64,9 +64,9 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
-/** Access legacy wire-format properties (times, name, platform_name) on a TrackFeature. */
-function getLegacyProps(track: TrackFeature): typeof track.properties & { name?: string; platform_name?: string; times?: number[] } {
-  return track.properties as typeof track.properties & { name?: string; platform_name?: string; times?: number[] };
+/** Access additional properties (name, platform_name, positions) on a TrackFeature. */
+function getTrackProps(track: TrackFeature): typeof track.properties & { name?: string; platform_name?: string; positions?: Array<{ time: string }> } {
+  return track.properties as typeof track.properties & { name?: string; platform_name?: string; positions?: Array<{ time: string }> };
 }
 
 export function execute(
@@ -81,13 +81,12 @@ export function execute(
   const [track1, track2] = tracks;
   const coords1 = track1.geometry.coordinates as number[][];
   const coords2 = track2.geometry.coordinates as number[][];
-  // Access legacy wire-format 'times' and 'name' properties
-  const legacyProps1 = getLegacyProps(track1);
-  const legacyProps2 = getLegacyProps(track2);
-  const times1 = legacyProps1.times;
-  const times2 = legacyProps2.times;
-  const name1 = String(legacyProps1.name ?? legacyProps1.platform_name ?? track1.id ?? 'Track 1');
-  const name2 = String(legacyProps2.name ?? legacyProps2.platform_name ?? track2.id ?? 'Track 2');
+  const props1 = getTrackProps(track1);
+  const props2 = getTrackProps(track2);
+  const positions1 = props1.positions;
+  const positions2 = props2.positions;
+  const name1 = String(props1.name ?? props1.platform_name ?? track1.id ?? 'Track 1');
+  const name2 = String(props2.name ?? props2.platform_name ?? track2.id ?? 'Track 2');
 
   // Build time-series by zipping coordinates by index
   const len = Math.min(coords1.length, coords2.length);
@@ -95,8 +94,7 @@ export function execute(
   const bearingPoints: Record<string, unknown>[] = [];
 
   for (let i = 0; i < len; i++) {
-    const time = times1?.[i] ?? times2?.[i] ?? i * 1000;
-    const isoTime = new Date(time).toISOString();
+    const isoTime = positions1?.[i]?.time ?? positions2?.[i]?.time ?? new Date(i * 1000).toISOString();
 
     const rangeNm = haversineDistanceNm(
       coords1[i][0], coords1[i][1], coords2[i][0], coords2[i][1],

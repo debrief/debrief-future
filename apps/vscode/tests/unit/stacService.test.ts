@@ -123,18 +123,18 @@ function createMockFeatureCollection(features: unknown[] = []): object {
 }
 
 /**
- * Create a mock track feature (LineString with times)
+ * Create a mock track feature (LineString with positions)
  */
 function createMockTrackFeature(overrides: Partial<{
   id: string;
   name: string;
-  times: string[];
+  positions: Array<{ time: string }>;
   coordinates: number[][];
 }> = {}): object {
-  const times = overrides.times ?? [
-    '2024-01-01T00:00:00Z',
-    '2024-01-01T01:00:00Z',
-    '2024-01-01T02:00:00Z',
+  const positions = overrides.positions ?? [
+    { time: '2024-01-01T00:00:00Z' },
+    { time: '2024-01-01T01:00:00Z' },
+    { time: '2024-01-01T02:00:00Z' },
   ];
   const coordinates = overrides.coordinates ?? [
     [0, 0],
@@ -149,9 +149,12 @@ function createMockTrackFeature(overrides: Partial<{
       coordinates,
     },
     properties: {
+      kind: 'TRACK',
       id: overrides.id ?? 'track-1',
       platform_name: overrides.name ?? 'Test Track',
-      times,
+      start_time: positions[0]?.time ?? '',
+      end_time: positions[positions.length - 1]?.time ?? '',
+      positions,
     },
   };
 }
@@ -304,7 +307,7 @@ describe('StacService', () => {
       expect(annotations).toHaveLength(1);
     });
 
-    it('should categorize LineString with times as Track', async () => {
+    it('should categorize LineString with kind=TRACK as Track', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -458,7 +461,7 @@ describe('StacService', () => {
       expect((result!.features[0].properties as Record<string, unknown>).kind).toBe('TRACK');
     });
 
-    it('should handle LineString without times as annotation feature', async () => {
+    it('should handle LineString without kind=TRACK as annotation feature', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -491,7 +494,7 @@ describe('StacService', () => {
 
       const tracks = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'TRACK');
       expect(tracks).toHaveLength(0);
-      // LINE without times is an annotation
+      // LINE without kind=TRACK is an annotation
       expect(result!.features).toHaveLength(1);
       expect((result!.features[0].properties as Record<string, unknown>).kind).toBe('LINE');
     });
@@ -1000,7 +1003,7 @@ describe('StacService', () => {
       expect(result!.locationCount).toBe(3);
     });
 
-    it('should calculate time extent from track times', async () => {
+    it('should calculate time extent from track start_time/end_time', async () => {
       const store = createMockStore();
       const item = createMockItem({
         properties: { datetime: '2024-06-01T00:00:00Z' },
@@ -1013,7 +1016,9 @@ describe('StacService', () => {
           type: 'Feature',
           geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
           properties: {
-            times: [1704067200000, 1735689599000],
+            kind: 'TRACK',
+            start_time: '2024-01-01T00:00:00Z',
+            end_time: '2024-12-31T23:59:59Z',
           },
         },
       ]);
@@ -1029,8 +1034,8 @@ describe('StacService', () => {
 
       const result = await service.loadPlot(store, 'items/plot.json');
 
-      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00.000Z');
-      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59.000Z');
+      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00Z');
+      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59Z');
     });
 
     it('should return null when item not found', async () => {
@@ -1136,6 +1141,76 @@ describe('StacService', () => {
       expect(result!.trackCount).toBe(1);
       // Time extent should default to item datetime
       expect(result!.timeExtent[0]).toBe('2024-06-01T00:00:00Z');
+    });
+
+    it('should use start_datetime/end_datetime from STAC item when available', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        properties: {
+          datetime: '2010-01-12T12:13:14+00:00',
+          start_datetime: '2010-01-12T12:13:14+00:00',
+          end_datetime: '2010-01-12T13:13:14+00:00',
+        },
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json' },
+        },
+      });
+      const features = createMockFeatureCollection([
+        {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+          properties: {}, // No times array or start_time/end_time
+        },
+      ]);
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const pathStr = String(p);
+        if (pathStr.endsWith('.geojson')) {
+          return JSON.stringify(features);
+        }
+        return JSON.stringify(item);
+      });
+
+      const result = await service.loadPlot(store, 'items/plot.json');
+
+      expect(result!.timeExtent[0]).toBe('2010-01-12T12:13:14+00:00');
+      expect(result!.timeExtent[1]).toBe('2010-01-12T13:13:14+00:00');
+    });
+
+    it('should extract time extent from track start_time/end_time properties', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        properties: { datetime: '2010-01-12T12:13:14+00:00' },
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json' },
+        },
+      });
+      const features = createMockFeatureCollection([
+        {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+          properties: {
+            kind: 'TRACK',
+            start_time: '2010-01-12T12:13:14+00:00',
+            end_time: '2010-01-12T13:13:14+00:00',
+          },
+        },
+      ]);
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const pathStr = String(p);
+        if (pathStr.endsWith('.geojson')) {
+          return JSON.stringify(features);
+        }
+        return JSON.stringify(item);
+      });
+
+      const result = await service.loadPlot(store, 'items/plot.json');
+
+      expect(result!.timeExtent[0]).toBe('2010-01-12T12:13:14+00:00');
+      expect(result!.timeExtent[1]).toBe('2010-01-12T13:13:14+00:00');
     });
   });
 
@@ -1742,7 +1817,7 @@ describe('StacService', () => {
       vi.clearAllMocks();
     });
 
-    it('should set start_datetime and end_datetime from track times', async () => {
+    it('should set start_datetime and end_datetime from track start_time/end_time', async () => {
       const item = createMockItem({
         assets: {
           data: { href: './data.geojson', type: 'application/geo+json', title: 'Data' },
@@ -1756,14 +1831,18 @@ describe('StacService', () => {
             type: 'Feature',
             geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
             properties: {
-              times: [1704067200000, 1704110400000],
+              kind: 'TRACK',
+              start_time: '2024-01-01T00:00:00.000Z',
+              end_time: '2024-01-01T12:00:00.000Z',
             },
           },
           {
             type: 'Feature',
             geometry: { type: 'LineString', coordinates: [[2, 2], [3, 3]] },
             properties: {
-              times: [1704153600000, 1704218400000],
+              kind: 'TRACK',
+              start_time: '2024-01-02T00:00:00.000Z',
+              end_time: '2024-01-02T18:00:00.000Z',
             },
           },
         ],

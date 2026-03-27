@@ -34,9 +34,9 @@ test.describe('Selection Sync', () => {
   });
 
   test('clicking feature in list selects it on map', async ({ page }) => {
-    // Find a feature row and click it
+    // Find a feature row and click its content area (avoid expand button)
     const featureRow = page.locator('.debrief-feature-row').first();
-    await featureRow.click();
+    await featureRow.locator('.debrief-feature-row__content').click();
 
     // Feature should be selected (row gets selected state)
     await expect(featureRow).toHaveClass(/selected/);

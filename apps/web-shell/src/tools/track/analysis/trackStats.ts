@@ -115,12 +115,15 @@ export function execute(
     );
   }
 
-  // Duration from properties.times (epoch ms array, legacy wire format)
-  const legacyProps = track.properties as typeof track.properties & { name?: string; platform_name?: string; times?: number[] };
+  // Duration from schema-standard start_time/end_time
+  const trackProps = track.properties as typeof track.properties & { name?: string; platform_name?: string; start_time?: string; end_time?: string };
   let durationHours = 0;
-  const times = legacyProps.times;
-  if (times && times.length >= 2) {
-    durationHours = (times[times.length - 1] - times[0]) / (1000 * 60 * 60);
+  if (trackProps.start_time && trackProps.end_time) {
+    const startMs = Date.parse(trackProps.start_time);
+    const endMs = Date.parse(trackProps.end_time);
+    if (!isNaN(startMs) && !isNaN(endMs)) {
+      durationHours = (endMs - startMs) / (1000 * 60 * 60);
+    }
   }
 
   const avgSpeedKts = durationHours > 0 ? totalDistanceNm / durationHours : 0;
@@ -133,7 +136,7 @@ export function execute(
   const centroidLon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
   const centroidLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
 
-  const trackName = String(legacyProps.name ?? legacyProps.platform_name ?? track.id ?? 'Unknown');
+  const trackName = String(trackProps.name ?? trackProps.platform_name ?? track.id ?? 'Unknown');
 
   return [{
     type: 'Feature',

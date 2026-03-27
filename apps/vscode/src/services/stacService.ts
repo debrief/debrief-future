@@ -257,9 +257,12 @@ export class StacService {
 
       let trackCount = 0;
       let locationCount = 0;
+      // Prefer start_datetime/end_datetime (set by updateTemporalMetadata),
+      // falling back to datetime for both bounds
+      const fallback = item.properties.datetime;
       const timeExtent: [string, string] = [
-        item.properties.datetime,
-        item.properties.datetime,
+        (item.properties.start_datetime as string | undefined) ?? fallback,
+        (item.properties.end_datetime as string | undefined) ?? fallback,
       ];
 
       if (geoJsonAsset) {
@@ -278,19 +281,16 @@ export class StacService {
             if (geom.type === 'LineString') {
               trackCount++;
 
-              // Update time extent from track times (epoch ms)
+              // Update time extent from track start_time/end_time (schema-standard)
               const props = feature.properties ?? {};
-              const times = props.times as number[] | undefined;
-              if (times && times.length > 0) {
-                const firstTime = times[0]!;
-                const lastTime = times[times.length - 1]!;
-                const firstIso = new Date(firstTime).toISOString();
-                const lastIso = new Date(lastTime).toISOString();
-                if (firstIso < timeExtent[0]) {
-                  timeExtent[0] = firstIso;
+              const startTime = props.start_time as string | undefined;
+              const endTime = props.end_time as string | undefined;
+              if (startTime && endTime) {
+                if (startTime < timeExtent[0]) {
+                  timeExtent[0] = startTime;
                 }
-                if (lastIso > timeExtent[1]) {
-                  timeExtent[1] = lastIso;
+                if (endTime > timeExtent[1]) {
+                  timeExtent[1] = endTime;
                 }
               }
             } else if (geom.type === 'Point') {
@@ -374,17 +374,12 @@ export class StacService {
           ? String(feature.id)
           : `feature-${features.length}`;
 
-        if (geom.type === 'LineString' && props.times !== undefined && props.times !== null) {
-          // Track: LineString with times array (epoch ms)
-          const times = (props.times as number[]) ?? [];
+        if (geom.type === 'LineString' && (props.kind === 'TRACK' || props.positions !== undefined)) {
+          // Track: LineString with schema-standard positions array
           const lineCoords = geom.coordinates as number[][];
-          const positions = (props.positions as Array<{ time: string }>) ??
-            times.map(t => ({ time: new Date(t).toISOString() }));
+          const positions = (props.positions as Array<{ time: string }>) ?? [];
 
-          // `times` is a runtime-only epoch-ms array used by MapView for temporal
-          // rendering — not part of the LinkML schema.  We type-extend rather than
-          // cast-away so the compiler still validates every schema field.
-          const track: TrackFeature & { properties: { times: number[] } } = {
+          const track: TrackFeature = {
             type: 'Feature',
             id: featureId,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
@@ -393,10 +388,9 @@ export class StacService {
               platform_id: featureId,
               platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
               track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
-              start_time: times[0] !== undefined && times[0] !== 0 ? new Date(times[0]).toISOString() : '',
-              end_time: times[times.length - 1] !== undefined && times[times.length - 1] !== 0 ? new Date(times[times.length - 1]!).toISOString() : '',
+              start_time: (props.start_time as string) ?? positions[0]?.time ?? '',
+              end_time: (props.end_time as string) ?? positions[positions.length - 1]?.time ?? '',
               positions,
-              times,
               style: {
                 line: { color: (props.color as string) ?? '#0066cc' },
                 point: { shape: 'circle', radius: 3, fill: true, fill_color: (props.color as string) ?? '#0066cc', color: '#000000' },
@@ -1023,16 +1017,13 @@ export class StacService {
         continue;
       }
 
-      // Fallback: extract from times array (millisecond timestamps)
-      const times = props.times as number[] | undefined;
-      if (times && times.length > 0) {
-        const sorted = [...times].sort((a, b) => a - b);
-        const first = sorted[0]!;
-        const last = sorted[sorted.length - 1]!;
-        const start = new Date(first).toISOString();
-        const end = new Date(last).toISOString();
-        if (!earliest || start < earliest) {earliest = start;}
-        if (!latest || end > latest) {latest = end;}
+      // Fallback: extract from positions array (ISO timestamps)
+      const positions = props.positions as Array<{ time: string }> | undefined;
+      if (positions && positions.length > 0) {
+        const start = positions[0]!.time;
+        const end = positions[positions.length - 1]!.time;
+        if (start && (!earliest || start < earliest)) {earliest = start;}
+        if (end && (!latest || end > latest)) {latest = end;}
       }
     }
 

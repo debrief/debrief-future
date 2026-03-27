@@ -88,13 +88,13 @@ describe('extractTemporalData', () => {
     const feature: TestFeatureInput = {
       id: '1',
       geometry: { type: 'Point', coordinates: [[0, 0]] },
-      properties: { times: [1000] },
+      properties: { positions: [{ time: '2024-01-14T08:00:00Z' }] },
     };
     // eslint-disable-next-line no-restricted-syntax
     expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
-  it('returns null when times array is missing', () => {
+  it('returns null when positions array is missing', () => {
     const feature: TestFeatureInput = {
       id: '1',
       geometry: { type: 'LineString', coordinates: [[-4, 50]] },
@@ -104,17 +104,17 @@ describe('extractTemporalData', () => {
     expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
-  it('throws when times length does not match coordinates', () => {
+  it('throws when positions length does not match coordinates', () => {
     const feature: TestFeatureInput = {
       id: 'mismatched',
       geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
-      properties: { times: [1000] },
+      properties: { positions: [{ time: '2024-01-14T08:00:00Z' }] },
     };
     // eslint-disable-next-line no-restricted-syntax
     expect(() => extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('mismatched arrays');
   });
 
-  it('extracts valid temporal data', () => {
+  it('extracts valid temporal data from positions array', () => {
     const feature: TestFeatureInput = {
       id: 'track-1',
       type: 'Feature',
@@ -125,34 +125,47 @@ describe('extractTemporalData', () => {
       properties: {
         kind: 'TRACK',
         name: 'OWNSHIP',
-        times: [1000, 2000, 3000],
+        positions: [
+          { time: '2024-01-14T08:00:00Z' },
+          { time: '2024-01-14T09:00:00Z' },
+          { time: '2024-01-14T10:00:00Z' },
+        ],
       },
     };
     // eslint-disable-next-line no-restricted-syntax
     const result = extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0]);
 
-    expect(result).toEqual({
-      trackId: 'track-1',
-      coordinates: [[-4, 50], [-4.1, 50.1], [-4.2, 50.2]],
-      timestamps: [1000, 2000, 3000],
-      timeExtent: [1000, 3000],
-    });
+    expect(result).not.toBeNull();
+    expect(result!.trackId).toBe('track-1');
+    expect(result!.coordinates).toEqual([[-4, 50], [-4.1, 50.1], [-4.2, 50.2]]);
+    expect(result!.timestamps).toEqual([
+      Date.parse('2024-01-14T08:00:00Z'),
+      Date.parse('2024-01-14T09:00:00Z'),
+      Date.parse('2024-01-14T10:00:00Z'),
+    ]);
+    expect(result!.timeExtent).toEqual([
+      Date.parse('2024-01-14T08:00:00Z'),
+      Date.parse('2024-01-14T10:00:00Z'),
+    ]);
   });
 
-  it('throws on non-numeric times (ISO strings)', () => {
-    const featureWithStringTimes: TestFeatureInput = {
-      id: 'string-times',
+  it('throws on invalid time string in positions', () => {
+    const feature: TestFeatureInput = {
+      id: 'bad-time',
       type: 'Feature',
       geometry: {
         type: 'LineString',
-        coordinates: [[-4, 50], [-4.1, 50.1], [-4.2, 50.2]],
+        coordinates: [[-4, 50], [-4.1, 50.1]],
       },
       properties: {
         kind: 'TRACK',
-        times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
+        positions: [
+          { time: '2024-01-14T08:00:00Z' },
+          { time: 'not-a-date' },
+        ],
       },
     };
     // eslint-disable-next-line no-restricted-syntax
-    expect(() => extractTemporalData(featureWithStringTimes as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('non-numeric times');
+    expect(() => extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('invalid time');
   });
 });
