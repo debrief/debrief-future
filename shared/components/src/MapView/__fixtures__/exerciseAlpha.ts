@@ -29,7 +29,7 @@ export const exerciseAlphaFeatures: GeoJSON.Feature[] = [
     },
     properties: {
       id: 'track-hms-defender', kind: 'TRACK', name: 'HMS Defender',
-      platformType: 'OWNSHIP', color: '#2196F3',
+      track_type: 'OWNSHIP', color: '#2196F3',
       start_time: '2024-01-15T09:30:00Z', end_time: '2024-01-15T14:00:00Z',
       positions: [
         { time: '2024-01-15T09:30:00Z' }, { time: '2024-01-15T09:50:00Z' }, { time: '2024-01-15T10:10:00Z' },
@@ -54,7 +54,7 @@ export const exerciseAlphaFeatures: GeoJSON.Feature[] = [
     },
     properties: {
       id: 'track-uss-freedom', kind: 'TRACK', name: 'USS Freedom',
-      platformType: 'CONTACT', color: '#4CAF50',
+      track_type: 'CONTACT', color: '#4CAF50',
       start_time: '2024-01-15T09:30:00Z', end_time: '2024-01-15T14:00:00Z',
       positions: [
         { time: '2024-01-15T09:30:00Z' }, { time: '2024-01-15T09:50:00Z' }, { time: '2024-01-15T10:10:00Z' },
@@ -69,13 +69,13 @@ export const exerciseAlphaFeatures: GeoJSON.Feature[] = [
   {
     type: 'Feature',
     geometry: { type: 'Point', coordinates: [-4.1189, 50.3912] },
-    properties: { id: 'loc-alpha-point', kind: 'POINT', name: 'Alpha Point', locationType: 'WAYPOINT' },
+    properties: { id: 'loc-alpha-point', kind: 'POINT', name: 'Alpha Point', location_type: 'WAYPOINT' },
   },
   // POINT — Reference
   {
     type: 'Feature',
     geometry: { type: 'Point', coordinates: [-4.1350, 50.4000] },
-    properties: { id: 'loc-bravo-datum', kind: 'POINT', name: 'Bravo Datum', locationType: 'REFERENCE' },
+    properties: { id: 'loc-bravo-datum', kind: 'POINT', name: 'Bravo Datum', location_type: 'REFERENCE' },
   },
   // CIRCLE — Exclusion Zone
   {

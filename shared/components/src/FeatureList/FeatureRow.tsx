@@ -80,11 +80,8 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
  * Get the type label for a feature.
  */
 function getFeatureType(feature: DebriefFeature): string {
-  // eslint-disable-next-line no-restricted-syntax
-  const props = feature.properties as unknown as Record<string, unknown>;
-
   if (isTrackFeature(feature)) {
-    return (feature.properties.track_type || props.platformType as string) ?? 'TRACK';
+    return feature.properties.track_type || 'TRACK';
   }
   if (isMultiPointFeature(feature)) {
     return 'MULTI_POINT';
@@ -93,9 +90,9 @@ function getFeatureType(feature: DebriefFeature): string {
     return 'MULTI_POLYGON';
   }
   if (isReferenceLocation(feature)) {
-    return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
+    return feature.properties.location_type || 'POINT';
   }
-  return (props.kind as string) ?? 'ANNOTATION';
+  return feature.properties.kind || 'ANNOTATION';
 }
 
 /**
@@ -111,21 +108,15 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
   }
 
   if (isTrackFeature(feature)) {
+    const positions = feature.properties.positions;
     let start: string | undefined = feature.properties.start_time;
     let end: string | undefined = feature.properties.end_time;
 
-    if (!start || !end) {
-      // eslint-disable-next-line no-restricted-syntax
-      const props = feature.properties as unknown as Record<string, unknown>;
-      const positions = props.positions as Array<{ time: string }> | undefined;
-      if (Array.isArray(positions) && positions.length > 0) {
-        if (!start && positions[0]?.time) {
-          start = positions[0].time;
-        }
-        if (!end && positions[positions.length - 1]?.time) {
-          end = positions[positions.length - 1]!.time;
-        }
-      }
+    if (!start && positions.length > 0) {
+      start = positions[0]?.time;
+    }
+    if (!end && positions.length > 0) {
+      end = positions[positions.length - 1]?.time;
     }
 
     if (start && end) {

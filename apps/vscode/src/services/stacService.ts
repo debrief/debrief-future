@@ -386,8 +386,8 @@ export class StacService {
             properties: {
               kind: 'TRACK',
               platform_id: featureId,
-              platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
-              track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
+              platform_name: (props.platform_name as string) ?? `Track ${trackCount + 1}`,
+              track_type: (props.track_type as string) ?? 'CONTACT',
               start_time: (props.start_time as string) ?? positions[0]?.time ?? '',
               end_time: (props.end_time as string) ?? positions[positions.length - 1]?.time ?? '',
               positions,
@@ -415,7 +415,7 @@ export class StacService {
             properties: {
               kind: 'POINT',
               name: (props.name as string) ?? `Location ${locationCount + 1}`,
-              location_type: (props.locationType as string) ?? (props.location_type as string) ?? 'REFERENCE',
+              location_type: (props.location_type as string) ?? 'REFERENCE',
               style: { shape: 'circle', radius: 5, fill_color: '#ff0000', color: '#000000' },
               provenance: props.provenance as SchemaLogEntry[] | undefined,
             },

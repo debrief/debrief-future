@@ -195,22 +195,15 @@ export function PositionSymbolsLayer({
       if (!coord) continue;
       const position: LatLngExpression = [coord[1], coord[0]];
 
-      // Determine marker appearance — per-position overrides take priority
-      const hasOverrideColor = !!style.fillColor || !!style.strokeColor;
-      const markerFillColor = style.fillColor ?? color;
-      const markerStrokeColor = style.strokeColor ?? color;
-      const baseRadius = style.radius ?? getRadiusForShape(style.symbol);
+      // Determine marker appearance
+      const markerFillColor = color;
+      const markerStrokeColor = color;
+      const baseRadius = getRadiusForShape(style.symbol);
       const markerRadius = isPositionSelected ? baseRadius + 3 : baseRadius;
-      const markerFillOpacity = style.fillOpacity ?? (isPositionSelected ? 0.9 : 0.7);
+      const markerFillOpacity = isPositionSelected ? 0.9 : 0.7;
       const weight = isPositionSelected ? 3 : 2;
 
-      // Show symbol if it has a per-position colour override (even if normally hidden)
-      const showForOverride = hasOverrideColor && !shouldShowSymbol;
-      if (showForOverride) {
-        // Override colour forces the position to be visible
-      }
-
-      if (shouldShowSymbol || showForOverride) {
+      if (shouldShowSymbol) {
         const shape = style.symbol as SymbolShape;
         if (shape === 'circle' || !shape) {
           // Circle: use Leaflet's native CircleMarker (most performant)
