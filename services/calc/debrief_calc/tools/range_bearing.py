@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 import uuid
-from datetime import UTC, datetime
+
 from typing import Any
 
 from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
@@ -49,17 +49,17 @@ def _extract_coords(feature: GeoJSONFeatureDict) -> list[list[float]]:
     return coords
 
 
-def _extract_times(feature: GeoJSONFeatureDict) -> list[int] | None:
-    """Extract epoch ms timestamps from properties.times."""
+def _extract_times(feature: GeoJSONFeatureDict) -> list[str] | None:
+    """Extract ISO 8601 timestamps from properties.positions[].time."""
     props = feature.get("properties", {}) or {}
-    times = props.get("times")
-    if isinstance(times, list) and len(times) > 0:
-        return times
+    positions = props.get("positions")
+    if isinstance(positions, list) and len(positions) > 0:
+        return [p["time"] for p in positions if isinstance(p, dict) and "time" in p]
     return None
 
 
 def _is_track(feature: GeoJSONFeatureDict) -> bool:
-    """Check if feature is a track (LineString with times)."""
+    """Check if feature is a track (LineString with positions)."""
     geom = feature.get("geometry", {})
     return geom.get("type") == "LineString" and _extract_times(feature) is not None
 
@@ -201,17 +201,11 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[Geo
     # Build DatasetEnvelope series matching TS format
     series_name = f"{name1} → {name2}"
     range_data = [
-        {
-            "time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(),
-            "value": e["range_nm"],
-        }
+        {"time": e["time"], "value": e["range_nm"]}
         for e in series
     ]
     bearing_data = [
-        {
-            "time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(),
-            "value": e["bearing_deg"],
-        }
+        {"time": e["time"], "value": e["bearing_deg"]}
         for e in series
     ]
 

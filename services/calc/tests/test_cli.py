@@ -32,10 +32,12 @@ class TestCli:
                 "id": "track-1",
                 "name": "Test Track",
                 "kind": "TRACK",
-                "times": [
-                    1704067200000,
-                    1704070800000,
-                    1704074400000,
+                "start_time": "2024-01-01T00:00:00Z",
+                "end_time": "2024-01-01T02:00:00Z",
+                "positions": [
+                    {"time": "2024-01-01T00:00:00Z"},
+                    {"time": "2024-01-01T01:00:00Z"},
+                    {"time": "2024-01-01T02:00:00Z"},
                 ],
             },
         }
@@ -66,7 +68,7 @@ class TestCli:
     def test_range_bearing_two_tracks(self) -> None:
         """CLI returns artifact MCP content for range-bearing with two tracks."""
         base_coords = [[-1.0, 50.0], [-1.1, 50.1]]
-        times = [1704067200000, 1704070800000]
+        positions = [{"time": "2024-01-01T00:00:00Z"}, {"time": "2024-01-01T01:00:00Z"}]
         features = [
             {
                 "type": "Feature",
@@ -75,7 +77,7 @@ class TestCli:
                     "id": f"track-{i}",
                     "name": f"Track {i}",
                     "kind": "TRACK",
-                    "times": times,
+                    "positions": positions,
                 },
             }
             for i in range(2)

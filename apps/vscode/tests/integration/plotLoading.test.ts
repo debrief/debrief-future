@@ -46,10 +46,10 @@ describe('Plot Loading Workflow', () => {
           [-2.0, 51.0],
         ],
       },
-      times: [
-        '2024-01-15T09:30:00Z',
-        '2024-01-15T11:00:00Z',
-        '2024-01-15T14:00:00Z',
+      positions: [
+        { time: '2024-01-15T09:30:00Z' },
+        { time: '2024-01-15T11:00:00Z' },
+        { time: '2024-01-15T14:00:00Z' },
       ],
       startTime: '2024-01-15T09:30:00Z',
       endTime: '2024-01-15T14:00:00Z',
@@ -68,10 +68,10 @@ describe('Plot Loading Workflow', () => {
           [-2.0, 50.8],
         ],
       },
-      times: [
-        '2024-01-15T10:00:00Z',
-        '2024-01-15T12:00:00Z',
-        '2024-01-15T14:00:00Z',
+      positions: [
+        { time: '2024-01-15T10:00:00Z' },
+        { time: '2024-01-15T12:00:00Z' },
+        { time: '2024-01-15T14:00:00Z' },
       ],
       startTime: '2024-01-15T10:00:00Z',
       endTime: '2024-01-15T14:00:00Z',
@@ -156,9 +156,9 @@ describe('Plot Loading Workflow', () => {
       expect(leafletCoords).toHaveLength(3);
     });
 
-    it('tracks have valid time arrays matching coordinates', () => {
+    it('tracks have valid positions arrays matching coordinates', () => {
       for (const track of mockTracks) {
-        expect(track.times.length).toBe(track.geometry.coordinates.length);
+        expect(track.positions.length).toBe(track.geometry.coordinates.length);
       }
     });
   });

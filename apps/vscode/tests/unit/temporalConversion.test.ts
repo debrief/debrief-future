@@ -1,8 +1,8 @@
 /**
  * Temporal Conversion Unit Tests
  *
- * Verifies that ISO 8601 string timestamps from Track.times are correctly
- * converted to epoch milliseconds for use by temporal-utils.ts.
+ * Verifies that ISO 8601 string timestamps from Track.positions[].time are
+ * correctly converted to epoch milliseconds for use by temporal-utils.ts.
  *
  * Feature: 077-fix-vscode-extension-bugs
  */

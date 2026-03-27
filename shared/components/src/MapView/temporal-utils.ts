@@ -105,28 +105,30 @@ export function extractTemporalData(
   // eslint-disable-next-line no-restricted-syntax
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
   // eslint-disable-next-line no-restricted-syntax
-  const times = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
+  const props = feature.properties as unknown as Record<string, unknown>;
+  const positions = props.positions as Array<{ time: string }> | undefined;
 
-  if (!times || !Array.isArray(times) || times.length === 0) return null;
-
-  // times must be epoch ms numbers — fail fast on wrong format (Constitution XIV.4)
-  if (typeof times[0] !== 'number') {
-    throw new Error(
-      `[temporal-utils] Feature "${String(feature.id)}" has non-numeric times ` +
-      `(got ${typeof times[0]}). times[] must contain epoch ms numbers. ` +
-      `Fix the data source, do not add format conversion here.`
-    );
-  }
-  const timestamps = times as number[];
+  if (!positions || !Array.isArray(positions) || positions.length === 0) return null;
 
   if (coordinates.length === 0) return null;
-  // times and coordinates must match in length
-  if (timestamps.length !== coordinates.length) {
+  // positions and coordinates must match in length
+  if (positions.length !== coordinates.length) {
     throw new Error(
       `[temporal-utils] Feature "${String(feature.id)}" has mismatched arrays: ` +
-      `${timestamps.length} times vs ${coordinates.length} coordinates. These must be parallel arrays.`
+      `${positions.length} positions vs ${coordinates.length} coordinates. These must be parallel arrays.`
     );
   }
+
+  // Parse ISO timestamps to epoch ms
+  const timestamps = positions.map((p, i) => {
+    const ms = Date.parse(p.time);
+    if (isNaN(ms)) {
+      throw new Error(
+        `[temporal-utils] Feature "${String(feature.id)}" has invalid time at positions[${i}]: "${p.time}".`
+      );
+    }
+    return ms;
+  });
 
   const first = timestamps[0]!;
   const last = timestamps[timestamps.length - 1]!;

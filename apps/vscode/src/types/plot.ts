@@ -84,11 +84,8 @@ export interface TrackViewModel {
   /** GeoJSON LineString geometry */
   geometry: GeoJSONLineString;
 
-  /** Time values for each coordinate (epoch ms) */
-  times: number[];
-
-  /** Position metadata array (parallel to geometry.coordinates) (Feature: 048) */
-  positions?: TimestampedPosition[];
+  /** Position metadata array (parallel to geometry.coordinates) */
+  positions: TimestampedPosition[];
 
   /** Start time of track */
   startTime: string;

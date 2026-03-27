@@ -44,11 +44,11 @@ def multi_track_context() -> SelectionContext:
         "properties": {
             "kind": "TRACK",
             "name": "Alpha",
-            "times": [1705305600000, 1705309200000],
+            "positions": [{"time": "2024-01-15T08:00:00Z"}, {"time": "2024-01-15T09:00:00Z"}],
         },
         "geometry": {
             "type": "LineString",
-            "coordinates": [[-5.0, 50.0, 0, 1705305600000], [-4.5, 50.2, 0, 1705309200000]],
+            "coordinates": [[-5.0, 50.0], [-4.5, 50.2]],
         },
     }
     feature2 = {
@@ -57,11 +57,11 @@ def multi_track_context() -> SelectionContext:
         "properties": {
             "kind": "TRACK",
             "name": "Bravo",
-            "times": [1705305600000, 1705309200000],
+            "positions": [{"time": "2024-01-15T08:00:00Z"}, {"time": "2024-01-15T09:00:00Z"}],
         },
         "geometry": {
             "type": "LineString",
-            "coordinates": [[-4.0, 50.5, 0, 1705305600000], [-4.5, 50.3, 0, 1705309200000]],
+            "coordinates": [[-4.0, 50.5], [-4.5, 50.3]],
         },
     }
     return SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])

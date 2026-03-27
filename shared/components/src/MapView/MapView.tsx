@@ -380,7 +380,7 @@ export function MapView({
       // eslint-disable-next-line no-restricted-syntax
       const popupLines = [`<b>id:</b> ${String(featureId)}`];
       for (const [k, v] of Object.entries(props)) {
-        if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'positions' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') continue;
+        if (k === 'style' || k === 'position_style_overrides' || k === 'positions' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') continue;
         if (v !== null && v !== undefined && typeof v !== 'object') {
           popupLines.push(`<b>${k}:</b> ${String(v)}`);
         }

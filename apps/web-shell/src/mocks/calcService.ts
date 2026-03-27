@@ -175,7 +175,7 @@ function isTrack(feature: Feature): boolean {
   return (
     feature.geometry?.type === 'LineString' &&
     feature.properties !== null &&
-    Array.isArray(feature.properties['times'])
+    (feature.properties['kind'] === 'TRACK' || Array.isArray(feature.properties['positions']))
   );
 }
 

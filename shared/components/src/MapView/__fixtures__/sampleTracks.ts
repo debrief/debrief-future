@@ -21,14 +21,19 @@ function generateTrack(
   startOffset: number = 0
 ): DebriefFeature {
   const coordinates: [number, number][] = [];
-  const times: number[] = [];
+  const positions: Array<{ time: string; course: number; speed: number }> = [];
 
   for (let i = 0; i < steps; i++) {
+    const timestamp = BASE_TIME + startOffset + i * MINUTE;
     coordinates.push([
       startLon + dlonPerStep * i + Math.sin(i * 0.3) * 0.005,
       startLat + dlatPerStep * i + Math.cos(i * 0.3) * 0.003,
     ]);
-    times.push(BASE_TIME + startOffset + i * MINUTE);
+    positions.push({
+      time: new Date(timestamp).toISOString(),
+      course: 45 + Math.sin(i * 0.3) * 10,
+      speed: 12,
+    });
   }
 
   return {
@@ -42,7 +47,9 @@ function generateTrack(
       kind: 'TRACK',
       name,
       color,
-      times,
+      start_time: positions[0]?.time ?? '',
+      end_time: positions[positions.length - 1]?.time ?? '',
+      positions,
       trackType: 'SURFACE',
     },
   // eslint-disable-next-line no-restricted-syntax

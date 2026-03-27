@@ -27,7 +27,7 @@ vi.mock('fs', () => ({
 const mockShapesFeatures = {
   type: 'FeatureCollection',
   features: [
-    // Track with times (should become Track)
+    // Track with positions (should become Track)
     {
       type: 'Feature',
       geometry: {
@@ -38,7 +38,13 @@ const mockShapesFeatures = {
         kind: 'TRACK',
         platform_name: 'MISSILE_ROTATION',
         track_type: 'CONTACT',
-        times: ['2024-01-01T00:00:00Z', '2024-01-01T00:01:00Z', '2024-01-01T00:02:00Z'],
+        start_time: '2024-01-01T00:00:00Z',
+        end_time: '2024-01-01T00:02:00Z',
+        positions: [
+          { time: '2024-01-01T00:00:00Z' },
+          { time: '2024-01-01T00:01:00Z' },
+          { time: '2024-01-01T00:02:00Z' },
+        ],
       },
     },
     // Polygon (should become otherFeature)
@@ -77,7 +83,7 @@ const mockShapesFeatures = {
         label: 'Annotation',
       },
     },
-    // LineString without times (should become otherFeature)
+    // LineString without kind=TRACK (should become otherFeature)
     {
       type: 'Feature',
       geometry: {
@@ -140,13 +146,13 @@ describe('StacService Feature Processing', () => {
   });
 
   describe('Feature categorization logic', () => {
-    it('should categorize LineString with times as Track', () => {
+    it('should categorize LineString with kind=TRACK as Track', () => {
       const feature = mockShapesFeatures.features[0];
       const geom = feature.geometry;
       const props = feature.properties;
 
       // This is the logic from stacService.loadPlotData
-      const isTrack = geom?.type === 'LineString' && !!props?.times;
+      const isTrack = geom?.type === 'LineString' && (props?.kind === 'TRACK' || !!props?.positions);
       expect(isTrack).toBe(true);
     });
 
@@ -164,7 +170,7 @@ describe('StacService Feature Processing', () => {
       const geom = feature.geometry;
       const props = feature.properties;
 
-      const isTrack = geom?.type === 'LineString' && props?.times;
+      const isTrack = geom?.type === 'LineString' && (props?.kind === 'TRACK' || props?.positions);
       const isLocation = geom?.type === 'Point' && props?.kind === 'LOCATION';
       const isOther = !isTrack && !isLocation && geom !== null;
 
@@ -176,19 +182,19 @@ describe('StacService Feature Processing', () => {
       const geom = feature.geometry;
       const props = feature.properties;
 
-      const isTrack = geom?.type === 'LineString' && props?.times;
+      const isTrack = geom?.type === 'LineString' && (props?.kind === 'TRACK' || props?.positions);
       const isLocation = geom?.type === 'Point' && props?.kind === 'LOCATION';
       const isOther = !isTrack && !isLocation && geom !== null;
 
       expect(isOther).toBe(true);
     });
 
-    it('should categorize LineString without times as otherFeature', () => {
+    it('should categorize LineString without kind=TRACK as otherFeature', () => {
       const feature = mockShapesFeatures.features[4];
       const geom = feature.geometry;
       const props = feature.properties;
 
-      const isTrack = geom?.type === 'LineString' && props?.times;
+      const isTrack = geom?.type === 'LineString' && (props?.kind === 'TRACK' || props?.positions);
       const isLocation = geom?.type === 'Point' && props?.kind === 'LOCATION';
       const isOther = !isTrack && !isLocation && geom !== null;
 
@@ -215,7 +221,7 @@ describe('StacService Feature Processing', () => {
           continue; // Skip null geometry
         }
 
-        if (geom.type === 'LineString' && props?.times) {
+        if (geom.type === 'LineString' && (props?.kind === 'TRACK' || props?.positions)) {
           tracks.push(feature);
         } else if (geom.type === 'Point' && props?.kind === 'LOCATION') {
           locations.push(feature);

@@ -30,11 +30,15 @@ def multi_track_context(tracks_pair_fixture: dict[str, Any]) -> SelectionContext
     return SelectionContext(type=ContextType.MULTI, features=tracks_pair_fixture["features"])
 
 
-def _make_track(name: str, coords: list[list[float]], times: list[int]) -> dict[str, Any]:
+def _make_track(name: str, coords: list[list[float]], times: list[str]) -> dict[str, Any]:
     return {
         "type": "Feature",
         "id": name,
-        "properties": {"name": name, "kind": "TRACK", "times": times},
+        "properties": {
+            "name": name,
+            "kind": "TRACK",
+            "positions": [{"time": t} for t in times],
+        },
         "geometry": {"type": "LineString", "coordinates": coords},
     }
 
@@ -148,7 +152,7 @@ class TestRangeBearingTrackPoint:
     """Track + Point tests."""
 
     def test_track_point_series(self) -> None:
-        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000])
+        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"])
         point = _make_point("P1", -4.5, 50.5)
         ctx = SelectionContext(type=ContextType.MULTI, features=[track, point])
         results = range_bearing(ctx, {})
@@ -163,7 +167,7 @@ class TestRangeBearingTrackPoint:
     def test_point_track_order(self) -> None:
         """Point first, track second — still produces series."""
         point = _make_point("P1", -4.5, 50.5)
-        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000])
+        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"])
         ctx = SelectionContext(type=ContextType.MULTI, features=[point, track])
         results = range_bearing(ctx, {})
         assert len(results) == 1
@@ -174,7 +178,7 @@ class TestRangeBearingTrackPolygon:
     """Track + Polygon tests."""
 
     def test_track_polygon_series(self) -> None:
-        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000])
+        track = _make_track("T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"])
         ring = [[-3.0, 49.0], [-2.0, 49.0], [-2.0, 50.0], [-3.0, 50.0], [-3.0, 49.0]]
         poly = _make_polygon("Zone", ring)
         ctx = SelectionContext(type=ContextType.MULTI, features=[track, poly])
@@ -205,13 +209,13 @@ class TestRangeBearingEdgeCases:
         feature1 = {
             "type": "Feature",
             "id": "track-1",
-            "properties": {"kind": "TRACK", "times": [1704067200000]},
+            "properties": {"kind": "TRACK", "positions": [{"time": "2024-01-01T00:00:00Z"}]},
             "geometry": {"type": "LineString", "coordinates": []},
         }
         feature2 = {
             "type": "Feature",
             "id": "track-2",
-            "properties": {"kind": "TRACK", "times": [1704067200000]},
+            "properties": {"kind": "TRACK", "positions": [{"time": "2024-01-01T00:00:00Z"}]},
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])

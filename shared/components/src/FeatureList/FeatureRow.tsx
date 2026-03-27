@@ -117,15 +117,13 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
     if (!start || !end) {
       // eslint-disable-next-line no-restricted-syntax
       const props = feature.properties as unknown as Record<string, unknown>;
-      const times = props.times as unknown[] | undefined;
-      if (Array.isArray(times) && times.length > 0) {
-        const firstTime = times[0];
-        const lastTime = times[times.length - 1];
-        if (!start && typeof firstTime === 'string') {
-          start = firstTime;
+      const positions = props.positions as Array<{ time: string }> | undefined;
+      if (Array.isArray(positions) && positions.length > 0) {
+        if (!start && positions[0]?.time) {
+          start = positions[0].time;
         }
-        if (!end && typeof lastTime === 'string') {
-          end = lastTime;
+        if (!end && positions[positions.length - 1]?.time) {
+          end = positions[positions.length - 1]!.time;
         }
       }
     }
@@ -367,7 +365,7 @@ export function FeatureRow({
             const props = feature.properties as unknown as Record<string, unknown>;
             const lines = [`id: ${String(feature.id)}`];
             for (const [k, v] of Object.entries(props)) {
-              if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') {
+              if (k === 'style' || k === 'position_style_overrides' || k === 'positions' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') {
                 lines.push(`${k}: [${Array.isArray(v) ? v.length + ' items' : 'object'}]`);
               } else if (v !== null && v !== undefined && typeof v !== 'object') {
                 lines.push(`${k}: ${String(v)}`);
