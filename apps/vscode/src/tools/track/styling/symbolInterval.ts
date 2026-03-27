@@ -42,15 +42,12 @@ export function execute(
       continue;
     }
 
-    // Defensively handle missing default_position_style.
-    // symbol_interval is stored on default_position_style alongside show_symbol
-    // (runtime extension beyond the PositionStyle schema type).
-    const dps = feature.properties.default_position_style ?? {
-      show_symbol: true, symbol: 'circle', show_label: false,
-    };
-    dps.show_symbol = true;
-    Object.assign(dps, { symbol_interval: interval });
-    feature.properties.default_position_style = dps;
+    // Store symbol_interval as a top-level track property so the
+    // PositionSymbolsLayer renderer picks it up via props.symbol_interval.
+    // Do NOT set show_symbol=true on default_position_style — the interval
+    // mechanism in resolvePositionStyle() selectively enables symbols only
+    // at positions that match the interval.
+    feature.properties.symbol_interval = interval;
 
     modified.push(feature);
   }
