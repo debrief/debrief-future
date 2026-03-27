@@ -152,13 +152,16 @@ export function createExecuteToolCommand(
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
-        // All DebriefFeature variants extend BaseFeatureProperties which includes provenance
-        // eslint-disable-next-line no-restricted-syntax -- stripping provenance for deep copy
-        const { provenance: _p, ...restProps } = f.properties as unknown as Record<string, unknown>;
+        // Deep-copy geometry and properties (minus provenance) for input state snapshot.
+        // Properties are serialised to JSON strings to detach from the live feature object.
+        const geomCopy = JSON.parse(JSON.stringify(f.geometry)) as unknown;
+        const propsCopy = JSON.parse(JSON.stringify(f.properties)) as Record<string, unknown>;
+        delete propsCopy.provenance;
+
         const state: InputFeatureState = {
           featureId: String(f.id),
-          geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
-          properties: JSON.parse(JSON.stringify(restProps)) as InputFeatureState['properties'],
+          geometry: geomCopy,
+          properties: propsCopy as InputFeatureState['properties'],
         };
         return state;
       });
