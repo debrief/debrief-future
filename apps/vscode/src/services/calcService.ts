@@ -672,7 +672,7 @@ print(json.dumps(tools))
           id: feature.id,
           geometry: feature.geometry,
           properties: {
-            ...JSON.parse(JSON.stringify(feature.properties)) as Record<string, unknown>,
+            ...structuredClone(feature.properties),
             id: feature.id,
           },
         });

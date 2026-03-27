@@ -153,15 +153,11 @@ export function createExecuteToolCommand(
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
         // Deep-copy geometry and properties (minus provenance) for input state snapshot.
-        // Properties are serialised to JSON strings to detach from the live feature object.
-        const geomCopy = JSON.parse(JSON.stringify(f.geometry)) as unknown;
-        const propsCopy = JSON.parse(JSON.stringify(f.properties)) as Record<string, unknown>;
-        delete propsCopy.provenance;
-
+        const { provenance: _p, ...restProps } = structuredClone(f.properties);
         const state: InputFeatureState = {
           featureId: String(f.id),
-          geometry: geomCopy,
-          properties: propsCopy as InputFeatureState['properties'],
+          geometry: structuredClone(f.geometry),
+          properties: restProps,
         };
         return state;
       });
