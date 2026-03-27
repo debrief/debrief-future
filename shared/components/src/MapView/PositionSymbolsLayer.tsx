@@ -125,7 +125,7 @@ export function PositionSymbolsLayer({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const defaultStyle: PositionStyle = explicitDps ?? (
     pointStyle?.shape
-      ? { show_symbol: true, symbol: pointStyle.shape as string, show_label: false }
+      ? { show_symbol: false, symbol: pointStyle.shape as string, show_label: false }
       : DEFAULT_POSITION_STYLE
   );
   const symbolInterval = props.symbol_interval;
