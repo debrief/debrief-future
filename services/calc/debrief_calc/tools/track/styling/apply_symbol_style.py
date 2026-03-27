@@ -104,10 +104,11 @@ def apply_symbol_style(
                 point["fill_color"] = line["color"]
 
         # Update default_position_style so the PositionSymbolsLayer renderer
-        # shows the chosen symbol shape on the map.
+        # uses the chosen symbol shape.  Only change the shape — do NOT set
+        # show_symbol=True, as that would make ALL positions visible instead
+        # of respecting the existing interval/override visibility cascade.
         dps = props.setdefault("default_position_style", {})
         dps["symbol"] = symbol
-        dps["show_symbol"] = True
 
         modified.append(feature)
 

@@ -57,7 +57,7 @@ class TestSymbolInterval:
     """Golden example tests for the symbol-interval tool."""
 
     def test_basic_golden_example(self) -> None:
-        """Apply interval='PT30M'. Verify show_symbol=True and symbol_interval set."""
+        """Apply interval='PT30M'. Verify symbol_interval set as top-level property."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"interval": "PT30M"}
@@ -65,15 +65,16 @@ class TestSymbolInterval:
         result = symbol_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
+        props = result[0]["properties"]
+        assert props["symbol_interval"] == "PT30M"
+        # default_position_style must not be mutated
+        dps = props["default_position_style"]
         assert dps["show_symbol"] is True
-        assert dps["symbol_interval"] == "PT30M"
-        # Other default_position_style properties remain unchanged
         assert dps["symbol"] == "circle"
         assert dps["show_label"] is False
 
     def test_no_existing_dps(self) -> None:
-        """Track with no default_position_style gets one with show_symbol=True."""
+        """Track with no default_position_style still gets symbol_interval set."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["default_position_style"]
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -82,26 +83,34 @@ class TestSymbolInterval:
         result = symbol_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
-        assert dps["show_symbol"] is True
-        assert dps["symbol_interval"] == "PT20M"
-        # Defaults created by setdefault
-        assert dps["symbol"] == "circle"
-        assert dps["show_label"] is False
+        props = result[0]["properties"]
+        assert props["symbol_interval"] == "PT20M"
+        # No default_position_style should be created
+        assert "default_position_style" not in props
 
     def test_overwrites_existing(self) -> None:
         """Existing symbol_interval is replaced with the new value."""
         feature = copy.deepcopy(TRACK_FEATURE)
-        feature["properties"]["default_position_style"]["symbol_interval"] = "PT5M"
+        feature["properties"]["symbol_interval"] = "PT5M"
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"interval": "PT1H"}
 
         result = symbol_interval(context, params)
 
         assert len(result) == 1
+        assert result[0]["properties"]["symbol_interval"] == "PT1H"
+
+    def test_does_not_change_show_symbol_visibility(self) -> None:
+        """Setting symbol interval must not alter show_symbol on default_position_style."""
+        feature = copy.deepcopy(TRACK_FEATURE)
+        feature["properties"]["default_position_style"]["show_symbol"] = False
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        params = {"interval": "PT30M"}
+
+        result = symbol_interval(context, params)
+
         dps = result[0]["properties"]["default_position_style"]
-        assert dps["symbol_interval"] == "PT1H"
-        assert dps["show_symbol"] is True
+        assert dps["show_symbol"] is False
 
     def test_error_no_tracks(self) -> None:
         """Empty feature list raises ValueError."""
@@ -120,6 +129,4 @@ class TestSymbolInterval:
         result = symbol_interval(context, params)
 
         assert len(result) == 1
-        dps = result[0]["properties"]["default_position_style"]
-        assert dps["show_symbol"] is True
-        assert dps["symbol_interval"] == "PT15M"
+        assert result[0]["properties"]["symbol_interval"] == "PT15M"

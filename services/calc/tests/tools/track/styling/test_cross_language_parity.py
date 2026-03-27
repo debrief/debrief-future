@@ -174,10 +174,12 @@ class TestCrossLanguageParity:
 
         assert len(result) >= 1
         primary = [f for f in result if f["id"] == "track-001"][0]
-        dps = primary["properties"]["default_position_style"]
-        assert dps["show_label"] is True
-        assert dps["label_interval"] == "PT15M"
-        # Original properties preserved
+        props = primary["properties"]
+        # label_interval stored as top-level property (not inside dps)
+        assert props["label_interval"] == "PT15M"
+        # default_position_style must not be mutated
+        dps = props["default_position_style"]
+        assert dps["show_label"] is False
         assert dps["show_symbol"] is True
         assert dps["symbol"] == "circle"
 
@@ -191,10 +193,12 @@ class TestCrossLanguageParity:
 
         assert len(result) >= 1
         primary = [f for f in result if f["id"] == "track-001"][0]
-        dps = primary["properties"]["default_position_style"]
+        props = primary["properties"]
+        # symbol_interval stored as top-level property (not inside dps)
+        assert props["symbol_interval"] == "PT30M"
+        # default_position_style must not be mutated
+        dps = props["default_position_style"]
         assert dps["show_symbol"] is True
-        assert dps["symbol_interval"] == "PT30M"
-        # Original properties preserved
         assert dps["symbol"] == "circle"
 
     def test_all_tools_preserve_feature_id(self) -> None:

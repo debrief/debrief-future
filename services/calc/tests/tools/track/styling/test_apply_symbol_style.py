@@ -138,10 +138,24 @@ class TestApplySymbolStyle:
         assert point["color"] == "#ffffff"
         assert point["weight"] == 1
         assert point["opacity"] == 1.0
-        # default_position_style created from scratch
+        # default_position_style created from scratch — show_symbol not forced
         dps = result[0]["properties"]["default_position_style"]
         assert dps["symbol"] == "cross"
-        assert dps["show_symbol"] is True
+        assert "show_symbol" not in dps
+
+    def test_does_not_change_show_symbol_visibility(self) -> None:
+        """Changing symbol shape must not alter show_symbol visibility."""
+        feature = copy.deepcopy(TRACK_FEATURE)
+        feature["properties"]["default_position_style"]["show_symbol"] = False
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        params = {"symbol": "square"}
+
+        result = apply_symbol_style(context, params)
+
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["symbol"] == "square"
+        # show_symbol must remain False — changing shape should not affect visibility
+        assert dps["show_symbol"] is False
 
     def test_error_invalid_symbol(self) -> None:
         """Invalid symbol raises ValueError."""
