@@ -37,7 +37,7 @@ function makeTrackFeature(): TestTrackFeature {
         line: { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 },
         point: { shape: 'circle', radius: 4, fill: true, fill_color: '#3388ff', fill_opacity: 0.8, stroke: true, color: '#ffffff', weight: 1, opacity: 1.0 },
       },
-      default_position_style: { show_symbol: true, symbol: 'circle', show_label: false },
+      default_position_style: { show_symbol: false, symbol: 'circle', show_label: false },
     },
   };
 }
@@ -108,6 +108,19 @@ describe('applySymbolStyle (T032)', () => {
     expect(() => execute([feature], { symbol: 'hexagon' as unknown as ApplySymbolStyleParams['symbol'] })).toThrow(
       'symbol must be one of: circle, square, diamond, triangle, cross',
     );
+  });
+
+  it('does not change show_symbol visibility on default_position_style', () => {
+    const feature = makeTrackFeature();
+    // show_symbol starts false
+    expect(feature.properties.default_position_style.show_symbol).toBe(false);
+
+    const result = execute([feature], { symbol: 'square' });
+
+    // show_symbol must remain false — changing shape should not affect visibility
+    const dps = result[0].properties.default_position_style;
+    expect(dps.symbol).toBe('square');
+    expect(dps.show_symbol).toBe(false);
   });
 
   it('default symbol: omitting symbol defaults to square', () => {

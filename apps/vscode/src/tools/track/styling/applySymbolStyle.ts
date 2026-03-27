@@ -86,10 +86,11 @@ export function execute(
     feature.properties.style = style;
 
     // Update default_position_style so the PositionSymbolsLayer renderer
-    // shows the chosen symbol shape on the map.
+    // uses the chosen symbol shape.  Only change the shape — do NOT set
+    // show_symbol=true, as that would make ALL positions visible instead
+    // of respecting the existing interval/override visibility cascade.
     const dps = feature.properties.default_position_style ?? { show_symbol: false, show_label: false };
     dps.symbol = symbol;
-    dps.show_symbol = true;
     feature.properties.default_position_style = dps;
 
     modified.push(feature);
