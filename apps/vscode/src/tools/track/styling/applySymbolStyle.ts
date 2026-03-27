@@ -63,9 +63,8 @@ export function execute(
       continue;
     }
 
-    // eslint-disable-next-line no-restricted-syntax -- defensive: features may lack nested style objects
-    const props = feature.properties as unknown as Record<string, unknown>;
-    const style = (props['style'] as { line?: { color?: string }; point?: Record<string, unknown> }) ?? {};
+    // Defensively handle missing style — real features from disk may lack it
+    const style = feature.properties.style ?? { line: {} };
     const point = style.point ?? {
       shape: 'square', radius: 4, fill: true,
       fill_color: '#3388ff', fill_opacity: 0.8,
@@ -84,14 +83,14 @@ export function execute(
     }
 
     style.point = point;
-    props['style'] = style;
+    feature.properties.style = style;
 
     // Update default_position_style so the PositionSymbolsLayer renderer
     // shows the chosen symbol shape on the map.
-    const dps = (props['default_position_style'] ?? {}) as Record<string, unknown>;
-    dps['symbol'] = symbol;
-    dps['show_symbol'] = true;
-    props['default_position_style'] = dps;
+    const dps = feature.properties.default_position_style ?? { show_symbol: false, show_label: false };
+    dps.symbol = symbol;
+    dps.show_symbol = true;
+    feature.properties.default_position_style = dps;
 
     modified.push(feature);
   }

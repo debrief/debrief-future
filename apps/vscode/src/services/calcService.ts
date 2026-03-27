@@ -672,8 +672,7 @@ print(json.dumps(tools))
           id: feature.id,
           geometry: feature.geometry,
           properties: {
-            // eslint-disable-next-line no-restricted-syntax -- serialization boundary: spreading typed props to JSON for Python CLI
-            ...(feature.properties as unknown as Record<string, unknown>),
+            ...JSON.parse(JSON.stringify(feature.properties)) as Record<string, unknown>,
             id: feature.id,
           },
         });

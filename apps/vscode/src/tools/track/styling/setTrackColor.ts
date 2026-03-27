@@ -45,13 +45,12 @@ export function execute(
       continue;
     }
 
-    // eslint-disable-next-line no-restricted-syntax -- defensive: features may lack nested style objects
-    const props = feature.properties as unknown as Record<string, unknown>;
-    const style = (props['style'] as { line?: Record<string, unknown> }) ?? {};
+    // Defensively handle missing style — real features from disk may lack it
+    const style = feature.properties.style ?? {};
     const line = style.line ?? { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 };
     line.color = color;
     style.line = line;
-    props['style'] = style;
+    feature.properties.style = style;
 
     modified.push(feature);
   }
