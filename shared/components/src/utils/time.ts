@@ -1,5 +1,5 @@
 import type { DebriefFeature, DebriefFeatureCollection, TimeExtent } from './types';
-import { isTrackFeature } from './types';
+import { isTrackFeature, isReferenceLocation } from './types';
 import type { PositionStyle, PositionStyleOverride } from '@debrief/schemas';
 
 /**
@@ -23,21 +23,18 @@ export function calculateTimeExtent(
 
   for (const feature of featureArray) {
     if (isTrackFeature(feature)) {
-      // Track has start_time and end_time (preferred)
       let startTime = parseTime(feature.properties.start_time);
       let endTime = parseTime(feature.properties.end_time);
 
-      // Fallback: derive from positions array if start_time/end_time not present
+      // Fallback: derive from positions array
       if (startTime === null || endTime === null) {
-        // eslint-disable-next-line no-restricted-syntax
-        const props = feature.properties as unknown as Record<string, unknown>;
-        const positions = props.positions as Array<{ time: string }> | undefined;
-        if (Array.isArray(positions) && positions.length > 0) {
-          if (startTime === null && positions[0]?.time) {
-            startTime = parseTime(positions[0].time);
+        const positions = feature.properties.positions;
+        if (positions.length > 0) {
+          if (startTime === null) {
+            startTime = parseTime(positions[0]?.time);
           }
-          if (endTime === null && positions[positions.length - 1]?.time) {
-            endTime = parseTime(positions[positions.length - 1]!.time);
+          if (endTime === null) {
+            endTime = parseTime(positions[positions.length - 1]?.time);
           }
         }
       }
@@ -48,46 +45,21 @@ export function calculateTimeExtent(
       if (endTime !== null) {
         maxTime = Math.max(maxTime, endTime);
       }
-    } else {
-      // ReferenceLocation and other feature types may have various time properties
-      // eslint-disable-next-line no-restricted-syntax
-      const props = feature.properties as unknown as Record<string, unknown>;
-
-      // Check for valid_from/valid_until (schema properties)
-      if (props.valid_from) {
-        const validFrom = parseTime(props.valid_from as string);
-        if (validFrom !== null) {
-          minTime = Math.min(minTime, validFrom);
-        }
+    } else if (isReferenceLocation(feature)) {
+      const validFrom = parseTime(feature.properties.valid_from);
+      if (validFrom !== null) {
+        minTime = Math.min(minTime, validFrom);
       }
-      if (props.valid_until) {
-        const validUntil = parseTime(props.valid_until as string);
-        if (validUntil !== null) {
-          maxTime = Math.max(maxTime, validUntil);
-        }
+      const validUntil = parseTime(feature.properties.valid_until);
+      if (validUntil !== null) {
+        maxTime = Math.max(maxTime, validUntil);
       }
-
-      // Check for start_time/end_time (used by PERIODTEXT, ELLIPSE2, etc.)
-      if (props.start_time) {
-        const startTime = parseTime(props.start_time as string);
-        if (startTime !== null) {
-          minTime = Math.min(minTime, startTime);
-        }
-      }
-      if (props.end_time) {
-        const endTime = parseTime(props.end_time as string);
-        if (endTime !== null) {
-          maxTime = Math.max(maxTime, endTime);
-        }
-      }
-
-      // Check for single time property (used by TIMETEXT, ELLIPSE, SENSOR, etc.)
-      if (props.time) {
-        const time = parseTime(props.time as string);
-        if (time !== null) {
-          minTime = Math.min(minTime, time);
-          maxTime = Math.max(maxTime, time);
-        }
+    } else if ('time' in feature.properties) {
+      // NarrativeEntry has a single time property
+      const time = parseTime(feature.properties.time as string);
+      if (time !== null) {
+        minTime = Math.min(minTime, time);
+        maxTime = Math.max(maxTime, time);
       }
     }
   }
@@ -279,14 +251,6 @@ export interface ResolvedPositionStyle {
   symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
   showLabel: boolean;
   labelText: string | null;
-  /** Per-position colour override from position_style_overrides (format menu) */
-  fillColor?: string;
-  /** Per-position stroke colour override */
-  strokeColor?: string;
-  /** Per-position radius override */
-  radius?: number;
-  /** Per-position fill opacity override */
-  fillOpacity?: number;
 }
 
 /**
@@ -323,12 +287,6 @@ export function resolvePositionStyle(
     showLabel = true;
   }
 
-  // Visual override fields from format menu
-  let fillColor: string | undefined;
-  let strokeColor: string | undefined;
-  let radius: number | undefined;
-  let fillOpacity: number | undefined;
-
   // Apply overrides (highest priority)
   if (override) {
     if (override.show_symbol !== undefined && override.show_symbol !== null) {
@@ -343,19 +301,6 @@ export function resolvePositionStyle(
     if (override.label) {
       labelText = override.label;
     }
-
-    // Visual style overrides (from format menu per-position formatting)
-    // eslint-disable-next-line no-restricted-syntax
-    const ov = override as Record<string, unknown>;
-    if (typeof ov.fill_color === 'string') fillColor = ov.fill_color;
-    if (typeof ov.stroke_color === 'string') strokeColor = ov.stroke_color;
-    if (typeof ov.radius === 'number') radius = ov.radius;
-    if (typeof ov.fill_opacity === 'number') fillOpacity = ov.fill_opacity;
-    // Also check shape from format menu (maps to symbol)
-    if (typeof ov.shape === 'string') {
-      symbol = ov.shape as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
-      showSymbol = true;
-    }
   }
 
   // Generate default label text from timestamp if showing label but no custom text
@@ -368,7 +313,7 @@ export function resolvePositionStyle(
     }
   }
 
-  return { showSymbol, symbol, showLabel, labelText, fillColor, strokeColor, radius, fillOpacity };
+  return { showSymbol, symbol, showLabel, labelText };
 }
 
 /**

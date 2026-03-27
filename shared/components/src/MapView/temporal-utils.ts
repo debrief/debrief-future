@@ -8,6 +8,7 @@
  */
 
 import type { DebriefFeature } from '../utils/types';
+import { isTrackFeature } from '../utils/types';
 
 /**
  * Extracted temporal data from a track feature.
@@ -98,20 +99,15 @@ export function extractTemporalData(
   feature: DebriefFeature
 ): TemporalTrackData | null {
   if (!feature || !feature.geometry || !feature.properties) return null;
+  if (!isTrackFeature(feature)) return null;
 
-  // Must be a LineString
-  if (feature.geometry.type !== 'LineString') return null;
-
-  // eslint-disable-next-line no-restricted-syntax
+  // After narrowing, geometry and positions are typed
+  // eslint-disable-next-line no-restricted-syntax — GeoJSON coordinates typed as number[]
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
-  // eslint-disable-next-line no-restricted-syntax
-  const props = feature.properties as unknown as Record<string, unknown>;
-  const positions = props.positions as Array<{ time: string }> | undefined;
+  const positions = feature.properties.positions;
 
-  if (!positions || !Array.isArray(positions) || positions.length === 0) return null;
+  if (positions.length === 0 || coordinates.length === 0) return null;
 
-  if (coordinates.length === 0) return null;
-  // positions and coordinates must match in length
   if (positions.length !== coordinates.length) {
     throw new Error(
       `[temporal-utils] Feature "${String(feature.id)}" has mismatched arrays: ` +
@@ -119,7 +115,6 @@ export function extractTemporalData(
     );
   }
 
-  // Parse ISO timestamps to epoch ms
   const timestamps = positions.map((p, i) => {
     const ms = Date.parse(p.time);
     if (isNaN(ms)) {
@@ -130,13 +125,10 @@ export function extractTemporalData(
     return ms;
   });
 
-  const first = timestamps[0]!;
-  const last = timestamps[timestamps.length - 1]!;
-
   return {
     trackId: String(feature.id ?? ''),
     coordinates,
     timestamps,
-    timeExtent: [first, last],
+    timeExtent: [timestamps[0]!, timestamps[timestamps.length - 1]!],
   };
 }

@@ -1,5 +1,5 @@
 import type { DebriefFeature } from './types';
-import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature } from './types';
+import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature } from './types';
 
 /**
  * Get a human-readable label for a feature.
@@ -10,36 +10,21 @@ import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygo
  * @returns A display label string
  */
 export function getFeatureLabel(feature: DebriefFeature): string {
-  // Access properties with type assertion to handle legacy data formats
-  // eslint-disable-next-line no-restricted-syntax
-  const props = feature.properties as unknown as Record<string, unknown>;
-
   if (isTrackFeature(feature)) {
-    // Schema: platform_name, platform_id; Legacy: name
-    return (
-      feature.properties.platform_name ||
-      feature.properties.platform_id ||
-      (props.name as string) ||
-      feature.id ||
-      'Unnamed Track'
-    );
+    return feature.properties.platform_name || feature.properties.platform_id || feature.id || 'Unnamed Track';
   } else if (isMultiPointFeature(feature) || isMultiPolygonFeature(feature)) {
     return feature.properties.label || feature.id || 'Unnamed Feature';
   } else if (isReferenceLocation(feature)) {
-    return (
-      feature.properties.name ||
-      (props.label as string) ||
-      feature.id ||
-      'Unnamed Feature'
-    );
+    return feature.properties.name || feature.id || 'Unnamed Feature';
   } else {
-    // Annotation types: use label if present, fall back to ID
-    return (
-      (props.label as string) ||
-      (props.name as string) ||
-      feature.id ||
-      'Unnamed Feature'
-    );
+    // Annotation union: label is optional on most types, absent on NarrativeEntry/TextAnnotation
+    if ('label' in feature.properties && typeof feature.properties.label === 'string' && feature.properties.label) {
+      return feature.properties.label;
+    }
+    if ('text' in feature.properties && typeof feature.properties.text === 'string' && feature.properties.text) {
+      return feature.properties.text;
+    }
+    return feature.properties.kind || feature.id || 'Unnamed Feature';
   }
 }
 
@@ -101,21 +86,18 @@ export function getFeatureIcon(feature: DebriefFeature): string {
  * @returns A CSS color string
  */
 export function getFeatureColor(feature: DebriefFeature): string {
-  // Check for explicit color in style (tracks have style.line.color)
+  // Extract color from typed style properties
   if (isTrackFeature(feature) && feature.properties.style?.line?.color) {
     return feature.properties.style.line.color;
   }
 
-  // Check for explicit color in properties.style.color (annotations, multi-geometry)
-  // eslint-disable-next-line no-restricted-syntax
-  const props = feature.properties as unknown as Record<string, unknown>;
-  const style = props.style as Record<string, unknown> | undefined;
-  if (style?.color && typeof style.color === 'string') {
-    return style.color;
-  }
-  // Check for top-level color property (legacy data)
-  if (props.color && typeof props.color === 'string') {
-    return props.color;
+  // Annotation/location/multi-geometry: style.color is typed on each variant
+  if (isAnnotationFeature(feature) || isReferenceLocation(feature) ||
+      isMultiPointFeature(feature) || isMultiPolygonFeature(feature)) {
+    const style = feature.properties.style;
+    if (style && 'color' in style && typeof style.color === 'string') {
+      return style.color;
+    }
   }
 
   // Fall back to type-based defaults
