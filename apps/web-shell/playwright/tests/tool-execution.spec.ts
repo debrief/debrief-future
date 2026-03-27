@@ -9,7 +9,8 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
   const target = (await featureRow.count()) > 0
     ? featureRow
     : page.locator('.debrief-feature-row').first();
-  await target.click();
+  // Click the content area to avoid the expand button (stopPropagation)
+  await target.locator('.debrief-feature-row__content').click();
   await page.waitForTimeout(200);
 }
 
@@ -61,9 +62,9 @@ test.describe('Tool Execution', () => {
   });
 
   test('bounding box tool works with any feature', async ({ page }) => {
-    // Select any feature (click on feature row)
+    // Select any feature (click on content area to avoid expand button)
     const featureRow = page.locator('.debrief-feature-row').first();
-    await featureRow.click();
+    await featureRow.locator('.debrief-feature-row__content').click();
     await page.waitForTimeout(200);
 
     // At least one tool should be available
