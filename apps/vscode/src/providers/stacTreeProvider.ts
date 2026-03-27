@@ -156,16 +156,22 @@ export class StacTreeProvider
   }
 
   private createCatalogItem(catalog: Catalog): vscode.TreeItem {
+    // itemCount -1 means "still counting" — show as expandable
+    const hasItems = catalog.itemCount !== 0;
     const item = new vscode.TreeItem(
       catalog.title,
-      catalog.itemCount > 0
+      hasItems
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
 
     item.contextValue = 'catalog';
     item.iconPath = new vscode.ThemeIcon('folder');
-    item.description = `${catalog.itemCount} plot${catalog.itemCount === 1 ? '' : 's'}`;
+    if (catalog.itemCount < 0) {
+      item.description = '';
+    } else {
+      item.description = `${catalog.itemCount} plot${catalog.itemCount === 1 ? '' : 's'}`;
+    }
     item.tooltip = catalog.description ?? catalog.title;
 
     // Double-click opens catalog overview panel (Feature: 042)
@@ -223,9 +229,19 @@ export class StacTreeProvider
 
     await this.configService.updateStoreStatus(store.id, 'available');
 
-    // Load catalogs
+    // Load catalogs — returns immediately with itemCount: -1
     const catalogs = await this.stacService.listCatalogs(store);
     this.catalogCache.set(store.id, catalogs);
+
+    // Count items in background, then refresh the store node so
+    // the description labels update with the real counts.
+    void this.stacService
+      .countItemsForCatalogs(store, catalogs)
+      .then(() => {
+        // Fire a targeted refresh for the store node so catalog
+        // descriptions update without clearing the whole tree.
+        this._onDidChangeTreeData.fire(store);
+      });
 
     return catalogs;
   }

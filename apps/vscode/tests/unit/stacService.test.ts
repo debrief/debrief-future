@@ -695,7 +695,8 @@ describe('StacService', () => {
 
       const result = await service.listCatalogs(store);
 
-      expect(result[0].itemCount).toBe(2);
+      // listCatalogs now returns -1 (deferred); counts are filled by countItemsForCatalogs
+      expect(result[0].itemCount).toBe(-1);
     });
 
     it('should return empty array when root catalog missing', async () => {
