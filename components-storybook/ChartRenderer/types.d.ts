@@ -24,6 +24,12 @@ export interface DataSeries {
  *
  * Every dataset artifact conforms to this structure. Exactly one of
  * `data` or `series` must be present.
+ *
+ * Schema equivalent: @debrief/schemas#DatasetEntry
+ * Not migrated: field names differ (data vs data_points, series vs DatasetSeries
+ * with data_points, AxisDefinition literal union vs DatasetAxisMetadata string).
+ * The ChartRenderer operates at runtime on this camelCase shape; the schema
+ * DatasetEntry is the persistence/wire representation.
  */
 export interface DatasetEnvelope {
     /** Dataset subtype identifier (e.g., "zone_histogram"). */

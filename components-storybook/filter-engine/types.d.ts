@@ -10,6 +10,13 @@
 /**
  * A single item in a STAC catalog overview.
  * Canonical definition — previously in CatalogOverview/types.ts.
+ *
+ * Schema equivalent: @debrief/schemas#StacItemSummary
+ * Not migrated: the generated StacItemSummary uses snake_case field names
+ * (item_path, start_datetime, end_datetime, vessel_classes, feature_tags,
+ * track_names) while this type uses camelCase. All consumers (ExerciseListView,
+ * FilterBar, timeline helpers) depend on camelCase field access. Rename would
+ * require coordinated update across many consumers.
  */
 export interface CatalogOverviewItem {
     /** STAC Item ID */

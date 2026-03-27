@@ -1,8 +1,6 @@
-/**
- * Type definitions for the LogPanel component.
- *
- * Feature: 072-log-panel (E02, Phase 2)
- */
+import { ParameterValue, InputFeatureState } from '@debrief/schemas';
+
+export type { ParameterValue, InputFeatureState };
 /**
  * Operation category derived from tool ID.
  */
@@ -16,21 +14,11 @@ export type PresentationMode = 'compact' | 'normal' | 'detailed';
  */
 export type ViewMode = 'timeline' | 'by-feature';
 /**
- * Typed parameter value with metadata.
- */
-export interface ParameterValue {
-    value: unknown;
-    default: boolean;
-    tunable: boolean;
-}
-/** Pre-tool feature state for mutation tools (mirrors session-state InputFeatureState). */
-export interface InputFeatureState {
-    featureId: string;
-    geometry: unknown;
-    properties: Record<string, unknown> | null;
-}
-/**
  * Display-oriented timeline entry derived from LogEntry.
+ *
+ * T023: TimelineEntry is a UI projection, not a schema type. It carries
+ * display-oriented fields (operationCategory, deleted, tuneAnnotation) that
+ * are not present in the schema LogEntry. Kept as a local UI type.
  */
 export interface TimelineEntry {
     activityId: string;
