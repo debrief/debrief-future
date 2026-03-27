@@ -1,3 +1,4 @@
+// Fix: track symbols/labels visibility preserved when running styling tools
 import * as vscode from 'vscode';
 import {
   subscribeToDirty,
