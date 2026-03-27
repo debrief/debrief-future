@@ -232,9 +232,12 @@ export class StacService {
 
       let trackCount = 0;
       let locationCount = 0;
+      // Prefer start_datetime/end_datetime (set by updateTemporalMetadata),
+      // falling back to datetime for both bounds
+      const fallback = item.properties.datetime;
       const timeExtent: [string, string] = [
-        item.properties.datetime,
-        item.properties.datetime,
+        item.properties.start_datetime ?? fallback,
+        item.properties.end_datetime ?? fallback,
       ];
 
       if (geoJsonAsset) {
@@ -253,8 +256,22 @@ export class StacService {
             if (geom.type === 'LineString') {
               trackCount++;
 
-              // Update time extent from track times (epoch ms)
+              // Update time extent from track feature properties
               const props = feature.properties ?? {};
+
+              // Prefer start_time/end_time on TRACK features (REP handler output)
+              const startTime = props.start_time as string | undefined;
+              const endTime = props.end_time as string | undefined;
+              if (startTime && endTime) {
+                if (startTime < timeExtent[0]) {
+                  timeExtent[0] = startTime;
+                }
+                if (endTime > timeExtent[1]) {
+                  timeExtent[1] = endTime;
+                }
+              }
+
+              // Fallback: extract from times array (epoch ms)
               const times = props.times as number[] | undefined;
               if (times && times.length > 0) {
                 const firstTime = times[0]!;

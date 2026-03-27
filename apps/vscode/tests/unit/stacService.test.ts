@@ -1136,6 +1136,76 @@ describe('StacService', () => {
       // Time extent should default to item datetime
       expect(result!.timeExtent[0]).toBe('2024-06-01T00:00:00Z');
     });
+
+    it('should use start_datetime/end_datetime from STAC item when available', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        properties: {
+          datetime: '2010-01-12T12:13:14+00:00',
+          start_datetime: '2010-01-12T12:13:14+00:00',
+          end_datetime: '2010-01-12T13:13:14+00:00',
+        },
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json' },
+        },
+      });
+      const features = createMockFeatureCollection([
+        {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+          properties: {}, // No times array or start_time/end_time
+        },
+      ]);
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const pathStr = String(p);
+        if (pathStr.endsWith('.geojson')) {
+          return JSON.stringify(features);
+        }
+        return JSON.stringify(item);
+      });
+
+      const result = await service.loadPlot(store, 'items/plot.json');
+
+      expect(result!.timeExtent[0]).toBe('2010-01-12T12:13:14+00:00');
+      expect(result!.timeExtent[1]).toBe('2010-01-12T13:13:14+00:00');
+    });
+
+    it('should extract time extent from track start_time/end_time properties', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        properties: { datetime: '2010-01-12T12:13:14+00:00' },
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json' },
+        },
+      });
+      const features = createMockFeatureCollection([
+        {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+          properties: {
+            kind: 'TRACK',
+            start_time: '2010-01-12T12:13:14+00:00',
+            end_time: '2010-01-12T13:13:14+00:00',
+          },
+        },
+      ]);
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const pathStr = String(p);
+        if (pathStr.endsWith('.geojson')) {
+          return JSON.stringify(features);
+        }
+        return JSON.stringify(item);
+      });
+
+      const result = await service.loadPlot(store, 'items/plot.json');
+
+      expect(result!.timeExtent[0]).toBe('2010-01-12T12:13:14+00:00');
+      expect(result!.timeExtent[1]).toBe('2010-01-12T13:13:14+00:00');
+    });
   });
 
   // ===========================================================================
