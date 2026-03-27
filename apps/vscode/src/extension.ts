@@ -150,12 +150,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   console.warn('[Debrief] view providers registered');
   outputChannel.appendLine('[startup] view providers registered');
 
+  // Set storesReady context immediately so the "Loading stores…" welcome
+  // view is dismissed as soon as views are registered — don't defer until
+  // Phase 3 which can be blocked by async work.
+  await vscode.commands.executeCommand('setContext', 'debrief.storesReady', true);
+  await vscode.commands.executeCommand(
+    'setContext',
+    'debrief.noStores',
+    configService.getStores().length === 0,
+  );
+
   // ── Phase 3: Activity bar, context, filesystem, commands ───────────────
 
-  // Initialize activity bar service (shows one-time prompt)
+  // Initialize activity bar service (shows one-time prompt).
+  // applyDefaults() awaits showInformationMessage which can block
+  // activation indefinitely in web VS Code — fire-and-forget instead.
   try {
     const activityBarService = new ActivityBarService(context);
-    await activityBarService.applyDefaults();
+    void activityBarService.applyDefaults();
 
     // Register activity bar restore command
     context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
@@ -227,8 +239,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
-  // Set noStores context — positive flag so welcome is hidden before activation
-  // (undefined = falsy = welcome hidden; true = no stores, show welcome)
+  // Keep noStores context in sync when config changes (storesReady + initial
+  // noStores are now set in Phase 2 to avoid blocking on Phase 3 async work).
   const updateNoStores = (): void => {
     void vscode.commands.executeCommand(
       'setContext',
@@ -236,12 +248,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       configService.getStores().length === 0,
     );
   };
-  await vscode.commands.executeCommand(
-    'setContext',
-    'debrief.noStores',
-    configService.getStores().length === 0,
-  );
-  await vscode.commands.executeCommand('setContext', 'debrief.storesReady', true);
   configService.onConfigChange(() => updateNoStores());
 
   // Track selection subscription for cleanup when session changes (Feature: 038)

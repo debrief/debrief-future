@@ -45,6 +45,7 @@ describe('StacTreeProvider', () => {
       validateStorePath: vi.fn().mockResolvedValue({ valid: true }),
       listCatalogs: vi.fn().mockResolvedValue([mockCatalog]),
       listItems: vi.fn().mockResolvedValue([mockItem]),
+      countItemsForCatalogs: vi.fn().mockResolvedValue(undefined),
     } as unknown as StacService;
 
     provider = new StacTreeProvider(mockConfigService, mockStacService);
