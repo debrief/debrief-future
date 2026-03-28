@@ -108,14 +108,20 @@ class TestDPFHandlerBasic:
         assert len(result.warnings) == 0
         assert result.handler == "Debrief DPF Format"
 
-        # Should have 2 tracks + 2 sensor contacts + 2 narratives = 6 features
+        # Should have 2 tracks + 2 narratives = 4 features
+        # Sensors are embedded in track properties (not standalone features)
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
-        sensors = [f for f in result.features if f["properties"]["kind"] == "SENSOR_CONTACT"]
         narratives = [f for f in result.features if f["properties"]["kind"] == "NARRATIVE"]
 
         assert len(tracks) == 2
-        assert len(sensors) == 2
         assert len(narratives) == 2
+
+        # NELSON track should have embedded sensor data
+        nelson = next(t for t in tracks if t["properties"]["platform_id"] == "NELSON")
+        assert "sensors" in nelson["properties"]
+        assert len(nelson["properties"]["sensors"]) == 1
+        assert nelson["properties"]["sensors"][0]["name"] == "Sensor_A"
+        assert len(nelson["properties"]["sensors"][0]["contacts"]) == 2
 
     def test_track_geometry(self) -> None:
         handler = DPFHandler()
@@ -153,20 +159,20 @@ class TestDPFHandlerBasic:
         content = (FIXTURES / "sample.dpf").read_text()
         result = handler.parse(content, str(FIXTURES / "sample.dpf"))
 
-        sensors = [f for f in result.features if f["properties"]["kind"] == "SENSOR_CONTACT"]
-        assert len(sensors) == 2
+        # Sensors are embedded in the NELSON track
+        tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
+        nelson = next(t for t in tracks if t["properties"]["platform_id"] == "NELSON")
+        sensor_data = nelson["properties"]["sensors"][0]
+        assert sensor_data["name"] == "Sensor_A"
+        contacts = sensor_data["contacts"]
+        assert len(contacts) == 2
 
         # First contact has frequency
-        c1 = sensors[0]
-        assert c1["geometry"] is None
-        assert c1["properties"]["bearing"] == 45.5
-        assert c1["properties"]["frequency"] == 150.0
-        assert c1["properties"]["parent_track"] == "NELSON"
-        assert c1["properties"]["sensor_name"] == "Sensor_A"
+        assert contacts[0]["bearing"] == 45.5
+        assert contacts[0]["frequency"] == 150.0
 
         # Second contact has ambiguous bearing
-        c2 = sensors[1]
-        assert c2["properties"]["ambiguous_bearing"] == 226.2
+        assert contacts[1]["ambiguous_bearing"] == 226.2
 
     def test_narrative_properties(self) -> None:
         handler = DPFHandler()
@@ -176,33 +182,51 @@ class TestDPFHandlerBasic:
         narratives = [f for f in result.features if f["properties"]["kind"] == "NARRATIVE"]
         assert len(narratives) == 2
         assert narratives[0]["geometry"] is None
-        assert narratives[0]["properties"]["entry"] == "Exercise commenced"
-        assert narratives[0]["properties"]["track"] == "NELSON"
+        assert narratives[0]["properties"]["text"] == "Exercise commenced"
+        assert narratives[0]["properties"]["track_id"] == "NELSON"
+        assert "style" in narratives[0]["properties"]
 
 
 class TestDPFSensorsAndTMA:
-    """Tests for sensor and TMA solution parsing."""
+    """Tests for sensor and TMA solution parsing (embedded in track properties)."""
 
-    def test_tma_solution(self) -> None:
+    def test_tua_data_embedded(self) -> None:
         handler = DPFHandler()
         content = (FIXTURES / "sample_sensors.dpf").read_text()
         result = handler.parse(content, str(FIXTURES / "sample_sensors.dpf"))
 
-        tma = [f for f in result.features if f["properties"]["kind"] == "TMA_SOLUTION"]
-        assert len(tma) == 1
-        assert tma[0]["properties"]["course"] == 180.0
-        assert tma[0]["properties"]["speed"] == 5.0
-        # TMA with location should have Point geometry
-        assert tma[0]["geometry"]["type"] == "Point"
+        tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
+        assert len(tracks) == 1
+        osprey = tracks[0]
 
-    def test_sensor_contacts_in_sensor_file(self) -> None:
+        # TUA data embedded in track properties
+        assert "tuas" in osprey["properties"]
+        tuas = osprey["properties"]["tuas"]
+        assert len(tuas) == 1
+        assert tuas[0]["name"] == "TMA Solutions"
+        assert tuas[0]["host_track_name"] == "OSPREY"
+
+        solution = tuas[0]["solutions"][0]
+        assert solution["course"] == 180.0
+        assert solution["speed"] == 5.0
+        assert "centre_lat" in solution
+        assert "centre_lon" in solution
+
+    def test_sensor_data_embedded(self) -> None:
         handler = DPFHandler()
         content = (FIXTURES / "sample_sensors.dpf").read_text()
         result = handler.parse(content, str(FIXTURES / "sample_sensors.dpf"))
 
-        sensors = [f for f in result.features if f["properties"]["kind"] == "SENSOR_CONTACT"]
-        assert len(sensors) == 2
-        assert sensors[0]["properties"]["bearing"] == 32.757
+        tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
+        osprey = tracks[0]
+
+        # Sensor data embedded in track properties
+        assert "sensors" in osprey["properties"]
+        sensors = osprey["properties"]["sensors"]
+        assert len(sensors) == 1
+        assert sensors[0]["name"] == "sensor 3:90"
+        assert len(sensors[0]["contacts"]) == 2
+        assert sensors[0]["contacts"][0]["bearing"] == 32.757
 
 
 class TestDPFNoNamespace:

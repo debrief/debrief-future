@@ -48,11 +48,10 @@
       "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "missile-firing",
+      "escort",
       "training"
     ],
     "debrief:feature_tags": [
-      "track-merge",
       "visual-sighting"
     ],
     "debrief:track_names": [
@@ -83,7 +82,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/reverse_chrono.rep",
+      "href": "file:///tmp/legacy-source-data/reverse_chrono.rep",
       "title": "reverse_chrono.rep"
     }
   ],
@@ -104,8 +103,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/reverse_chrono.rep",
-        "load_timestamp": "2026-03-21T10:15:05.560180Z",
+        "source_path": "/tmp/legacy-source-data/reverse_chrono.rep",
+        "load_timestamp": "2026-03-28T13:51:03.765134Z",
         "tool_version": "0.1.0"
       }
     }

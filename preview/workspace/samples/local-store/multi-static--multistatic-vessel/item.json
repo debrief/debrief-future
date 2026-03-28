@@ -5,74 +5,27 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "multi-static--multistatic-vessel",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          -0.0,
-          60.2
-        ],
-        [
-          0.5,
-          60.2
-        ],
-        [
-          0.5,
-          60.7
-        ],
-        [
-          -0.0,
-          60.7
-        ],
-        [
-          -0.0,
-          60.2
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    -0.0,
-    60.2,
-    0.5,
-    60.7
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Formidable Shield: Multistatic Vessel",
-    "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Formidable Shield: Multistatic Vessel \u2014 Multi-static sonar exercise in the North Atlantic. 3 platform track(s) recorded including Contact Alpha, HNLMS Diamond, HMS Bainbridge. 34 sensor contact(s) logged. Multi-national participation: GB, NL.",
-    "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute",
-      "surface/warship/destroyer/type45",
-      "surface/warship/frigate/type26"
-    ],
+    "datetime": "2026-03-28T13:50:57.747184+00:00",
+    "description": "Formidable Shield: Multistatic Vessel \u2014 Multi-static sonar exercise in the North Atlantic.",
+    "debrief:vessel_classes": [],
     "debrief:tags": [
-      "AAW",
       "ASW",
-      "amphibious",
-      "certification",
+      "escort",
+      "harbour-ops",
       "multi-national",
-      "surveillance"
+      "surveillance",
+      "training"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "passive-search",
-      "radar-detection",
-      "sonar-contact",
-      "towed-array"
+      "helicopter-ops",
+      "prosecution"
     ],
-    "debrief:track_names": [
-      "Contact Alpha",
-      "HNLMS Diamond",
-      "HMS Bainbridge"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "NL"
-    ]
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -92,34 +45,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "MultiStatic_Vessel (multi-static)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/MultiStatic_Vessel.rep",
-      "title": "MultiStatic_Vessel.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-MultiStatic_Vessel": {
-      "href": "./assets/MultiStatic_Vessel.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "MultiStatic_Vessel.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/MultiStatic_Vessel.rep",
-        "load_timestamp": "2026-03-21T10:15:00.263969Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

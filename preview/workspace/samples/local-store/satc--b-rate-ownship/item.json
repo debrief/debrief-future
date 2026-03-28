@@ -49,13 +49,12 @@
     ],
     "debrief:tags": [
       "ASW",
-      "force-protection",
-      "prosecution",
-      "surveillance"
+      "SAR",
+      "prosecution"
     ],
     "debrief:feature_tags": [
-      "sonar-contact",
-      "track-merge",
+      "datum",
+      "depth-charge",
       "visual-sighting"
     ],
     "debrief:track_names": [
@@ -86,7 +85,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Ownship.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/B_Rate_Ownship.rep",
       "title": "B_Rate_Ownship.rep"
     }
   ],
@@ -107,21 +106,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Ownship.rep",
-        "load_timestamp": "2026-03-21T10:15:01.923331Z",
-        "tool_version": "0.1.0"
-      }
-    },
-    "merged-satc--b-rate-sensor-source-B_Rate_Sensor": {
-      "href": "./assets/B_Rate_Sensor.dsf",
-      "type": "application/octet-stream",
-      "title": "B_Rate_Sensor.dsf",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/B_Rate_Sensor.dsf",
-        "load_timestamp": "2026-03-21T10:15:01.935001Z",
+        "source_path": "/tmp/legacy-source-data/SATC/B_Rate_Ownship.rep",
+        "load_timestamp": "2026-03-28T13:50:59.543647Z",
         "tool_version": "0.1.0"
       }
     }

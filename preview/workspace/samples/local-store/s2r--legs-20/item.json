@@ -5,71 +5,21 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "s2r--legs-20",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          0.31281666666666663,
-          0.49495833333333333
-        ],
-        [
-          1.3376527777777778,
-          0.49495833333333333
-        ],
-        [
-          1.3376527777777778,
-          1.1225333333333334
-        ],
-        [
-          0.31281666666666663,
-          1.1225333333333334
-        ],
-        [
-          0.31281666666666663,
-          0.49495833333333333
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    0.31281666666666663,
-    0.49495833333333333,
-    1.3376527777777778,
-    1.1225333333333334
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Dynamic Mongoose: Legs 20",
-    "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Dynamic Mongoose: Legs 20 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Roosevelt, FS Cole. 835 sensor contact(s) logged. Multi-national participation: FR, US.",
-    "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-14T00:13:14+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland",
-      "subsurface/submarine/ssk/type212"
-    ],
+    "datetime": "2026-03-28T13:50:59.140073+00:00",
+    "description": "Dynamic Mongoose: Legs 20 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap.",
+    "debrief:vessel_classes": [],
     "debrief:tags": [
-      "AAW",
       "ASW",
-      "harbour-ops",
-      "missile-firing",
+      "force-protection",
       "surveillance"
     ],
-    "debrief:feature_tags": [
-      "minefield",
-      "passive-search",
-      "radar-detection",
-      "sonar-contact",
-      "towed-array"
-    ],
-    "debrief:track_names": [
-      "USS Roosevelt",
-      "FS Cole"
-    ],
-    "debrief:nationalities": [
-      "FR",
-      "US"
-    ]
+    "debrief:feature_tags": [],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -89,34 +39,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "legs_20 (s2r)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/legs_20.rep",
-      "title": "legs_20.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-legs_20": {
-      "href": "./assets/legs_20.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "legs_20.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/legs_20.rep",
-        "load_timestamp": "2026-03-21T10:15:01.646407Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

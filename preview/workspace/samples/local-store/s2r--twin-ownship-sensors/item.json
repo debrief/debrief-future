@@ -5,70 +5,25 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "s2r--twin-ownship-sensors",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          -0.0342,
-          60.08679444444444
-        ],
-        [
-          0.25,
-          60.08679444444444
-        ],
-        [
-          0.25,
-          60.33229166666667
-        ],
-        [
-          -0.0342,
-          60.33229166666667
-        ],
-        [
-          -0.0342,
-          60.08679444444444
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    -0.0342,
-    60.08679444444444,
-    0.25,
-    60.33229166666667
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Dynamic Mongoose: Twin Ownship Sensors",
-    "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Dynamic Mongoose: Twin Ownship Sensors \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. 42 sensor contact(s) logged. Multi-national participation: FR, GB.",
-    "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T14:00:00+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute",
-      "surface/warship/frigate/type23"
-    ],
+    "datetime": "2026-03-28T13:50:59.351958+00:00",
+    "description": "Dynamic Mongoose: Twin Ownship Sensors \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap.",
+    "debrief:vessel_classes": [],
     "debrief:tags": [
       "ASW",
-      "missile-firing",
-      "surveillance"
+      "certification",
+      "harbour-ops",
+      "surveillance",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "passive-search",
-      "sonar-contact",
-      "sprint-and-drift",
-      "towed-array",
-      "visual-sighting",
-      "zig-zag"
+      "torpedo-run"
     ],
-    "debrief:track_names": [
-      "Contact Alpha",
-      "HMS Richmond"
-    ],
-    "debrief:nationalities": [
-      "FR",
-      "GB"
-    ]
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -88,34 +43,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "twin_ownship_sensors (s2r)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/twin_ownship_sensors.rep",
-      "title": "twin_ownship_sensors.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-twin_ownship_sensors": {
-      "href": "./assets/twin_ownship_sensors.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "twin_ownship_sensors.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/twin_ownship_sensors.rep",
-        "load_timestamp": "2026-03-21T10:15:01.874540Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

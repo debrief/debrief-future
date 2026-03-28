@@ -48,12 +48,15 @@
       "surface/warship/destroyer/type45"
     ],
     "debrief:tags": [
-      "EW",
+      "certification",
+      "multi-national",
+      "replenishment",
       "training"
     ],
     "debrief:feature_tags": [
+      "depth-charge",
       "radar-detection",
-      "sonar-contact"
+      "visual-sighting"
     ],
     "debrief:track_names": [
       "HMS Collingwood"
@@ -83,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boat2.rep",
+      "href": "file:///tmp/legacy-source-data/boat2.rep",
       "title": "boat2.rep"
     }
   ],
@@ -104,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boat2.rep",
-        "load_timestamp": "2026-03-21T10:15:04.210404Z",
+        "source_path": "/tmp/legacy-source-data/boat2.rep",
+        "load_timestamp": "2026-03-28T13:51:02.034163Z",
         "tool_version": "0.1.0"
       }
     }

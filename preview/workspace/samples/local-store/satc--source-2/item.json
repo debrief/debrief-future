@@ -41,24 +41,23 @@
   "properties": {
     "title": "Silent Resolve: Source 2",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Silent Resolve: Source 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Hamburg.",
+    "description": "Silent Resolve: Source 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Portland.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
     "end_datetime": "2000-01-01T02:01:40+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia"
+      "subsurface/submarine/ssn/trafalgar"
     ],
     "debrief:tags": [
       "ASW",
-      "force-protection",
-      "harbour-ops",
-      "prosecution",
-      "transit"
+      "NGFS",
+      "prosecution"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "helicopter-ops",
+      "radar-detection"
     ],
     "debrief:track_names": [
-      "FGS Hamburg"
+      "FGS Portland"
     ],
     "debrief:nationalities": [
       "DE"
@@ -85,7 +84,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/source_2.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/source_2.rep",
       "title": "source_2.rep"
     }
   ],
@@ -106,8 +105,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/source_2.rep",
-        "load_timestamp": "2026-03-21T10:15:04.154176Z",
+        "source_path": "/tmp/legacy-source-data/SATC/source_2.rep",
+        "load_timestamp": "2026-03-28T13:51:01.943003Z",
         "tool_version": "0.1.0"
       }
     }

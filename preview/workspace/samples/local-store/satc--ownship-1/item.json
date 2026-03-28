@@ -49,11 +49,14 @@
     ],
     "debrief:tags": [
       "ASW",
-      "escort",
+      "EW",
+      "NGFS",
+      "harbour-ops",
       "prosecution"
     ],
     "debrief:feature_tags": [
-      "radar-detection"
+      "prosecution",
+      "visual-sighting"
     ],
     "debrief:track_names": [
       "HMS Defender"
@@ -83,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_1.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/ownship_1.rep",
       "title": "ownship_1.rep"
     }
   ],
@@ -104,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_1.rep",
-        "load_timestamp": "2026-03-21T10:15:04.106068Z",
+        "source_path": "/tmp/legacy-source-data/SATC/ownship_1.rep",
+        "load_timestamp": "2026-03-28T13:51:01.886313Z",
         "tool_version": "0.1.0"
       }
     }

@@ -48,14 +48,11 @@
       "surface/warship/destroyer/type45"
     ],
     "debrief:tags": [
-      "NGFS",
-      "SAR",
+      "certification",
       "training"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "radar-detection",
-      "visual-sighting"
+      "radar-detection"
     ],
     "debrief:track_names": [
       "HMS Collingwood"
@@ -85,7 +82,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/BAD_boat2.rep",
+      "href": "file:///tmp/legacy-source-data/other_formats/BAD_boat2.rep",
       "title": "BAD_boat2.rep"
     }
   ],
@@ -106,8 +103,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/BAD_boat2.rep",
-        "load_timestamp": "2026-03-21T10:15:05.454865Z",
+        "source_path": "/tmp/legacy-source-data/other_formats/BAD_boat2.rep",
+        "load_timestamp": "2026-03-28T13:51:03.761306Z",
         "tool_version": "0.1.0"
       }
     }

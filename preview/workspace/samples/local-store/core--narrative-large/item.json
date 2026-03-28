@@ -9,23 +9,16 @@
   "bbox": null,
   "properties": {
     "title": "Saxon Warrior: Narrative Large",
-    "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Narrative Large \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 4795 narrative entries.",
+    "datetime": "2026-03-28T13:51:03.744944+00:00",
+    "description": "Saxon Warrior: Narrative Large \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
-      "AAW",
-      "boarding",
-      "certification",
+      "MCM",
       "training"
     ],
-    "debrief:feature_tags": [
-      "intercept",
-      "visual-sighting"
-    ],
+    "debrief:feature_tags": [],
     "debrief:track_names": [],
-    "debrief:nationalities": [],
-    "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T11:44:58+00:00"
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -45,34 +38,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "narrative_large (core)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative_large.rep",
-      "title": "narrative_large.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-narrative_large": {
-      "href": "./assets/narrative_large.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "narrative_large.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative_large.rep",
-        "load_timestamp": "2026-03-21T10:15:05.418410Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

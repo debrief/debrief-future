@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Lightweight Test Tracks",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Lightweight Test Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 39 platform track(s) recorded including FGS Mason, HMS Auvergne, USS Portland and 36 other(s). Multi-national participation: DE, FR, GB, US.",
+    "description": "Saxon Warrior: Lightweight Test Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 39 platform track(s) recorded including USS Auvergne, FS Kent, FGS Sachsen and 36 other(s). Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-15T12:13:14+00:00",
     "debrief:vessel_classes": [
@@ -55,53 +55,56 @@
       "surface/warship/patrol/river"
     ],
     "debrief:tags": [
+      "SAR",
       "amphibious",
       "multi-national",
-      "training"
+      "training",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "radar-detection"
+      "depth-charge",
+      "visual-sighting"
     ],
     "debrief:track_names": [
-      "FGS Mason",
-      "HMS Auvergne",
-      "USS Portland",
-      "FS Helsingborg",
-      "FGS Laboon",
-      "HMS Northumberland",
-      "USS Lancaster",
-      "FS Roosevelt",
-      "FGS Bainbridge",
-      "HMS Provence",
-      "USS Diamond",
-      "FS Dragon",
-      "FGS Andrea Doria",
-      "HMS Aquitaine",
-      "USS Carney",
-      "FS De Ruyter",
-      "FGS Fridtjof Nansen",
-      "HMS Cole",
-      "USS Roald Amundsen",
-      "FS Hamburg",
-      "FGS De Zeven Provincien",
-      "HMS Ramage",
-      "USS Mahan",
-      "FS Iron Duke",
-      "FGS Defender",
+      "USS Auvergne",
+      "FS Kent",
+      "FGS Sachsen",
+      "HMS Evertsen",
+      "USS Mason",
+      "FS Carney",
+      "FGS Helsingborg",
       "HMS Westminster",
-      "USS Dauntless",
-      "FS Tromp",
-      "FGS Kent",
-      "HMS Hessen",
-      "USS Visby",
-      "FS Evertsen",
-      "FGS Languedoc",
-      "HMS Bretagne",
-      "USS Richmond",
-      "FS Gonzalez",
-      "FGS Bergamini",
-      "HMS Argyll",
-      "USS Duncan"
+      "USS Gonzalez",
+      "FS Hessen",
+      "FGS De Ruyter",
+      "HMS Bergamini",
+      "USS Bretagne",
+      "FS Dauntless",
+      "FGS Sutherland",
+      "HMS Hamburg",
+      "USS Diamond",
+      "FS Provence",
+      "FGS Iron Duke",
+      "HMS Portland",
+      "USS Bainbridge",
+      "FS Ramage",
+      "FGS Roald Amundsen",
+      "HMS Truxtun",
+      "USS Cole",
+      "FS Dragon",
+      "FGS Tromp",
+      "HMS De Zeven Provincien",
+      "USS Andrea Doria",
+      "FS Mahan",
+      "FGS Roosevelt",
+      "HMS Aquitaine",
+      "USS Defender",
+      "FS Visby",
+      "FGS Lancaster",
+      "HMS Somerset",
+      "USS Otto Sverdrup",
+      "FS Argyll",
+      "FGS Languedoc"
     ],
     "debrief:nationalities": [
       "DE",
@@ -131,7 +134,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/lightweight_test_tracks.rep",
+      "href": "file:///tmp/legacy-source-data/lightweight_test_tracks.rep",
       "title": "lightweight_test_tracks.rep"
     }
   ],
@@ -152,8 +155,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/lightweight_test_tracks.rep",
-        "load_timestamp": "2026-03-21T10:15:04.442981Z",
+        "source_path": "/tmp/legacy-source-data/lightweight_test_tracks.rep",
+        "load_timestamp": "2026-03-28T13:51:02.340165Z",
         "tool_version": "0.1.0"
       }
     }

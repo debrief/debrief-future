@@ -49,13 +49,13 @@
     ],
     "debrief:tags": [
       "ASW",
-      "boarding",
-      "certification",
-      "multi-national",
+      "NGFS",
       "prosecution"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "passive-search",
+      "radar-detection",
+      "sonar-contact"
     ],
     "debrief:track_names": [
       "HMS Defender"
@@ -85,7 +85,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipTrack.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/L1_OwnshipTrack.rep",
       "title": "L1_OwnshipTrack.rep"
     }
   ],
@@ -106,21 +106,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipTrack.rep",
-        "load_timestamp": "2026-03-21T10:15:02.082818Z",
-        "tool_version": "0.1.0"
-      }
-    },
-    "merged-satc--l1-ownshipsensor-source-L1_OwnshipSensor": {
-      "href": "./assets/L1_OwnshipSensor.dsf",
-      "type": "application/octet-stream",
-      "title": "L1_OwnshipSensor.dsf",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipSensor.dsf",
-        "load_timestamp": "2026-03-21T10:15:02.079174Z",
+        "source_path": "/tmp/legacy-source-data/SATC/L1_OwnshipTrack.rep",
+        "load_timestamp": "2026-03-28T13:51:01.186874Z",
         "tool_version": "0.1.0"
       }
     }

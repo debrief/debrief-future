@@ -49,13 +49,14 @@
     ],
     "debrief:tags": [
       "ASW",
-      "EW",
-      "SAR",
-      "missile-firing",
+      "amphibious",
+      "mine-clearance",
+      "multi-national",
       "prosecution"
     ],
     "debrief:feature_tags": [
       "active-search",
+      "towed-array",
       "visual-sighting"
     ],
     "debrief:track_names": [
@@ -86,7 +87,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_SubjectTrack.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/L1_SubjectTrack.rep",
       "title": "L1_SubjectTrack.rep"
     }
   ],
@@ -107,8 +108,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_SubjectTrack.rep",
-        "load_timestamp": "2026-03-21T10:15:02.087196Z",
+        "source_path": "/tmp/legacy-source-data/SATC/L1_SubjectTrack.rep",
+        "load_timestamp": "2026-03-28T13:51:01.191823Z",
         "tool_version": "0.1.0"
       }
     }

@@ -41,30 +41,26 @@
   "properties": {
     "title": "Silent Resolve: Freqtracksquantized",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Silent Resolve: Freqtracksquantized \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Bergamini. 53 sensor contact(s) logged.",
+    "description": "Silent Resolve: Freqtracksquantized \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS De Ruyter.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/trafalgar"
+      "subsurface/submarine/ssk/gotland"
     ],
     "debrief:tags": [
       "ASW",
-      "missile-firing",
-      "prosecution",
-      "surveillance"
+      "multi-national",
+      "prosecution"
     ],
     "debrief:feature_tags": [
-      "helicopter-ops",
-      "prosecution",
-      "sonar-contact",
-      "sprint-and-drift",
-      "visual-sighting"
+      "intercept",
+      "radar-detection"
     ],
     "debrief:track_names": [
-      "HDMS Bergamini"
+      "FGS De Ruyter"
     ],
     "debrief:nationalities": [
-      "DK"
+      "DE"
     ]
   },
   "links": [
@@ -88,7 +84,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/FreqTracksQuantized.dpf",
+      "href": "file:///tmp/legacy-source-data/SATC/FreqTracksQuantized.dpf",
       "title": "FreqTracksQuantized.dpf"
     }
   ],
@@ -109,8 +105,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/FreqTracksQuantized.dpf",
-        "load_timestamp": "2026-03-21T10:15:02.074559Z",
+        "source_path": "/tmp/legacy-source-data/SATC/FreqTracksQuantized.dpf",
+        "load_timestamp": "2026-03-28T13:51:01.180976Z",
         "tool_version": "0.1.0"
       }
     }

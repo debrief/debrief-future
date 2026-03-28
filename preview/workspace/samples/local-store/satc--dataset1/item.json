@@ -41,27 +41,26 @@
   "properties": {
     "title": "Silent Resolve: Dataset1",
     "datetime": "2016-10-10T12:00:00+00:00",
-    "description": "Silent Resolve: Dataset1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Visby.",
+    "description": "Silent Resolve: Dataset1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
     "start_datetime": "2016-10-10T12:00:00+00:00",
     "end_datetime": "2016-10-10T19:37:00+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia"
+      "subsurface/submarine/ssk/gotland"
     ],
     "debrief:tags": [
-      "AAW",
       "ASW",
-      "prosecution",
-      "training",
-      "transit"
+      "EW",
+      "missile-firing",
+      "prosecution"
     ],
     "debrief:feature_tags": [
       "visual-sighting"
     ],
     "debrief:track_names": [
-      "HMS Visby"
+      "HMS Fridtjof Nansen"
     ],
     "debrief:nationalities": [
-      "SE"
+      "GB"
     ]
   },
   "links": [
@@ -85,7 +84,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset1.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/Dataset1.rep",
       "title": "Dataset1.rep"
     }
   ],
@@ -106,8 +105,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset1.rep",
-        "load_timestamp": "2026-03-21T10:15:02.623241Z",
+        "source_path": "/tmp/legacy-source-data/SATC/Dataset1.rep",
+        "load_timestamp": "2026-03-28T13:51:00.148617Z",
         "tool_version": "0.1.0"
       }
     }

@@ -41,28 +41,28 @@
   "properties": {
     "title": "Silent Resolve: Tug 1",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Silent Resolve: Tug 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HNoMS Languedoc.",
+    "description": "Silent Resolve: Tug 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Mason.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
     "end_datetime": "2000-01-01T05:37:00+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/trafalgar"
+      "subsurface/submarine/ssk/type212"
     ],
     "debrief:tags": [
       "ASW",
-      "force-protection",
-      "gunnery",
-      "prosecution"
+      "amphibious",
+      "mine-clearance",
+      "prosecution",
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "intercept",
-      "track-merge",
-      "visual-sighting"
+      "datum",
+      "radar-detection"
     ],
     "debrief:track_names": [
-      "HNoMS Languedoc"
+      "HDMS Mason"
     ],
     "debrief:nationalities": [
-      "NO"
+      "DK"
     ]
   },
   "links": [
@@ -86,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/tug_1.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/tug_1.rep",
       "title": "tug_1.rep"
     }
   ],
@@ -107,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/tug_1.rep",
-        "load_timestamp": "2026-03-21T10:15:04.174314Z",
+        "source_path": "/tmp/legacy-source-data/SATC/tug_1.rep",
+        "load_timestamp": "2026-03-28T13:51:01.992041Z",
         "tool_version": "0.1.0"
       }
     }

@@ -151,19 +151,103 @@ def _attach_provenance(
 
 
 def _count_feature_kinds(features: list[dict[str, Any]]) -> tuple[int, int, int]:
-    """Count tracks, sensors, and narratives in a feature list."""
+    """Count tracks, embedded sensors, and narratives in a feature list."""
     tracks = 0
     sensors = 0
     narratives = 0
     for f in features:
-        kind = f.get("properties", {}).get("kind", "")
+        props = f.get("properties", {})
+        kind = props.get("kind", "")
         if kind == "TRACK":
             tracks += 1
-        elif kind in ("SENSOR_CONTACT", "SENSOR", "SENSOR2"):
-            sensors += 1
+            # Count embedded sensor contacts
+            for sensor_data in props.get("sensors", []):
+                sensors += len(sensor_data.get("contacts", []))
         elif kind == "NARRATIVE":
             narratives += 1
     return tracks, sensors, narratives
+
+
+def _merge_deferred_sensors(
+    catalog_path: Path,
+    deferred_sensors: dict[str, list[tuple[str, list[dict[str, Any]]]]],
+    result: ImportResult,
+) -> None:
+    """Merge deferred DSF sensor data into companion track features.
+
+    For each parent_track name, find the track feature in the catalog
+    with matching platform_id and embed the sensor data into its
+    properties.sensors array.
+    """
+    import json
+
+    from debrief_stac.catalog import open_catalog
+
+    catalog_data = open_catalog(catalog_path)
+    item_links = [link for link in catalog_data.get("links", []) if link.get("rel") == "item"]
+
+    # Build index: platform_id → (plot_id, feature_index) for all tracks
+    track_index: dict[str, tuple[str, int]] = {}
+    for link in item_links:
+        href = link.get("href", "")
+        # href is like "./plot-id/item.json"
+        plot_id = href.replace("./", "").replace("/item.json", "")
+        features_path = catalog_path / plot_id / "features.geojson"
+        if not features_path.exists():
+            continue
+        with open(features_path) as f:
+            fc = json.load(f)
+        for i, feature in enumerate(fc.get("features", [])):
+            props = feature.get("properties", {})
+            if props.get("kind") == "TRACK":
+                pid = props.get("platform_id", "")
+                if pid:
+                    track_index[pid] = (plot_id, i)
+
+    for track_name, sensor_entries in deferred_sensors.items():
+        if track_name not in track_index:
+            for file_rel, _sensors in sensor_entries:
+                result.warnings.append(
+                    ImportWarning(
+                        file=file_rel,
+                        code="ORPHAN_SENSOR",
+                        message=f"No companion track '{track_name}' found for sensor data",
+                    )
+                )
+            continue
+
+        plot_id, feat_idx = track_index[track_name]
+        features_path = catalog_path / plot_id / "features.geojson"
+        with open(features_path) as f:
+            fc = json.load(f)
+
+        track_feature = fc["features"][feat_idx]
+        existing_sensors = track_feature["properties"].get("sensors", [])
+
+        # Merge all sensor entries for this track
+        for _file_rel, sensor_list in sensor_entries:
+            for sensor_data in sensor_list:
+                # Check if a sensor with this name already exists
+                existing = next(
+                    (s for s in existing_sensors if s["name"] == sensor_data["name"]),
+                    None,
+                )
+                if existing is not None:
+                    existing["contacts"].extend(sensor_data["contacts"])
+                else:
+                    existing_sensors.append(sensor_data)
+
+        track_feature["properties"]["sensors"] = existing_sensors
+        fc["features"][feat_idx] = track_feature
+
+        with open(features_path, "w") as f:
+            json.dump(fc, f, indent=2)
+
+        logger.info(
+            "Merged sensor data for '%s' into plot '%s'",
+            track_name,
+            plot_id,
+        )
 
 
 def import_legacy_data(
@@ -216,6 +300,11 @@ def import_legacy_data(
     # Create catalog
     create_catalog(catalog_path, title=catalog_title)
 
+    # Deferred sensor data from DSF files, keyed by parent track name.
+    # After all files are imported, we merge these into companion tracks.
+    # Structure: {parent_track_name: [(source_file_rel, [SensorData, ...]), ...]}
+    deferred_sensors: dict[str, list[tuple[str, list[dict[str, Any]]]]] = {}
+
     for source_file in source_files:
         result.files_processed += 1
         file_rel = str(source_file.relative_to(source_dir))
@@ -228,6 +317,13 @@ def import_legacy_data(
             for w in parse_result.warnings:
                 result.warnings.append(ImportWarning(file=file_rel, code=w.code, message=w.message))
 
+            # Defer DSF sensor data for later merging into companion tracks
+            if parse_result.pending_sensor_data:
+                for track_name, sensor_list in parse_result.pending_sensor_data.items():
+                    contact_count = sum(len(s["contacts"]) for s in sensor_list)
+                    result.total_sensors += contact_count
+                    deferred_sensors.setdefault(track_name, []).append((file_rel, sensor_list))
+
             # Schema-validate at parser_output boundary (warn-and-continue)
             schema_warnings = parse_result.schema_validate_features()
             for sw in schema_warnings:
@@ -236,13 +332,14 @@ def import_legacy_data(
                 )
 
             if not parse_result.features:
-                result.warnings.append(
-                    ImportWarning(
-                        file=file_rel,
-                        code="NO_FEATURES",
-                        message="File parsed but produced no features",
+                if not parse_result.pending_sensor_data:
+                    result.warnings.append(
+                        ImportWarning(
+                            file=file_rel,
+                            code="NO_FEATURES",
+                            message="File parsed but produced no features",
+                        )
                     )
-                )
                 result.files_succeeded += 1
                 continue
 
@@ -290,6 +387,10 @@ def import_legacy_data(
             logger.error("Failed to import %s: %s", file_rel, e)
             result.errors.append(ImportFileError(file=file_rel, error=str(e)))
             result.files_failed += 1
+
+    # Phase 2: Merge deferred sensor data into companion tracks
+    if deferred_sensors:
+        _merge_deferred_sensors(catalog_path, deferred_sensors, result)
 
     result.duration_seconds = time.perf_counter() - start_time
     return result

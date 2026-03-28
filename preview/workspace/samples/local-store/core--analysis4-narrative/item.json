@@ -1,0 +1,47 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--analysis4-narrative",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "Saxon Warrior: Analysis4 Narrative",
+    "datetime": "2026-03-28T13:50:57.665440+00:00",
+    "description": "Saxon Warrior: Analysis4 Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "SAR",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "torpedo-run"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Analysis4_Narrative (core)"
+    }
+  ],
+  "assets": {}
+}

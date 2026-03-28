@@ -5,71 +5,25 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "satc--thirty-min-earlier-first-turn",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          0.0025667,
-          -0.0063056
-        ],
-        [
-          0.0294361,
-          -0.0063056
-        ],
-        [
-          0.0294361,
-          0.0512972
-        ],
-        [
-          0.0025667,
-          0.0512972
-        ],
-        [
-          0.0025667,
-          -0.0063056
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    0.0025667,
-    -0.0063056,
-    0.0294361,
-    0.0512972
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Silent Resolve: Thirty Min Earlier First Turn",
-    "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Silent Resolve: Thirty Min Earlier First Turn \u2014 Semi-auto track construction exercise in the Norwegian Sea. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. 61 sensor contact(s) logged. Multi-national participation: GB, SE.",
-    "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T12:35:00+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute",
-      "surface/warship/frigate/type23"
-    ],
+    "datetime": "2026-03-28T13:51:01.948943+00:00",
+    "description": "Silent Resolve: Thirty Min Earlier First Turn \u2014 Semi-auto track construction exercise in the Norwegian Sea.",
+    "debrief:vessel_classes": [],
     "debrief:tags": [
       "ASW",
-      "MCM",
+      "SAR",
+      "gunnery",
       "prosecution",
-      "surveillance",
-      "training",
-      "transit"
+      "training"
     ],
     "debrief:feature_tags": [
-      "prosecution",
-      "radar-detection",
-      "sonar-contact",
       "track-merge"
     ],
-    "debrief:track_names": [
-      "HMS Richmond",
-      "Contact Alpha"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "SE"
-    ]
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -89,34 +43,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "thirty_min_earlier_first_turn (satc)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/thirty_min_earlier_first_turn.dpf",
-      "title": "thirty_min_earlier_first_turn.dpf"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-thirty_min_earlier_first_turn": {
-      "href": "./assets/thirty_min_earlier_first_turn.dpf",
-      "type": "application/octet-stream",
-      "title": "thirty_min_earlier_first_turn.dpf",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/thirty_min_earlier_first_turn.dpf",
-        "load_timestamp": "2026-03-21T10:15:02.170149Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

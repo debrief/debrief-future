@@ -5,73 +5,35 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "s2r--ambig-tracks2",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          0.02385,
-          60.20242777777778
-        ],
-        [
-          0.5999861111111111,
-          60.20242777777778
-        ],
-        [
-          0.5999861111111111,
-          60.4822278
-        ],
-        [
-          0.02385,
-          60.4822278
-        ],
-        [
-          0.02385,
-          60.20242777777778
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    0.02385,
-    60.20242777777778,
-    0.5999861111111111,
-    60.4822278
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Dynamic Mongoose: Ambig Tracks2",
-    "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Dynamic Mongoose: Ambig Tracks2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 4 platform track(s) recorded including Contact Alpha, HMS Richmond, Contact Alpha and 1 other(s). 242 sensor contact(s) logged. Multi-national participation: FR, GB.",
-    "start_datetime": "2010-01-12T12:00:00+00:00",
-    "end_datetime": "2010-01-12T16:00:00+00:00",
+    "datetime": "2010-01-12T12:08:00+00:00",
+    "description": "Dynamic Mongoose: Ambig Tracks2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. Multi-national participation: GB, US.",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssn/astute",
       "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
+      "AAW",
       "ASW",
-      "certification",
-      "escort",
-      "harbour-ops",
-      "multi-national",
       "surveillance"
     ],
     "debrief:feature_tags": [
-      "passive-search",
-      "sonar-contact",
-      "towed-array",
-      "visual-sighting"
+      "radar-detection",
+      "zig-zag"
     ],
     "debrief:track_names": [
-      "Contact Alpha",
-      "HMS Richmond",
       "Contact Alpha",
       "HMS Richmond"
     ],
     "debrief:nationalities": [
-      "FR",
-      "GB"
-    ]
+      "GB",
+      "US"
+    ],
+    "start_datetime": "2010-01-12T12:08:00+00:00",
+    "end_datetime": "2010-01-12T15:54:00+00:00"
   },
   "links": [
     {
@@ -91,34 +53,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "Ambig_tracks2 (s2r)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks2.rep",
-      "title": "Ambig_tracks2.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-Ambig_tracks2": {
-      "href": "./assets/Ambig_tracks2.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "Ambig_tracks2.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks2.rep",
-        "load_timestamp": "2026-03-21T10:15:01.419842Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

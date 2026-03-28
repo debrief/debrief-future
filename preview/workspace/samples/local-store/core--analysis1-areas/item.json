@@ -1,0 +1,107 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--analysis1-areas",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.93165,
+          21.864075
+        ],
+        [
+          -21.471280555555555,
+          21.864075
+        ],
+        [
+          -21.471280555555555,
+          22.20677222222222
+        ],
+        [
+          -21.93165,
+          22.20677222222222
+        ],
+        [
+          -21.93165,
+          21.864075
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.93165,
+    21.864075,
+    -21.471280555555555,
+    22.20677222222222
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Analysis1 Areas",
+    "datetime": "2026-03-28T13:50:57.636617+00:00",
+    "description": "Saxon Warrior: Analysis1 Areas \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "amphibious",
+      "force-protection",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "torpedo-run"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Analysis1_Areas (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/Demo-Analysis/Analysis1_Areas.rep",
+      "title": "Analysis1_Areas.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Analysis1_Areas": {
+      "href": "./assets/Analysis1_Areas.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Analysis1_Areas.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/Demo-Analysis/Analysis1_Areas.rep",
+        "load_timestamp": "2026-03-28T13:50:57.638291Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

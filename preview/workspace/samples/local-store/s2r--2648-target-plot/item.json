@@ -5,66 +5,21 @@
     "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
   ],
   "id": "s2r--2648-target-plot",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        [
-          -0.13801666666666668,
-          0.16666666666666666
-        ],
-        [
-          0.423875,
-          0.16666666666666666
-        ],
-        [
-          0.423875,
-          3.745277777777778
-        ],
-        [
-          -0.13801666666666668,
-          3.745277777777778
-        ],
-        [
-          -0.13801666666666668,
-          0.16666666666666666
-        ]
-      ]
-    ]
-  },
-  "bbox": [
-    -0.13801666666666668,
-    0.16666666666666666,
-    0.423875,
-    3.745277777777778
-  ],
+  "geometry": null,
+  "bbox": null,
   "properties": {
     "title": "Dynamic Mongoose: 2648 Target Plot",
-    "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Dynamic Mongoose: 2648 Target Plot \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Auvergne. 8511 sensor contact(s) logged.",
-    "start_datetime": "2010-01-12T12:13:14+00:00",
-    "end_datetime": "2010-01-13T12:13:14+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
-    ],
+    "datetime": "2026-03-28T13:50:58.558527+00:00",
+    "description": "Dynamic Mongoose: 2648 Target Plot \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap.",
+    "debrief:vessel_classes": [],
     "debrief:tags": [
       "ASW",
-      "replenishment",
+      "certification",
       "surveillance"
     ],
-    "debrief:feature_tags": [
-      "active-search",
-      "datum",
-      "passive-search",
-      "sonar-contact",
-      "visual-sighting"
-    ],
-    "debrief:track_names": [
-      "USS Auvergne"
-    ],
-    "debrief:nationalities": [
-      "US"
-    ]
+    "debrief:feature_tags": [],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -84,34 +39,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "2648_target_plot (s2r)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2648_target_plot.rep",
-      "title": "2648_target_plot.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-2648_target_plot": {
-      "href": "./assets/2648_target_plot.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "2648_target_plot.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2648_target_plot.rep",
-        "load_timestamp": "2026-03-21T10:15:01.024883Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

@@ -10,64 +10,58 @@
     "coordinates": [
       [
         [
-          -30.182964218418814,
-          -0.12067121288205127
+          -30.075269444444444,
+          -0.0951111111111111
         ],
         [
-          -29.99826369059747,
-          -0.12067121288205127
+          -30.002402777777778,
+          -0.0951111111111111
         ],
         [
-          -29.99826369059747,
-          0.06473251289156451
+          -30.002402777777778,
+          -0.010880555555555557
         ],
         [
-          -30.182964218418814,
-          0.06473251289156451
+          -30.075269444444444,
+          -0.010880555555555557
         ],
         [
-          -30.182964218418814,
-          -0.12067121288205127
+          -30.075269444444444,
+          -0.0951111111111111
         ]
       ]
     ]
   },
   "bbox": [
-    -30.182964218418814,
-    -0.12067121288205127,
-    -29.99826369059747,
-    0.06473251289156451
+    -30.075269444444444,
+    -0.0951111111111111,
+    -30.002402777777778,
+    -0.010880555555555557
   ],
   "properties": {
     "title": "Silent Resolve: Bluetrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Silent Resolve: Bluetrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 3 platform track(s) recorded including HMS Richmond, Contact Alpha, HMS Richmond. 241 sensor contact(s) logged. Multi-national participation: DE, GB.",
+    "description": "Silent Resolve: Bluetrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Richmond.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T13:13:14+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute",
       "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
       "ASW",
       "NGFS",
-      "missile-firing",
+      "multi-national",
       "prosecution",
       "surveillance"
     ],
     "debrief:feature_tags": [
-      "prosecution",
-      "sonar-contact",
-      "sprint-and-drift",
-      "visual-sighting"
+      "helicopter-ops",
+      "radar-detection"
     ],
     "debrief:track_names": [
-      "HMS Richmond",
-      "Contact Alpha",
       "HMS Richmond"
     ],
     "debrief:nationalities": [
-      "DE",
       "GB"
     ]
   },
@@ -92,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueTrack.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/BlueTrack.rep",
       "title": "BlueTrack.rep"
     }
   ],
@@ -113,34 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueTrack.rep",
-        "load_timestamp": "2026-03-21T10:15:01.984047Z",
-        "tool_version": "0.1.0"
-      }
-    },
-    "merged-satc--bluesensor-source-BlueSensor": {
-      "href": "./assets/BlueSensor.dsf",
-      "type": "application/octet-stream",
-      "title": "BlueSensor.dsf",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueSensor.dsf",
-        "load_timestamp": "2026-03-21T10:15:01.945907Z",
-        "tool_version": "0.1.0"
-      }
-    },
-    "merged-satc--bluesensor-sparse-source-BlueSensor_sparse": {
-      "href": "./assets/BlueSensor_sparse.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "BlueSensor_sparse.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueSensor_sparse.rep",
-        "load_timestamp": "2026-03-21T10:15:01.951229Z",
+        "source_path": "/tmp/legacy-source-data/SATC/BlueTrack.rep",
+        "load_timestamp": "2026-03-28T13:50:59.570795Z",
         "tool_version": "0.1.0"
       }
     }

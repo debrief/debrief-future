@@ -1,0 +1,115 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--redtrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.03338888888888889,
+          60.1
+        ],
+        [
+          0.25,
+          60.1
+        ],
+        [
+          0.25,
+          60.27423611111111
+        ],
+        [
+          -0.03338888888888889,
+          60.27423611111111
+        ],
+        [
+          -0.03338888888888889,
+          60.1
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.03338888888888889,
+    60.1,
+    0.25,
+    60.27423611111111
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Redtrack",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Saxon Warrior: Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "EW",
+      "SAR",
+      "escort",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "RedTrack (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/S2R-2553-Missing-Sensor-Data/RedTrack.rep",
+      "title": "RedTrack.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-RedTrack": {
+      "href": "./assets/RedTrack.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "RedTrack.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/S2R-2553-Missing-Sensor-Data/RedTrack.rep",
+        "load_timestamp": "2026-03-28T13:50:59.367318Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

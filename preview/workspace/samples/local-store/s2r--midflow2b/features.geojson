@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "ae7c8d99-1f2d-48af-9089-158949b78549",
+      "id": "8a91e18f-a42a-4871-8186-e4430f1203df",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -8296,2600 +8296,543 @@
         },
         "symbol_interval": "PT5M",
         "label_interval": "PT15M",
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "ae7c8d99-1f2d-48af-9089-158949b78549"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "85ed69da-5e45-41d2-8d33-5f7dbfebbd75",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.92,
-        "time": "2009-07-22T04:43:00+00:00",
-        "label": "090722 044232",
-        "frequency": 50.03,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "85ed69da-5e45-41d2-8d33-5f7dbfebbd75"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "afc77175-b32e-4821-ab02-c6e79f8afa67",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.273,
-        "time": "2009-07-22T04:43:30+00:00",
-        "label": "090722 044319",
-        "frequency": 50.079,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "afc77175-b32e-4821-ab02-c6e79f8afa67"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3f8b535e-a955-4e4d-8c42-ac76a98fe025",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.655,
-        "time": "2009-07-22T04:44:00+00:00",
-        "label": "090722 044319",
-        "frequency": 50.132,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "3f8b535e-a955-4e4d-8c42-ac76a98fe025"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "634a1739-77d8-449e-a98a-e11d6b2cac5e",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.036,
-        "time": "2009-07-22T04:44:30+00:00",
-        "label": "090722 044319",
-        "frequency": 50.184,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "634a1739-77d8-449e-a98a-e11d6b2cac5e"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "f8c12a53-20c1-432d-b5b4-e6981a396f15",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.458,
-        "time": "2009-07-22T04:45:00+00:00",
-        "label": "090722 044456",
-        "frequency": 50.23,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "f8c12a53-20c1-432d-b5b4-e6981a396f15"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4254ef47-b53c-4071-8f0d-c37894d267a8",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.146,
-        "time": "2009-07-22T04:45:30+00:00",
-        "label": "090722 044456",
-        "frequency": 50.23,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4254ef47-b53c-4071-8f0d-c37894d267a8"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "8bceebb7-6143-4bfe-bec0-e998975aa5f2",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.93,
-        "time": "2009-07-22T04:46:00+00:00",
-        "label": "090722 044544",
-        "frequency": 50.206,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "8bceebb7-6143-4bfe-bec0-e998975aa5f2"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "fa11b493-5c20-4af8-a951-6f5e4642d9a1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.8,
-        "time": "2009-07-22T04:46:30+00:00",
-        "label": "090722 044544",
-        "frequency": 50.16,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "fa11b493-5c20-4af8-a951-6f5e4642d9a1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "86db33c0-6cd8-4a5f-b81b-4dba1e931295",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.106,
-        "time": "2009-07-22T04:47:00+00:00",
-        "label": "090722 044630",
-        "frequency": 50.104,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "86db33c0-6cd8-4a5f-b81b-4dba1e931295"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "90c09c27-0822-4254-8264-172e8af8a596",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 291.411,
-        "time": "2009-07-22T04:47:30+00:00",
-        "label": "090722 044630",
-        "frequency": 50.049,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "90c09c27-0822-4254-8264-172e8af8a596"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "55b4f05b-21a3-44c8-b844-79ac428c7782",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 290.717,
-        "time": "2009-07-22T04:48:00+00:00",
-        "label": "090722 044630",
-        "frequency": 49.993,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "55b4f05b-21a3-44c8-b844-79ac428c7782"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "c45af928-39a6-4813-b83b-7bc2d9eca957",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 290.103,
-        "time": "2009-07-22T04:48:30+00:00",
-        "label": "090722 044818",
-        "frequency": 49.954,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "c45af928-39a6-4813-b83b-7bc2d9eca957"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "795551be-2ebf-4713-8e5e-e7b0f3fff398",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.609,
-        "time": "2009-07-22T04:49:00+00:00",
-        "label": "090722 044818",
-        "frequency": 49.939,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "795551be-2ebf-4713-8e5e-e7b0f3fff398"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "06595c33-348c-450c-acfb-1778d2729a3c",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.115,
-        "time": "2009-07-22T04:49:30+00:00",
-        "label": "090722 044818",
-        "frequency": 49.924,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "06595c33-348c-450c-acfb-1778d2729a3c"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4a7fa58a-7e98-4a55-97e2-4a3fb4b9b8c1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.776,
-        "time": "2009-07-22T04:50:00+00:00",
-        "label": "090722 044937",
-        "frequency": 49.933,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4a7fa58a-7e98-4a55-97e2-4a3fb4b9b8c1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "f337f9b9-c7fd-428b-ba0c-7933db5af393",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.485,
-        "time": "2009-07-22T04:50:30+00:00",
-        "label": "090722 044937",
-        "frequency": 49.949,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "f337f9b9-c7fd-428b-ba0c-7933db5af393"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "911f6d7b-32ff-4a46-b945-e307fb15fb22",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.254,
-        "time": "2009-07-22T04:51:00+00:00",
-        "label": "090722 045049",
-        "frequency": 49.954,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "911f6d7b-32ff-4a46-b945-e307fb15fb22"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "981e007a-a406-403e-be7c-82d9e4121b36",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.129,
-        "time": "2009-07-22T04:51:30+00:00",
-        "label": "090722 045049",
-        "frequency": 49.937,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "981e007a-a406-403e-be7c-82d9e4121b36"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "8d4bfaf3-1cbb-4c49-8cb2-986b6fd64cee",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.004,
-        "time": "2009-07-22T04:52:00+00:00",
-        "label": "090722 045049",
-        "frequency": 49.921,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "8d4bfaf3-1cbb-4c49-8cb2-986b6fd64cee"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "f43eea3f-9d8e-4f79-8998-c51ba96f9765",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.0,
-        "time": "2009-07-22T04:52:30+00:00",
-        "label": "090722 045201",
-        "frequency": 49.936,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "f43eea3f-9d8e-4f79-8998-c51ba96f9765"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d115c231-3bfe-42af-ba5f-42c02d3a05d1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.0,
-        "time": "2009-07-22T04:53:00+00:00",
-        "label": "090722 045201",
-        "frequency": 49.953,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d115c231-3bfe-42af-ba5f-42c02d3a05d1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "21519514-0d2b-4d49-9abe-6a7bc48960b1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.149,
-        "time": "2009-07-22T04:53:30+00:00",
-        "label": "090722 045313",
-        "frequency": 49.966,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "21519514-0d2b-4d49-9abe-6a7bc48960b1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "90a6facf-52c6-43c6-8b97-6c2030516708",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.413,
-        "time": "2009-07-22T04:54:00+00:00",
-        "label": "090722 045313",
-        "frequency": 49.975,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "90a6facf-52c6-43c6-8b97-6c2030516708"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "dc35998a-b97f-46f8-874f-55dfe09d1eae",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.677,
-        "time": "2009-07-22T04:54:30+00:00",
-        "label": "090722 045313",
-        "frequency": 49.985,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "dc35998a-b97f-46f8-874f-55dfe09d1eae"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2d45ab23-c38b-4f35-96b5-f90ec4d7c5a8",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.8,
-        "time": "2009-07-22T04:55:00+00:00",
-        "label": "090722 045444",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2d45ab23-c38b-4f35-96b5-f90ec4d7c5a8"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "c7e4e019-53e5-4737-88b6-86b777201d2b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.8,
-        "time": "2009-07-22T04:55:30+00:00",
-        "label": "090722 045444",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "c7e4e019-53e5-4737-88b6-86b777201d2b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "46cfcde2-4384-4a30-8295-5fa91d1ac508",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.8,
-        "time": "2009-07-22T04:56:00+00:00",
-        "label": "090722 045556",
-        "frequency": 49.988,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "46cfcde2-4384-4a30-8295-5fa91d1ac508"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d9eaacb5-d8ae-473c-9d78-6b9d0e6a833b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.8,
-        "time": "2009-07-22T04:56:30+00:00",
-        "label": "090722 045556",
-        "frequency": 49.975,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d9eaacb5-d8ae-473c-9d78-6b9d0e6a833b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "b4327572-c28a-436c-a439-b591a06c396f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 288.8,
-        "time": "2009-07-22T04:57:00+00:00",
-        "label": "090722 045556",
-        "frequency": 49.962,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "b4327572-c28a-436c-a439-b591a06c396f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "5460062e-d782-4d69-bee6-b83108c80e88",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.166,
-        "time": "2009-07-22T04:57:30+00:00",
-        "label": "090722 045704",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "5460062e-d782-4d69-bee6-b83108c80e88"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e8eda498-0558-43c9-9771-1d5d5eb5021f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.589,
-        "time": "2009-07-22T04:58:00+00:00",
-        "label": "090722 045704",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "e8eda498-0558-43c9-9771-1d5d5eb5021f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4c3ca4b6-df8d-42e5-bf3a-2a325e89669b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.8,
-        "time": "2009-07-22T04:58:30+00:00",
-        "label": "090722 045815",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4c3ca4b6-df8d-42e5-bf3a-2a325e89669b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4ec9ea5d-c742-4c33-9914-a72907e75acf",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.8,
-        "time": "2009-07-22T04:59:00+00:00",
-        "label": "090722 045815",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4ec9ea5d-c742-4c33-9914-a72907e75acf"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "0707faea-9f1b-4114-ad25-ec071bed917e",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 289.957,
-        "time": "2009-07-22T04:59:30+00:00",
-        "label": "090722 045919",
-        "frequency": 49.964,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "0707faea-9f1b-4114-ad25-ec071bed917e"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "0cd97704-1fe7-4669-b8c0-588b2952b533",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 290.386,
-        "time": "2009-07-22T05:00:00+00:00",
-        "label": "090722 045919",
-        "frequency": 49.975,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "0cd97704-1fe7-4669-b8c0-588b2952b533"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "5abae73b-f837-413d-a527-85292d0daaf1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 290.814,
-        "time": "2009-07-22T05:00:30+00:00",
-        "label": "090722 045919",
-        "frequency": 49.985,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "5abae73b-f837-413d-a527-85292d0daaf1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "392bad75-9f37-4313-91d5-8138d5811ca6",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 291.097,
-        "time": "2009-07-22T05:01:00+00:00",
-        "label": "090722 050043",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "392bad75-9f37-4313-91d5-8138d5811ca6"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4ce51452-0be6-49f4-bafe-cc3900f7b4ed",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 291.267,
-        "time": "2009-07-22T05:01:30+00:00",
-        "label": "090722 050043",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4ce51452-0be6-49f4-bafe-cc3900f7b4ed"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "6916d7c8-eb52-40cd-86d5-ce3bb9bd1f89",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 291.438,
-        "time": "2009-07-22T05:02:00+00:00",
-        "label": "090722 050043",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "6916d7c8-eb52-40cd-86d5-ce3bb9bd1f89"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "f2c81222-577a-4c89-883b-2af3d4bf010b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 291.703,
-        "time": "2009-07-22T05:02:30+00:00",
-        "label": "090722 050211",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "f2c81222-577a-4c89-883b-2af3d4bf010b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a8d3c754-c2dd-493d-896a-65315264e17a",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.023,
-        "time": "2009-07-22T05:03:00+00:00",
-        "label": "090722 050211",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a8d3c754-c2dd-493d-896a-65315264e17a"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "7f48d8b6-b733-4903-8699-31a9d7e1ea08",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.3,
-        "time": "2009-07-22T05:03:30+00:00",
-        "label": "090722 050326",
-        "frequency": 49.988,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "7f48d8b6-b733-4903-8699-31a9d7e1ea08"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1d28533c-11b5-48c5-ba61-cac244981564",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.3,
-        "time": "2009-07-22T05:04:00+00:00",
-        "label": "090722 050326",
-        "frequency": 49.975,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "1d28533c-11b5-48c5-ba61-cac244981564"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e338dcfe-adba-45f0-bada-3be20584a2a6",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.3,
-        "time": "2009-07-22T05:04:30+00:00",
-        "label": "090722 050326",
-        "frequency": 49.962,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "e338dcfe-adba-45f0-bada-3be20584a2a6"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1501e337-830b-4788-b364-71b90bea9599",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.507,
-        "time": "2009-07-22T05:05:00+00:00",
-        "label": "090722 050434",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "1501e337-830b-4788-b364-71b90bea9599"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "527c998f-f834-4f2d-864e-18c2567bbc75",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.745,
-        "time": "2009-07-22T05:05:30+00:00",
-        "label": "090722 050434",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "527c998f-f834-4f2d-864e-18c2567bbc75"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d67497bb-72f5-4de2-995f-2c43d57fc352",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 292.984,
-        "time": "2009-07-22T05:06:00+00:00",
-        "label": "090722 050434",
-        "frequency": 49.96,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d67497bb-72f5-4de2-995f-2c43d57fc352"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "743ea6a8-5cad-4791-bef0-c7cdc5bc280d",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.122,
-        "time": "2009-07-22T05:06:30+00:00",
-        "label": "090722 050602",
-        "frequency": 49.967,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "743ea6a8-5cad-4791-bef0-c7cdc5bc280d"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d25f6f67-83f2-48d8-9640-da0e2fdd5441",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.252,
-        "time": "2009-07-22T05:07:00+00:00",
-        "label": "090722 050602",
-        "frequency": 49.975,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d25f6f67-83f2-48d8-9640-da0e2fdd5441"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "bc5d2eea-440b-44d3-be58-57ca5816f2cc",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.383,
-        "time": "2009-07-22T05:07:30+00:00",
-        "label": "090722 050602",
-        "frequency": 49.983,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "bc5d2eea-440b-44d3-be58-57ca5816f2cc"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e880d756-a21a-4492-aff5-4cf94e33eda1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.52,
-        "time": "2009-07-22T05:08:00+00:00",
-        "label": "090722 050757",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "e880d756-a21a-4492-aff5-4cf94e33eda1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "dcab8f10-239c-4e2f-ae3f-11b94aa885c7",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.717,
-        "time": "2009-07-22T05:08:30+00:00",
-        "label": "090722 050757",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "dcab8f10-239c-4e2f-ae3f-11b94aa885c7"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "9a72b3b9-c754-4eac-8e1b-d05b8414b7f9",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 293.914,
-        "time": "2009-07-22T05:09:00+00:00",
-        "label": "090722 050757",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "9a72b3b9-c754-4eac-8e1b-d05b8414b7f9"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "caf20a1d-8486-4612-ae72-337bdfdcb723",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.056,
-        "time": "2009-07-22T05:09:30+00:00",
-        "label": "090722 050913",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "caf20a1d-8486-4612-ae72-337bdfdcb723"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "0362aff9-b4cf-4e85-90ee-f7df047fed42",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.155,
-        "time": "2009-07-22T05:10:00+00:00",
-        "label": "090722 050913",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "0362aff9-b4cf-4e85-90ee-f7df047fed42"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "631f41e0-0f1f-4520-9e78-42755dff74e4",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.254,
-        "time": "2009-07-22T05:10:30+00:00",
-        "label": "090722 050913",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "631f41e0-0f1f-4520-9e78-42755dff74e4"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3a9316ff-25e8-4681-a9f5-e9695cb6f17a",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.405,
-        "time": "2009-07-22T05:11:00+00:00",
-        "label": "090722 051044",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "3a9316ff-25e8-4681-a9f5-e9695cb6f17a"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2cc7c31a-d9c9-4bc5-8b96-e9eae9e461cf",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.603,
-        "time": "2009-07-22T05:11:30+00:00",
-        "label": "090722 051044",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2cc7c31a-d9c9-4bc5-8b96-e9eae9e461cf"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "ba8b579f-b6b4-4010-8ac8-6ad3d36a7fa9",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.8,
-        "time": "2009-07-22T05:12:00+00:00",
-        "label": "090722 051044",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "ba8b579f-b6b4-4010-8ac8-6ad3d36a7fa9"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4d4606c8-060a-4efe-8024-6d766096cf67",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.8,
-        "time": "2009-07-22T05:12:30+00:00",
-        "label": "090722 051200",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4d4606c8-060a-4efe-8024-6d766096cf67"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "bec13370-d191-4287-be04-6a254148d2c0",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.8,
-        "time": "2009-07-22T05:13:00+00:00",
-        "label": "090722 051200",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "bec13370-d191-4287-be04-6a254148d2c0"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "9b1b1fdd-eb42-4fb8-b895-27385cb95f9f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.8,
-        "time": "2009-07-22T05:13:30+00:00",
-        "label": "090722 051320",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "9b1b1fdd-eb42-4fb8-b895-27385cb95f9f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "b836f1cf-37df-4b71-bbf9-6ec1612ca1e8",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 294.8,
-        "time": "2009-07-22T05:14:00+00:00",
-        "label": "090722 051320",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "b836f1cf-37df-4b71-bbf9-6ec1612ca1e8"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "324c6332-a8b4-434a-a784-c4a7130e5995",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.086,
-        "time": "2009-07-22T05:14:30+00:00",
-        "label": "090722 051404",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "324c6332-a8b4-434a-a784-c4a7130e5995"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "ba6911cc-95a9-47d3-8c26-8a548c3a21e4",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.415,
-        "time": "2009-07-22T05:15:00+00:00",
-        "label": "090722 051404",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "ba6911cc-95a9-47d3-8c26-8a548c3a21e4"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4a7dfe68-dc2a-4a78-8584-3c869e90880f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.745,
-        "time": "2009-07-22T05:15:30+00:00",
-        "label": "090722 051404",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4a7dfe68-dc2a-4a78-8584-3c869e90880f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "7583abfa-d2e5-43e2-9cc4-57a22320b1ad",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.8,
-        "time": "2009-07-22T05:16:00+00:00",
-        "label": "090722 051535",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "7583abfa-d2e5-43e2-9cc4-57a22320b1ad"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "70644766-d17a-4d6b-ac14-af6c3ef2d546",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.8,
-        "time": "2009-07-22T05:16:30+00:00",
-        "label": "090722 051535",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "70644766-d17a-4d6b-ac14-af6c3ef2d546"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "4c482fe8-0c13-450c-a202-fea5929fcdf9",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.8,
-        "time": "2009-07-22T05:17:00+00:00",
-        "label": "090722 051639",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "4c482fe8-0c13-450c-a202-fea5929fcdf9"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "11efbe2e-9732-4800-909e-94e922e1ba01",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.8,
-        "time": "2009-07-22T05:17:30+00:00",
-        "label": "090722 051639",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "11efbe2e-9732-4800-909e-94e922e1ba01"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "531ea541-e9d2-41b1-85d9-4ec72f7d1b5d",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 295.8,
-        "time": "2009-07-22T05:18:00+00:00",
-        "label": "090722 051639",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "531ea541-e9d2-41b1-85d9-4ec72f7d1b5d"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "aacb618a-2301-4bfd-b3db-373e02b1cabe",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 296.022,
-        "time": "2009-07-22T05:18:30+00:00",
-        "label": "090722 051811",
-        "frequency": 49.98,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "aacb618a-2301-4bfd-b3db-373e02b1cabe"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "6a4d5807-2fba-4aa8-ba88-ecf1287fff70",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 296.372,
-        "time": "2009-07-22T05:19:00+00:00",
-        "label": "090722 051811",
-        "frequency": 49.965,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "6a4d5807-2fba-4aa8-ba88-ecf1287fff70"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "15d526c8-9ffc-4bd4-9688-31fd45f25458",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 296.5,
-        "time": "2009-07-22T05:19:30+00:00",
-        "label": "090722 051911",
-        "frequency": 49.967,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "15d526c8-9ffc-4bd4-9688-31fd45f25458"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "165008f3-64e0-4728-b13a-e998eadde157",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 296.5,
-        "time": "2009-07-22T05:20:00+00:00",
-        "label": "090722 051911",
-        "frequency": 49.979,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "165008f3-64e0-4728-b13a-e998eadde157"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "fa48ab9e-e3b5-4bfa-93e3-e7ec4c6b7cbb",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 296.5,
-        "time": "2009-07-22T05:20:30+00:00",
-        "label": "090722 051911",
-        "frequency": 49.99,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "fa48ab9e-e3b5-4bfa-93e3-e7ec4c6b7cbb"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a0edae41-cf11-45e7-be38-463855d4cd75",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 297.0,
-        "time": "2009-07-22T05:21:00+00:00",
-        "label": "090722 052030",
-        "frequency": 50.04,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a0edae41-cf11-45e7-be38-463855d4cd75"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "89a3a37a-6df7-4e47-9fcb-8fad8af2f401",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 297.5,
-        "time": "2009-07-22T05:21:30+00:00",
-        "label": "090722 052030",
-        "frequency": 50.09,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "89a3a37a-6df7-4e47-9fcb-8fad8af2f401"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "08652857-3ba3-4057-bff6-6e95bef1e8a6",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 297.673,
-        "time": "2009-07-22T05:22:00+00:00",
-        "label": "090722 052130",
-        "frequency": 50.153,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "08652857-3ba3-4057-bff6-6e95bef1e8a6"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "bb9405bc-da46-4e17-af2d-2f4006f9ca96",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 297.871,
-        "time": "2009-07-22T05:22:30+00:00",
-        "label": "090722 052222",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "bb9405bc-da46-4e17-af2d-2f4006f9ca96"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2fbd6ef2-f7f6-4655-809a-978eaa2bef28",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 298.139,
-        "time": "2009-07-22T05:23:00+00:00",
-        "label": "090722 052222",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2fbd6ef2-f7f6-4655-809a-978eaa2bef28"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1b48c7e8-22ea-468c-add9-fe6c574721ad",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 298.442,
-        "time": "2009-07-22T05:23:30+00:00",
-        "label": "090722 052318",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "1b48c7e8-22ea-468c-add9-fe6c574721ad"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "ab31b1dc-e37e-4ad8-a71b-504951333c74",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 298.798,
-        "time": "2009-07-22T05:24:00+00:00",
-        "label": "090722 052318",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "ab31b1dc-e37e-4ad8-a71b-504951333c74"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "c8384552-207c-4cdb-b248-ca45d8f1f64b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 299.135,
-        "time": "2009-07-22T05:24:30+00:00",
-        "label": "090722 052417",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "c8384552-207c-4cdb-b248-ca45d8f1f64b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "f4fb7f1c-6021-463b-bffb-c037868030b3",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 299.448,
-        "time": "2009-07-22T05:25:00+00:00",
-        "label": "090722 052417",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "f4fb7f1c-6021-463b-bffb-c037868030b3"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "69fec7f4-8fc2-4499-a41e-be7904d95e9d",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "NONSUCH",
-        "sensor_name": "SENSOR_A_2",
-        "bearing": 299.784,
-        "time": "2009-07-22T05:25:30+00:00",
-        "label": "090722 052505",
-        "frequency": 50.2,
-        "provenance": [
-          {
-            "activity_id": "cca7bd22-8a64-4601-956a-69b234666ce4",
-            "timestamp": "2026-03-21T10:15:01.738285Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "69fec7f4-8fc2-4499-a41e-be7904d95e9d"
-            ],
-            "execution_duration": "PT0S"
+        "sensors": [
+          {
+            "name": "SENSOR_A_2",
+            "contacts": [
+              {
+                "time": "2009-07-22T04:43:00+00:00",
+                "bearing": 295.92,
+                "frequency": 50.03,
+                "label": "090722 044232"
+              },
+              {
+                "time": "2009-07-22T04:43:30+00:00",
+                "bearing": 295.273,
+                "frequency": 50.079,
+                "label": "090722 044319"
+              },
+              {
+                "time": "2009-07-22T04:44:00+00:00",
+                "bearing": 294.655,
+                "frequency": 50.132,
+                "label": "090722 044319"
+              },
+              {
+                "time": "2009-07-22T04:44:30+00:00",
+                "bearing": 294.036,
+                "frequency": 50.184,
+                "label": "090722 044319"
+              },
+              {
+                "time": "2009-07-22T04:45:00+00:00",
+                "bearing": 293.458,
+                "frequency": 50.23,
+                "label": "090722 044456"
+              },
+              {
+                "time": "2009-07-22T04:45:30+00:00",
+                "bearing": 293.146,
+                "frequency": 50.23,
+                "label": "090722 044456"
+              },
+              {
+                "time": "2009-07-22T04:46:00+00:00",
+                "bearing": 292.93,
+                "frequency": 50.206,
+                "label": "090722 044544"
+              },
+              {
+                "time": "2009-07-22T04:46:30+00:00",
+                "bearing": 292.8,
+                "frequency": 50.16,
+                "label": "090722 044544"
+              },
+              {
+                "time": "2009-07-22T04:47:00+00:00",
+                "bearing": 292.106,
+                "frequency": 50.104,
+                "label": "090722 044630"
+              },
+              {
+                "time": "2009-07-22T04:47:30+00:00",
+                "bearing": 291.411,
+                "frequency": 50.049,
+                "label": "090722 044630"
+              },
+              {
+                "time": "2009-07-22T04:48:00+00:00",
+                "bearing": 290.717,
+                "frequency": 49.993,
+                "label": "090722 044630"
+              },
+              {
+                "time": "2009-07-22T04:48:30+00:00",
+                "bearing": 290.103,
+                "frequency": 49.954,
+                "label": "090722 044818"
+              },
+              {
+                "time": "2009-07-22T04:49:00+00:00",
+                "bearing": 289.609,
+                "frequency": 49.939,
+                "label": "090722 044818"
+              },
+              {
+                "time": "2009-07-22T04:49:30+00:00",
+                "bearing": 289.115,
+                "frequency": 49.924,
+                "label": "090722 044818"
+              },
+              {
+                "time": "2009-07-22T04:50:00+00:00",
+                "bearing": 288.776,
+                "frequency": 49.933,
+                "label": "090722 044937"
+              },
+              {
+                "time": "2009-07-22T04:50:30+00:00",
+                "bearing": 288.485,
+                "frequency": 49.949,
+                "label": "090722 044937"
+              },
+              {
+                "time": "2009-07-22T04:51:00+00:00",
+                "bearing": 288.254,
+                "frequency": 49.954,
+                "label": "090722 045049"
+              },
+              {
+                "time": "2009-07-22T04:51:30+00:00",
+                "bearing": 288.129,
+                "frequency": 49.937,
+                "label": "090722 045049"
+              },
+              {
+                "time": "2009-07-22T04:52:00+00:00",
+                "bearing": 288.004,
+                "frequency": 49.921,
+                "label": "090722 045049"
+              },
+              {
+                "time": "2009-07-22T04:52:30+00:00",
+                "bearing": 288.0,
+                "frequency": 49.936,
+                "label": "090722 045201"
+              },
+              {
+                "time": "2009-07-22T04:53:00+00:00",
+                "bearing": 288.0,
+                "frequency": 49.953,
+                "label": "090722 045201"
+              },
+              {
+                "time": "2009-07-22T04:53:30+00:00",
+                "bearing": 288.149,
+                "frequency": 49.966,
+                "label": "090722 045313"
+              },
+              {
+                "time": "2009-07-22T04:54:00+00:00",
+                "bearing": 288.413,
+                "frequency": 49.975,
+                "label": "090722 045313"
+              },
+              {
+                "time": "2009-07-22T04:54:30+00:00",
+                "bearing": 288.677,
+                "frequency": 49.985,
+                "label": "090722 045313"
+              },
+              {
+                "time": "2009-07-22T04:55:00+00:00",
+                "bearing": 288.8,
+                "frequency": 49.99,
+                "label": "090722 045444"
+              },
+              {
+                "time": "2009-07-22T04:55:30+00:00",
+                "bearing": 288.8,
+                "frequency": 49.99,
+                "label": "090722 045444"
+              },
+              {
+                "time": "2009-07-22T04:56:00+00:00",
+                "bearing": 288.8,
+                "frequency": 49.988,
+                "label": "090722 045556"
+              },
+              {
+                "time": "2009-07-22T04:56:30+00:00",
+                "bearing": 288.8,
+                "frequency": 49.975,
+                "label": "090722 045556"
+              },
+              {
+                "time": "2009-07-22T04:57:00+00:00",
+                "bearing": 288.8,
+                "frequency": 49.962,
+                "label": "090722 045556"
+              },
+              {
+                "time": "2009-07-22T04:57:30+00:00",
+                "bearing": 289.166,
+                "frequency": 49.96,
+                "label": "090722 045704"
+              },
+              {
+                "time": "2009-07-22T04:58:00+00:00",
+                "bearing": 289.589,
+                "frequency": 49.96,
+                "label": "090722 045704"
+              },
+              {
+                "time": "2009-07-22T04:58:30+00:00",
+                "bearing": 289.8,
+                "frequency": 49.96,
+                "label": "090722 045815"
+              },
+              {
+                "time": "2009-07-22T04:59:00+00:00",
+                "bearing": 289.8,
+                "frequency": 49.96,
+                "label": "090722 045815"
+              },
+              {
+                "time": "2009-07-22T04:59:30+00:00",
+                "bearing": 289.957,
+                "frequency": 49.964,
+                "label": "090722 045919"
+              },
+              {
+                "time": "2009-07-22T05:00:00+00:00",
+                "bearing": 290.386,
+                "frequency": 49.975,
+                "label": "090722 045919"
+              },
+              {
+                "time": "2009-07-22T05:00:30+00:00",
+                "bearing": 290.814,
+                "frequency": 49.985,
+                "label": "090722 045919"
+              },
+              {
+                "time": "2009-07-22T05:01:00+00:00",
+                "bearing": 291.097,
+                "frequency": 49.99,
+                "label": "090722 050043"
+              },
+              {
+                "time": "2009-07-22T05:01:30+00:00",
+                "bearing": 291.267,
+                "frequency": 49.99,
+                "label": "090722 050043"
+              },
+              {
+                "time": "2009-07-22T05:02:00+00:00",
+                "bearing": 291.438,
+                "frequency": 49.99,
+                "label": "090722 050043"
+              },
+              {
+                "time": "2009-07-22T05:02:30+00:00",
+                "bearing": 291.703,
+                "frequency": 49.99,
+                "label": "090722 050211"
+              },
+              {
+                "time": "2009-07-22T05:03:00+00:00",
+                "bearing": 292.023,
+                "frequency": 49.99,
+                "label": "090722 050211"
+              },
+              {
+                "time": "2009-07-22T05:03:30+00:00",
+                "bearing": 292.3,
+                "frequency": 49.988,
+                "label": "090722 050326"
+              },
+              {
+                "time": "2009-07-22T05:04:00+00:00",
+                "bearing": 292.3,
+                "frequency": 49.975,
+                "label": "090722 050326"
+              },
+              {
+                "time": "2009-07-22T05:04:30+00:00",
+                "bearing": 292.3,
+                "frequency": 49.962,
+                "label": "090722 050326"
+              },
+              {
+                "time": "2009-07-22T05:05:00+00:00",
+                "bearing": 292.507,
+                "frequency": 49.96,
+                "label": "090722 050434"
+              },
+              {
+                "time": "2009-07-22T05:05:30+00:00",
+                "bearing": 292.745,
+                "frequency": 49.96,
+                "label": "090722 050434"
+              },
+              {
+                "time": "2009-07-22T05:06:00+00:00",
+                "bearing": 292.984,
+                "frequency": 49.96,
+                "label": "090722 050434"
+              },
+              {
+                "time": "2009-07-22T05:06:30+00:00",
+                "bearing": 293.122,
+                "frequency": 49.967,
+                "label": "090722 050602"
+              },
+              {
+                "time": "2009-07-22T05:07:00+00:00",
+                "bearing": 293.252,
+                "frequency": 49.975,
+                "label": "090722 050602"
+              },
+              {
+                "time": "2009-07-22T05:07:30+00:00",
+                "bearing": 293.383,
+                "frequency": 49.983,
+                "label": "090722 050602"
+              },
+              {
+                "time": "2009-07-22T05:08:00+00:00",
+                "bearing": 293.52,
+                "frequency": 49.99,
+                "label": "090722 050757"
+              },
+              {
+                "time": "2009-07-22T05:08:30+00:00",
+                "bearing": 293.717,
+                "frequency": 49.99,
+                "label": "090722 050757"
+              },
+              {
+                "time": "2009-07-22T05:09:00+00:00",
+                "bearing": 293.914,
+                "frequency": 49.99,
+                "label": "090722 050757"
+              },
+              {
+                "time": "2009-07-22T05:09:30+00:00",
+                "bearing": 294.056,
+                "frequency": 49.99,
+                "label": "090722 050913"
+              },
+              {
+                "time": "2009-07-22T05:10:00+00:00",
+                "bearing": 294.155,
+                "frequency": 49.99,
+                "label": "090722 050913"
+              },
+              {
+                "time": "2009-07-22T05:10:30+00:00",
+                "bearing": 294.254,
+                "frequency": 49.99,
+                "label": "090722 050913"
+              },
+              {
+                "time": "2009-07-22T05:11:00+00:00",
+                "bearing": 294.405,
+                "frequency": 49.99,
+                "label": "090722 051044"
+              },
+              {
+                "time": "2009-07-22T05:11:30+00:00",
+                "bearing": 294.603,
+                "frequency": 49.99,
+                "label": "090722 051044"
+              },
+              {
+                "time": "2009-07-22T05:12:00+00:00",
+                "bearing": 294.8,
+                "frequency": 49.99,
+                "label": "090722 051044"
+              },
+              {
+                "time": "2009-07-22T05:12:30+00:00",
+                "bearing": 294.8,
+                "frequency": 49.99,
+                "label": "090722 051200"
+              },
+              {
+                "time": "2009-07-22T05:13:00+00:00",
+                "bearing": 294.8,
+                "frequency": 49.99,
+                "label": "090722 051200"
+              },
+              {
+                "time": "2009-07-22T05:13:30+00:00",
+                "bearing": 294.8,
+                "frequency": 49.99,
+                "label": "090722 051320"
+              },
+              {
+                "time": "2009-07-22T05:14:00+00:00",
+                "bearing": 294.8,
+                "frequency": 49.99,
+                "label": "090722 051320"
+              },
+              {
+                "time": "2009-07-22T05:14:30+00:00",
+                "bearing": 295.086,
+                "frequency": 49.99,
+                "label": "090722 051404"
+              },
+              {
+                "time": "2009-07-22T05:15:00+00:00",
+                "bearing": 295.415,
+                "frequency": 49.99,
+                "label": "090722 051404"
+              },
+              {
+                "time": "2009-07-22T05:15:30+00:00",
+                "bearing": 295.745,
+                "frequency": 49.99,
+                "label": "090722 051404"
+              },
+              {
+                "time": "2009-07-22T05:16:00+00:00",
+                "bearing": 295.8,
+                "frequency": 49.99,
+                "label": "090722 051535"
+              },
+              {
+                "time": "2009-07-22T05:16:30+00:00",
+                "bearing": 295.8,
+                "frequency": 49.99,
+                "label": "090722 051535"
+              },
+              {
+                "time": "2009-07-22T05:17:00+00:00",
+                "bearing": 295.8,
+                "frequency": 49.99,
+                "label": "090722 051639"
+              },
+              {
+                "time": "2009-07-22T05:17:30+00:00",
+                "bearing": 295.8,
+                "frequency": 49.99,
+                "label": "090722 051639"
+              },
+              {
+                "time": "2009-07-22T05:18:00+00:00",
+                "bearing": 295.8,
+                "frequency": 49.99,
+                "label": "090722 051639"
+              },
+              {
+                "time": "2009-07-22T05:18:30+00:00",
+                "bearing": 296.022,
+                "frequency": 49.98,
+                "label": "090722 051811"
+              },
+              {
+                "time": "2009-07-22T05:19:00+00:00",
+                "bearing": 296.372,
+                "frequency": 49.965,
+                "label": "090722 051811"
+              },
+              {
+                "time": "2009-07-22T05:19:30+00:00",
+                "bearing": 296.5,
+                "frequency": 49.967,
+                "label": "090722 051911"
+              },
+              {
+                "time": "2009-07-22T05:20:00+00:00",
+                "bearing": 296.5,
+                "frequency": 49.979,
+                "label": "090722 051911"
+              },
+              {
+                "time": "2009-07-22T05:20:30+00:00",
+                "bearing": 296.5,
+                "frequency": 49.99,
+                "label": "090722 051911"
+              },
+              {
+                "time": "2009-07-22T05:21:00+00:00",
+                "bearing": 297.0,
+                "frequency": 50.04,
+                "label": "090722 052030"
+              },
+              {
+                "time": "2009-07-22T05:21:30+00:00",
+                "bearing": 297.5,
+                "frequency": 50.09,
+                "label": "090722 052030"
+              },
+              {
+                "time": "2009-07-22T05:22:00+00:00",
+                "bearing": 297.673,
+                "frequency": 50.153,
+                "label": "090722 052130"
+              },
+              {
+                "time": "2009-07-22T05:22:30+00:00",
+                "bearing": 297.871,
+                "frequency": 50.2,
+                "label": "090722 052222"
+              },
+              {
+                "time": "2009-07-22T05:23:00+00:00",
+                "bearing": 298.139,
+                "frequency": 50.2,
+                "label": "090722 052222"
+              },
+              {
+                "time": "2009-07-22T05:23:30+00:00",
+                "bearing": 298.442,
+                "frequency": 50.2,
+                "label": "090722 052318"
+              },
+              {
+                "time": "2009-07-22T05:24:00+00:00",
+                "bearing": 298.798,
+                "frequency": 50.2,
+                "label": "090722 052318"
+              },
+              {
+                "time": "2009-07-22T05:24:30+00:00",
+                "bearing": 299.135,
+                "frequency": 50.2,
+                "label": "090722 052417"
+              },
+              {
+                "time": "2009-07-22T05:25:00+00:00",
+                "bearing": 299.448,
+                "frequency": 50.2,
+                "label": "090722 052417"
+              },
+              {
+                "time": "2009-07-22T05:25:30+00:00",
+                "bearing": 299.784,
+                "frequency": 50.2,
+                "label": "090722 052505"
+              }
+            ]
+          }
+        ],
+        "provenance": [
+          {
+            "activity_id": "9becd816-6e08-4c49-9e7d-241b0d2ce9d0",
+            "timestamp": "2026-03-28T13:50:59.243307Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8a91e18f-a42a-4871-8186-e4430f1203df"
+            ],
+            "execution_duration": "PT0.008064S"
           }
         ]
       }

@@ -9,23 +9,18 @@
   "bbox": null,
   "properties": {
     "title": "Saxon Warrior: Narrative2",
-    "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Narrative2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 20 narrative entries.",
+    "datetime": "2026-03-28T13:51:02.366377+00:00",
+    "description": "Saxon Warrior: Narrative2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
-      "AAW",
-      "certification",
-      "replenishment",
+      "amphibious",
       "training"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "intercept"
+      "helicopter-ops"
     ],
     "debrief:track_names": [],
-    "debrief:nationalities": [],
-    "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T11:41:00+00:00"
+    "debrief:nationalities": []
   },
   "links": [
     {
@@ -45,34 +40,7 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "narrative2 (core)"
-    },
-    {
-      "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative2.rep",
-      "title": "narrative2.rep"
     }
   ],
-  "assets": {
-    "features": {
-      "href": "./features.geojson",
-      "type": "application/geo+json",
-      "title": "GeoJSON Features",
-      "roles": [
-        "data"
-      ]
-    },
-    "source-narrative2": {
-      "href": "./assets/narrative2.rep",
-      "type": "application/vnd.businessobjects",
-      "title": "narrative2.rep",
-      "roles": [
-        "source"
-      ],
-      "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative2.rep",
-        "load_timestamp": "2026-03-21T10:15:04.470093Z",
-        "tool_version": "0.1.0"
-      }
-    }
-  }
+  "assets": {}
 }

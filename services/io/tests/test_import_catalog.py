@@ -111,14 +111,18 @@ class TestCountFeatureKinds:
 
     def test_mixed_features(self) -> None:
         features = [
+            {
+                "properties": {
+                    "kind": "TRACK",
+                    "sensors": [{"name": "S1", "contacts": [{"time": "t", "bearing": 0}]}],
+                }
+            },
             {"properties": {"kind": "TRACK"}},
-            {"properties": {"kind": "TRACK"}},
-            {"properties": {"kind": "SENSOR_CONTACT"}},
             {"properties": {"kind": "NARRATIVE"}},
         ]
         tracks, sensors, narratives = _count_feature_kinds(features)
         assert tracks == 2
-        assert sensors == 1
+        assert sensors == 1  # 1 embedded sensor contact
         assert narratives == 1
 
 
@@ -230,8 +234,8 @@ class TestImportLegacyData:
         assert result.total_tracks > 0
         assert catalog.exists()
 
-    def test_import_dpf_files_rejected_by_schema(self, tmp_path: Path) -> None:
-        """DPF files containing SENSOR_CONTACT/TMA_SOLUTION features are rejected."""
+    def test_import_dpf_files(self, tmp_path: Path) -> None:
+        """DPF files import successfully with sensors/TMA embedded in tracks."""
         source = tmp_path / "source"
         source.mkdir()
         for dpf_file in FIXTURES.glob("*.dpf"):
@@ -241,11 +245,12 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed > 0
-        # DPF files produce SENSOR_CONTACT and TMA_SOLUTION kinds not in schema
-        assert result.files_failed > 0
+        assert result.files_succeeded > 0
+        assert result.files_failed == 0
+        assert result.total_tracks > 0
 
-    def test_import_dsf_files_rejected_by_schema(self, tmp_path: Path) -> None:
-        """DSF files produce SENSOR_CONTACT features which are rejected at catalog_write."""
+    def test_import_dsf_files(self, tmp_path: Path) -> None:
+        """DSF files import successfully; sensor data deferred for merging."""
         source = tmp_path / "source"
         source.mkdir()
         for dsf_file in FIXTURES.glob("*.dsf"):
@@ -255,16 +260,18 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed > 0
-        # DSF files fail because SENSOR_CONTACT is not a valid FeatureKindEnum
-        assert result.files_failed > 0
-        assert result.files_succeeded == 0
-        assert any("SENSOR_CONTACT" in e.error for e in result.errors)
+        # DSF files succeed (no standalone features, just deferred sensor data)
+        assert result.files_succeeded > 0
+        assert result.files_failed == 0
+        # Orphan warnings since there are no companion tracks
+        orphan_warns = [w for w in result.warnings if w.code == "ORPHAN_SENSOR"]
+        assert len(orphan_warns) > 0
 
     def test_import_mixed_formats(self, tmp_path: Path) -> None:
         """Import a mix of REP, DPF, and DSF files.
 
-        REP files succeed (TRACK-only). DPF and DSF files fail because they
-        produce SENSOR_CONTACT / TMA_SOLUTION features rejected at catalog_write.
+        All formats now succeed: REP and DPF produce valid features;
+        DSF defers sensor data (orphaned without companion tracks here).
         """
         source = tmp_path / "source"
         source.mkdir()
@@ -278,9 +285,8 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed == 3
-        # REP succeeds; DPF and DSF fail (invalid feature kinds)
-        assert result.files_succeeded >= 1
-        assert result.files_failed >= 2
+        assert result.files_succeeded == 3
+        assert result.files_failed == 0
 
     def test_domain_in_plot_id(self, tmp_path: Path) -> None:
         """Verify domain detection creates correct plot IDs."""
@@ -361,8 +367,8 @@ class TestImportLegacyData:
 class TestSchemaValidationInImport:
     """Tests for schema validation at import time."""
 
-    def test_import_reports_schema_warnings(self, tmp_path: Path) -> None:
-        """Schema validation warnings appear in import result for DSF files."""
+    def test_import_dsf_no_schema_warnings(self, tmp_path: Path) -> None:
+        """DSF files produce no features, so no schema warnings are emitted."""
         source = tmp_path / "source"
         source.mkdir()
         for dsf_file in FIXTURES.glob("*.dsf"):
@@ -371,23 +377,25 @@ class TestSchemaValidationInImport:
         catalog = tmp_path / "catalog"
         result = import_legacy_data(source, catalog)
 
-        # Schema warnings are collected (parser_output boundary, warn-and-continue)
+        # DSF files produce no standalone features, so no schema validation runs
         schema_warns = [w for w in result.warnings if w.code == "SCHEMA_VALIDATION"]
-        assert len(schema_warns) > 0
+        assert len(schema_warns) == 0
 
-    def test_import_records_error_for_invalid_features(self, tmp_path: Path) -> None:
-        """Files producing invalid features are recorded as errors, not successes."""
+    def test_import_rep_features_pass_validation(self, tmp_path: Path) -> None:
+        """REP files produce schema-valid features that import successfully."""
         source = tmp_path / "source"
         source.mkdir()
-        (source / "sensor.dsf").write_text((FIXTURES / "sen_frig_sensor.dsf").read_text())
+        src = FIXTURES / "boat1.rep"
+        if not src.exists():
+            pytest.skip("boat1.rep fixture not available")
+        (source / "boat1.rep").write_text(src.read_text())
 
         catalog = tmp_path / "catalog"
         result = import_legacy_data(source, catalog)
 
-        assert result.files_failed == 1
-        assert result.files_succeeded == 0
-        assert len(result.errors) == 1
-        assert "SENSOR_CONTACT" in result.errors[0].error
+        assert result.files_failed == 0
+        assert result.files_succeeded == 1
+        assert result.total_tracks > 0
 
 
 class TestGenerateReport:

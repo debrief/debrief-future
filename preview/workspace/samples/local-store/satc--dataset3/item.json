@@ -45,16 +45,16 @@
     "start_datetime": "2016-10-10T12:00:00+00:00",
     "end_datetime": "2016-10-12T10:20:56+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
       "ASW",
-      "EW",
-      "gunnery",
-      "mine-clearance",
+      "SAR",
       "prosecution"
     ],
     "debrief:feature_tags": [
+      "datum",
+      "depth-charge",
       "radar-detection"
     ],
     "debrief:track_names": [
@@ -85,7 +85,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset3.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/Dataset3.rep",
       "title": "Dataset3.rep"
     }
   ],
@@ -106,8 +106,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset3.rep",
-        "load_timestamp": "2026-03-21T10:15:03.572127Z",
+        "source_path": "/tmp/legacy-source-data/SATC/Dataset3.rep",
+        "load_timestamp": "2026-03-28T13:51:01.111444Z",
         "tool_version": "0.1.0"
       }
     }

@@ -106,6 +106,16 @@ class ParseResult(BaseModel):
     handler_version: str = "0.0.0"
     """Semantic version of the handler that processed the file."""
 
+    pending_sensor_data: dict[str, list[dict[str, Any]]] = Field(default_factory=dict)
+    """Sensor data to be embedded into companion tracks (keyed by parent track name).
+
+    DSF files contain sensor contacts for tracks defined in companion REP files.
+    Rather than producing standalone SENSOR_CONTACT features (which fail schema
+    validation), the DSF handler groups contacts into SensorData structures keyed
+    by parent track name. The import pipeline merges these into the correct tracks.
+    Each value is a list of SensorData dicts: [{name, contacts: [...]}].
+    """
+
     def schema_validate_features(self) -> list[ParseWarning]:
         """Run schema validation on parsed features (warn-and-continue).
 

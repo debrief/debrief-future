@@ -41,31 +41,34 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks With Narrative",
     "datetime": "1970-01-03T01:34:00+00:00",
-    "description": "Saxon Warrior: Sen Tracks With Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including USS Truxtun, FS Andrea Doria. 6 narrative entries. Multi-national participation: FR, US.",
+    "description": "Saxon Warrior: Sen Tracks With Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mahan, FGS Otto Sverdrup. 6 narrative entries. Multi-national participation: DE, FR.",
     "start_datetime": "1970-01-03T01:34:00+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute",
-      "surface/warship/corvette/visby"
+      "subsurface/submarine/ssn/trafalgar",
+      "surface/warship/patrol/river"
     ],
     "debrief:tags": [
       "ASW",
       "certification",
-      "mine-clearance",
-      "surveillance",
+      "escort",
+      "missile-firing",
+      "replenishment",
       "training"
     ],
     "debrief:feature_tags": [
       "datum",
-      "visual-sighting"
+      "sonar-contact",
+      "visual-sighting",
+      "zig-zag"
     ],
     "debrief:track_names": [
-      "USS Truxtun",
-      "FS Andrea Doria"
+      "FS Mahan",
+      "FGS Otto Sverdrup"
     ],
     "debrief:nationalities": [
-      "FR",
-      "US"
+      "DE",
+      "FR"
     ]
   },
   "links": [
@@ -89,7 +92,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_tracks_with_narrative.dpf",
+      "href": "file:///tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
       "title": "sen_tracks_with_narrative.dpf"
     }
   ],
@@ -110,8 +113,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_tracks_with_narrative.dpf",
-        "load_timestamp": "2026-03-21T10:15:06.072817Z",
+        "source_path": "/tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
+        "load_timestamp": "2026-03-28T13:51:04.117114Z",
         "tool_version": "0.1.0"
       }
     }

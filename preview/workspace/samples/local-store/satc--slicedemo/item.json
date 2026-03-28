@@ -41,33 +41,26 @@
   "properties": {
     "title": "Silent Resolve: Slicedemo",
     "datetime": "2001-01-01T14:00:47.812000+00:00",
-    "description": "Silent Resolve: Slicedemo \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Richmond. 315 sensor contact(s) logged.",
+    "description": "Silent Resolve: Slicedemo \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Kent.",
     "start_datetime": "2001-01-01T14:00:47.812000+00:00",
     "end_datetime": "2001-01-01T18:00:49.546000+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute"
+      "subsurface/submarine/ssk/type212"
     ],
     "debrief:tags": [
       "ASW",
-      "EW",
-      "boarding",
-      "prosecution",
-      "surveillance",
-      "transit"
+      "mine-clearance",
+      "prosecution"
     ],
     "debrief:feature_tags": [
-      "passive-search",
-      "prosecution",
-      "sonar-contact",
-      "sprint-and-drift",
-      "visual-sighting",
-      "zig-zag"
+      "radar-detection",
+      "sprint-and-drift"
     ],
     "debrief:track_names": [
-      "HDMS Richmond"
+      "FGS Kent"
     ],
     "debrief:nationalities": [
-      "DK"
+      "DE"
     ]
   },
   "links": [
@@ -91,7 +84,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/SliceDemo.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/SliceDemo.rep",
       "title": "SliceDemo.rep"
     }
   ],
@@ -112,8 +105,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/SliceDemo.rep",
-        "load_timestamp": "2026-03-21T10:15:02.144741Z",
+        "source_path": "/tmp/legacy-source-data/SATC/SliceDemo.rep",
+        "load_timestamp": "2026-03-28T13:51:01.846279Z",
         "tool_version": "0.1.0"
       }
     }

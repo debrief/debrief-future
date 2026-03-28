@@ -34,34 +34,44 @@ class TestDSFParsing:
         result = handler.parse(content, str(FIXTURES / "sen_frig_sensor.dsf"))
 
         assert result.handler == "Debrief DSF Format"
-        assert len(result.features) == 4  # 3 SENSOR2 + 1 SENSOR
+        # DSF produces no standalone features; contacts go to pending_sensor_data
+        assert len(result.features) == 0
+        assert len(result.pending_sensor_data) > 0
+        # Count total contacts across all tracks/sensors
+        total_contacts = sum(
+            len(s["contacts"]) for sensors in result.pending_sensor_data.values() for s in sensors
+        )
+        assert total_contacts == 4  # 3 SENSOR2 + 1 SENSOR
 
     def test_sensor2_with_tabs(self) -> None:
         handler = DSFHandler()
         content = ";SENSOR2:\t951212\t054902.486\tFRIGATE\t@A\tNULL\t032.8\t12000.0\t150.0\tNULL\tSENSOR_A\tfirst contact\n"
         result = handler.parse(content, "test.dsf")
 
-        assert len(result.features) == 1
-        props = result.features[0]["properties"]
-        assert props["kind"] == "SENSOR_CONTACT"
-        assert props["parent_track"] == "FRIGATE"
-        assert props["bearing"] == 32.8
-        assert props["range"] == 12000.0
-        assert props["frequency"] == 150.0
-        assert props["sensor_name"] == "SENSOR_A"
+        assert len(result.features) == 0
+        assert "FRIGATE" in result.pending_sensor_data
+        sensors = result.pending_sensor_data["FRIGATE"]
+        assert len(sensors) == 1
+        assert sensors[0]["name"] == "SENSOR_A"
+        contact = sensors[0]["contacts"][0]
+        assert contact["bearing"] == 32.8
+        assert contact["range"] == 12000.0
+        assert contact["frequency"] == 150.0
 
     def test_sensor2_with_quoted_track(self) -> None:
         handler = DSFHandler()
         content = ';SENSOR2: 20010101 145342.894 "OS" @B NULL 221.5 NULL NULL NULL "FS" "Contact"\n'
         result = handler.parse(content, "test.dsf")
 
-        assert len(result.features) == 1
-        props = result.features[0]["properties"]
-        assert props["parent_track"] == "OS"
-        assert props["bearing"] == 221.5
-        assert "range" not in props  # NULL
-        assert "frequency" not in props  # NULL
-        assert props["sensor_name"] == "FS"
+        assert len(result.features) == 0
+        assert "OS" in result.pending_sensor_data
+        sensors = result.pending_sensor_data["OS"]
+        assert len(sensors) == 1
+        assert sensors[0]["name"] == "FS"
+        contact = sensors[0]["contacts"][0]
+        assert contact["bearing"] == 221.5
+        assert "range" not in contact  # NULL
+        assert "frequency" not in contact  # NULL
 
     def test_sensor_with_null_position(self) -> None:
         handler = DSFHandler()
@@ -70,19 +80,18 @@ class TestDSFParsing:
         )
         result = handler.parse(content, "test.dsf")
 
-        assert len(result.features) == 1
-        props = result.features[0]["properties"]
-        assert props["parent_track"] == "SUBMARINE"
-        assert props["bearing"] == 180.5
+        assert len(result.features) == 0
+        assert "SUBMARINE" in result.pending_sensor_data
+        contact = result.pending_sensor_data["SUBMARINE"][0]["contacts"][0]
+        assert contact["bearing"] == 180.5
 
     def test_sensor_with_coordinates(self) -> None:
         handler = DSFHandler()
         content = ";SENSOR: 100112 121314 OWNSHIP @A 0 4 0 S 30 0 10 W 2.4 12000 Plain Cookie\n"
         result = handler.parse(content, "test.dsf")
 
-        assert len(result.features) == 1
-        props = result.features[0]["properties"]
-        assert props["parent_track"] == "OWNSHIP"
+        assert len(result.features) == 0
+        assert "OWNSHIP" in result.pending_sensor_data
 
     def test_empty_file(self) -> None:
         handler = DSFHandler()
@@ -120,10 +129,9 @@ class TestDSFParsing:
         content = ";SENSOR2: 951212 055200.000 SUB @B NULL 180.5 NULL NULL NULL TA label\n"
         result = handler.parse(content, "test.dsf")
 
-        props = result.features[0]["properties"]
-        assert "range" not in props
-        assert "frequency" not in props
-        assert "speed" not in props
+        contact = result.pending_sensor_data["SUB"][0]["contacts"][0]
+        assert "range" not in contact
+        assert "frequency" not in contact
 
 
 class TestDSFRegistration:
