@@ -198,6 +198,25 @@
   border-color: var(--vscode-focusBorder, #0078d4);
 }
 
+.debrief-value-editor__typeahead {
+  background: var(--vscode-editorWidget-background, #fff);
+  border: 1px solid var(--vscode-widget-border, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+}
+
+.debrief-value-editor__typeahead .debrief-value-editor__dropdown {
+  margin-top: 4px;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.debrief-value-editor__option--highlighted {
+  background: var(--vscode-list-hoverBackground, #f0f0f0);
+}
+
 /* SaveFilterButton styles (#128) */
 .debrief-save-filter {
   position: relative;

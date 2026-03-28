@@ -183,6 +183,112 @@ describe('ValueEditor', () => {
     });
   });
 
+  describe('typeahead (filename)', () => {
+    const filenames = ['satc--bluetrack', 'satc--bluesensor', 'demo-tracks--alpha', 'demo-tracks--beta'];
+
+    it('renders typeahead input', () => {
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={vi.fn()}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      expect(screen.getByTestId('value-editor-typeahead')).toBeInTheDocument();
+      expect(screen.getByTestId('value-editor-typeahead-input')).toBeInTheDocument();
+    });
+
+    it('filters available values as user types', () => {
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={vi.fn()}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-typeahead-input');
+      fireEvent.change(input, { target: { value: 'satc' } });
+
+      expect(screen.getByTestId('value-editor-typeahead-list')).toBeInTheDocument();
+      expect(screen.getByTestId('value-option-satc--bluetrack')).toBeInTheDocument();
+      expect(screen.getByTestId('value-option-satc--bluesensor')).toBeInTheDocument();
+      expect(screen.queryByTestId('value-option-demo-tracks--alpha')).not.toBeInTheDocument();
+    });
+
+    it('fires onSelect when clicking a suggestion', () => {
+      const onSelect = vi.fn();
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={onSelect}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-typeahead-input');
+      fireEvent.change(input, { target: { value: 'blue' } });
+      fireEvent.click(screen.getByTestId('value-option-satc--bluetrack'));
+      expect(onSelect).toHaveBeenCalledWith('satc--bluetrack');
+    });
+
+    it('fires onSelect on Enter with highlighted suggestion', () => {
+      const onSelect = vi.fn();
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={onSelect}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-typeahead-input');
+      fireEvent.change(input, { target: { value: 'demo' } });
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(onSelect).toHaveBeenCalledWith('demo-tracks--alpha');
+    });
+
+    it('shows no matches message when nothing matches', () => {
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={vi.fn()}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-typeahead-input');
+      fireEvent.change(input, { target: { value: 'zzzzz' } });
+      expect(screen.getByText('No matches')).toBeInTheDocument();
+    });
+
+    it('does not show dropdown when input is empty', () => {
+      render(
+        <ValueEditor
+          filterType="filename"
+          value=""
+          onSelect={vi.fn()}
+          onClose={vi.fn()}
+          availableValues={filenames}
+        />
+      );
+
+      expect(screen.queryByTestId('value-editor-typeahead-list')).not.toBeInTheDocument();
+    });
+  });
+
   describe('hierarchical (vessel-class)', () => {
     it('renders CascadingMenu for vessel-class', () => {
       render(

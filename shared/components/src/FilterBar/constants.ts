@@ -15,7 +15,7 @@ export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
   { type: 'duration', label: 'Duration', inputMethod: 'bucket' },
   { type: 'modified', label: 'Modified', inputMethod: 'bucket' },
   { type: 'title', label: 'Title', inputMethod: 'free-text' },
-  { type: 'filename', label: 'Filename', inputMethod: 'flat-dropdown' },
+  { type: 'filename', label: 'Filename', inputMethod: 'typeahead' },
   { type: 'plot-contents', label: 'Plot Contents', inputMethod: 'free-text' },
   { type: 'track-name', label: 'Track Name', inputMethod: 'flat-dropdown' },
   { type: 'nationality', label: 'Nationality', inputMethod: 'flat-dropdown' },

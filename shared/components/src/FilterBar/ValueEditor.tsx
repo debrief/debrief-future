@@ -98,6 +98,9 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
       );
     }
 
+    case 'typeahead':
+      return <TypeaheadInput value={value} onSelect={onSelect} onClose={onClose} availableValues={availableValues} />;
+
     case 'free-text':
       return <FreeTextInput value={value} onSelect={onSelect} onClose={onClose} />;
 
@@ -121,6 +124,106 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
         </div>
       );
   }
+};
+
+interface TypeaheadInputProps {
+  readonly value: string;
+  readonly onSelect: (value: string) => void;
+  readonly onClose: () => void;
+  readonly availableValues: readonly string[];
+}
+
+const MAX_TYPEAHEAD_RESULTS = 20;
+
+const TypeaheadInput: React.FC<TypeaheadInputProps> = ({ value, onSelect, onClose, availableValues }) => {
+  const [text, setText] = useState(value);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
+  const filtered = text.trim()
+    ? availableValues.filter((v) => v.toLowerCase().includes(text.trim().toLowerCase())).slice(0, MAX_TYPEAHEAD_RESULTS)
+    : [];
+
+  const handleApply = useCallback(() => {
+    if (text.trim()) {
+      onSelect(text.trim());
+    }
+  }, [text, onSelect]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightIndex((i) => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightIndex((i) => Math.max(i - 1, -1));
+    } else if (e.key === 'Enter') {
+      const highlighted = filtered[highlightIndex];
+      if (highlightIndex >= 0 && highlighted !== undefined) {
+        onSelect(highlighted);
+      } else {
+        handleApply();
+      }
+    } else if (e.key === 'Escape') {
+      e.stopPropagation();
+      onClose();
+    }
+  }, [handleApply, onClose, filtered, highlightIndex, onSelect]);
+
+  // Reset highlight when text changes
+  useEffect(() => {
+    setHighlightIndex(-1);
+  }, [text]);
+
+  return (
+    <div ref={containerRef} className="debrief-value-editor__typeahead" data-testid="value-editor-typeahead">
+      <input
+        ref={inputRef}
+        type="text"
+        className="debrief-value-editor__input"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Type to filter..."
+        data-testid="value-editor-typeahead-input"
+      />
+      {filtered.length > 0 && (
+        <div className="debrief-value-editor__dropdown" data-testid="value-editor-typeahead-list">
+          {filtered.map((v, i) => (
+            <button
+              key={v}
+              className={`debrief-value-editor__option ${v === value ? 'debrief-value-editor__option--selected' : ''} ${i === highlightIndex ? 'debrief-value-editor__option--highlighted' : ''}`}
+              data-testid={`value-option-${v}`}
+              onClick={() => onSelect(v)}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      )}
+      {text.trim() && filtered.length === 0 && (
+        <div className="debrief-value-editor__dropdown">
+          <div className="debrief-value-editor__empty">No matches</div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 interface FreeTextInputProps {
