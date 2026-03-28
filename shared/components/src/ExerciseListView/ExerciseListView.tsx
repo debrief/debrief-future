@@ -1,5 +1,6 @@
 /**
- * ExerciseListView — main container with virtualised scrolling, sort, recently opened (#129).
+ * ExerciseListView — main container with virtualised scrolling, sort, text search,
+ * and recently opened (#129).
  *
  * Review decisions: 4B (inline sort + recent), 3B (lazy GeoJSON), 11A (AbortController).
  */
@@ -36,6 +37,9 @@ const DEFAULT_DIRECTIONS: Record<SortDimension, SortDirection> = {
 /** Row height estimate for virtualiser. */
 const ROW_HEIGHT = 80;
 
+/** Maximum number of autocomplete suggestions to show. */
+const MAX_SUGGESTIONS = 8;
+
 export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   items,
   recentItems = [],
@@ -47,14 +51,44 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   height,
 }) => {
   const [sort, setSort] = useState<SortConfiguration>(initialSort ?? DEFAULT_SORT);
+  const [searchText, setSearchText] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLUListElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Track which items have had their GeoJSON requested
   const requestedRef = useRef(new Set<string>());
 
+  // Text filter: case-insensitive substring match on title and id
+  const searchLower = searchText.toLowerCase();
+  const filteredItems = useMemo(() => {
+    if (!searchLower) return items;
+    return items.filter(
+      (item) =>
+        item.title.toLowerCase().includes(searchLower) ||
+        item.id.toLowerCase().includes(searchLower),
+    );
+  }, [items, searchLower]);
+
+  // Autocomplete suggestions: unique titles matching the search text
+  const suggestions = useMemo(() => {
+    if (!searchLower || searchLower.length < 1) return [];
+    return items
+      .filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchLower) ||
+          item.id.toLowerCase().includes(searchLower),
+      )
+      .map((item) => item.title)
+      .filter((title, i, arr) => arr.indexOf(title) === i) // deduplicate
+      .slice(0, MAX_SUGGESTIONS);
+  }, [items, searchLower]);
+
   // Sort items
   const sortedItems = useMemo(() => {
-    const arr = [...items];
+    const arr = [...filteredItems];
     const comparator = sortComparators[sort.dimension];
     arr.sort((a, b) => {
       const result = comparator(a, b);
@@ -65,7 +99,7 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
           : result;
     });
     return arr;
-  }, [items, sort]);
+  }, [filteredItems, sort]);
 
   // Virtualiser
   const virtualizer = useVirtualizer({
@@ -99,6 +133,58 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
       }
       return { dimension, direction: DEFAULT_DIRECTIONS[dimension] };
     });
+  }, []);
+
+  // Search handlers
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+    setShowSuggestions(true);
+    setActiveSuggestion(-1);
+  }, []);
+
+  const handleSuggestionSelect = useCallback((title: string) => {
+    setSearchText(title);
+    setShowSuggestions(false);
+    setActiveSuggestion(-1);
+  }, []);
+
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!showSuggestions || suggestions.length === 0) {
+        if (e.key === 'Escape') {
+          setSearchText('');
+          setShowSuggestions(false);
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveSuggestion((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveSuggestion((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+      } else if (e.key === 'Enter' && activeSuggestion >= 0) {
+        e.preventDefault();
+        handleSuggestionSelect(suggestions[activeSuggestion]);
+      } else if (e.key === 'Escape') {
+        setShowSuggestions(false);
+        setActiveSuggestion(-1);
+      }
+    },
+    [showSuggestions, suggestions, activeSuggestion, handleSuggestionSelect],
+  );
+
+  const handleSearchBlur = useCallback(() => {
+    // Delay to allow click on suggestion to register
+    setTimeout(() => setShowSuggestions(false), 150);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchText('');
+    setShowSuggestions(false);
+    setActiveSuggestion(-1);
+    searchRef.current?.focus();
   }, []);
 
   const containerClass = ['exercise-list-view', className].filter(Boolean).join(' ');
@@ -141,6 +227,70 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
         ))}
       </div>
 
+      {/* Search Bar */}
+      <div className="exercise-list-view__search-bar" data-testid="search-bar">
+        <div className="exercise-list-view__search-wrapper">
+          <span className="exercise-list-view__search-icon" aria-hidden="true">&#x1F50D;</span>
+          <input
+            ref={searchRef}
+            type="text"
+            className="exercise-list-view__search-input"
+            data-testid="search-input"
+            placeholder="Filter by name..."
+            value={searchText}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            onFocus={() => searchText && setShowSuggestions(true)}
+            onBlur={handleSearchBlur}
+            aria-label="Filter exercises by name"
+            aria-autocomplete="list"
+            aria-controls={showSuggestions && suggestions.length > 0 ? 'search-suggestions' : undefined}
+            aria-activedescendant={activeSuggestion >= 0 ? `suggestion-${activeSuggestion}` : undefined}
+            role="combobox"
+            aria-expanded={showSuggestions && suggestions.length > 0}
+          />
+          {searchText && (
+            <button
+              className="exercise-list-view__search-clear"
+              data-testid="search-clear"
+              onClick={handleClearSearch}
+              aria-label="Clear search"
+            >
+              &#x2715;
+            </button>
+          )}
+          {showSuggestions && suggestions.length > 0 && (
+            <ul
+              ref={suggestionsRef}
+              id="search-suggestions"
+              className="exercise-list-view__suggestions"
+              data-testid="search-suggestions"
+              role="listbox"
+            >
+              {suggestions.map((title, i) => (
+                <li
+                  key={title}
+                  id={`suggestion-${i}`}
+                  className={`exercise-list-view__suggestion${i === activeSuggestion ? ' exercise-list-view__suggestion--active' : ''}`}
+                  data-testid="search-suggestion"
+                  role="option"
+                  aria-selected={i === activeSuggestion}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => handleSuggestionSelect(title)}
+                >
+                  {title}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {searchText && (
+          <span className="exercise-list-view__search-count" data-testid="search-count">
+            {filteredItems.length} of {items.length}
+          </span>
+        )}
+      </div>
+
       {/* Recently Opened Section */}
       {recentItems.length > 0 && (
         <div className="exercise-list-view__recent" data-testid="recent-section">
@@ -180,42 +330,53 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
         className="exercise-list-view__scroll"
         data-testid="exercise-list-scroll"
       >
-        <div
-          className="exercise-list-view__content"
-          style={{
-            height: `${virtualizer.getTotalSize()}px`,
-            position: 'relative',
-            width: '100%',
-          }}
-        >
-          {visibleItems.map((virtualItem) => {
-            const item = sortedItems[virtualItem.index];
-            if (!item) return null;
+        {sortedItems.length === 0 && searchText ? (
+          <div className="exercise-list-view__empty">
+            <div className="exercise-list-view__empty-message">
+              No matches for &ldquo;{searchText}&rdquo;
+            </div>
+            <div className="exercise-list-view__empty-hint">
+              Try a different search term.
+            </div>
+          </div>
+        ) : (
+          <div
+            className="exercise-list-view__content"
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              position: 'relative',
+              width: '100%',
+            }}
+          >
+            {visibleItems.map((virtualItem) => {
+              const item = sortedItems[virtualItem.index];
+              if (!item) return null;
 
-            return (
-              <div
-                key={virtualItem.key}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-              >
-                <ExerciseListItemRow
-                  item={item}
-                  trackData={trackData?.get(item.id) ?? null}
-                  trackDataLoading={
-                    requestedRef.current.has(item.id) && !trackData?.has(item.id)
-                  }
-                  onSelect={onItemSelect}
-                />
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <div
+                  key={virtualItem.key}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: `${virtualItem.size}px`,
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  <ExerciseListItemRow
+                    item={item}
+                    trackData={trackData?.get(item.id) ?? null}
+                    trackDataLoading={
+                      requestedRef.current.has(item.id) && !trackData?.has(item.id)
+                    }
+                    onSelect={onItemSelect}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
