@@ -228,6 +228,11 @@ def import_legacy_data(
             for w in parse_result.warnings:
                 result.warnings.append(ImportWarning(file=file_rel, code=w.code, message=w.message))
 
+            # Schema-validate at parser_output boundary (warn-and-continue)
+            schema_warnings = parse_result.schema_validate_features()
+            for sw in schema_warnings:
+                result.warnings.append(ImportWarning(file=file_rel, code=sw.code, message=sw.message))
+
             if not parse_result.features:
                 result.warnings.append(
                     ImportWarning(

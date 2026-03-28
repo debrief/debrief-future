@@ -230,8 +230,8 @@ class TestImportLegacyData:
         assert result.total_tracks > 0
         assert catalog.exists()
 
-    def test_import_dpf_files(self, tmp_path: Path) -> None:
-        """Import DPF fixtures into STAC catalog."""
+    def test_import_dpf_files_rejected_by_schema(self, tmp_path: Path) -> None:
+        """DPF files containing SENSOR_CONTACT/TMA_SOLUTION features are rejected."""
         source = tmp_path / "source"
         source.mkdir()
         for dpf_file in FIXTURES.glob("*.dpf"):
@@ -241,11 +241,11 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed > 0
-        assert result.files_succeeded > 0
-        assert result.total_tracks > 0
+        # DPF files produce SENSOR_CONTACT and TMA_SOLUTION kinds not in schema
+        assert result.files_failed > 0
 
-    def test_import_dsf_files(self, tmp_path: Path) -> None:
-        """Import DSF fixtures into STAC catalog."""
+    def test_import_dsf_files_rejected_by_schema(self, tmp_path: Path) -> None:
+        """DSF files produce SENSOR_CONTACT features which are rejected at catalog_write."""
         source = tmp_path / "source"
         source.mkdir()
         for dsf_file in FIXTURES.glob("*.dsf"):
@@ -255,10 +255,17 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed > 0
-        assert result.files_succeeded > 0
+        # DSF files fail because SENSOR_CONTACT is not a valid FeatureKindEnum
+        assert result.files_failed > 0
+        assert result.files_succeeded == 0
+        assert any("SENSOR_CONTACT" in e.error for e in result.errors)
 
     def test_import_mixed_formats(self, tmp_path: Path) -> None:
-        """Import a mix of REP, DPF, and DSF files."""
+        """Import a mix of REP, DPF, and DSF files.
+
+        REP files succeed (TRACK-only). DPF and DSF files fail because they
+        produce SENSOR_CONTACT / TMA_SOLUTION features rejected at catalog_write.
+        """
         source = tmp_path / "source"
         source.mkdir()
 
@@ -271,8 +278,9 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed == 3
-        assert result.files_succeeded == 3
-        assert result.files_failed == 0
+        # REP succeeds; DPF and DSF fail (invalid feature kinds)
+        assert result.files_succeeded >= 1
+        assert result.files_failed >= 2
 
     def test_domain_in_plot_id(self, tmp_path: Path) -> None:
         """Verify domain detection creates correct plot IDs."""
@@ -348,6 +356,38 @@ class TestImportLegacyData:
             assert entry["used"] == []
             assert feature.get("id") in entry["generated"]
             assert entry["execution_duration"].startswith("PT")
+
+
+class TestSchemaValidationInImport:
+    """Tests for schema validation at import time."""
+
+    def test_import_reports_schema_warnings(self, tmp_path: Path) -> None:
+        """Schema validation warnings appear in import result for DSF files."""
+        source = tmp_path / "source"
+        source.mkdir()
+        for dsf_file in FIXTURES.glob("*.dsf"):
+            (source / dsf_file.name).write_text(dsf_file.read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        # Schema warnings are collected (parser_output boundary, warn-and-continue)
+        schema_warns = [w for w in result.warnings if w.code == "SCHEMA_VALIDATION"]
+        assert len(schema_warns) > 0
+
+    def test_import_records_error_for_invalid_features(self, tmp_path: Path) -> None:
+        """Files producing invalid features are recorded as errors, not successes."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "sensor.dsf").write_text((FIXTURES / "sen_frig_sensor.dsf").read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_failed == 1
+        assert result.files_succeeded == 0
+        assert len(result.errors) == 1
+        assert "SENSOR_CONTACT" in result.errors[0].error
 
 
 class TestGenerateReport:

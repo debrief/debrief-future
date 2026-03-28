@@ -6,6 +6,37 @@ from pathlib import Path
 import pytest
 
 
+def _write_features_raw(catalog_path: Path, plot_id: str, features: list[dict]) -> None:
+    """Write features directly, bypassing schema validation."""
+    from debrief_stac.features import _bbox_to_polygon, _calculate_bbox
+    from debrief_stac.plot import _save_plot, read_plot
+
+    plot_dir = Path(catalog_path) / plot_id
+    features_path = plot_dir / "features.geojson"
+    if features_path.exists():
+        with open(features_path) as f:
+            fc = json.load(f)
+    else:
+        fc = {"type": "FeatureCollection", "features": []}
+    fc["features"].extend(features)
+    with open(features_path, "w") as f:
+        json.dump(fc, f, indent=2)
+
+    # Update item bbox and assets (mimic add_features)
+    item = read_plot(catalog_path, plot_id)
+    item["assets"]["features"] = {
+        "href": "./features.geojson",
+        "type": "application/geo+json",
+        "title": "GeoJSON Features",
+        "roles": ["data"],
+    }
+    bbox = _calculate_bbox(fc["features"])
+    if bbox:
+        item["bbox"] = list(bbox)
+        item["geometry"] = _bbox_to_polygon(bbox)
+    _save_plot(catalog_path, plot_id, item)
+
+
 class TestGeometryTypes:
     """Tests for various GeoJSON geometry types in features."""
 
@@ -23,11 +54,16 @@ class TestGeometryTypes:
         features = [
             {
                 "type": "Feature",
+                "id": "mp-001",
                 "geometry": {
                     "type": "MultiPoint",
                     "coordinates": [[0, 0], [1, 1], [2, 2]],
                 },
-                "properties": {"name": "multipoint"},
+                "properties": {
+                    "kind": "MULTI_POINT",
+                    "label": "multipoint",
+                    "style": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                },
             }
         ]
         add_features(catalog_path, plot_id, features)
@@ -38,7 +74,6 @@ class TestGeometryTypes:
     def test_add_features_multilinestring(self, tmp_path: Path) -> None:
         """Test adding MultiLineString geometry."""
         from debrief_stac.catalog import create_catalog
-        from debrief_stac.features import add_features
         from debrief_stac.models import PlotMetadata
         from debrief_stac.plot import create_plot, read_plot
 
@@ -59,7 +94,7 @@ class TestGeometryTypes:
                 "properties": {"name": "multilinestring"},
             }
         ]
-        add_features(catalog_path, plot_id, features)
+        _write_features_raw(catalog_path, plot_id, features)
 
         item = read_plot(catalog_path, plot_id)
         assert item["bbox"] == [0, 0, 3, 3]
@@ -78,6 +113,7 @@ class TestGeometryTypes:
         features = [
             {
                 "type": "Feature",
+                "id": "mpoly-001",
                 "geometry": {
                     "type": "MultiPolygon",
                     "coordinates": [
@@ -85,7 +121,11 @@ class TestGeometryTypes:
                         [[[2, 2], [3, 2], [3, 3], [2, 3], [2, 2]]],
                     ],
                 },
-                "properties": {"name": "multipolygon"},
+                "properties": {
+                    "kind": "MULTI_POLYGON",
+                    "label": "multipolygon",
+                    "style": {"fill_color": "#0066CC", "color": "#FFF"},
+                },
             }
         ]
         add_features(catalog_path, plot_id, features)
@@ -107,8 +147,14 @@ class TestGeometryTypes:
         features = [
             {
                 "type": "Feature",
+                "id": "narr-001",
                 "geometry": None,
-                "properties": {"name": "no geometry"},
+                "properties": {
+                    "kind": "NARRATIVE",
+                    "time": "2026-01-09T10:00:00Z",
+                    "text": "no geometry",
+                    "style": {"shape": "circle", "radius": 4, "fill_color": "#999", "color": "#000"},
+                },
             }
         ]
         add_features(catalog_path, plot_id, features)
@@ -120,7 +166,6 @@ class TestGeometryTypes:
     def test_add_features_unknown_geometry_type(self, tmp_path: Path) -> None:
         """Test adding feature with unknown geometry type."""
         from debrief_stac.catalog import create_catalog
-        from debrief_stac.features import add_features
         from debrief_stac.models import PlotMetadata
         from debrief_stac.plot import create_plot, read_plot
 
@@ -128,7 +173,7 @@ class TestGeometryTypes:
         metadata = PlotMetadata(title="Unknown Geometry Test")
         plot_id = create_plot(catalog_path, metadata)
 
-        # First add valid feature
+        # Bypass schema validation - tests bbox calculation with unknown geometry types
         features = [
             {
                 "type": "Feature",
@@ -141,7 +186,7 @@ class TestGeometryTypes:
                 "properties": {"name": "unknown geometry type"},
             },
         ]
-        add_features(catalog_path, plot_id, features)
+        _write_features_raw(catalog_path, plot_id, features)
 
         item = read_plot(catalog_path, plot_id)
         # Only gets bbox from valid Point
@@ -280,8 +325,14 @@ class TestMCPTools:
             features=[
                 {
                     "type": "Feature",
+                    "id": "ref-001",
                     "geometry": {"type": "Point", "coordinates": [0, 0]},
-                    "properties": {},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": "Test Point",
+                        "location_type": "WAYPOINT",
+                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    },
                 }
             ],
         )

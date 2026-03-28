@@ -54,6 +54,7 @@ class TestFullWorkflow:
         track_features = [
             {
                 "type": "Feature",
+                "id": "track-alpha",
                 "geometry": {
                     "type": "LineString",
                     "coordinates": [
@@ -64,20 +65,34 @@ class TestFullWorkflow:
                     ],
                 },
                 "properties": {
-                    "name": "Track Alpha",
-                    "mmsi": "123456789",
-                    "vessel_type": "cargo",
+                    "kind": "TRACK",
+                    "platform_id": "VESSEL-ALPHA",
+                    "track_type": "OWNSHIP",
+                    "start_time": "2026-01-09T10:00:00Z",
+                    "end_time": "2026-01-09T12:00:00Z",
+                    "positions": [
+                        {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12},
+                        {"time": "2026-01-09T12:00:00Z", "course": 45, "speed": 12},
+                    ],
+                    "style": {
+                        "line": {"color": "#0066CC"},
+                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                    },
+                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
                 },
             },
             {
                 "type": "Feature",
+                "id": "ref-point-1",
                 "geometry": {
                     "type": "Point",
                     "coordinates": [-4.2, 50.3],
                 },
                 "properties": {
+                    "kind": "POINT",
                     "name": "Reference Point",
-                    "type": "waypoint",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
                 },
             },
         ]
@@ -161,8 +176,14 @@ class TestFullWorkflow:
         batch1 = [
             {
                 "type": "Feature",
+                "id": "ref-b1",
                 "geometry": {"type": "Point", "coordinates": [0, 0]},
-                "properties": {"batch": 1},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Batch 1",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             }
         ]
         count1 = add_features(catalog_path, plot_id, batch1)
@@ -172,13 +193,25 @@ class TestFullWorkflow:
         batch2 = [
             {
                 "type": "Feature",
+                "id": "ref-b2a",
                 "geometry": {"type": "Point", "coordinates": [1, 1]},
-                "properties": {"batch": 2},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Batch 2a",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             },
             {
                 "type": "Feature",
+                "id": "ref-b2b",
                 "geometry": {"type": "Point", "coordinates": [2, 2]},
-                "properties": {"batch": 2},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Batch 2b",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             },
         ]
         count2 = add_features(catalog_path, plot_id, batch2)
@@ -206,28 +239,50 @@ class TestFullWorkflow:
         tracks = [
             {
                 "type": "Feature",
+                "id": "track-alpha",
                 "geometry": {
                     "type": "LineString",
                     "coordinates": [[-5.0, 50.0], [-4.5, 50.2], [-4.0, 50.5]],
                 },
                 "properties": {
-                    "name": "Track Alpha",
                     "kind": "TRACK",
+                    "platform_id": "VESSEL-ALPHA",
+                    "track_type": "OWNSHIP",
                     "start_time": "2022-08-27T09:00:00Z",
                     "end_time": "2022-09-01T12:00:00Z",
+                    "positions": [
+                        {"time": "2022-08-27T09:00:00Z", "course": 45, "speed": 12},
+                        {"time": "2022-09-01T12:00:00Z", "course": 45, "speed": 12},
+                    ],
+                    "style": {
+                        "line": {"color": "#0066CC"},
+                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                    },
+                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
                 },
             },
             {
                 "type": "Feature",
+                "id": "track-bravo",
                 "geometry": {
                     "type": "LineString",
                     "coordinates": [[-3.0, 51.0], [-2.5, 51.2]],
                 },
                 "properties": {
-                    "name": "Track Bravo",
                     "kind": "TRACK",
+                    "platform_id": "VESSEL-BRAVO",
+                    "track_type": "OWNSHIP",
                     "start_time": "2022-08-30T06:00:00Z",
                     "end_time": "2022-09-10T16:44:49Z",
+                    "positions": [
+                        {"time": "2022-08-30T06:00:00Z", "course": 90, "speed": 10},
+                        {"time": "2022-09-10T16:44:49Z", "course": 90, "speed": 10},
+                    ],
+                    "style": {
+                        "line": {"color": "#CC0000"},
+                        "point": {"shape": "circle", "radius": 4, "fill_color": "#CC0000", "color": "#FFF"},
+                    },
+                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
                 },
             },
         ]
@@ -262,8 +317,14 @@ class TestFullWorkflow:
             features = [
                 {
                     "type": "Feature",
+                    "id": f"ref-{i}",
                     "geometry": {"type": "Point", "coordinates": [i, i]},
-                    "properties": {"index": i},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": f"Point {i}",
+                        "location_type": "WAYPOINT",
+                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    },
                 }
             ]
             add_features(catalog_path, plot_id, features)

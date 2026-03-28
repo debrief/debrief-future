@@ -116,16 +116,39 @@ class TestSTACItemValidation:
         features = [
             {
                 "type": "Feature",
+                "id": "track-alpha",
                 "geometry": {
                     "type": "LineString",
                     "coordinates": [[-5.0, 50.0], [-4.0, 51.0], [-3.0, 50.5]],
                 },
-                "properties": {"name": "Track Alpha"},
+                "properties": {
+                    "kind": "TRACK",
+                    "platform_id": "VESSEL-A",
+                    "platform_name": "Track Alpha",
+                    "track_type": "OWNSHIP",
+                    "start_time": "2026-01-09T10:00:00Z",
+                    "end_time": "2026-01-09T12:00:00Z",
+                    "positions": [
+                        {"time": "2026-01-09T10:00:00Z", "course": 45.0, "speed": 12.0},
+                        {"time": "2026-01-09T12:00:00Z", "course": 50.0, "speed": 13.0},
+                    ],
+                    "style": {
+                        "line": {"color": "#0066CC"},
+                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                    },
+                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                },
             },
             {
                 "type": "Feature",
+                "id": "ref-point-1",
                 "geometry": {"type": "Point", "coordinates": [-4.5, 50.5]},
-                "properties": {"name": "Reference Point"},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Reference Point",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             },
         ]
         add_features(catalog_path, plot_id, features)
@@ -197,8 +220,14 @@ class TestSTACFullWorkflowValidation:
             features = [
                 {
                     "type": "Feature",
+                    "id": f"ref-{i}",
                     "geometry": {"type": "Point", "coordinates": [i, i]},
-                    "properties": {"index": i},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": f"Point {i}",
+                        "location_type": "WAYPOINT",
+                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    },
                 }
             ]
             add_features(catalog_path, plot_id, features)
@@ -328,8 +357,14 @@ class TestSTACStructuralValidation:
         features = [
             {
                 "type": "Feature",
+                "id": "ref-geom-1",
                 "geometry": {"type": "Point", "coordinates": [0, 0]},
-                "properties": {},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Test Point",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             }
         ]
         add_features(catalog_path, plot_id, features)
@@ -359,8 +394,14 @@ class TestSTACStructuralValidation:
         features = [
             {
                 "type": "Feature",
+                "id": "ref-asset-1",
                 "geometry": {"type": "Point", "coordinates": [0, 0]},
-                "properties": {},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Test Point",
+                    "location_type": "WAYPOINT",
+                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                },
             }
         ]
         add_features(catalog_path, plot_id, features)
