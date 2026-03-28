@@ -103,9 +103,7 @@ def merge_sensor_into_track(
             if asset_file.is_file():
                 dest = track_assets_dir / asset_file.name
                 shutil.copy2(asset_file, dest)
-                logger.info(
-                    "Copied asset %s -> %s", asset_file.name, track_plot_id
-                )
+                logger.info("Copied asset %s -> %s", asset_file.name, track_plot_id)
 
     # Copy asset metadata from sensor item.json to track item.json
     sensor_item = read_plot(catalog_path, sensor_plot_id)
