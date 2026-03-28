@@ -76,9 +76,18 @@ class TestFullWorkflow:
                     ],
                     "style": {
                         "line": {"color": "#0066CC"},
-                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#0066CC",
+                            "color": "#FFF",
+                        },
                     },
-                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
                 },
             },
             {
@@ -92,7 +101,12 @@ class TestFullWorkflow:
                     "kind": "POINT",
                     "name": "Reference Point",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             },
         ]
@@ -182,7 +196,12 @@ class TestFullWorkflow:
                     "kind": "POINT",
                     "name": "Batch 1",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             }
         ]
@@ -199,7 +218,12 @@ class TestFullWorkflow:
                     "kind": "POINT",
                     "name": "Batch 2a",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             },
             {
@@ -210,7 +234,12 @@ class TestFullWorkflow:
                     "kind": "POINT",
                     "name": "Batch 2b",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             },
         ]
@@ -256,9 +285,18 @@ class TestFullWorkflow:
                     ],
                     "style": {
                         "line": {"color": "#0066CC"},
-                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#0066CC",
+                            "color": "#FFF",
+                        },
                     },
-                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
                 },
             },
             {
@@ -280,9 +318,18 @@ class TestFullWorkflow:
                     ],
                     "style": {
                         "line": {"color": "#CC0000"},
-                        "point": {"shape": "circle", "radius": 4, "fill_color": "#CC0000", "color": "#FFF"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#CC0000",
+                            "color": "#FFF",
+                        },
                     },
-                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
                 },
             },
         ]
@@ -323,7 +370,12 @@ class TestFullWorkflow:
                         "kind": "POINT",
                         "name": f"Point {i}",
                         "location_type": "WAYPOINT",
-                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
                     },
                 }
             ]

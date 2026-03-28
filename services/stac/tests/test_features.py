@@ -184,7 +184,9 @@ def catalog_with_features(tmp_path: Path) -> tuple[Path, str]:
 class TestUpdateFeatures:
     def test_update_existing_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
-        updated = make_sample_reference_location(feature_id="track_a", name="Updated A", lon=99.0, lat=99.0)
+        updated = make_sample_reference_location(
+            feature_id="track_a", name="Updated A", lon=99.0, lat=99.0
+        )
         count = update_features(str(catalog_path), plot_id, [updated])
         assert count == 1
 

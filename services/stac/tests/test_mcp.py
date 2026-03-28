@@ -149,7 +149,12 @@ class TestMCPToolIntegration:
                     "kind": "POINT",
                     "name": "Test Point",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             }
         ]

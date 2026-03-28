@@ -134,9 +134,18 @@ class TestSTACItemValidation:
                     ],
                     "style": {
                         "line": {"color": "#0066CC"},
-                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#0066CC",
+                            "color": "#FFF",
+                        },
                     },
-                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
                 },
             },
             {
@@ -147,7 +156,12 @@ class TestSTACItemValidation:
                     "kind": "POINT",
                     "name": "Reference Point",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             },
         ]
@@ -226,7 +240,12 @@ class TestSTACFullWorkflowValidation:
                         "kind": "POINT",
                         "name": f"Point {i}",
                         "location_type": "WAYPOINT",
-                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
                     },
                 }
             ]
@@ -363,7 +382,12 @@ class TestSTACStructuralValidation:
                     "kind": "POINT",
                     "name": "Test Point",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             }
         ]
@@ -400,7 +424,12 @@ class TestSTACStructuralValidation:
                     "kind": "POINT",
                     "name": "Test Point",
                     "location_type": "WAYPOINT",
-                    "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
                 },
             }
         ]

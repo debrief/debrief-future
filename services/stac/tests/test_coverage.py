@@ -62,7 +62,12 @@ class TestGeometryTypes:
                 "properties": {
                     "kind": "MULTI_POINT",
                     "label": "multipoint",
-                    "style": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 4,
+                        "fill_color": "#0066CC",
+                        "color": "#FFF",
+                    },
                 },
             }
         ]
@@ -153,7 +158,12 @@ class TestGeometryTypes:
                     "kind": "NARRATIVE",
                     "time": "2026-01-09T10:00:00Z",
                     "text": "no geometry",
-                    "style": {"shape": "circle", "radius": 4, "fill_color": "#999", "color": "#000"},
+                    "style": {
+                        "shape": "circle",
+                        "radius": 4,
+                        "fill_color": "#999",
+                        "color": "#000",
+                    },
                 },
             }
         ]
@@ -331,7 +341,12 @@ class TestMCPTools:
                         "kind": "POINT",
                         "name": "Test Point",
                         "location_type": "WAYPOINT",
-                        "style": {"shape": "circle", "radius": 6, "fill_color": "#FF5733", "color": "#000"},
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
                     },
                 }
             ],

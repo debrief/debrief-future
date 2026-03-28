@@ -50,9 +50,18 @@ def config_with_stores(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
                     ],
                     "style": {
                         "line": {"color": "#0066CC"},
-                        "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#0066CC",
+                            "color": "#FFF",
+                        },
                     },
-                    "default_position_style": {"show_symbol": False, "symbol": "circle", "show_label": False},
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
                 },
             }
         ],
