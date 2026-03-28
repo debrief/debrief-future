@@ -1,5 +1,6 @@
 /**
  * React app entry point for Debrief Web Shell.
+ * Data quality: sensor-only plots merged into track companions, timestamps fixed.
  */
 
 import { StrictMode } from 'react';
