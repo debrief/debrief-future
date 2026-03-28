@@ -110,6 +110,19 @@
         "load_timestamp": "2026-03-21T10:15:01.554083Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-s2r-freq--contact-bearings-source-Contact_bearings": {
+      "href": "./assets/Contact_bearings.dsf",
+      "type": "application/octet-stream",
+      "title": "Contact_bearings.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/freq/Contact_bearings.dsf",
+        "load_timestamp": "2026-03-21T10:15:01.472252Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

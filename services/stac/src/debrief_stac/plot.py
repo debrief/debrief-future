@@ -157,18 +157,19 @@ def update_temporal_metadata(
     catalog_path: CatalogPath,
     plot_id: str,
 ) -> TemporalExtent | None:
-    """Compute temporal extent from track features and update the STAC Item.
+    """Compute temporal extent from all features and update the STAC Item.
 
-    Scans the plot's features.geojson for TRACK features with start_time/end_time
-    properties, computes the global min/max, and writes datetime, start_datetime,
-    end_datetime to the item properties.
+    Scans the plot's features.geojson for temporal data across all feature
+    types: TRACK (start_time/end_time), sensor contacts and narratives
+    (time), and annotations (time_start/time_end). Computes the global
+    min/max and writes datetime, start_datetime, end_datetime to the item.
 
     Args:
         catalog_path: Path to the catalog directory
         plot_id: ID of the plot to update
 
     Returns:
-        TemporalExtent if tracks with temporal data found, None otherwise
+        TemporalExtent if features with temporal data found, None otherwise
     """
     catalog_path = Path(catalog_path)
     item = read_plot(catalog_path, plot_id)
@@ -181,25 +182,39 @@ def update_temporal_metadata(
     with open(features_path) as f:
         fc = json.load(f)
 
-    # Scan TRACK features for temporal data
-    start_times: list[str] = []
-    end_times: list[str] = []
+    # Collect all timestamps from all feature types
+    all_times: list[str] = []
 
     for feature in fc.get("features", []):
         props = feature.get("properties") or {}
-        if props.get("kind") != "TRACK":
-            continue
-        st = props.get("start_time")
-        et = props.get("end_time")
-        if st and et:
-            start_times.append(st)
-            end_times.append(et)
+        kind = props.get("kind", "")
 
-    if not start_times:
+        if kind == "TRACK":
+            # Tracks have explicit start/end range
+            st = props.get("start_time")
+            et = props.get("end_time")
+            if st:
+                all_times.append(st)
+            if et:
+                all_times.append(et)
+        else:
+            # Sensor contacts, narratives: "time" or "timestamp" property
+            t = props.get("time") or props.get("timestamp")
+            if t:
+                all_times.append(t)
+            # Annotations (PERIODTEXT, TIMETEXT, etc.): time_start/time_end
+            ts = props.get("time_start")
+            te = props.get("time_end")
+            if ts:
+                all_times.append(ts)
+            if te:
+                all_times.append(te)
+
+    if not all_times:
         return None
 
-    earliest = min(start_times)
-    latest = max(end_times)
+    earliest = min(all_times)
+    latest = max(all_times)
 
     # Update item properties
     item["properties"]["datetime"] = earliest

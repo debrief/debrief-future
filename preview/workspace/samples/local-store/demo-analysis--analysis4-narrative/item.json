@@ -9,7 +9,7 @@
   "bbox": null,
   "properties": {
     "title": "Joint Warrior: Analysis4 Narrative",
-    "datetime": "2026-03-21T10:15:00.173026+00:00",
+    "datetime": "1995-12-12T05:00:00+00:00",
     "description": "Joint Warrior: Analysis4 Narrative \u2014 Analysis and review exercise in the North Atlantic. 21 narrative entries.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
@@ -25,7 +25,9 @@
       "intercept"
     ],
     "debrief:track_names": [],
-    "debrief:nationalities": []
+    "debrief:nationalities": [],
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:25:00+00:00"
   },
   "links": [
     {

@@ -40,10 +40,10 @@
   ],
   "properties": {
     "title": "Dynamic Mongoose: Ambig Tracks2",
-    "datetime": "2010-01-12T12:08:00+00:00",
+    "datetime": "2010-01-12T12:00:00+00:00",
     "description": "Dynamic Mongoose: Ambig Tracks2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 4 platform track(s) recorded including Contact Alpha, HMS Richmond, Contact Alpha and 1 other(s). 242 sensor contact(s) logged. Multi-national participation: FR, GB.",
-    "start_datetime": "2010-01-12T12:08:00+00:00",
-    "end_datetime": "2010-01-12T15:54:00+00:00",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T16:00:00+00:00",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssn/astute",
       "surface/warship/frigate/type23"

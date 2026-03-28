@@ -110,6 +110,19 @@
         "load_timestamp": "2026-03-21T10:15:00.471216Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-s2r-2553-missing-sensor-data--bluesensorbrg-source-BlueSensorBrg": {
+      "href": "./assets/BlueSensorBrg.dsf",
+      "type": "application/octet-stream",
+      "title": "BlueSensorBrg.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2553_missing_sensor_data/BlueSensorBrg.dsf",
+        "load_timestamp": "2026-03-21T10:15:00.465956Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

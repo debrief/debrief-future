@@ -64,18 +64,6 @@
     },
     {
       "rel": "item",
-      "href": "./demo-review--review2-sensor1/item.json",
-      "type": "application/geo+json",
-      "title": "Review2_Sensor1 (demo/review)"
-    },
-    {
-      "rel": "item",
-      "href": "./demo-review--review3-sensor2/item.json",
-      "type": "application/geo+json",
-      "title": "Review3_Sensor2 (demo/review)"
-    },
-    {
-      "rel": "item",
       "href": "./demo-trialsplanning--trialsplanning3-hits/item.json",
       "type": "application/geo+json",
       "title": "TrialsPlanning3_hits (demo/trialsplanning)"
@@ -166,12 +154,6 @@
     },
     {
       "rel": "item",
-      "href": "./s2r-2553-missing-sensor-data--bluesensorbrg/item.json",
-      "type": "application/geo+json",
-      "title": "BlueSensorBrg (s2r/2553-missing-sensor-data)"
-    },
-    {
-      "rel": "item",
       "href": "./s2r-2553-missing-sensor-data--bluetrack/item.json",
       "type": "application/geo+json",
       "title": "BlueTrack (s2r/2553-missing-sensor-data)"
@@ -226,18 +208,6 @@
     },
     {
       "rel": "item",
-      "href": "./s2r--ambig-tracks-hover-north-hm/item.json",
-      "type": "application/geo+json",
-      "title": "Ambig_tracks_hover_north_HM (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--ambig-tracks-hover-north-ta/item.json",
-      "type": "application/geo+json",
-      "title": "Ambig_tracks_hover_north_TA (s2r)"
-    },
-    {
-      "rel": "item",
       "href": "./s2r--polyline-measurement/item.json",
       "type": "application/geo+json",
       "title": "Polyline_Measurement (s2r)"
@@ -247,12 +217,6 @@
       "href": "./s2r--dodgy-track/item.json",
       "type": "application/geo+json",
       "title": "dodgy_track (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r-freq--contact-bearings/item.json",
-      "type": "application/geo+json",
-      "title": "Contact_bearings (s2r/freq)"
     },
     {
       "rel": "item",
@@ -328,12 +292,6 @@
     },
     {
       "rel": "item",
-      "href": "./s2r--sensor/item.json",
-      "type": "application/geo+json",
-      "title": "sensor (s2r)"
-    },
-    {
-      "rel": "item",
       "href": "./s2r-smooth-back-jumps--jumps/item.json",
       "type": "application/geo+json",
       "title": "jumps (s2r/smooth-back-jumps)"
@@ -376,24 +334,6 @@
     },
     {
       "rel": "item",
-      "href": "./satc--b-rate-sensor/item.json",
-      "type": "application/geo+json",
-      "title": "B_Rate_Sensor (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--bluesensor/item.json",
-      "type": "application/geo+json",
-      "title": "BlueSensor (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--bluesensor-sparse/item.json",
-      "type": "application/geo+json",
-      "title": "BlueSensor_sparse (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--bluetrack/item.json",
       "type": "application/geo+json",
       "title": "BlueTrack (satc)"
@@ -421,12 +361,6 @@
       "href": "./satc--freqtracksquantized/item.json",
       "type": "application/geo+json",
       "title": "FreqTracksQuantized (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--l1-ownshipsensor/item.json",
-      "type": "application/geo+json",
-      "title": "L1_OwnshipSensor (satc)"
     },
     {
       "rel": "item",
@@ -622,18 +556,6 @@
     },
     {
       "rel": "item",
-      "href": "./other-formats-ta-dummy-data--freq-bluesensor/item.json",
-      "type": "application/geo+json",
-      "title": "Freq_BlueSensor (other-formats/ta-dummy-data)"
-    },
-    {
-      "rel": "item",
-      "href": "./other-formats-ta-dummy-data--freq-bluesensor-nopos/item.json",
-      "type": "application/geo+json",
-      "title": "Freq_BlueSensor_NoPos (other-formats/ta-dummy-data)"
-    },
-    {
-      "rel": "item",
       "href": "./other-formats-ta-dummy-data--freq-bluetrack/item.json",
       "type": "application/geo+json",
       "title": "Freq_BlueTrack (other-formats/ta-dummy-data)"
@@ -685,30 +607,6 @@
       "href": "./core--samplescale/item.json",
       "type": "application/geo+json",
       "title": "samplescale (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--sen-frig-sensor/item.json",
-      "type": "application/geo+json",
-      "title": "sen_frig_sensor (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--sen-missing-host-sensor/item.json",
-      "type": "application/geo+json",
-      "title": "sen_missing_host_sensor (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--sen-ssk-freq/item.json",
-      "type": "application/geo+json",
-      "title": "sen_ssk_freq (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--sen-ssk-sensor/item.json",
-      "type": "application/geo+json",
-      "title": "sen_ssk_sensor (core)"
     },
     {
       "rel": "item",

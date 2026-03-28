@@ -43,7 +43,7 @@
     "datetime": "1995-12-12T05:00:00+00:00",
     "description": "Saxon Warrior: Colortest \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 11 platform track(s) recorded including USS Mahan, FS Visby, FGS Ramage and 8 other(s). 11 narrative entries. Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T05:05:00+00:00",
+    "end_datetime": "1995-12-12T05:10:00+00:00",
     "debrief:vessel_classes": [
       "surface/warship/carrier/queen-elizabeth",
       "surface/warship/corvette/visby",

@@ -10,33 +10,33 @@
     "coordinates": [
       [
         [
-          -30.1197583,
-          -0.0951111111111111
+          -30.182964218418814,
+          -0.12067121288205127
         ],
         [
-          -30.0,
-          -0.0951111111111111
+          -29.99826369059747,
+          -0.12067121288205127
         ],
         [
-          -30.0,
-          -0.0
+          -29.99826369059747,
+          0.06473251289156451
         ],
         [
-          -30.1197583,
-          -0.0
+          -30.182964218418814,
+          0.06473251289156451
         ],
         [
-          -30.1197583,
-          -0.0951111111111111
+          -30.182964218418814,
+          -0.12067121288205127
         ]
       ]
     ]
   },
   "bbox": [
-    -30.1197583,
-    -0.0951111111111111,
-    -30.0,
-    -0.0
+    -30.182964218418814,
+    -0.12067121288205127,
+    -29.99826369059747,
+    0.06473251289156451
   ],
   "properties": {
     "title": "Silent Resolve: Bluetrack",
@@ -115,6 +115,32 @@
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueTrack.rep",
         "load_timestamp": "2026-03-21T10:15:01.984047Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-satc--bluesensor-source-BlueSensor": {
+      "href": "./assets/BlueSensor.dsf",
+      "type": "application/octet-stream",
+      "title": "BlueSensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueSensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:01.945907Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-satc--bluesensor-sparse-source-BlueSensor_sparse": {
+      "href": "./assets/BlueSensor_sparse.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BlueSensor_sparse.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueSensor_sparse.rep",
+        "load_timestamp": "2026-03-21T10:15:01.951229Z",
         "tool_version": "0.1.0"
       }
     }

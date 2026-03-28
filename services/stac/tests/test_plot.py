@@ -364,3 +364,122 @@ class TestUpdateTemporalMetadata:
         result = update_temporal_metadata(catalog_path, plot_id)
 
         assert result is None
+
+    # --- Sensor/narrative temporal extraction ---
+
+    def test_sensor_only_temporal_extent(self, temp_dir: Path) -> None:
+        """Sensor-only plots derive temporal extent from sensor time properties."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Sensors"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T12:00:00+00:00",
+                    "parent_track": "OWNSHIP",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T14:00:00+00:00",
+                    "parent_track": "OWNSHIP",
+                },
+            },
+        ]
+        add_features(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "2010-01-12T12:00:00+00:00"
+        assert result.end_datetime == "2010-01-12T14:00:00+00:00"
+
+    def test_narrative_only_temporal_extent(self, temp_dir: Path) -> None:
+        """Narrative-only plots derive temporal extent from narrative time properties."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Narratives"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "NARRATIVE",
+                    "time": "1995-12-12T05:00:00+00:00",
+                    "text": "First entry",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "NARRATIVE",
+                    "time": "1995-12-12T11:00:00+00:00",
+                    "text": "Last entry",
+                },
+            },
+        ]
+        add_features(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "1995-12-12T05:00:00+00:00"
+        assert result.end_datetime == "1995-12-12T11:00:00+00:00"
+
+    def test_mixed_track_and_sensor_temporal_extent(self, temp_dir: Path) -> None:
+        """Mixed track+sensor plots use global min/max across all types."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Mixed"))
+
+        features = [
+            _make_track("Alpha", "2010-01-12T13:00:00Z", "2010-01-12T14:00:00Z"),
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T12:00:00Z",
+                    "parent_track": "Alpha",
+                },
+            },
+        ]
+        add_features(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        # Sensor contact at 12:00 is earlier than track start at 13:00
+        assert result.start_datetime == "2010-01-12T12:00:00Z"
+        assert result.end_datetime == "2010-01-12T14:00:00Z"
+
+    def test_periodtext_temporal_extent(self, temp_dir: Path) -> None:
+        """PERIODTEXT features contribute time_start/time_end to extent."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="PeriodText"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [-4.0, 50.0]},
+                "properties": {
+                    "kind": "PERIODTEXT",
+                    "time_start": "2010-01-12T12:20:00+00:00",
+                    "time_end": "2010-01-12T12:24:00+00:00",
+                    "text": "Hit_121220",
+                },
+            },
+        ]
+        add_features(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "2010-01-12T12:20:00+00:00"
+        assert result.end_datetime == "2010-01-12T12:24:00+00:00"

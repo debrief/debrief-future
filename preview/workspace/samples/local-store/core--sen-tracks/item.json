@@ -112,6 +112,58 @@
         "load_timestamp": "2026-03-21T10:15:06.059531Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-core--sen-frig-sensor-source-sen_frig_sensor": {
+      "href": "./assets/sen_frig_sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_frig_sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_frig_sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:06.039191Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-core--sen-missing-host-sensor-source-sen_missing_host_sensor": {
+      "href": "./assets/sen_missing_host_sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_missing_host_sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:06.044969Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-core--sen-ssk-freq-source-sen_ssk_freq": {
+      "href": "./assets/sen_ssk_freq.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_ssk_freq.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_ssk_freq.dsf",
+        "load_timestamp": "2026-03-21T10:15:06.048138Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-core--sen-ssk-sensor-source-sen_ssk_sensor": {
+      "href": "./assets/sen_ssk_sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_ssk_sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_ssk_sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:06.051172Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

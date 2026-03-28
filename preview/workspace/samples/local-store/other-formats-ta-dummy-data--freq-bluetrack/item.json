@@ -117,6 +117,32 @@
         "load_timestamp": "2026-03-21T10:15:05.519394Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-other-formats-ta-dummy-data--freq-bluesensor-source-Freq_BlueSensor": {
+      "href": "./assets/Freq_BlueSensor.dsf",
+      "type": "application/octet-stream",
+      "title": "Freq_BlueSensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueSensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:05.464918Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-other-formats-ta-dummy-data--freq-bluesensor-nopos-source-Freq_BlueSensor_NoPos": {
+      "href": "./assets/Freq_BlueSensor_NoPos.dsf",
+      "type": "application/octet-stream",
+      "title": "Freq_BlueSensor_NoPos.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueSensor_NoPos.dsf",
+        "load_timestamp": "2026-03-21T10:15:05.474322Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

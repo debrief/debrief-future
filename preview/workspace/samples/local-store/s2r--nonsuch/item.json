@@ -112,6 +112,19 @@
         "load_timestamp": "2026-03-21T10:15:01.768221Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-s2r--sensor-source-sensor": {
+      "href": "./assets/sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/sensor.dsf",
+        "load_timestamp": "2026-03-21T10:15:01.791735Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

@@ -40,7 +40,7 @@
   ],
   "properties": {
     "title": "Joint Warrior: Trialsplanning3 Hits",
-    "datetime": "2026-03-21T10:15:00.193773+00:00",
+    "datetime": "2010-01-12T12:20:00+00:00",
     "description": "Joint Warrior: Trialsplanning3 Hits \u2014 Analysis and review exercise in the North Atlantic.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
@@ -51,7 +51,9 @@
     ],
     "debrief:feature_tags": [],
     "debrief:track_names": [],
-    "debrief:nationalities": []
+    "debrief:nationalities": [],
+    "start_datetime": "2010-01-12T12:20:00+00:00",
+    "end_datetime": "2010-01-12T12:40:00+00:00"
   },
   "links": [
     {

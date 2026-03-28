@@ -114,6 +114,32 @@
         "load_timestamp": "2026-03-21T10:15:00.183835Z",
         "tool_version": "0.1.0"
       }
+    },
+    "merged-demo-review--review2-sensor1-source-Review2_Sensor1": {
+      "href": "./assets/Review2_Sensor1.dsf",
+      "type": "application/octet-stream",
+      "title": "Review2_Sensor1.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Review/Review2_Sensor1.dsf",
+        "load_timestamp": "2026-03-21T10:15:00.189807Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "merged-demo-review--review3-sensor2-source-Review3_Sensor2": {
+      "href": "./assets/Review3_Sensor2.dsf",
+      "type": "application/octet-stream",
+      "title": "Review3_Sensor2.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Review/Review3_Sensor2.dsf",
+        "load_timestamp": "2026-03-21T10:15:00.192557Z",
+        "tool_version": "0.1.0"
+      }
     }
   }
 }

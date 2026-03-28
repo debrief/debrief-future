@@ -43,7 +43,7 @@
     "datetime": "1995-12-12T05:00:00+00:00",
     "description": "Saxon Warrior: Shapes \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 14 platform track(s) recorded including USS Languedoc, FS Northumberland, FGS Cole and 11 other(s). 10 sensor contact(s) logged. 4 narrative entries. Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
-    "end_datetime": "1995-12-12T07:16:00+00:00",
+    "end_datetime": "1995-12-12T07:41:00+00:00",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssk/gotland",
       "surface/warship/carrier/queen-elizabeth",

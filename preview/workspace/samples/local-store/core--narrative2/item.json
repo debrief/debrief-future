@@ -9,7 +9,7 @@
   "bbox": null,
   "properties": {
     "title": "Saxon Warrior: Narrative2",
-    "datetime": "2026-03-21T10:15:04.466885+00:00",
+    "datetime": "1995-12-12T05:00:00+00:00",
     "description": "Saxon Warrior: Narrative2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 20 narrative entries.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
@@ -23,7 +23,9 @@
       "intercept"
     ],
     "debrief:track_names": [],
-    "debrief:nationalities": []
+    "debrief:nationalities": [],
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:41:00+00:00"
   },
   "links": [
     {
