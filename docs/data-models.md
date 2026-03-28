@@ -74,7 +74,7 @@ classDiagram
         +nationalities: string[]
     }
 
-    STACStore "1" --> "1..*" STACCatalog : contains
+    STACStore "1" --> "1" STACCatalog : contains
     STACCatalog "1" --> "0..*" STACCollection : organises
     STACCollection "1" --> "0..*" STACItem : contains
     STACCatalog "1" --> "0..*" STACItem : flat (no collection)
@@ -131,7 +131,14 @@ classDiagram
         +type: "Feature"
         +id: string
         +geometry: Geometry
-        +properties: Properties
+        +properties: BaseFeatureProperties
+    }
+
+    class BaseFeatureProperties {
+        <<abstract>>
+        +kind: FeatureKindEnum
+        +tags: string[]
+        +provenance: LogEntry[]
     }
 
     class TrackFeature {
@@ -201,18 +208,19 @@ classDiagram
     }
 
     class SystemState {
-        +geometry: EmptyPoint
+        +geometry: Point (empty coords)
         +properties: SystemStateProperties
         kind = SYSTEM
     }
 
     class SystemRecord {
-        +geometry: EmptyPoint
+        +geometry: Point (empty coords)
         +properties: SystemRecordProperties
         kind = SYSTEM_RECORD
     }
 
     FeatureCollection "1" --> "0..*" Feature : features
+    Feature --> BaseFeatureProperties : properties
     Feature <|-- TrackFeature
     Feature <|-- ReferenceLocation
     Feature <|-- NarrativeEntry
@@ -229,6 +237,8 @@ classDiagram
 ```
 
 The `kind` property on each feature acts as a discriminator. Frontends use it to select the correct renderer and property panel.
+
+> **Schema note:** Most properties classes inherit from `BaseFeatureProperties` via `is_a`. The exception is `SystemStateProperties`, which defines its own `provenance` field directly rather than inheriting. This is a minor inconsistency in the schema -- functionally equivalent but structurally divergent.
 
 ## TrackFeature Detail
 
@@ -568,6 +578,18 @@ classDiagram
         +param_type: ParameterTypeEnum
     }
 
+    Tool "1" --> "0..*" SelectionRequirement : requirements
+    Tool "1" --> "0..*" ToolParameter : parameters
+```
+
+## Tool Results
+
+When a tool executes, its MCP response carries `ToolResultAnnotations` that tell the frontend how to apply the result. Results flow into `LogEntry.was_generated_by` on the affected features for provenance.
+
+```mermaid
+classDiagram
+    direction LR
+
     class ToolResultAnnotations {
         +resultType: "top/domain/specific"
         +sourceFeatures: string[]
@@ -584,9 +606,29 @@ classDiagram
         artifact
     }
 
-    Tool "1" --> "0..*" SelectionRequirement : requirements
-    Tool "1" --> "0..*" ToolParameter : parameters
-    ToolResultAnnotations --> ResultCategoryEnum
+    class DatasetEntry {
+        +type: string
+        +title: string
+        +metadata: DatasetMetadata
+        +data_points: DatasetDataPoint[]
+        +series: DatasetSeries[]
+    }
+
+    class DatasetSeries {
+        +name: string
+        +data_points: DatasetDataPoint[]
+    }
+
+    class DatasetDataPoint {
+        +x_value: string
+        +y_value: string
+        +series_key: string
+    }
+
+    ToolResultAnnotations --> ResultCategoryEnum : resultType prefix
+    DatasetEntry "1" --> "0..*" DatasetDataPoint : flat data
+    DatasetEntry "1" --> "0..*" DatasetSeries : multi-series
+    DatasetSeries "1" --> "1..*" DatasetDataPoint : data_points
 ```
 
 ## Session State
@@ -658,6 +700,8 @@ classDiagram
     SessionState --> SpatialSlice
     SessionState --> FeaturesSlice
     SessionState --> DocumentSlice
+    SessionState --> ResultsSlice
+    SessionState --> BrowserFilterSlice
     TemporalSlice --> TimeInstant : currentTime
     FeaturesSlice --> FeatureSelection
     FeatureSelection --> TimeInstant
