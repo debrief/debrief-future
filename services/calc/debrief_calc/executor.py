@@ -216,9 +216,9 @@ def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
 def _schema_validate_features(features: list[GeoJSONFeatureDict], tool_name: str) -> None:
     """Run schema validation on output features (warn-and-continue).
 
-    Validates each feature that has a known ``kind`` against the Pydantic model
-    from ``debrief_schemas.validation.FEATURE_MODEL_MAP``. Schema failures are
-    logged as warnings rather than raising, to allow gradual adoption.
+    Calc outputs are transient (not persisted to the catalog), so validation
+    failures are logged as warnings. The blocking validation gate is at the
+    ``catalog_write`` boundary in debrief-stac.
     """
     try:
         from debrief_schemas.validation import SchemaValidationError, validate_feature

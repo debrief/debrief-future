@@ -41,25 +41,26 @@
   "properties": {
     "title": "Dynamic Mongoose: Third Party Track",
     "datetime": "1970-01-03T01:44:25+00:00",
-    "description": "Dynamic Mongoose: Third Party Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including FS Provence.",
+    "description": "Dynamic Mongoose: Third Party Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Cole.",
     "start_datetime": "1970-01-03T01:44:25+00:00",
     "end_datetime": "1970-01-03T01:51:25+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/trafalgar"
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
       "ASW",
       "certification",
-      "surveillance"
+      "surveillance",
+      "training"
     ],
     "debrief:feature_tags": [
-      "radar-detection"
+      "visual-sighting"
     ],
     "debrief:track_names": [
-      "FS Provence"
+      "HNoMS Cole"
     ],
     "debrief:nationalities": [
-      "FR"
+      "NO"
     ]
   },
   "links": [
@@ -83,7 +84,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/third_party_track.rep",
+      "href": "file:///tmp/legacy-source-data/S2R/third_party_track.rep",
       "title": "third_party_track.rep"
     }
   ],
@@ -104,8 +105,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/third_party_track.rep",
-        "load_timestamp": "2026-03-21T10:15:01.811875Z",
+        "source_path": "/tmp/legacy-source-data/S2R/third_party_track.rep",
+        "load_timestamp": "2026-03-28T13:50:59.300913Z",
         "tool_version": "0.1.0"
       }
     }

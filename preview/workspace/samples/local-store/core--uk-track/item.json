@@ -41,28 +41,25 @@
   "properties": {
     "title": "Saxon Warrior: Uk Track",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Uk Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FGS Mason.",
+    "description": "Saxon Warrior: Uk Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Roald Amundsen.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
     "end_datetime": "1995-12-12T11:41:00+00:00",
     "debrief:vessel_classes": [
       "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "SAR",
-      "boarding",
-      "escort",
+      "replenishment",
       "training"
     ],
     "debrief:feature_tags": [
-      "depth-charge",
-      "prosecution",
+      "passive-search",
       "radar-detection"
     ],
     "debrief:track_names": [
-      "FGS Mason"
+      "FS Roald Amundsen"
     ],
     "debrief:nationalities": [
-      "DE"
+      "FR"
     ]
   },
   "links": [
@@ -86,7 +83,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/uk_track.rep",
+      "href": "file:///tmp/legacy-source-data/uk_track.rep",
       "title": "uk_track.rep"
     }
   ],
@@ -107,8 +104,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/uk_track.rep",
-        "load_timestamp": "2026-03-21T10:15:06.123678Z",
+        "source_path": "/tmp/legacy-source-data/uk_track.rep",
+        "load_timestamp": "2026-03-28T13:51:04.160606Z",
         "tool_version": "0.1.0"
       }
     }

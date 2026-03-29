@@ -15,9 +15,10 @@ def make_sample_track_feature(
     platform_id: str = "VESSEL-A",
     platform_name: str = "HMS Example",
 ) -> GeoJSONFeature:
-    """Create a sample track feature for testing.
+    """Create a schema-valid sample track feature for testing.
 
-    Returns a GeoJSON Feature representing a vessel track.
+    Returns a GeoJSON Feature representing a vessel track,
+    compliant with the TrackFeature Pydantic model.
     """
     return {
         "type": "Feature",
@@ -31,31 +32,31 @@ def make_sample_track_feature(
             ],
         },
         "properties": {
+            "kind": "TRACK",
             "platform_id": platform_id,
             "platform_name": platform_name,
             "track_type": "OWNSHIP",
             "start_time": "2026-01-09T10:00:00Z",
             "end_time": "2026-01-09T12:00:00Z",
             "positions": [
-                {
-                    "time": "2026-01-09T10:00:00Z",
-                    "coordinates": [-5.0, 50.0],
-                    "course": 45.0,
-                    "speed": 12.0,
-                },
-                {
-                    "time": "2026-01-09T11:00:00Z",
-                    "coordinates": [-5.1, 50.1],
-                    "course": 47.0,
-                    "speed": 11.5,
-                },
-                {
-                    "time": "2026-01-09T12:00:00Z",
-                    "coordinates": [-5.2, 50.2],
-                    "course": 50.0,
-                    "speed": 13.0,
-                },
+                {"time": "2026-01-09T10:00:00Z", "course": 45.0, "speed": 12.0},
+                {"time": "2026-01-09T11:00:00Z", "course": 47.0, "speed": 11.5},
+                {"time": "2026-01-09T12:00:00Z", "course": 50.0, "speed": 13.0},
             ],
+            "style": {
+                "line": {"color": "#0066CC"},
+                "point": {
+                    "shape": "circle",
+                    "radius": 4,
+                    "fill_color": "#0066CC",
+                    "color": "#FFFFFF",
+                },
+            },
+            "default_position_style": {
+                "show_symbol": False,
+                "symbol": "circle",
+                "show_label": False,
+            },
         },
         "bbox": [-5.2, 50.0, -5.0, 50.2],
     }
@@ -67,15 +68,27 @@ def make_sample_reference_location(
     lon: float = -4.5,
     lat: float = 50.5,
 ) -> GeoJSONFeature:
-    """Create a sample reference location for testing.
+    """Create a schema-valid sample reference location for testing.
 
-    Returns a GeoJSON Feature representing a reference point.
+    Returns a GeoJSON Feature representing a reference point,
+    compliant with the ReferenceLocation Pydantic model.
     """
     return {
         "type": "Feature",
         "id": feature_id,
         "geometry": {"type": "Point", "coordinates": [lon, lat]},
-        "properties": {"name": name, "location_type": "WAYPOINT", "description": "Test waypoint"},
+        "properties": {
+            "kind": "POINT",
+            "name": name,
+            "location_type": "WAYPOINT",
+            "description": "Test waypoint",
+            "style": {
+                "shape": "circle",
+                "radius": 6,
+                "fill_color": "#FF5733",
+                "color": "#000000",
+            },
+        },
     }
 
 

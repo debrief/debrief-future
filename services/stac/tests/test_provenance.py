@@ -27,9 +27,9 @@ class TestUnifiedProvenance:
         prov = result["properties"]["provenance"]
         assert isinstance(prov, list)
         assert len(prov) == 1
-        assert prov[0]["wasGeneratedBy"]["tool"] == "track-smoother"
-        assert prov[0]["wasGeneratedBy"]["toolVersion"] == "1.0.0"
-        assert "activityId" in prov[0]
+        assert prov[0]["was_generated_by"]["tool"] == "track-smoother"
+        assert prov[0]["was_generated_by"]["tool_version"] == "1.0.0"
+        assert "activity_id" in prov[0]
         assert "timestamp" in prov[0]
         assert prov[0]["used"] == ["track_a"]
 
@@ -49,9 +49,11 @@ class TestUnifiedProvenance:
         result = attach_log_entry(feature, entry)
 
         prov = result["properties"]["provenance"][0]
-        assert prov["wasGeneratedBy"]["tool"] == "cpa-calculator"
+        assert prov["was_generated_by"]["tool"] == "cpa-calculator"
         assert prov["used"] == ["track_a", "track_b"]
-        assert prov["wasGeneratedBy"]["parameters"]["threshold"]["value"] == 500
+        # Parameters are serialized as a list of ParameterValue objects
+        param_values = [p["value"] for p in prov["was_generated_by"]["parameters"]]
+        assert "500" in param_values
 
     def test_provenance_modifies_in_place(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {}}

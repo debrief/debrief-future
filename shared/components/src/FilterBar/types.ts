@@ -5,7 +5,7 @@
 import type { FilterType, FilterExpression, StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 
 /** Input method used by a filter type's value editor */
-export type InputMethod = 'hierarchical' | 'flat-dropdown' | 'free-text' | 'bucket';
+export type InputMethod = 'hierarchical' | 'flat-dropdown' | 'free-text' | 'bucket' | 'typeahead';
 
 /** Metadata for a filter type option in the add menu */
 export interface FilterTypeOption {

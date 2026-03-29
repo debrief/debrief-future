@@ -174,6 +174,27 @@ describe("title matcher", () => {
   });
 });
 
+describe("filename matcher", () => {
+  const match = getMatcher("filename");
+
+  it("matches case-insensitive substring of item ID", () => {
+    expect(match(makeItem({ id: "core--boat1" }), "boat1", DESC_MAP)).toBe(true);
+    expect(match(makeItem({ id: "core--boat1" }), "CORE", DESC_MAP)).toBe(true);
+  });
+
+  it("does not match absent substring", () => {
+    expect(match(makeItem({ id: "core--boat1" }), "sensor", DESC_MAP)).toBe(false);
+  });
+
+  it("matches partial ID across domain separator", () => {
+    expect(match(makeItem({ id: "demo-review--review1-tracks" }), "review1", DESC_MAP)).toBe(true);
+  });
+
+  it("returns false for empty ID", () => {
+    expect(match(makeItem({ id: "" }), "test", DESC_MAP)).toBe(false);
+  });
+});
+
 describe("track-name matcher", () => {
   const match = getMatcher("track-name");
 

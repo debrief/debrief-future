@@ -41,25 +41,27 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Saxon Warrior: Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Dauntless, FGS Gonzalez. Multi-national participation: DE, FR.",
+    "description": "Saxon Warrior: Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mason, FGS Ramage. Multi-national participation: DE, FR.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssn/trafalgar",
-      "surface/warship/frigate/type26"
+      "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "AAW",
       "ASW",
+      "amphibious",
       "boarding",
-      "training"
+      "training",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "active-search",
+      "radar-detection"
     ],
     "debrief:track_names": [
-      "FS Dauntless",
-      "FGS Gonzalez"
+      "FS Mason",
+      "FGS Ramage"
     ],
     "debrief:nationalities": [
       "DE",
@@ -87,7 +89,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_tracks.rep",
+      "href": "file:///tmp/legacy-source-data/sen_tracks.rep",
       "title": "sen_tracks.rep"
     }
   ],
@@ -108,8 +110,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_tracks.rep",
-        "load_timestamp": "2026-03-21T10:15:06.059531Z",
+        "source_path": "/tmp/legacy-source-data/sen_tracks.rep",
+        "load_timestamp": "2026-03-28T13:51:04.087299Z",
         "tool_version": "0.1.0"
       }
     }

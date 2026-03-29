@@ -85,6 +85,12 @@ function matchTitle(item: StacBrowserItem, value: string): boolean {
   return item.title.toLowerCase().includes(value.toLowerCase());
 }
 
+/** Match filename (item ID) with case-insensitive substring */
+function matchFilename(item: StacBrowserItem, value: string): boolean {
+  if (!item.id) return false;
+  return item.id.toLowerCase().includes(value.toLowerCase());
+}
+
 /** Match author with case-insensitive exact match */
 function matchAuthor(item: StacBrowserItem, value: string): boolean {
   if (!item.author) return false;
@@ -119,6 +125,7 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
   duration: (item, value) => matchDuration(item, value),
   modified: (item, value) => matchModified(item, value),
   title: (item, value) => matchTitle(item, value),
+  filename: (item, value) => matchFilename(item, value),
   "plot-contents": (item, value) => matchPlotContents(item, value),
   "track-name": (item, value) =>
     arrayContainsCaseInsensitive(item.trackNames, value),

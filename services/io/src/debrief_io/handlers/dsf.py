@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import re
 import time
-import uuid
 from datetime import UTC, datetime
 from typing import Any
 
@@ -72,10 +71,47 @@ def _safe_float(val: str) -> float | None:
         return None
 
 
+class _SensorContactRecord:
+    """Intermediate record for a parsed sensor contact."""
+
+    __slots__ = ("parent_track", "sensor_name", "time", "bearing", "range", "frequency", "label")
+
+    def __init__(
+        self,
+        parent_track: str,
+        sensor_name: str,
+        time: str,
+        bearing: float | None,
+        range: float | None = None,
+        frequency: float | None = None,
+        label: str | None = None,
+    ) -> None:
+        self.parent_track = parent_track
+        self.sensor_name = sensor_name
+        self.time = time
+        self.bearing = bearing
+        self.range = range
+        self.frequency = frequency
+        self.label = label
+
+    def to_contact_dict(self) -> dict[str, Any]:
+        """Convert to SensorContact schema dict."""
+        entry: dict[str, Any] = {"time": self.time}
+        if self.bearing is not None:
+            entry["bearing"] = self.bearing
+        if self.range is not None:
+            entry["range"] = self.range
+        if self.frequency is not None:
+            entry["frequency"] = self.frequency
+        if self.label:
+            entry["label"] = self.label
+        return entry
+
+
 def _parse_sensor2_line(
     parts: list[str], line_num: int
-) -> tuple[dict[str, Any] | None, ParseWarning | None]:
-    """Parse a ;SENSOR2: line into a GeoJSON feature.
+) -> tuple[_SensorContactRecord | None, ParseWarning | None]:
+    """Parse a ;SENSOR2: line into a sensor contact record.
 
     Format: ;SENSOR2: DATE TIME TRACK SYMBOL NULL BEARING RANGE FREQ SPEED SENSOR LABEL...
     Fields after SYMBOL may be NULL.
@@ -94,7 +130,7 @@ def _parse_sensor2_line(
     bearing = _safe_float(parts[5])
     range_val = _safe_float(parts[6]) if len(parts) > 6 else None
     frequency = _safe_float(parts[7]) if len(parts) > 7 else None
-    speed = _safe_float(parts[8]) if len(parts) > 8 else None
+    # parts[8] = speed (not in SensorContact schema, ignored)
     sensor_name = parts[9] if len(parts) > 9 else None
     if sensor_name:
         sensor_name = _extract_track_name(sensor_name)
@@ -110,36 +146,21 @@ def _parse_sensor2_line(
             code="INVALID_TIMESTAMP",
         )
 
-    props: dict[str, Any] = {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": track_name,
-        "time": timestamp.isoformat(),
-    }
-    if bearing is not None:
-        props["bearing"] = bearing
-    if range_val is not None:
-        props["range"] = range_val
-    if frequency is not None:
-        props["frequency"] = frequency
-    if speed is not None:
-        props["speed"] = speed
-    if sensor_name:
-        props["sensor_name"] = sensor_name
-    if label:
-        props["label"] = label
-
-    return {
-        "type": "Feature",
-        "id": str(uuid.uuid4()),
-        "geometry": None,
-        "properties": props,
-    }, None
+    return _SensorContactRecord(
+        parent_track=track_name,
+        sensor_name=sensor_name or "Unknown",
+        time=timestamp.isoformat(),
+        bearing=bearing,
+        range=range_val,
+        frequency=frequency,
+        label=label,
+    ), None
 
 
 def _parse_sensor_line(
     parts: list[str], line_num: int
-) -> tuple[dict[str, Any] | None, ParseWarning | None]:
-    """Parse a ;SENSOR: line into a GeoJSON feature.
+) -> tuple[_SensorContactRecord | None, ParseWarning | None]:
+    """Parse a ;SENSOR: line into a sensor contact record.
 
     Format: ;SENSOR: DATE TIME TRACK SYMBOL LAT_OR_NULL BEARING RANGE SENSOR LABEL...
     Location can be DMS coordinates or NULL.
@@ -199,26 +220,43 @@ def _parse_sensor_line(
             bearing = _safe_float(remaining[-2]) if len(remaining) >= 2 else None
             range_val = _safe_float(remaining[-1]) if len(remaining) >= 1 else None
 
-    props: dict[str, Any] = {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": track_name,
-        "time": timestamp.isoformat(),
-    }
-    if bearing is not None:
-        props["bearing"] = bearing
-    if range_val is not None:
-        props["range"] = range_val
     if sensor_name:
-        props["sensor_name"] = _extract_track_name(sensor_name)
+        sensor_name = _extract_track_name(sensor_name)
     if label:
-        props["label"] = label.strip('"')
+        label = label.strip('"')
 
-    return {
-        "type": "Feature",
-        "id": str(uuid.uuid4()),
-        "geometry": None,
-        "properties": props,
-    }, None
+    return _SensorContactRecord(
+        parent_track=track_name,
+        sensor_name=sensor_name or "Unknown",
+        time=timestamp.isoformat(),
+        bearing=bearing,
+        range=range_val,
+        label=label,
+    ), None
+
+
+def _group_contacts(
+    records: list[_SensorContactRecord],
+) -> dict[str, list[dict[str, Any]]]:
+    """Group sensor contact records into SensorData dicts keyed by parent track.
+
+    Returns: {parent_track_name: [SensorData, ...]}
+    where SensorData = {name: str, contacts: [SensorContact, ...]}
+    """
+    # Group by (parent_track, sensor_name)
+    grouped: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for rec in records:
+        track_sensors = grouped.setdefault(rec.parent_track, {})
+        contacts = track_sensors.setdefault(rec.sensor_name, [])
+        contacts.append(rec.to_contact_dict())
+
+    # Convert to {parent_track: [SensorData, ...]}
+    result: dict[str, list[dict[str, Any]]] = {}
+    for track_name, sensors in grouped.items():
+        sensor_list = [{"name": sname, "contacts": contacts} for sname, contacts in sensors.items()]
+        result[track_name] = sensor_list
+
+    return result
 
 
 class DSFHandler(BaseHandler):
@@ -246,10 +284,17 @@ class DSFHandler(BaseHandler):
         return [".dsf", ".DSF"]
 
     def parse(self, content: str, source_file: str) -> ParseResult:
-        """Parse DSF sensor contact lines into GeoJSON features."""
+        """Parse DSF sensor contact lines into grouped SensorData.
+
+        DSF files contain sensor contacts for tracks defined in companion
+        files (typically REP). Instead of producing standalone SENSOR_CONTACT
+        features, contacts are grouped by parent track and sensor name into
+        SensorData structures via ``pending_sensor_data``. The import pipeline
+        merges these into the companion track features.
+        """
         start = time.perf_counter()
         warnings: list[ParseWarning] = []
-        features: list[dict[str, Any]] = []
+        records: list[_SensorContactRecord] = []
 
         for line_num, line in enumerate(content.splitlines(), start=1):
             stripped = line.strip()
@@ -262,11 +307,11 @@ class DSFHandler(BaseHandler):
             if normalised.startswith(";SENSOR2:"):
                 after = normalised[len(";SENSOR2:") :].strip()
                 parts = after.split()
-                feature, warning = _parse_sensor2_line(parts, line_num)
+                record, warning = _parse_sensor2_line(parts, line_num)
             elif normalised.startswith(";SENSOR:"):
                 after = normalised[len(";SENSOR:") :].strip()
                 parts = after.split()
-                feature, warning = _parse_sensor_line(parts, line_num)
+                record, warning = _parse_sensor_line(parts, line_num)
             else:
                 warnings.append(
                     ParseWarning(
@@ -279,16 +324,20 @@ class DSFHandler(BaseHandler):
 
             if warning:
                 warnings.append(warning)
-            if feature:
-                features.append(feature)
+            if record:
+                records.append(record)
+
+        # Group contacts into SensorData dicts keyed by parent track
+        pending = _group_contacts(records)
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 
         return ParseResult(
-            features=features,
+            features=[],
             warnings=warnings,
             source_file=source_file,
             parse_time_ms=elapsed_ms,
             handler=self.name,
             handler_version=self.version,
+            pending_sensor_data=pending,
         )

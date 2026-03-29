@@ -14,6 +14,7 @@ const PROPERTY_MAP: Record<FilterType, string> = {
   duration: "duration",
   modified: "updated",
   title: "title",
+  filename: "debrief:filename",
   "plot-contents": "debrief:plot_contents",
   "track-name": "debrief:track_names",
   nationality: "debrief:nationalities",
@@ -35,7 +36,7 @@ function predicateToCql2(predicate: Predicate): Record<string, unknown> {
   let expr: Record<string, unknown>;
 
   // Title and plot-contents use LIKE with wildcards (free-text substring match)
-  if (predicate.type === "title" || predicate.type === "plot-contents") {
+  if (predicate.type === "title" || predicate.type === "filename" || predicate.type === "plot-contents") {
     expr = {
       op: "like",
       args: [{ property }, `%${predicate.value}%`],

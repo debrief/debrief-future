@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "08098f86-11b1-4a81-8767-d799b19d25f9",
+      "id": "60d0d279-a61a-4004-8fae-b3fba38d963e",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -1678,8 +1678,8 @@
         "label_interval": "PT30M",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -1687,16 +1687,16 @@
             },
             "used": [],
             "generated": [
-              "08098f86-11b1-4a81-8767-d799b19d25f9"
+              "60d0d279-a61a-4004-8fae-b3fba38d963e"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "eb5b757d-bb57-4e62-a2d1-0757dda419a3",
+      "id": "aeb0d13e-e3bc-4d4a-aad1-ad22be360082",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -3371,8 +3371,8 @@
         "label_interval": "PT30M",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3380,27 +3380,264 @@
             },
             "used": [],
             "generated": [
-              "eb5b757d-bb57-4e62-a2d1-0757dda419a3"
+              "aeb0d13e-e3bc-4d4a-aad1-ad22be360082"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
+          }
+        ],
+        "sensors": [
+          {
+            "name": "New_SSK_BB",
+            "contacts": [
+              {
+                "time": "1970-01-03T03:05:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:06:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:07:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:08:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:09:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:10:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:11:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:12:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:13:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:14:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:15:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:16:25+00:00",
+                "bearing": -88.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:17:25+00:00",
+                "bearing": -88.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:18:25+00:00",
+                "bearing": -89.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:19:25+00:00",
+                "bearing": -89.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:05:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:06:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:07:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:08:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:09:25+00:00",
+                "bearing": -85.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:10:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:11:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:12:25+00:00",
+                "bearing": -86.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:13:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:14:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:15:25+00:00",
+                "bearing": -87.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:16:25+00:00",
+                "bearing": -88.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:17:25+00:00",
+                "bearing": -88.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:18:25+00:00",
+                "bearing": -89.0,
+                "range": 0.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:19:25+00:00",
+                "bearing": -89.0,
+                "range": 0.0,
+                "label": "some message"
+              }
+            ]
+          },
+          {
+            "name": "New_SSK_FREQ",
+            "contacts": [
+              {
+                "time": "1970-01-03T03:14:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:15:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:16:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:17:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:18:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:19:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:20:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              },
+              {
+                "time": "1970-01-03T03:21:25+00:00",
+                "frequency": 23.0,
+                "label": "some message"
+              }
+            ]
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "cdb62488-5fe6-45d3-9bfb-3ec370a8090a",
+      "id": "fd87b36a-ff3c-4b14-8659-f370fcce2360",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "Frigate",
-        "entry": "COMEX PHASE DELTA",
-        "type": "EntryType",
         "time": "1970-01-03T01:34:00+00:00",
+        "text": "COMEX PHASE DELTA",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "Frigate",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3408,27 +3645,32 @@
             },
             "used": [],
             "generated": [
-              "cdb62488-5fe6-45d3-9bfb-3ec370a8090a"
+              "fd87b36a-ff3c-4b14-8659-f370fcce2360"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "1ee92f65-58da-4f70-83b1-33b016483667",
+      "id": "61ed10a2-218b-43ae-8e50-1b7dae019beb",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "New_SSK",
-        "entry": "AVOID PINNACLE",
-        "type": "EntryType",
         "time": "1970-01-03T02:31:00+00:00",
+        "text": "AVOID PINNACLE",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "New_SSK",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3436,27 +3678,32 @@
             },
             "used": [],
             "generated": [
-              "1ee92f65-58da-4f70-83b1-33b016483667"
+              "61ed10a2-218b-43ae-8e50-1b7dae019beb"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "d915f683-f992-471b-bdf0-559a6007532e",
+      "id": "2d92a369-2a0f-4ea2-944d-853fd3423023",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "Frigate",
-        "entry": "ENTERING CONSTRAINED CHANNEL",
-        "type": "EntryType",
         "time": "1970-01-03T02:43:00+00:00",
+        "text": "ENTERING CONSTRAINED CHANNEL",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "Frigate",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3464,27 +3711,32 @@
             },
             "used": [],
             "generated": [
-              "d915f683-f992-471b-bdf0-559a6007532e"
+              "2d92a369-2a0f-4ea2-944d-853fd3423023"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "dc620bdd-2418-46cb-b551-aa620c802f06",
+      "id": "893b3963-761e-4d91-bd85-eedb7a852739",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "New_SSK",
-        "entry": "TARGET ACQUIRED",
-        "type": "EntryType",
         "time": "1970-01-03T03:29:00+00:00",
+        "text": "TARGET ACQUIRED",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "New_SSK",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3492,27 +3744,32 @@
             },
             "used": [],
             "generated": [
-              "dc620bdd-2418-46cb-b551-aa620c802f06"
+              "893b3963-761e-4d91-bd85-eedb7a852739"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "6853767b-5c42-4780-a5f2-72460b96791b",
+      "id": "58cb4764-f2df-49e2-a68f-9267c9093876",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "Frigate",
-        "entry": "FEEL LIKE I'M BEING WATCHED",
-        "type": "EntryType",
         "time": "1970-01-03T03:48:00+00:00",
+        "text": "FEEL LIKE I'M BEING WATCHED",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "Frigate",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3520,27 +3777,32 @@
             },
             "used": [],
             "generated": [
-              "6853767b-5c42-4780-a5f2-72460b96791b"
+              "58cb4764-f2df-49e2-a68f-9267c9093876"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "22ff3912-4330-4de5-b044-d238175e6d90",
+      "id": "1b7e56df-fc3f-4093-b88e-c6207af3f943",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "Frigate",
-        "entry": "Start defensive measures\n",
-        "type": "EntryType",
         "time": "1970-01-03T04:17:25+00:00",
+        "text": "Start defensive measures\n",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "Frigate",
         "provenance": [
           {
-            "activity_id": "a7f24c51-66db-484b-b879-3dc0849dd1f3",
-            "timestamp": "2026-03-21T10:15:06.072817Z",
+            "activity_id": "d038abbf-357b-4713-bba6-a836437cdd38",
+            "timestamp": "2026-03-28T13:51:04.109303Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -3548,9 +3810,9 @@
             },
             "used": [],
             "generated": [
-              "22ff3912-4330-4de5-b044-d238175e6d90"
+              "1b7e56df-fc3f-4093-b88e-c6207af3f943"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.018704S"
           }
         ]
       }

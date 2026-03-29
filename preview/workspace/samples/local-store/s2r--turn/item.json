@@ -41,31 +41,24 @@
   "properties": {
     "title": "Dynamic Mongoose: Turn",
     "datetime": "2009-04-22T17:59:58.490000+00:00",
-    "description": "Dynamic Mongoose: Turn \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Tromp, FS Languedoc. 51 sensor contact(s) logged. Multi-national participation: FR, US.",
+    "description": "Dynamic Mongoose: Turn \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Northumberland, FS Provence. Multi-national participation: FR, US.",
     "start_datetime": "2009-04-22T17:59:58.490000+00:00",
     "end_datetime": "2009-04-22T19:10:22.390000+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/type212",
-      "subsurface/submarine/ssn/trafalgar"
+      "subsurface/submarine/ssn/trafalgar",
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
       "ASW",
-      "escort",
-      "force-protection",
-      "harbour-ops",
+      "MCM",
       "surveillance"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "passive-search",
-      "radar-detection",
-      "sonar-contact",
-      "sprint-and-drift",
       "visual-sighting"
     ],
     "debrief:track_names": [
-      "USS Tromp",
-      "FS Languedoc"
+      "USS Northumberland",
+      "FS Provence"
     ],
     "debrief:nationalities": [
       "FR",
@@ -93,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/turn.rep",
+      "href": "file:///tmp/legacy-source-data/S2R/turn.rep",
       "title": "turn.rep"
     }
   ],
@@ -114,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/turn.rep",
-        "load_timestamp": "2026-03-21T10:15:01.853142Z",
+        "source_path": "/tmp/legacy-source-data/S2R/turn.rep",
+        "load_timestamp": "2026-03-28T13:50:59.338028Z",
         "tool_version": "0.1.0"
       }
     }

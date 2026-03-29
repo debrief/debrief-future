@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "abb5a1da-1b2e-4100-9fbc-aae4adf39f6f",
+      "id": "9178a80d-9405-4629-b257-ab817651d7b6",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -5848,8 +5848,8 @@
         "label_interval": "PT30M",
         "provenance": [
           {
-            "activity_id": "b71178b9-70ed-4ee3-b47c-572573e58d3f",
-            "timestamp": "2026-03-21T10:15:04.120666Z",
+            "activity_id": "3e726d26-5ccd-412c-b8c1-add4eab85064",
+            "timestamp": "2026-03-28T13:51:01.893319Z",
             "was_generated_by": {
               "tool": "rep-parser",
               "tool_version": "1.0.0",
@@ -5857,9 +5857,1177 @@
             },
             "used": [],
             "generated": [
-              "abb5a1da-1b2e-4100-9fbc-aae4adf39f6f"
+              "9178a80d-9405-4629-b257-ab817651d7b6"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.003139S"
+          }
+        ],
+        "sensors": [
+          {
+            "name": "ARRAY",
+            "contacts": [
+              {
+                "time": "1900-12-12T06:38:38+00:00",
+                "bearing": 213.0,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:38:56+00:00",
+                "bearing": 216.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:39:12+00:00",
+                "bearing": 219.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:39:26+00:00",
+                "bearing": 222.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:39:40+00:00",
+                "bearing": 226.0,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:40:00+00:00",
+                "bearing": 230.0,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:40:16+00:00",
+                "bearing": 234.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:40:28+00:00",
+                "bearing": 237.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:40:44+00:00",
+                "bearing": 242.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:40:58+00:00",
+                "bearing": 245.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:41:16+00:00",
+                "bearing": 248.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:41:30+00:00",
+                "bearing": 252.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:41:44+00:00",
+                "bearing": 256.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:41:58+00:00",
+                "bearing": 260.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:42:08+00:00",
+                "bearing": 264.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:42:26+00:00",
+                "bearing": 268.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:42:42+00:00",
+                "bearing": 272.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:42:56+00:00",
+                "bearing": 275.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:43:10+00:00",
+                "bearing": 279.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:43:32+00:00",
+                "bearing": 283.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:43:50+00:00",
+                "bearing": 287.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:44:10+00:00",
+                "bearing": 291.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:44:36+00:00",
+                "bearing": 294.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:45:02+00:00",
+                "bearing": 299.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:45:28+00:00",
+                "bearing": 303.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:45:54+00:00",
+                "bearing": 307.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:46:30+00:00",
+                "bearing": 309.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:47:02+00:00",
+                "bearing": 312.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:47:30+00:00",
+                "bearing": 314.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:48:02+00:00",
+                "bearing": 316.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:48:30+00:00",
+                "bearing": 317.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:49:02+00:00",
+                "bearing": 319.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:49:36+00:00",
+                "bearing": 321.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:50:10+00:00",
+                "bearing": 322.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:50:46+00:00",
+                "bearing": 323.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:51:22+00:00",
+                "bearing": 323.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:52:08+00:00",
+                "bearing": 323.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:52:38+00:00",
+                "bearing": 324.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:53:14+00:00",
+                "bearing": 325.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:53:46+00:00",
+                "bearing": 325.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:54:22+00:00",
+                "bearing": 326.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:55:00+00:00",
+                "bearing": 327.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:55:38+00:00",
+                "bearing": 327.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:56:14+00:00",
+                "bearing": 328.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:56:50+00:00",
+                "bearing": 328.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:57:24+00:00",
+                "bearing": 329.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:58:10+00:00",
+                "bearing": 330.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:58:52+00:00",
+                "bearing": 331.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T06:59:36+00:00",
+                "bearing": 332.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:00:14+00:00",
+                "bearing": 332.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:00:52+00:00",
+                "bearing": 334.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:01:30+00:00",
+                "bearing": 335.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:02:02+00:00",
+                "bearing": 336.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:02:24+00:00",
+                "bearing": 336.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:02:54+00:00",
+                "bearing": 333.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:03:24+00:00",
+                "bearing": 331.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:03:52+00:00",
+                "bearing": 330.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:04:18+00:00",
+                "bearing": 328.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:04:40+00:00",
+                "bearing": 327.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:05:08+00:00",
+                "bearing": 328.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:05:42+00:00",
+                "bearing": 328.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:06:10+00:00",
+                "bearing": 328.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:06:36+00:00",
+                "bearing": 328.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:07:08+00:00",
+                "bearing": 329.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:07:42+00:00",
+                "bearing": 329.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:08:12+00:00",
+                "bearing": 330.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:08:46+00:00",
+                "bearing": 331.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:09:24+00:00",
+                "bearing": 331.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:09:58+00:00",
+                "bearing": 332.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:10:30+00:00",
+                "bearing": 332.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:11:00+00:00",
+                "bearing": 333.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:11:40+00:00",
+                "bearing": 334.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:12:12+00:00",
+                "bearing": 335.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:12:48+00:00",
+                "bearing": 335.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:13:20+00:00",
+                "bearing": 336.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:13:56+00:00",
+                "bearing": 337.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:14:32+00:00",
+                "bearing": 338.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:15:04+00:00",
+                "bearing": 339.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:15:38+00:00",
+                "bearing": 340.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:16:04+00:00",
+                "bearing": 340.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:16:34+00:00",
+                "bearing": 341.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:16:56+00:00",
+                "bearing": 341.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:17:22+00:00",
+                "bearing": 342.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:17:52+00:00",
+                "bearing": 343.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:18:24+00:00",
+                "bearing": 344.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:18:52+00:00",
+                "bearing": 344.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:19:24+00:00",
+                "bearing": 345.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:19:54+00:00",
+                "bearing": 346.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:20:28+00:00",
+                "bearing": 346.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:21:06+00:00",
+                "bearing": 347.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:21:38+00:00",
+                "bearing": 348.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:22:16+00:00",
+                "bearing": 349.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:22:48+00:00",
+                "bearing": 350.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:23:24+00:00",
+                "bearing": 351.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:23:58+00:00",
+                "bearing": 352.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:24:36+00:00",
+                "bearing": 353.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:25:08+00:00",
+                "bearing": 354.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:25:40+00:00",
+                "bearing": 355.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:26:10+00:00",
+                "bearing": 356.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:26:44+00:00",
+                "bearing": 356.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:27:20+00:00",
+                "bearing": 357.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:27:50+00:00",
+                "bearing": 358.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:28:18+00:00",
+                "bearing": 359.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:28:50+00:00",
+                "bearing": 359.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:29:16+00:00",
+                "bearing": 1.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:29:44+00:00",
+                "bearing": 1.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:30:08+00:00",
+                "bearing": 2.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:30:32+00:00",
+                "bearing": 4.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:30:58+00:00",
+                "bearing": 4.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:31:30+00:00",
+                "bearing": 5.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:32:00+00:00",
+                "bearing": 6.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:32:32+00:00",
+                "bearing": 7.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:33:12+00:00",
+                "bearing": 8.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:33:48+00:00",
+                "bearing": 10.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:34:22+00:00",
+                "bearing": 10.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:35:00+00:00",
+                "bearing": 11.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:35:36+00:00",
+                "bearing": 12.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:36:06+00:00",
+                "bearing": 13.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:36:36+00:00",
+                "bearing": 14.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:37:06+00:00",
+                "bearing": 14.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:37:40+00:00",
+                "bearing": 16.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:38:08+00:00",
+                "bearing": 17.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:38:44+00:00",
+                "bearing": 18.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:39:20+00:00",
+                "bearing": 19.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:39:54+00:00",
+                "bearing": 21.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:40:28+00:00",
+                "bearing": 21.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:41:04+00:00",
+                "bearing": 22.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:41:36+00:00",
+                "bearing": 23.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:42:06+00:00",
+                "bearing": 24.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:42:44+00:00",
+                "bearing": 25.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:43:22+00:00",
+                "bearing": 26.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:44:00+00:00",
+                "bearing": 26.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:44:32+00:00",
+                "bearing": 27.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:45:08+00:00",
+                "bearing": 28.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:45:44+00:00",
+                "bearing": 28.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:46:18+00:00",
+                "bearing": 29.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:46:56+00:00",
+                "bearing": 29.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:47:38+00:00",
+                "bearing": 29.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:48:12+00:00",
+                "bearing": 30.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:48:52+00:00",
+                "bearing": 30.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:49:32+00:00",
+                "bearing": 31.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:50:06+00:00",
+                "bearing": 31.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:50:42+00:00",
+                "bearing": 32.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:51:18+00:00",
+                "bearing": 32.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:51:56+00:00",
+                "bearing": 32.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:52:38+00:00",
+                "bearing": 32.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:53:22+00:00",
+                "bearing": 32.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:53:50+00:00",
+                "bearing": 32.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:54:20+00:00",
+                "bearing": 33.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:54:52+00:00",
+                "bearing": 33.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:55:28+00:00",
+                "bearing": 32.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:56:02+00:00",
+                "bearing": 31.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:56:26+00:00",
+                "bearing": 30.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:56:48+00:00",
+                "bearing": 27.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:57:14+00:00",
+                "bearing": 23.9,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:57:36+00:00",
+                "bearing": 20.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:57:58+00:00",
+                "bearing": 14.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:58:20+00:00",
+                "bearing": 8.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:58:40+00:00",
+                "bearing": 3.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:59:00+00:00",
+                "bearing": 356.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:59:20+00:00",
+                "bearing": 350.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:59:30+00:00",
+                "bearing": 345.2,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:59:42+00:00",
+                "bearing": 340.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T07:59:58+00:00",
+                "bearing": 335.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:00:18+00:00",
+                "bearing": 328.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:00:34+00:00",
+                "bearing": 323.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:00:50+00:00",
+                "bearing": 319.8,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:01:10+00:00",
+                "bearing": 313.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:01:30+00:00",
+                "bearing": 308.5,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:01:50+00:00",
+                "bearing": 304.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:02:12+00:00",
+                "bearing": 299.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:02:38+00:00",
+                "bearing": 293.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:03:06+00:00",
+                "bearing": 287.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:03:28+00:00",
+                "bearing": 282.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:03:50+00:00",
+                "bearing": 277.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:04:16+00:00",
+                "bearing": 272.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:04:36+00:00",
+                "bearing": 268.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:05:06+00:00",
+                "bearing": 263.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:05:28+00:00",
+                "bearing": 258.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:05:56+00:00",
+                "bearing": 255.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:06:22+00:00",
+                "bearing": 252.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:06:52+00:00",
+                "bearing": 248.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:07:22+00:00",
+                "bearing": 245.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:07:56+00:00",
+                "bearing": 242.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:08:28+00:00",
+                "bearing": 239.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:08:54+00:00",
+                "bearing": 237.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:09:22+00:00",
+                "bearing": 236.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:09:54+00:00",
+                "bearing": 236.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:10:32+00:00",
+                "bearing": 236.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:11:14+00:00",
+                "bearing": 236.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:11:50+00:00",
+                "bearing": 237.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:12:32+00:00",
+                "bearing": 239.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:13:18+00:00",
+                "bearing": 241.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:13:58+00:00",
+                "bearing": 241.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:14:34+00:00",
+                "bearing": 243.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:15:18+00:00",
+                "bearing": 243.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:16:00+00:00",
+                "bearing": 244.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:16:40+00:00",
+                "bearing": 245.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:17:16+00:00",
+                "bearing": 246.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:17:56+00:00",
+                "bearing": 248.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:18:38+00:00",
+                "bearing": 249.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:19:24+00:00",
+                "bearing": 249.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:20:08+00:00",
+                "bearing": 250.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:20:46+00:00",
+                "bearing": 251.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:21:44+00:00",
+                "bearing": 252.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:22:20+00:00",
+                "bearing": 253.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:23:02+00:00",
+                "bearing": 254.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:23:38+00:00",
+                "bearing": 255.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:24:12+00:00",
+                "bearing": 255.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:24:48+00:00",
+                "bearing": 256.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:25:26+00:00",
+                "bearing": 257.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:26:06+00:00",
+                "bearing": 259.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:26:46+00:00",
+                "bearing": 260.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:27:32+00:00",
+                "bearing": 262.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:28:14+00:00",
+                "bearing": 263.4,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:28:58+00:00",
+                "bearing": 264.7,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:29:42+00:00",
+                "bearing": 267.1,
+                "label": "Label"
+              },
+              {
+                "time": "1900-12-12T08:30:30+00:00",
+                "bearing": 268.1,
+                "label": "Label"
+              }
+            ]
+          },
+          {
+            "name": "Plain",
+            "contacts": [
+              {
+                "time": "2010-01-12T12:13:14+00:00",
+                "bearing": 2.4,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:14:44+00:00",
+                "bearing": 1.6,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:16:14+00:00",
+                "bearing": 2.7,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:17:44+00:00",
+                "bearing": 3.8,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:19:14+00:00",
+                "bearing": 3.4,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:21:59+00:00",
+                "bearing": -2.6,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:23:29+00:00",
+                "bearing": -6.8,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:24:59+00:00",
+                "bearing": -11.9,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:26:29+00:00",
+                "bearing": -18.1,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:28:14+00:00",
+                "bearing": -26.9,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              },
+              {
+                "time": "2010-01-12T12:29:59+00:00",
+                "bearing": -34.2,
+                "range": 12000.0,
+                "label": "Cookie SUBJECT held on Plain Cookie"
+              }
+            ]
           }
         ]
       }

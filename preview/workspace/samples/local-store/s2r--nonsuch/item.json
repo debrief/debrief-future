@@ -41,29 +41,25 @@
   "properties": {
     "title": "Dynamic Mongoose: Nonsuch",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Dynamic Mongoose: Nonsuch \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HMS De Ruyter.",
+    "description": "Dynamic Mongoose: Nonsuch \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Truxtun.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
+      "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
       "ASW",
-      "MCM",
-      "gunnery",
-      "mine-clearance",
+      "multi-national",
       "surveillance"
     ],
     "debrief:feature_tags": [
-      "sonar-contact",
-      "sprint-and-drift",
       "visual-sighting"
     ],
     "debrief:track_names": [
-      "HMS De Ruyter"
+      "HNoMS Truxtun"
     ],
     "debrief:nationalities": [
-      "GB"
+      "NO"
     ]
   },
   "links": [
@@ -87,7 +83,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/nonsuch.rep",
+      "href": "file:///tmp/legacy-source-data/S2R/nonsuch.rep",
       "title": "nonsuch.rep"
     }
   ],
@@ -108,8 +104,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/nonsuch.rep",
-        "load_timestamp": "2026-03-21T10:15:01.768221Z",
+        "source_path": "/tmp/legacy-source-data/S2R/nonsuch.rep",
+        "load_timestamp": "2026-03-28T13:50:59.276595Z",
         "tool_version": "0.1.0"
       }
     }

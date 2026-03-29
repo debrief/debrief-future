@@ -49,14 +49,14 @@
     ],
     "debrief:tags": [
       "ASW",
-      "boarding",
-      "escort",
-      "mine-clearance",
-      "prosecution"
+      "force-protection",
+      "prosecution",
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "intercept",
-      "radar-detection"
+      "sonar-contact",
+      "track-merge",
+      "visual-sighting"
     ],
     "debrief:track_names": [
       "HMS Defender"
@@ -86,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_2.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/ownship_2.rep",
       "title": "ownship_2.rep"
     }
   ],
@@ -107,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/ownship_2.rep",
-        "load_timestamp": "2026-03-21T10:15:04.120666Z",
+        "source_path": "/tmp/legacy-source-data/SATC/ownship_2.rep",
+        "load_timestamp": "2026-03-28T13:51:01.902141Z",
         "tool_version": "0.1.0"
       }
     }

@@ -41,27 +41,28 @@
   "properties": {
     "title": "Dynamic Mongoose: Dodgy Track",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Dynamic Mongoose: Dodgy Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Evertsen.",
+    "description": "Dynamic Mongoose: Dodgy Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Defender.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/type212"
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
       "ASW",
-      "surveillance",
-      "transit"
+      "certification",
+      "multi-national",
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "torpedo-run",
-      "track-merge",
-      "visual-sighting"
+      "intercept",
+      "visual-sighting",
+      "zig-zag"
     ],
     "debrief:track_names": [
-      "USS Evertsen"
+      "HNoMS Defender"
     ],
     "debrief:nationalities": [
-      "US"
+      "NO"
     ]
   },
   "links": [
@@ -85,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/dodgy_track.rep",
+      "href": "file:///tmp/legacy-source-data/S2R/dodgy_track.rep",
       "title": "dodgy_track.rep"
     }
   ],
@@ -106,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/dodgy_track.rep",
-        "load_timestamp": "2026-03-21T10:15:01.467889Z",
+        "source_path": "/tmp/legacy-source-data/S2R/dodgy_track.rep",
+        "load_timestamp": "2026-03-28T13:50:59.082216Z",
         "tool_version": "0.1.0"
       }
     }

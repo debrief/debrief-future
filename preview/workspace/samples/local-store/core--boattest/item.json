@@ -48,13 +48,15 @@
       "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "missile-firing",
+      "AAW",
+      "MCM",
+      "replenishment",
       "training"
     ],
     "debrief:feature_tags": [
-      "prosecution",
+      "helicopter-ops",
       "radar-detection",
-      "torpedo-run"
+      "zig-zag"
     ],
     "debrief:track_names": [
       "HMS Nelson"
@@ -84,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boattest.rep",
+      "href": "file:///tmp/legacy-source-data/boattest.rep",
       "title": "boattest.rep"
     }
   ],
@@ -105,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boattest.rep",
-        "load_timestamp": "2026-03-21T10:15:04.219719Z",
+        "source_path": "/tmp/legacy-source-data/boattest.rep",
+        "load_timestamp": "2026-03-28T13:51:02.044926Z",
         "tool_version": "0.1.0"
       }
     }

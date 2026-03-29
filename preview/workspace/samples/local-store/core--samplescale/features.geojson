@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "3a9caa74-17d2-4e55-97ce-68f563ef548e",
+      "id": "2b317fc4-d8a3-4eb8-a3fb-00f9c36c64e2",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -4058,8 +4058,8 @@
         "label_interval": "PT1H",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -4067,16 +4067,16 @@
             },
             "used": [],
             "generated": [
-              "3a9caa74-17d2-4e55-97ce-68f563ef548e"
+              "2b317fc4-d8a3-4eb8-a3fb-00f9c36c64e2"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "368b897b-51ef-4f0a-99b5-28d261411b00",
+      "id": "6514daaf-5ead-4aa3-a306-e1b6634cbfe5",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -8141,8 +8141,8 @@
         "label_interval": "PT1H",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8150,27 +8150,32 @@
             },
             "used": [],
             "generated": [
-              "368b897b-51ef-4f0a-99b5-28d261411b00"
+              "6514daaf-5ead-4aa3-a306-e1b6634cbfe5"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "4f135158-43ea-4b83-9547-a0d17900fec0",
+      "id": "b0ba58c4-2e58-45c4-b84d-2ae9941f9a21",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 1",
-        "type": "Narratives",
         "time": "1995-12-12T05:00:00+00:00",
+        "text": "comment 1",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8178,27 +8183,32 @@
             },
             "used": [],
             "generated": [
-              "4f135158-43ea-4b83-9547-a0d17900fec0"
+              "b0ba58c4-2e58-45c4-b84d-2ae9941f9a21"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "73f801e9-1136-4e43-b4c8-0e25067a45b8",
+      "id": "22895bf8-7328-40d6-887a-ef289d5012bc",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2",
-        "type": "Narratives",
         "time": "1995-12-12T05:01:00+00:00",
+        "text": "comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2comment 2",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8206,27 +8216,32 @@
             },
             "used": [],
             "generated": [
-              "73f801e9-1136-4e43-b4c8-0e25067a45b8"
+              "22895bf8-7328-40d6-887a-ef289d5012bc"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "56db34c9-f950-46c2-ad50-674d25c136bd",
+      "id": "ac669e83-5a97-4be1-bf9a-1667a0db0107",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 3",
-        "type": "Narratives",
         "time": "1995-12-12T05:02:00+00:00",
+        "text": "comment 3",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8234,27 +8249,32 @@
             },
             "used": [],
             "generated": [
-              "56db34c9-f950-46c2-ad50-674d25c136bd"
+              "ac669e83-5a97-4be1-bf9a-1667a0db0107"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "57a88b1e-10ad-4137-80e4-a78bb944bef7",
+      "id": "2df92de9-bf5d-4ff4-b3ed-0ffd57398ebd",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 4",
-        "type": "Narratives",
         "time": "1995-12-12T05:22:00+00:00",
+        "text": "comment 4",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8262,27 +8282,32 @@
             },
             "used": [],
             "generated": [
-              "57a88b1e-10ad-4137-80e4-a78bb944bef7"
+              "2df92de9-bf5d-4ff4-b3ed-0ffd57398ebd"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "088ac2c4-dec5-472f-9c8e-d65d63975f7f",
+      "id": "8e9ef24c-de86-46ee-a6e8-e9ce0c436def",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 4A",
-        "type": "Narratives",
         "time": "1995-12-12T06:12:00+00:00",
+        "text": "comment 4A",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8290,27 +8315,32 @@
             },
             "used": [],
             "generated": [
-              "088ac2c4-dec5-472f-9c8e-d65d63975f7f"
+              "8e9ef24c-de86-46ee-a6e8-e9ce0c436def"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "ea0eca4a-4009-49d6-a82d-7e0a0e6ddc70",
+      "id": "1d2a37c1-6d99-4bd7-873e-e73776689250",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 4B",
-        "type": "Narratives",
         "time": "1995-12-12T06:22:00+00:00",
+        "text": "comment 4B",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8318,27 +8348,32 @@
             },
             "used": [],
             "generated": [
-              "ea0eca4a-4009-49d6-a82d-7e0a0e6ddc70"
+              "1d2a37c1-6d99-4bd7-873e-e73776689250"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "4ec21120-7bf3-431a-ac76-bc25bdd58e3f",
+      "id": "7f871839-b226-48f3-9073-994b4eba8b7b",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 4V",
-        "type": "Narratives",
         "time": "1995-12-12T06:42:00+00:00",
+        "text": "comment 4V",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8346,27 +8381,32 @@
             },
             "used": [],
             "generated": [
-              "4ec21120-7bf3-431a-ac76-bc25bdd58e3f"
+              "7f871839-b226-48f3-9073-994b4eba8b7b"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "4897ed10-2eed-4b0f-86b0-eed544fab5bc",
+      "id": "fb91106a-abfa-4689-8cb1-f56719d05466",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 5",
-        "type": "Narratives",
         "time": "1995-12-12T09:53:00+00:00",
+        "text": "comment 5",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8374,27 +8414,32 @@
             },
             "used": [],
             "generated": [
-              "4897ed10-2eed-4b0f-86b0-eed544fab5bc"
+              "fb91106a-abfa-4689-8cb1-f56719d05466"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "23bdd3b8-a10b-4329-ad38-8d6d3be348d0",
+      "id": "cbc1138f-1935-4ba2-beb8-a4c078ee906c",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 6",
-        "type": "Narratives",
         "time": "1995-12-12T09:54:00+00:00",
+        "text": "comment 6",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8402,27 +8447,32 @@
             },
             "used": [],
             "generated": [
-              "23bdd3b8-a10b-4329-ad38-8d6d3be348d0"
+              "cbc1138f-1935-4ba2-beb8-a4c078ee906c"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "6eab72e5-bf2a-4cea-94db-b069db29b2fa",
+      "id": "c409d830-d6c1-43eb-830f-42844a6c2e13",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "COLLINGWOOD",
-        "entry": "SUSPECTED DETECTION OF RED",
-        "type": "Narratives",
         "time": "1995-12-12T09:57:00+00:00",
+        "text": "SUSPECTED DETECTION OF RED",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "COLLINGWOOD",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8430,27 +8480,32 @@
             },
             "used": [],
             "generated": [
-              "6eab72e5-bf2a-4cea-94db-b069db29b2fa"
+              "c409d830-d6c1-43eb-830f-42844a6c2e13"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "30275290-5add-4456-a92c-45c05512e375",
+      "id": "6eff1ad5-6e44-4de3-9cbc-546a0297b117",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "COLLINGWOOD",
-        "entry": "CONFIRMED. OBTAIN SOLUTION",
-        "type": "Narratives",
         "time": "1995-12-12T10:03:00+00:00",
+        "text": "CONFIRMED. OBTAIN SOLUTION",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "COLLINGWOOD",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8458,27 +8513,32 @@
             },
             "used": [],
             "generated": [
-              "30275290-5add-4456-a92c-45c05512e375"
+              "6eff1ad5-6e44-4de3-9cbc-546a0297b117"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "afaa3a78-a076-4cfa-a680-9360e1169e24",
+      "id": "a4c019d2-a5d6-4596-b6ae-9634cb02618c",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "COLLINGWOOD",
-        "entry": "SUSPECT TARGET ZIG",
-        "type": "Narratives",
         "time": "1995-12-12T10:13:00+00:00",
+        "text": "SUSPECT TARGET ZIG",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "COLLINGWOOD",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8486,27 +8546,32 @@
             },
             "used": [],
             "generated": [
-              "afaa3a78-a076-4cfa-a680-9360e1169e24"
+              "a4c019d2-a5d6-4596-b6ae-9634cb02618c"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "27d43cc5-d6aa-469a-b08e-9d69f330a08c",
+      "id": "772ac725-6611-4ce5-9a15-056f1eb76a64",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "PORT DETECTION, 16 HZ",
-        "type": "Narratives",
         "time": "1995-12-12T10:14:00+00:00",
+        "text": "PORT DETECTION, 16 HZ",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8514,27 +8579,32 @@
             },
             "used": [],
             "generated": [
-              "27d43cc5-d6aa-469a-b08e-9d69f330a08c"
+              "772ac725-6611-4ce5-9a15-056f1eb76a64"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "613ea8bb-d99a-4786-a20b-fe10a644c049",
+      "id": "ef5af461-0b1d-42e3-82ba-472ba65708ef",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "ENTER TRAIL",
-        "type": "Narratives",
         "time": "1995-12-12T10:29:00+00:00",
+        "text": "ENTER TRAIL",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8542,27 +8612,32 @@
             },
             "used": [],
             "generated": [
-              "613ea8bb-d99a-4786-a20b-fe10a644c049"
+              "ef5af461-0b1d-42e3-82ba-472ba65708ef"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "3c00b5c8-72be-453a-8142-5746ee4fbe9c",
+      "id": "3ccfa0f9-6edc-45d3-bd81-9dd94ba8678e",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "TARGET ZIG DETECTED",
-        "type": "Narratives",
         "time": "1995-12-12T10:37:00+00:00",
+        "text": "TARGET ZIG DETECTED",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8570,27 +8645,32 @@
             },
             "used": [],
             "generated": [
-              "3c00b5c8-72be-453a-8142-5746ee4fbe9c"
+              "3ccfa0f9-6edc-45d3-bd81-9dd94ba8678e"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "c9afd784-b2aa-4737-a2d4-398eb64c5ffe",
+      "id": "4e127e84-fb2f-4864-b57a-3f3d4a6fe361",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "COLLINGWOOD",
-        "entry": "FINEX CALLED, ENTER TRANSITION",
-        "type": "Narratives",
         "time": "1995-12-12T11:19:00+00:00",
+        "text": "FINEX CALLED, ENTER TRANSITION",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "COLLINGWOOD",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8598,27 +8678,32 @@
             },
             "used": [],
             "generated": [
-              "c9afd784-b2aa-4737-a2d4-398eb64c5ffe"
+              "4e127e84-fb2f-4864-b57a-3f3d4a6fe361"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "e5d889cd-8b85-4524-85a0-5c6afc33e986",
+      "id": "e1104678-3545-42ae-be85-033258050823",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 10",
-        "type": "Narratives",
         "time": "1995-12-12T11:20:00+00:00",
+        "text": "comment 10",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8626,27 +8711,32 @@
             },
             "used": [],
             "generated": [
-              "e5d889cd-8b85-4524-85a0-5c6afc33e986"
+              "e1104678-3545-42ae-be85-033258050823"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "0dbaf1fa-2932-4a1a-b3c1-7fc80f8cd262",
+      "id": "33defe4a-63a2-4910-9012-5a856e6085ef",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 11",
-        "type": "Narratives",
         "time": "1995-12-12T11:37:00+00:00",
+        "text": "comment 11",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8654,27 +8744,32 @@
             },
             "used": [],
             "generated": [
-              "0dbaf1fa-2932-4a1a-b3c1-7fc80f8cd262"
+              "33defe4a-63a2-4910-9012-5a856e6085ef"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "598c1d58-6d3a-4470-a3a0-2685d0af9223",
+      "id": "4e9f12f7-c4ab-42f4-b872-c5e0a9447a86",
       "geometry": null,
       "properties": {
         "kind": "NARRATIVE",
-        "track": "NELSON",
-        "entry": "comment 12",
-        "type": "Narratives",
         "time": "1995-12-12T11:41:00+00:00",
+        "text": "comment 12",
+        "style": {
+          "shape": "circle",
+          "radius": 4,
+          "fill_color": "#888888",
+          "color": "#888888"
+        },
+        "track_id": "NELSON",
         "provenance": [
           {
-            "activity_id": "4d8f9d29-1669-4ef8-9540-e8d393c04edb",
-            "timestamp": "2026-03-21T10:15:06.031869Z",
+            "activity_id": "0bff99b6-5893-49e0-8ed2-9545005973c8",
+            "timestamp": "2026-03-28T13:51:04.060319Z",
             "was_generated_by": {
               "tool": "dpf-parser",
               "tool_version": "1.0.0",
@@ -8682,9 +8777,9 @@
             },
             "used": [],
             "generated": [
-              "598c1d58-6d3a-4470-a3a0-2685d0af9223"
+              "4e9f12f7-c4ab-42f4-b872-c5e0a9447a86"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.007724S"
           }
         ]
       }

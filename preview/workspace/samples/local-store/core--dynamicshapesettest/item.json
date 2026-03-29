@@ -49,15 +49,14 @@
       "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "amphibious",
-      "missile-firing",
-      "training",
-      "transit"
+      "demo",
+      "force-protection",
+      "surveillance",
+      "training"
     ],
     "debrief:feature_tags": [
-      "intercept",
-      "radar-detection",
-      "sonar-contact"
+      "minefield",
+      "radar-detection"
     ],
     "debrief:track_names": [
       "HMS Nelson",
@@ -89,7 +88,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/DynamicShapeSetTest.dpf",
+      "href": "file:///tmp/legacy-source-data/DynamicShapeSetTest.dpf",
       "title": "DynamicShapeSetTest.dpf"
     }
   ],
@@ -110,8 +109,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/DynamicShapeSetTest.dpf",
-        "load_timestamp": "2026-03-21T10:15:00.227961Z",
+        "source_path": "/tmp/legacy-source-data/DynamicShapeSetTest.dpf",
+        "load_timestamp": "2026-03-28T13:50:57.718124Z",
         "tool_version": "0.1.0"
       }
     }

@@ -41,26 +41,25 @@
   "properties": {
     "title": "Formidable Shield: Gapstesttrack",
     "datetime": "2009-04-22T17:59:58.490000+00:00",
-    "description": "Formidable Shield: Gapstesttrack \u2014 Multi-static sonar exercise in the North Atlantic. 1 platform track(s) recorded including FS Roald Amundsen. 25 sensor contact(s) logged.",
+    "description": "Formidable Shield: Gapstesttrack \u2014 Multi-static sonar exercise in the North Atlantic. 1 platform track(s) recorded including FS Fridtjof Nansen.",
     "start_datetime": "2009-04-22T17:59:58.490000+00:00",
     "end_datetime": "2009-04-22T19:10:22.390000+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/type212"
+      "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
       "ASW",
-      "boarding",
+      "MCM",
+      "gunnery",
       "multi-national",
-      "surveillance"
+      "surveillance",
+      "training"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "passive-search",
-      "sonar-contact",
       "visual-sighting"
     ],
     "debrief:track_names": [
-      "FS Roald Amundsen"
+      "FS Fridtjof Nansen"
     ],
     "debrief:nationalities": [
       "FR"
@@ -87,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiPath/GapsTestTrack.dpf",
+      "href": "file:///tmp/legacy-source-data/MultiStatics/GapsTestTrack.dpf",
       "title": "GapsTestTrack.dpf"
     }
   ],
@@ -108,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiPath/GapsTestTrack.dpf",
-        "load_timestamp": "2026-03-21T10:15:00.243602Z",
+        "source_path": "/tmp/legacy-source-data/MultiStatics/GapsTestTrack.dpf",
+        "load_timestamp": "2026-03-28T13:50:57.739876Z",
         "tool_version": "0.1.0"
       }
     }

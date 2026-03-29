@@ -41,31 +41,30 @@
   "properties": {
     "title": "Saxon Warrior: Bulk Blue Tracks",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Bulk Blue Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including USS Languedoc, FS Diamond, FGS Carney. Multi-national participation: DE, FR, US.",
+    "description": "Saxon Warrior: Bulk Blue Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including HMS Hamburg, USS Aquitaine, FS Mahan. Multi-national participation: FR, GB, US.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T20:13:14+00:00",
     "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
       "surface/warship/destroyer/type45",
       "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "EW",
-      "escort",
-      "training"
+      "training",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "helicopter-ops",
-      "radar-detection"
+      "radar-detection",
+      "zig-zag"
     ],
     "debrief:track_names": [
-      "USS Languedoc",
-      "FS Diamond",
-      "FGS Carney"
+      "HMS Hamburg",
+      "USS Aquitaine",
+      "FS Mahan"
     ],
     "debrief:nationalities": [
-      "DE",
       "FR",
+      "GB",
       "US"
     ]
   },
@@ -90,7 +89,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_BLUE_TRACKS.rep",
+      "href": "file:///tmp/legacy-source-data/BULK_BLUE_TRACKS.rep",
       "title": "BULK_BLUE_TRACKS.rep"
     }
   ],
@@ -111,8 +110,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/BULK_BLUE_TRACKS.rep",
-        "load_timestamp": "2026-03-21T10:14:59.585189Z",
+        "source_path": "/tmp/legacy-source-data/BULK_BLUE_TRACKS.rep",
+        "load_timestamp": "2026-03-28T13:50:56.757924Z",
         "tool_version": "0.1.0"
       }
     }

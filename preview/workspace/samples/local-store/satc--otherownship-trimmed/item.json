@@ -41,28 +41,28 @@
   "properties": {
     "title": "Silent Resolve: Otherownship Trimmed",
     "datetime": "2011-03-21T22:08:02.380000+00:00",
-    "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HNoMS Truxtun.",
+    "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Argyll.",
     "start_datetime": "2011-03-21T22:08:02.380000+00:00",
     "end_datetime": "2011-03-22T04:47:54.870000+00:00",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia"
+      "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
       "ASW",
-      "mine-clearance",
+      "SAR",
+      "missile-firing",
       "prosecution",
-      "training"
+      "transit"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "towed-array",
+      "prosecution",
       "visual-sighting"
     ],
     "debrief:track_names": [
-      "HNoMS Truxtun"
+      "HMS Argyll"
     ],
     "debrief:nationalities": [
-      "NO"
+      "GB"
     ]
   },
   "links": [
@@ -86,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/OtherOwnship_Trimmed.rep",
+      "href": "file:///tmp/legacy-source-data/SATC/OtherOwnship_Trimmed.rep",
       "title": "OtherOwnship_Trimmed.rep"
     }
   ],
@@ -107,8 +107,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/OtherOwnship_Trimmed.rep",
-        "load_timestamp": "2026-03-21T10:15:04.069172Z",
+        "source_path": "/tmp/legacy-source-data/SATC/OtherOwnship_Trimmed.rep",
+        "load_timestamp": "2026-03-28T13:51:01.814647Z",
         "tool_version": "0.1.0"
       }
     }

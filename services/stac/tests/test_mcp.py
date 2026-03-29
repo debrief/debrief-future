@@ -143,8 +143,19 @@ class TestMCPToolIntegration:
         features = [
             {
                 "type": "Feature",
+                "id": "ref-001",
                 "geometry": {"type": "Point", "coordinates": [0, 0]},
-                "properties": {"name": "Test Point"},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Test Point",
+                    "location_type": "WAYPOINT",
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
+                },
             }
         ]
         add_result = mcp_add_features(

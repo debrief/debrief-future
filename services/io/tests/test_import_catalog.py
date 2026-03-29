@@ -111,14 +111,18 @@ class TestCountFeatureKinds:
 
     def test_mixed_features(self) -> None:
         features = [
+            {
+                "properties": {
+                    "kind": "TRACK",
+                    "sensors": [{"name": "S1", "contacts": [{"time": "t", "bearing": 0}]}],
+                }
+            },
             {"properties": {"kind": "TRACK"}},
-            {"properties": {"kind": "TRACK"}},
-            {"properties": {"kind": "SENSOR_CONTACT"}},
             {"properties": {"kind": "NARRATIVE"}},
         ]
         tracks, sensors, narratives = _count_feature_kinds(features)
         assert tracks == 2
-        assert sensors == 1
+        assert sensors == 1  # 1 embedded sensor contact
         assert narratives == 1
 
 
@@ -231,7 +235,7 @@ class TestImportLegacyData:
         assert catalog.exists()
 
     def test_import_dpf_files(self, tmp_path: Path) -> None:
-        """Import DPF fixtures into STAC catalog."""
+        """DPF files import successfully with sensors/TMA embedded in tracks."""
         source = tmp_path / "source"
         source.mkdir()
         for dpf_file in FIXTURES.glob("*.dpf"):
@@ -242,10 +246,11 @@ class TestImportLegacyData:
 
         assert result.files_processed > 0
         assert result.files_succeeded > 0
+        assert result.files_failed == 0
         assert result.total_tracks > 0
 
     def test_import_dsf_files(self, tmp_path: Path) -> None:
-        """Import DSF fixtures into STAC catalog."""
+        """DSF files import successfully; sensor data deferred for merging."""
         source = tmp_path / "source"
         source.mkdir()
         for dsf_file in FIXTURES.glob("*.dsf"):
@@ -255,10 +260,19 @@ class TestImportLegacyData:
         result = import_legacy_data(source, catalog)
 
         assert result.files_processed > 0
+        # DSF files succeed (no standalone features, just deferred sensor data)
         assert result.files_succeeded > 0
+        assert result.files_failed == 0
+        # Orphan warnings since there are no companion tracks
+        orphan_warns = [w for w in result.warnings if w.code == "ORPHAN_SENSOR"]
+        assert len(orphan_warns) > 0
 
     def test_import_mixed_formats(self, tmp_path: Path) -> None:
-        """Import a mix of REP, DPF, and DSF files."""
+        """Import a mix of REP, DPF, and DSF files.
+
+        All formats now succeed: REP and DPF produce valid features;
+        DSF defers sensor data (orphaned without companion tracks here).
+        """
         source = tmp_path / "source"
         source.mkdir()
 
@@ -348,6 +362,61 @@ class TestImportLegacyData:
             assert entry["used"] == []
             assert feature.get("id") in entry["generated"]
             assert entry["execution_duration"].startswith("PT")
+
+
+class TestSchemaValidationInImport:
+    """Tests for schema validation at import time."""
+
+    def test_import_dsf_no_schema_warnings(self, tmp_path: Path) -> None:
+        """DSF files produce no features, so no schema warnings are emitted."""
+        source = tmp_path / "source"
+        source.mkdir()
+        for dsf_file in FIXTURES.glob("*.dsf"):
+            (source / dsf_file.name).write_text(dsf_file.read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        # DSF files produce no standalone features, so no schema validation runs
+        schema_warns = [w for w in result.warnings if w.code == "SCHEMA_VALIDATION"]
+        assert len(schema_warns) == 0
+
+    def test_import_rep_features_pass_validation(self, tmp_path: Path) -> None:
+        """REP files produce schema-valid features that import successfully."""
+        source = tmp_path / "source"
+        source.mkdir()
+        src = FIXTURES / "boat1.rep"
+        if not src.exists():
+            pytest.skip("boat1.rep fixture not available")
+        (source / "boat1.rep").write_text(src.read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_failed == 0
+        assert result.files_succeeded == 1
+        assert result.total_tracks > 0
+
+
+class TestFailedImportCleanup:
+    """Tests for cleanup of partially-created plots on import failure."""
+
+    def test_failed_import_leaves_no_orphan_directory(self, tmp_path: Path) -> None:
+        """When add_features fails, the plot directory is cleaned up."""
+        source = tmp_path / "source"
+        source.mkdir()
+        # shapes.rep produces ELLIPSE features which fail schema validation
+        (source / "shapes.rep").write_text((FIXTURES / "shapes.rep").read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_failed == 1
+        assert result.files_succeeded == 0
+
+        # Verify no orphan plot directories remain (only catalog.json at root)
+        plot_dirs = [d for d in catalog.iterdir() if d.is_dir()]
+        assert len(plot_dirs) == 0, f"Orphan directories found: {[d.name for d in plot_dirs]}"
 
 
 class TestGenerateReport:

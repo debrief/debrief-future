@@ -6,6 +6,7 @@ Following TDD: Write tests first, ensure they fail, then implement.
 """
 
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,25 @@ from debrief_stac.features import add_features
 from debrief_stac.models import PlotMetadata
 from debrief_stac.plot import create_plot, read_plot, update_temporal_metadata
 from debrief_stac.types import STAC_VERSION
+
+
+def _write_features_raw(catalog_path: Path, plot_id: str, features: Sequence[dict]) -> None:
+    """Write features directly to disk, bypassing schema validation.
+
+    Used by tests that exercise temporal metadata extraction on non-schema
+    feature types (SENSOR_CONTACT, NARRATIVE, PERIODTEXT, etc.) which
+    are rejected by catalog_write validation.
+    """
+    plot_dir = Path(catalog_path) / plot_id
+    features_path = plot_dir / "features.geojson"
+    if features_path.exists():
+        with open(features_path) as f:
+            fc = json.load(f)
+    else:
+        fc = {"type": "FeatureCollection", "features": []}
+    fc["features"].extend(features)
+    with open(features_path, "w") as f:
+        json.dump(fc, f, indent=2)
 
 
 class TestCreatePlot:
@@ -195,23 +215,44 @@ class TestReadPlot:
         assert isinstance(item["assets"], dict)
 
 
+_track_counter = 0
+
+
 def _make_track(
     name: str,
     start_time: str,
     end_time: str,
     coords: list[list[float]] | None = None,
 ) -> dict:
-    """Helper: build a TRACK feature with start_time/end_time properties."""
+    """Helper: build a schema-valid TRACK feature with start_time/end_time."""
+    global _track_counter  # noqa: PLW0603
+    _track_counter += 1
     if coords is None:
         coords = [[-5.0, 50.0], [-4.0, 50.5]]
     return {
         "type": "Feature",
+        "id": f"track-{name.lower()}-{_track_counter}",
         "geometry": {"type": "LineString", "coordinates": coords},
         "properties": {
-            "name": name,
             "kind": "TRACK",
+            "platform_id": name,
+            "platform_name": name,
+            "track_type": "OWNSHIP",
             "start_time": start_time,
             "end_time": end_time,
+            "positions": [
+                {"time": start_time, "course": 45, "speed": 12},
+                {"time": end_time, "course": 45, "speed": 12},
+            ],
+            "style": {
+                "line": {"color": "#0066CC"},
+                "point": {"shape": "circle", "radius": 4, "fill_color": "#0066CC", "color": "#FFF"},
+            },
+            "default_position_style": {
+                "show_symbol": False,
+                "symbol": "circle",
+                "show_label": False,
+            },
         },
     }
 
@@ -302,7 +343,7 @@ class TestUpdateTemporalMetadata:
         catalog_path = create_catalog(temp_dir / "catalog")
         plot_id = create_plot(catalog_path, PlotMetadata(title="No tracks"))
 
-        # Add a non-track feature
+        # Add a non-track feature (bypasses schema validation — WAYPOINT not in schema)
         features = [
             {
                 "type": "Feature",
@@ -310,7 +351,7 @@ class TestUpdateTemporalMetadata:
                 "properties": {"name": "Waypoint", "kind": "WAYPOINT"},
             }
         ]
-        add_features(catalog_path, plot_id, features)
+        _write_features_raw(catalog_path, plot_id, features)
 
         item_before = read_plot(catalog_path, plot_id)
         original_datetime = item_before["properties"]["datetime"]
@@ -343,6 +384,7 @@ class TestUpdateTemporalMetadata:
         catalog_path = create_catalog(temp_dir / "catalog")
         plot_id = create_plot(catalog_path, PlotMetadata(title="No temporal"))
 
+        # Deliberately incomplete TRACK — bypasses validation to test edge case
         features = [
             {
                 "type": "Feature",
@@ -350,7 +392,7 @@ class TestUpdateTemporalMetadata:
                 "properties": {"name": "Track-no-time", "kind": "TRACK"},
             }
         ]
-        add_features(catalog_path, plot_id, features)
+        _write_features_raw(catalog_path, plot_id, features)
 
         result = update_temporal_metadata(catalog_path, plot_id)
 
@@ -364,3 +406,122 @@ class TestUpdateTemporalMetadata:
         result = update_temporal_metadata(catalog_path, plot_id)
 
         assert result is None
+
+    # --- Sensor/narrative temporal extraction ---
+
+    def test_sensor_only_temporal_extent(self, temp_dir: Path) -> None:
+        """Sensor-only plots derive temporal extent from sensor time properties."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Sensors"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T12:00:00+00:00",
+                    "parent_track": "OWNSHIP",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T14:00:00+00:00",
+                    "parent_track": "OWNSHIP",
+                },
+            },
+        ]
+        _write_features_raw(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "2010-01-12T12:00:00+00:00"
+        assert result.end_datetime == "2010-01-12T14:00:00+00:00"
+
+    def test_narrative_only_temporal_extent(self, temp_dir: Path) -> None:
+        """Narrative-only plots derive temporal extent from narrative time properties."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Narratives"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "NARRATIVE",
+                    "time": "1995-12-12T05:00:00+00:00",
+                    "text": "First entry",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "NARRATIVE",
+                    "time": "1995-12-12T11:00:00+00:00",
+                    "text": "Last entry",
+                },
+            },
+        ]
+        _write_features_raw(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "1995-12-12T05:00:00+00:00"
+        assert result.end_datetime == "1995-12-12T11:00:00+00:00"
+
+    def test_mixed_track_and_sensor_temporal_extent(self, temp_dir: Path) -> None:
+        """Mixed track+sensor plots use global min/max across all types."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Mixed"))
+
+        features = [
+            _make_track("Alpha", "2010-01-12T13:00:00Z", "2010-01-12T14:00:00Z"),
+            {
+                "type": "Feature",
+                "geometry": None,
+                "properties": {
+                    "kind": "SENSOR_CONTACT",
+                    "time": "2010-01-12T12:00:00Z",
+                    "parent_track": "Alpha",
+                },
+            },
+        ]
+        _write_features_raw(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        # Sensor contact at 12:00 is earlier than track start at 13:00
+        assert result.start_datetime == "2010-01-12T12:00:00Z"
+        assert result.end_datetime == "2010-01-12T14:00:00Z"
+
+    def test_periodtext_temporal_extent(self, temp_dir: Path) -> None:
+        """PERIODTEXT features contribute time_start/time_end to extent."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="PeriodText"))
+
+        features = [
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [-4.0, 50.0]},
+                "properties": {
+                    "kind": "PERIODTEXT",
+                    "time_start": "2010-01-12T12:20:00+00:00",
+                    "time_end": "2010-01-12T12:24:00+00:00",
+                    "text": "Hit_121220",
+                },
+            },
+        ]
+        _write_features_raw(catalog_path, plot_id, features)
+
+        result = update_temporal_metadata(catalog_path, plot_id)
+
+        assert result is not None
+        assert result.start_datetime == "2010-01-12T12:20:00+00:00"
+        assert result.end_datetime == "2010-01-12T12:24:00+00:00"

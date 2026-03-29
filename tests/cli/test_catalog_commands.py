@@ -37,7 +37,32 @@ def config_with_stores(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
                 "type": "Feature",
                 "id": "track-1",
                 "geometry": {"type": "LineString", "coordinates": [[-4.5, 50.2], [-4.4, 50.3]]},
-                "properties": {"kind": "TRACK", "name": "HMS Example"},
+                "properties": {
+                    "kind": "TRACK",
+                    "platform_id": "HMS-EXAMPLE",
+                    "platform_name": "HMS Example",
+                    "track_type": "OWNSHIP",
+                    "start_time": "2026-01-09T10:00:00Z",
+                    "end_time": "2026-01-09T12:00:00Z",
+                    "positions": [
+                        {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12},
+                        {"time": "2026-01-09T12:00:00Z", "course": 45, "speed": 12},
+                    ],
+                    "style": {
+                        "line": {"color": "#0066CC"},
+                        "point": {
+                            "shape": "circle",
+                            "radius": 4,
+                            "fill_color": "#0066CC",
+                            "color": "#FFF",
+                        },
+                    },
+                    "default_position_style": {
+                        "show_symbol": False,
+                        "symbol": "circle",
+                        "show_label": False,
+                    },
+                },
             }
         ],
     )

@@ -41,36 +41,38 @@
   "properties": {
     "title": "Formidable Shield: Buoy Test Track",
     "datetime": "1995-12-12T05:03:00+00:00",
-    "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNLMS Somerset, HMS Iron Duke and 1 other(s). Multi-national participation: GB, NL, US.",
+    "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNoMS Languedoc, FS Northumberland and 1 other(s). Multi-national participation: FR, GB, IT, NO.",
     "start_datetime": "1995-12-12T05:03:00+00:00",
     "end_datetime": "1995-12-12T11:45:00+00:00",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/arleigh-burke",
       "surface/warship/destroyer/type45",
-      "surface/warship/patrol/river"
+      "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
       "ASW",
+      "NGFS",
+      "SAR",
+      "boarding",
+      "demo",
       "force-protection",
       "multi-national",
-      "surveillance",
-      "training"
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "radar-detection",
-      "sprint-and-drift"
+      "visual-sighting"
     ],
     "debrief:track_names": [
       "HMS Collingwood",
-      "HNLMS Somerset",
-      "HMS Iron Duke",
-      "USS Gonzalez"
+      "HNoMS Languedoc",
+      "FS Northumberland",
+      "ITS Sachsen"
     ],
     "debrief:nationalities": [
+      "FR",
       "GB",
-      "NL",
-      "US"
+      "IT",
+      "NO"
     ]
   },
   "links": [
@@ -94,7 +96,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/buoy_test_track.rep",
+      "href": "file:///tmp/legacy-source-data/MultiStatics/buoy_test_track.rep",
       "title": "buoy_test_track.rep"
     }
   ],
@@ -115,8 +117,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/buoy_test_track.rep",
-        "load_timestamp": "2026-03-21T10:15:00.438517Z",
+        "source_path": "/tmp/legacy-source-data/MultiStatics/buoy_test_track.rep",
+        "load_timestamp": "2026-03-28T13:50:57.885357Z",
         "tool_version": "0.1.0"
       }
     }

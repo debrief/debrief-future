@@ -1,4 +1,5 @@
 // Fix: track symbols/labels visibility preserved when running styling tools
+// Data quality: sensor-only plots merged into track companions, timestamps fixed
 import * as vscode from 'vscode';
 import {
   subscribeToDirty,

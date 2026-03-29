@@ -54,6 +54,7 @@ export type FilterType =
   | "duration"
   | "modified"
   | "title"
+  | "filename"
   | "plot-contents"
   | "track-name"
   | "nationality"

@@ -534,3 +534,34 @@ class TestChainedMutations:
         second_input_coords = _json.loads(entry2["input_state"][0]["geometry"])["coordinates"]
         assert second_input_coords[0] == pytest.approx(intermediate_coords[0], abs=0.001)
         assert second_input_coords[1] == pytest.approx(intermediate_coords[1], abs=0.001)
+
+
+class TestSchemaValidationWarnAndContinue:
+    """Tests that calc executor schema validation is warn-and-continue.
+
+    Calc outputs are transient (not persisted to catalog), so validation
+    is non-blocking. The blocking gate is at catalog_write in debrief-stac.
+    """
+
+    def test_schema_validate_warns_on_invalid_kind(self, caplog: pytest.LogCaptureFixture) -> None:
+        """Invalid known kinds produce warnings but don't raise."""
+        import logging
+
+        from debrief_calc.executor import _schema_validate_features
+
+        features = [
+            {
+                "type": "Feature",
+                "id": "bad-track",
+                "geometry": {"type": "LineString", "coordinates": [[-5, 50], [-4, 51]]},
+                "properties": {
+                    "kind": "TRACK",
+                    "bogus_field": "should not be here",
+                },
+            },
+        ]
+
+        with caplog.at_level(logging.WARNING):
+            _schema_validate_features(features, "test-tool")
+
+        assert "Schema validation warning" in caplog.text

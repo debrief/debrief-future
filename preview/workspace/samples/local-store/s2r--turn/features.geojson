@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "23725749-ce4c-4a2d-9ce1-91ed92b511d8",
+      "id": "1cebf426-ba37-4cf7-8077-19f3b8dc3e76",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -5326,1557 +5326,184 @@
         },
         "symbol_interval": "PT5M",
         "label_interval": "PT15M",
+        "sensors": [
+          {
+            "name": "BowMerchantvessel",
+            "contacts": [
+              {
+                "time": "2009-04-22T18:24:00+00:00",
+                "bearing": 259.1,
+                "frequency": 300.528,
+                "label": " 1824"
+              },
+              {
+                "time": "2009-04-22T18:25:00+00:00",
+                "bearing": 259.0,
+                "frequency": 300.528,
+                "label": " 1825"
+              },
+              {
+                "time": "2009-04-22T18:26:00+00:00",
+                "bearing": 259.0,
+                "frequency": 300.529,
+                "label": " 1826"
+              },
+              {
+                "time": "2009-04-22T18:27:00+00:00",
+                "bearing": 258.9,
+                "frequency": 300.528,
+                "label": " 1827"
+              },
+              {
+                "time": "2009-04-22T18:28:00+00:00",
+                "bearing": 258.9,
+                "frequency": 300.534,
+                "label": " 1828"
+              },
+              {
+                "time": "2009-04-22T18:29:00+00:00",
+                "bearing": 258.7,
+                "frequency": 300.528,
+                "label": " 1829"
+              },
+              {
+                "time": "2009-04-22T18:30:00+00:00",
+                "bearing": 258.6,
+                "frequency": 300.528,
+                "label": " 1830"
+              },
+              {
+                "time": "2009-04-22T18:31:00+00:00",
+                "bearing": 258.5,
+                "frequency": 300.535,
+                "label": " 1831"
+              },
+              {
+                "time": "2009-04-22T18:32:00+00:00",
+                "bearing": 258.3,
+                "frequency": 300.528,
+                "label": " 1832"
+              },
+              {
+                "time": "2009-04-22T18:33:00+00:00",
+                "bearing": 258.3,
+                "frequency": 300.566,
+                "label": " 1833"
+              },
+              {
+                "time": "2009-04-22T18:34:00+00:00",
+                "bearing": 258.4,
+                "frequency": 300.635,
+                "label": " 1834"
+              },
+              {
+                "time": "2009-04-22T18:35:00+00:00",
+                "bearing": 259.4,
+                "frequency": 300.651,
+                "label": " 1835"
+              },
+              {
+                "time": "2009-04-22T18:36:00+00:00",
+                "bearing": 261.5,
+                "frequency": 300.612,
+                "label": " 1836"
+              },
+              {
+                "time": "2009-04-22T18:37:00+00:00",
+                "bearing": 265.2,
+                "frequency": 300.451,
+                "label": " 1837"
+              },
+              {
+                "time": "2009-04-22T18:38:00+00:00",
+                "bearing": 269.7,
+                "frequency": 300.236,
+                "label": " 1838"
+              },
+              {
+                "time": "2009-04-22T18:39:00+00:00",
+                "bearing": 274.9,
+                "frequency": 300.011,
+                "label": " 1839"
+              },
+              {
+                "time": "2009-04-22T18:40:00+00:00",
+                "bearing": 279.7,
+                "frequency": 299.844,
+                "label": " 1840"
+              },
+              {
+                "time": "2009-04-22T18:41:00+00:00",
+                "bearing": 283.8,
+                "frequency": 299.767,
+                "label": " 1841"
+              },
+              {
+                "time": "2009-04-22T18:42:00+00:00",
+                "bearing": 287.5,
+                "frequency": 299.737,
+                "label": " 1842"
+              },
+              {
+                "time": "2009-04-22T18:43:00+00:00",
+                "bearing": 291.1,
+                "frequency": 299.698,
+                "label": " 1843"
+              },
+              {
+                "time": "2009-04-22T18:44:00+00:00",
+                "bearing": 294.6,
+                "frequency": 299.69,
+                "label": " 1844"
+              },
+              {
+                "time": "2009-04-22T18:45:00+00:00",
+                "bearing": 297.5,
+                "frequency": 299.652,
+                "label": " 1845"
+              },
+              {
+                "time": "2009-04-22T18:46:00+00:00",
+                "bearing": 300.5,
+                "frequency": 299.629,
+                "label": " 1846"
+              },
+              {
+                "time": "2009-04-22T18:47:00+00:00",
+                "bearing": 303.1,
+                "frequency": 299.606,
+                "label": " 1847"
+              },
+              {
+                "time": "2009-04-22T18:48:00+00:00",
+                "bearing": 305.6,
+                "frequency": 299.583,
+                "label": " 1848"
+              }
+            ]
+          }
+        ],
         "provenance": [
           {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
+            "activity_id": "6dea7377-c437-4717-adab-64c6ac006043",
+            "timestamp": "2026-03-28T13:50:59.309155Z",
             "was_generated_by": {
-              "tool": "rep-parser",
+              "tool": "dpf-parser",
               "tool_version": "1.0.0",
               "parameters": []
             },
             "used": [],
             "generated": [
-              "23725749-ce4c-4a2d-9ce1-91ed92b511d8"
+              "1cebf426-ba37-4cf7-8077-19f3b8dc3e76"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.005681S"
           }
         ]
       }
     },
     {
       "type": "Feature",
-      "id": "d0d8119c-4be2-48ef-b758-8028f43c8497",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 259.1,
-        "time": "2009-04-22T18:24:00+00:00",
-        "label": " 1824",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d0d8119c-4be2-48ef-b758-8028f43c8497"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "089c4051-91f0-491d-8c33-3a1a959c77c0",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 259.0,
-        "time": "2009-04-22T18:25:00+00:00",
-        "label": " 1825",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "089c4051-91f0-491d-8c33-3a1a959c77c0"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a6ad0683-effa-4daa-8409-2761140f9c44",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 259.0,
-        "time": "2009-04-22T18:26:00+00:00",
-        "label": " 1826",
-        "frequency": 300.529,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a6ad0683-effa-4daa-8409-2761140f9c44"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2c7775f5-41d5-46a7-9c6f-88bfae321438",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.9,
-        "time": "2009-04-22T18:27:00+00:00",
-        "label": " 1827",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2c7775f5-41d5-46a7-9c6f-88bfae321438"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "c2edf6e8-07e4-4bdf-affc-42c0f8c1fa84",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.9,
-        "time": "2009-04-22T18:28:00+00:00",
-        "label": " 1828",
-        "frequency": 300.534,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "c2edf6e8-07e4-4bdf-affc-42c0f8c1fa84"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "8f4fc827-e3ab-4dbd-a16d-30eb0473d274",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.7,
-        "time": "2009-04-22T18:29:00+00:00",
-        "label": " 1829",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "8f4fc827-e3ab-4dbd-a16d-30eb0473d274"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "069089f0-3c61-4cc7-8d99-4c6ec3c910b7",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.6,
-        "time": "2009-04-22T18:30:00+00:00",
-        "label": " 1830",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "069089f0-3c61-4cc7-8d99-4c6ec3c910b7"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "dcd5469d-91b4-4549-8b4d-e983c41a604f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.5,
-        "time": "2009-04-22T18:31:00+00:00",
-        "label": " 1831",
-        "frequency": 300.535,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "dcd5469d-91b4-4549-8b4d-e983c41a604f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "87d595e7-b01e-4cb1-83cb-d7feeb9acb0f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.3,
-        "time": "2009-04-22T18:32:00+00:00",
-        "label": " 1832",
-        "frequency": 300.528,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "87d595e7-b01e-4cb1-83cb-d7feeb9acb0f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "87ec05b0-0383-45d6-b0d8-e976cbae52c3",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.3,
-        "time": "2009-04-22T18:33:00+00:00",
-        "label": " 1833",
-        "frequency": 300.566,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "87ec05b0-0383-45d6-b0d8-e976cbae52c3"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "042ff3bd-15d5-42ad-8ce8-e2ba58a7ab1c",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 258.4,
-        "time": "2009-04-22T18:34:00+00:00",
-        "label": " 1834",
-        "frequency": 300.635,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "042ff3bd-15d5-42ad-8ce8-e2ba58a7ab1c"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "002be5da-4dcd-4413-8e09-235f77d56e8b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 259.4,
-        "time": "2009-04-22T18:35:00+00:00",
-        "label": " 1835",
-        "frequency": 300.651,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "002be5da-4dcd-4413-8e09-235f77d56e8b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "34c5d14c-339e-4ffa-a1be-53a19a8af89c",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 261.5,
-        "time": "2009-04-22T18:36:00+00:00",
-        "label": " 1836",
-        "frequency": 300.612,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "34c5d14c-339e-4ffa-a1be-53a19a8af89c"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "95cb0b02-fe7a-4d6b-908b-95777fb501d1",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 265.2,
-        "time": "2009-04-22T18:37:00+00:00",
-        "label": " 1837",
-        "frequency": 300.451,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "95cb0b02-fe7a-4d6b-908b-95777fb501d1"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "311c95b7-385e-4011-8637-f56ebd9659a3",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 269.7,
-        "time": "2009-04-22T18:38:00+00:00",
-        "label": " 1838",
-        "frequency": 300.236,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "311c95b7-385e-4011-8637-f56ebd9659a3"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "b4381012-a534-4268-b953-7b1492238bae",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 274.9,
-        "time": "2009-04-22T18:39:00+00:00",
-        "label": " 1839",
-        "frequency": 300.011,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "b4381012-a534-4268-b953-7b1492238bae"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3064714e-e534-434c-b91e-085d47c7c1d2",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 279.7,
-        "time": "2009-04-22T18:40:00+00:00",
-        "label": " 1840",
-        "frequency": 299.844,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "3064714e-e534-434c-b91e-085d47c7c1d2"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a0811b57-7bcc-4eff-8bfb-1474f9fbdb0f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 283.8,
-        "time": "2009-04-22T18:41:00+00:00",
-        "label": " 1841",
-        "frequency": 299.767,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a0811b57-7bcc-4eff-8bfb-1474f9fbdb0f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "43f1c54a-8a82-4d91-9611-74f62c6ee0b5",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 287.5,
-        "time": "2009-04-22T18:42:00+00:00",
-        "label": " 1842",
-        "frequency": 299.737,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "43f1c54a-8a82-4d91-9611-74f62c6ee0b5"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "b8e4efef-3f79-425b-85c8-0b98d5299d04",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 291.1,
-        "time": "2009-04-22T18:43:00+00:00",
-        "label": " 1843",
-        "frequency": 299.698,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "b8e4efef-3f79-425b-85c8-0b98d5299d04"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d8eca049-07ad-4199-8fd1-3db84b34c67d",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 294.6,
-        "time": "2009-04-22T18:44:00+00:00",
-        "label": " 1844",
-        "frequency": 299.69,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d8eca049-07ad-4199-8fd1-3db84b34c67d"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "08051e1f-f776-4b3a-ad02-09970adf4778",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 297.5,
-        "time": "2009-04-22T18:45:00+00:00",
-        "label": " 1845",
-        "frequency": 299.652,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "08051e1f-f776-4b3a-ad02-09970adf4778"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "aa033bfc-3eed-49ae-9953-8200e1753028",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 300.5,
-        "time": "2009-04-22T18:46:00+00:00",
-        "label": " 1846",
-        "frequency": 299.629,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "aa033bfc-3eed-49ae-9953-8200e1753028"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "92753837-0690-41af-9c6a-61d2828e727b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 303.1,
-        "time": "2009-04-22T18:47:00+00:00",
-        "label": " 1847",
-        "frequency": 299.606,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "92753837-0690-41af-9c6a-61d2828e727b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "53b32a19-2e14-4623-8839-4ce86221726d",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "sensor_name": "BowMerchantvessel",
-        "bearing": 305.6,
-        "time": "2009-04-22T18:48:00+00:00",
-        "label": " 1848",
-        "frequency": 299.583,
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "53b32a19-2e14-4623-8839-4ce86221726d"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "26d186c7-4ae8-48fb-9a77-007065842142",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:24:00+00:00",
-        "bearing": 259.1,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1824",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "26d186c7-4ae8-48fb-9a77-007065842142"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1eb6d23d-24c9-4a48-895a-327d7ea8efb3",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:25:00+00:00",
-        "bearing": 259.0,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1825",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "1eb6d23d-24c9-4a48-895a-327d7ea8efb3"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "821056a5-04f7-480e-bf02-76b70bcb89fa",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:26:00+00:00",
-        "bearing": 259.0,
-        "frequency": 300.529,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1826",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "821056a5-04f7-480e-bf02-76b70bcb89fa"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3a950109-d1c4-4b3f-8c06-2e716f9f22d2",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:27:00+00:00",
-        "bearing": 258.9,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1827",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "3a950109-d1c4-4b3f-8c06-2e716f9f22d2"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "badf73d1-ef37-4b5c-b204-24f0e507575b",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:28:00+00:00",
-        "bearing": 258.9,
-        "frequency": 300.534,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1828",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "badf73d1-ef37-4b5c-b204-24f0e507575b"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "7dccb47d-99e7-4694-9399-1aeca66e4881",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:29:00+00:00",
-        "bearing": 258.7,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1829",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "7dccb47d-99e7-4694-9399-1aeca66e4881"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "ca38fbc5-698a-4e49-bbd7-e23fe0e1208a",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:30:00+00:00",
-        "bearing": 258.6,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1830",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "ca38fbc5-698a-4e49-bbd7-e23fe0e1208a"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "42e34328-5d84-4c6d-9793-c88cdad7c497",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:31:00+00:00",
-        "bearing": 258.5,
-        "frequency": 300.535,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1831",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "42e34328-5d84-4c6d-9793-c88cdad7c497"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "89933d8a-9e32-4b04-b7ef-1e2bad89bbce",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:32:00+00:00",
-        "bearing": 258.3,
-        "frequency": 300.528,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1832",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "89933d8a-9e32-4b04-b7ef-1e2bad89bbce"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "752cb97a-654c-477a-85d6-6349ddf303ec",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:33:00+00:00",
-        "bearing": 258.3,
-        "frequency": 300.566,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1833",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "752cb97a-654c-477a-85d6-6349ddf303ec"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d187a678-3803-42a5-937e-8bde58b3b914",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:34:00+00:00",
-        "bearing": 258.4,
-        "frequency": 300.635,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1834",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d187a678-3803-42a5-937e-8bde58b3b914"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "fa8436b9-48b2-41c7-a3e5-dbfbe37b8864",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:35:00+00:00",
-        "bearing": 259.4,
-        "frequency": 300.651,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1835",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "fa8436b9-48b2-41c7-a3e5-dbfbe37b8864"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "37b47a99-0468-4a8a-a647-195bc062e3a6",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:36:00+00:00",
-        "bearing": 261.5,
-        "frequency": 300.612,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1836",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "37b47a99-0468-4a8a-a647-195bc062e3a6"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "87353a0f-fc96-4072-8878-3d4efad9db6e",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:37:00+00:00",
-        "bearing": 265.2,
-        "frequency": 300.451,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1837",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "87353a0f-fc96-4072-8878-3d4efad9db6e"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e976c7cb-dca3-4998-92cf-c6c842e5651c",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:38:00+00:00",
-        "bearing": 269.7,
-        "frequency": 300.236,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1838",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "e976c7cb-dca3-4998-92cf-c6c842e5651c"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "8494421f-4267-4d45-9bac-50aa0304f966",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:39:00+00:00",
-        "bearing": 274.9,
-        "frequency": 300.011,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1839",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "8494421f-4267-4d45-9bac-50aa0304f966"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "66f3c5a4-7bbf-4206-a22b-1ce2bc2c0517",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:40:00+00:00",
-        "bearing": 279.7,
-        "frequency": 299.844,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1840",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "66f3c5a4-7bbf-4206-a22b-1ce2bc2c0517"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a9fc0db4-5553-4da0-afd3-e7e70dfb38f5",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:41:00+00:00",
-        "bearing": 283.8,
-        "frequency": 299.767,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1841",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a9fc0db4-5553-4da0-afd3-e7e70dfb38f5"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "9c8fcac4-6e9e-4a48-8e80-835e91eae98f",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:42:00+00:00",
-        "bearing": 287.5,
-        "frequency": 299.737,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1842",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "9c8fcac4-6e9e-4a48-8e80-835e91eae98f"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "7e18d856-ed60-4e63-b63f-c557c75450c5",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:43:00+00:00",
-        "bearing": 291.1,
-        "frequency": 299.698,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1843",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "7e18d856-ed60-4e63-b63f-c557c75450c5"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "c2686d94-ff34-4efa-801b-aadb121df2a0",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:44:00+00:00",
-        "bearing": 294.6,
-        "frequency": 299.69,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1844",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "c2686d94-ff34-4efa-801b-aadb121df2a0"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "acd337b7-89ee-4119-abef-64e8eddda35a",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:45:00+00:00",
-        "bearing": 297.5,
-        "frequency": 299.652,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1845",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "acd337b7-89ee-4119-abef-64e8eddda35a"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "d8e11f85-23b9-4fd1-b4b5-f64e43493deb",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:46:00+00:00",
-        "bearing": 300.5,
-        "frequency": 299.629,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1846",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "d8e11f85-23b9-4fd1-b4b5-f64e43493deb"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "9bafde79-e53c-4d5f-afe7-8819e7a0e3ff",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:47:00+00:00",
-        "bearing": 303.1,
-        "frequency": 299.606,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1847",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "9bafde79-e53c-4d5f-afe7-8819e7a0e3ff"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "6a2d3f85-d5d1-4321-9018-fcb4165e1d1c",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:47:00+00:00",
-        "bearing": 304.1,
-        "frequency": 299.606,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1847",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "6a2d3f85-d5d1-4321-9018-fcb4165e1d1c"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2e194187-c4b2-49d5-9c11-02fe75a320bc",
-      "geometry": null,
-      "properties": {
-        "kind": "SENSOR_CONTACT",
-        "parent_track": "MAYO",
-        "time": "2009-04-22T18:48:00+00:00",
-        "bearing": 305.6,
-        "frequency": 299.583,
-        "sensor_name": "BowMerchantvessel",
-        "label": "1848",
-        "provenance": [
-          {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
-            "was_generated_by": {
-              "tool": "rep-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2e194187-c4b2-49d5-9c11-02fe75a320bc"
-            ],
-            "execution_duration": "PT0S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "5509d524-f563-474a-a8c4-a6a096b9a553",
+      "id": "5ba8b89b-4625-49d0-872d-0a52fe0b9ef9",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -12201,8 +10828,8 @@
         "label_interval": "PT15M",
         "provenance": [
           {
-            "activity_id": "9c1a76d7-217a-4749-9eff-dde31ecc7a8d",
-            "timestamp": "2026-03-21T10:15:01.853142Z",
+            "activity_id": "b38fb709-15e9-439e-9848-d761735f0985",
+            "timestamp": "2026-03-28T13:50:59.324249Z",
             "was_generated_by": {
               "tool": "rep-parser",
               "tool_version": "1.0.0",
@@ -12210,9 +10837,9 @@
             },
             "used": [],
             "generated": [
-              "5509d524-f563-474a-a8c4-a6a096b9a553"
+              "5ba8b89b-4625-49d0-872d-0a52fe0b9ef9"
             ],
-            "execution_duration": "PT0S"
+            "execution_duration": "PT0.00318S"
           }
         ]
       }

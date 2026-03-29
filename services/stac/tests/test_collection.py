@@ -247,8 +247,19 @@ class TestCollectionPromotionUS1:
         features = [
             {
                 "type": "Feature",
+                "id": "ref-a",
                 "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
-                "properties": {"name": "Point A"},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Point A",
+                    "location_type": "WAYPOINT",
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
+                },
             },
         ]
         add_features(catalog_path, plot_id, features)
@@ -261,8 +272,19 @@ class TestCollectionPromotionUS1:
         more_features = [
             {
                 "type": "Feature",
+                "id": "ref-b",
                 "geometry": {"type": "Point", "coordinates": [10.0, 60.0]},
-                "properties": {"name": "Point B"},
+                "properties": {
+                    "kind": "POINT",
+                    "name": "Point B",
+                    "location_type": "WAYPOINT",
+                    "style": {
+                        "shape": "circle",
+                        "radius": 6,
+                        "fill_color": "#FF5733",
+                        "color": "#000",
+                    },
+                },
             },
         ]
         add_features(catalog_path, plot_id, more_features)
@@ -347,8 +369,19 @@ class TestCollectionPromotionUS1:
             [
                 {
                     "type": "Feature",
+                    "id": "ref-a",
                     "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
-                    "properties": {"name": "Point A"},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": "Point A",
+                        "location_type": "WAYPOINT",
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
+                    },
                 },
             ],
         )
@@ -436,8 +469,19 @@ class TestReadSummariesUS3:
             [
                 {
                     "type": "Feature",
+                    "id": "ref-a",
                     "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
-                    "properties": {"name": "A"},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": "A",
+                        "location_type": "WAYPOINT",
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
+                    },
                 },
             ],
         )
@@ -517,7 +561,17 @@ class TestDeletionRebuildUS4:
                         "type": "Feature",
                         "id": f"{pid}-feat-1",
                         "geometry": {"type": "Point", "coordinates": [0, 0]},
-                        "properties": {"name": f"{pid} feature"},
+                        "properties": {
+                            "kind": "POINT",
+                            "name": f"{pid} feature",
+                            "location_type": "WAYPOINT",
+                            "style": {
+                                "shape": "circle",
+                                "radius": 6,
+                                "fill_color": "#FF5733",
+                                "color": "#000",
+                            },
+                        },
                     },
                 ],
             )

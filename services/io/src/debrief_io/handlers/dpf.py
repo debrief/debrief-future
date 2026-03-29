@@ -249,7 +249,7 @@ class DPFHandler(BaseHandler):
     ) -> list[dict[str, Any]]:
         """Parse a <track> element into GeoJSON features.
 
-        Returns track LineString features plus sensor and TMA features.
+        Returns track LineString features with embedded sensor and TMA data.
         """
         features: list[dict[str, Any]] = []
         track_name = track_elem.get("Name", "Unknown")
@@ -272,6 +272,20 @@ class DPFHandler(BaseHandler):
         # Direct fixes (some older files put fixes directly under track)
         direct_fixes = self._parse_fixes(track_elem, ns, warnings, track_name)
         all_fixes.extend(direct_fixes)
+
+        # Collect embedded sensor data
+        sensors_data: list[dict[str, Any]] = []
+        for sensor_elem in track_elem.findall(_tag("sensor", ns)):
+            sensor_entry = self._parse_sensor_data(sensor_elem, ns, warnings, track_name)
+            if sensor_entry is not None:
+                sensors_data.append(sensor_entry)
+
+        # Collect embedded TUA data
+        tuas_data: list[dict[str, Any]] = []
+        for tma_elem in track_elem.findall(_tag("tma", ns)):
+            tua_entry = self._parse_tua_data(tma_elem, ns, warnings, track_name)
+            if tua_entry is not None:
+                tuas_data.append(tua_entry)
 
         # Build track feature if we have fixes
         if all_fixes:
@@ -299,6 +313,40 @@ class DPFHandler(BaseHandler):
                 coordinates.append(coordinates[0])
                 positions_data.append(positions_data[0])
 
+            track_props: dict[str, Any] = {
+                "kind": "TRACK",
+                "platform_id": track_name,
+                "platform_name": track_name,
+                "track_type": "CONTACT",
+                "start_time": start_time.isoformat(),
+                "end_time": end_time.isoformat(),
+                "positions": positions_data,
+                "style": {
+                    "line": {"color": track_color},
+                    "point": {
+                        "shape": "circle",
+                        "radius": 3.0,
+                        "fill_color": track_color,
+                        "color": track_color,
+                    },
+                },
+                "default_position_style": {
+                    "show_symbol": False,
+                    "symbol": "circle",
+                    "show_label": False,
+                },
+                "symbol_interval": symbol_interval,
+                "label_interval": label_interval,
+            }
+
+            # Embed sensor data into track properties
+            if sensors_data:
+                track_props["sensors"] = sensors_data
+
+            # Embed TUA data into track properties
+            if tuas_data:
+                track_props["tuas"] = tuas_data
+
             features.append(
                 {
                     "type": "Feature",
@@ -307,43 +355,9 @@ class DPFHandler(BaseHandler):
                         "type": "LineString",
                         "coordinates": coordinates,
                     },
-                    "properties": {
-                        "kind": "TRACK",
-                        "platform_id": track_name,
-                        "platform_name": track_name,
-                        "track_type": "CONTACT",
-                        "start_time": start_time.isoformat(),
-                        "end_time": end_time.isoformat(),
-                        "positions": positions_data,
-                        "style": {
-                            "line": {"color": track_color},
-                            "point": {
-                                "shape": "circle",
-                                "radius": 3.0,
-                                "fill_color": track_color,
-                                "color": track_color,
-                            },
-                        },
-                        "default_position_style": {
-                            "show_symbol": False,
-                            "symbol": "circle",
-                            "show_label": False,
-                        },
-                        "symbol_interval": symbol_interval,
-                        "label_interval": label_interval,
-                    },
+                    "properties": track_props,
                 }
             )
-
-        # Parse sensors
-        for sensor_elem in track_elem.findall(_tag("sensor", ns)):
-            sensor_features = self._parse_sensor(sensor_elem, ns, warnings, track_name)
-            features.extend(sensor_features)
-
-        # Parse TMA solutions
-        for tma_elem in track_elem.findall(_tag("tma", ns)):
-            tma_features = self._parse_tma(tma_elem, ns, warnings, track_name)
-            features.extend(tma_features)
 
         return features
 
@@ -419,17 +433,20 @@ class DPFHandler(BaseHandler):
 
         return fixes
 
-    def _parse_sensor(
+    def _parse_sensor_data(
         self,
         sensor_elem: ET.Element,
         ns: str | None,
         warnings: list[ParseWarning],
         parent_track: str,
-    ) -> list[dict[str, Any]]:
-        """Parse a <sensor> element into sensor contact features."""
-        features: list[dict[str, Any]] = []
+    ) -> dict[str, Any] | None:
+        """Parse a <sensor> element into a SensorData dict for embedding in TrackProperties.
+
+        Returns a dict matching the SensorData schema:
+        {name, contacts: [{time, bearing, range?, frequency?, ambiguous_bearing?, label?}]}
+        """
         sensor_name = sensor_elem.get("Name", "Unknown")
-        track_name = sensor_elem.get("TrackName", parent_track)
+        contacts: list[dict[str, Any]] = []
 
         for contact in sensor_elem.findall(_tag("sensor_contact", ns)):
             dtg = contact.get("Dtg", "")
@@ -455,55 +472,47 @@ class DPFHandler(BaseHandler):
                 )
                 continue
 
+            entry: dict[str, Any] = {
+                "time": timestamp.isoformat(),
+                "bearing": bearing,
+            }
+
             # Optional ambiguous bearing
-            ambiguous_bearing: float | None = None
             if contact.get("HasAmbiguousBearing", "false").lower() == "true":
                 with contextlib.suppress(ValueError):
-                    ambiguous_bearing = float(contact.get("AmbiguousBearing", "0"))
+                    entry["ambiguous_bearing"] = float(contact.get("AmbiguousBearing", "0"))
 
             # Optional frequency
-            frequency: float | None = None
             if contact.get("HasFrequency", "false").lower() == "true":
                 with contextlib.suppress(ValueError):
-                    frequency = float(contact.get("Frequency", "0"))
+                    entry["frequency"] = float(contact.get("Frequency", "0"))
 
             label = contact.get("Label", "")
+            if label:
+                entry["label"] = label
 
-            props: dict[str, Any] = {
-                "kind": "SENSOR_CONTACT",
-                "parent_track": track_name,
-                "sensor_name": sensor_name,
-                "bearing": bearing,
-                "time": timestamp.isoformat(),
-                "label": label,
-            }
-            if ambiguous_bearing is not None:
-                props["ambiguous_bearing"] = ambiguous_bearing
-            if frequency is not None:
-                props["frequency"] = frequency
+            contacts.append(entry)
 
-            features.append(
-                {
-                    "type": "Feature",
-                    "id": str(uuid.uuid4()),
-                    "geometry": None,
-                    "properties": props,
-                }
-            )
+        if not contacts:
+            return None
 
-        return features
+        return {"name": sensor_name, "contacts": contacts}
 
-    def _parse_tma(
+    def _parse_tua_data(
         self,
         tma_elem: ET.Element,
         ns: str | None,
         warnings: list[ParseWarning],
         parent_track: str,
-    ) -> list[dict[str, Any]]:
-        """Parse a <tma> element into TMA solution features."""
-        features: list[dict[str, Any]] = []
+    ) -> dict[str, Any] | None:
+        """Parse a <tma> element into a TUAData dict for embedding in TrackProperties.
+
+        Returns a dict matching the TUAData schema:
+        {name, host_track_name, solutions: [{time, label, bearing?, range?, ...}]}
+        """
         tma_name = tma_elem.get("Name", "Unknown")
         track_name = tma_elem.get("TrackName", parent_track)
+        solutions: list[dict[str, Any]] = []
 
         for solution in tma_elem.findall(_tag("tma_solution", ns)):
             dtg = solution.get("Dtg", "")
@@ -517,53 +526,37 @@ class DPFHandler(BaseHandler):
                 )
                 continue
 
-            label = solution.get("Label", "")
-
-            props: dict[str, Any] = {
-                "kind": "TMA_SOLUTION",
-                "parent_track": track_name,
-                "tma_name": tma_name,
+            entry: dict[str, Any] = {
                 "time": timestamp.isoformat(),
-                "label": label,
+                "label": solution.get("Label", ""),
             }
 
-            # Extract optional attributes
-            for attr in ("Course", "Speed", "Bearing", "Depth"):
+            # Extract optional numeric attributes
+            for attr in ("Course", "Speed", "Bearing"):
                 val = solution.get(attr)
                 if val is not None:
                     with contextlib.suppress(ValueError):
-                        props[attr.lower()] = float(val)
+                        entry[attr.lower()] = float(val)
 
-            # Parse location if present
+            # Parse location if present → absolute positioning
             centre = solution.find(_tag("centre", ns))
             if centre is not None:
                 location = _parse_location(centre, ns)
                 if location is not None:
-                    lat, lon, depth = location
-                    features.append(
-                        {
-                            "type": "Feature",
-                            "id": str(uuid.uuid4()),
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [lon, lat],
-                            },
-                            "properties": props,
-                        }
-                    )
-                    continue
+                    lat, lon, _depth = location
+                    entry["centre_lat"] = lat
+                    entry["centre_lon"] = lon
 
-            # No location — null geometry
-            features.append(
-                {
-                    "type": "Feature",
-                    "id": str(uuid.uuid4()),
-                    "geometry": None,
-                    "properties": props,
-                }
-            )
+            solutions.append(entry)
 
-        return features
+        if not solutions:
+            return None
+
+        return {
+            "name": tma_name,
+            "host_track_name": track_name,
+            "solutions": solutions,
+        }
 
     def _parse_narrative(
         self,
@@ -571,7 +564,13 @@ class DPFHandler(BaseHandler):
         ns: str | None,
         warnings: list[ParseWarning],
     ) -> list[dict[str, Any]]:
-        """Parse a <narrative> element into narrative features."""
+        """Parse a <narrative> element into narrative features.
+
+        Maps DPF XML attributes to NarrativeEntryProperties schema:
+        - Entry → text
+        - Track → track_id
+        - Type is dropped (not in schema)
+        """
         features: list[dict[str, Any]] = []
 
         for entry in narrative_elem.findall(_tag("narrative_entry", ns)):
@@ -586,18 +585,28 @@ class DPFHandler(BaseHandler):
                 )
                 continue
 
+            props: dict[str, Any] = {
+                "kind": "NARRATIVE",
+                "time": timestamp.isoformat(),
+                "text": entry.get("Entry", ""),
+                "style": {
+                    "shape": "circle",
+                    "radius": 4,
+                    "fill_color": "#888888",
+                    "color": "#888888",
+                },
+            }
+
+            track = entry.get("Track", "")
+            if track:
+                props["track_id"] = track
+
             features.append(
                 {
                     "type": "Feature",
                     "id": str(uuid.uuid4()),
                     "geometry": None,
-                    "properties": {
-                        "kind": "NARRATIVE",
-                        "track": entry.get("Track", ""),
-                        "entry": entry.get("Entry", ""),
-                        "type": entry.get("Type", ""),
-                        "time": timestamp.isoformat(),
-                    },
+                    "properties": props,
                 }
             )
 

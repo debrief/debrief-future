@@ -23,25 +23,6 @@ from debrief_stac.types import (
 logger = logging.getLogger(__name__)
 
 
-def _schema_validate_on_read(features: list[GeoJSONFeature]) -> None:
-    """Run schema validation on features loaded from disk (warn-and-continue).
-
-    Validates each feature that has a known ``kind`` against the Pydantic model
-    from ``debrief_schemas.validation.FEATURE_MODEL_MAP``.  Schema failures are
-    logged as warnings rather than raising, to allow gradual adoption.
-    """
-    try:
-        from debrief_schemas.validation import SchemaValidationError, validate_feature
-    except ImportError:
-        return  # debrief-schemas not available
-
-    for i, feature in enumerate(features):
-        try:
-            validate_feature(feature, "catalog_read")
-        except SchemaValidationError as e:
-            logger.warning("Catalog read schema warning for feature[%d]: %s", i, e)
-
-
 def add_features(
     catalog_path: CatalogPath,
     plot_id: str,
@@ -88,8 +69,6 @@ def add_features(
         # Load existing
         with open(features_path) as f:
             fc: GeoJSONFeatureCollection = json.load(f)
-        # Schema-validate features loaded from disk (warn-and-continue)
-        _schema_validate_on_read(fc["features"])
     else:
         # Create new
         fc = {"type": "FeatureCollection", "features": []}
@@ -167,9 +146,6 @@ def update_features(
     with open(features_path) as f:
         fc: GeoJSONFeatureCollection = json.load(f)
 
-    # Schema-validate features loaded from disk (warn-and-continue)
-    _schema_validate_on_read(fc["features"])
-
     # Build lookup of updates by ID
     updates = {}
     for feat in features:
@@ -238,9 +214,6 @@ def delete_features(
     with open(features_path) as f:
         fc: GeoJSONFeatureCollection = json.load(f)
 
-    # Schema-validate features loaded from disk (warn-and-continue)
-    _schema_validate_on_read(fc["features"])
-
     ids_to_remove = set(feature_ids)
     original_count = len(fc["features"])
     fc["features"] = [
@@ -279,13 +252,14 @@ def _validate_feature(feature: GeoJSONFeature) -> None:
     """Validate a GeoJSON feature has required fields.
 
     Performs structural validation (required fields) and schema validation
-    against debrief-schemas Pydantic models (warn-and-continue).
+    against debrief-schemas Pydantic models (blocking — Constitution XIV.4).
 
     Args:
         feature: Feature dictionary to validate
 
     Raises:
         ValueError: If feature is missing required structural fields
+        SchemaValidationError: If feature fails schema validation
     """
     if not isinstance(feature, dict):
         raise ValueError("Feature must be a dictionary")
@@ -299,16 +273,13 @@ def _validate_feature(feature: GeoJSONFeature) -> None:
     if "properties" not in feature:
         raise ValueError("Feature must have a 'properties' field")
 
-    # Schema validation (warn-and-continue)
+    # Schema validation — blocking (Constitution XIV.4)
     try:
-        from debrief_schemas.validation import SchemaValidationError, validate_feature
+        from debrief_schemas.validation import validate_feature
     except ImportError:
         pass
     else:
-        try:
-            validate_feature(feature, "catalog_write")
-        except SchemaValidationError as e:
-            logger.warning("Catalog schema validation: %s", e)
+        validate_feature(feature, "catalog_write")
 
 
 def _calculate_bbox(features: Sequence[GeoJSONFeature]) -> BoundingBox | None:

@@ -14,6 +14,7 @@ from fixtures import (
     make_sample_track_feature,
 )
 
+from debrief_schemas.validation import SchemaValidationError
 from debrief_stac.catalog import create_catalog
 from debrief_stac.features import add_features, delete_features, update_features
 from debrief_stac.models import PlotMetadata
@@ -183,23 +184,15 @@ def catalog_with_features(tmp_path: Path) -> tuple[Path, str]:
 class TestUpdateFeatures:
     def test_update_existing_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
-        updated = {
-            "type": "Feature",
-            "id": "track_a",
-            "geometry": {"type": "Point", "coordinates": [99, 99]},
-            "properties": {"kind": "track", "name": "Updated Track A"},
-        }
+        updated = make_sample_reference_location(
+            feature_id="track_a", name="Updated A", lon=99.0, lat=99.0
+        )
         count = update_features(str(catalog_path), plot_id, [updated])
         assert count == 1
 
     def test_update_nonexistent_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
-        updated = {
-            "type": "Feature",
-            "id": "nonexistent",
-            "geometry": {"type": "Point", "coordinates": [0, 0]},
-            "properties": {"kind": "track"},
-        }
+        updated = make_sample_reference_location(feature_id="nonexistent", lon=0.0, lat=0.0)
         count = update_features(str(catalog_path), plot_id, [updated])
         assert count == 0
 
@@ -233,3 +226,54 @@ class TestDeleteFeatures:
         plot_id = create_plot(str(catalog_path), PlotMetadata(title="Empty"))
         count = delete_features(str(catalog_path), plot_id, ["x"])
         assert count == 0
+
+
+class TestSchemaValidationBlocking:
+    """Tests that catalog_write validation is blocking (Constitution XIV.4)."""
+
+    def test_add_features_rejects_unknown_kind(
+        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
+    ) -> None:
+        """Features with unknown kind are rejected at catalog_write boundary."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, sample_plot_metadata)
+
+        invalid_feature = {
+            "type": "Feature",
+            "id": "sensor-001",
+            "geometry": None,
+            "properties": {
+                "kind": "SENSOR_CONTACT",
+                "parent_track": "Frigate",
+                "time": "1970-01-03T03:31:25+00:00",
+                "bearing": 80.0,
+            },
+        }
+
+        with pytest.raises(SchemaValidationError, match="Unknown feature kind"):
+            add_features(catalog_path, plot_id, [invalid_feature])
+
+    def test_add_features_rejects_extra_properties(
+        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
+    ) -> None:
+        """Features with extra (non-schema) properties are rejected."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, sample_plot_metadata)
+
+        # Valid POINT kind but with extra field 'parent_track'
+        feature = make_sample_reference_location()
+        feature["properties"]["parent_track"] = "Frigate"
+
+        with pytest.raises(SchemaValidationError):
+            add_features(catalog_path, plot_id, [feature])
+
+    def test_add_features_accepts_valid_feature(
+        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
+    ) -> None:
+        """Schema-valid features are accepted (regression guard)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, sample_plot_metadata)
+
+        features = [make_sample_track_feature()]
+        count = add_features(catalog_path, plot_id, features)
+        assert count == 1

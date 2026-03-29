@@ -33,6 +33,7 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
   const duration = computeDuration(item);
   const durationLabel = formatDuration(duration);
   const dateLabel = formatDateRange(item.startDatetime, item.endDatetime, item.datetime);
+  const folderName = item.itemPath.replace(/^\.\//, '').replace(/\/item\.json$/, '');
 
   const vesselInfo = truncateArray(item.vesselClasses, MAX_VISIBLE_TAGS);
   const tagInfo = truncateArray(item.tags, MAX_VISIBLE_TAGS);
@@ -62,6 +63,10 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
           data-testid="exercise-item-title"
         >
           {item.title}
+        </div>
+
+        <div className="exercise-list-item-row__folder" data-testid="exercise-item-folder" title={folderName}>
+          {folderName}
         </div>
 
         <div className="exercise-list-item-row__date" data-testid="exercise-item-date">

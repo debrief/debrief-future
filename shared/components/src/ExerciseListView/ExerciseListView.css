@@ -194,6 +194,15 @@
   white-space: nowrap;
 }
 
+.exercise-list-item-row__folder {
+  font-size: 11px;
+  color: var(--el-muted);
+  font-family: var(--vscode-editor-font-family, monospace);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .exercise-list-item-row__date {
   font-size: 11px;
   color: var(--el-muted);

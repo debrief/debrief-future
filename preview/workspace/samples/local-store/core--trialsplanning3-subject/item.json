@@ -1,0 +1,116 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--trialsplanning3-subject",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -30.119758333333333,
+          -0.07229166666666667
+        ],
+        [
+          -30.0,
+          -0.07229166666666667
+        ],
+        [
+          -30.0,
+          -0.0
+        ],
+        [
+          -30.119758333333333,
+          -0.0
+        ],
+        [
+          -30.119758333333333,
+          -0.07229166666666667
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -30.119758333333333,
+    -0.07229166666666667,
+    -30.0,
+    -0.0
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Trialsplanning3 Subject",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Saxon Warrior: Trialsplanning3 Subject \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T13:13:14+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "boarding",
+      "harbour-ops",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "prosecution",
+      "visual-sighting"
+    ],
+    "debrief:track_names": [
+      "Contact Alpha"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "TrialsPlanning3_subject (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/Demo-Trialsplanning/TrialsPlanning3_subject.rep",
+      "title": "TrialsPlanning3_subject.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-TrialsPlanning3_subject": {
+      "href": "./assets/TrialsPlanning3_subject.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "TrialsPlanning3_subject.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/Demo-Trialsplanning/TrialsPlanning3_subject.rep",
+        "load_timestamp": "2026-03-28T13:50:57.694433Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}
