@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+import shutil
 import time
 import uuid
 from datetime import UTC, datetime
@@ -148,6 +149,22 @@ def _attach_provenance(
         )
         props = feature.setdefault("properties", {})
         props["provenance"] = [entry]
+
+
+def _remove_catalog_link(catalog_path: Path, plot_id: str) -> None:
+    """Remove a plot's item link from catalog.json after cleanup."""
+    import json
+
+    catalog_file = catalog_path / "catalog.json"
+    if not catalog_file.exists():
+        return
+    catalog = json.loads(catalog_file.read_text())
+    catalog["links"] = [
+        link
+        for link in catalog.get("links", [])
+        if not (link.get("rel") == "item" and f"{plot_id}/item.json" in link.get("href", ""))
+    ]
+    catalog_file.write_text(json.dumps(catalog, indent=2) + "\n")
 
 
 def _count_feature_kinds(features: list[dict[str, Any]]) -> tuple[int, int, int]:
@@ -367,14 +384,22 @@ def import_legacy_data(
             # Create plot
             created_id = create_plot(catalog_path, metadata, plot_id=plot_id)
 
-            # Add features
-            add_features(catalog_path, created_id, parse_result.features)
+            try:
+                # Add features
+                add_features(catalog_path, created_id, parse_result.features)
 
-            # Add source file as asset
-            add_asset(catalog_path, created_id, source_file)
+                # Add source file as asset
+                add_asset(catalog_path, created_id, source_file)
 
-            # Update temporal metadata
-            update_temporal_metadata(catalog_path, created_id)
+                # Update temporal metadata
+                update_temporal_metadata(catalog_path, created_id)
+            except Exception:
+                # Clean up partially-created plot directory on failure
+                plot_dir = catalog_path / created_id
+                if plot_dir.exists():
+                    shutil.rmtree(plot_dir)
+                    _remove_catalog_link(catalog_path, created_id)
+                raise
 
             # Count feature kinds
             tracks, sensors, narratives = _count_feature_kinds(parse_result.features)

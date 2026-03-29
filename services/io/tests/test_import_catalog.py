@@ -398,6 +398,27 @@ class TestSchemaValidationInImport:
         assert result.total_tracks > 0
 
 
+class TestFailedImportCleanup:
+    """Tests for cleanup of partially-created plots on import failure."""
+
+    def test_failed_import_leaves_no_orphan_directory(self, tmp_path: Path) -> None:
+        """When add_features fails, the plot directory is cleaned up."""
+        source = tmp_path / "source"
+        source.mkdir()
+        # shapes.rep produces ELLIPSE features which fail schema validation
+        (source / "shapes.rep").write_text((FIXTURES / "shapes.rep").read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_failed == 1
+        assert result.files_succeeded == 0
+
+        # Verify no orphan plot directories remain (only catalog.json at root)
+        plot_dirs = [d for d in catalog.iterdir() if d.is_dir()]
+        assert len(plot_dirs) == 0, f"Orphan directories found: {[d.name for d in plot_dirs]}"
+
+
 class TestGenerateReport:
     """Tests for report generation."""
 

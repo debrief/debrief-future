@@ -28,12 +28,6 @@
     },
     {
       "rel": "item",
-      "href": "./core--colortest/item.json",
-      "type": "application/geo+json",
-      "title": "ColorTest (core)"
-    },
-    {
-      "rel": "item",
       "href": "./core--analysis1-areas/item.json",
       "type": "application/geo+json",
       "title": "Analysis1_Areas (core)"
@@ -52,21 +46,9 @@
     },
     {
       "rel": "item",
-      "href": "./core--analysis4-narrative/item.json",
-      "type": "application/geo+json",
-      "title": "Analysis4_Narrative (core)"
-    },
-    {
-      "rel": "item",
       "href": "./core--review1-tracks/item.json",
       "type": "application/geo+json",
       "title": "Review1_Tracks (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--trialsplanning3-hits/item.json",
-      "type": "application/geo+json",
-      "title": "TrialsPlanning3_hits (core)"
     },
     {
       "rel": "item",
@@ -88,21 +70,9 @@
     },
     {
       "rel": "item",
-      "href": "./multi-static--blueparallelcourses/item.json",
-      "type": "application/geo+json",
-      "title": "BlueParallelCourses (multi-static)"
-    },
-    {
-      "rel": "item",
       "href": "./multi-static--gapstesttrack/item.json",
       "type": "application/geo+json",
       "title": "GapsTestTrack (multi-static)"
-    },
-    {
-      "rel": "item",
-      "href": "./multi-static--multistatic-vessel/item.json",
-      "type": "application/geo+json",
-      "title": "MultiStatic_Vessel (multi-static)"
     },
     {
       "rel": "item",
@@ -112,21 +82,9 @@
     },
     {
       "rel": "item",
-      "href": "./multi-static--offset-null-positions/item.json",
-      "type": "application/geo+json",
-      "title": "Offset_null_positions (multi-static)"
-    },
-    {
-      "rel": "item",
       "href": "./multi-static--sensor-offset-short/item.json",
       "type": "application/geo+json",
       "title": "Sensor_Offset_short (multi-static)"
-    },
-    {
-      "rel": "item",
-      "href": "./multi-static--threebuoys/item.json",
-      "type": "application/geo+json",
-      "title": "ThreeBuoys (multi-static)"
     },
     {
       "rel": "item",
@@ -166,39 +124,9 @@
     },
     {
       "rel": "item",
-      "href": "./core--all-tracks-use-current-heading/item.json",
-      "type": "application/geo+json",
-      "title": "All Tracks Use Current Heading (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--all-tracks/item.json",
-      "type": "application/geo+json",
-      "title": "All Tracks (core)"
-    },
-    {
-      "rel": "item",
       "href": "./core--plotwithgeotiff/item.json",
       "type": "application/geo+json",
       "title": "PlotWithGeoTiff (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--2648-target-plot/item.json",
-      "type": "application/geo+json",
-      "title": "2648_target_plot (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--2648-tx-tma-to-dr/item.json",
-      "type": "application/geo+json",
-      "title": "2648_tx_TMA_to_DR (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--ambig-tracks/item.json",
-      "type": "application/geo+json",
-      "title": "Ambig_tracks (s2r)"
     },
     {
       "rel": "item",
@@ -214,27 +142,9 @@
     },
     {
       "rel": "item",
-      "href": "./s2r--ambig-tracks-hover-north/item.json",
-      "type": "application/geo+json",
-      "title": "Ambig_tracks_hover_north (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--polyline-measurement/item.json",
-      "type": "application/geo+json",
-      "title": "Polyline_Measurement (s2r)"
-    },
-    {
-      "rel": "item",
       "href": "./s2r--dodgy-track/item.json",
       "type": "application/geo+json",
       "title": "dodgy_track (s2r)"
-    },
-    {
-      "rel": "item",
-      "href": "./s2r--legs-20/item.json",
-      "type": "application/geo+json",
-      "title": "legs_20 (s2r)"
     },
     {
       "rel": "item",
@@ -292,12 +202,6 @@
     },
     {
       "rel": "item",
-      "href": "./s2r--twin-ownship-sensors/item.json",
-      "type": "application/geo+json",
-      "title": "twin_ownship_sensors (s2r)"
-    },
-    {
-      "rel": "item",
       "href": "./core--bluetrack/item.json",
       "type": "application/geo+json",
       "title": "BlueTrack (core)"
@@ -307,18 +211,6 @@
       "href": "./core--redtrack/item.json",
       "type": "application/geo+json",
       "title": "RedTrack (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--workingfreqplot/item.json",
-      "type": "application/geo+json",
-      "title": "WorkingFreqPlot (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--multitonalfreqplot/item.json",
-      "type": "application/geo+json",
-      "title": "MultiTonalFreqPlot (core)"
     },
     {
       "rel": "item",
@@ -352,21 +244,9 @@
     },
     {
       "rel": "item",
-      "href": "./satc--1936-verification/item.json",
-      "type": "application/geo+json",
-      "title": "1936_verification (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--b-rate-ownship/item.json",
       "type": "application/geo+json",
       "title": "B_Rate_Ownship (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--bluesensor-sparse/item.json",
-      "type": "application/geo+json",
-      "title": "BlueSensor_sparse (satc)"
     },
     {
       "rel": "item",
@@ -376,39 +256,15 @@
     },
     {
       "rel": "item",
-      "href": "./satc--compositestraighttest/item.json",
-      "type": "application/geo+json",
-      "title": "CompositeStraightTest (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--dataset1/item.json",
       "type": "application/geo+json",
       "title": "Dataset1 (satc)"
     },
     {
       "rel": "item",
-      "href": "./satc--dataset2b/item.json",
-      "type": "application/geo+json",
-      "title": "Dataset2b (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--dataset3/item.json",
       "type": "application/geo+json",
       "title": "Dataset3 (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--deb-north-low-bearing-rate-s-turns/item.json",
-      "type": "application/geo+json",
-      "title": "Deb_North_Low_Bearing_Rate_s_turns (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--freqtracks/item.json",
-      "type": "application/geo+json",
-      "title": "FreqTracks (satc)"
     },
     {
       "rel": "item",
@@ -430,18 +286,6 @@
     },
     {
       "rel": "item",
-      "href": "./satc--l2-scenario/item.json",
-      "type": "application/geo+json",
-      "title": "L2_Scenario (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--mda-test/item.json",
-      "type": "application/geo+json",
-      "title": "MDA_Test (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--otherownship/item.json",
       "type": "application/geo+json",
       "title": "OtherOwnship (satc)"
@@ -457,12 +301,6 @@
       "href": "./satc--redtrack/item.json",
       "type": "application/geo+json",
       "title": "RedTrack (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--scenarioone-targetzig/item.json",
-      "type": "application/geo+json",
-      "title": "ScenarioOne_TargetZig (satc)"
     },
     {
       "rel": "item",
@@ -502,24 +340,6 @@
     },
     {
       "rel": "item",
-      "href": "./satc--thirty-min-earlier-first-turn/item.json",
-      "type": "application/geo+json",
-      "title": "thirty_min_earlier_first_turn (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--thirty-min-extra-leg/item.json",
-      "type": "application/geo+json",
-      "title": "thirty_min_extra_leg (satc)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc--thiry-min-one/item.json",
-      "type": "application/geo+json",
-      "title": "thiry_min_one (satc)"
-    },
-    {
-      "rel": "item",
       "href": "./satc--tug-1/item.json",
       "type": "application/geo+json",
       "title": "tug_1 (satc)"
@@ -553,36 +373,6 @@
       "href": "./core--lightweight-test-tracks/item.json",
       "type": "application/geo+json",
       "title": "lightweight_test_tracks (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--narrative/item.json",
-      "type": "application/geo+json",
-      "title": "narrative (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--narrative2/item.json",
-      "type": "application/geo+json",
-      "title": "narrative2 (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--narrative-bulk/item.json",
-      "type": "application/geo+json",
-      "title": "narrative_bulk (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--narrative-large/item.json",
-      "type": "application/geo+json",
-      "title": "narrative_large (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--offset-times/item.json",
-      "type": "application/geo+json",
-      "title": "offset_times (core)"
     },
     {
       "rel": "item",
@@ -625,12 +415,6 @@
       "href": "./core--sen-tracks-with-narrative/item.json",
       "type": "application/geo+json",
       "title": "sen_tracks_with_narrative (core)"
-    },
-    {
-      "rel": "item",
-      "href": "./core--shapes/item.json",
-      "type": "application/geo+json",
-      "title": "shapes (core)"
     },
     {
       "rel": "item",
