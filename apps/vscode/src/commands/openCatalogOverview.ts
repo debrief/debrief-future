@@ -46,6 +46,7 @@ export function createOpenCatalogOverviewCommand(
       context,
       catalog.id,
       catalog.title,
+      store.path,
     );
 
     panel.loadCatalog(catalog, store.path, items, store.id);
