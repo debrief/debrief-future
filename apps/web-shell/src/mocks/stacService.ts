@@ -12,8 +12,10 @@
 import type { CatalogOverviewItem } from '@debrief/components';
 import type { FeatureCollection } from 'geojson';
 
-// Bundled fixture imports — used as fallback and for Playwright E2E tests
+// Import fixture data via Vite's JSON import (bundled fallback for production builds)
+import exerciseAlphaItem from '@test-data/local-store/exercise-alpha/item.json';
 import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-alpha.geojson';
+import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
 /** STAC Item structure from item.json */
@@ -39,7 +41,22 @@ interface StacCatalog {
   links: Array<{ rel: string; href: string; title?: string }>;
 }
 
+function asStacItem(data: unknown): StacItem { return data as StacItem; }
 function asFeatureCollection(data: unknown): FeatureCollection { return data as FeatureCollection; }
+
+/** Bundled fixture items — used for production builds and when /stac-store/ is unavailable. */
+const BUNDLED_ITEMS: Array<{ itemPath: string; item: StacItem; data: FeatureCollection }> = [
+  {
+    itemPath: './exercise-alpha/item.json',
+    item: asStacItem(exerciseAlphaItem),
+    data: asFeatureCollection(exerciseAlphaData),
+  },
+  {
+    itemPath: './training-run-1/item.json',
+    item: asStacItem(trainingRun1Item),
+    data: asFeatureCollection(trainingRun1Data),
+  },
+];
 
 /** Prefix for the Vite middleware that serves the VS Code STAC store. */
 const STORE_PREFIX = '/stac-store';
@@ -108,6 +125,17 @@ export function createMockStacService(): MockStacService {
   let items: CatalogOverviewItem[] = [];
   const itemMap = new Map<string, StacItem>();
 
+  /** Populate from bundled fixture data (production fallback). */
+  function loadBundledFallback(): void {
+    items = [];
+    for (const entry of BUNDLED_ITEMS) {
+      items.push(toOverviewItem(entry.itemPath, entry.item));
+      itemMap.set(entry.itemPath, entry.item);
+      geojsonCache.set(entry.itemPath, entry.data);
+    }
+    console.log(`[stacService] Loaded ${items.length} bundled items`);
+  }
+
   return {
     async init(): Promise<void> {
       try {
@@ -150,6 +178,7 @@ export function createMockStacService(): MockStacService {
         console.log(`[stacService] Loaded ${items.length} items from STAC store`);
       } catch (err) {
         console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
+        loadBundledFallback();
       }
     },
 
