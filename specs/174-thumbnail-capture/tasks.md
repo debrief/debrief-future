@@ -171,8 +171,8 @@
 
 > **PLAYWRIGHT WORKS IN CLOUD SESSIONS** — The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T037 Create Playwright E2E test: gallery preview panel renders, prev/next navigation, fallback state `apps/web-shell/playwright/tests/thumbnail-preview.spec.ts`
-- [ ] T038 Run E2E tests: `cd apps/web-shell && node run-playwright.mjs`
+- [x] T037 Create Playwright E2E test: gallery preview panel renders, prev/next navigation, fallback state `apps/web-shell/playwright/tests/thumbnail-preview.spec.ts`
+- [x] T038 Run E2E tests: `cd apps/web-shell && node run-playwright.mjs`
 
 **Checkpoint**: All E2E tests pass.
 
