@@ -82,24 +82,24 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             src={item.thumbnailSmHref}
             alt={`Thumbnail for ${item.title}`}
             className="exercise-list-item-row__raster-thumbnail"
+            data-testid="raster-thumbnail"
             width={60}
             height={45}
             onError={(e) => {
-              // Fallback to SpatialThumbnail on load error
-              const img = e.currentTarget;
-              const parent = img.parentElement;
-              if (parent) {
-                img.style.display = 'none';
-                // The SpatialThumbnail below will render as fallback
-              }
+              // Hide broken image, show fallback SpatialThumbnail
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+              if (fallback) fallback.style.display = '';
             }}
           />
         ) : null}
-        <SpatialThumbnail
-          bbox={item.bbox}
-          trackData={trackData}
-          loading={trackDataLoading}
-        />
+        <div style={item.thumbnailSmHref ? { display: 'none' } : undefined}>
+          <SpatialThumbnail
+            bbox={item.bbox}
+            trackData={trackData}
+            loading={trackDataLoading}
+          />
+        </div>
       </div>
 
       <div className="exercise-list-item-row__info">

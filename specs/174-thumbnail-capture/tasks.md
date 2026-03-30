@@ -137,12 +137,12 @@
 
 ### Tests
 
-- [ ] T030 [test] Write unit test for ExerciseListItemRow: PNG rendering when `thumbnailSmHref` exists, SVG fallback when null `shared/components/src/ExerciseListView/__tests__/ExerciseListItemRow.test.tsx`
+- [x] T030 [test] Write unit test for ExerciseListItemRow: PNG rendering when `thumbnailSmHref` exists, SVG fallback when null `shared/components/src/ExerciseListView/__tests__/ExerciseListItemRow.test.tsx`
 
 ### Implementation
 
-- [ ] T031 Update ExerciseListItemRow to render `<img>` when `item.thumbnailSmHref` is available, with `onError` fallback to SpatialThumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T032 Run component tests: `pnpm --filter @debrief/components test`
+- [x] T031 Update ExerciseListItemRow to render `<img>` when `item.thumbnailSmHref` is available, with `onError` fallback to SpatialThumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T032 Run component tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: List view shows raster thumbnails with seamless SVG fallback.
 
