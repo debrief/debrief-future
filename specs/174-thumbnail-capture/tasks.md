@@ -156,10 +156,10 @@
 
 ### Implementation
 
-- [ ] T033 Add `fitToWindow()` method to AnalysisPage POM `apps/web-shell/playwright/pages/AnalysisPage.ts`
-- [ ] T034 Create backfill script: iterate catalog, open each plot, fit to window, wait for tiles, screenshot, resize with sharp, write PNGs + update item.json `apps/web-shell/scripts/generate-thumbnails.ts`
-- [ ] T035 Add `"generate-thumbnails"` npm script to web-shell package.json `apps/web-shell/package.json`
-- [ ] T036 Test: run backfill script against web-shell dev server and verify output files
+- [x] T033 Add `fitToWindow()` method to AnalysisPage POM `apps/web-shell/playwright/pages/AnalysisPage.ts`
+- [x] T034 Create backfill script: iterate catalog, open each plot, fit to window, wait for tiles, screenshot, resize with sharp, write PNGs + update item.json `apps/web-shell/scripts/generate-thumbnails.ts`
+- [x] T035 Add `"generate-thumbnails"` npm script to web-shell package.json `apps/web-shell/package.json`
+- [x] T036 Test: run backfill script against web-shell dev server and verify output files
 
 **Checkpoint**: All existing plots have thumbnails.
 

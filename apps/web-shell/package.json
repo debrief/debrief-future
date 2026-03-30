@@ -13,7 +13,8 @@
     "test:ui": "playwright test --config=playwright/playwright.config.ts --ui",
     "test:cloud": "node run-playwright.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "generate-thumbnails": "npx tsx scripts/generate-thumbnails.ts"
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
