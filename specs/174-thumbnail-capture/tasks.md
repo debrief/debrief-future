@@ -66,16 +66,16 @@
 
 ### Tests
 
-- [ ] T007 [test] Write unit tests for `store_thumbnail()` `services/stac/tests/test_thumbnails.py`
-- [ ] T008 [P][test] Add test fixture: sample STAC item with thumbnail assets `apps/vscode/test-data/local-store/exercises/exercise_alpha/item.json`
+- [x] T007 [test] Write unit tests for `store_thumbnail()` `services/stac/tests/test_thumbnails.py`
+- [x] T008 [P][test] Add test fixture: sample STAC item with thumbnail assets `apps/vscode/test-data/local-store/exercise-alpha/item.json`
 
 ### Implementation
 
-- [ ] T009 Create `store_thumbnail()` function following `store_artifact()` pattern `services/stac/src/debrief_stac/thumbnails.py`
-- [ ] T010 [P] Add `thumbnailHref` and `thumbnailSmHref` fields to `CatalogOverviewItem` `shared/components/src/filter-engine/types.ts`
-- [ ] T011 [P] Update VS Code stacService to extract thumbnail hrefs using direct key lookup (`item.assets['thumbnail']`) `apps/vscode/src/services/stacService.ts`
-- [ ] T012 [P] Update web-shell mock stacService `toOverviewItem()` to populate thumbnailHref from item assets `apps/web-shell/src/mocks/stacService.ts`
-- [ ] T013 Run Python tests: `uv run pytest services/stac/tests/test_thumbnails.py`
+- [x] T009 Create `store_thumbnail()` function following `store_artifact()` pattern `services/stac/src/debrief_stac/thumbnails.py`
+- [x] T010 [P] Add `thumbnailHref` and `thumbnailSmHref` fields to `CatalogOverviewItem` `shared/components/src/filter-engine/types.ts`
+- [x] T011 [P] Update VS Code stacService to extract thumbnail hrefs using direct key lookup (`item.assets['thumbnail']`) `apps/vscode/src/services/stacService.ts`
+- [x] T012 [P] Update web-shell mock stacService `toOverviewItem()` to populate thumbnailHref from item assets `apps/web-shell/src/mocks/stacService.ts`
+- [x] T013 Run Python tests: `uv run pytest services/stac/tests/test_thumbnails.py`
 
 **Checkpoint**: Thumbnail storage works. STAC items can store and retrieve thumbnail assets.
 

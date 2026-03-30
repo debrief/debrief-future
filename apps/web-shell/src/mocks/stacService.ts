@@ -28,6 +28,7 @@ interface StacItem {
     'debrief:nationalities'?: string[];
     'debrief:track_names'?: string[];
   };
+  assets?: Record<string, { href: string; type?: string; roles?: string[] }>;
 }
 
 /** Type-bridge helpers: JSON imports are typed as `unknown` by Vite; these
@@ -74,6 +75,8 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     featureTags: item.properties['debrief:feature_tags'] ?? [],
     nationalities: item.properties['debrief:nationalities'] ?? [],
     trackNames: item.properties['debrief:track_names'] ?? [],
+    thumbnailHref: item.assets?.['thumbnail']?.href ?? null,
+    thumbnailSmHref: item.assets?.['thumbnail-sm']?.href ?? null,
   };
 }
 

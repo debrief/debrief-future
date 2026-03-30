@@ -220,6 +220,8 @@ export class StacService {
             featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
             nationalities: (item.properties['debrief:nationalities'] as string[] | undefined) ?? [],
             trackNames: (item.properties['debrief:track_names'] as string[] | undefined) ?? [],
+            thumbnailHref: item.assets['thumbnail']?.href ?? null,
+            thumbnailSmHref: item.assets['thumbnail-sm']?.href ?? null,
           });
         }
       }

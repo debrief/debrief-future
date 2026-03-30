@@ -44,6 +44,10 @@ export interface CatalogOverviewItem {
   nationalities?: readonly string[];
   /** Track platform names from debrief:track_names */
   trackNames?: readonly string[];
+  /** Href to large thumbnail PNG (800x600), or null if not captured */
+  thumbnailHref?: string | null;
+  /** Href to small thumbnail PNG (200x150), or null if not captured */
+  thumbnailSmHref?: string | null;
 }
 
 /** All supported metadata filter types from SRD Section 4.4 */
