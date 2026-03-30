@@ -13,6 +13,12 @@ import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-al
 import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
+// Import thumbnail PNGs as Vite static assets — gives us proper URLs (#174)
+import exerciseAlphaThumb from '@test-data/local-store/exercise-alpha/thumbnail.png';
+import exerciseAlphaThumbSm from '@test-data/local-store/exercise-alpha/thumbnail-sm.png';
+import trainingRun1Thumb from '@test-data/local-store/training-run-1/thumbnail.png';
+import trainingRun1ThumbSm from '@test-data/local-store/training-run-1/thumbnail-sm.png';
+
 /** STAC Item structure from fixture data */
 interface StacItem {
   id: string;
@@ -36,15 +42,24 @@ interface StacItem {
 function asStacItem(data: unknown): StacItem { return data as StacItem; }
 function asFeatureCollection(data: unknown): FeatureCollection { return data as FeatureCollection; }
 
-/** Map of item paths to their data */
-const itemDataMap: Record<string, { item: StacItem; data: FeatureCollection }> = {
+/** Map of item paths to their data and resolved thumbnail URLs */
+const itemDataMap: Record<string, {
+  item: StacItem;
+  data: FeatureCollection;
+  thumbnailUrl: string | null;
+  thumbnailSmUrl: string | null;
+}> = {
   './exercise-alpha/item.json': {
     item: asStacItem(exerciseAlphaItem),
     data: asFeatureCollection(exerciseAlphaData),
+    thumbnailUrl: exerciseAlphaThumb,
+    thumbnailSmUrl: exerciseAlphaThumbSm,
   },
   './training-run-1/item.json': {
     item: asStacItem(trainingRun1Item),
     data: asFeatureCollection(trainingRun1Data),
+    thumbnailUrl: trainingRun1Thumb,
+    thumbnailSmUrl: trainingRun1ThumbSm,
   },
 };
 
@@ -60,8 +75,14 @@ function getItemPaths(): string[] {
 
 /**
  * Convert a STAC item to CatalogOverviewItem format.
+ * Thumbnail URLs are resolved via Vite static asset imports (#174).
  */
-function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
+function toOverviewItem(
+  itemPath: string,
+  item: StacItem,
+  thumbnailUrl: string | null,
+  thumbnailSmUrl: string | null,
+): CatalogOverviewItem {
   return {
     id: item.id,
     title: item.properties.title ?? item.id,
@@ -75,8 +96,8 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     featureTags: item.properties['debrief:feature_tags'] ?? [],
     nationalities: item.properties['debrief:nationalities'] ?? [],
     trackNames: item.properties['debrief:track_names'] ?? [],
-    thumbnailHref: item.assets?.['thumbnail']?.href ?? null,
-    thumbnailSmHref: item.assets?.['thumbnail-sm']?.href ?? null,
+    thumbnailHref: thumbnailUrl,
+    thumbnailSmHref: thumbnailSmUrl,
   };
 }
 
@@ -105,7 +126,7 @@ export function createMockStacService(): MockStacService {
         .map(path => {
           const entry = itemDataMap[path];
           if (!entry) return null;
-          return toOverviewItem(path, entry.item);
+          return toOverviewItem(path, entry.item, entry.thumbnailUrl, entry.thumbnailSmUrl);
         })
         .filter((item): item is CatalogOverviewItem => item !== null);
     },
