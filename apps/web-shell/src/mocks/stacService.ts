@@ -1,25 +1,22 @@
 /**
  * Mock STAC service for web-shell.
- * Loads fixture data from @test-data alias to simulate STAC catalog operations.
+ *
+ * Reads the full STAC catalog from the VS Code local-store via the Vite
+ * stac-store middleware plugin (/stac-store/...). This allows the web-shell
+ * to display all ~80 plots without hardcoding imports (#174).
+ *
+ * Falls back to bundled fixture imports for the two original test items
+ * when the /stac-store/ endpoint is unavailable (e.g. in production builds).
  */
 
 import type { CatalogOverviewItem } from '@debrief/components';
 import type { FeatureCollection } from 'geojson';
 
-// Import fixture data via Vite's JSON import
-import catalogData from '@test-data/local-store/catalog.json';
-import exerciseAlphaItem from '@test-data/local-store/exercise-alpha/item.json';
+// Bundled fixture imports — used as fallback and for Playwright E2E tests
 import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-alpha.geojson';
-import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
-// Import thumbnail PNGs as Vite static assets — gives us proper URLs (#174)
-import exerciseAlphaThumb from '@test-data/local-store/exercise-alpha/thumbnail.png';
-import exerciseAlphaThumbSm from '@test-data/local-store/exercise-alpha/thumbnail-sm.png';
-import trainingRun1Thumb from '@test-data/local-store/training-run-1/thumbnail.png';
-import trainingRun1ThumbSm from '@test-data/local-store/training-run-1/thumbnail-sm.png';
-
-/** STAC Item structure from fixture data */
+/** STAC Item structure from item.json */
 interface StacItem {
   id: string;
   bbox?: [number, number, number, number];
@@ -35,54 +32,33 @@ interface StacItem {
     'debrief:track_names'?: string[];
   };
   assets?: Record<string, { href: string; type?: string; roles?: string[] }>;
+  links?: Array<{ rel: string; href: string }>;
 }
 
-/** Type-bridge helpers: JSON imports are typed as `unknown` by Vite; these
- *  single-hop casts avoid the `as unknown as T` double-cast lint violation. */
-function asStacItem(data: unknown): StacItem { return data as StacItem; }
+interface StacCatalog {
+  links: Array<{ rel: string; href: string; title?: string }>;
+}
+
 function asFeatureCollection(data: unknown): FeatureCollection { return data as FeatureCollection; }
 
-/** Map of item paths to their data and resolved thumbnail URLs */
-const itemDataMap: Record<string, {
-  item: StacItem;
-  data: FeatureCollection;
-  thumbnailUrl: string | null;
-  thumbnailSmUrl: string | null;
-}> = {
-  './exercise-alpha/item.json': {
-    item: asStacItem(exerciseAlphaItem),
-    data: asFeatureCollection(exerciseAlphaData),
-    thumbnailUrl: exerciseAlphaThumb,
-    thumbnailSmUrl: exerciseAlphaThumbSm,
-  },
-  './training-run-1/item.json': {
-    item: asStacItem(trainingRun1Item),
-    data: asFeatureCollection(trainingRun1Data),
-    thumbnailUrl: trainingRun1Thumb,
-    thumbnailSmUrl: trainingRun1ThumbSm,
-  },
-};
+/** Prefix for the Vite middleware that serves the VS Code STAC store. */
+const STORE_PREFIX = '/stac-store';
 
 /**
- * Parse catalog links to extract item paths.
+ * Resolve a relative STAC asset href to an absolute URL via the store middleware.
+ * itemPath "./exercise-alpha/item.json", href "./thumbnail.png"
+ *   → "/stac-store/exercise-alpha/thumbnail.png"
  */
-function getItemPaths(): string[] {
-  const catalog = catalogData as { links?: Array<{ rel: string; href: string; title?: string }> };
-  return (catalog.links ?? [])
-    .filter(link => link.rel === 'item')
-    .map(link => link.href);
+function resolveStacHref(itemPath: string, href: string): string {
+  const dir = itemPath.replace(/\/[^/]+$/, '').replace(/^\.\//, '');
+  const file = href.replace(/^\.\//, '');
+  return `${STORE_PREFIX}/${dir}/${file}`;
 }
 
-/**
- * Convert a STAC item to CatalogOverviewItem format.
- * Thumbnail URLs are resolved via Vite static asset imports (#174).
- */
-function toOverviewItem(
-  itemPath: string,
-  item: StacItem,
-  thumbnailUrl: string | null,
-  thumbnailSmUrl: string | null,
-): CatalogOverviewItem {
+/** Convert a STAC item + its catalog-relative itemPath to a CatalogOverviewItem. */
+function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
+  const thumbAsset = item.assets?.['thumbnail'];
+  const thumbSmAsset = item.assets?.['thumbnail-sm'];
   return {
     id: item.id,
     title: item.properties.title ?? item.id,
@@ -96,52 +72,113 @@ function toOverviewItem(
     featureTags: item.properties['debrief:feature_tags'] ?? [],
     nationalities: item.properties['debrief:nationalities'] ?? [],
     trackNames: item.properties['debrief:track_names'] ?? [],
-    thumbnailHref: thumbnailUrl,
-    thumbnailSmHref: thumbnailSmUrl,
+    thumbnailHref: thumbAsset ? resolveStacHref(itemPath, thumbAsset.href) : null,
+    thumbnailSmHref: thumbSmAsset ? resolveStacHref(itemPath, thumbSmAsset.href) : null,
   };
 }
+
+/** Pre-fetched GeoJSON data keyed by item path (loaded on demand). */
+const geojsonCache = new Map<string, FeatureCollection>();
+
+// Seed cache with bundled test data (always available)
+geojsonCache.set('./exercise-alpha/item.json', asFeatureCollection(exerciseAlphaData));
+geojsonCache.set('./training-run-1/item.json', asFeatureCollection(trainingRun1Data));
 
 /**
  * Mock STAC service interface.
  */
 export interface MockStacService {
-  /** Get all items in the catalog */
+  /** Load catalog and return all items. Must be called before getItems(). */
+  init(): Promise<void>;
+
+  /** Get all items in the catalog (call init() first). */
   getItems(): CatalogOverviewItem[];
 
-  /** Get plot data (GeoJSON FeatureCollection) for an item */
-  getPlotData(itemPath: string): FeatureCollection;
+  /** Get plot data (GeoJSON FeatureCollection) for an item — fetches on demand. */
+  getPlotData(itemPath: string): Promise<FeatureCollection>;
 
   /** Get item metadata */
   getItem(itemPath: string): StacItem | null;
 }
 
 /**
- * Create a mock STAC service instance.
+ * Create a mock STAC service that reads from the /stac-store/ middleware.
  */
 export function createMockStacService(): MockStacService {
+  let items: CatalogOverviewItem[] = [];
+  const itemMap = new Map<string, StacItem>();
+
   return {
-    getItems(): CatalogOverviewItem[] {
-      const paths = getItemPaths();
-      return paths
-        .map(path => {
-          const entry = itemDataMap[path];
-          if (!entry) return null;
-          return toOverviewItem(path, entry.item, entry.thumbnailUrl, entry.thumbnailSmUrl);
-        })
-        .filter((item): item is CatalogOverviewItem => item !== null);
+    async init(): Promise<void> {
+      try {
+        // Fetch the catalog.json to discover all item links
+        const catalogRes = await fetch(`${STORE_PREFIX}/catalog.json`);
+        if (!catalogRes.ok) throw new Error(`catalog.json: ${catalogRes.status}`);
+        const catalog = await catalogRes.json() as StacCatalog;
+
+        const itemPaths = catalog.links
+          .filter(link => link.rel === 'item')
+          .map(link => link.href);
+
+        // Fetch each item.json in parallel
+        const results = await Promise.allSettled(
+          itemPaths.map(async (itemPath) => {
+            const resolvedPath = itemPath.replace(/^\.\//, '');
+            const res = await fetch(`${STORE_PREFIX}/${resolvedPath}`);
+            if (!res.ok) throw new Error(`${resolvedPath}: ${res.status}`);
+            const item = await res.json() as StacItem;
+            return { itemPath, item };
+          }),
+        );
+
+        items = [];
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            const { itemPath, item } = result.value;
+            items.push(toOverviewItem(itemPath, item));
+            itemMap.set(itemPath, item);
+          }
+        }
+
+        // Sort by datetime descending
+        items.sort((a, b) => {
+          const da = a.datetime ? new Date(a.datetime).getTime() : 0;
+          const db = b.datetime ? new Date(b.datetime).getTime() : 0;
+          return db - da;
+        });
+
+        console.log(`[stacService] Loaded ${items.length} items from STAC store`);
+      } catch (err) {
+        console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
+      }
     },
 
-    getPlotData(itemPath: string): FeatureCollection {
-      const entry = itemDataMap[itemPath];
-      if (!entry) {
-        throw new Error(`Unknown item path: ${itemPath}`);
-      }
-      return entry.data;
+    getItems(): CatalogOverviewItem[] {
+      return items;
+    },
+
+    async getPlotData(itemPath: string): Promise<FeatureCollection> {
+      // Check cache first (includes bundled fallback data)
+      const cached = geojsonCache.get(itemPath);
+      if (cached) return cached;
+
+      // Fetch the GeoJSON data asset from the store
+      const item = itemMap.get(itemPath);
+      if (!item) throw new Error(`Unknown item path: ${itemPath}`);
+
+      const dataAsset = item.assets?.['data'];
+      if (!dataAsset) throw new Error(`No data asset in ${itemPath}`);
+
+      const url = resolveStacHref(itemPath, dataAsset.href);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`GeoJSON fetch failed: ${url} (${res.status})`);
+      const data = await res.json() as FeatureCollection;
+      geojsonCache.set(itemPath, data);
+      return data;
     },
 
     getItem(itemPath: string): StacItem | null {
-      const entry = itemDataMap[itemPath];
-      return entry?.item ?? null;
+      return itemMap.get(itemPath) ?? null;
     },
   };
 }

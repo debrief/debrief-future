@@ -195,8 +195,16 @@ export default function App() {
   const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
+  // Catalog loading state (#174 — async init for dynamic STAC store)
+  const [catalogLoaded, setCatalogLoaded] = useState(false);
+
+  useEffect(() => {
+    void stacService.init().then(() => setCatalogLoaded(true));
+  }, []);
+
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
+    if (!catalogLoaded) return [];
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
       vesselClasses: item.vesselClasses ?? [],
@@ -208,7 +216,7 @@ export default function App() {
       collection: null,
       modified: null,
     }));
-  }, []);
+  }, [catalogLoaded]);
 
   // Extract features array from current plot
   const plotFeatures = useMemo<DebriefFeature[]>(() => {
@@ -294,8 +302,9 @@ export default function App() {
 
   // Handle plot selection from catalog
   const handlePlotSelect = useCallback((itemPath: string) => {
+    void (async () => {
     try {
-      const plotData = stacService.getPlotData(itemPath);
+      const plotData = await stacService.getPlotData(itemPath);
       const item = stacService.getItem(itemPath);
 
       // Reset session store for new plot
@@ -335,6 +344,7 @@ export default function App() {
     } catch (error) {
       console.error('Failed to load plot:', error);
     }
+    })();
   }, []);
 
   // Handle back to catalog
