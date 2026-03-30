@@ -166,6 +166,12 @@ export type { GuidanceText } from './MapView/drawing';
 export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
 
+// Thumbnail capture utilities (Feature: 174-thumbnail-capture)
+export { captureMapAsDataUrl } from './MapView/captureMap';
+export type { CaptureMapOptions } from './MapView/captureMap';
+export { downscaleDataUrl } from './MapView/resizeImage';
+export type { DownscaleOptions } from './MapView/resizeImage';
+
 // ChartRenderer (Feature: 085-chart-renderer)
 export { ChartRenderer } from './ChartRenderer';
 export type { ChartRendererProps } from './ChartRenderer';

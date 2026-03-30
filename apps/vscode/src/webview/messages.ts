@@ -286,6 +286,22 @@ export interface ImportCompleteMessage {
 }
 
 // ============================================================================
+// Thumbnail Capture Messages (#174)
+// ============================================================================
+
+/** Request thumbnail capture from the webview (Extension → Webview) */
+export interface RequestThumbnailCaptureMessage extends RequestMessage {
+  type: 'requestThumbnailCapture';
+}
+
+/** Thumbnail capture response with base64 PNG data (Webview → Extension) */
+export interface ThumbnailCaptureResponseMessage extends ResponseMessage {
+  type: 'thumbnailCaptureResponse';
+  largePngBase64: string | null;
+  smallPngBase64: string | null;
+}
+
+// ============================================================================
 // Union Types
 // ============================================================================
 
@@ -310,7 +326,8 @@ export type ExtensionToWebviewMessage =
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
-  | ImportCompleteMessage;
+  | ImportCompleteMessage
+  | RequestThumbnailCaptureMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -325,7 +342,8 @@ export type WebviewToExtensionMessage =
   | RequestUndoMessage
   | RequestRedoMessage
   | FeatureDrawnMessage
-  | DrawingModeChangedMessage;
+  | DrawingModeChangedMessage
+  | ThumbnailCaptureResponseMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)

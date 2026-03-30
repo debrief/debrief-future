@@ -89,17 +89,17 @@
 
 ### Tests
 
-- [ ] T014 [test] Write unit test for `captureMapAsDataUrl()` using jsdom + mock DOM `shared/components/src/MapView/__tests__/captureMap.test.ts`
-- [ ] T015 [P][test] Write unit test for `downscaleDataUrl()` using jsdom canvas `shared/components/src/MapView/__tests__/resizeImage.test.ts`
+- [x] T014 [test] Write unit test for `captureMapAsDataUrl()` using jsdom + mock DOM `shared/components/src/MapView/__tests__/captureMap.test.ts`
+- [x] T015 [P][test] Write unit test for `downscaleDataUrl()` using jsdom canvas `shared/components/src/MapView/__tests__/resizeImage.test.ts`
 
 ### Implementation
 
-- [ ] T016 Create map capture utility wrapping `modern-screenshot` domToPng `shared/components/src/MapView/captureMap.ts`
-- [ ] T017 [P] Create image downscale utility using offscreen canvas `shared/components/src/MapView/resizeImage.ts`
-- [ ] T018 Add `RequestThumbnailCaptureMessage` and `ThumbnailCaptureResponseMessage` to webview protocol `apps/vscode/src/webview/messages.ts`
-- [ ] T019 Handle `requestThumbnailCapture` in webview: capture map, downscale, send both base64 PNGs back `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T020 Integrate capture into saveSession: await with 5-second timeout, decode base64, call `store_thumbnail()` via stacService `apps/vscode/src/commands/saveSession.ts`
-- [ ] T021 Run unit tests: `pnpm --filter @debrief/components test`
+- [x] T016 Create map capture utility wrapping `modern-screenshot` domToPng `shared/components/src/MapView/captureMap.ts`
+- [x] T017 [P] Create image downscale utility using offscreen canvas `shared/components/src/MapView/resizeImage.ts`
+- [x] T018 Add `RequestThumbnailCaptureMessage` and `ThumbnailCaptureResponseMessage` to webview protocol `apps/vscode/src/webview/messages.ts`
+- [x] T019 Handle `requestThumbnailCapture` in webview: capture map, downscale, send both base64 PNGs back `apps/vscode/src/webview/mapPanel.ts`
+- [x] T020 Integrate capture into saveSession: await with 5-second timeout, decode base64, call `store_thumbnail()` via stacService `apps/vscode/src/commands/saveSession.ts`
+- [x] T021 Run unit tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Save-time thumbnail capture works end-to-end.
 

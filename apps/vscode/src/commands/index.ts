@@ -419,7 +419,7 @@ export function registerCommands(
       createSaveSessionCommand(sessionManager, (storeId) => {
         const store = configService.getStore(storeId);
         return store?.path;
-      })
+      }, getMapPanel)
     )
   );
 

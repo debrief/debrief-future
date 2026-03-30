@@ -11,7 +11,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MapView, createDrawnFeature, getPaletteStyleOverrides } from '@debrief/components';
+import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
 import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
@@ -156,6 +156,35 @@ function MapViewApp(): React.ReactElement {
           break;
         case 'setDrawingPaletteIndex':
           setPaletteIndex(msg.paletteIndex);
+          break;
+        case 'requestThumbnailCapture':
+          void (async () => {
+            try {
+              const mapContainer = document.querySelector('.leaflet-container') as HTMLElement | null;
+              if (!mapContainer) throw new Error('No .leaflet-container found');
+              const largeDataUrl = await captureMapAsDataUrl(mapContainer, { width: 800, height: 600 });
+              const smallDataUrl = await downscaleDataUrl(largeDataUrl, { width: 200, height: 150 });
+              // Strip data URL prefix to get raw base64
+              const largePngBase64 = largeDataUrl.replace(/^data:image\/png;base64,/, '');
+              const smallPngBase64 = smallDataUrl.replace(/^data:image\/png;base64,/, '');
+              vscode.postMessage({
+                type: 'thumbnailCaptureResponse',
+                requestId: msg.requestId,
+                success: true,
+                largePngBase64,
+                smallPngBase64,
+              });
+            } catch (err) {
+              vscode.postMessage({
+                type: 'thumbnailCaptureResponse',
+                requestId: msg.requestId,
+                success: false,
+                largePngBase64: null,
+                smallPngBase64: null,
+                error: String(err),
+              });
+            }
+          })();
           break;
       }
     };

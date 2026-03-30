@@ -2,14 +2,19 @@
  * Save Session Command - Persist session state to a .debrief-session file
  *
  * Feature: 029-session-state-vscode (Phase 7)
+ * Feature: 174-thumbnail-capture (thumbnail generation on save)
  *
  * Saves the current session state (viewport, selection, time, visibility)
- * to a file adjacent to the plot data file.
+ * to a file adjacent to the plot data file. After saving, captures map
+ * thumbnails and stores them as STAC assets.
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
 import { saveSession, type SessionStoreWithUndo } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
+import type { MapPanel } from '../webview/mapPanel';
 import { parseStacUri } from '../types/stac';
 
 /**
@@ -36,15 +41,56 @@ function deriveSessionPath(plotUri: string, storePath: string): string | null {
 }
 
 /**
+ * Write thumbnail PNG files and update the STAC item.json with thumbnail assets.
+ */
+async function storeThumbnails(
+  storePath: string,
+  plotUri: string,
+  largePngBase64: string,
+  smallPngBase64: string,
+): Promise<void> {
+  const parsed = parseStacUri(plotUri);
+  if (!parsed) return;
+
+  const itemDir = path.join(storePath, path.dirname(parsed.itemPath));
+  const itemJsonPath = path.join(storePath, parsed.itemPath);
+
+  // Write thumbnail files
+  const largePath = path.join(itemDir, 'thumbnail.png');
+  const smallPath = path.join(itemDir, 'thumbnail-sm.png');
+  fs.writeFileSync(largePath, Buffer.from(largePngBase64, 'base64'));
+  fs.writeFileSync(smallPath, Buffer.from(smallPngBase64, 'base64'));
+
+  // Update item.json with thumbnail asset entries
+  const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8'));
+  itemData.assets = itemData.assets ?? {};
+  itemData.assets['thumbnail'] = {
+    href: './thumbnail.png',
+    type: 'image/png',
+    title: 'Plot thumbnail',
+    roles: ['thumbnail'],
+  };
+  itemData.assets['thumbnail-sm'] = {
+    href: './thumbnail-sm.png',
+    type: 'image/png',
+    title: 'Plot thumbnail (small)',
+    roles: ['thumbnail'],
+  };
+  fs.writeFileSync(itemJsonPath, JSON.stringify(itemData, null, 2));
+}
+
+/**
  * Create the save session command handler.
  *
  * @param sessionManager - The session manager service
  * @param getStorePath - Function to get the store path for a store ID
+ * @param getMapPanel - Function to get the current MapPanel (for thumbnail capture)
  * @returns The command handler function
  */
 export function createSaveSessionCommand(
   sessionManager: SessionManager,
-  getStorePath: (storeId: string) => string | undefined
+  getStorePath: (storeId: string) => string | undefined,
+  getMapPanel?: () => MapPanel | undefined,
 ): () => Promise<void> {
   return async () => {
     const session = sessionManager.getActiveSession();
@@ -101,6 +147,23 @@ export function createSaveSessionCommand(
       void vscode.window.showInformationMessage(
         `Session saved to ${result.path}`
       );
+
+      // Capture thumbnails after successful save (#174)
+      const mapPanel = getMapPanel?.();
+      if (mapPanel) {
+        try {
+          const parsed = parseStacUri(plotUri);
+          const storePath = parsed ? getStorePath(parsed.storeId) : undefined;
+          if (parsed && storePath) {
+            const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
+            if (largePngBase64 && smallPngBase64) {
+              await storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
+            }
+          }
+        } catch (err) {
+          console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
+        }
+      }
     } else {
       void vscode.window.showErrorMessage(
         `Failed to save session: ${result.error}`
