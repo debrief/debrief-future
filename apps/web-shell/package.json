@@ -13,7 +13,8 @@
     "test:ui": "playwright test --config=playwright/playwright.config.ts --ui",
     "test:cloud": "node run-playwright.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "generate-thumbnails": "npx tsx scripts/generate-thumbnails.ts"
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
+    "sharp": "^0.33.0",
     "@sparticuz/chromium": "^143.0.4",
     "@types/geojson": "^7946.0.0",
     "@types/leaflet": "^1.9.8",

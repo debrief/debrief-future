@@ -49,12 +49,12 @@
 
 **Purpose**: Install dependencies and configure CORS for canvas capture
 
-- [ ] T001 Add `modern-screenshot` dependency to `shared/components/package.json`
-- [ ] T002 [P] Add `sharp` as devDependency to `apps/web-shell/package.json`
-- [ ] T003 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/MapView/MapView.tsx`
-- [ ] T004 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T005 [P] Add `data-testid="fit-to-window"` to fit button in `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
-- [ ] T006 Run `pnpm install` to install new dependencies
+- [x] T001 Add `modern-screenshot` dependency to `shared/components/package.json`
+- [x] T002 [P] Add `sharp` as devDependency to `apps/web-shell/package.json`
+- [x] T003 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/MapView/MapView.tsx`
+- [x] T004 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T005 [P] Add `data-testid="fit-to-window"` to fit button in `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
+- [x] T006 Run `pnpm install` to install new dependencies
 
 ---
 
@@ -66,16 +66,16 @@
 
 ### Tests
 
-- [ ] T007 [test] Write unit tests for `store_thumbnail()` `services/stac/tests/test_thumbnails.py`
-- [ ] T008 [P][test] Add test fixture: sample STAC item with thumbnail assets `apps/vscode/test-data/local-store/exercises/exercise_alpha/item.json`
+- [x] T007 [test] Write unit tests for `store_thumbnail()` `services/stac/tests/test_thumbnails.py`
+- [x] T008 [P][test] Add test fixture: sample STAC item with thumbnail assets `apps/vscode/test-data/local-store/exercise-alpha/item.json`
 
 ### Implementation
 
-- [ ] T009 Create `store_thumbnail()` function following `store_artifact()` pattern `services/stac/src/debrief_stac/thumbnails.py`
-- [ ] T010 [P] Add `thumbnailHref` and `thumbnailSmHref` fields to `CatalogOverviewItem` `shared/components/src/filter-engine/types.ts`
-- [ ] T011 [P] Update VS Code stacService to extract thumbnail hrefs using direct key lookup (`item.assets['thumbnail']`) `apps/vscode/src/services/stacService.ts`
-- [ ] T012 [P] Update web-shell mock stacService `toOverviewItem()` to populate thumbnailHref from item assets `apps/web-shell/src/mocks/stacService.ts`
-- [ ] T013 Run Python tests: `uv run pytest services/stac/tests/test_thumbnails.py`
+- [x] T009 Create `store_thumbnail()` function following `store_artifact()` pattern `services/stac/src/debrief_stac/thumbnails.py`
+- [x] T010 [P] Add `thumbnailHref` and `thumbnailSmHref` fields to `CatalogOverviewItem` `shared/components/src/filter-engine/types.ts`
+- [x] T011 [P] Update VS Code stacService to extract thumbnail hrefs using direct key lookup (`item.assets['thumbnail']`) `apps/vscode/src/services/stacService.ts`
+- [x] T012 [P] Update web-shell mock stacService `toOverviewItem()` to populate thumbnailHref from item assets `apps/web-shell/src/mocks/stacService.ts`
+- [x] T013 Run Python tests: `uv run pytest services/stac/tests/test_thumbnails.py`
 
 **Checkpoint**: Thumbnail storage works. STAC items can store and retrieve thumbnail assets.
 
@@ -89,17 +89,17 @@
 
 ### Tests
 
-- [ ] T014 [test] Write unit test for `captureMapAsDataUrl()` using jsdom + mock DOM `shared/components/src/MapView/__tests__/captureMap.test.ts`
-- [ ] T015 [P][test] Write unit test for `downscaleDataUrl()` using jsdom canvas `shared/components/src/MapView/__tests__/resizeImage.test.ts`
+- [x] T014 [test] Write unit test for `captureMapAsDataUrl()` using jsdom + mock DOM `shared/components/src/MapView/__tests__/captureMap.test.ts`
+- [x] T015 [P][test] Write unit test for `downscaleDataUrl()` using jsdom canvas `shared/components/src/MapView/__tests__/resizeImage.test.ts`
 
 ### Implementation
 
-- [ ] T016 Create map capture utility wrapping `modern-screenshot` domToPng `shared/components/src/MapView/captureMap.ts`
-- [ ] T017 [P] Create image downscale utility using offscreen canvas `shared/components/src/MapView/resizeImage.ts`
-- [ ] T018 Add `RequestThumbnailCaptureMessage` and `ThumbnailCaptureResponseMessage` to webview protocol `apps/vscode/src/webview/messages.ts`
-- [ ] T019 Handle `requestThumbnailCapture` in webview: capture map, downscale, send both base64 PNGs back `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T020 Integrate capture into saveSession: await with 5-second timeout, decode base64, call `store_thumbnail()` via stacService `apps/vscode/src/commands/saveSession.ts`
-- [ ] T021 Run unit tests: `pnpm --filter @debrief/components test`
+- [x] T016 Create map capture utility wrapping `modern-screenshot` domToPng `shared/components/src/MapView/captureMap.ts`
+- [x] T017 [P] Create image downscale utility using offscreen canvas `shared/components/src/MapView/resizeImage.ts`
+- [x] T018 Add `RequestThumbnailCaptureMessage` and `ThumbnailCaptureResponseMessage` to webview protocol `apps/vscode/src/webview/messages.ts`
+- [x] T019 Handle `requestThumbnailCapture` in webview: capture map, downscale, send both base64 PNGs back `apps/vscode/src/webview/mapPanel.ts`
+- [x] T020 Integrate capture into saveSession: await with 5-second timeout, decode base64, call `store_thumbnail()` via stacService `apps/vscode/src/commands/saveSession.ts`
+- [x] T021 Run unit tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Save-time thumbnail capture works end-to-end.
 
@@ -113,17 +113,17 @@
 
 ### Tests
 
-- [ ] T022 [test] Write component tests for ThumbnailPreview: render, fallback, prev/next, keyboard nav, onError handler `shared/components/src/StacBrowser/__tests__/ThumbnailPreview.test.tsx`
+- [x] T022 [test] Write component tests for ThumbnailPreview: render, fallback, prev/next, keyboard nav, onError handler `shared/components/src/StacBrowser/__tests__/ThumbnailPreview.test.tsx`
 
 ### Implementation
 
-- [ ] T023 Create ThumbnailPreview component with large `<img>`, title overlay, prev/next buttons, keyboard arrows, SVG fallback via `onError` `shared/components/src/StacBrowser/ThumbnailPreview.tsx`
-- [ ] T024 [P] Create ThumbnailPreview styles `shared/components/src/StacBrowser/ThumbnailPreview.css`
-- [ ] T025 Add preview panel to StacBrowser GoldenLayout (4th panel, right side of top row) `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T026 Change ExerciseListItemRow: single-click = highlight/preview (`onHighlight`), double-click = open (`onSelect`) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T027 Update ExerciseListView to pass `onHighlight` and `onSelect` callbacks separately `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T028 Wire StacBrowser `selectedItemId` state to ThumbnailPreview panel and list highlight `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T029 Run component tests: `pnpm --filter @debrief/components test`
+- [x] T023 Create ThumbnailPreview component with large `<img>`, title overlay, prev/next buttons, keyboard arrows, SVG fallback via `onError` `shared/components/src/StacBrowser/ThumbnailPreview.tsx`
+- [x] T024 [P] Create ThumbnailPreview styles `shared/components/src/StacBrowser/ThumbnailPreview.css`
+- [x] T025 Add preview panel to StacBrowser GoldenLayout (4th panel, right side of top row) `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T026 Change ExerciseListItemRow: single-click = highlight/preview (`onHighlight`), double-click = open (`onSelect`) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T027 Update ExerciseListView to pass `onHighlight` and `onSelect` callbacks separately `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T028 Wire StacBrowser `selectedItemId` state to ThumbnailPreview panel and list highlight `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T029 Run component tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Gallery preview pane works with prev/next navigation.
 
@@ -137,12 +137,12 @@
 
 ### Tests
 
-- [ ] T030 [test] Write unit test for ExerciseListItemRow: PNG rendering when `thumbnailSmHref` exists, SVG fallback when null `shared/components/src/ExerciseListView/__tests__/ExerciseListItemRow.test.tsx`
+- [x] T030 [test] Write unit test for ExerciseListItemRow: PNG rendering when `thumbnailSmHref` exists, SVG fallback when null `shared/components/src/ExerciseListView/__tests__/ExerciseListItemRow.test.tsx`
 
 ### Implementation
 
-- [ ] T031 Update ExerciseListItemRow to render `<img>` when `item.thumbnailSmHref` is available, with `onError` fallback to SpatialThumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T032 Run component tests: `pnpm --filter @debrief/components test`
+- [x] T031 Update ExerciseListItemRow to render `<img>` when `item.thumbnailSmHref` is available, with `onError` fallback to SpatialThumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T032 Run component tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: List view shows raster thumbnails with seamless SVG fallback.
 
@@ -156,10 +156,10 @@
 
 ### Implementation
 
-- [ ] T033 Add `fitToWindow()` method to AnalysisPage POM `apps/web-shell/playwright/pages/AnalysisPage.ts`
-- [ ] T034 Create backfill script: iterate catalog, open each plot, fit to window, wait for tiles, screenshot, resize with sharp, write PNGs + update item.json `apps/web-shell/scripts/generate-thumbnails.ts`
-- [ ] T035 Add `"generate-thumbnails"` npm script to web-shell package.json `apps/web-shell/package.json`
-- [ ] T036 Test: run backfill script against web-shell dev server and verify output files
+- [x] T033 Add `fitToWindow()` method to AnalysisPage POM `apps/web-shell/playwright/pages/AnalysisPage.ts`
+- [x] T034 Create backfill script: iterate catalog, open each plot, fit to window, wait for tiles, screenshot, resize with sharp, write PNGs + update item.json `apps/web-shell/scripts/generate-thumbnails.ts`
+- [x] T035 Add `"generate-thumbnails"` npm script to web-shell package.json `apps/web-shell/package.json`
+- [x] T036 Test: run backfill script against web-shell dev server and verify output files
 
 **Checkpoint**: All existing plots have thumbnails.
 
@@ -171,8 +171,8 @@
 
 > **PLAYWRIGHT WORKS IN CLOUD SESSIONS** — The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T037 Create Playwright E2E test: gallery preview panel renders, prev/next navigation, fallback state `apps/web-shell/playwright/tests/thumbnail-preview.spec.ts`
-- [ ] T038 Run E2E tests: `cd apps/web-shell && node run-playwright.mjs`
+- [x] T037 Create Playwright E2E test: gallery preview panel renders, prev/next navigation, fallback state `apps/web-shell/playwright/tests/thumbnail-preview.spec.ts`
+- [x] T038 Run E2E tests: `cd apps/web-shell && node run-playwright.mjs`
 
 **Checkpoint**: All E2E tests pass.
 
@@ -182,21 +182,21 @@
 
 ### Verification
 
-- [ ] T039 Run full CI check: `task verify` (lint + typecheck + tests)
-- [ ] T040 Run quickstart.md validation: manually verify the steps in `specs/174-thumbnail-capture/quickstart.md`
+- [x] T039 Run full CI check: `task verify` (lint + typecheck + tests)
+- [x] T040 Run quickstart.md validation: manually verify the steps in `specs/174-thumbnail-capture/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T041 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/174-thumbnail-capture/evidence/test-summary.md`
-- [ ] T042 Create usage demonstration in `specs/174-thumbnail-capture/evidence/usage-example.md`
+- [x] T041 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/174-thumbnail-capture/evidence/test-summary.md`
+- [x] T042 Create usage demonstration in `specs/174-thumbnail-capture/evidence/usage-example.md`
 - [ ] T043 [P] Capture theme screenshots (light/dark/vscode) of ThumbnailPreview to `specs/174-thumbnail-capture/evidence/screenshots/`
 - [ ] T044 Capture interaction GIF showing gallery prev/next navigation to `specs/174-thumbnail-capture/evidence/screenshots/interaction.gif`
-- [ ] T045 [P] Capture sample STAC item.json with thumbnail assets to `specs/174-thumbnail-capture/evidence/sample-item.json`
+- [x] T045 [P] Capture sample STAC item.json with thumbnail assets to `specs/174-thumbnail-capture/evidence/sample-item.json`
 
 ### Media Content
 
-- [ ] T046 Create shipped blog post in `specs/174-thumbnail-capture/media/shipped-post.md`
-- [ ] T047 [P] Create LinkedIn shipped summary in `specs/174-thumbnail-capture/media/linkedin-shipped.md`
+- [x] T046 Create shipped blog post in `specs/174-thumbnail-capture/media/shipped-post.md`
+- [x] T047 [P] Create LinkedIn shipped summary in `specs/174-thumbnail-capture/media/linkedin-shipped.md`
 
 ### PR Creation
 

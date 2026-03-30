@@ -375,4 +375,19 @@ export class AnalysisPage {
   async hasActivityPanel(): Promise<boolean> {
     return await this.activityPanel.isVisible();
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Thumbnail capture helpers (#174)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Click the "Fit to visible features" button on the map toolbar.
+   * Waits for the map to settle after fitting.
+   */
+  async fitToWindow(): Promise<void> {
+    const fitButton = this.page.locator('[data-testid="fit-to-window"]');
+    await fitButton.click();
+    // Allow the map to animate to the new bounds
+    await this.page.waitForTimeout(500);
+  }
 }

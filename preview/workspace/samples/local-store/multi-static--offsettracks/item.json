@@ -10,7 +10,7 @@
     "coordinates": [
       [
         [
-          -0.0,
+          0,
           60.2
         ],
         [
@@ -22,18 +22,18 @@
           60.7
         ],
         [
-          -0.0,
+          0,
           60.7
         ],
         [
-          -0.0,
+          0,
           60.2
         ]
       ]
     ]
   },
   "bbox": [
-    -0.0,
+    0,
     60.2,
     0.5,
     60.7
@@ -41,7 +41,7 @@
   "properties": {
     "title": "Formidable Shield: Offsettracks",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Formidable Shield: Offsettracks \u2014 Multi-static sonar exercise in the North Atlantic. 3 platform track(s) recorded including HNoMS Mahan, FS Roosevelt, Contact Alpha. Multi-national participation: FR, GB, NO.",
+    "description": "Formidable Shield: Offsettracks — Multi-static sonar exercise in the North Atlantic. 3 platform track(s) recorded including HNoMS Mahan, FS Roosevelt, Contact Alpha. Multi-national participation: FR, GB, NO.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T13:00:00+00:00",
     "debrief:vessel_classes": [
@@ -116,6 +116,22 @@
         "load_timestamp": "2026-03-28T13:50:57.757046Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

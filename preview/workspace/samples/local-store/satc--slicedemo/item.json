@@ -41,7 +41,7 @@
   "properties": {
     "title": "Silent Resolve: Slicedemo",
     "datetime": "2001-01-01T14:00:47.812000+00:00",
-    "description": "Silent Resolve: Slicedemo \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Kent.",
+    "description": "Silent Resolve: Slicedemo — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Kent.",
     "start_datetime": "2001-01-01T14:00:47.812000+00:00",
     "end_datetime": "2001-01-01T18:00:49.546000+00:00",
     "debrief:vessel_classes": [
@@ -109,6 +109,22 @@
         "load_timestamp": "2026-03-28T13:51:01.846279Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -6,6 +6,8 @@ export type { RawTaxonomy } from './filter-engine/taxonomy';
 // StacBrowser (Feature: 132-three-view-sync)
 export { StacBrowser } from './StacBrowser';
 export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
+export { ThumbnailPreview } from './StacBrowser/ThumbnailPreview';
+export type { ThumbnailPreviewProps } from './StacBrowser/ThumbnailPreview';
 
 export { TimelineView } from './TimelineView';
 export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
@@ -165,6 +167,12 @@ export { DRAWING_GUIDANCE, CANCEL_HINT } from './MapView/drawing';
 export type { GuidanceText } from './MapView/drawing';
 export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
+
+// Thumbnail capture utilities (Feature: 174-thumbnail-capture)
+export { captureMapAsDataUrl } from './MapView/captureMap';
+export type { CaptureMapOptions } from './MapView/captureMap';
+export { downscaleDataUrl } from './MapView/resizeImage';
+export type { DownscaleOptions } from './MapView/resizeImage';
 
 // ChartRenderer (Feature: 085-chart-renderer)
 export { ChartRenderer } from './ChartRenderer';

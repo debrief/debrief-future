@@ -41,7 +41,7 @@
   "properties": {
     "title": "Dynamic Mongoose: Turn Single Point",
     "datetime": "2009-04-22T18:02:54.410000+00:00",
-    "description": "Dynamic Mongoose: Turn Single Point \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Roald Amundsen.",
+    "description": "Dynamic Mongoose: Turn Single Point — Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Roald Amundsen.",
     "start_datetime": "2009-04-22T18:02:54.410000+00:00",
     "end_datetime": "2009-04-22T18:02:54.410000+00:00",
     "debrief:vessel_classes": [
@@ -109,6 +109,22 @@
         "load_timestamp": "2026-03-28T13:50:59.342954Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

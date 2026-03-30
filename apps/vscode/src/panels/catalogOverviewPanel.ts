@@ -6,6 +6,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import type { StacItemSummary, Catalog } from '../types/stac';
 
 /** Message sent from extension to webview */
@@ -23,6 +24,8 @@ interface LoadCatalogOverviewMessage {
       datetime: string | null;
       startDatetime: string | null;
       endDatetime: string | null;
+      thumbnailHref: string | null;
+      thumbnailSmHref: string | null;
     }>;
   };
 }
@@ -93,6 +96,7 @@ export class CatalogOverviewPanel {
     context: vscode.ExtensionContext,
     catalogId: string,
     catalogTitle: string,
+    storePath?: string,
   ): CatalogOverviewPanel {
     const key = catalogId;
 
@@ -107,6 +111,15 @@ export class CatalogOverviewPanel {
       ? vscode.window.activeTextEditor.viewColumn
       : vscode.ViewColumn.One;
 
+    const localResourceRoots = [
+      vscode.Uri.joinPath(extensionUri, 'dist'),
+      vscode.Uri.joinPath(extensionUri, 'node_modules'),
+    ];
+    // Allow webview to load thumbnail images from the STAC store directory
+    if (storePath) {
+      localResourceRoots.push(vscode.Uri.file(storePath));
+    }
+
     const panel = vscode.window.createWebviewPanel(
       CatalogOverviewPanel.viewType,
       `Overview: ${catalogTitle}`,
@@ -114,10 +127,7 @@ export class CatalogOverviewPanel {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
-        localResourceRoots: [
-          vscode.Uri.joinPath(extensionUri, 'dist'),
-          vscode.Uri.joinPath(extensionUri, 'node_modules'),
-        ],
+        localResourceRoots,
       },
     );
 
@@ -141,20 +151,34 @@ export class CatalogOverviewPanel {
       this.storeId = storeId;
     }
 
-    const overviewItems = items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      itemPath: item.itemPath,
-      bbox: item.bbox ?? null,
-      datetime: item.datetime ?? null,
-      startDatetime: item.startDatetime ?? null,
-      endDatetime: item.endDatetime ?? null,
-      vesselClasses: item.vesselClasses ?? [],
-      tags: item.tags ?? [],
-      featureTags: item.featureTags ?? [],
-      nationalities: item.nationalities ?? [],
-      trackNames: item.trackNames ?? [],
-    }));
+    const webview = this.panel.webview;
+    const overviewItems = items.map((item) => {
+      // Resolve relative thumbnail hrefs (e.g. "./thumbnail.png") to webview URIs
+      const itemDir = path.dirname(path.join(storePath, item.itemPath));
+      const thumbnailHref = item.thumbnailHref
+        ? webview.asWebviewUri(vscode.Uri.file(path.resolve(itemDir, item.thumbnailHref))).toString()
+        : null;
+      const thumbnailSmHref = item.thumbnailSmHref
+        ? webview.asWebviewUri(vscode.Uri.file(path.resolve(itemDir, item.thumbnailSmHref))).toString()
+        : null;
+
+      return {
+        id: item.id,
+        title: item.title,
+        itemPath: item.itemPath,
+        bbox: item.bbox ?? null,
+        datetime: item.datetime ?? null,
+        startDatetime: item.startDatetime ?? null,
+        endDatetime: item.endDatetime ?? null,
+        vesselClasses: item.vesselClasses ?? [],
+        tags: item.tags ?? [],
+        featureTags: item.featureTags ?? [],
+        nationalities: item.nationalities ?? [],
+        trackNames: item.trackNames ?? [],
+        thumbnailHref,
+        thumbnailSmHref,
+      };
+    });
 
     this.postMessage({
       type: 'loadCatalogOverview',

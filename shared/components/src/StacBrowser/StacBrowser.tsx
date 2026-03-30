@@ -29,6 +29,7 @@ import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
 import { ExerciseListView } from '../ExerciseListView';
 import type { ExerciseListItem } from '../ExerciseListView/types';
+import { ThumbnailPreview } from './ThumbnailPreview';
 import { TimelineView } from '../TimelineView';
 import { formatDateRange } from '../utils/timeline-helpers';
 import type { Bounds } from '../utils/types';
@@ -114,17 +115,17 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 1;
+const BROWSER_LAYOUT_VERSION = 4;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
   root: {
     type: 'column',
     content: [
-      // Top row: Exercise list (full width)
+      // Top: Exercise list (preview is inline when an item is selected)
       {
         type: 'stack',
-        height: 50,
+        height: 55,
         content: [
           {
             type: 'component',
@@ -136,7 +137,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
       // Bottom row: Timeline + Map
       {
         type: 'row',
-        height: 50,
+        height: 45,
         content: [
           {
             type: 'stack',
@@ -198,6 +199,8 @@ interface BrowserPanelContext {
   filteredItems: readonly StacBrowserItem[];
   spatialFilteredItems: readonly StacBrowserItem[];
   onItemSelect?: (itemPath: string) => void;
+  onItemHighlight?: (itemId: string) => void;
+  highlightedItemId: string | null;
   colorMap?: ReadonlyMap<string, string>;
   onViewportChange: (bounds: Bounds | null) => void;
   onTemporalFilterChange: (filter: TemporalFilter | null) => void;
@@ -217,15 +220,32 @@ function renderPanel(type: string): React.ReactElement {
   if (!ctx) return <div>Loading...</div>;
 
   switch (type) {
-    case PANEL_LIST:
+    case PANEL_LIST: {
+      const previewItem = ctx.highlightedItemId
+        ? ctx.filteredItems.find(i => i.id === ctx.highlightedItemId) ?? null
+        : null;
       return (
-        <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
-          <ExerciseListView
-            items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
-            onItemSelect={ctx.onItemSelect}
-          />
+        <div style={{ display: 'flex', height: '100%' }} data-testid="stac-browser-list">
+          <div style={{ flex: previewItem ? '0 0 50%' : '1 1 100%', overflow: 'auto', minWidth: 0 }}>
+            <ExerciseListView
+              items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
+              onItemSelect={ctx.onItemSelect}
+              onItemHighlight={ctx.onItemHighlight}
+              highlightedItemId={ctx.highlightedItemId}
+            />
+          </div>
+          {previewItem && (
+            <div style={{ flex: '0 0 50%', minWidth: 0, overflow: 'hidden' }} data-testid="stac-browser-preview">
+              <ThumbnailPreview
+                item={previewItem}
+                items={ctx.filteredItems}
+                onOpen={ctx.onItemSelect}
+              />
+            </div>
+          )}
         </div>
       );
+    }
     case PANEL_TIMELINE:
       return (
         <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-timeline">
@@ -263,6 +283,7 @@ function renderPanel(type: string): React.ReactElement {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              crossOrigin="anonymous"
             />
             {bounds && <FitBounds bounds={bounds} />}
             <ViewportTracker onViewportChange={ctx.onViewportChange} />
@@ -308,6 +329,13 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const glRef = useRef<GoldenLayout | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isEmpty, setIsEmpty] = useState(false);
+
+  // ─── Preview highlight state (#174) ────────────────────────────────────────
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+
+  const handleItemHighlight = useCallback((itemId: string) => {
+    setHighlightedItemId(itemId);
+  }, []);
 
   // ─── Filter state ──────────────────────────────────────────────────────────
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
@@ -379,11 +407,13 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     filteredItems,
     spatialFilteredItems,
     onItemSelect,
+    onItemHighlight: handleItemHighlight,
+    highlightedItemId,
     colorMap,
     onViewportChange: handleViewportChange,
     onTemporalFilterChange: handleTemporalFilterChange,
     colourFn,
-  }), [filteredItems, spatialFilteredItems, onItemSelect, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
+  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
 
   // Update module-level context and re-render panels
   useEffect(() => {

@@ -515,6 +515,35 @@ export class MapPanel {
     return this.resultLayers;
   }
 
+  // Thumbnail capture (#174) — pending callback for request/response correlation
+  private thumbnailCaptureResolve: ((result: { largePngBase64: string | null; smallPngBase64: string | null }) => void) | null = null;
+
+  /**
+   * Request thumbnail capture from the webview.
+   * Returns base64-encoded PNG data for both large and small thumbnails,
+   * or null values if capture fails.
+   */
+  public requestThumbnailCapture(timeoutMs: number = 5000): Promise<{ largePngBase64: string | null; smallPngBase64: string | null }> {
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        this.thumbnailCaptureResolve = null;
+        resolve({ largePngBase64: null, smallPngBase64: null });
+      }, timeoutMs);
+
+      this.thumbnailCaptureResolve = (result) => {
+        clearTimeout(timer);
+        this.thumbnailCaptureResolve = null;
+        resolve(result);
+      };
+
+      const requestId = `thumb-${Date.now()}`;
+      this.postMessage({
+        type: 'requestThumbnailCapture',
+        requestId,
+      });
+    });
+  }
+
   /**
    * Set services for REP import functionality
    */
@@ -938,6 +967,16 @@ export class MapPanel {
         // Handle drawing mode change from webview (#108)
         if (this.activeSession) {
           this.activeSession.getState().setDrawingMode(message.drawingMode);
+        }
+        break;
+
+      case 'thumbnailCaptureResponse':
+        // Handle thumbnail capture response (#174)
+        if (this.thumbnailCaptureResolve) {
+          this.thumbnailCaptureResolve({
+            largePngBase64: message.largePngBase64,
+            smallPngBase64: message.smallPngBase64,
+          });
         }
         break;
     }

@@ -103,6 +103,10 @@ declare global {
   interface Window {
     __sessionStore: ReturnType<typeof getSessionStore>;
     __currentPlotFeatures: Feature[];
+    /** Exposed for Playwright backfill script (#174) */
+    __openPlot?: (itemPath: string) => void;
+    /** Exposed for Playwright backfill script (#174) */
+    __backToCatalog?: () => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -195,8 +199,25 @@ export default function App() {
   const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
+  // Catalog loading state (#174 — async init for dynamic STAC store)
+  const [catalogLoaded, setCatalogLoaded] = useState(false);
+
+  useEffect(() => {
+    void stacService.init().then(() => {
+      setCatalogLoaded(true);
+
+      // Auto-open a plot if ?plot= URL parameter is present (#174 backfill support)
+      const params = new URLSearchParams(window.location.search);
+      const plotParam = params.get('plot');
+      if (plotParam) {
+        handlePlotSelect(plotParam);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
+    if (!catalogLoaded) return [];
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
       vesselClasses: item.vesselClasses ?? [],
@@ -208,7 +229,7 @@ export default function App() {
       collection: null,
       modified: null,
     }));
-  }, []);
+  }, [catalogLoaded]);
 
   // Extract features array from current plot
   const plotFeatures = useMemo<DebriefFeature[]>(() => {
@@ -294,8 +315,9 @@ export default function App() {
 
   // Handle plot selection from catalog
   const handlePlotSelect = useCallback((itemPath: string) => {
+    void (async () => {
     try {
-      const plotData = stacService.getPlotData(itemPath);
+      const plotData = await stacService.getPlotData(itemPath);
       const item = stacService.getItem(itemPath);
 
       // Reset session store for new plot
@@ -335,6 +357,7 @@ export default function App() {
     } catch (error) {
       console.error('Failed to load plot:', error);
     }
+    })();
   }, []);
 
   // Handle back to catalog
@@ -346,6 +369,13 @@ export default function App() {
     setLogEntries([]);
     store.getState().clearSelection();
   }, [store]);
+
+  // Expose navigation functions for Playwright backfill script (#174)
+  useEffect(() => {
+    window.__openPlot = handlePlotSelect;
+    window.__backToCatalog = handleBackToCatalog;
+    return () => { delete window.__openPlot; delete window.__backToCatalog; };
+  }, [handlePlotSelect, handleBackToCatalog]);
 
   // Restore original features for a reverted activity
   const restoreSnapshots = useCallback((aid: string) => {

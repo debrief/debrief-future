@@ -41,7 +41,7 @@
   "properties": {
     "title": "Formidable Shield: Buoy Test Track",
     "datetime": "1995-12-12T05:03:00+00:00",
-    "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNoMS Languedoc, FS Northumberland and 1 other(s). Multi-national participation: FR, GB, IT, NO.",
+    "description": "Formidable Shield: Buoy Test Track — Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNoMS Languedoc, FS Northumberland and 1 other(s). Multi-national participation: FR, GB, IT, NO.",
     "start_datetime": "1995-12-12T05:03:00+00:00",
     "end_datetime": "1995-12-12T11:45:00+00:00",
     "debrief:vessel_classes": [
@@ -121,6 +121,22 @@
         "load_timestamp": "2026-03-28T13:50:57.885357Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

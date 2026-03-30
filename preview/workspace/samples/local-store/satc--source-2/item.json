@@ -41,7 +41,7 @@
   "properties": {
     "title": "Silent Resolve: Source 2",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Silent Resolve: Source 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Portland.",
+    "description": "Silent Resolve: Source 2 — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Portland.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
     "end_datetime": "2000-01-01T02:01:40+00:00",
     "debrief:vessel_classes": [
@@ -109,6 +109,22 @@
         "load_timestamp": "2026-03-28T13:51:01.943003Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -41,7 +41,7 @@
   "properties": {
     "title": "Silent Resolve: Otherownship Trimmed",
     "datetime": "2011-03-21T22:08:02.380000+00:00",
-    "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Argyll.",
+    "description": "Silent Resolve: Otherownship Trimmed — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Argyll.",
     "start_datetime": "2011-03-21T22:08:02.380000+00:00",
     "end_datetime": "2011-03-22T04:47:54.870000+00:00",
     "debrief:vessel_classes": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-03-28T13:51:01.814647Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -41,7 +41,7 @@
   "properties": {
     "title": "Silent Resolve: Source 1",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Silent Resolve: Source 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Otto Sverdrup.",
+    "description": "Silent Resolve: Source 1 — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Otto Sverdrup.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
     "end_datetime": "2000-01-01T05:37:00+00:00",
     "debrief:vessel_classes": [
@@ -110,6 +110,22 @@
         "load_timestamp": "2026-03-28T13:51:01.925484Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

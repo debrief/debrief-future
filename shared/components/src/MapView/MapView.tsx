@@ -512,7 +512,7 @@ export function MapView({
         style={{ height: '100%', width: '100%' }}
         zoomControl={!showToolbar}
       >
-        <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} />
+        <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} crossOrigin="anonymous" />
 
         {showToolbar && (
           <LeafletToolbar

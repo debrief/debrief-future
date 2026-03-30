@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Analysis1 Areas",
     "datetime": "2026-03-28T13:50:57.636617+00:00",
-    "description": "Saxon Warrior: Analysis1 Areas \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
+    "description": "Saxon Warrior: Analysis1 Areas — Royal Navy training exercise in the English Channel / Western Approaches.",
     "debrief:vessel_classes": [],
     "debrief:tags": [
       "ASW",
@@ -103,6 +103,22 @@
         "load_timestamp": "2026-03-28T13:50:57.638291Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

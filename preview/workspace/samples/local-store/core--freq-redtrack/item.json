@@ -11,14 +11,14 @@
       [
         [
           -0.24723333333333333,
-          60.0
+          60
         ],
         [
-          -0.0,
-          60.0
+          0,
+          60
         ],
         [
-          -0.0,
+          0,
           60.258975
         ],
         [
@@ -27,21 +27,21 @@
         ],
         [
           -0.24723333333333333,
-          60.0
+          60
         ]
       ]
     ]
   },
   "bbox": [
     -0.24723333333333333,
-    60.0,
-    -0.0,
+    60,
+    0,
     60.258975
   ],
   "properties": {
     "title": "Saxon Warrior: Freq Redtrack",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Freq Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Saxon Warrior: Freq Redtrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T14:00:00+00:00",
     "debrief:vessel_classes": [
@@ -110,6 +110,22 @@
         "load_timestamp": "2026-03-28T13:50:57.932170Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

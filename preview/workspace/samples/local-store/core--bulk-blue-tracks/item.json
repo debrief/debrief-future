@@ -11,11 +11,11 @@
       [
         [
           -0.040402777777777774,
-          -0.0
+          0
         ],
         [
           0.03963888888888889,
-          -0.0
+          0
         ],
         [
           0.03963888888888889,
@@ -27,21 +27,21 @@
         ],
         [
           -0.040402777777777774,
-          -0.0
+          0
         ]
       ]
     ]
   },
   "bbox": [
     -0.040402777777777774,
-    -0.0,
+    0,
     0.03963888888888889,
     0.22360833333333335
   ],
   "properties": {
     "title": "Saxon Warrior: Bulk Blue Tracks",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Bulk Blue Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including HMS Hamburg, USS Aquitaine, FS Mahan. Multi-national participation: FR, GB, US.",
+    "description": "Saxon Warrior: Bulk Blue Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including HMS Hamburg, USS Aquitaine, FS Mahan. Multi-national participation: FR, GB, US.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T20:13:14+00:00",
     "debrief:vessel_classes": [
@@ -114,6 +114,22 @@
         "load_timestamp": "2026-03-28T13:50:56.757924Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
