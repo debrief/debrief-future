@@ -116,33 +116,50 @@ const PANEL_PREVIEW = 'browser-preview';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 2;
+const BROWSER_LAYOUT_VERSION = 3;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
   root: {
     type: 'column',
     content: [
-      // Top row: Exercise list (full width)
-      {
-        type: 'stack',
-        height: 50,
-        content: [
-          {
-            type: 'component',
-            componentType: PANEL_LIST,
-            title: 'Exercises',
-          },
-        ],
-      },
-      // Bottom row: Timeline + Map + Preview
+      // Top row: Exercise list + Preview side by side
       {
         type: 'row',
-        height: 50,
+        height: 55,
         content: [
           {
             type: 'stack',
-            width: 33,
+            width: 65,
+            content: [
+              {
+                type: 'component',
+                componentType: PANEL_LIST,
+                title: 'Exercises',
+              },
+            ],
+          },
+          {
+            type: 'stack',
+            width: 35,
+            content: [
+              {
+                type: 'component',
+                componentType: PANEL_PREVIEW,
+                title: 'Preview',
+              },
+            ],
+          },
+        ],
+      },
+      // Bottom row: Timeline + Map
+      {
+        type: 'row',
+        height: 45,
+        content: [
+          {
+            type: 'stack',
+            width: 50,
             content: [
               {
                 type: 'component',
@@ -153,23 +170,12 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
           },
           {
             type: 'stack',
-            width: 34,
+            width: 50,
             content: [
               {
                 type: 'component',
                 componentType: PANEL_MAP,
                 title: 'Map',
-              },
-            ],
-          },
-          {
-            type: 'stack',
-            width: 33,
-            content: [
-              {
-                type: 'component',
-                componentType: PANEL_PREVIEW,
-                title: 'Preview',
               },
             ],
           },
