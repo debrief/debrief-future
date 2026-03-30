@@ -58,8 +58,9 @@ const BUNDLED_ITEMS: Array<{ itemPath: string; item: StacItem; data: FeatureColl
   },
 ];
 
-/** Prefix for the Vite middleware that serves the VS Code STAC store. */
-const STORE_PREFIX = '/stac-store';
+/** Prefix for the Vite middleware that serves the VS Code STAC store.
+ * Uses Vite's BASE_URL so it works on GitHub Pages (e.g. /debrief-future/web-shell/stac-store). */
+const STORE_PREFIX = `${import.meta.env.BASE_URL}stac-store`.replace(/\/\//g, '/');
 
 /**
  * Resolve a relative STAC asset href to an absolute URL via the store middleware.

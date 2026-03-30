@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
 import type { IncomingMessage, ServerResponse } from 'http';
+import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
 
 /**
  * Vite plugin to handle .geojson files as JSON.
@@ -33,43 +34,72 @@ const STAC_STORE_ROOT = process.env.STAC_STORE_PATH
   : path.resolve(__dirname, '../vscode/test-data/local-store');
 const STAC_STORE_PREFIX = '/stac-store/';
 
+/** Serve STAC store files via middleware (shared between dev and preview servers). */
+function stacStoreMiddleware(req: IncomingMessage, res: ServerResponse, next: () => void): void {
+  if (!req.url?.startsWith(STAC_STORE_PREFIX)) {
+    next();
+    return;
+  }
+  const relativePath = req.url.slice(STAC_STORE_PREFIX.length);
+  const filePath = path.join(STAC_STORE_ROOT, relativePath);
+
+  // Prevent directory traversal
+  if (!filePath.startsWith(STAC_STORE_ROOT)) {
+    res.statusCode = 403;
+    res.end('Forbidden');
+    return;
+  }
+
+  if (!fs.existsSync(filePath)) {
+    res.statusCode = 404;
+    res.end('Not found');
+    return;
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.json': 'application/json',
+    '.geojson': 'application/geo+json',
+  };
+
+  res.setHeader('Content-Type', mimeTypes[ext] ?? 'application/octet-stream');
+  fs.createReadStream(filePath).pipe(res);
+}
+
+/** Recursively copy a directory tree, creating destination dirs as needed. */
+function copyDirSync(src: string, dest: string): void {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 function stacStorePlugin(): Plugin {
   return {
     name: 'vite-plugin-stac-store',
     configureServer(server) {
-      server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
-        if (!req.url?.startsWith(STAC_STORE_PREFIX)) {
-          next();
-          return;
-        }
-        const relativePath = req.url.slice(STAC_STORE_PREFIX.length);
-        const filePath = path.join(STAC_STORE_ROOT, relativePath);
-
-        // Prevent directory traversal
-        if (!filePath.startsWith(STAC_STORE_ROOT)) {
-          res.statusCode = 403;
-          res.end('Forbidden');
-          return;
-        }
-
-        if (!fs.existsSync(filePath)) {
-          res.statusCode = 404;
-          res.end('Not found');
-          return;
-        }
-
-        const ext = path.extname(filePath).toLowerCase();
-        const mimeTypes: Record<string, string> = {
-          '.png': 'image/png',
-          '.jpg': 'image/jpeg',
-          '.jpeg': 'image/jpeg',
-          '.json': 'application/json',
-          '.geojson': 'application/geo+json',
-        };
-
-        res.setHeader('Content-Type', mimeTypes[ext] ?? 'application/octet-stream');
-        fs.createReadStream(filePath).pipe(res);
-      });
+      server.middlewares.use(stacStoreMiddleware);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(stacStoreMiddleware);
+    },
+    writeBundle(_options: NormalizedOutputOptions, _bundle: OutputBundle) {
+      // Copy STAC store into the build output so static hosting (GitHub Pages) can serve it
+      const outDir = _options.dir ?? path.resolve(__dirname, 'dist');
+      const destDir = path.join(outDir, 'stac-store');
+      if (fs.existsSync(STAC_STORE_ROOT)) {
+        copyDirSync(STAC_STORE_ROOT, destDir);
+        console.log(`[stac-store] Copied STAC store to ${destDir}`);
+      }
     },
   };
 }
