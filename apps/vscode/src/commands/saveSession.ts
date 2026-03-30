@@ -43,14 +43,16 @@ function deriveSessionPath(plotUri: string, storePath: string): string | null {
 /**
  * Write thumbnail PNG files and update the STAC item.json with thumbnail assets.
  */
-async function storeThumbnails(
+function storeThumbnails(
   storePath: string,
   plotUri: string,
   largePngBase64: string,
   smallPngBase64: string,
-): Promise<void> {
+): void {
   const parsed = parseStacUri(plotUri);
-  if (!parsed) return;
+  if (!parsed) {
+    return;
+  }
 
   const itemDir = path.join(storePath, path.dirname(parsed.itemPath));
   const itemJsonPath = path.join(storePath, parsed.itemPath);
@@ -62,7 +64,9 @@ async function storeThumbnails(
   fs.writeFileSync(smallPath, Buffer.from(smallPngBase64, 'base64'));
 
   // Update item.json with thumbnail asset entries
-  const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8'));
+  const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8')) as {
+    assets: Record<string, { href: string; type: string; title: string; roles: string[] }>;
+  };
   itemData.assets = itemData.assets ?? {};
   itemData.assets['thumbnail'] = {
     href: './thumbnail.png',
@@ -157,7 +161,7 @@ export function createSaveSessionCommand(
           if (parsed && storePath) {
             const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
             if (largePngBase64 && smallPngBase64) {
-              await storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
+              storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
             }
           }
         } catch (err) {

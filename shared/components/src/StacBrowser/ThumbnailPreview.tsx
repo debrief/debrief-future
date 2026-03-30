@@ -31,14 +31,16 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
   const hasNext = currentIndex >= 0 && currentIndex < items.length - 1;
 
   const goToPrev = useCallback(() => {
-    if (hasPrev) {
-      onNavigate?.(items[currentIndex - 1].id);
+    const prevItem = items[currentIndex - 1];
+    if (hasPrev && prevItem) {
+      onNavigate?.(prevItem.id);
     }
   }, [hasPrev, items, currentIndex, onNavigate]);
 
   const goToNext = useCallback(() => {
-    if (hasNext) {
-      onNavigate?.(items[currentIndex + 1].id);
+    const nextItem = items[currentIndex + 1];
+    if (hasNext && nextItem) {
+      onNavigate?.(nextItem.id);
     }
   }, [hasNext, items, currentIndex, onNavigate]);
 
