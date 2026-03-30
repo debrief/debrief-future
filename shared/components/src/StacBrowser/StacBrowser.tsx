@@ -263,6 +263,7 @@ function renderPanel(type: string): React.ReactElement {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              crossOrigin="anonymous"
             />
             {bounds && <FitBounds bounds={bounds} />}
             <ViewportTracker onViewportChange={ctx.onViewportChange} />

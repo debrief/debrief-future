@@ -277,6 +277,7 @@ class ToolbarControl extends L.Control {
         () => this.handleFitToWindow()
       );
       fitButton.innerHTML = this.getFitIcon();
+      fitButton.setAttribute('data-testid', 'fit-to-window');
       this.container.appendChild(fitButton);
     }
 

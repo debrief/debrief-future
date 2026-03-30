@@ -49,12 +49,12 @@
 
 **Purpose**: Install dependencies and configure CORS for canvas capture
 
-- [ ] T001 Add `modern-screenshot` dependency to `shared/components/package.json`
-- [ ] T002 [P] Add `sharp` as devDependency to `apps/web-shell/package.json`
-- [ ] T003 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/MapView/MapView.tsx`
-- [ ] T004 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T005 [P] Add `data-testid="fit-to-window"` to fit button in `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
-- [ ] T006 Run `pnpm install` to install new dependencies
+- [x] T001 Add `modern-screenshot` dependency to `shared/components/package.json`
+- [x] T002 [P] Add `sharp` as devDependency to `apps/web-shell/package.json`
+- [x] T003 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/MapView/MapView.tsx`
+- [x] T004 [P] Add `crossOrigin="anonymous"` to TileLayer in `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T005 [P] Add `data-testid="fit-to-window"` to fit button in `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
+- [x] T006 Run `pnpm install` to install new dependencies
 
 ---
 
