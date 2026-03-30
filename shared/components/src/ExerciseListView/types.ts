@@ -68,8 +68,14 @@ export interface ExerciseListViewProps {
   /** Recently opened exercises, ordered by most recent first. */
   readonly recentItems?: readonly RecentlyOpenedEntry[];
 
-  /** Called when the analyst clicks an exercise to open it. */
+  /** Called when the analyst clicks an exercise to open it (double-click when onItemHighlight provided). */
   readonly onItemSelect?: (itemPath: string) => void;
+
+  /** Called on single-click to highlight an item for preview (#174). */
+  readonly onItemHighlight?: (itemId: string) => void;
+
+  /** ID of the currently highlighted/selected item (#174). */
+  readonly highlightedItemId?: string | null;
 
   /** Initial sort configuration. Defaults to recency descending. */
   readonly initialSort?: SortConfiguration;
@@ -98,8 +104,14 @@ export interface ExerciseListItemRowProps {
   /** Whether track data is currently loading. */
   readonly trackDataLoading?: boolean;
 
-  /** Called when the row is clicked. */
+  /** Called when the row is clicked (single-click = open, or highlight if onHighlight provided). */
   readonly onSelect?: (itemPath: string) => void;
+
+  /** Called on single-click to highlight/preview the item (#174). When provided, onSelect fires on double-click. */
+  readonly onHighlight?: (itemId: string) => void;
+
+  /** Whether this row is currently highlighted/selected for preview (#174). */
+  readonly highlighted?: boolean;
 }
 
 /** Props for the spatial thumbnail component. */

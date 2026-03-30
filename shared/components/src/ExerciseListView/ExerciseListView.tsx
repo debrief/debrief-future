@@ -40,6 +40,8 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   items,
   recentItems = [],
   onItemSelect,
+  onItemHighlight,
+  highlightedItemId,
   initialSort,
   onRequestTrackData,
   trackData,
@@ -211,6 +213,8 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
                     requestedRef.current.has(item.id) && !trackData?.has(item.id)
                   }
                   onSelect={onItemSelect}
+                  onHighlight={onItemHighlight}
+                  highlighted={highlightedItemId === item.id}
                 />
               </div>
             );

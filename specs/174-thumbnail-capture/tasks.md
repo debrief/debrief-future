@@ -113,17 +113,17 @@
 
 ### Tests
 
-- [ ] T022 [test] Write component tests for ThumbnailPreview: render, fallback, prev/next, keyboard nav, onError handler `shared/components/src/StacBrowser/__tests__/ThumbnailPreview.test.tsx`
+- [x] T022 [test] Write component tests for ThumbnailPreview: render, fallback, prev/next, keyboard nav, onError handler `shared/components/src/StacBrowser/__tests__/ThumbnailPreview.test.tsx`
 
 ### Implementation
 
-- [ ] T023 Create ThumbnailPreview component with large `<img>`, title overlay, prev/next buttons, keyboard arrows, SVG fallback via `onError` `shared/components/src/StacBrowser/ThumbnailPreview.tsx`
-- [ ] T024 [P] Create ThumbnailPreview styles `shared/components/src/StacBrowser/ThumbnailPreview.css`
-- [ ] T025 Add preview panel to StacBrowser GoldenLayout (4th panel, right side of top row) `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T026 Change ExerciseListItemRow: single-click = highlight/preview (`onHighlight`), double-click = open (`onSelect`) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T027 Update ExerciseListView to pass `onHighlight` and `onSelect` callbacks separately `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T028 Wire StacBrowser `selectedItemId` state to ThumbnailPreview panel and list highlight `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T029 Run component tests: `pnpm --filter @debrief/components test`
+- [x] T023 Create ThumbnailPreview component with large `<img>`, title overlay, prev/next buttons, keyboard arrows, SVG fallback via `onError` `shared/components/src/StacBrowser/ThumbnailPreview.tsx`
+- [x] T024 [P] Create ThumbnailPreview styles `shared/components/src/StacBrowser/ThumbnailPreview.css`
+- [x] T025 Add preview panel to StacBrowser GoldenLayout (4th panel, right side of top row) `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T026 Change ExerciseListItemRow: single-click = highlight/preview (`onHighlight`), double-click = open (`onSelect`) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T027 Update ExerciseListView to pass `onHighlight` and `onSelect` callbacks separately `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T028 Wire StacBrowser `selectedItemId` state to ThumbnailPreview panel and list highlight `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T029 Run component tests: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Gallery preview pane works with prev/next navigation.
 

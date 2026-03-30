@@ -6,6 +6,8 @@ export type { RawTaxonomy } from './filter-engine/taxonomy';
 // StacBrowser (Feature: 132-three-view-sync)
 export { StacBrowser } from './StacBrowser';
 export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
+export { ThumbnailPreview } from './StacBrowser/ThumbnailPreview';
+export type { ThumbnailPreviewProps } from './StacBrowser/ThumbnailPreview';
 
 export { TimelineView } from './TimelineView';
 export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
