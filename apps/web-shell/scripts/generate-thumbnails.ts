@@ -72,8 +72,13 @@ async function getChromiumPath(): Promise<string | undefined> {
   try {
     const sparticuz = (await import('@sparticuz/chromium')).default;
     const p = await sparticuz.executablePath();
-    console.log(`Using @sparticuz/chromium: ${p}`);
-    return p;
+    // Only use sparticuz on Linux — it ships a Linux ELF binary that won't run on Windows/macOS
+    if (process.platform === 'linux' && fs.existsSync(p)) {
+      console.log(`Using @sparticuz/chromium: ${p}`);
+      return p;
+    }
+    console.log(`Skipping @sparticuz/chromium (platform: ${process.platform}), using Playwright chromium`);
+    return undefined;
   } catch {
     return undefined;
   }
@@ -149,8 +154,15 @@ async function generateThumbnails(): Promise<void> {
         await page.waitForTimeout(500);
       }
 
-      // Let rendering settle after fit
-      await page.waitForTimeout(1000);
+      // Wait for map tiles to load (locally we have network access for OSM tiles)
+      await page.waitForFunction(() => {
+        const tiles = document.querySelectorAll('.leaflet-tile-container img');
+        if (tiles.length === 0) return true; // no tiles expected
+        return Array.from(tiles).every(
+          (img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0,
+        );
+      }, { timeout: 10000 }).catch(() => { /* proceed even if tiles timeout */ });
+      await page.waitForTimeout(500);
 
       // Capture
       const mapContainer = page.locator('.leaflet-container').first();
