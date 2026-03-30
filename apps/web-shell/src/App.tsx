@@ -103,6 +103,10 @@ declare global {
   interface Window {
     __sessionStore: ReturnType<typeof getSessionStore>;
     __currentPlotFeatures: Feature[];
+    /** Exposed for Playwright backfill script (#174) */
+    __openPlot?: (itemPath: string) => void;
+    /** Exposed for Playwright backfill script (#174) */
+    __backToCatalog?: () => void;
   }
 }
 window.__sessionStore = getSessionStore();
@@ -199,8 +203,17 @@ export default function App() {
   const [catalogLoaded, setCatalogLoaded] = useState(false);
 
   useEffect(() => {
-    void stacService.init().then(() => setCatalogLoaded(true));
-  }, []);
+    void stacService.init().then(() => {
+      setCatalogLoaded(true);
+
+      // Auto-open a plot if ?plot= URL parameter is present (#174 backfill support)
+      const params = new URLSearchParams(window.location.search);
+      const plotParam = params.get('plot');
+      if (plotParam) {
+        handlePlotSelect(plotParam);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
@@ -356,6 +369,13 @@ export default function App() {
     setLogEntries([]);
     store.getState().clearSelection();
   }, [store]);
+
+  // Expose navigation functions for Playwright backfill script (#174)
+  useEffect(() => {
+    window.__openPlot = handlePlotSelect;
+    window.__backToCatalog = handleBackToCatalog;
+    return () => { delete window.__openPlot; delete window.__backToCatalog; };
+  }, [handlePlotSelect, handleBackToCatalog]);
 
   // Restore original features for a reverted activity
   const restoreSnapshots = useCallback((aid: string) => {

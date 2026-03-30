@@ -162,11 +162,14 @@ export function createMockStacService(): MockStacService {
       const cached = geojsonCache.get(itemPath);
       if (cached) return cached;
 
-      // Fetch the GeoJSON data asset from the store
+      // Fetch the GeoJSON data asset from the store (find by role, not key)
       const item = itemMap.get(itemPath);
       if (!item) throw new Error(`Unknown item path: ${itemPath}`);
 
-      const dataAsset = item.assets?.['data'];
+      const dataEntry = Object.values(item.assets ?? {}).find(
+        (a) => a.roles?.includes('data') && (a.type === 'application/geo+json' || a.href.endsWith('.geojson')),
+      );
+      const dataAsset = dataEntry ?? item.assets?.['data'];
       if (!dataAsset) throw new Error(`No data asset in ${itemPath}`);
 
       const url = resolveStacHref(itemPath, dataAsset.href);

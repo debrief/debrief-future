@@ -1,17 +1,17 @@
 /**
  * generate-thumbnails.ts — Batch thumbnail backfill via Playwright (#174).
  *
- * Opens every plot in the web-shell catalog, fits to window, waits for tiles,
- * captures a screenshot, resizes with sharp, and writes both thumbnail sizes
- * alongside the STAC item.json.
+ * Loads the web-shell once, then iterates through all plots by calling
+ * the exposed window.__openPlot() function. For each plot, captures a
+ * screenshot, resizes with sharp, and writes thumbnails to disk.
  *
  * Usage:
- *   pnpm --filter @debrief/web-shell generate-thumbnails
+ *   # Start dev server pointing at the full catalog:
+ *   STAC_STORE_PATH=/path/to/local-store pnpm --filter @debrief/web-shell dev
  *
- * Requires:
- *   - Web-shell dev server running on http://localhost:5173
- *   - sharp (devDependency)
- *   - @sparticuz/chromium (cloud) or Playwright Chromium (local)
+ *   # Run backfill (same STAC_STORE_PATH so script knows where to write):
+ *   STAC_STORE_PATH=/path/to/local-store node --experimental-strip-types \
+ *     apps/web-shell/scripts/generate-thumbnails.ts
  */
 
 import { chromium, type Browser, type Page } from '@playwright/test';
@@ -19,7 +19,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-// Dynamic import for sharp (ESM)
 const sharpModule = await import('sharp');
 const sharp = sharpModule.default;
 
@@ -32,73 +31,64 @@ const LARGE_HEIGHT = 600;
 const SMALL_WIDTH = 200;
 const SMALL_HEIGHT = 150;
 
-/** Find the STAC store root from the vscode test-data. */
 function findStoreRoot(): string {
-  const testDataPath = path.resolve(__dirname, '../../../apps/vscode/test-data/local-store');
-  if (fs.existsSync(path.join(testDataPath, 'catalog.json'))) {
-    return testDataPath;
+  if (process.env.STAC_STORE_PATH) {
+    const p = path.resolve(process.env.STAC_STORE_PATH);
+    if (fs.existsSync(path.join(p, 'catalog.json'))) return p;
+    throw new Error(`STAC_STORE_PATH set but no catalog.json found at ${p}`);
   }
-  throw new Error(`Cannot find STAC store at ${testDataPath}`);
+  const testDataPath = path.resolve(__dirname, '../../../apps/vscode/test-data/local-store');
+  if (fs.existsSync(path.join(testDataPath, 'catalog.json'))) return testDataPath;
+  throw new Error('No STAC store found. Set STAC_STORE_PATH env var.');
 }
 
-/** Read catalog.json and extract item directory names. */
-function getPlotIds(storeRoot: string): string[] {
-  const catalogPath = path.join(storeRoot, 'catalog.json');
-  const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8')) as {
-    links: Array<{ rel: string; href: string }>;
-  };
+/** Fetch item paths from the running dev server's STAC store endpoint. */
+async function fetchItemPaths(): Promise<string[]> {
+  const res = await fetch(`${BASE_URL}/stac-store/catalog.json`);
+  if (!res.ok) throw new Error(`Failed to fetch catalog: ${res.status}`);
+  const catalog = await res.json() as { links: Array<{ rel: string; href: string }> };
   return catalog.links
     .filter((link) => link.rel === 'item')
-    .map((link) => path.dirname(link.href).replace(/^\.\//, ''));
+    .map((link) => link.href);
 }
 
-/** Update item.json with thumbnail asset entries. */
 function updateItemJson(itemJsonPath: string): void {
   const item = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8')) as {
     assets: Record<string, unknown>;
   };
   item.assets = item.assets ?? {};
   item.assets['thumbnail'] = {
-    href: './thumbnail.png',
-    type: 'image/png',
-    title: 'Plot thumbnail',
-    roles: ['thumbnail'],
+    href: './thumbnail.png', type: 'image/png',
+    title: 'Plot thumbnail', roles: ['thumbnail'],
   };
   item.assets['thumbnail-sm'] = {
-    href: './thumbnail-sm.png',
-    type: 'image/png',
-    title: 'Plot thumbnail (small)',
-    roles: ['thumbnail'],
+    href: './thumbnail-sm.png', type: 'image/png',
+    title: 'Plot thumbnail (small)', roles: ['thumbnail'],
   };
   fs.writeFileSync(itemJsonPath, JSON.stringify(item, null, 2));
 }
 
-/** Get Chromium executable — use @sparticuz/chromium in cloud, fallback to default. */
 async function getChromiumPath(): Promise<string | undefined> {
   try {
     const sparticuz = (await import('@sparticuz/chromium')).default;
-    const execPath = await sparticuz.executablePath();
-    console.log(`Using @sparticuz/chromium: ${execPath}`);
-    return execPath;
+    const p = await sparticuz.executablePath();
+    console.log(`Using @sparticuz/chromium: ${p}`);
+    return p;
   } catch {
-    console.log('Using default Playwright chromium');
     return undefined;
   }
 }
 
 async function generateThumbnails(): Promise<void> {
   const storeRoot = findStoreRoot();
-  const plotIds = getPlotIds(storeRoot);
 
-  console.log(`Found ${plotIds.length} plots in ${storeRoot}`);
+  console.log('Fetching catalog from dev server...');
+  const itemPaths = await fetchItemPaths();
+  console.log(`Found ${itemPaths.length} plots in ${storeRoot}\n`);
 
-  if (plotIds.length === 0) {
-    console.log('No plots found. Exiting.');
-    return;
-  }
+  if (itemPaths.length === 0) return;
 
   const executablePath = await getChromiumPath();
-
   let browser: Browser;
   try {
     browser = await chromium.launch({
@@ -115,104 +105,85 @@ async function generateThumbnails(): Promise<void> {
     viewport: { width: LARGE_WIDTH, height: LARGE_HEIGHT },
   });
 
+  // Load the web-shell once and wait for catalog init
+  console.log('Loading web-shell...');
+  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  // Wait for __openPlot to be exposed (signals the app is ready)
+  await page.waitForFunction(() => typeof window.__openPlot === 'function', { timeout: 60000 });
+  console.log('Web-shell ready.\n');
+
   let successCount = 0;
   let failCount = 0;
 
-  for (const plotId of plotIds) {
+  for (const itemPath of itemPaths) {
+    const plotId = path.dirname(itemPath).replace(/^\.\//, '');
+    const plotDir = path.join(storeRoot, plotId);
+    const itemJsonPath = path.join(plotDir, 'item.json');
+
+    if (!fs.existsSync(itemJsonPath)) {
+      console.warn(`  [${plotId}] Skip: no item.json`);
+      failCount++;
+      continue;
+    }
+
     try {
-      console.log(`Processing: ${plotId}`);
-      const plotDir = path.join(storeRoot, plotId);
-      const itemJsonPath = path.join(plotDir, 'item.json');
+      // Open the plot via the exposed function (no page reload!)
+      await page.evaluate((p) => window.__openPlot?.(p), itemPath);
 
-      if (!fs.existsSync(itemJsonPath)) {
-        console.warn(`  Skipping: no item.json found`);
-        failCount++;
-        continue;
+      // Wait for the analysis view with a visible map and rendered features
+      await page.waitForSelector('.web-shell--analysis', { state: 'visible', timeout: 15000 });
+      await page.waitForSelector('.leaflet-container', { state: 'visible', timeout: 10000 });
+
+      // Wait for at least one Leaflet interactive feature to appear (tracks, points, etc.)
+      try {
+        await page.waitForSelector('.leaflet-interactive', { state: 'attached', timeout: 5000 });
+      } catch {
+        // Some plots may have no features — that's OK, capture the empty map
+      }
+      await page.waitForTimeout(500);
+
+      // Fit to window
+      const fitButton = page.locator('[data-testid="fit-to-window"]');
+      if (await fitButton.isVisible({ timeout: 1500 }).catch(() => false)) {
+        await fitButton.click();
+        await page.waitForTimeout(500);
       }
 
-      // Navigate to the web-shell home page
-      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-
-      // Wait for the catalog list to load
-      await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
-        state: 'visible',
-        timeout: 15000,
-      });
-
-      // Find and double-click the item matching this plot title
-      // Read the item title from item.json for matching
-      const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8')) as {
-        properties?: { title?: string };
-        id: string;
-      };
-      const title = itemData.properties?.title ?? itemData.id;
-
-      const row = page.locator('[data-testid="exercise-item-title"]', { hasText: title });
-      if (!(await row.isVisible({ timeout: 3000 }).catch(() => false))) {
-        console.warn(`  Skipping: item "${title}" not found in catalog list`);
-        failCount++;
-        continue;
-      }
-
-      // Double-click to open the plot
-      await row.dblclick();
-
-      // Wait for the analysis view and map to load
-      await page.waitForSelector('.leaflet-container', { state: 'visible', timeout: 15000 });
-
-      // Wait for map features to render
+      // Let rendering settle after fit
       await page.waitForTimeout(1000);
 
-      // Click fit-to-window button if available
-      const fitButton = page.locator('[data-testid="fit-to-window"]');
-      if (await fitButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await fitButton.click();
-        await page.waitForTimeout(1000);
-      }
-
-      // Wait for tiles to settle
-      await page.waitForTimeout(2000);
-
-      // Capture screenshot of the map
+      // Capture
       const mapContainer = page.locator('.leaflet-container').first();
       const largePng = await mapContainer.screenshot({ type: 'png' });
-
-      // Resize to small thumbnail with sharp
       const smallPng = await sharp(largePng)
         .resize(SMALL_WIDTH, SMALL_HEIGHT, { fit: 'fill' })
         .png()
         .toBuffer();
 
-      // Write files
-      const largePath = path.join(plotDir, 'thumbnail.png');
-      const smallPath = path.join(plotDir, 'thumbnail-sm.png');
-      fs.writeFileSync(largePath, largePng);
-      fs.writeFileSync(smallPath, smallPng);
-
-      // Update item.json
+      // Write
+      fs.writeFileSync(path.join(plotDir, 'thumbnail.png'), largePng);
+      fs.writeFileSync(path.join(plotDir, 'thumbnail-sm.png'), smallPng);
       updateItemJson(itemJsonPath);
 
-      console.log(`  ✓ Generated thumbnails (${largePng.length} bytes + ${smallPng.length} bytes)`);
+      console.log(`  [${plotId}] ✓ ${largePng.length} + ${smallPng.length} bytes`);
       successCount++;
 
-      // Navigate back to catalog for next item
-      const backButton = page.locator('[aria-label="Back to catalog"]');
-      if (await backButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await backButton.click();
-        await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
-          state: 'visible',
-          timeout: 10000,
-        });
-      }
+      // Navigate back to catalog (stays in same SPA — no reload)
+      await page.evaluate(() => window.__backToCatalog?.());
+      await page.waitForTimeout(200);
     } catch (err) {
-      console.error(`  ✗ Failed: ${err}`);
+      console.error(`  [${plotId}] ✗ ${err}`);
       failCount++;
+      // Try to recover
+      try {
+        await page.evaluate(() => window.__backToCatalog?.());
+        await page.waitForTimeout(500);
+      } catch { /* continue */ }
     }
   }
 
   await browser.close();
-
-  console.log(`\nDone: ${successCount} succeeded, ${failCount} failed out of ${plotIds.length} plots.`);
+  console.log(`\nDone: ${successCount} succeeded, ${failCount} failed out of ${itemPaths.length} plots.`);
 }
 
 generateThumbnails().catch((err) => {
