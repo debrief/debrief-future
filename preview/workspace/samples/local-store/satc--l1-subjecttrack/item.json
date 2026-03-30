@@ -11,37 +11,37 @@
       [
         [
           -30.041875,
-          -0.0
+          0
         ],
         [
-          -30.0,
-          -0.0
+          -30,
+          0
         ],
         [
-          -30.0,
-          -0.0
-        ],
-        [
-          -30.041875,
-          -0.0
+          -30,
+          0
         ],
         [
           -30.041875,
-          -0.0
+          0
+        ],
+        [
+          -30.041875,
+          0
         ]
       ]
     ]
   },
   "bbox": [
     -30.041875,
-    -0.0,
-    -30.0,
-    -0.0
+    0,
+    -30,
+    0
   ],
   "properties": {
     "title": "Silent Resolve: L1 Subjecttrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Silent Resolve: L1 Subjecttrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Silent Resolve: L1 Subjecttrack — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T12:29:59+00:00",
     "debrief:vessel_classes": [
@@ -112,6 +112,22 @@
         "load_timestamp": "2026-03-28T13:51:01.191823Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Plotwithgeotiff",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Plotwithgeotiff \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Collingwood, HMS Nelson. Multi-national participation: DE, GB.",
+    "description": "Saxon Warrior: Plotwithgeotiff — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Collingwood, HMS Nelson. Multi-national participation: DE, GB.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
     "end_datetime": "1995-12-12T05:26:00+00:00",
     "debrief:vessel_classes": [
@@ -113,6 +113,22 @@
         "load_timestamp": "2026-03-28T13:50:57.957353Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

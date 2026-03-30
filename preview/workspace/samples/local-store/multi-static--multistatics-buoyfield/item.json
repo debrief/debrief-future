@@ -41,7 +41,7 @@
   "properties": {
     "title": "Formidable Shield: Multistatics Buoyfield",
     "datetime": "2014-12-12T12:00:00+00:00",
-    "description": "Formidable Shield: Multistatics Buoyfield \u2014 Multi-static sonar exercise in the North Atlantic. 5 platform track(s) recorded including FS Bretagne, ITS Hessen, HNLMS Laboon and 2 other(s). Multi-national participation: FR, GB, IT, NL, US.",
+    "description": "Formidable Shield: Multistatics Buoyfield — Multi-static sonar exercise in the North Atlantic. 5 platform track(s) recorded including FS Bretagne, ITS Hessen, HNLMS Laboon and 2 other(s). Multi-national participation: FR, GB, IT, NL, US.",
     "start_datetime": "2014-12-12T12:00:00+00:00",
     "end_datetime": "2014-12-12T12:45:00+00:00",
     "debrief:vessel_classes": [
@@ -124,6 +124,22 @@
         "load_timestamp": "2026-03-28T13:50:57.903668Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

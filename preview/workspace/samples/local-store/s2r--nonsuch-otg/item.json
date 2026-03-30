@@ -14,16 +14,16 @@
           4.921111111111111
         ],
         [
-          30.0,
+          30,
           4.921111111111111
         ],
         [
-          30.0,
-          5.0
+          30,
+          5
         ],
         [
           29.873711111111113,
-          5.0
+          5
         ],
         [
           29.873711111111113,
@@ -35,13 +35,13 @@
   "bbox": [
     29.873711111111113,
     4.921111111111111,
-    30.0,
-    5.0
+    30,
+    5
   ],
   "properties": {
     "title": "Dynamic Mongoose: Nonsuch Otg",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Dynamic Mongoose: Nonsuch Otg \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Evertsen.",
+    "description": "Dynamic Mongoose: Nonsuch Otg — Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Evertsen.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
     "debrief:vessel_classes": [
@@ -110,6 +110,22 @@
         "load_timestamp": "2026-03-28T13:50:59.296134Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

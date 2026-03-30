@@ -41,7 +41,7 @@
   "properties": {
     "title": "Formidable Shield: Sensor Offset Short",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Formidable Shield: Sensor Offset Short \u2014 Multi-static sonar exercise in the North Atlantic. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. Multi-national participation: GB, NO.",
+    "description": "Formidable Shield: Sensor Offset Short — Multi-static sonar exercise in the North Atlantic. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. Multi-national participation: GB, NO.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T12:18:40+00:00",
     "debrief:vessel_classes": [
@@ -113,6 +113,22 @@
         "load_timestamp": "2026-03-28T13:50:57.787291Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

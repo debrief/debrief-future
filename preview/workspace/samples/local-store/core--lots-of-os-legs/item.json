@@ -11,11 +11,11 @@
       [
         [
           -0.2472333,
-          60.0
+          60
         ],
         [
           0.3207417,
-          60.0
+          60
         ],
         [
           0.3207417,
@@ -27,21 +27,21 @@
         ],
         [
           -0.2472333,
-          60.0
+          60
         ]
       ]
     ]
   },
   "bbox": [
     -0.2472333,
-    60.0,
+    60,
     0.3207417,
     60.2793028
   ],
   "properties": {
     "title": "Saxon Warrior: Lots Of Os Legs",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Lots Of Os Legs \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 11 platform track(s) recorded including HMS Roosevelt, USS Mahan, FS Mason and 8 other(s). Multi-national participation: DE, FR, GB, US.",
+    "description": "Saxon Warrior: Lots Of Os Legs — Royal Navy training exercise in the English Channel / Western Approaches. 11 platform track(s) recorded including HMS Roosevelt, USS Mahan, FS Mason and 8 other(s). Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T14:00:00+00:00",
     "debrief:vessel_classes": [
@@ -133,6 +133,22 @@
         "load_timestamp": "2026-03-28T13:50:57.943132Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -10,38 +10,38 @@
     "coordinates": [
       [
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ]
       ]
     ]
   },
   "bbox": [
-    0.0,
-    0.0,
-    0.0,
-    0.0
+    0,
+    0,
+    0,
+    0
   ],
   "properties": {
     "title": "Silent Resolve: Dataset1",
     "datetime": "2016-10-10T12:00:00+00:00",
-    "description": "Silent Resolve: Dataset1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
+    "description": "Silent Resolve: Dataset1 — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
     "start_datetime": "2016-10-10T12:00:00+00:00",
     "end_datetime": "2016-10-10T19:37:00+00:00",
     "debrief:vessel_classes": [
@@ -109,6 +109,22 @@
         "load_timestamp": "2026-03-28T13:51:00.148617Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
