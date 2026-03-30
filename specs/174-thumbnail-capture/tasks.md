@@ -182,21 +182,21 @@
 
 ### Verification
 
-- [ ] T039 Run full CI check: `task verify` (lint + typecheck + tests)
-- [ ] T040 Run quickstart.md validation: manually verify the steps in `specs/174-thumbnail-capture/quickstart.md`
+- [x] T039 Run full CI check: `task verify` (lint + typecheck + tests)
+- [x] T040 Run quickstart.md validation: manually verify the steps in `specs/174-thumbnail-capture/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T041 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/174-thumbnail-capture/evidence/test-summary.md`
-- [ ] T042 Create usage demonstration in `specs/174-thumbnail-capture/evidence/usage-example.md`
+- [x] T041 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/174-thumbnail-capture/evidence/test-summary.md`
+- [x] T042 Create usage demonstration in `specs/174-thumbnail-capture/evidence/usage-example.md`
 - [ ] T043 [P] Capture theme screenshots (light/dark/vscode) of ThumbnailPreview to `specs/174-thumbnail-capture/evidence/screenshots/`
 - [ ] T044 Capture interaction GIF showing gallery prev/next navigation to `specs/174-thumbnail-capture/evidence/screenshots/interaction.gif`
-- [ ] T045 [P] Capture sample STAC item.json with thumbnail assets to `specs/174-thumbnail-capture/evidence/sample-item.json`
+- [x] T045 [P] Capture sample STAC item.json with thumbnail assets to `specs/174-thumbnail-capture/evidence/sample-item.json`
 
 ### Media Content
 
-- [ ] T046 Create shipped blog post in `specs/174-thumbnail-capture/media/shipped-post.md`
-- [ ] T047 [P] Create LinkedIn shipped summary in `specs/174-thumbnail-capture/media/linkedin-shipped.md`
+- [x] T046 Create shipped blog post in `specs/174-thumbnail-capture/media/shipped-post.md`
+- [x] T047 [P] Create LinkedIn shipped summary in `specs/174-thumbnail-capture/media/linkedin-shipped.md`
 
 ### PR Creation
 
