@@ -36,60 +36,6 @@ describe('ThumbnailPreview', () => {
     expect(screen.getByTestId('thumbnail-preview-fallback')).toBeTruthy();
   });
 
-  it('shows the item title', () => {
-    const item = makeItem('a', 'My Exercise');
-    render(<ThumbnailPreview item={item} items={[item]} />);
-    expect(screen.getByTestId('thumbnail-preview-title').textContent).toBe('My Exercise');
-  });
-
-  it('navigates to next item on next button click', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B'), makeItem('c', 'C')];
-    const onNavigate = vi.fn();
-    render(<ThumbnailPreview item={items[0]} items={items} onNavigate={onNavigate} />);
-
-    fireEvent.click(screen.getByTestId('thumbnail-preview-next'));
-    expect(onNavigate).toHaveBeenCalledWith('b');
-  });
-
-  it('navigates to previous item on prev button click', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B'), makeItem('c', 'C')];
-    const onNavigate = vi.fn();
-    render(<ThumbnailPreview item={items[1]} items={items} onNavigate={onNavigate} />);
-
-    fireEvent.click(screen.getByTestId('thumbnail-preview-prev'));
-    expect(onNavigate).toHaveBeenCalledWith('a');
-  });
-
-  it('disables prev button at first item', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B')];
-    render(<ThumbnailPreview item={items[0]} items={items} />);
-    expect((screen.getByTestId('thumbnail-preview-prev') as HTMLButtonElement).disabled).toBe(true);
-  });
-
-  it('disables next button at last item', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B')];
-    render(<ThumbnailPreview item={items[1]} items={items} />);
-    expect((screen.getByTestId('thumbnail-preview-next') as HTMLButtonElement).disabled).toBe(true);
-  });
-
-  it('shows counter as "1 / 3" for first of three items', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B'), makeItem('c', 'C')];
-    render(<ThumbnailPreview item={items[0]} items={items} />);
-    expect(screen.getByText('1 / 3')).toBeTruthy();
-  });
-
-  it('navigates via keyboard arrow keys', () => {
-    const items = [makeItem('a', 'A'), makeItem('b', 'B'), makeItem('c', 'C')];
-    const onNavigate = vi.fn();
-    render(<ThumbnailPreview item={items[1]} items={items} onNavigate={onNavigate} />);
-
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(onNavigate).toHaveBeenCalledWith('c');
-
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(onNavigate).toHaveBeenCalledWith('a');
-  });
-
   it('fires onOpen on double-click', () => {
     const item = makeItem('a', 'Alpha');
     const onOpen = vi.fn();

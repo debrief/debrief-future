@@ -1,4 +1,4 @@
-/* ThumbnailPreview — gallery preview panel styles (#174) */
+/* ThumbnailPreview — inline preview styles (#174) */
 
 .thumbnail-preview {
   display: flex;
@@ -47,53 +47,6 @@
 .thumbnail-preview__fallback-svg {
   width: 100%;
   height: 100%;
-}
-
-.thumbnail-preview__title {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--co-editor-foreground, #ccc);
-  background: var(--co-sideBar-background, rgba(0, 0, 0, 0.5));
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.thumbnail-preview__nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--co-sideBar-background, rgba(0, 0, 0, 0.3));
-}
-
-.thumbnail-preview__nav-btn {
-  background: none;
-  border: 1px solid var(--co-button-border, #444);
-  color: var(--co-editor-foreground, #ccc);
-  padding: 4px 10px;
-  cursor: pointer;
-  border-radius: 3px;
-  font-size: 14px;
-  line-height: 1;
-}
-
-.thumbnail-preview__nav-btn:hover:not(:disabled) {
-  background: var(--co-button-hoverBackground, #333);
-}
-
-.thumbnail-preview__nav-btn:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.thumbnail-preview__nav-counter {
-  color: var(--co-descriptionForeground, #888);
-  font-size: 12px;
-  min-width: 50px;
-  text-align: center;
 }
 
 /* Highlighted row style for ExerciseListItemRow (#174) */

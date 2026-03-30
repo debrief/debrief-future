@@ -112,43 +112,25 @@ function ViewportTracker({ onViewportChange }: { onViewportChange: (bounds: Boun
 const PANEL_LIST = 'browser-list';
 const PANEL_TIMELINE = 'browser-timeline';
 const PANEL_MAP = 'browser-map';
-const PANEL_PREVIEW = 'browser-preview';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 3;
+const BROWSER_LAYOUT_VERSION = 4;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
   root: {
     type: 'column',
     content: [
-      // Top row: Exercise list + Preview side by side
+      // Top: Exercise list (preview is inline when an item is selected)
       {
-        type: 'row',
+        type: 'stack',
         height: 55,
         content: [
           {
-            type: 'stack',
-            width: 65,
-            content: [
-              {
-                type: 'component',
-                componentType: PANEL_LIST,
-                title: 'Exercises',
-              },
-            ],
-          },
-          {
-            type: 'stack',
-            width: 35,
-            content: [
-              {
-                type: 'component',
-                componentType: PANEL_PREVIEW,
-                title: 'Preview',
-              },
-            ],
+            type: 'component',
+            componentType: PANEL_LIST,
+            title: 'Exercises',
           },
         ],
       },
@@ -238,17 +220,32 @@ function renderPanel(type: string): React.ReactElement {
   if (!ctx) return <div>Loading...</div>;
 
   switch (type) {
-    case PANEL_LIST:
+    case PANEL_LIST: {
+      const previewItem = ctx.highlightedItemId
+        ? ctx.filteredItems.find(i => i.id === ctx.highlightedItemId) ?? null
+        : null;
       return (
-        <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
-          <ExerciseListView
-            items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
-            onItemSelect={ctx.onItemSelect}
-            onItemHighlight={ctx.onItemHighlight}
-            highlightedItemId={ctx.highlightedItemId}
-          />
+        <div style={{ display: 'flex', height: '100%' }} data-testid="stac-browser-list">
+          <div style={{ flex: previewItem ? '0 0 50%' : '1 1 100%', overflow: 'auto', minWidth: 0 }}>
+            <ExerciseListView
+              items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
+              onItemSelect={ctx.onItemSelect}
+              onItemHighlight={ctx.onItemHighlight}
+              highlightedItemId={ctx.highlightedItemId}
+            />
+          </div>
+          {previewItem && (
+            <div style={{ flex: '0 0 50%', minWidth: 0, overflow: 'hidden' }} data-testid="stac-browser-preview">
+              <ThumbnailPreview
+                item={previewItem}
+                items={ctx.filteredItems}
+                onOpen={ctx.onItemSelect}
+              />
+            </div>
+          )}
         </div>
       );
+    }
     case PANEL_TIMELINE:
       return (
         <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-timeline">
@@ -311,21 +308,6 @@ function renderPanel(type: string): React.ReactElement {
               </Rectangle>
             ))}
           </MapContainer>
-        </div>
-      );
-    }
-    case PANEL_PREVIEW: {
-      const previewItem = ctx.highlightedItemId
-        ? ctx.filteredItems.find(i => i.id === ctx.highlightedItemId) ?? null
-        : null;
-      return (
-        <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-preview">
-          <ThumbnailPreview
-            item={previewItem}
-            items={ctx.filteredItems}
-            onNavigate={ctx.onItemHighlight}
-            onOpen={ctx.onItemSelect}
-          />
         </div>
       );
     }
