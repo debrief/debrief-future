@@ -5,6 +5,7 @@ import {
   subscribeToDirty,
   subscribeToSelection,
   createResultIdRegistry,
+  createAutoRefreshController,
   type SessionStoreApi,
   type FeatureSelection,
 } from '@debrief/session-state';
@@ -90,6 +91,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   // Create Result ID Registry for tracking logical result IDs (Feature: 087)
   const resultIdRegistry = createResultIdRegistry();
+
+  // Create Auto-Refresh Controller for result view auto-refresh (Feature: 089)
+  const autoRefreshController = createAutoRefreshController({
+    registry: resultIdRegistry,
+    debounceMs: 300,
+  });
+  context.subscriptions.push({ dispose: () => autoRefreshController.dispose() });
 
   // Wire output channel to services for cross-ecosystem diagnostics
   calcService.setOutputChannel(outputChannel);

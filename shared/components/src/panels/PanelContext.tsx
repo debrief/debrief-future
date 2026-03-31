@@ -11,6 +11,7 @@ import type { MapViewProps } from '../MapView';
 import type { LogPanelProps } from '../LogPanel';
 import type { StacFileTreeProps } from '../StacFileTree';
 import type { ChartRendererProps } from '../ChartRenderer';
+import type { AutoRefreshControllerLike } from '../hooks/useAutoRefresh';
 
 /** Content type for result tabs — dataset (chart), image, or fallback */
 export type ResultArtifactType = 'dataset' | 'image' | 'other';
@@ -25,6 +26,8 @@ export interface ChartTabData {
   imageDataUri?: string;
   /** File metadata for fallback ('other') tabs */
   fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
+  /** Logical result ID for auto-refresh binding (Feature: 089). */
+  resultId?: string;
 }
 
 /** Chart-related props passed via context */
@@ -53,6 +56,8 @@ export interface PanelContextValue {
   logPanelProps: LogPanelProps | null;
   stacFileTreeProps: StacFileTreeProps | null;
   chartProps: ChartContextProps | null;
+  /** Auto-refresh controller instance (Feature: 089). Null when not wired. */
+  autoRefreshController?: AutoRefreshControllerLike | null;
 }
 
 const PanelContextInternal = createContext<PanelContextValue | null>(null);
