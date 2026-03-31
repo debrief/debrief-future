@@ -5,7 +5,7 @@
  * Displayed inline within the exercises panel when an item is highlighted.
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { CatalogOverviewItem } from '../filter-engine/types';
 import './ThumbnailPreview.css';
 
@@ -22,6 +22,13 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
   item,
   onOpen,
 }) => {
+  const [imageError, setImageError] = useState(false);
+
+  // Reset error state when the selected item changes
+  useEffect(() => {
+    setImageError(false);
+  }, [item?.id]);
+
   if (!item) {
     return (
       <div className="thumbnail-preview thumbnail-preview--empty" data-testid="thumbnail-preview">
@@ -33,6 +40,7 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
   }
 
   const thumbnailSrc = item.thumbnailHref ?? null;
+  const showFallback = !thumbnailSrc || imageError;
 
   return (
     <div
@@ -42,15 +50,13 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
       title="Double-click to open"
     >
       <div className="thumbnail-preview__image-container">
-        {thumbnailSrc ? (
+        {!showFallback ? (
           <img
             src={thumbnailSrc}
             alt={`Preview of ${item.title}`}
             className="thumbnail-preview__image"
             data-testid="thumbnail-preview-image"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="thumbnail-preview__fallback" data-testid="thumbnail-preview-fallback">

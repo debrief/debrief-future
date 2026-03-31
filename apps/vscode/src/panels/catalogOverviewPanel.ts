@@ -6,6 +6,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import * as path from 'path';
 import type { StacItemSummary, Catalog } from '../types/stac';
 
@@ -151,16 +152,12 @@ export class CatalogOverviewPanel {
       this.storeId = storeId;
     }
 
-    const webview = this.panel.webview;
     const overviewItems = items.map((item) => {
-      // Resolve relative thumbnail hrefs (e.g. "./thumbnail.png") to webview URIs
+      // Resolve relative thumbnail hrefs to data URIs for reliable display in
+      // code-server webviews where asWebviewUri may not serve local files (#174).
       const itemDir = path.dirname(path.join(storePath, item.itemPath));
-      const thumbnailHref = item.thumbnailHref
-        ? webview.asWebviewUri(vscode.Uri.file(path.resolve(itemDir, item.thumbnailHref))).toString()
-        : null;
-      const thumbnailSmHref = item.thumbnailSmHref
-        ? webview.asWebviewUri(vscode.Uri.file(path.resolve(itemDir, item.thumbnailSmHref))).toString()
-        : null;
+      const thumbnailHref = readThumbnailAsDataUri(itemDir, item.thumbnailHref);
+      const thumbnailSmHref = readThumbnailAsDataUri(itemDir, item.thumbnailSmHref);
 
       return {
         id: item.id,
@@ -305,6 +302,23 @@ export class CatalogOverviewPanel {
   <script nonce="${nonce}" src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
+  }
+}
+
+/**
+ * Read a thumbnail file relative to an item directory and return a data URI.
+ * Returns null if the href is missing or the file cannot be read.
+ */
+function readThumbnailAsDataUri(itemDir: string, href: string | null): string | null {
+  if (!href) {
+    return null;
+  }
+  try {
+    const filePath = path.resolve(itemDir, href);
+    const data = fs.readFileSync(filePath);
+    return `data:image/png;base64,${data.toString('base64')}`;
+  } catch {
+    return null;
   }
 }
 
