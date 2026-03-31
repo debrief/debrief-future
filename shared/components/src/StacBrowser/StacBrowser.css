@@ -120,11 +120,6 @@
   background: var(--vscode-button-hoverBackground, #0062a3);
 }
 
-/* ─── Hide close buttons — analysts can collapse/maximise but not close ───── */
-.stac-browser .lm_close_tab {
-  display: none !important;
-}
-
 /* ─── GoldenLayout header overrides (lighter panel headers) ────────────────── */
 .stac-browser .lm_header {
   height: 28px !important;
