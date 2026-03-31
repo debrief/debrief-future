@@ -596,17 +596,15 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
 
   return (
     <div className={`stac-browser ${className ?? ''}`} data-testid="stac-browser">
-      {/* Filter bar — always visible, outside GoldenLayout */}
-      <div className="stac-browser__filter-bar" data-testid="stac-browser-filter-bar">
-        <FilterBar
-          items={items as StacBrowserItem[]}
-          taxonomy={taxonomy}
-          onFilteredItems={handleFilteredItems}
-        />
-      </div>
-
-      {/* Active filter indicator + reset layout button */}
-      <div className="stac-browser__toolbar">
+      {/* Filter bar row — FilterBar + active count + Reset Layout in one line */}
+      <div className="stac-browser__filter-row" data-testid="stac-browser-filter-bar">
+        <div className="stac-browser__filter-bar">
+          <FilterBar
+            items={items as StacBrowserItem[]}
+            taxonomy={taxonomy}
+            onFilteredItems={handleFilteredItems}
+          />
+        </div>
         {activeFilterCount > 0 && (
           <span className="stac-browser__filter-count" data-testid="stac-browser-filter-count">
             {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
