@@ -199,12 +199,14 @@ export default function App() {
   const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
-  // Catalog loading state (#174 — async init for dynamic STAC store)
-  const [catalogLoaded, setCatalogLoaded] = useState(false);
+  // Catalog revision counter — starts at 1 because bundled items are seeded synchronously.
+  // Incremented after init() to pick up any additional store items.
+  const [catalogRevision, setCatalogRevision] = useState(1);
 
   useEffect(() => {
     void stacService.init().then(() => {
-      setCatalogLoaded(true);
+      // Bump revision to re-render with store items (may include more than bundled set)
+      setCatalogRevision(r => r + 1);
 
       // Auto-open a plot if ?plot= URL parameter is present (#174 backfill support)
       const params = new URLSearchParams(window.location.search);
@@ -217,7 +219,7 @@ export default function App() {
 
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
-    if (!catalogLoaded) return [];
+    void catalogRevision; // dependency — re-compute when store items arrive
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
       vesselClasses: item.vesselClasses ?? [],
@@ -229,7 +231,7 @@ export default function App() {
       collection: null,
       modified: null,
     }));
-  }, [catalogLoaded]);
+  }, [catalogRevision]);
 
   // Extract features array from current plot
   const plotFeatures = useMemo<DebriefFeature[]>(() => {

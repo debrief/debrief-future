@@ -40,6 +40,11 @@ export class CatalogPage {
   async waitForLoad(): Promise<void> {
     await this.page.waitForSelector('.web-shell--welcome', { state: 'visible' });
     await this.page.waitForSelector('.stac-browser', { state: 'visible' });
+    // Wait for stacService.init() to complete and exercise rows to render
+    await this.page.waitForSelector('[data-testid="exercise-list-item-row"]', {
+      state: 'visible',
+      timeout: 15000,
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -134,18 +139,18 @@ export class CatalogPage {
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * Click on an exercise item (single click to open).
+   * Click on an exercise item (single click to highlight/preview).
    */
   async clickItem(item: Locator): Promise<void> {
     await item.click();
   }
 
   /**
-   * Open an exercise item by clicking it.
+   * Open an exercise item by double-clicking it.
    * Returns an AnalysisPage for the opened plot.
    */
   async openItem(item: Locator): Promise<AnalysisPage> {
-    await item.click();
+    await item.dblclick();
     const analysisPage = new AnalysisPage(this.page);
     await analysisPage.waitForLoad();
     return analysisPage;

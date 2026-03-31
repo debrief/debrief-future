@@ -19,7 +19,7 @@ test.describe('Tool Execution', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map to render
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
