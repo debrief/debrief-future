@@ -156,8 +156,8 @@ export class CatalogOverviewPanel {
       // Resolve relative thumbnail hrefs to data URIs for reliable display in
       // code-server webviews where asWebviewUri may not serve local files (#174).
       const itemDir = path.dirname(path.join(storePath, item.itemPath));
-      const thumbnailHref = readThumbnailAsDataUri(itemDir, item.thumbnailHref);
-      const thumbnailSmHref = readThumbnailAsDataUri(itemDir, item.thumbnailSmHref);
+      const thumbnailHref = readThumbnailAsDataUri(itemDir, item.thumbnailHref ?? null);
+      const thumbnailSmHref = readThumbnailAsDataUri(itemDir, item.thumbnailSmHref ?? null);
 
       return {
         id: item.id,
