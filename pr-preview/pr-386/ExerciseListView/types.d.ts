@@ -53,6 +53,12 @@ export interface ExerciseListViewProps {
     readonly highlightedItemId?: string | null;
     /** Initial sort configuration. Defaults to recency descending. */
     readonly initialSort?: SortConfiguration;
+    /** Controlled sort state — when provided, overrides internal state. */
+    readonly sort?: SortConfiguration;
+    /** Sort change callback for controlled mode. */
+    readonly onSortChange?: (sort: SortConfiguration) => void;
+    /** Hide the inline sort bar (when sort controls are rendered externally). */
+    readonly hideSortBar?: boolean;
     /** Called when track GeoJSON data is needed for a thumbnail. */
     readonly onRequestTrackData?: (itemId: string, trackDataHref: string) => void;
     /** Track data loaded via lazy loading, keyed by item ID. */
