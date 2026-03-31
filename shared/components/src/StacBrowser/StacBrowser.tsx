@@ -115,14 +115,15 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 5;
+const BROWSER_LAYOUT_VERSION = 6;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
   header: {
-    // Analysts can collapse/resize panels but not close them
+    // Analysts can collapse/maximise panels but not close or pop out
     close: false,
     popout: false,
+    maximise: 'maximise',
   },
   root: {
     type: 'column',
@@ -136,6 +137,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
             type: 'component',
             componentType: PANEL_LIST,
             title: 'Exercises',
+            isClosable: false,
           },
         ],
       },
@@ -152,6 +154,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_TIMELINE,
                 title: 'Timeline',
+                isClosable: false,
               },
             ],
           },
@@ -163,6 +166,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_MAP,
                 title: 'Map',
+                isClosable: false,
               },
             ],
           },
