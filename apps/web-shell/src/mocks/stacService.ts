@@ -125,6 +125,8 @@ export interface MockStacService {
 export function createMockStacService(): MockStacService {
   let items: CatalogOverviewItem[] = [];
   const itemMap = new Map<string, StacItem>();
+  /** Guard against concurrent init calls (React 18 StrictMode fires effects twice). */
+  let initPromise: Promise<void> | null = null;
 
   /** Populate from bundled fixture data (production fallback). */
   function loadBundledFallback(): void {
@@ -137,50 +139,58 @@ export function createMockStacService(): MockStacService {
     console.log(`[stacService] Loaded ${items.length} bundled items`);
   }
 
+  /** Perform the actual catalog load (called once). */
+  async function doInit(): Promise<void> {
+    try {
+      // Fetch the catalog.json to discover all item links
+      const catalogRes = await fetch(`${STORE_PREFIX}/catalog.json`);
+      if (!catalogRes.ok) throw new Error(`catalog.json: ${catalogRes.status}`);
+      const catalog = await catalogRes.json() as StacCatalog;
+
+      const itemPaths = catalog.links
+        .filter(link => link.rel === 'item')
+        .map(link => link.href);
+
+      // Fetch each item.json in parallel
+      const results = await Promise.allSettled(
+        itemPaths.map(async (itemPath) => {
+          const resolvedPath = itemPath.replace(/^\.\//, '');
+          const res = await fetch(`${STORE_PREFIX}/${resolvedPath}`);
+          if (!res.ok) throw new Error(`${resolvedPath}: ${res.status}`);
+          const item = await res.json() as StacItem;
+          return { itemPath, item };
+        }),
+      );
+
+      items = [];
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          const { itemPath, item } = result.value;
+          items.push(toOverviewItem(itemPath, item));
+          itemMap.set(itemPath, item);
+        }
+      }
+
+      // Sort by datetime descending
+      items.sort((a, b) => {
+        const da = a.datetime ? new Date(a.datetime).getTime() : 0;
+        const db = b.datetime ? new Date(b.datetime).getTime() : 0;
+        return db - da;
+      });
+
+      console.log(`[stacService] Loaded ${items.length} items from STAC store`);
+    } catch (err) {
+      console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
+      loadBundledFallback();
+    }
+  }
+
   return {
     async init(): Promise<void> {
-      try {
-        // Fetch the catalog.json to discover all item links
-        const catalogRes = await fetch(`${STORE_PREFIX}/catalog.json`);
-        if (!catalogRes.ok) throw new Error(`catalog.json: ${catalogRes.status}`);
-        const catalog = await catalogRes.json() as StacCatalog;
-
-        const itemPaths = catalog.links
-          .filter(link => link.rel === 'item')
-          .map(link => link.href);
-
-        // Fetch each item.json in parallel
-        const results = await Promise.allSettled(
-          itemPaths.map(async (itemPath) => {
-            const resolvedPath = itemPath.replace(/^\.\//, '');
-            const res = await fetch(`${STORE_PREFIX}/${resolvedPath}`);
-            if (!res.ok) throw new Error(`${resolvedPath}: ${res.status}`);
-            const item = await res.json() as StacItem;
-            return { itemPath, item };
-          }),
-        );
-
-        items = [];
-        for (const result of results) {
-          if (result.status === 'fulfilled') {
-            const { itemPath, item } = result.value;
-            items.push(toOverviewItem(itemPath, item));
-            itemMap.set(itemPath, item);
-          }
-        }
-
-        // Sort by datetime descending
-        items.sort((a, b) => {
-          const da = a.datetime ? new Date(a.datetime).getTime() : 0;
-          const db = b.datetime ? new Date(b.datetime).getTime() : 0;
-          return db - da;
-        });
-
-        console.log(`[stacService] Loaded ${items.length} items from STAC store`);
-      } catch (err) {
-        console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
-        loadBundledFallback();
+      if (!initPromise) {
+        initPromise = doInit();
       }
+      return initPromise;
     },
 
     getItems(): CatalogOverviewItem[] {

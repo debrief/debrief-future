@@ -29,8 +29,9 @@ async function loadPlot(page: import('@playwright/test').Page) {
   await page.goto('/');
   await expect(page.locator('.web-shell--welcome')).toBeVisible();
 
-  // Click the first exercise list item to open a plot
+  // Wait for exercise rows to load (stacService.init is async)
   const exerciseRow = page.locator('[data-testid="exercise-list-item-row"]').first();
+  await expect(exerciseRow).toBeVisible({ timeout: 10000 });
   await exerciseRow.click();
 
   // Wait for analysis view

@@ -10,8 +10,8 @@ test.describe('Thumbnail Preview', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Wait for StacBrowser and exercise list to load
-    await expect(page.locator('[data-testid="stac-browser"]')).toBeVisible();
-    await expect(page.locator('[data-testid="exercise-list-item-row"]').first()).toBeVisible();
+    await expect(page.locator('[data-testid="stac-browser"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-testid="exercise-list-item-row"]').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('no preview shown initially', async ({ page }) => {
