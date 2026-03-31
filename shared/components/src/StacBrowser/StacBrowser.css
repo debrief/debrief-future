@@ -179,3 +179,12 @@
 .stac-browser .lm_splitter:hover {
   background: var(--vscode-focusBorder, #007fd4);
 }
+
+/* ─── Resizable split pane divider ───────────────────────────────────────── */
+.stac-browser__splitter {
+  transition: background 0.15s;
+}
+
+.stac-browser__splitter:hover {
+  background: var(--vscode-focusBorder, #007fd4) !important;
+}

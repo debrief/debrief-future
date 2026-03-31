@@ -10,7 +10,7 @@
  * exercise list (top, full width), timeline (bottom-left), map (bottom-right).
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import {
   GoldenLayout,
   LayoutConfig,
@@ -115,10 +115,15 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 4;
+const BROWSER_LAYOUT_VERSION = 5;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
+  header: {
+    // Analysts can collapse/resize panels but not close them
+    close: false,
+    popout: false,
+  },
   root: {
     type: 'column',
     content: [
@@ -194,6 +199,76 @@ function clearBrowserLayout(): void {
   } catch { /* ignore */ }
 }
 
+// ─── Resizable split pane ───────────────────────────────────────────────────
+const SPLIT_MIN_PCT = 20;
+const SPLIT_MAX_PCT = 80;
+const SPLIT_DEFAULT_PCT = 50;
+const SPLIT_STORAGE_KEY = 'debrief-browser-split-pct';
+
+function loadSplitPct(): number {
+  try {
+    const v = localStorage.getItem(SPLIT_STORAGE_KEY);
+    if (v) { const n = Number(v); if (n >= SPLIT_MIN_PCT && n <= SPLIT_MAX_PCT) return n; }
+  } catch { /* ignore */ }
+  return SPLIT_DEFAULT_PCT;
+}
+
+function saveSplitPct(pct: number): void {
+  try { localStorage.setItem(SPLIT_STORAGE_KEY, String(Math.round(pct))); } catch { /* ignore */ }
+}
+
+/** Horizontal resizable split pane for exercise list + preview. */
+const ResizableSplitPane: React.FC<{ left: React.ReactNode; right: React.ReactNode }> = ({ left, right }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [leftPct, setLeftPct] = useState(loadSplitPct);
+
+  const onMouseDown = useCallback((e: ReactMouseEvent) => {
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onMouseMove = (ev: globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.min(SPLIT_MAX_PCT, Math.max(SPLIT_MIN_PCT, pct));
+      setLeftPct(clamped);
+    };
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      // Save after drag ends
+      setLeftPct(prev => { saveSplitPct(prev); return prev; });
+    };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ display: 'flex', height: '100%', width: '100%' }}>
+      <div style={{ flex: `0 0 ${leftPct}%`, overflow: 'auto', minWidth: 0 }}>
+        {left}
+      </div>
+      <div
+        style={{
+          flex: '0 0 4px',
+          cursor: 'col-resize',
+          background: 'var(--vscode-panel-border, #e0e0e0)',
+        }}
+        className="stac-browser__splitter"
+        onMouseDown={onMouseDown}
+        data-testid="stac-browser-splitter"
+      />
+      <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+        {right}
+      </div>
+    </div>
+  );
+};
+
 // ─── Context for passing props to panels ──────────────────────────────────────
 interface BrowserPanelContext {
   filteredItems: readonly StacBrowserItem[];
@@ -224,25 +299,33 @@ function renderPanel(type: string): React.ReactElement {
       const previewItem = ctx.highlightedItemId
         ? ctx.filteredItems.find(i => i.id === ctx.highlightedItemId) ?? null
         : null;
-      return (
-        <div style={{ display: 'flex', height: '100%' }} data-testid="stac-browser-list">
-          <div style={{ flex: previewItem ? '0 0 50%' : '1 1 100%', overflow: 'auto', minWidth: 0 }}>
-            <ExerciseListView
-              items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
-              onItemSelect={ctx.onItemSelect}
-              onItemHighlight={ctx.onItemHighlight}
-              highlightedItemId={ctx.highlightedItemId}
-            />
+      const listView = (
+        <ExerciseListView
+          items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
+          onItemSelect={ctx.onItemSelect}
+          onItemHighlight={ctx.onItemHighlight}
+          highlightedItemId={ctx.highlightedItemId}
+        />
+      );
+      if (!previewItem) {
+        return (
+          <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
+            {listView}
           </div>
-          {previewItem && (
-            <div style={{ flex: '0 0 50%', minWidth: 0, overflow: 'hidden' }} data-testid="stac-browser-preview">
+        );
+      }
+      return (
+        <div style={{ height: '100%' }} data-testid="stac-browser-list">
+          <ResizableSplitPane
+            left={listView}
+            right={
               <ThumbnailPreview
                 item={previewItem}
                 items={ctx.filteredItems}
                 onOpen={ctx.onItemSelect}
               />
-            </div>
-          )}
+            }
+          />
         </div>
       );
     }
