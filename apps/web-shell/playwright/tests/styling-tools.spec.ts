@@ -35,7 +35,7 @@ test.describe('Styling Tools Integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Open a plot via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map features to render
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({

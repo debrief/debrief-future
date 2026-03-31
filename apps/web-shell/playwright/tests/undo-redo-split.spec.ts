@@ -32,7 +32,7 @@ async function loadPlot(page: import('@playwright/test').Page) {
   // Wait for exercise rows to load (stacService.init is async)
   const exerciseRow = page.locator('[data-testid="exercise-list-item-row"]').first();
   await expect(exerciseRow).toBeVisible({ timeout: 10000 });
-  await exerciseRow.click();
+  await exerciseRow.dblclick();
 
   // Wait for analysis view
   await expect(page.locator('.web-shell--analysis')).toBeVisible({ timeout: 10000 });

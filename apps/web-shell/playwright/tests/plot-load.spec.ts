@@ -12,7 +12,7 @@ test.describe('Plot Load', () => {
 
     // Click on first exercise list item to open plot
     const exerciseRow = page.locator('[data-testid="exercise-list-item-row"]').first();
-    await exerciseRow.click();
+    await exerciseRow.dblclick();
 
     // Should switch to analysis view
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('Plot Load', () => {
 
   test('analysis view shows back button', async ({ page }) => {
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
 
     // Verify back button exists
     const backButton = page.locator('.web-shell__back-button[aria-label="Back to catalog"]');
@@ -30,7 +30,7 @@ test.describe('Plot Load', () => {
 
   test('analysis view shows map', async ({ page }) => {
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
 
     // Leaflet container should be present (within GoldenLayout map panel)
     await expect(page.locator('.leaflet-container')).toBeVisible();
@@ -38,7 +38,7 @@ test.describe('Plot Load', () => {
 
   test('analysis view shows activity panel', async ({ page }) => {
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
 
     // Activity panel should be visible (within GoldenLayout)
     await expect(page.locator('.debrief-activity-panel')).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Plot Load', () => {
 
   test('map renders tracks from loaded plot', async ({ page }) => {
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
 
     // Wait for map to render
     await expect(page.locator('.leaflet-container')).toBeVisible();
@@ -57,7 +57,7 @@ test.describe('Plot Load', () => {
 
   test('back button returns to catalog', async ({ page }) => {
     // Navigate to analysis view via exercise list
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
 
     // Click back button
