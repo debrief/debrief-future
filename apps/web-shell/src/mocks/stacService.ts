@@ -58,8 +58,9 @@ const BUNDLED_ITEMS: Array<{ itemPath: string; item: StacItem; data: FeatureColl
   },
 ];
 
-/** Prefix for the Vite middleware that serves the VS Code STAC store. */
-const STORE_PREFIX = '/stac-store';
+/** Prefix for the Vite middleware that serves the VS Code STAC store.
+ * Uses Vite's BASE_URL so it works on GitHub Pages (e.g. /debrief-future/web-shell/stac-store). */
+const STORE_PREFIX = `${import.meta.env.BASE_URL}stac-store`.replace(/\/\//g, '/');
 
 /**
  * Resolve a relative STAC asset href to an absolute URL via the store middleware.
@@ -122,64 +123,75 @@ export interface MockStacService {
  * Create a mock STAC service that reads from the /stac-store/ middleware.
  */
 export function createMockStacService(): MockStacService {
-  let items: CatalogOverviewItem[] = [];
   const itemMap = new Map<string, StacItem>();
+  /** Guard against concurrent init calls (React 18 StrictMode fires effects twice). */
+  let initPromise: Promise<void> | null = null;
+
+  // Seed with bundled items immediately so getItems() returns data before init() completes.
+  // This avoids blank exercise lists while the /stac-store/ fetch is in progress.
+  let items: CatalogOverviewItem[] = BUNDLED_ITEMS.map(entry => {
+    itemMap.set(entry.itemPath, entry.item);
+    geojsonCache.set(entry.itemPath, entry.data);
+    return toOverviewItem(entry.itemPath, entry.item);
+  });
 
   /** Populate from bundled fixture data (production fallback). */
   function loadBundledFallback(): void {
-    items = [];
-    for (const entry of BUNDLED_ITEMS) {
-      items.push(toOverviewItem(entry.itemPath, entry.item));
-      itemMap.set(entry.itemPath, entry.item);
-      geojsonCache.set(entry.itemPath, entry.data);
+    // Already seeded — nothing to do
+  }
+
+  /** Perform the actual catalog load (called once). */
+  async function doInit(): Promise<void> {
+    try {
+      // Fetch the catalog.json to discover all item links
+      const catalogRes = await fetch(`${STORE_PREFIX}/catalog.json`);
+      if (!catalogRes.ok) throw new Error(`catalog.json: ${catalogRes.status}`);
+      const catalog = await catalogRes.json() as StacCatalog;
+
+      const itemPaths = catalog.links
+        .filter(link => link.rel === 'item')
+        .map(link => link.href);
+
+      // Fetch each item.json in parallel
+      const results = await Promise.allSettled(
+        itemPaths.map(async (itemPath) => {
+          const resolvedPath = itemPath.replace(/^\.\//, '');
+          const res = await fetch(`${STORE_PREFIX}/${resolvedPath}`);
+          if (!res.ok) throw new Error(`${resolvedPath}: ${res.status}`);
+          const item = await res.json() as StacItem;
+          return { itemPath, item };
+        }),
+      );
+
+      items = [];
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          const { itemPath, item } = result.value;
+          items.push(toOverviewItem(itemPath, item));
+          itemMap.set(itemPath, item);
+        }
+      }
+
+      // Sort by datetime descending
+      items.sort((a, b) => {
+        const da = a.datetime ? new Date(a.datetime).getTime() : 0;
+        const db = b.datetime ? new Date(b.datetime).getTime() : 0;
+        return db - da;
+      });
+
+      console.log(`[stacService] Loaded ${items.length} items from STAC store`);
+    } catch (err) {
+      console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
+      loadBundledFallback();
     }
-    console.log(`[stacService] Loaded ${items.length} bundled items`);
   }
 
   return {
     async init(): Promise<void> {
-      try {
-        // Fetch the catalog.json to discover all item links
-        const catalogRes = await fetch(`${STORE_PREFIX}/catalog.json`);
-        if (!catalogRes.ok) throw new Error(`catalog.json: ${catalogRes.status}`);
-        const catalog = await catalogRes.json() as StacCatalog;
-
-        const itemPaths = catalog.links
-          .filter(link => link.rel === 'item')
-          .map(link => link.href);
-
-        // Fetch each item.json in parallel
-        const results = await Promise.allSettled(
-          itemPaths.map(async (itemPath) => {
-            const resolvedPath = itemPath.replace(/^\.\//, '');
-            const res = await fetch(`${STORE_PREFIX}/${resolvedPath}`);
-            if (!res.ok) throw new Error(`${resolvedPath}: ${res.status}`);
-            const item = await res.json() as StacItem;
-            return { itemPath, item };
-          }),
-        );
-
-        items = [];
-        for (const result of results) {
-          if (result.status === 'fulfilled') {
-            const { itemPath, item } = result.value;
-            items.push(toOverviewItem(itemPath, item));
-            itemMap.set(itemPath, item);
-          }
-        }
-
-        // Sort by datetime descending
-        items.sort((a, b) => {
-          const da = a.datetime ? new Date(a.datetime).getTime() : 0;
-          const db = b.datetime ? new Date(b.datetime).getTime() : 0;
-          return db - da;
-        });
-
-        console.log(`[stacService] Loaded ${items.length} items from STAC store`);
-      } catch (err) {
-        console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
-        loadBundledFallback();
+      if (!initPromise) {
+        initPromise = doInit();
       }
+      return initPromise;
     },
 
     getItems(): CatalogOverviewItem[] {

@@ -10,7 +10,7 @@ test.describe('Drawing — Feature 094', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Open the first plot by clicking exercise list item
-    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
+    await page.locator('[data-testid="exercise-list-item-row"]').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible({ timeout: 10000 });
     // Wait for map to be ready (Leaflet interactive elements)
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 10000 });
