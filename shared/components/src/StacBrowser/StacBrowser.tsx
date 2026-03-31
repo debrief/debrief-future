@@ -262,7 +262,7 @@ const ResizableSplitPane: React.FC<{ left: React.ReactNode; right: React.ReactNo
         onMouseDown={onMouseDown}
         data-testid="stac-browser-splitter"
       />
-      <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+      <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }} data-testid="stac-browser-preview">
         {right}
       </div>
     </div>
