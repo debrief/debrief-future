@@ -123,20 +123,21 @@ export interface MockStacService {
  * Create a mock STAC service that reads from the /stac-store/ middleware.
  */
 export function createMockStacService(): MockStacService {
-  let items: CatalogOverviewItem[] = [];
   const itemMap = new Map<string, StacItem>();
   /** Guard against concurrent init calls (React 18 StrictMode fires effects twice). */
   let initPromise: Promise<void> | null = null;
 
+  // Seed with bundled items immediately so getItems() returns data before init() completes.
+  // This avoids blank exercise lists while the /stac-store/ fetch is in progress.
+  let items: CatalogOverviewItem[] = BUNDLED_ITEMS.map(entry => {
+    itemMap.set(entry.itemPath, entry.item);
+    geojsonCache.set(entry.itemPath, entry.data);
+    return toOverviewItem(entry.itemPath, entry.item);
+  });
+
   /** Populate from bundled fixture data (production fallback). */
   function loadBundledFallback(): void {
-    items = [];
-    for (const entry of BUNDLED_ITEMS) {
-      items.push(toOverviewItem(entry.itemPath, entry.item));
-      itemMap.set(entry.itemPath, entry.item);
-      geojsonCache.set(entry.itemPath, entry.data);
-    }
-    console.log(`[stacService] Loaded ${items.length} bundled items`);
+    // Already seeded — nothing to do
   }
 
   /** Perform the actual catalog load (called once). */
