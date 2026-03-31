@@ -168,6 +168,11 @@
   opacity: 1;
 }
 
+/* Hide close buttons on tabs — panels are restored via "Reset Layout" */
+.stac-browser .lm_header .lm_tab .lm_close_tab {
+  display: none;
+}
+
 .stac-browser .lm_content {
   background: var(--vscode-editor-background, #fff);
 }
