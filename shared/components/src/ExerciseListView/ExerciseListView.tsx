@@ -43,12 +43,16 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   onItemHighlight,
   highlightedItemId,
   initialSort,
+  sort: controlledSort,
+  onSortChange,
+  hideSortBar,
   onRequestTrackData,
   trackData,
   className,
   height,
 }) => {
-  const [sort, setSort] = useState<SortConfiguration>(initialSort ?? DEFAULT_SORT);
+  const [internalSort, setInternalSort] = useState<SortConfiguration>(initialSort ?? DEFAULT_SORT);
+  const sort = controlledSort ?? internalSort;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Track which items have had their GeoJSON requested
@@ -95,13 +99,15 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
 
   // Sort change handler
   const handleSortClick = useCallback((dimension: SortDimension) => {
-    setSort((prev) => {
-      if (prev.dimension === dimension) {
-        return { dimension, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
-      }
-      return { dimension, direction: DEFAULT_DIRECTIONS[dimension] };
-    });
-  }, []);
+    const next = sort.dimension === dimension
+      ? { dimension, direction: (sort.direction === 'asc' ? 'desc' : 'asc') as SortDirection }
+      : { dimension, direction: DEFAULT_DIRECTIONS[dimension] };
+    if (onSortChange) {
+      onSortChange(next);
+    } else {
+      setInternalSort(next);
+    }
+  }, [sort, onSortChange]);
 
   const containerClass = ['exercise-list-view', className].filter(Boolean).join(' ');
   const containerStyle = height != null ? { height: `${height}px` } : { height: '100%' };
@@ -125,23 +131,25 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
 
   return (
     <div className={containerClass} style={containerStyle} data-testid="exercise-list-view">
-      {/* Sort Bar */}
-      <div className="exercise-list-view__sort-bar" data-testid="sort-bar">
-        <span className="exercise-list-view__sort-label">Sort by:</span>
-        {(Object.keys(SORT_LABELS) as SortDimension[]).map((dim) => (
-          <button
-            key={dim}
-            className={`exercise-list-view__sort-btn${sort.dimension === dim ? ' exercise-list-view__sort-btn--active' : ''}`}
-            data-direction={sort.dimension === dim ? sort.direction : undefined}
-            data-testid={`sort-btn-${dim}`}
-            onClick={() => handleSortClick(dim)}
-            aria-pressed={sort.dimension === dim}
-            aria-label={`Sort by ${SORT_LABELS[dim]}${sort.dimension === dim ? `, ${sort.direction === 'asc' ? 'ascending' : 'descending'}` : ''}`}
-          >
-            {SORT_LABELS[dim]}
-          </button>
-        ))}
-      </div>
+      {/* Sort Bar — hidden when sort controls are rendered externally */}
+      {!hideSortBar && (
+        <div className="exercise-list-view__sort-bar" data-testid="sort-bar">
+          <span className="exercise-list-view__sort-label">Sort by:</span>
+          {(Object.keys(SORT_LABELS) as SortDimension[]).map((dim) => (
+            <button
+              key={dim}
+              className={`exercise-list-view__sort-btn${sort.dimension === dim ? ' exercise-list-view__sort-btn--active' : ''}`}
+              data-direction={sort.dimension === dim ? sort.direction : undefined}
+              data-testid={`sort-btn-${dim}`}
+              onClick={() => handleSortClick(dim)}
+              aria-pressed={sort.dimension === dim}
+              aria-label={`Sort by ${SORT_LABELS[dim]}${sort.dimension === dim ? `, ${sort.direction === 'asc' ? 'ascending' : 'descending'}` : ''}`}
+            >
+              {SORT_LABELS[dim]}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Recently Opened Section */}
       {recentItems.length > 0 && (

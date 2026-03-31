@@ -28,7 +28,7 @@ import type { TemporalFilter } from '../TimelineView/types';
 import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
 import { ExerciseListView } from '../ExerciseListView';
-import type { ExerciseListItem } from '../ExerciseListView/types';
+import type { ExerciseListItem, SortConfiguration, SortDimension, SortDirection } from '../ExerciseListView/types';
 import { ThumbnailPreview } from './ThumbnailPreview';
 import { TimelineView } from '../TimelineView';
 import { formatDateRange } from '../utils/timeline-helpers';
@@ -284,11 +284,99 @@ interface BrowserPanelContext {
   onViewportChange: (bounds: Bounds | null) => void;
   onTemporalFilterChange: (filter: TemporalFilter | null) => void;
   colourFn?: (item: StacBrowserItem) => string | null;
+  sort: SortConfiguration;
+  onSortChange: (sort: SortConfiguration) => void;
 }
 
 // Use a module-level ref so panel renderers can access it
 let currentBrowserContext: BrowserPanelContext | null = null;
 const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: string }>();
+
+// Sort dropdown injected into the Exercises GoldenLayout header
+let sortHeaderRoot: Root | null = null;
+let sortHeaderContainer: HTMLElement | null = null;
+
+/** Sort dimension labels for the dropdown. */
+const SORT_LABELS: Record<SortDimension, string> = {
+  recency: 'Recency',
+  title: 'Title',
+  duration: 'Duration',
+};
+const DEFAULT_DIRECTIONS: Record<SortDimension, SortDirection> = {
+  recency: 'desc',
+  title: 'asc',
+  duration: 'desc',
+};
+
+/** Render sort dropdown into the GoldenLayout header. */
+function renderSortHeader(): void {
+  const ctx = currentBrowserContext;
+  if (!sortHeaderRoot || !ctx) return;
+
+  sortHeaderRoot.render(
+    <SortHeaderDropdown sort={ctx.sort} onSortChange={ctx.onSortChange} />,
+  );
+}
+
+/** Inline sort dropdown component for the GoldenLayout header. */
+const SortHeaderDropdown: React.FC<{
+  sort: SortConfiguration;
+  onSortChange: (sort: SortConfiguration) => void;
+}> = ({ sort, onSortChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: globalThis.MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const arrow = sort.direction === 'asc' ? '\u2191' : '\u2193';
+
+  return (
+    <div ref={ref} className="stac-browser__sort-header" data-testid="sort-header-dropdown">
+      <button
+        type="button"
+        className="stac-browser__sort-header-btn"
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+        title={`Sort: ${SORT_LABELS[sort.dimension]} ${sort.direction === 'asc' ? 'ascending' : 'descending'}`}
+      >
+        {SORT_LABELS[sort.dimension]} {arrow}
+      </button>
+      {open && (
+        <div className="stac-browser__sort-header-menu">
+          {(Object.keys(SORT_LABELS) as SortDimension[]).map((dim) => {
+            const isActive = sort.dimension === dim;
+            return (
+              <button
+                key={dim}
+                type="button"
+                className={`stac-browser__sort-header-option${isActive ? ' stac-browser__sort-header-option--active' : ''}`}
+                data-testid={`sort-header-${dim}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const next: SortConfiguration = isActive
+                    ? { dimension: dim, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
+                    : { dimension: dim, direction: DEFAULT_DIRECTIONS[dim] };
+                  onSortChange(next);
+                  setOpen(false);
+                }}
+              >
+                {SORT_LABELS[dim]}
+                {isActive && <span className="stac-browser__sort-header-arrow">{arrow}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ─── Panel renderers ─────────────────────────────────────────────────────────
 // GoldenLayout bind handler passes container element; renderers use module-level
@@ -309,6 +397,9 @@ function renderPanel(type: string): React.ReactElement {
           onItemSelect={ctx.onItemSelect}
           onItemHighlight={ctx.onItemHighlight}
           highlightedItemId={ctx.highlightedItemId}
+          sort={ctx.sort}
+          onSortChange={ctx.onSortChange}
+          hideSortBar
         />
       );
       if (!previewItem) {
@@ -424,6 +515,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     setHighlightedItemId(itemId);
   }, []);
 
+  // ─── Sort state (lifted from ExerciseListView for header injection) ────────
+  const DEFAULT_SORT: SortConfiguration = { dimension: 'recency', direction: 'desc' };
+  const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
+  const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
+
   // ─── Filter state ──────────────────────────────────────────────────────────
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
   const [viewport, setViewport] = useState<ViewportPolygon | null>(null);
@@ -500,15 +596,18 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     onViewportChange: handleViewportChange,
     onTemporalFilterChange: handleTemporalFilterChange,
     colourFn,
-  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
+    sort,
+    onSortChange: handleSortChange,
+  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn, sort, handleSortChange]);
 
-  // Update module-level context and re-render panels
+  // Update module-level context and re-render panels + sort header
   useEffect(() => {
     currentBrowserContext = contextValue;
     // Re-render all mounted panels with new context
     for (const [, panel] of mountedBrowserPanels) {
       panel.root.render(renderPanel(panel.type));
     }
+    renderSortHeader();
   }, [contextValue]);
 
   // ─── Debounced layout save ────────────────────────────────────────────────
@@ -537,6 +636,27 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
 
       mountedBrowserPanels.set(container, { root, type: componentType });
       root.render(renderPanel(componentType));
+
+      // Inject sort dropdown into the Exercises panel header
+      if (componentType === PANEL_LIST) {
+        const injectSort = () => {
+          try {
+            const headerEl = container.tab?.element?.closest('.lm_header');
+            const controlsEl = headerEl?.querySelector('.lm_controls');
+            if (controlsEl && !sortHeaderContainer) {
+              sortHeaderContainer = document.createElement('li');
+              sortHeaderContainer.className = 'stac-browser__sort-header-li';
+              controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
+              sortHeaderRoot = createRoot(sortHeaderContainer);
+              renderSortHeader();
+            } else if (!controlsEl) {
+              // Tab may not be assigned yet — retry on next frame
+              requestAnimationFrame(injectSort);
+            }
+          } catch { /* tab not ready yet */ }
+        };
+        requestAnimationFrame(injectSort);
+      }
 
       return { component: undefined, virtual: false };
     };
@@ -581,6 +701,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
         panel.root.unmount();
       }
       mountedBrowserPanels.clear();
+      if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
+      sortHeaderContainer = null;
       gl.destroy();
       glRef.current = null;
     };

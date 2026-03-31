@@ -191,3 +191,75 @@
 .stac-browser__splitter:hover {
   background: var(--vscode-focusBorder, #007fd4) !important;
 }
+
+/* ─── Sort dropdown in GoldenLayout header ───────────────────────────────── */
+.stac-browser__sort-header-li {
+  display: flex !important;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.stac-browser__sort-header {
+  position: relative;
+}
+
+.stac-browser__sort-header-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--vscode-tab-inactiveForeground, #666);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+  line-height: 20px;
+}
+
+.stac-browser__sort-header-btn:hover {
+  color: var(--vscode-foreground, #333);
+  border-color: var(--vscode-button-secondaryBackground, #ccc);
+}
+
+.stac-browser__sort-header-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 200;
+  background: var(--vscode-menu-background, #fff);
+  border: 1px solid var(--vscode-menu-border, #ccc);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  padding: 4px 0;
+}
+
+.stac-browser__sort-header-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--vscode-menu-foreground, #333);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stac-browser__sort-header-option:hover {
+  background: var(--vscode-menu-selectionBackground, #e8e8e8);
+}
+
+.stac-browser__sort-header-option--active {
+  color: var(--vscode-focusBorder, #007fd4);
+  font-weight: 600;
+}
+
+.stac-browser__sort-header-arrow {
+  margin-left: 8px;
+  font-size: 11px;
+}
