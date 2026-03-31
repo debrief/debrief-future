@@ -40,6 +40,11 @@ export class CatalogPage {
   async waitForLoad(): Promise<void> {
     await this.page.waitForSelector('.web-shell--welcome', { state: 'visible' });
     await this.page.waitForSelector('.stac-browser', { state: 'visible' });
+    // Wait for stacService.init() to complete and exercise rows to render
+    await this.page.waitForSelector('[data-testid="exercise-list-item-row"]', {
+      state: 'visible',
+      timeout: 15000,
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
