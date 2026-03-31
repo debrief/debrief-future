@@ -73,6 +73,31 @@ jobs:
         env:
           VITE_BASE_URL: /debrief-future/web-shell/
 
+      - name: Create root landing page
+        run: |
+          mkdir -p /tmp/gh-pages-root
+          cat > /tmp/gh-pages-root/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="refresh" content="0;url=web-shell/">
+            <title>Debrief Future</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="web-shell/">Web Shell</a>…</p>
+            <script>window.location.replace('web-shell/');</script>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy root landing page to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/gh-pages-root
+          keep_files: true
+
       - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
