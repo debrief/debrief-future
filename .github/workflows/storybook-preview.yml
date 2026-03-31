@@ -89,6 +89,31 @@ jobs:
           destination_dir: web-shell
           keep_files: true
 
+      - name: Create root redirect page
+        run: |
+          mkdir -p /tmp/gh-pages-root
+          cat > /tmp/gh-pages-root/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta http-equiv="refresh" content="0; url=web-shell/">
+              <title>Debrief – redirecting…</title>
+            </head>
+            <body>
+              <p>Redirecting to <a href="web-shell/">web-shell/</a>…</p>
+            </body>
+          </html>
+          EOF
+
+      - name: Deploy root redirect to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/gh-pages-root
+          destination_dir: .
+          keep_files: true
+
   # Deploy PR preview
   build-and-deploy:
     runs-on: ubuntu-latest
