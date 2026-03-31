@@ -1,1 +1,0 @@
-{"version":3,"file":"captureMap.d.ts","sourceRoot":"","sources":["../../src/MapView/captureMap.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAQH,MAAM,WAAW,iBAAiB;IAChC,4CAA4C;IAC5C,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,6CAA6C;IAC7C,MAAM,CAAC,EAAE,MAAM,CAAC;CACjB;AAED;;;;;;;;;GASG;AACH,wBAAsB,mBAAmB,CACvC,SAAS,EAAE,WAAW,EACtB,OAAO,GAAE,iBAAsB,GAC9B,OAAO,CAAC,MAAM,CAAC,CAWjB"}
