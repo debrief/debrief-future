@@ -120,10 +120,11 @@ const BROWSER_LAYOUT_VERSION = 6;
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
   header: {
-    // Analysts can collapse/maximise panels but not close or pop out
+    // Analysts can maximise/restore panels but not close or pop out
     close: false,
     popout: false,
     maximise: 'maximise',
+    minimise: 'restore',
   },
   root: {
     type: 'column',
