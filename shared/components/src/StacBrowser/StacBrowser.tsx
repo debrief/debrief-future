@@ -10,7 +10,7 @@
  * exercise list (top, full width), timeline (bottom-left), map (bottom-right).
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import {
   GoldenLayout,
   LayoutConfig,
@@ -28,7 +28,7 @@ import type { TemporalFilter } from '../TimelineView/types';
 import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
 import { ExerciseListView } from '../ExerciseListView';
-import type { ExerciseListItem } from '../ExerciseListView/types';
+import type { ExerciseListItem, SortConfiguration, SortDimension, SortDirection } from '../ExerciseListView/types';
 import { ThumbnailPreview } from './ThumbnailPreview';
 import { TimelineView } from '../TimelineView';
 import { formatDateRange } from '../utils/timeline-helpers';
@@ -115,10 +115,17 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 4;
+const BROWSER_LAYOUT_VERSION = 6;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
+  header: {
+    // Analysts can maximise/restore panels but not close or pop out
+    close: false,
+    popout: false,
+    maximise: 'maximise',
+    minimise: 'restore',
+  },
   root: {
     type: 'column',
     content: [
@@ -131,6 +138,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
             type: 'component',
             componentType: PANEL_LIST,
             title: 'Exercises',
+            isClosable: false,
           },
         ],
       },
@@ -147,6 +155,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_TIMELINE,
                 title: 'Timeline',
+                isClosable: false,
               },
             ],
           },
@@ -158,6 +167,7 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_MAP,
                 title: 'Map',
+                isClosable: false,
               },
             ],
           },
@@ -194,6 +204,76 @@ function clearBrowserLayout(): void {
   } catch { /* ignore */ }
 }
 
+// ─── Resizable split pane ───────────────────────────────────────────────────
+const SPLIT_MIN_PCT = 20;
+const SPLIT_MAX_PCT = 80;
+const SPLIT_DEFAULT_PCT = 50;
+const SPLIT_STORAGE_KEY = 'debrief-browser-split-pct';
+
+function loadSplitPct(): number {
+  try {
+    const v = localStorage.getItem(SPLIT_STORAGE_KEY);
+    if (v) { const n = Number(v); if (n >= SPLIT_MIN_PCT && n <= SPLIT_MAX_PCT) return n; }
+  } catch { /* ignore */ }
+  return SPLIT_DEFAULT_PCT;
+}
+
+function saveSplitPct(pct: number): void {
+  try { localStorage.setItem(SPLIT_STORAGE_KEY, String(Math.round(pct))); } catch { /* ignore */ }
+}
+
+/** Horizontal resizable split pane for exercise list + preview. */
+const ResizableSplitPane: React.FC<{ left: React.ReactNode; right: React.ReactNode }> = ({ left, right }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [leftPct, setLeftPct] = useState(loadSplitPct);
+
+  const onMouseDown = useCallback((e: ReactMouseEvent) => {
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onMouseMove = (ev: globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.min(SPLIT_MAX_PCT, Math.max(SPLIT_MIN_PCT, pct));
+      setLeftPct(clamped);
+    };
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      // Save after drag ends
+      setLeftPct(prev => { saveSplitPct(prev); return prev; });
+    };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ display: 'flex', height: '100%', width: '100%' }}>
+      <div style={{ flex: `0 0 ${leftPct}%`, overflow: 'auto', minWidth: 0 }}>
+        {left}
+      </div>
+      <div
+        style={{
+          flex: '0 0 4px',
+          cursor: 'col-resize',
+          background: 'var(--vscode-panel-border, #e0e0e0)',
+        }}
+        className="stac-browser__splitter"
+        onMouseDown={onMouseDown}
+        data-testid="stac-browser-splitter"
+      />
+      <div style={{ flex: 1, overflow: 'auto', minWidth: 0 }} data-testid="stac-browser-preview">
+        {right}
+      </div>
+    </div>
+  );
+};
+
 // ─── Context for passing props to panels ──────────────────────────────────────
 interface BrowserPanelContext {
   filteredItems: readonly StacBrowserItem[];
@@ -205,11 +285,99 @@ interface BrowserPanelContext {
   onViewportChange: (bounds: Bounds | null) => void;
   onTemporalFilterChange: (filter: TemporalFilter | null) => void;
   colourFn?: (item: StacBrowserItem) => string | null;
+  sort: SortConfiguration;
+  onSortChange: (sort: SortConfiguration) => void;
 }
 
 // Use a module-level ref so panel renderers can access it
 let currentBrowserContext: BrowserPanelContext | null = null;
 const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: string }>();
+
+// Sort dropdown injected into the Exercises GoldenLayout header
+let sortHeaderRoot: Root | null = null;
+let sortHeaderContainer: HTMLElement | null = null;
+
+/** Sort dimension labels for the dropdown. */
+const SORT_LABELS: Record<SortDimension, string> = {
+  recency: 'Recency',
+  title: 'Title',
+  duration: 'Duration',
+};
+const DEFAULT_DIRECTIONS: Record<SortDimension, SortDirection> = {
+  recency: 'desc',
+  title: 'asc',
+  duration: 'desc',
+};
+
+/** Render sort dropdown into the GoldenLayout header. */
+function renderSortHeader(): void {
+  const ctx = currentBrowserContext;
+  if (!sortHeaderRoot || !ctx) return;
+
+  sortHeaderRoot.render(
+    <SortHeaderDropdown sort={ctx.sort} onSortChange={ctx.onSortChange} />,
+  );
+}
+
+/** Inline sort dropdown component for the GoldenLayout header. */
+const SortHeaderDropdown: React.FC<{
+  sort: SortConfiguration;
+  onSortChange: (sort: SortConfiguration) => void;
+}> = ({ sort, onSortChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: globalThis.MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const arrow = sort.direction === 'asc' ? '\u2191' : '\u2193';
+
+  return (
+    <div ref={ref} className="stac-browser__sort-header" data-testid="sort-header-dropdown">
+      <button
+        type="button"
+        className="stac-browser__sort-header-btn"
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+        title={`Sort: ${SORT_LABELS[sort.dimension]} ${sort.direction === 'asc' ? 'ascending' : 'descending'}`}
+      >
+        {SORT_LABELS[sort.dimension]} {arrow}
+      </button>
+      {open && (
+        <div className="stac-browser__sort-header-menu">
+          {(Object.keys(SORT_LABELS) as SortDimension[]).map((dim) => {
+            const isActive = sort.dimension === dim;
+            return (
+              <button
+                key={dim}
+                type="button"
+                className={`stac-browser__sort-header-option${isActive ? ' stac-browser__sort-header-option--active' : ''}`}
+                data-testid={`sort-header-${dim}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const next: SortConfiguration = isActive
+                    ? { dimension: dim, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
+                    : { dimension: dim, direction: DEFAULT_DIRECTIONS[dim] };
+                  onSortChange(next);
+                  setOpen(false);
+                }}
+              >
+                {SORT_LABELS[dim]}
+                {isActive && <span className="stac-browser__sort-header-arrow">{arrow}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ─── Panel renderers ─────────────────────────────────────────────────────────
 // GoldenLayout bind handler passes container element; renderers use module-level
@@ -224,25 +392,36 @@ function renderPanel(type: string): React.ReactElement {
       const previewItem = ctx.highlightedItemId
         ? ctx.filteredItems.find(i => i.id === ctx.highlightedItemId) ?? null
         : null;
-      return (
-        <div style={{ display: 'flex', height: '100%' }} data-testid="stac-browser-list">
-          <div style={{ flex: previewItem ? '0 0 50%' : '1 1 100%', overflow: 'auto', minWidth: 0 }}>
-            <ExerciseListView
-              items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
-              onItemSelect={ctx.onItemSelect}
-              onItemHighlight={ctx.onItemHighlight}
-              highlightedItemId={ctx.highlightedItemId}
-            />
+      const listView = (
+        <ExerciseListView
+          items={ctx.filteredItems.map(item => ({ ...item, trackDataHref: null })) as ExerciseListItem[]}
+          onItemSelect={ctx.onItemSelect}
+          onItemHighlight={ctx.onItemHighlight}
+          highlightedItemId={ctx.highlightedItemId}
+          sort={ctx.sort}
+          onSortChange={ctx.onSortChange}
+          hideSortBar
+        />
+      );
+      if (!previewItem) {
+        return (
+          <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
+            {listView}
           </div>
-          {previewItem && (
-            <div style={{ flex: '0 0 50%', minWidth: 0, overflow: 'hidden' }} data-testid="stac-browser-preview">
+        );
+      }
+      return (
+        <div style={{ height: '100%' }} data-testid="stac-browser-list">
+          <ResizableSplitPane
+            left={listView}
+            right={
               <ThumbnailPreview
                 item={previewItem}
                 items={ctx.filteredItems}
                 onOpen={ctx.onItemSelect}
               />
-            </div>
-          )}
+            }
+          />
         </div>
       );
     }
@@ -337,6 +516,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     setHighlightedItemId(itemId);
   }, []);
 
+  // ─── Sort state (lifted from ExerciseListView for header injection) ────────
+  const DEFAULT_SORT: SortConfiguration = { dimension: 'recency', direction: 'desc' };
+  const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
+  const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
+
   // ─── Filter state ──────────────────────────────────────────────────────────
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
   const [viewport, setViewport] = useState<ViewportPolygon | null>(null);
@@ -413,15 +597,18 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     onViewportChange: handleViewportChange,
     onTemporalFilterChange: handleTemporalFilterChange,
     colourFn,
-  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
+    sort,
+    onSortChange: handleSortChange,
+  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn, sort, handleSortChange]);
 
-  // Update module-level context and re-render panels
+  // Update module-level context and re-render panels + sort header
   useEffect(() => {
     currentBrowserContext = contextValue;
     // Re-render all mounted panels with new context
     for (const [, panel] of mountedBrowserPanels) {
       panel.root.render(renderPanel(panel.type));
     }
+    renderSortHeader();
   }, [contextValue]);
 
   // ─── Debounced layout save ────────────────────────────────────────────────
@@ -450,6 +637,27 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
 
       mountedBrowserPanels.set(container, { root, type: componentType });
       root.render(renderPanel(componentType));
+
+      // Inject sort dropdown into the Exercises panel header
+      if (componentType === PANEL_LIST) {
+        const injectSort = () => {
+          try {
+            const headerEl = container.tab?.element?.closest('.lm_header');
+            const controlsEl = headerEl?.querySelector('.lm_controls');
+            if (controlsEl && !sortHeaderContainer) {
+              sortHeaderContainer = document.createElement('li');
+              sortHeaderContainer.className = 'stac-browser__sort-header-li';
+              controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
+              sortHeaderRoot = createRoot(sortHeaderContainer);
+              renderSortHeader();
+            } else if (!controlsEl) {
+              // Tab may not be assigned yet — retry on next frame
+              requestAnimationFrame(injectSort);
+            }
+          } catch { /* tab not ready yet */ }
+        };
+        requestAnimationFrame(injectSort);
+      }
 
       return { component: undefined, virtual: false };
     };
@@ -494,6 +702,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
         panel.root.unmount();
       }
       mountedBrowserPanels.clear();
+      if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
+      sortHeaderContainer = null;
       gl.destroy();
       glRef.current = null;
     };
@@ -509,17 +719,15 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
 
   return (
     <div className={`stac-browser ${className ?? ''}`} data-testid="stac-browser">
-      {/* Filter bar — always visible, outside GoldenLayout */}
-      <div className="stac-browser__filter-bar" data-testid="stac-browser-filter-bar">
-        <FilterBar
-          items={items as StacBrowserItem[]}
-          taxonomy={taxonomy}
-          onFilteredItems={handleFilteredItems}
-        />
-      </div>
-
-      {/* Active filter indicator + reset layout button */}
-      <div className="stac-browser__toolbar">
+      {/* Filter bar row — FilterBar + active count + Reset Layout in one line */}
+      <div className="stac-browser__filter-row" data-testid="stac-browser-filter-bar">
+        <div className="stac-browser__filter-bar">
+          <FilterBar
+            items={items as StacBrowserItem[]}
+            taxonomy={taxonomy}
+            onFilteredItems={handleFilteredItems}
+          />
+        </div>
         {activeFilterCount > 0 && (
           <span className="stac-browser__filter-count" data-testid="stac-browser-filter-count">
             {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active

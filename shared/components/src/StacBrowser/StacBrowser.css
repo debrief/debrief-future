@@ -16,20 +16,18 @@
   position: relative;
 }
 
-.stac-browser__filter-bar {
-  flex: 0 0 auto;
-  border-bottom: 1px solid var(--vscode-panel-border, #e0e0e0);
-}
-
-.stac-browser__toolbar {
+.stac-browser__filter-row {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
-  background: var(--vscode-editor-background, #fff);
+  gap: 8px;
+  padding-right: 8px;
   border-bottom: 1px solid var(--vscode-panel-border, #e0e0e0);
-  min-height: 28px;
+}
+
+.stac-browser__filter-bar {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .stac-browser__filter-count {
@@ -156,7 +154,9 @@
 }
 
 .stac-browser .lm_header .lm_controls {
-  top: 5px;
+  top: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .stac-browser .lm_header .lm_controls > li {
@@ -166,6 +166,47 @@
 
 .stac-browser .lm_header .lm_controls > li:hover {
   opacity: 1;
+}
+
+/* Replace broken PNG icons with CSS-drawn equivalents */
+.stac-browser .lm_controls .lm_maximise {
+  background-image: none !important;
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+/* Maximise icon: single rectangle */
+.stac-browser .lm_controls .lm_maximise::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--vscode-icon-foreground, #555);
+  border-radius: 1px;
+}
+
+/* Restore icon when maximised: overlapping rectangles */
+.stac-browser .lm_maximised .lm_controls .lm_maximise::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--vscode-icon-foreground, #555);
+  border-radius: 1px;
+  background: var(--vscode-editorGroupHeader-tabsBackground, #f3f3f3);
+}
+
+.stac-browser .lm_maximised .lm_controls .lm_maximise::after {
+  top: 5px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  background: var(--vscode-editorGroupHeader-tabsBackground, #f3f3f3);
 }
 
 /* Hide close buttons on tabs — panels are restored via "Reset Layout" */
@@ -183,4 +224,89 @@
 
 .stac-browser .lm_splitter:hover {
   background: var(--vscode-focusBorder, #007fd4);
+}
+
+/* ─── Resizable split pane divider ───────────────────────────────────────── */
+.stac-browser__splitter {
+  transition: background 0.15s;
+}
+
+.stac-browser__splitter:hover {
+  background: var(--vscode-focusBorder, #007fd4) !important;
+}
+
+/* ─── Sort dropdown in GoldenLayout header ───────────────────────────────── */
+.stac-browser__sort-header-li {
+  /* Override GoldenLayout's 18x18 constraint on .lm_controls > * */
+  width: auto !important;
+  height: auto !important;
+  float: none !important;
+  display: flex !important;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.stac-browser__sort-header {
+  position: relative;
+}
+
+.stac-browser__sort-header-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--vscode-tab-inactiveForeground, #666);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+  line-height: 20px;
+}
+
+.stac-browser__sort-header-btn:hover {
+  color: var(--vscode-foreground, #333);
+  border-color: var(--vscode-button-secondaryBackground, #ccc);
+}
+
+.stac-browser__sort-header-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 200;
+  background: var(--vscode-menu-background, #fff);
+  border: 1px solid var(--vscode-menu-border, #ccc);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  padding: 4px 0;
+}
+
+.stac-browser__sort-header-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--vscode-menu-foreground, #333);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stac-browser__sort-header-option:hover {
+  background: var(--vscode-menu-selectionBackground, #e8e8e8);
+}
+
+.stac-browser__sort-header-option--active {
+  color: var(--vscode-focusBorder, #007fd4);
+  font-weight: 600;
+}
+
+.stac-browser__sort-header-arrow {
+  margin-left: 8px;
+  font-size: 11px;
 }

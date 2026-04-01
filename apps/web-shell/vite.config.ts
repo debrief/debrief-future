@@ -28,10 +28,14 @@ function geojsonPlugin(): Plugin {
  * under /stac-store/. This allows thumbnail <img> tags to load PNGs
  * directly from the local STAC catalog without bundling them (#174).
  */
-/** STAC store root — override with STAC_STORE_PATH env var to point at a full catalog. */
+/** STAC store root — override with STAC_STORE_PATH env var to point at a full catalog.
+ *  In local dev, prefers the preview samples directory (~71 items) over minimal test-data (2 items).
+ *  In CI, always uses test-data for E2E test stability. */
+const PREVIEW_SAMPLES_DIR = path.resolve(__dirname, '../../preview/workspace/samples/local-store');
+const TEST_DATA_DIR = path.resolve(__dirname, '../vscode/test-data/local-store');
 const STAC_STORE_ROOT = process.env.STAC_STORE_PATH
   ? path.resolve(process.env.STAC_STORE_PATH)
-  : path.resolve(__dirname, '../vscode/test-data/local-store');
+  : (!process.env.CI && fs.existsSync(PREVIEW_SAMPLES_DIR)) ? PREVIEW_SAMPLES_DIR : TEST_DATA_DIR;
 const STAC_STORE_PREFIX = '/stac-store/';
 
 /** Serve STAC store files via middleware (shared between dev and preview servers). */
