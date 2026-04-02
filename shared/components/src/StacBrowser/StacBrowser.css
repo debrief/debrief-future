@@ -310,3 +310,37 @@
   margin-left: 8px;
   font-size: 11px;
 }
+
+/* ─── Panel collapse button ──────────────────────────────────────────────── */
+.stac-browser__collapse-btn-li {
+  width: auto !important;
+  height: auto !important;
+  float: none !important;
+  display: flex !important;
+  align-items: center;
+  margin-right: 2px;
+}
+
+.stac-browser__collapse-btn {
+  background: none;
+  border: none;
+  color: var(--vscode-icon-foreground, #555);
+  font-size: 9px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.stac-browser__collapse-btn:hover {
+  opacity: 1;
+}
+
+/* Collapsed panel — hide content, keep header visible */
+.stac-browser__panel-collapsed > .lm_items {
+  display: none !important;
+}
+
+.stac-browser__panel-collapsed > .lm_header {
+  border-bottom: none !important;
+}

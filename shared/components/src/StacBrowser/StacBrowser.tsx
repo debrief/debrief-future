@@ -297,6 +297,97 @@ const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: str
 let sortHeaderRoot: Root | null = null;
 let sortHeaderContainer: HTMLElement | null = null;
 
+// ─── Panel collapse state ───────────────────────────────────────────────────
+// GoldenLayout v2 has no built-in collapse. We implement it by saving the
+// original size, shrinking the stack to header-only height (28px), and
+// triggering a relayout so siblings absorb the freed space.
+
+interface CollapseEntry {
+  savedSize: number;
+  savedSizeUnit: string;
+  btnRoot: Root;
+  btnContainer: HTMLElement;
+  stackEl: HTMLElement;
+}
+
+const collapseMap = new Map<string, CollapseEntry>();
+const HEADER_HEIGHT = 28;
+
+/** Access internal size props that GoldenLayout exposes on JS objects but
+ *  excludes from TS types. */
+interface SizableItem { size: number; sizeUnit: string; minSize?: number; minSizeUnit?: string; updateSize(force?: boolean): void; }
+function asSizable(item: unknown): SizableItem { return item as SizableItem; }
+
+function isCollapsed(panelType: string): boolean {
+  return collapseMap.has(panelType);
+}
+
+function toggleCollapse(container: ComponentContainer, panelType: string): void {
+  const gl = container.layoutManager;
+  const stack = container.parent.parentItem;  // Stack's parent is Row or Column
+  if (!stack) return;
+
+  const entry = collapseMap.get(panelType);
+  const sizable = asSizable(stack);
+  const stackEl = stack.element;
+
+  if (entry) {
+    // Restore
+    sizable.size = entry.savedSize;
+    sizable.sizeUnit = entry.savedSizeUnit;
+    stackEl.classList.remove('stac-browser__panel-collapsed');
+    collapseMap.delete(panelType);
+  } else {
+    // Collapse — save current size, shrink to header-only
+    const btnEntry = findCollapseEntry(panelType);
+    collapseMap.set(panelType, {
+      savedSize: sizable.size,
+      savedSizeUnit: sizable.sizeUnit,
+      btnRoot: btnEntry?.btnRoot ?? null!,
+      btnContainer: btnEntry?.btnContainer ?? null!,
+      stackEl,
+    });
+    sizable.size = HEADER_HEIGHT;
+    sizable.sizeUnit = 'px';
+    stackEl.classList.add('stac-browser__panel-collapsed');
+  }
+
+  // Trigger relayout so siblings absorb the freed/restored space
+  (gl as unknown as { updateSizeFromContainer(): void }).updateSizeFromContainer();
+  renderAllCollapseButtons();
+}
+
+function findCollapseEntry(panelType: string): CollapseEntry | undefined {
+  return collapseMap.get(panelType);
+}
+
+/** Re-render all collapse button icons to reflect current state. */
+function renderAllCollapseButtons(): void {
+  for (const [, panel] of mountedBrowserPanels) {
+    const entry = collapseBtnRoots.get(panel.type);
+    if (entry) {
+      const collapsed = isCollapsed(panel.type);
+      entry.root.render(
+        <CollapseButton collapsed={collapsed} />,
+      );
+    }
+  }
+}
+
+const collapseBtnRoots = new Map<string, { root: Root; container: HTMLElement }>();
+
+/** Collapse/expand chevron button for panel headers. */
+const CollapseButton: React.FC<{ collapsed: boolean }> = ({ collapsed }) => (
+  <button
+    type="button"
+    className="stac-browser__collapse-btn"
+    title={collapsed ? 'Expand panel' : 'Collapse panel'}
+    data-testid="panel-collapse-btn"
+  >
+    {collapsed ? '\u25B6' : '\u25BC'}
+  </button>
+);
+
 /** Sort dimension labels for the dropdown. */
 const SORT_LABELS: Record<SortDimension, string> = {
   recency: 'Recency',
@@ -638,26 +729,41 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       mountedBrowserPanels.set(container, { root, type: componentType });
       root.render(renderPanel(componentType));
 
-      // Inject sort dropdown into the Exercises panel header
-      if (componentType === PANEL_LIST) {
-        const injectSort = () => {
-          try {
-            const headerEl = container.tab?.element?.closest('.lm_header');
-            const controlsEl = headerEl?.querySelector('.lm_controls');
-            if (controlsEl && !sortHeaderContainer) {
-              sortHeaderContainer = document.createElement('li');
-              sortHeaderContainer.className = 'stac-browser__sort-header-li';
-              controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
-              sortHeaderRoot = createRoot(sortHeaderContainer);
-              renderSortHeader();
-            } else if (!controlsEl) {
-              // Tab may not be assigned yet — retry on next frame
-              requestAnimationFrame(injectSort);
-            }
-          } catch { /* tab not ready yet */ }
-        };
-        requestAnimationFrame(injectSort);
-      }
+      // Inject header controls (sort dropdown for Exercises, collapse button for all)
+      const injectHeaderControls = () => {
+        try {
+          const headerEl = container.tab?.element?.closest('.lm_header');
+          const controlsEl = headerEl?.querySelector('.lm_controls');
+          if (!controlsEl) {
+            requestAnimationFrame(injectHeaderControls);
+            return;
+          }
+
+          // Sort dropdown — only for Exercises panel
+          if (componentType === PANEL_LIST && !sortHeaderContainer) {
+            sortHeaderContainer = document.createElement('li');
+            sortHeaderContainer.className = 'stac-browser__sort-header-li';
+            controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
+            sortHeaderRoot = createRoot(sortHeaderContainer);
+            renderSortHeader();
+          }
+
+          // Collapse button — for all panels
+          if (!collapseBtnRoots.has(componentType)) {
+            const btnLi = document.createElement('li');
+            btnLi.className = 'stac-browser__collapse-btn-li';
+            btnLi.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleCollapse(container, componentType);
+            });
+            controlsEl.insertBefore(btnLi, controlsEl.firstChild);
+            const btnRoot = createRoot(btnLi);
+            collapseBtnRoots.set(componentType, { root: btnRoot, container: btnLi });
+            btnRoot.render(<CollapseButton collapsed={false} />);
+          }
+        } catch { /* tab not ready yet */ }
+      };
+      requestAnimationFrame(injectHeaderControls);
 
       return { component: undefined, virtual: false };
     };
@@ -704,6 +810,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       mountedBrowserPanels.clear();
       if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
       sortHeaderContainer = null;
+      for (const [, entry] of collapseBtnRoots) { entry.root.unmount(); }
+      collapseBtnRoots.clear();
+      collapseMap.clear();
       gl.destroy();
       glRef.current = null;
     };
@@ -714,6 +823,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     const gl = glRef.current;
     if (!gl) return;
     clearBrowserLayout();
+    collapseMap.clear();
+    for (const [, entry] of collapseBtnRoots) { entry.root.unmount(); }
+    collapseBtnRoots.clear();
     gl.loadLayout(BROWSER_DEFAULT_LAYOUT);
   }, []);
 
