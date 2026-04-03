@@ -413,9 +413,13 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
               const legacyMode = this._context.globalState.get<string>(
                 'debrief.logPanel.presentationMode'
               );
-              if (legacyMode === 'compact') savedMode = 'compact';
-              else if (legacyMode === 'detailed') savedMode = 'detailed';
-              else savedMode = 'timeline'; // 'normal' maps to default 'timeline'
+              if (legacyMode === 'compact') {
+                savedMode = 'compact';
+              } else if (legacyMode === 'detailed') {
+                savedMode = 'detailed';
+              } else {
+                savedMode = 'timeline'; // 'normal' maps to default 'timeline'
+              }
               // Persist migration so it only happens once
               void this._context.globalState.update('debrief.logPanel.viewMode', savedMode);
               void this._context.globalState.update('debrief.logPanel.presentationMode', undefined);
