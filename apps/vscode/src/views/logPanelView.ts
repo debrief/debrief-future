@@ -27,7 +27,6 @@ import type { ToolParameter } from '../types/tool';
 // Locally-defined types matching @debrief/components LogPanel types.
 // Defined here to avoid ESM-from-CJS import issues with @debrief/components.
 type OperationCategory = 'calculation' | 'import' | 'property-edit' | 'export';
-type PresentationMode = 'compact' | 'normal' | 'detailed';
 interface LogParameterValue {
   value: unknown;
   default: boolean;
