@@ -133,6 +133,8 @@ interface ResultTab {
   imageDataUri?: string;
   /** File metadata for fallback display (artifactType === 'other') */
   fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
+  /** Rendering hint from dataset: 'table' for flat statistics (#177) */
+  displayHint?: 'table' | 'chart';
 }
 
 /** Image file extensions that should render inline */
@@ -803,6 +805,7 @@ export default function App() {
         const tab: ResultTab = {
           id: filePath, title: parsed.title, path: filePath,
           artifactType: 'dataset', dataset: parsed,
+          displayHint: parsed.displayHint,
         };
         setResultTabs(prev => [...prev, tab]);
         setActiveResultTabId(tab.id);
@@ -1118,6 +1121,9 @@ export default function App() {
       artifactType: t.artifactType,
       imageDataUri: t.imageDataUri,
       fileMeta: t.fileMeta,
+      displayHint: t.displayHint,
+      tableData: t.displayHint === 'table' && t.dataset?.data ? t.dataset.data : undefined,
+      isSaved: false,
     }));
     return {
       chartSpec: activeChartSpec,
