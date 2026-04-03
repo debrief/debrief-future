@@ -145,9 +145,9 @@ test.describe('Event Log Propagation', () => {
     await page.locator('.card-flip__inner--flipped [data-testid="edit-face-done"]').click();
     await page.waitForTimeout(200);
 
-    // Verify parameter updated on display face
-    const directionParam = olderEntry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toHaveText('270');
+    // Verify parameter chip value updated on display face
+    const directionChipValue = olderEntry.locator('[data-testid="tune-param-direction"]');
+    await expect(directionChipValue).toContainText('270');
 
     // Allow time for the tune handler to re-execute and propagate
     await page.waitForTimeout(500);
@@ -200,15 +200,15 @@ test.describe('Event Log Propagation', () => {
     await page.locator('.card-flip__inner--flipped [data-testid="edit-face-done"]').click();
     await page.waitForTimeout(200);
 
-    const directionParam = olderEntry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toHaveText('0');
+    const directionChipValue = olderEntry.locator('[data-testid="tune-param-direction"]');
+    await expect(directionChipValue).toContainText('0');
 
     // Both entries should still exist after tuning
     expect(await analysisPage.getLogEntryCount()).toBe(2);
 
     // The newer entry (second move) should still show its original params
     const newerEntry = analysisPage.logEntries.nth(0);
-    const newerDirection = newerEntry.locator('[data-testid="tune-param-direction"]');
-    await expect(newerDirection).toHaveText('90');
+    const newerDirectionChip = newerEntry.locator('[data-testid="tune-param-direction"]');
+    await expect(newerDirectionChip).toContainText('90');
   });
 });

@@ -55,7 +55,7 @@ export function ParameterChip({ chip, className }: ParameterChipProps): React.Re
         </span>
       )}
       <span className="log-panel__chip-name">{chip.name}</span>
-      <span className="log-panel__chip-value">{formatChipValue(chip)}</span>
+      <span className="log-panel__chip-value" data-testid={`tune-param-${chip.name}`}>{formatChipValue(chip)}</span>
       {!chip.isDefault && (
         <span className="log-panel__chip-marker" aria-label="non-default value" title="Non-default value">
           {'\u25CF'}

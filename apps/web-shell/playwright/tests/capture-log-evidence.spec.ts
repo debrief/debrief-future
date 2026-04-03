@@ -120,9 +120,9 @@ test.describe('Evidence screenshots: LogPanel states', () => {
     const entry = analysisPage.logEntries.first();
     await expect(entry).toBeVisible();
 
-    // Ensure tunable params are visible
-    const tunableValues = entry.locator('.log-panel__entry-param-value--tunable');
-    await expect(tunableValues.first()).toBeVisible();
+    // Ensure parameter chips are visible (Feature 176: rich card)
+    const chips = entry.locator('.log-panel__chip');
+    await expect(chips.first()).toBeVisible();
 
     // Screenshot the log panel area
     const logPanel = analysisPage.logPanel;
@@ -187,9 +187,9 @@ test.describe('Evidence screenshots: LogPanel states', () => {
     await page.getByTestId('edit-face-done').click();
     await page.waitForTimeout(200);
 
-    // Verify parameter updated on display face
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toHaveText('10');
+    // Verify parameter chip value updated on display face
+    const distanceChipValue = entry.locator('[data-testid="tune-param-distance_km"]');
+    await expect(distanceChipValue).toContainText('10');
 
     // Tuned badge should appear
     const tunedBadge = entry.locator('[data-testid="badge-tuned"]');
