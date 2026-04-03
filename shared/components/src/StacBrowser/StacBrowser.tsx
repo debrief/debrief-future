@@ -115,7 +115,7 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 6;
+const BROWSER_LAYOUT_VERSION = 7;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
@@ -297,96 +297,25 @@ const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: str
 let sortHeaderRoot: Root | null = null;
 let sortHeaderContainer: HTMLElement | null = null;
 
-// ─── Panel collapse state ───────────────────────────────────────────────────
-// GoldenLayout v2 has no built-in collapse. We implement it by saving the
-// original size, shrinking the stack to header-only height (28px), and
-// triggering a relayout so siblings absorb the freed space.
+// ─── Panel hide/show ────────────────────────────────────────────────────────
+// Instead of pixel-based collapse (which GL v2 doesn't support), we remove
+// hidden panels from the GL tree entirely. GL auto-redistributes space to
+// siblings. Restore buttons appear in the filter bar row.
 
-interface CollapseEntry {
-  savedSize: number;
-  savedSizeUnit: string;
-  btnRoot: Root;
-  btnContainer: HTMLElement;
-  stackEl: HTMLElement;
-}
+/** Panel configs for re-adding removed panels. */
+const PANEL_CONFIGS: Record<string, { type: 'component'; componentType: string; title: string; isClosable: boolean }> = {
+  [PANEL_LIST]: { type: 'component', componentType: PANEL_LIST, title: 'Exercises', isClosable: false },
+  [PANEL_TIMELINE]: { type: 'component', componentType: PANEL_TIMELINE, title: 'Timeline', isClosable: false },
+  [PANEL_MAP]: { type: 'component', componentType: PANEL_MAP, title: 'Map', isClosable: false },
+};
 
-const collapseMap = new Map<string, CollapseEntry>();
-const HEADER_HEIGHT = 28;
+/** Title labels for restore buttons. */
+const PANEL_TITLES: Record<string, string> = {
+  [PANEL_TIMELINE]: 'Timeline',
+  [PANEL_MAP]: 'Map',
+};
 
-/** Access internal size props that GoldenLayout exposes on JS objects but
- *  excludes from TS types. */
-interface SizableItem { size: number; sizeUnit: string; minSize?: number; minSizeUnit?: string; updateSize(force?: boolean): void; }
-function asSizable(item: unknown): SizableItem { return item as SizableItem; }
-
-function isCollapsed(panelType: string): boolean {
-  return collapseMap.has(panelType);
-}
-
-function toggleCollapse(container: ComponentContainer, panelType: string): void {
-  const gl = container.layoutManager;
-  const stack = container.parent.parentItem;  // Stack's parent is Row or Column
-  if (!stack) return;
-
-  const entry = collapseMap.get(panelType);
-  const sizable = asSizable(stack);
-  const stackEl = stack.element;
-
-  if (entry) {
-    // Restore
-    sizable.size = entry.savedSize;
-    sizable.sizeUnit = entry.savedSizeUnit;
-    stackEl.classList.remove('stac-browser__panel-collapsed');
-    collapseMap.delete(panelType);
-  } else {
-    // Collapse — save current size, shrink to header-only
-    const btnEntry = findCollapseEntry(panelType);
-    collapseMap.set(panelType, {
-      savedSize: sizable.size,
-      savedSizeUnit: sizable.sizeUnit,
-      btnRoot: btnEntry?.btnRoot ?? null!,
-      btnContainer: btnEntry?.btnContainer ?? null!,
-      stackEl,
-    });
-    sizable.size = HEADER_HEIGHT;
-    sizable.sizeUnit = 'px';
-    stackEl.classList.add('stac-browser__panel-collapsed');
-  }
-
-  // Trigger relayout so siblings absorb the freed/restored space
-  (gl as unknown as { updateSizeFromContainer(): void }).updateSizeFromContainer();
-  renderAllCollapseButtons();
-}
-
-function findCollapseEntry(panelType: string): CollapseEntry | undefined {
-  return collapseMap.get(panelType);
-}
-
-/** Re-render all collapse button icons to reflect current state. */
-function renderAllCollapseButtons(): void {
-  for (const [, panel] of mountedBrowserPanels) {
-    const entry = collapseBtnRoots.get(panel.type);
-    if (entry) {
-      const collapsed = isCollapsed(panel.type);
-      entry.root.render(
-        <CollapseButton collapsed={collapsed} />,
-      );
-    }
-  }
-}
-
-const collapseBtnRoots = new Map<string, { root: Root; container: HTMLElement }>();
-
-/** Collapse/expand chevron button for panel headers. */
-const CollapseButton: React.FC<{ collapsed: boolean }> = ({ collapsed }) => (
-  <button
-    type="button"
-    className="stac-browser__collapse-btn"
-    title={collapsed ? 'Expand panel' : 'Collapse panel'}
-    data-testid="panel-collapse-btn"
-  >
-    {collapsed ? '\u25B6' : '\u25BC'}
-  </button>
-);
+const hideBtnRoots = new Map<string, { root: Root; container: HTMLElement }>();
 
 /** Sort dimension labels for the dropdown. */
 const SORT_LABELS: Record<SortDimension, string> = {
@@ -612,6 +541,18 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
   const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
 
+  // ─── Hidden panels (removed from GL, restore via filter bar buttons) ──────
+  const [hiddenPanels, setHiddenPanels] = useState<Set<string>>(new Set());
+
+  const restorePanel = useCallback((panelType: string) => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const config = PANEL_CONFIGS[panelType];
+    if (!config) return;
+    gl.addItem(config);
+    setHiddenPanels(prev => { const next = new Set(prev); next.delete(panelType); return next; });
+  }, []);
+
   // ─── Filter state ──────────────────────────────────────────────────────────
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
   const [viewport, setViewport] = useState<ViewportPolygon | null>(null);
@@ -729,7 +670,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       mountedBrowserPanels.set(container, { root, type: componentType });
       root.render(renderPanel(componentType));
 
-      // Inject header controls (sort dropdown for Exercises, collapse button for all)
+      // Inject header controls (sort dropdown for Exercises, hide button for Timeline/Map)
       const injectHeaderControls = () => {
         try {
           const headerEl = container.tab?.element?.closest('.lm_header');
@@ -748,18 +689,28 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             renderSortHeader();
           }
 
-          // Collapse button — for all panels
-          if (!collapseBtnRoots.has(componentType)) {
+          // Hide button — only for Timeline and Map panels
+          if ((componentType === PANEL_TIMELINE || componentType === PANEL_MAP) && !hideBtnRoots.has(componentType)) {
             const btnLi = document.createElement('li');
-            btnLi.className = 'stac-browser__collapse-btn-li';
+            btnLi.className = 'stac-browser__hide-btn-li';
             btnLi.addEventListener('click', (e) => {
               e.stopPropagation();
-              toggleCollapse(container, componentType);
+              // Remove the Stack from GoldenLayout — GL auto-redistributes space
+              const componentItem = container.parent;
+              const stack = componentItem?.parentItem;
+              if (stack) {
+                stack.remove();
+              }
+              setHiddenPanels(prev => new Set(prev).add(componentType));
             });
             controlsEl.insertBefore(btnLi, controlsEl.firstChild);
             const btnRoot = createRoot(btnLi);
-            collapseBtnRoots.set(componentType, { root: btnRoot, container: btnLi });
-            btnRoot.render(<CollapseButton collapsed={false} />);
+            hideBtnRoots.set(componentType, { root: btnRoot, container: btnLi });
+            btnRoot.render(
+              <button type="button" className="stac-browser__hide-btn" title={`Hide ${PANEL_TITLES[componentType]} panel`}>
+                {'\u2212'}
+              </button>,
+            );
           }
         } catch { /* tab not ready yet */ }
       };
@@ -810,9 +761,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       mountedBrowserPanels.clear();
       if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
       sortHeaderContainer = null;
-      for (const [, entry] of collapseBtnRoots) { entry.root.unmount(); }
-      collapseBtnRoots.clear();
-      collapseMap.clear();
+      for (const [, entry] of hideBtnRoots) { entry.root.unmount(); }
+      hideBtnRoots.clear();
       gl.destroy();
       glRef.current = null;
     };
@@ -823,9 +773,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     const gl = glRef.current;
     if (!gl) return;
     clearBrowserLayout();
-    collapseMap.clear();
-    for (const [, entry] of collapseBtnRoots) { entry.root.unmount(); }
-    collapseBtnRoots.clear();
+    for (const [, entry] of hideBtnRoots) { entry.root.unmount(); }
+    hideBtnRoots.clear();
+    setHiddenPanels(new Set());
     gl.loadLayout(BROWSER_DEFAULT_LAYOUT);
   }, []);
 
@@ -854,6 +804,28 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
         >
           Reset Layout
         </button>
+        {hiddenPanels.has(PANEL_TIMELINE) && (
+          <button
+            type="button"
+            className="stac-browser__restore-btn"
+            onClick={() => restorePanel(PANEL_TIMELINE)}
+            title="Show Timeline panel"
+            data-testid="restore-timeline"
+          >
+            + Timeline
+          </button>
+        )}
+        {hiddenPanels.has(PANEL_MAP) && (
+          <button
+            type="button"
+            className="stac-browser__restore-btn"
+            onClick={() => restorePanel(PANEL_MAP)}
+            title="Show Map panel"
+            data-testid="restore-map"
+          >
+            + Map
+          </button>
+        )}
       </div>
 
       {/* GoldenLayout container for the 3 panels */}
