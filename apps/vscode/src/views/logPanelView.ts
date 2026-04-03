@@ -34,20 +34,20 @@ interface LogParameterValue {
   tunable: boolean;
 }
 interface TimelineEntry {
-  activityId: string;
+  activity_id: string;
   timestamp: string;
   toolName: string;
-  toolVersion: string;
+  tool_version: string;
   parameters: Record<string, LogParameterValue>;
   usedFeatureIds: string[];
   generatedFeatureIds: string[];
-  executionDuration: string;
-  generatedResultId: string | null;
+  execution_duration: string;
+  generated_result_id: string | null;
   operationCategory: OperationCategory;
   deleted?: boolean;
   disabled?: boolean;
   rationale?: string | null;
-  tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
+  tuneAnnotation?: { parameter: string; previous_value: unknown; new_value: unknown } | null;
 }
 
 // Locally-defined ParameterSchemaEntry matching @debrief/components LogPanel types.
@@ -67,7 +67,7 @@ interface ParameterSchemaEntry {
 // Webview → Extension messages
 interface EntrySelectMessage {
   type: 'entry:select';
-  payload: { activityId: string; featureIds: string[] };
+  payload: { activity_id: string; featureIds: string[] };
 }
 
 interface EntryDeselectMessage {
@@ -76,7 +76,7 @@ interface EntryDeselectMessage {
 
 interface ActionInvokeMessage {
   type: 'action:invoke';
-  payload: { actionType: string; activityId: string };
+  payload: { actionType: string; activity_id: string };
 }
 
 interface ModeChangeMessage {
@@ -91,22 +91,22 @@ interface WebviewReadyMessage {
 // Phase 6 messages (Feature: 076-replay-tune)
 interface TuneRequestMessage {
   type: 'tune:request';
-  payload: { activityId: string; parameter: string; newValue: unknown };
+  payload: { activity_id: string; parameter: string; new_value: unknown };
 }
 
 interface RevertToRequestMessage {
   type: 'revert-to:request';
-  payload: { activityId: string };
+  payload: { activity_id: string };
 }
 
 interface RevertThisRequestMessage {
   type: 'revert-this:request';
-  payload: { activityId: string };
+  payload: { activity_id: string };
 }
 
 interface RestoreRequestMessage {
   type: 'restore:request';
-  payload: { activityId: string };
+  payload: { activity_id: string };
 }
 
 interface ReplayCancelMessage {
@@ -116,12 +116,12 @@ interface ReplayCancelMessage {
 // Feature 113: flip-card edit messages
 interface DisableToggleMessage {
   type: 'disable:toggle';
-  payload: { activityId: string; disabled: boolean };
+  payload: { activity_id: string; disabled: boolean };
 }
 
 interface RationaleUpdateMessage {
   type: 'rationale:update';
-  payload: { activityId: string; rationale: string };
+  payload: { activity_id: string; rationale: string };
 }
 
 interface SchemaRequestMessage {
@@ -167,21 +167,21 @@ function classifyOperation(toolId: string): OperationCategory {
  */
 function toTimelineEntry(entry: LogEntry): TimelineEntry {
   return {
-    activityId: entry.activityId,
+    activity_id: entry.activity_id,
     timestamp: entry.timestamp,
-    toolName: entry.wasGeneratedBy.tool,
-    toolVersion: entry.wasGeneratedBy.toolVersion,
-    parameters: entry.wasGeneratedBy.parameters as { [k: string]: LogParameterValue },
+    toolName: entry.was_generated_by.tool,
+    tool_version: entry.was_generated_by.tool_version,
+    parameters: entry.was_generated_by.parameters as { [k: string]: LogParameterValue },
     usedFeatureIds: entry.used,
     generatedFeatureIds: entry.generated,
-    executionDuration: entry.executionDuration,
-    generatedResultId: entry.generatedResultId ?? null,
-    operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
+    execution_duration: entry.execution_duration,
+    generated_result_id: entry.generated_result_id ?? null,
+    operationCategory: classifyOperation(entry.was_generated_by.tool),
     deleted: entry.deleted === true,
     disabled: entry.disabled === true,
     rationale: entry.rationale ?? null,
     tuneAnnotation: entry.tune
-      ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
+      ? { parameter: entry.tune.parameter, previous_value: entry.tune.previous_value, new_value: entry.tune.new_value }
       : null,
   };
 }
@@ -560,9 +560,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // ─── Phase 6 handlers (Feature: 076-replay-tune) ──────────────────
 
   private async _handleTuneRequest(payload: {
-    activityId: string;
+    activity_id: string;
     parameter: string;
-    newValue: unknown;
+    new_value: unknown;
   }): Promise<void> {
     if (!this._assertLogServiceReady('tune:request')) { return; }
     const storePath = this._getStorePath!();
@@ -574,7 +574,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       const result = await this._logService!.tuneEntry(
         storePath, itemPath,
-        payload.activityId, payload.parameter, payload.newValue
+        payload.activity_id, payload.parameter, payload.new_value
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -589,7 +589,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _handleRevertToRequest(payload: {
-    activityId: string;
+    activity_id: string;
   }): Promise<void> {
     if (!this._assertLogServiceReady('revert-to:request')) { return; }
     const storePath = this._getStorePath!();
@@ -599,7 +599,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      await this._logService!.revertTo(storePath, itemPath, payload.activityId);
+      await this._logService!.revertTo(storePath, itemPath, payload.activity_id);
       this._postMessage({
         type: 'action:result',
         payload: {
@@ -619,7 +619,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _handleRevertThisRequest(payload: {
-    activityId: string;
+    activity_id: string;
   }): Promise<void> {
     if (!this._assertLogServiceReady('revert-this:request')) { return; }
     const storePath = this._getStorePath!();
@@ -630,7 +630,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
     try {
       const result = await this._logService!.revertThis(
-        storePath, itemPath, payload.activityId
+        storePath, itemPath, payload.activity_id
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -644,7 +644,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _handleRestoreRequest(payload: {
-    activityId: string;
+    activity_id: string;
   }): Promise<void> {
     if (!this._assertLogServiceReady('restore:request')) { return; }
     const storePath = this._getStorePath!();
@@ -655,7 +655,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
     try {
       const result = await this._logService!.restoreEntry(
-        storePath, itemPath, payload.activityId
+        storePath, itemPath, payload.activity_id
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -670,8 +670,8 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   private _sendReplayResult(result: ReplayResult): void {
     // Update Result ID Registry from replay artifacts (Feature: 087)
-    if (this._resultIdRegistry && result.artifactsCreated.length > 0) {
-      this._resultIdRegistry.registerFromReplayResult(result.artifactsCreated);
+    if (this._resultIdRegistry && result.artifacts_created.length > 0) {
+      this._resultIdRegistry.registerFromReplayResult(result.artifacts_created);
     }
 
     this._postMessage({
@@ -707,7 +707,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         payload: {
           actionType: 'snapshot',
           available: false,
-          message: `Snapshot created: ${result.snapshotAsset} (${result.entriesCaptured} entries captured).`,
+          message: `Snapshot created: ${result.snapshot_asset} (${result.entries_captured} entries captured).`,
         },
       });
       await this._sendTimelineUpdate();
@@ -728,7 +728,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // ─── Feature 113: Flip-card edit handlers ──────────────────────────
 
   private async _handleDisableToggle(payload: {
-    activityId: string;
+    activity_id: string;
     disabled: boolean;
   }): Promise<void> {
     if (!this._assertLogServiceReady('disable:toggle')) { return; }
@@ -741,7 +741,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       await this._logService!.disableEntry(
         storePath, itemPath,
-        payload.activityId, payload.disabled
+        payload.activity_id, payload.disabled
       );
       await this._sendTimelineUpdate();
     } catch (err) {
@@ -753,7 +753,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _handleRationaleUpdate(payload: {
-    activityId: string;
+    activity_id: string;
     rationale: string;
   }): Promise<void> {
     if (!this._assertLogServiceReady('rationale:update')) { return; }
@@ -766,7 +766,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       await this._logService!.setRationale(
         storePath, itemPath,
-        payload.activityId, payload.rationale
+        payload.activity_id, payload.rationale
       );
       // No timeline update needed — rationale is metadata only
     } catch (err) {

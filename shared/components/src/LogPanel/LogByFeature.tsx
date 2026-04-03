@@ -44,7 +44,7 @@ export function LogByFeature({
   // still show their overall step number.
   const stepIndexMap = useMemo(() => {
     const map = new Map<string, number>();
-    entries.forEach((e, i) => { map.set(e.activityId, i + 1); });
+    entries.forEach((e, i) => { map.set(e.activity_id, i + 1); });
     return map;
   }, [entries]);
 
@@ -55,26 +55,26 @@ export function LogByFeature({
       role="list"
     >
       {groups.map((group) => (
-        <div key={group.featureId} className="log-panel__feature-group">
-          <div className="log-panel__feature-heading" data-testid={`feature-group-${group.featureId}`}>
+        <div key={group.feature_id} className="log-panel__feature-group">
+          <div className="log-panel__feature-heading" data-testid={`feature-group-${group.feature_id}`}>
             {group.displayName}
           </div>
           {group.entries.map((entry) => (
             <LogEntry
-              key={`${group.featureId}-${entry.activityId}`}
+              key={`${group.feature_id}-${entry.activity_id}`}
               entry={entry}
-              stepIndex={stepIndexMap.get(entry.activityId)}
+              stepIndex={stepIndexMap.get(entry.activity_id)}
               featureNames={featureNames}
               presentationMode={presentationMode}
-              isSelected={entry.activityId === selectedEntryId}
+              isSelected={entry.activity_id === selectedEntryId}
               onClick={onEntryClick}
               onTuneClick={onTuneClick}
               onRestoreClick={onRestoreClick}
-              isEditing={editingActivityId === entry.activityId}
-              schema={editingActivityId === entry.activityId ? editingSchema : undefined}
-              schemaLoading={editingActivityId === entry.activityId ? schemaLoading : false}
-              schemaError={editingActivityId === entry.activityId ? schemaError : null}
-              rationaleRef={editingActivityId === entry.activityId ? rationaleRef : undefined}
+              isEditing={editingActivityId === entry.activity_id}
+              schema={editingActivityId === entry.activity_id ? editingSchema : undefined}
+              schemaLoading={editingActivityId === entry.activity_id ? schemaLoading : false}
+              schemaError={editingActivityId === entry.activity_id ? schemaError : null}
+              rationaleRef={editingActivityId === entry.activity_id ? rationaleRef : undefined}
               onEditClick={onEditClick}
               onDoneClick={onDoneClick}
               onParameterChange={onParameterChange}

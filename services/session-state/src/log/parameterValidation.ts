@@ -71,7 +71,7 @@ export function validateParameter(
     }
 
     case 'enum': {
-      const allowed = typeInfo.allowedValues ?? [];
+      const allowed = typeInfo.allowed_values ?? [];
       if (!allowed.includes(String(value))) {
         return {
           valid: false,

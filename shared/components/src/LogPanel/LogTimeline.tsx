@@ -40,20 +40,20 @@ export function LogTimeline({
     >
       {entries.map((entry, idx) => (
         <LogEntry
-          key={entry.activityId}
+          key={entry.activity_id}
           entry={entry}
           stepIndex={idx + 1}
           featureNames={featureNames}
           presentationMode={presentationMode}
-          isSelected={entry.activityId === selectedEntryId}
+          isSelected={entry.activity_id === selectedEntryId}
           onClick={onEntryClick}
           onTuneClick={onTuneClick}
           onRestoreClick={onRestoreClick}
-          isEditing={editingActivityId === entry.activityId}
-          schema={editingActivityId === entry.activityId ? editingSchema : undefined}
-          schemaLoading={editingActivityId === entry.activityId ? schemaLoading : false}
-          schemaError={editingActivityId === entry.activityId ? schemaError : null}
-          rationaleRef={editingActivityId === entry.activityId ? rationaleRef : undefined}
+          isEditing={editingActivityId === entry.activity_id}
+          schema={editingActivityId === entry.activity_id ? editingSchema : undefined}
+          schemaLoading={editingActivityId === entry.activity_id ? schemaLoading : false}
+          schemaError={editingActivityId === entry.activity_id ? schemaError : null}
+          rationaleRef={editingActivityId === entry.activity_id ? rationaleRef : undefined}
           onEditClick={onEditClick}
           onDoneClick={onDoneClick}
           onParameterChange={onParameterChange}

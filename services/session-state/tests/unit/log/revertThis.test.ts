@@ -14,48 +14,48 @@ function makeFeatureCollection() {
         type: 'Feature',
         geometry: null,
         properties: {
-          featureId: 'track-alpha',
+          feature_id: 'track-alpha',
           provenance: [
             {
-              activityId: 'act-001',
+              activity_id: 'act-001',
               timestamp: '2026-02-01T10:00:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-range',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-001'],
-              executionDuration: 'PT0.5S',
-              generatedResultId: null,
+              execution_duration: 'PT0.5S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-002',
+              activity_id: 'act-002',
               timestamp: '2026-02-01T10:05:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-bearing',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-002'],
-              executionDuration: 'PT0.3S',
-              generatedResultId: null,
+              execution_duration: 'PT0.3S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-003',
+              activity_id: 'act-003',
               timestamp: '2026-02-01T10:10:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-speed',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-003'],
-              executionDuration: 'PT0.2S',
-              generatedResultId: null,
+              execution_duration: 'PT0.2S',
+              generated_result_id: null,
               tune: null,
             },
           ],
@@ -71,7 +71,7 @@ function makeFeatureCollectionWithDeleted() {
   const prov = (
     fc.features[0].properties as Record<string, unknown>
   ).provenance as Array<Record<string, unknown>>;
-  const entry = prov.find((e) => e.activityId === 'act-002');
+  const entry = prov.find((e) => e.activity_id === 'act-002');
   if (entry) {
     entry.deleted = true;
   }
@@ -86,7 +86,7 @@ function makeDeps(overrides?: Partial<LogServiceDeps>): LogServiceDeps {
     writeGeoJson: vi.fn().mockResolvedValue(undefined),
     executeTool: vi
       .fn()
-      .mockResolvedValue({ success: true, durationMs: 100 }),
+      .mockResolvedValue({ success: true, duration_ms: 100 }),
     loadSnapshot: vi.fn().mockResolvedValue(null),
     resolveToolVersion: vi.fn().mockResolvedValue('1.0.0'),
     ...overrides,
@@ -104,7 +104,7 @@ describe('LogService.revertThis', () => {
     // The remaining timeline from act-002 index is [act-002, act-003]
     // act-002 is deleted so only act-003 is replayed
     expect(result.status).toBe('completed');
-    expect(result.entriesReplayed).toBe(1); // only act-003
+    expect(result.entries_replayed).toBe(1); // only act-003
     expect(deps.executeTool).toHaveBeenCalled();
   });
 
@@ -115,22 +115,22 @@ describe('LogService.revertThis', () => {
     const result = await service.revertThis('/store', 'item.json', 'act-002');
 
     expect(result.status).toBe('completed');
-    expect(result.haltReason).toBeNull();
+    expect(result.halt_reason).toBeNull();
   });
 
   it('halts when tool execution fails', async () => {
     const deps = makeDeps({
       executeTool: vi
         .fn()
-        .mockResolvedValue({ success: false, durationMs: 50 }),
+        .mockResolvedValue({ success: false, duration_ms: 50 }),
     });
     const service = createLogService(deps);
 
     const result = await service.revertThis('/store', 'item.json', 'act-002');
 
     expect(result.status).toBe('halted');
-    expect(result.haltReason).not.toBeNull();
-    expect(result.haltReason!.type).toBe('execution-error');
+    expect(result.halt_reason).not.toBeNull();
+    expect(result.halt_reason!.type).toBe('execution-error');
   });
 });
 
@@ -151,7 +151,7 @@ describe('LogService.restoreEntry', () => {
 
     expect(result.status).toBe('completed');
     // Replay from act-002 onward: act-002 (restored, not deleted) and act-003
-    expect(result.entriesReplayed).toBe(2);
+    expect(result.entries_replayed).toBe(2);
     expect(deps.executeTool).toHaveBeenCalledTimes(2);
   });
 
@@ -170,7 +170,7 @@ describe('LogService.restoreEntry', () => {
     );
 
     expect(result.status).toBe('completed');
-    expect(result.haltReason).toBeNull();
-    expect(result.entriesReplayed).toBeGreaterThan(0);
+    expect(result.halt_reason).toBeNull();
+    expect(result.entries_replayed).toBeGreaterThan(0);
   });
 });

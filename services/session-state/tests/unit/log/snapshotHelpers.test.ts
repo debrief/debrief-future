@@ -19,20 +19,20 @@ describe('findSystemRecord', () => {
     const fc: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
-        { type: 'Feature', geometry: null, properties: { featureType: 'track' } },
-        { type: 'Feature', geometry: null, properties: { featureType: 'system', snapshotLinks: null } },
+        { type: 'Feature', geometry: null, properties: { feature_type: 'track' } },
+        { type: 'Feature', geometry: null, properties: { feature_type: 'system', snapshot_links: null } },
       ],
     };
     const result = findSystemRecord(fc);
     expect(result).not.toBeNull();
-    expect(result!.properties!.featureType).toBe('system');
+    expect(result!.properties!.feature_type).toBe('system');
   });
 
   it('returns null when no system record exists', () => {
     const fc: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
-        { type: 'Feature', geometry: null, properties: { featureType: 'track' } },
+        { type: 'Feature', geometry: null, properties: { feature_type: 'track' } },
       ],
     };
     expect(findSystemRecord(fc)).toBeNull();
@@ -49,10 +49,10 @@ describe('createSystemRecord', () => {
     expect(record.type).toBe('Feature');
     expect(record.geometry).toEqual({ type: 'Point', coordinates: [] });
     expect(record.properties).toEqual({
-      featureType: 'system',
-      snapshotLinks: null,
+      feature_type: 'system',
+      snapshot_links: null,
       branches: [],
-      branchOrigin: null,
+      branch_origin: null,
       provenance: [],
     });
   });
@@ -66,7 +66,7 @@ describe('stripSpatialProvenance', () => {
         {
           type: 'Feature',
           geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
-          properties: { featureType: 'track', provenance: [{ activityId: 'a1' }] },
+          properties: { feature_type: 'track', provenance: [{ activity_id: 'a1' }] },
         },
       ],
     };
@@ -75,19 +75,19 @@ describe('stripSpatialProvenance', () => {
   });
 
   it('preserves system record provenance', () => {
-    const systemProv = [{ activityId: 'snap-1', type: 'snapshot' }];
+    const systemProv = [{ activity_id: 'snap-1', type: 'snapshot' }];
     const fc: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
         {
           type: 'Feature',
           geometry: null,
-          properties: { featureType: 'system', provenance: systemProv },
+          properties: { feature_type: 'system', provenance: systemProv },
         },
         {
           type: 'Feature',
           geometry: null,
-          properties: { featureType: 'track', provenance: [{ activityId: 'a1' }] },
+          properties: { feature_type: 'track', provenance: [{ activity_id: 'a1' }] },
         },
       ],
     };
@@ -103,12 +103,12 @@ describe('stripSpatialProvenance', () => {
         {
           type: 'Feature',
           geometry: null,
-          properties: { featureType: 'track', provenance: [{ activityId: 'a1' }] },
+          properties: { feature_type: 'track', provenance: [{ activity_id: 'a1' }] },
         },
       ],
     };
     const clean = stripSpatialProvenance(fc);
-    expect(fc.features[0].properties!.provenance).toEqual([{ activityId: 'a1' }]);
+    expect(fc.features[0].properties!.provenance).toEqual([{ activity_id: 'a1' }]);
     expect(clean.features[0].properties!.provenance).toEqual([]);
   });
 
@@ -132,12 +132,12 @@ describe('countLogEntries', () => {
         {
           type: 'Feature',
           geometry: null,
-          properties: { provenance: [{ activityId: 'a1' }, { activityId: 'a2' }] },
+          properties: { provenance: [{ activity_id: 'a1' }, { activity_id: 'a2' }] },
         },
         {
           type: 'Feature',
           geometry: null,
-          properties: { provenance: [{ activityId: 'a2' }, { activityId: 'a3' }] },
+          properties: { provenance: [{ activity_id: 'a2' }, { activity_id: 'a3' }] },
         },
       ],
     };
@@ -151,12 +151,12 @@ describe('countLogEntries', () => {
         {
           type: 'Feature',
           geometry: null,
-          properties: { featureType: 'system', provenance: [{ activityId: 'sys-1' }] },
+          properties: { feature_type: 'system', provenance: [{ activity_id: 'sys-1' }] },
         },
         {
           type: 'Feature',
           geometry: null,
-          properties: { provenance: [{ activityId: 'a1' }] },
+          properties: { provenance: [{ activity_id: 'a1' }] },
         },
       ],
     };
@@ -174,7 +174,7 @@ describe('countLogEntries', () => {
         {
           type: 'Feature',
           geometry: null,
-          properties: { provenance: { activityId: 'legacy-1' } },
+          properties: { provenance: { activity_id: 'legacy-1' } },
         },
       ],
     };
@@ -212,12 +212,12 @@ describe('normaliseProvenance', () => {
   });
 
   it('returns array as-is', () => {
-    const arr = [{ activityId: 'a1' }];
+    const arr = [{ activity_id: 'a1' }];
     expect(normaliseProvenance(arr)).toBe(arr);
   });
 
   it('wraps single object in array', () => {
-    const obj = { activityId: 'a1' };
+    const obj = { activity_id: 'a1' };
     expect(normaliseProvenance(obj)).toEqual([obj]);
   });
 });
@@ -232,9 +232,9 @@ describe('trimProvenanceAfterEntry', () => {
           geometry: null,
           properties: {
             provenance: [
-              { activityId: 'a1', timestamp: '2026-01-01T10:00:00Z' },
-              { activityId: 'a2', timestamp: '2026-01-01T11:00:00Z' },
-              { activityId: 'a3', timestamp: '2026-01-01T12:00:00Z' },
+              { activity_id: 'a1', timestamp: '2026-01-01T10:00:00Z' },
+              { activity_id: 'a2', timestamp: '2026-01-01T11:00:00Z' },
+              { activity_id: 'a3', timestamp: '2026-01-01T12:00:00Z' },
             ],
           },
         },
@@ -245,7 +245,7 @@ describe('trimProvenanceAfterEntry', () => {
     expect(result.entriesBefore).toBe(2); // a1, a2
     expect(result.entriesAfter).toBe(1);  // a3
     expect(fc.features[0].properties!.provenance).toEqual([
-      { activityId: 'a3', timestamp: '2026-01-01T12:00:00Z' },
+      { activity_id: 'a3', timestamp: '2026-01-01T12:00:00Z' },
     ]);
   });
 
@@ -267,8 +267,8 @@ describe('trimProvenanceAfterEntry', () => {
           type: 'Feature',
           geometry: null,
           properties: {
-            featureType: 'system',
-            provenance: [{ activityId: 'sys-1', type: 'snapshot', timestamp: '2026-01-01T09:00:00Z' }],
+            feature_type: 'system',
+            provenance: [{ activity_id: 'sys-1', type: 'snapshot', timestamp: '2026-01-01T09:00:00Z' }],
           },
         },
         {
@@ -276,8 +276,8 @@ describe('trimProvenanceAfterEntry', () => {
           geometry: null,
           properties: {
             provenance: [
-              { activityId: 'a1', timestamp: '2026-01-01T10:00:00Z' },
-              { activityId: 'a2', timestamp: '2026-01-01T11:00:00Z' },
+              { activity_id: 'a1', timestamp: '2026-01-01T10:00:00Z' },
+              { activity_id: 'a2', timestamp: '2026-01-01T11:00:00Z' },
             ],
           },
         },
@@ -287,11 +287,11 @@ describe('trimProvenanceAfterEntry', () => {
     trimProvenanceAfterEntry(fc, 'a1');
     // System record provenance should be untouched
     expect(fc.features[0].properties!.provenance).toEqual([
-      { activityId: 'sys-1', type: 'snapshot', timestamp: '2026-01-01T09:00:00Z' },
+      { activity_id: 'sys-1', type: 'snapshot', timestamp: '2026-01-01T09:00:00Z' },
     ]);
     // Spatial feature should only have entries after a1
     expect(fc.features[1].properties!.provenance).toEqual([
-      { activityId: 'a2', timestamp: '2026-01-01T11:00:00Z' },
+      { activity_id: 'a2', timestamp: '2026-01-01T11:00:00Z' },
     ]);
   });
 });

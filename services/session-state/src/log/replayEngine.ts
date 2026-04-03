@@ -73,7 +73,7 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
       let startIndex = 0;
       if (tuneTarget) {
         const tuneIdx = timeline.findIndex(
-          (e) => e.activityId === tuneTarget.activityId
+          (e) => e.activity_id === tuneTarget.activity_id
         );
         if (tuneIdx >= 0) {
           startIndex = tuneIdx;
@@ -84,36 +84,36 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
       const entries: ReplayEntry[] = [];
       for (let i = startIndex; i < timeline.length; i++) {
         const entry = timeline[i]!;
-        if (deletedSet.has(entry.activityId)) continue;
+        if (deletedSet.has(entry.activity_id)) continue;
         if (entry.disabled === true) continue;
 
         const rawParams = unwrapParameters(
-          entry.wasGeneratedBy.parameters as Record<string, unknown>
+          entry.was_generated_by.parameters as Record<string, unknown>
         );
 
         // If this is the tune target entry, apply the new parameter value
         const isTune =
-          tuneTarget !== null && entry.activityId === tuneTarget.activityId;
+          tuneTarget !== null && entry.activity_id === tuneTarget.activity_id;
         if (isTune) {
-          rawParams[tuneTarget.parameter] = tuneTarget.newValue;
+          rawParams[tuneTarget.parameter] = tuneTarget.new_value;
         }
 
         entries.push({
-          activityId: entry.activityId,
+          activity_id: entry.activity_id,
           timestamp: entry.timestamp,
-          toolId: entry.wasGeneratedBy.tool,
-          toolVersion: entry.wasGeneratedBy.toolVersion,
+          tool_id: entry.was_generated_by.tool,
+          tool_version: entry.was_generated_by.tool_version,
           parameters: rawParams,
-          featureIds: [...entry.used],
-          isTuneTarget: isTune,
+          feature_ids: [...entry.used],
+          is_tune_target: isTune,
         });
       }
 
       return {
-        startFromSnapshot: snapshotAsset,
+        start_from_snapshot: snapshotAsset,
         entries,
-        tuneTarget,
-        preReplayState: deepClone(currentState),
+        tune_target: tuneTarget,
+        pre_replay_state: deepClone(currentState),
       };
     },
 
@@ -123,22 +123,22 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
       const totalEntries = plan.entries.length;
 
       // Phase 1: Load snapshot if needed
-      if (plan.startFromSnapshot) {
+      if (plan.start_from_snapshot) {
         if (deps.signal.aborted) {
           return {
             status: 'cancelled',
-            entriesReplayed: 0,
-            totalEntries,
-            haltReason: null,
-            tuneAnnotation: null,
-            artifactsCreated: [],
+            entries_replayed: 0,
+            total_entries: totalEntries,
+            halt_reason: null,
+            tune_annotation: null,
+            artifacts_created: [],
           };
         }
 
-        deps.onProgress({
+        deps.on_progress({
           current: 0,
           total: totalEntries,
-          currentToolId: '',
+          current_tool_id: '',
           phase: 'loading-snapshot',
         });
 
@@ -152,11 +152,11 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
         if (deps.signal.aborted) {
           return {
             status: 'cancelled',
-            entriesReplayed,
-            totalEntries,
-            haltReason: null,
-            tuneAnnotation: null,
-            artifactsCreated,
+            entries_replayed: entriesReplayed,
+            total_entries: totalEntries,
+            halt_reason: null,
+            tune_annotation: null,
+            artifacts_created: artifactsCreated,
           };
         }
 
@@ -166,68 +166,68 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
         // "0.0.0" is the fallback placeholder used when the recording side
         // didn't know the real version (e.g. MCP annotations missing).
         // Treat it as "any version" so replay isn't blocked.
-        const installedVersion = await deps.resolveToolVersion(entry.toolId);
+        const installedVersion = await deps.resolve_tool_version(entry.tool_id);
         if (
           installedVersion !== null &&
-          installedVersion !== entry.toolVersion &&
-          entry.toolVersion !== '0.0.0'
+          installedVersion !== entry.tool_version &&
+          entry.tool_version !== '0.0.0'
         ) {
           return {
             status: 'halted',
-            entriesReplayed,
-            totalEntries,
-            haltReason: {
+            entries_replayed: entriesReplayed,
+            total_entries: totalEntries,
+            halt_reason: {
               type: 'version-mismatch',
-              entryActivityId: entry.activityId,
-              toolId: entry.toolId,
-              message: `Tool "${entry.toolId}" version mismatch: expected ${entry.toolVersion}, installed ${installedVersion}`,
+              entry_activity_id: entry.activity_id,
+              tool_id: entry.tool_id,
+              message: `Tool "${entry.tool_id}" version mismatch: expected ${entry.tool_version}, installed ${installedVersion}`,
             },
-            tuneAnnotation: null,
-            artifactsCreated,
+            tune_annotation: null,
+            artifacts_created: artifactsCreated,
           };
         }
 
         // Report progress
-        deps.onProgress({
+        deps.on_progress({
           current: i + 1,
           total: totalEntries,
-          currentToolId: entry.toolId,
+          current_tool_id: entry.tool_id,
           phase: 'replaying',
         });
 
         // Execute the tool, passing the original activityId so the callee
         // can stamp it on output provenance (prevents duplicate timeline entries).
-        const result = await deps.executeTool(
-          entry.toolId,
-          entry.featureIds,
+        const result = await deps.execute_tool(
+          entry.tool_id,
+          entry.feature_ids,
           entry.parameters,
-          entry.activityId,
+          entry.activity_id,
           entry.timestamp
         );
 
         if (!result.success) {
           return {
             status: 'halted',
-            entriesReplayed,
-            totalEntries,
-            haltReason: {
+            entries_replayed: entriesReplayed,
+            total_entries: totalEntries,
+            halt_reason: {
               type: 'execution-error',
-              entryActivityId: entry.activityId,
-              toolId: entry.toolId,
-              message: `Tool "${entry.toolId}" execution failed during replay`,
+              entry_activity_id: entry.activity_id,
+              tool_id: entry.tool_id,
+              message: `Tool "${entry.tool_id}" execution failed during replay`,
             },
-            tuneAnnotation: null,
-            artifactsCreated,
+            tune_annotation: null,
+            artifacts_created: artifactsCreated,
           };
         }
 
         // Track artifacts
-        if (result.artifactHref && result.resultId) {
+        if (result.artifact_href && result.result_id) {
           artifactsCreated.push({
-            resultId: result.resultId,
+            result_id: result.result_id,
             version: artifactsCreated.length + 1,
-            path: result.artifactHref,
-            previousPath: '',
+            path: result.artifact_href,
+            previous_path: '',
           });
         }
 
@@ -235,31 +235,31 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
       }
 
       // Phase 3: Finalise
-      deps.onProgress({
+      deps.on_progress({
         current: totalEntries,
         total: totalEntries,
-        currentToolId: '',
+        current_tool_id: '',
         phase: 'finalising',
       });
 
       // Build tune annotation if there was a tune target
       let tuneAnnotation: TuneAnnotation | null = null;
-      if (plan.tuneTarget) {
+      if (plan.tune_target) {
         tuneAnnotation = {
           timestamp: new Date().toISOString(),
-          parameter: plan.tuneTarget.parameter,
-          previousValue: plan.tuneTarget.previousValue,
-          newValue: plan.tuneTarget.newValue,
+          parameter: plan.tune_target.parameter,
+          previous_value: plan.tune_target.previous_value,
+          new_value: plan.tune_target.new_value,
         };
       }
 
       return {
         status: 'completed',
-        entriesReplayed,
-        totalEntries,
-        haltReason: null,
-        tuneAnnotation,
-        artifactsCreated,
+        entries_replayed: entriesReplayed,
+        total_entries: totalEntries,
+        halt_reason: null,
+        tune_annotation: tuneAnnotation,
+        artifacts_created: artifactsCreated,
       };
     },
   };

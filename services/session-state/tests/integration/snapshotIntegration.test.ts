@@ -219,16 +219,16 @@ function createWorkingGeoJson(entryCount: number, featureCount: number = 2): Geo
     const provenance: unknown[] = [];
     for (let ei = 0; ei < entryCount; ei++) {
       provenance.push({
-        activityId: `act-${ei + 1}`,
+        activity_id: `act-${ei + 1}`,
         timestamp: `2026-02-09T10:${String(ei).padStart(2, '0')}:00.000Z`,
-        wasGeneratedBy: {
+        was_generated_by: {
           tool: `tool-${ei + 1}`,
-          toolVersion: '1.0.0',
+          tool_version: '1.0.0',
           parameters: {},
         },
         used: [`track-${fi + 1}`],
         generated: [],
-        executionDuration: 'PT1S',
+        execution_duration: 'PT1S',
         tune: null,
       });
     }
@@ -239,7 +239,7 @@ function createWorkingGeoJson(entryCount: number, featureCount: number = 2): Geo
       geometry: { type: 'Point', coordinates: [fi, fi] },
       properties: {
         name: `Track ${fi + 1}`,
-        featureType: 'track',
+        feature_type: 'track',
         provenance,
       },
     });
@@ -286,15 +286,15 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     const result = await service.createSnapshot(storePath, itemPath);
 
     // Verify result
-    expect(result.entriesCaptured).toBe(5);
-    expect(result.entriesRemaining).toBe(0);
-    expect(result.snapshotAsset).toMatch(/^plot-snap-.*\.geojson$/);
+    expect(result.entries_captured).toBe(5);
+    expect(result.entries_remaining).toBe(0);
+    expect(result.snapshot_asset).toMatch(/^plot-snap-.*\.geojson$/);
     expect(result.timestamp).toBeTruthy();
 
     // Verify snapshot file exists on disk
     const assetsDir = path.join(itemDir, 'assets');
     expect(fs.existsSync(assetsDir)).toBe(true);
-    const snapshotPath = path.join(assetsDir, result.snapshotAsset);
+    const snapshotPath = path.join(assetsDir, result.snapshot_asset);
     expect(fs.existsSync(snapshotPath)).toBe(true);
 
     // Read and verify snapshot content
@@ -304,7 +304,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Spatial features should have empty provenance
     const spatialFeatures = snapshot.features.filter(
-      (f) => f.properties?.featureType !== 'system'
+      (f) => f.properties?.feature_type !== 'system'
     );
     expect(spatialFeatures.length).toBe(2);
     for (const f of spatialFeatures) {
@@ -313,10 +313,10 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // System record should exist with snapshot links
     const sysRec = snapshot.features.find(
-      (f) => f.properties?.featureType === 'system'
+      (f) => f.properties?.feature_type === 'system'
     );
     expect(sysRec).toBeTruthy();
-    expect(sysRec!.properties!.snapshotLinks).toEqual({
+    expect(sysRec!.properties!.snapshot_links).toEqual({
       prev: null,
       next: expect.objectContaining({ asset: 'plot.geojson' }),
     });
@@ -325,10 +325,10 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     const item = JSON.parse(
       fs.readFileSync(path.join(itemDir, 'plot-001.json'), 'utf-8')
     );
-    const assetKey = path.parse(result.snapshotAsset).name;
+    const assetKey = path.parse(result.snapshot_asset).name;
     expect(item.assets[assetKey]).toBeTruthy();
     expect(item.assets[assetKey].roles).toContain('snapshot');
-    expect(item.assets[assetKey].href).toContain(result.snapshotAsset);
+    expect(item.assets[assetKey].href).toContain(result.snapshot_asset);
 
     // Verify working file was updated
     const updatedWorking = JSON.parse(
@@ -337,7 +337,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Working file spatial features should have cleared provenance
     const workingSpatial = updatedWorking.features.filter(
-      (f) => f.properties?.featureType !== 'system'
+      (f) => f.properties?.feature_type !== 'system'
     );
     for (const f of workingSpatial) {
       expect(f.properties?.provenance).toEqual([]);
@@ -345,16 +345,16 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Working file system record should link back to snapshot
     const workingSysRec = updatedWorking.features.find(
-      (f) => f.properties?.featureType === 'system'
+      (f) => f.properties?.feature_type === 'system'
     );
     expect(workingSysRec).toBeTruthy();
-    const workingLinks = workingSysRec!.properties!.snapshotLinks as {
-      prev: { asset: string; provEntryCount: number } | null;
+    const workingLinks = workingSysRec!.properties!.snapshot_links as {
+      prev: { asset: string; prov_entry_count: number } | null;
       next: unknown;
     };
     expect(workingLinks.prev).toEqual({
-      asset: result.snapshotAsset,
-      provEntryCount: 5,
+      asset: result.snapshot_asset,
+      prov_entry_count: 5,
     });
     expect(workingLinks.next).toBeNull();
 
@@ -375,10 +375,10 @@ describe('Snapshot Service Integration (real filesystem)', () => {
       fs.readFileSync(path.join(itemDir, 'plot.geojson'), 'utf-8')
     ) as GeoJsonFeatureCollection;
     const sysRec = updatedWorking.features.find(
-      (f) => f.properties?.featureType === 'system'
+      (f) => f.properties?.feature_type === 'system'
     );
     expect(sysRec).toBeTruthy();
-    expect(sysRec!.properties!.snapshotLinks).toBeTruthy();
+    expect(sysRec!.properties!.snapshot_links).toBeTruthy();
   });
 
   // ── Multi-snapshot chain ────────────────────────────────────────────
@@ -399,17 +399,17 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     ) as GeoJsonFeatureCollection;
 
     // Add new provenance entries to the spatial feature
-    const spatialB = afterA.features.find((f) => f.properties?.featureType !== 'system');
+    const spatialB = afterA.features.find((f) => f.properties?.feature_type !== 'system');
     if (spatialB && spatialB.properties) {
       spatialB.properties.provenance = [];
       for (let i = 0; i < 4; i++) {
         (spatialB.properties.provenance as unknown[]).push({
-          activityId: `act-b-${i + 1}`,
+          activity_id: `act-b-${i + 1}`,
           timestamp: `2026-02-09T11:${String(i).padStart(2, '0')}:00.000Z`,
-          wasGeneratedBy: { tool: `tool-b-${i + 1}`, toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: `tool-b-${i + 1}`, tool_version: '1.0.0', parameters: {} },
           used: ['track-1'],
           generated: [],
-          executionDuration: 'PT1S',
+          execution_duration: 'PT1S',
           tune: null,
         });
       }
@@ -423,17 +423,17 @@ describe('Snapshot Service Integration (real filesystem)', () => {
       fs.readFileSync(path.join(itemDir, 'plot.geojson'), 'utf-8')
     ) as GeoJsonFeatureCollection;
 
-    const spatialC = afterB.features.find((f) => f.properties?.featureType !== 'system');
+    const spatialC = afterB.features.find((f) => f.properties?.feature_type !== 'system');
     if (spatialC && spatialC.properties) {
       spatialC.properties.provenance = [];
       for (let i = 0; i < 2; i++) {
         (spatialC.properties.provenance as unknown[]).push({
-          activityId: `act-c-${i + 1}`,
+          activity_id: `act-c-${i + 1}`,
           timestamp: `2026-02-09T12:${String(i).padStart(2, '0')}:00.000Z`,
-          wasGeneratedBy: { tool: `tool-c-${i + 1}`, toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: `tool-c-${i + 1}`, tool_version: '1.0.0', parameters: {} },
           used: ['track-1'],
           generated: [],
-          executionDuration: 'PT1S',
+          execution_duration: 'PT1S',
           tune: null,
         });
       }
@@ -447,13 +447,13 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Read all three snapshot files
     const snapA = JSON.parse(
-      fs.readFileSync(path.join(assetsDir, resultA.snapshotAsset), 'utf-8')
+      fs.readFileSync(path.join(assetsDir, resultA.snapshot_asset), 'utf-8')
     ) as GeoJsonFeatureCollection;
     const snapB = JSON.parse(
-      fs.readFileSync(path.join(assetsDir, resultB.snapshotAsset), 'utf-8')
+      fs.readFileSync(path.join(assetsDir, resultB.snapshot_asset), 'utf-8')
     ) as GeoJsonFeatureCollection;
     const snapC = JSON.parse(
-      fs.readFileSync(path.join(assetsDir, resultC.snapshotAsset), 'utf-8')
+      fs.readFileSync(path.join(assetsDir, resultC.snapshot_asset), 'utf-8')
     ) as GeoJsonFeatureCollection;
     const finalWorking = JSON.parse(
       fs.readFileSync(path.join(itemDir, 'plot.geojson'), 'utf-8')
@@ -461,39 +461,39 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Helper to extract snapshotLinks from a FeatureCollection
     function getLinks(fc: GeoJsonFeatureCollection) {
-      const sys = fc.features.find((f) => f.properties?.featureType === 'system');
-      return sys?.properties?.snapshotLinks as {
-        prev: { asset: string; provEntryCount: number } | null;
-        next: { asset: string; provEntryCount: number } | null;
+      const sys = fc.features.find((f) => f.properties?.feature_type === 'system');
+      return sys?.properties?.snapshot_links as {
+        prev: { asset: string; prov_entry_count: number } | null;
+        next: { asset: string; prov_entry_count: number } | null;
       } | null;
     }
 
     // Snapshot A: prev=null, next=B
     const linksA = getLinks(snapA);
     expect(linksA!.prev).toBeNull();
-    expect(linksA!.next!.asset).toBe(resultB.snapshotAsset);
+    expect(linksA!.next!.asset).toBe(resultB.snapshot_asset);
 
     // Snapshot B: prev=A, next=C
     const linksB = getLinks(snapB);
-    expect(linksB!.prev!.asset).toBe(resultA.snapshotAsset);
-    expect(linksB!.next!.asset).toBe(resultC.snapshotAsset);
+    expect(linksB!.prev!.asset).toBe(resultA.snapshot_asset);
+    expect(linksB!.next!.asset).toBe(resultC.snapshot_asset);
 
     // Snapshot C: prev=B, next=working
     const linksC = getLinks(snapC);
-    expect(linksC!.prev!.asset).toBe(resultB.snapshotAsset);
+    expect(linksC!.prev!.asset).toBe(resultB.snapshot_asset);
     expect(linksC!.next!.asset).toBe('plot.geojson');
 
     // Working file: prev=C, next=null
     const linksWorking = getLinks(finalWorking);
-    expect(linksWorking!.prev!.asset).toBe(resultC.snapshotAsset);
+    expect(linksWorking!.prev!.asset).toBe(resultC.snapshot_asset);
     expect(linksWorking!.next).toBeNull();
 
     // Entry counts should be correct
-    expect(linksA!.next!.provEntryCount).toBe(4);  // B had 4 entries
-    expect(linksB!.prev!.provEntryCount).toBe(3);  // A had 3 entries
-    expect(linksB!.next!.provEntryCount).toBe(2);  // C had 2 entries
-    expect(linksC!.prev!.provEntryCount).toBe(4);  // B had 4 entries
-    expect(linksWorking!.prev!.provEntryCount).toBe(2); // C had 2 entries
+    expect(linksA!.next!.prov_entry_count).toBe(4);  // B had 4 entries
+    expect(linksB!.prev!.prov_entry_count).toBe(3);  // A had 3 entries
+    expect(linksB!.next!.prov_entry_count).toBe(2);  // C had 2 entries
+    expect(linksC!.prev!.prov_entry_count).toBe(4);  // B had 4 entries
+    expect(linksWorking!.prev!.prov_entry_count).toBe(2); // C had 2 entries
 
     // Verify item.json has all 3 snapshot assets registered
     const item = JSON.parse(
@@ -501,9 +501,9 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     );
     const assetKeys = Object.keys(item.assets);
     expect(assetKeys).toContain('plot'); // original
-    expect(assetKeys).toContain(path.parse(resultA.snapshotAsset).name);
-    expect(assetKeys).toContain(path.parse(resultB.snapshotAsset).name);
-    expect(assetKeys).toContain(path.parse(resultC.snapshotAsset).name);
+    expect(assetKeys).toContain(path.parse(resultA.snapshot_asset).name);
+    expect(assetKeys).toContain(path.parse(resultB.snapshot_asset).name);
+    expect(assetKeys).toContain(path.parse(resultC.snapshot_asset).name);
   });
 
   // ── US2: Detect boundary and load entries ───────────────────────────
@@ -524,8 +524,8 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     // Now boundary should exist
     const boundary = await service.getSnapshotBoundary(storePath, itemPath);
     expect(boundary).not.toBeNull();
-    expect(boundary!.asset).toBe(result.snapshotAsset);
-    expect(boundary!.provEntryCount).toBe(7);
+    expect(boundary!.asset).toBe(result.snapshot_asset);
+    expect(boundary!.prov_entry_count).toBe(7);
   });
 
   it('loads entries from a snapshot file on disk', async () => {
@@ -539,7 +539,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     const loaded = await service.loadSnapshotEntries(
       storePath,
       itemPath,
-      result.snapshotAsset
+      result.snapshot_asset
     );
 
     // Spatial features in the snapshot have empty provenance (stripped).
@@ -549,7 +549,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     // returns 1 entry — the file-level snapshot provenance event.
     expect(loaded.entries).toHaveLength(1);
     expect((loaded.entries[0] as Record<string, unknown>).type).toBe('snapshot');
-    expect(loaded.nextBoundary).toBeNull(); // first snapshot, no prev
+    expect(loaded.next_boundary).toBeNull(); // first snapshot, no prev
   });
 
   // ── US3: Capture from specific entry ────────────────────────────────
@@ -562,11 +562,11 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Capture from entry 3 (act-3): entries 1-3 go to snapshot, 4-5 stay
     const result = await service.createSnapshot(storePath, itemPath, {
-      fromEntryId: 'act-3',
+      from_entry_id: 'act-3',
     });
 
-    expect(result.entriesCaptured).toBe(3);
-    expect(result.entriesRemaining).toBe(2);
+    expect(result.entries_captured).toBe(3);
+    expect(result.entries_remaining).toBe(2);
 
     // Verify working file still has entries 4 and 5
     const updatedWorking = JSON.parse(
@@ -574,21 +574,21 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     ) as GeoJsonFeatureCollection;
 
     const spatial = updatedWorking.features.find(
-      (f) => f.properties?.featureType !== 'system'
+      (f) => f.properties?.feature_type !== 'system'
     );
-    const prov = spatial!.properties!.provenance as Array<{ activityId: string }>;
+    const prov = spatial!.properties!.provenance as Array<{ activity_id: string }>;
     expect(prov).toHaveLength(2);
-    expect(prov[0].activityId).toBe('act-4');
-    expect(prov[1].activityId).toBe('act-5');
+    expect(prov[0].activity_id).toBe('act-4');
+    expect(prov[1].activity_id).toBe('act-5');
 
     // Verify chain metadata
     const sysRec = updatedWorking.features.find(
-      (f) => f.properties?.featureType === 'system'
+      (f) => f.properties?.feature_type === 'system'
     );
-    const links = sysRec!.properties!.snapshotLinks as {
-      prev: { asset: string; provEntryCount: number };
+    const links = sysRec!.properties!.snapshot_links as {
+      prev: { asset: string; prov_entry_count: number };
     };
-    expect(links.prev.provEntryCount).toBe(3);
+    expect(links.prev.prov_entry_count).toBe(3);
   });
 
   // ── US4: Cross-snapshot timeline assembly ───────────────────────────
@@ -607,25 +607,25 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     const afterSnap = JSON.parse(
       fs.readFileSync(path.join(itemDir, 'plot.geojson'), 'utf-8')
     ) as GeoJsonFeatureCollection;
-    const spatial = afterSnap.features.find((f) => f.properties?.featureType !== 'system');
+    const spatial = afterSnap.features.find((f) => f.properties?.feature_type !== 'system');
     if (spatial && spatial.properties) {
       spatial.properties.provenance = [
         {
-          activityId: 'act-new-1',
+          activity_id: 'act-new-1',
           timestamp: '2026-02-09T14:00:00.000Z',
-          wasGeneratedBy: { tool: 'tool-new-1', toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: 'tool-new-1', tool_version: '1.0.0', parameters: {} },
           used: ['track-1'],
           generated: [],
-          executionDuration: 'PT1S',
+          execution_duration: 'PT1S',
           tune: null,
         },
         {
-          activityId: 'act-new-2',
+          activity_id: 'act-new-2',
           timestamp: '2026-02-09T14:01:00.000Z',
-          wasGeneratedBy: { tool: 'tool-new-2', toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: 'tool-new-2', tool_version: '1.0.0', parameters: {} },
           used: ['track-1'],
           generated: [],
-          executionDuration: 'PT1S',
+          execution_duration: 'PT1S',
           tune: null,
         },
       ];
@@ -649,7 +649,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Assemble cross-snapshot timeline
     const timeline = service.assembleCrossSnapshotTimeline(currentFC, {
-      previousEntries: previous.entries,
+      previous_entries: previous.entries,
     });
 
     // Timeline includes:
@@ -664,8 +664,8 @@ describe('Snapshot Service Integration (real filesystem)', () => {
       (e) => (e as Record<string, unknown>).type !== 'snapshot'
     );
     expect(spatialEntries).toHaveLength(2);
-    expect(spatialEntries[0].activityId).toBe('act-new-1');
-    expect(spatialEntries[1].activityId).toBe('act-new-2');
+    expect(spatialEntries[0].activity_id).toBe('act-new-1');
+    expect(spatialEntries[1].activity_id).toBe('act-new-2');
   });
 
   // ── Round-trip: full workflow ───────────────────────────────────────
@@ -679,23 +679,23 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Phase 2: Snapshot A
     const snapA = await service.createSnapshot(storePath, itemPath);
-    expect(snapA.entriesCaptured).toBe(4);
+    expect(snapA.entries_captured).toBe(4);
 
     // Phase 3: More work — 3 new entries
     const afterA = JSON.parse(
       fs.readFileSync(path.join(itemDir, 'plot.geojson'), 'utf-8')
     ) as GeoJsonFeatureCollection;
     for (const f of afterA.features) {
-      if (f.properties && f.properties.featureType !== 'system') {
+      if (f.properties && f.properties.feature_type !== 'system') {
         f.properties.provenance = [];
         for (let i = 0; i < 3; i++) {
           (f.properties.provenance as unknown[]).push({
-            activityId: `act-phase3-${i + 1}`,
+            activity_id: `act-phase3-${i + 1}`,
             timestamp: `2026-02-09T15:${String(i).padStart(2, '0')}:00.000Z`,
-            wasGeneratedBy: { tool: `tool-phase3-${i + 1}`, toolVersion: '1.0.0', parameters: {} },
+            was_generated_by: { tool: `tool-phase3-${i + 1}`, tool_version: '1.0.0', parameters: {} },
             used: [f.id],
             generated: [],
-            executionDuration: 'PT1S',
+            execution_duration: 'PT1S',
             tune: null,
           });
         }
@@ -705,7 +705,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
 
     // Phase 4: Snapshot B
     const snapB = await service.createSnapshot(storePath, itemPath);
-    expect(snapB.entriesCaptured).toBe(3);
+    expect(snapB.entries_captured).toBe(3);
 
     // Phase 5: Navigate the chain
     // Working file → boundary → Snapshot B → boundary → Snapshot A
@@ -713,7 +713,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     // Step 1: Get boundary from working file
     const boundaryFromWorking = await service.getSnapshotBoundary(storePath, itemPath);
     expect(boundaryFromWorking).not.toBeNull();
-    expect(boundaryFromWorking!.asset).toBe(snapB.snapshotAsset);
+    expect(boundaryFromWorking!.asset).toBe(snapB.snapshot_asset);
 
     // Step 2: Load entries from Snapshot B
     const fromB = await service.loadSnapshotEntries(
@@ -722,16 +722,16 @@ describe('Snapshot Service Integration (real filesystem)', () => {
       boundaryFromWorking!.asset
     );
     // Snapshot B is a clean file — no spatial provenance entries
-    expect(fromB.nextBoundary).not.toBeNull();
-    expect(fromB.nextBoundary!.asset).toBe(snapA.snapshotAsset);
+    expect(fromB.next_boundary).not.toBeNull();
+    expect(fromB.next_boundary!.asset).toBe(snapA.snapshot_asset);
 
     // Step 3: Load entries from Snapshot A
     const fromA = await service.loadSnapshotEntries(
       storePath,
       itemPath,
-      fromB.nextBoundary!.asset
+      fromB.next_boundary!.asset
     );
-    expect(fromA.nextBoundary).toBeNull(); // end of chain
+    expect(fromA.next_boundary).toBeNull(); // end of chain
 
     // Verify all files on disk are valid JSON
     const assetsDir = path.join(itemDir, 'assets');
@@ -760,7 +760,7 @@ describe('Snapshot Service Integration (real filesystem)', () => {
           geometry: { type: 'Point', coordinates: [1, 1] },
           properties: {
             name: 'Empty track',
-            featureType: 'track',
+            feature_type: 'track',
             provenance: [],
           },
         },
@@ -771,16 +771,16 @@ describe('Snapshot Service Integration (real filesystem)', () => {
     const service = createSnapshotService(deps);
     const result = await service.createSnapshot(storePath, itemPath);
 
-    expect(result.entriesCaptured).toBe(0);
-    expect(result.entriesRemaining).toBe(0);
+    expect(result.entries_captured).toBe(0);
+    expect(result.entries_remaining).toBe(0);
 
     // Snapshot file should still exist
-    const snapshotPath = path.join(itemDir, 'assets', result.snapshotAsset);
+    const snapshotPath = path.join(itemDir, 'assets', result.snapshot_asset);
     expect(fs.existsSync(snapshotPath)).toBe(true);
 
     // Chain should be valid
     const boundary = await service.getSnapshotBoundary(storePath, itemPath);
     expect(boundary).not.toBeNull();
-    expect(boundary!.provEntryCount).toBe(0);
+    expect(boundary!.prov_entry_count).toBe(0);
   });
 });

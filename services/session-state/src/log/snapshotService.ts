@@ -61,9 +61,9 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       let entriesCaptured = totalEntries;
       let entriesRemaining = 0;
 
-      if (options?.fromEntryId) {
+      if (options?.from_entry_id) {
         // Trim working file provenance to keep only entries after the split point
-        const { entriesBefore, entriesAfter } = trimProvenanceAfterEntry(working, options.fromEntryId);
+        const { entriesBefore, entriesAfter } = trimProvenanceAfterEntry(working, options.from_entry_id);
         entriesCaptured = entriesBefore;
         entriesRemaining = entriesAfter;
       }
@@ -74,24 +74,24 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       const timestampStr = timestamp.toISOString();
 
       // 7. Get previous snapshot link from working file's system record
-      const currentLinks = (sysRec.properties?.snapshotLinks ?? null) as SnapshotLinks | null;
+      const currentLinks = (sysRec.properties?.snapshot_links ?? null) as SnapshotLinks | null;
       const prevSnapshotRef = currentLinks?.prev ?? null;
 
       // 8. Set snapshot's system record links
       const cleanSysRec = findSystemRecord(cleanCopy);
       if (cleanSysRec && cleanSysRec.properties) {
-        cleanSysRec.properties.snapshotLinks = {
+        cleanSysRec.properties.snapshot_links = {
           prev: prevSnapshotRef,
-          next: { asset: 'plot.geojson', provEntryCount: entriesRemaining },
+          next: { asset: 'plot.geojson', prov_entry_count: entriesRemaining },
         };
 
         // Record file-level provenance on snapshot (FR-007)
         const snapshotProvEntry: FileProvEntry = {
-          activityId: crypto.randomUUID(),
+          activity_id: crypto.randomUUID(),
           type: 'snapshot',
           timestamp: timestampStr,
           asset: filename,
-          branchId: null,
+          branch_id: null,
           direction: null,
         };
         const existingProv = normaliseProvenance(cleanSysRec.properties.provenance);
@@ -113,10 +113,10 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
         if (prevSnapshot) {
           const prevSysRec = findSystemRecord(prevSnapshot);
           if (prevSysRec && prevSysRec.properties) {
-            const prevLinks = (prevSysRec.properties.snapshotLinks ?? { prev: null, next: null }) as SnapshotLinks;
-            prevSysRec.properties.snapshotLinks = {
+            const prevLinks = (prevSysRec.properties.snapshot_links ?? { prev: null, next: null }) as SnapshotLinks;
+            prevSysRec.properties.snapshot_links = {
               prev: prevLinks.prev,
-              next: { asset: filename, provEntryCount: entriesCaptured },
+              next: { asset: filename, prov_entry_count: entriesCaptured },
             };
             // Write updated previous snapshot back
             await deps.writeSnapshotAsset(
@@ -131,18 +131,18 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
 
       // 11. Update working file system record
       if (sysRec.properties) {
-        sysRec.properties.snapshotLinks = {
-          prev: { asset: filename, provEntryCount: entriesCaptured },
+        sysRec.properties.snapshot_links = {
+          prev: { asset: filename, prov_entry_count: entriesCaptured },
           next: null,
         };
 
         // Record file-level provenance on working file (FR-007)
         const workingProvEntry: FileProvEntry = {
-          activityId: crypto.randomUUID(),
+          activity_id: crypto.randomUUID(),
           type: 'snapshot',
           timestamp: timestampStr,
           asset: filename,
-          branchId: null,
+          branch_id: null,
           direction: null,
         };
         const existingWorkingProv = normaliseProvenance(sysRec.properties.provenance);
@@ -150,10 +150,10 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       }
 
       // 12. Clear provenance on working file spatial features (FR-005)
-      if (!options?.fromEntryId) {
+      if (!options?.from_entry_id) {
         // Standard snapshot: clear all
         for (const f of working.features) {
-          if (f.properties && f.properties.featureType !== 'system') {
+          if (f.properties && f.properties.feature_type !== 'system') {
             f.properties.provenance = [];
           }
         }
@@ -167,9 +167,9 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       deps.markDirty();
 
       return {
-        snapshotAsset: filename,
-        entriesCaptured,
-        entriesRemaining,
+        snapshot_asset: filename,
+        entries_captured: entriesCaptured,
+        entries_remaining: entriesRemaining,
         timestamp: timestampStr,
       };
     },
@@ -185,12 +185,12 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       const sysRec = findSystemRecord(fc);
       if (!sysRec || !sysRec.properties) return null;
 
-      const links = sysRec.properties.snapshotLinks as SnapshotLinks | null;
+      const links = sysRec.properties.snapshot_links as SnapshotLinks | null;
       if (!links || !links.prev) return null;
 
       return {
         asset: links.prev.asset,
-        provEntryCount: links.prev.provEntryCount,
+        prov_entry_count: links.prev.prov_entry_count,
       };
     },
 
@@ -213,16 +213,16 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       const sysRec = findSystemRecord(snapshotFc);
       let nextBoundary: SnapshotBoundary | null = null;
       if (sysRec && sysRec.properties) {
-        const links = sysRec.properties.snapshotLinks as SnapshotLinks | null;
+        const links = sysRec.properties.snapshot_links as SnapshotLinks | null;
         if (links && links.prev) {
           nextBoundary = {
             asset: links.prev.asset,
-            provEntryCount: links.prev.provEntryCount,
+            prov_entry_count: links.prev.prov_entry_count,
           };
         }
       }
 
-      return { entries, nextBoundary };
+      return { entries, next_boundary: nextBoundary };
     },
 
     // ── US4: Cross-Snapshot Timeline Assembly ────────────────────────
@@ -233,10 +233,10 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
       const seen = new Map<string, LogEntry>();
 
       // Add previous snapshot entries first (oldest first)
-      if (options?.previousEntries) {
-        for (const entry of options.previousEntries) {
-          if (entry.activityId && !seen.has(entry.activityId)) {
-            seen.set(entry.activityId, entry);
+      if (options?.previous_entries) {
+        for (const entry of options.previous_entries) {
+          if (entry.activity_id && !seen.has(entry.activity_id)) {
+            seen.set(entry.activity_id, entry);
           }
         }
       }
@@ -248,7 +248,7 @@ export function createSnapshotService(deps: SnapshotServiceDeps): SnapshotServic
         const entries = normaliseProvenance(props.provenance);
         for (const raw of entries) {
           const entry = raw as Record<string, unknown>;
-          const activityId = entry.activityId;
+          const activityId = entry.activity_id;
           if (typeof activityId === 'string' && activityId.length > 0) {
             if (!seen.has(activityId)) {
               seen.set(activityId, entry as unknown as LogEntry);

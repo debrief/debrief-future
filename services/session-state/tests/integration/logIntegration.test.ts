@@ -46,7 +46,7 @@ function createInMemoryStore() {
       let count = 0;
       for (const prov of provenance) {
         const feature = data.find(
-          (f) => (f as Record<string, unknown>).id === prov.featureId
+          (f) => (f as Record<string, unknown>).id === prov.feature_id
         );
         if (!feature) continue;
         const props = (feature as Record<string, unknown>)
@@ -90,10 +90,10 @@ describe('Log Service Integration', () => {
     // Simulate a tool result with two input features
     const toolResult: ToolResultForLog = {
       success: true,
-      toolId: 'calculate-range',
-      durationMs: 342,
-      resultType: 'addition/range-result',
-      sourceFeatureIds: ['track-alpha', 'track-bravo'],
+      tool_id: 'calculate-range',
+      duration_ms: 342,
+      result_type: 'addition/range-result',
+      source_feature_ids: ['track-alpha', 'track-bravo'],
       features: {
         type: 'FeatureCollection',
         features: [],
@@ -101,7 +101,7 @@ describe('Log Service Integration', () => {
     };
 
     const expanded: ExpandedToolResultFields = {
-      toolVersion: '1.2.0',
+      tool_version: '1.2.0',
       parameters: {
         units: { value: 'nautical_miles', default: true, tunable: true },
       },
@@ -115,8 +115,8 @@ describe('Log Service Integration', () => {
       'items/plot-001/plot-001.json'
     );
 
-    expect(result.activityId).toBeTruthy();
-    expect(result.featuresUpdated).toBe(2);
+    expect(result.activity_id).toBeTruthy();
+    expect(result.features_updated).toBe(2);
     expect(result.entries).toHaveLength(1);
     expect(markDirty).toHaveBeenCalledOnce();
 
@@ -125,9 +125,9 @@ describe('Log Service Integration', () => {
     const alphaProps = (alpha as Record<string, unknown>).properties as Record<string, unknown>;
     expect(alphaProps.provenance).toHaveLength(1);
     const entry = (alphaProps.provenance as unknown[])[0] as Record<string, unknown>;
-    expect(entry.activityId).toBe(result.activityId);
-    expect(entry.wasGeneratedBy).toEqual(
-      expect.objectContaining({ tool: 'calculate-range', toolVersion: '1.2.0' })
+    expect(entry.activity_id).toBe(result.activity_id);
+    expect(entry.was_generated_by).toEqual(
+      expect.objectContaining({ tool: 'calculate-range', tool_version: '1.2.0' })
     );
 
     // Assemble timeline
@@ -138,9 +138,9 @@ describe('Log Service Integration', () => {
 
     // Both features share the same activityId, so dedup produces 1 entry
     expect(timeline).toHaveLength(1);
-    expect(timeline[0].activityId).toBe(result.activityId);
+    expect(timeline[0].activity_id).toBe(result.activity_id);
     expect(timeline[0].used).toEqual(['track-alpha', 'track-bravo']);
-    expect(timeline[0].executionDuration).toMatch(/^PT/);
+    expect(timeline[0].execution_duration).toMatch(/^PT/);
   });
 
   it('handles multiple sequential tool executions', async () => {
@@ -161,12 +161,12 @@ describe('Log Service Integration', () => {
     const result1 = await logService.recordToolResult(
       {
         success: true,
-        toolId: 'calculate-range',
-        durationMs: 100,
-        sourceFeatureIds: ['track-001'],
+        tool_id: 'calculate-range',
+        duration_ms: 100,
+        source_feature_ids: ['track-001'],
         features: { type: 'FeatureCollection', features: [] },
       },
-      { toolVersion: '1.0.0' },
+      { tool_version: '1.0.0' },
       '/store',
       'items/plot/plot.json'
     );
@@ -175,18 +175,18 @@ describe('Log Service Integration', () => {
     const result2 = await logService.recordToolResult(
       {
         success: true,
-        toolId: 'calculate-bearing',
-        durationMs: 200,
-        sourceFeatureIds: ['track-001'],
+        tool_id: 'calculate-bearing',
+        duration_ms: 200,
+        source_feature_ids: ['track-001'],
         features: { type: 'FeatureCollection', features: [] },
       },
-      { toolVersion: '2.0.0' },
+      { tool_version: '2.0.0' },
       '/store',
       'items/plot/plot.json'
     );
 
     // Both IDs should be different
-    expect(result1.activityId).not.toBe(result2.activityId);
+    expect(result1.activity_id).not.toBe(result2.activity_id);
 
     // Feature should have 2 provenance entries (append-only)
     const feature = store.features[0] as Record<string, unknown>;
@@ -196,8 +196,8 @@ describe('Log Service Integration', () => {
     // Timeline should show both, sorted by timestamp
     const timeline = await logService.getTimeline('/store', 'items/plot/plot.json');
     expect(timeline).toHaveLength(2);
-    expect(timeline[0].wasGeneratedBy.tool).toBe('calculate-range');
-    expect(timeline[1].wasGeneratedBy.tool).toBe('calculate-bearing');
+    expect(timeline[0].was_generated_by.tool).toBe('calculate-range');
+    expect(timeline[1].was_generated_by.tool).toBe('calculate-bearing');
     expect(markDirty).toHaveBeenCalledTimes(2);
   });
 
@@ -216,17 +216,17 @@ describe('Log Service Integration', () => {
     const result = await logService.recordToolResult(
       {
         success: false,
-        toolId: 'calculate-range',
-        durationMs: 50,
-        sourceFeatureIds: ['track-001'],
+        tool_id: 'calculate-range',
+        duration_ms: 50,
+        source_feature_ids: ['track-001'],
       },
       undefined,
       '/store',
       'items/plot/plot.json'
     );
 
-    expect(result.activityId).toBe('');
-    expect(result.featuresUpdated).toBe(0);
+    expect(result.activity_id).toBe('');
+    expect(result.features_updated).toBe(0);
     expect(result.entries).toHaveLength(0);
     expect(markDirty).not.toHaveBeenCalled();
 
@@ -253,9 +253,9 @@ describe('Log Service Integration', () => {
     const result = await logService.recordToolResult(
       {
         success: true,
-        toolId: 'calculate-range',
-        durationMs: 150,
-        sourceFeatureIds: ['track-input'],
+        tool_id: 'calculate-range',
+        duration_ms: 150,
+        source_feature_ids: ['track-input'],
         features: {
           type: 'FeatureCollection',
           features: [
@@ -263,24 +263,24 @@ describe('Log Service Integration', () => {
               type: 'Feature',
               id: 'output-1',
               properties: {
-                provenance: [{ activityId: pythonActivityId }],
+                provenance: [{ activity_id: pythonActivityId }],
               },
               geometry: null,
             },
           ],
         },
       },
-      { toolVersion: '1.0.0' },
+      { tool_version: '1.0.0' },
       '/store',
       'items/plot/plot.json'
     );
 
     // Should reuse the Python-generated activityId
-    expect(result.activityId).toBe(pythonActivityId);
+    expect(result.activity_id).toBe(pythonActivityId);
 
     // Input feature should have provenance with same activityId
     const timeline = await logService.getTimeline('/store', 'items/plot/plot.json');
     expect(timeline).toHaveLength(1);
-    expect(timeline[0].activityId).toBe(pythonActivityId);
+    expect(timeline[0].activity_id).toBe(pythonActivityId);
   });
 });

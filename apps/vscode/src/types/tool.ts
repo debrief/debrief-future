@@ -317,7 +317,7 @@ export interface ToolProvenance {
   toolName: string;
 
   /** Tool version string */
-  toolVersion: string;
+  tool_version: string;
 
   /** Execution timestamp (ISO 8601) */
   executionTime: string;
@@ -375,13 +375,13 @@ export interface ToolExecutionResult {
   artifactHref?: string;
 
   /** Tool version from expanded contract (Phase 0) */
-  toolVersion?: string;
+  tool_version?: string;
   /** Modified features with property deltas (Phase 0) */
-  modifiedFeatures?: Array<{ featureId: string; changedProperties: Record<string, { previousValue: unknown; newValue: unknown }> }>;
+  modifiedFeatures?: Array<{ feature_id: string; changed_properties: Record<string, { previous_value: unknown; new_value: unknown }> }>;
   /** Created feature IDs (Phase 0) */
   createdFeatures?: string[];
   /** Created artifacts (Phase 0) */
-  createdAssets?: Array<{ resultId: string; path: string; mimeType?: string }>;
+  createdAssets?: Array<{ result_id: string; path: string; mime_type?: string }>;
   /** Full resolved parameters (Phase 0) */
   parameters?: Record<string, { value: unknown; default: boolean; tunable: boolean }>;
 }

@@ -57,8 +57,8 @@ export function extractActivityIdFromOutputFeatures(
     const prov = props.provenance;
     if (Array.isArray(prov) && prov.length > 0) {
       const last = prov[prov.length - 1] as Record<string, unknown>;
-      if (typeof last.activityId === 'string') {
-        return last.activityId;
+      if (typeof last.activity_id === 'string') {
+        return last.activity_id;
       }
     }
   }
@@ -68,7 +68,7 @@ export function extractActivityIdFromOutputFeatures(
 /** Fields extracted from Python-generated provenance on output features. */
 export interface PythonProvenanceFallback {
   parameters?: Record<string, ParameterValue>;
-  toolVersion?: string;
+  tool_version?: string;
 }
 
 /**
@@ -89,15 +89,15 @@ export function extractFromOutputFeatures(
     if (!Array.isArray(prov)) continue;
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      if (activityId && e.activityId !== activityId) continue;
-      const wgb = e.wasGeneratedBy as Record<string, unknown> | undefined;
+      if (activityId && e.activity_id !== activityId) continue;
+      const wgb = e.was_generated_by as Record<string, unknown> | undefined;
       if (!wgb) continue;
 
       const result: PythonProvenanceFallback = {};
 
       // Extract toolVersion
-      if (typeof wgb.toolVersion === 'string' && wgb.toolVersion !== '0.0.0') {
-        result.toolVersion = wgb.toolVersion;
+      if (typeof wgb.tool_version === 'string' && wgb.tool_version !== '0.0.0') {
+        result.tool_version = wgb.tool_version;
       }
 
       // Extract parameters (verify ParameterValue shape)
@@ -112,7 +112,7 @@ export function extractFromOutputFeatures(
         }
       }
 
-      if (result.toolVersion ?? result.parameters) {
+      if (result.tool_version ?? result.parameters) {
         return result;
       }
     }
@@ -141,7 +141,7 @@ function buildWasGeneratedBy(
 ): WasGeneratedBy {
   return {
     tool: toolId,
-    toolVersion: expanded?.toolVersion ?? fallback?.toolVersion ?? '0.0.0',
+    tool_version: expanded?.tool_version ?? fallback?.tool_version ?? '0.0.0',
     parameters: expanded?.parameters ?? fallback?.parameters ?? {},
   };
 }
@@ -154,12 +154,12 @@ function resolveUsedFeatureIds(
   expanded: ExpandedToolResultFields | undefined
 ): string[] {
   // Prefer sourceFeatureIds from MCP annotations
-  if (toolResult.sourceFeatureIds && toolResult.sourceFeatureIds.length > 0) {
-    return [...toolResult.sourceFeatureIds];
+  if (toolResult.source_feature_ids && toolResult.source_feature_ids.length > 0) {
+    return [...toolResult.source_feature_ids];
   }
   // Fall back to modifiedFeatures from expanded contract
-  if (expanded?.modifiedFeatures && expanded.modifiedFeatures.length > 0) {
-    return expanded.modifiedFeatures.map((mf) => mf.featureId);
+  if (expanded?.modified_features && expanded.modified_features.length > 0) {
+    return expanded.modified_features.map((mf) => mf.feature_id);
   }
   return [];
 }
@@ -174,8 +174,8 @@ function resolveGeneratedOutputs(
   const generated: string[] = [];
 
   // Add created feature IDs
-  if (expanded?.createdFeatures) {
-    generated.push(...expanded.createdFeatures);
+  if (expanded?.created_features) {
+    generated.push(...expanded.created_features);
   } else if (toolResult.features?.features) {
     // Fall back to extracting IDs from output features
     for (const f of toolResult.features.features) {
@@ -187,12 +187,12 @@ function resolveGeneratedOutputs(
   }
 
   // Add created asset paths
-  if (expanded?.createdAssets) {
-    for (const asset of expanded.createdAssets) {
+  if (expanded?.created_assets) {
+    for (const asset of expanded.created_assets) {
       generated.push(asset.path);
     }
-  } else if (toolResult.artifactHref) {
-    generated.push(toolResult.artifactHref);
+  } else if (toolResult.artifact_href) {
+    generated.push(toolResult.artifact_href);
   }
 
   return generated;
@@ -213,13 +213,13 @@ export function buildLogEntry(
   inputState?: InputFeatureState[]
 ): LogEntry {
   const resolvedActivityId = activityId ?? generateActivityId();
-  const toolId = toolResult.toolId ?? 'unknown-tool';
+  const toolId = toolResult.tool_id ?? 'unknown-tool';
 
   // When expanded fields are missing, try to extract from Python provenance
   // on the output features. The Python executor always attaches full
   // ParameterValue objects ({value, default, tunable}) and toolVersion.
   let fallback: PythonProvenanceFallback | undefined;
-  if ((!expanded?.parameters || !expanded?.toolVersion) && toolResult.features?.features) {
+  if ((!expanded?.parameters || !expanded?.tool_version) && toolResult.features?.features) {
     fallback = extractFromOutputFeatures(
       toolResult.features.features as Array<Record<string, unknown>>,
       resolvedActivityId
@@ -227,14 +227,14 @@ export function buildLogEntry(
   }
 
   return {
-    activityId: resolvedActivityId,
+    activity_id: resolvedActivityId,
     timestamp: new Date().toISOString(),
-    wasGeneratedBy: buildWasGeneratedBy(toolId, expanded, fallback),
+    was_generated_by: buildWasGeneratedBy(toolId, expanded, fallback),
     used: resolveUsedFeatureIds(toolResult, expanded),
     generated: resolveGeneratedOutputs(toolResult, expanded),
-    executionDuration: msToIsoDuration(toolResult.durationMs),
-    generatedResultId: expanded?.createdAssets?.[0]?.resultId ?? null,
+    execution_duration: msToIsoDuration(toolResult.duration_ms),
+    generated_result_id: expanded?.created_assets?.[0]?.result_id ?? null,
     tune: null,
-    inputState: inputState ?? toolResult.inputState ?? null,
+    input_state: inputState ?? toolResult.input_state ?? null,
   };
 }

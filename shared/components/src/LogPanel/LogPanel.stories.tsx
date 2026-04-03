@@ -31,87 +31,87 @@ const sampleFeatureNames: Record<string, string> = {
 
 const sampleEntries: TimelineEntry[] = [
   {
-    activityId: 'act-005',
+    activity_id: 'act-005',
     timestamp: '2026-02-09T14:35:00Z',
     toolName: 'Range & Bearing',
-    toolVersion: '1.2.0',
+    tool_version: '1.2.0',
     parameters: {
       maxRange: { value: 5000, default: false, tunable: true },
       units: { value: 'metres', default: true, tunable: false },
     },
     usedFeatureIds: ['track-alpha', 'track-bravo'],
     generatedFeatureIds: ['result-rb-001'],
-    executionDuration: 'PT0.5S',
-    generatedResultId: 'result-rb-001',
+    execution_duration: 'PT0.5S',
+    generated_result_id: 'result-rb-001',
     operationCategory: 'calculation',
   },
   {
-    activityId: 'act-004',
+    activity_id: 'act-004',
     timestamp: '2026-02-09T14:30:00Z',
     toolName: 'Closest Approach',
-    toolVersion: '1.1.0',
+    tool_version: '1.1.0',
     parameters: {
       threshold: { value: 2000, default: false, tunable: true },
     },
     usedFeatureIds: ['track-alpha', 'track-charlie'],
     generatedFeatureIds: ['result-cpa-001'],
-    executionDuration: 'PT1.2S',
-    generatedResultId: 'result-cpa-001',
+    execution_duration: 'PT1.2S',
+    generated_result_id: 'result-cpa-001',
     operationCategory: 'calculation',
   },
   {
-    activityId: 'act-003',
+    activity_id: 'act-003',
     timestamp: '2026-02-09T14:25:00Z',
     toolName: 'Track Statistics',
-    toolVersion: '1.0.0',
+    tool_version: '1.0.0',
     parameters: {},
     usedFeatureIds: ['track-alpha'],
     generatedFeatureIds: [],
-    executionDuration: 'PT0.3S',
-    generatedResultId: null,
+    execution_duration: 'PT0.3S',
+    generated_result_id: null,
     operationCategory: 'calculation',
   },
   {
-    activityId: 'act-002',
+    activity_id: 'act-002',
     timestamp: '2026-02-09T14:20:00Z',
     toolName: 'change-track-color',
-    toolVersion: '1.0.0',
+    tool_version: '1.0.0',
     parameters: {
       color: { value: 'red', default: false, tunable: true },
     },
     usedFeatureIds: ['track-bravo'],
     generatedFeatureIds: [],
-    executionDuration: 'PT0.05S',
-    generatedResultId: null,
+    execution_duration: 'PT0.05S',
+    generated_result_id: null,
     operationCategory: 'property-edit',
   },
   {
-    activityId: 'act-001',
+    activity_id: 'act-001',
     timestamp: '2026-02-09T14:00:00Z',
     toolName: 'load-rep',
-    toolVersion: '1.0.0',
+    tool_version: '1.0.0',
     parameters: {
       file: { value: 'exercise_data.rep', default: false, tunable: false },
     },
     usedFeatureIds: [],
     generatedFeatureIds: ['track-alpha', 'track-bravo', 'track-charlie'],
-    executionDuration: 'PT2.1S',
-    generatedResultId: null,
+    execution_duration: 'PT2.1S',
+    generated_result_id: null,
     operationCategory: 'import',
   },
 ];
 
 // Entry that references a deleted feature
 const entryWithDeletedFeature: TimelineEntry = {
-  activityId: 'act-006',
+  activity_id: 'act-006',
   timestamp: '2026-02-09T14:40:00Z',
   toolName: 'Range & Bearing',
-  toolVersion: '1.2.0',
+  tool_version: '1.2.0',
   parameters: {},
   usedFeatureIds: ['track-alpha', 'deleted-feature'],
   generatedFeatureIds: [],
-  executionDuration: 'PT0.4S',
-  generatedResultId: null,
+  execution_duration: 'PT0.4S',
+  generated_result_id: null,
   operationCategory: 'calculation',
 };
 
@@ -378,14 +378,14 @@ export const ActionsDisabled: Story = {
 // Sample disabled entry
 const disabledEntry: TimelineEntry = {
   ...sampleEntries[0],
-  activityId: 'act-disabled-001',
+  activity_id: 'act-disabled-001',
   disabled: true,
 };
 
 // Sample entry with rationale
 const entryWithRationale: TimelineEntry = {
   ...sampleEntries[0],
-  activityId: 'act-rationale-001',
+  activity_id: 'act-rationale-001',
   rationale: 'Increased range to capture distant contacts from the latest exercise data.',
 };
 
@@ -440,13 +440,13 @@ function FlipCardInteractive(props: {
 
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
     setLocalEntries((prev) =>
-      prev.map((e) => (e.activityId === activityId ? { ...e, disabled } : e))
+      prev.map((e) => (e.activity_id === activityId ? { ...e, disabled } : e))
     );
   }, []);
 
   const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
     setLocalEntries((prev) =>
-      prev.map((e) => (e.activityId === activityId ? { ...e, rationale } : e))
+      prev.map((e) => (e.activity_id === activityId ? { ...e, rationale } : e))
     );
   }, []);
 

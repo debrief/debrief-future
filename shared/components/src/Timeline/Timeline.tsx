@@ -171,7 +171,7 @@ export function Timeline({
       const bar = findBarAtPoint(x, y, bars);
 
       if (bar) {
-        onSelect?.(bar.featureId, event);
+        onSelect?.(bar.feature_id, event);
       } else {
         onBackgroundClick?.();
       }
@@ -190,7 +190,7 @@ export function Timeline({
       const y = event.clientY - rect.top;
 
       const bar = findBarAtPoint(x, y, bars);
-      setHoveredBar(bar?.featureId ?? null);
+      setHoveredBar(bar?.feature_id ?? null);
 
       canvas.style.cursor = bar ? 'pointer' : 'default';
     },
@@ -247,7 +247,7 @@ export function Timeline({
       </div>
       {hoveredBar && (
         <div className="debrief-timeline__tooltip">
-          {bars.find((b) => b.featureId === hoveredBar)?.label}
+          {bars.find((b) => b.feature_id === hoveredBar)?.label}
         </div>
       )}
     </div>

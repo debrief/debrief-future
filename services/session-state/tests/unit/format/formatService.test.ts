@@ -65,10 +65,10 @@ describe('formatService', () => {
 
       const result = await service.applyStyleChange('plot-001', request);
 
-      expect(result.activityId).toBeTruthy();
-      expect(typeof result.activityId).toBe('string');
-      expect(result.featuresUpdated).toBe(1);
-      expect(result.previousValues).toEqual({
+      expect(result.activity_id).toBeTruthy();
+      expect(typeof result.activity_id).toBe('string');
+      expect(result.features_updated).toBe(1);
+      expect(result.previous_values).toEqual({
         'track-001': '#0000CC',
       });
 
@@ -106,9 +106,9 @@ describe('formatService', () => {
 
       const result = await service.applyStyleChange('plot-001', request);
 
-      expect(result.featuresUpdated).toBe(2);
-      expect(typeof result.activityId).toBe('string');
-      expect(Object.keys(result.previousValues)).toHaveLength(2);
+      expect(result.features_updated).toBe(2);
+      expect(typeof result.activity_id).toBe('string');
+      expect(Object.keys(result.previous_values)).toHaveLength(2);
 
       // Single provenance entry for batch
       expect(deps.appendProvenance).toHaveBeenCalledTimes(1);
@@ -126,9 +126,9 @@ describe('formatService', () => {
 
       const result = await service.applyStyleChange('plot-001', request);
 
-      expect(result.featuresUpdated).toBe(2);
-      expect(Object.keys(result.previousValues)).toHaveLength(2);
-      expect(result.previousValues['nonexistent-id']).toBeUndefined();
+      expect(result.features_updated).toBe(2);
+      expect(Object.keys(result.previous_values)).toHaveLength(2);
+      expect(result.previous_values['nonexistent-id']).toBeUndefined();
     });
 
     it('should throw error when no active plot', async () => {
@@ -161,7 +161,7 @@ describe('formatService', () => {
 
       const result = await service.applyStyleChange('plot-001', request);
 
-      expect(result.featuresUpdated).toBe(1);
+      expect(result.features_updated).toBe(1);
 
       // Verify position_style_overrides was created
       const writtenFC = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls[0][1] as Record<string, unknown>;

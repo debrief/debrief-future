@@ -4,6 +4,7 @@
  */
 
 // LogEntry types (PROV-aligned, mirrors Phase 0 LinkML schema)
+// Field names use snake_case to match the wire format (ADR-010).
 export interface ParameterValue {
   value: unknown;
   default: boolean;
@@ -12,32 +13,32 @@ export interface ParameterValue {
 
 export interface WasGeneratedBy {
   tool: string;
-  toolVersion: string;
+  tool_version: string;
   parameters: Record<string, ParameterValue>;
 }
 
 export interface TuneAnnotation {
   timestamp: string;
   parameter: string;
-  previousValue: unknown;
-  newValue: unknown;
+  previous_value: unknown;
+  new_value: unknown;
 }
 
 /** Pre-tool feature state for mutation (in-place transform) tools. */
 export interface InputFeatureState {
-  featureId: string;
+  feature_id: string;
   geometry: unknown;
   properties: Record<string, unknown> | null;
 }
 
 export interface LogEntry {
-  activityId: string;
+  activity_id: string;
   timestamp: string;
-  wasGeneratedBy: WasGeneratedBy;
+  was_generated_by: WasGeneratedBy;
   used: string[];
   generated: string[];
-  executionDuration: string;
-  generatedResultId?: string | null;
+  execution_duration: string;
+  generated_result_id?: string | null;
   tune: TuneAnnotation | null;
   deleted?: boolean;
   /** Whether this entry is skipped during replay. Feature: 113-prov-card-flip */
@@ -45,38 +46,38 @@ export interface LogEntry {
   /** Free-text analyst annotation. Feature: 113-prov-card-flip */
   rationale?: string | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
-  inputState?: InputFeatureState[] | null;
+  input_state?: InputFeatureState[] | null;
 }
 
 // Expanded ToolResult fields (Phase 0 contract)
 export interface ModifiedFeature {
-  featureId: string;
-  changedProperties: Record<string, PropertyDelta>;
+  feature_id: string;
+  changed_properties: Record<string, PropertyDelta>;
 }
 
 export interface PropertyDelta {
-  previousValue: unknown;
-  newValue: unknown;
+  previous_value: unknown;
+  new_value: unknown;
 }
 
 export interface CreatedAsset {
-  resultId: string;
+  result_id: string;
   path: string;
-  mimeType?: string;
+  mime_type?: string;
 }
 
 export interface ExpandedToolResultFields {
-  toolVersion?: string;
-  modifiedFeatures?: ModifiedFeature[];
-  createdFeatures?: string[];
-  createdAssets?: CreatedAsset[];
+  tool_version?: string;
+  modified_features?: ModifiedFeature[];
+  created_features?: string[];
+  created_assets?: CreatedAsset[];
   parameters?: Record<string, ParameterValue>;
 }
 
 // LogService interface
 export interface RecordResult {
-  activityId: string;
-  featuresUpdated: number;
+  activity_id: string;
+  features_updated: number;
   entries: LogEntry[];
 }
 
@@ -88,18 +89,18 @@ export interface TimelineOptions {
 export interface ToolResultForLog {
   success: boolean;
   features?: { type: 'FeatureCollection'; features: unknown[] };
-  durationMs: number;
-  resultType?: string;
-  sourceFeatureIds?: string[];
-  artifactHref?: string;
-  toolId?: string;
+  duration_ms: number;
+  result_type?: string;
+  source_feature_ids?: string[];
+  artifact_href?: string;
+  tool_id?: string;
   /** Pre-tool geometry snapshot for mutation tools (passed through to LogEntry). */
-  inputState?: InputFeatureState[];
+  input_state?: InputFeatureState[];
 }
 
 // Feature provenance entry for stacService
 export interface FeatureProvenance {
-  featureId: string;
+  feature_id: string;
   entry: Record<string, unknown>;
 }
 
@@ -168,106 +169,106 @@ export interface LogService {
 
 /** Describes a single entry in a replay plan. */
 export interface ReplayEntry {
-  activityId: string;
+  activity_id: string;
   /** Original ISO-8601 timestamp — stamped on output provenance to preserve ordering. */
   timestamp: string;
-  toolId: string;
-  toolVersion: string;
+  tool_id: string;
+  tool_version: string;
   parameters: Record<string, unknown>;
-  featureIds: string[];
-  isTuneTarget: boolean;
+  feature_ids: string[];
+  is_tune_target: boolean;
 }
 
 /** Describes the parameter being tuned. */
 export interface TuneTarget {
-  activityId: string;
+  activity_id: string;
   parameter: string;
-  previousValue: unknown;
-  newValue: unknown;
+  previous_value: unknown;
+  new_value: unknown;
 }
 
 /** Full replay plan built from timeline analysis. */
 export interface ReplayPlan {
-  startFromSnapshot: string | null;
+  start_from_snapshot: string | null;
   entries: ReplayEntry[];
-  tuneTarget: TuneTarget | null;
-  preReplayState: GeoJsonFeatureCollection;
+  tune_target: TuneTarget | null;
+  pre_replay_state: GeoJsonFeatureCollection;
 }
 
 /** Progress update emitted during replay. */
 export interface ReplayProgress {
   current: number;
   total: number;
-  currentToolId: string;
+  current_tool_id: string;
   phase: 'loading-snapshot' | 'replaying' | 'finalising';
 }
 
 /** New versioned artifact produced during replay. */
 export interface ArtifactVersion {
-  resultId: string;
+  result_id: string;
   version: number;
   path: string;
-  previousPath: string;
+  previous_path: string;
 }
 
 /** Why replay stopped before completing. */
 export interface ReplayHaltReason {
   type: 'version-mismatch' | 'dependency-missing' | 'execution-error';
-  entryActivityId: string;
-  toolId: string;
+  entry_activity_id: string;
+  tool_id: string;
   message: string;
 }
 
 /** Outcome of a replay operation. */
 export interface ReplayResult {
   status: 'completed' | 'halted' | 'cancelled';
-  entriesReplayed: number;
-  totalEntries: number;
-  haltReason: ReplayHaltReason | null;
-  tuneAnnotation: TuneAnnotation | null;
-  artifactsCreated: ArtifactVersion[];
+  entries_replayed: number;
+  total_entries: number;
+  halt_reason: ReplayHaltReason | null;
+  tune_annotation: TuneAnnotation | null;
+  artifacts_created: ArtifactVersion[];
 }
 
 /** Minimal tool execution result for the Replay Engine. */
 export interface ToolExecutionResultForReplay {
   success: boolean;
   features?: { type: 'FeatureCollection'; features: unknown[] };
-  durationMs: number;
-  toolVersion?: string;
-  artifactHref?: string;
-  resultId?: string;
+  duration_ms: number;
+  tool_version?: string;
+  artifact_href?: string;
+  result_id?: string;
 }
 
 /** Callback to execute a single tool during replay. */
 export type ToolExecutor = (
-  toolId: string,
-  featureIds: string[],
+  tool_id: string,
+  feature_ids: string[],
   params: Record<string, unknown>,
-  /** Original activityId — callee should stamp this on output provenance. */
-  activityId?: string,
+  /** Original activity_id — callee should stamp this on output provenance. */
+  activity_id?: string,
   /** Original timestamp — callee should stamp this on output provenance to preserve ordering. */
   timestamp?: string
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Callback to load a snapshot GeoJSON for cross-snapshot replay. */
 export type SnapshotLoader = (
-  storePath: string,
-  itemPath: string,
-  assetFilename: string
+  store_path: string,
+  item_path: string,
+  asset_filename: string
 ) => Promise<GeoJsonFeatureCollection | null>;
 
 /** Callback to get the installed version of a tool. */
-export type ToolVersionResolver = (toolId: string) => Promise<string | null>;
+export type ToolVersionResolver = (tool_id: string) => Promise<string | null>;
 
 /** Callback to report progress to the UI. */
 export type ProgressReporter = (progress: ReplayProgress) => void;
 
 /** All dependencies the Replay Engine needs. */
 export interface ReplayEngineDeps {
-  executeTool: ToolExecutor;
-  loadSnapshot: SnapshotLoader;
-  resolveToolVersion: ToolVersionResolver;
-  onProgress: ProgressReporter;
+  execute_tool: ToolExecutor;
+  load_snapshot: SnapshotLoader;
+  resolve_tool_version: ToolVersionResolver;
+  on_progress: ProgressReporter;
   signal: AbortSignal;
 }
 
@@ -289,7 +290,7 @@ export interface ParameterTypeInfo {
   type: 'float' | 'integer' | 'duration' | 'enum' | 'boolean' | 'string';
   min?: number;
   max?: number;
-  allowedValues?: string[];
+  allowed_values?: string[];
   pattern?: string;
   label: string;
 }
@@ -299,7 +300,7 @@ export interface ParameterTypeInfo {
 /** Reference to another file in the snapshot chain. */
 export interface SnapshotRef {
   asset: string;
-  provEntryCount: number;
+  prov_entry_count: number;
 }
 
 /** Doubly-linked chain pointers on the system record. */
@@ -310,61 +311,61 @@ export interface SnapshotLinks {
 
 /** File-level provenance entry on the system record. */
 export interface FileProvEntry {
-  activityId: string;
+  activity_id: string;
   type: 'snapshot' | 'branch';
   timestamp: string;
   asset: string | null;
-  branchId: string | null;
+  branch_id: string | null;
   direction: 'source' | 'target' | null;
 }
 
 /** Properties of the system record feature. */
 export interface SystemRecordProperties {
-  featureType: 'system';
-  snapshotLinks: SnapshotLinks | null;
+  feature_type: 'system';
+  snapshot_links: SnapshotLinks | null;
   branches: BranchRecord[];
-  branchOrigin: BranchOrigin | null;
+  branch_origin: BranchOrigin | null;
   provenance: FileProvEntry[];
 }
 
 /** Branch record on the source plot's system record. */
 export interface BranchRecord {
-  branchId: string;
-  branchedFrom: string;
-  branchedAt: string;
-  targetAsset: string;
+  branch_id: string;
+  branched_from: string;
+  branched_at: string;
+  target_asset: string;
 }
 
 // ─── Branch Types (Feature: 075-branching) ──────────────────────────────
 
 /** Reverse link on a branch plot's system record. */
 export interface BranchOrigin {
-  sourceAsset: string;
-  branchedFrom: string;
-  branchedAt: string;
-  branchId: string;
+  source_asset: string;
+  branched_from: string;
+  branched_at: string;
+  branch_id: string;
 }
 
 /** Options for branchFrom(). */
 export interface BranchFromOptions {
-  activityId: string;
+  activity_id: string;
 }
 
 /** Result of a successful branch creation. */
 export interface BranchResult {
-  branchId: string;
-  branchItemPath: string;
-  branchGeoJsonPath: string;
-  branchedFrom: string;
-  entriesIncluded: number;
+  branch_id: string;
+  branch_item_path: string;
+  branch_geojson_path: string;
+  branched_from: string;
+  entries_included: number;
   timestamp: string;
 }
 
 /** Where a branch point entry is located in the history. */
 export type BranchPointLocation =
-  | { type: 'current-segment'; entryIndex: number }
-  | { type: 'snapshot-boundary'; snapshotAsset: string }
-  | { type: 'pre-snapshot-arbitrary'; snapshotAsset: string; entryIndex: number };
+  | { type: 'current-segment'; entry_index: number }
+  | { type: 'snapshot-boundary'; snapshot_asset: string }
+  | { type: 'pre-snapshot-arbitrary'; snapshot_asset: string; entry_index: number };
 
 /** Branch-specific error codes. */
 export type BranchErrorCode =
@@ -376,63 +377,63 @@ export type BranchErrorCode =
 
 /** Dependencies for the branch service (extends snapshot deps). */
 export interface BranchServiceDeps extends SnapshotServiceDeps {
-  createItem: (storePath: string, title: string) => { itemPath: string; itemId: string; itemDir: string };
-  generateBranchId: () => string;
+  create_item: (store_path: string, title: string) => { item_path: string; item_id: string; item_dir: string };
+  generate_branch_id: () => string;
 }
 
 /** Branch service interface. */
 export interface BranchService {
   branchFrom(
-    storePath: string,
-    itemPath: string,
+    store_path: string,
+    item_path: string,
     options: BranchFromOptions
   ): Promise<BranchResult>;
 
   locateBranchPoint(
-    storePath: string,
-    itemPath: string,
-    activityId: string
+    store_path: string,
+    item_path: string,
+    activity_id: string
   ): Promise<BranchPointLocation | null>;
 
   getBranches(
-    storePath: string,
-    itemPath: string
+    store_path: string,
+    item_path: string
   ): Promise<BranchRecord[]>;
 
   getBranchOrigin(
-    storePath: string,
-    itemPath: string
+    store_path: string,
+    item_path: string
   ): Promise<BranchOrigin | null>;
 }
 
 /** Options for creating a snapshot. */
 export interface CreateSnapshotOptions {
-  fromEntryId?: string;
+  from_entry_id?: string;
 }
 
 /** Result of a successful snapshot creation. */
 export interface SnapshotResult {
-  snapshotAsset: string;
-  entriesCaptured: number;
-  entriesRemaining: number;
+  snapshot_asset: string;
+  entries_captured: number;
+  entries_remaining: number;
   timestamp: string;
 }
 
 /** Snapshot boundary info for "Show earlier history". */
 export interface SnapshotBoundary {
   asset: string;
-  provEntryCount: number;
+  prov_entry_count: number;
 }
 
 /** Result of loading entries from a snapshot. */
 export interface SnapshotEntriesResult {
   entries: LogEntry[];
-  nextBoundary: SnapshotBoundary | null;
+  next_boundary: SnapshotBoundary | null;
 }
 
 /** Extended timeline options for cross-snapshot assembly. */
 export interface CrossSnapshotTimelineOptions {
-  previousEntries?: LogEntry[];
+  previous_entries?: LogEntry[];
 }
 
 /** Minimal GeoJSON FeatureCollection for snapshot operations. */

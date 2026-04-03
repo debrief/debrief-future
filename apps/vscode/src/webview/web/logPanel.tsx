@@ -34,9 +34,9 @@ interface ReplayProgressPayload {
 
 interface ReplayResultPayload {
   status: 'completed' | 'halted' | 'cancelled';
-  entriesReplayed: number;
-  totalEntries: number;
-  haltReason: { type: string; toolId: string; message: string } | null;
+  entries_replayed: number;
+  total_entries: number;
+  halt_reason: { type: string; tool_id: string; message: string } | null;
 }
 
 // Extended message type to include Phase 6 + Feature 113 messages
@@ -130,11 +130,11 @@ function LogPanelApp(): React.ReactElement {
           const result = msg.payload;
           if (result.status === 'completed') {
             setActionResultMessage(
-              `Replay completed: ${result.entriesReplayed} operations replayed.`
+              `Replay completed: ${result.entries_replayed} operations replayed.`
             );
-          } else if (result.status === 'halted' && result.haltReason) {
+          } else if (result.status === 'halted' && result.halt_reason) {
             setActionResultMessage(
-              `Replay halted at "${result.haltReason.toolId}": ${result.haltReason.message}`
+              `Replay halted at "${result.halt_reason.tool_id}": ${result.halt_reason.message}`
             );
           } else if (result.status === 'cancelled') {
             setActionResultMessage('Replay cancelled. Previous state restored.');
