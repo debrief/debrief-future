@@ -488,11 +488,11 @@ export default function App() {
       const updatedInputStates = new Map<string, Array<{ feature_id: string; geometry: string; properties?: string }>>();
 
       // Restore features from inputState and re-execute for mutation tools
-      if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
+      if (entry?.input_state && entry.input_state.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
-            entry.inputState!.map(is => [is.feature_id, is])
+            entry.input_state!.map(is => [is.feature_id, is])
           );
           // Restore original geometry in the plot (pre-tuned-entry state)
           // T022: schema InputFeatureState stores geometry/properties as JSON strings
@@ -540,11 +540,11 @@ export default function App() {
             for (let i = tunedIdx - 1; i >= 0; i--) {
               const nextEntry = logEntries[i]!;
               if (!isMutationTool(nextEntry.toolName)) continue;
-              if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
+              if (!nextEntry.input_state || nextEntry.input_state.length === 0) continue;
 
               // Only replay if this entry affects features that were modified
               // T022: schema InputFeatureState uses feature_id (snake_case)
-              const affectedIds = new Set(nextEntry.inputState.map(is => is.feature_id));
+              const affectedIds = new Set(nextEntry.input_state.map(is => is.feature_id));
               const featuresToReplay = currentFeatures.filter(f =>
                 affectedIds.has(String(f.id))
               ) as Feature[];
@@ -599,7 +599,7 @@ export default function App() {
             return {
               ...e,
               parameters: updatedParams,
-              tuneAnnotation: { parameter, previousValue: e.parameters[parameter]?.value, newValue },
+              tuneAnnotation: { parameter, previous_value: e.parameters[parameter]?.value, new_value: newValue },
             };
           }
           // Update inputState for subsequent entries that were replayed
@@ -989,7 +989,7 @@ export default function App() {
       execution_duration: 'PT0.1S',
       generated_result_id: generatedIds[0] ?? null,
       operationCategory: 'calculation',
-      inputState,
+      input_state: inputState,
     };
 
     // Store pre-tool snapshots for revert (captured before execution above)
