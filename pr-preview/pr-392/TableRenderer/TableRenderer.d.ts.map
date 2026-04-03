@@ -1,0 +1,1 @@
+{"version":3,"file":"TableRenderer.d.ts","sourceRoot":"","sources":["../../src/TableRenderer/TableRenderer.tsx"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,MAAM,WAAW,kBAAkB;IACjC,qFAAqF;IACrF,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,EAAE,CAAC;IAChC,8BAA8B;IAC9B,SAAS,CAAC,EAAE,MAAM,CAAC;CACpB;AAYD,wBAAgB,aAAa,CAAC,EAAE,IAAI,EAAE,SAAS,EAAE,EAAE,kBAAkB,kDAyFpE"}
