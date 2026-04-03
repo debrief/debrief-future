@@ -206,7 +206,7 @@ export { LogPanelWrapper } from './panels/LogPanelWrapper';
 export { MapPanel } from './panels/MapPanel';
 export { ChartPanelWrapper } from './panels/ChartPanelWrapper';
 
-// LogPanel (Feature: 072-log-panel)
+// LogPanel (Feature: 072-log-panel, updated: 176-log-panel-ux)
 export { LogPanel } from './LogPanel';
 export type {
   LogPanelProps,
@@ -219,7 +219,6 @@ export type {
   TimelineEntry,
   InputFeatureState,
   OperationCategory,
-  PresentationMode,
   ViewMode,
   ParameterValue as LogParameterValue,
   FeatureDisplayInfo,
@@ -233,12 +232,33 @@ export type {
   ModeInitPayload,
   ParameterSchemaEntry,
   CardReplayStatus,
+  // Feature 176: Rich card types
+  ToolCategory,
+  ParamType,
+  ToolCategoryConfig,
+  ParamChipData,
+  ToolCategoryIconProps,
+  ParameterChipProps,
+  TrackBadgeProps,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,
+  VALID_VIEW_MODES,
 } from './LogPanel';
 export type {
   FilterState as LogFilterState,
+} from './LogPanel';
+// Feature 176: Rich card sub-components and utilities
+export {
+  ToolCategoryIcon,
+  ParameterChip,
+  TrackBadge,
+  resolveToolCategory,
+  TOOL_CATEGORY_CONFIGS,
+  UNKNOWN_CATEGORY_CONFIG,
+  inferParamType,
+  inferFromSchema,
+  inferFromValue,
 } from './LogPanel';
 
 // Colour Engine (Feature: 134-colour-scheme-engine)

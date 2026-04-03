@@ -21,6 +21,7 @@ on:
       - 'shared/components/**'
       - 'apps/web-shell/**'
       - 'apps/vscode/test-data/**'
+      - 'preview/workspace/samples/**'
       - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
   pull_request:
@@ -29,6 +30,7 @@ on:
       - 'shared/components/**'
       - 'apps/web-shell/**'
       - 'apps/vscode/test-data/**'
+      - 'preview/workspace/samples/**'
       - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
 
@@ -72,6 +74,7 @@ jobs:
         run: pnpm --filter @debrief/web-shell build
         env:
           VITE_BASE_URL: /debrief-future/web-shell/
+          STAC_STORE_PATH: ${{ github.workspace }}/preview/workspace/samples/local-store
 
       - name: Create root landing page
         run: |
@@ -149,6 +152,7 @@ jobs:
         run: pnpm --filter @debrief/web-shell build
         env:
           VITE_BASE_URL: /debrief-future/pr-preview/pr-${{ github.event.pull_request.number }}/web-shell/
+          STAC_STORE_PATH: ${{ github.workspace }}/preview/workspace/samples/local-store
 
       - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

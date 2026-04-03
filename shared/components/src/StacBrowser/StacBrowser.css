@@ -310,3 +310,45 @@
   margin-left: 8px;
   font-size: 11px;
 }
+
+/* ─── Panel hide button (in header controls, Timeline/Map only) ──────────── */
+.stac-browser__hide-btn-li {
+  width: auto !important;
+  height: auto !important;
+  float: none !important;
+  display: flex !important;
+  align-items: center;
+  margin-right: 2px;
+}
+
+.stac-browser__hide-btn {
+  background: none;
+  border: none;
+  color: var(--vscode-icon-foreground, #555);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 18px;
+  opacity: 0.5;
+}
+
+.stac-browser__hide-btn:hover {
+  opacity: 1;
+}
+
+/* ─── Restore buttons (in filter bar, next to Reset Layout) ──────────────── */
+.stac-browser__restore-btn {
+  background: var(--vscode-button-secondaryBackground, #e8e8e8);
+  border: 1px solid var(--vscode-button-secondaryBackground, #ccc);
+  color: var(--vscode-button-secondaryForeground, #333);
+  padding: 2px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.stac-browser__restore-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #ddd);
+}

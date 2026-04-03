@@ -27,7 +27,6 @@ import type { ToolParameter } from '../types/tool';
 // Locally-defined types matching @debrief/components LogPanel types.
 // Defined here to avoid ESM-from-CJS import issues with @debrief/components.
 type OperationCategory = 'calculation' | 'import' | 'property-edit' | 'export';
-type PresentationMode = 'compact' | 'normal' | 'detailed';
 interface LogParameterValue {
   value: unknown;
   default: boolean;
@@ -81,7 +80,7 @@ interface ActionInvokeMessage {
 
 interface ModeChangeMessage {
   type: 'mode:change';
-  payload: { presentationMode: PresentationMode };
+  payload: { viewMode: string };
 }
 
 interface WebviewReadyMessage {
@@ -402,15 +401,16 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
           }
           this._pendingMessages = [];
 
-          // Send initial presentation mode from globalState
+          // Send initial view mode from globalState
           {
-            const savedMode = this._context.globalState.get<PresentationMode>(
-              'debrief.logPanel.presentationMode',
-              'normal'
+            const VALID_VIEW_MODES = ['timeline', 'by-feature', 'compact', 'detailed'];
+            const savedMode = this._context.globalState.get<string>(
+              'debrief.logPanel.viewMode',
+              'timeline'
             );
             this._postMessage({
               type: 'mode:init',
-              payload: { presentationMode: savedMode },
+              payload: { viewMode: VALID_VIEW_MODES.includes(savedMode) ? savedMode : 'timeline' },
             });
           }
 
@@ -500,10 +500,10 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'mode:change':
-          // Persist presentation mode to globalState
+          // Persist view mode to globalState (Feature 176: unified ViewMode)
           void this._context.globalState.update(
-            'debrief.logPanel.presentationMode',
-            message.payload.presentationMode
+            'debrief.logPanel.viewMode',
+            message.payload.viewMode
           );
           break;
 
