@@ -174,6 +174,10 @@ export type { CaptureMapOptions } from './MapView/captureMap';
 export { downscaleDataUrl } from './MapView/resizeImage';
 export type { DownscaleOptions } from './MapView/resizeImage';
 
+// TableRenderer (Feature: 177-tabular-results-panel)
+export { TableRenderer } from './TableRenderer';
+export type { TableRendererProps } from './TableRenderer';
+
 // ChartRenderer (Feature: 085-chart-renderer)
 export { ChartRenderer } from './ChartRenderer';
 export type { ChartRendererProps } from './ChartRenderer';

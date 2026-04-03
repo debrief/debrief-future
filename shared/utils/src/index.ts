@@ -49,6 +49,14 @@ export type {
   ResolvedPositionStyle,
 } from './types.js';
 
+// CSV utilities
+export {
+  sanitizeFilename,
+  generateCsvFilename,
+  formatCsvValue,
+  buildCsvContent,
+} from './csv.js';
+
 // MCP types
 export type {
   DebriefAnnotations,

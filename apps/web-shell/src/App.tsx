@@ -1125,6 +1125,9 @@ export default function App() {
       activeChartTabId: activeResultTabId,
       onChartTabSelect: setActiveResultTabId,
       onChartTabClose: handleCloseResultTab,
+      onSave: (_tabId: string) => { /* Save handled by VS Code extension host (#177) */ },
+      onSaveAs: (_tabId: string, _baseName: string, _tag?: string) => { /* Save As handled by VS Code extension host (#177) */ },
+      onRetry: (_tabId: string) => { /* Retry handled by VS Code extension host (#177) */ },
     };
   }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab]);
 
