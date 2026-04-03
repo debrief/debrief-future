@@ -9,7 +9,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { LogPanel } from './LogPanel';
 import type {
   TimelineEntry,
-  PresentationMode,
   ViewMode,
   FilterState,
   LogPanelMessage,
@@ -121,12 +120,8 @@ function LogPanelInteractive(props: {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
   hasActiveSession: boolean;
-  initialMode?: PresentationMode;
   initialView?: ViewMode;
 }) {
-  const [presentationMode, setPresentationMode] = useState<PresentationMode>(
-    props.initialMode ?? 'normal'
-  );
   const [viewMode, setViewMode] = useState<ViewMode>(props.initialView ?? 'timeline');
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
@@ -144,7 +139,6 @@ function LogPanelInteractive(props: {
       <LogPanel
         entries={props.entries}
         featureNames={props.featureNames}
-        presentationMode={presentationMode}
         viewMode={viewMode}
         selectedEntryId={selectedEntryId}
         filterState={filterState}
@@ -152,7 +146,6 @@ function LogPanelInteractive(props: {
         plotName="Exercise Alpha"
         actionResultMessage={notification}
         onMessage={handleMessage}
-        onPresentationModeChange={setPresentationMode}
         onViewModeChange={setViewMode}
         onFilterStateChange={setFilterState}
         onSelectedEntryChange={setSelectedEntryId}
@@ -224,7 +217,6 @@ export const EntrySelected: Story = {
           <LogPanel
             entries={sampleEntries}
             featureNames={sampleFeatureNames}
-            presentationMode="normal"
             viewMode="timeline"
             selectedEntryId={selectedEntryId}
             filterState={filterState}
@@ -252,40 +244,40 @@ export const EntryWithDeletedFeature: Story = {
   ),
 };
 
-// --- US3: Presentation Modes ---
+// --- US3: View Modes (Feature 176: unified 4-tab) ---
 
-export const CompactMode: Story = {
-  name: 'Compact Mode',
+export const CompactView: Story = {
+  name: 'Compact View',
   render: () => (
     <LogPanelInteractive
       entries={sampleEntries}
       featureNames={sampleFeatureNames}
       hasActiveSession={true}
-      initialMode="compact"
+      initialView="compact"
     />
   ),
 };
 
-export const NormalMode: Story = {
-  name: 'Normal Mode',
+export const TimelineView: Story = {
+  name: 'Timeline View',
   render: () => (
     <LogPanelInteractive
       entries={sampleEntries}
       featureNames={sampleFeatureNames}
       hasActiveSession={true}
-      initialMode="normal"
+      initialView="timeline"
     />
   ),
 };
 
-export const DetailedMode: Story = {
-  name: 'Detailed Mode',
+export const DetailedView: Story = {
+  name: 'Detailed View',
   render: () => (
     <LogPanelInteractive
       entries={sampleEntries}
       featureNames={sampleFeatureNames}
       hasActiveSession={true}
-      initialMode="detailed"
+      initialView="detailed"
     />
   ),
 };
@@ -296,7 +288,6 @@ export const FilterActive: Story = {
   name: 'Filter Active',
   render: () => {
     const Wrapper = () => {
-      const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
       const [viewMode, setViewMode] = useState<ViewMode>('timeline');
       const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
       const [filterState, setFilterState] = useState<FilterState>({
@@ -311,14 +302,12 @@ export const FilterActive: Story = {
           <LogPanel
             entries={sampleEntries}
             featureNames={sampleFeatureNames}
-            presentationMode={presentationMode}
             viewMode={viewMode}
             selectedEntryId={selectedEntryId}
             filterState={filterState}
             hasActiveSession={true}
             plotName="Exercise Alpha"
             actionResultMessage={null}
-            onPresentationModeChange={setPresentationMode}
             onViewModeChange={setViewMode}
             onFilterStateChange={setFilterState}
             onSelectedEntryChange={setSelectedEntryId}
@@ -357,7 +346,6 @@ export const ActionsDisabled: Story = {
           <LogPanel
             entries={sampleEntries}
             featureNames={sampleFeatureNames}
-            presentationMode="normal"
             viewMode="timeline"
             selectedEntryId={null}
             filterState={filterState}
@@ -396,7 +384,6 @@ function FlipCardInteractive(props: {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
 }) {
-  const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
   const [viewMode, setViewMode] = useState<ViewMode>('timeline');
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
@@ -455,7 +442,6 @@ function FlipCardInteractive(props: {
       <LogPanel
         entries={localEntries}
         featureNames={props.featureNames}
-        presentationMode={presentationMode}
         viewMode={viewMode}
         selectedEntryId={selectedEntryId}
         filterState={filterState}
@@ -463,7 +449,6 @@ function FlipCardInteractive(props: {
         plotName="Exercise Alpha"
         actionResultMessage={notification}
         onMessage={handleMessage}
-        onPresentationModeChange={setPresentationMode}
         onViewModeChange={setViewMode}
         onFilterStateChange={setFilterState}
         onSelectedEntryChange={setSelectedEntryId}

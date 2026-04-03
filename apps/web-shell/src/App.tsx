@@ -44,7 +44,6 @@ import type {
   ActivityPanelMessage,
   DebriefFeature,
   TimelineEntry,
-  PresentationMode,
   ViewMode,
   LogPanelMessage,
   PanelContextValue,
@@ -181,7 +180,6 @@ export default function App() {
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
-  const [logPresentationMode, setLogPresentationMode] = useState<PresentationMode>('normal');
   const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
   const [logSelectedEntryId, setLogSelectedEntryId] = useState<string | null>(null);
   const [logFilterState, setLogFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
@@ -1161,7 +1159,6 @@ export default function App() {
     logPanelProps: currentPlot ? {
       entries: logEntries,
       featureNames,
-      presentationMode: logPresentationMode,
       viewMode: logViewMode,
       selectedEntryId: logSelectedEntryId,
       filterState: logFilterState,
@@ -1169,7 +1166,6 @@ export default function App() {
       plotName: currentPlot?.title ?? null,
       actionResultMessage: logNotification,
       onMessage: handleLogMessage,
-      onPresentationModeChange: setLogPresentationMode,
       onViewModeChange: setLogViewMode,
       onFilterStateChange: setLogFilterState,
       onSelectedEntryChange: setLogSelectedEntryId,
@@ -1195,7 +1191,7 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, allFeatures, state.selection.featureIds, handleActivityMessage,
     selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
-    handleShapeCreated, logEntries, featureNames, logPresentationMode,
+    handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,

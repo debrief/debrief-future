@@ -60,14 +60,17 @@ function combinedBounds(items: StacBrowserItem[]): LatLngBoundsExpression | null
   return [[minLat, minLng], [maxLat, maxLng]];
 }
 
-/** Auto-fit map to bounds once on initial mount only. */
+/** Auto-fit map to bounds, re-fitting when the bounds change significantly
+ *  (e.g. when the full catalog finishes loading and replaces the seeded items). */
 function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }): null {
   const map = useMap();
-  const fittedRef = useRef(false);
+  const prevBoundsRef = useRef<string | null>(null);
   useEffect(() => {
-    if (bounds && !fittedRef.current) {
-      fittedRef.current = true;
-      map.fitBounds(bounds as L.LatLngBoundsExpression, { padding: [20, 20] });
+    if (!bounds) return;
+    const key = JSON.stringify(bounds);
+    if (key !== prevBoundsRef.current) {
+      prevBoundsRef.current = key;
+      map.fitBounds(bounds as L.LatLngBoundsExpression, { padding: [20, 20], animate: false });
     }
   }, [map, bounds]);
   return null;
@@ -325,6 +328,7 @@ const ResizableSplitPane: React.FC<{ left: React.ReactNode; right: React.ReactNo
 
 // ─── Context for passing props to panels ──────────────────────────────────────
 interface BrowserPanelContext {
+  allItems: readonly StacBrowserItem[];
   filteredItems: readonly StacBrowserItem[];
   spatialFilteredItems: readonly StacBrowserItem[];
   onItemSelect?: (itemPath: string) => void;
@@ -500,7 +504,10 @@ function renderPanel(type: string): React.ReactElement {
       );
     case PANEL_MAP: {
       const mapItems = (ctx.filteredItems as StacBrowserItem[]).filter(i => i.bbox !== null);
-      const bounds = combinedBounds(mapItems);
+      // Use ALL items for initial fit so the map shows everything when the catalog loads,
+      // not just the filtered subset (which may be empty before FitBounds runs).
+      const allMapItems = (ctx.allItems as StacBrowserItem[]).filter(i => i.bbox !== null);
+      const bounds = combinedBounds(allMapItems);
       const rectangles = mapItems.map(item => ({
         id: item.id,
         bounds: bboxToBounds(item.bbox!),
@@ -634,7 +641,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   // ─── Viewport callback (from map panel) ────────────────────────────────────
   const handleViewportChange = useCallback((bounds: Bounds | null) => {
     if (bounds) {
-      // Convert Bounds to ViewportPolygon for the filter
+      // Track the viewport so spatial filtering works if enabled,
+      // but don't auto-activate it — the map is for overview, not filtering.
+      // Auto-activation caused a boot-order race: the initial FitBounds for
+      // seeded items locked the viewport before the full catalog loaded,
+      // filtering out all items whose bboxes were outside that small area.
       const [west, south, east, north] = bounds;
       setViewport({
         coordinates: [
@@ -644,7 +655,6 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
           [west, south],   // SW
         ],
       });
-      setSpatialFilterActive(true);
     }
   }, []);
 
@@ -666,6 +676,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
 
   // ─── Update browser panel context ─────────────────────────────────────────
   const contextValue: BrowserPanelContext = useMemo(() => ({
+    allItems: items,
     filteredItems,
     spatialFilteredItems,
     onItemSelect,
@@ -677,7 +688,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     colourFn,
     sort,
     onSortChange: handleSortChange,
-  }), [filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn, sort, handleSortChange]);
+  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn, sort, handleSortChange]);
 
   // Update module-level context and re-render panels + sort header
   useEffect(() => {

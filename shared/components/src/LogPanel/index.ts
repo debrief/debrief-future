@@ -2,6 +2,7 @@
  * LogPanel module — public API.
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 113-prov-card-flip (flip-card components)
+ * Updated: 176-log-panel-ux (rich card UX, unified ViewMode)
  */
 
 export { LogPanel } from './LogPanel';
@@ -16,7 +17,6 @@ export type {
   TimelineEntry,
   InputFeatureState,
   OperationCategory,
-  PresentationMode,
   ViewMode,
   FilterState,
   ParameterValue,
@@ -31,8 +31,16 @@ export type {
   ModeInitPayload,
   ParameterSchemaEntry,
   CardReplayStatus,
+  // Feature 176: Rich card types
+  ToolCategory,
+  ParamType,
+  ToolCategoryConfig,
+  ParamChipData,
+  ToolCategoryIconProps,
+  ParameterChipProps,
+  TrackBadgeProps,
 } from './types';
-export { DEFAULT_FILTER_STATE } from './types';
+export { DEFAULT_FILTER_STATE, VALID_VIEW_MODES } from './types';
 export { ParameterEditor } from './ParameterEditor';
 export type { ParameterEditorProps } from './ParameterEditor';
 export { ReplayProgress } from './ReplayProgress';
@@ -44,3 +52,9 @@ export type { EditFaceProps } from './EditFace';
 export { SkeletonLoader } from './SkeletonLoader';
 export type { SkeletonLoaderProps } from './SkeletonLoader';
 export { cascadeDisable } from './utils';
+// Feature 176: Rich card sub-components
+export { ToolCategoryIcon } from './ToolCategoryIcon';
+export { ParameterChip } from './ParameterChip';
+export { TrackBadge } from './TrackBadge';
+export { resolveToolCategory, TOOL_CATEGORY_CONFIGS, UNKNOWN_CATEGORY_CONFIG } from './toolCategories';
+export { inferParamType, inferFromSchema, inferFromValue } from './paramTypeInference';

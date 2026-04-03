@@ -170,16 +170,31 @@ export function groupEntriesByFeature(
 
 /**
  * Format an ISO 8601 duration to a human-readable string.
- * e.g., "PT0.5S" → "0.5s", "PT1M2S" → "1m 2s"
+ * e.g., "PT0.5S" → "500ms", "PT1M2S" → "1m 2s", "PT0.25S" → "250ms"
+ * Feature 176: sub-second durations now display in milliseconds.
  */
 export function formatDuration(isoDuration: string): string {
   const match = isoDuration.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/);
   if (!match) return isoDuration;
 
+  const hours = match[1] ? parseInt(match[1], 10) : 0;
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  const seconds = match[3] ? parseFloat(match[3]) : 0;
+
+  // Sub-second with no hours/minutes → display as milliseconds
+  if (hours === 0 && minutes === 0 && seconds > 0 && seconds < 1) {
+    const ms = Math.round(seconds * 1000);
+    return `${ms}ms`;
+  }
+
   const parts: string[] = [];
-  if (match[1]) parts.push(`${match[1]}h`);
-  if (match[2]) parts.push(`${match[2]}m`);
-  if (match[3]) parts.push(`${match[3]}s`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (seconds > 0) {
+    // Show decimal only when needed (e.g. 2.3s, not 2.0s)
+    const sStr = seconds % 1 === 0 ? `${seconds}` : `${seconds}`;
+    parts.push(`${sStr}s`);
+  }
 
   return parts.length > 0 ? parts.join(' ') : '< 1s';
 }

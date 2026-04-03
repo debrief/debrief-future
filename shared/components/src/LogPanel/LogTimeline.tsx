@@ -13,7 +13,7 @@ import { LogEntry } from './LogEntry';
 export function LogTimeline({
   entries,
   featureNames,
-  presentationMode,
+  viewMode,
   selectedEntryId,
   onEntryClick,
   onTuneClick,
@@ -44,7 +44,7 @@ export function LogTimeline({
           entry={entry}
           stepIndex={idx + 1}
           featureNames={featureNames}
-          presentationMode={presentationMode}
+          viewMode={viewMode}
           isSelected={entry.activityId === selectedEntryId}
           onClick={onEntryClick}
           onTuneClick={onTuneClick}

@@ -30,7 +30,6 @@ import './LogPanel.css';
 export function LogPanel({
   entries,
   featureNames,
-  presentationMode,
   viewMode,
   selectedEntryId,
   filterState,
@@ -38,7 +37,6 @@ export function LogPanel({
   actionResultMessage,
   replayProgress,
   onMessage,
-  onPresentationModeChange,
   onViewModeChange,
   onFilterStateChange,
   onSelectedEntryChange,
@@ -280,10 +278,8 @@ export function LogPanel({
       <LogActionBar
         selectedEntryId={selectedEntryId}
         viewMode={viewMode}
-        presentationMode={presentationMode}
         onActionInvoke={handleActionInvoke}
         onViewModeChange={onViewModeChange}
-        onPresentationModeChange={onPresentationModeChange}
       />
 
       {/* Filter row */}
@@ -319,11 +315,12 @@ export function LogPanel({
       )}
 
       {/* Timeline or By-Feature view */}
-      {viewMode === 'timeline' ? (
-        <LogTimeline
+      {/* Render timeline or by-feature based on layout mode */}
+      {(viewMode === 'by-feature') ? (
+        <LogByFeature
           entries={filteredEntries}
           featureNames={featureNames}
-          presentationMode={presentationMode}
+          viewMode={viewMode}
           selectedEntryId={selectedEntryId}
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}
@@ -336,10 +333,10 @@ export function LogPanel({
           {...flipCardProps}
         />
       ) : (
-        <LogByFeature
+        <LogTimeline
           entries={filteredEntries}
           featureNames={featureNames}
-          presentationMode={presentationMode}
+          viewMode={viewMode}
           selectedEntryId={selectedEntryId}
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}

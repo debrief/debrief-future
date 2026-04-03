@@ -13,11 +13,8 @@ export const LOG_PANEL_STRINGS = {
   // View modes
   viewTimeline: 'Timeline',
   viewByFeature: 'By Feature',
-
-  // Presentation modes
-  modeCompact: 'Compact',
-  modeNormal: 'Normal',
-  modeDetailed: 'Detailed',
+  viewCompact: 'Compact',
+  viewDetailed: 'Detailed',
 
   // Filter row
   filterSearch: 'Search entries...',
@@ -104,4 +101,19 @@ export const LOG_PANEL_STRINGS = {
   sliderValueLabel: (value: number) => String(value),
   jsonEditorParseError: 'Invalid JSON',
   colorPickerLabel: 'Select colour',
+
+  // Tool categories (Feature: 176)
+  categoryImportLabel: 'Import',
+  categoryStyleLabel: 'Style',
+  categoryCalcLabel: 'Calculation',
+  categoryFilterLabel: 'Filter',
+  categorySnapshotLabel: 'Snapshot',
+  categoryUnknownLabel: 'Other',
+
+  // Parameter chips (Feature: 176)
+  chipNonDefaultTooltip: 'Non-default value',
+
+  // Rich card (Feature: 176)
+  rationaleTooltip: (rationale: string) => rationale,
+  durationMs: (ms: number) => `${ms}ms`,
 } as const;

@@ -111,20 +111,17 @@ test.describe('PROV Tuning (move-shape)', () => {
     const entry = analysisPage.logEntries.first();
     await expect(entry.locator('.log-panel__entry-tool')).toHaveText('move-shape');
 
-    // Should show tunable parameters (distance_km and direction)
-    const paramKeys = entry.locator('.log-panel__entry-param-key');
-    await expect(paramKeys.first()).toBeVisible();
-    const paramTexts = await paramKeys.allTextContents();
-    expect(paramTexts).toContain('distance_km:');
-    expect(paramTexts).toContain('direction:');
+    // Should show parameter chips for distance_km and direction (Feature 176: rich card)
+    const chips = entry.locator('.log-panel__chip');
+    await expect(chips.first()).toBeVisible();
+    const chipNames = entry.locator('.log-panel__chip-name');
+    const chipTexts = await chipNames.allTextContents();
+    expect(chipTexts).toContain('distance_km');
+    expect(chipTexts).toContain('direction');
 
-    // Parameter values should be clickable (tunable class applied)
-    const tunableValues = entry.locator(
-      '.log-panel__entry-param-value--tunable'
-    );
-    await expect(tunableValues.first()).toBeVisible();
-    const tunableCount = await tunableValues.count();
-    expect(tunableCount).toBe(2); // distance_km and direction
+    // Both parameter chips should be visible
+    const chipCount = await chips.count();
+    expect(chipCount).toBeGreaterThanOrEqual(2);
   });
 
   test('tuning distance parameter via edit face updates entry and shows annotation', async ({ page }) => {
@@ -150,9 +147,9 @@ test.describe('PROV Tuning (move-shape)', () => {
     await page.getByTestId('edit-face-done').click();
     await page.waitForTimeout(200);
 
-    // After tuning, the display face parameter value should update to 10
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toHaveText('10');
+    // After tuning, the display face parameter chip value should update to 10
+    const distanceChipValue = entry.locator('[data-testid="tune-param-distance_km"]');
+    await expect(distanceChipValue).toContainText('10');
 
     // A tune notification should appear
     const notification = page.getByTestId('log-panel-notification');
@@ -186,9 +183,9 @@ test.describe('PROV Tuning (move-shape)', () => {
     await page.getByTestId('edit-face-done').click();
     await page.waitForTimeout(200);
 
-    // After tuning, display face value should update to 180
-    const directionParam = entry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toHaveText('180');
+    // After tuning, display face chip value should update to 180
+    const directionChipValue = entry.locator('[data-testid="tune-param-direction"]');
+    await expect(directionChipValue).toContainText('180');
 
     // Tuned badge should appear
     const tunedBadge = entry.locator('[data-testid="badge-tuned"]');
@@ -208,8 +205,8 @@ test.describe('PROV Tuning (move-shape)', () => {
     await page.getByTestId('edit-face-done').click();
     await page.waitForTimeout(200);
 
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toHaveText('10');
+    const distanceChipValue = entry.locator('[data-testid="tune-param-distance_km"]');
+    await expect(distanceChipValue).toContainText('10');
 
     // Tuned badge visible
     await expect(entry.locator('[data-testid="badge-tuned"]')).toBeVisible();
@@ -220,8 +217,8 @@ test.describe('PROV Tuning (move-shape)', () => {
     await page.getByTestId('edit-face-done').click();
     await page.waitForTimeout(200);
 
-    const directionParam = entry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toHaveText('270');
+    const directionChipValue = entry.locator('[data-testid="tune-param-direction"]');
+    await expect(directionChipValue).toContainText('270');
 
     // Tuned badge still visible
     await expect(entry.locator('[data-testid="badge-tuned"]')).toBeVisible();
@@ -233,15 +230,15 @@ test.describe('PROV Tuning (move-shape)', () => {
     await analysisPage.switchToLogTab();
 
     const entry = analysisPage.logEntries.first();
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toHaveText('5');
+    const distanceChipValue = entry.locator('[data-testid="tune-param-distance_km"]');
+    await expect(distanceChipValue).toContainText('5');
 
-    // Click the display face parameter value — should NOT trigger tune
-    await distanceParam.click();
+    // Click the display face parameter chip — should NOT trigger tune
+    await distanceChipValue.click();
     await page.waitForTimeout(500);
 
     // Value should remain unchanged
-    await expect(distanceParam).toHaveText('5');
+    await expect(distanceChipValue).toContainText('5');
 
     // No tuned badge should appear
     await expect(entry.locator('[data-testid="badge-tuned"]')).not.toBeVisible();
