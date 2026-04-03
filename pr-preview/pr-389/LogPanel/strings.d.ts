@@ -11,9 +11,6 @@ export declare const LOG_PANEL_STRINGS: {
     readonly viewByFeature: "By Feature";
     readonly viewCompact: "Compact";
     readonly viewDetailed: "Detailed";
-    readonly modeCompact: "Compact";
-    readonly modeNormal: "Normal";
-    readonly modeDetailed: "Detailed";
     readonly filterSearch: "Search entries...";
     readonly filterToolType: "All tools";
     readonly filterCategory: "All categories";

@@ -33,13 +33,7 @@ export interface ParamChipData {
     readonly unit?: string | null;
 }
 /**
- * Presentation mode controlling entry detail level.
- * @deprecated Feature 176: Use ViewMode 'compact' | 'detailed' instead.
- */
-export type PresentationMode = 'compact' | 'normal' | 'detailed';
-/**
- * Unified view mode replacing ViewMode + PresentationMode.
- * Feature: 176-log-panel-ux
+ * View mode controlling card layout and detail level.
  * - timeline: full 3-row cards, newest-first
  * - by-feature: full 3-row cards, grouped by track
  * - compact: header + meta rows only
@@ -47,8 +41,7 @@ export type PresentationMode = 'compact' | 'normal' | 'detailed';
  */
 export type ViewMode = 'timeline' | 'by-feature' | 'compact' | 'detailed';
 /**
- * Valid ViewMode values for runtime validation (e.g. globalState migration).
- * Feature: 176-log-panel-ux
+ * Valid ViewMode values for runtime validation.
  */
 export declare const VALID_VIEW_MODES: readonly ViewMode[];
 /**
@@ -182,9 +175,6 @@ export type ExtensionToWebviewMessage = {
 } | {
     type: 'mode:init';
     payload: ModeInitPayload;
-} | {
-    type: 'viewMode:init';
-    payload: ModeInitPayload;
 };
 /**
  * Props for the LogPanel root component.
@@ -192,8 +182,6 @@ export type ExtensionToWebviewMessage = {
 export interface LogPanelProps {
     entries: TimelineEntry[];
     featureNames: Record<string, string>;
-    /** @deprecated Use viewMode instead. Ignored when viewMode is set. */
-    presentationMode?: PresentationMode;
     viewMode: ViewMode;
     selectedEntryId: string | null;
     filterState: FilterState;
@@ -201,8 +189,6 @@ export interface LogPanelProps {
     plotName: string | null;
     actionResultMessage: string | null;
     onMessage?: (message: LogPanelMessage) => void;
-    /** @deprecated Use onViewModeChange instead. */
-    onPresentationModeChange?: (mode: PresentationMode) => void;
     onViewModeChange?: (mode: ViewMode) => void;
     onFilterStateChange?: (state: FilterState) => void;
     onSelectedEntryChange?: (entryId: string | null) => void;
