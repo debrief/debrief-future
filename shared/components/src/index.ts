@@ -219,7 +219,6 @@ export type {
   TimelineEntry,
   InputFeatureState,
   OperationCategory,
-  PresentationMode,
   ViewMode,
   ParameterValue as LogParameterValue,
   FeatureDisplayInfo,

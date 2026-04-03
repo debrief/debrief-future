@@ -401,36 +401,16 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
           }
           this._pendingMessages = [];
 
-          // Send initial view mode from globalState (with migration from legacy key)
+          // Send initial view mode from globalState
           {
             const VALID_VIEW_MODES = ['timeline', 'by-feature', 'compact', 'detailed'];
-            // Try new key first, then migrate from legacy key
-            let savedMode = this._context.globalState.get<string>(
-              'debrief.logPanel.viewMode'
+            const savedMode = this._context.globalState.get<string>(
+              'debrief.logPanel.viewMode',
+              'timeline'
             );
-            if (!savedMode) {
-              // Migration: read legacy presentationMode and map to ViewMode
-              const legacyMode = this._context.globalState.get<string>(
-                'debrief.logPanel.presentationMode'
-              );
-              if (legacyMode === 'compact') {
-                savedMode = 'compact';
-              } else if (legacyMode === 'detailed') {
-                savedMode = 'detailed';
-              } else {
-                savedMode = 'timeline'; // 'normal' maps to default 'timeline'
-              }
-              // Persist migration so it only happens once
-              void this._context.globalState.update('debrief.logPanel.viewMode', savedMode);
-              void this._context.globalState.update('debrief.logPanel.presentationMode', undefined);
-            }
-            // Validate against known values (Gap 2: stale globalState protection)
-            if (!VALID_VIEW_MODES.includes(savedMode)) {
-              savedMode = 'timeline';
-            }
             this._postMessage({
               type: 'mode:init',
-              payload: { viewMode: savedMode },
+              payload: { viewMode: VALID_VIEW_MODES.includes(savedMode) ? savedMode : 'timeline' },
             });
           }
 

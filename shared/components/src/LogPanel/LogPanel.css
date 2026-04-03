@@ -334,26 +334,6 @@
   flex-shrink: 0;
 }
 
-/* Legacy param display (kept for backwards compat) */
-.log-panel__entry-params {
-  margin-top: 4px;
-  font-size: 0.85em;
-  color: var(--vscode-descriptionForeground, #969696);
-}
-
-.log-panel__entry-param {
-  display: flex;
-  gap: 4px;
-}
-
-.log-panel__entry-param-key {
-  opacity: 0.7;
-}
-
-.log-panel__entry-param-value {
-  font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
-}
-
 /* Detailed mode additions */
 .log-panel__entry-details {
   margin-top: 4px;
@@ -470,17 +450,6 @@
 .log-panel__entry-badge--deleted {
   background: var(--vscode-editorWarning-background, rgba(255, 140, 0, 0.15));
   color: var(--vscode-editorWarning-foreground, #ff8c00);
-}
-
-/* Tunable parameter value — clickable (Feature: 076) */
-.log-panel__entry-param-value--tunable {
-  cursor: pointer;
-  border-bottom: 1px dashed var(--vscode-descriptionForeground, #969696);
-}
-
-.log-panel__entry-param-value--tunable:hover {
-  color: var(--vscode-textLink-foreground, #3794ff);
-  border-bottom-color: var(--vscode-textLink-foreground, #3794ff);
 }
 
 /* Restore button for deleted entries (Feature: 076) */

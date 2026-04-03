@@ -10,16 +10,11 @@ export const LOG_PANEL_STRINGS = {
   emptyNoPlot: 'No plot is open. Open a plot to view its analytical history.',
   emptyNoEntries: 'No operations recorded yet. Tool executions will appear here as you work.',
 
-  // View modes (unified 4-tab, Feature 176)
+  // View modes
   viewTimeline: 'Timeline',
   viewByFeature: 'By Feature',
   viewCompact: 'Compact',
   viewDetailed: 'Detailed',
-
-  // Presentation modes (deprecated — kept for backwards compat)
-  modeCompact: 'Compact',
-  modeNormal: 'Normal',
-  modeDetailed: 'Detailed',
 
   // Filter row
   filterSearch: 'Search entries...',

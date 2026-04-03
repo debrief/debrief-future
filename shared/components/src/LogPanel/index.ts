@@ -17,7 +17,6 @@ export type {
   TimelineEntry,
   InputFeatureState,
   OperationCategory,
-  PresentationMode,
   ViewMode,
   FilterState,
   ParameterValue,

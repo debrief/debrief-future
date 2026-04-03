@@ -5,7 +5,6 @@
  * Handles message passing between extension host and React component.
  * Phase 6: Adds tune/revert/replay message forwarding.
  * Feature 113: Adds schema cache, disable/rationale handlers.
- * Feature 176: Unified ViewMode (4-tab), removes PresentationMode.
  *
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 076-replay-tune (E02, Phase 6)
@@ -116,15 +115,9 @@ function LogPanelApp(): React.ReactElement {
           setTimeout(() => setActionResultMessage(null), 3000);
           break;
 
-        // Feature 176: extension sends persisted ViewMode on init
         case 'mode:init':
-        case 'viewMode:init': {
-          const payload = msg.payload as { viewMode?: string; presentationMode?: string };
-          if (payload.viewMode) {
-            setViewMode(payload.viewMode as ViewMode);
-          }
+          setViewMode(msg.payload.viewMode as ViewMode);
           break;
-        }
 
         // Phase 6: replay messages
         case 'replay:progress':

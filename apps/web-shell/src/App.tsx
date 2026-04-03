@@ -180,7 +180,6 @@ export default function App() {
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
-  // Feature 176: PresentationMode removed — viewMode now covers all modes
   const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
   const [logSelectedEntryId, setLogSelectedEntryId] = useState<string | null>(null);
   const [logFilterState, setLogFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
