@@ -1396,6 +1396,386 @@
         },
         "symbol_interval": "PT5M",
         "label_interval": "PT15M",
+        "contact_tracks": [
+          {
+            "name": "SUBJECT1",
+            "positions": [
+              {
+                "time": "2010-01-12T12:00:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:00:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:02:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:04:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:05:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:06:40+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:15:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:23:20+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:00:00+00:00",
+            "end_time": "2010-01-12T12:23:20+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT2",
+            "positions": [
+              {
+                "time": "2010-01-12T12:00:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:01:40+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:03:20+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:05:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:07:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:15:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:24:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:00:00+00:00",
+            "end_time": "2010-01-12T12:24:10+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "aSUBJECT3",
+            "positions": [
+              {
+                "time": "2010-01-12T12:08:20+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:16:40+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:25:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:08:20+00:00",
+            "end_time": "2010-01-12T12:25:00+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT4",
+            "positions": [
+              {
+                "time": "2010-01-12T12:09:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:17:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:25:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:09:10+00:00",
+            "end_time": "2010-01-12T12:25:50+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT5",
+            "positions": [
+              {
+                "time": "2010-01-12T12:10:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:18:20+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:26:40+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:10:00+00:00",
+            "end_time": "2010-01-12T12:26:40+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT6",
+            "positions": [
+              {
+                "time": "2010-01-12T12:10:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:19:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:27:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:10:50+00:00",
+            "end_time": "2010-01-12T12:27:30+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT7",
+            "positions": [
+              {
+                "time": "2010-01-12T12:11:40+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:20:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:28:20+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:29:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:11:40+00:00",
+            "end_time": "2010-01-12T12:29:10+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT8",
+            "positions": [
+              {
+                "time": "2010-01-12T12:12:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:20:50+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:30:00+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:12:30+00:00",
+            "end_time": "2010-01-12T12:30:00+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          },
+          {
+            "name": "SUBJECT0",
+            "positions": [
+              {
+                "time": "2010-01-12T12:14:10+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              },
+              {
+                "time": "2010-01-12T12:22:30+00:00",
+                "course": 320.0,
+                "speed": 9.0,
+                "depth": 0.0
+              }
+            ],
+            "start_time": "2010-01-12T12:14:10+00:00",
+            "end_time": "2010-01-12T12:22:30+00:00",
+            "style": {
+              "line": {
+                "color": "#808080"
+              },
+              "point": {
+                "shape": "circle",
+                "radius": 3.0,
+                "fill_color": "#808080",
+                "color": "#808080"
+              }
+            }
+          }
+        ],
         "provenance": [
           {
             "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
@@ -1416,844 +1796,7 @@
     },
     {
       "type": "Feature",
-      "id": "8b694817-c464-4507-8117-e1e73656ee9b",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0,
-            60.0
-          ],
-          [
-            -0.0026778,
-            60.0015972
-          ],
-          [
-            -0.0080361,
-            60.0047889
-          ],
-          [
-            -0.0133917,
-            60.0079806
-          ],
-          [
-            -0.01875,
-            60.0111722
-          ],
-          [
-            -0.0214306,
-            60.0127667
-          ],
-          [
-            -0.0482306,
-            60.0287278
-          ],
-          [
-            -0.0750417,
-            60.0446861
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT1",
-        "platform_name": "SUBJECT1",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:00:00+00:00",
-        "end_time": "2010-01-12T12:23:20+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:00:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:00:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:02:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:04:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:05:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:06:40+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:15:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:23:20+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "8b694817-c464-4507-8117-e1e73656ee9b"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1052c725-01b4-4550-b3c0-824e96168493",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0,
-            60.0
-          ],
-          [
-            -0.0053556,
-            60.0031917
-          ],
-          [
-            -0.0107139,
-            60.0063833
-          ],
-          [
-            -0.0160722,
-            60.009575
-          ],
-          [
-            -0.0241111,
-            60.0143639
-          ],
-          [
-            -0.0509111,
-            60.0303222
-          ],
-          [
-            -0.077725,
-            60.0462806
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT2",
-        "platform_name": "SUBJECT2",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:00:00+00:00",
-        "end_time": "2010-01-12T12:24:10+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:00:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:01:40+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:03:20+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:05:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:07:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:15:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:24:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "1052c725-01b4-4550-b3c0-824e96168493"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "a8e8089c-4f82-4a47-b332-1b4d23c9b845",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0267889,
-            60.0159583
-          ],
-          [
-            -0.0535917,
-            60.0319194
-          ],
-          [
-            -0.0804056,
-            60.0478778
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "aSUBJECT3",
-        "platform_name": "aSUBJECT3",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:08:20+00:00",
-        "end_time": "2010-01-12T12:25:00+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:08:20+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:16:40+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:25:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "a8e8089c-4f82-4a47-b332-1b4d23c9b845"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "6b190800-6bc8-4a0c-9f87-6768625c8c7e",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0294694,
-            60.0175556
-          ],
-          [
-            -0.0562722,
-            60.0335139
-          ],
-          [
-            -0.0830889,
-            60.049475
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT4",
-        "platform_name": "SUBJECT4",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:09:10+00:00",
-        "end_time": "2010-01-12T12:25:50+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:09:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:17:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:25:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "6b190800-6bc8-4a0c-9f87-6768625c8c7e"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2c0c1c80-bba8-46f6-9684-5a61ea411e14",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.03215,
-            60.01915
-          ],
-          [
-            -0.0589528,
-            60.0351111
-          ],
-          [
-            -0.0857722,
-            60.0510694
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT5",
-        "platform_name": "SUBJECT5",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:10:00+00:00",
-        "end_time": "2010-01-12T12:26:40+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:10:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:18:20+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:26:40+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "2c0c1c80-bba8-46f6-9684-5a61ea411e14"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "de24a1b1-0b53-47e0-ba79-3ae2cbd405ee",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0348278,
-            60.0207472
-          ],
-          [
-            -0.0616333,
-            60.0367056
-          ],
-          [
-            -0.0884528,
-            60.0526667
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT6",
-        "platform_name": "SUBJECT6",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:10:50+00:00",
-        "end_time": "2010-01-12T12:27:30+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:10:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:19:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:27:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "de24a1b1-0b53-47e0-ba79-3ae2cbd405ee"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "7ea07ff9-26fd-45d2-833a-fd0fc2e15ae8",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0375083,
-            60.0223417
-          ],
-          [
-            -0.0643167,
-            60.0383028
-          ],
-          [
-            -0.0911361,
-            60.0542611
-          ],
-          [
-            -0.0938194,
-            60.0558583
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT7",
-        "platform_name": "SUBJECT7",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:11:40+00:00",
-        "end_time": "2010-01-12T12:29:10+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:11:40+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:20:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:28:20+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:29:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "7ea07ff9-26fd-45d2-833a-fd0fc2e15ae8"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "bd157f4a-cc5b-45d0-bb02-b9570e4cefca",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.0401889,
-            60.0239389
-          ],
-          [
-            -0.0669972,
-            60.0398972
-          ],
-          [
-            -0.0965028,
-            60.0574528
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT8",
-        "platform_name": "SUBJECT8",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:12:30+00:00",
-        "end_time": "2010-01-12T12:30:00+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:12:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:20:50+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:30:00+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "bd157f4a-cc5b-45d0-bb02-b9570e4cefca"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "430c9345-1496-4ef0-b35f-8e5d8e0ab589",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            -0.04555,
-            60.0271306
-          ],
-          [
-            -0.0723611,
-            60.0430889
-          ]
-        ]
-      },
-      "properties": {
-        "kind": "TRACK",
-        "platform_id": "SUBJECT0",
-        "platform_name": "SUBJECT0",
-        "track_type": "CONTACT",
-        "start_time": "2010-01-12T12:14:10+00:00",
-        "end_time": "2010-01-12T12:22:30+00:00",
-        "positions": [
-          {
-            "time": "2010-01-12T12:14:10+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          },
-          {
-            "time": "2010-01-12T12:22:30+00:00",
-            "course": 320.0,
-            "speed": 9.0,
-            "depth": 0.0
-          }
-        ],
-        "style": {
-          "line": {
-            "color": "#808080"
-          },
-          "point": {
-            "shape": "circle",
-            "radius": 3.0,
-            "fill_color": "#808080",
-            "color": "#808080"
-          }
-        },
-        "default_position_style": {
-          "show_symbol": false,
-          "symbol": "circle",
-          "show_label": false
-        },
-        "symbol_interval": "PT1M",
-        "label_interval": "PT5M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "430c9345-1496-4ef0-b35f-8e5d8e0ab589"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e62a877d-afff-4e65-b23e-d65581caae23",
+      "id": "06b76d2d-08c9-4b31-8fcb-63ad84eedd8d",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -3365,23 +2908,7 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M",
-        "provenance": [
-          {
-            "activity_id": "085b8b32-5362-4549-b67b-46f5c78f72de",
-            "timestamp": "2026-03-28T13:50:57.936995Z",
-            "was_generated_by": {
-              "tool": "dpf-parser",
-              "tool_version": "1.0.0",
-              "parameters": []
-            },
-            "used": [],
-            "generated": [
-              "e62a877d-afff-4e65-b23e-d65581caae23"
-            ],
-            "execution_duration": "PT0.002532S"
-          }
-        ]
+        "label_interval": "PT15M"
       }
     }
   ]

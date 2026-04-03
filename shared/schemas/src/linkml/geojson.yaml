@@ -316,6 +316,33 @@ classes:
         required: true
         inlined_as_list: true
 
+  ContactTrackData:
+    description: >-
+      Tracked contact positions embedded in the observing platform's track.
+      Represents the estimated track of a contact as detected by the host
+      platform's sensors. Stored as a child rather than a top-level feature.
+    attributes:
+      name:
+        description: Contact track identifier (e.g., "SUBJECT1")
+        required: true
+      positions:
+        description: Array of timestamped contact positions
+        range: TimestampedPosition
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      start_time:
+        description: Contact track start time (ISO8601)
+        range: datetime
+        required: true
+      end_time:
+        description: Contact track end time (ISO8601)
+        range: datetime
+        required: true
+      style:
+        description: Contact track styling
+        range: TrackStyle
+
 # ============================================================================
 # TrackFeature
 # ============================================================================
@@ -399,6 +426,14 @@ classes:
           Embedded Target Uncertainty Area data associated with this track.
           Each TUA entry is a named collection of time-indexed solutions.
         range: TUAData
+        multivalued: true
+        inlined_as_list: true
+      contact_tracks:
+        description: >-
+          Embedded contact track data. Each entry represents a target track
+          detected/tracked by this platform's sensors. Contact tracks are
+          nested here rather than appearing as top-level features.
+        range: ContactTrackData
         multivalued: true
         inlined_as_list: true
   TrackFeature:

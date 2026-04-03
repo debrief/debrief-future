@@ -1209,12 +1209,19 @@ class SegmentMetadata(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     segment_type: SegmentTypeEnum = Field(default=..., description="""Segment type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SelectionRequirement']} })
-    start_time: datetime  = Field(default=..., description="""Segment start timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    end_time: datetime  = Field(default=..., description="""Segment end timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    positions: list[TimestampedPosition] = Field(default=..., description="""Per-position metadata (parallel to coordinates)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties']} })
+    start_time: datetime  = Field(default=..., description="""Segment start timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    end_time: datetime  = Field(default=..., description="""Segment end timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    positions: list[TimestampedPosition] = Field(default=..., description="""Per-position metadata (parallel to coordinates)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'ContactTrackData', 'TrackProperties']} })
     name: Optional[str] = Field(default=None, description="""Human-readable segment name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -1222,6 +1229,7 @@ class SegmentMetadata(ConfiguredBaseModel):
                        'LevelDefinition',
                        'DatasetSeries']} })
     style: Optional[LineProperties] = Field(default=None, description="""Per-segment line styling override""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -1282,6 +1290,7 @@ class SensorData(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Sensor identifier (e.g., \"TOWED_ARRAY\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -1337,6 +1346,7 @@ class TUAData(ConfiguredBaseModel):
     name: str = Field(default=..., description="""TUA collection name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -1345,6 +1355,46 @@ class TUAData(ConfiguredBaseModel):
                        'DatasetSeries']} })
     host_track_name: str = Field(default=..., description="""Name of track this TUA set relates to""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
     solutions: list[TUASolution] = Field(default=..., description="""Array of TUA estimates""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
+
+
+class ContactTrackData(ConfiguredBaseModel):
+    """
+    Tracked contact positions embedded in the observing platform's track. Represents the estimated track of a contact as detected by the host platform's sensors. Stored as a child rather than a top-level feature.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+
+    name: str = Field(default=..., description="""Contact track identifier (e.g., \"SUBJECT1\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'SensorData',
+                       'TUAData',
+                       'ContactTrackData',
+                       'PointMetadataEntry',
+                       'ReferenceLocationProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'LevelDefinition',
+                       'DatasetSeries']} })
+    positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped contact positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'ContactTrackData', 'TrackProperties']} })
+    start_time: datetime  = Field(default=..., description="""Contact track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    end_time: datetime  = Field(default=..., description="""Contact track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    style: Optional[TrackStyle] = Field(default=None, description="""Contact track styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class TrackProperties(BaseFeatureProperties):
@@ -1372,10 +1422,17 @@ class TrackProperties(BaseFeatureProperties):
     platform_id: str = Field(default=..., description="""Platform/vessel identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     platform_name: Optional[str] = Field(default=None, description="""Human-readable platform name""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     track_type: TrackTypeEnum = Field(default=..., description="""Type of track""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    start_time: datetime  = Field(default=..., description="""Track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    end_time: datetime  = Field(default=..., description="""Track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped positions""", min_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties']} })
+    start_time: datetime  = Field(default=..., description="""Track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    end_time: datetime  = Field(default=..., description="""Track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped positions""", min_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'ContactTrackData', 'TrackProperties']} })
     style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -1394,6 +1451,7 @@ class TrackProperties(BaseFeatureProperties):
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    contact_tracks: Optional[list[ContactTrackData]] = Field(default=[], description="""Embedded contact track data. Each entry represents a target track detected/tracked by this platform's sensors. Contact tracks are nested here rather than appearing as top-level features.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
@@ -1523,6 +1581,7 @@ class PointMetadataEntry(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Human-readable point label (e.g., \"Ref 1\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -1556,6 +1615,7 @@ class ReferenceLocationProperties(BaseFeatureProperties):
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -1580,6 +1640,7 @@ class ReferenceLocationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for display""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -1703,8 +1764,14 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'SystemRecordProperties'],
          'equals_string': 'SYSTEM'} })
     state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
-    start_time: Optional[datetime ] = Field(default=None, description="""Viewport start time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
-    end_time: Optional[datetime ] = Field(default=None, description="""Viewport end time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
+    start_time: Optional[datetime ] = Field(default=None, description="""Viewport start time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
+    end_time: Optional[datetime ] = Field(default=None, description="""Viewport end time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
+                       'TrackProperties',
+                       'SystemStateProperties']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
@@ -1844,6 +1911,7 @@ class MultiPointFeatureProperties(BaseFeatureProperties):
                        'ToolResultAnnotations',
                        'DatasetAxisMetadata']} })
     style: PointProperties = Field(default=..., description="""Point styling for all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -1989,6 +2057,7 @@ class MultiPolygonFeatureProperties(BaseFeatureProperties):
                        'ToolResultAnnotations',
                        'DatasetAxisMetadata']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling for all regions""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2252,6 +2321,7 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for display position""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2395,6 +2465,7 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the circle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2536,6 +2607,7 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the rectangle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2677,6 +2749,7 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: LineProperties = Field(default=..., description="""Line styling properties for the line segment""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2807,6 +2880,7 @@ class TextAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for the text position marker""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -2951,6 +3025,7 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: LineProperties = Field(default=..., description="""Line styling properties for the vector""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -3093,6 +3168,7 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the polygon area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'ContactTrackData',
                        'TrackProperties',
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
@@ -3241,6 +3317,7 @@ class Tool(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Human-readable name displayed in menus and panels. Should be concise (2-4 words).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -3266,6 +3343,7 @@ class ToolParameter(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Parameter identifier (kebab-case)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -3662,6 +3740,7 @@ class LevelDefinition(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Level identifier used in selection paths""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -4068,6 +4147,7 @@ class DatasetSeries(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Series display name (shown in chart legend)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'ContactTrackData',
                        'PointMetadataEntry',
                        'ReferenceLocationProperties',
                        'Tool',
@@ -4140,6 +4220,7 @@ SensorContact.model_rebuild()
 SensorData.model_rebuild()
 TUASolution.model_rebuild()
 TUAData.model_rebuild()
+ContactTrackData.model_rebuild()
 TrackProperties.model_rebuild()
 TrackFeature.model_rebuild()
 PointMetadataEntry.model_rebuild()

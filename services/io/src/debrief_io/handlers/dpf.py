@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import re
 import time
 import uuid
 import xml.etree.ElementTree as ET
@@ -219,10 +220,16 @@ class DPFHandler(BaseHandler):
             )
 
         # Parse tracks (including composite_track which extends track)
+        # Collect XML-level metadata alongside parsed features so we can
+        # detect contact tracks that should be nested inside a parent.
+        track_entries: list[tuple[ET.Element, list[dict[str, Any]]]] = []
         for track_tag in ("track", "composite_track"):
             for track_elem in layers.findall(_tag(track_tag, ns)):
                 track_features = self._parse_track(track_elem, ns, warnings, source_file)
-                features.extend(track_features)
+                track_entries.append((track_elem, track_features))
+
+        # Nest contact tracks inside their parent platform track
+        features = self._nest_contact_tracks(track_entries, ns)
 
         # Parse narratives
         for narrative_elem in layers.findall(_tag("narrative", ns)):
@@ -239,6 +246,102 @@ class DPFHandler(BaseHandler):
             handler=self.name,
             handler_version=self.version,
         )
+
+    @staticmethod
+    def _base_track_name(name: str) -> str:
+        """Normalise a track name to its base form.
+
+        Strips an optional single-char lowercase prefix (``bSENSOR`` → ``SENSOR``,
+        ``aSUBJECT3`` → ``SUBJECT3``) and then removes trailing digits that are
+        directly concatenated to a letter (``SUBJECT3`` → ``SUBJECT``) but leaves
+        underscore-separated suffixes intact (``SENSOR_1`` stays ``SENSOR_1``).
+        """
+        core = name
+        if len(core) > 1 and core[0].islower() and core[1].isupper():
+            core = core[1:]
+        return re.sub(r"(?<=[A-Za-z])\d+$", "", core)
+
+    def _nest_contact_tracks(
+        self,
+        track_entries: list[tuple[ET.Element, list[dict[str, Any]]]],
+        ns: str | None,
+    ) -> list[dict[str, Any]]:
+        """Detect numbered contact-track variants and nest them in the parent.
+
+        A track is a **numbered variant** when stripping its single-char prefix
+        and trailing digits yields a base name that matches another track in the
+        same file (e.g. ``SUBJECT3`` is a variant of ``SUBJECT``).
+
+        Numbered variants are embedded as ``contact_tracks`` inside the first
+        track whose normalised name contains ``SENSOR``.  If no SENSOR track
+        exists, all features are returned as-is.
+        """
+        if len(track_entries) < 2:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        # Build name → index mapping and base-name set
+        names: list[str] = [elem.get("Name", "") for elem, _feats in track_entries]
+        bases: set[str] = {self._base_track_name(n) for n in names}
+
+        # Identify the SENSOR parent (first track with SENSOR in normalised name)
+        sensor_idx: int | None = None
+        for i, n in enumerate(names):
+            if "SENSOR" in self._base_track_name(n).upper():
+                sensor_idx = i
+                break
+
+        if sensor_idx is None:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        # Detect numbered variants: base name matches another track AND
+        # the original name differs from the base (i.e. it had digits/prefix stripped).
+        variant_indices: set[int] = set()
+        for i, n in enumerate(names):
+            if i == sensor_idx:
+                continue
+            base = self._base_track_name(n)
+            # It's a variant if (a) stripping changed the name AND
+            # (b) there exists a *different* track whose base == this base
+            if base != n and base in bases:
+                variant_indices.add(i)
+
+        if not variant_indices:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        # Nest variants inside the SENSOR track
+        _parent_elem, parent_features = track_entries[sensor_idx]
+        if not parent_features:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        parent_feature = parent_features[0]
+        contact_tracks_data: list[dict[str, Any]] = []
+
+        for vi in variant_indices:
+            _elem, variant_features = track_entries[vi]
+            for vf in variant_features:
+                props = vf.get("properties", {})
+                if props.get("kind") != "TRACK":
+                    continue
+                entry: dict[str, Any] = {
+                    "name": props.get("platform_id", "Unknown"),
+                    "positions": props.get("positions", []),
+                    "start_time": props.get("start_time", ""),
+                    "end_time": props.get("end_time", ""),
+                }
+                style = props.get("style")
+                if style:
+                    entry["style"] = style
+                contact_tracks_data.append(entry)
+
+        if contact_tracks_data:
+            parent_feature["properties"]["contact_tracks"] = contact_tracks_data
+
+        # Return all features except nested variants
+        result: list[dict[str, Any]] = []
+        for i, (_elem, feats) in enumerate(track_entries):
+            if i not in variant_indices:
+                result.extend(feats)
+        return result
 
     def _parse_track(
         self,
