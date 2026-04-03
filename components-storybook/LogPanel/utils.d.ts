@@ -37,7 +37,8 @@ export declare function groupEntriesByFeature(entries: TimelineEntry[], featureN
 }>;
 /**
  * Format an ISO 8601 duration to a human-readable string.
- * e.g., "PT0.5S" → "0.5s", "PT1M2S" → "1m 2s"
+ * e.g., "PT0.5S" → "500ms", "PT1M2S" → "1m 2s", "PT0.25S" → "250ms"
+ * Feature 176: sub-second durations now display in milliseconds.
  */
 export declare function formatDuration(isoDuration: string): string;
 /**

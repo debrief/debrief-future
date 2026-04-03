@@ -9,9 +9,8 @@ export declare const LOG_PANEL_STRINGS: {
     readonly emptyNoEntries: "No operations recorded yet. Tool executions will appear here as you work.";
     readonly viewTimeline: "Timeline";
     readonly viewByFeature: "By Feature";
-    readonly modeCompact: "Compact";
-    readonly modeNormal: "Normal";
-    readonly modeDetailed: "Detailed";
+    readonly viewCompact: "Compact";
+    readonly viewDetailed: "Detailed";
     readonly filterSearch: "Search entries...";
     readonly filterToolType: "All tools";
     readonly filterCategory: "All categories";
@@ -78,5 +77,14 @@ export declare const LOG_PANEL_STRINGS: {
     readonly sliderValueLabel: (value: number) => string;
     readonly jsonEditorParseError: "Invalid JSON";
     readonly colorPickerLabel: "Select colour";
+    readonly categoryImportLabel: "Import";
+    readonly categoryStyleLabel: "Style";
+    readonly categoryCalcLabel: "Calculation";
+    readonly categoryFilterLabel: "Filter";
+    readonly categorySnapshotLabel: "Snapshot";
+    readonly categoryUnknownLabel: "Other";
+    readonly chipNonDefaultTooltip: "Non-default value";
+    readonly rationaleTooltip: (rationale: string) => string;
+    readonly durationMs: (ms: number) => string;
 };
 //# sourceMappingURL=strings.d.ts.map
