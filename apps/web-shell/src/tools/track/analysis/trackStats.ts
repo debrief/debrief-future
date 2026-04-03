@@ -138,6 +138,28 @@ export function execute(
 
   const trackName = String(trackProps.name ?? trackProps.platform_name ?? track.id ?? 'Unknown');
 
+  const statistics: Record<string, unknown> = {
+    point_count: pointCount,
+    duration_hours: Math.round(durationHours * 100) / 100,
+    [distanceKey(distanceUnit)]: Math.round(distance * 100) / 100,
+    [speedKey(distanceUnit)]: Math.round(speed * 100) / 100,
+  };
+
+  // Build a DatasetEnvelope for tabular display (#177)
+  const tableDataset = {
+    type: 'track_statistics',
+    title: `Track Statistics: ${trackName}`,
+    displayHint: 'table' as const,
+    metadata: {
+      xAxis: { label: 'Metric', type: 'nominal' as const },
+      yAxis: { label: 'Value', type: 'quantitative' as const },
+    },
+    data: Object.entries(statistics).map(([key, val]) => ({
+      metric: key.replace(/_/g, ' '),
+      value: val,
+    })),
+  };
+
   return [{
     type: 'Feature',
     id: `stats-${generateUUID()}`,
@@ -147,12 +169,8 @@ export function execute(
       name: `Statistics: ${trackName}`,
       source_track: String(track.id ?? ''),
       source_name: trackName,
-      statistics: {
-        point_count: pointCount,
-        duration_hours: Math.round(durationHours * 100) / 100,
-        [distanceKey(distanceUnit)]: Math.round(distance * 100) / 100,
-        [speedKey(distanceUnit)]: Math.round(speed * 100) / 100,
-      },
+      statistics,
+      '__datasets': [tableDataset],
     },
   }];
 }
