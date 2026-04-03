@@ -5,10 +5,12 @@
  * Handles message passing between extension host and React component.
  * Phase 6: Adds tune/revert/replay message forwarding.
  * Feature 113: Adds schema cache, disable/rationale handlers.
+ * Feature 176: Unified ViewMode (4-tab), removes PresentationMode.
  *
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 076-replay-tune (E02, Phase 6)
  * Updated: 113-prov-card-flip (flip-card edit wiring)
+ * Updated: 176-log-panel-ux (unified ViewMode)
  */
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
@@ -16,7 +18,6 @@ import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import type {
   TimelineEntry,
-  PresentationMode,
   ViewMode,
   LogFilterState,
   LogPanelMessage,
@@ -74,8 +75,7 @@ function LogPanelApp(): React.ReactElement {
   const [hasActiveSession, setHasActiveSession] = useState(false);
   const [plotName, setPlotName] = useState<string | null>(null);
 
-  // UI state
-  const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
+  // UI state — unified ViewMode (Feature 176)
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = vscode.getState();
     return saved?.viewMode ?? 'timeline';
@@ -116,9 +116,15 @@ function LogPanelApp(): React.ReactElement {
           setTimeout(() => setActionResultMessage(null), 3000);
           break;
 
+        // Feature 176: extension sends persisted ViewMode on init
         case 'mode:init':
-          setPresentationMode(msg.payload.presentationMode);
+        case 'viewMode:init': {
+          const payload = msg.payload as { viewMode?: string; presentationMode?: string };
+          if (payload.viewMode) {
+            setViewMode(payload.viewMode as ViewMode);
+          }
           break;
+        }
 
         // Phase 6: replay messages
         case 'replay:progress':
@@ -203,17 +209,13 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage(message);
   }, []);
 
-  // Handle presentation mode change → forward to extension for persistence
-  const handlePresentationModeChange = useCallback((mode: PresentationMode) => {
-    setPresentationMode(mode);
-    vscode.postMessage({ type: 'mode:change', payload: { presentationMode: mode } });
-  }, []);
-
-  // Handle view mode change → persist in webview state
+  // Handle view mode change → persist in webview state + notify extension
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode);
     const currentState = vscode.getState() ?? {};
     vscode.setState({ ...currentState, viewMode: mode });
+    // Notify extension for globalState persistence
+    vscode.postMessage({ type: 'mode:change', payload: { viewMode: mode } });
   }, []);
 
   // Handle entry selection
@@ -228,7 +230,6 @@ function LogPanelApp(): React.ReactElement {
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
       // Optimistic update: immediately reflect the new value in local state
-      // so the slider doesn't snap back while waiting for the replay round-trip.
       setEntries((prev) =>
         prev.map((e) => {
           if (e.activityId !== activityId) return e;
@@ -283,9 +284,6 @@ function LogPanelApp(): React.ReactElement {
   }, []);
 
   // Feature 113: Schema resolution via extension host round-trip.
-  // Sends schema:request to extension, which looks up tool definitions
-  // and returns ParameterSchemaEntry[] with proper choices/paramType.
-  // Falls back to local parameter-based derivation if no response.
   const pendingSchemaRef = useRef(new Map<string, {
     resolve: (schema: ReadonlyArray<ParameterSchemaEntry>) => void;
   }>());
@@ -293,15 +291,12 @@ function LogPanelApp(): React.ReactElement {
   const handleSchemaRequest = useCallback(
     (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
       return new Promise<ReadonlyArray<ParameterSchemaEntry>>((resolve) => {
-        // Store resolver for when schema:response arrives
         pendingSchemaRef.current.set(toolId, { resolve });
-
-        // Send request to extension host
         vscode.postMessage({ type: 'schema:request', payload: { toolId } });
 
         // Timeout fallback: derive from local parameter metadata after 2s
         setTimeout(() => {
-          if (!pendingSchemaRef.current.has(toolId)) return; // Already resolved
+          if (!pendingSchemaRef.current.has(toolId)) return;
           pendingSchemaRef.current.delete(toolId);
 
           const entry = entries.find((e) => e.toolName === toolId);
@@ -350,7 +345,6 @@ function LogPanelApp(): React.ReactElement {
     <LogPanel
       entries={entries}
       featureNames={featureNames}
-      presentationMode={presentationMode}
       viewMode={viewMode}
       selectedEntryId={selectedEntryId}
       filterState={filterState}
@@ -359,7 +353,6 @@ function LogPanelApp(): React.ReactElement {
       actionResultMessage={actionResultMessage}
       replayProgress={replayProgress}
       onMessage={handleMessage}
-      onPresentationModeChange={handlePresentationModeChange}
       onViewModeChange={handleViewModeChange}
       onFilterStateChange={setFilterState}
       onSelectedEntryChange={handleSelectedEntryChange}

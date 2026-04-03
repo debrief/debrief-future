@@ -1,19 +1,24 @@
 /**
- * LogEntry component — renders a single timeline entry with flip-card support.
+ * LogEntry component — renders a single timeline entry as a rich card.
  *
- * Supports three presentation modes:
- * - Compact: tool name + primary feature name
- * - Normal: + parameters, change summary
- * - Detailed: + timestamp, duration, attachment info
+ * Card anatomy (Feature 176):
+ * - Row 1 (Header): step + category icon + tool name + rationale icon
+ * - Row 2 (Meta): track badges + timestamp + duration
+ * - Row 3 (Params): type-aware parameter chips (hidden in compact mode)
  *
  * Feature: 072-log-panel
  * Updated: 113-prov-card-flip (flip-card edit face)
+ * Updated: 176-log-panel-ux (rich card anatomy, unified ViewMode)
  */
 
-import React, { useCallback } from 'react';
-import type { LogEntryProps } from './types';
+import React, { useCallback, useMemo } from 'react';
+import type { LogEntryProps, ParamChipData } from './types';
 import { resolveFeatureDisplay, getAffectedFeatureIds, formatDuration, formatTimestamp } from './utils';
+import { inferParamType } from './paramTypeInference';
 import { LOG_PANEL_STRINGS } from './strings';
+import { ToolCategoryIcon } from './ToolCategoryIcon';
+import { ParameterChip } from './ParameterChip';
+import { TrackBadge } from './TrackBadge';
 import { CardFlip } from './CardFlip';
 import { EditFace } from './EditFace';
 import './LogPanel.css';
@@ -24,10 +29,10 @@ import './EditFace.css';
 export function LogEntry({
   entry,
   featureNames,
-  presentationMode,
+  viewMode,
   isSelected,
   onClick,
-  onTuneClick,
+  // onTuneClick is kept in props for API compat but not used by rich card layout
   onRestoreClick,
   isEditing = false,
   onEditClick,
@@ -47,7 +52,24 @@ export function LogEntry({
 }: LogEntryProps): React.ReactElement {
   const affectedIds = getAffectedFeatureIds(entry);
   const features = affectedIds.map((id) => resolveFeatureDisplay(id, featureNames));
-  const primaryFeature = features[0];
+
+  // Build parameter chips with inferred types
+  const chips: ParamChipData[] = useMemo(() => {
+    return Object.entries(entry.parameters)
+      .filter(([, param]) => !param.default)
+      .slice(0, 5)
+      .map(([key, param]) => {
+        // Find matching schema entry if available
+        const schemaEntry = schema?.find((s) => s.name === key) ?? null;
+        return {
+          name: key,
+          value: param.value,
+          paramType: inferParamType(key, param.value, schemaEntry),
+          isDefault: param.default === true,
+          unit: null,
+        };
+      });
+  }, [entry.parameters, schema]);
 
   const handleClick = () => {
     onClick?.(entry);
@@ -83,7 +105,10 @@ export function LogEntry({
     .filter(Boolean)
     .join(' ');
 
-  // Front face — the read-only card content
+  const showParams = viewMode !== 'compact';
+  const showDetails = viewMode === 'detailed';
+
+  // Front face — the read-only rich card
   const frontFace = (
     <div
       className={entryClass}
@@ -100,18 +125,21 @@ export function LogEntry({
         }
       }}
     >
-      {/* Header: step index + tool name + primary feature + badges + edit icon (all modes) */}
+      {/* Row 1: Header — step + icon + tool name + rationale + badges + edit icon */}
       <div className="log-panel__entry-header">
         {stepIndex != null && (
           <span className="log-panel__entry-step">{stepIndex}</span>
         )}
+        <ToolCategoryIcon toolName={entry.toolName} size={18} />
         <span className="log-panel__entry-tool">{entry.toolName}</span>
-        {primaryFeature && (
+        {entry.rationale && (
           <span
-            className={`log-panel__entry-feature ${!primaryFeature.exists ? 'log-panel__entry-deleted' : ''}`}
+            className="log-panel__entry-rationale-icon"
+            title={LOG_PANEL_STRINGS.rationaleTooltip(entry.rationale)}
+            aria-label="Has rationale"
+            data-testid="rationale-icon"
           >
-            {primaryFeature.displayName}
-            {features.length > 1 && ` +${features.length - 1}`}
+            {'\uD83D\uDCAC'}
           </span>
         )}
         {entry.tuneAnnotation && (
@@ -147,61 +175,45 @@ export function LogEntry({
         )}
       </div>
 
-      {/* Normal mode: parameters */}
-      {(presentationMode === 'normal' || presentationMode === 'detailed') &&
-        Object.keys(entry.parameters).length > 0 && (
-          <div className="log-panel__entry-params">
-            {Object.entries(entry.parameters)
-              .filter(([, param]) => !param.default)
-              .slice(0, 3)
-              .map(([key, param]) => (
-                <div key={key} className="log-panel__entry-param">
-                  <span className="log-panel__entry-param-key">{key}:</span>
-                  {param.tunable && onTuneClick ? (
-                    <span
-                      className="log-panel__entry-param-value log-panel__entry-param-value--tunable"
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onTuneClick(entry, key);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onTuneClick(entry, key);
-                        }
-                      }}
-                      data-testid={`tune-param-${key}`}
-                    >
-                      {String(param.value)}
-                    </span>
-                  ) : (
-                    <span className="log-panel__entry-param-value">
-                      {String(param.value)}
-                    </span>
-                  )}
-                </div>
-              ))}
-          </div>
-        )}
+      {/* Row 2: Meta — track badges + timestamp + duration */}
+      <div className="log-panel__entry-meta">
+        <div className="log-panel__entry-badges">
+          {features.map((f) => (
+            <TrackBadge key={f.featureId} name={f.displayName} exists={f.exists} />
+          ))}
+        </div>
+        <span className="log-panel__entry-timestamp">
+          {formatTimestamp(entry.timestamp)}
+        </span>
+        <span className="log-panel__entry-duration">
+          {formatDuration(entry.executionDuration)}
+        </span>
+      </div>
 
-      {/* Detailed mode: timestamp, duration */}
-      {presentationMode === 'detailed' && (
+      {/* Row 3: Parameter chips (hidden in compact mode) */}
+      {showParams && chips.length > 0 && (
+        <div className="log-panel__entry-chips" data-testid="param-chips">
+          {chips.map((chip) => (
+            <ParameterChip key={chip.name} chip={chip} />
+          ))}
+        </div>
+      )}
+
+      {/* Detailed mode: extended feature lists */}
+      {showDetails && (
         <div className="log-panel__entry-details">
-          <div className="log-panel__entry-detail">
-            <span className="log-panel__entry-detail-label">
-              {LOG_PANEL_STRINGS.timestampLabel}:
-            </span>
-            <span>{formatTimestamp(entry.timestamp)}</span>
-          </div>
-          <div className="log-panel__entry-detail">
-            <span className="log-panel__entry-detail-label">
-              {LOG_PANEL_STRINGS.durationLabel}:
-            </span>
-            <span>{formatDuration(entry.executionDuration)}</span>
-          </div>
+          {entry.usedFeatureIds.length > 0 && (
+            <div className="log-panel__entry-detail">
+              <span className="log-panel__entry-detail-label">Used:</span>
+              <span>{entry.usedFeatureIds.map((id) => featureNames[id] ?? id).join(', ')}</span>
+            </div>
+          )}
+          {entry.generatedFeatureIds.length > 0 && (
+            <div className="log-panel__entry-detail">
+              <span className="log-panel__entry-detail-label">Generated:</span>
+              <span>{entry.generatedFeatureIds.map((id) => featureNames[id] ?? id).join(', ')}</span>
+            </div>
+          )}
           {entry.generatedResultId && (
             <div className="log-panel__entry-detail">
               <span className="log-panel__entry-detail-label">Result:</span>

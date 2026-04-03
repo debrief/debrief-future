@@ -10,11 +10,13 @@ export const LOG_PANEL_STRINGS = {
   emptyNoPlot: 'No plot is open. Open a plot to view its analytical history.',
   emptyNoEntries: 'No operations recorded yet. Tool executions will appear here as you work.',
 
-  // View modes
+  // View modes (unified 4-tab, Feature 176)
   viewTimeline: 'Timeline',
   viewByFeature: 'By Feature',
+  viewCompact: 'Compact',
+  viewDetailed: 'Detailed',
 
-  // Presentation modes
+  // Presentation modes (deprecated — kept for backwards compat)
   modeCompact: 'Compact',
   modeNormal: 'Normal',
   modeDetailed: 'Detailed',
@@ -104,4 +106,19 @@ export const LOG_PANEL_STRINGS = {
   sliderValueLabel: (value: number) => String(value),
   jsonEditorParseError: 'Invalid JSON',
   colorPickerLabel: 'Select colour',
+
+  // Tool categories (Feature: 176)
+  categoryImportLabel: 'Import',
+  categoryStyleLabel: 'Style',
+  categoryCalcLabel: 'Calculation',
+  categoryFilterLabel: 'Filter',
+  categorySnapshotLabel: 'Snapshot',
+  categoryUnknownLabel: 'Other',
+
+  // Parameter chips (Feature: 176)
+  chipNonDefaultTooltip: 'Non-default value',
+
+  // Rich card (Feature: 176)
+  rationaleTooltip: (rationale: string) => rationale,
+  durationMs: (ms: number) => `${ms}ms`,
 } as const;

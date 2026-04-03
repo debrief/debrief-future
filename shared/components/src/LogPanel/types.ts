@@ -17,14 +17,57 @@ export type { ParameterValue, InputFeatureState };
 export type OperationCategory = 'calculation' | 'import' | 'property-edit' | 'export';
 
 /**
+ * Tool category for visual icon rendering. Feature: 176-log-panel-ux
+ */
+export type ToolCategory = 'import' | 'style' | 'calc' | 'filter' | 'snapshot';
+
+/**
+ * Parameter display type for chip icon selection. Feature: 176-log-panel-ux
+ */
+export type ParamType = 'colour' | 'number' | 'boolean' | 'range' | 'enum';
+
+/**
+ * Static config for a tool category's visual properties. Feature: 176-log-panel-ux
+ */
+export interface ToolCategoryConfig {
+  readonly category: ToolCategory;
+  readonly background: string;
+  readonly glyph: string;
+  readonly label: string;
+}
+
+/**
+ * Data for rendering a parameter chip. Feature: 176-log-panel-ux
+ */
+export interface ParamChipData {
+  readonly name: string;
+  readonly value: unknown;
+  readonly paramType: ParamType | null;
+  readonly isDefault: boolean;
+  readonly unit?: string | null;
+}
+
+/**
  * Presentation mode controlling entry detail level.
+ * @deprecated Feature 176: Use ViewMode 'compact' | 'detailed' instead.
  */
 export type PresentationMode = 'compact' | 'normal' | 'detailed';
 
 /**
- * View mode for the timeline.
+ * Unified view mode replacing ViewMode + PresentationMode.
+ * Feature: 176-log-panel-ux
+ * - timeline: full 3-row cards, newest-first
+ * - by-feature: full 3-row cards, grouped by track
+ * - compact: header + meta rows only
+ * - detailed: full 3-row cards + used/generated feature lists
  */
-export type ViewMode = 'timeline' | 'by-feature';
+export type ViewMode = 'timeline' | 'by-feature' | 'compact' | 'detailed';
+
+/**
+ * Valid ViewMode values for runtime validation (e.g. globalState migration).
+ * Feature: 176-log-panel-ux
+ */
+export const VALID_VIEW_MODES: readonly ViewMode[] = ['timeline', 'by-feature', 'compact', 'detailed'] as const;
 
 /**
  * Display-oriented timeline entry derived from LogEntry.
@@ -117,7 +160,7 @@ export type LogPanelMessage =
   | { type: 'entry:select'; payload: { activityId: string; featureIds: string[] } }
   | { type: 'entry:deselect' }
   | { type: 'action:invoke'; payload: { actionType: ActionType; activityId: string } }
-  | { type: 'mode:change'; payload: { presentationMode: PresentationMode } };
+  | { type: 'mode:change'; payload: { viewMode: ViewMode } };
 
 // --- Messages: Extension → Webview ---
 
@@ -142,7 +185,7 @@ export interface ActionResultPayload {
 }
 
 export interface ModeInitPayload {
-  presentationMode: PresentationMode;
+  viewMode: ViewMode;
 }
 
 export type ExtensionToWebviewMessage =
@@ -150,7 +193,8 @@ export type ExtensionToWebviewMessage =
   | { type: 'session:change'; payload: SessionChangePayload }
   | { type: 'selection:update'; payload: SelectionUpdatePayload }
   | { type: 'action:result'; payload: ActionResultPayload }
-  | { type: 'mode:init'; payload: ModeInitPayload };
+  | { type: 'mode:init'; payload: ModeInitPayload }
+  | { type: 'viewMode:init'; payload: ModeInitPayload };
 
 // --- Component Props ---
 
@@ -160,7 +204,8 @@ export type ExtensionToWebviewMessage =
 export interface LogPanelProps {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
-  presentationMode: PresentationMode;
+  /** @deprecated Use viewMode instead. Ignored when viewMode is set. */
+  presentationMode?: PresentationMode;
   viewMode: ViewMode;
   selectedEntryId: string | null;
   filterState: FilterState;
@@ -168,6 +213,7 @@ export interface LogPanelProps {
   plotName: string | null;
   actionResultMessage: string | null;
   onMessage?: (message: LogPanelMessage) => void;
+  /** @deprecated Use onViewModeChange instead. */
   onPresentationModeChange?: (mode: PresentationMode) => void;
   onViewModeChange?: (mode: ViewMode) => void;
   onFilterStateChange?: (state: FilterState) => void;
@@ -196,7 +242,7 @@ export interface LogPanelProps {
 export interface LogEntryProps {
   entry: TimelineEntry;
   featureNames: Record<string, string>;
-  presentationMode: PresentationMode;
+  viewMode: ViewMode;
   isSelected: boolean;
   onClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
@@ -238,7 +284,7 @@ export interface LogEntryProps {
 export interface LogTimelineProps {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
-  presentationMode: PresentationMode;
+  viewMode: ViewMode;
   selectedEntryId: string | null;
   onEntryClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
@@ -270,7 +316,7 @@ export interface LogTimelineProps {
 export interface LogByFeatureProps {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
-  presentationMode: PresentationMode;
+  viewMode: ViewMode;
   selectedEntryId: string | null;
   onEntryClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
@@ -312,10 +358,34 @@ export interface LogFilterRowProps {
 export interface LogActionBarProps {
   selectedEntryId: string | null;
   viewMode: ViewMode;
-  presentationMode: PresentationMode;
   onActionInvoke?: (actionType: ActionType, activityId: string) => void;
   onViewModeChange?: (mode: ViewMode) => void;
-  onPresentationModeChange?: (mode: PresentationMode) => void;
+  className?: string;
+}
+
+/**
+ * Props for the ToolCategoryIcon component. Feature: 176-log-panel-ux
+ */
+export interface ToolCategoryIconProps {
+  toolName: string;
+  size?: number;
+  className?: string;
+}
+
+/**
+ * Props for the ParameterChip component. Feature: 176-log-panel-ux
+ */
+export interface ParameterChipProps {
+  chip: ParamChipData;
+  className?: string;
+}
+
+/**
+ * Props for the TrackBadge component. Feature: 176-log-panel-ux
+ */
+export interface TrackBadgeProps {
+  name: string;
+  exists: boolean;
   className?: string;
 }
 
