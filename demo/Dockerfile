@@ -5,8 +5,8 @@ FROM lscr.io/linuxserver/webtop:ubuntu-xfce
 
 # Install additional dependencies needed for Debrief
 RUN apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-venv \
+    python3 \
+    python3-venv \
     python3-pip \
     curl \
     jq \

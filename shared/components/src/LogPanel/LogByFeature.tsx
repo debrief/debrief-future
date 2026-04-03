@@ -16,7 +16,7 @@ import { groupEntriesByFeature } from './utils';
 export function LogByFeature({
   entries,
   featureNames,
-  presentationMode,
+  viewMode,
   selectedEntryId,
   onEntryClick,
   onTuneClick,
@@ -65,7 +65,7 @@ export function LogByFeature({
               entry={entry}
               stepIndex={stepIndexMap.get(entry.activityId)}
               featureNames={featureNames}
-              presentationMode={presentationMode}
+              viewMode={viewMode}
               isSelected={entry.activityId === selectedEntryId}
               onClick={onEntryClick}
               onTuneClick={onTuneClick}

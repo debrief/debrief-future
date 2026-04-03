@@ -10,11 +10,11 @@ FROM linuxserver/webtop:ubuntu-xfce
 LABEL maintainer="Debrief Team"
 LABEL description="Browser-accessible Debrief demo environment"
 
-# Install Python 3.11+ (if not present in base)
+# Install Python (if not present in base)
 # Note: webtop is Ubuntu-based, so apt is available
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 \
-    python3.11-venv \
+    python3 \
+    python3-venv \
     python3-pip \
     curl \
     scrot \

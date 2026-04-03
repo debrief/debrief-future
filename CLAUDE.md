@@ -210,4 +210,3 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 ## Recent Changes
 - 175-review-feedback: Added Python 3.11 (service, schema), TypeScript 5.x (frontend components, VS Code extension) + Pydantic v2 (models), LinkML >= 1.7.0 (schema), `ulid` (ID generation), React 18.x (UI), `@tanstack/react-virtual` (list virtualisation)
 - 174-thumbnail-capture: Added Python 3.11 (STAC service), TypeScript 5.x (components, VS Code extension, web-shell) + `modern-screenshot` (DOM-to-PNG capture), `sharp` (Node.js image resize for backfill), Playwright (backfill browser automation), GoldenLayout (preview panel layout)
-- 173-cradle-to-grave-typing: Added Python 3.11, TypeScript 5.x (existing monorepo — no new languages) + debrief_schemas (Pydantic models), @debrief/schemas (TS types + unions.ts type guards), LinkML >= 1.7.0 (gen-typescript, gen-pydantic)

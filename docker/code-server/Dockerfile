@@ -7,10 +7,10 @@ FROM codercom/code-server:latest
 
 USER root
 
-# Install Python 3.11 and system dependencies
+# Install Python and system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 \
-    python3.11-venv \
+    python3 \
+    python3-venv \
     python3-pip \
     curl \
     && rm -rf /var/lib/apt/lists/*

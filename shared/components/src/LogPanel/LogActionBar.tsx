@@ -1,18 +1,18 @@
 /**
- * LogActionBar component — action buttons + view/mode toggles.
+ * LogActionBar component — action buttons + unified 4-tab view mode.
  *
- * Actions: Tune, Revert to Here, Revert This, Snapshot, Rationale
+ * Actions: Revert to Here, Revert This, Snapshot, Rationale
  * All actions return "not available" in Phase 2.
  * Buttons disabled when no entry is selected.
  *
  * Feature: 072-log-panel (US6)
+ * Updated: 176-log-panel-ux (unified 4-tab ViewMode, ARIA tablist)
  */
 
 import React from 'react';
-import type { LogActionBarProps, ActionType, ViewMode, PresentationMode } from './types';
+import type { LogActionBarProps, ActionType, ViewMode } from './types';
 import { LOG_PANEL_STRINGS } from './strings';
 
-// Feature 113: Tune button removed — replaced by flip-card edit face.
 const ACTION_BUTTONS: Array<{ type: ActionType; label: string }> = [
   { type: 'revertTo', label: LOG_PANEL_STRINGS.actionRevertTo },
   { type: 'revertThis', label: LOG_PANEL_STRINGS.actionRevertThis },
@@ -23,21 +23,15 @@ const ACTION_BUTTONS: Array<{ type: ActionType; label: string }> = [
 const VIEW_MODES: Array<{ value: ViewMode; label: string }> = [
   { value: 'timeline', label: LOG_PANEL_STRINGS.viewTimeline },
   { value: 'by-feature', label: LOG_PANEL_STRINGS.viewByFeature },
-];
-
-const PRESENTATION_MODES: Array<{ value: PresentationMode; label: string }> = [
-  { value: 'compact', label: LOG_PANEL_STRINGS.modeCompact },
-  { value: 'normal', label: LOG_PANEL_STRINGS.modeNormal },
-  { value: 'detailed', label: LOG_PANEL_STRINGS.modeDetailed },
+  { value: 'compact', label: LOG_PANEL_STRINGS.viewCompact },
+  { value: 'detailed', label: LOG_PANEL_STRINGS.viewDetailed },
 ];
 
 export function LogActionBar({
   selectedEntryId,
   viewMode,
-  presentationMode,
   onActionInvoke,
   onViewModeChange,
-  onPresentationModeChange,
   className,
 }: LogActionBarProps): React.ReactElement {
   const hasSelection = selectedEntryId !== null;
@@ -63,30 +57,22 @@ export function LogActionBar({
         ))}
       </div>
 
-      {/* View mode + presentation mode toggles */}
+      {/* Unified 4-tab view mode with ARIA tablist */}
       <div className="log-panel__action-bar-toggles">
-        {/* View mode toggle */}
-        <div className="log-panel__toggle-group" data-testid="log-view-mode-toggle">
+        <div
+          className="log-panel__toggle-group"
+          role="tablist"
+          aria-label="Log view mode"
+          data-testid="log-view-mode-toggle"
+        >
           {VIEW_MODES.map((mode) => (
             <button
               key={mode.value}
               className={`log-panel__toggle-btn ${viewMode === mode.value ? 'log-panel__toggle-btn--active' : ''}`}
+              role="tab"
+              aria-selected={viewMode === mode.value}
               onClick={() => onViewModeChange?.(mode.value)}
               data-testid={`log-view-mode-${mode.value}`}
-            >
-              {mode.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Presentation mode toggle */}
-        <div className="log-panel__toggle-group" data-testid="log-presentation-mode-toggle">
-          {PRESENTATION_MODES.map((mode) => (
-            <button
-              key={mode.value}
-              className={`log-panel__toggle-btn ${presentationMode === mode.value ? 'log-panel__toggle-btn--active' : ''}`}
-              onClick={() => onPresentationModeChange?.(mode.value)}
-              data-testid={`log-presentation-mode-${mode.value}`}
             >
               {mode.label}
             </button>

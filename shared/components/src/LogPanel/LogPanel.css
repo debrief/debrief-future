@@ -238,24 +238,100 @@
   opacity: 0.6;
 }
 
-/* Normal mode additions */
-.log-panel__entry-params {
-  margin-top: 4px;
-  font-size: 0.85em;
+/* Row 2: Meta row — track badges + timestamp + duration (Feature: 176) */
+.log-panel__entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.8em;
   color: var(--vscode-descriptionForeground, #969696);
 }
 
-.log-panel__entry-param {
+.log-panel__entry-badges {
   display: flex;
-  gap: 4px;
+  gap: 3px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
-.log-panel__entry-param-key {
-  opacity: 0.7;
+.log-panel__entry-timestamp,
+.log-panel__entry-duration {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.log-panel__entry-param-value {
+.log-panel__entry-duration {
   font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
+  font-size: 0.95em;
+}
+
+/* Track badge pill (Feature: 176) */
+.log-panel__track-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  background: var(--vscode-badge-background, rgba(128, 128, 128, 0.2));
+  color: var(--vscode-badge-foreground, #cccccc);
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-panel__track-badge--deleted {
+  font-style: italic;
+  opacity: 0.6;
+}
+
+/* Row 3: Parameter chips (Feature: 176) */
+.log-panel__entry-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.log-panel__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-foreground, #cccccc);
+  white-space: nowrap;
+}
+
+.log-panel__chip-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.log-panel__chip-name {
+  opacity: 0.6;
+  font-size: 10px;
+}
+
+.log-panel__chip-value {
+  font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
+  font-size: 11px;
+}
+
+.log-panel__chip-marker {
+  color: var(--vscode-editorError-foreground, #f48771);
+  font-size: 6px;
+  line-height: 1;
+}
+
+/* Rationale icon in header (Feature: 176) */
+.log-panel__entry-rationale-icon {
+  font-size: 12px;
+  cursor: help;
+  flex-shrink: 0;
 }
 
 /* Detailed mode additions */
@@ -264,8 +340,8 @@
   font-size: 0.85em;
   color: var(--vscode-descriptionForeground, #969696);
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .log-panel__entry-detail {
@@ -374,17 +450,6 @@
 .log-panel__entry-badge--deleted {
   background: var(--vscode-editorWarning-background, rgba(255, 140, 0, 0.15));
   color: var(--vscode-editorWarning-foreground, #ff8c00);
-}
-
-/* Tunable parameter value — clickable (Feature: 076) */
-.log-panel__entry-param-value--tunable {
-  cursor: pointer;
-  border-bottom: 1px dashed var(--vscode-descriptionForeground, #969696);
-}
-
-.log-panel__entry-param-value--tunable:hover {
-  color: var(--vscode-textLink-foreground, #3794ff);
-  border-bottom-color: var(--vscode-textLink-foreground, #3794ff);
 }
 
 /* Restore button for deleted entries (Feature: 076) */
