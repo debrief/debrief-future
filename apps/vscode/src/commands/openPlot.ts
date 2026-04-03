@@ -330,12 +330,18 @@ export function createOpenPlotCommand(
           if (!activityId) { return; }
           const props = f.properties;
           if (!props || !Array.isArray(props.provenance)) { return; }
-          for (const prov of props.provenance as Array<{ activityId?: unknown; timestamp?: unknown }>) {
+          for (const prov of props.provenance as Array<Record<string, unknown>>) {
+            // Python executor writes snake_case keys (activity_id),
+            // TypeScript writes camelCase (activityId). Handle both.
             if (prov.activityId !== undefined && prov.activityId !== null) {
               prov.activityId = activityId;
+            } else if (prov.activity_id !== undefined && prov.activity_id !== null) {
+              prov.activity_id = activityId;
             }
-            if (timestamp !== undefined && prov.timestamp !== undefined && prov.timestamp !== null) {
-              prov.timestamp = timestamp;
+            if (timestamp !== undefined) {
+              if (prov.timestamp !== undefined && prov.timestamp !== null) {
+                prov.timestamp = timestamp;
+              }
             }
           }
         };
