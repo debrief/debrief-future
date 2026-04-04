@@ -474,6 +474,34 @@ export function createMockCalcService(): MockCalcService {
                       .map(([k, v]) => `  ${k.replace(/_/g, ' ')}: ${String(v)}`)
                       .join('\n');
                     displayMessage = `${String(props['name'] ?? label)}\n${lines}`;
+
+                    // Synthesize a table dataset from statistics (#177)
+                    // This handles Python MCP tools that return properties.statistics
+                    // but no __datasets array.
+                    if (!props['__datasets']) {
+                      const srcNames = (selectedFeatures
+                        .map(sf => String(sf.properties?.['name'] ?? sf.id ?? 'feature'))
+                        .map(n => n.toLowerCase().replace(/\s+/g, '-'))
+                        .join('-'));
+                      datasets.push({
+                        filename: `${toolId}-${srcNames}.dataset.json`,
+                        envelope: {
+                          type: `${toolId}_statistics`,
+                          title: String(props['name'] ?? `${label} Results`),
+                          displayHint: 'table',
+                          metadata: {
+                            xAxis: { label: 'Metric', type: 'nominal' },
+                            yAxis: { label: 'Value', type: 'quantitative' },
+                          },
+                          data: Object.entries(stats)
+                            .filter(([, v]) => typeof v === 'number' || typeof v === 'string')
+                            .map(([key, val]) => ({
+                              metric: key.replace(/_/g, ' '),
+                              value: val,
+                            })),
+                        },
+                      });
+                    }
                   }
                 }
 
