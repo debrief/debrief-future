@@ -741,23 +741,6 @@ export interface TUAData {
 
 
 /**
- * Tracked contact positions embedded in the observing platform's track. Represents the estimated track of a contact as detected by the host platform's sensors. Stored as a child rather than a top-level feature.
- */
-export interface ContactTrackData {
-    /** Contact track identifier (e.g., "SUBJECT1") */
-    name: string,
-    /** Array of timestamped contact positions */
-    positions: TimestampedPosition[],
-    /** Contact track start time (ISO8601) */
-    start_time: string,
-    /** Contact track end time (ISO8601) */
-    end_time: string,
-    /** Contact track styling */
-    style?: TrackStyle,
-}
-
-
-/**
  * Properties for a TrackFeature
  */
 export interface TrackProperties extends BaseFeatureProperties {
@@ -791,8 +774,6 @@ export interface TrackProperties extends BaseFeatureProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
-    /** Embedded contact track data. Each entry represents a target track detected/tracked by this platform's sensors. Contact tracks are nested here rather than appearing as top-level features. */
-    contact_tracks?: ContactTrackData[],
 }
 
 

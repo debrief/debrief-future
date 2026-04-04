@@ -1396,384 +1396,195 @@
         },
         "symbol_interval": "PT5M",
         "label_interval": "PT15M",
-        "contact_tracks": [
+        "sensors": [
           {
             "name": "SUBJECT1",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:00:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 206.582
               },
               {
                 "time": "2010-01-12T12:00:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 207.474
               },
               {
                 "time": "2010-01-12T12:02:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 209.741
               },
               {
                 "time": "2010-01-12T12:04:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 211.046
               },
               {
                 "time": "2010-01-12T12:05:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 212.285
               },
               {
                 "time": "2010-01-12T12:06:40+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 212.936
               },
               {
                 "time": "2010-01-12T12:15:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 220.798
               },
               {
                 "time": "2010-01-12T12:23:20+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 231.897
               }
-            ],
-            "start_time": "2010-01-12T12:00:00+00:00",
-            "end_time": "2010-01-12T12:23:20+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT2",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:00:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 206.582
               },
               {
                 "time": "2010-01-12T12:01:40+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 208.647
               },
               {
                 "time": "2010-01-12T12:03:20+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 210.455
               },
               {
                 "time": "2010-01-12T12:05:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 211.656
               },
               {
                 "time": "2010-01-12T12:07:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 213.609
               },
               {
                 "time": "2010-01-12T12:15:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 221.743
               },
               {
                 "time": "2010-01-12T12:24:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 233.228
               }
-            ],
-            "start_time": "2010-01-12T12:00:00+00:00",
-            "end_time": "2010-01-12T12:24:10+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "aSUBJECT3",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:08:20+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 214.303
               },
               {
                 "time": "2010-01-12T12:16:40+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 222.722
               },
               {
                 "time": "2010-01-12T12:25:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 234.605
               }
-            ],
-            "start_time": "2010-01-12T12:08:20+00:00",
-            "end_time": "2010-01-12T12:25:00+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT4",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:09:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 215.022
               },
               {
                 "time": "2010-01-12T12:17:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 223.734
               },
               {
                 "time": "2010-01-12T12:25:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 236.025
               }
-            ],
-            "start_time": "2010-01-12T12:09:10+00:00",
-            "end_time": "2010-01-12T12:25:50+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT5",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:10:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 215.765
               },
               {
                 "time": "2010-01-12T12:18:20+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 224.783
               },
               {
                 "time": "2010-01-12T12:26:40+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 237.49
               }
-            ],
-            "start_time": "2010-01-12T12:10:00+00:00",
-            "end_time": "2010-01-12T12:26:40+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT6",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:10:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 216.533
               },
               {
                 "time": "2010-01-12T12:19:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 225.869
               },
               {
                 "time": "2010-01-12T12:27:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 238.576
               }
-            ],
-            "start_time": "2010-01-12T12:10:50+00:00",
-            "end_time": "2010-01-12T12:27:30+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT7",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:11:40+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 217.328
               },
               {
                 "time": "2010-01-12T12:20:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 226.995
               },
               {
                 "time": "2010-01-12T12:28:20+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 238.83
               },
               {
                 "time": "2010-01-12T12:29:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 238.597
               }
-            ],
-            "start_time": "2010-01-12T12:11:40+00:00",
-            "end_time": "2010-01-12T12:29:10+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT8",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:12:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 218.152
               },
               {
                 "time": "2010-01-12T12:20:50+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 228.158
               },
               {
                 "time": "2010-01-12T12:30:00+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 238.327
               }
-            ],
-            "start_time": "2010-01-12T12:12:30+00:00",
-            "end_time": "2010-01-12T12:30:00+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           },
           {
             "name": "SUBJECT0",
-            "positions": [
+            "contacts": [
               {
                 "time": "2010-01-12T12:14:10+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 219.885
               },
               {
                 "time": "2010-01-12T12:22:30+00:00",
-                "course": 320.0,
-                "speed": 9.0,
-                "depth": 0.0
+                "bearing": 230.608
               }
-            ],
-            "start_time": "2010-01-12T12:14:10+00:00",
-            "end_time": "2010-01-12T12:22:30+00:00",
-            "style": {
-              "line": {
-                "color": "#808080"
-              },
-              "point": {
-                "shape": "circle",
-                "radius": 3.0,
-                "fill_color": "#808080",
-                "color": "#808080"
-              }
-            }
+            ]
           }
         ],
         "provenance": [
