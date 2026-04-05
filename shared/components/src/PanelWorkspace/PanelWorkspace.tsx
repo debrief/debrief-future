@@ -62,6 +62,8 @@ export function PanelWorkspace({
     saveTimeoutRef.current = setTimeout(() => {
       const gl = glRef.current;
       if (!gl || !gl.isInitialised) return;
+      // Don't persist empty/degraded layouts — they corrupt the saved state
+      if (!gl.rootItem || gl.rootItem.contentItems.length === 0) return;
       try {
         const resolvedConfig = gl.saveLayout();
         saveLayout(resolvedConfig);
@@ -108,18 +110,22 @@ export function PanelWorkspace({
     });
 
     return () => {
-      // Save layout before destroying
-      if (gl.isInitialised) {
+      // Cancel any pending debounced save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Save layout before destroying — but only if the layout still has
+      // content. During React unmount (e.g. navigating away from analysis
+      // view), GoldenLayout may report an empty/degraded state. Persisting
+      // that would corrupt the saved layout for the next session.
+      if (gl.isInitialised && gl.rootItem && gl.rootItem.contentItems.length > 0) {
         try {
           const resolvedConfig = gl.saveLayout();
           saveLayout(resolvedConfig);
         } catch {
           // Ignore save errors during cleanup
         }
-      }
-
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
       }
 
       unmountAll();

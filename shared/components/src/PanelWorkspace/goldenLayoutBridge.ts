@@ -96,10 +96,19 @@ export function createBindHandler(
       panelId,
     };
 
-    const root = createRoot(container.element);
-    const panel: MountedPanel = { root, props, componentType };
+    const panel: MountedPanel = { root: undefined as unknown as Root, props, componentType };
     mountedPanels.set(container, panel);
-    renderPanel(container, panel);
+
+    // Defer React root creation to the next microtask so GoldenLayout has
+    // finished attaching the container element to the DOM. Without this,
+    // createRoot + render can fire before the element is mounted, triggering
+    // React error #409 and silently dropping panels.
+    queueMicrotask(() => {
+      if (!mountedPanels.has(container)) return; // already unbound
+      const root = createRoot(container.element);
+      panel.root = root;
+      renderPanel(container, panel);
+    });
 
     return { component: undefined, virtual: false };
   };
@@ -112,7 +121,8 @@ export function createUnbindHandler(): VirtualLayout.UnbindComponentEventHandler
   return (container: ComponentContainer): void => {
     const panel = mountedPanels.get(container);
     if (panel) {
-      panel.root.unmount();
+      // Root may not exist yet if unbind fires before the deferred microtask
+      if (panel.root) panel.root.unmount();
       mountedPanels.delete(container);
     }
   };
@@ -127,7 +137,8 @@ export function updateContextWrapper(
 ): void {
   currentContextWrapper = contextWrapper;
   for (const [container, panel] of mountedPanels) {
-    renderPanel(container, panel);
+    // Skip panels whose root hasn't been created yet (deferred microtask)
+    if (panel.root) renderPanel(container, panel);
   }
 }
 
@@ -136,7 +147,7 @@ export function updateContextWrapper(
  */
 export function unmountAll(): void {
   for (const [, panel] of mountedPanels) {
-    panel.root.unmount();
+    if (panel.root) panel.root.unmount();
   }
   mountedPanels.clear();
   currentContextWrapper = undefined;
