@@ -209,6 +209,16 @@ export function PanelWorkspace({
     const mapColumn = gl.rootItem ? findMapColumn(gl.rootItem) : null;
     if (mapColumn) {
       mapColumn.addComponent(componentType, undefined, title);
+
+      // Set 70/30 split between map (top) and results (bottom) (#177).
+      // After addComponent, the column has two stacks. Assign relative
+      // sizes so the map keeps 70% and results gets 30%.
+      const items = mapColumn.contentItems;
+      if (items.length === 2) {
+        (items[0] as ContentItem & { size: number }).size = 70;
+        (items[1] as ContentItem & { size: number }).size = 30;
+        mapColumn.updateSize(false);
+      }
     } else {
       // Fallback: use default placement
       gl.addComponent(componentType, undefined, title);
