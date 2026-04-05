@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--tug-1",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.0311565919,
+          -0.006830494
+        ],
+        [
+          0.2267058057,
+          -0.006830494
+        ],
+        [
+          0.2267058057,
+          0.1770600835
+        ],
+        [
+          0.0311565919,
+          0.1770600835
+        ],
+        [
+          0.0311565919,
+          -0.006830494
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.0311565919,
+    -0.006830494,
+    0.2267058057,
+    0.1770600835
+  ],
+  "properties": {
+    "title": "Silent Resolve: Tug 1",
+    "datetime": "1999-12-31T22:00:00+00:00",
+    "description": "Silent Resolve: Tug 1 — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Mason.",
+    "start_datetime": "1999-12-31T22:00:00+00:00",
+    "end_datetime": "2000-01-01T05:37:00+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/type212"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "amphibious",
+      "mine-clearance",
+      "prosecution",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "HDMS Mason"
+    ],
+    "debrief:nationalities": [
+      "DK"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "tug_1 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/SATC/tug_1.rep",
+      "title": "tug_1.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-tug_1": {
+      "href": "./assets/tug_1.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "tug_1.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/SATC/tug_1.rep",
+        "load_timestamp": "2026-03-28T13:51:01.992041Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
