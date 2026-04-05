@@ -63,6 +63,7 @@ import {
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { GeoJSONFeature } from '@debrief/utils';
+import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 
@@ -135,6 +136,8 @@ interface ResultTab {
   fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
   /** Rendering hint from dataset: 'table' for flat statistics (#177) */
   displayHint?: 'table' | 'chart';
+  /** Whether this result has been saved (#177) */
+  isSaved?: boolean;
 }
 
 /** Image file extensions that should render inline */
@@ -1112,6 +1115,32 @@ export default function App() {
     ChartRenderer,
   }), []);
 
+  // Save result as CSV to the plot's asset folder (#177)
+  const handleSaveResult = useCallback((tabId: string, baseName?: string, tag?: string) => {
+    const tab = resultTabs.find(t => t.id === tabId);
+    if (!tab || !tab.dataset || !currentPlot) return;
+
+    // Build CSV from dataset
+    const data = tab.dataset.data ?? tab.dataset.series?.flatMap(s => s.data) ?? [];
+    if (data.length === 0) return;
+    const csv = buildCsvContent(data as Record<string, unknown>[]);
+
+    // Generate filename
+    const toolName = tab.title.split(':')[0]?.trim().toLowerCase().replace(/\s+/g, '-') ?? 'result';
+    const filename = generateCsvFilename(toolName, baseName, tag);
+
+    // Write to mock filesystem
+    const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+    const assetPath = `${itemDir}/assets/${filename}`;
+    mockFsAdapter.writeFile(assetPath, csv);
+
+    // Mark tab as saved
+    setResultTabs(prev => prev.map(t => t.id === tabId ? { ...t, isSaved: true } : t));
+
+    // Refresh the file tree so the new asset appears
+    setTreeRefreshKey(k => k + 1);
+  }, [resultTabs, currentPlot]);
+
   // Results context for the Chart/Results panel wrapper
   const chartContextProps = useMemo<ChartContextProps | null>(() => {
     if (resultTabs.length === 0 && !activeChartSpec) return null;
@@ -1123,7 +1152,7 @@ export default function App() {
       fileMeta: t.fileMeta,
       displayHint: t.displayHint,
       tableData: t.displayHint === 'table' && t.dataset?.data ? t.dataset.data : undefined,
-      isSaved: false,
+      isSaved: t.isSaved ?? false,
     }));
     return {
       chartSpec: activeChartSpec,
@@ -1131,11 +1160,11 @@ export default function App() {
       activeChartTabId: activeResultTabId,
       onChartTabSelect: setActiveResultTabId,
       onChartTabClose: handleCloseResultTab,
-      onSave: (_tabId: string) => { /* Save handled by VS Code extension host (#177) */ },
-      onSaveAs: (_tabId: string, _baseName: string, _tag?: string) => { /* Save As handled by VS Code extension host (#177) */ },
-      onRetry: (_tabId: string) => { /* Retry handled by VS Code extension host (#177) */ },
+      onSave: (tabId: string) => handleSaveResult(tabId),
+      onSaveAs: (tabId: string, baseName: string, tag?: string) => handleSaveResult(tabId, baseName, tag),
+      onRetry: (_tabId: string) => { /* Retry not yet implemented in web-shell */ },
     };
-  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab]);
+  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab, handleSaveResult]);
 
   // Full context value for all panel wrappers
   const panelContextValue = useMemo<PanelContextValue>(() => ({
