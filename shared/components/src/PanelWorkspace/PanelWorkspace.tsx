@@ -52,6 +52,7 @@ export function PanelWorkspace({
   const containerRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<GoldenLayout | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressSaveRef = useRef(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
   // Debounced save handler
@@ -62,7 +63,8 @@ export function PanelWorkspace({
     saveTimeoutRef.current = setTimeout(() => {
       const gl = glRef.current;
       if (!gl || !gl.isInitialised) return;
-      // Don't persist empty/degraded layouts — they corrupt the saved state
+      // Don't persist during reset or when layout is empty/degraded
+      if (suppressSaveRef.current) return;
       if (!gl.rootItem || gl.rootItem.contentItems.length === 0) return;
       try {
         const resolvedConfig = gl.saveLayout();
@@ -145,10 +147,25 @@ export function PanelWorkspace({
     const gl = glRef.current;
     if (!gl) return;
 
+    // Suppress layout saves during reset to prevent persisting the
+    // intermediate empty state between clearRoot and addChild.
+    suppressSaveRef.current = true;
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
     clearLayout();
     gl.loadLayout(DEFAULT_LAYOUT_CONFIG);
+
+    // After loadLayout, GoldenLayout has created new DOM containers and
+    // the bridge has bound fresh React roots. Force a re-render of all
+    // panels with the current context wrapper so they pick up the latest
+    // props (plot data, tools, etc.).
+    updateContextWrapper(contextWrapper);
+
+    suppressSaveRef.current = false;
     onLayoutReset?.();
-  }, [onLayoutReset]);
+  }, [onLayoutReset, contextWrapper]);
 
   // Check if a component type is currently present in the layout
   const hasPanel = useCallback((componentType: string): boolean => {
