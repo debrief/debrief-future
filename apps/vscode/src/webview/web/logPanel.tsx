@@ -225,7 +225,7 @@ function LogPanelApp(): React.ReactElement {
       // Optimistic update: immediately reflect the new value in local state
       setEntries((prev) =>
         prev.map((e) => {
-          if (e.activityId !== activityId) return e;
+          if (e.activity_id !== activityId) return e;
           const paramEntry = e.parameters[parameter];
           if (!paramEntry) return e;
           return {
@@ -244,7 +244,7 @@ function LogPanelApp(): React.ReactElement {
         tuneTimerRef.current = null;
         vscode.postMessage({
           type: 'tune:request',
-          payload: { activityId, parameter, newValue },
+          payload: { activity_id: activityId, parameter, new_value: newValue },
         });
       }, 400);
     },
@@ -254,21 +254,21 @@ function LogPanelApp(): React.ReactElement {
   const handleRevertToRequest = useCallback((activityId: string) => {
     vscode.postMessage({
       type: 'revert-to:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
   const handleRevertThisRequest = useCallback((activityId: string) => {
     vscode.postMessage({
       type: 'revert-this:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
   const handleRestoreRequest = useCallback((activityId: string) => {
     vscode.postMessage({
       type: 'restore:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
@@ -322,7 +322,7 @@ function LogPanelApp(): React.ReactElement {
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
     vscode.postMessage({
       type: 'disable:toggle',
-      payload: { activityId, disabled },
+      payload: { activity_id: activityId, disabled },
     });
   }, []);
 
@@ -330,7 +330,7 @@ function LogPanelApp(): React.ReactElement {
   const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
     vscode.postMessage({
       type: 'rationale:update',
-      payload: { activityId, rationale },
+      payload: { activity_id: activityId, rationale },
     });
   }, []);
 
