@@ -36,7 +36,7 @@ import {
   PANEL_CHART,
   parseTaxonomy,
 } from '@debrief/components';
-import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
+import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
   StacBrowserItem,
   CatalogOverviewItem,
@@ -182,6 +182,7 @@ export default function App() {
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
+  const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -372,6 +373,7 @@ export default function App() {
     store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
+    setSavedResultFiles([]);
     store.getState().clearSelection();
   }, [store]);
 
@@ -1137,6 +1139,19 @@ export default function App() {
     // Mark tab as saved
     setResultTabs(prev => prev.map(t => t.id === tabId ? { ...t, isSaved: true } : t));
 
+    // Add to associated result files so it appears in the LayersToolbar dropdown
+    setSavedResultFiles(prev => {
+      // Avoid duplicates if same file saved twice
+      if (prev.some(f => f.path === assetPath)) return prev;
+      return [...prev, {
+        name: filename,
+        path: assetPath,
+        category: 'result' as const,
+        format: 'csv',
+        mtime: Date.now(),
+      }];
+    });
+
     // Refresh the file tree so the new asset appears
     setTreeRefreshKey(k => k + 1);
   }, [resultTabs, currentPlot]);
@@ -1179,6 +1194,7 @@ export default function App() {
       tools,
       features: allFeatures,
       selectedFeatureIds: state.selection.featureIds,
+      resultFiles: savedResultFiles,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
@@ -1233,7 +1249,7 @@ export default function App() {
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
-    handleFileSelect, treeRefreshKey, chartContextProps,
+    handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles,
   ]);
 
   // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
