@@ -183,6 +183,7 @@ export default function App() {
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
   const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
+  const [highlightedFilePaths, setHighlightedFilePaths] = useState<string[]>([]);
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -374,6 +375,7 @@ export default function App() {
     setToolMessage(null);
     setLogEntries([]);
     setSavedResultFiles([]);
+    setHighlightedFilePaths([]);
     store.getState().clearSelection();
   }, [store]);
 
@@ -1099,10 +1101,27 @@ export default function App() {
         }
         break;
       }
+      case 'file:action': {
+        const { file, action } = message.payload;
+        if (action === 'open') {
+          // Load the file as a result tab in the Results panel
+          void handleFileSelect(file.path);
+        } else if (action === 'reveal') {
+          // Highlight the file in the Navigation tree
+          setHighlightedFilePaths([file.path]);
+        } else if (action === 'openWith') {
+          // Web-shell has no viewer picker — show a notification
+          setToolMessage(`Open with: no alternative viewers available for ${file.name}`);
+        } else if (action === 'delete') {
+          // Remove from saved results list (does not delete from filesystem)
+          setSavedResultFiles(prev => prev.filter(f => f.path !== file.path));
+        }
+        break;
+      }
       default:
         break;
     }
-  }, [playback, store, handleRunTool]);
+  }, [playback, store, handleRunTool, handleFileSelect]);
 
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
@@ -1235,6 +1254,7 @@ export default function App() {
       currentItemPath: currentPlot
         ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`
         : undefined,
+      highlightedPaths: highlightedFilePaths,
       onFileSelect: handleFileSelect,
       refreshKey: treeRefreshKey,
       className: 'web-shell__file-tree',
@@ -1249,7 +1269,7 @@ export default function App() {
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
-    handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles,
+    handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles, highlightedFilePaths,
   ]);
 
   // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
