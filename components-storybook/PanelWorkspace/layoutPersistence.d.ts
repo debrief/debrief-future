@@ -5,7 +5,7 @@
  * with version checking and component type validation.
  */
 export declare const LAYOUT_STORAGE_KEY = "debrief-panel-layout";
-export declare const LAYOUT_VERSION = 1;
+export declare const LAYOUT_VERSION = 2;
 /**
  * Recursively validates that all componentType values in the config tree
  * exist in the registeredTypes array.

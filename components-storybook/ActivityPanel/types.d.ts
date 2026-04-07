@@ -97,6 +97,12 @@ export type ActivityPanelMessage = {
         positionIndex?: number;
         childType?: string;
     };
+} | {
+    type: 'file:action';
+    payload: {
+        file: AssociatedFile;
+        action: 'open' | 'openWith' | 'reveal' | 'delete';
+    };
 };
 /**
  * Props for the ActivityPanel component.
