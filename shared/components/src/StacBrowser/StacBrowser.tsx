@@ -118,17 +118,19 @@ const PANEL_MAP = 'browser-map';
 
 // ─── Layout persistence ──────────────────────────────────────────────────────
 const BROWSER_LAYOUT_KEY = 'debrief-browser-layout';
-const BROWSER_LAYOUT_VERSION = 6;
+const BROWSER_LAYOUT_VERSION = 8;
+
+/** Shared header config for all generated layouts. */
+const BROWSER_HEADER_CONFIG = {
+  close: false,
+  popout: false,
+  maximise: 'maximise',
+  minimise: 'restore',
+} as const;
 
 const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
   settings: { popoutWholeStack: false },
-  header: {
-    // Analysts can maximise/restore panels but not close or pop out
-    close: false,
-    popout: false,
-    maximise: 'maximise',
-    minimise: 'restore',
-  },
+  header: BROWSER_HEADER_CONFIG,
   root: {
     type: 'column',
     content: [
@@ -179,6 +181,53 @@ const BROWSER_DEFAULT_LAYOUT: LayoutConfig = {
     ],
   },
 };
+
+/**
+ * Build a LayoutConfig with only the visible panels.
+ * Exercises is always visible. Timeline and Map can be hidden independently.
+ * When both bottom panels are hidden, Exercises fills the full height.
+ */
+function buildLayoutForVisiblePanels(hidden: Set<string>): LayoutConfig {
+  const exercises = { type: 'component' as const, componentType: PANEL_LIST, title: 'Exercises', isClosable: false };
+  const timeline = { type: 'component' as const, componentType: PANEL_TIMELINE, title: 'Timeline', isClosable: false };
+  const map = { type: 'component' as const, componentType: PANEL_MAP, title: 'Map', isClosable: false };
+
+  const showTimeline = !hidden.has(PANEL_TIMELINE);
+  const showMap = !hidden.has(PANEL_MAP);
+  const hasBottom = showTimeline || showMap;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const content: any[] = [
+    { type: 'stack', height: hasBottom ? 55 : 100, content: [exercises] },
+  ];
+
+  if (showTimeline && showMap) {
+    content.push({
+      type: 'row', height: 45, content: [
+        { type: 'stack', width: 50, content: [timeline] },
+        { type: 'stack', width: 50, content: [map] },
+      ],
+    });
+  } else if (showTimeline) {
+    content.push({ type: 'stack', height: 45, content: [timeline] });
+  } else if (showMap) {
+    content.push({ type: 'stack', height: 45, content: [map] });
+  }
+
+  return {
+    settings: { popoutWholeStack: false },
+    header: BROWSER_HEADER_CONFIG,
+    root: { type: 'column', content },
+  };
+}
+
+/** Clean up injected header controls before rebuilding the layout. */
+function cleanupInjectedControls(): void {
+  if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
+  sortHeaderContainer = null;
+  for (const [, entry] of hideBtnRoots) { entry.root.unmount(); }
+  hideBtnRoots.clear();
+}
 
 function saveBrowserLayout(config: unknown): void {
   try {
@@ -300,6 +349,19 @@ const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: str
 // Sort dropdown injected into the Exercises GoldenLayout header
 let sortHeaderRoot: Root | null = null;
 let sortHeaderContainer: HTMLElement | null = null;
+
+// ─── Panel hide/show ────────────────────────────────────────────────────────
+// When a panel is hidden, we rebuild the GoldenLayout with a config that
+// excludes it. This guarantees correct positioning when panels are restored.
+// Restore buttons appear in the filter bar row.
+
+/** Title labels for restore buttons. */
+const PANEL_TITLES: Record<string, string> = {
+  [PANEL_TIMELINE]: 'Timeline',
+  [PANEL_MAP]: 'Map',
+};
+
+const hideBtnRoots = new Map<string, { root: Root; container: HTMLElement }>();
 
 /** Sort dimension labels for the dropdown. */
 const SORT_LABELS: Record<SortDimension, string> = {
@@ -528,6 +590,22 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
   const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
 
+  // ─── Hidden panels (removed from GL, restore via filter bar buttons) ──────
+  const [hiddenPanels, setHiddenPanels] = useState<Set<string>>(new Set());
+
+  const restorePanel = useCallback((panelType: string) => {
+    const gl = glRef.current;
+    if (!gl) return;
+    setHiddenPanels(prev => {
+      const next = new Set(prev);
+      next.delete(panelType);
+      // Rebuild the entire layout so the panel appears in its correct position
+      cleanupInjectedControls();
+      gl.loadLayout(buildLayoutForVisiblePanels(next));
+      return next;
+    });
+  }, []);
+
   // ─── Filter state ──────────────────────────────────────────────────────────
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
   const [viewport, setViewport] = useState<ViewportPolygon | null>(null);
@@ -649,26 +727,55 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       mountedBrowserPanels.set(container, { root, type: componentType });
       root.render(renderPanel(componentType));
 
-      // Inject sort dropdown into the Exercises panel header
-      if (componentType === PANEL_LIST) {
-        const injectSort = () => {
-          try {
-            const headerEl = container.tab?.element?.closest('.lm_header');
-            const controlsEl = headerEl?.querySelector('.lm_controls');
-            if (controlsEl && !sortHeaderContainer) {
-              sortHeaderContainer = document.createElement('li');
-              sortHeaderContainer.className = 'stac-browser__sort-header-li';
-              controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
-              sortHeaderRoot = createRoot(sortHeaderContainer);
-              renderSortHeader();
-            } else if (!controlsEl) {
-              // Tab may not be assigned yet — retry on next frame
-              requestAnimationFrame(injectSort);
-            }
-          } catch { /* tab not ready yet */ }
-        };
-        requestAnimationFrame(injectSort);
-      }
+      // Inject header controls (sort dropdown for Exercises, hide button for Timeline/Map)
+      const injectHeaderControls = () => {
+        try {
+          const headerEl = container.tab?.element?.closest('.lm_header');
+          const controlsEl = headerEl?.querySelector('.lm_controls');
+          if (!controlsEl) {
+            requestAnimationFrame(injectHeaderControls);
+            return;
+          }
+
+          // Sort dropdown — only for Exercises panel
+          if (componentType === PANEL_LIST && !sortHeaderContainer) {
+            sortHeaderContainer = document.createElement('li');
+            sortHeaderContainer.className = 'stac-browser__sort-header-li';
+            controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
+            sortHeaderRoot = createRoot(sortHeaderContainer);
+            renderSortHeader();
+          }
+
+          // Hide button — only for Timeline and Map panels
+          if ((componentType === PANEL_TIMELINE || componentType === PANEL_MAP) && !hideBtnRoots.has(componentType)) {
+            const btnLi = document.createElement('li');
+            btnLi.className = 'stac-browser__hide-btn-li';
+            btnLi.addEventListener('click', (e) => {
+              e.stopPropagation();
+              // Rebuild layout without this panel so siblings fill the freed space
+              setHiddenPanels(prev => {
+                const next = new Set(prev);
+                next.add(componentType);
+                const glInst = glRef.current;
+                if (glInst) {
+                  cleanupInjectedControls();
+                  glInst.loadLayout(buildLayoutForVisiblePanels(next));
+                }
+                return next;
+              });
+            });
+            controlsEl.insertBefore(btnLi, controlsEl.firstChild);
+            const btnRoot = createRoot(btnLi);
+            hideBtnRoots.set(componentType, { root: btnRoot, container: btnLi });
+            btnRoot.render(
+              <button type="button" className="stac-browser__hide-btn" title={`Hide ${PANEL_TITLES[componentType]} panel`}>
+                {'\u2212'}
+              </button>,
+            );
+          }
+        } catch { /* tab not ready yet */ }
+      };
+      requestAnimationFrame(injectHeaderControls);
 
       return { component: undefined, virtual: false };
     };
@@ -713,8 +820,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
         panel.root.unmount();
       }
       mountedBrowserPanels.clear();
-      if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
-      sortHeaderContainer = null;
+      cleanupInjectedControls();
       gl.destroy();
       glRef.current = null;
     };
@@ -725,6 +831,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     const gl = glRef.current;
     if (!gl) return;
     clearBrowserLayout();
+    cleanupInjectedControls();
+    setHiddenPanels(new Set());
     gl.loadLayout(BROWSER_DEFAULT_LAYOUT);
   }, []);
 
@@ -753,6 +861,28 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
         >
           Reset Layout
         </button>
+        {hiddenPanels.has(PANEL_TIMELINE) && (
+          <button
+            type="button"
+            className="stac-browser__restore-btn"
+            onClick={() => restorePanel(PANEL_TIMELINE)}
+            title="Show Timeline panel"
+            data-testid="restore-timeline"
+          >
+            + Timeline
+          </button>
+        )}
+        {hiddenPanels.has(PANEL_MAP) && (
+          <button
+            type="button"
+            className="stac-browser__restore-btn"
+            onClick={() => restorePanel(PANEL_MAP)}
+            title="Show Map panel"
+            data-testid="restore-map"
+          >
+            + Map
+          </button>
+        )}
       </div>
 
       {/* GoldenLayout container for the 3 panels */}
