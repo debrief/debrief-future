@@ -45,4 +45,6 @@ export interface DatasetEnvelope {
   data?: Record<string, unknown>[];
   /** Named data series (multi-line/multi-series charts). */
   series?: DataSeries[];
+  /** Rendering hint: 'table' for flat statistics, 'chart' for Vega-Lite (default). Feature: 177 */
+  displayHint?: 'table' | 'chart';
 }

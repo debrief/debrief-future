@@ -6,7 +6,7 @@
  */
 
 export const LAYOUT_STORAGE_KEY = 'debrief-panel-layout';
-export const LAYOUT_VERSION = 1;
+export const LAYOUT_VERSION = 2;
 
 interface PersistedLayout {
   version: number;
@@ -26,6 +26,26 @@ function isLocalStorageAvailable(): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Recursively collects all componentType values from the config tree.
+ */
+function collectComponentTypes(config: unknown): string[] {
+  if (config === null || config === undefined || typeof config !== 'object') return [];
+  const types: string[] = [];
+  if ('componentType' in config) {
+    const ct = (config as { componentType: unknown }).componentType;
+    if (typeof ct === 'string') types.push(ct);
+  }
+  if (Array.isArray(config)) {
+    for (const item of config) types.push(...collectComponentTypes(item));
+  } else {
+    for (const value of Object.values(config)) {
+      types.push(...collectComponentTypes(value));
+    }
+  }
+  return types;
 }
 
 /**
@@ -156,6 +176,19 @@ export function loadLayout(
     // Validate component types
     if (!validateLayoutTypes(layout.config, registeredTypes)) {
       console.warn('Layout contains unregistered component types, ignoring');
+      return null;
+    }
+
+    // Verify essential panels are present (reject corrupted layouts that
+    // pass type validation but are structurally broken — e.g., empty sidebar).
+    const presentTypes = new Set(collectComponentTypes(layout.config));
+    const essentialTypes = registeredTypes.filter(t => t !== 'chart'); // chart is dynamic
+    const missingTypes = essentialTypes.filter(t => !presentTypes.has(t));
+    if (missingTypes.length > 0) {
+      console.warn(
+        `Layout is missing essential panels: ${missingTypes.join(', ')}. ` +
+        'Falling back to default layout.'
+      );
       return null;
     }
 

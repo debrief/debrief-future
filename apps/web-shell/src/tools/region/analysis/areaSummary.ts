@@ -100,6 +100,23 @@ export function execute(
     statistics.centroid = [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
   }
 
+  // Build a DatasetEnvelope for tabular display (#177)
+  const tableDataset = {
+    type: 'region_statistics',
+    title: 'Area Summary',
+    displayHint: 'table' as const,
+    metadata: {
+      xAxis: { label: 'Metric', type: 'nominal' as const },
+      yAxis: { label: 'Value', type: 'quantitative' as const },
+    },
+    data: Object.entries(statistics)
+      .filter(([, v]) => typeof v === 'number')
+      .map(([key, val]) => ({
+        metric: key.replace(/_/g, ' '),
+        value: val,
+      })),
+  };
+
   return [{
     type: 'Feature',
     id: `area-${generateUUID()}`,
@@ -119,6 +136,7 @@ export function execute(
       label: `Area Summary`,
       statistics,
       bounds: [minLon, minLat, maxLon, maxLat],
+      '__datasets': [tableDataset],
       style: {
         fill: true,
         fill_color: '#FF9800',

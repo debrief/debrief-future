@@ -11,6 +11,8 @@ interface UseTreeStateReturn {
   nodes: TreeNodeData[];
   /** Toggle expand/collapse state of a node */
   toggleNode: (path: string) => Promise<void>;
+  /** Expand a path and all its ancestors so the target node is rendered */
+  expandPath: (path: string) => Promise<void>;
   /** Whether initial load is in progress */
   isLoading: boolean;
   /** Error message if initial load failed */
@@ -283,5 +285,45 @@ export function useTreeState(
     [fs, nodes]
   );
 
-  return { nodes, toggleNode, isLoading, error };
+  /**
+   * Expand all ancestor directories of the given path so the target
+   * node is visible in the tree. Walks down from the root, expanding
+   * each segment one at a time so children are loaded lazily.
+   */
+  const expandPath = useCallback(
+    async (targetPath: string) => {
+      // Build the list of ancestor paths from root down to (but excluding) the target
+      // e.g. /a/b/c/file.csv → ['/a', '/a/b', '/a/b/c']
+      const segments = targetPath.split('/').filter(Boolean);
+      const ancestors: string[] = [];
+      for (let i = 1; i < segments.length; i++) {
+        ancestors.push('/' + segments.slice(0, i).join('/'));
+      }
+
+      // Find a node by path in the current tree
+      function findNode(items: TreeNodeData[], path: string): TreeNodeData | null {
+        for (const node of items) {
+          if (node.path === path) return node;
+          if (node.children) {
+            const found = findNode(node.children, path);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      // Expand each ancestor in sequence (top-down) so children load first
+      for (const ancestor of ancestors) {
+        if (!expandedPathsRef.current.has(ancestor)) {
+          const node = findNode(nodes, ancestor);
+          if (node && node.isExpandable && node.children === null) {
+            await toggleNode(ancestor);
+          }
+        }
+      }
+    },
+    [nodes, toggleNode]
+  );
+
+  return { nodes, toggleNode, expandPath, isLoading, error };
 }

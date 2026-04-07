@@ -503,6 +503,7 @@ export function ActivityPanel({
             onToggleVisibility={handleToggleVisibility}
             onFormat={handleToolbarFormat}
             onRunTool={(toolId) => onMessage?.({ type: 'tool:run', payload: { toolId } })}
+            onFileAction={(file, action) => onMessage?.({ type: 'file:action', payload: { file, action } })}
           />
           <FeatureList
             features={features}

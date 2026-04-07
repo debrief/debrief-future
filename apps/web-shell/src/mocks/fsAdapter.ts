@@ -14,6 +14,26 @@ import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
 /** Sample dataset files for chart rendering demonstration */
+const sampleTrackStats = JSON.stringify({
+  type: 'track_statistics',
+  title: 'Track Statistics — HMS Defender',
+  displayHint: 'table',
+  metadata: {
+    xAxis: { label: 'Metric', type: 'nominal' },
+    yAxis: { label: 'Value', type: 'quantitative' },
+  },
+  data: [
+    { metric: 'Total Distance', value: 142.3, unit: 'nm' },
+    { metric: 'Average Speed', value: 12.45, unit: 'kts' },
+    { metric: 'Max Speed', value: 18.92, unit: 'kts' },
+    { metric: 'Min Speed', value: 3.217, unit: 'kts' },
+    { metric: 'Duration', value: '04:32:15', unit: 'hh:mm:ss' },
+    { metric: 'Leg Count', value: 47, unit: '' },
+    { metric: 'Average Course', value: 127.6, unit: 'deg' },
+    { metric: 'Course Change Rate', value: 2.843, unit: 'deg/min' },
+  ],
+});
+
 const sampleZoneHistogram = JSON.stringify({
   type: 'zone_histogram',
   title: 'Buffer Zone Point Distribution',
@@ -56,6 +76,7 @@ const files: Record<string, string> = {
   '/local-store/catalog.json': JSON.stringify(catalogData),
   '/local-store/exercise-alpha/item.json': JSON.stringify(exerciseAlphaItem),
   '/local-store/exercise-alpha/exercise-alpha.geojson': JSON.stringify(exerciseAlphaData),
+  '/local-store/exercise-alpha/assets/track-stats.dataset.json': sampleTrackStats,
   '/local-store/exercise-alpha/assets/zone-histogram.dataset.json': sampleZoneHistogram,
   '/local-store/exercise-alpha/assets/range-bearing-series.dataset.json': sampleRangeBearingSeries,
   '/local-store/training-run-1/item.json': JSON.stringify(trainingRun1Item),

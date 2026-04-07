@@ -302,6 +302,41 @@ export interface ThumbnailCaptureResponseMessage extends ResponseMessage {
 }
 
 // ============================================================================
+// Tabular Results Messages (#177)
+// ============================================================================
+
+/** Request to save tabular result as CSV (Webview → Extension) */
+export interface SaveResultMessage {
+  type: 'saveResult';
+  tabId: string;
+  toolName: string;
+}
+
+/** Request to save tabular result with custom name (Webview → Extension) */
+export interface SaveResultAsMessage {
+  type: 'saveResultAs';
+  tabId: string;
+  toolName: string;
+  baseName: string;
+  tag?: string;
+}
+
+/** Retry a failed tool execution (Webview → Extension) */
+export interface RetryToolMessage {
+  type: 'retryTool';
+  tabId: string;
+}
+
+/** Notify webview of save completion (Extension → Webview) */
+export interface ResultSavedMessage {
+  type: 'resultSaved';
+  tabId: string;
+  filename: string;
+  success: boolean;
+  error?: string;
+}
+
+// ============================================================================
 // Union Types
 // ============================================================================
 
@@ -327,7 +362,8 @@ export type ExtensionToWebviewMessage =
   | RequestTrackDetailsResponse
   | ImportProgressMessage
   | ImportCompleteMessage
-  | RequestThumbnailCaptureMessage;
+  | RequestThumbnailCaptureMessage
+  | ResultSavedMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -343,7 +379,10 @@ export type WebviewToExtensionMessage =
   | RequestRedoMessage
   | FeatureDrawnMessage
   | DrawingModeChangedMessage
-  | ThumbnailCaptureResponseMessage;
+  | ThumbnailCaptureResponseMessage
+  | SaveResultMessage
+  | SaveResultAsMessage
+  | RetryToolMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)

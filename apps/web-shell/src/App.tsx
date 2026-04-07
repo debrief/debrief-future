@@ -36,7 +36,7 @@ import {
   PANEL_CHART,
   parseTaxonomy,
 } from '@debrief/components';
-import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
+import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
   StacBrowserItem,
   CatalogOverviewItem,
@@ -63,6 +63,7 @@ import {
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { GeoJSONFeature } from '@debrief/utils';
+import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 
@@ -133,6 +134,10 @@ interface ResultTab {
   imageDataUri?: string;
   /** File metadata for fallback display (artifactType === 'other') */
   fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
+  /** Rendering hint from dataset: 'table' for flat statistics (#177) */
+  displayHint?: 'table' | 'chart';
+  /** Whether this result has been saved (#177) */
+  isSaved?: boolean;
 }
 
 /** Image file extensions that should render inline */
@@ -177,6 +182,8 @@ export default function App() {
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
+  const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
+  const [highlightedFilePaths, setHighlightedFilePaths] = useState<string[]>([]);
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -367,6 +374,8 @@ export default function App() {
     store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
+    setSavedResultFiles([]);
+    setHighlightedFilePaths([]);
     store.getState().clearSelection();
   }, [store]);
 
@@ -803,6 +812,7 @@ export default function App() {
         const tab: ResultTab = {
           id: filePath, title: parsed.title, path: filePath,
           artifactType: 'dataset', dataset: parsed,
+          displayHint: parsed.displayHint,
         };
         setResultTabs(prev => [...prev, tab]);
         setActiveResultTabId(tab.id);
@@ -1091,10 +1101,27 @@ export default function App() {
         }
         break;
       }
+      case 'file:action': {
+        const { file, action } = message.payload;
+        if (action === 'open') {
+          // Load the file as a result tab in the Results panel
+          void handleFileSelect(file.path);
+        } else if (action === 'reveal') {
+          // Highlight the file in the Navigation tree
+          setHighlightedFilePaths([file.path]);
+        } else if (action === 'openWith') {
+          // Web-shell has no viewer picker — show a notification
+          setToolMessage(`Open with: no alternative viewers available for ${file.name}`);
+        } else if (action === 'delete') {
+          // Remove from saved results list (does not delete from filesystem)
+          setSavedResultFiles(prev => prev.filter(f => f.path !== file.path));
+        }
+        break;
+      }
       default:
         break;
     }
-  }, [playback, store, handleRunTool]);
+  }, [playback, store, handleRunTool, handleFileSelect]);
 
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
@@ -1109,6 +1136,45 @@ export default function App() {
     ChartRenderer,
   }), []);
 
+  // Save result as CSV to the plot's asset folder (#177)
+  const handleSaveResult = useCallback((tabId: string, baseName?: string, tag?: string) => {
+    const tab = resultTabs.find(t => t.id === tabId);
+    if (!tab || !tab.dataset || !currentPlot) return;
+
+    // Build CSV from dataset
+    const data = tab.dataset.data ?? tab.dataset.series?.flatMap(s => s.data) ?? [];
+    if (data.length === 0) return;
+    const csv = buildCsvContent(data as Record<string, unknown>[]);
+
+    // Generate filename
+    const toolName = tab.title.split(':')[0]?.trim().toLowerCase().replace(/\s+/g, '-') ?? 'result';
+    const filename = generateCsvFilename(toolName, baseName, tag);
+
+    // Write to mock filesystem
+    const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+    const assetPath = `${itemDir}/assets/${filename}`;
+    mockFsAdapter.writeFile(assetPath, csv);
+
+    // Mark tab as saved
+    setResultTabs(prev => prev.map(t => t.id === tabId ? { ...t, isSaved: true } : t));
+
+    // Add to associated result files so it appears in the LayersToolbar dropdown
+    setSavedResultFiles(prev => {
+      // Avoid duplicates if same file saved twice
+      if (prev.some(f => f.path === assetPath)) return prev;
+      return [...prev, {
+        name: filename,
+        path: assetPath,
+        category: 'result' as const,
+        format: 'csv',
+        mtime: Date.now(),
+      }];
+    });
+
+    // Refresh the file tree so the new asset appears
+    setTreeRefreshKey(k => k + 1);
+  }, [resultTabs, currentPlot]);
+
   // Results context for the Chart/Results panel wrapper
   const chartContextProps = useMemo<ChartContextProps | null>(() => {
     if (resultTabs.length === 0 && !activeChartSpec) return null;
@@ -1118,6 +1184,9 @@ export default function App() {
       artifactType: t.artifactType,
       imageDataUri: t.imageDataUri,
       fileMeta: t.fileMeta,
+      displayHint: t.displayHint,
+      tableData: t.displayHint === 'table' && t.dataset?.data ? t.dataset.data : undefined,
+      isSaved: t.isSaved ?? false,
     }));
     return {
       chartSpec: activeChartSpec,
@@ -1125,8 +1194,11 @@ export default function App() {
       activeChartTabId: activeResultTabId,
       onChartTabSelect: setActiveResultTabId,
       onChartTabClose: handleCloseResultTab,
+      onSave: (tabId: string) => handleSaveResult(tabId),
+      onSaveAs: (tabId: string, baseName: string, tag?: string) => handleSaveResult(tabId, baseName, tag),
+      onRetry: (_tabId: string) => { /* Retry not yet implemented in web-shell */ },
     };
-  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab]);
+  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab, handleSaveResult]);
 
   // Full context value for all panel wrappers
   const panelContextValue = useMemo<PanelContextValue>(() => ({
@@ -1141,6 +1213,7 @@ export default function App() {
       tools,
       features: allFeatures,
       selectedFeatureIds: state.selection.featureIds,
+      resultFiles: savedResultFiles,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
@@ -1181,6 +1254,7 @@ export default function App() {
       currentItemPath: currentPlot
         ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`
         : undefined,
+      highlightedPaths: highlightedFilePaths,
       onFileSelect: handleFileSelect,
       refreshKey: treeRefreshKey,
       className: 'web-shell__file-tree',
@@ -1195,7 +1269,7 @@ export default function App() {
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
     handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
-    handleFileSelect, treeRefreshKey, chartContextProps,
+    handleFileSelect, treeRefreshKey, chartContextProps, savedResultFiles, highlightedFilePaths,
   ]);
 
   // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
