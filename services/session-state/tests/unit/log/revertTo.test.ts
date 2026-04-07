@@ -14,48 +14,48 @@ function makeFeatureCollection() {
         type: 'Feature',
         geometry: null,
         properties: {
-          featureId: 'track-alpha',
+          feature_id: 'track-alpha',
           provenance: [
             {
-              activityId: 'act-001',
+              activity_id: 'act-001',
               timestamp: '2026-02-01T10:00:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-range',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-001'],
-              executionDuration: 'PT0.5S',
-              generatedResultId: null,
+              execution_duration: 'PT0.5S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-002',
+              activity_id: 'act-002',
               timestamp: '2026-02-01T10:05:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-bearing',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-002'],
-              executionDuration: 'PT0.3S',
-              generatedResultId: null,
+              execution_duration: 'PT0.3S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-003',
+              activity_id: 'act-003',
               timestamp: '2026-02-01T10:10:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-speed',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-003'],
-              executionDuration: 'PT0.2S',
-              generatedResultId: null,
+              execution_duration: 'PT0.2S',
+              generated_result_id: null,
               tune: null,
             },
           ],
@@ -65,34 +65,34 @@ function makeFeatureCollection() {
         type: 'Feature',
         geometry: null,
         properties: {
-          featureId: 'track-beta',
+          feature_id: 'track-beta',
           provenance: [
             {
-              activityId: 'act-001',
+              activity_id: 'act-001',
               timestamp: '2026-02-01T10:00:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-range',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-beta'],
               generated: ['result-001'],
-              executionDuration: 'PT0.5S',
-              generatedResultId: null,
+              execution_duration: 'PT0.5S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-003',
+              activity_id: 'act-003',
               timestamp: '2026-02-01T10:10:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-speed',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-beta'],
               generated: ['result-003'],
-              executionDuration: 'PT0.2S',
-              generatedResultId: null,
+              execution_duration: 'PT0.2S',
+              generated_result_id: null,
               tune: null,
             },
           ],
@@ -110,7 +110,7 @@ function makeDeps(overrides?: Partial<LogServiceDeps>): LogServiceDeps {
     writeGeoJson: vi.fn().mockResolvedValue(undefined),
     executeTool: vi
       .fn()
-      .mockResolvedValue({ success: true, durationMs: 100 }),
+      .mockResolvedValue({ success: true, duration_ms: 100 }),
     loadSnapshot: vi.fn().mockResolvedValue(null),
     resolveToolVersion: vi.fn().mockResolvedValue('1.0.0'),
     ...overrides,
@@ -137,7 +137,7 @@ describe('LogService.revertTo', () => {
       Record<string, unknown>
     >;
     expect(alphaProv).toHaveLength(1);
-    expect(alphaProv[0].activityId).toBe('act-001');
+    expect(alphaProv[0].activity_id).toBe('act-001');
 
     // track-beta: originally had act-001, act-003. After revert to act-001, only act-001 remains.
     const betaProps = writtenFc.features[1].properties as Record<
@@ -146,7 +146,7 @@ describe('LogService.revertTo', () => {
     >;
     const betaProv = betaProps.provenance as Array<Record<string, unknown>>;
     expect(betaProv).toHaveLength(1);
-    expect(betaProv[0].activityId).toBe('act-001');
+    expect(betaProv[0].activity_id).toBe('act-001');
   });
 
   it('keeps the target entry itself', async () => {
@@ -167,7 +167,7 @@ describe('LogService.revertTo', () => {
     >;
     // Should keep act-001 and act-002, remove act-003
     expect(alphaProv).toHaveLength(2);
-    expect(alphaProv.map((e) => e.activityId)).toEqual([
+    expect(alphaProv.map((e) => e.activity_id)).toEqual([
       'act-001',
       'act-002',
     ]);

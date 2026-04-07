@@ -113,9 +113,9 @@ export function LogEntry({
     <div
       className={entryClass}
       onClick={handleClick}
-      data-testid={`log-entry-${entry.activityId}`}
-      data-activity-id={entry.activityId}
-      title={LOG_PANEL_STRINGS.toolVersionTooltip(entry.toolVersion)}
+      data-testid={`log-entry-${entry.activity_id}`}
+      data-activity-id={entry.activity_id}
+      title={LOG_PANEL_STRINGS.toolVersionTooltip(entry.tool_version)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -166,7 +166,7 @@ export function LogEntry({
             tabIndex={0}
             onClick={handleEditIconClick}
             onKeyDown={handleEditIconKeyDown}
-            data-testid={`edit-icon-${entry.activityId}`}
+            data-testid={`edit-icon-${entry.activity_id}`}
             title={LOG_PANEL_STRINGS.editIconTooltip}
             aria-label={LOG_PANEL_STRINGS.editIconTooltip}
           >
@@ -179,14 +179,14 @@ export function LogEntry({
       <div className="log-panel__entry-meta">
         <div className="log-panel__entry-badges">
           {features.map((f) => (
-            <TrackBadge key={f.featureId} name={f.displayName} exists={f.exists} />
+            <TrackBadge key={f.feature_id} name={f.displayName} exists={f.exists} />
           ))}
         </div>
         <span className="log-panel__entry-timestamp">
           {formatTimestamp(entry.timestamp)}
         </span>
         <span className="log-panel__entry-duration">
-          {formatDuration(entry.executionDuration)}
+          {formatDuration(entry.execution_duration)}
         </span>
       </div>
 
@@ -214,10 +214,10 @@ export function LogEntry({
               <span>{entry.generatedFeatureIds.map((id) => featureNames[id] ?? id).join(', ')}</span>
             </div>
           )}
-          {entry.generatedResultId && (
+          {entry.generated_result_id && (
             <div className="log-panel__entry-detail">
               <span className="log-panel__entry-detail-label">Result:</span>
-              <span>{entry.generatedResultId}</span>
+              <span>{entry.generated_result_id}</span>
             </div>
           )}
         </div>
@@ -232,7 +232,7 @@ export function LogEntry({
               e.stopPropagation();
               onRestoreClick(entry);
             }}
-            data-testid={`restore-entry-${entry.activityId}`}
+            data-testid={`restore-entry-${entry.activity_id}`}
           >
             {LOG_PANEL_STRINGS.restoreLabel}
           </button>
@@ -250,14 +250,14 @@ export function LogEntry({
       schemaError={schemaError ?? null}
       replayStatus={replayStatus}
       onParameterChange={(paramName, newValue) =>
-        onParameterChange?.(entry.activityId, paramName, newValue)
+        onParameterChange?.(entry.activity_id, paramName, newValue)
       }
       onDisableToggle={(disabled) =>
-        onDisableToggle?.(entry.activityId, disabled)
+        onDisableToggle?.(entry.activity_id, disabled)
       }
-      onDeleteClick={() => onDeleteClick?.(entry.activityId)}
+      onDeleteClick={() => onDeleteClick?.(entry.activity_id)}
       onRationaleChange={(text) =>
-        onRationaleChange?.(entry.activityId, text)
+        onRationaleChange?.(entry.activity_id, text)
       }
       onDone={() => onDoneClick?.(entry)}
       onRetrySchema={() => onRetrySchema?.(entry.toolName)}
@@ -274,7 +274,7 @@ export function LogEntry({
         isFlipped={isEditing}
         front={frontFace}
         back={backFace}
-        data-testid={`card-flip-${entry.activityId}`}
+        data-testid={`card-flip-${entry.activity_id}`}
       />
     );
   }

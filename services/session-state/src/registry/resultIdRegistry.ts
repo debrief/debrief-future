@@ -110,13 +110,13 @@ export function createResultIdRegistry(): ResultIdRegistry {
     },
 
     registerFromLogEntry(entry: LogEntry): void {
-      // FR-013: Skip entries without generatedResultId
-      if (!entry.generatedResultId) return;
+      // FR-013: Skip entries without generated_result_id
+      if (!entry.generated_result_id) return;
 
       const artifactPath = extractArtifactPath(entry);
       if (!artifactPath) return;
 
-      _register(entry.generatedResultId, artifactPath, null, null, true);
+      _register(entry.generated_result_id, artifactPath, null, null, true);
     },
 
     registerFromRecordResult(result: RecordResult): void {
@@ -127,9 +127,9 @@ export function createResultIdRegistry(): ResultIdRegistry {
 
     registerFromReplayResult(artifacts: ArtifactVersion[]): void {
       for (const artifact of artifacts) {
-        if (artifact.resultId) {
+        if (artifact.result_id) {
           _register(
-            artifact.resultId,
+            artifact.result_id,
             artifact.path,
             artifact.version,
             null,

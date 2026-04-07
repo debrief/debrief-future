@@ -1,3 +1,5 @@
+const { rules: snakeCaseRules } = require('../../shared/eslint-rules/provenance-snake-case.cjs');
+
 module.exports = {
   root: true,
   env: {
@@ -19,5 +21,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/ban-types': 'warn',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'no-restricted-syntax': ['error', ...snakeCaseRules],
   },
 };

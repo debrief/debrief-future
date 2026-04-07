@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **Tabular Results Panel** (#177) — Display `debrief-calc` tool outputs as tables (flat statistics) or charts (Vega-Lite time-series) in a panel beneath the map. Supports Save / Save As to CSV in the plot's assets folder, surfaces saved files in the LayersToolbar Associated Files dropdown, and wires Open / Reveal in Explorer / Open With file actions in the web-shell.
+  - New components: `TableRenderer`, expanded `ChartPanelWrapper` with save UI and tab management
+  - New utilities: `buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, `formatCsvValue` in `@debrief/utils`
+  - Auto-synthesis of table datasets from MCP tools that return `properties.statistics` (track-stats, area-summary)
+  - All user-facing strings externalised via `ResultsPanelLabels` interface (Constitution Article XI)
+  - Tests: 33 new unit tests (26 CSV + 7 TableRenderer), 8 new E2E tests across save flow, file actions, and panel persistence
+  - Evidence: `specs/177-tabular-results-panel/evidence/test-summary.md`, `usage-example.md`
+- **VS Code integration SRD** for the Tabular Results Panel — captures the deferred work to bring feature parity to the VS Code extension (`docs/tabular-results-vscode-integration-srd.md`)
+
+### Fixed
+- **GoldenLayout panel persistence** — sidebar panels (Navigation, Activity, Log) no longer disappear after navigating between plots. Layout version bumped from 1 to 2; corrupted layouts that pass type validation but lack essential panels are now rejected and replaced with the default. Layout saves are suppressed during reset to prevent intermediate empty state from being persisted.
+
 ## [2026-03-18]
 
 ### Added

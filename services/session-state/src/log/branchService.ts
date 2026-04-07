@@ -32,11 +32,11 @@ export function findEntryInFeatures(
   activityId: string
 ): number {
   for (const f of fc.features) {
-    if (f.properties?.featureType === 'system') continue;
+    if (f.properties?.feature_type === 'system') continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (let i = 0; i < prov.length; i++) {
       const e = prov[i] as Record<string, unknown>;
-      if (e.activityId === activityId) return i;
+      if (e.activity_id === activityId) return i;
     }
   }
   return -1;
@@ -54,11 +54,11 @@ export function trimProvenanceToEntry(
   // Find the timestamp of the branch point entry
   let splitTimestamp: string | null = null;
   for (const f of fc.features) {
-    if (f.properties?.featureType === 'system') continue;
+    if (f.properties?.feature_type === 'system') continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      if (e.activityId === branchPointActivityId) {
+      if (e.activity_id === branchPointActivityId) {
         splitTimestamp = e.timestamp as string;
         break;
       }
@@ -73,7 +73,7 @@ export function trimProvenanceToEntry(
   // Deep-copy and trim
   const copy: GeoJsonFeatureCollection = JSON.parse(JSON.stringify(fc));
   for (const f of copy.features) {
-    if (f.properties?.featureType === 'system') continue;
+    if (f.properties?.feature_type === 'system') continue;
     if (!f.properties) continue;
     const prov = normaliseProvenance(f.properties.provenance);
     f.properties.provenance = prov.filter((entry) => {
@@ -92,7 +92,7 @@ export function createBranchRecord(
   branchedAt: string,
   targetAsset: string
 ): BranchRecord {
-  return { branchId, branchedFrom, branchedAt, targetAsset };
+  return { branch_id: branchId, branched_from: branchedFrom, branched_at: branchedAt, target_asset: targetAsset };
 }
 
 /** Build a BranchOrigin for the branch plot's system record. */
@@ -102,7 +102,7 @@ export function createBranchOrigin(
   branchedAt: string,
   branchId: string
 ): BranchOrigin {
-  return { sourceAsset, branchedFrom, branchedAt, branchId };
+  return { source_asset: sourceAsset, branched_from: branchedFrom, branched_at: branchedAt, branch_id: branchId };
 }
 
 /** Build a FileProvEntry for a branch event. */
@@ -113,7 +113,7 @@ export function createBranchProvEntry(
   branchId: string,
   direction: 'source' | 'target'
 ): FileProvEntry {
-  return { activityId, type: 'branch', timestamp, asset, branchId, direction };
+  return { activity_id: activityId, type: 'branch', timestamp, asset, branch_id: branchId, direction };
 }
 
 /**
@@ -123,11 +123,11 @@ export function createBranchProvEntry(
 function countEntries(fc: GeoJsonFeatureCollection): number {
   const seen = new Set<string>();
   for (const f of fc.features) {
-    if (f.properties?.featureType === 'system') continue;
+    if (f.properties?.feature_type === 'system') continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      if (typeof e.activityId === 'string') seen.add(e.activityId);
+      if (typeof e.activity_id === 'string') seen.add(e.activity_id);
     }
   }
   return seen.size;
@@ -146,7 +146,7 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       itemPath: string,
       options: BranchFromOptions
     ): Promise<BranchResult> {
-      const { activityId } = options;
+      const { activity_id: activityId } = options;
 
       // 1. Load source plot
       const source = await deps.loadGeoJson(storePath, itemPath);
@@ -180,10 +180,10 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       } else if (location.type === 'snapshot-boundary') {
         // Load snapshot and use its features (already clean)
         const snapshotFc = await deps.loadSnapshotGeoJson(
-          storePath, itemPath, location.snapshotAsset
+          storePath, itemPath, location.snapshot_asset
         );
         if (!snapshotFc) {
-          const err = new Error(`Snapshot file not found: ${location.snapshotAsset}`);
+          const err = new Error(`Snapshot file not found: ${location.snapshot_asset}`);
           (err as unknown as Record<string, unknown>).code = 'SNAPSHOT_NOT_FOUND';
           throw err;
         }
@@ -200,7 +200,7 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       }
 
       // 5. Generate branch ID and timestamp
-      const branchId = deps.generateBranchId();
+      const branchId = deps.generate_branch_id();
       const timestamp = new Date();
       const timestampStr = timestamp.toISOString();
 
@@ -219,8 +219,8 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
           timestampStr,
           branchId
         );
-        branchSysRec.properties.branchOrigin = branchOrigin;
-        branchSysRec.properties.snapshotLinks = { prev: null, next: null };
+        branchSysRec.properties.branch_origin = branchOrigin;
+        branchSysRec.properties.snapshot_links = { prev: null, next: null };
         branchSysRec.properties.branches = [];
 
         // File-level provenance on branch
@@ -244,9 +244,9 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       let branchItemPath: string;
       let branchItemDir: string;
       try {
-        const created = deps.createItem(storePath, branchTitle);
-        branchItemPath = created.itemPath;
-        branchItemDir = created.itemDir;
+        const created = deps.create_item(storePath, branchTitle);
+        branchItemPath = created.item_path;
+        branchItemDir = created.item_dir;
       } catch (writeErr) {
         const err = new Error(`Failed to create branch item: ${(writeErr as Error).message}`);
         (err as unknown as Record<string, unknown>).code = 'WRITE_FAILED';
@@ -296,11 +296,11 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       const entriesIncluded = countEntries(branchFc);
 
       return {
-        branchId,
-        branchItemPath,
-        branchGeoJsonPath: `${branchItemDir}/plot.geojson`,
-        branchedFrom: activityId,
-        entriesIncluded,
+        branch_id: branchId,
+        branch_item_path: branchItemPath,
+        branch_geojson_path: `${branchItemDir}/plot.geojson`,
+        branched_from: activityId,
+        entries_included: entriesIncluded,
         timestamp: timestampStr,
       };
     },
@@ -317,14 +317,14 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
 
       const idx = findEntryInFeatures(fc, activityId);
       if (idx >= 0) {
-        return { type: 'current-segment', entryIndex: idx };
+        return { type: 'current-segment', entry_index: idx };
       }
 
       // Walk snapshot chain
       const sysRec = findSystemRecord(fc);
       if (!sysRec?.properties) return null;
 
-      const links = sysRec.properties.snapshotLinks as SnapshotLinks | null;
+      const links = sysRec.properties.snapshot_links as SnapshotLinks | null;
       let currentAsset = links?.prev?.asset ?? null;
 
       while (currentAsset) {
@@ -336,7 +336,7 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
         if (snapIdx >= 0) {
           // Determine if this is the last entry (snapshot boundary) or arbitrary
           const snapSysRec = findSystemRecord(snapshotFc);
-          const snapLinks = snapSysRec?.properties?.snapshotLinks as SnapshotLinks | null;
+          const snapLinks = snapSysRec?.properties?.snapshot_links as SnapshotLinks | null;
           const _nextRef = snapLinks?.next;
 
           // It's a snapshot boundary if the snapshot has entries and
@@ -360,17 +360,17 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
           // snapshot hasn't been fully stripped (or we loaded entries).
           // Treat as snapshot-boundary if it's the last activity in the snapshot.
           if (totalEntries <= 1 || snapIdx === 0) {
-            return { type: 'snapshot-boundary', snapshotAsset: currentAsset };
+            return { type: 'snapshot-boundary', snapshot_asset: currentAsset };
           }
 
           // Check if there are entries after this one
           let hasEntriesAfter = false;
           for (const f of snapshotFc.features) {
-            if (f.properties?.featureType === 'system') continue;
+            if (f.properties?.feature_type === 'system') continue;
             const prov = normaliseProvenance(f.properties?.provenance);
             for (let i = 0; i < prov.length; i++) {
               const e = prov[i] as Record<string, unknown>;
-              if (e.activityId === activityId) {
+              if (e.activity_id === activityId) {
                 // Check if there are entries after this in the same feature
                 if (i < prov.length - 1) {
                   hasEntriesAfter = true;
@@ -384,17 +384,17 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
           if (hasEntriesAfter) {
             return {
               type: 'pre-snapshot-arbitrary',
-              snapshotAsset: currentAsset,
-              entryIndex: snapIdx,
+              snapshot_asset: currentAsset,
+              entry_index: snapIdx,
             };
           }
 
-          return { type: 'snapshot-boundary', snapshotAsset: currentAsset };
+          return { type: 'snapshot-boundary', snapshot_asset: currentAsset };
         }
 
         // Follow the chain backward
         const snapSysRec = findSystemRecord(snapshotFc);
-        const snapLinks = snapSysRec?.properties?.snapshotLinks as SnapshotLinks | null;
+        const snapLinks = snapSysRec?.properties?.snapshot_links as SnapshotLinks | null;
         currentAsset = snapLinks?.prev?.asset ?? null;
       }
 
@@ -426,7 +426,7 @@ export function createBranchService(deps: BranchServiceDeps): BranchService {
       const sysRec = findSystemRecord(fc);
       if (!sysRec?.properties) return null;
 
-      return (sysRec.properties.branchOrigin ?? null) as BranchOrigin | null;
+      return (sysRec.properties.branch_origin ?? null) as BranchOrigin | null;
     },
   };
 }

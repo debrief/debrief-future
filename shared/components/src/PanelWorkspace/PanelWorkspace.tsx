@@ -52,6 +52,7 @@ export function PanelWorkspace({
   const containerRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<GoldenLayout | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressSaveRef = useRef(false);
   const [isEmpty, setIsEmpty] = useState(false);
 
   // Debounced save handler
@@ -62,6 +63,9 @@ export function PanelWorkspace({
     saveTimeoutRef.current = setTimeout(() => {
       const gl = glRef.current;
       if (!gl || !gl.isInitialised) return;
+      // Don't persist during reset or when layout is empty/degraded
+      if (suppressSaveRef.current) return;
+      if (!gl.rootItem || gl.rootItem.contentItems.length === 0) return;
       try {
         const resolvedConfig = gl.saveLayout();
         saveLayout(resolvedConfig);
@@ -108,18 +112,22 @@ export function PanelWorkspace({
     });
 
     return () => {
-      // Save layout before destroying
-      if (gl.isInitialised) {
+      // Cancel any pending debounced save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Save layout before destroying — but only if the layout still has
+      // content. During React unmount (e.g. navigating away from analysis
+      // view), GoldenLayout may report an empty/degraded state. Persisting
+      // that would corrupt the saved layout for the next session.
+      if (gl.isInitialised && gl.rootItem && gl.rootItem.contentItems.length > 0) {
         try {
           const resolvedConfig = gl.saveLayout();
           saveLayout(resolvedConfig);
         } catch {
           // Ignore save errors during cleanup
         }
-      }
-
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
       }
 
       unmountAll();
@@ -139,10 +147,25 @@ export function PanelWorkspace({
     const gl = glRef.current;
     if (!gl) return;
 
+    // Suppress layout saves during reset to prevent persisting the
+    // intermediate empty state between clearRoot and addChild.
+    suppressSaveRef.current = true;
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
     clearLayout();
     gl.loadLayout(DEFAULT_LAYOUT_CONFIG);
+
+    // After loadLayout, GoldenLayout has created new DOM containers and
+    // the bridge has bound fresh React roots. Force a re-render of all
+    // panels with the current context wrapper so they pick up the latest
+    // props (plot data, tools, etc.).
+    updateContextWrapper(contextWrapper);
+
+    suppressSaveRef.current = false;
     onLayoutReset?.();
-  }, [onLayoutReset]);
+  }, [onLayoutReset, contextWrapper]);
 
   // Check if a component type is currently present in the layout
   const hasPanel = useCallback((componentType: string): boolean => {
@@ -186,6 +209,16 @@ export function PanelWorkspace({
     const mapColumn = gl.rootItem ? findMapColumn(gl.rootItem) : null;
     if (mapColumn) {
       mapColumn.addComponent(componentType, undefined, title);
+
+      // Set 70/30 split between map (top) and results (bottom) (#177).
+      // After addComponent, the column has two stacks. Assign relative
+      // sizes so the map keeps 70% and results gets 30%.
+      const items = mapColumn.contentItems;
+      if (items.length === 2) {
+        (items[0] as ContentItem & { size: number }).size = 70;
+        (items[1] as ContentItem & { size: number }).size = 30;
+        mapColumn.updateSize(false);
+      }
     } else {
       // Fallback: use default placement
       gl.addComponent(componentType, undefined, title);

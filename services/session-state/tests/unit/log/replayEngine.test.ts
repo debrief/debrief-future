@@ -13,21 +13,21 @@ import type {
 } from '../../../src/log/types.js';
 
 function makeEntry(
-  overrides: Partial<LogEntry> & { activityId: string }
+  overrides: Partial<LogEntry> & { activity_id: string }
 ): LogEntry {
   return {
     timestamp: '2026-02-01T00:00:00Z',
-    wasGeneratedBy: {
+    was_generated_by: {
       tool: 'test-tool',
-      toolVersion: '1.0.0',
+      tool_version: '1.0.0',
       parameters: {
         param1: { value: 10, default: false, tunable: true },
       },
     },
     used: ['feature-a'],
     generated: ['result-a'],
-    executionDuration: 'PT1S',
-    generatedResultId: null,
+    execution_duration: 'PT1S',
+    generated_result_id: null,
     tune: null,
     ...overrides,
   };
@@ -35,12 +35,12 @@ function makeEntry(
 
 function makeDeps(overrides?: Partial<ReplayEngineDeps>): ReplayEngineDeps {
   return {
-    executeTool: vi
+    execute_tool: vi
       .fn()
-      .mockResolvedValue({ success: true, durationMs: 100 }),
-    loadSnapshot: vi.fn().mockResolvedValue(null),
-    resolveToolVersion: vi.fn().mockResolvedValue('1.0.0'),
-    onProgress: vi.fn(),
+      .mockResolvedValue({ success: true, duration_ms: 100 }),
+    load_snapshot: vi.fn().mockResolvedValue(null),
+    resolve_tool_version: vi.fn().mockResolvedValue('1.0.0'),
+    on_progress: vi.fn(),
     signal: new AbortController().signal,
     ...overrides,
   };
@@ -53,7 +53,7 @@ function makeState(): GeoJsonFeatureCollection {
       {
         type: 'Feature',
         geometry: null,
-        properties: { featureId: 'feature-a' },
+        properties: { feature_id: 'feature-a' },
       },
     ],
   };
@@ -66,16 +66,16 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
-        makeEntry({ activityId: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
-        makeEntry({ activityId: 'act-3', timestamp: '2026-02-01T02:00:00Z' }),
+        makeEntry({ activity_id: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
+        makeEntry({ activity_id: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
+        makeEntry({ activity_id: 'act-3', timestamp: '2026-02-01T02:00:00Z' }),
       ];
 
       const tuneTarget: TuneTarget = {
-        activityId: 'act-2',
+        activity_id: 'act-2',
         parameter: 'param1',
-        previousValue: 10,
-        newValue: 20,
+        previous_value: 10,
+        new_value: 20,
       };
 
       const plan = engine.buildPlan(
@@ -88,9 +88,9 @@ describe('createReplayEngine', () => {
 
       // Should include entries from act-2 onward (act-2, act-3)
       expect(plan.entries).toHaveLength(2);
-      expect(plan.entries[0].activityId).toBe('act-2');
-      expect(plan.entries[1].activityId).toBe('act-3');
-      expect(plan.tuneTarget).toEqual(tuneTarget);
+      expect(plan.entries[0].activity_id).toBe('act-2');
+      expect(plan.entries[1].activity_id).toBe('act-3');
+      expect(plan.tune_target).toEqual(tuneTarget);
     });
 
     it('skips deleted entries', () => {
@@ -98,9 +98,9 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
-        makeEntry({ activityId: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
-        makeEntry({ activityId: 'act-3', timestamp: '2026-02-01T02:00:00Z' }),
+        makeEntry({ activity_id: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
+        makeEntry({ activity_id: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
+        makeEntry({ activity_id: 'act-3', timestamp: '2026-02-01T02:00:00Z' }),
       ];
 
       const plan = engine.buildPlan(
@@ -113,8 +113,8 @@ describe('createReplayEngine', () => {
 
       // Should skip act-2
       expect(plan.entries).toHaveLength(2);
-      expect(plan.entries[0].activityId).toBe('act-1');
-      expect(plan.entries[1].activityId).toBe('act-3');
+      expect(plan.entries[0].activity_id).toBe('act-1');
+      expect(plan.entries[1].activity_id).toBe('act-3');
     });
 
     it('applies new parameter value on tune target entry', () => {
@@ -122,14 +122,14 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
+        makeEntry({ activity_id: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
       ];
 
       const tuneTarget: TuneTarget = {
-        activityId: 'act-1',
+        activity_id: 'act-1',
         parameter: 'param1',
-        previousValue: 10,
-        newValue: 42,
+        previous_value: 10,
+        new_value: 42,
       };
 
       const plan = engine.buildPlan(
@@ -140,7 +140,7 @@ describe('createReplayEngine', () => {
         null
       );
 
-      expect(plan.entries[0].isTuneTarget).toBe(true);
+      expect(plan.entries[0].is_tune_target).toBe(true);
       expect(plan.entries[0].parameters.param1).toBe(42);
     });
 
@@ -150,15 +150,15 @@ describe('createReplayEngine', () => {
 
       const state = makeState();
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], state, null);
 
       // Should be equal in value but not same reference
-      expect(plan.preReplayState).toEqual(state);
-      expect(plan.preReplayState).not.toBe(state);
-      expect(plan.preReplayState.features[0]).not.toBe(state.features[0]);
+      expect(plan.pre_replay_state).toEqual(state);
+      expect(plan.pre_replay_state).not.toBe(state);
+      expect(plan.pre_replay_state.features[0]).not.toBe(state.features[0]);
     });
   });
 
@@ -169,23 +169,23 @@ describe('createReplayEngine', () => {
 
       const timeline: LogEntry[] = [
         makeEntry({
-          activityId: 'act-1',
+          activity_id: 'act-1',
           timestamp: '2026-02-01T00:00:00Z',
-          wasGeneratedBy: { tool: 'tool-a', toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: 'tool-a', tool_version: '1.0.0', parameters: {} },
         }),
         makeEntry({
-          activityId: 'act-2',
+          activity_id: 'act-2',
           timestamp: '2026-02-01T01:00:00Z',
-          wasGeneratedBy: { tool: 'tool-b', toolVersion: '1.0.0', parameters: {} },
+          was_generated_by: { tool: 'tool-b', tool_version: '1.0.0', parameters: {} },
         }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], makeState(), null);
       await engine.execute(plan);
 
-      expect(deps.executeTool).toHaveBeenCalledTimes(2);
+      expect(deps.execute_tool).toHaveBeenCalledTimes(2);
       // First call should be tool-a with its activityId and timestamp
-      expect(deps.executeTool).toHaveBeenNthCalledWith(
+      expect(deps.execute_tool).toHaveBeenNthCalledWith(
         1,
         'tool-a',
         expect.any(Array),
@@ -194,7 +194,7 @@ describe('createReplayEngine', () => {
         '2026-02-01T00:00:00Z'
       );
       // Second call should be tool-b with its activityId and timestamp
-      expect(deps.executeTool).toHaveBeenNthCalledWith(
+      expect(deps.execute_tool).toHaveBeenNthCalledWith(
         2,
         'tool-b',
         expect.any(Array),
@@ -209,15 +209,15 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
-        makeEntry({ activityId: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
+        makeEntry({ activity_id: 'act-1', timestamp: '2026-02-01T00:00:00Z' }),
+        makeEntry({ activity_id: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], makeState(), null);
       await engine.execute(plan);
 
       // Progress is reported for each entry (replaying phase) plus finalising
-      const progressCalls = (deps.onProgress as ReturnType<typeof vi.fn>).mock
+      const progressCalls = (deps.on_progress as ReturnType<typeof vi.fn>).mock
         .calls;
       expect(progressCalls.length).toBeGreaterThanOrEqual(3);
 
@@ -238,22 +238,22 @@ describe('createReplayEngine', () => {
 
     it('halts on version mismatch', async () => {
       const deps = makeDeps({
-        resolveToolVersion: vi.fn().mockResolvedValue('2.0.0'), // different from entry's 1.0.0
+        resolve_tool_version: vi.fn().mockResolvedValue('2.0.0'), // different from entry's 1.0.0
       });
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], makeState(), null);
       const result = await engine.execute(plan);
 
       expect(result.status).toBe('halted');
-      expect(result.haltReason).not.toBeNull();
-      expect(result.haltReason!.type).toBe('version-mismatch');
-      expect(result.haltReason!.entryActivityId).toBe('act-1');
-      expect(result.entriesReplayed).toBe(0);
+      expect(result.halt_reason).not.toBeNull();
+      expect(result.halt_reason!.type).toBe('version-mismatch');
+      expect(result.halt_reason!.entry_activity_id).toBe('act-1');
+      expect(result.entries_replayed).toBe(0);
     });
 
     it('returns cancelled when AbortSignal is aborted', async () => {
@@ -264,15 +264,15 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], makeState(), null);
       const result = await engine.execute(plan);
 
       expect(result.status).toBe('cancelled');
-      expect(result.entriesReplayed).toBe(0);
-      expect(deps.executeTool).not.toHaveBeenCalled();
+      expect(result.entries_replayed).toBe(0);
+      expect(deps.execute_tool).not.toHaveBeenCalled();
     });
 
     it('creates tune annotation on completion when tuneTarget exists', async () => {
@@ -280,14 +280,14 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const tuneTarget: TuneTarget = {
-        activityId: 'act-1',
+        activity_id: 'act-1',
         parameter: 'param1',
-        previousValue: 10,
-        newValue: 20,
+        previous_value: 10,
+        new_value: 20,
       };
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(
@@ -300,34 +300,34 @@ describe('createReplayEngine', () => {
       const result = await engine.execute(plan);
 
       expect(result.status).toBe('completed');
-      expect(result.tuneAnnotation).not.toBeNull();
-      expect(result.tuneAnnotation!.parameter).toBe('param1');
-      expect(result.tuneAnnotation!.previousValue).toBe(10);
-      expect(result.tuneAnnotation!.newValue).toBe(20);
-      expect(result.tuneAnnotation!.timestamp).toBeDefined();
+      expect(result.tune_annotation).not.toBeNull();
+      expect(result.tune_annotation!.parameter).toBe('param1');
+      expect(result.tune_annotation!.previous_value).toBe(10);
+      expect(result.tune_annotation!.new_value).toBe(20);
+      expect(result.tune_annotation!.timestamp).toBeDefined();
     });
 
     it('halts on tool execution failure', async () => {
       const deps = makeDeps({
-        executeTool: vi
+        execute_tool: vi
           .fn()
-          .mockResolvedValue({ success: false, durationMs: 50 }),
+          .mockResolvedValue({ success: false, duration_ms: 50 }),
       });
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
-        makeEntry({ activityId: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
+        makeEntry({ activity_id: 'act-1' }),
+        makeEntry({ activity_id: 'act-2', timestamp: '2026-02-01T01:00:00Z' }),
       ];
 
       const plan = engine.buildPlan(timeline, null, [], makeState(), null);
       const result = await engine.execute(plan);
 
       expect(result.status).toBe('halted');
-      expect(result.haltReason).not.toBeNull();
-      expect(result.haltReason!.type).toBe('execution-error');
-      expect(result.haltReason!.entryActivityId).toBe('act-1');
-      expect(result.entriesReplayed).toBe(0);
+      expect(result.halt_reason).not.toBeNull();
+      expect(result.halt_reason!.type).toBe('execution-error');
+      expect(result.halt_reason!.entry_activity_id).toBe('act-1');
+      expect(result.entries_replayed).toBe(0);
     });
 
     it('handles snapshot loading phase', async () => {
@@ -335,7 +335,7 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(
@@ -346,12 +346,12 @@ describe('createReplayEngine', () => {
         'snapshot-001.geojson'
       );
 
-      expect(plan.startFromSnapshot).toBe('snapshot-001.geojson');
+      expect(plan.start_from_snapshot).toBe('snapshot-001.geojson');
 
       const result = await engine.execute(plan);
 
       // Should report loading-snapshot phase
-      const progressCalls = (deps.onProgress as ReturnType<typeof vi.fn>).mock
+      const progressCalls = (deps.on_progress as ReturnType<typeof vi.fn>).mock
         .calls;
       const loadingCalls = progressCalls.filter(
         (c: unknown[]) =>
@@ -368,7 +368,7 @@ describe('createReplayEngine', () => {
       const engine = createReplayEngine(deps);
 
       const timeline: LogEntry[] = [
-        makeEntry({ activityId: 'act-1' }),
+        makeEntry({ activity_id: 'act-1' }),
       ];
 
       const plan = engine.buildPlan(
@@ -379,7 +379,7 @@ describe('createReplayEngine', () => {
         'snapshot-abc.geojson'
       );
 
-      expect(plan.startFromSnapshot).toBe('snapshot-abc.geojson');
+      expect(plan.start_from_snapshot).toBe('snapshot-abc.geojson');
     });
   });
 });

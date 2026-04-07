@@ -20,12 +20,12 @@ function makeFC(opts?: {
   const provenance = [];
   for (let i = 1; i <= entryCount; i++) {
     provenance.push({
-      activityId: `act-${i}`,
+      activity_id: `act-${i}`,
       timestamp: `2026-02-09T${String(10 + i).padStart(2, '0')}:00:00Z`,
-      wasGeneratedBy: { tool: 'test-tool', toolVersion: '1.0.0', parameters: {} },
+      was_generated_by: { tool: 'test-tool', tool_version: '1.0.0', parameters: {} },
       used: ['track-1'],
       generated: [],
-      executionDuration: 'PT0.1S',
+      execution_duration: 'PT0.1S',
       tune: null,
     });
   }
@@ -34,7 +34,7 @@ function makeFC(opts?: {
     type: 'Feature',
     geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
     id: 'track-1',
-    properties: { featureType: 'track', provenance: [...provenance] },
+    properties: { feature_type: 'track', provenance: [...provenance] },
   });
 
   if (opts?.hasSystemRecord !== false) {
@@ -42,8 +42,8 @@ function makeFC(opts?: {
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [] },
       properties: {
-        featureType: 'system',
-        snapshotLinks: opts?.systemSnapshotLinks ?? null,
+        feature_type: 'system',
+        snapshot_links: opts?.systemSnapshotLinks ?? null,
         branches: [],
         provenance: opts?.systemProvenance ?? [],
       },
@@ -89,15 +89,15 @@ describe('createSnapshot (US1)', () => {
     );
     // Spatial features should have empty provenance
     const spatialFeatures = writtenData.features.filter(
-      (f: Record<string, unknown>) => (f.properties as Record<string, unknown>)?.featureType !== 'system'
+      (f: Record<string, unknown>) => (f.properties as Record<string, unknown>)?.feature_type !== 'system'
     );
     for (const f of spatialFeatures) {
       expect((f.properties as Record<string, unknown>).provenance).toEqual([]);
     }
 
-    expect(result.entriesCaptured).toBe(3);
-    expect(result.entriesRemaining).toBe(0);
-    expect(result.snapshotAsset).toMatch(/^plot-snap-.*\.geojson$/);
+    expect(result.entries_captured).toBe(3);
+    expect(result.entries_remaining).toBe(0);
+    expect(result.snapshot_asset).toMatch(/^plot-snap-.*\.geojson$/);
   });
 
   it('creates system record if missing (FR-008)', async () => {
@@ -111,10 +111,10 @@ describe('createSnapshot (US1)', () => {
 
     // System record should have been created and added to the working FC
     const sysRec = fcNoSysRec.features.find(
-      f => f.properties?.featureType === 'system'
+      f => f.properties?.feature_type === 'system'
     );
     expect(sysRec).toBeDefined();
-    expect(sysRec!.properties!.snapshotLinks).toBeDefined();
+    expect(sysRec!.properties!.snapshot_links).toBeDefined();
   });
 
   it('links working file prev to the new snapshot', async () => {
@@ -127,10 +127,10 @@ describe('createSnapshot (US1)', () => {
     const result = await service.createSnapshot('/store', 'item.json');
 
     // Working file's system record should have prev pointing to snapshot
-    const sysRec = fc.features.find(f => f.properties?.featureType === 'system');
-    const links = sysRec!.properties!.snapshotLinks as { prev: { asset: string } | null };
+    const sysRec = fc.features.find(f => f.properties?.feature_type === 'system');
+    const links = sysRec!.properties!.snapshot_links as { prev: { asset: string } | null };
     expect(links.prev).not.toBeNull();
-    expect(links.prev!.asset).toBe(result.snapshotAsset);
+    expect(links.prev!.asset).toBe(result.snapshot_asset);
   });
 
   it('sets snapshot next to working file', async () => {
@@ -143,9 +143,9 @@ describe('createSnapshot (US1)', () => {
       (deps.writeSnapshotAsset as ReturnType<typeof vi.fn>).mock.calls[0][3]
     );
     const snapshotSysRec = writtenData.features.find(
-      (f: Record<string, unknown>) => (f.properties as Record<string, unknown>)?.featureType === 'system'
+      (f: Record<string, unknown>) => (f.properties as Record<string, unknown>)?.feature_type === 'system'
     );
-    const links = (snapshotSysRec.properties as Record<string, unknown>).snapshotLinks as {
+    const links = (snapshotSysRec.properties as Record<string, unknown>).snapshot_links as {
       next: { asset: string } | null;
     };
     expect(links.next).not.toBeNull();
@@ -162,14 +162,14 @@ describe('createSnapshot (US1)', () => {
     await service.createSnapshot('/store', 'item.json');
 
     // Working file spatial features should have empty provenance
-    const spatialFeatures = fc.features.filter(f => f.properties?.featureType !== 'system');
+    const spatialFeatures = fc.features.filter(f => f.properties?.feature_type !== 'system');
     for (const f of spatialFeatures) {
       expect(f.properties!.provenance).toEqual([]);
     }
   });
 
   it('preserves system record provenance (FR-006)', async () => {
-    const existingProv = [{ activityId: 'old-snap', type: 'snapshot', timestamp: '2026-01-01T00:00:00Z' }];
+    const existingProv = [{ activity_id: 'old-snap', type: 'snapshot', timestamp: '2026-01-01T00:00:00Z' }];
     const fc = makeFC({ systemProvenance: existingProv });
     const deps = createMockDeps({
       loadGeoJson: vi.fn().mockResolvedValue(fc),
@@ -178,7 +178,7 @@ describe('createSnapshot (US1)', () => {
 
     await service.createSnapshot('/store', 'item.json');
 
-    const sysRec = fc.features.find(f => f.properties?.featureType === 'system');
+    const sysRec = fc.features.find(f => f.properties?.feature_type === 'system');
     const prov = sysRec!.properties!.provenance as unknown[];
     // Should have the old entry PLUS the new snapshot entry
     expect(prov.length).toBeGreaterThanOrEqual(2);
@@ -194,7 +194,7 @@ describe('createSnapshot (US1)', () => {
 
     await service.createSnapshot('/store', 'item.json');
 
-    const sysRec = fc.features.find(f => f.properties?.featureType === 'system');
+    const sysRec = fc.features.find(f => f.properties?.feature_type === 'system');
     const prov = sysRec!.properties!.provenance as Array<{ type: string; asset: string }>;
     const snapshotEntry = prov.find(e => e.type === 'snapshot');
     expect(snapshotEntry).toBeDefined();
@@ -210,8 +210,8 @@ describe('createSnapshot (US1)', () => {
 
     const result = await service.createSnapshot('/store', 'item.json');
 
-    expect(result.entriesCaptured).toBe(0);
-    expect(result.entriesRemaining).toBe(0);
+    expect(result.entries_captured).toBe(0);
+    expect(result.entries_remaining).toBe(0);
   });
 
   it('does not modify working file if snapshot write fails (FR-015)', async () => {
@@ -241,13 +241,13 @@ describe('createSnapshot (US1)', () => {
 
   it('updates previous snapshot next link for second snapshot', async () => {
     const prevSnapshotFC = makeFC({ entryCount: 0 });
-    const prevSysRec = prevSnapshotFC.features.find(f => f.properties?.featureType === 'system');
-    prevSysRec!.properties!.snapshotLinks = { prev: null, next: { asset: 'plot.geojson', provEntryCount: 3 } };
+    const prevSysRec = prevSnapshotFC.features.find(f => f.properties?.feature_type === 'system');
+    prevSysRec!.properties!.snapshot_links = { prev: null, next: { asset: 'plot.geojson', prov_entry_count: 3 } };
 
     const fc = makeFC({
       entryCount: 5,
       systemSnapshotLinks: {
-        prev: { asset: 'plot-snap-2026-02-09T10-00-00.geojson', provEntryCount: 3 },
+        prev: { asset: 'plot-snap-2026-02-09T10-00-00.geojson', prov_entry_count: 3 },
         next: null,
       },
     });
@@ -282,7 +282,7 @@ describe('getSnapshotBoundary (US2)', () => {
   it('returns boundary when prev link exists', async () => {
     const fc = makeFC({
       systemSnapshotLinks: {
-        prev: { asset: 'plot-snap-2026-02-09T10-00-00.geojson', provEntryCount: 12 },
+        prev: { asset: 'plot-snap-2026-02-09T10-00-00.geojson', prov_entry_count: 12 },
         next: null,
       },
     });
@@ -293,7 +293,7 @@ describe('getSnapshotBoundary (US2)', () => {
 
     expect(boundary).toEqual({
       asset: 'plot-snap-2026-02-09T10-00-00.geojson',
-      provEntryCount: 12,
+      prov_entry_count: 12,
     });
   });
 
@@ -335,15 +335,15 @@ describe('loadSnapshotEntries (US2)', () => {
     const result = await service.loadSnapshotEntries('/store', 'item.json', 'snap.geojson');
 
     expect(result.entries).toHaveLength(5);
-    expect(result.entries[0].activityId).toBe('act-1');
+    expect(result.entries[0].activity_id).toBe('act-1');
   });
 
   it('returns next boundary if snapshot has prev link', async () => {
     const snapshotFC = makeFC({
       entryCount: 3,
       systemSnapshotLinks: {
-        prev: { asset: 'older-snap.geojson', provEntryCount: 8 },
-        next: { asset: 'plot.geojson', provEntryCount: 5 },
+        prev: { asset: 'older-snap.geojson', prov_entry_count: 8 },
+        next: { asset: 'plot.geojson', prov_entry_count: 5 },
       },
     });
     const deps = createMockDeps({
@@ -353,9 +353,9 @@ describe('loadSnapshotEntries (US2)', () => {
 
     const result = await service.loadSnapshotEntries('/store', 'item.json', 'snap.geojson');
 
-    expect(result.nextBoundary).toEqual({
+    expect(result.next_boundary).toEqual({
       asset: 'older-snap.geojson',
-      provEntryCount: 8,
+      prov_entry_count: 8,
     });
   });
 
@@ -367,7 +367,7 @@ describe('loadSnapshotEntries (US2)', () => {
     const service = createSnapshotService(deps);
 
     const result = await service.loadSnapshotEntries('/store', 'item.json', 'snap.geojson');
-    expect(result.nextBoundary).toBeNull();
+    expect(result.next_boundary).toBeNull();
   });
 
   it('throws when snapshot file not found', async () => {
@@ -394,17 +394,17 @@ describe('createSnapshot with fromEntryId (US3)', () => {
     });
     const service = createSnapshotService(deps);
 
-    const result = await service.createSnapshot('/store', 'item.json', { fromEntryId: 'act-2' });
+    const result = await service.createSnapshot('/store', 'item.json', { from_entry_id: 'act-2' });
 
-    expect(result.entriesCaptured).toBe(2);
-    expect(result.entriesRemaining).toBe(1);
+    expect(result.entries_captured).toBe(2);
+    expect(result.entries_remaining).toBe(1);
 
     // Working file should only have entries after act-2
-    const spatialFeatures = fc.features.filter(f => f.properties?.featureType !== 'system');
+    const spatialFeatures = fc.features.filter(f => f.properties?.feature_type !== 'system');
     for (const f of spatialFeatures) {
-      const prov = f.properties!.provenance as Array<{ activityId: string }>;
+      const prov = f.properties!.provenance as Array<{ activity_id: string }>;
       for (const entry of prov) {
-        expect(entry.activityId).toBe('act-3');
+        expect(entry.activity_id).toBe('act-3');
       }
     }
   });
@@ -416,10 +416,10 @@ describe('createSnapshot with fromEntryId (US3)', () => {
     });
     const service = createSnapshotService(deps);
 
-    const result = await service.createSnapshot('/store', 'item.json', { fromEntryId: 'act-3' });
+    const result = await service.createSnapshot('/store', 'item.json', { from_entry_id: 'act-3' });
 
-    expect(result.entriesCaptured).toBe(3);
-    expect(result.entriesRemaining).toBe(0);
+    expect(result.entries_captured).toBe(3);
+    expect(result.entries_remaining).toBe(0);
   });
 
   it('capture at first entry retains rest', async () => {
@@ -429,10 +429,10 @@ describe('createSnapshot with fromEntryId (US3)', () => {
     });
     const service = createSnapshotService(deps);
 
-    const result = await service.createSnapshot('/store', 'item.json', { fromEntryId: 'act-1' });
+    const result = await service.createSnapshot('/store', 'item.json', { from_entry_id: 'act-1' });
 
-    expect(result.entriesCaptured).toBe(1);
-    expect(result.entriesRemaining).toBe(2);
+    expect(result.entries_captured).toBe(1);
+    expect(result.entries_remaining).toBe(2);
   });
 
   it('throws for invalid entry ID', async () => {
@@ -443,7 +443,7 @@ describe('createSnapshot with fromEntryId (US3)', () => {
     const service = createSnapshotService(deps);
 
     await expect(
-      service.createSnapshot('/store', 'item.json', { fromEntryId: 'nonexistent' })
+      service.createSnapshot('/store', 'item.json', { from_entry_id: 'nonexistent' })
     ).rejects.toThrow('not found');
   });
 });
@@ -457,21 +457,21 @@ describe('assembleCrossSnapshotTimeline (US4)', () => {
     const currentFC = makeFC({ entryCount: 2 }); // act-1 at 11:00, act-2 at 12:00
     const previousEntries = [
       {
-        activityId: 'prev-1',
+        activity_id: 'prev-1',
         timestamp: '2026-02-09T08:00:00Z',
-        wasGeneratedBy: { tool: 'test', toolVersion: '1.0.0', parameters: {} },
+        was_generated_by: { tool: 'test', tool_version: '1.0.0', parameters: {} },
         used: [],
         generated: [],
-        executionDuration: 'PT0.1S',
+        execution_duration: 'PT0.1S',
         tune: null,
       },
       {
-        activityId: 'prev-2',
+        activity_id: 'prev-2',
         timestamp: '2026-02-09T09:00:00Z',
-        wasGeneratedBy: { tool: 'test', toolVersion: '1.0.0', parameters: {} },
+        was_generated_by: { tool: 'test', tool_version: '1.0.0', parameters: {} },
         used: [],
         generated: [],
-        executionDuration: 'PT0.1S',
+        execution_duration: 'PT0.1S',
         tune: null,
       },
     ];
@@ -479,13 +479,13 @@ describe('assembleCrossSnapshotTimeline (US4)', () => {
     const deps = createMockDeps();
     const service = createSnapshotService(deps);
 
-    const timeline = service.assembleCrossSnapshotTimeline(currentFC, { previousEntries });
+    const timeline = service.assembleCrossSnapshotTimeline(currentFC, { previous_entries: previousEntries });
 
     expect(timeline).toHaveLength(4);
-    expect(timeline[0].activityId).toBe('prev-1');
-    expect(timeline[1].activityId).toBe('prev-2');
-    expect(timeline[2].activityId).toBe('act-1');
-    expect(timeline[3].activityId).toBe('act-2');
+    expect(timeline[0].activity_id).toBe('prev-1');
+    expect(timeline[1].activity_id).toBe('prev-2');
+    expect(timeline[2].activity_id).toBe('act-1');
+    expect(timeline[3].activity_id).toBe('act-2');
   });
 
   it('deduplicates on activityId', () => {
@@ -497,7 +497,7 @@ describe('assembleCrossSnapshotTimeline (US4)', () => {
           geometry: null,
           properties: {
             provenance: [
-              { activityId: 'shared', timestamp: '2026-02-09T12:00:00Z' },
+              { activity_id: 'shared', timestamp: '2026-02-09T12:00:00Z' },
             ],
           },
         },
@@ -505,12 +505,12 @@ describe('assembleCrossSnapshotTimeline (US4)', () => {
     };
     const previousEntries = [
       {
-        activityId: 'shared',
+        activity_id: 'shared',
         timestamp: '2026-02-09T12:00:00Z',
-        wasGeneratedBy: { tool: 'test', toolVersion: '1.0.0', parameters: {} },
+        was_generated_by: { tool: 'test', tool_version: '1.0.0', parameters: {} },
         used: [],
         generated: [],
-        executionDuration: 'PT0.1S',
+        execution_duration: 'PT0.1S',
         tune: null,
       },
     ];
@@ -518,7 +518,7 @@ describe('assembleCrossSnapshotTimeline (US4)', () => {
     const deps = createMockDeps();
     const service = createSnapshotService(deps);
 
-    const timeline = service.assembleCrossSnapshotTimeline(currentFC, { previousEntries });
+    const timeline = service.assembleCrossSnapshotTimeline(currentFC, { previous_entries: previousEntries });
     expect(timeline).toHaveLength(1);
   });
 

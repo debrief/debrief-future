@@ -14,36 +14,36 @@ function makeFeatureCollection() {
         type: 'Feature',
         geometry: null,
         properties: {
-          featureId: 'track-alpha',
+          feature_id: 'track-alpha',
           provenance: [
             {
-              activityId: 'act-001',
+              activity_id: 'act-001',
               timestamp: '2026-02-01T10:00:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-range',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {
                   interval: { value: 'PT60S', default: true, tunable: true },
                 },
               },
               used: ['track-alpha'],
               generated: ['result-001'],
-              executionDuration: 'PT0.5S',
-              generatedResultId: null,
+              execution_duration: 'PT0.5S',
+              generated_result_id: null,
               tune: null,
             },
             {
-              activityId: 'act-002',
+              activity_id: 'act-002',
               timestamp: '2026-02-01T10:05:00Z',
-              wasGeneratedBy: {
+              was_generated_by: {
                 tool: 'calc-bearing',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: {},
               },
               used: ['track-alpha'],
               generated: ['result-002'],
-              executionDuration: 'PT0.3S',
-              generatedResultId: null,
+              execution_duration: 'PT0.3S',
+              generated_result_id: null,
               tune: null,
             },
           ],
@@ -61,7 +61,7 @@ function makeDeps(overrides?: Partial<LogServiceDeps>): LogServiceDeps {
     writeGeoJson: vi.fn().mockResolvedValue(undefined),
     executeTool: vi
       .fn()
-      .mockResolvedValue({ success: true, durationMs: 100 }),
+      .mockResolvedValue({ success: true, duration_ms: 100 }),
     loadSnapshot: vi.fn().mockResolvedValue(null),
     resolveToolVersion: vi.fn().mockResolvedValue('1.0.0'),
     ...overrides,
@@ -83,8 +83,8 @@ describe('LogService.tuneEntry', () => {
 
     expect(result.status).toBe('completed');
     // act-001 and act-002 should both be replayed (from tune target onward)
-    expect(result.entriesReplayed).toBe(2);
-    expect(result.totalEntries).toBe(2);
+    expect(result.entries_replayed).toBe(2);
+    expect(result.total_entries).toBe(2);
   });
 
   it('tuning to same value returns result with 0 entries (no-op)', async () => {
@@ -101,9 +101,9 @@ describe('LogService.tuneEntry', () => {
     );
 
     expect(result.status).toBe('completed');
-    expect(result.entriesReplayed).toBe(0);
-    expect(result.totalEntries).toBe(0);
-    expect(result.tuneAnnotation).toBeNull();
+    expect(result.entries_replayed).toBe(0);
+    expect(result.total_entries).toBe(0);
+    expect(result.tune_annotation).toBeNull();
   });
 
   it('appends TuneAnnotation to provenance via writeGeoJson', async () => {
@@ -125,18 +125,18 @@ describe('LogService.tuneEntry', () => {
     const props = writtenFc.features[0].properties as Record<string, unknown>;
     const prov = props.provenance as Array<Record<string, unknown>>;
     const targetEntry = prov.find(
-      (e: Record<string, unknown>) => e.activityId === 'act-001'
+      (e: Record<string, unknown>) => e.activity_id === 'act-001'
     );
     expect(targetEntry).toBeDefined();
     expect(targetEntry!.tune).not.toBeNull();
     const tune = targetEntry!.tune as {
       parameter: string;
-      previousValue: unknown;
-      newValue: unknown;
+      previous_value: unknown;
+      new_value: unknown;
     };
     expect(tune.parameter).toBe('interval');
-    expect(tune.previousValue).toBe('PT60S');
-    expect(tune.newValue).toBe('PT30S');
+    expect(tune.previous_value).toBe('PT60S');
+    expect(tune.new_value).toBe('PT30S');
   });
 
   it('updates parameter value in provenance after tune', async () => {
@@ -157,9 +157,9 @@ describe('LogService.tuneEntry', () => {
     const props = writtenFc.features[0].properties as Record<string, unknown>;
     const prov = props.provenance as Array<Record<string, unknown>>;
     const targetEntry = prov.find(
-      (e: Record<string, unknown>) => e.activityId === 'act-001'
+      (e: Record<string, unknown>) => e.activity_id === 'act-001'
     );
-    const wgb = targetEntry!.wasGeneratedBy as {
+    const wgb = targetEntry!.was_generated_by as {
       parameters: Record<string, { value: unknown }>;
     };
     expect(wgb.parameters.interval.value).toBe('PT30S');
@@ -214,33 +214,33 @@ describe('LogService.tuneEntry', () => {
             id: 'rect-1',
             provenance: [
               {
-                activityId: 'act-move',
+                activity_id: 'act-move',
                 timestamp: '2026-03-01T10:00:00Z',
-                wasGeneratedBy: {
+                was_generated_by: {
                   tool: 'move-shape',
-                  toolVersion: '1.0.0',
+                  tool_version: '1.0.0',
                   parameters: {
                     direction: { value: 90, default: true, tunable: true },
                   },
                 },
                 used: ['rect-1'],
                 generated: [],
-                executionDuration: 'PT0.1S',
-                generatedResultId: null,
+                execution_duration: 'PT0.1S',
+                generated_result_id: null,
                 tune: null,
               },
               {
-                activityId: 'act-gen',
+                activity_id: 'act-gen',
                 timestamp: '2026-03-01T10:01:00Z',
-                wasGeneratedBy: {
+                was_generated_by: {
                   tool: 'generate-reference-points',
-                  toolVersion: '1.0.0',
+                  tool_version: '1.0.0',
                   parameters: {},
                 },
                 used: ['rect-1'],
                 generated: ['old-point-id'],
-                executionDuration: 'PT0.1S',
-                generatedResultId: null,
+                execution_duration: 'PT0.1S',
+                generated_result_id: null,
                 tune: null,
               },
             ],
@@ -257,17 +257,17 @@ describe('LogService.tuneEntry', () => {
             id: 'new-point-xyz',
             provenance: [
               {
-                activityId: 'act-gen',
+                activity_id: 'act-gen',
                 timestamp: '2026-03-01T10:01:00Z',
-                wasGeneratedBy: {
+                was_generated_by: {
                   tool: 'generate-reference-points',
-                  toolVersion: '1.0.0',
+                  tool_version: '1.0.0',
                   parameters: {},
                 },
                 used: ['rect-1'],
                 generated: [],
-                executionDuration: 'PT0.1S',
-                generatedResultId: null,
+                execution_duration: 'PT0.1S',
+                generated_result_id: null,
                 tune: null,
               },
             ],

@@ -28,7 +28,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'act-1', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' } },
+              { activity_id: 'act-1', timestamp: '2026-02-09T10:00:00Z', was_generated_by: { tool: 'tool-a' } },
             ],
           },
         },
@@ -36,7 +36,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'act-2', timestamp: '2026-02-09T11:00:00Z', wasGeneratedBy: { tool: 'tool-b' } },
+              { activity_id: 'act-2', timestamp: '2026-02-09T11:00:00Z', was_generated_by: { tool: 'tool-b' } },
             ],
           },
         },
@@ -44,8 +44,8 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(2);
-    expect(result[0].activityId).toBe('act-1');
-    expect(result[1].activityId).toBe('act-2');
+    expect(result[0].activity_id).toBe('act-1');
+    expect(result[1].activity_id).toBe('act-2');
   });
 
   it('deduplicates on activityId and merges generated arrays', () => {
@@ -55,7 +55,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' }, generated: ['feat-1'] },
+              { activity_id: 'shared-act', timestamp: '2026-02-09T10:00:00Z', was_generated_by: { tool: 'tool-a' }, generated: ['feat-1'] },
             ],
           },
         },
@@ -63,7 +63,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a' }, generated: ['feat-2'] },
+              { activity_id: 'shared-act', timestamp: '2026-02-09T10:00:00Z', was_generated_by: { tool: 'tool-a' }, generated: ['feat-2'] },
             ],
           },
         },
@@ -71,7 +71,7 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].activityId).toBe('shared-act');
+    expect(result[0].activity_id).toBe('shared-act');
     expect(result[0].generated).toEqual(['feat-1', 'feat-2']);
   });
 
@@ -82,7 +82,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
+              { activity_id: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
             ],
           },
         },
@@ -90,7 +90,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
+              { activity_id: 'shared-act', timestamp: '2026-02-09T10:00:00Z', generated: ['feat-1'] },
             ],
           },
         },
@@ -108,8 +108,8 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'act-late', timestamp: '2026-02-09T15:00:00Z' },
-              { activityId: 'act-early', timestamp: '2026-02-09T08:00:00Z' },
+              { activity_id: 'act-late', timestamp: '2026-02-09T15:00:00Z' },
+              { activity_id: 'act-early', timestamp: '2026-02-09T08:00:00Z' },
             ],
           },
         },
@@ -117,7 +117,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'act-mid', timestamp: '2026-02-09T12:00:00Z' },
+              { activity_id: 'act-mid', timestamp: '2026-02-09T12:00:00Z' },
             ],
           },
         },
@@ -125,9 +125,9 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].activityId).toBe('act-early');
-    expect(result[1].activityId).toBe('act-mid');
-    expect(result[2].activityId).toBe('act-late');
+    expect(result[0].activity_id).toBe('act-early');
+    expect(result[1].activity_id).toBe('act-mid');
+    expect(result[2].activity_id).toBe('act-late');
   });
 
   it('handles features with null properties', () => {
@@ -138,7 +138,7 @@ describe('assembleTimeline', () => {
           type: 'Feature',
           properties: {
             provenance: [
-              { activityId: 'act-1', timestamp: '2026-02-09T10:00:00Z' },
+              { activity_id: 'act-1', timestamp: '2026-02-09T10:00:00Z' },
             ],
           },
         },
@@ -155,14 +155,14 @@ describe('assembleTimeline', () => {
         {
           type: 'Feature',
           properties: {
-            provenance: { activityId: 'legacy-act', timestamp: '2026-01-01T00:00:00Z' },
+            provenance: { activity_id: 'legacy-act', timestamp: '2026-01-01T00:00:00Z' },
           },
         },
       ],
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].activityId).toBe('legacy-act');
+    expect(result[0].activity_id).toBe('legacy-act');
   });
 
   it('normalises snake_case provenance from Python importers', () => {
@@ -191,10 +191,10 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].activityId).toBe('import-act-1');
-    expect(result[0].wasGeneratedBy.tool).toBe('rep-parser');
-    expect(result[0].wasGeneratedBy.toolVersion).toBe('1.0.0');
-    expect(result[0].executionDuration).toBe('PT0S');
+    expect(result[0].activity_id).toBe('import-act-1');
+    expect(result[0].was_generated_by.tool).toBe('rep-parser');
+    expect(result[0].was_generated_by.tool_version).toBe('1.0.0');
+    expect(result[0].execution_duration).toBe('PT0S');
     expect(result[0].generated).toEqual(['feat-1']);
   });
 
@@ -221,12 +221,12 @@ describe('assembleTimeline', () => {
           properties: {
             provenance: [
               {
-                activityId: 'ts-act',
+                activity_id: 'ts-act',
                 timestamp: '2026-03-21T11:00:00Z',
-                wasGeneratedBy: { tool: 'move-track', toolVersion: '2.0.0', parameters: {} },
+                was_generated_by: { tool: 'move-track', tool_version: '2.0.0', parameters: {} },
                 used: ['feat-1'],
                 generated: ['feat-2'],
-                executionDuration: 'PT1.5S',
+                execution_duration: 'PT1.5S',
               },
             ],
           },
@@ -235,8 +235,8 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(2);
-    expect(result[0].activityId).toBe('python-act');
-    expect(result[1].activityId).toBe('ts-act');
+    expect(result[0].activity_id).toBe('python-act');
+    expect(result[1].activity_id).toBe('ts-act');
   });
 
   it('skips entries without activityId', () => {
@@ -247,7 +247,7 @@ describe('assembleTimeline', () => {
           properties: {
             provenance: [
               { timestamp: '2026-02-09T10:00:00Z' }, // no activityId
-              { activityId: 'valid', timestamp: '2026-02-09T11:00:00Z' },
+              { activity_id: 'valid', timestamp: '2026-02-09T11:00:00Z' },
             ],
           },
         },
@@ -255,16 +255,16 @@ describe('assembleTimeline', () => {
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].activityId).toBe('valid');
+    expect(result[0].activity_id).toBe('valid');
   });
 });
 
 describe('normaliseEntry', () => {
   it('passes through camelCase entries unchanged', () => {
     const input = {
-      activityId: 'act-1',
+      activity_id: 'act-1',
       timestamp: '2026-01-01T00:00:00Z',
-      wasGeneratedBy: { tool: 'test', toolVersion: '1.0', parameters: {} },
+      was_generated_by: { tool: 'test', tool_version: '1.0', parameters: {} },
     };
     const result = normaliseEntry(input);
     expect(result).toBe(input); // same reference — no copy
@@ -279,12 +279,12 @@ describe('normaliseEntry', () => {
       generated: ['feat-1'],
       execution_duration: 'PT0.5S',
     });
-    expect(result.activityId).toBe('py-act');
+    expect(result.activity_id).toBe('py-act');
     expect(result.timestamp).toBe('2026-03-21T10:00:00Z');
-    const wgb = result.wasGeneratedBy as { tool: string; toolVersion: string };
+    const wgb = result.was_generated_by as { tool: string; tool_version: string };
     expect(wgb.tool).toBe('rep-parser');
-    expect(wgb.toolVersion).toBe('1.0.0');
-    expect(result.executionDuration).toBe('PT0.5S');
+    expect(wgb.tool_version).toBe('1.0.0');
+    expect(result.execution_duration).toBe('PT0.5S');
     expect(result.generated).toEqual(['feat-1']);
   });
 
