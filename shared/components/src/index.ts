@@ -85,6 +85,7 @@ export type { PositionSymbolsLayerProps } from './MapView/PositionSymbolsLayer';
 // Hooks
 export { useSelection } from './hooks/useSelection';
 export { useTheme } from './hooks/useTheme';
+export { useIsMobile } from './hooks/useIsMobile';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
@@ -211,6 +212,10 @@ export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';
 export { MapPanel } from './panels/MapPanel';
 export { ChartPanelWrapper } from './panels/ChartPanelWrapper';
+
+// MobileTabLayout (Feature: mobile-web-shell-preview)
+export { MobileTabLayout } from './MobileTabLayout/MobileTabLayout';
+export type { MobileTabLayoutProps } from './MobileTabLayout/MobileTabLayout';
 
 // LogPanel (Feature: 072-log-panel, updated: 176-log-panel-ux)
 export { LogPanel } from './LogPanel';

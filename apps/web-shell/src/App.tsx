@@ -35,6 +35,8 @@ import {
   createDefaultRegistry,
   PANEL_CHART,
   parseTaxonomy,
+  useIsMobile,
+  MobileTabLayout,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -199,6 +201,9 @@ export default function App() {
   const [resultTabs, setResultTabs] = useState<ResultTab[]>([]);
   const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
   const [layoutResetCount, setLayoutResetCount] = useState(0);
+
+  // Mobile viewport detection (Feature: mobile-web-shell-preview)
+  const isMobile = useIsMobile();
 
   // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
   const drawingMode = state.drawingMode;
@@ -1379,12 +1384,21 @@ export default function App() {
       )}
 
       <main className="web-shell__main">
-        <PanelWorkspace
-          registry={panelRegistry}
-          contextWrapper={contextWrapper}
-          className="web-shell__panel-workspace"
-          onLayoutReset={() => setLayoutResetCount(c => c + 1)}
-        />
+        {isMobile ? (
+          <PanelContextProvider value={panelContextValue}>
+            <MobileTabLayout
+              hasResults={chartContextProps !== null}
+              className="web-shell__panel-workspace"
+            />
+          </PanelContextProvider>
+        ) : (
+          <PanelWorkspace
+            registry={panelRegistry}
+            contextWrapper={contextWrapper}
+            className="web-shell__panel-workspace"
+            onLayoutReset={() => setLayoutResetCount(c => c + 1)}
+          />
+        )}
       </main>
     </div>
   );
