@@ -5,6 +5,8 @@ interface UseTreeStateReturn {
     nodes: TreeNodeData[];
     /** Toggle expand/collapse state of a node */
     toggleNode: (path: string) => Promise<void>;
+    /** Expand a path and all its ancestors so the target node is rendered */
+    expandPath: (path: string) => Promise<void>;
     /** Whether initial load is in progress */
     isLoading: boolean;
     /** Error message if initial load failed */

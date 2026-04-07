@@ -31,7 +31,7 @@ export declare function getSelectableFeatureIds(entry: TimelineEntry, featureNam
  * Returns groups sorted by feature name, entries within each group sorted most-recent-first.
  */
 export declare function groupEntriesByFeature(entries: TimelineEntry[], featureNames: Record<string, string>): Array<{
-    featureId: string;
+    feature_id: string;
     displayName: string;
     entries: TimelineEntry[];
 }>;

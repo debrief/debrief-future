@@ -52,32 +52,32 @@ export declare const VALID_VIEW_MODES: readonly ViewMode[];
  * are not present in the schema LogEntry. Kept as a local UI type.
  */
 export interface TimelineEntry {
-    activityId: string;
+    activity_id: string;
     timestamp: string;
     toolName: string;
-    toolVersion: string;
+    tool_version: string;
     parameters: Record<string, ParameterValue>;
     usedFeatureIds: string[];
     generatedFeatureIds: string[];
-    executionDuration: string;
-    generatedResultId: string | null;
+    execution_duration: string;
+    generated_result_id: string | null;
     operationCategory: OperationCategory;
     deleted?: boolean;
     disabled?: boolean;
     rationale?: string | null;
     tuneAnnotation?: {
         parameter: string;
-        previousValue: unknown;
-        newValue: unknown;
+        previous_value: unknown;
+        new_value: unknown;
     } | null;
     /** Pre-tool geometry for mutation tools — enables correct tune replay. */
-    inputState?: InputFeatureState[] | null;
+    input_state?: InputFeatureState[] | null;
 }
 /**
  * Feature display info for resolving names.
  */
 export interface FeatureDisplayInfo {
-    featureId: string;
+    feature_id: string;
     displayName: string;
     exists: boolean;
 }
@@ -124,7 +124,7 @@ export type CardReplayStatus = 'idle' | 'pending' | 'in-progress' | 'error';
 export type LogPanelMessage = {
     type: 'entry:select';
     payload: {
-        activityId: string;
+        activity_id: string;
         featureIds: string[];
     };
 } | {
@@ -133,7 +133,7 @@ export type LogPanelMessage = {
     type: 'action:invoke';
     payload: {
         actionType: ActionType;
-        activityId: string;
+        activity_id: string;
     };
 } | {
     type: 'mode:change';
