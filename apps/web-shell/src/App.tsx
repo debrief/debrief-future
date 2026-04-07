@@ -1385,10 +1385,12 @@ export default function App() {
 
       <main className="web-shell__main">
         {isMobile ? (
-          <MobileTabLayout
-            hasResults={chartContextProps !== null}
-            className="web-shell__panel-workspace"
-          />
+          <PanelContextProvider value={panelContextValue}>
+            <MobileTabLayout
+              hasResults={chartContextProps !== null}
+              className="web-shell__panel-workspace"
+            />
+          </PanelContextProvider>
         ) : (
           <PanelWorkspace
             registry={panelRegistry}
