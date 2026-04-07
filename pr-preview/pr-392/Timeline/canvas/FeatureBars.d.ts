@@ -23,7 +23,7 @@ export interface FeatureBarsConfig {
     fontSize?: number;
 }
 export interface FeatureBarInfo {
-    featureId: string;
+    feature_id: string;
     x: number;
     y: number;
     width: number;
