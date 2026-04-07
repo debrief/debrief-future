@@ -313,9 +313,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
               'debrief.logPanel.viewMode',
               'timeline'
             );
-            const viewMode: ViewMode = (VALID_VIEW_MODES as readonly string[]).includes(savedMode)
-              ? (savedMode as ViewMode)
-              : 'timeline';
+            // SAFETY: `VALID_VIEW_MODES` is `readonly ViewMode[]` and
+            // TypeScript's `.includes()` signature on a narrow readonly
+            // array rejects a plain string. Widening to `readonly string[]`
+            // is a safe upcast (ViewMode is a string literal subtype) and
+            // the `isViewMode` type guard narrows the result back to
+            // `ViewMode` through the return type.
+            const isViewMode = (value: string): value is ViewMode =>
+              (VALID_VIEW_MODES as readonly string[]).includes(value);
+            const viewMode: ViewMode = isViewMode(savedMode) ? savedMode : 'timeline';
             this._postMessage({
               type: 'mode:init',
               payload: { viewMode },
