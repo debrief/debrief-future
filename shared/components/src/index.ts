@@ -204,6 +204,8 @@ export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
 // Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
 export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
 export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
+export { DEFAULT_RESULTS_PANEL_LABELS } from './panels/resultsPanelLabels';
+export type { ResultsPanelLabels } from './panels/resultsPanelLabels';
 export { NavigationPanel } from './panels/NavigationPanel';
 export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';

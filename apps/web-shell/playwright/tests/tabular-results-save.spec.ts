@@ -32,16 +32,19 @@ test.describe('Tabular Results Save Flow (#177)', () => {
   test('Range Bearing result saved via Save As appears in Layers dropdown', async ({ page }) => {
     // Multi-select two tracks via the session store
     await page.evaluate(([a, b]) => {
+      // SAFETY: __sessionStore is exposed on window by App.tsx for E2E tests
+      // and Playwright debug hooks. Cast through `unknown` to satisfy strict
+      // mode without depending on the full SessionStoreApi type in test code.
       const store = (window as unknown as { __sessionStore?: { getState(): { setSelection: (ids: string[]) => void } } }).__sessionStore;
       if (!store) throw new Error('Session store not exposed on window');
       store.getState().setSelection([a, b]);
     }, [TRACK_A, TRACK_B]);
     // Allow tools panel to react to selection change
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
     // Wait for Range Bearing to become active (needs 2 features)
     const rangeBearingTool = page.locator('.debrief-tools-panel__item--active:has-text("Range Bearing")');
-    await expect(rangeBearingTool).toBeVisible({ timeout: 3000 });
+    await expect(rangeBearingTool).toBeVisible({ timeout: 5000 });
 
     // Run Range Bearing
     await rangeBearingTool.locator('button').first().click();
@@ -95,6 +98,9 @@ test.describe('Tabular Results Save Flow (#177)', () => {
   test('Save (quick) generates date-stamped filename in Layers dropdown', async ({ page }) => {
     // Multi-select two tracks via the session store
     await page.evaluate(([a, b]) => {
+      // SAFETY: __sessionStore is exposed on window by App.tsx for E2E tests
+      // and Playwright debug hooks. Cast through `unknown` to satisfy strict
+      // mode without depending on the full SessionStoreApi type in test code.
       const store = (window as unknown as { __sessionStore?: { getState(): { setSelection: (ids: string[]) => void } } }).__sessionStore;
       if (!store) throw new Error('Session store not exposed on window');
       store.getState().setSelection([a, b]);

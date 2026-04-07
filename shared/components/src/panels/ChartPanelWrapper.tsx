@@ -10,6 +10,7 @@ import { usePanelContext } from './PanelContext';
 import type { ChartTabData } from './PanelContext';
 import type { ChartRendererProps } from '../ChartRenderer';
 import { TableRenderer } from '../TableRenderer';
+import { DEFAULT_RESULTS_PANEL_LABELS, type ResultsPanelLabels } from './resultsPanelLabels';
 
 /** Format bytes into a human-readable string */
 function formatFileSize(bytes: number): string {
@@ -23,10 +24,12 @@ function TabContent({
   tab,
   chartSpec,
   ChartRenderer,
+  labels,
 }: {
   tab: ChartTabData;
   chartSpec: ChartRendererProps['spec'];
   ChartRenderer: React.ComponentType<ChartRendererProps>;
+  labels: ResultsPanelLabels;
 }) {
   // Error state (Feature: 177)
   if (tab.errorMessage) {
@@ -46,16 +49,16 @@ function TabContent({
           opacity: 0.6,
         }}
         role="status"
-        aria-label="Loading results"
+        aria-label={labels.loadingResults}
       >
-        Computing results…
+        {labels.computingResults}
       </div>
     );
   }
 
   // Table rendering (Feature: 177)
   if (tab.displayHint === 'table' && tab.tableData) {
-    return <TableRenderer data={tab.tableData} />;
+    return <TableRenderer data={tab.tableData} labels={labels} />;
   }
 
   const type = tab.artifactType ?? 'dataset';
@@ -98,15 +101,16 @@ function TabContent({
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-errorForeground, #d32f2f)' }}>
-      Unable to render chart
+      {labels.unableToRender}
     </div>
   );
 }
 
 /** Save As inline form (Feature: 177) */
-function SaveAsForm({ onSubmit, onCancel }: {
+function SaveAsForm({ onSubmit, onCancel, labels }: {
   onSubmit: (baseName: string, tag?: string) => void;
   onCancel: () => void;
+  labels: ResultsPanelLabels;
 }) {
   const [baseName, setBaseName] = useState('');
   const [tag, setTag] = useState('');
@@ -123,9 +127,9 @@ function SaveAsForm({ onSubmit, onCancel }: {
         fontSize: 12,
       }}
       role="form"
-      aria-label="Save results as"
+      aria-label={labels.saveResultAs}
     >
-      <label htmlFor="save-as-name" style={{ color: 'var(--vscode-foreground, #ccc)' }}>Name:</label>
+      <label htmlFor="save-as-name" style={{ color: 'var(--vscode-foreground, #ccc)' }}>{labels.nameLabel}</label>
       <input
         id="save-as-name"
         type="text"
@@ -140,9 +144,9 @@ function SaveAsForm({ onSubmit, onCancel }: {
           fontSize: 12,
           width: 120,
         }}
-        aria-label="Base filename"
+        aria-label={labels.baseFilenameAriaLabel}
       />
-      <label htmlFor="save-as-tag" style={{ color: 'var(--vscode-foreground, #ccc)' }}>Tag:</label>
+      <label htmlFor="save-as-tag" style={{ color: 'var(--vscode-foreground, #ccc)' }}>{labels.tagLabel}</label>
       <input
         id="save-as-tag"
         type="text"
@@ -157,7 +161,7 @@ function SaveAsForm({ onSubmit, onCancel }: {
           fontSize: 12,
           width: 80,
         }}
-        aria-label="Optional tag"
+        aria-label={labels.optionalTagAriaLabel}
       />
       <button
         type="button"
@@ -172,9 +176,9 @@ function SaveAsForm({ onSubmit, onCancel }: {
           cursor: baseName.trim() ? 'pointer' : 'default',
           opacity: baseName.trim() ? 1 : 0.5,
         }}
-        aria-label="Confirm save"
+        aria-label={labels.confirmSave}
       >
-        OK
+        {labels.ok}
       </button>
       <button
         type="button"
@@ -187,9 +191,9 @@ function SaveAsForm({ onSubmit, onCancel }: {
           fontSize: 12,
           cursor: 'pointer',
         }}
-        aria-label="Cancel save"
+        aria-label={labels.cancelSave}
       >
-        Cancel
+        {labels.cancel}
       </button>
     </div>
   );
@@ -199,10 +203,15 @@ export function ChartPanelWrapper() {
   const ctx = usePanelContext();
   const [showSaveAs, setShowSaveAs] = useState(false);
 
+  const labels: ResultsPanelLabels = {
+    ...DEFAULT_RESULTS_PANEL_LABELS,
+    ...ctx.chartProps?.labels,
+  };
+
   if (!ctx.chartProps) {
     return (
       <div style={{ padding: 16, color: '#969696', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }} data-testid="panel-chart">
-        No results to display. Run a tool or open a file from the Navigation panel.
+        {labels.noResults}
       </div>
     );
   }
@@ -256,8 +265,8 @@ export function ChartPanelWrapper() {
               {tab.isSaved === false && !tab.errorMessage && !tab.isLoading && (
                 <span
                   style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--vscode-editorWarning-foreground, #cca700)', flexShrink: 0 }}
-                  title="Unsaved"
-                  aria-label="Unsaved result"
+                  title={labels.unsavedResult}
+                  aria-label={labels.unsavedResult}
                 />
               )}
               <button
@@ -273,7 +282,7 @@ export function ChartPanelWrapper() {
                   cursor: 'pointer',
                 }}
                 onClick={(e) => { e.stopPropagation(); onChartTabClose(tab.id); }}
-                aria-label={`Close ${tab.title}`}
+                aria-label={labels.closeTab(tab.title)}
               >
                 &times;
               </button>
@@ -295,9 +304,9 @@ export function ChartPanelWrapper() {
                   cursor: activeTab.isSaved ? 'default' : 'pointer',
                   padding: '2px 6px',
                 }}
-                aria-label="Save result"
+                aria-label={labels.saveResult}
               >
-                Save
+                {labels.save}
               </button>
               <button
                 type="button"
@@ -311,9 +320,9 @@ export function ChartPanelWrapper() {
                   cursor: activeTab.isSaved ? 'default' : 'pointer',
                   padding: '2px 6px',
                 }}
-                aria-label="Save result as"
+                aria-label={labels.saveResultAs}
               >
-                Save As…
+                {labels.saveAs}
               </button>
             </div>
           )}
@@ -332,9 +341,9 @@ export function ChartPanelWrapper() {
                   fontSize: 12,
                   cursor: 'pointer',
                 }}
-                aria-label="Retry tool execution"
+                aria-label={labels.retryToolExecution}
               >
-                Retry
+                {labels.retry}
               </button>
             </div>
           )}
@@ -343,7 +352,7 @@ export function ChartPanelWrapper() {
 
       {/* Save As form (Feature: 177) */}
       {showSaveAs && (
-        <SaveAsForm onSubmit={handleSaveAs} onCancel={() => setShowSaveAs(false)} />
+        <SaveAsForm onSubmit={handleSaveAs} onCancel={() => setShowSaveAs(false)} labels={labels} />
       )}
 
       {/* Content area */}
@@ -362,14 +371,14 @@ export function ChartPanelWrapper() {
             role="alert"
             data-testid="panel-chart-error"
           >
-            <div style={{ fontSize: 14, fontWeight: 500 }}>Tool execution failed</div>
+            <div style={{ fontSize: 14, fontWeight: 500 }}>{labels.toolExecutionFailed}</div>
             <div style={{ fontSize: 12 }}>{activeTab.errorMessage}</div>
           </div>
         ) : activeTab ? (
-          <TabContent tab={activeTab} chartSpec={chartSpec} ChartRenderer={ChartRenderer} />
+          <TabContent tab={activeTab} chartSpec={chartSpec} ChartRenderer={ChartRenderer} labels={labels} />
         ) : chartTabs.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-errorForeground, #d32f2f)' }}>
-            Unable to render chart
+            {labels.unableToRender}
           </div>
         ) : null}
       </div>

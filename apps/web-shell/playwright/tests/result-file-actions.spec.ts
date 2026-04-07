@@ -24,6 +24,9 @@ test.describe('Result file actions (#177)', () => {
 
     // Multi-select two tracks via the session store
     await page.evaluate(([a, b]) => {
+      // SAFETY: __sessionStore is exposed on window by App.tsx for E2E tests
+      // and Playwright debug hooks. Cast through `unknown` to satisfy strict
+      // mode without depending on the full SessionStoreApi type in test code.
       const store = (window as unknown as { __sessionStore?: { getState(): { setSelection: (ids: string[]) => void } } }).__sessionStore;
       if (!store) throw new Error('Session store not exposed on window');
       store.getState().setSelection([a, b]);

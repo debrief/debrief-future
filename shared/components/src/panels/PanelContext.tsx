@@ -11,6 +11,7 @@ import type { MapViewProps } from '../MapView';
 import type { LogPanelProps } from '../LogPanel';
 import type { StacFileTreeProps } from '../StacFileTree';
 import type { ChartRendererProps } from '../ChartRenderer';
+import type { ResultsPanelLabels } from './resultsPanelLabels';
 
 /** Content type for result tabs — dataset (chart), image, or fallback */
 export type ResultArtifactType = 'dataset' | 'image' | 'other';
@@ -50,6 +51,8 @@ export interface ChartContextProps {
   onSaveAs?: (tabId: string, baseName: string, tag?: string) => void;
   /** Retry a failed tool execution (Feature: 177) */
   onRetry?: (tabId: string) => void;
+  /** Optional partial overrides for user-facing strings (i18n) (Feature: 177) */
+  labels?: Partial<ResultsPanelLabels>;
 }
 
 /** Components that panels need to render — passed as component types to avoid circular imports */

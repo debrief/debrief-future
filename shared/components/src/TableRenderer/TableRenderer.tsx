@@ -6,11 +6,15 @@
  * (e.g., track-stats). Column names are derived from the data keys.
  */
 
+import { DEFAULT_RESULTS_PANEL_LABELS, type ResultsPanelLabels } from '../panels/resultsPanelLabels';
+
 export interface TableRendererProps {
   /** Array of row records. Column names are derived from the keys of the first row. */
   data: Record<string, unknown>[];
   /** Optional CSS class name */
   className?: string;
+  /** Optional partial overrides for user-facing strings (i18n) */
+  labels?: Partial<ResultsPanelLabels>;
 }
 
 function formatCell(value: unknown): string {
@@ -23,7 +27,9 @@ function formatCell(value: unknown): string {
   return String(value);
 }
 
-export function TableRenderer({ data, className }: TableRendererProps) {
+export function TableRenderer({ data, className, labels: labelOverrides }: TableRendererProps) {
+  const labels = { ...DEFAULT_RESULTS_PANEL_LABELS, ...labelOverrides };
+
   if (data.length === 0) {
     return (
       <div
@@ -37,7 +43,7 @@ export function TableRenderer({ data, className }: TableRendererProps) {
         role="status"
         data-testid="table-renderer-empty"
       >
-        No data to display
+        {labels.noDataToDisplay}
       </div>
     );
   }
@@ -61,7 +67,7 @@ export function TableRenderer({ data, className }: TableRendererProps) {
           color: 'var(--vscode-foreground, #cccccc)',
         }}
         role="table"
-        aria-label="Tool results"
+        aria-label={labels.toolResultsTableLabel}
       >
         <thead>
           <tr>
