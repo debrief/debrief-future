@@ -362,7 +362,7 @@ export function ActivityPanel({
 
   // Info dialog state (Feature 098)
   const [infoDialogState, setInfoDialogState] = useState<{
-    featureId: string;
+    feature_id: string;
     featureName: string;
     geometryType: string;
     coordinates: number[] | number[][] | number[][][] | number[][][][];
@@ -374,7 +374,7 @@ export function ActivityPanel({
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
       setFormatMenuState(null); // Mutual exclusion
       setInfoDialogState({
-        featureId: feature.id,
+        feature_id: feature.id,
         featureName: getFeatureLabel(feature),
         geometryType: feature.geometry?.type ?? 'None',
         coordinates: (feature.geometry?.coordinates ?? []) as number[] | number[][] | number[][][] | number[][][][],
@@ -415,7 +415,7 @@ export function ActivityPanel({
 
       setFormatMenuState(null); // Mutual exclusion
       setInfoDialogState({
-        featureId: displayItem.id,
+        feature_id: displayItem.id,
         featureName: displayItem.label,
         geometryType,
         coordinates,

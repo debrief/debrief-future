@@ -17,7 +17,7 @@ export function normaliseProvenance(raw: unknown): unknown[] {
 
 /** Find the system record in a FeatureCollection. */
 export function findSystemRecord(fc: GeoJsonFeatureCollection): GeoJsonFeature | null {
-  return fc.features.find(f => f.properties?.featureType === SYSTEM_FEATURE_TYPE) ?? null;
+  return fc.features.find(f => f.properties?.feature_type === SYSTEM_FEATURE_TYPE) ?? null;
 }
 
 /** Create a minimal system record feature. */
@@ -26,10 +26,10 @@ export function createSystemRecord(): GeoJsonFeature {
     type: 'Feature',
     geometry: { type: 'Point', coordinates: [] },
     properties: {
-      featureType: 'system',
-      snapshotLinks: null,
+      feature_type: 'system',
+      snapshot_links: null,
       branches: [],
-      branchOrigin: null,
+      branch_origin: null,
       provenance: [],
     },
   };
@@ -42,7 +42,7 @@ export function createSystemRecord(): GeoJsonFeature {
 export function stripSpatialProvenance(fc: GeoJsonFeatureCollection): GeoJsonFeatureCollection {
   const cleanFeatures = fc.features.map(f => {
     const clone: GeoJsonFeature = JSON.parse(JSON.stringify(f));
-    if (clone.properties && clone.properties.featureType !== SYSTEM_FEATURE_TYPE) {
+    if (clone.properties && clone.properties.feature_type !== SYSTEM_FEATURE_TYPE) {
       clone.properties.provenance = [];
     }
     return clone;
@@ -57,11 +57,11 @@ export function stripSpatialProvenance(fc: GeoJsonFeatureCollection): GeoJsonFea
 export function countLogEntries(fc: GeoJsonFeatureCollection): number {
   const seen = new Set<string>();
   for (const f of fc.features) {
-    if (f.properties?.featureType === SYSTEM_FEATURE_TYPE) continue;
+    if (f.properties?.feature_type === SYSTEM_FEATURE_TYPE) continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      const activityId = e.activityId;
+      const activityId = e.activity_id;
       if (typeof activityId === 'string' && activityId.length > 0) {
         seen.add(activityId);
       }
@@ -99,11 +99,11 @@ export function trimProvenanceAfterEntry(
   // First, find the timestamp of the entry to split on
   let splitTimestamp: string | null = null;
   for (const f of fc.features) {
-    if (f.properties?.featureType === SYSTEM_FEATURE_TYPE) continue;
+    if (f.properties?.feature_type === SYSTEM_FEATURE_TYPE) continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      if (e.activityId === entryId) {
+      if (e.activity_id === entryId) {
         splitTimestamp = e.timestamp as string;
         break;
       }
@@ -120,11 +120,11 @@ export function trimProvenanceAfterEntry(
   const afterIds = new Set<string>();
 
   for (const f of fc.features) {
-    if (f.properties?.featureType === SYSTEM_FEATURE_TYPE) continue;
+    if (f.properties?.feature_type === SYSTEM_FEATURE_TYPE) continue;
     const prov = normaliseProvenance(f.properties?.provenance);
     for (const entry of prov) {
       const e = entry as Record<string, unknown>;
-      const aid = e.activityId as string;
+      const aid = e.activity_id as string;
       const ts = e.timestamp as string;
       if (!aid) continue;
       if (ts <= splitTimestamp!) {
@@ -137,7 +137,7 @@ export function trimProvenanceAfterEntry(
 
   // Trim: keep only entries with timestamp > splitTimestamp
   for (const f of fc.features) {
-    if (f.properties?.featureType === SYSTEM_FEATURE_TYPE) continue;
+    if (f.properties?.feature_type === SYSTEM_FEATURE_TYPE) continue;
     if (!f.properties) continue;
     const prov = normaliseProvenance(f.properties.provenance);
     f.properties.provenance = prov.filter((entry) => {

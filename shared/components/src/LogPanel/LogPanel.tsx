@@ -96,17 +96,17 @@ export function LogPanel({
   // Handle entry click — toggle selection
   const handleEntryClick = useCallback(
     (entry: TimelineEntry) => {
-      if (selectedEntryId === entry.activityId) {
+      if (selectedEntryId === entry.activity_id) {
         // Deselect
         onSelectedEntryChange?.(null);
         onMessage?.({ type: 'entry:deselect' });
       } else {
         // Select
-        onSelectedEntryChange?.(entry.activityId);
+        onSelectedEntryChange?.(entry.activity_id);
         const featureIds = getSelectableFeatureIds(entry, featureNames);
         onMessage?.({
           type: 'entry:select',
-          payload: { activityId: entry.activityId, featureIds },
+          payload: { activity_id: entry.activity_id, featureIds },
         });
       }
     },
@@ -118,7 +118,7 @@ export function LogPanel({
     (actionType: ActionType, activityId: string) => {
       // Feature 113: Rationale action bar shortcut flips the card and focuses rationale
       if (actionType === 'rationale') {
-        const entry = entries.find((e) => e.activityId === activityId);
+        const entry = entries.find((e) => e.activity_id === activityId);
         if (entry) {
           setEditingActivityId(activityId);
           // Request schema if not cached
@@ -134,7 +134,7 @@ export function LogPanel({
 
       onMessage?.({
         type: 'action:invoke',
-        payload: { actionType, activityId },
+        payload: { actionType, activity_id: activityId },
       });
     },
     [onMessage, entries, requestSchema]
@@ -146,7 +146,7 @@ export function LogPanel({
       if (onTuneRequest) {
         // Pass current value for inline editing; caller provides new value
         const paramVal = entry.parameters[parameterName];
-        onTuneRequest(entry.activityId, parameterName, paramVal?.value);
+        onTuneRequest(entry.activity_id, parameterName, paramVal?.value);
       }
     },
     [onTuneRequest]
@@ -155,7 +155,7 @@ export function LogPanel({
   // Phase 6: Wrap onRestoreRequest for LogEntry's onRestoreClick signature
   const handleRestoreClick = useCallback(
     (entry: TimelineEntry) => {
-      onRestoreRequest?.(entry.activityId);
+      onRestoreRequest?.(entry.activity_id);
     },
     [onRestoreRequest]
   );
@@ -164,7 +164,7 @@ export function LogPanel({
   const handleEditClick = useCallback(
     (entry: TimelineEntry) => {
       // Single-card constraint: auto-close any currently editing card
-      setEditingActivityId(entry.activityId);
+      setEditingActivityId(entry.activity_id);
       setSchemaError(null);
 
       // Check schema cache
@@ -200,7 +200,7 @@ export function LogPanel({
       setEditingActivityId(null);
       onMessage?.({
         type: 'action:invoke',
-        payload: { actionType: 'revertThis', activityId },
+        payload: { actionType: 'revertThis', activity_id: activityId },
       });
     },
     [onMessage]
@@ -233,7 +233,7 @@ export function LogPanel({
 
   // Feature 113: Get cached schema for currently editing entry
   const editingEntry = editingActivityId
-    ? entries.find((e) => e.activityId === editingActivityId)
+    ? entries.find((e) => e.activity_id === editingActivityId)
     : null;
   const editingSchema = editingEntry
     ? schemaCacheRef.current.get(editingEntry.toolName) ?? null

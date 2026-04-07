@@ -20,32 +20,14 @@ import type {
   ViewMode,
   LogFilterState,
   LogPanelMessage,
-  ExtensionToWebviewMessage,
   ParameterSchemaEntry,
 } from '@debrief/components';
-
-// Phase 6 message types from the extension
-interface ReplayProgressPayload {
-  current: number;
-  total: number;
-  currentToolId: string;
-  phase: string;
-}
-
-interface ReplayResultPayload {
-  status: 'completed' | 'halted' | 'cancelled';
-  entriesReplayed: number;
-  totalEntries: number;
-  haltReason: { type: string; toolId: string; message: string } | null;
-}
-
-// Extended message type to include Phase 6 + Feature 113 messages
-type ExtendedExtensionMessage =
-  | ExtensionToWebviewMessage
-  | { type: 'replay:progress'; payload: ReplayProgressPayload }
-  | { type: 'replay:result'; payload: ReplayResultPayload }
-  | { type: 'replay:error'; payload: { message: string } }
-  | { type: 'schema:response'; payload: { toolId: string; schema: unknown[]; error: string | null } };
+// Shared message contract — single source of truth for both extension and webview.
+import type {
+  ExtensionMessage,
+  ReplayProgressPayload,
+} from '../logPanelMessages';
+import { postWebviewMessage } from '../logPanelMessages';
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -88,7 +70,7 @@ function LogPanelApp(): React.ReactElement {
 
   // Listen for messages from extension
   useEffect(() => {
-    const handleMessage = (event: MessageEvent<ExtendedExtensionMessage>) => {
+    const handleMessage = (event: MessageEvent<ExtensionMessage>) => {
       const msg = event.data;
 
       switch (msg.type) {
@@ -129,11 +111,11 @@ function LogPanelApp(): React.ReactElement {
           const result = msg.payload;
           if (result.status === 'completed') {
             setActionResultMessage(
-              `Replay completed: ${result.entriesReplayed} operations replayed.`
+              `Replay completed: ${result.entries_replayed} operations replayed.`
             );
-          } else if (result.status === 'halted' && result.haltReason) {
+          } else if (result.status === 'halted' && result.halt_reason) {
             setActionResultMessage(
-              `Replay halted at "${result.haltReason.toolId}": ${result.haltReason.message}`
+              `Replay halted at "${result.halt_reason.tool_id}": ${result.halt_reason.message}`
             );
           } else if (result.status === 'cancelled') {
             setActionResultMessage('Replay cancelled. Previous state restored.');
@@ -199,7 +181,7 @@ function LogPanelApp(): React.ReactElement {
 
   // Handle messages from LogPanel component → forward to extension
   const handleMessage = useCallback((message: LogPanelMessage) => {
-    vscode.postMessage(message);
+    postWebviewMessage(vscode, message);
   }, []);
 
   // Handle view mode change → persist in webview state + notify extension
@@ -208,7 +190,7 @@ function LogPanelApp(): React.ReactElement {
     const currentState = vscode.getState() ?? {};
     vscode.setState({ ...currentState, viewMode: mode });
     // Notify extension for globalState persistence
-    vscode.postMessage({ type: 'mode:change', payload: { viewMode: mode } });
+    postWebviewMessage(vscode, { type: 'mode:change', payload: { viewMode: mode } });
   }, []);
 
   // Handle entry selection
@@ -222,17 +204,19 @@ function LogPanelApp(): React.ReactElement {
   const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
-      // Optimistic update: immediately reflect the new value in local state
+      // Optimistic update: immediately reflect the new value in local state.
+      // ParameterValue.value is `string` per the LinkML schema (wire format),
+      // so coerce here to keep the local state type-correct.
       setEntries((prev) =>
         prev.map((e) => {
-          if (e.activityId !== activityId) return e;
+          if (e.activity_id !== activityId) return e;
           const paramEntry = e.parameters[parameter];
           if (!paramEntry) return e;
           return {
             ...e,
             parameters: {
               ...e.parameters,
-              [parameter]: { ...paramEntry, value: newValue },
+              [parameter]: { ...paramEntry, value: String(newValue) },
             },
           };
         })
@@ -242,9 +226,9 @@ function LogPanelApp(): React.ReactElement {
       if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
       tuneTimerRef.current = setTimeout(() => {
         tuneTimerRef.current = null;
-        vscode.postMessage({
+        postWebviewMessage(vscode, {
           type: 'tune:request',
-          payload: { activityId, parameter, newValue },
+          payload: { activity_id: activityId, parameter, new_value: newValue },
         });
       }, 400);
     },
@@ -252,28 +236,28 @@ function LogPanelApp(): React.ReactElement {
   );
 
   const handleRevertToRequest = useCallback((activityId: string) => {
-    vscode.postMessage({
+    postWebviewMessage(vscode, {
       type: 'revert-to:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
   const handleRevertThisRequest = useCallback((activityId: string) => {
-    vscode.postMessage({
+    postWebviewMessage(vscode, {
       type: 'revert-this:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
   const handleRestoreRequest = useCallback((activityId: string) => {
-    vscode.postMessage({
+    postWebviewMessage(vscode, {
       type: 'restore:request',
-      payload: { activityId },
+      payload: { activity_id: activityId },
     });
   }, []);
 
   const handleReplayCancel = useCallback(() => {
-    vscode.postMessage({ type: 'replay:cancel' });
+    postWebviewMessage(vscode, { type: 'replay:cancel' });
   }, []);
 
   // Feature 113: Schema resolution via extension host round-trip.
@@ -285,7 +269,7 @@ function LogPanelApp(): React.ReactElement {
     (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
       return new Promise<ReadonlyArray<ParameterSchemaEntry>>((resolve) => {
         pendingSchemaRef.current.set(toolId, { resolve });
-        vscode.postMessage({ type: 'schema:request', payload: { toolId } });
+        postWebviewMessage(vscode, { type: 'schema:request', payload: { toolId } });
 
         // Timeout fallback: derive from local parameter metadata after 2s
         setTimeout(() => {
@@ -320,17 +304,17 @@ function LogPanelApp(): React.ReactElement {
 
   // Feature 113: disable toggle → forward to extension
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
-    vscode.postMessage({
+    postWebviewMessage(vscode, {
       type: 'disable:toggle',
-      payload: { activityId, disabled },
+      payload: { activity_id: activityId, disabled },
     });
   }, []);
 
   // Feature 113: rationale update → forward to extension
   const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
-    vscode.postMessage({
+    postWebviewMessage(vscode, {
       type: 'rationale:update',
-      payload: { activityId, rationale },
+      payload: { activity_id: activityId, rationale },
     });
   }, []);
 
@@ -373,4 +357,4 @@ if (container) {
 }
 
 // Notify extension that webview is ready
-vscode.postMessage({ type: 'webviewReady' });
+postWebviewMessage(vscode, { type: 'webviewReady' });
