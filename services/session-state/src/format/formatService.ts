@@ -16,9 +16,9 @@ export interface FormatChangeRequest {
 }
 
 export interface FormatChangeResult {
-  readonly activityId: string;
-  readonly featuresUpdated: number;
-  readonly previousValues: Record<string, unknown>;
+  readonly activity_id: string;
+  readonly features_updated: number;
+  readonly previous_values: Record<string, unknown>;
 }
 
 export interface FormatMenuItem {
@@ -184,9 +184,9 @@ export function createFormatService(deps: FormatServiceDeps): FormatService {
       const activityId = crypto.randomUUID();
 
       return {
-        activityId,
-        featuresUpdated,
-        previousValues,
+        activity_id: activityId,
+        features_updated: featuresUpdated,
+        previous_values: previousValues,
       };
     },
 

@@ -1181,7 +1181,7 @@ export class StacService {
   async appendProvenance(
     storePath: string,
     itemPath: string,
-    provenance: Array<{ featureId: string; entry: Record<string, unknown> }>
+    provenance: Array<{ feature_id: string; entry: Record<string, unknown> }>
   ): Promise<number> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
@@ -1223,7 +1223,7 @@ export class StacService {
     }
 
     let updated = 0;
-    for (const { featureId, entry } of provenance) {
+    for (const { feature_id: featureId, entry } of provenance) {
       const feature = featureMap.get(featureId);
       if (!feature) { continue; }
 

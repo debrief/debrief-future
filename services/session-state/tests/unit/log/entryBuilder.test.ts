@@ -54,8 +54,8 @@ describe('extractActivityIdFromOutputFeatures', () => {
         type: 'Feature',
         properties: {
           provenance: [
-            { activityId: 'old-id', timestamp: '2026-01-01T00:00:00Z' },
-            { activityId: 'new-id', timestamp: '2026-02-09T00:00:00Z' },
+            { activity_id: 'old-id', timestamp: '2026-01-01T00:00:00Z' },
+            { activity_id: 'new-id', timestamp: '2026-02-09T00:00:00Z' },
           ],
         },
       },
@@ -82,9 +82,9 @@ describe('extractActivityIdFromOutputFeatures', () => {
 describe('buildLogEntry', () => {
   const baseToolResult: ToolResultForLog = {
     success: true,
-    durationMs: 300,
-    toolId: 'calculate-range',
-    sourceFeatureIds: ['track-1', 'track-2'],
+    duration_ms: 300,
+    tool_id: 'calculate-range',
+    source_feature_ids: ['track-1', 'track-2'],
     features: {
       type: 'FeatureCollection',
       features: [{ id: 'result-1', type: 'Feature', properties: {} }],
@@ -94,41 +94,41 @@ describe('buildLogEntry', () => {
   it('creates a valid Log entry with basic fields', () => {
     const entry = buildLogEntry(baseToolResult, undefined);
 
-    expect(entry.activityId).toBeTruthy();
+    expect(entry.activity_id).toBeTruthy();
     expect(entry.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
-    expect(entry.wasGeneratedBy.tool).toBe('calculate-range');
-    expect(entry.wasGeneratedBy.toolVersion).toBe('0.0.0'); // fallback
-    expect(entry.wasGeneratedBy.parameters).toEqual({});
+    expect(entry.was_generated_by.tool).toBe('calculate-range');
+    expect(entry.was_generated_by.tool_version).toBe('0.0.0'); // fallback
+    expect(entry.was_generated_by.parameters).toEqual({});
     expect(entry.used).toEqual(['track-1', 'track-2']);
     expect(entry.generated).toEqual(['result-1']);
-    expect(entry.executionDuration).toBe('PT0.3S');
+    expect(entry.execution_duration).toBe('PT0.3S');
     expect(entry.tune).toBeNull();
   });
 
   it('uses provided activityId', () => {
     const entry = buildLogEntry(baseToolResult, undefined, 'my-activity-id');
-    expect(entry.activityId).toBe('my-activity-id');
+    expect(entry.activity_id).toBe('my-activity-id');
   });
 
   it('uses expanded fields when available', () => {
     const expanded: ExpandedToolResultFields = {
-      toolVersion: '2.1.0',
+      tool_version: '2.1.0',
       parameters: {
         threshold: { value: 0.5, default: true, tunable: true },
       },
-      createdFeatures: ['feat-new-1'],
-      createdAssets: [{ resultId: 'bt_001', path: './results/bt_001.json' }],
+      created_features: ['feat-new-1'],
+      created_assets: [{ result_id: 'bt_001', path: './results/bt_001.json' }],
     };
 
     const entry = buildLogEntry(baseToolResult, expanded);
 
-    expect(entry.wasGeneratedBy.toolVersion).toBe('2.1.0');
-    expect(entry.wasGeneratedBy.parameters).toEqual({
+    expect(entry.was_generated_by.tool_version).toBe('2.1.0');
+    expect(entry.was_generated_by.parameters).toEqual({
       threshold: { value: 0.5, default: true, tunable: true },
     });
     expect(entry.generated).toContain('feat-new-1');
     expect(entry.generated).toContain('./results/bt_001.json');
-    expect(entry.generatedResultId).toBe('bt_001');
+    expect(entry.generated_result_id).toBe('bt_001');
   });
 
   it('falls back to output feature IDs when no createdFeatures', () => {
@@ -139,13 +139,13 @@ describe('buildLogEntry', () => {
   it('falls back to modifiedFeatures for used when no sourceFeatureIds', () => {
     const result: ToolResultForLog = {
       success: true,
-      durationMs: 100,
-      toolId: 'some-tool',
+      duration_ms: 100,
+      tool_id: 'some-tool',
     };
     const expanded: ExpandedToolResultFields = {
-      modifiedFeatures: [
-        { featureId: 'f1', changedProperties: {} },
-        { featureId: 'f2', changedProperties: {} },
+      modified_features: [
+        { feature_id: 'f1', changed_properties: {} },
+        { feature_id: 'f2', changed_properties: {} },
       ],
     };
 
@@ -156,18 +156,18 @@ describe('buildLogEntry', () => {
   it('uses unknown-tool when toolId not provided', () => {
     const result: ToolResultForLog = {
       success: true,
-      durationMs: 50,
+      duration_ms: 50,
     };
     const entry = buildLogEntry(result, undefined);
-    expect(entry.wasGeneratedBy.tool).toBe('unknown-tool');
+    expect(entry.was_generated_by.tool).toBe('unknown-tool');
   });
 
   it('includes artifact href in generated', () => {
     const result: ToolResultForLog = {
       success: true,
-      durationMs: 200,
-      toolId: 'generate-plot',
-      artifactHref: 'results/plot_001.png',
+      duration_ms: 200,
+      tool_id: 'generate-plot',
+      artifact_href: 'results/plot_001.png',
     };
     const entry = buildLogEntry(result, undefined);
     expect(entry.generated).toContain('results/plot_001.png');
@@ -185,9 +185,9 @@ describe('buildLogEntry', () => {
     };
     const result: ToolResultForLog = {
       success: true,
-      durationMs: 100,
-      toolId: 'move-shape',
-      sourceFeatureIds: ['rect-1'],
+      duration_ms: 100,
+      tool_id: 'move-shape',
+      source_feature_ids: ['rect-1'],
       features: {
         type: 'FeatureCollection',
         features: [{
@@ -195,10 +195,10 @@ describe('buildLogEntry', () => {
           type: 'Feature',
           properties: {
             provenance: [{
-              activityId: 'act-123',
-              wasGeneratedBy: {
+              activity_id: 'act-123',
+              was_generated_by: {
                 tool: 'move-shape',
-                toolVersion: '1.0.0',
+                tool_version: '1.0.0',
                 parameters: pythonParams,
               },
             }],
@@ -207,10 +207,10 @@ describe('buildLogEntry', () => {
       },
     };
 
-    const entry = buildLogEntry(result, { toolVersion: '1.0.0' }, 'act-123');
-    expect(entry.wasGeneratedBy.parameters).toEqual(pythonParams);
-    expect(entry.wasGeneratedBy.parameters.direction.tunable).toBe(true);
-    expect(entry.wasGeneratedBy.parameters.distance_km.tunable).toBe(true);
+    const entry = buildLogEntry(result, { tool_version: '1.0.0' }, 'act-123');
+    expect(entry.was_generated_by.parameters).toEqual(pythonParams);
+    expect(entry.was_generated_by.parameters.direction.tunable).toBe(true);
+    expect(entry.was_generated_by.parameters.distance_km.tunable).toBe(true);
   });
 
   it('prefers expanded.parameters over Python provenance extraction', () => {
@@ -219,8 +219,8 @@ describe('buildLogEntry', () => {
     };
     const result: ToolResultForLog = {
       success: true,
-      durationMs: 100,
-      toolId: 'move-shape',
+      duration_ms: 100,
+      tool_id: 'move-shape',
       features: {
         type: 'FeatureCollection',
         features: [{
@@ -228,8 +228,8 @@ describe('buildLogEntry', () => {
           type: 'Feature',
           properties: {
             provenance: [{
-              activityId: 'act-456',
-              wasGeneratedBy: {
+              activity_id: 'act-456',
+              was_generated_by: {
                 tool: 'move-shape',
                 parameters: { direction: { value: 90, default: false, tunable: true } },
               },
@@ -240,7 +240,7 @@ describe('buildLogEntry', () => {
     };
 
     const entry = buildLogEntry(result, { parameters: expandedParams }, 'act-456');
-    expect(entry.wasGeneratedBy.parameters).toEqual(expandedParams);
+    expect(entry.was_generated_by.parameters).toEqual(expandedParams);
   });
 });
 
@@ -250,8 +250,8 @@ describe('extractParametersFromOutputFeatures', () => {
       type: 'Feature',
       properties: {
         provenance: [{
-          activityId: 'act-1',
-          wasGeneratedBy: {
+          activity_id: 'act-1',
+          was_generated_by: {
             tool: 'move-shape',
             parameters: {
               direction: { value: 90, default: false, tunable: true },
@@ -270,8 +270,8 @@ describe('extractParametersFromOutputFeatures', () => {
       type: 'Feature',
       properties: {
         provenance: [{
-          activityId: 'act-other',
-          wasGeneratedBy: { tool: 'x', parameters: { a: { value: 1 } } },
+          activity_id: 'act-other',
+          was_generated_by: { tool: 'x', parameters: { a: { value: 1 } } },
         }],
       },
     }];
@@ -291,8 +291,8 @@ describe('extractParametersFromOutputFeatures', () => {
       type: 'Feature',
       properties: {
         provenance: [{
-          activityId: 'act-1',
-          wasGeneratedBy: { tool: 'x', parameters: {} },
+          activity_id: 'act-1',
+          was_generated_by: { tool: 'x', parameters: {} },
         }],
       },
     }];

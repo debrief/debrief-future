@@ -1060,13 +1060,13 @@ export class MapPanel {
                   properties: feature.properties,
                 }],
               },
-              durationMs: 0,
-              resultType: 'addition/drawn-feature',
-              sourceFeatureIds: [],
-              toolId,
+              duration_ms: 0,
+              result_type: 'addition/drawn-feature',
+              source_feature_ids: [],
+              tool_id: toolId,
             },
             {
-              createdFeatures: [feature.id],
+              created_features: [feature.id],
               parameters: {
                 featureKind: { value: feature.kind, default: false, tunable: false },
               },

@@ -24,12 +24,12 @@ import type {
 
 function makeEntry(id: number) {
   return {
-    activityId: `act-${id}`,
+    activity_id: `act-${id}`,
     timestamp: `2026-02-10T${String(10 + id).padStart(2, '0')}:00:00Z`,
-    wasGeneratedBy: { tool: 'test-tool', toolVersion: '1.0.0', parameters: {} },
+    was_generated_by: { tool: 'test-tool', tool_version: '1.0.0', parameters: {} },
     used: ['track-1'],
     generated: [],
-    executionDuration: 'PT0.1S',
+    execution_duration: 'PT0.1S',
     tune: null,
   };
 }
@@ -54,7 +54,7 @@ function makeFC(opts?: {
     type: 'Feature',
     geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
     id: 'track-1',
-    properties: { featureType: 'track', provenance: [...provenance] },
+    properties: { feature_type: 'track', provenance: [...provenance] },
   });
 
   if (opts?.hasSystemRecord !== false) {
@@ -62,10 +62,10 @@ function makeFC(opts?: {
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [] },
       properties: {
-        featureType: 'system',
-        snapshotLinks: opts?.systemSnapshotLinks ?? null,
+        feature_type: 'system',
+        snapshot_links: opts?.systemSnapshotLinks ?? null,
         branches: opts?.systemBranches ?? [],
-        branchOrigin: opts?.systemBranchOrigin ?? null,
+        branch_origin: opts?.systemBranchOrigin ?? null,
         provenance: opts?.systemProvenance ?? [],
       },
     });
@@ -84,12 +84,12 @@ function createMockDeps(overrides?: Partial<BranchServiceDeps>): BranchServiceDe
     loadSnapshotGeoJson: vi.fn().mockResolvedValue(null),
     writeGeoJson: vi.fn().mockResolvedValue(undefined),
     markDirty: vi.fn(),
-    createItem: vi.fn().mockImplementation((_store: string, title: string) => ({
-      itemPath: `${title}/item.json`,
-      itemId: `item-${title}`,
-      itemDir: `/store/${title}`,
+    create_item: vi.fn().mockImplementation((_store: string, title: string) => ({
+      item_path: `${title}/item.json`,
+      item_id: `item-${title}`,
+      item_dir: `/store/${title}`,
     })),
-    generateBranchId: vi.fn().mockImplementation(() => {
+    generate_branch_id: vi.fn().mockImplementation(() => {
       branchIdCounter++;
       return `branch-test-${branchIdCounter}`;
     }),
@@ -124,10 +124,10 @@ describe('trimProvenanceToEntry', () => {
     const fc = makeFC({ entryCount: 5 });
     const result = trimProvenanceToEntry(fc, 'act-3');
 
-    const track = result.features.find(f => f.properties?.featureType === 'track');
+    const track = result.features.find(f => f.properties?.feature_type === 'track');
     const prov = track!.properties!.provenance as unknown[];
     expect(prov).toHaveLength(3);
-    expect((prov[2] as Record<string, unknown>).activityId).toBe('act-3');
+    expect((prov[2] as Record<string, unknown>).activity_id).toBe('act-3');
   });
 
   it('returns a deep copy (source unchanged)', () => {
@@ -136,7 +136,7 @@ describe('trimProvenanceToEntry', () => {
     trimProvenanceToEntry(fc, 'act-3');
 
     // Original should be unchanged
-    const track = fc.features.find(f => f.properties?.featureType === 'track');
+    const track = fc.features.find(f => f.properties?.feature_type === 'track');
     expect((track!.properties!.provenance as unknown[]).length).toBe(5);
   });
 
@@ -149,7 +149,7 @@ describe('trimProvenanceToEntry', () => {
     const fc = makeFC({ entryCount: 5 });
     const result = trimProvenanceToEntry(fc, 'act-5');
 
-    const track = result.features.find(f => f.properties?.featureType === 'track');
+    const track = result.features.find(f => f.properties?.feature_type === 'track');
     expect((track!.properties!.provenance as unknown[]).length).toBe(5);
   });
 
@@ -157,7 +157,7 @@ describe('trimProvenanceToEntry', () => {
     const fc = makeFC({ entryCount: 5 });
     const result = trimProvenanceToEntry(fc, 'act-1');
 
-    const track = result.features.find(f => f.properties?.featureType === 'track');
+    const track = result.features.find(f => f.properties?.feature_type === 'track');
     expect((track!.properties!.provenance as unknown[]).length).toBe(1);
   });
 });
@@ -166,10 +166,10 @@ describe('createBranchRecord', () => {
   it('builds a valid BranchRecord', () => {
     const record = createBranchRecord('branch-x', 'act-5', '2026-02-10T12:00:00Z', '../branch/plot.geojson');
     expect(record).toEqual({
-      branchId: 'branch-x',
-      branchedFrom: 'act-5',
-      branchedAt: '2026-02-10T12:00:00Z',
-      targetAsset: '../branch/plot.geojson',
+      branch_id: 'branch-x',
+      branched_from: 'act-5',
+      branched_at: '2026-02-10T12:00:00Z',
+      target_asset: '../branch/plot.geojson',
     });
   });
 });
@@ -178,10 +178,10 @@ describe('createBranchOrigin', () => {
   it('builds a valid BranchOrigin', () => {
     const origin = createBranchOrigin('../source/plot.geojson', 'act-5', '2026-02-10T12:00:00Z', 'branch-x');
     expect(origin).toEqual({
-      sourceAsset: '../source/plot.geojson',
-      branchedFrom: 'act-5',
-      branchedAt: '2026-02-10T12:00:00Z',
-      branchId: 'branch-x',
+      source_asset: '../source/plot.geojson',
+      branched_from: 'act-5',
+      branched_at: '2026-02-10T12:00:00Z',
+      branch_id: 'branch-x',
     });
   });
 });
@@ -190,11 +190,11 @@ describe('createBranchProvEntry', () => {
   it('builds a source FileProvEntry', () => {
     const entry = createBranchProvEntry('ev-1', '2026-02-10T12:00:00Z', '../branch/plot.geojson', 'branch-x', 'source');
     expect(entry).toEqual({
-      activityId: 'ev-1',
+      activity_id: 'ev-1',
       type: 'branch',
       timestamp: '2026-02-10T12:00:00Z',
       asset: '../branch/plot.geojson',
-      branchId: 'branch-x',
+      branch_id: 'branch-x',
       direction: 'source',
     });
   });
@@ -219,12 +219,12 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     const result = await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
-    expect(result.branchedFrom).toBe('act-3');
-    expect(result.entriesIncluded).toBe(3);
-    expect(result.branchId).toBe('branch-test-1');
+    expect(result.branched_from).toBe('act-3');
+    expect(result.entries_included).toBe(3);
+    expect(result.branch_id).toBe('branch-test-1');
 
     // Verify branch GeoJSON was written with trimmed provenance
     const writeCall = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls.find(
@@ -232,7 +232,7 @@ describe('branchFrom (US1)', () => {
     );
     expect(writeCall).toBeDefined();
     const branchFc = writeCall![2] as GeoJsonFeatureCollection;
-    const branchTrack = branchFc.features.find(f => f.properties?.featureType === 'track');
+    const branchTrack = branchFc.features.find(f => f.properties?.feature_type === 'track');
     expect((branchTrack!.properties!.provenance as unknown[]).length).toBe(3);
   });
 
@@ -244,10 +244,10 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     const result = await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-1',
+      activity_id: 'act-1',
     });
 
-    expect(result.entriesIncluded).toBe(1);
+    expect(result.entries_included).toBe(1);
   });
 
   it('T014: branches from last entry — branch is full duplicate', async () => {
@@ -258,10 +258,10 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     const result = await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-5',
+      activity_id: 'act-5',
     });
 
-    expect(result.entriesIncluded).toBe(5);
+    expect(result.entries_included).toBe(5);
   });
 
   it('T015: two-way links — source BranchRecord matches branch BranchOrigin', async () => {
@@ -272,7 +272,7 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
     // Check source system record was updated
@@ -281,22 +281,22 @@ describe('branchFrom (US1)', () => {
     );
     expect(sourceWriteCall).toBeDefined();
     const sourceFc = sourceWriteCall![2] as GeoJsonFeatureCollection;
-    const sourceSysRec = sourceFc.features.find(f => f.properties?.featureType === 'system');
+    const sourceSysRec = sourceFc.features.find(f => f.properties?.feature_type === 'system');
     const branches = sourceSysRec!.properties!.branches as BranchRecord[];
     expect(branches).toHaveLength(1);
-    expect(branches[0].branchId).toBe('branch-test-1');
-    expect(branches[0].branchedFrom).toBe('act-3');
+    expect(branches[0].branch_id).toBe('branch-test-1');
+    expect(branches[0].branched_from).toBe('act-3');
 
     // Check branch system record
     const branchWriteCall = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls.find(
       (c: unknown[]) => (c[1] as string).includes('branch-test-1')
     );
     const branchFc = branchWriteCall![2] as GeoJsonFeatureCollection;
-    const branchSysRec = branchFc.features.find(f => f.properties?.featureType === 'system');
-    const origin = branchSysRec!.properties!.branchOrigin as BranchOrigin;
+    const branchSysRec = branchFc.features.find(f => f.properties?.feature_type === 'system');
+    const origin = branchSysRec!.properties!.branch_origin as BranchOrigin;
     expect(origin).toBeDefined();
-    expect(origin.branchId).toBe('branch-test-1');
-    expect(origin.branchedFrom).toBe('act-3');
+    expect(origin.branch_id).toBe('branch-test-1');
+    expect(origin.branched_from).toBe('act-3');
   });
 
   it('T016: source unchanged after branch — all original entries intact', async () => {
@@ -307,7 +307,7 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
     // Source should still have all 5 entries on spatial features
@@ -315,7 +315,7 @@ describe('branchFrom (US1)', () => {
       (c: unknown[]) => (c[1] as string) === 'plot-alpha/item.json'
     );
     const sourceFc = sourceWriteCall![2] as GeoJsonFeatureCollection;
-    const track = sourceFc.features.find(f => f.properties?.featureType === 'track');
+    const track = sourceFc.features.find(f => f.properties?.feature_type === 'track');
     expect((track!.properties!.provenance as unknown[]).length).toBe(5);
   });
 
@@ -327,7 +327,7 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
     // Source provenance
@@ -335,24 +335,24 @@ describe('branchFrom (US1)', () => {
       (c: unknown[]) => (c[1] as string) === 'plot-alpha/item.json'
     );
     const sourceFc = sourceWriteCall![2] as GeoJsonFeatureCollection;
-    const sourceSysRec = sourceFc.features.find(f => f.properties?.featureType === 'system');
+    const sourceSysRec = sourceFc.features.find(f => f.properties?.feature_type === 'system');
     const sourceProv = sourceSysRec!.properties!.provenance as Array<Record<string, unknown>>;
     const sourceBranchProv = sourceProv.find(p => p.type === 'branch');
     expect(sourceBranchProv).toBeDefined();
     expect(sourceBranchProv!.direction).toBe('source');
-    expect(sourceBranchProv!.branchId).toBe('branch-test-1');
+    expect(sourceBranchProv!.branch_id).toBe('branch-test-1');
 
     // Branch provenance
     const branchWriteCall = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls.find(
       (c: unknown[]) => (c[1] as string).includes('branch-test-1')
     );
     const branchFc = branchWriteCall![2] as GeoJsonFeatureCollection;
-    const branchSysRec = branchFc.features.find(f => f.properties?.featureType === 'system');
+    const branchSysRec = branchFc.features.find(f => f.properties?.feature_type === 'system');
     const branchProv = branchSysRec!.properties!.provenance as Array<Record<string, unknown>>;
     const branchBranchProv = branchProv.find(p => p.type === 'branch');
     expect(branchBranchProv).toBeDefined();
     expect(branchBranchProv!.direction).toBe('target');
-    expect(branchBranchProv!.branchId).toBe('branch-test-1');
+    expect(branchBranchProv!.branch_id).toBe('branch-test-1');
   });
 
   it('T018: entry not found — error thrown with ENTRY_NOT_FOUND code', async () => {
@@ -364,7 +364,7 @@ describe('branchFrom (US1)', () => {
 
     try {
       await service.branchFrom('/store', 'plot-alpha/item.json', {
-        activityId: 'act-99',
+        activity_id: 'act-99',
       });
       expect.fail('Should have thrown');
     } catch (err) {
@@ -380,7 +380,7 @@ describe('branchFrom (US1)', () => {
     const service = createBranchService(deps);
 
     await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
     expect(deps.markDirty).toHaveBeenCalledOnce();
@@ -394,7 +394,7 @@ describe('branchFrom (US1)', () => {
 
     try {
       await service.branchFrom('/store', 'plot-alpha/item.json', {
-        activityId: 'act-1',
+        activity_id: 'act-1',
       });
       expect.fail('Should have thrown');
     } catch (err) {
@@ -410,8 +410,8 @@ describe('branchFrom (US1)', () => {
 describe('getBranches (US2)', () => {
   it('T028: returns all branch records from source', async () => {
     const branches: BranchRecord[] = [
-      { branchId: 'b-1', branchedFrom: 'act-3', branchedAt: '2026-02-10T12:00:00Z', targetAsset: '../b-1/plot.geojson' },
-      { branchId: 'b-2', branchedFrom: 'act-5', branchedAt: '2026-02-10T13:00:00Z', targetAsset: '../b-2/plot.geojson' },
+      { branch_id: 'b-1', branched_from: 'act-3', branched_at: '2026-02-10T12:00:00Z', target_asset: '../b-1/plot.geojson' },
+      { branch_id: 'b-2', branched_from: 'act-5', branched_at: '2026-02-10T13:00:00Z', target_asset: '../b-2/plot.geojson' },
     ];
     const fc = makeFC({ entryCount: 5, systemBranches: branches });
     const deps = createMockDeps({
@@ -421,8 +421,8 @@ describe('getBranches (US2)', () => {
 
     const result = await service.getBranches('/store', 'item.json');
     expect(result).toHaveLength(2);
-    expect(result[0].branchId).toBe('b-1');
-    expect(result[1].branchId).toBe('b-2');
+    expect(result[0].branch_id).toBe('b-1');
+    expect(result[1].branch_id).toBe('b-2');
   });
 
   it('T031: returns empty array when no branches', async () => {
@@ -440,10 +440,10 @@ describe('getBranches (US2)', () => {
 describe('getBranchOrigin (US2)', () => {
   it('T029: returns origin from branch plot', async () => {
     const origin: BranchOrigin = {
-      sourceAsset: '../source/plot.geojson',
-      branchedFrom: 'act-3',
-      branchedAt: '2026-02-10T12:00:00Z',
-      branchId: 'branch-abc',
+      source_asset: '../source/plot.geojson',
+      branched_from: 'act-3',
+      branched_at: '2026-02-10T12:00:00Z',
+      branch_id: 'branch-abc',
     };
     const fc = makeFC({ entryCount: 3, systemBranchOrigin: origin });
     const deps = createMockDeps({
@@ -476,7 +476,7 @@ describe('multiple branches (US2)', () => {
     const service = createBranchService(deps);
 
     // Create first branch
-    await service.branchFrom('/store', 'plot-alpha/item.json', { activityId: 'act-2' });
+    await service.branchFrom('/store', 'plot-alpha/item.json', { activity_id: 'act-2' });
 
     // Update the mock to return the modified source
     const firstSourceCall = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls.find(
@@ -486,18 +486,18 @@ describe('multiple branches (US2)', () => {
     (deps.loadGeoJson as ReturnType<typeof vi.fn>).mockResolvedValue(updatedSource);
 
     // Create second branch
-    await service.branchFrom('/store', 'plot-alpha/item.json', { activityId: 'act-4' });
+    await service.branchFrom('/store', 'plot-alpha/item.json', { activity_id: 'act-4' });
 
     // Check the source now has both branches
     const secondSourceCall = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock.calls.filter(
       (c: unknown[]) => (c[1] as string) === 'plot-alpha/item.json'
     );
     const finalSource = secondSourceCall[secondSourceCall.length - 1]![2] as GeoJsonFeatureCollection;
-    const sysRec = finalSource.features.find(f => f.properties?.featureType === 'system');
+    const sysRec = finalSource.features.find(f => f.properties?.feature_type === 'system');
     const branches = sysRec!.properties!.branches as BranchRecord[];
     expect(branches).toHaveLength(2);
-    expect(branches[0].branchedFrom).toBe('act-2');
-    expect(branches[1].branchedFrom).toBe('act-4');
+    expect(branches[0].branched_from).toBe('act-2');
+    expect(branches[1].branched_from).toBe('act-4');
   });
 });
 
@@ -507,10 +507,10 @@ describe('multiple branches (US2)', () => {
 
 describe('locateBranchPoint (US3)', () => {
   it('T036: walks snapshot chain to find entry', async () => {
-    const snapshotFc = makeFC({ entryCount: 3, systemSnapshotLinks: { prev: null, next: { asset: 'plot.geojson', provEntryCount: 2 } } });
+    const snapshotFc = makeFC({ entryCount: 3, systemSnapshotLinks: { prev: null, next: { asset: 'plot.geojson', prov_entry_count: 2 } } });
     const workingFc = makeFC({
       entryCount: 2,
-      systemSnapshotLinks: { prev: { asset: 'snap-1.geojson', provEntryCount: 3 }, next: null },
+      systemSnapshotLinks: { prev: { asset: 'snap-1.geojson', prov_entry_count: 3 }, next: null },
     });
     // Working file has entries act-1, act-2 but we want act-3 which is only in the snapshot
     // Actually, let's make it cleaner: working has entries 4-5, snapshot has 1-3
@@ -521,18 +521,18 @@ describe('locateBranchPoint (US3)', () => {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: snapEntries } },
+          properties: { feature_type: 'track', provenance: snapEntries } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: null, next: { asset: 'plot.geojson', provEntryCount: 2 } }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: null, next: { asset: 'plot.geojson', prov_entry_count: 2 } }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
     const workingFcClean: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: workEntries } },
+          properties: { feature_type: 'track', provenance: workEntries } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: { asset: 'snap-1.geojson', provEntryCount: 3 }, next: null }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: { asset: 'snap-1.geojson', prov_entry_count: 3 }, next: null }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
 
@@ -556,7 +556,7 @@ describe('locateBranchPoint (US3)', () => {
     const service = createBranchService(deps);
 
     const location = await service.locateBranchPoint('/store', 'item.json', 'act-3');
-    expect(location).toEqual({ type: 'current-segment', entryIndex: 2 });
+    expect(location).toEqual({ type: 'current-segment', entry_index: 2 });
   });
 
   it('returns null when entry not found anywhere', async () => {
@@ -578,18 +578,18 @@ describe('branchFrom at snapshot boundary (US3)', () => {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(1), makeEntry(2), makeEntry(3)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(1), makeEntry(2), makeEntry(3)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: null, next: { asset: 'plot.geojson', provEntryCount: 2 } }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: null, next: { asset: 'plot.geojson', prov_entry_count: 2 } }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
     const workingFc: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: { asset: 'snap-1.geojson', provEntryCount: 3 }, next: null }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: { asset: 'snap-1.geojson', prov_entry_count: 3 }, next: null }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
 
@@ -601,12 +601,12 @@ describe('branchFrom at snapshot boundary (US3)', () => {
 
     // Branch from the last entry in the snapshot (act-3) = snapshot boundary
     const result = await service.branchFrom('/store', 'plot-alpha/item.json', {
-      activityId: 'act-3',
+      activity_id: 'act-3',
     });
 
-    expect(result.branchedFrom).toBe('act-3');
+    expect(result.branched_from).toBe('act-3');
     // The branch contains the snapshot's features (3 entries)
-    expect(result.entriesIncluded).toBe(3);
+    expect(result.entries_included).toBe(3);
   });
 
   it('T038: pre-snapshot arbitrary entry — REPLAY_NOT_AVAILABLE error', async () => {
@@ -615,18 +615,18 @@ describe('branchFrom at snapshot boundary (US3)', () => {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(1), makeEntry(2), makeEntry(3)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(1), makeEntry(2), makeEntry(3)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: null, next: { asset: 'plot.geojson', provEntryCount: 2 } }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: null, next: { asset: 'plot.geojson', prov_entry_count: 2 } }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
     const workingFc: GeoJsonFeatureCollection = {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: { asset: 'snap-1.geojson', provEntryCount: 3 }, next: null }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: { asset: 'snap-1.geojson', prov_entry_count: 3 }, next: null }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
 
@@ -638,7 +638,7 @@ describe('branchFrom at snapshot boundary (US3)', () => {
 
     try {
       await service.branchFrom('/store', 'plot-alpha/item.json', {
-        activityId: 'act-2',
+        activity_id: 'act-2',
       });
       expect.fail('Should have thrown');
     } catch (err) {
@@ -652,9 +652,9 @@ describe('branchFrom at snapshot boundary (US3)', () => {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(4), makeEntry(5)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: { asset: 'snap-1.geojson', provEntryCount: 3 }, next: null }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: { asset: 'snap-1.geojson', prov_entry_count: 3 }, next: null }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
 
@@ -663,9 +663,9 @@ describe('branchFrom at snapshot boundary (US3)', () => {
       type: 'FeatureCollection',
       features: [
         { type: 'Feature', geometry: { type: 'LineString', coordinates: [[0, 0]] }, id: 'track-1',
-          properties: { featureType: 'track', provenance: [makeEntry(3)] } },
+          properties: { feature_type: 'track', provenance: [makeEntry(3)] } },
         { type: 'Feature', geometry: { type: 'Point', coordinates: [] },
-          properties: { featureType: 'system', snapshotLinks: { prev: null, next: null }, branches: [], branchOrigin: null, provenance: [] } },
+          properties: { feature_type: 'system', snapshot_links: { prev: null, next: null }, branches: [], branch_origin: null, provenance: [] } },
       ],
     };
 
@@ -683,7 +683,7 @@ describe('branchFrom at snapshot boundary (US3)', () => {
 
     try {
       await service.branchFrom('/store', 'plot-alpha/item.json', {
-        activityId: 'act-3',
+        activity_id: 'act-3',
       });
       expect.fail('Should have thrown');
     } catch (err) {
@@ -696,10 +696,10 @@ describe('nested branching (T043)', () => {
   it('branch from a branch plot links to immediate parent', async () => {
     // This branch plot is itself a branch
     const branchOrigin: BranchOrigin = {
-      sourceAsset: '../original/plot.geojson',
-      branchedFrom: 'act-5',
-      branchedAt: '2026-02-10T10:00:00Z',
-      branchId: 'branch-parent',
+      source_asset: '../original/plot.geojson',
+      branched_from: 'act-5',
+      branched_at: '2026-02-10T10:00:00Z',
+      branch_id: 'branch-parent',
     };
     const fc = makeFC({ entryCount: 3, systemBranchOrigin: branchOrigin });
     const deps = createMockDeps({
@@ -708,7 +708,7 @@ describe('nested branching (T043)', () => {
     const service = createBranchService(deps);
 
     const result = await service.branchFrom('/store', 'branch-parent/item.json', {
-      activityId: 'act-2',
+      activity_id: 'act-2',
     });
 
     // Check the new branch's origin points to branch-parent, not original
@@ -716,8 +716,8 @@ describe('nested branching (T043)', () => {
       (c: unknown[]) => (c[1] as string).includes('branch-test-1')
     );
     const branchFc = branchWriteCall![2] as GeoJsonFeatureCollection;
-    const branchSysRec = branchFc.features.find(f => f.properties?.featureType === 'system');
-    const origin = branchSysRec!.properties!.branchOrigin as BranchOrigin;
-    expect(origin.sourceAsset).toContain('branch-parent');
+    const branchSysRec = branchFc.features.find(f => f.properties?.feature_type === 'system');
+    const origin = branchSysRec!.properties!.branch_origin as BranchOrigin;
+    expect(origin.source_asset).toContain('branch-parent');
   });
 });

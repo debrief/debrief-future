@@ -405,16 +405,16 @@ export default function App() {
     } else if (message.type === 'entry:deselect') {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
-      const { actionType, activityId } = message.payload;
+      const { actionType, activity_id: activityId } = message.payload;
       if (actionType === 'revertTo') {
         // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
-          const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          const idx = prev.findIndex((e: TimelineEntry) => e.activity_id === activityId);
           if (idx < 0) return prev;
           // Entries before idx (most-recent-first) are the ones being removed
           const removed = prev.slice(0, idx);
           for (const r of removed) {
-            restoreSnapshots(r.activityId);
+            restoreSnapshots(r.activity_id);
           }
           return prev.slice(idx);
         });
@@ -425,7 +425,7 @@ export default function App() {
         restoreSnapshots(activityId);
         setLogEntries((prev: TimelineEntry[]) =>
           prev.map((e: TimelineEntry) =>
-            e.activityId === activityId ? { ...e, deleted: true } : e
+            e.activity_id === activityId ? { ...e, deleted: true } : e
           )
         );
         setLogNotification('Operation removed.');
@@ -446,7 +446,7 @@ export default function App() {
   // Edit face slider passes the already-new value (use directly, debounced).
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, value: unknown) => {
-      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+      const entry = logEntries.find((e: TimelineEntry) => e.activity_id === activityId);
       const currentValue = entry?.parameters[parameter]?.value;
 
       // Ignore display-face clicks (value unchanged) — tuning is done via
@@ -468,7 +468,7 @@ export default function App() {
   const applyTune = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
       // Find the entry being tuned
-      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+      const entry = logEntries.find((e: TimelineEntry) => e.activity_id === activityId);
 
       // Extract raw parameter values from a log entry's ParameterValue wrappers
       const unwrapParams = (params: Record<string, { value: unknown }>): Record<string, unknown> => {
@@ -488,11 +488,11 @@ export default function App() {
       const updatedInputStates = new Map<string, Array<{ feature_id: string; geometry: string; properties?: string }>>();
 
       // Restore features from inputState and re-execute for mutation tools
-      if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
+      if (entry?.input_state && entry.input_state.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
-            entry.inputState!.map(is => [is.feature_id, is])
+            entry.input_state!.map(is => [is.feature_id, is])
           );
           // Restore original geometry in the plot (pre-tuned-entry state)
           // T022: schema InputFeatureState stores geometry/properties as JSON strings
@@ -535,16 +535,16 @@ export default function App() {
           // logEntries is stored newest-first, so entries at indices before tunedIdx
           // are chronologically after the tuned entry. Iterate from tunedIdx-1 → 0
           // to replay in chronological order.
-          const tunedIdx = logEntries.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          const tunedIdx = logEntries.findIndex((e: TimelineEntry) => e.activity_id === activityId);
           if (tunedIdx > 0) {
             for (let i = tunedIdx - 1; i >= 0; i--) {
               const nextEntry = logEntries[i]!;
               if (!isMutationTool(nextEntry.toolName)) continue;
-              if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
+              if (!nextEntry.input_state || nextEntry.input_state.length === 0) continue;
 
               // Only replay if this entry affects features that were modified
               // T022: schema InputFeatureState uses feature_id (snake_case)
-              const affectedIds = new Set(nextEntry.inputState.map(is => is.feature_id));
+              const affectedIds = new Set(nextEntry.input_state.map(is => is.feature_id));
               const featuresToReplay = currentFeatures.filter(f =>
                 affectedIds.has(String(f.id))
               ) as Feature[];
@@ -552,7 +552,7 @@ export default function App() {
 
               // Capture pre-execution state as updated inputState for this entry
               // T022: schema InputFeatureState stores geometry/properties as JSON strings
-              updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
+              updatedInputStates.set(nextEntry.activity_id, featuresToReplay.map(f => {
                 const props = (f.properties ?? {}) as { [key: string]: unknown };
                 const restProps = Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'provenance'));
                 return {
@@ -587,7 +587,7 @@ export default function App() {
       // Update the tuned entry's parameters/annotation and inputState for replayed entries
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) => {
-          if (e.activityId === activityId) {
+          if (e.activity_id === activityId) {
             const updatedParams = { ...e.parameters };
             if (updatedParams[parameter]) {
               // T022: schema ParameterValue.value is string (wire format); serialize if needed
@@ -599,13 +599,13 @@ export default function App() {
             return {
               ...e,
               parameters: updatedParams,
-              tuneAnnotation: { parameter, previousValue: e.parameters[parameter]?.value, newValue },
+              tuneAnnotation: { parameter, previous_value: e.parameters[parameter]?.value, new_value: newValue },
             };
           }
           // Update inputState for subsequent entries that were replayed
-          const newState = updatedInputStates.get(e.activityId);
+          const newState = updatedInputStates.get(e.activity_id);
           if (newState) {
-            return { ...e, inputState: newState };
+            return { ...e, input_state: newState };
           }
           return e;
         })
@@ -620,7 +620,7 @@ export default function App() {
   const handleRestoreRequest = useCallback((activityId: string) => {
     setLogEntries((prev: TimelineEntry[]) =>
       prev.map((e: TimelineEntry) =>
-        e.activityId === activityId ? { ...e, deleted: false } : e
+        e.activity_id === activityId ? { ...e, deleted: false } : e
       )
     );
     setLogNotification('Operation restored.');
@@ -688,7 +688,7 @@ export default function App() {
     (activityId: string, disabled: boolean) => {
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) =>
-          e.activityId === activityId ? { ...e, disabled } : e
+          e.activity_id === activityId ? { ...e, disabled } : e
         )
       );
     },
@@ -700,7 +700,7 @@ export default function App() {
     (activityId: string, rationale: string) => {
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) =>
-          e.activityId === activityId ? { ...e, rationale } : e
+          e.activity_id === activityId ? { ...e, rationale } : e
         )
       );
     },
@@ -765,15 +765,15 @@ export default function App() {
       const nextId = activityCounter + 1;
       setActivityCounter(nextId);
       const entry: TimelineEntry = {
-        activityId: `act-${String(nextId).padStart(3, '0')}`,
+        activity_id: `act-${String(nextId).padStart(3, '0')}`,
         timestamp: new Date().toISOString(),
         toolName: `draw-${mode ?? 'shape'}`,
-        toolVersion: '1.0.0',
+        tool_version: '1.0.0',
         parameters: {},
         usedFeatureIds: [],
         generatedFeatureIds: [feature.id],
-        executionDuration: 'PT0S',
-        generatedResultId: feature.id,
+        execution_duration: 'PT0S',
+        generated_result_id: feature.id,
         operationCategory: 'property-edit',
       };
       setLogEntries(prev => [entry, ...prev]);
@@ -973,10 +973,10 @@ export default function App() {
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
 
     const entry: TimelineEntry = {
-      activityId,
+      activity_id: activityId,
       timestamp: new Date().toISOString(),
       toolName: toolId,
-      toolVersion: '1.0.0',
+      tool_version: '1.0.0',
       // T022: schema ParameterValue.value is string; serialize non-string values
       parameters: result.parameters
         ? Object.fromEntries(Object.entries(result.parameters).map(([k, v]) => [
@@ -986,10 +986,10 @@ export default function App() {
         : {},
       usedFeatureIds: usedIds,
       generatedFeatureIds: generatedIds,
-      executionDuration: 'PT0.1S',
-      generatedResultId: generatedIds[0] ?? null,
+      execution_duration: 'PT0.1S',
+      generated_result_id: generatedIds[0] ?? null,
       operationCategory: 'calculation',
-      inputState,
+      input_state: inputState,
     };
 
     // Store pre-tool snapshots for revert (captured before execution above)

@@ -297,7 +297,7 @@ export class CalcService {
         sourceFeatureIds: result.sourceFeatureIds,
         artifactData: result.artifactData,
         artifactHref: result.artifactHref,
-        toolVersion: result.toolVersion,
+        tool_version: result.tool_version,
         modifiedFeatures: result.modifiedFeatures,
         createdFeatures: result.createdFeatures,
         createdAssets: result.createdAssets,
@@ -376,7 +376,7 @@ export class CalcService {
       const provenance: ToolProvenance = {
         toolId,
         toolName,
-        toolVersion,
+        tool_version: toolVersion,
         executionTime: new Date().toISOString(),
         sourceFeatureIds,
         durationMs: result.durationMs,
@@ -411,7 +411,7 @@ export class CalcService {
     const provenance: ToolProvenance = {
       toolId,
       toolName,
-      toolVersion,
+      tool_version: toolVersion,
       executionTime: new Date().toISOString(),
       sourceFeatureIds,
       durationMs: result.durationMs,
@@ -711,7 +711,7 @@ print(json.dumps(tools))
     toolId: string,
     features: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> | null }>,
     params: Record<string, unknown>
-  ): Promise<{ success: boolean; features?: SafeFeatureCollection; resultType?: string; artifactHref?: string; toolVersion?: string }> {
+  ): Promise<{ success: boolean; features?: SafeFeatureCollection; resultType?: string; artifactHref?: string; tool_version?: string }> {
     await this.connect();
 
     const input = JSON.stringify({
@@ -760,7 +760,7 @@ print(json.dumps(tools))
       features: { type: 'FeatureCollection', features: geoFeatures },
       resultType,
       artifactHref,
-      toolVersion,
+      tool_version: toolVersion,
     };
   }
 
@@ -777,7 +777,7 @@ print(json.dumps(tools))
     toolId: string,
     featureIds: string[],
     params?: Record<string, unknown>
-  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string; toolVersion?: string; modifiedFeatures?: ToolExecutionResult['modifiedFeatures']; createdFeatures?: string[]; createdAssets?: ToolExecutionResult['createdAssets']; parameters?: ToolExecutionResult['parameters'] }> {
+  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string; tool_version?: string; modifiedFeatures?: ToolExecutionResult['modifiedFeatures']; createdFeatures?: string[]; createdAssets?: ToolExecutionResult['createdAssets']; parameters?: ToolExecutionResult['parameters'] }> {
     const features = this.resolveFeatures(featureIds);
 
     const input = JSON.stringify({
@@ -830,13 +830,23 @@ print(json.dumps(tools))
         toolVersion = item.annotations['debrief:toolVersion'];
       }
       if (item.annotations?.['debrief:modifiedFeatures']) {
-        modifiedFeatures = item.annotations['debrief:modifiedFeatures'];
+        // eslint-disable-next-line no-restricted-syntax -- mapping MCP camelCase wire format to snake_case
+        modifiedFeatures = item.annotations['debrief:modifiedFeatures'].map((mf) => ({
+          feature_id: mf.featureId, // eslint-disable-line no-restricted-syntax -- MCP wire format
+          changed_properties: Object.fromEntries(
+            Object.entries(mf.changedProperties).map(([k, v]) => [k, { previous_value: v.previousValue, new_value: v.newValue }]) // eslint-disable-line no-restricted-syntax -- MCP wire format
+          ),
+        }));
       }
       if (item.annotations?.['debrief:createdFeatures']) {
         createdFeatures = item.annotations['debrief:createdFeatures'];
       }
       if (item.annotations?.['debrief:createdAssets']) {
-        createdAssets = item.annotations['debrief:createdAssets'];
+        createdAssets = item.annotations['debrief:createdAssets'].map((ca) => ({
+          result_id: ca.resultId,
+          path: ca.path,
+          ...(ca.mimeType !== undefined ? { mime_type: ca.mimeType } : {}),
+        }));
       }
       if (item.annotations?.['debrief:parameters']) {
         parameters = item.annotations['debrief:parameters'];
@@ -864,7 +874,7 @@ print(json.dumps(tools))
       sourceFeatureIds,
       artifactData,
       artifactHref,
-      toolVersion,
+      tool_version: toolVersion,
       modifiedFeatures,
       createdFeatures,
       createdAssets,

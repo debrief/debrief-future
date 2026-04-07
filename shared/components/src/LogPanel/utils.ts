@@ -109,9 +109,9 @@ export function resolveFeatureDisplay(
 ): FeatureDisplayInfo {
   const name = featureNames[featureId];
   if (name) {
-    return { featureId, displayName: name, exists: true };
+    return { feature_id: featureId, displayName: name, exists: true };
   }
-  return { featureId, displayName: '(deleted)', exists: false };
+  return { feature_id: featureId, displayName: '(deleted)', exists: false };
 }
 
 /**
@@ -140,7 +140,7 @@ export function getSelectableFeatureIds(
 export function groupEntriesByFeature(
   entries: TimelineEntry[],
   featureNames: Record<string, string>
-): Array<{ featureId: string; displayName: string; entries: TimelineEntry[] }> {
+): Array<{ feature_id: string; displayName: string; entries: TimelineEntry[] }> {
   const groups = new Map<string, TimelineEntry[]>();
 
   for (const entry of entries) {
@@ -154,11 +154,11 @@ export function groupEntriesByFeature(
   }
 
   // Build result array, sorted by feature display name
-  const result: Array<{ featureId: string; displayName: string; entries: TimelineEntry[] }> = [];
+  const result: Array<{ feature_id: string; displayName: string; entries: TimelineEntry[] }> = [];
   for (const [featureId, featureEntries] of groups) {
     const info = resolveFeatureDisplay(featureId, featureNames);
     result.push({
-      featureId,
+      feature_id: featureId,
       displayName: info.displayName,
       entries: featureEntries,
     });
@@ -237,7 +237,7 @@ export function cascadeDisable(
     if (visited.has(currentId)) continue;
     visited.add(currentId);
 
-    const entry = timeline.find((e) => e.activityId === currentId);
+    const entry = timeline.find((e) => e.activity_id === currentId);
     if (!entry) continue;
 
     const generatedFeatures = new Set(entry.generatedFeatureIds);
@@ -246,13 +246,13 @@ export function cascadeDisable(
     const entryIndex = timeline.indexOf(entry);
     for (let i = entryIndex + 1; i < timeline.length; i++) {
       const subsequent = timeline[i];
-      if (!subsequent || visited.has(subsequent.activityId)) continue;
+      if (!subsequent || visited.has(subsequent.activity_id)) continue;
       const dependsOnDisabled = subsequent.usedFeatureIds.some((f) =>
         generatedFeatures.has(f)
       );
       if (dependsOnDisabled) {
-        disabled.push(subsequent.activityId);
-        queue.push(subsequent.activityId);
+        disabled.push(subsequent.activity_id);
+        queue.push(subsequent.activity_id);
       }
     }
   }

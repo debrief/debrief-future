@@ -36,7 +36,7 @@ export interface FeatureBarsConfig {
 }
 
 export interface FeatureBarInfo {
-  featureId: string;
+  feature_id: string;
   x: number;
   y: number;
   width: number;
@@ -95,7 +95,7 @@ export function calculateFeatureBars(
     );
 
     bars.push({
-      featureId: feature.id,
+      feature_id: feature.id,
       x: Math.max(0, x),
       y: yOffset,
       width: Math.min(barWidth, width - x),

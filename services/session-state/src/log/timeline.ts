@@ -19,54 +19,52 @@ function normaliseProvenance(raw: unknown): unknown[] {
 }
 
 /**
- * Normalise a single provenance entry from snake_case (Python-generated)
- * to camelCase (TypeScript LogEntry format).
+ * Normalise a single provenance entry to snake_case (ADR-010 wire format).
  *
- * Python importers (debrief-io) write provenance with snake_case keys:
- *   activity_id, was_generated_by, execution_duration, tool_version
- * TypeScript consumers expect camelCase:
- *   activityId, wasGeneratedBy, executionDuration, toolVersion
- *
- * Entries already in camelCase are passed through unchanged.
+ * New entries from Python and TypeScript both use snake_case.
+ * Legacy entries written before ADR-010 may use camelCase — convert them.
+ * Entries already in snake_case are passed through unchanged.
  */
+/* eslint-disable no-restricted-syntax -- intentionally reads legacy camelCase keys to convert them */
 export function normaliseEntry(raw: Record<string, unknown>): Record<string, unknown> {
-  // Already camelCase — pass through
-  if (raw.activityId !== undefined) return raw;
+  // Already snake_case — pass through
+  if (raw.activity_id !== undefined) return raw;
 
-  // Snake_case entry from Python — convert
-  if (raw.activity_id === undefined) return raw;
+  // Legacy camelCase entry — convert to snake_case
+  if (raw.activityId === undefined) return raw;
 
-  const wgb = raw.was_generated_by as Record<string, unknown> | undefined;
-  const wasGeneratedBy: WasGeneratedBy | undefined = wgb
+  const wgb = raw.wasGeneratedBy as Record<string, unknown> | undefined;
+  const was_generated_by: WasGeneratedBy | undefined = wgb
     ? {
         tool: (wgb.tool as string) ?? 'unknown',
-        toolVersion: (wgb.tool_version as string) ?? (wgb.toolVersion as string) ?? '',
+        tool_version: (wgb.tool_version as string) ?? (wgb.toolVersion as string) ?? '',
         parameters: (wgb.parameters as Record<string, ParameterValue>) ?? {},
       }
     : undefined;
 
   return {
-    activityId: raw.activity_id,
+    activity_id: raw.activityId,
     timestamp: raw.timestamp,
-    ...(wasGeneratedBy ? { wasGeneratedBy } : {}),
+    ...(was_generated_by ? { was_generated_by } : {}),
     used: raw.used ?? [],
     generated: raw.generated ?? [],
-    executionDuration: raw.execution_duration ?? raw.executionDuration ?? 'PT0S',
-    generatedResultId: raw.generated_result_id ?? raw.generatedResultId ?? null,
+    execution_duration: raw.executionDuration ?? raw.execution_duration ?? 'PT0S',
+    generated_result_id: raw.generatedResultId ?? raw.generated_result_id ?? null,
     tune: raw.tune ?? null,
     deleted: raw.deleted,
     disabled: raw.disabled,
     rationale: raw.rationale,
-    inputState: raw.input_state ?? raw.inputState ?? null,
+    input_state: raw.inputState ?? raw.input_state ?? null,
   };
 }
+/* eslint-enable no-restricted-syntax */
 
 /**
  * Assemble a global timeline from a GeoJSON FeatureCollection.
  *
  * 1. Iterates all features
  * 2. Collects properties.provenance entries
- * 3. Deduplicates on activityId (first occurrence wins)
+ * 3. Deduplicates on activity_id (first occurrence wins)
  * 4. Sorts by timestamp ascending
  *
  * @param featureCollection - A GeoJSON FeatureCollection (parsed from disk)
@@ -83,9 +81,9 @@ export function assembleTimeline(
   // Merge previous snapshot entries first (cross-snapshot assembly)
   if (options?.previousEntries) {
     for (const entry of options.previousEntries) {
-      if (entry.activityId && !seen.has(entry.activityId)) {
+      if (entry.activity_id && !seen.has(entry.activity_id)) {
         if (includeDeleted || !(entry as LogEntry).deleted) {
-          seen.set(entry.activityId, entry);
+          seen.set(entry.activity_id, entry);
         }
       }
     }
@@ -98,17 +96,17 @@ export function assembleTimeline(
     const entries = normaliseProvenance(props.provenance);
     for (const raw of entries) {
       const entry = normaliseEntry(raw as Record<string, unknown>);
-      const activityId = entry.activityId;
-      if (typeof activityId !== 'string' || activityId.length === 0) continue;
+      const activity_id = entry.activity_id;
+      if (typeof activity_id !== 'string' || activity_id.length === 0) continue;
 
       // Skip deleted entries unless includeDeleted is true
       if (!includeDeleted && (entry as Record<string, unknown>).deleted === true) {
         continue;
       }
 
-      // Dedup by activityId — merge generated[] across features that
+      // Dedup by activity_id — merge generated[] across features that
       // share the same activity (e.g. multi-track import from one file).
-      const existing = seen.get(activityId);
+      const existing = seen.get(activity_id);
       if (existing) {
         // Merge generated IDs that aren't already listed
         const gen = (entry as Record<string, unknown>).generated;
@@ -121,7 +119,7 @@ export function assembleTimeline(
           }
         }
       } else {
-        seen.set(activityId, entry as unknown as LogEntry);
+        seen.set(activity_id, entry as unknown as LogEntry);
       }
     }
   }
