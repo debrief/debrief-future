@@ -150,9 +150,7 @@ def _bearing_between(lat1: float, lon1: float, lat2: float, lon2: float) -> floa
     lat2_r = math.radians(lat2)
     dlon = math.radians(lon2 - lon1)
     x = math.sin(dlon) * math.cos(lat2_r)
-    y = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(
-        dlon
-    )
+    y = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(dlon)
     return math.degrees(math.atan2(x, y)) % 360
 
 
@@ -407,10 +405,12 @@ class DPFHandler(BaseHandler):
                         continue
                     p_lat, p_lon = parent_loc
                     bearing = _bearing_between(p_lat, p_lon, vp["lat"], vp["lon"])
-                    contacts.append({
-                        "time": vp["time"],
-                        "bearing": round(bearing, 3),
-                    })
+                    contacts.append(
+                        {
+                            "time": vp["time"],
+                            "bearing": round(bearing, 3),
+                        }
+                    )
                 if contacts:
                     new_sensors.append({"name": contact_name, "contacts": contacts})
 
