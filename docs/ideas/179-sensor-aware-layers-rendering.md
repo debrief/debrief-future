@@ -107,7 +107,22 @@ The path-based ID scheme extends naturally:
 
 `flattenTrackChildren()` becomes a dispatcher that selects one of the four layouts based on `(hasSensors, segments?.length)`. The existing `flattenSegments()` function is reused for the segment sub-tree, wrapped under the new `Track Segments` group row when needed.
 
-Group rows are always expandable and default to expanded (so an analyst expanding a track immediately sees both `Positions` and `Sensors`, not two collapsed rows that look identical). The existing `expandedIds` state machine handles this with no changes — just seed it with the group IDs on first expansion of the parent.
+Group rows are always expandable and **default to collapsed**. When a track is expanded the analyst sees two (or three, for Case D) rows: `Positions`, `Sensors`, and optionally `Track Segments`. This keeps the default view quiet for tracks with hundreds of positions and requires one extra click to drill into sensor data. The existing `expandedIds` state machine handles this with no changes — the new group IDs follow the same add/remove pattern as every other expandable row.
+
+## Row Display Format
+
+Sensor and contact rows follow the same label/sublabel pattern used for positions today (`getPositionLabel` / `getPositionSublabel` in `flattenFeatures.ts`).
+
+| Row kind | Label | Sublabel | Notes |
+|----------|-------|----------|-------|
+| `group` (`Positions`, `Sensors`, `Track Segments`) | Group name | null | Non-selectable group header |
+| `sensor` | Sensor name | `"N contacts"` | e.g. `"TOWED_ARRAY"` / `"42 contacts"` |
+| `contact` | Formatted time | Bearing in degrees | e.g. `"12:34:56"` / `"045°"` |
+| `contact` (ambiguous) | Formatted time | `"primary° / ambiguous°"` | e.g. `"12:34:56"` / `"045° / 225°"` — single row, not two siblings |
+
+Time formatting reuses the existing `formatTime()` helper. Bearing formatting uses `Math.round()` for whole degrees, matching how course is shown on position rows (`flattenFeatures.ts:74`).
+
+Optional fields (`range`, `frequency`, `contact.label`, `comment`) are **not** shown inline on the row — they belong in an info popover if needed (the existing `onInfoClick` / `onChildInfoClick` hook already supports this pattern).
 
 ## What This Enables
 
@@ -119,9 +134,10 @@ Group rows are always expandable and default to expanded (so an analyst expandin
 ## Success Criteria
 
 - All four cases (A/B/C/D) render correctly in `FeatureList.stories.tsx`
-- A track with sensors shows `Positions` and `Sensors` group rows when expanded
-- Each named sensor shows a contact count in its label (`"TOWED_ARRAY (42 contacts)"`)
-- Contact rows show timestamp and bearing as label/sublabel
+- A track with sensors shows `Positions` and `Sensors` group rows (collapsed by default) when expanded
+- Each named sensor shows a contact count in its sublabel (`"TOWED_ARRAY"` / `"42 contacts"`)
+- Contact rows show time as label and bearing as sublabel (`"12:34:56"` / `"045°"`)
+- Ambiguous bearings render as a single row with slash-separated sublabel (`"045° / 225°"`) — not two sibling rows
 - Selection propagates correctly: selecting a sensor row highlights all child contacts; child selection propagates up to the parent via `hasChildSelected`
 - Virtualisation still works: a track with 10,000 contacts must not break scroll performance
 - Case A (no sensors, single segment) is visually unchanged from today — this is the dominant existing case and must not regress
@@ -134,12 +150,6 @@ Group rows are always expandable and default to expanded (so an analyst expandin
 - Sensor row labels must remain stable under sensor reordering (use `name` as the stable key, not array index)
 - Empty-sensors-array tracks (`sensors: []`) behave as Case A/B — no `Sensors` group row is shown
 - Must work offline (Constitution Art. I) — no schema changes, purely a UI rendering change
-
-## Open Questions
-
-- **Group row persistence** — should `Positions` and `Sensors` groups default to expanded when the parent track is expanded, or start collapsed? Proposal: default expanded, because the whole point of this feature is to surface the sensor data immediately.
-- **Contact row sublabel format** — do we show `bearing°` only, or add `range` and `frequency` when present? Proposal: bearing in label, time in sublabel, optionally `range`/`frequency` in an info popover (consistent with position rows).
-- **Ambiguous bearing** — a `SensorContact` with `ambiguous_bearing` holds two bearings. Show as one row with both values, or two sibling rows? Proposal: one row, display as `"045° / 225°"`.
 
 ## Out of Scope
 
