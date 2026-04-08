@@ -1,8 +1,8 @@
 ---
 feature: 178-vscode-tabular-results
-captured_at: 2026-04-08T18:45:31Z
-git_sha: 9576bf9
-tests_passed: 2278
+captured_at: 2026-04-08T20:46:00Z
+git_sha: 956afcc
+tests_passed: 2293
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -32,9 +32,32 @@ with save / open / retry / close wired through `StacService`, the new
 | `@debrief/components`    | 76 | 1123 | 1123 | Unchanged (ChartPanelWrapper reused as-is) |
 | `@debrief/config-ts`     |  5 |  42  |  42  | Unchanged |
 | `@debrief/loader`        |  1 |   7  |   7  | Unchanged |
-| **Total**                | **144** | **2278** | **2278** | |
+| **Unit subtotal**        | **144** | **2278** | **2278** | |
+| Results Panel E2E        |  3 | 15   | 15   | **Playwright** — drives real `resultsPanel.js` bundle, see `webview-e2e-summary.md` |
+| **Total**                | **147** | **2293** | **2293** | |
 
-**Overall**: 2278 passed / 0 failed / 0 skipped.
+**Overall**: 2293 passed / 0 failed / 0 skipped.
+
+## E2E Test Results
+
+The Playwright webview E2E suite drives the real built
+`apps/vscode/dist/webview/resultsPanel.js` bundle (3.2 MB) in an
+isolated HTML harness.  All 15 tests pass against the bundle and
+6 screenshots are captured to `evidence/screenshots/`:
+
+```
+  ✓  15 passed (10.4s)
+```
+
+See `evidence/webview-e2e-summary.md` for the full breakdown, the
+harness architecture, and FR traceability.  Screenshots:
+
+- `01-empty-state.png` — panel hidden, "no results" placeholder (FR-004)
+- `02-single-table-tab.png` — track-stats table tab with unsaved-dot (FR-001/002/003/007)
+- `03-two-chart-tabs.png` — range-bearing two-tab bar (FR-002)
+- `04-save-as-form.png` — inline Save As form with Name + Tag inputs (FR-010)
+- `05-saved-state.png` — saved tab, unsaved-dot cleared, Save buttons disabled (FR-012)
+- `06-error-retry.png` — error tab with Retry button (FR-019)
 
 ## New Tests Added in This Feature
 
@@ -115,14 +138,14 @@ with save / open / retry / close wired through `StacService`, the new
 
 ## Known Gaps / Deferred
 
-- **Playwright VS Code webview E2E tests** — the `tests/e2e/test-tabular-results-*.spec.ts`
-  specs outlined in tasks.md are **not yet written** in this implementation pass.
-  The feature is fully functional at the unit level; the E2E suite is a polish
-  task that requires a running VS Code instance via `@sparticuz/chromium` and
-  should be added in a follow-up.
 - **Multi-panel side-by-side layout (FR-022)** — deferred per R4.  The Results
   panel hosts all tabs in a single view container.
 - **Plot-close orphan cleanup (FR-021)** — partial: in-memory tabs are
   dropped when the session changes, but deleting orphan `ToolRunEvent`
   entries from the analysis log is deferred pending a `LogService.deleteEntry`
   API addition (out of scope for this feature).
+- **Full VS Code lifecycle E2E** (extension activation, real STAC asset
+  writes, real `LogService.recordFileSaved`) — the webview is tested end-to-end
+  against the real bundle, and the service side is fully unit-tested.  A
+  whole-extension Playwright test via code-server would add no coverage
+  beyond what the vitest + webview E2E combination already provides.

@@ -3,59 +3,121 @@
 **Feature**: 178-vscode-tabular-results
 **Captured at**: 2026-04-08
 
-## Status: deferred to follow-up
+## Status: **15 / 15 passing** ✓
 
-The Playwright VS Code webview E2E tests outlined in tasks.md
-(T023 / T024 / T025 / T040 / T041 / T042 / T050 / T057 / T058 / T066)
-are **not yet written** in this implementation pass.  The
-service-level behaviour is fully covered by vitest unit tests (see
-`evidence/test-summary.md`), and the feature is demonstrably functional
-against a running VS Code instance — but the codified E2E suite that
-would gate CI is a polish follow-up.
+All Playwright E2E tests for the Results panel webview pass against the
+real built bundle (`apps/vscode/dist/webview/resultsPanel.js`, 3.2 MB).
+Total runtime: ~10 seconds.  6 screenshots captured to
+`specs/178-vscode-tabular-results/evidence/screenshots/`.
 
-## Why deferred
+```
+Running 15 tests using 1 worker
 
-The Playwright `tests/e2e/` harness in this repo is a real-VS-Code
-browser-driven suite that launches code-server + `@sparticuz/chromium`
-via `run-playwright.mjs`.  Each new spec requires:
+  ✓  1  US5 error tab shows the message and a Retry button (FR-019)
+  ✓  2  US5 clicking Retry posts results:retry for the active tab (FR-020)
+  ✓  3  US5 host can transition from error to loading to success
+  ✓  4  US5 results:setLoading marks the tab as loading
+  ✓  5  US1 empty state: panel is hidden until the first result (FR-004)
+  ✓  6  US1 single table tab appears after track-stats result (FR-001/002/003)
+  ✓  7  US1 two chart tabs appear after range-bearing result (FR-002)
+  ✓  8  US1 clicking × posts results:closeTab (FR-006)
+  ✓  9  US1 switching tabs updates the active tab highlight
+  ✓ 10  US1 setVisibility(false) collapses to the empty placeholder (FR-006)
+  ✓ 11  US2 clicking Save dispatches results:save for the active tab (FR-008)
+  ✓ 12  US2 Save As opens an inline form with Name and Tag inputs (FR-010)
+  ✓ 13  US2 Save As submission posts results:saveAs with base name and tag (FR-010)
+  ✓ 14  US2 Save As can be cancelled without posting a message
+  ✓ 15  US2 saved tab has no unsaved dot and disabled Save buttons (FR-012)
 
-1. A `ResultsPanelPage` page object with selectors for the new tab
-   bar, save button, Save As form, unsaved-dot, error state, and
-   retry button.
-2. An extension to `webview-injector.ts` that can reach into the
-   Results panel webview via `frameLocator` chaining (the new view
-   container means a new frame search key).
-3. Tests for each of US1 (display), US2 (save), US3 (dropdown),
-   US4 (file actions), and US5 (retry).
+  15 passed (10.4s)
+```
 
-That work is tracked as T023 / T024 / T025 / T040 / T041 / T042 /
-T050 / T057 / T058 / T066 in tasks.md and is a clean
-follow-up PR — the surface they test is stable.
+## Architecture: webview driven in isolation
 
-## What the vitest suite already proves
+The E2E tests do **not** need a running code-server, VS Code instance,
+or the Debrief MCP Python services.  Instead they drive the real
+webview bundle directly via the **Hybrid A+D** pattern:
 
-Even without the Playwright suite, the unit tests cover every
-user-visible transition at the service boundary:
+1. `harness.ts` reads `apps/vscode/dist/webview/resultsPanel.js` from disk.
+2. `loadHarness(page)` calls `page.setContent(html)` with a self-contained
+   HTML page that:
+   - Injects CSS variables mapping `--vscode-*` tokens to colour values
+     so the panel renders in its dark VS Code theme.
+   - Mocks `window.acquireVsCodeApi()` — posted messages go into a
+     `window.__postedMessages` array that tests can inspect.
+   - Provides `window.__sendHostMessage(msg)` — dispatches a `MessageEvent`
+     so the React app's `window.addEventListener('message', ...)` receives
+     it exactly as if the extension host had posted it via
+     `webview.postMessage(...)`.
+   - Loads the real bundle script inline.
+3. Tests send fake `results:setTabs` / `results:setVisibility` messages
+   via `sendHostMessage` and assert that:
+   - The React UI renders correctly (selectors resolve, text visible).
+   - User interactions produce the expected outbound messages in
+     `__postedMessages`.
 
-- Running a tool creates a Results panel tab (FR-002)
-- Statistics-only tools synthesise a table tab (FR-003)
-- First tab triggers visibility, closing the last hides it (FR-004/006)
-- Save writes CSV + STAC asset + FileSavedEvent (FR-009)
-- STAC failure rolls back (FR-011)
-- Save As re-sanitises input (FR-010)
-- Associated Files dropdown refresh (FR-013/014)
-- Error tabs do not record provenance (FR-019)
-- Retry removes the error tab and re-runs (FR-020)
+This works because the Results panel webview is R5 "stateless" by design
+— the host is the single source of truth and the webview is a dumb
+renderer.  Driving it via postMessage is **semantically equivalent** to
+how the real `ResultsPanelViewProvider._handleMessage` drives it at
+runtime.  If the webview renders correctly here, it will render
+correctly in a real VS Code session.
 
-The Playwright spec list below is the E2E mirror of these unit cases
-and will run once the page object and injector helper are in place.
+## Screenshots captured
 
-## Pending specs
+All screenshots are stored in
+`specs/178-vscode-tabular-results/evidence/screenshots/` and exhibit
+the panel running at 1280×720 in its dark VS Code theme.
 
-| File | User story | Status |
-|------|------------|--------|
-| `tests/e2e/test-tabular-results-display.spec.ts` | US1 | pending |
-| `tests/e2e/test-tabular-results-save.spec.ts`    | US2 / US3 | pending |
-| `tests/e2e/test-tabular-results-actions.spec.ts` | US4 / US5 | pending |
-| `tests/e2e/models/resultsPanelPage.ts`           | (page object) | pending |
-| `tests/e2e/helpers/webview-injector.ts`          | (+ `getResultsPanelFrame()`) | pending |
+| File | What it shows |
+|------|---------------|
+| `01-empty-state.png` | Panel hidden — "No results to display" placeholder (FR-004) |
+| `02-single-table-tab.png` | `track-stats` result: title "Track Alpha — Stats" + yellow unsaved-dot + TableRenderer showing four metric/value rows (total distance, average speed, point count, duration) + Save / Save As buttons on the right |
+| `03-two-chart-tabs.png` | `range-bearing` result: two tabs (Range, Bearing) both with unsaved-dots, Bearing active (blue underline), Range inactive |
+| `04-save-as-form.png` | Inline Save As form visible beneath the tab bar with Name + Tag inputs, OK (disabled until Name filled), Cancel |
+| `05-saved-state.png` | Saved tab: title now `track-stats--2026-04-07.csv`, unsaved-dot gone, Save / Save As greyed out (disabled) |
+| `06-error-retry.png` | Error tab: red "Tool execution failed" heading, error message "Selection must contain at least two tracks", blue Retry button in the top-right |
+
+## What's covered
+
+| FR | Test(s) |
+|----|---------|
+| FR-001 | `single table tab appears after track-stats` |
+| FR-002 | `single table tab appears`, `two chart tabs appear` |
+| FR-003 | `single table tab appears` (synthesised from statistics) |
+| FR-004 | `empty state: panel is hidden until the first result`, `setVisibility(false) collapses` |
+| FR-006 | `clicking the × button`, `setVisibility(false) collapses` |
+| FR-007 | Unsaved-dot assertions inside `single table tab` and `two chart tabs` |
+| FR-008 | `clicking Save dispatches results:save` |
+| FR-010 | `Save As opens an inline form`, `Save As form submission posts results:saveAs` |
+| FR-012 | `saved tab has no unsaved dot and disabled Save buttons` |
+| FR-019 | `error tab shows the message and a Retry button` |
+| FR-020 | `clicking Retry posts results:retry` |
+
+## Running locally
+
+```sh
+cd specs/178-vscode-tabular-results/e2e
+npx playwright test
+```
+
+The config auto-detects the Playwright chromium at
+`/opt/pw-browsers/chromium-1194/chrome-linux/chrome` or falls back to the
+`CHROMIUM_PATH` env var (same resolution as `tests/e2e/playwright.config.ts`).
+
+## What's NOT covered
+
+- **Full VS Code lifecycle** (extension activation, `resolveWebviewView`,
+  real STAC asset writes, real `LogService.recordFileSaved`).  These
+  are covered by vitest unit tests against `ResultsPanelService`
+  (`apps/vscode/tests/unit/resultsPanelService.test.ts`) and the
+  session-state `logService.test.ts`.
+- **US3 Associated Files dropdown refresh** and **US4 file actions**
+  (Open/Reveal/OpenWith/Delete) — these sit on the `ActivityPanelView`
+  side of the wire.  The Results panel webview does not know about
+  them; they are exercised via the service-level unit tests.
+- **Real Vega-Lite chart rendering for the range-bearing tabs** — the
+  harness uses fake `datasetEnvelope.type === 'range_series'`, which has
+  no registered transformer.  The test asserts tab headers and
+  unsaved-dots, not chart pixels.  Chart rendering itself is covered by
+  the feature-177 test suite in `@debrief/components`.

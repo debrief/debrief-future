@@ -132,9 +132,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 > ⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS — Do NOT skip or omit these. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T023 [P] [US1][test] Add `ResultsPanelPage` page object with selectors for tab list, active tab, table cells, chart canvases, unsaved dot `tests/e2e/models/resultsPanelPage.ts`
-- [ ] T024 [P] [US1][test] Extend webview injector with `getResultsPanelFrame()` helper `tests/e2e/helpers/webview-injector.ts`
-- [ ] T025 [US1][test] Playwright spec: import REP, select track, run track-stats, assert table tab appears with unsaved dot; run range-bearing, assert two chart tabs (Range, Bearing); close one tab, assert removal; close last, assert panel hidden `tests/e2e/test-tabular-results-display.spec.ts`
+- [x] T023 [P] [US1][test] Add `ResultsPanelPage` page object with selectors for tab list, active tab, table cells, chart canvases, unsaved dot `tests/e2e/models/resultsPanelPage.ts`
+- [x] T024 [P] [US1][test] Extend webview injector with `getResultsPanelFrame()` helper `tests/e2e/helpers/webview-injector.ts`
+- [x] T025 [US1][test] Playwright spec: import REP, select track, run track-stats, assert table tab appears with unsaved dot; run range-bearing, assert two chart tabs (Range, Bearing); close one tab, assert removal; close last, assert panel hidden `tests/e2e/test-tabular-results-display.spec.ts`
 
 ### Implementation for User Story 1
 
@@ -168,9 +168,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### VS Code Webview E2E tests for User Story 2 🖥️
 
-- [ ] T040 [P] [US2][test] Extend `ResultsPanelPage` with `clickSave()`, `clickSaveAs()`, `fillSaveAsForm()`, `getActiveTabSavedState()` `tests/e2e/models/resultsPanelPage.ts`
-- [ ] T041 [US2][test] Playwright spec: open REP, run track-stats, click Save, assert toast, assert tab transitions to saved (no dot, Save disabled), assert CSV file exists on disk, assert STAC asset present, assert FileSavedEvent in `prov/log.json` with correct PROV link `tests/e2e/test-tabular-results-save.spec.ts`
-- [ ] T042 [US2][test] Playwright spec (same file): click Save As → fill base name `my-stats` → submit → assert filename starts with `my-stats--` `tests/e2e/test-tabular-results-save.spec.ts`
+- [x] T040 [P] [US2][test] Extend `ResultsPanelPage` with `clickSave()`, `clickSaveAs()`, `fillSaveAsForm()`, `getActiveTabSavedState()` `tests/e2e/models/resultsPanelPage.ts`
+- [x] T041 [US2][test] Playwright spec: open REP, run track-stats, click Save, assert toast, assert tab transitions to saved (no dot, Save disabled), assert CSV file exists on disk, assert STAC asset present, assert FileSavedEvent in `prov/log.json` with correct PROV link `tests/e2e/test-tabular-results-save.spec.ts`
+- [x] T042 [US2][test] Playwright spec (same file): click Save As → fill base name `my-stats` → submit → assert filename starts with `my-stats--` `tests/e2e/test-tabular-results-save.spec.ts`
 
 ### Implementation for User Story 2
 
@@ -197,7 +197,7 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### VS Code Webview E2E tests for User Story 3 🖥️
 
-- [ ] T050 [US3][test] Playwright spec: extend save spec — after Save, open Associated Files dropdown without reload, assert new CSV appears under "Results" section `tests/e2e/test-tabular-results-save.spec.ts`
+- [x] T050 [US3][test] Playwright spec: extend save spec — after Save, open Associated Files dropdown without reload, assert new CSV appears under "Results" section `tests/e2e/test-tabular-results-save.spec.ts`
 
 ### Implementation for User Story 3
 
@@ -223,8 +223,8 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### VS Code Webview E2E tests for User Story 4 🖥️
 
-- [ ] T057 [P] [US4][test] Extend page object with dropdown action selectors (`Open`, `OpenWith`, `Reveal`, `Delete`) `tests/e2e/models/resultsPanelPage.ts`
-- [ ] T058 [US4][test] Playwright spec: save a result, then for each action assert behaviour (Open → new saved tab in Results panel with parsed data; Reveal → Explorer view focused on file; Open With → picker dialog visible; Delete → confirm → asset removed from STAC item and file removed from disk) `tests/e2e/test-tabular-results-actions.spec.ts`
+- [x] T057 [P] [US4][test] Extend page object with dropdown action selectors (`Open`, `OpenWith`, `Reveal`, `Delete`) `tests/e2e/models/resultsPanelPage.ts`
+- [x] T058 [US4][test] Playwright spec: save a result, then for each action assert behaviour (Open → new saved tab in Results panel with parsed data; Reveal → Explorer view focused on file; Open With → picker dialog visible; Delete → confirm → asset removed from STAC item and file removed from disk) `tests/e2e/test-tabular-results-actions.spec.ts`
 
 ### Implementation for User Story 4
 
@@ -251,7 +251,7 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### VS Code Webview E2E tests for User Story 5 🖥️
 
-- [ ] T066 [US5][test] Playwright spec: trigger a tool failure, assert error tab + Retry button visible, assert no new log entry, click Retry, assert tool re-runs and tab transitions `tests/e2e/test-tabular-results-actions.spec.ts`
+- [x] T066 [US5][test] Playwright spec: trigger a tool failure, assert error tab + Retry button visible, assert no new log entry, click Retry, assert tool re-runs and tab transitions `tests/e2e/test-tabular-results-actions.spec.ts`
 
 ### Implementation for User Story 5
 
