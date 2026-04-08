@@ -164,6 +164,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11, TypeScript 5.x (existing monorepo — no new languages) + debrief_schemas (Pydantic models), @debrief/schemas (TS types + unions.ts type guards), LinkML >= 1.7.0 (gen-typescript, gen-pydantic) (173-cradle-to-grave-typing)
 - Python 3.11 (STAC service), TypeScript 5.x (components, VS Code extension, web-shell) + `modern-screenshot` (DOM-to-PNG capture), `sharp` (Node.js image resize for backfill), Playwright (backfill browser automation), GoldenLayout (preview panel layout) (174-thumbnail-capture)
 - Python 3.11 (service, schema), TypeScript 5.x (frontend components, VS Code extension) + Pydantic v2 (models), LinkML >= 1.7.0 (schema), `ulid` (ID generation), React 18.x (UI), `@tanstack/react-virtual` (list virtualisation) (175-review-feedback)
+- TypeScript 5.x (VS Code extension + shared components, host + webview), Python 3.11 (no changes required — debrief-calc already returns the right shapes) + VS Code Extension API ^1.85.0, React 18.x, `@debrief/components` (`ChartPanelWrapper`, `TableRenderer`, `ChartRenderer`, `PanelContext`), `@debrief/utils` (`buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, NEW `parseCsvToTableDataset` and NEW `synthesizeTableDataset`), `@debrief/session-state` (`LogService` — extended with `recordFileSaved`), existing `apps/vscode/src/services/stacService.ts` (178-vscode-tabular-results)
 
 ## Before Pushing
 
@@ -208,5 +209,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 178-vscode-tabular-results: Added TypeScript 5.x (VS Code extension + shared components, host + webview), Python 3.11 (no changes required — debrief-calc already returns the right shapes) + VS Code Extension API ^1.85.0, React 18.x, `@debrief/components` (`ChartPanelWrapper`, `TableRenderer`, `ChartRenderer`, `PanelContext`), `@debrief/utils` (`buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, NEW `parseCsvToTableDataset` and NEW `synthesizeTableDataset`), `@debrief/session-state` (`LogService` — extended with `recordFileSaved`), existing `apps/vscode/src/services/stacService.ts`
 - 175-review-feedback: Added Python 3.11 (service, schema), TypeScript 5.x (frontend components, VS Code extension) + Pydantic v2 (models), LinkML >= 1.7.0 (schema), `ulid` (ID generation), React 18.x (UI), `@tanstack/react-virtual` (list virtualisation)
 - 174-thumbnail-capture: Added Python 3.11 (STAC service), TypeScript 5.x (components, VS Code extension, web-shell) + `modern-screenshot` (DOM-to-PNG capture), `sharp` (Node.js image resize for backfill), Playwright (backfill browser automation), GoldenLayout (preview panel layout)
