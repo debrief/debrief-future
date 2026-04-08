@@ -337,6 +337,81 @@ export interface ResultSavedMessage {
 }
 
 // ============================================================================
+// Results Panel Messages (#178 — VS Code Tabular Results integration)
+// ============================================================================
+
+/** Single tab shape sent to the Results panel webview. Mirrors
+ * `@debrief/components#ChartTabData` but is replicated here to keep the
+ * webview message surface self-contained. */
+export interface ResultsTabSnapshot {
+  id: string;
+  title: string;
+  toolId: string;
+  displayHint?: 'table' | 'chart';
+  /** Flat rows for the TableRenderer (when displayHint = 'table'). */
+  tableData?: Record<string, unknown>[];
+  /** Full DatasetEnvelope for the ChartRenderer (when displayHint = 'chart'). */
+  datasetEnvelope?: Record<string, unknown>;
+  isSaved?: boolean;
+  isLoading?: boolean;
+  errorMessage?: string;
+}
+
+/** Replace the full tab list in the Results panel webview. */
+export interface ResultsSetTabsMessage {
+  type: 'results:setTabs';
+  payload: {
+    tabs: ResultsTabSnapshot[];
+    activeTabId: string | null;
+  };
+}
+
+/** Toggle the Results panel visibility (host → webview). */
+export interface ResultsSetVisibilityMessage {
+  type: 'results:setVisibility';
+  payload: { visible: boolean };
+}
+
+/** Signal that a given tab is in a loading state. */
+export interface ResultsSetLoadingMessage {
+  type: 'results:setLoading';
+  payload: { tabId: string; isLoading: boolean };
+}
+
+/** Webview → host: the React app has finished mounting. */
+export interface ResultsWebviewReadyMessage {
+  type: 'results:webviewReady';
+}
+
+/** Webview → host: user clicked Save on a tab. */
+export interface ResultsSaveMessage {
+  type: 'results:save';
+  payload: { tabId: string };
+}
+
+/** Webview → host: user confirmed the Save As form. */
+export interface ResultsSaveAsMessage {
+  type: 'results:saveAs';
+  payload: {
+    tabId: string;
+    baseName: string;
+    tag?: string;
+  };
+}
+
+/** Webview → host: user clicked Retry on a failed tab. */
+export interface ResultsRetryMessage {
+  type: 'results:retry';
+  payload: { tabId: string };
+}
+
+/** Webview → host: user clicked × on a tab. */
+export interface ResultsCloseTabMessage {
+  type: 'results:closeTab';
+  payload: { tabId: string };
+}
+
+// ============================================================================
 // Union Types
 // ============================================================================
 
@@ -363,7 +438,11 @@ export type ExtensionToWebviewMessage =
   | ImportProgressMessage
   | ImportCompleteMessage
   | RequestThumbnailCaptureMessage
-  | ResultSavedMessage;
+  | ResultSavedMessage
+  // Results panel (#178)
+  | ResultsSetTabsMessage
+  | ResultsSetVisibilityMessage
+  | ResultsSetLoadingMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -382,7 +461,13 @@ export type WebviewToExtensionMessage =
   | ThumbnailCaptureResponseMessage
   | SaveResultMessage
   | SaveResultAsMessage
-  | RetryToolMessage;
+  | RetryToolMessage
+  // Results panel (#178)
+  | ResultsWebviewReadyMessage
+  | ResultsSaveMessage
+  | ResultsSaveAsMessage
+  | ResultsRetryMessage
+  | ResultsCloseTabMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)

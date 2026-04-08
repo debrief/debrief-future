@@ -65,9 +65,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 **Purpose**: Wire the new webview entry into the existing esbuild bundling pipeline (R2) and register the new VS Code view container in `package.json`. No new packages — this feature lives entirely in `apps/vscode`, `shared/utils`, and `services/session-state`.
 
-- [ ] T001 [P] Add `resultsPanel` entry to the esbuild webview build inputs `apps/vscode/esbuild.webview.config.js`
-- [ ] T002 [P] Register new view container `debrief.results` and view `debrief.resultsPanel` under `contributes.viewsContainers.panel` and `contributes.views` in `apps/vscode/package.json`
-- [ ] T003 [P] Add results-panel CSP nonce template (reuse existing `getNonce()` helper, no new file) — verify by reading `apps/vscode/src/views/activityPanelView.ts` for the existing CSP pattern
+- [x] T001 [P] Add `resultsPanel` entry to the esbuild webview build inputs `apps/vscode/esbuild.webview.config.js`
+- [x] T002 [P] Register new view container `debrief.results` and view `debrief.resultsPanel` under `contributes.viewsContainers.panel` and `contributes.views` in `apps/vscode/package.json`
+- [x] T003 [P] Add results-panel CSP nonce template (reuse existing `getNonce()` helper, no new file) — verify by reading `apps/vscode/src/views/activityPanelView.ts` for the existing CSP pattern
 
 **Checkpoint**: Build passes (`pnpm --filter @debrief/vscode build`); the empty Results view container is visible in the VS Code panel area but renders nothing yet.
 
@@ -81,32 +81,32 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Shared utility — synthesizer extraction (R6)
 
-- [ ] T004 [P] [FOUNDATION][test] Write unit tests for `synthesizeTableDataset` (table-from-statistics happy path, missing statistics returns null, multi-row arrays) `shared/utils/src/datasetSynthesis.test.ts`
-- [ ] T005 [FOUNDATION] Implement `synthesizeTableDataset(toolId, properties, sourceLabel): DatasetEnvelope | null` extracted from `apps/web-shell/src/mocks/calcService.ts:478-504` `shared/utils/src/datasetSynthesis.ts`
-- [ ] T006 [FOUNDATION] Export `synthesizeTableDataset` from the package barrel `shared/utils/src/index.ts`
-- [ ] T007 [FOUNDATION] Refactor web-shell mock to consume the shared export (no behaviour change — NFR-1 / FR-025 / SC-006) `apps/web-shell/src/mocks/calcService.ts`
+- [x] T004 [P] [FOUNDATION][test] Write unit tests for `synthesizeTableDataset` (table-from-statistics happy path, missing statistics returns null, multi-row arrays) `shared/utils/src/datasetSynthesis.test.ts`
+- [x] T005 [FOUNDATION] Implement `synthesizeTableDataset(toolId, properties, sourceLabel): DatasetEnvelope | null` extracted from `apps/web-shell/src/mocks/calcService.ts:478-504` `shared/utils/src/datasetSynthesis.ts`
+- [x] T006 [FOUNDATION] Export `synthesizeTableDataset` from the package barrel `shared/utils/src/index.ts`
+- [x] T007 [FOUNDATION] Refactor web-shell mock to consume the shared export (no behaviour change — NFR-1 / FR-025 / SC-006) `apps/web-shell/src/mocks/calcService.ts`
 
 ### Shared utility — CSV round-trip parser (R3)
 
-- [ ] T008 [P] [FOUNDATION][test] Write round-trip tests for `parseCsvToTableDataset` (header-only, quoted strings with commas/newlines, build → parse identity, malformed input throws) `shared/utils/src/csv.test.ts`
-- [ ] T009 [FOUNDATION] Implement `parseCsvToTableDataset(csv: string, title: string): DatasetEnvelope` (RFC-4180 subset, < 100 LOC, inverse of `buildCsvContent`) `shared/utils/src/csv.ts`
-- [ ] T010 [FOUNDATION] Export `parseCsvToTableDataset` from the package barrel `shared/utils/src/index.ts`
+- [x] T008 [P] [FOUNDATION][test] Write round-trip tests for `parseCsvToTableDataset` (header-only, quoted strings with commas/newlines, build → parse identity, malformed input throws) `shared/utils/src/csv.test.ts`
+- [x] T009 [FOUNDATION] Implement `parseCsvToTableDataset(csv: string, title: string): DatasetEnvelope` (RFC-4180 subset, < 100 LOC, inverse of `buildCsvContent`) `shared/utils/src/csv.ts`
+- [x] T010 [FOUNDATION] Export `parseCsvToTableDataset` from the package barrel `shared/utils/src/index.ts`
 
 ### LogService extension — `recordFileSaved` (R7)
 
-- [ ] T011 [P] [FOUNDATION][test] Write unit tests for `recordFileSaved` covering: happy path links to ToolRunEvent, throws when `parentActivityId` missing, throws when filename does not start with `assets/`, sentinel `was_generated_by.tool === 'debrief.fileSave'`, `used[0]` equals parent id `services/session-state/src/log/logService.test.ts`
-- [ ] T012 [FOUNDATION] Add `FILE_SAVE_TOOL_SENTINEL = 'debrief.fileSave'` constant and `recordFileSaved` method signature to interface `services/session-state/src/log/types.ts`
-- [ ] T013 [FOUNDATION] Implement `recordFileSaved` in `services/session-state/src/log/logService.ts` — appends LogEntry via existing persistence path with sentinel tool, `used: [parentActivityId]`, `generated: [filename]` (per `contracts/log-service-extension.md`)
+- [x] T011 [P] [FOUNDATION][test] Write unit tests for `recordFileSaved` covering: happy path links to ToolRunEvent, throws when `parentActivityId` missing, throws when filename does not start with `assets/`, sentinel `was_generated_by.tool === 'debrief.fileSave'`, `used[0]` equals parent id `services/session-state/src/log/logService.test.ts`
+- [x] T012 [FOUNDATION] Add `FILE_SAVE_TOOL_SENTINEL = 'debrief.fileSave'` constant and `recordFileSaved` method signature to interface `services/session-state/src/log/types.ts`
+- [x] T013 [FOUNDATION] Implement `recordFileSaved` in `services/session-state/src/log/logService.ts` — appends LogEntry via existing persistence path with sentinel tool, `used: [parentActivityId]`, `generated: [filename]` (per `contracts/log-service-extension.md`)
 
 ### Message protocol types
 
-- [ ] T014 [P] [FOUNDATION][test] Add discriminated-union round-trip tests for the new `results:*` message types `apps/vscode/src/webview/messages.test.ts`
-- [ ] T015 [FOUNDATION] Add `results:setTabs`, `results:setVisibility`, `results:setLoading`, `results:webviewReady`, `results:save`, `results:saveAs`, `results:retry`, `results:closeTab` to the discriminated union (per `contracts/webview-messages.md`) `apps/vscode/src/webview/messages.ts`
+- [x] T014 [P] [FOUNDATION][test] Add discriminated-union round-trip tests for the new `results:*` message types `apps/vscode/src/webview/messages.test.ts`
+- [x] T015 [FOUNDATION] Add `results:setTabs`, `results:setVisibility`, `results:setLoading`, `results:webviewReady`, `results:save`, `results:saveAs`, `results:retry`, `results:closeTab` to the discriminated union (per `contracts/webview-messages.md`) `apps/vscode/src/webview/messages.ts`
 
 ### StacService — delete asset capability (FR-018)
 
-- [ ] T016 [P] [FOUNDATION][test] Write unit test for `deleteResultAsset(storePath, itemPath, filename)` (asset removed from STAC item, file removed from disk) `apps/vscode/src/services/stacService.test.ts`
-- [ ] T017 [FOUNDATION] Add `deleteResultAsset` to `apps/vscode/src/services/stacService.ts` if not already present (FR-018 backing for US4 Delete action)
+- [x] T016 [P] [FOUNDATION][test] Write unit test for `deleteResultAsset(storePath, itemPath, filename)` (asset removed from STAC item, file removed from disk) `apps/vscode/src/services/stacService.test.ts`
+- [x] T017 [FOUNDATION] Add `deleteResultAsset` to `apps/vscode/src/services/stacService.ts` if not already present (FR-018 backing for US4 Delete action)
 
 **Checkpoint**: Foundation ready — all shared utilities, log methods, message types, and STAC delete are tested and merged. User story implementation can now begin in parallel.
 
@@ -122,11 +122,11 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 > Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T018 [P] [US1][test] Vitest: `addDatasetsForToolResult` adds one tab per `__datasets` envelope (FR-002) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T019 [P] [US1][test] Vitest: `addDatasetsForToolResult` synthesises a single table tab from `properties.statistics` when `__datasets` is absent (FR-003) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T020 [P] [US1][test] Vitest: First tab triggers `results:setVisibility { visible: true }`; subsequent adds do not (FR-004) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T021 [P] [US1][test] Vitest: `handleCloseTab` removes the tab and emits `results:setVisibility { visible: false }` when last tab closes (FR-006) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T022 [P] [US1][test] Vitest: New tabs default to `state.kind === 'unsaved'` so the dot indicator is on (FR-007) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T018 [P] [US1][test] Vitest: `addDatasetsForToolResult` adds one tab per `__datasets` envelope (FR-002) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T019 [P] [US1][test] Vitest: `addDatasetsForToolResult` synthesises a single table tab from `properties.statistics` when `__datasets` is absent (FR-003) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T020 [P] [US1][test] Vitest: First tab triggers `results:setVisibility { visible: true }`; subsequent adds do not (FR-004) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T021 [P] [US1][test] Vitest: `handleCloseTab` removes the tab and emits `results:setVisibility { visible: false }` when last tab closes (FR-006) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T022 [P] [US1][test] Vitest: New tabs default to `state.kind === 'unsaved'` so the dot indicator is on (FR-007) `apps/vscode/src/services/resultsPanelService.test.ts`
 
 ### VS Code Webview E2E tests for User Story 1 🖥️
 
@@ -138,15 +138,15 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Implementation for User Story 1
 
-- [ ] T026 [US1] Define `ResultTab` and `PlotKey` types per data-model.md `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T027 [US1] Implement `ResultsPanelService` constructor wiring deps (`stacService`, `logService`, `calcService`, `panelView`, `activityPanelView`, `sessionManager`) and in-memory `_tabs: ResultTab[]` + `_panelVisible: boolean` `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T028 [US1] Implement `addDatasetsForToolResult` per `contracts/results-panel-service.md` pseudo-code (extract `__datasets`, fall back to `synthesizeTableDataset`, push tabs, emit `results:setVisibility` on first, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T029 [US1] Implement `handleCloseTab` (remove tab, hide panel when empty, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T030 [US1] Implement private `_toChartTabData()` mapper from `ResultTab[]` → `ChartTabData[]` (preserves `isLoading`, `isSaved`, `errorMessage`) `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T031 [US1] Implement `ResultsPanelViewProvider` (WebviewViewProvider) — bundles `dist/webview/resultsPanel.js`, applies CSP nonce, forwards messages to `ResultsPanelService`, replays state on `results:webviewReady` `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T032 [US1] Implement React entry that renders `<PanelContext.Provider><ChartPanelWrapper/></PanelContext.Provider>` and translates host messages into `ChartContextProps` `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T033 [US1] Wire `executeTool.ts` to call `resultsPanelService.addDatasetsForToolResult({ plotKey, toolId, result, sourceFeatureIds, parameters, parentActivityId })` after successful runs `apps/vscode/src/commands/executeTool.ts`
-- [ ] T034 [US1] Instantiate `ResultsPanelService` and `ResultsPanelViewProvider` in `activate()` and register the provider with `vscode.window.registerWebviewViewProvider('debrief.resultsPanel', ...)` `apps/vscode/src/extension.ts`
+- [x] T026 [US1] Define `ResultTab` and `PlotKey` types per data-model.md `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T027 [US1] Implement `ResultsPanelService` constructor wiring deps (`stacService`, `logService`, `calcService`, `panelView`, `activityPanelView`, `sessionManager`) and in-memory `_tabs: ResultTab[]` + `_panelVisible: boolean` `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T028 [US1] Implement `addDatasetsForToolResult` per `contracts/results-panel-service.md` pseudo-code (extract `__datasets`, fall back to `synthesizeTableDataset`, push tabs, emit `results:setVisibility` on first, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T029 [US1] Implement `handleCloseTab` (remove tab, hide panel when empty, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T030 [US1] Implement private `_toChartTabData()` mapper from `ResultTab[]` → `ChartTabData[]` (preserves `isLoading`, `isSaved`, `errorMessage`) `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T031 [US1] Implement `ResultsPanelViewProvider` (WebviewViewProvider) — bundles `dist/webview/resultsPanel.js`, applies CSP nonce, forwards messages to `ResultsPanelService`, replays state on `results:webviewReady` `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T032 [US1] Implement React entry that renders `<PanelContext.Provider><ChartPanelWrapper/></PanelContext.Provider>` and translates host messages into `ChartContextProps` `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T033 [US1] Wire `executeTool.ts` to call `resultsPanelService.addDatasetsForToolResult({ plotKey, toolId, result, sourceFeatureIds, parameters, parentActivityId })` after successful runs `apps/vscode/src/commands/executeTool.ts`
+- [x] T034 [US1] Instantiate `ResultsPanelService` and `ResultsPanelViewProvider` in `activate()` and register the provider with `vscode.window.registerWebviewViewProvider('debrief.resultsPanel', ...)` `apps/vscode/src/extension.ts`
 
 **Checkpoint**: User Story 1 fully functional — running a tool from the toolbar makes the Results panel appear with a tab; tabs render table or charts; close + switch work. Run T025 Playwright spec to verify.
 
@@ -160,10 +160,10 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Unit tests for User Story 2 ⚠️
 
-- [ ] T035 [P] [US2][test] Vitest: `handleSave` writes CSV via `vscode.workspace.fs.writeFile`, calls `stacService.addResultAsset`, calls `logService.recordFileSaved`, transitions tab to `saved`, emits `results:setTabs` (FR-009, FR-012) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T036 [P] [US2][test] Vitest: `handleSave` STAC failure path deletes the file from disk and sets tab to `error` state (FR-011) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T037 [P] [US2][test] Vitest: `handleSave` write failure leaves no STAC entry and no log entry (FR-011) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T038 [P] [US2][test] Vitest: `handleSaveAs` re-sanitises `baseName` and `tag`, then delegates to the same save sequence (FR-010) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T035 [P] [US2][test] Vitest: `handleSave` writes CSV via `vscode.workspace.fs.writeFile`, calls `stacService.addResultAsset`, calls `logService.recordFileSaved`, transitions tab to `saved`, emits `results:setTabs` (FR-009, FR-012) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T036 [P] [US2][test] Vitest: `handleSave` STAC failure path deletes the file from disk and sets tab to `error` state (FR-011) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T037 [P] [US2][test] Vitest: `handleSave` write failure leaves no STAC entry and no log entry (FR-011) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T038 [P] [US2][test] Vitest: `handleSaveAs` re-sanitises `baseName` and `tag`, then delegates to the same save sequence (FR-010) `apps/vscode/src/services/resultsPanelService.test.ts`
 - [ ] T039 [P] [US2][test] Vitest: After successful save, `ActivityPanelViewProvider.addResultFile` is called with the saved filename (FR-013/FR-014 wiring) `apps/vscode/src/services/resultsPanelService.test.ts`
 
 ### VS Code Webview E2E tests for User Story 2 🖥️
@@ -174,11 +174,11 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Implementation for User Story 2
 
-- [ ] T043 [US2] Implement `handleSave(tabId)` per `contracts/results-panel-service.md` (find tab, build CSV via `buildCsvContent`, generate filename via `generateCsvFilename`, write file, register STAC asset, on failure delete file + set error, on success record FileSavedEvent, transition state, call `activityPanelView.addResultFile`, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T044 [US2] Implement `handleSaveAs(tabId, baseName, tag?)` — re-sanitises inputs via `sanitizeFilename`, then delegates to the same save sequence with the chosen base name `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T045 [US2] Wire webview message router so `results:save` and `results:saveAs` reach the service handlers `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T046 [US2] Wire `ChartContextProps.onSave` and `onSaveAs` callbacks in the React entry to post `results:save` / `results:saveAs` messages to the host `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T047 [US2] Verify CSP allows `acquireVsCodeApi()` postMessage path (existing pattern — no change expected) `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T043 [US2] Implement `handleSave(tabId)` per `contracts/results-panel-service.md` (find tab, build CSV via `buildCsvContent`, generate filename via `generateCsvFilename`, write file, register STAC asset, on failure delete file + set error, on success record FileSavedEvent, transition state, call `activityPanelView.addResultFile`, emit `results:setTabs`) `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T044 [US2] Implement `handleSaveAs(tabId, baseName, tag?)` — re-sanitises inputs via `sanitizeFilename`, then delegates to the same save sequence with the chosen base name `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T045 [US2] Wire webview message router so `results:save` and `results:saveAs` reach the service handlers `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T046 [US2] Wire `ChartContextProps.onSave` and `onSaveAs` callbacks in the React entry to post `results:save` / `results:saveAs` messages to the host `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T047 [US2] Verify CSP allows `acquireVsCodeApi()` postMessage path (existing pattern — no change expected) `apps/vscode/src/views/resultsPanelView.ts`
 
 **Checkpoint**: User Story 2 fully functional — Save persists everything, Save As works with custom names, failed saves clean up. T041 and T042 Playwright specs green.
 
@@ -192,8 +192,8 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Unit tests for User Story 3 ⚠️
 
-- [ ] T048 [P] [US3][test] Vitest: `ActivityPanelViewProvider.addResultFile` updates `_resultFiles` and triggers `_sendLayersUpdate` with `resultsChanged: true` (FR-013/FR-014) `apps/vscode/src/views/activityPanelView.test.ts`
-- [ ] T049 [P] [US3][test] Vitest: After `ResultsPanelService.handleSave` succeeds, `activityPanelView.addResultFile` is invoked exactly once with the new asset path `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T048 [P] [US3][test] Vitest: `ActivityPanelViewProvider.addResultFile` updates `_resultFiles` and triggers `_sendLayersUpdate` with `resultsChanged: true` (FR-013/FR-014) `apps/vscode/src/views/activityPanelView.test.ts`
+- [x] T049 [P] [US3][test] Vitest: After `ResultsPanelService.handleSave` succeeds, `activityPanelView.addResultFile` is invoked exactly once with the new asset path `apps/vscode/src/services/resultsPanelService.test.ts`
 
 ### VS Code Webview E2E tests for User Story 3 🖥️
 
@@ -201,9 +201,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Implementation for User Story 3
 
-- [ ] T051 [US3] Confirm `ActivityPanelViewProvider.addResultFile(name, filePath)` exists; if absent, add it (it pushes into `_resultFiles` and calls `_sendLayersUpdate` with `resultsChanged: true`) `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T052 [US3] Confirm `_sendLayersUpdate` already includes `resultFiles` and `resultsChanged` in its payload to the activity panel webview; no client-side change needed (existing dropdown reads `resultFiles`) `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T053 [US3] Audit `ResultsPanelService.handleSave` to ensure `addResultFile` is invoked **after** STAC registration succeeds and **before** the webview state update — verify wiring matches the contract `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T051 [US3] Confirm `ActivityPanelViewProvider.addResultFile(name, filePath)` exists; if absent, add it (it pushes into `_resultFiles` and calls `_sendLayersUpdate` with `resultsChanged: true`) `apps/vscode/src/views/activityPanelView.ts`
+- [x] T052 [US3] Confirm `_sendLayersUpdate` already includes `resultFiles` and `resultsChanged` in its payload to the activity panel webview; no client-side change needed (existing dropdown reads `resultFiles`) `apps/vscode/src/views/activityPanelView.ts`
+- [x] T053 [US3] Audit `ResultsPanelService.handleSave` to ensure `addResultFile` is invoked **after** STAC registration succeeds and **before** the webview state update — verify wiring matches the contract `apps/vscode/src/services/resultsPanelService.ts`
 
 **Checkpoint**: User Story 3 functional — saved files surface in the dropdown automatically. T050 Playwright assertion passes.
 
@@ -217,9 +217,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Unit tests for User Story 4 ⚠️
 
-- [ ] T054 [P] [US4][test] Vitest: `ResultsPanelService.openSavedFile` reads the CSV from disk, parses via `parseCsvToTableDataset`, creates a tab in `state.kind === 'saved'` (FR-015) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T055 [P] [US4][test] Vitest: `openSavedFile` parse failure surfaces an error and does NOT create a tab `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T056 [P] [US4][test] Vitest: `activityPanelView` `file:action` handler routes `open` → `resultsPanelService.openSavedFile`, `reveal` → `vscode.commands.executeCommand('revealFileInOS' / 'revealInExplorer')`, `openWith` → `vscode.commands.executeCommand('explorer.openWith')`, `delete` → confirm dialog + `stacService.deleteResultAsset` (FR-015–FR-018) `apps/vscode/src/views/activityPanelView.test.ts`
+- [x] T054 [P] [US4][test] Vitest: `ResultsPanelService.openSavedFile` reads the CSV from disk, parses via `parseCsvToTableDataset`, creates a tab in `state.kind === 'saved'` (FR-015) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T055 [P] [US4][test] Vitest: `openSavedFile` parse failure surfaces an error and does NOT create a tab `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T056 [P] [US4][test] Vitest: `activityPanelView` `file:action` handler routes `open` → `resultsPanelService.openSavedFile`, `reveal` → `vscode.commands.executeCommand('revealFileInOS' / 'revealInExplorer')`, `openWith` → `vscode.commands.executeCommand('explorer.openWith')`, `delete` → confirm dialog + `stacService.deleteResultAsset` (FR-015–FR-018) `apps/vscode/src/views/activityPanelView.test.ts`
 
 ### VS Code Webview E2E tests for User Story 4 🖥️
 
@@ -228,10 +228,10 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Implementation for User Story 4
 
-- [ ] T059 [US4] Implement `openSavedFile({ plotKey, assetFilename })` per contract — `vscode.workspace.fs.readFile`, `parseCsvToTableDataset`, push tab in `saved` state with the existing `savedActivityId` looked up from the timeline, emit `results:setTabs` `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T060 [US4] Add `file:action` message handler to `ActivityPanelViewProvider` that switches on `action` and dispatches Open / Reveal / OpenWith / Delete `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T061 [US4] Implement Delete confirmation dialog via `vscode.window.showWarningMessage(..., { modal: true }, 'Delete')` and call `stacService.deleteResultAsset` on confirm `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T062 [US4] Wire dropdown click handlers in the activity panel webview to post `file:action` messages with the action name and asset path `apps/vscode/src/webview/web/activityPanel.tsx`
+- [x] T059 [US4] Implement `openSavedFile({ plotKey, assetFilename })` per contract — `vscode.workspace.fs.readFile`, `parseCsvToTableDataset`, push tab in `saved` state with the existing `savedActivityId` looked up from the timeline, emit `results:setTabs` `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T060 [US4] Add `file:action` message handler to `ActivityPanelViewProvider` that switches on `action` and dispatches Open / Reveal / OpenWith / Delete `apps/vscode/src/views/activityPanelView.ts`
+- [x] T061 [US4] Implement Delete confirmation dialog via `vscode.window.showWarningMessage(..., { modal: true }, 'Delete')` and call `stacService.deleteResultAsset` on confirm `apps/vscode/src/views/activityPanelView.ts`
+- [x] T062 [US4] Wire dropdown click handlers in the activity panel webview to post `file:action` messages with the action name and asset path `apps/vscode/src/webview/web/activityPanel.tsx`
 
 **Checkpoint**: User Story 4 functional — all four file actions work. T058 Playwright spec green.
 
@@ -245,9 +245,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Unit tests for User Story 5 ⚠️
 
-- [ ] T063 [P] [US5][test] Vitest: `addErrorTab` creates a tab in `state.kind === 'error'` and emits `results:setTabs` (FR-019) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T064 [P] [US5][test] Vitest: `addErrorTab` does NOT call `logService.recordToolResult` (no provenance for failed runs) (FR-019) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T065 [P] [US5][test] Vitest: `handleRetry` removes the failed tab and re-invokes `executeTool` with the original `featureIds` and `params` (FR-020) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T063 [P] [US5][test] Vitest: `addErrorTab` creates a tab in `state.kind === 'error'` and emits `results:setTabs` (FR-019) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T064 [P] [US5][test] Vitest: `addErrorTab` does NOT call `logService.recordToolResult` (no provenance for failed runs) (FR-019) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T065 [P] [US5][test] Vitest: `handleRetry` removes the failed tab and re-invokes `executeTool` with the original `featureIds` and `params` (FR-020) `apps/vscode/src/services/resultsPanelService.test.ts`
 
 ### VS Code Webview E2E tests for User Story 5 🖥️
 
@@ -255,11 +255,11 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Implementation for User Story 5
 
-- [ ] T067 [US5] Implement `addErrorTab({ plotKey, toolId, errorMessage, sourceFeatureIds, parameters })` — push a tab in `error` state, emit `results:setTabs`, do not touch `logService` `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T068 [US5] Implement `handleRetry(tabId)` — remove the failed tab, call `vscode.commands.executeCommand('debrief.executeTool', ...)` with original featureIds + params; the existing executeTool path will then call `addDatasetsForToolResult` or `addErrorTab` again `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T069 [US5] Wire `executeTool.ts` failure path to call `resultsPanelService.addErrorTab(...)` instead of just toasting `apps/vscode/src/commands/executeTool.ts`
-- [ ] T070 [US5] Wire `ChartContextProps.onRetry` callback in the React entry to post `results:retry` `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T071 [US5] Wire `results:retry` message router in the view provider to call `resultsPanelService.handleRetry` `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T067 [US5] Implement `addErrorTab({ plotKey, toolId, errorMessage, sourceFeatureIds, parameters })` — push a tab in `error` state, emit `results:setTabs`, do not touch `logService` `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T068 [US5] Implement `handleRetry(tabId)` — remove the failed tab, call `vscode.commands.executeCommand('debrief.executeTool', ...)` with original featureIds + params; the existing executeTool path will then call `addDatasetsForToolResult` or `addErrorTab` again `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T069 [US5] Wire `executeTool.ts` failure path to call `resultsPanelService.addErrorTab(...)` instead of just toasting `apps/vscode/src/commands/executeTool.ts`
+- [x] T070 [US5] Wire `ChartContextProps.onRetry` callback in the React entry to post `results:retry` `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T071 [US5] Wire `results:retry` message router in the view provider to call `resultsPanelService.handleRetry` `apps/vscode/src/views/resultsPanelView.ts`
 
 **Checkpoint**: All five user stories independently functional. T066 Playwright spec green.
 
@@ -271,13 +271,13 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Unit tests
 
-- [ ] T072 [P] [POLISH][test] Vitest: On `SessionManager.onActiveSessionChange` (close event), `ResultsPanelService` calls `logService.deleteEntry` for each unsaved tab's `parentActivityId` and discards the tabs (FR-021) `apps/vscode/src/services/resultsPanelService.test.ts`
-- [ ] T073 [P] [POLISH][test] Vitest: Close event leaves saved tabs' `parentActivityId` log entries intact (FR-021) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T072 [P] [POLISH][test] Vitest: On `SessionManager.onActiveSessionChange` (close event), `ResultsPanelService` calls `logService.deleteEntry` for each unsaved tab's `parentActivityId` and discards the tabs (FR-021) `apps/vscode/src/services/resultsPanelService.test.ts`
+- [x] T073 [P] [POLISH][test] Vitest: Close event leaves saved tabs' `parentActivityId` log entries intact (FR-021) `apps/vscode/src/services/resultsPanelService.test.ts`
 
 ### Implementation
 
-- [ ] T074 [POLISH] Subscribe to `sessionManager.onActiveSessionChange` in `ResultsPanelService` constructor and implement the cleanup walker per `contracts/results-panel-service.md` plot-close pseudo-code `apps/vscode/src/services/resultsPanelService.ts`
-- [ ] T075 [POLISH] Implement `dispose()` to remove the subscription `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T074 [POLISH] Subscribe to `sessionManager.onActiveSessionChange` in `ResultsPanelService` constructor and implement the cleanup walker per `contracts/results-panel-service.md` plot-close pseudo-code `apps/vscode/src/services/resultsPanelService.ts`
+- [x] T075 [POLISH] Implement `dispose()` to remove the subscription `apps/vscode/src/services/resultsPanelService.ts`
 
 **Checkpoint**: Closing and reopening a plot leaves no orphan ToolRunEvents in the log. Verify via quickstart.md "Lifecycle" section.
 
@@ -289,9 +289,9 @@ This feature is **Integration** (host wiring + new VS Code webview consuming an 
 
 ### Cross-cutting hardening
 
-- [ ] T076 [POLISH] Verify all new user-facing strings in `resultsPanel.tsx` and `resultsPanelView.ts` come from the existing `resultsPanelLabels.ts` (FR-023, SC-007) `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T077 [POLISH] Add ARIA roles, table semantics, and labelled buttons audit per FR-024 / SC-007 — confirm `ChartPanelWrapper` already exposes them and the new wrapper does not strip them `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T078 [POLISH] Run `pnpm -r typecheck` and ensure no `any` introduced (Article XV) — fix any pyright/tsc warnings in new files
+- [x] T076 [POLISH] Verify all new user-facing strings in `resultsPanel.tsx` and `resultsPanelView.ts` come from the existing `resultsPanelLabels.ts` (FR-023, SC-007) `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T077 [POLISH] Add ARIA roles, table semantics, and labelled buttons audit per FR-024 / SC-007 — confirm `ChartPanelWrapper` already exposes them and the new wrapper does not strip them `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T078 [POLISH] Run `pnpm -r typecheck` and ensure no `any` introduced (Article XV) — fix any pyright/tsc warnings in new files
 - [ ] T079 [POLISH] Run `task verify` (full lint + typecheck + unit + Playwright suite per CLAUDE.md "Before Pushing") and resolve any failures
 
 ### Evidence Collection (REQUIRED)

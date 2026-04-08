@@ -17,6 +17,7 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
 import type { LogPanelViewProvider } from '../views/logPanelView';
+import type { ResultsPanelService } from '../services/resultsPanelService';
 import type { ToolParameter } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 
@@ -94,7 +95,8 @@ export function createExecuteToolCommand(
   activityPanelProvider?: ActivityPanelViewProvider,
   logService?: LogService,
   resultIdRegistry?: ResultIdRegistry,
-  logPanelProvider?: LogPanelViewProvider
+  logPanelProvider?: LogPanelViewProvider,
+  resultsPanelService?: ResultsPanelService
 ): (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => Promise<void> {
   return async (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => {
     // Handle string, { toolId, params } object, and legacy { toolName } format
@@ -184,6 +186,21 @@ export function createExecuteToolCommand(
     );
 
     if (!result.success) {
+      // Surface the failure in the Results panel as an error tab (FR-019)
+      // so the user can retry without re-running from the toolbar.
+      if (resultsPanelService) {
+        const store = panel.getCurrentStore?.();
+        const plot = panel.getCurrentPlot?.();
+        if (store?.path && plot?.itemPath) {
+          resultsPanelService.addErrorTab({
+            plotKey: { storePath: store.path, itemPath: plot.itemPath },
+            toolId: resolvedToolId,
+            errorMessage: result.error ?? 'Unknown error',
+            sourceFeatureIds: selectedFeatureIds,
+            parameters: toolParams,
+          });
+        }
+      }
       void vscode.window.showErrorMessage(
         `Tool execution failed: ${result.error ?? 'Unknown error'}`
       );
@@ -339,6 +356,21 @@ export function createExecuteToolCommand(
             // Refresh Log Panel timeline to show the new entry (Feature: 113)
             if (logPanelProvider) {
               void logPanelProvider.refreshTimeline();
+            }
+
+            // Feature: 178 — route tool result datasets into the Results panel.
+            // Only runs if the ResultsPanelService is wired AND the tool
+            // returned a proper FeatureCollection.  Tools that produce only
+            // a map layer with no __datasets / statistics are a no-op here.
+            if (resultsPanelService && result.features) {
+              resultsPanelService.addDatasetsForToolResult({
+                plotKey: { storePath: store.path, itemPath: plot.itemPath },
+                toolId: resolvedToolId,
+                result: { features: result.features },
+                sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
+                parameters: toolParams,
+                parentActivityId: recordResult.activity_id,
+              });
             }
           }
         } catch (logErr) {

@@ -104,6 +104,16 @@ export interface FeatureProvenance {
   entry: Record<string, unknown>;
 }
 
+/**
+ * Sentinel tool name used on FileSavedEvent LogEntries to mark them as
+ * distinct from ToolRunEvents.  Producers (`LogService.recordFileSaved`)
+ * and consumers (cleanup walker on plot close) reference this single
+ * constant to avoid string literals scattered across the codebase.
+ *
+ * Feature: 178-vscode-tabular-results (R7)
+ */
+export const FILE_SAVE_TOOL_SENTINEL = 'debrief.fileSave';
+
 export interface LogService {
   recordToolResult(
     toolResult: ToolResultForLog,
@@ -111,6 +121,34 @@ export interface LogService {
     storePath: string,
     itemPath: string
   ): Promise<RecordResult>;
+
+  /**
+   * Append a FileSavedEvent to the analysis log.
+   *
+   * Creates a LogEntry with `was_generated_by.tool = FILE_SAVE_TOOL_SENTINEL`
+   * linked via `used[0] = parentActivityId` to the originating ToolRunEvent,
+   * and recording the saved filename in `generated[0]`.
+   *
+   * Feature: 178-vscode-tabular-results (R7)
+   *
+   * @param storePath          STAC store root.
+   * @param itemPath           STAC item path within the store.
+   * @param parentActivityId   activity_id of the originating ToolRunEvent.
+   * @param filename           Saved file path relative to the item, e.g.
+   *                           `assets/track-stats--2026-04-07T10-00-00.csv`.
+   * @param timestamp          ISO-8601 timestamp of the save action.
+   * @returns                  The new entry's activity_id.
+   *
+   * @throws If `filename` does not begin with `assets/`.
+   * @throws If `timestamp` is not a parseable ISO-8601 string.
+   */
+  recordFileSaved(
+    storePath: string,
+    itemPath: string,
+    parentActivityId: string,
+    filename: string,
+    timestamp: string
+  ): Promise<{ activity_id: string }>;
 
   getTimeline(
     storePath: string,

@@ -16,6 +16,8 @@ import { OutlineProvider } from './providers/outlineProvider';
 import { TimeRangeViewProvider } from './views/timeRangeView';
 import { ActivityPanelViewProvider } from './views/activityPanelView';
 import { LogPanelViewProvider } from './views/logPanelView';
+import { ResultsPanelViewProvider } from './views/resultsPanelView';
+import { ResultsPanelService } from './services/resultsPanelService';
 import { MapPanel } from './webview/mapPanel';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
@@ -133,11 +135,39 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
   logPanelProvider.setCalcService(calcService);
 
+  // Results panel (Feature: 178-vscode-tabular-results)
+  const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
+  const resultsPanelService = new ResultsPanelService({
+    stacService,
+    // Per-plot LogService is owned by MapPanel — resolve dynamically.
+    getLogService: () => mapPanel?.getLogService?.() ?? undefined,
+    panelView: resultsPanelProvider,
+    activityPanelView: activityPanelProvider,
+    sessionManager,
+  });
+  resultsPanelProvider.setService(resultsPanelService);
+  context.subscriptions.push({ dispose: () => resultsPanelService.dispose() });
+
+  // Wire the Associated Files dropdown action handler (Feature: 178)
+  activityPanelProvider.setFileActionServices(
+    stacService,
+    resultsPanelService,
+    () => {
+      const store = mapPanel?.getCurrentStore?.();
+      const plot = mapPanel?.getCurrentPlot?.();
+      if (store?.path && plot?.itemPath) {
+        return { storePath: store.path, itemPath: plot.itemPath };
+      }
+      return undefined;
+    },
+  );
+
   // Register all view providers — this is what makes views appear in the UI
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
-    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider)
+    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider),
+    vscode.window.registerWebviewViewProvider('debrief.resultsPanel', resultsPanelProvider)
   );
 
   // Register outline provider for selection
@@ -320,7 +350,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       mapPanel = panel;
     },
     resultIdRegistry,
-    logPanelProvider
+    logPanelProvider,
+    resultsPanelService
   );
   context.subscriptions.push(...commands);
 
