@@ -1,3 +1,5 @@
+const { rules: snakeCaseRules } = require('../eslint-rules/provenance-snake-case.cjs');
+
 module.exports = {
   root: true,
   env: {
@@ -47,6 +49,7 @@ module.exports = {
         message:
           'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
       },
+      ...snakeCaseRules,
     ],
   },
 };

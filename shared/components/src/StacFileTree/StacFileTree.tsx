@@ -2,7 +2,7 @@
  * StacFileTree component - renders STAC catalog filesystem structure as a tree
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Icon } from 'vscrui';
 import type { IIconProps } from 'vscrui';
 import { useTreeState } from './useTreeState';
@@ -180,13 +180,19 @@ export function StacFileTree({
   refreshKey,
   className,
 }: StacFileTreeProps) {
-  const { nodes, toggleNode, isLoading, error } = useTreeState(fs, rootPath, refreshKey);
+  const { nodes, toggleNode, expandPath, isLoading, error } = useTreeState(fs, rootPath, refreshKey);
 
   // Compute highlight sets
   const { directPaths, ancestorPaths } = useMemo(
     () => computeHighlightSets(highlightedPaths),
     [highlightedPaths]
   );
+
+  // Auto-expand ancestors of highlighted paths so the target nodes are visible
+  useEffect(() => {
+    if (highlightedPaths.length === 0) return;
+    void Promise.all(highlightedPaths.map(p => expandPath(p)));
+  }, [highlightedPaths, expandPath]);
 
   const handleDoubleClick = (node: TreeNodeData) => {
     if (node.nodeType === 'item' && onItemSelect) {

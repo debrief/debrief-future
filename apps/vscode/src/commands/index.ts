@@ -263,14 +263,14 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.toggleLayerVisibility',
-      (args: { layerId: string; featureId?: string }) => {
+      (args: { layerId: string; feature_id?: string }) => {
         const panel = getMapPanel();
         if (!panel || !args?.layerId) {
           return;
         }
 
-        // Use session state if featureId is provided
-        const featureId = args.featureId;
+        // Use session state if feature_id is provided
+        const featureId = args.feature_id;
         const activeSession: SessionStoreApi | null = sessionManager.getActiveSession();
 
         if (featureId !== undefined && activeSession !== null) {

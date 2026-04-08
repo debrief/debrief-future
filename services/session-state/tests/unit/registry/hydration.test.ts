@@ -195,10 +195,10 @@ describe('hydrate then live update', () => {
     // Live update to v2 via replay
     registry.registerFromReplayResult([
       {
-        resultId: 'bt_plot_001',
+        result_id: 'bt_plot_001',
         version: 2,
         path: './results/bt_plot_001_v2.png',
-        previousPath: './results/bt_plot_001_v1.png',
+        previous_path: './results/bt_plot_001_v1.png',
       },
     ]);
 

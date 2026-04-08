@@ -23,125 +23,31 @@ import {
 import type { SessionManager } from '../services/sessionManager';
 import type { CalcService } from '../services/calcService';
 import type { ToolParameter } from '../types/tool';
+import type {
+  WebviewMessage,
+  ExtensionMessage,
+  TuneRequestMessage,
+  RevertToRequestMessage,
+  RevertThisRequestMessage,
+  RestoreRequestMessage,
+  DisableToggleMessage,
+  RationaleUpdateMessage,
+  SchemaRequestMessage,
+} from '../webview/logPanelMessages';
 
-// Locally-defined types matching @debrief/components LogPanel types.
-// Defined here to avoid ESM-from-CJS import issues with @debrief/components.
-type OperationCategory = 'calculation' | 'import' | 'property-edit' | 'export';
-interface LogParameterValue {
-  value: unknown;
-  default: boolean;
-  tunable: boolean;
-}
-interface TimelineEntry {
-  activityId: string;
-  timestamp: string;
-  toolName: string;
-  toolVersion: string;
-  parameters: Record<string, LogParameterValue>;
-  usedFeatureIds: string[];
-  generatedFeatureIds: string[];
-  executionDuration: string;
-  generatedResultId: string | null;
-  operationCategory: OperationCategory;
-  deleted?: boolean;
-  disabled?: boolean;
-  rationale?: string | null;
-  tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
-}
+// Type-only imports from @debrief/components — erased at compile time so the
+// extension does not pull the runtime ESM bundle.
+import type {
+  TimelineEntry,
+  LogParameterValue,
+  OperationCategory,
+  ParameterSchemaEntry,
+  ViewMode,
+} from '@debrief/components';
+import { VALID_VIEW_MODES } from '@debrief/components';
 
-// Locally-defined ParameterSchemaEntry matching @debrief/components LogPanel types.
-interface ParameterSchemaEntry {
-  name: string;
-  type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
-  description: string | null;
-  tunable: boolean;
-  defaultValue: unknown;
-  minimum: number | null;
-  maximum: number | null;
-  step: number | null;
-  choices: ReadonlyArray<unknown> | null;
-  paramType: string | null;
-}
-
-// Webview → Extension messages
-interface EntrySelectMessage {
-  type: 'entry:select';
-  payload: { activityId: string; featureIds: string[] };
-}
-
-interface EntryDeselectMessage {
-  type: 'entry:deselect';
-}
-
-interface ActionInvokeMessage {
-  type: 'action:invoke';
-  payload: { actionType: string; activityId: string };
-}
-
-interface ModeChangeMessage {
-  type: 'mode:change';
-  payload: { viewMode: string };
-}
-
-interface WebviewReadyMessage {
-  type: 'webviewReady';
-}
-
-// Phase 6 messages (Feature: 076-replay-tune)
-interface TuneRequestMessage {
-  type: 'tune:request';
-  payload: { activityId: string; parameter: string; newValue: unknown };
-}
-
-interface RevertToRequestMessage {
-  type: 'revert-to:request';
-  payload: { activityId: string };
-}
-
-interface RevertThisRequestMessage {
-  type: 'revert-this:request';
-  payload: { activityId: string };
-}
-
-interface RestoreRequestMessage {
-  type: 'restore:request';
-  payload: { activityId: string };
-}
-
-interface ReplayCancelMessage {
-  type: 'replay:cancel';
-}
-
-// Feature 113: flip-card edit messages
-interface DisableToggleMessage {
-  type: 'disable:toggle';
-  payload: { activityId: string; disabled: boolean };
-}
-
-interface RationaleUpdateMessage {
-  type: 'rationale:update';
-  payload: { activityId: string; rationale: string };
-}
-
-interface SchemaRequestMessage {
-  type: 'schema:request';
-  payload: { toolId: string };
-}
-
-type WebviewMessage =
-  | EntrySelectMessage
-  | EntryDeselectMessage
-  | ActionInvokeMessage
-  | ModeChangeMessage
-  | WebviewReadyMessage
-  | TuneRequestMessage
-  | RevertToRequestMessage
-  | RevertThisRequestMessage
-  | RestoreRequestMessage
-  | ReplayCancelMessage
-  | DisableToggleMessage
-  | RationaleUpdateMessage
-  | SchemaRequestMessage;
+// Webview ↔ Extension message types are imported from `../webview/logPanelMessages`
+// (shared with the webview side to enforce a single contract).
 
 // Tool category mapping for operation classification
 const TOOL_CATEGORY_MAP: Record<string, OperationCategory> = {
@@ -166,21 +72,21 @@ function classifyOperation(toolId: string): OperationCategory {
  */
 function toTimelineEntry(entry: LogEntry): TimelineEntry {
   return {
-    activityId: entry.activityId,
+    activity_id: entry.activity_id,
     timestamp: entry.timestamp,
-    toolName: entry.wasGeneratedBy.tool,
-    toolVersion: entry.wasGeneratedBy.toolVersion,
-    parameters: entry.wasGeneratedBy.parameters as { [k: string]: LogParameterValue },
+    toolName: entry.was_generated_by.tool,
+    tool_version: entry.was_generated_by.tool_version,
+    parameters: entry.was_generated_by.parameters as { [k: string]: LogParameterValue },
     usedFeatureIds: entry.used,
     generatedFeatureIds: entry.generated,
-    executionDuration: entry.executionDuration,
-    generatedResultId: entry.generatedResultId ?? null,
-    operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
+    execution_duration: entry.execution_duration,
+    generated_result_id: entry.generated_result_id ?? null,
+    operationCategory: classifyOperation(entry.was_generated_by.tool),
     deleted: entry.deleted === true,
     disabled: entry.disabled === true,
     rationale: entry.rationale ?? null,
     tuneAnnotation: entry.tune
-      ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
+      ? { parameter: entry.tune.parameter, previous_value: entry.tune.previous_value, new_value: entry.tune.new_value }
       : null,
   };
 }
@@ -192,7 +98,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
   private _isWebviewReady = false;
-  private _pendingMessages: Array<Record<string, unknown>> = [];
+  private _pendingMessages: ExtensionMessage[] = [];
 
   // Session integration
   private _activeSession?: SessionStoreApi;
@@ -403,14 +309,22 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
           // Send initial view mode from globalState
           {
-            const VALID_VIEW_MODES = ['timeline', 'by-feature', 'compact', 'detailed'];
             const savedMode = this._context.globalState.get<string>(
               'debrief.logPanel.viewMode',
               'timeline'
             );
+            // SAFETY: `VALID_VIEW_MODES` is `readonly ViewMode[]` and
+            // TypeScript's `.includes()` signature on a narrow readonly
+            // array rejects a plain string. Widening to `readonly string[]`
+            // is a safe upcast (ViewMode is a string literal subtype) and
+            // the `isViewMode` type guard narrows the result back to
+            // `ViewMode` through the return type.
+            const isViewMode = (value: string): value is ViewMode =>
+              (VALID_VIEW_MODES as readonly string[]).includes(value);
+            const viewMode: ViewMode = isViewMode(savedMode) ? savedMode : 'timeline';
             this._postMessage({
               type: 'mode:init',
-              payload: { viewMode: VALID_VIEW_MODES.includes(savedMode) ? savedMode : 'timeline' },
+              payload: { viewMode },
             });
           }
 
@@ -448,7 +362,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         case 'action:invoke':
           {
             const actionType = message.payload.actionType;
-            if (actionType === 'tune' || actionType === 'revertTo' || actionType === 'revertThis') {
+            if (actionType === 'revertTo' || actionType === 'revertThis') {
               // These are handled via dedicated Phase 6 messages from the webview.
               this._postMessage({
                 type: 'action:result',
@@ -525,8 +439,12 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   /**
    * Post message to webview, queueing if not ready.
+   *
+   * Typed against `ExtensionMessage` so that any payload shape mismatch
+   * (e.g. an outgoing field renamed without updating the contract) is a
+   * compile error rather than a silent runtime `undefined` on the webview.
    */
-  private _postMessage(message: Record<string, unknown>): void {
+  private _postMessage(message: ExtensionMessage): void {
     if (this._isWebviewReady && this._view) {
       void this._view.webview.postMessage(message);
     } else {
@@ -559,11 +477,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   // ─── Phase 6 handlers (Feature: 076-replay-tune) ──────────────────
 
-  private async _handleTuneRequest(payload: {
-    activityId: string;
-    parameter: string;
-    newValue: unknown;
-  }): Promise<void> {
+  private async _handleTuneRequest(payload: TuneRequestMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('tune:request')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -574,7 +488,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       const result = await this._logService!.tuneEntry(
         storePath, itemPath,
-        payload.activityId, payload.parameter, payload.newValue
+        payload.activity_id, payload.parameter, payload.new_value
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -588,9 +502,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _handleRevertToRequest(payload: {
-    activityId: string;
-  }): Promise<void> {
+  private async _handleRevertToRequest(payload: RevertToRequestMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('revert-to:request')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -599,7 +511,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      await this._logService!.revertTo(storePath, itemPath, payload.activityId);
+      await this._logService!.revertTo(storePath, itemPath, payload.activity_id);
       this._postMessage({
         type: 'action:result',
         payload: {
@@ -618,9 +530,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _handleRevertThisRequest(payload: {
-    activityId: string;
-  }): Promise<void> {
+  private async _handleRevertThisRequest(payload: RevertThisRequestMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('revert-this:request')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -630,7 +540,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
     try {
       const result = await this._logService!.revertThis(
-        storePath, itemPath, payload.activityId
+        storePath, itemPath, payload.activity_id
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -643,9 +553,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _handleRestoreRequest(payload: {
-    activityId: string;
-  }): Promise<void> {
+  private async _handleRestoreRequest(payload: RestoreRequestMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('restore:request')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -655,7 +563,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
     try {
       const result = await this._logService!.restoreEntry(
-        storePath, itemPath, payload.activityId
+        storePath, itemPath, payload.activity_id
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
@@ -670,8 +578,8 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   private _sendReplayResult(result: ReplayResult): void {
     // Update Result ID Registry from replay artifacts (Feature: 087)
-    if (this._resultIdRegistry && result.artifactsCreated.length > 0) {
-      this._resultIdRegistry.registerFromReplayResult(result.artifactsCreated);
+    if (this._resultIdRegistry && result.artifacts_created.length > 0) {
+      this._resultIdRegistry.registerFromReplayResult(result.artifacts_created);
     }
 
     this._postMessage({
@@ -707,7 +615,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         payload: {
           actionType: 'snapshot',
           available: false,
-          message: `Snapshot created: ${result.snapshotAsset} (${result.entriesCaptured} entries captured).`,
+          message: `Snapshot created: ${result.snapshot_asset} (${result.entries_captured} entries captured).`,
         },
       });
       await this._sendTimelineUpdate();
@@ -727,10 +635,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   // ─── Feature 113: Flip-card edit handlers ──────────────────────────
 
-  private async _handleDisableToggle(payload: {
-    activityId: string;
-    disabled: boolean;
-  }): Promise<void> {
+  private async _handleDisableToggle(payload: DisableToggleMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('disable:toggle')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -741,7 +646,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       await this._logService!.disableEntry(
         storePath, itemPath,
-        payload.activityId, payload.disabled
+        payload.activity_id, payload.disabled
       );
       await this._sendTimelineUpdate();
     } catch (err) {
@@ -752,10 +657,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _handleRationaleUpdate(payload: {
-    activityId: string;
-    rationale: string;
-  }): Promise<void> {
+  private async _handleRationaleUpdate(payload: RationaleUpdateMessage['payload']): Promise<void> {
     if (!this._assertLogServiceReady('rationale:update')) { return; }
     const storePath = this._getStorePath!();
     const itemPath = this._getItemPath!();
@@ -766,7 +668,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     try {
       await this._logService!.setRationale(
         storePath, itemPath,
-        payload.activityId, payload.rationale
+        payload.activity_id, payload.rationale
       );
       // No timeline update needed — rationale is metadata only
     } catch (err) {
@@ -777,9 +679,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private _handleSchemaRequest(payload: {
-    toolId: string;
-  }): void {
+  private _handleSchemaRequest(payload: SchemaRequestMessage['payload']): void {
     if (!this._calcService) {
       // No CalcService — return empty schema (fallback to text inputs)
       this._postMessage({

@@ -14,17 +14,17 @@ import type { LogEntry, RecordResult, ArtifactVersion } from '../../../src/log/t
 
 function makeLogEntry(overrides: Partial<LogEntry> = {}): LogEntry {
   return {
-    activityId: 'act-001',
+    activity_id: 'act-001',
     timestamp: '2026-02-13T10:00:00Z',
-    wasGeneratedBy: {
+    was_generated_by: {
       tool: 'bearing-time-plot',
-      toolVersion: '1.0.0',
+      tool_version: '1.0.0',
       parameters: {},
     },
     used: ['track-a'],
     generated: ['./results/bt_plot_001_v1.png'],
-    executionDuration: 'PT0.5S',
-    generatedResultId: 'bt_plot_001',
+    execution_duration: 'PT0.5S',
+    generated_result_id: 'bt_plot_001',
     tune: null,
     ...overrides,
   };
@@ -32,18 +32,18 @@ function makeLogEntry(overrides: Partial<LogEntry> = {}): LogEntry {
 
 function makeRecordResult(entries: LogEntry[]): RecordResult {
   return {
-    activityId: entries[0]?.activityId ?? '',
-    featuresUpdated: 1,
+    activity_id: entries[0]?.activity_id ?? '',
+    features_updated: 1,
     entries,
   };
 }
 
 function makeArtifactVersion(overrides: Partial<ArtifactVersion> = {}): ArtifactVersion {
   return {
-    resultId: 'bt_plot_001',
+    result_id: 'bt_plot_001',
     version: 2,
     path: './results/bt_plot_001_v2.png',
-    previousPath: './results/bt_plot_001_v1.png',
+    previous_path: './results/bt_plot_001_v1.png',
     ...overrides,
   };
 }
@@ -83,10 +83,10 @@ describe('createResultIdRegistry', () => {
       const registry = createResultIdRegistry();
       expect(registry.size).toBe(0);
 
-      registry.registerFromLogEntry(makeLogEntry({ generatedResultId: 'id-1', generated: ['./results/id-1_v1.png'] }));
+      registry.registerFromLogEntry(makeLogEntry({ generated_result_id: 'id-1', generated: ['./results/id-1_v1.png'] }));
       expect(registry.size).toBe(1);
 
-      registry.registerFromLogEntry(makeLogEntry({ generatedResultId: 'id-2', generated: ['./results/id-2_v1.png'] }));
+      registry.registerFromLogEntry(makeLogEntry({ generated_result_id: 'id-2', generated: ['./results/id-2_v1.png'] }));
       expect(registry.size).toBe(2);
     });
   });
@@ -107,13 +107,13 @@ describe('registerFromLogEntry', () => {
 
   it('no-ops when entry has null generatedResultId (FR-013)', () => {
     const registry = createResultIdRegistry();
-    registry.registerFromLogEntry(makeLogEntry({ generatedResultId: null }));
+    registry.registerFromLogEntry(makeLogEntry({ generated_result_id: null }));
     expect(registry.size).toBe(0);
   });
 
   it('no-ops when entry has undefined generatedResultId (FR-013)', () => {
     const registry = createResultIdRegistry();
-    registry.registerFromLogEntry(makeLogEntry({ generatedResultId: undefined }));
+    registry.registerFromLogEntry(makeLogEntry({ generated_result_id: undefined }));
     expect(registry.size).toBe(0);
   });
 
@@ -133,7 +133,7 @@ describe('registerFromLogEntry', () => {
     const registry = createResultIdRegistry();
     registry.registerFromLogEntry(
       makeLogEntry({
-        generatedResultId: 'bt_plot_001',
+        generated_result_id: 'bt_plot_001',
         generated: ['feature-id-only'],
       })
     );
@@ -145,8 +145,8 @@ describe('registerFromRecordResult', () => {
   it('processes all entries in the result', () => {
     const registry = createResultIdRegistry();
     const entries = [
-      makeLogEntry({ generatedResultId: 'id-1', generated: ['./results/id-1_v1.png'] }),
-      makeLogEntry({ generatedResultId: 'id-2', generated: ['./results/id-2_v1.json'] }),
+      makeLogEntry({ generated_result_id: 'id-1', generated: ['./results/id-1_v1.png'] }),
+      makeLogEntry({ generated_result_id: 'id-2', generated: ['./results/id-2_v1.json'] }),
     ];
 
     registry.registerFromRecordResult(makeRecordResult(entries));
@@ -158,8 +158,8 @@ describe('registerFromRecordResult', () => {
   it('skips entries without generatedResultId', () => {
     const registry = createResultIdRegistry();
     const entries = [
-      makeLogEntry({ generatedResultId: 'id-1', generated: ['./results/id-1_v1.png'] }),
-      makeLogEntry({ generatedResultId: null }),
+      makeLogEntry({ generated_result_id: 'id-1', generated: ['./results/id-1_v1.png'] }),
+      makeLogEntry({ generated_result_id: null }),
     ];
 
     registry.registerFromRecordResult(makeRecordResult(entries));
@@ -171,7 +171,7 @@ describe('registerFromReplayResult', () => {
   it('registers mappings from artifact versions', () => {
     const registry = createResultIdRegistry();
     const artifacts: ArtifactVersion[] = [
-      makeArtifactVersion({ resultId: 'bt_plot_001', version: 2, path: './results/bt_plot_001_v2.png' }),
+      makeArtifactVersion({ result_id: 'bt_plot_001', version: 2, path: './results/bt_plot_001_v2.png' }),
     ];
 
     registry.registerFromReplayResult(artifacts);
@@ -183,8 +183,8 @@ describe('registerFromReplayResult', () => {
   it('processes multiple artifact versions', () => {
     const registry = createResultIdRegistry();
     const artifacts: ArtifactVersion[] = [
-      makeArtifactVersion({ resultId: 'id-1', version: 3, path: './results/id-1_v3.png' }),
-      makeArtifactVersion({ resultId: 'id-2', version: 1, path: './results/id-2_v1.json' }),
+      makeArtifactVersion({ result_id: 'id-1', version: 3, path: './results/id-1_v3.png' }),
+      makeArtifactVersion({ result_id: 'id-2', version: 1, path: './results/id-2_v1.json' }),
     ];
 
     registry.registerFromReplayResult(artifacts);
@@ -251,10 +251,10 @@ describe('subscribeAll()', () => {
     registry.subscribeAll((e) => events.push(e));
 
     registry.registerFromLogEntry(
-      makeLogEntry({ generatedResultId: 'id-1', generated: ['./results/id-1_v1.png'] })
+      makeLogEntry({ generated_result_id: 'id-1', generated: ['./results/id-1_v1.png'] })
     );
     registry.registerFromLogEntry(
-      makeLogEntry({ generatedResultId: 'id-2', generated: ['./results/id-2_v1.json'] })
+      makeLogEntry({ generated_result_id: 'id-2', generated: ['./results/id-2_v1.json'] })
     );
 
     expect(events).toHaveLength(2);
@@ -296,7 +296,7 @@ describe('unsubscribe', () => {
     unsub();
 
     registry.registerFromLogEntry(
-      makeLogEntry({ generatedResultId: 'id-2', generated: ['./results/id-2_v1.png'] })
+      makeLogEntry({ generated_result_id: 'id-2', generated: ['./results/id-2_v1.png'] })
     );
     expect(events).toHaveLength(1);
   });
@@ -339,7 +339,7 @@ describe('change event content', () => {
 
     // Update via replay to v2
     registry.registerFromReplayResult([
-      makeArtifactVersion({ resultId: 'bt_plot_001', version: 2, path: './results/bt_plot_001_v2.png' }),
+      makeArtifactVersion({ result_id: 'bt_plot_001', version: 2, path: './results/bt_plot_001_v2.png' }),
     ]);
 
     expect(events[0].previousPath).toBe('./results/bt_plot_001_v1.png');
@@ -378,19 +378,19 @@ describe('edge cases', () => {
 
     registry.registerFromLogEntry(
       makeLogEntry({
-        generatedResultId: 'bt_plot_001',
+        generated_result_id: 'bt_plot_001',
         generated: ['./results/bt_plot_001_v1.png'],
       })
     );
     registry.registerFromLogEntry(
       makeLogEntry({
-        generatedResultId: 'bt_plot_001',
+        generated_result_id: 'bt_plot_001',
         generated: ['./results/bt_plot_001_v2.png'],
       })
     );
     registry.registerFromLogEntry(
       makeLogEntry({
-        generatedResultId: 'bt_plot_001',
+        generated_result_id: 'bt_plot_001',
         generated: ['./results/bt_plot_001_v3.png'],
       })
     );
@@ -423,7 +423,7 @@ describe('edge cases', () => {
     // New tool execution updates the mapping
     registry.registerFromLogEntry(
       makeLogEntry({
-        generatedResultId: 'bt_plot_001',
+        generated_result_id: 'bt_plot_001',
         generated: ['./results/bt_plot_001_v2.png'],
       })
     );
@@ -474,12 +474,12 @@ describe('integration with LogService flow', () => {
     registry.subscribeAll((e) => events.push(e));
 
     const recordResult: RecordResult = {
-      activityId: 'act-123',
-      featuresUpdated: 2,
+      activity_id: 'act-123',
+      features_updated: 2,
       entries: [
         makeLogEntry({
-          activityId: 'act-123',
-          generatedResultId: 'range_plot_001',
+          activity_id: 'act-123',
+          generated_result_id: 'range_plot_001',
           generated: ['track-a', 'track-b', './results/range_plot_001_v1.json'],
         }),
       ],

@@ -137,7 +137,7 @@ describe('validateParameter', () => {
     const typeInfo: ParameterTypeInfo = {
       type: 'enum',
       label: 'Mode',
-      allowedValues: ['fast', 'slow', 'medium'],
+      allowed_values: ['fast', 'slow', 'medium'],
     };
 
     it('valid value returns valid', () => {

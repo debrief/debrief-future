@@ -155,7 +155,7 @@ export function createExecuteToolCommand(
         // Deep-copy geometry and properties (minus provenance) for input state snapshot.
         const { provenance: _p, ...restProps } = structuredClone(f.properties);
         const state: InputFeatureState = {
-          featureId: String(f.id),
+          feature_id: String(f.id),
           geometry: structuredClone(f.geometry),
           properties: restProps,
         };
@@ -313,18 +313,18 @@ export function createExecuteToolCommand(
               {
                 success: true,
                 features: result.features,
-                durationMs: result.durationMs,
-                resultType: result.resultType,
-                sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
-                artifactHref: result.artifactHref,
-                toolId: resolvedToolId,
-                ...(isMutation && preToolInputState ? { inputState: preToolInputState } : {}),
+                duration_ms: result.durationMs,
+                result_type: result.resultType,
+                source_feature_ids: result.sourceFeatureIds ?? selectedFeatureIds,
+                artifact_href: result.artifactHref,
+                tool_id: resolvedToolId,
+                ...(isMutation && preToolInputState ? { input_state: preToolInputState } : {}),
               },
-              result.toolVersion || result.parameters ? {
-                toolVersion: result.toolVersion,
-                modifiedFeatures: result.modifiedFeatures,
-                createdFeatures: result.createdFeatures,
-                createdAssets: result.createdAssets,
+              result.tool_version || result.parameters ? {
+                tool_version: result.tool_version,
+                modified_features: result.modifiedFeatures,
+                created_features: result.createdFeatures,
+                created_assets: result.createdAssets,
                 parameters: result.parameters,
               } : undefined,
               store.path,

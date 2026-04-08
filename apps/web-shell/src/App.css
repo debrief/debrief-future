@@ -212,3 +212,30 @@ body {
 .leaflet-container a.leaflet-popup-close-button {
   color: var(--vscode-foreground, #cccccc);
 }
+
+/* ---- Mobile responsive adjustments (Feature: mobile-web-shell-preview) ---- */
+@media (max-width: 767px) {
+  /* Stack header items vertically on narrow screens */
+  .web-shell__header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 12px;
+  }
+
+  .web-shell__subtitle {
+    display: none;
+  }
+
+  .web-shell__header-links {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Tool message toast: full width on mobile */
+  .web-shell__tool-message {
+    left: 8px;
+    right: 8px;
+    max-width: none;
+    top: 48px;
+  }
+}

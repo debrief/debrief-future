@@ -17,7 +17,7 @@ function createMockDeps(overrides?: Partial<LogServiceDeps>): LogServiceDeps {
           id: 'track-1',
           properties: {
             provenance: [
-              { activityId: 'act-1', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a', toolVersion: '1.0.0', parameters: {} }, used: [], generated: [], executionDuration: 'PT0.1S', tune: null },
+              { activity_id: 'act-1', timestamp: '2026-02-09T10:00:00Z', was_generated_by: { tool: 'tool-a', tool_version: '1.0.0', parameters: {} }, used: [], generated: [], execution_duration: 'PT0.1S', tune: null },
             ],
           },
         },
@@ -26,8 +26,8 @@ function createMockDeps(overrides?: Partial<LogServiceDeps>): LogServiceDeps {
           id: 'track-2',
           properties: {
             provenance: [
-              { activityId: 'act-1', timestamp: '2026-02-09T10:00:00Z', wasGeneratedBy: { tool: 'tool-a', toolVersion: '1.0.0', parameters: {} }, used: [], generated: [], executionDuration: 'PT0.1S', tune: null },
-              { activityId: 'act-2', timestamp: '2026-02-09T11:00:00Z', wasGeneratedBy: { tool: 'tool-b', toolVersion: '1.0.0', parameters: {} }, used: [], generated: [], executionDuration: 'PT0.2S', tune: null },
+              { activity_id: 'act-1', timestamp: '2026-02-09T10:00:00Z', was_generated_by: { tool: 'tool-a', tool_version: '1.0.0', parameters: {} }, used: [], generated: [], execution_duration: 'PT0.1S', tune: null },
+              { activity_id: 'act-2', timestamp: '2026-02-09T11:00:00Z', was_generated_by: { tool: 'tool-b', tool_version: '1.0.0', parameters: {} }, used: [], generated: [], execution_duration: 'PT0.2S', tune: null },
             ],
           },
         },
@@ -45,14 +45,14 @@ describe('createLogService', () => {
       const service = createLogService(deps);
 
       const result = await service.recordToolResult(
-        { success: false, durationMs: 100, toolId: 'test-tool' },
+        { success: false, duration_ms: 100, tool_id: 'test-tool' },
         undefined,
         '/store',
         'item.json'
       );
 
-      expect(result.activityId).toBe('');
-      expect(result.featuresUpdated).toBe(0);
+      expect(result.activity_id).toBe('');
+      expect(result.features_updated).toBe(0);
       expect(result.entries).toHaveLength(0);
       expect(deps.appendProvenance).not.toHaveBeenCalled();
       expect(deps.markDirty).not.toHaveBeenCalled();
@@ -64,13 +64,13 @@ describe('createLogService', () => {
 
       const toolResult: ToolResultForLog = {
         success: true,
-        durationMs: 300,
-        toolId: 'calculate-range',
-        sourceFeatureIds: ['track-1', 'track-2'],
+        duration_ms: 300,
+        tool_id: 'calculate-range',
+        source_feature_ids: ['track-1', 'track-2'],
         features: {
           type: 'FeatureCollection',
           features: [
-            { id: 'result-1', type: 'Feature', properties: { provenance: [{ activityId: 'from-python' }] } },
+            { id: 'result-1', type: 'Feature', properties: { provenance: [{ activity_id: 'from-python' }] } },
           ],
         },
       };
@@ -82,14 +82,14 @@ describe('createLogService', () => {
         'item.json'
       );
 
-      expect(result.activityId).toBe('from-python');
+      expect(result.activity_id).toBe('from-python');
       expect(result.entries).toHaveLength(1);
       expect(deps.appendProvenance).toHaveBeenCalledWith(
         '/store',
         'item.json',
         expect.arrayContaining([
-          expect.objectContaining({ featureId: 'track-1' }),
-          expect.objectContaining({ featureId: 'track-2' }),
+          expect.objectContaining({ feature_id: 'track-1' }),
+          expect.objectContaining({ feature_id: 'track-2' }),
         ])
       );
       expect(deps.markDirty).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe('createLogService', () => {
       const service = createLogService(deps);
 
       await service.recordToolResult(
-        { success: true, durationMs: 100, toolId: 'test', sourceFeatureIds: ['f1'] },
+        { success: true, duration_ms: 100, tool_id: 'test', source_feature_ids: ['f1'] },
         undefined,
         '/store',
         'item.json'
@@ -114,19 +114,19 @@ describe('createLogService', () => {
       const service = createLogService(deps);
 
       const expanded: ExpandedToolResultFields = {
-        toolVersion: '2.0.0',
+        tool_version: '2.0.0',
         parameters: { threshold: { value: 0.5, default: true, tunable: true } },
       };
 
       const result = await service.recordToolResult(
-        { success: true, durationMs: 200, toolId: 'fancy-tool', sourceFeatureIds: ['f1'] },
+        { success: true, duration_ms: 200, tool_id: 'fancy-tool', source_feature_ids: ['f1'] },
         expanded,
         '/store',
         'item.json'
       );
 
-      expect(result.entries[0].wasGeneratedBy.toolVersion).toBe('2.0.0');
-      expect(result.entries[0].wasGeneratedBy.parameters).toEqual({
+      expect(result.entries[0].was_generated_by.tool_version).toBe('2.0.0');
+      expect(result.entries[0].was_generated_by.parameters).toEqual({
         threshold: { value: 0.5, default: true, tunable: true },
       });
     });
@@ -138,8 +138,8 @@ describe('createLogService', () => {
       const result = await service.recordToolResult(
         {
           success: true,
-          durationMs: 100,
-          toolId: 'create-tool',
+          duration_ms: 100,
+          tool_id: 'create-tool',
           features: {
             type: 'FeatureCollection',
             features: [{ id: 'new-1', type: 'Feature', properties: {} }],
@@ -164,8 +164,8 @@ describe('createLogService', () => {
       const timeline = await service.getTimeline('/store', 'item.json');
 
       expect(timeline).toHaveLength(2); // act-1 and act-2 (deduplicated)
-      expect(timeline[0].activityId).toBe('act-1');
-      expect(timeline[1].activityId).toBe('act-2');
+      expect(timeline[0].activity_id).toBe('act-1');
+      expect(timeline[1].activity_id).toBe('act-2');
       expect(deps.loadGeoJson).toHaveBeenCalledWith('/store', 'item.json');
     });
 

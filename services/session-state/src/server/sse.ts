@@ -65,7 +65,7 @@ export function createSSEHandler(store: SessionStoreApi) {
         slice: 'temporal',
         field: 'currentTime',
         value: state.currentTime,
-        previousValue: prevState.currentTime,
+        previous_value: prevState.currentTime,
         timestamp: Date.now(),
       });
     }

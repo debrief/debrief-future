@@ -119,10 +119,10 @@ function makeReplayEngine(
   signal: AbortSignal
 ): ReplayEngine {
   const engineDeps: ReplayEngineDeps = {
-    executeTool: deps.executeTool,
-    loadSnapshot: deps.loadSnapshot,
-    resolveToolVersion: deps.resolveToolVersion,
-    onProgress: () => {}, // Default no-op progress reporter
+    execute_tool: deps.executeTool,
+    load_snapshot: deps.loadSnapshot,
+    resolve_tool_version: deps.resolveToolVersion,
+    on_progress: () => {}, // Default no-op progress reporter
     signal,
   };
   return createReplayEngine(engineDeps);
@@ -141,7 +141,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
     ): Promise<RecordResult> {
       // FR-009: Do not record entries for failed executions
       if (!toolResult.success) {
-        return { activityId: '', featuresUpdated: 0, entries: [] };
+        return { activity_id: '', features_updated: 0, entries: [] };
       }
 
       // Try to reuse activityId from output features (set by Python executor)
@@ -160,7 +160,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
 
       const provenance: FeatureProvenance[] = inputFeatureIds.map(
         (featureId) => ({
-          featureId,
+          feature_id: featureId,
           entry: entry as unknown as Record<string, unknown>,
         })
       );
@@ -180,8 +180,8 @@ export function createLogService(deps: LogServiceDeps): LogService {
       }
 
       return {
-        activityId: entry.activityId,
-        featuresUpdated,
+        activity_id: entry.activity_id,
+        features_updated: featuresUpdated,
         entries: [entry],
       };
     },
@@ -225,13 +225,13 @@ export function createLogService(deps: LogServiceDeps): LogService {
       const timeline = assembleTimeline(fc, { includeDeleted: true });
 
       // Find the target entry
-      const targetEntry = timeline.find((e) => e.activityId === activityId);
+      const targetEntry = timeline.find((e) => e.activity_id === activityId);
       if (!targetEntry) {
         throw new Error(`Entry with activityId "${activityId}" not found`);
       }
 
       // Get current value of the parameter
-      const paramVal = targetEntry.wasGeneratedBy.parameters[parameter];
+      const paramVal = targetEntry.was_generated_by.parameters[parameter];
       const currentValue =
         paramVal !== null &&
         typeof paramVal === 'object' &&
@@ -243,35 +243,35 @@ export function createLogService(deps: LogServiceDeps): LogService {
       if (JSON.stringify(currentValue) === JSON.stringify(newValue)) {
         return {
           status: 'completed',
-          entriesReplayed: 0,
-          totalEntries: 0,
-          haltReason: null,
-          tuneAnnotation: null,
-          artifactsCreated: [],
+          entries_replayed: 0,
+          total_entries: 0,
+          halt_reason: null,
+          tune_annotation: null,
+          artifacts_created: [],
         };
       }
 
       // Collect deleted activity IDs
       const deletedActivityIds = timeline
         .filter((e) => e.deleted === true)
-        .map((e) => e.activityId);
+        .map((e) => e.activity_id);
 
       const tuneTarget = {
-        activityId,
+        activity_id: activityId,
         parameter,
-        previousValue: currentValue,
-        newValue,
+        previous_value: currentValue,
+        new_value: newValue,
       };
 
-      // Restore features to their pre-tool state using inputState
+      // Restore features to their pre-tool state using input_state
       // so the replay engine re-executes from the correct geometry.
-      const inputState = targetEntry.inputState as
-        | Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> | null }>
+      const inputState = targetEntry.input_state as
+        | Array<{ feature_id: string; geometry: unknown; properties: Record<string, unknown> | null }>
         | undefined;
       if (inputState && inputState.length > 0) {
         for (const saved of inputState) {
           const feature = fc.features.find(
-            (f) => String(f.id ?? (f.properties as Record<string, unknown> | null)?.id) === saved.featureId
+            (f) => String(f.id ?? (f.properties as Record<string, unknown> | null)?.id) === saved.feature_id
           );
           if (feature) {
             feature.geometry = JSON.parse(JSON.stringify(saved.geometry));
@@ -311,10 +311,10 @@ export function createLogService(deps: LogServiceDeps): LogService {
       // We match by activityId in provenance rather than by feature ID,
       // because Python creates new features with new IDs on each replay —
       // the original `generated` IDs become stale after the first tune.
-      const replayActivityIds = new Set(plan.entries.map((e) => e.activityId));
+      const replayActivityIds = new Set(plan.entries.map((e) => e.activity_id));
       const usedFeatureIds = new Set<string>();
       for (const entry of plan.entries) {
-        for (const fid of entry.featureIds) {
+        for (const fid of entry.feature_ids) {
           usedFeatureIds.add(fid);
         }
       }
@@ -323,7 +323,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
       if (preFc) {
         const fid = (f: Record<string, unknown>): string => {
           const props = f.properties as Record<string, unknown> | null;
-          return String(f.id ?? props?.id ?? props?.featureId ?? '');
+          return String(f.id ?? props?.id ?? props?.feature_id ?? '');
         };
         const before = preFc.features.length;
         preFc.features = preFc.features.filter((f) => {
@@ -336,7 +336,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
           if (!Array.isArray(prov)) { return true; }
           for (const raw of prov) {
             const entry = raw as Record<string, unknown>;
-            if (replayActivityIds.has(entry.activityId as string)) {
+            if (replayActivityIds.has((entry.activity_id as string) ?? '')) {
               return false; // generated by a replayed activity — remove it
             }
           }
@@ -355,7 +355,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
       // If completed, write the tune annotation to provenance.
       // Reload from disk because executeTool callbacks may have written
       // updated feature geometry during replay (the in-memory fc is stale).
-      if (result.status === 'completed' && result.tuneAnnotation) {
+      if (result.status === 'completed' && result.tune_annotation) {
         const updatedFc = await deps.loadGeoJson(storePath, itemPath);
         const targetFc = updatedFc ?? fc;
 
@@ -366,14 +366,14 @@ export function createLogService(deps: LogServiceDeps): LogService {
           const prov = normaliseProvenanceArray(props.provenance);
           for (const raw of prov) {
             const entry = raw as Record<string, unknown>;
-            if (entry.activityId === activityId) {
+            if (entry.activity_id === activityId) {
               // Mark the tune annotation on the entry
-              entry.tune = result.tuneAnnotation;
+              entry.tune = result.tune_annotation;
               // Update the parameter value so the timeline reflects the
               // tuned value.  The executeTool callback for mutation tools
               // preserves the original provenance (to keep the activityId
               // stable), so we must patch the value in-place here.
-              const wgb = entry.wasGeneratedBy as Record<string, unknown> | undefined;
+              const wgb = entry.was_generated_by as Record<string, unknown> | undefined;
               if (wgb?.parameters) {
                 const params = wgb.parameters as Record<string, unknown>;
                 const pv = params[parameter];
@@ -422,7 +422,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
         const prov = normaliseProvenanceArray(props.provenance);
         for (const raw of prov) {
           const entry = raw as Record<string, unknown>;
-          if (entry.activityId === activityId) {
+          if (entry.activity_id === activityId) {
             targetTimestamp = entry.timestamp as string;
             break;
           }
@@ -473,7 +473,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
         const prov = normaliseProvenanceArray(props.provenance);
         for (const raw of prov) {
           const entry = raw as Record<string, unknown>;
-          if (entry.activityId === activityId) {
+          if (entry.activity_id === activityId) {
             entry.deleted = true;
           }
         }
@@ -485,11 +485,11 @@ export function createLogService(deps: LogServiceDeps): LogService {
       // Collect deleted activity IDs (including the one we just marked)
       const deletedActivityIds = timeline
         .filter((e) => e.deleted === true)
-        .map((e) => e.activityId);
+        .map((e) => e.activity_id);
 
       // Find the index of the deleted entry
       const deletedIdx = timeline.findIndex(
-        (e) => e.activityId === activityId
+        (e) => e.activity_id === activityId
       );
       if (deletedIdx < 0) {
         throw new Error(`Entry with activityId "${activityId}" not found`);
@@ -543,7 +543,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
         const prov = normaliseProvenanceArray(props.provenance);
         for (const raw of prov) {
           const entry = raw as Record<string, unknown>;
-          if (entry.activityId === activityId) {
+          if (entry.activity_id === activityId) {
             delete entry.deleted;
           }
         }
@@ -555,11 +555,11 @@ export function createLogService(deps: LogServiceDeps): LogService {
       // Collect deleted activity IDs (the restored one should no longer be deleted)
       const deletedActivityIds = timeline
         .filter((e) => e.deleted === true)
-        .map((e) => e.activityId);
+        .map((e) => e.activity_id);
 
       // Find the index of the restored entry to replay from it onward
       const restoredIdx = timeline.findIndex(
-        (e) => e.activityId === activityId
+        (e) => e.activity_id === activityId
       );
       if (restoredIdx < 0) {
         throw new Error(`Entry with activityId "${activityId}" not found`);
@@ -618,7 +618,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
         const prov = normaliseProvenanceArray(props.provenance);
         for (const raw of prov) {
           const entry = raw as Record<string, unknown>;
-          if (entry.activityId === activityId) {
+          if (entry.activity_id === activityId) {
             if (disabled) {
               entry.disabled = true;
             } else {
@@ -660,7 +660,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
         const prov = normaliseProvenanceArray(props.provenance);
         for (const raw of prov) {
           const entry = raw as Record<string, unknown>;
-          if (entry.activityId === activityId) {
+          if (entry.activity_id === activityId) {
             entry.rationale = rationale || null;
           }
         }

@@ -85,6 +85,7 @@ export type { PositionSymbolsLayerProps } from './MapView/PositionSymbolsLayer';
 // Hooks
 export { useSelection } from './hooks/useSelection';
 export { useTheme } from './hooks/useTheme';
+export { useIsMobile } from './hooks/useIsMobile';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
@@ -174,6 +175,10 @@ export type { CaptureMapOptions } from './MapView/captureMap';
 export { downscaleDataUrl } from './MapView/resizeImage';
 export type { DownscaleOptions } from './MapView/resizeImage';
 
+// TableRenderer (Feature: 177-tabular-results-panel)
+export { TableRenderer } from './TableRenderer';
+export type { TableRendererProps } from './TableRenderer';
+
 // ChartRenderer (Feature: 085-chart-renderer)
 export { ChartRenderer } from './ChartRenderer';
 export type { ChartRendererProps } from './ChartRenderer';
@@ -200,11 +205,17 @@ export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
 // Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
 export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
 export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
+export { DEFAULT_RESULTS_PANEL_LABELS } from './panels/resultsPanelLabels';
+export type { ResultsPanelLabels } from './panels/resultsPanelLabels';
 export { NavigationPanel } from './panels/NavigationPanel';
 export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';
 export { MapPanel } from './panels/MapPanel';
 export { ChartPanelWrapper } from './panels/ChartPanelWrapper';
+
+// MobileTabLayout (Feature: mobile-web-shell-preview)
+export { MobileTabLayout } from './MobileTabLayout/MobileTabLayout';
+export type { MobileTabLayoutProps } from './MobileTabLayout/MobileTabLayout';
 
 // LogPanel (Feature: 072-log-panel, updated: 176-log-panel-ux)
 export { LogPanel } from './LogPanel';

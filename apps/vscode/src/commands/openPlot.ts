@@ -306,14 +306,14 @@ export function createOpenPlotCommand(
 
         // Load current features from disk (geometry restored by logService before replay)
         const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
-        if (!fc) { return { success: false, durationMs: Date.now() - startMs }; }
+        if (!fc) { return { success: false, duration_ms: Date.now() - startMs }; }
 
         // SafeFeature already has id?: string | number
         const allFeatures = fc.features;
         const features = allFeatures.filter(
           (f) => featureIds.includes(String(f.id ?? f.properties?.['id']))
         );
-        if (features.length === 0) { return { success: false, durationMs: Date.now() - startMs }; }
+        if (features.length === 0) { return { success: false, duration_ms: Date.now() - startMs }; }
 
         // Execute tool via Python CLI
         const result = await calcService.executeToolDirect(
@@ -321,7 +321,7 @@ export function createOpenPlotCommand(
           features as Parameters<typeof calcService.executeToolDirect>[1],
           params
         );
-        if (!result.success || !result.features) { return { success: false, durationMs: Date.now() - startMs }; }
+        if (!result.success || !result.features) { return { success: false, duration_ms: Date.now() - startMs }; }
 
         // Helper: stamp the original activityId and timestamp on Python-generated
         // provenance so the timeline shows one entry per original activity at
@@ -330,12 +330,14 @@ export function createOpenPlotCommand(
           if (!activityId) { return; }
           const props = f.properties;
           if (!props || !Array.isArray(props.provenance)) { return; }
-          for (const prov of props.provenance as Array<{ activityId?: unknown; timestamp?: unknown }>) {
-            if (prov.activityId !== undefined && prov.activityId !== null) {
-              prov.activityId = activityId;
+          for (const prov of props.provenance as Array<Record<string, unknown>>) {
+            if (prov.activity_id !== undefined && prov.activity_id !== null) {
+              prov.activity_id = activityId;
             }
-            if (timestamp !== undefined && prov.timestamp !== undefined && prov.timestamp !== null) {
-              prov.timestamp = timestamp;
+            if (timestamp !== undefined) {
+              if (prov.timestamp !== undefined && prov.timestamp !== null) {
+                prov.timestamp = timestamp;
+              }
             }
           }
         };
@@ -376,9 +378,9 @@ export function createOpenPlotCommand(
 
         return {
           success: true,
-          durationMs: Date.now() - startMs,
-          artifactHref: result.artifactHref,
-          toolVersion: result.toolVersion,
+          duration_ms: Date.now() - startMs,
+          artifact_href: result.artifactHref,
+          tool_version: result.tool_version,
         };
       },
 
