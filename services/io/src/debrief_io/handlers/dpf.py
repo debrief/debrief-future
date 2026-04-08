@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import math
+import re
 import time
 import uuid
 import xml.etree.ElementTree as ET
@@ -142,6 +144,58 @@ def _calculate_intervals(duration_hours: float) -> tuple[str, str]:
         return ("PT1H", "PT4H")
 
 
+def _bearing_between(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Compute the initial bearing (degrees, 0-360) from point 1 to point 2."""
+    lat1_r = math.radians(lat1)
+    lat2_r = math.radians(lat2)
+    dlon = math.radians(lon2 - lon1)
+    x = math.sin(dlon) * math.cos(lat2_r)
+    y = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(dlon)
+    return math.degrees(math.atan2(x, y)) % 360
+
+
+def _interpolate_position(
+    positions: list[dict[str, Any]], target_time: datetime
+) -> tuple[float, float] | None:
+    """Linearly interpolate lat/lon from a sorted positions list at *target_time*.
+
+    Each element must have ``time`` (ISO-8601 str) and ``course``/``speed`` or
+    derive from coordinates.  Returns (lat, lon) or None if *target_time* is
+    outside the position range.
+    """
+    if not positions:
+        return None
+
+    # Parse timestamps lazily
+    def _ts(p: dict[str, Any]) -> datetime:
+        t = datetime.fromisoformat(p["time"])
+        if t.tzinfo is None:
+            t = t.replace(tzinfo=UTC)
+        return t
+
+    first_t = _ts(positions[0])
+    last_t = _ts(positions[-1])
+
+    if target_time < first_t or target_time > last_t:
+        return None
+
+    # Find bracketing positions
+    for j in range(len(positions) - 1):
+        t_a = _ts(positions[j])
+        t_b = _ts(positions[j + 1])
+        if t_a <= target_time <= t_b:
+            span = (t_b - t_a).total_seconds()
+            frac = 0.0 if span == 0 else (target_time - t_a).total_seconds() / span
+            # Positions array doesn't carry lat/lon directly — they're in the
+            # parallel coordinates array.  However the caller passes fixes that
+            # *do* carry lat/lon, so we rely on those keys.
+            lat_a, lon_a = positions[j]["lat"], positions[j]["lon"]
+            lat_b, lon_b = positions[j + 1]["lat"], positions[j + 1]["lon"]
+            return (lat_a + frac * (lat_b - lat_a), lon_a + frac * (lon_b - lon_a))
+
+    return None
+
+
 class DPFHandler(BaseHandler):
     """Handler for Debrief DPF (Plot File) XML format.
 
@@ -219,10 +273,16 @@ class DPFHandler(BaseHandler):
             )
 
         # Parse tracks (including composite_track which extends track)
+        # Collect XML-level metadata alongside parsed features so we can
+        # detect contact tracks that should be nested inside a parent.
+        track_entries: list[tuple[ET.Element, list[dict[str, Any]]]] = []
         for track_tag in ("track", "composite_track"):
             for track_elem in layers.findall(_tag(track_tag, ns)):
                 track_features = self._parse_track(track_elem, ns, warnings, source_file)
-                features.extend(track_features)
+                track_entries.append((track_elem, track_features))
+
+        # Nest contact tracks inside their parent platform track
+        features = self._nest_contact_tracks(track_entries, ns)
 
         # Parse narratives
         for narrative_elem in layers.findall(_tag("narrative", ns)):
@@ -239,6 +299,132 @@ class DPFHandler(BaseHandler):
             handler=self.name,
             handler_version=self.version,
         )
+
+    @staticmethod
+    def _base_track_name(name: str) -> str:
+        """Normalise a track name to its base form.
+
+        Strips an optional single-char lowercase prefix (``bSENSOR`` → ``SENSOR``,
+        ``aSUBJECT3`` → ``SUBJECT3``) and then removes trailing digits that are
+        directly concatenated to a letter (``SUBJECT3`` → ``SUBJECT``) but leaves
+        underscore-separated suffixes intact (``SENSOR_1`` stays ``SENSOR_1``).
+        """
+        core = name
+        if len(core) > 1 and core[0].islower() and core[1].isupper():
+            core = core[1:]
+        return re.sub(r"(?<=[A-Za-z])\d+$", "", core)
+
+    @staticmethod
+    def _feature_positions_with_coords(
+        feature: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Build a list of ``{time, lat, lon}`` dicts from a track feature.
+
+        Pairs the ``properties.positions`` timestamps with the
+        ``geometry.coordinates`` lon/lat values.
+        """
+        coords = feature.get("geometry", {}).get("coordinates", [])
+        positions = feature.get("properties", {}).get("positions", [])
+        result: list[dict[str, Any]] = []
+        for pos, coord in zip(positions, coords, strict=False):
+            result.append({"time": pos["time"], "lat": coord[1], "lon": coord[0]})
+        return result
+
+    def _nest_contact_tracks(
+        self,
+        track_entries: list[tuple[ET.Element, list[dict[str, Any]]]],
+        ns: str | None,
+    ) -> list[dict[str, Any]]:
+        """Convert numbered contact-track variants into SensorData on the parent.
+
+        A track is a **numbered variant** when stripping its single-char prefix
+        and trailing digits yields a base name that matches another track in the
+        same file (e.g. ``SUBJECT3`` is a variant of ``SUBJECT``).
+
+        Each variant is converted to a :class:`SensorData` entry
+        (``{name, contacts: [{time, bearing}]}``).  The bearing at each
+        contact-track position is computed from the SENSOR parent's
+        interpolated position at the same timestamp.
+
+        The resulting SensorData entries are appended to the parent track's
+        ``properties.sensors`` array.  If no SENSOR-named track exists, all
+        features are returned unchanged.
+        """
+        if len(track_entries) < 2:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        names: list[str] = [elem.get("Name", "") for elem, _feats in track_entries]
+        bases: set[str] = {self._base_track_name(n) for n in names}
+
+        # Find the SENSOR parent
+        sensor_idx: int | None = None
+        for i, n in enumerate(names):
+            if "SENSOR" in self._base_track_name(n).upper():
+                sensor_idx = i
+                break
+
+        if sensor_idx is None:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        # Detect numbered variants
+        variant_indices: set[int] = set()
+        for i, n in enumerate(names):
+            if i == sensor_idx:
+                continue
+            base = self._base_track_name(n)
+            if base != n and base in bases:
+                variant_indices.add(i)
+
+        if not variant_indices:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        _parent_elem, parent_features = track_entries[sensor_idx]
+        if not parent_features:
+            return [f for _elem, feats in track_entries for f in feats]
+
+        parent_feature = parent_features[0]
+        parent_pos = self._feature_positions_with_coords(parent_feature)
+
+        # Convert each variant into a SensorData entry
+        new_sensors: list[dict[str, Any]] = []
+        for vi in sorted(variant_indices):
+            _elem, variant_features = track_entries[vi]
+            for vf in variant_features:
+                props = vf.get("properties", {})
+                if props.get("kind") != "TRACK":
+                    continue
+                contact_name = props.get("platform_id", names[vi])
+                var_pos = self._feature_positions_with_coords(vf)
+                contacts: list[dict[str, Any]] = []
+                for vp in var_pos:
+                    t = datetime.fromisoformat(vp["time"])
+                    if t.tzinfo is None:
+                        t = t.replace(tzinfo=UTC)
+                    parent_loc = _interpolate_position(parent_pos, t)
+                    if parent_loc is None:
+                        continue
+                    p_lat, p_lon = parent_loc
+                    bearing = _bearing_between(p_lat, p_lon, vp["lat"], vp["lon"])
+                    contacts.append(
+                        {
+                            "time": vp["time"],
+                            "bearing": round(bearing, 3),
+                        }
+                    )
+                if contacts:
+                    new_sensors.append({"name": contact_name, "contacts": contacts})
+
+        if new_sensors:
+            existing = parent_feature["properties"].get("sensors", [])
+            existing.extend(new_sensors)
+            parent_feature["properties"]["sensors"] = existing
+
+        # Return all features except the absorbed variants
+        result: list[dict[str, Any]] = []
+        for i, (_elem, feats) in enumerate(track_entries):
+            if i not in variant_indices:
+                result.extend(feats)
+        return result
 
     def _parse_track(
         self,
