@@ -1,8 +1,8 @@
 ---
 feature: 178-vscode-tabular-results
-captured_at: 2026-04-09T20:50:00Z
-git_sha: 528d8a8
-tests_passed: 2311
+captured_at: 2026-04-09T21:30:00Z
+git_sha: b94ed25
+tests_passed: 2315
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -28,16 +28,108 @@ with save / open / retry / close wired through `StacService`, the new
 |---------|-----------:|------:|-------:|-------|
 | `@debrief/utils`         |  7 | 143  | 143  | + 14 new (`parseCsvToTableDataset` round-trip, `synthesizeTableDataset`) |
 | `@debrief/session-state` | 34 | 615  | 615  | + 5 new (`recordFileSaved` happy path + 4 error / sentinel cases) |
-| `@debrief/vscode`        | 22 | 357  | 357  | + 10 `ResultsPanelService` + 7 `executeToolDatasetRouting` + 2 **NEW** reveal regression tests |
+| `@debrief/vscode`        | 23 | 361  | 361  | + 10 `ResultsPanelService` + 7 `executeToolDatasetRouting` + 2 reveal regression + 4 **NEW** `calcServiceDatasetArtifact` (real Python MCP) |
 | `@debrief/components`    | 76 | 1123 | 1123 | Unchanged (ChartPanelWrapper reused as-is) |
 | `@debrief/config-ts`     |  5 |  42  |  42  | Unchanged |
 | `@debrief/loader`        |  1 |   7  |   7  | Unchanged |
-| **Unit subtotal**        | **145** | **2287** | **2287** | |
+| **Unit subtotal**        | **146** | **2291** | **2291** | |
 | Harness E2E (feature 178) |  3 | 15   | 15   | **Playwright** — drives the real `resultsPanel.js` bundle via postMessage harness; includes a REAL chart rendering assertion |
 | Canonical VS Code E2E    |  3 |  9   |  9   | **Playwright + openvscode-server** — 3 tabular-results (incl. NEW panel-closed bootstrap) + 4 smoke + 2 webview-resolve |
-| **Total**                | **151** | **2311** | **2311** | |
+| **Total**                | **152** | **2315** | **2315** | |
 
-**Overall**: 2311 passed / 0 failed / 0 skipped.
+**Overall**: 2315 passed / 0 failed / 0 skipped.
+
+## Bug fix (2026-04-09, third round)
+
+User reported: *"I selected two tracks, and ran 'Range-bearing'. No
+graph was shown."*  This was a completely different bug from the
+previous two rounds — my earlier regression tests didn't catch it
+because they tested the wrong layer.
+
+### Root cause
+
+The Python `range-bearing` tool has
+`@tool(output_kind="dataset/range_bearing_series", ...)`.  The Python
+MCP result builder sees `output_kind.startswith("dataset/")` and
+wraps the carrier feature in `build_artifact(...)` which sets
+`debrief:resultType = "artifact/dataset/range_bearing_series"` and
+`debrief:href = "range_bearing_series-<ids>.json"`.
+
+In `CalcService.executeToolOnMcp`, the content-item loop had:
+
+```ts
+if (item.annotations?.['debrief:href']) {
+  artifactHref = item.annotations['debrief:href'];
+  if (item.type === 'resource' && item.resource) {
+    artifactData = item.resource.text;
+  }
+  continue;  // ← skipped pushing to geoFeatures
+}
+```
+
+So `result.features.features = []` for range-bearing.  The carrier
+feature (with `__datasets` in its properties) was captured in
+`artifactData` / `artifactHref` instead.  Downstream in
+`executeTool.ts`:
+
+  - My dataset-carrier filter looked at `result.features.features`,
+    found nothing, and `datasetCarrierFeatures = []`.
+  - `createResultLayer()` saw `result.artifactData && result.artifactHref`
+    and returned a result layer (with `artifactHref` set).
+  - `if (layer) { ... }` ran the artifact auto-persist branch:
+    `stacService.addResultAsset(...)` wrote the carrier to
+    `assets/range_bearing_series-<ids>.json` and added the entry to
+    the Associated Files dropdown.
+  - `resultsPanelService.addDatasetsForToolResult` was NEVER called.
+
+User saw the "Analysis complete" toast (from the `if (layer)`
+branch), a new entry in the Associated Files dropdown, and NO chart
+in the Results panel — because the panel was never asked to show
+one.
+
+### Fix
+
+`CalcService.executeToolOnMcp` now detects `debrief:resultType`
+strings starting with `artifact/dataset/` and routes the parsed
+carrier feature into `geoFeatures` instead of `artifactData`.  The
+downstream `executeTool.ts` filter then sees the carrier in
+`result.features.features`, extracts it to `datasetCarrierFeatures`,
+and hands it to `ResultsPanelService.addDatasetsForToolResult`.
+
+Non-dataset artifacts (images, etc.) continue to flow through the
+unchanged `artifactData` path.
+
+### Regression test that would have caught it
+
+`apps/vscode/tests/unit/calcServiceDatasetArtifact.test.ts` (4 tests):
+
+  ✓ real Python range-bearing output emits a dataset artifact content item
+    — asserts the Python side still emits `artifact/dataset/range_bearing_series`
+  ✓ parseMcpResponseForTest routes the dataset artifact into features
+    (NOT artifactData) — user-reported bug
+  ✓ the routed feature is a dataset carrier with __datasets in its properties
+  ✓ the resultType is preserved on the result so downstream code can detect
+    the dataset path
+
+The test runs the **real Python CLI** via `execSync` with two tracks,
+captures stdout, and feeds it through the newly-extracted pure
+`parseMcpResponseForTest()` helper.  Verified by git-stashing the
+fix: without it, 3/4 tests fail; with it, all 4 pass.
+
+### Why my earlier tests missed it
+
+- `resultsPanelService.test.ts` mocked the view provider and skipped
+  the CalcService layer entirely.
+- `executeToolDatasetRouting.test.ts` handed executeTool a synthetic
+  `ToolExecutionResult` with carriers already in `result.features.features`
+  — bypassing the CalcService MCP parsing.  It tested the carrier
+  *filter*, not the carrier *arrival*.
+- Canonical VS Code E2E tests dispatched `message` events directly
+  inside the webview, bypassing the entire CalcService → executeTool
+  pipeline.
+
+The new test is the first one in the suite that exercises the
+**real** Python → MCP → CalcService → parseMcpResponse path.
 
 ## Bug fixes captured by regression tests (2026-04-09)
 
