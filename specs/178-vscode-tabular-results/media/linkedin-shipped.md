@@ -2,7 +2,7 @@
 platform: linkedin
 feature: 178-vscode-tabular-results
 post_type: shipped
-word_count: 178
+word_count: 195
 ---
 
 Shipped: tabular results in the Debrief VS Code extension.
@@ -12,16 +12,25 @@ showed you a map layer — but the actual statistics and chart datasets
 just… vanished.  You had to pop over to the web-shell for the real
 numbers.
 
-Feature 178 fixes that.  A new Results panel lives beneath the editor.
-Run `track-stats` and you get a proper table tab.  Run `range-bearing`
-and you get Range and Bearing chart tabs side by side.  Hit Save, and
-the CSV is written to disk, registered as a STAC asset, and linked via
-a new `FileSavedEvent` LogEntry back to the originating tool run — full
-PROV-aligned provenance, zero partial state on failure.
+Feature 178 fixes that.  A new **Debrief Results** view lives in the
+VS Code panel dock (next to Terminal / Output).  Run `track-stats` and
+you get a proper table tab.  Run `range-bearing` and you get Range and
+Bearing chart tabs side by side.  Hit Save, and the CSV is written to
+disk, registered as a STAC asset, and linked via a new `FileSavedEvent`
+LogEntry back to the originating tool run — full PROV-aligned
+provenance, zero partial state on failure.
 
-The win: zero forks of shared components.  `ChartPanelWrapper`,
-`TableRenderer`, all the CSV utilities — reused unchanged from the
-web-shell.  Extension host owns the tab state; the webview is a dumb
-renderer, trivially recoverable when VS Code collapses the panel.
+Zero forks of shared components.  `ChartPanelWrapper`, `TableRenderer`,
+all the CSV utilities — reused unchanged from the web-shell.  Extension
+host owns the tab state; the webview is a dumb renderer, trivially
+recoverable when VS Code collapses the panel.
 
-38 new unit tests, 2278 total passing.  Details in the shipped post.
+38 new unit tests, 23 Playwright E2E tests, 2301 total passing.  The
+full post has screenshots showing the empty state, populated tabs with
+unsaved indicators, Save As form, error + Retry, and two end-to-end
+captures inside real VS Code chrome courtesy of the openvscode-server
+E2E pipeline.
+
+[Link to full shipped post]
+
+#FutureDebrief #MaritimeAnalysis #VSCode #ProvenanceTracking
