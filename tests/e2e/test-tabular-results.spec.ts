@@ -465,4 +465,201 @@ test.describe('Tabular Results Panel — Real VS Code Webview (Feature 178)', ()
       path: `${SCREENSHOT_DIR}/canonical-03-chart-in-vscode.png`,
     });
   });
+
+  test('REAL end-to-end: invoke the Python range-bearing tool via command palette and verify chart renders (user-reported bug, final check)', async ({
+    codeServerPage,
+    page,
+  }) => {
+    // This is the test I should have written from the start.
+    //
+    // It invokes the `debrief.__test.runExerciseAlphaRangeBearing`
+    // command via the VS Code command palette.  That command — registered
+    // in extension.ts — reads the test workspace's Exercise Alpha
+    // GeoJSON from disk, extracts the two TRACK features, and calls
+    // the REAL `CalcService.executeToolDirect('range-bearing', ...)`
+    // which:
+    //
+    //   1. Spawns the real Python `debrief_calc.cli` subprocess
+    //   2. Passes JSON input on stdin
+    //   3. Parses the real MCP response JSON on stdout
+    //   4. Routes dataset artifacts (debrief:resultType starting with
+    //      `artifact/dataset/`) into `features.features` via the fix in
+    //      commit 047a468
+    //   5. Returns a ToolExecutionResult
+    //
+    // The test command then filters dataset carriers and hands them
+    // to the REAL `ResultsPanelService.addDatasetsForToolResult()`,
+    // which pushes a tab, fires reveal() (commit f3107d8), which
+    // executes the `debrief.resultsPanel.focus` command, which causes
+    // VS Code to:
+    //
+    //   6. Reveal the panel dock
+    //   7. Fire `resolveWebviewView` on ResultsPanelViewProvider
+    //   8. Mount the webview iframe with the bundled resultsPanel.js
+    //   9. The React app posts `results:webviewReady`
+    //   10. Host flushes queued messages via `webview.postMessage()`
+    //   11. React app receives them via `window.addEventListener('message')`
+    //   12. Updates state, re-renders ChartPanelWrapper
+    //   13. `transformDataset` produces a Vega-Lite spec (commit 528d8a8)
+    //   14. ChartRenderer passes it to vega-embed
+    //   15. vega-embed mounts a <canvas> element
+    //
+    // If ANY of those 15 steps regresses, this test fails.  Unlike my
+    // earlier tests, it does NOT mock any layer, does NOT bypass any
+    // layer via message-dispatch shortcuts, and does NOT assume
+    // anything about the Python tool output.  The ONLY thing mocked
+    // is the "user selected two tracks" step — the test command reads
+    // the tracks directly from disk.
+
+    await codeServerPage.dismissNotifications();
+
+    // Invoke the test command via the command palette.  It has a
+    // title in package.json so it's visible; the category prefix is
+    // "Debrief Test" to avoid collision with real commands.
+    await codeServerPage.executeCommand(
+      'Debrief Test: Run Exercise Alpha Range-Bearing',
+    );
+
+    // The command is async and runs Python → reads stdout → routes
+    // through service.  Give it a moment to complete.  Success is
+    // signalled by an information toast:
+    //   "[__test] range-bearing produced N dataset carriers..."
+    // or an error toast if the path is broken.
+    await page.waitForTimeout(5_000);
+
+    // Capture a diagnostic screenshot of whatever state VS Code is in
+    // right now — BEFORE asserting anything — so we can see if the
+    // command even succeeded, if the panel is visible, and what
+    // toasts are showing.
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/canonical-04-diagnostic-after-command.png`,
+    });
+
+    // Dump all visible notification text to the console for diagnostics.
+    const toasts = await page
+      .locator('.notification-toast-container')
+      .allTextContents();
+    console.log('[__test diag] toasts:', JSON.stringify(toasts));
+
+    // Dump iframe count + URLs for diagnostics.
+    const frameInfo = page.frames().map((f) => ({
+      url: f.url().substring(0, 80),
+    }));
+    console.log('[__test diag] frames:', JSON.stringify(frameInfo));
+
+    // Assert no error toast appeared.
+    const errorToasts = await page
+      .locator('.notification-toast-container .notification-list-item-error')
+      .count();
+    expect(errorToasts, '[__test] should not report an error').toBe(0);
+
+    // Panel dock should now be visible (reveal() was called).
+    await expect(page.locator('.part.panel')).toBeAttached({ timeout: 10_000 });
+
+    // Find the Results panel inner frame by probing for EITHER the
+    // panel-chart (populated) OR results-panel-empty (empty state) —
+    // we want to identify the frame regardless of state so we can
+    // inspect what messages it received.
+    let innerFrame: import('@playwright/test').Frame | undefined;
+    const start = Date.now();
+    while (Date.now() - start < 20_000) {
+      for (const frame of page.frames()) {
+        if (!frame.url().includes('webview')) continue;
+        for (const child of frame.childFrames()) {
+          const hasChart = await child
+            .locator('[data-testid="panel-chart"]')
+            .first()
+            .isVisible()
+            .catch(() => false);
+          const hasEmpty = await child
+            .locator('[data-testid="results-panel-empty"]')
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (hasChart || hasEmpty) {
+            innerFrame = child;
+            break;
+          }
+        }
+        if (innerFrame) break;
+      }
+      if (innerFrame) break;
+      await page.waitForTimeout(500);
+    }
+
+    // Diagnostic: before asserting the chart is rendered, dump the
+    // messages the webview actually received from the host.  This
+    // reveals whether the real webview.postMessage() → React
+    // window.addEventListener('message') path is delivering anything.
+    if (innerFrame) {
+      const diag = await innerFrame.evaluate(() => {
+        const w = window as unknown as {
+          __debriefResultsMessages?: Array<{ type: string }>;
+          __debriefResultsReadySent?: boolean;
+          __debriefResultsState?: unknown;
+        };
+        return {
+          readySent: w.__debriefResultsReadySent ?? false,
+          messageCount: w.__debriefResultsMessages?.length ?? 0,
+          messageTypes: w.__debriefResultsMessages?.map((m) => m.type) ?? [],
+          state: w.__debriefResultsState ?? null,
+        };
+      });
+      console.log('[__test diag] webview state:', JSON.stringify(diag));
+    } else {
+      console.log('[__test diag] innerFrame not found');
+    }
+
+    expect(
+      innerFrame,
+      'Webview inner frame must be findable (empty or populated)',
+    ).toBeDefined();
+
+    // Now assert the populated state.
+    const hasChartAfter = await innerFrame!
+      .locator('[data-testid="panel-chart"]')
+      .first()
+      .isVisible()
+      .catch(() => false);
+    expect(
+      hasChartAfter,
+      'ChartPanelWrapper must be visible after running the real range-bearing tool',
+    ).toBe(true);
+
+    // Real Vega-Lite chart must be rendered.  `range_bearing_series`
+    // has a registered transformer in `@debrief/components`, so
+    // `transformDataset` returns `{ok: true, spec}`, ChartRenderer
+    // hands it to vega-embed, and a canvas mounts.
+    const chartRenderer = innerFrame!.locator('[data-testid="chart-renderer"]');
+    await expect(chartRenderer).toBeVisible({ timeout: 10_000 });
+    await expect(chartRenderer.locator('canvas')).toBeAttached({
+      timeout: 15_000,
+    });
+
+    // No error state.
+    await expect(
+      innerFrame!.locator('[data-testid="chart-error"]'),
+    ).toHaveCount(0);
+    await expect(
+      innerFrame!.locator('[data-testid="panel-chart-error"]'),
+    ).toHaveCount(0);
+
+    // Maximize the panel so the chart is clearly visible in the screenshot.
+    await codeServerPage.dismissNotifications();
+    await page.keyboard.press('Control+Shift+KeyP');
+    await page.locator('.quick-input-box input').waitFor({ state: 'visible' });
+    await page
+      .locator('.quick-input-box input')
+      .fill('>View: Toggle Maximized Panel');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(1_000);
+    await codeServerPage.dismissNotifications();
+
+    // Give vega-embed a moment to re-render at the new container size.
+    await page.waitForTimeout(2_000);
+
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/canonical-04-real-range-bearing-chart.png`,
+    });
+  });
 });

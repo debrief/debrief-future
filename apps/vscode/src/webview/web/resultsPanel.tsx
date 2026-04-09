@@ -146,12 +146,45 @@ function ResultsPanelApp(): React.ReactElement {
   const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
+    // Test instrumentation (Feature 178): record all incoming messages
+    // on `window.__debriefResultsMessages` so E2E tests can verify that
+    // the real host → webview messaging path is delivering data.  This
+    // is the *only* place we check whether the panel is actually
+    // getting the messages it needs — without it, a silent failure
+    // looks identical to a working panel from the outside.
+    interface TestWindow {
+      __debriefResultsMessages?: unknown[];
+      __debriefResultsReadySent?: boolean;
+      __debriefResultsState?: {
+        visible: boolean;
+        tabCount: number;
+        activeTabId: string | null;
+      };
+    }
+    const testWin = window as unknown as TestWindow;
+    if (!testWin.__debriefResultsMessages) {
+      testWin.__debriefResultsMessages = [];
+    }
+
     const onMessage = (event: MessageEvent<IncomingMessage>) => {
       const msg = event.data;
+      // Record every message the webview receives (including ones we
+      // don't recognise), so diagnostics can tell the difference
+      // between "message delivered but we ignored it" and "message
+      // never arrived at all".
+      testWin.__debriefResultsMessages!.push({
+        type: (msg as { type?: unknown })?.type ?? '(no-type)',
+        raw: msg,
+      });
       switch (msg.type) {
         case 'results:setTabs':
           setTabs(msg.payload.tabs);
           setActiveTabId(msg.payload.activeTabId);
+          testWin.__debriefResultsState = {
+            visible: true,
+            tabCount: msg.payload.tabs.length,
+            activeTabId: msg.payload.activeTabId,
+          };
           break;
         case 'results:setVisibility':
           setVisible(msg.payload.visible);
@@ -171,6 +204,7 @@ function ResultsPanelApp(): React.ReactElement {
     };
     window.addEventListener('message', onMessage);
     vscode.postMessage({ type: 'results:webviewReady' });
+    testWin.__debriefResultsReadySent = true;
     return () => window.removeEventListener('message', onMessage);
   }, []);
 

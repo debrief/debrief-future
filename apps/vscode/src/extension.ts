@@ -137,6 +137,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
+  resultsPanelProvider.setOutputChannel(outputChannel);
   const resultsPanelService = new ResultsPanelService({
     stacService,
     // Per-plot LogService is owned by MapPanel — resolve dynamically.
@@ -146,25 +147,30 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     sessionManager,
   });
   resultsPanelProvider.setService(resultsPanelService);
+  resultsPanelService.setOutputChannel(outputChannel);
   context.subscriptions.push({ dispose: () => resultsPanelService.dispose() });
 
-  // Feature: 178 — Test-only command for E2E regression coverage.
+  // Feature: 178 — Test-only commands for E2E regression coverage.
   //
   // Registered unconditionally (not gated by NODE_ENV) because the
   // VSIX is built once and installed into both dev and E2E user-data
-  // dirs. The command is undocumented and prefixed `debrief.__test`
-  // so it never surfaces in the command palette (no title in
-  // package.json means the UI search filter hides it).
+  // dirs.  The commands are undocumented and prefixed `debrief.__test`
+  // so they never surface in the command palette (no title in
+  // package.json means the UI search filter hides them).
   //
-  // Accepts a JSON payload: { toolId, datasets }, routes it through
-  // `resultsPanelService.addDatasetsForToolResult()` exactly as the
-  // real executeTool path would, and returns nothing.
+  // 1. `debrief.__test.pushDatasetResult`  — fast path: routes a
+  //    pre-built dataset payload through `ResultsPanelService` only.
+  //    Exercises the panel bootstrap / reveal / render chain but
+  //    skips CalcService + MCP entirely.
   //
-  // This lets an E2E test drive the REAL bootstrap path:
-  //   tool result arrives → service.addDatasetsForToolResult fires
-  //   → reveal() called → panel area becomes visible → webview
-  //   resolves → bundle mounts → webviewReady → messages flush
-  //   → chart renders in the real iframe.
+  // 2. `debrief.__test.runRealTool`  — full path: runs the REAL
+  //    Python tool via `CalcService.executeToolDirect()`, parses
+  //    the real MCP response, filters dataset carriers, and routes
+  //    them through `ResultsPanelService.addDatasetsForToolResult()`.
+  //    This is the end-to-end regression for the user-reported bug:
+  //    it exercises the exact code path a real tool invocation
+  //    takes (minus the UI selection step), so if the chart fails
+  //    to render here it would fail in production too.
   context.subscriptions.push(
     vscode.commands.registerCommand(
       'debrief.__test.pushDatasetResult',
@@ -175,9 +181,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           storePath: store?.path ?? '/tmp/e2e-store',
           itemPath: plot?.itemPath ?? 'e2e/item.json',
         };
-        // Build a synthetic feature collection whose single carrier
-        // feature has `properties.__datasets` set to the payload —
-        // the exact shape the Python tools emit.
         resultsPanelService.addDatasetsForToolResult({
           plotKey,
           toolId: payload.toolId,
@@ -197,6 +200,216 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           sourceFeatureIds: ['e2e-track-1', 'e2e-track-2'],
           parentActivityId: `e2e-activity-${Date.now()}`,
         });
+      },
+    ),
+    // `debrief.__test.runExerciseAlphaRangeBearing`
+    //
+    // Self-contained test command: reads the Exercise Alpha GeoJSON
+    // from disk, extracts the two TRACK features, runs the REAL
+    // range-bearing Python tool via CalcService, routes the result
+    // through ResultsPanelService (exactly as a real tool invocation
+    // would) — then the Results panel should reveal and the chart
+    // should render.
+    //
+    // This command takes NO arguments so it can be invoked directly
+    // from the Playwright command palette.  It has a title so it's
+    // visible in the palette.
+    vscode.commands.registerCommand(
+      'debrief.__test.runExerciseAlphaRangeBearing',
+      async (): Promise<void> => {
+        try {
+          // Resolve the test workspace path — walk up from the
+          // workspace folder to find tests/e2e/test-workspace.
+          const folders = vscode.workspace.workspaceFolders;
+          if (!folders || folders.length === 0) {
+            void vscode.window.showErrorMessage(
+              '[__test] No workspace folder open',
+            );
+            return;
+          }
+          // Load the plot GeoJSON directly from the workspace
+          const fs = await import('fs');
+          const path = await import('path');
+          const workspacePath = folders[0]!.uri.fsPath;
+          const geojsonPath = path.join(
+            workspacePath,
+            'local-store',
+            'exercise-alpha',
+            'exercise-alpha.geojson',
+          );
+          if (!fs.existsSync(geojsonPath)) {
+            void vscode.window.showErrorMessage(
+              `[__test] exercise-alpha.geojson not found at ${geojsonPath}`,
+            );
+            return;
+          }
+          const raw = fs.readFileSync(geojsonPath, 'utf-8');
+          const fc = JSON.parse(raw) as {
+            features: Array<{
+              type: 'Feature';
+              id?: string | number;
+              geometry: unknown;
+              properties: Record<string, unknown> | null;
+            }>;
+          };
+          const tracks = fc.features
+            .filter((f) => f.properties?.['kind'] === 'TRACK')
+            .slice(0, 2);
+          if (tracks.length < 2) {
+            void vscode.window.showErrorMessage(
+              `[__test] expected at least 2 TRACK features, got ${tracks.length}`,
+            );
+            return;
+          }
+
+          // Run the REAL Python tool via CalcService.
+          const toolResult = await calcService.executeToolDirect(
+            'range-bearing',
+            tracks,
+            {},
+          );
+          if (!toolResult.success) {
+            void vscode.window.showErrorMessage(
+              '[__test] range-bearing tool failed',
+            );
+            return;
+          }
+
+          // Filter dataset carriers out of the returned features.
+          const allFeatures = toolResult.features?.features ?? [];
+          const datasetCarriers: typeof allFeatures = [];
+          for (const feature of allFeatures) {
+            const props = (feature as { properties?: unknown } | null)?.properties;
+            if (props !== null && typeof props === 'object') {
+              const propsMap = props as Record<string, unknown>;
+              const hasDatasets =
+                Array.isArray(propsMap['__datasets']) &&
+                (propsMap['__datasets'] as unknown[]).length > 0;
+              if (hasDatasets) {
+                datasetCarriers.push(feature);
+              }
+            }
+          }
+
+          if (datasetCarriers.length === 0) {
+            void vscode.window.showErrorMessage(
+              '[__test] tool ran but produced no dataset carriers — the CalcService parser bug is still present',
+            );
+            return;
+          }
+
+          // Route through the REAL ResultsPanelService — this will
+          // fire reveal() → focus command → resolveWebviewView →
+          // bundle mount → webviewReady → flush messages → chart
+          // renders in the real iframe.
+          const plotKey = {
+            storePath: path.join(workspacePath, 'local-store'),
+            itemPath: 'exercise-alpha/item.json',
+          };
+          resultsPanelService.addDatasetsForToolResult({
+            plotKey,
+            toolId: 'range-bearing',
+            result: {
+              features: {
+                type: 'FeatureCollection',
+                features: datasetCarriers,
+              },
+            },
+            sourceFeatureIds: tracks.map((f) => String(f.id ?? '')).filter(Boolean),
+            parameters: {},
+            parentActivityId: `e2e-activity-${Date.now()}`,
+          });
+
+          void vscode.window.showInformationMessage(
+            `[__test] range-bearing produced ${datasetCarriers.length} dataset carriers — Results panel should now be visible`,
+          );
+        } catch (err) {
+          void vscode.window.showErrorMessage(
+            `[__test] runExerciseAlphaRangeBearing failed: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      },
+    ),
+    vscode.commands.registerCommand(
+      'debrief.__test.runRealTool',
+      async (payload: {
+        toolId: string;
+        features: Array<{
+          type: 'Feature';
+          id?: string | number;
+          geometry: unknown;
+          properties: Record<string, unknown> | null;
+        }>;
+        plotKey?: { storePath: string; itemPath: string };
+      }): Promise<{ ok: boolean; error?: string; carrierCount?: number }> => {
+        // Run the REAL Python MCP tool via CalcService.executeToolDirect,
+        // which spawns `debrief_calc.cli` with stdin JSON, parses the MCP
+        // response, and returns the features.  For dataset tools this
+        // returns the carrier feature in result.features.features
+        // (with the fix in 047a468 applied to executeToolDirect too).
+        try {
+          const toolResult = await calcService.executeToolDirect(
+            payload.toolId,
+            payload.features,
+            {},
+          );
+          if (!toolResult.success) {
+            return { ok: false, error: 'tool execution failed' };
+          }
+
+          // Filter the returned features into map-only vs dataset carriers,
+          // mirroring the real executeTool.ts logic.
+          const allFeatures = toolResult.features?.features ?? [];
+          const datasetCarriers: typeof allFeatures = [];
+          for (const feature of allFeatures) {
+            const props = (feature as { properties?: unknown } | null)?.properties;
+            if (props !== null && typeof props === 'object') {
+              const propsMap = props as Record<string, unknown>;
+              const hasDatasets =
+                Array.isArray(propsMap['__datasets']) &&
+                (propsMap['__datasets'] as unknown[]).length > 0;
+              const hasStatistics =
+                propsMap['statistics'] !== null &&
+                typeof propsMap['statistics'] === 'object';
+              if (hasDatasets || hasStatistics) {
+                datasetCarriers.push(feature);
+              }
+            }
+          }
+
+          if (datasetCarriers.length === 0) {
+            return { ok: true, carrierCount: 0 };
+          }
+
+          // Route to the Results panel via the REAL service.  This will
+          // fire reveal() → focus command → resolveWebviewView → bundle
+          // mount → webviewReady → flush messages → chart renders.
+          const plotKey = payload.plotKey ?? {
+            storePath: '/tmp/e2e-store',
+            itemPath: 'e2e/item.json',
+          };
+          resultsPanelService.addDatasetsForToolResult({
+            plotKey,
+            toolId: payload.toolId,
+            result: {
+              features: {
+                type: 'FeatureCollection',
+                features: datasetCarriers,
+              },
+            },
+            sourceFeatureIds: payload.features
+              .map((f) => (f.id !== undefined ? String(f.id) : ''))
+              .filter(Boolean),
+            parameters: {},
+            parentActivityId: `e2e-activity-${Date.now()}`,
+          });
+          return { ok: true, carrierCount: datasetCarriers.length };
+        } catch (err) {
+          return {
+            ok: false,
+            error: err instanceof Error ? err.message : String(err),
+          };
+        }
       },
     ),
   );
@@ -220,7 +433,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
     vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider),
-    vscode.window.registerWebviewViewProvider('debrief.resultsPanel', resultsPanelProvider)
+    // Feature 178: retainContextWhenHidden=true keeps the webview
+    // alive across panel dock collapse/expand.  Without this, VS
+    // Code disposes the webview on collapse, the cached `_view`
+    // reference in ResultsPanelViewProvider becomes stale, and the
+    // next `postMessage` silently drops the message into a dead
+    // webview — the user-reported "tool completed but no graph" bug.
+    vscode.window.registerWebviewViewProvider(
+      'debrief.resultsPanel',
+      resultsPanelProvider,
+      { webviewOptions: { retainContextWhenHidden: true } },
+    )
   );
 
   // Register outline provider for selection

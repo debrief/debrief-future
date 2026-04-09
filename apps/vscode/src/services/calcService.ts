@@ -746,6 +746,25 @@ print(json.dumps(tools))
         toolVersion = item.annotations['debrief:toolVersion'];
       }
       if (item.annotations?.['debrief:href']) {
+        // Feature 178: dataset artifacts carry a GeoJSON feature with
+        // `__datasets` in its properties — route into geoFeatures so
+        // downstream code can hand them to the Results panel.  Mirrors
+        // the same fix in executeToolOnMcp above.
+        const resultTypeAnno = item.annotations['debrief:resultType'];
+        if (
+          typeof resultTypeAnno === 'string' &&
+          resultTypeAnno.startsWith('artifact/dataset/') &&
+          item.type === 'resource' &&
+          item.resource
+        ) {
+          try {
+            const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+            geoFeatures.push(feature);
+            continue;
+          } catch {
+            /* fall through */
+          }
+        }
         artifactHref = item.annotations['debrief:href'];
         continue;
       }

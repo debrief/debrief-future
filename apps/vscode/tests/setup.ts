@@ -96,6 +96,11 @@ vi.mock('vscode', () => ({
       const scheme = uri.startsWith('https://') ? 'https' : uri.startsWith('http://') ? 'http' : 'file';
       return { fsPath: uri, scheme, path: uri };
     }),
+    joinPath: vi.fn((base: { fsPath?: string; path?: string }, ...segments: string[]) => {
+      const basePath = base.fsPath ?? base.path ?? '';
+      const joined = [basePath, ...segments].join('/').replace(/\/+/g, '/');
+      return { fsPath: joined, scheme: 'file', path: joined };
+    }),
   },
   EventEmitter: MockEventEmitter,
   TreeItem: MockTreeItem,

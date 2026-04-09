@@ -21,6 +21,7 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
   private _pendingMessages: Array<Record<string, unknown>> = [];
   private _isReady = false;
   private _service?: ResultsPanelService;
+  private _outputChannel?: vscode.OutputChannel;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -32,11 +33,29 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     this._service = service;
   }
 
+  /**
+   * Wire the Debrief output channel so lifecycle events (resolve,
+   * dispose, message send, flush) get logged to the user-visible
+   * output.  Enables field diagnosis of "tool completed but no graph"
+   * without requiring the user to run a debugger.
+   */
+  public setOutputChannel(channel: vscode.OutputChannel): void {
+    this._outputChannel = channel;
+  }
+
+  private _log(message: string): void {
+    const line = `[debrief/results] ${message}`;
+    this._outputChannel?.appendLine(line);
+  }
+
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken,
   ): void {
+    this._log(
+      `resolveWebviewView called (pending=${this._pendingMessages.length})`,
+    );
     this._view = webviewView;
     this._isReady = false;
 
@@ -50,18 +69,41 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlContent(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage((message: IncomingMessage) => {
+      this._log(`onDidReceiveMessage: ${message.type}`);
       this._handleMessage(message);
+    });
+
+    // Safety net: even with retainContextWhenHidden = true, a webview
+    // view CAN still be disposed if the user explicitly removes the
+    // view container, the extension reloads, or the window is closed
+    // while the view was never opened.  Reset local state on dispose
+    // so the next `postMessage` call queues instead of sending to a
+    // stale reference.
+    webviewView.onDidDispose(() => {
+      this._log('onDidDispose fired — resetting _view and _isReady');
+      this._view = undefined;
+      this._isReady = false;
     });
   }
 
   /**
    * Post a message to the webview.  If the React app has not yet signalled
    * `results:webviewReady` we queue the message and flush on ready.
+   *
+   * Note: this relies on `onDidDispose` to reset `_view` /
+   * `_isReady` when VS Code tears the webview down.  Without that
+   * handler, this method would happily call postMessage on a dead
+   * webview reference and silently drop the message.
    */
   public postMessage(message: Record<string, unknown>): void {
+    const type = (message as { type?: string }).type ?? '(no-type)';
     if (this._isReady && this._view) {
+      this._log(`postMessage(${type}) — delivering to webview`);
       void this._view.webview.postMessage(message);
     } else {
+      this._log(
+        `postMessage(${type}) — queued (isReady=${this._isReady}, hasView=${!!this._view})`,
+      );
       this._pendingMessages.push(message);
     }
   }
@@ -89,11 +131,17 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
    * appear in the Results panel, even if the panel wasn't open".
    */
   public async reveal(): Promise<void> {
+    this._log(
+      `reveal() called (hasView=${!!this._view}, isReady=${this._isReady}, pending=${this._pendingMessages.length})`,
+    );
     try {
       await vscode.commands.executeCommand('debrief.resultsPanel.focus');
+      this._log('reveal() — focus command completed');
     } catch (err) {
       // Non-fatal — the command might not be registered yet during
       // very early activation.  Log and carry on.
+      const msg = err instanceof Error ? err.message : String(err);
+      this._log(`reveal() — focus command failed: ${msg}`);
       console.warn('[debrief/results] reveal: focus command failed', err);
     }
   }
@@ -105,6 +153,9 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     switch (message.type) {
       case 'results:webviewReady': {
         this._isReady = true;
+        this._log(
+          `flushing ${this._pendingMessages.length} pending message(s) to webview`,
+        );
         // Flush any queued messages.
         for (const pending of this._pendingMessages) {
           void this._view?.webview.postMessage(pending);

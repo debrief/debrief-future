@@ -124,6 +124,15 @@ export class ResultsPanelService {
   private _activeTabId: string | null = null;
   private _panelVisible = false;
   private _sessionDisposable?: vscode.Disposable;
+  private _outputChannel?: vscode.OutputChannel;
+
+  public setOutputChannel(channel: vscode.OutputChannel): void {
+    this._outputChannel = channel;
+  }
+
+  private _log(message: string): void {
+    this._outputChannel?.appendLine(`[debrief/resultsService] ${message}`);
+  }
 
   constructor(deps: ResultsPanelServiceDeps) {
     this._deps = deps;
@@ -159,6 +168,9 @@ export class ResultsPanelService {
     parameters?: Record<string, unknown>;
     parentActivityId: string;
   }): void {
+    this._log(
+      `addDatasetsForToolResult called: toolId=${args.toolId} featureCount=${args.result.features?.features?.length ?? 0}`,
+    );
     const datasets: DatasetEnvelope[] = [];
     const features = args.result.features?.features ?? [];
     const sourceLabel = sourceLabelFromIds(args.sourceFeatureIds);
@@ -190,7 +202,11 @@ export class ResultsPanelService {
       }
     }
 
+    this._log(`  extracted ${datasets.length} DatasetEnvelope(s)`);
     if (datasets.length === 0) {
+      this._log(
+        '  no datasets extracted — Results panel will NOT be shown for this tool result',
+      );
       return; // No results panel for this tool result (FR-004).
     }
 
@@ -325,6 +341,7 @@ export class ResultsPanelService {
     this._activeTabId = tab.id;
 
     if (!this._panelVisible) {
+      this._log('  panel was hidden — revealing');
       this._panelVisible = true;
       this._deps.panelView.postMessage({
         type: 'results:setVisibility',
@@ -336,6 +353,7 @@ export class ResultsPanelService {
     }
 
     this._broadcastTabs();
+    this._log(`  tabs=${this._tabs.length} active=${this._activeTabId}`);
   }
 
   // -------------------------------------------------------------------------

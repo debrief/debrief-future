@@ -202,6 +202,11 @@
         "enablement": "debrief.tool.range-bearing.active"
       },
       {
+        "command": "debrief.__test.runExerciseAlphaRangeBearing",
+        "title": "Debrief (test): Run Exercise Alpha Range-Bearing",
+        "category": "Debrief Test"
+      },
+      {
         "command": "debrief.tool.closestApproach",
         "title": "Debrief: Closest Point of Approach",
         "enablement": "debrief.tool.closest-approach.active"
