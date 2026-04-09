@@ -3,12 +3,16 @@
  *
  * Feature: 178-vscode-tabular-results
  *
- * Drives the real webview bundle via postMessage and asserts that:
+ * Drives the real webview bundle (ChartPanelWrapper inside
+ * PanelContextProvider) via postMessage and asserts that:
  *   - Clicking Save posts `results:save { tabId }` to the host
  *   - Save As opens an inline form, re-posts `results:saveAs` with
  *     the sanitised base name + tag
  *   - After the host flips the tab to `isSaved: true`, the unsaved dot
  *     clears and both Save buttons become disabled
+ *
+ * All selectors are the SHARED-COMPONENT aria-labels (from the
+ * `@debrief/components` ResultsPanelLabels), not custom test IDs.
  *
  * Covers acceptance scenarios 1, 2, and 4 from US2 in spec.md.
  */
@@ -45,7 +49,7 @@ test.describe('Results Panel — US2: Save flow', () => {
     });
     await clearPostedMessages(page);
 
-    await page.getByTestId('results-save-button').click();
+    await page.getByRole('button', { name: 'Save result', exact: true }).click();
 
     const posted = await getPostedMessages(page);
     const saveMsg = posted.find(
@@ -69,7 +73,7 @@ test.describe('Results Panel — US2: Save flow', () => {
       },
     });
 
-    await page.getByTestId('results-save-as-button').click();
+    await page.getByRole('button', { name: 'Save result as' }).click();
 
     const nameInput = page.getByLabel('Base filename');
     const tagInput = page.getByLabel('Optional tag');
@@ -77,7 +81,7 @@ test.describe('Results Panel — US2: Save flow', () => {
     await expect(tagInput).toBeVisible();
 
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "04-save-as-form.png"),
+      path: join(SCREENSHOT_DIR, '04-save-as-form.png'),
       fullPage: false,
     });
   });
@@ -94,7 +98,7 @@ test.describe('Results Panel — US2: Save flow', () => {
     });
     await clearPostedMessages(page);
 
-    await page.getByTestId('results-save-as-button').click();
+    await page.getByRole('button', { name: 'Save result as' }).click();
 
     await page.getByLabel('Base filename').fill('my-stats');
     await page.getByLabel('Optional tag').fill('v2');
@@ -129,7 +133,7 @@ test.describe('Results Panel — US2: Save flow', () => {
       },
     });
 
-    await page.getByTestId('results-save-as-button').click();
+    await page.getByRole('button', { name: 'Save result as' }).click();
     await page.getByLabel('Base filename').fill('my-stats');
     await clearPostedMessages(page);
     await page.getByLabel('Cancel save').click();
@@ -153,7 +157,8 @@ test.describe('Results Panel — US2: Save flow', () => {
         activeTabId: TRACK_STATS_TAB.id,
       },
     });
-    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+    // The unsaved-dot is a span with aria-label="Unsaved result".
+    await expect(page.getByLabel('Unsaved result').first()).toBeVisible();
 
     // Host flips the tab to saved.
     await sendHostMessage(page, {
@@ -164,13 +169,19 @@ test.describe('Results Panel — US2: Save flow', () => {
       },
     });
 
-    // Unsaved dot is gone, Save buttons are disabled.
-    await expect(page.getByTestId('unsaved-dot')).toHaveCount(0);
-    await expect(page.getByTestId('results-save-button')).toBeDisabled();
-    await expect(page.getByTestId('results-save-as-button')).toBeDisabled();
+    // Unsaved dot is gone.
+    await expect(page.getByLabel('Unsaved result')).toHaveCount(0);
+
+    // Save buttons are disabled.
+    await expect(
+      page.getByRole('button', { name: 'Save result', exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: 'Save result as' }),
+    ).toBeDisabled();
 
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "05-saved-state.png"),
+      path: join(SCREENSHOT_DIR, '05-saved-state.png'),
       fullPage: false,
     });
   });

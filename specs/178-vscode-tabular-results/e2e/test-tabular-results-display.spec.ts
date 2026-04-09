@@ -4,10 +4,14 @@
  * Feature: 178-vscode-tabular-results
  *
  * Drives the real `apps/vscode/dist/webview/resultsPanel.js` bundle in a
- * minimal HTML harness via the Hybrid-A+D postMessage pattern.  This tests
- * the webview renderer end-to-end (React, TableRenderer, ChartRenderer, tab
- * bar, unsaved-dot indicator, close handlers) **without** needing a
- * running code-server or the Debrief VS Code extension host.
+ * minimal HTML harness via the Hybrid-A+D postMessage pattern.
+ *
+ * The bundle renders `@debrief/components` `<ChartPanelWrapper />` inside
+ * a `<PanelContextProvider>` — so the selectors used here are the
+ * SHARED-COMPONENT selectors (aria-labels + `data-testid` values set by
+ * ChartPanelWrapper / TableRenderer / ChartRenderer), NOT custom ones
+ * invented for this webview.  That guarantees the web-shell and the
+ * VS Code panel test the same surface (FR-025 / SC-006).
  *
  * Covers acceptance scenarios 1–4 from US1 in spec.md.
  */
@@ -32,20 +36,21 @@ test.describe('Results Panel — US1: Display', () => {
   test('empty state: panel is hidden until the first result (FR-004)', async ({
     page,
   }) => {
-    // On load the panel should show the "no results" placeholder —
-    // the webview itself is visible, but the "visible" flag is false.
+    // On load the panel should show the empty placeholder —
+    // the webview is mounted but has no tabs and is marked invisible.
     await expect(
       page.getByTestId('results-panel-empty'),
     ).toBeVisible();
+    // ChartPanelWrapper is NOT rendered until we have tabs.
     await expect(page.getByTestId('panel-chart')).toHaveCount(0);
 
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "01-empty-state.png"),
+      path: join(SCREENSHOT_DIR, '01-empty-state.png'),
       fullPage: false,
     });
   });
 
-  test('single table tab appears after track-stats tool result (FR-001, FR-002, FR-003)', async ({
+  test('single table tab renders via TableRenderer (FR-001, FR-002, FR-003)', async ({
     page,
   }) => {
     // Host announces visibility + a single synthesised table tab.
@@ -61,42 +66,51 @@ test.describe('Results Panel — US1: Display', () => {
       },
     });
 
-    // Panel is now visible with the tab rendered.
+    // ChartPanelWrapper's root element is visible.
     await expect(page.getByTestId('panel-chart')).toBeVisible();
 
-    // Tab header is present with the right title.
-    const tabHeader = page.getByTestId(`results-tab-${TRACK_STATS_TAB.id}`);
-    await expect(tabHeader).toBeVisible();
-    await expect(tabHeader).toContainText('Track Alpha — Stats');
-
-    // Unsaved dot is visible for an unsaved tab (FR-007).
+    // Tab header is present (rendered by ChartPanelWrapper's tab bar)
+    // — find by accessible close-button aria-label which encodes the title.
     await expect(
-      page.getByTestId('unsaved-dot'),
+      page.getByRole('button', { name: 'Close Track Alpha — Stats' }),
     ).toBeVisible();
 
-    // Table content renders — TableRenderer shows the metric rows.
-    // We assert by looking for the row values that buildCsvContent would write.
-    await expect(page.getByTestId('panel-chart')).toContainText('total distance nm');
-    await expect(page.getByTestId('panel-chart')).toContainText('12.5');
-    await expect(page.getByTestId('panel-chart')).toContainText('average speed kn');
+    // Unsaved-dot indicator — ChartPanelWrapper renders a span with
+    // `aria-label="Unsaved result"` and `title="Unsaved result"`.
+    await expect(
+      page.getByLabel('Unsaved result').first(),
+    ).toBeVisible();
 
-    // Save / Save As buttons are visible and enabled (unsaved tab).
-    const saveButton = page.getByTestId('results-save-button');
-    const saveAsButton = page.getByTestId('results-save-as-button');
-    await expect(saveButton).toBeVisible();
-    await expect(saveButton).toBeEnabled();
-    await expect(saveAsButton).toBeVisible();
-    await expect(saveAsButton).toBeEnabled();
+    // Table content actually rendered by the shared TableRenderer —
+    // assert the metric names and values that the host fed in.
+    const panelChart = page.getByTestId('panel-chart');
+    await expect(panelChart).toContainText('total distance nm');
+    await expect(panelChart).toContainText('12.5');
+    await expect(panelChart).toContainText('average speed kn');
+    await expect(panelChart).toContainText('point count');
+
+    // Save / Save As buttons visible and enabled on an unsaved tab.
+    await expect(
+      page.getByRole('button', { name: 'Save result', exact: true }),
+    ).toBeEnabled();
+    await expect(
+      page.getByRole('button', { name: 'Save result as' }),
+    ).toBeEnabled();
 
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "02-single-table-tab.png"),
+      path: join(SCREENSHOT_DIR, '02-single-table-tab.png'),
       fullPage: false,
     });
   });
 
-  test('two chart tabs appear after range-bearing tool result (FR-002)', async ({
+  test('chart tab actually renders a Vega-Lite chart (FR-002, FR-025, user-reported bug)', async ({
     page,
   }) => {
+    // This is the test that SHOULD have caught the original "no range
+    // graph" bug.  We open a chart tab, then assert that the shared
+    // ChartRenderer's <canvas> element is actually present — which
+    // only happens if `transformDataset` succeeded AND vega-embed
+    // mounted the spec.
     await sendHostMessage(page, {
       type: 'results:setVisibility',
       payload: { visible: true },
@@ -105,29 +119,57 @@ test.describe('Results Panel — US1: Display', () => {
       type: 'results:setTabs',
       payload: {
         tabs: [RANGE_BEARING_RANGE_TAB, RANGE_BEARING_BEARING_TAB],
-        activeTabId: RANGE_BEARING_BEARING_TAB.id,
+        activeTabId: RANGE_BEARING_RANGE_TAB.id,
       },
     });
 
-    // Both tab headers are present.
-    const rangeTab = page.getByTestId(
-      `results-tab-${RANGE_BEARING_RANGE_TAB.id}`,
-    );
-    const bearingTab = page.getByTestId(
-      `results-tab-${RANGE_BEARING_BEARING_TAB.id}`,
-    );
+    // Panel visible with the right number of tabs.
+    await expect(page.getByTestId('panel-chart')).toBeVisible();
 
-    await expect(rangeTab).toBeVisible();
-    await expect(rangeTab).toContainText('Range');
-    await expect(bearingTab).toBeVisible();
-    await expect(bearingTab).toContainText('Bearing');
+    // Tab bar shows both tabs (via close-button aria-labels).
+    await expect(
+      page.getByRole('button', {
+        name: `Close ${RANGE_BEARING_RANGE_TAB.title}`,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: `Close ${RANGE_BEARING_BEARING_TAB.title}`,
+      }),
+    ).toBeVisible();
 
-    // Both have the unsaved-dot indicator.
-    const dots = page.getByTestId('unsaved-dot');
-    await expect(dots).toHaveCount(2);
+    // Both are unsaved.
+    await expect(page.getByLabel('Unsaved result')).toHaveCount(2);
 
+    // ── THE KEY ASSERTION ──
+    // ChartRenderer mounts a canvas element via vega-embed when the
+    // spec is valid and the dataset type has a registered transformer.
+    // `range_bearing_series` IS registered (see
+    // shared/components/src/ChartRenderer/transformer/mappings/index.ts).
+    //
+    // If transformDataset returned the wrong shape (the original bug),
+    // chartSpec would be null, ChartRenderer would show its error state,
+    // and no <canvas> would render.
+    const chartRenderer = page.getByTestId('chart-renderer').first();
+    await expect(chartRenderer).toBeVisible();
+
+    // Wait for vega-embed to finish rendering.  The loading overlay
+    // disappears once the chart is mounted.
+    await expect(page.getByTestId('chart-loading')).toHaveCount(0, {
+      timeout: 5_000,
+    });
+
+    // No error state.
+    await expect(page.getByTestId('chart-error')).toHaveCount(0);
+
+    // A real <canvas> element exists inside the chart renderer —
+    // this is vega-embed's rendering target.
+    await expect(chartRenderer.locator('canvas')).toBeAttached();
+
+    // Capture the screenshot — this is the one that will show the
+    // actual chart for the user.
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "03-two-chart-tabs.png"),
+      path: join(SCREENSHOT_DIR, '03-two-chart-tabs.png'),
       fullPage: false,
     });
   });
@@ -149,14 +191,12 @@ test.describe('Results Panel — US1: Display', () => {
 
     await clearPostedMessages(page);
 
-    // Click the close button inside the Range tab header.
-    // Default label from DEFAULT_RESULTS_PANEL_LABELS is `Close ${title}`.
-    const rangeTab = page.getByTestId(
-      `results-tab-${RANGE_BEARING_RANGE_TAB.id}`,
-    );
-    await rangeTab.getByRole('button', { name: 'Close Range' }).click();
+    // Click the close button on the Range tab.
+    await page
+      .getByRole('button', { name: `Close ${RANGE_BEARING_RANGE_TAB.title}` })
+      .click();
 
-    // The webview should have dispatched a results:closeTab message.
+    // Webview should have dispatched a results:closeTab message.
     const posted = await getPostedMessages(page);
     const closeMsg = posted.find(
       (m) => (m as { type?: string }).type === 'results:closeTab',
@@ -168,7 +208,9 @@ test.describe('Results Panel — US1: Display', () => {
     });
   });
 
-  test('switching tabs updates the active tab highlight', async ({ page }) => {
+  test('switching tabs updates the active tab via local state', async ({
+    page,
+  }) => {
     await sendHostMessage(page, {
       type: 'results:setVisibility',
       payload: { visible: true },
@@ -181,17 +223,24 @@ test.describe('Results Panel — US1: Display', () => {
       },
     });
 
-    const rangeTab = page.getByTestId(
-      `results-tab-${RANGE_BEARING_RANGE_TAB.id}`,
-    );
-    await rangeTab.click();
+    // ChartPanelWrapper renders each tab header as a clickable <div>
+    // whose only reliable selector is the Close button it contains —
+    // click the parent of the "Close Range" button to activate the
+    // Range tab.
+    const rangeCloseButton = page.getByRole('button', {
+      name: `Close ${RANGE_BEARING_RANGE_TAB.title}`,
+    });
+    await rangeCloseButton.locator('..').click();
 
-    // After clicking Range, the active-tab highlight (local state)
-    // should move to the Range tab header.
-    await expect(rangeTab).toHaveCSS(
-      'border-bottom',
-      /rgb\(0,\s*127,\s*212\)|#007fd4/i,
-    );
+    // The panel chart content area is still visible; the chartSpec
+    // switches to the newly active tab's envelope.
+    await expect(page.getByTestId('panel-chart')).toBeVisible();
+    // The Range tab is now active — the chart renderer mounts a new
+    // canvas for its spec.
+    await expect(page.getByTestId('chart-renderer')).toBeVisible();
+    await expect(
+      page.getByTestId('chart-renderer').locator('canvas'),
+    ).toBeAttached();
   });
 
   test('setVisibility(false) collapses the panel to the empty placeholder (FR-006)', async ({

@@ -3,20 +3,32 @@
  *
  * Feature: 178-vscode-tabular-results (R5 — stateless webview)
  *
+ * Renders `@debrief/components` `<ChartPanelWrapper />` inside a
+ * `<PanelContextProvider>` — the exact same component the web-shell
+ * uses.  This avoids forking any rendering logic (FR-025 / SC-006).
+ *
  * The extension host (`ResultsPanelService`) is the single source of
- * truth.  This webview receives `results:setTabs` messages, renders
- * the tab bar and the active tab's content via `TableRenderer` (for
- * `displayHint === 'table'`) or `ChartRenderer` (for charts), and
- * forwards user actions (save, retry, close) back to the host.
+ * truth.  This webview:
+ *   1. Receives `results:setTabs` / `results:setVisibility` /
+ *      `results:setLoading` messages from the host.
+ *   2. Translates the snapshot list into `ChartTabData[]` + computes
+ *      the Vega-Lite `chartSpec` for the active chart tab via
+ *      `transformDataset`.
+ *   3. Forwards user actions (`onChartTabSelect`, `onChartTabClose`,
+ *      `onSave`, `onSaveAs`, `onRetry`) back to the host as the
+ *      corresponding `results:*` messages.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  TableRenderer,
+  ChartPanelWrapper,
   ChartRenderer,
+  PanelContextProvider,
   transformDataset,
-  DEFAULT_RESULTS_PANEL_LABELS,
+  type ChartContextProps,
+  type ChartTabData,
+  type PanelContextValue,
   type ChartRendererProps,
 } from '@debrief/components';
 
@@ -33,7 +45,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
 const vscode = acquireVsCodeApi();
 
 // ---------------------------------------------------------------------------
-// Message shapes (mirror apps/vscode/src/webview/messages.ts)
+// Host → webview message shapes (mirror apps/vscode/src/webview/messages.ts)
 // ---------------------------------------------------------------------------
 
 interface TabSnapshot {
@@ -41,7 +53,9 @@ interface TabSnapshot {
   title: string;
   toolId: string;
   displayHint?: 'table' | 'chart';
+  /** Flat table rows when displayHint === 'table'. */
   tableData?: Record<string, unknown>[];
+  /** Full DatasetEnvelope when displayHint === 'chart'. */
   datasetEnvelope?: Record<string, unknown>;
   isSaved?: boolean;
   isLoading?: boolean;
@@ -72,83 +86,54 @@ type IncomingMessage =
   | SetLoadingMessage;
 
 // ---------------------------------------------------------------------------
-// SaveAs inline form
+// Stub components for the rest of PanelContext that ChartPanelWrapper
+// does not touch (but the context type still requires).
 // ---------------------------------------------------------------------------
 
-function SaveAsForm({
-  onSubmit,
-  onCancel,
-}: {
-  onSubmit: (baseName: string, tag?: string) => void;
-  onCancel: () => void;
-}): React.ReactElement {
-  const [baseName, setBaseName] = useState('');
-  const [tag, setTag] = useState('');
-  const labels = DEFAULT_RESULTS_PANEL_LABELS;
+const StubComponent: React.ComponentType<unknown> = () => null;
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '2px 8px',
-        background: 'var(--vscode-editorGroupHeader-tabsBackground, #252526)',
-        borderBottom: '1px solid var(--vscode-panel-border, #454545)',
-        fontSize: 12,
-      }}
-      role="form"
-      aria-label={labels.saveResultAs}
-    >
-      <label htmlFor="save-as-name">{labels.nameLabel}</label>
-      <input
-        id="save-as-name"
-        type="text"
-        value={baseName}
-        onChange={(e) => setBaseName(e.target.value)}
-        maxLength={64}
-        aria-label={labels.baseFilenameAriaLabel}
-        style={{
-          background: 'var(--vscode-input-background, #3c3c3c)',
-          color: 'var(--vscode-input-foreground, #ccc)',
-          border: '1px solid var(--vscode-input-border, #3c3c3c)',
-          padding: '2px 4px',
-          width: 120,
-        }}
-      />
-      <label htmlFor="save-as-tag">{labels.tagLabel}</label>
-      <input
-        id="save-as-tag"
-        type="text"
-        value={tag}
-        onChange={(e) => setTag(e.target.value)}
-        maxLength={32}
-        aria-label={labels.optionalTagAriaLabel}
-        style={{
-          background: 'var(--vscode-input-background, #3c3c3c)',
-          color: 'var(--vscode-input-foreground, #ccc)',
-          border: '1px solid var(--vscode-input-border, #3c3c3c)',
-          padding: '2px 4px',
-          width: 80,
-        }}
-      />
-      <button
-        type="button"
-        disabled={!baseName.trim()}
-        aria-label={labels.confirmSave}
-        onClick={() => onSubmit(baseName.trim(), tag.trim() || undefined)}
-      >
-        {labels.ok}
-      </button>
-      <button
-        type="button"
-        aria-label={labels.cancelSave}
-        onClick={onCancel}
-      >
-        {labels.cancel}
-      </button>
-    </div>
-  );
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a TabSnapshot to the `ChartTabData` shape the shared
+ * `ChartPanelWrapper` consumes.  Both tables and charts live in this
+ * list; the wrapper routes on `displayHint`.
+ */
+function snapshotToChartTabData(snapshot: TabSnapshot): ChartTabData {
+  return {
+    id: snapshot.id,
+    title: snapshot.title,
+    artifactType: 'dataset',
+    displayHint: snapshot.displayHint,
+    tableData: snapshot.tableData,
+    isSaved: snapshot.isSaved,
+    isLoading: snapshot.isLoading,
+    errorMessage: snapshot.errorMessage,
+  };
+}
+
+/**
+ * Compute the Vega-Lite spec for the active tab.  Returns `null` for
+ * non-chart tabs, for empty datasets, or when no registered
+ * transformer handles the envelope's `type`.
+ */
+function computeChartSpec(
+  snapshot: TabSnapshot | null,
+): ChartRendererProps['spec'] | null {
+  if (!snapshot || snapshot.displayHint !== 'chart') return null;
+  const envelope = snapshot.datasetEnvelope;
+  if (!envelope) return null;
+  try {
+    // Cast is safe: the host sends the runtime DatasetEnvelope shape.
+    // transformDataset validates at runtime and returns { ok, spec | error }.
+    const result = transformDataset(envelope as unknown as Parameters<typeof transformDataset>[0]);
+    return result.ok ? result.spec : null;
+  } catch (err) {
+    console.error('[debrief/results] transformDataset threw:', err);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -159,8 +144,6 @@ function ResultsPanelApp(): React.ReactElement {
   const [tabs, setTabs] = useState<TabSnapshot[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
-  const [showSaveAs, setShowSaveAs] = useState(false);
-  const labels = DEFAULT_RESULTS_PANEL_LABELS;
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<IncomingMessage>) => {
@@ -191,64 +174,101 @@ function ResultsPanelApp(): React.ReactElement {
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
-  const activeTab = useMemo(
+  // Track-local active tab id so clicking a tab updates the highlight
+  // without round-tripping through the host.  The host is still the
+  // source of truth for the tab LIST — this is pure UI state.
+  const handleChartTabSelect = useCallback((tabId: string) => {
+    setActiveTabId(tabId);
+  }, []);
+
+  const handleChartTabClose = useCallback((tabId: string) => {
+    vscode.postMessage({
+      type: 'results:closeTab',
+      payload: { tabId },
+    });
+  }, []);
+
+  const handleSave = useCallback((tabId: string) => {
+    vscode.postMessage({
+      type: 'results:save',
+      payload: { tabId },
+    });
+  }, []);
+
+  const handleSaveAs = useCallback(
+    (tabId: string, baseName: string, tag?: string) => {
+      vscode.postMessage({
+        type: 'results:saveAs',
+        payload: { tabId, baseName, tag },
+      });
+    },
+    [],
+  );
+
+  const handleRetry = useCallback((tabId: string) => {
+    vscode.postMessage({
+      type: 'results:retry',
+      payload: { tabId },
+    });
+  }, []);
+
+  const activeTabSnapshot = useMemo(
     () => tabs.find((t) => t.id === activeTabId) ?? null,
     [tabs, activeTabId],
   );
 
-  const chartSpec = useMemo<ChartRendererProps['spec'] | null>(() => {
-    if (!activeTab || activeTab.displayHint !== 'chart') return null;
-    const envelope = activeTab.datasetEnvelope;
-    if (!envelope) return null;
-    try {
-      // `transformDataset` expects the DatasetEnvelope runtime shape.
-      // We pass the raw envelope through as unknown — at runtime the
-      // structure matches because the host sent it verbatim.
-      return transformDataset(envelope as unknown as Parameters<typeof transformDataset>[0]);
-    } catch {
-      return null;
-    }
-  }, [activeTab]);
-
-  const handleTabClick = useCallback((id: string) => {
-    setActiveTabId(id);
-  }, []);
-
-  const handleTabClose = useCallback((id: string) => {
-    vscode.postMessage({
-      type: 'results:closeTab',
-      payload: { tabId: id },
-    });
-  }, []);
-
-  const handleSave = useCallback(() => {
-    if (!activeTabId) return;
-    vscode.postMessage({
-      type: 'results:save',
-      payload: { tabId: activeTabId },
-    });
-  }, [activeTabId]);
-
-  const handleSaveAsSubmit = useCallback(
-    (baseName: string, tag?: string) => {
-      if (!activeTabId) return;
-      vscode.postMessage({
-        type: 'results:saveAs',
-        payload: { tabId: activeTabId, baseName, tag },
-      });
-      setShowSaveAs(false);
-    },
-    [activeTabId],
+  const chartSpec = useMemo(
+    () => computeChartSpec(activeTabSnapshot),
+    [activeTabSnapshot],
   );
 
-  const handleRetry = useCallback(() => {
-    if (!activeTabId) return;
-    vscode.postMessage({
-      type: 'results:retry',
-      payload: { tabId: activeTabId },
-    });
-  }, [activeTabId]);
+  const chartTabs: ChartTabData[] = useMemo(
+    () => tabs.map(snapshotToChartTabData),
+    [tabs],
+  );
 
+  // Build the PanelContext value.  ChartPanelWrapper only reads
+  // `ctx.chartProps` and `ctx.components.ChartRenderer` — the other
+  // component slots get no-op stubs to satisfy the required type.
+  const panelContextValue: PanelContextValue = useMemo(() => {
+    const chartProps: ChartContextProps = {
+      chartSpec,
+      chartTabs,
+      activeChartTabId: activeTabId,
+      onChartTabSelect: handleChartTabSelect,
+      onChartTabClose: handleChartTabClose,
+      onSave: handleSave,
+      onSaveAs: handleSaveAs,
+      onRetry: handleRetry,
+    };
+    return {
+      components: {
+        ActivityPanel: StubComponent as PanelContextValue['components']['ActivityPanel'],
+        MapView: StubComponent as PanelContextValue['components']['MapView'],
+        LogPanel: StubComponent as PanelContextValue['components']['LogPanel'],
+        StacFileTree: StubComponent as PanelContextValue['components']['StacFileTree'],
+        ChartRenderer,
+      },
+      activityPanelProps: null,
+      mapViewProps: null,
+      logPanelProps: null,
+      stacFileTreeProps: null,
+      chartProps,
+    };
+  }, [
+    chartSpec,
+    chartTabs,
+    activeTabId,
+    handleChartTabSelect,
+    handleChartTabClose,
+    handleSave,
+    handleSaveAs,
+    handleRetry,
+  ]);
+
+  // Empty placeholder when the host has not yet announced visibility
+  // or no tabs exist.  Using the same `data-testid` the harness E2E
+  // tests look for.
   if (!visible || tabs.length === 0) {
     return (
       <div
@@ -259,238 +279,19 @@ function ResultsPanelApp(): React.ReactElement {
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
+          fontSize: 12,
         }}
         data-testid="results-panel-empty"
       >
-        {labels.noResults}
+        No results to display. Run a tool or open a file from the Navigation panel.
       </div>
     );
   }
 
   return (
-    <div
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      data-testid="panel-chart"
-    >
-      {/* Tab bar */}
-      <div
-        style={{
-          display: 'flex',
-          flexShrink: 0,
-          overflowX: 'auto',
-          background: 'var(--vscode-editorGroupHeader-tabsBackground, #252526)',
-          borderBottom: '1px solid var(--vscode-panel-border, #454545)',
-        }}
-      >
-        {tabs.map((tab) => (
-          <div
-            key={tab.id}
-            data-testid={`results-tab-${tab.id}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '4px 12px',
-              cursor: 'pointer',
-              fontSize: 12,
-              color:
-                tab.id === activeTabId
-                  ? 'var(--vscode-tab-activeForeground, #ffffff)'
-                  : 'var(--vscode-tab-inactiveForeground, #969696)',
-              borderBottom:
-                tab.id === activeTabId
-                  ? '2px solid var(--vscode-focusBorder, #007fd4)'
-                  : '2px solid transparent',
-              background:
-                tab.id === activeTabId
-                  ? 'var(--vscode-tab-activeBackground, #1e1e1e)'
-                  : 'transparent',
-            }}
-            onClick={() => handleTabClick(tab.id)}
-          >
-            <span>{tab.title}</span>
-            {tab.isSaved === false && !tab.errorMessage && !tab.isLoading && (
-              <span
-                data-testid="unsaved-dot"
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background:
-                    'var(--vscode-editorWarning-foreground, #cca700)',
-                  flexShrink: 0,
-                }}
-                title={labels.unsavedResult}
-                aria-label={labels.unsavedResult}
-              />
-            )}
-            <button
-              type="button"
-              aria-label={labels.closeTab(tab.title)}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTabClose(tab.id);
-              }}
-              style={{
-                padding: 0,
-                width: 16,
-                height: 16,
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--vscode-icon-foreground, #c5c5c5)',
-                fontSize: 14,
-                cursor: 'pointer',
-              }}
-            >
-              &times;
-            </button>
-          </div>
-        ))}
-
-        {/* Save / Save As buttons */}
-        {activeTab && !activeTab.errorMessage && !activeTab.isLoading && (
-          <div
-            style={{
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '0 8px',
-            }}
-          >
-            <button
-              type="button"
-              data-testid="results-save-button"
-              disabled={activeTab.isSaved === true}
-              onClick={handleSave}
-              aria-label={labels.saveResult}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: activeTab.isSaved
-                  ? 'var(--vscode-disabledForeground, #5a5a5a)'
-                  : 'var(--vscode-foreground, #ccc)',
-                cursor: activeTab.isSaved ? 'default' : 'pointer',
-                padding: '2px 6px',
-                fontSize: 12,
-              }}
-            >
-              {labels.save}
-            </button>
-            <button
-              type="button"
-              data-testid="results-save-as-button"
-              disabled={activeTab.isSaved === true}
-              onClick={() => setShowSaveAs(true)}
-              aria-label={labels.saveResultAs}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: activeTab.isSaved
-                  ? 'var(--vscode-disabledForeground, #5a5a5a)'
-                  : 'var(--vscode-foreground, #ccc)',
-                cursor: activeTab.isSaved ? 'default' : 'pointer',
-                padding: '2px 6px',
-                fontSize: 12,
-              }}
-            >
-              {labels.saveAs}
-            </button>
-          </div>
-        )}
-
-        {/* Retry button */}
-        {activeTab?.errorMessage && (
-          <div
-            style={{
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0 8px',
-            }}
-          >
-            <button
-              type="button"
-              data-testid="results-retry-button"
-              onClick={handleRetry}
-              aria-label={labels.retryToolExecution}
-              style={{
-                background: 'var(--vscode-button-background, #0e639c)',
-                color: 'var(--vscode-button-foreground, #fff)',
-                border: 'none',
-                padding: '2px 8px',
-                fontSize: 12,
-                cursor: 'pointer',
-              }}
-            >
-              {labels.retry}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Save As inline form */}
-      {showSaveAs && (
-        <SaveAsForm
-          onSubmit={handleSaveAsSubmit}
-          onCancel={() => setShowSaveAs(false)}
-        />
-      )}
-
-      {/* Content area */}
-      <div style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: 8 }}>
-        {activeTab?.errorMessage ? (
-          <div
-            role="alert"
-            data-testid="results-error"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: 'var(--vscode-errorForeground, #d32f2f)',
-              flexDirection: 'column',
-              gap: 8,
-            }}
-          >
-            <div style={{ fontSize: 14, fontWeight: 500 }}>
-              {labels.toolExecutionFailed}
-            </div>
-            <div style={{ fontSize: 12 }}>{activeTab.errorMessage}</div>
-          </div>
-        ) : activeTab?.isLoading ? (
-          <div
-            role="status"
-            aria-label={labels.loadingResults}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: 'var(--vscode-descriptionForeground, #969696)',
-            }}
-          >
-            {labels.computingResults}
-          </div>
-        ) : activeTab && activeTab.displayHint === 'table' && activeTab.tableData ? (
-          <TableRenderer data={activeTab.tableData} labels={labels} />
-        ) : activeTab && chartSpec ? (
-          <ChartRenderer spec={chartSpec} />
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              color: 'var(--vscode-errorForeground, #d32f2f)',
-            }}
-          >
-            {labels.unableToRender}
-          </div>
-        )}
-      </div>
-    </div>
+    <PanelContextProvider value={panelContextValue}>
+      <ChartPanelWrapper />
+    </PanelContextProvider>
   );
 }
 

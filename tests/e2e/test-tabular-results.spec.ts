@@ -187,13 +187,20 @@ test.describe('Tabular Results Panel — Real VS Code Webview (Feature 178)', ()
 
     // Tab bar and content should appear — proves the stateless webview
     // responds to host messages exactly as it would under the real
-    // ResultsPanelService.
+    // ResultsPanelService.  Selectors match the shared ChartPanelWrapper
+    // DOM (from `@debrief/components`), which is what the webview now
+    // renders directly (FR-025 / SC-006).
     await expect(
       innerFrame!.locator('[data-testid="panel-chart"]'),
     ).toBeVisible({ timeout: 5_000 });
+
+    // Unsaved-dot indicator — ChartPanelWrapper renders a span with
+    // aria-label="Unsaved result" (from DEFAULT_RESULTS_PANEL_LABELS).
     await expect(
-      innerFrame!.locator('[data-testid="unsaved-dot"]'),
+      innerFrame!.locator('[aria-label="Unsaved result"]'),
     ).toBeVisible();
+
+    // TableRenderer content.
     await expect(
       innerFrame!.locator('[data-testid="panel-chart"]'),
     ).toContainText('total distance nm');
@@ -207,11 +214,13 @@ test.describe('Tabular Results Panel — Real VS Code Webview (Feature 178)', ()
     });
 
     // ── Step 8: verify the Save button is enabled for an unsaved tab ──
+    // ChartPanelWrapper renders the Save / Save As buttons with aria-labels
+    // "Save result" and "Save result as".
     await expect(
-      innerFrame!.locator('[data-testid="results-save-button"]'),
+      innerFrame!.locator('button[aria-label="Save result"]'),
     ).toBeEnabled();
     await expect(
-      innerFrame!.locator('[data-testid="results-save-as-button"]'),
+      innerFrame!.locator('button[aria-label="Save result as"]'),
     ).toBeEnabled();
   });
 

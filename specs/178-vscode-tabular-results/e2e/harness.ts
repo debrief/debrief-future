@@ -199,26 +199,40 @@ export const TRACK_STATS_TAB = {
   isSaved: false,
 };
 
+// NOTE: The dataset `type` MUST be `range_bearing_series` — that's the
+// transformer name registered in
+// `shared/components/src/ChartRenderer/transformer/mappings/index.ts`.
+// It expects `series: [{ name, data: [{ time, value }] }]` — the exact
+// shape the real Python `range_bearing.py` tool emits.  Do NOT invent
+// synthetic type names here; the webview's `transformDataset` call will
+// return `{ ok: false, error: 'no transformer' }` and the chart tab
+// will render empty.
+
 export const RANGE_BEARING_RANGE_TAB = {
   id: 'tab-range-1',
-  title: 'Range',
+  title: 'Range: track-1 → track-2',
   toolId: 'range-bearing',
   displayHint: 'chart' as const,
   datasetEnvelope: {
-    type: 'range_series',
-    title: 'Range',
+    type: 'range_bearing_series',
+    title: 'Range: track-1 → track-2',
     displayHint: 'chart',
     metadata: {
       xAxis: { label: 'Time', type: 'temporal' },
       yAxis: { label: 'Range', type: 'quantitative', units: 'nm' },
     },
-    data: [
-      { time: '2024-06-15T10:00:00Z', range: 12.3 },
-      { time: '2024-06-15T10:05:00Z', range: 11.8 },
-      { time: '2024-06-15T10:10:00Z', range: 10.9 },
-      { time: '2024-06-15T10:15:00Z', range: 9.7 },
-      { time: '2024-06-15T10:20:00Z', range: 8.5 },
-      { time: '2024-06-15T10:25:00Z', range: 7.2 },
+    series: [
+      {
+        name: 'track-1 → track-2',
+        data: [
+          { time: '2024-06-15T10:00:00Z', value: 12.3 },
+          { time: '2024-06-15T10:05:00Z', value: 11.8 },
+          { time: '2024-06-15T10:10:00Z', value: 10.9 },
+          { time: '2024-06-15T10:15:00Z', value: 9.7 },
+          { time: '2024-06-15T10:20:00Z', value: 8.5 },
+          { time: '2024-06-15T10:25:00Z', value: 7.2 },
+        ],
+      },
     ],
   },
   isSaved: false,
@@ -226,24 +240,29 @@ export const RANGE_BEARING_RANGE_TAB = {
 
 export const RANGE_BEARING_BEARING_TAB = {
   id: 'tab-bearing-1',
-  title: 'Bearing',
+  title: 'Bearing: track-1 → track-2',
   toolId: 'range-bearing',
   displayHint: 'chart' as const,
   datasetEnvelope: {
-    type: 'bearing_series',
-    title: 'Bearing',
+    type: 'range_bearing_series',
+    title: 'Bearing: track-1 → track-2',
     displayHint: 'chart',
     metadata: {
       xAxis: { label: 'Time', type: 'temporal' },
       yAxis: { label: 'Bearing', type: 'quantitative', units: '°' },
     },
-    data: [
-      { time: '2024-06-15T10:00:00Z', bearing: 45 },
-      { time: '2024-06-15T10:05:00Z', bearing: 52 },
-      { time: '2024-06-15T10:10:00Z', bearing: 61 },
-      { time: '2024-06-15T10:15:00Z', bearing: 68 },
-      { time: '2024-06-15T10:20:00Z', bearing: 74 },
-      { time: '2024-06-15T10:25:00Z', bearing: 79 },
+    series: [
+      {
+        name: 'track-1 → track-2',
+        data: [
+          { time: '2024-06-15T10:00:00Z', value: 45 },
+          { time: '2024-06-15T10:05:00Z', value: 52 },
+          { time: '2024-06-15T10:10:00Z', value: 61 },
+          { time: '2024-06-15T10:15:00Z', value: 68 },
+          { time: '2024-06-15T10:20:00Z', value: 74 },
+          { time: '2024-06-15T10:25:00Z', value: 79 },
+        ],
+      },
     ],
   },
   isSaved: false,

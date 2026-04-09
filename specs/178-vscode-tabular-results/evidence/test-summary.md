@@ -1,8 +1,8 @@
 ---
 feature: 178-vscode-tabular-results
-captured_at: 2026-04-09T17:12:00Z
-git_sha: d6823ca
-tests_passed: 2301
+captured_at: 2026-04-09T20:20:00Z
+git_sha: e206953
+tests_passed: 2308
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -28,16 +28,56 @@ with save / open / retry / close wired through `StacService`, the new
 |---------|-----------:|------:|-------:|-------|
 | `@debrief/utils`         |  7 | 143  | 143  | + 14 new (`parseCsvToTableDataset` round-trip, `synthesizeTableDataset`) |
 | `@debrief/session-state` | 34 | 615  | 615  | + 5 new (`recordFileSaved` happy path + 4 error / sentinel cases) |
-| `@debrief/vscode`        | 21 | 348  | 348  | + 10 new (`ResultsPanelService` — US1/US2/US5 coverage) |
+| `@debrief/vscode`        | 22 | 355  | 355  | + 10 `ResultsPanelService` + 7 **NEW** `executeToolDatasetRouting` regression |
 | `@debrief/components`    | 76 | 1123 | 1123 | Unchanged (ChartPanelWrapper reused as-is) |
 | `@debrief/config-ts`     |  5 |  42  |  42  | Unchanged |
 | `@debrief/loader`        |  1 |   7  |   7  | Unchanged |
-| **Unit subtotal**        | **144** | **2278** | **2278** | |
-| Harness E2E (feature 178) |  3 | 15   | 15   | **Playwright** — drives real `resultsPanel.js` bundle via postMessage harness, see `webview-e2e-summary.md` |
-| Canonical VS Code E2E    |  3 |  8   |  8   | **Playwright + openvscode-server** — 2 tabular-results + 4 smoke + 2 webview-resolve running against real VS Code chrome with Hybrid A+D |
-| **Total**                | **150** | **2301** | **2301** | |
+| **Unit subtotal**        | **145** | **2285** | **2285** | |
+| Harness E2E (feature 178) |  3 | 15   | 15   | **Playwright** — drives the real `resultsPanel.js` bundle via postMessage harness; includes a REAL chart rendering assertion |
+| Canonical VS Code E2E    |  3 |  8   |  8   | **Playwright + openvscode-server** — 2 tabular-results + 4 smoke + 2 webview-resolve |
+| **Total**                | **151** | **2308** | **2308** | |
 
-**Overall**: 2301 passed / 0 failed / 0 skipped.
+**Overall**: 2308 passed / 0 failed / 0 skipped.
+
+## Bug fixes captured by regression tests (2026-04-09)
+
+Two user-reported bugs landed during this feature pass:
+
+1. **"I didn't see the range graph"** — `resultsPanel.tsx` called
+   `transformDataset(envelope)` but used the return value directly as
+   the Vega-Lite spec.  The function actually returns
+   `{ ok: true, spec } | { ok: false, error }`, so `chartSpec` was
+   never a valid spec and the chart never rendered.
+   - **Fix**: replace the custom React app with
+     `<ChartPanelWrapper />` wrapped in `<PanelContextProvider>` — the
+     same pattern the web-shell uses.  `chartSpec` is now computed via
+     `transformDataset(envelope).ok ? .spec : null`.
+   - **Regression test**: harness spec
+     `chart tab actually renders a Vega-Lite chart` asserts that a
+     `<canvas>` element is attached inside `[data-testid="chart-renderer"]`
+     after the host sends a `range_bearing_series` dataset.
+
+2. **"the results set is still being added to the item"** —
+   `executeTool.ts` called `stacService.addFeatures(...)` for every
+   non-mutation tool result, including dataset-carrier features (the
+   synthetic Point features whose `properties.__datasets` transports
+   the real dataset to the Results panel).  This wrote a point at
+   (0,0) + the full dataset into the plot's main GeoJSON asset,
+   breaking the FR-009 "save explicit" contract.
+   - **Fix**: `executeTool.ts` now splits tool result features into
+     `mapOnlyFeatures` (spatial results) and `datasetCarrierFeatures`
+     (features whose `properties.__datasets` / `properties.statistics`
+     is set).  Only map-only features flow through `createResultLayer`
+     and `stacService.addFeatures`.  Dataset carriers go directly to
+     `ResultsPanelService.addDatasetsForToolResult()` — in-memory only
+     until the user clicks Save.
+   - **Regression tests**: new file
+     `apps/vscode/tests/unit/executeToolDatasetRouting.test.ts` (7 tests):
+     - dataset-only path: does NOT call `addFeatures`, does NOT add a
+       map layer, DOES route to ResultsPanelService, DOES record a
+       ToolRunEvent
+     - map-only path (buffer): DOES call `addFeatures` with real
+       features, DOES add a map layer, does NOT touch ResultsPanelService
 
 ## E2E Test Results
 

@@ -207,12 +207,76 @@ export function createExecuteToolCommand(
       return;
     }
 
-    // Create result layer with provenance (FR-024)
+    // Feature: 178-vscode-tabular-results
+    //
+    // Dataset-carrying features (carrier features whose `properties`
+    // contain `__datasets` or `statistics`) must NOT flow through the
+    // map-layer / STAC-persist path. They exist only to transport the
+    // DatasetEnvelope to the Results panel; persisting them to the
+    // plot's main GeoJSON would:
+    //   - add a synthetic Point (often at [0,0]) to the map
+    //   - silently save the tool output without the user clicking Save
+    //   - break the FR-009 "save explicit" contract
+    //
+    // We split the feature collection into two views:
+    //   - `mapOnlyFeatures`: real spatial results that belong on the map
+    //     and in the plot GeoJSON (buffer polygons, reference points,
+    //     etc.)
+    //   - `datasetCarrierFeatures`: kept only in memory in the
+    //     ResultsPanelService, never written to disk until the user
+    //     clicks Save / Save As.
+    //
+    // The ORIGINAL `result.features` is preserved (with both groups)
+    // and passed to `LogService.recordToolResult` so that Python-side
+    // activity IDs attached to carrier features flow through provenance
+    // continuity.
+    type AnyFeature = { properties?: unknown };
+    const allResultFeatures: AnyFeature[] =
+      result.features?.features ?? [];
+    const mapOnlyFeatures: AnyFeature[] = [];
+    const datasetCarrierFeatures: AnyFeature[] = [];
+    for (const feature of allResultFeatures) {
+      const props = feature?.properties;
+      if (props !== null && typeof props === 'object') {
+        const propsMap = props as Record<string, unknown>;
+        const hasDatasets =
+          Array.isArray(propsMap['__datasets']) &&
+          (propsMap['__datasets'] as unknown[]).length > 0;
+        const hasStatistics =
+          propsMap['statistics'] !== null &&
+          typeof propsMap['statistics'] === 'object';
+        if (hasDatasets || hasStatistics) {
+          datasetCarrierFeatures.push(feature);
+          continue;
+        }
+      }
+      mapOnlyFeatures.push(feature);
+    }
+
+    // Build a MAP-ONLY view of the result for createResultLayer + addFeatures.
+    // We deliberately do NOT mutate `result` — the original is reused
+    // below when calling recordToolResult so Python activity IDs flow
+    // through to provenance.
+    const mapOnlyResult: typeof result = result.features
+      ? {
+          ...result,
+          features: {
+            ...result.features,
+            features: mapOnlyFeatures as typeof result.features.features,
+          },
+        }
+      : result;
+
+    // Create result layer with provenance (FR-024).
+    // When ALL features were dataset carriers, `mapOnlyFeatures` is
+    // empty — `createResultLayer` returns null in that case, which
+    // is exactly what we want: no map layer, no STAC row, no layers-tree
+    // entry, just the Results panel tab.
     const execution = calcService.getCurrentExecution();
     const layer = calcService.createResultLayer(
       resolvedToolId,
       execution?.id ?? `exec-${Date.now()}`,
-      result,
+      mapOnlyResult,
       selectedFeatureIds
     );
 
@@ -296,11 +360,13 @@ export function createExecuteToolCommand(
       // Auto-persist non-mutation feature results to STAC (#041)
       // All additive/reference/etc. results must be on disk so that
       // the tune replay cycle (cleanup → re-execute → write) works.
+      // NOTE (#178): `layer.features.features` already excludes
+      // dataset carriers because it was built from `mapOnlyResult`.
       if (stacService && !result.artifactData && !isMutationResult) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
-          if (store?.path && plot?.itemPath) {
+          if (store?.path && plot?.itemPath && layer.features.features.length > 0) {
             await stacService.addFeatures(
               store.path,
               plot.itemPath,
@@ -311,76 +377,100 @@ export function createExecuteToolCommand(
           console.warn('[debrief] Failed to persist result to STAC:', persistErr);
         }
       }
+    }
 
-      // Record provenance via Log Service (Feature: 071)
-      // Resolve logService dynamically: prefer MapPanel's logService (set per-plot),
-      // fall back to the static logService parameter (legacy path).
-      const resolvedLogService = panel.getLogService?.() ?? logService;
-      if (!resolvedLogService) {
-        console.warn('[debrief] executeTool: logService not available — provenance will not be recorded. Was the plot opened correctly?');
-      }
-      if (resolvedLogService && stacService) {
-        try {
-          const store = panel.getCurrentStore?.();
-          const plot = panel.getCurrentPlot?.();
-          if (store?.path && plot?.itemPath) {
-            // Include pre-tool inputState for mutation tools
-            const isMutation = result.resultType?.startsWith('mutation/');
-            const recordResult = await resolvedLogService.recordToolResult(
-              {
-                success: true,
-                features: result.features,
-                duration_ms: result.durationMs,
-                result_type: result.resultType,
-                source_feature_ids: result.sourceFeatureIds ?? selectedFeatureIds,
-                artifact_href: result.artifactHref,
-                tool_id: resolvedToolId,
-                ...(isMutation && preToolInputState ? { input_state: preToolInputState } : {}),
-              },
-              result.tool_version || result.parameters ? {
-                tool_version: result.tool_version,
-                modified_features: result.modifiedFeatures,
-                created_features: result.createdFeatures,
-                created_assets: result.createdAssets,
-                parameters: result.parameters,
-              } : undefined,
-              store.path,
-              plot.itemPath
-            );
+    // ──────────────────────────────────────────────────────────────────
+    // Provenance + Results panel wiring — runs for BOTH map-layer and
+    // dataset-only results.  A dataset-only tool (like `range-bearing`
+    // returning carrier features) has `layer === null` above, so the
+    // map-layer path is skipped, but we still need to:
+    //   1. Record a ToolRunEvent in the analysis log so the Results
+    //      panel's save flow can link the future FileSavedEvent to it.
+    //   2. Create Results panel tabs via
+    //      `ResultsPanelService.addDatasetsForToolResult()`.
+    // ──────────────────────────────────────────────────────────────────
 
-            // Update Result ID Registry from recorded entries (Feature: 087)
-            if (resultIdRegistry) {
-              resultIdRegistry.registerFromRecordResult(recordResult);
-            }
+    const resolvedLogService = panel.getLogService?.() ?? logService;
+    if (!resolvedLogService && (layer || datasetCarrierFeatures.length > 0)) {
+      console.warn('[debrief] executeTool: logService not available — provenance will not be recorded. Was the plot opened correctly?');
+    }
+    if (resolvedLogService && stacService) {
+      try {
+        const store = panel.getCurrentStore?.();
+        const plot = panel.getCurrentPlot?.();
+        if (store?.path && plot?.itemPath) {
+          // Include pre-tool inputState for mutation tools
+          const isMutation = result.resultType?.startsWith('mutation/');
+          const recordResult = await resolvedLogService.recordToolResult(
+            {
+              success: true,
+              // Pass the ORIGINAL features (map + dataset carriers) so
+              // Python-generated activity IDs on carrier features flow
+              // through `extractActivityIdFromOutputFeatures`.
+              features: result.features,
+              duration_ms: result.durationMs,
+              result_type: result.resultType,
+              source_feature_ids: result.sourceFeatureIds ?? selectedFeatureIds,
+              artifact_href: result.artifactHref,
+              tool_id: resolvedToolId,
+              ...(isMutation && preToolInputState ? { input_state: preToolInputState } : {}),
+            },
+            result.tool_version || result.parameters ? {
+              tool_version: result.tool_version,
+              modified_features: result.modifiedFeatures,
+              created_features: result.createdFeatures,
+              created_assets: result.createdAssets,
+              parameters: result.parameters,
+            } : undefined,
+            store.path,
+            plot.itemPath
+          );
 
-            // Refresh Log Panel timeline to show the new entry (Feature: 113)
-            if (logPanelProvider) {
-              void logPanelProvider.refreshTimeline();
-            }
-
-            // Feature: 178 — route tool result datasets into the Results panel.
-            // Only runs if the ResultsPanelService is wired AND the tool
-            // returned a proper FeatureCollection.  Tools that produce only
-            // a map layer with no __datasets / statistics are a no-op here.
-            if (resultsPanelService && result.features) {
-              resultsPanelService.addDatasetsForToolResult({
-                plotKey: { storePath: store.path, itemPath: plot.itemPath },
-                toolId: resolvedToolId,
-                result: { features: result.features },
-                sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
-                parameters: toolParams,
-                parentActivityId: recordResult.activity_id,
-              });
-            }
+          // Update Result ID Registry from recorded entries (Feature: 087)
+          if (resultIdRegistry) {
+            resultIdRegistry.registerFromRecordResult(recordResult);
           }
-        } catch (logErr) {
-          console.warn('[debrief] Failed to record provenance:', logErr);
-        }
-      }
 
-      // Success notification (FR-015)
+          // Refresh Log Panel timeline to show the new entry (Feature: 113)
+          if (logPanelProvider) {
+            void logPanelProvider.refreshTimeline();
+          }
+
+          // Feature: 178 — route tool result datasets into the Results panel.
+          // Only fires when the tool emitted at least one dataset carrier
+          // feature (whose `properties.__datasets` or `properties.statistics`
+          // we detected above).  The carrier features are in-memory only —
+          // they NEVER get written to disk until the user clicks Save / Save As.
+          if (resultsPanelService && datasetCarrierFeatures.length > 0) {
+            resultsPanelService.addDatasetsForToolResult({
+              plotKey: { storePath: store.path, itemPath: plot.itemPath },
+              toolId: resolvedToolId,
+              result: {
+                features: {
+                  type: 'FeatureCollection',
+                  features: datasetCarrierFeatures,
+                },
+              },
+              sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
+              parameters: toolParams,
+              parentActivityId: recordResult.activity_id,
+            });
+          }
+        }
+      } catch (logErr) {
+        console.warn('[debrief] Failed to record provenance:', logErr);
+      }
+    }
+
+    // Success notification (FR-015) — only for results that produced
+    // something user-visible (map layer, or Results panel datasets).
+    if (layer) {
       void vscode.window.showInformationMessage(
         `Analysis complete: ${layer.name}`
+      );
+    } else if (datasetCarrierFeatures.length > 0) {
+      void vscode.window.showInformationMessage(
+        `${toolName} complete — see Debrief Results panel`
       );
     }
   };

@@ -3,11 +3,14 @@
  *
  * Feature: 178-vscode-tabular-results
  *
- * Drives the webview bundle to exercise the error tab + Retry flow and
- * the per-tab loading state.  US4 (file actions) lives on the
- * ActivityPanelViewProvider side, not the Results panel webview, so it
- * is covered by vitest unit tests against `_handleFileAction` rather
- * than this webview E2E spec.
+ * Drives the webview bundle (ChartPanelWrapper) to exercise the error
+ * tab + Retry flow and the per-tab loading state.  US4 (file actions)
+ * lives on the ActivityPanelViewProvider side, not the Results panel
+ * webview, so it is covered by vitest unit tests against
+ * `_handleFileAction` rather than this webview E2E spec.
+ *
+ * All selectors are the SHARED-COMPONENT aria-labels + `data-testid`
+ * values set by ChartPanelWrapper — not custom ones.
  *
  * Covers acceptance scenarios 1 and 2 from US5 in spec.md.
  */
@@ -43,24 +46,33 @@ test.describe('Results Panel — US5: Error and Retry', () => {
       },
     });
 
-    // The error region renders the message.
-    const errorRegion = page.getByTestId('results-error');
+    // ChartPanelWrapper's error state is marked with
+    // `data-testid="panel-chart-error"` and carries the title plus
+    // the error message.
+    const errorRegion = page.getByTestId('panel-chart-error');
     await expect(errorRegion).toBeVisible();
+    await expect(errorRegion).toContainText('Tool execution failed');
     await expect(errorRegion).toContainText(
       'Selection must contain at least two tracks',
     );
 
-    // Retry button is visible and enabled.
-    const retryButton = page.getByTestId('results-retry-button');
+    // Retry button with aria-label "Retry tool execution".
+    const retryButton = page.getByRole('button', {
+      name: 'Retry tool execution',
+    });
     await expect(retryButton).toBeVisible();
     await expect(retryButton).toBeEnabled();
 
-    // Save / Save As buttons are NOT visible on an error tab.
-    await expect(page.getByTestId('results-save-button')).toHaveCount(0);
-    await expect(page.getByTestId('results-save-as-button')).toHaveCount(0);
+    // Save / Save As should NOT be rendered on an error tab.
+    await expect(
+      page.getByRole('button', { name: 'Save result', exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Save result as' }),
+    ).toHaveCount(0);
 
     await page.screenshot({
-      path: join(SCREENSHOT_DIR, "06-error-retry.png"),
+      path: join(SCREENSHOT_DIR, '06-error-retry.png'),
       fullPage: false,
     });
   });
@@ -77,7 +89,7 @@ test.describe('Results Panel — US5: Error and Retry', () => {
     });
     await clearPostedMessages(page);
 
-    await page.getByTestId('results-retry-button').click();
+    await page.getByRole('button', { name: 'Retry tool execution' }).click();
 
     const posted = await getPostedMessages(page);
     const retryMsg = posted.find(
@@ -101,7 +113,7 @@ test.describe('Results Panel — US5: Error and Retry', () => {
         activeTabId: ERROR_TAB.id,
       },
     });
-    await expect(page.getByTestId('results-error')).toBeVisible();
+    await expect(page.getByTestId('panel-chart-error')).toBeVisible();
 
     // Host: retry fires — replace with a fresh unsaved-success tab.
     await sendHostMessage(page, {
@@ -112,11 +124,12 @@ test.describe('Results Panel — US5: Error and Retry', () => {
       },
     });
 
-    await expect(page.getByTestId('results-error')).toHaveCount(0);
+    // Error region gone, table content visible, unsaved-dot back.
+    await expect(page.getByTestId('panel-chart-error')).toHaveCount(0);
     await expect(page.getByTestId('panel-chart')).toContainText(
       'total distance nm',
     );
-    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+    await expect(page.getByLabel('Unsaved result').first()).toBeVisible();
   });
 
   test('results:setLoading marks the tab as loading', async ({ page }) => {
@@ -133,7 +146,8 @@ test.describe('Results Panel — US5: Error and Retry', () => {
       payload: { tabId: TRACK_STATS_TAB.id, isLoading: true },
     });
 
-    // Content area shows the loading status element.
+    // ChartPanelWrapper's loading state uses role="status" with
+    // aria-label from `labels.loadingResults` ("Computing results").
     await expect(page.getByRole('status')).toBeVisible();
   });
 });
