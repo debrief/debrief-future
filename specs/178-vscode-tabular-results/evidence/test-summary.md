@@ -1,8 +1,8 @@
 ---
 feature: 178-vscode-tabular-results
-captured_at: 2026-04-08T20:46:00Z
-git_sha: 956afcc
-tests_passed: 2293
+captured_at: 2026-04-09T17:12:00Z
+git_sha: d6823ca
+tests_passed: 2301
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -33,10 +33,11 @@ with save / open / retry / close wired through `StacService`, the new
 | `@debrief/config-ts`     |  5 |  42  |  42  | Unchanged |
 | `@debrief/loader`        |  1 |   7  |   7  | Unchanged |
 | **Unit subtotal**        | **144** | **2278** | **2278** | |
-| Results Panel E2E        |  3 | 15   | 15   | **Playwright** — drives real `resultsPanel.js` bundle, see `webview-e2e-summary.md` |
-| **Total**                | **147** | **2293** | **2293** | |
+| Harness E2E (feature 178) |  3 | 15   | 15   | **Playwright** — drives real `resultsPanel.js` bundle via postMessage harness, see `webview-e2e-summary.md` |
+| Canonical VS Code E2E    |  3 |  8   |  8   | **Playwright + openvscode-server** — 2 tabular-results + 4 smoke + 2 webview-resolve running against real VS Code chrome with Hybrid A+D |
+| **Total**                | **150** | **2301** | **2301** | |
 
-**Overall**: 2293 passed / 0 failed / 0 skipped.
+**Overall**: 2301 passed / 0 failed / 0 skipped.
 
 ## E2E Test Results
 
@@ -52,12 +53,24 @@ isolated HTML harness.  All 15 tests pass against the bundle and
 See `evidence/webview-e2e-summary.md` for the full breakdown, the
 harness architecture, and FR traceability.  Screenshots:
 
+### Harness screenshots (isolated bundle)
+
 - `01-empty-state.png` — panel hidden, "no results" placeholder (FR-004)
 - `02-single-table-tab.png` — track-stats table tab with unsaved-dot (FR-001/002/003/007)
 - `03-two-chart-tabs.png` — range-bearing two-tab bar (FR-002)
 - `04-save-as-form.png` — inline Save As form with Name + Tag inputs (FR-010)
 - `05-saved-state.png` — saved tab, unsaved-dot cleared, Save buttons disabled (FR-012)
 - `06-error-retry.png` — error tab with Retry button (FR-019)
+
+### Canonical screenshots (real openvscode-server chrome)
+
+- `canonical-01-empty-state-in-vscode.png` — full VS Code chrome
+  (activity bar, Explorer, editor area, panel dock) with the new
+  **DEBRIEF RESULTS** tab active in the bottom panel and the empty
+  state rendered by the real bundle
+- `canonical-02-populated-in-vscode.png` — same chrome, Results panel
+  showing the **Track Alpha — Stats** tab with unsaved-dot and the
+  TableRenderer displaying real metric/value rows via postMessage
 
 ## New Tests Added in This Feature
 
