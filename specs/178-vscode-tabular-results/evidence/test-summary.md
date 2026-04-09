@@ -1,8 +1,8 @@
 ---
 feature: 178-vscode-tabular-results
-captured_at: 2026-04-09T20:20:00Z
-git_sha: e206953
-tests_passed: 2308
+captured_at: 2026-04-09T20:50:00Z
+git_sha: 528d8a8
+tests_passed: 2311
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -28,16 +28,16 @@ with save / open / retry / close wired through `StacService`, the new
 |---------|-----------:|------:|-------:|-------|
 | `@debrief/utils`         |  7 | 143  | 143  | + 14 new (`parseCsvToTableDataset` round-trip, `synthesizeTableDataset`) |
 | `@debrief/session-state` | 34 | 615  | 615  | + 5 new (`recordFileSaved` happy path + 4 error / sentinel cases) |
-| `@debrief/vscode`        | 22 | 355  | 355  | + 10 `ResultsPanelService` + 7 **NEW** `executeToolDatasetRouting` regression |
+| `@debrief/vscode`        | 22 | 357  | 357  | + 10 `ResultsPanelService` + 7 `executeToolDatasetRouting` + 2 **NEW** reveal regression tests |
 | `@debrief/components`    | 76 | 1123 | 1123 | Unchanged (ChartPanelWrapper reused as-is) |
 | `@debrief/config-ts`     |  5 |  42  |  42  | Unchanged |
 | `@debrief/loader`        |  1 |   7  |   7  | Unchanged |
-| **Unit subtotal**        | **145** | **2285** | **2285** | |
+| **Unit subtotal**        | **145** | **2287** | **2287** | |
 | Harness E2E (feature 178) |  3 | 15   | 15   | **Playwright** — drives the real `resultsPanel.js` bundle via postMessage harness; includes a REAL chart rendering assertion |
-| Canonical VS Code E2E    |  3 |  8   |  8   | **Playwright + openvscode-server** — 2 tabular-results + 4 smoke + 2 webview-resolve |
-| **Total**                | **151** | **2308** | **2308** | |
+| Canonical VS Code E2E    |  3 |  9   |  9   | **Playwright + openvscode-server** — 3 tabular-results (incl. NEW panel-closed bootstrap) + 4 smoke + 2 webview-resolve |
+| **Total**                | **151** | **2311** | **2311** | |
 
-**Overall**: 2308 passed / 0 failed / 0 skipped.
+**Overall**: 2311 passed / 0 failed / 0 skipped.
 
 ## Bug fixes captured by regression tests (2026-04-09)
 
@@ -111,6 +111,14 @@ harness architecture, and FR traceability.  Screenshots:
 - `canonical-02-populated-in-vscode.png` — same chrome, Results panel
   showing the **Track Alpha — Stats** tab with unsaved-dot and the
   TableRenderer displaying real metric/value rows via postMessage
+- `canonical-03-chart-in-vscode.png` — **NEW** — real openvscode-server
+  chrome with the bottom panel maximized and a real Vega-Lite line
+  chart rendered inside the Results panel.  Shows the "Range:
+  track-1 → track-2" tab active with the yellow unsaved-dot, a
+  declining blue line series, axes labelled "Range (nm)" and "Time",
+  and Save / Save As buttons.  Captured by the new `range-bearing
+  result with the panel CLOSED bootstraps the webview` canonical
+  E2E test — proves the user-reported bug is fixed.
 
 ## New Tests Added in This Feature
 

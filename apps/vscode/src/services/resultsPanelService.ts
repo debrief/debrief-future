@@ -67,7 +67,16 @@ export interface ResultTab {
  */
 export interface ResultsPanelViewController {
   postMessage(message: Record<string, unknown>): void;
-  reveal(): void;
+  /**
+   * Reveal the Results panel view container in the VS Code panel dock.
+   *
+   * Must cause `resolveWebviewView` to fire if it hasn't already — the
+   * implementation currently calls the auto-generated
+   * `debrief.resultsPanel.focus` command to guarantee bootstrap on
+   * first-ever-result.  Returns a promise so callers can await it in
+   * tests; the production caller uses `void reveal()` (fire-and-forget).
+   */
+  reveal(): Promise<void>;
 }
 
 export interface ResultsPanelServiceDeps {
@@ -208,11 +217,11 @@ export class ResultsPanelService {
         payload: { visible: true },
       });
       // Reveal the panel view so the analyst can see the new result.
-      try {
-        this._deps.panelView.reveal();
-      } catch {
-        /* non-fatal — reveal may throw if the view is not yet registered */
-      }
+      // On first-ever-result, this bootstraps the full webview lifecycle
+      // (panel dock → resolveWebviewView → bundle mount → webviewReady
+      // → flush queued messages).  Fire-and-forget: `reveal()` is async
+      // but we don't want to block the executeTool flow on it.
+      void this._deps.panelView.reveal();
     }
 
     this._broadcastTabs();
@@ -321,11 +330,9 @@ export class ResultsPanelService {
         type: 'results:setVisibility',
         payload: { visible: true },
       });
-      try {
-        this._deps.panelView.reveal();
-      } catch {
-        /* non-fatal */
-      }
+      // Fire-and-forget bootstrap — `reveal()` executes the VS Code
+      // focus command which triggers resolveWebviewView on first call.
+      void this._deps.panelView.reveal();
     }
 
     this._broadcastTabs();

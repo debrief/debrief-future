@@ -69,14 +69,32 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
   /**
    * Focus the Results panel view container so it becomes visible after
    * the first result arrives.
+   *
+   * Uses VS Code's auto-generated `<viewId>.focus` command
+   * (`debrief.resultsPanel.focus`) rather than `this._view.show(true)`.
+   * `show()` is a no-op when `this._view` is `undefined`, which is the
+   * case until the user has manually opened the panel area at least
+   * once — so calling it here would silently fail on first-ever-result.
+   *
+   * Executing the focus command causes VS Code to:
+   *   1. Reveal the panel dock (making it visible),
+   *   2. Activate the Debrief Results view container,
+   *   3. Fire `resolveWebviewView` on this provider (which sets
+   *      `this._view`, loads the HTML, and triggers the webview-ready
+   *      handshake),
+   *   4. Flush any messages queued in `_pendingMessages` once the
+   *      React app posts `results:webviewReady`.
+   *
+   * This is the path the user expects: "run a tool → see the result
+   * appear in the Results panel, even if the panel wasn't open".
    */
-  public reveal(): void {
-    if (this._view) {
-      try {
-        this._view.show(true);
-      } catch {
-        /* non-fatal — show() throws if the view isn't currently visible */
-      }
+  public async reveal(): Promise<void> {
+    try {
+      await vscode.commands.executeCommand('debrief.resultsPanel.focus');
+    } catch (err) {
+      // Non-fatal — the command might not be registered yet during
+      // very early activation.  Log and carry on.
+      console.warn('[debrief/results] reveal: focus command failed', err);
     }
   }
 

@@ -50,7 +50,7 @@ function makeDeps(overrides?: Partial<ResultsPanelServiceDeps>): ResultsPanelSer
   } as unknown as LogService;
   const panelView = {
     postMessage: vi.fn(),
-    reveal: vi.fn(),
+    reveal: vi.fn().mockResolvedValue(undefined),
   };
   const activityPanelView = {
     addResultFile: vi.fn(),
@@ -181,6 +181,89 @@ describe('ResultsPanelService — addDatasetsForToolResult (US1)', () => {
     const types = post.mock.calls.map((c) => (c[0] as { type: string }).type);
     expect(types).toContain('results:setVisibility');
     expect(types).toContain('results:setTabs');
+  });
+
+  it('first tab calls panelView.reveal() — bootstraps the webview when the panel has never been opened (user-reported bug)', () => {
+    // This is the regression test for the user-reported bug:
+    // "I ran a range-bearing tool. It completed, but I didn't see the
+    // range graph."  Root cause: `reveal()` was a no-op until
+    // `resolveWebviewView` had fired, which only happens AFTER the user
+    // manually opens the panel dock.  On first-ever-result, messages
+    // would queue in `_pendingMessages` and the user would see the
+    // completion toast but no panel.
+    expect(deps.panelView.reveal).not.toHaveBeenCalled();
+
+    service.addDatasetsForToolResult({
+      plotKey,
+      toolId: 'range-bearing',
+      result: {
+        features: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {
+                __datasets: [
+                  {
+                    type: 'range_bearing_series',
+                    title: 'Range',
+                    metadata: {
+                      xAxis: { label: 'Time', type: 'temporal' },
+                      yAxis: { label: 'Range', type: 'quantitative' },
+                    },
+                    series: [{ name: 'a→b', data: [{ time: 'x', value: 1 }] }],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      sourceFeatureIds: ['track-1', 'track-2'],
+      parentActivityId: 'act-parent',
+    });
+
+    // The fix: reveal() is called on the first result, unconditionally.
+    expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
+  });
+
+  it('subsequent tabs do NOT re-reveal the panel (regression guard)', () => {
+    // First tab — reveal fires.
+    service.addDatasetsForToolResult({
+      plotKey,
+      toolId: 'track-stats',
+      result: {
+        features: {
+          type: 'FeatureCollection',
+          features: [
+            { type: 'Feature', properties: { statistics: { count: 5 } } },
+          ],
+        },
+      },
+      sourceFeatureIds: ['track-1'],
+      parentActivityId: 'act-1',
+    });
+    expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
+
+    // Second tab — reveal should NOT fire again.  The panel is
+    // already visible; re-focusing it would steal focus from the
+    // user's current view.
+    service.addDatasetsForToolResult({
+      plotKey,
+      toolId: 'track-stats',
+      result: {
+        features: {
+          type: 'FeatureCollection',
+          features: [
+            { type: 'Feature', properties: { statistics: { count: 10 } } },
+          ],
+        },
+      },
+      sourceFeatureIds: ['track-2'],
+      parentActivityId: 'act-2',
+    });
+    expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
+    expect(service.getTabsForTest()).toHaveLength(2);
   });
 
   it('is a no-op when the result has no datasets or statistics', () => {

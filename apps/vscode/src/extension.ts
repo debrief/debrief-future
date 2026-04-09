@@ -148,6 +148,59 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   resultsPanelProvider.setService(resultsPanelService);
   context.subscriptions.push({ dispose: () => resultsPanelService.dispose() });
 
+  // Feature: 178 — Test-only command for E2E regression coverage.
+  //
+  // Registered unconditionally (not gated by NODE_ENV) because the
+  // VSIX is built once and installed into both dev and E2E user-data
+  // dirs. The command is undocumented and prefixed `debrief.__test`
+  // so it never surfaces in the command palette (no title in
+  // package.json means the UI search filter hides it).
+  //
+  // Accepts a JSON payload: { toolId, datasets }, routes it through
+  // `resultsPanelService.addDatasetsForToolResult()` exactly as the
+  // real executeTool path would, and returns nothing.
+  //
+  // This lets an E2E test drive the REAL bootstrap path:
+  //   tool result arrives → service.addDatasetsForToolResult fires
+  //   → reveal() called → panel area becomes visible → webview
+  //   resolves → bundle mounts → webviewReady → messages flush
+  //   → chart renders in the real iframe.
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'debrief.__test.pushDatasetResult',
+      (payload: { toolId: string; datasets: Array<Record<string, unknown>> }) => {
+        const store = mapPanel?.getCurrentStore?.();
+        const plot = mapPanel?.getCurrentPlot?.();
+        const plotKey = {
+          storePath: store?.path ?? '/tmp/e2e-store',
+          itemPath: plot?.itemPath ?? 'e2e/item.json',
+        };
+        // Build a synthetic feature collection whose single carrier
+        // feature has `properties.__datasets` set to the payload —
+        // the exact shape the Python tools emit.
+        resultsPanelService.addDatasetsForToolResult({
+          plotKey,
+          toolId: payload.toolId,
+          result: {
+            features: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  id: `e2e-${Date.now()}`,
+                  geometry: { type: 'Point', coordinates: [0, 0] },
+                  properties: { __datasets: payload.datasets },
+                },
+              ] as unknown as Array<import('@debrief/utils').SafeFeature>,
+            },
+          },
+          sourceFeatureIds: ['e2e-track-1', 'e2e-track-2'],
+          parentActivityId: `e2e-activity-${Date.now()}`,
+        });
+      },
+    ),
+  );
+
   // Wire the Associated Files dropdown action handler (Feature: 178)
   activityPanelProvider.setFileActionServices(
     stacService,
