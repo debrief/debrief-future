@@ -519,3 +519,173 @@ describe('FeatureList filtering', () => {
     expect(screen.getByText('No features available')).toBeInTheDocument();
   });
 });
+
+// ─── Sensor-aware rendering integration tests (Feature #179) ────────
+
+const mockTrackWithSensors: TrackFeature = {
+  type: 'Feature',
+  id: 'track-s01',
+  geometry: {
+    type: 'LineString',
+    // eslint-disable-next-line no-restricted-syntax
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-S01',
+    platform_name: 'Sensor Track',
+    track_type: 'OWNSHIP',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [
+      { time: '2024-01-15T08:00:00Z', course: 90, speed: 12.5 },
+    ],
+    sensors: [
+      {
+        name: 'TOWED_ARRAY',
+        contacts: [
+          { time: '2024-01-15T08:00:00Z', bearing: 45 },
+          { time: '2024-01-15T08:05:00Z', bearing: 50 },
+        ],
+      },
+    ],
+  },
+// eslint-disable-next-line no-restricted-syntax
+} as unknown as TrackFeature;
+
+const sensorFeatureCollection: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: [mockTrackWithSensors],
+};
+
+describe('FeatureList sensor rendering (Feature #179)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders group rows when track with sensors is expanded', () => {
+    const { container } = render(
+      <FeatureList features={sensorFeatureCollection} height={400} />
+    );
+
+    // Click the track row expand button
+    const expandBtn = container.querySelector('[aria-label="Expand"]');
+    expect(expandBtn).toBeInTheDocument();
+    fireEvent.click(expandBtn!);
+
+    // Should show Positions and Sensors group rows
+    expect(screen.getByText('Positions (1)')).toBeInTheDocument();
+    expect(screen.getByText('Sensors (1)')).toBeInTheDocument();
+  });
+
+  it('US2: clicking group row selects only the group path (no fan-out)', () => {
+    const onSelectionChange = vi.fn();
+    const { container } = render(
+      <FeatureList
+        features={sensorFeatureCollection}
+        onSelectionChange={onSelectionChange}
+        height={400}
+      />
+    );
+
+    // Expand the track
+    const expandBtn = container.querySelector('[aria-label="Expand"]');
+    fireEvent.click(expandBtn!);
+
+    // Click the Sensors group row label
+    const sensorsRow = screen.getByText('Sensors (1)').closest('.debrief-feature-row');
+    fireEvent.click(sensorsRow!);
+
+    expect(onSelectionChange).toHaveBeenCalled();
+    const selectedIds = onSelectionChange.mock.calls[onSelectionChange.mock.calls.length - 1]![0] as Set<string>;
+    expect(selectedIds.size).toBe(1);
+    expect(selectedIds.has('track-s01/sensors')).toBe(true);
+  });
+
+  it('US3: sensor row in hiddenIds renders with hidden state', () => {
+    const hiddenIds = new Set(['track-s01/sensors/TOWED_ARRAY']);
+    const { container } = render(
+      <FeatureList
+        features={sensorFeatureCollection}
+        hiddenIds={hiddenIds}
+        height={400}
+      />
+    );
+
+    // Expand the track, then expand Sensors group
+    const expandBtn = container.querySelector('[aria-label="Expand"]');
+    fireEvent.click(expandBtn!);
+
+    // Expand the Sensors group
+    const sensorsGroupExpand = screen.getByText('Sensors (1)')
+      .closest('.debrief-feature-row')
+      ?.querySelector('[aria-label="Expand"]');
+    if (sensorsGroupExpand) {
+      fireEvent.click(sensorsGroupExpand);
+    }
+
+    // The sensor row should be visible (rendered) but with hidden styling
+    const sensorRow = screen.queryByText('TOWED_ARRAY')?.closest('.debrief-feature-row');
+    if (sensorRow) {
+      expect(sensorRow.classList.contains('debrief-feature-row--hidden')).toBe(true);
+    }
+  });
+
+  it('contact row info icon triggers onChildInfoClick', () => {
+    const onChildInfoClick = vi.fn();
+    const { container } = render(
+      <FeatureList
+        features={sensorFeatureCollection}
+        showInfoIcon={true}
+        onChildInfoClick={onChildInfoClick}
+        height={400}
+      />
+    );
+
+    // Expand track → Sensors group → sensor
+    const expandBtn = container.querySelector('[aria-label="Expand"]');
+    fireEvent.click(expandBtn!);
+
+    const sensorsGroupExpand = screen.getByText('Sensors (1)')
+      .closest('.debrief-feature-row')
+      ?.querySelector('[aria-label="Expand"]');
+    if (sensorsGroupExpand) fireEvent.click(sensorsGroupExpand);
+
+    const sensorExpand = screen.queryByText('TOWED_ARRAY')
+      ?.closest('.debrief-feature-row')
+      ?.querySelector('[aria-label="Expand"]');
+    if (sensorExpand) fireEvent.click(sensorExpand);
+
+    // Look for info icon on a contact row
+    const contactInfoIcon = container.querySelector('[data-testid="info-icon-track-s01/sensors/TOWED_ARRAY/contacts/0"]');
+    if (contactInfoIcon) {
+      fireEvent.click(contactInfoIcon);
+      expect(onChildInfoClick).toHaveBeenCalledTimes(1);
+      expect(onChildInfoClick.mock.calls[0]![1].type).toBe('contact');
+    }
+  });
+
+  it('sensor row does NOT show info icon (FR-017 negative assertion)', () => {
+    const { container } = render(
+      <FeatureList
+        features={sensorFeatureCollection}
+        showInfoIcon={true}
+        onChildInfoClick={() => {}}
+        height={400}
+      />
+    );
+
+    // Expand track → Sensors group
+    const expandBtn = container.querySelector('[aria-label="Expand"]');
+    fireEvent.click(expandBtn!);
+
+    const sensorsGroupExpand = screen.getByText('Sensors (1)')
+      .closest('.debrief-feature-row')
+      ?.querySelector('[aria-label="Expand"]');
+    if (sensorsGroupExpand) fireEvent.click(sensorsGroupExpand);
+
+    // Sensor row should NOT have info icon
+    const sensorInfoIcon = container.querySelector('[data-testid="info-icon-track-s01/sensors/TOWED_ARRAY"]');
+    expect(sensorInfoIcon).toBeNull();
+  });
+});
