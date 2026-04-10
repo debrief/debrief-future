@@ -58,11 +58,20 @@ export function TemporalTrackLayer({
     };
   }, [feature.id, feature.properties, renderState.visibleCoordinates, hasTemporalData]);
 
+  // Read line style from feature properties (set by Format menu)
+  // eslint-disable-next-line no-restricted-syntax
+  const featureStyle = (feature.properties as unknown as Record<string, unknown>)?.style as
+    | Record<string, unknown>
+    | undefined;
+  // eslint-disable-next-line no-restricted-syntax
+  const lineStyle = featureStyle?.line as Record<string, unknown> | undefined;
+
   const style = useMemo((): PathOptions => ({
     color,
-    weight: isSelected ? 4 : 3,
-    opacity: 1,
-  }), [isSelected, color]);
+    weight: isSelected ? 4 : (lineStyle?.weight as number) ?? 3,
+    opacity: (lineStyle?.opacity as number) ?? 1,
+    dashArray: (lineStyle?.dash_array as string) ?? undefined,
+  }), [isSelected, color, lineStyle]);
 
   const onEachFeature = useMemo(() => {
     return (_feat: GeoJSON.Feature, layer: L.Layer) => {
