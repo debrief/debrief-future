@@ -16,6 +16,7 @@ from typing import Any
 
 from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
+from debrief_schemas import OutputKindEnum
 
 
 def _haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
@@ -130,7 +131,7 @@ def _calculate_track_stats(
     name="track-stats",
     description="Calculate statistics for a single track including point count, duration, distance, and average speed",
     input_kinds=["TRACK"],
-    output_kind="track/statistics",
+    output_kind=OutputKindEnum.trackSOLIDUSstatistics,
     context_type=ContextType.SINGLE,
     parameters=[
         ToolParameter(

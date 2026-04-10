@@ -12,6 +12,7 @@ from typing import Any
 
 from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
 from debrief_calc.registry import tool
+from debrief_schemas import OutputKindEnum
 
 
 def _calculate_bearing(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
@@ -112,7 +113,7 @@ def _feature_name(feature: GeoJSONFeatureDict, fallback: str) -> str:
     name="range-bearing",
     description="Calculate range and bearing time-series between two features (tracks, points, polygons)",
     input_kinds=["TRACK", "SHAPE"],
-    output_kind="dataset/range_bearing_series",
+    output_kind=OutputKindEnum.datasetSOLIDUSrange_bearing_series,
     context_type=ContextType.MULTI,
     parameters=[],
 )

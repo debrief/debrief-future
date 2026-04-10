@@ -7,6 +7,7 @@
 
 import type { MCPToolDefinition } from '../../../services/toolService';
 import type { TrackFeature } from '@debrief/schemas';
+import { OutputKindEnum } from '@debrief/schemas';
 import type { GeoJSONFeature } from '@debrief/utils';
 
 const EARTH_RADIUS_NM = 3440.065;
@@ -60,7 +61,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:selectionRequirements': [{ kind: 'TRACK', min: 2, max: 2 }],
     'debrief:category': 'track/analysis',
     'debrief:version': '1.0.0',
-    'debrief:outputKind': 'dataset/range_bearing_series',
+    'debrief:outputKind': OutputKindEnum.datasetSOLIDUSrange_bearing_series,
   },
 };
 
