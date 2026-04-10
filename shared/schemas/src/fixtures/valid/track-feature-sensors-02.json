@@ -1,0 +1,135 @@
+{
+  "type": "Feature",
+  "id": "track-with-sensors-002",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [[-5.0, 50.0], [-4.9, 50.1], [-4.8, 50.2]]
+  },
+  "properties": {
+    "kind": "TRACK",
+    "platform_id": "HMS-FULL-SENSORS",
+    "platform_name": "HMS Full Sensors",
+    "track_type": "OWNSHIP",
+    "start_time": "2026-01-09T10:00:00Z",
+    "end_time": "2026-01-09T12:00:00Z",
+    "positions": [
+      {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T11:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T12:00:00Z", "course": 45, "speed": 12}
+    ],
+    "sensors": [
+      {
+        "name": "TOWED_ARRAY",
+        "base_frequency": 150.0,
+        "offset": 200.0,
+        "array_centre_mode": "PLAIN",
+        "worm_in_hole": false,
+        "color": "#0066CC",
+        "visible": true,
+        "line_thickness": 2,
+        "contacts": [
+          {
+            "time": "2026-01-09T10:00:00Z",
+            "bearing": 45.0,
+            "has_bearing": true,
+            "range": 5000.0,
+            "frequency": 152.3,
+            "has_frequency": true,
+            "ambiguous_bearing": 225.0,
+            "has_ambiguous": true,
+            "label": "C1",
+            "comment": "Initial contact",
+            "color": "#FF0000",
+            "visible": true,
+            "show_label": true,
+            "line_style": "SOLID",
+            "label_location": "LEFT",
+            "put_label_at": "MIDDLE",
+            "origin": [-5.0, 50.0]
+          },
+          {
+            "time": "2026-01-09T10:15:00Z",
+            "bearing": 47.2,
+            "has_bearing": true,
+            "range": 4800.0,
+            "frequency": 152.1,
+            "has_frequency": true,
+            "ambiguous_bearing": 227.2,
+            "has_ambiguous": true,
+            "label": "C2",
+            "color": "#00FF00",
+            "visible": false,
+            "show_label": false,
+            "line_style": "DASHED",
+            "label_location": "RIGHT",
+            "put_label_at": "END",
+            "origin": [-4.95, 50.05]
+          },
+          {
+            "time": "2026-01-09T10:30:00Z",
+            "bearing": 50.1,
+            "has_bearing": false,
+            "frequency": 151.8,
+            "has_frequency": false,
+            "label": "C3",
+            "comment": "Signal fading",
+            "color": null,
+            "visible": true,
+            "show_label": true,
+            "line_style": "DOT",
+            "label_location": "CENTER",
+            "put_label_at": "START"
+          },
+          {
+            "time": "2026-01-09T10:45:00Z",
+            "bearing": 52.5,
+            "has_bearing": true,
+            "frequency": 151.5,
+            "has_frequency": true,
+            "visible": true,
+            "show_label": false,
+            "line_style": "DASH_DOT"
+          },
+          {
+            "time": "2026-01-09T11:00:00Z",
+            "bearing": 55.0,
+            "has_bearing": true,
+            "range": 4200.0,
+            "frequency": 151.2,
+            "has_frequency": true,
+            "label": "C5",
+            "visible": true,
+            "show_label": false
+          }
+        ],
+        "measured_positions": []
+      }
+    ],
+    "default_position_style": {
+      "show_symbol": false,
+      "symbol": "circle",
+      "show_label": false
+    },
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#0066CC",
+        "weight": 2,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round"
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 4,
+        "fill": true,
+        "fill_color": "#0066CC",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    }
+  }
+}
