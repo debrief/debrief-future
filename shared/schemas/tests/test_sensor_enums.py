@@ -64,7 +64,7 @@ class TestLineStyleEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z",
+            time="2026-01-09T10:00:00Z",  # type: ignore[arg-type]  # Pydantic coerces str→datetime
             bearing=45.0,
             line_style=value,  # type: ignore[arg-type]
         )
@@ -87,7 +87,7 @@ class TestLabelLocationEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z",
+            time="2026-01-09T10:00:00Z",  # type: ignore[arg-type]  # Pydantic coerces str→datetime
             bearing=45.0,
             label_location=value,  # type: ignore[arg-type]
         )
@@ -110,7 +110,7 @@ class TestLineLabelPositionEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z",
+            time="2026-01-09T10:00:00Z",  # type: ignore[arg-type]  # Pydantic coerces str→datetime
             bearing=45.0,
             put_label_at=value,  # type: ignore[arg-type]
         )
