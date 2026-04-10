@@ -1,6 +1,6 @@
 import { DebriefFeature } from '../utils/types';
 
-export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment';
+export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment' | 'group' | 'sensor' | 'contact';
 export interface DisplayItem {
     /** Discriminator for the row kind */
     type: DisplayItemType;
@@ -26,6 +26,11 @@ export interface DisplayItem {
  * This is a pure function — no side effects.
  */
 export declare function flattenFeatures(features: DebriefFeature[], expandedIds: Set<string>): DisplayItem[];
+/**
+ * Extract the root feature ID from any path in the DisplayItem ID scheme.
+ * E.g., 'track-001/sensors/TOWED/contacts/3' → 'track-001'
+ */
+export declare function getRootFeatureId(path: string): string;
 /**
  * Check if any selected ID is a child of the given feature.
  * Uses simple string prefix matching — no path parsing required.
