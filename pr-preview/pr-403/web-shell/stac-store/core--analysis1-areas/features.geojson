@@ -1,0 +1,188 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "6bb41f2b-49cc-4288-86c3-3cb2f569bd3d",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.721597222222222,
+              22.054258333333333
+            ],
+            [
+              -21.560805555555557,
+              22.054258333333333
+            ],
+            [
+              -21.560805555555557,
+              21.927283333333335
+            ],
+            [
+              -21.721597222222222,
+              21.927283333333335
+            ],
+            [
+              -21.721597222222222,
+              22.054258333333333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "RED SEARCH ALPHA",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "provenance": [
+          {
+            "activity_id": "82328187-b416-4d18-83c8-0c5fdc2dce6c",
+            "timestamp": "2026-03-28T13:50:57.636559Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6bb41f2b-49cc-4288-86c3-3cb2f569bd3d"
+            ],
+            "execution_duration": "PT0.000152S"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "98c8dd8c-127f-4c76-81eb-aedae921f805",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.894402777777778,
+              22.054258333333333
+            ],
+            [
+              -21.743358333333333,
+              22.054258333333333
+            ],
+            [
+              -21.743358333333333,
+              21.927283333333335
+            ],
+            [
+              -21.894402777777778,
+              21.927283333333335
+            ],
+            [
+              -21.894402777777778,
+              22.054258333333333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "RED SEARCH BRAVO",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "provenance": [
+          {
+            "activity_id": "82328187-b416-4d18-83c8-0c5fdc2dce6c",
+            "timestamp": "2026-03-28T13:50:57.636559Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "98c8dd8c-127f-4c76-81eb-aedae921f805"
+            ],
+            "execution_duration": "PT0.000152S"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "85413149-3b98-48ea-b661-db2f9621c4cc",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.93165,
+              22.20677222222222
+            ],
+            [
+              -21.471280555555555,
+              22.20677222222222
+            ],
+            [
+              -21.471280555555555,
+              21.864075
+            ],
+            [
+              -21.93165,
+              21.864075
+            ],
+            [
+              -21.93165,
+              22.20677222222222
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "SERIAL 12E",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "provenance": [
+          {
+            "activity_id": "82328187-b416-4d18-83c8-0c5fdc2dce6c",
+            "timestamp": "2026-03-28T13:50:57.636559Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "85413149-3b98-48ea-b661-db2f9621c4cc"
+            ],
+            "execution_duration": "PT0.000152S"
+          }
+        ]
+      }
+    }
+  ]
+}
