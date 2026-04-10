@@ -1,6 +1,7 @@
 /* TimelineView component styles (#131) */
 
 .timeline-view {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -159,4 +160,25 @@
 
 .timeline-view__row-bg:hover {
   fill: var(--vscode-list-hoverBackground, rgba(0, 0, 0, 0.04));
+}
+
+/* Zoom hint overlay */
+.timeline-view__zoom-hint {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 3px;
+  background: var(--vscode-editorWidget-background, rgba(37, 37, 38, 0.92));
+  color: var(--vscode-editorWidget-foreground, #ccc);
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 10;
+  animation: timeline-hint-fade 0.15s ease forwards;
+}
+
+@keyframes timeline-hint-fade {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 0.9; transform: translateX(-50%) translateY(0); }
 }
