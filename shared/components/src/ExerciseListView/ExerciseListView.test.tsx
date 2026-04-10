@@ -327,6 +327,34 @@ describe('ExerciseListView', () => {
     });
   });
 
+  // ── Thumbnail Size ──
+
+  describe('Thumbnail Size', () => {
+    it('uses default row height of 80px for small thumbnails', () => {
+      const items = makeItems(3);
+      const { container } = render(<ExerciseListView items={items} />);
+      const content = container.querySelector('.exercise-list-view__content') as HTMLElement;
+      // 3 items * 80px = 240px
+      expect(content.style.height).toBe('240px');
+    });
+
+    it('uses taller rows for medium thumbnails', () => {
+      const items = makeItems(3);
+      const { container } = render(<ExerciseListView items={items} thumbnailSize="medium" />);
+      const content = container.querySelector('.exercise-list-view__content') as HTMLElement;
+      // 3 items * 105px = 315px
+      expect(content.style.height).toBe('315px');
+    });
+
+    it('uses tallest rows for large thumbnails', () => {
+      const items = makeItems(3);
+      const { container } = render(<ExerciseListView items={items} thumbnailSize="large" />);
+      const content = container.querySelector('.exercise-list-view__content') as HTMLElement;
+      // 3 items * 135px = 405px
+      expect(content.style.height).toBe('405px');
+    });
+  });
+
   // ── Lazy GeoJSON Loading ──
 
   describe('Lazy GeoJSON Loading', () => {

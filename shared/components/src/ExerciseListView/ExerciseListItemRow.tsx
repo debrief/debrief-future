@@ -9,6 +9,7 @@
 import React, { useCallback } from 'react';
 import type { ExerciseListItemRowProps } from './types';
 import { SpatialThumbnail } from './SpatialThumbnail';
+import { THUMBNAIL_SIZE_CONFIGS } from './constants';
 import { formatDuration, computeDuration, formatDateRange, truncateArray } from './utils';
 
 /** Maximum number of tags/vessel classes to show before overflow indicator. */
@@ -21,7 +22,9 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
   onSelect,
   onHighlight,
   highlighted,
+  thumbnailSize = 'small',
 }) => {
+  const sizeConfig = THUMBNAIL_SIZE_CONFIGS[thumbnailSize];
   const handleClick = useCallback(() => {
     if (onHighlight) {
       // When highlight is supported, single-click = highlight for preview
@@ -83,8 +86,8 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             alt={`Thumbnail for ${item.title}`}
             className="exercise-list-item-row__raster-thumbnail"
             data-testid="raster-thumbnail"
-            width={60}
-            height={45}
+            width={sizeConfig.rasterWidth}
+            height={sizeConfig.rasterHeight}
             onError={(e) => {
               // Hide broken image, show fallback SpatialThumbnail
               e.currentTarget.style.display = 'none';
@@ -98,6 +101,8 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             bbox={item.bbox}
             trackData={trackData}
             loading={trackDataLoading}
+            width={sizeConfig.spatialWidth}
+            height={sizeConfig.spatialHeight}
           />
         </div>
       </div>
