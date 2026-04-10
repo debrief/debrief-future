@@ -132,8 +132,7 @@ function sourceLabelFromIds(ids: string[]): string {
  */
 function buildShortTabTitle(
   envelopeTitle: string,
-  sourceFeatureIds: string[],
-  _toolId: string,
+  sourceNames: string[],
 ): string {
   const colonIdx = envelopeTitle.indexOf(': ');
   if (colonIdx < 0) {
@@ -152,19 +151,17 @@ function buildShortTabTitle(
     /[0-9a-f]{8}-[0-9a-f]{4}/.test(suffix);
 
   if (looksLikeUuids) {
-    // Use the source feature IDs instead — they might be more readable.
-    // If they're also UUIDs, just return the subject alone.
-    const shortIds = sourceFeatureIds
-      .map((id) => {
-        // If the ID itself is a UUID, truncate to first 8 chars.
-        if (/^[0-9a-f]{8}-[0-9a-f]{4}/.test(id)) {
-          return id.slice(0, 8);
+    // Use the resolved source names instead.
+    const shortNames = sourceNames
+      .map((name) => {
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}/.test(name)) {
+          return name.slice(0, 8);
         }
-        return id.length > 20 ? id.slice(0, 17) + '...' : id;
+        return name.length > 25 ? name.slice(0, 22) + '...' : name;
       })
       .join(' → ');
-    return shortIds
-      ? `${subject} (${shortIds})`.slice(0, 60)
+    return shortNames
+      ? `${subject} (${shortNames})`.slice(0, 60)
       : subject;
   }
 
@@ -224,6 +221,9 @@ export class ResultsPanelService {
       features?: { type: 'FeatureCollection'; features: unknown[] };
     };
     sourceFeatureIds: string[];
+    /** Human-readable names for the source features (e.g. "HMS Defender").
+     *  Falls back to sourceFeatureIds when not provided. */
+    sourceFeatureNames?: string[];
     parameters?: Record<string, unknown>;
     parentActivityId: string;
   }): void {
@@ -282,8 +282,7 @@ export class ResultsPanelService {
           // e.g. "Range (HMS Defender → USS Freedom)".
           title: buildShortTabTitle(
             envelope.title,
-            args.sourceFeatureIds,
-            args.toolId,
+            args.sourceFeatureNames ?? args.sourceFeatureIds,
           ),
         },
         sourceFeatureIds: [...args.sourceFeatureIds],

@@ -442,6 +442,32 @@ export function createExecuteToolCommand(
           // we detected above).  The carrier features are in-memory only —
           // they NEVER get written to disk until the user clicks Save / Save As.
           if (resultsPanelService && datasetCarrierFeatures.length > 0) {
+            // Resolve human-readable feature names from the map panel
+            // so the Results panel can show "Range (HMS Defender → USS
+            // Freedom)" instead of "Range (c144f1fd → 8ebb42d3)".
+            //
+            // Uses the schema-typed `DebriefFeature` union via the
+            // `isTrackFeature` / `isReferenceLocation` type guards
+            // from @debrief/schemas.  TrackFeature has `platform_name`,
+            // ReferenceLocation has `label`, annotations have `label`.
+            const sourceIds = result.sourceFeatureIds ?? selectedFeatureIds;
+            const allPanelFeatures: DebriefFeature[] = panel.getFeatures();
+            const sourceFeatureNames: string[] = sourceIds.map((id) => {
+              const feature = allPanelFeatures.find(
+                (f: DebriefFeature) => String(f.id) === id,
+              );
+              if (!feature) { return id; }
+              // TrackFeature → platform_name
+              if ('platform_name' in feature.properties && feature.properties.platform_name) {
+                return feature.properties.platform_name;
+              }
+              // ReferenceLocation / Annotation → label
+              if ('label' in feature.properties && feature.properties.label) {
+                return String(feature.properties.label);
+              }
+              return String(feature.id);
+            });
+
             resultsPanelService.addDatasetsForToolResult({
               plotKey: { storePath: store.path, itemPath: plot.itemPath },
               toolId: resolvedToolId,
@@ -451,7 +477,8 @@ export function createExecuteToolCommand(
                   features: datasetCarrierFeatures,
                 },
               },
-              sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
+              sourceFeatureIds: sourceIds,
+              sourceFeatureNames,
               parameters: toolParams,
               parentActivityId: recordResult.activity_id,
             });
