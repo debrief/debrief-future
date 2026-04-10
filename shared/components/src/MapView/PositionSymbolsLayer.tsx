@@ -195,12 +195,12 @@ export function PositionSymbolsLayer({
       if (!coord) continue;
       const position: LatLngExpression = [coord[1], coord[0]];
 
-      // Determine marker appearance
-      const markerFillColor = color;
+      // Determine marker appearance — read overrides from style.point.*
+      const markerFillColor = (pointStyle?.fill_color as string) ?? color;
       const markerStrokeColor = color;
-      const baseRadius = getRadiusForShape(style.symbol);
+      const baseRadius = (pointStyle?.radius as number) ?? getRadiusForShape(style.symbol);
       const markerRadius = isPositionSelected ? baseRadius + 3 : baseRadius;
-      const markerFillOpacity = isPositionSelected ? 0.9 : 0.7;
+      const markerFillOpacity = isPositionSelected ? 0.9 : (pointStyle?.fill_opacity as number) ?? 0.7;
       const weight = isPositionSelected ? 3 : 2;
 
       if (shouldShowSymbol) {
@@ -266,7 +266,7 @@ export function PositionSymbolsLayer({
     }
 
     return items;
-  }, [visibleRange, resolvedStyles, coordinates, color, isSelected, selectedIds, featureId]);
+  }, [visibleRange, resolvedStyles, coordinates, color, isSelected, selectedIds, featureId, pointStyle]);
 
   if (elements.length === 0) return null;
 

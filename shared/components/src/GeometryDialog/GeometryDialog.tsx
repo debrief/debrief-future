@@ -8,6 +8,8 @@ export interface GeometryDialogProps {
   geometryType: string;
   /** GeoJSON coordinates array */
   coordinates: number[] | number[][] | number[][][] | number[][][][];
+  /** Feature properties to display (optional) */
+  properties?: Record<string, unknown>;
   /** Anchor position for dialog placement */
   anchorPosition: { x: number; y: number };
   /** Callback when dialog should close */
@@ -68,9 +70,35 @@ function formatCoordinates(
   }
 }
 
+/** Keys to omit from the properties display (large/internal data). */
+const OMITTED_KEYS = new Set(['positions', 'pointMetadata', 'pointColors', 'zones', 'position_style_overrides']);
+
 /**
- * GeometryDialog displays a feature's geometry type and coordinates
- * in a fixed-position dialog anchored near the info button.
+ * Format a property value for display.
+ */
+function formatPropertyValue(value: unknown, indent = 0): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value === 'boolean') return String(value);
+  if (typeof value === 'number') return String(value);
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '[]';
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'object') {
+    // eslint-disable-next-line no-restricted-syntax
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return '{}';
+    const pad = '  '.repeat(indent + 1);
+    const lines = entries.map(([k, v]) => `${pad}${k}: ${formatPropertyValue(v, indent + 1)}`);
+    return `{\n${lines.join('\n')}\n${'  '.repeat(indent)}}`;
+  }
+  return String(value);
+}
+
+/**
+ * GeometryDialog displays a feature's geometry type, coordinates,
+ * and properties in a fixed-position dialog anchored near the info button.
  *
  * Feature: 098-feature-info-button
  */
@@ -78,6 +106,7 @@ export function GeometryDialog({
   featureName,
   geometryType,
   coordinates,
+  properties,
   anchorPosition,
   onDismiss,
 }: GeometryDialogProps) {
@@ -167,6 +196,18 @@ export function GeometryDialog({
         <div className="debrief-geometry-dialog__type" data-testid="geometry-type">
           {geometryType}
         </div>
+        {properties && Object.keys(properties).length > 0 && (
+          <div className="debrief-geometry-dialog__properties" data-testid="feature-properties">
+            <div className="debrief-geometry-dialog__section-label">Properties</div>
+            <pre className="debrief-geometry-dialog__coordinates">
+              {Object.entries(properties)
+                .filter(([k]) => !OMITTED_KEYS.has(k))
+                .map(([k, v]) => `${k}: ${formatPropertyValue(v)}`)
+                .join('\n')}
+            </pre>
+          </div>
+        )}
+        <div className="debrief-geometry-dialog__section-label">Coordinates</div>
         <pre className="debrief-geometry-dialog__coordinates" data-testid="geometry-coordinates">
           {formattedCoords}
         </pre>

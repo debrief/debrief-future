@@ -520,6 +520,10 @@ export function createOpenPlotCommand(
       storeId,
       itemPath
     );
+
+    // Switch sidebar to Debrief activity pane so the analyst has
+    // tools, layers, and time controls ready immediately.
+    void vscode.commands.executeCommand('debrief.activityPanel.focus');
   };
 }
 

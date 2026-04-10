@@ -29,6 +29,7 @@ A 7-phase implementation delivering sensor capabilities incrementally. Each phas
 | 1 | Schema Overhaul | Full SensorContact/SensorData redesign, display properties, array offset modes, measured positions, update 9 tool specs | Approved |
 | 2 | REP Import | SENSOR v1, then SENSOR2, SENSOR3, SENSORARC parsers | Approved |
 | 3 | Rendering | Leaflet custom layer for bearing lines, ambiguous bearings, sensor arcs, snail mode | Approved |
+| 3b | Layers Panel ([#179](179-sensor-aware-layers-rendering.md)) | Sensor-aware track rendering in `FeatureList` — `Positions`/`Sensors`/`Track Segments` grouping rows; per-sensor contact expansion | Proposed |
 | 4 | Array Offsets | PLAIN, WORM, MEASURED array centre calculations | Approved |
 | 5 | Residual Analysis | Doublet infrastructure, bearing + frequency residuals, custom React scatter component | **Deferred** |
 | 6 | TMA Data Model | TMA schemas, Absolute/Relative segments, solution generation from sensor cuts | **Deferred** |
@@ -499,6 +500,7 @@ Generate TMA solution -> select Shear drag mode -> drag TMA segment to refine ->
 | #117 | REP sensor import (v1/v2/v3/arc) | #116 | Medium |
 | #118 | Sensor rendering (bearing lines, arcs, snail mode) | #116, #117 | High |
 | #119 | Array offset calculations (PLAIN/WORM/MEASURED) | #116 | Medium |
+| [#179](179-sensor-aware-layers-rendering.md) | Sensor-aware track rendering in Layers panel | #116 | Low |
 | #120 | Bearing & frequency residual analysis | #116, #119 | High |
 | #121 | TMA data model & solution generation | #116, #120 | High |
 | #122 | TMA interactive drag | #121, #120 | High |

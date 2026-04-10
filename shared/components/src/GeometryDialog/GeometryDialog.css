@@ -80,6 +80,24 @@
   display: inline-block;
 }
 
+.debrief-geometry-dialog__section-label {
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--debrief-text-muted, #888888);
+  margin: 8px 0 4px;
+}
+
+.debrief-geometry-dialog__section-label:first-child {
+  margin-top: 0;
+}
+
+.debrief-geometry-dialog__properties + .debrief-geometry-dialog__section-label {
+  border-top: 1px solid var(--debrief-border-color, #3a3a3a);
+  padding-top: 6px;
+}
+
 .debrief-geometry-dialog__coordinates {
   margin: 0;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
