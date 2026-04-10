@@ -131,13 +131,13 @@ Large features broken down into multiple backlog items.
 | ID | Title | Description | Status | Items |
 |----|-------|-------------|--------|-------|
 | 024 | [Storyboarding Briefings](docs/ideas/017-storyboarding-briefings.md) | Add storyboarding capability for mission/exercise briefings | proposed | — |
-| E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | #062, #063, #064, #065, #066, #067, #068 |
+| E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | ~~#062~~, #063, #064, #065, #066, ~~#067~~, #068 |
 | ~~E02~~ | ~~PROV Logging Implementation~~ | ~~[Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md)~~ | ~~complete~~ | ~~#070, #071, #072, #073, #074, #075, #076~~ |
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | ~~#078~~, #079, ~~#080~~, #081, #082, #084 |
-| E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089, #090 |
+| E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | ~~#085~~, ~~#086~~, ~~#087~~, ~~#088~~, #089, #090 |
 | ~~E05~~ | ~~Shape Drawing Tools~~ | ~~Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown~~ | ~~complete~~ | ~~#091, #092, #093, #094, #095, #096~~ |
-| E06 | Architectural Consistency | [Fix implementation drift and constitutional violations from six-axis review](docs/architectural-consistency-review.md) | approved | #102, #103, #104, #105, #106, #107, #108, #109, #110, #111, #112 |
-| E07 | Sensor Data Pipeline | [Port legacy sensor capabilities in 7 phases: schema, import, rendering, array offsets, residuals, TMA, interactive drag](docs/ideas/E07-sensor-data-pipeline.md) | proposed | #116, #117, #118, #119, #179, #120, #121, #122 |
+| E06 | Architectural Consistency | [Fix implementation drift and constitutional violations from six-axis review](docs/architectural-consistency-review.md) | approved | ~~#102~~, ~~#103~~, #104, #105, #106, #107, #108, #109, #110, #111, ~~#112~~ |
+| E07 | Sensor Data Pipeline | [Port legacy sensor capabilities in 7 phases: schema, import, rendering, array offsets, residuals, TMA, interactive drag](docs/ideas/E07-sensor-data-pipeline.md) | proposed | ~~#116~~, #117, #118, #119, ~~#179~~, #120, #121, #122 |
 | ~~E08~~ | ~~STAC Stack Browser Discovery UI~~ | ~~[Analyst-facing discovery interface: filter bar, list/map/timeline views, vessel taxonomy, colour schemes](docs/stac-browser-srd.md)~~ | ~~complete~~ | ~~#125~~, ~~#126~~, ~~#127~~, ~~#128~~, ~~#129~~, ~~#130~~, ~~#131~~, ~~#132~~, ~~#133~~, ~~#134~~, ~~#136~~, ~~#174~~ |
 | E09 | Provenance Graph | [Reference data currency tracking and solution comparison (shadow tracks)](docs/provenance-graph-spec.md) | proposed | #145, #146, #147, #148, #150, #151, #149 |
 
