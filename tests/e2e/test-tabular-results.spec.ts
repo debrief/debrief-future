@@ -228,10 +228,12 @@ test.describe('Tabular Results Panel — Real VS Code Webview (Feature 178)', ()
     codeServerPage,
     page,
   }) => {
-    // Smaller smoke: if the view container and view were NOT registered
-    // in package.json, this command would not exist and the Quick Input
-    // would show "No matching commands" instead of running. This test
-    // asserts the manifest contribution from the commit.
+    // Dismiss any leftover overlays from the previous test that might
+    // capture keyboard focus (Quick Input, notification toasts).
+    await page.keyboard.press('Escape');
+    await codeServerPage.dismissNotifications();
+    await page.waitForTimeout(500);
+
     await page.keyboard.press('Control+KeyJ');
     await page.waitForTimeout(500);
     await codeServerPage.executeCommand('Debrief Results: Focus on Results View');
