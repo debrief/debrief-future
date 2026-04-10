@@ -157,6 +157,24 @@ You **MUST** consider the user input before proceeding (if not empty).
       ```
     - Commit: `chore(backlog): mark item {ID} as complete`
 
+12. ## Prompt dev to publish a blog post
+
+    When implementation is complete, output this message:
+
+    ---
+    
+    ### Publish this update
+    
+    Open a Claude Code session in the **debrief.github.io** repo and run:
+    
+        /publish-future-post https://github.com/debrief/debrief-future/tree/<BRANCH>/specs/<NNN>-<slug>/media
+    
+    This will read the spec from the dev branch, copy screenshots into
+    the site's assets, and draft a blog post.
+
+    Replace `<BRANCH>` with the current git branch name, and `<NNN>-<slug>`
+    with the spec folder name.
+
 ## Slash Command Task Execution
 
 Some tasks invoke slash commands rather than creating files. These tasks have the format:
