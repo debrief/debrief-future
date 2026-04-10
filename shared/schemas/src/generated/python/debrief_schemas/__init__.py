@@ -522,6 +522,82 @@ class SystemStateTypeEnum(str, Enum):
     """
 
 
+class ArrayCentreModeEnum(str, Enum):
+    """
+    Array centre calculation mode for towed array sensors
+    """
+    PLAIN = "PLAIN"
+    """
+    Simple backtrack along vessel heading
+    """
+    WORM = "WORM"
+    """
+    Follow vessel track path backwards
+    """
+    MEASURED = "MEASURED"
+    """
+    Use actual measured array positions
+    """
+
+
+class LineStyleEnum(str, Enum):
+    """
+    Visual style for bearing lines
+    """
+    SOLID = "SOLID"
+    """
+    Continuous line
+    """
+    DASHED = "DASHED"
+    """
+    Evenly spaced dashes
+    """
+    DOT = "DOT"
+    """
+    Evenly spaced dots
+    """
+    DASH_DOT = "DASH_DOT"
+    """
+    Alternating dash and dot
+    """
+
+
+class LabelLocationEnum(str, Enum):
+    """
+    Horizontal alignment of contact labels
+    """
+    LEFT = "LEFT"
+    """
+    Left-aligned text
+    """
+    CENTER = "CENTER"
+    """
+    Center-aligned text
+    """
+    RIGHT = "RIGHT"
+    """
+    Right-aligned text
+    """
+
+
+class LineLabelPositionEnum(str, Enum):
+    """
+    Position along the bearing line where the label is placed
+    """
+    START = "START"
+    """
+    At the origin (sensor location)
+    """
+    MIDDLE = "MIDDLE"
+    """
+    At the midpoint of the bearing line
+    """
+    END = "END"
+    """
+    At the far end of the bearing line
+    """
+
+
 class OutputKindEnum(str, Enum):
     """
     Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
@@ -787,6 +863,7 @@ class TimestampedPosition(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
 
     time: datetime  = Field(default=..., description="""Position timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'MeasuredArrayPosition',
                        'SensorContact',
                        'TUASolution',
                        'NarrativeEntryProperties']} })
@@ -807,7 +884,11 @@ class PointProperties(ConfiguredBaseModel):
     fill_color: str = Field(default=..., description="""Fill color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
     fill_opacity: Optional[float] = Field(default=None, description="""Fill transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
     stroke: Optional[bool] = Field(default=None, description="""Whether to draw outline""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
-    color: str = Field(default=..., description="""Stroke color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Stroke color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties',
+                       'LineProperties',
+                       'PolygonProperties',
+                       'SensorContact',
+                       'SensorData']} })
     weight: Optional[float] = Field(default=None, description="""Stroke width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     opacity: Optional[float] = Field(default=None, description="""Stroke transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     legacy_style: Optional[str] = Field(default=None, description="""Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties']} })
@@ -820,7 +901,11 @@ class LineProperties(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
 
     stroke: Optional[bool] = Field(default=None, description="""Whether to draw the line""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
-    color: str = Field(default=..., description="""Line color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Line color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties',
+                       'LineProperties',
+                       'PolygonProperties',
+                       'SensorContact',
+                       'SensorData']} })
     weight: Optional[float] = Field(default=None, description="""Line width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     opacity: Optional[float] = Field(default=None, description="""Line transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     line_cap: Optional[LineCapEnum] = Field(default=None, description="""Line endpoint style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
@@ -838,7 +923,11 @@ class PolygonProperties(ConfiguredBaseModel):
     fill_color: str = Field(default=..., description="""Fill color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
     fill_opacity: Optional[float] = Field(default=None, description="""Fill transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
     stroke: Optional[bool] = Field(default=None, description="""Whether to draw border""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
-    color: str = Field(default=..., description="""Border color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Border color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties',
+                       'LineProperties',
+                       'PolygonProperties',
+                       'SensorContact',
+                       'SensorData']} })
     weight: Optional[float] = Field(default=None, description="""Border width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     opacity: Optional[float] = Field(default=None, description="""Border transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     line_cap: Optional[LineCapEnum] = Field(default=None, description="""Border endpoint style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
@@ -873,7 +962,7 @@ class PositionStyle(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    show_label: bool = Field(default=..., description="""Whether to display labels at positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+    show_label: bool = Field(default=..., description="""Whether to display labels at positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride', 'SensorContact']} })
 
 
 class PositionStyleOverride(ConfiguredBaseModel):
@@ -893,7 +982,7 @@ class PositionStyleOverride(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    show_label: Optional[bool] = Field(default=None, description="""Override whether to show label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+    show_label: Optional[bool] = Field(default=None, description="""Override whether to show label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride', 'SensorContact']} })
     label: Optional[str] = Field(default=None, description="""Custom label text (null = use timestamp)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
@@ -1244,6 +1333,20 @@ class SegmentMetadata(ConfiguredBaseModel):
     after_leg: Optional[str] = Field(default=None, description="""Name of following TMA leg (DYNAMIC_INFILL)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata']} })
 
 
+class MeasuredArrayPosition(ConfiguredBaseModel):
+    """
+    Timestamped geographic position of a towed array centre. Used by MEASURED array centre mode for bearing line origin interpolation.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+
+    time: datetime  = Field(default=..., description="""Position timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'MeasuredArrayPosition',
+                       'SensorContact',
+                       'TUASolution',
+                       'NarrativeEntryProperties']} })
+    location: list[float] = Field(default=..., description="""Array centre position [longitude, latitude] (GeoJSON coordinate order)""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasuredArrayPosition']} })
+
+
 class SensorContact(ConfiguredBaseModel):
     """
     Single sensor measurement record. Represents one bearing/range observation at a point in time.
@@ -1251,13 +1354,17 @@ class SensorContact(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     time: datetime  = Field(default=..., description="""Contact measurement timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'MeasuredArrayPosition',
                        'SensorContact',
                        'TUASolution',
                        'NarrativeEntryProperties']} })
     bearing: float = Field(default=..., description="""Bearing to contact in degrees (0-360)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
+    has_bearing: Optional[bool] = Field(default=None, description="""Controls bearing line display (true=show, false=hide). Data stored regardless.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    ambiguous_bearing: Optional[float] = Field(default=None, description="""Ambiguous bearing (second solution) in degrees""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    has_ambiguous: Optional[bool] = Field(default=None, description="""Controls ambiguous bearing display""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
     range: Optional[float] = Field(default=None, description="""Range to contact in metres""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
     frequency: Optional[float] = Field(default=None, description="""Measured frequency in Hz""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
-    ambiguous_bearing: Optional[float] = Field(default=None, description="""Ambiguous bearing (second solution) in degrees""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    has_frequency: Optional[bool] = Field(default=None, description="""Controls frequency data display""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
     label: Optional[str] = Field(default=None, description="""Display label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
                        'TUASolution',
@@ -1271,6 +1378,17 @@ class SensorContact(ConfiguredBaseModel):
                        'ToolResultAnnotations',
                        'DatasetAxisMetadata']} })
     comment: Optional[str] = Field(default=None, description="""Operator note""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    color: Optional[str] = Field(default=None, description="""Contact color override (null = inherit from parent SensorData)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties',
+                       'LineProperties',
+                       'PolygonProperties',
+                       'SensorContact',
+                       'SensorData']} })
+    visible: Optional[bool] = Field(default=None, description="""Contact visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'SensorData']} })
+    show_label: Optional[bool] = Field(default=None, description="""Label visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride', 'SensorContact']} })
+    line_style: Optional[LineStyleEnum] = Field(default=None, description="""Bearing line visual style""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    label_location: Optional[LabelLocationEnum] = Field(default=None, description="""Label horizontal alignment""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    put_label_at: Optional[LineLabelPositionEnum] = Field(default=None, description="""Label position along bearing line""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
+    origin: Optional[list[float]] = Field(default=None, description="""Explicit sensor location override [longitude, latitude]""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'VectorAnnotationProperties']} })
 
 
 class SensorData(ConfiguredBaseModel):
@@ -1290,8 +1408,17 @@ class SensorData(ConfiguredBaseModel):
                        'DatasetSeries']} })
     base_frequency: Optional[float] = Field(default=None, description="""Reference frequency in Hz""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SensorData']} })
     offset: Optional[float] = Field(default=None, description="""Sensor offset from host platform in metres""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
+    array_centre_mode: Optional[ArrayCentreModeEnum] = Field(default=None, description="""How bearing line origin is calculated relative to host platform""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
     worm_in_hole: Optional[bool] = Field(default=None, description="""Display mode flag""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
+    color: Optional[str] = Field(default=None, description="""Default color for all contacts in this sensor""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties',
+                       'LineProperties',
+                       'PolygonProperties',
+                       'SensorContact',
+                       'SensorData']} })
+    visible: Optional[bool] = Field(default=None, description="""Sensor visibility""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'SensorData']} })
+    line_thickness: Optional[int] = Field(default=None, description="""Bearing line width in pixels""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
     contacts: list[SensorContact] = Field(default=..., description="""Array of sensor measurements""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
+    measured_positions: Optional[list[MeasuredArrayPosition]] = Field(default=[], description="""Actual towed array positions for MEASURED array centre mode""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
 
 
 class TUASolution(ConfiguredBaseModel):
@@ -1301,6 +1428,7 @@ class TUASolution(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     time: datetime  = Field(default=..., description="""Solution timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'MeasuredArrayPosition',
                        'SensorContact',
                        'TUASolution',
                        'NarrativeEntryProperties']} })
@@ -2236,6 +2364,7 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'SystemRecordProperties'],
          'equals_string': 'NARRATIVE'} })
     time: datetime  = Field(default=..., description="""Narrative timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'MeasuredArrayPosition',
                        'SensorContact',
                        'TUASolution',
                        'NarrativeEntryProperties']} })
@@ -2925,7 +3054,7 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'SelectionRequirement',
                        'SystemRecordProperties'],
          'equals_string': 'VECTOR'} })
-    origin: list[float] = Field(default=..., description="""Vector origin as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
+    origin: list[float] = Field(default=..., description="""Vector origin as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'VectorAnnotationProperties']} })
     range: float = Field(default=..., description="""Vector length/range in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
     bearing: float = Field(default=..., description="""Vector bearing in degrees (0-360, from north) for precise reconstruction""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -4136,6 +4265,7 @@ GeoJSONMultiPoint.model_rebuild()
 GeoJSONMultiLineString.model_rebuild()
 GeoJSONMultiPolygon.model_rebuild()
 SegmentMetadata.model_rebuild()
+MeasuredArrayPosition.model_rebuild()
 SensorContact.model_rebuild()
 SensorData.model_rebuild()
 TUASolution.model_rebuild()

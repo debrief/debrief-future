@@ -250,6 +250,48 @@ enums:
       selection:
         description: Feature selection state (selected IDs)
 
+  ArrayCentreModeEnum:
+    description: Array centre calculation mode for towed array sensors
+    permissible_values:
+      PLAIN:
+        description: Simple backtrack along vessel heading
+      WORM:
+        description: Follow vessel track path backwards
+      MEASURED:
+        description: Use actual measured array positions
+
+  LineStyleEnum:
+    description: Visual style for bearing lines
+    permissible_values:
+      SOLID:
+        description: Continuous line
+      DASHED:
+        description: Evenly spaced dashes
+      DOT:
+        description: Evenly spaced dots
+      DASH_DOT:
+        description: Alternating dash and dot
+
+  LabelLocationEnum:
+    description: Horizontal alignment of contact labels
+    permissible_values:
+      LEFT:
+        description: Left-aligned text
+      CENTER:
+        description: Center-aligned text
+      RIGHT:
+        description: Right-aligned text
+
+  LineLabelPositionEnum:
+    description: Position along the bearing line where the label is placed
+    permissible_values:
+      START:
+        description: At the origin (sensor location)
+      MIDDLE:
+        description: At the midpoint of the bearing line
+      END:
+        description: At the far end of the bearing line
+
 # ============================================================================
 # Types
 # ============================================================================
