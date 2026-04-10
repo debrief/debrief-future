@@ -108,6 +108,38 @@ export declare function interpolateTrackPosition(coordinates: [number, number][]
  */
 export declare function resolveContactColor(contact: SensorContact, sensor: SensorData, trackColor: string | undefined): string;
 /**
+ * Compute relative bearing from vessel course to a target bearing.
+ * Returns value in range (-180, +180]:
+ *   negative = port side
+ *   positive = starboard side
+ */
+export declare function getRelativeBearing(courseDeg: number, bearingDeg: number): number;
+/**
+ * Interpolate the host track's course at a given timestamp.
+ * Returns course in degrees, or null if time is out of range.
+ */
+export declare function interpolateTrackCourse(positions: Array<{
+    time: string;
+    course?: number;
+}>, targetTimeMs: number): number | null;
+/**
+ * Determine whether a bearing is to the port side of the vessel.
+ * Port = negative relative bearing.
+ */
+export declare function isBearingToPort(bearingDeg: number, courseDeg: number): boolean;
+/**
+ * Assign colours for primary and ambiguous bearing lines based on
+ * port/starboard convention from legacy Debrief:
+ *   - Port-side bearing → base (brighter) colour
+ *   - Starboard-side bearing → darker colour
+ *
+ * This is independent of which bearing is "primary" vs "ambiguous".
+ */
+export declare function assignAmbiguousColors(primaryBearing: number, _ambiguousBearing: number, courseDeg: number, baseColor: string): {
+    primaryColor: string;
+    ambiguousColor: string;
+};
+/**
  * Filter and prepare sensor contacts for rendering.
  *
  * Filters by:
