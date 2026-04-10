@@ -391,7 +391,7 @@ class REPHandler(BaseHandler):
         features.extend(sensorarc_features)
 
         # Group sensor contacts into pending_sensor_data keyed by parent track
-        pending_sensor_data: dict[str, list[dict[str, Any]]] = {}
+        pending_sensor_data = {}
         if sensor_contacts:
             pending_sensor_data = group_sensor_contacts(sensor_contacts)
             # Emit warnings for orphaned sensor data (track not in this file)
