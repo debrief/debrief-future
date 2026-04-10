@@ -12,4 +12,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 128-saved-filter-configurations | 2 | md | 2026-03-07 | current | — |
 | 137-rep-temporal-metadata | 4 | md, json | 2026-03-18 | current | — |
 | 116-sensor-schema-overhaul | 3 | md | 2026-04-10 | current | [#407](https://github.com/debrief/debrief-future/pull/407) |
-| 117-rep-sensor-import | 4 | md, json, rep | 2026-04-10 | current | — |
+| 117-rep-sensor-import | 4 | md, json, rep | 2026-04-10 | current | [#411](https://github.com/debrief/debrief-future/pull/411) |
