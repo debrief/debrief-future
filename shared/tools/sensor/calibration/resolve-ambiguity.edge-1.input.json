@@ -7,7 +7,12 @@
         "id": "sensor-single-cut",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -22,7 +27,14 @@
               "ambiguous_bearing": 270.0,
               "ambiguous": true,
               "frequency": 200.0,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }
@@ -32,7 +44,12 @@
         "id": "track-target",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-0.9, 50.0]]
+          "coordinates": [
+            [
+              -0.9,
+              50.0
+            ]
+          ]
         },
         "properties": {
           "kind": "TRACK",
@@ -42,7 +59,15 @@
           "start_time": "2024-01-15T10:00:00Z",
           "end_time": "2024-01-15T10:00:00Z",
           "positions": [
-            {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.9, 50.0], "course": 180.0, "speed": 5.0}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "coordinates": [
+                -0.9,
+                50.0
+              ],
+              "course": 180.0,
+              "speed": 5.0
+            }
           ]
         }
       }

@@ -19,13 +19,17 @@
               "id": "contact-a",
               "time": "2024-01-15T10:00:00Z",
               "bearing": 90.0,
-              "ambiguous": false
+              "ambiguous": false,
+              "has_bearing": true,
+              "visible": true
             },
             {
               "id": "contact-b",
               "time": "2024-01-15T10:05:00Z",
               "bearing": 92.0,
-              "ambiguous": false
+              "ambiguous": false,
+              "has_bearing": true,
+              "visible": true
             }
           ]
         }

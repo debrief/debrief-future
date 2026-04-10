@@ -15,8 +15,24 @@
           "platform_id": "VESSEL-A",
           "sensor_type": "SONAR",
           "contacts": [
-            {"id": "pa-001", "time": "2024-01-15T10:00:00Z", "bearing": 270.0, "frequency": 100.0},
-            {"id": "pa-002", "time": "2024-01-15T10:10:00Z", "bearing": 265.0, "frequency": 102.0}
+            {
+              "id": "pa-001",
+              "time": "2024-01-15T10:00:00Z",
+              "bearing": 270.0,
+              "frequency": 100.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
+            },
+            {
+              "id": "pa-002",
+              "time": "2024-01-15T10:10:00Z",
+              "bearing": 265.0,
+              "frequency": 102.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
+            }
           ]
         }
       },
@@ -33,7 +49,15 @@
           "platform_id": "VESSEL-A",
           "sensor_type": "SONAR",
           "contacts": [
-            {"id": "sa-001", "time": "2024-01-15T10:05:00Z", "bearing": 90.0, "frequency": 120.0}
+            {
+              "id": "sa-001",
+              "time": "2024-01-15T10:05:00Z",
+              "bearing": 90.0,
+              "frequency": 120.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
+            }
           ]
         }
       }

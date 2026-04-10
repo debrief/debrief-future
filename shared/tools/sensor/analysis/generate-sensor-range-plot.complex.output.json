@@ -7,7 +7,11 @@
       "text": "{\"title\":\"Sensor Range Plot: PORT_ARRAY vs Target NorthEast\",\"sensor_name\":\"PORT_ARRAY\",\"ownship\":\"OWNSHIP\",\"target\":\"Target NorthEast\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"range_m\":6576.8,\"bearing\":45.0,\"ownship_position\":[-1.0,50.0],\"target_position\":[-0.95,50.05]},{\"time\":\"2024-01-15T10:01:00Z\",\"range_m\":6350.2,\"bearing\":47.0,\"ownship_position\":[-0.99,50.005],\"target_position\":[-0.94,50.055]},{\"time\":\"2024-01-15T10:02:00Z\",\"range_m\":6123.5,\"bearing\":49.0,\"ownship_position\":[-0.98,50.01],\"target_position\":[-0.93,50.06]}],\"statistics\":{\"min_range_m\":6123.5,\"max_range_m\":6576.8,\"mean_range_m\":6350.2,\"data_points\":3}}",
       "annotations": {
         "debrief:resultType": "artifact/analysis/sensor_range_plot",
-        "debrief:sourceFeatures": ["sensor-port-array", "track-ownship", "track-target-ne"],
+        "debrief:sourceFeatures": [
+          "sensor-port-array",
+          "track-ownship",
+          "track-target-ne"
+        ],
         "debrief:label": "Generated range plot for PORT_ARRAY vs Target NorthEast: 3 data points, range 6124-6577m",
         "debrief:href": "PORT_ARRAY-Target_NorthEast-range-plot.json"
       }
@@ -19,7 +23,11 @@
       "text": "{\"title\":\"Sensor Range Plot: STBD_ARRAY vs Target West\",\"sensor_name\":\"STBD_ARRAY\",\"ownship\":\"OWNSHIP\",\"target\":\"Target West\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"range_m\":10712.4,\"bearing\":280.0,\"ownship_position\":[-1.0,50.0],\"target_position\":[-1.15,50.0]},{\"time\":\"2024-01-15T10:01:00Z\",\"range_m\":12138.7,\"bearing\":282.0,\"ownship_position\":[-0.99,50.005],\"target_position\":[-1.16,50.005]},{\"time\":\"2024-01-15T10:02:00Z\",\"range_m\":13565.1,\"bearing\":284.0,\"ownship_position\":[-0.98,50.01],\"target_position\":[-1.17,50.01]}],\"statistics\":{\"min_range_m\":10712.4,\"max_range_m\":13565.1,\"mean_range_m\":12138.7,\"data_points\":3}}",
       "annotations": {
         "debrief:resultType": "artifact/analysis/sensor_range_plot",
-        "debrief:sourceFeatures": ["sensor-stbd-array", "track-ownship", "track-target-w"],
+        "debrief:sourceFeatures": [
+          "sensor-stbd-array",
+          "track-ownship",
+          "track-target-w"
+        ],
         "debrief:label": "Generated range plot for STBD_ARRAY vs Target West: 3 data points, range 10712-13565m",
         "debrief:href": "STBD_ARRAY-Target_West-range-plot.json"
       }

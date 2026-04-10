@@ -4,10 +4,13 @@
       "type": "resource",
       "uri": "feature://merged-sensor-001",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"merged-sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Merged Result\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"c-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":180.0,\"source_sensor\":\"Solo Sensor\"},{\"id\":\"c-002\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":182.0,\"source_sensor\":\"Solo Sensor\"}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"merged-sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Merged Result\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"c-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":180.0,\"source_sensor\":\"Solo Sensor\",\"has_bearing\":true,\"visible\":true},{\"id\":\"c-002\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":182.0,\"source_sensor\":\"Solo Sensor\",\"has_bearing\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "addition/sensor/merged",
-        "debrief:sourceFeatures": ["sensor-only", "sensor-empty"],
+        "debrief:sourceFeatures": [
+          "sensor-only",
+          "sensor-empty"
+        ],
         "debrief:label": "Merged 2 contacts from 2 sensors into Merged Result"
       }
     }

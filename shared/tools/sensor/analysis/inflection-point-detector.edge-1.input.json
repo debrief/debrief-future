@@ -11,12 +11,30 @@
           "sensor_name": "TOWED_ARRAY",
           "source_frequency_hz": 150.0,
           "residuals": [
-            {"time": "2024-01-15T10:00:00Z", "residual_hz": 0.100},
-            {"time": "2024-01-15T10:01:00Z", "residual_hz": 0.090},
-            {"time": "2024-01-15T10:02:00Z", "residual_hz": 0.078},
-            {"time": "2024-01-15T10:03:00Z", "residual_hz": 0.065},
-            {"time": "2024-01-15T10:04:00Z", "residual_hz": 0.050},
-            {"time": "2024-01-15T10:05:00Z", "residual_hz": 0.035}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "residual_hz": 0.1
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "residual_hz": 0.09
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "residual_hz": 0.078
+            },
+            {
+              "time": "2024-01-15T10:03:00Z",
+              "residual_hz": 0.065
+            },
+            {
+              "time": "2024-01-15T10:04:00Z",
+              "residual_hz": 0.05
+            },
+            {
+              "time": "2024-01-15T10:05:00Z",
+              "residual_hz": 0.035
+            }
           ]
         }
       }

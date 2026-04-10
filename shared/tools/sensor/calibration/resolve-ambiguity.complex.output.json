@@ -4,10 +4,13 @@
       "type": "resource",
       "uri": "feature://sensor-port-array",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-port-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01],[-0.97,50.015]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"PORT_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous_bearing\":315.0,\"ambiguous\":false,\"resolved_bearing\":45.0,\"frequency\":150.1,\"origin\":[-1.0,50.0]},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":47.0,\"ambiguous_bearing\":313.0,\"ambiguous\":false,\"resolved_bearing\":47.0,\"frequency\":150.2,\"origin\":[-0.99,50.005]},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":49.0,\"ambiguous\":false,\"frequency\":150.3,\"origin\":[-0.98,50.01]},{\"time\":\"2024-01-15T10:03:00Z\",\"bearing\":51.0,\"ambiguous_bearing\":309.0,\"ambiguous\":false,\"resolved_bearing\":51.0,\"frequency\":150.25,\"origin\":[-0.97,50.015]}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-port-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01],[-0.97,50.015]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"PORT_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous_bearing\":315.0,\"ambiguous\":false,\"resolved_bearing\":45.0,\"frequency\":150.1,\"origin\":[-1.0,50.0],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":47.0,\"ambiguous_bearing\":313.0,\"ambiguous\":false,\"resolved_bearing\":47.0,\"frequency\":150.2,\"origin\":[-0.99,50.005],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":49.0,\"ambiguous\":false,\"frequency\":150.3,\"origin\":[-0.98,50.01],\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:03:00Z\",\"bearing\":51.0,\"ambiguous_bearing\":309.0,\"ambiguous\":false,\"resolved_bearing\":51.0,\"frequency\":150.25,\"origin\":[-0.97,50.015],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/resolved",
-        "debrief:sourceFeatures": ["sensor-port-array", "track-target-ne"],
+        "debrief:sourceFeatures": [
+          "sensor-port-array",
+          "track-target-ne"
+        ],
         "debrief:label": "Resolved ambiguity for 3 cut(s) on PORT_ARRAY using target track Target NorthEast"
       }
     },
@@ -15,10 +18,13 @@
       "type": "resource",
       "uri": "feature://sensor-stbd-array",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-stbd-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"STBD_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":280.0,\"ambiguous_bearing\":80.0,\"ambiguous\":false,\"resolved_bearing\":280.0,\"frequency\":160.0,\"origin\":[-1.0,50.0]},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":282.0,\"ambiguous_bearing\":78.0,\"ambiguous\":false,\"resolved_bearing\":282.0,\"frequency\":160.1,\"origin\":[-0.99,50.005]},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":284.0,\"ambiguous_bearing\":76.0,\"ambiguous\":false,\"resolved_bearing\":284.0,\"frequency\":160.2,\"origin\":[-0.98,50.01]}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-stbd-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"STBD_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":280.0,\"ambiguous_bearing\":80.0,\"ambiguous\":false,\"resolved_bearing\":280.0,\"frequency\":160.0,\"origin\":[-1.0,50.0],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":282.0,\"ambiguous_bearing\":78.0,\"ambiguous\":false,\"resolved_bearing\":282.0,\"frequency\":160.1,\"origin\":[-0.99,50.005],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":284.0,\"ambiguous_bearing\":76.0,\"ambiguous\":false,\"resolved_bearing\":284.0,\"frequency\":160.2,\"origin\":[-0.98,50.01],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/resolved",
-        "debrief:sourceFeatures": ["sensor-stbd-array", "track-target-w"],
+        "debrief:sourceFeatures": [
+          "sensor-stbd-array",
+          "track-target-w"
+        ],
         "debrief:label": "Resolved ambiguity for 3 cut(s) on STBD_ARRAY using target track Target West"
       }
     }
