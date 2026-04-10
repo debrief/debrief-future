@@ -227,7 +227,7 @@ describe('ResultsPanelService — addDatasetsForToolResult (US1)', () => {
     expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
   });
 
-  it('subsequent tabs do NOT re-reveal the panel (regression guard)', () => {
+  it('subsequent tabs also call reveal() — panel may have been closed between runs', () => {
     // First tab — reveal fires.
     service.addDatasetsForToolResult({
       plotKey,
@@ -245,9 +245,9 @@ describe('ResultsPanelService — addDatasetsForToolResult (US1)', () => {
     });
     expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
 
-    // Second tab — reveal should NOT fire again.  The panel is
-    // already visible; re-focusing it would steal focus from the
-    // user's current view.
+    // Second tab — reveal fires again (panel may have been closed
+    // by the user between runs; reveal() is idempotent so it's
+    // always safe to call).
     service.addDatasetsForToolResult({
       plotKey,
       toolId: 'track-stats',
@@ -262,7 +262,7 @@ describe('ResultsPanelService — addDatasetsForToolResult (US1)', () => {
       sourceFeatureIds: ['track-2'],
       parentActivityId: 'act-2',
     });
-    expect(deps.panelView.reveal).toHaveBeenCalledTimes(1);
+    expect(deps.panelView.reveal).toHaveBeenCalledTimes(2);
     expect(service.getTabsForTest()).toHaveLength(2);
   });
 

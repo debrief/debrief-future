@@ -226,19 +226,17 @@ export class ResultsPanelService {
 
     this._activeTabId = this._tabs[this._tabs.length - 1]!.id;
 
-    if (!this._panelVisible) {
-      this._panelVisible = true;
-      this._deps.panelView.postMessage({
-        type: 'results:setVisibility',
-        payload: { visible: true },
-      });
-      // Reveal the panel view so the analyst can see the new result.
-      // On first-ever-result, this bootstraps the full webview lifecycle
-      // (panel dock → resolveWebviewView → bundle mount → webviewReady
-      // → flush queued messages).  Fire-and-forget: `reveal()` is async
-      // but we don't want to block the executeTool flow on it.
-      void this._deps.panelView.reveal();
-    }
+    // Always reveal + broadcast when new datasets arrive.  The panel
+    // may have been closed by the user (× button on the Debrief
+    // Results tab) since the last tool run, so we can't gate on
+    // `_panelVisible`.  reveal() is idempotent (just a focus command)
+    // and cheap when the panel is already visible.
+    this._panelVisible = true;
+    this._deps.panelView.postMessage({
+      type: 'results:setVisibility',
+      payload: { visible: true },
+    });
+    void this._deps.panelView.reveal();
 
     this._broadcastTabs();
   }
@@ -277,13 +275,12 @@ export class ResultsPanelService {
     this._tabs.push(tab);
     this._activeTabId = tab.id;
 
-    if (!this._panelVisible) {
-      this._panelVisible = true;
-      this._deps.panelView.postMessage({
-        type: 'results:setVisibility',
-        payload: { visible: true },
-      });
-    }
+    this._panelVisible = true;
+    this._deps.panelView.postMessage({
+      type: 'results:setVisibility',
+      payload: { visible: true },
+    });
+    void this._deps.panelView.reveal();
 
     this._broadcastTabs();
   }
@@ -360,17 +357,12 @@ export class ResultsPanelService {
     this._tabs.push(tab);
     this._activeTabId = tab.id;
 
-    if (!this._panelVisible) {
-      this._log('  panel was hidden — revealing');
-      this._panelVisible = true;
-      this._deps.panelView.postMessage({
-        type: 'results:setVisibility',
-        payload: { visible: true },
-      });
-      // Fire-and-forget bootstrap — `reveal()` executes the VS Code
-      // focus command which triggers resolveWebviewView on first call.
-      void this._deps.panelView.reveal();
-    }
+    this._panelVisible = true;
+    this._deps.panelView.postMessage({
+      type: 'results:setVisibility',
+      payload: { visible: true },
+    });
+    void this._deps.panelView.reveal();
 
     this._broadcastTabs();
     this._log(`  tabs=${this._tabs.length} active=${this._activeTabId}`);
