@@ -1,0 +1,108 @@
+{
+  "pending_sensor_data": {
+    "NELSON": [
+      {
+        "name": "TOWED_ARRAY",
+        "contacts": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "bearing": 45.0,
+            "range": 4572.0,
+            "has_ambiguous": false,
+            "has_frequency": false,
+            "origin": [
+              -21.697880555555557,
+              22.186286111111112
+            ],
+            "label": "contact_1"
+          },
+          {
+            "time": "1995-12-12T05:01:00+00:00",
+            "bearing": 50.0,
+            "range": 5029.2,
+            "has_ambiguous": false,
+            "has_frequency": false,
+            "label": "contact_2"
+          },
+          {
+            "time": "1995-12-12T05:02:00+00:00",
+            "bearing": 55.0,
+            "range": 5486.4,
+            "has_ambiguous": false,
+            "has_frequency": false,
+            "label": "contact_3"
+          }
+        ],
+        "color": "#FF0000"
+      }
+    ],
+    "NEL STYLE": [
+      {
+        "name": "HULL_SONAR",
+        "contacts": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "bearing": 90.0,
+            "range": 2743.2,
+            "has_ambiguous": false,
+            "has_frequency": false,
+            "label": "bow_contact"
+          }
+        ],
+        "color": "#FF0000"
+      }
+    ],
+    "FRIGATE": [
+      {
+        "name": "SENSOR_A",
+        "contacts": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "bearing": 32.8,
+            "range": 10972.8,
+            "ambiguous_bearing": 240.5,
+            "frequency": 169.4,
+            "label": "first contact"
+          },
+          {
+            "time": "1995-12-12T05:01:00+00:00",
+            "bearing": 35.2,
+            "range": 10515.6,
+            "has_ambiguous": false,
+            "has_frequency": false,
+            "label": "second contact"
+          },
+          {
+            "time": "1995-12-12T05:02:00+00:00",
+            "bearing": 38.0,
+            "range": 10058.4,
+            "ambiguous_bearing": 242.0,
+            "frequency": 170.0,
+            "label": "third contact"
+          }
+        ],
+        "color": "#0000FF"
+      }
+    ]
+  },
+  "features_summary": [
+    {
+      "kind": "TRACK",
+      "id": "6cb46440"
+    },
+    {
+      "kind": "TRACK",
+      "id": "3747f95a"
+    },
+    {
+      "kind": "DYNAMIC_TRACK_COVERAGE",
+      "id": "13fe54db"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "ORPHANED_SENSOR",
+      "message": "Sensor data references track 'NEL STYLE' which has no position data in this file"
+    }
+  ]
+}

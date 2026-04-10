@@ -39,7 +39,7 @@ class TestDSFParsing:
         assert len(result.pending_sensor_data) > 0
         # Count total contacts across all tracks/sensors
         total_contacts = sum(
-            len(s["contacts"]) for sensors in result.pending_sensor_data.values() for s in sensors
+            len(s.contacts) for sensors in result.pending_sensor_data.values() for s in sensors
         )
         assert total_contacts == 4  # 3 SENSOR2 + 1 SENSOR
 
@@ -52,11 +52,11 @@ class TestDSFParsing:
         assert "FRIGATE" in result.pending_sensor_data
         sensors = result.pending_sensor_data["FRIGATE"]
         assert len(sensors) == 1
-        assert sensors[0]["name"] == "SENSOR_A"
-        contact = sensors[0]["contacts"][0]
-        assert contact["bearing"] == 32.8
-        assert contact["range"] == 12000.0
-        assert contact["frequency"] == 150.0
+        assert sensors[0].name == "SENSOR_A"
+        contact = sensors[0].contacts[0]
+        assert contact.bearing == 32.8
+        assert contact.range == 12000.0
+        assert contact.frequency == 150.0
 
     def test_sensor2_with_quoted_track(self) -> None:
         handler = DSFHandler()
@@ -67,11 +67,11 @@ class TestDSFParsing:
         assert "OS" in result.pending_sensor_data
         sensors = result.pending_sensor_data["OS"]
         assert len(sensors) == 1
-        assert sensors[0]["name"] == "FS"
-        contact = sensors[0]["contacts"][0]
-        assert contact["bearing"] == 221.5
-        assert "range" not in contact  # NULL
-        assert "frequency" not in contact  # NULL
+        assert sensors[0].name == "FS"
+        contact = sensors[0].contacts[0]
+        assert contact.bearing == 221.5
+        assert contact.range is None  # NULL
+        assert contact.frequency is None  # NULL
 
     def test_sensor_with_null_position(self) -> None:
         handler = DSFHandler()
@@ -82,8 +82,8 @@ class TestDSFParsing:
 
         assert len(result.features) == 0
         assert "SUBMARINE" in result.pending_sensor_data
-        contact = result.pending_sensor_data["SUBMARINE"][0]["contacts"][0]
-        assert contact["bearing"] == 180.5
+        contact = result.pending_sensor_data["SUBMARINE"][0].contacts[0]
+        assert contact.bearing == 180.5
 
     def test_sensor_with_coordinates(self) -> None:
         handler = DSFHandler()
@@ -129,9 +129,9 @@ class TestDSFParsing:
         content = ";SENSOR2: 951212 055200.000 SUB @B NULL 180.5 NULL NULL NULL TA label\n"
         result = handler.parse(content, "test.dsf")
 
-        contact = result.pending_sensor_data["SUB"][0]["contacts"][0]
-        assert "range" not in contact
-        assert "frequency" not in contact
+        contact = result.pending_sensor_data["SUB"][0].contacts[0]
+        assert contact.range is None
+        assert contact.frequency is None
 
 
 class TestDSFRegistration:

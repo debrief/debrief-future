@@ -30,6 +30,14 @@ from typing import Any
 
 from debrief_io.handlers.annotations.parser import is_annotation_line, parse_annotations
 from debrief_io.handlers.base import BaseHandler
+from debrief_io.handlers.sensor_parser import (
+    group_sensor_contacts,
+    is_sensor_line,
+    parse_sensor_v1,
+    parse_sensor_v2,
+    parse_sensor_v3,
+    parse_sensorarc,
+)
 from debrief_io.models import ParseResult, ParseWarning
 from debrief_io.symbology import get_color
 
@@ -301,6 +309,8 @@ class REPHandler(BaseHandler):
         warnings: list[ParseWarning] = []
         tracks: dict[str, TrackBuilder] = {}
         annotation_lines: list[tuple[int, str]] = []
+        sensor_contacts: list = []  # ParsedSensorContact records
+        sensorarc_features: list[dict[str, Any]] = []
 
         lines = content.splitlines()
 
@@ -309,9 +319,29 @@ class REPHandler(BaseHandler):
             if not line.strip():
                 continue
 
-            # Check for annotation lines (special comments like ;NARRATIVE:, ;CIRCLE:, etc.)
+            # Check for sensor and annotation lines
             if line.strip().startswith(";"):
-                if is_annotation_line(line):
+                stripped = line.strip()
+                # Intercept sensor lines before annotation parser (#117)
+                if is_sensor_line(stripped):
+                    upper = stripped.upper()
+                    if upper.startswith(";SENSOR3:"):
+                        record = parse_sensor_v3(stripped, line_num)
+                        if record:
+                            sensor_contacts.append(record)
+                    elif upper.startswith(";SENSOR2:"):
+                        record = parse_sensor_v2(stripped, line_num)
+                        if record:
+                            sensor_contacts.append(record)
+                    elif upper.startswith(";SENSORARC"):
+                        feature = parse_sensorarc(stripped, line_num)
+                        if feature:
+                            sensorarc_features.append(feature)
+                    elif upper.startswith(";SENSOR:"):
+                        record = parse_sensor_v1(stripped, line_num)
+                        if record:
+                            sensor_contacts.append(record)
+                elif is_annotation_line(line):
                     annotation_lines.append((line_num, line))
                 # Skip all comment lines for track parsing
                 continue
@@ -357,6 +387,23 @@ class REPHandler(BaseHandler):
             annotation_features = parse_annotations(annotation_lines, source_file)
             features.extend(annotation_features)
 
+        # Add SENSORARC features (standalone DynamicTrackCoverage annotations)
+        features.extend(sensorarc_features)
+
+        # Group sensor contacts into pending_sensor_data keyed by parent track
+        pending_sensor_data = {}
+        if sensor_contacts:
+            pending_sensor_data = group_sensor_contacts(sensor_contacts)
+            # Emit warnings for orphaned sensor data (track not in this file)
+            for track_name in pending_sensor_data:
+                if track_name not in tracks:
+                    warnings.append(
+                        ParseWarning(
+                            message=f"Sensor data references track '{track_name}' which has no position data in this file",
+                            code="ORPHANED_SENSOR",
+                        )
+                    )
+
         elapsed_ms = (time.perf_counter() - start_time) * 1000
 
         return ParseResult(
@@ -367,6 +414,7 @@ class REPHandler(BaseHandler):
             parse_time_ms=elapsed_ms,
             handler=self.name,
             handler_version=self.version,
+            pending_sensor_data=pending_sensor_data,
         )
 
     def _parse_position(self, match: re.Match[str], line_number: int) -> ParsedPosition | None:

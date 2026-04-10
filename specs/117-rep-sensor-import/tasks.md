@@ -47,10 +47,10 @@
 
 **Purpose**: Create the new sensor_parser module, test fixtures, and test file scaffolding
 
-- [ ] T001 Create sensor parser module with dataclass and constants `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T002 [P] Create test fixture with all 4 sensor formats `services/io/tests/fixtures/valid/sensor_all_formats.rep`
-- [ ] T003 [P] Create test fixture for edge cases (NULL/NAN bearings, quoted names, 360 bearing, zero range) `services/io/tests/fixtures/valid/sensor_edge_cases.rep`
-- [ ] T004 [P] Create sensor parser unit test file with imports and fixture loading `services/io/tests/test_sensor_parser.py`
+- [x] T001 Create sensor parser module with dataclass and constants `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T002 [P] Create test fixture with all 4 sensor formats `services/io/tests/fixtures/valid/sensor_all_formats.rep`
+- [x] T003 [P] Create test fixture for edge cases (NULL/NAN bearings, quoted names, 360 bearing, zero range) `services/io/tests/fixtures/valid/sensor_edge_cases.rep`
+- [x] T004 [P] Create sensor parser unit test file with imports and fixture loading `services/io/tests/test_sensor_parser.py`
 
 ---
 
@@ -62,17 +62,17 @@
 
 ### Tests for User Story 6
 
-- [ ] T005 [test] Write test: REP parse produces no standalone SENSOR/SENSOR_CONTACT features `services/io/tests/test_rep_handler.py`
-- [ ] T006 [P][test] Write test: sensor lines populate pending_sensor_data on ParseResult `services/io/tests/test_rep_handler.py`
-- [ ] T007 [P][test] Write test: orphaned sensor data (track not in file) emits warning and retains data `services/io/tests/test_rep_handler.py`
+- [x] T005 [test] Write test: REP parse produces no standalone SENSOR/SENSOR_CONTACT features `services/io/tests/test_rep_handler.py`
+- [x] T006 [P][test] Write test: sensor lines populate pending_sensor_data on ParseResult `services/io/tests/test_rep_handler.py`
+- [x] T007 [P][test] Write test: orphaned sensor data (track not in file) emits warning and retains data `services/io/tests/test_rep_handler.py`
 
 ### Implementation for User Story 6
 
-- [ ] T008 Add `is_sensor_line()` function to sensor_parser module `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T009 Remove SENSOR/SENSOR2 from annotation parser ANNOTATION_PREFIXES `services/io/src/debrief_io/handlers/annotations/parser.py`
-- [ ] T010 Modify REP handler parse loop to intercept sensor lines before annotation delegation `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T011 Add sensor contact collection and `group_sensor_contacts()` call to REP handler `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T012 Wire `pending_sensor_data` into ParseResult and emit ORPHANED_SENSOR warnings `services/io/src/debrief_io/handlers/rep.py`
+- [x] T008 Add `is_sensor_line()` function to sensor_parser module `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T009 Remove SENSOR/SENSOR2 from annotation parser ANNOTATION_PREFIXES `services/io/src/debrief_io/handlers/annotations/parser.py`
+- [x] T010 Modify REP handler parse loop to intercept sensor lines before annotation delegation `services/io/src/debrief_io/handlers/rep.py`
+- [x] T011 Add sensor contact collection and `group_sensor_contacts()` call to REP handler `services/io/src/debrief_io/handlers/rep.py`
+- [x] T012 Wire `pending_sensor_data` into ParseResult and emit ORPHANED_SENSOR warnings `services/io/src/debrief_io/handlers/rep.py`
 
 **Checkpoint**: Sensor lines are intercepted by the REP handler, no standalone sensor features are produced. Pipeline wiring complete. Individual parser functions can now be implemented.
 
@@ -86,21 +86,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T013 [test] Write test: parse_sensor_v1 extracts all fields from a valid line `services/io/tests/test_sensor_parser.py`
-- [ ] T014 [P][test] Write test: parse_sensor_v1 handles quoted track name `services/io/tests/test_sensor_parser.py`
-- [ ] T015 [P][test] Write test: parse_sensor_v1 handles NULL location (origin is None) `services/io/tests/test_sensor_parser.py`
-- [ ] T016 [P][test] Write test: parse_sensor_v1 handles explicit DMS location (origin is [lon, lat]) `services/io/tests/test_sensor_parser.py`
-- [ ] T017 [P][test] Write test: range conversion from yards to metres (5000 yds -> 4572.0 m) `services/io/tests/test_sensor_parser.py`
-- [ ] T018 [P][test] Write test: symbology code @C produces correct CSS hex color `services/io/tests/test_sensor_parser.py`
-- [ ] T019 [P][test] Write test: contacts with same sensor name merge into single SensorData entry `services/io/tests/test_sensor_parser.py`
-- [ ] T020 [P][test] Write test: contacts within SensorData are ordered by timestamp `services/io/tests/test_sensor_parser.py`
+- [x] T013 [test] Write test: parse_sensor_v1 extracts all fields from a valid line `services/io/tests/test_sensor_parser.py`
+- [x] T014 [P][test] Write test: parse_sensor_v1 handles quoted track name `services/io/tests/test_sensor_parser.py`
+- [x] T015 [P][test] Write test: parse_sensor_v1 handles NULL location (origin is None) `services/io/tests/test_sensor_parser.py`
+- [x] T016 [P][test] Write test: parse_sensor_v1 handles explicit DMS location (origin is [lon, lat]) `services/io/tests/test_sensor_parser.py`
+- [x] T017 [P][test] Write test: range conversion from yards to metres (5000 yds -> 4572.0 m) `services/io/tests/test_sensor_parser.py`
+- [x] T018 [P][test] Write test: symbology code @C produces correct CSS hex color `services/io/tests/test_sensor_parser.py`
+- [x] T019 [P][test] Write test: contacts with same sensor name merge into single SensorData entry `services/io/tests/test_sensor_parser.py`
+- [x] T020 [P][test] Write test: contacts within SensorData are ordered by timestamp `services/io/tests/test_sensor_parser.py`
 
 ### Implementation for User Story 1
 
-- [ ] T021 Implement `parse_sensor_v1()` function with field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T022 Implement `group_sensor_contacts()` function to group ParsedSensorContacts into SensorData dicts `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T023 Wire parse_sensor_v1 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T024 [test] Write integration test: full REP parse with SENSOR v1 lines produces correct embedded sensors `services/io/tests/test_rep_handler.py`
+- [x] T021 Implement `parse_sensor_v1()` function with field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T022 Implement `group_sensor_contacts()` function to group ParsedSensorContacts into SensorData dicts `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T023 Wire parse_sensor_v1 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
+- [x] T024 [test] Write integration test: full REP parse with SENSOR v1 lines produces correct embedded sensors `services/io/tests/test_rep_handler.py`
 
 **Checkpoint**: SENSOR v1 lines are parsed and embedded in TrackFeature.properties.sensors[]. Core pipeline is proven end-to-end.
 
@@ -114,14 +114,14 @@
 
 ### Tests for User Story 5
 
-- [ ] T025 [test] Write test: bearing "NULL" produces has_bearing=false, bearing=0 `services/io/tests/test_sensor_parser.py`
-- [ ] T026 [P][test] Write test: bearing "NAN" produces has_bearing=false, bearing=0 `services/io/tests/test_sensor_parser.py`
-- [ ] T027 [P][test] Write test: bearing 0.0 (true north) produces has_bearing=true, bearing=0.0 `services/io/tests/test_sensor_parser.py`
+- [x] T025 [test] Write test: bearing "NULL" produces has_bearing=false, bearing=0 `services/io/tests/test_sensor_parser.py`
+- [x] T026 [P][test] Write test: bearing "NAN" produces has_bearing=false, bearing=0 `services/io/tests/test_sensor_parser.py`
+- [x] T027 [P][test] Write test: bearing 0.0 (true north) produces has_bearing=true, bearing=0.0 `services/io/tests/test_sensor_parser.py`
 
 ### Implementation for User Story 5
 
-- [ ] T028 Add NULL/NAN bearing detection and has_bearing flag logic to parse_sensor_v1 `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T029 Add bearing 360 normalisation (360 is valid, equivalent to 0) `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T028 Add NULL/NAN bearing detection and has_bearing flag logic to parse_sensor_v1 `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T029 Add bearing 360 normalisation (360 is valid, equivalent to 0) `services/io/src/debrief_io/handlers/sensor_parser.py`
 
 **Checkpoint**: NULL/NAN bearing values are correctly handled. Frequency-only contacts produce valid SensorContact dicts.
 
@@ -135,16 +135,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T030 [test] Write test: parse_sensor_v2 extracts ambiguous_bearing and frequency `services/io/tests/test_sensor_parser.py`
-- [ ] T031 [P][test] Write test: parse_sensor_v2 with NULL ambiguous bearing sets has_ambiguous=false `services/io/tests/test_sensor_parser.py`
-- [ ] T032 [P][test] Write test: parse_sensor_v2 with NULL frequency sets has_frequency=false `services/io/tests/test_sensor_parser.py`
-- [ ] T033 [P][test] Write test: multiple SENSOR2 contacts merge into one SensorData entry `services/io/tests/test_sensor_parser.py`
+- [x] T030 [test] Write test: parse_sensor_v2 extracts ambiguous_bearing and frequency `services/io/tests/test_sensor_parser.py`
+- [x] T031 [P][test] Write test: parse_sensor_v2 with NULL ambiguous bearing sets has_ambiguous=false `services/io/tests/test_sensor_parser.py`
+- [x] T032 [P][test] Write test: parse_sensor_v2 with NULL frequency sets has_frequency=false `services/io/tests/test_sensor_parser.py`
+- [x] T033 [P][test] Write test: multiple SENSOR2 contacts merge into one SensorData entry `services/io/tests/test_sensor_parser.py`
 
 ### Implementation for User Story 2
 
-- [ ] T034 Implement `parse_sensor_v2()` function with v2 field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T035 Wire parse_sensor_v2 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T036 [test] Write integration test: SENSOR2 lines produce correct embedded sensor data with boolean flags `services/io/tests/test_rep_handler.py`
+- [x] T034 Implement `parse_sensor_v2()` function with v2 field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T035 Wire parse_sensor_v2 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
+- [x] T036 [test] Write integration test: SENSOR2 lines produce correct embedded sensor data with boolean flags `services/io/tests/test_rep_handler.py`
 
 **Checkpoint**: SENSOR2 lines produce contacts with ambiguous bearing and frequency data. Boolean flags are correctly set.
 
@@ -158,15 +158,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T037 [test] Write test: parse_sensor_v3 extracts all SENSOR2-equivalent fields correctly `services/io/tests/test_sensor_parser.py`
-- [ ] T038 [P][test] Write test: parse_sensor_v3 silently discards bearing accuracy and frequency accuracy `services/io/tests/test_sensor_parser.py`
-- [ ] T039 [P][test] Write test: mixed SENSOR/SENSOR2/SENSOR3 lines merge into single SensorData `services/io/tests/test_sensor_parser.py`
+- [x] T037 [test] Write test: parse_sensor_v3 extracts all SENSOR2-equivalent fields correctly `services/io/tests/test_sensor_parser.py`
+- [x] T038 [P][test] Write test: parse_sensor_v3 silently discards bearing accuracy and frequency accuracy `services/io/tests/test_sensor_parser.py`
+- [x] T039 [P][test] Write test: mixed SENSOR/SENSOR2/SENSOR3 lines merge into single SensorData `services/io/tests/test_sensor_parser.py`
 
 ### Implementation for User Story 3
 
-- [ ] T040 Implement `parse_sensor_v3()` function with v3 field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T041 Wire parse_sensor_v3 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T042 [test] Write integration test: SENSOR3 lines in mixed-format REP file produce correct output `services/io/tests/test_rep_handler.py`
+- [x] T040 Implement `parse_sensor_v3()` function with v3 field extraction per contract `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T041 Wire parse_sensor_v3 into REP handler's sensor line interception loop `services/io/src/debrief_io/handlers/rep.py`
+- [x] T042 [test] Write integration test: SENSOR3 lines in mixed-format REP file produce correct output `services/io/tests/test_rep_handler.py`
 
 **Checkpoint**: SENSOR3 lines are parsed without errors. Accuracy fields are silently discarded. All three SENSOR formats can coexist in the same file.
 
@@ -180,15 +180,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T043 [test] Write test: parse_sensorarc extracts all fields correctly `services/io/tests/test_sensor_parser.py`
-- [ ] T044 [P][test] Write test: SENSORARC produces DynamicTrackCoverage feature, not SensorContact `services/io/tests/test_sensor_parser.py`
-- [ ] T045 [P][test] Write test: SENSORARC track_id correctly associates with parent track `services/io/tests/test_sensor_parser.py`
+- [x] T043 [test] Write test: parse_sensorarc extracts all fields correctly `services/io/tests/test_sensor_parser.py`
+- [x] T044 [P][test] Write test: SENSORARC produces DynamicTrackCoverage feature, not SensorContact `services/io/tests/test_sensor_parser.py`
+- [x] T045 [P][test] Write test: SENSORARC track_id correctly associates with parent track `services/io/tests/test_sensor_parser.py`
 
 ### Implementation for User Story 4
 
-- [ ] T046 Implement `parse_sensorarc()` function returning GeoJSON feature dict `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T047 Wire parse_sensorarc into REP handler and add DynamicTrackCoverage features to output `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T048 [test] Write integration test: SENSORARC lines in REP file produce coverage annotations alongside embedded sensors `services/io/tests/test_rep_handler.py`
+- [x] T046 Implement `parse_sensorarc()` function returning GeoJSON feature dict `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T047 Wire parse_sensorarc into REP handler and add DynamicTrackCoverage features to output `services/io/src/debrief_io/handlers/rep.py`
+- [x] T048 [test] Write integration test: SENSORARC lines in REP file produce coverage annotations alongside embedded sensors `services/io/tests/test_rep_handler.py`
 
 **Checkpoint**: All four sensor formats are fully parsed. SENSORARC produces standalone annotation features. SENSOR v1/v2/v3 produce embedded sensor data.
 
@@ -200,27 +200,27 @@
 
 ### Hardening
 
-- [ ] T049 Add malformed line handling with warnings (missing fields, invalid timestamps, empty sensor name) `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T050 [P][test] Write edge case tests: malformed lines, missing fields, bearing=360, zero range, degenerate SENSORARC `services/io/tests/test_sensor_parser.py`
-- [ ] T051 [P][test] Write performance test: 10,000-line REP file with mixed sensor formats parses in under 1 second (SC-008) `services/io/tests/test_sensor_parser.py`
-- [ ] T052 Add provenance recording (source file + line number) to parsed sensor contacts `services/io/src/debrief_io/handlers/sensor_parser.py`
-- [ ] T053 Run quickstart.md validation against implementation `specs/117-rep-sensor-import/quickstart.md`
+- [x] T049 Add malformed line handling with warnings (missing fields, invalid timestamps, empty sensor name) `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T050 [P][test] Write edge case tests: malformed lines, missing fields, bearing=360, zero range, degenerate SENSORARC `services/io/tests/test_sensor_parser.py`
+- [x] T051 [P][test] Write performance test: 10,000-line REP file with mixed sensor formats parses in under 1 second (SC-008) `services/io/tests/test_sensor_parser.py`
+- [x] T052 Add provenance recording (source file + line number) to parsed sensor contacts `services/io/src/debrief_io/handlers/sensor_parser.py`
+- [x] T053 Run quickstart.md validation against implementation `specs/117-rep-sensor-import/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T054 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/117-rep-sensor-import/evidence/test-summary.md`
-- [ ] T055 Create usage demonstration `specs/117-rep-sensor-import/evidence/usage-example.md`
-- [ ] T056 [P] Capture sample input REP file `specs/117-rep-sensor-import/evidence/sample-input.rep`
-- [ ] T057 [P] Capture parsed output JSON showing embedded sensors `specs/117-rep-sensor-import/evidence/parsed-output.json`
+- [x] T054 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/117-rep-sensor-import/evidence/test-summary.md`
+- [x] T055 Create usage demonstration `specs/117-rep-sensor-import/evidence/usage-example.md`
+- [x] T056 [P] Capture sample input REP file `specs/117-rep-sensor-import/evidence/sample-input.rep`
+- [x] T057 [P] Capture parsed output JSON showing embedded sensors `specs/117-rep-sensor-import/evidence/parsed-output.json`
 
 ### Media Content
 
-- [ ] T058 Create shipped blog post `specs/117-rep-sensor-import/media/shipped-post.md`
-- [ ] T059 [P] Create LinkedIn shipped summary `specs/117-rep-sensor-import/media/linkedin-shipped.md`
+- [x] T058 Create shipped blog post `specs/117-rep-sensor-import/media/shipped-post.md`
+- [x] T059 [P] Create LinkedIn shipped summary `specs/117-rep-sensor-import/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T060 Create PR and publish blog: run /speckit.pr
+- [x] T060 Create PR and publish blog: run /speckit.pr
 
 **Task T060 must run last. It depends on all evidence and media tasks being complete.**
 

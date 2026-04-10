@@ -17,6 +17,7 @@ from typing import Any
 
 from debrief_io.models import ImportFileError, ImportResult, ImportWarning
 from debrief_io.parser import parse
+from debrief_schemas import SensorData  # noqa: TC001 — runtime model_dump()
 
 logger = logging.getLogger(__name__)
 
@@ -187,14 +188,15 @@ def _count_feature_kinds(features: list[dict[str, Any]]) -> tuple[int, int, int]
 
 def _merge_deferred_sensors(
     catalog_path: Path,
-    deferred_sensors: dict[str, list[tuple[str, list[dict[str, Any]]]]],
+    deferred_sensors: dict[str, list[tuple[str, list[SensorData]]]],
     result: ImportResult,
 ) -> None:
-    """Merge deferred DSF sensor data into companion track features.
+    """Merge deferred sensor data into companion track features.
 
     For each parent_track name, find the track feature in the catalog
     with matching platform_id and embed the sensor data into its
-    properties.sensors array.
+    properties.sensors array. SensorData models are serialised to dicts
+    for JSON storage.
     """
     import json
 
@@ -244,15 +246,16 @@ def _merge_deferred_sensors(
         # Merge all sensor entries for this track
         for _file_rel, sensor_list in sensor_entries:
             for sensor_data in sensor_list:
+                sd_dict = sensor_data.model_dump(exclude_none=True, mode="json")
                 # Check if a sensor with this name already exists
                 existing = next(
-                    (s for s in existing_sensors if s["name"] == sensor_data["name"]),
+                    (s for s in existing_sensors if s["name"] == sd_dict["name"]),
                     None,
                 )
                 if existing is not None:
-                    existing["contacts"].extend(sensor_data["contacts"])
+                    existing["contacts"].extend(sd_dict["contacts"])
                 else:
-                    existing_sensors.append(sensor_data)
+                    existing_sensors.append(sd_dict)
 
         track_feature["properties"]["sensors"] = existing_sensors
         fc["features"][feat_idx] = track_feature
@@ -320,7 +323,7 @@ def import_legacy_data(
     # Deferred sensor data from DSF files, keyed by parent track name.
     # After all files are imported, we merge these into companion tracks.
     # Structure: {parent_track_name: [(source_file_rel, [SensorData, ...]), ...]}
-    deferred_sensors: dict[str, list[tuple[str, list[dict[str, Any]]]]] = {}
+    deferred_sensors: dict[str, list[tuple[str, list[SensorData]]]] = {}
 
     for source_file in source_files:
         result.files_processed += 1
@@ -337,7 +340,7 @@ def import_legacy_data(
             # Defer DSF sensor data for later merging into companion tracks
             if parse_result.pending_sensor_data:
                 for track_name, sensor_list in parse_result.pending_sensor_data.items():
-                    contact_count = sum(len(s["contacts"]) for s in sensor_list)
+                    contact_count = sum(len(s.contacts) for s in sensor_list)
                     result.total_sensors += contact_count
                     deferred_sensors.setdefault(track_name, []).append((file_rel, sensor_list))
 
