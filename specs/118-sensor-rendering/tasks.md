@@ -245,8 +245,8 @@
 
 ### Media Content
 
-- [ ] T070 Create shipped blog post `specs/118-sensor-rendering/media/shipped-post.md`
-- [ ] T071 [P] Create LinkedIn shipped summary `specs/118-sensor-rendering/media/linkedin-shipped.md`
+- [x] T070 Create shipped blog post `specs/118-sensor-rendering/media/shipped-post.md`
+- [x] T071 [P] Create LinkedIn shipped summary `specs/118-sensor-rendering/media/linkedin-shipped.md`
 
 ### PR Creation
 
