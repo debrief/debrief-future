@@ -9,6 +9,7 @@ import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
 import { extractParameters } from '@debrief/components';
 import type { SafeFeature } from '@debrief/utils';
+import { synthesizeTableDataset } from '@debrief/utils';
 import { listTools, executeTool } from '../services/toolService';
 
 /** Feature with properties containing an id */
@@ -475,32 +476,28 @@ export function createMockCalcService(): MockCalcService {
                       .join('\n');
                     displayMessage = `${String(props['name'] ?? label)}\n${lines}`;
 
-                    // Synthesize a table dataset from statistics (#177)
+                    // Synthesize a table dataset from statistics (#177 / #178)
                     // This handles Python MCP tools that return properties.statistics
-                    // but no __datasets array.
+                    // but no __datasets array.  Extracted into the shared
+                    // synthesizeTableDataset() utility in #178 so the VS Code
+                    // extension host can reuse the same logic without forking.
                     if (!props['__datasets']) {
-                      const srcNames = (selectedFeatures
-                        .map(sf => String(sf.properties?.['name'] ?? sf.id ?? 'feature'))
-                        .map(n => n.toLowerCase().replace(/\s+/g, '-'))
-                        .join('-'));
-                      datasets.push({
-                        filename: `${toolId}-${srcNames}.dataset.json`,
-                        envelope: {
-                          type: `${toolId}_statistics`,
-                          title: String(props['name'] ?? `${label} Results`),
-                          displayHint: 'table',
-                          metadata: {
-                            xAxis: { label: 'Metric', type: 'nominal' },
-                            yAxis: { label: 'Value', type: 'quantitative' },
-                          },
-                          data: Object.entries(stats)
-                            .filter(([, v]) => typeof v === 'number' || typeof v === 'string')
-                            .map(([key, val]) => ({
-                              metric: key.replace(/_/g, ' '),
-                              value: val,
-                            })),
-                        },
-                      });
+                      const sourceLabel = String(label);
+                      const envelope = synthesizeTableDataset(
+                        toolId,
+                        props,
+                        sourceLabel,
+                      );
+                      if (envelope) {
+                        const srcNames = (selectedFeatures
+                          .map(sf => String(sf.properties?.['name'] ?? sf.id ?? 'feature'))
+                          .map(n => n.toLowerCase().replace(/\s+/g, '-'))
+                          .join('-'));
+                        datasets.push({
+                          filename: `${toolId}-${srcNames}.dataset.json`,
+                          envelope: envelope as unknown as Record<string, unknown>,
+                        });
+                      }
                     }
                   }
                 }

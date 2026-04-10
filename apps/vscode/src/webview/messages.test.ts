@@ -92,3 +92,90 @@ describe('Exercise List View Messages', () => {
     expect(msg.type).toBe('exerciseListReady');
   });
 });
+
+describe('Results Panel Messages (#178)', () => {
+  it('ResultsSetTabsMessage round-trips through JSON', () => {
+    const msg: import('./messages').ResultsSetTabsMessage = {
+      type: 'results:setTabs',
+      payload: {
+        tabs: [
+          {
+            id: 'tab-1',
+            title: 'Track Stats',
+            toolId: 'track-stats',
+            displayHint: 'table',
+            tableData: [{ metric: 'speed', value: 12.5 }],
+            isSaved: false,
+          },
+        ],
+        activeTabId: 'tab-1',
+      },
+    };
+    const round = JSON.parse(
+      JSON.stringify(msg),
+    ) as typeof msg;
+    expect(round.type).toBe('results:setTabs');
+    expect(round.payload.tabs).toHaveLength(1);
+    expect(round.payload.tabs[0]!.id).toBe('tab-1');
+    expect(round.payload.activeTabId).toBe('tab-1');
+  });
+
+  it('ResultsSetVisibilityMessage discriminates by type', () => {
+    const msg: import('./messages').ResultsSetVisibilityMessage = {
+      type: 'results:setVisibility',
+      payload: { visible: true },
+    };
+    expect(msg.type).toBe('results:setVisibility');
+    expect(msg.payload.visible).toBe(true);
+  });
+
+  it('ResultsSetLoadingMessage discriminates by type', () => {
+    const msg: import('./messages').ResultsSetLoadingMessage = {
+      type: 'results:setLoading',
+      payload: { tabId: 'tab-1', isLoading: true },
+    };
+    expect(msg.type).toBe('results:setLoading');
+  });
+
+  it('ResultsWebviewReadyMessage discriminates by type', () => {
+    const msg: import('./messages').ResultsWebviewReadyMessage = {
+      type: 'results:webviewReady',
+    };
+    expect(msg.type).toBe('results:webviewReady');
+  });
+
+  it('ResultsSaveMessage round-trips through JSON', () => {
+    const msg: import('./messages').ResultsSaveMessage = {
+      type: 'results:save',
+      payload: { tabId: 'tab-1' },
+    };
+    const round = JSON.parse(JSON.stringify(msg)) as typeof msg;
+    expect(round.type).toBe('results:save');
+    expect(round.payload.tabId).toBe('tab-1');
+  });
+
+  it('ResultsSaveAsMessage carries baseName and optional tag', () => {
+    const msg: import('./messages').ResultsSaveAsMessage = {
+      type: 'results:saveAs',
+      payload: { tabId: 'tab-1', baseName: 'my-stats', tag: 'v2' },
+    };
+    expect(msg.payload.baseName).toBe('my-stats');
+    expect(msg.payload.tag).toBe('v2');
+  });
+
+  it('ResultsRetryMessage discriminates by type', () => {
+    const msg: import('./messages').ResultsRetryMessage = {
+      type: 'results:retry',
+      payload: { tabId: 'tab-1' },
+    };
+    expect(msg.type).toBe('results:retry');
+  });
+
+  it('ResultsCloseTabMessage discriminates by type', () => {
+    const msg: import('./messages').ResultsCloseTabMessage = {
+      type: 'results:closeTab',
+      payload: { tabId: 'tab-1' },
+    };
+    expect(msg.type).toBe('results:closeTab');
+  });
+});

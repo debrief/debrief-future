@@ -19,6 +19,7 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogPanelViewProvider } from '../views/logPanelView';
+import type { ResultsPanelService } from '../services/resultsPanelService';
 import type { MapPanel } from '../webview/mapPanel';
 
 import { createOpenPlotCommand } from './openPlot';
@@ -56,7 +57,8 @@ export function registerCommands(
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
   resultIdRegistry?: ResultIdRegistry,
-  logPanelProvider?: LogPanelViewProvider
+  logPanelProvider?: LogPanelViewProvider,
+  resultsPanelService?: ResultsPanelService
 ): vscode.Disposable[] {
   const disposables: vscode.Disposable[] = [];
 
@@ -186,7 +188,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider, undefined, resultIdRegistry, logPanelProvider)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider, undefined, resultIdRegistry, logPanelProvider, resultsPanelService)
     )
   );
 

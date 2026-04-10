@@ -25,7 +25,8 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-import type { AssociatedFile } from '../services/stacService';
+import type { AssociatedFile, StacService } from '../services/stacService';
+import type { ResultsPanelService } from '../services/resultsPanelService';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -72,6 +73,14 @@ interface LayerFormatMessage {
   payload: { featureIds: string[]; property: string; value: string | number | boolean };
 }
 
+interface FileActionMessage {
+  type: 'file:action';
+  payload: {
+    file: AssociatedFile;
+    action: 'open' | 'openWith' | 'reveal' | 'delete';
+  };
+}
+
 interface WebviewReadyMessage {
   type: 'webviewReady';
 }
@@ -86,6 +95,7 @@ type WebviewMessage =
   | LayerDeleteMessage
   | LayerSelectMessage
   | LayerFormatMessage
+  | FileActionMessage
   | WebviewReadyMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
@@ -113,6 +123,13 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   // undefined = not checked yet (loading), true = available, false = unavailable
   private _calcAvailable: boolean | undefined = undefined;
 
+  // Feature: 178-vscode-tabular-results — lazy-wired references used by
+  // the Associated Files dropdown file-action handler.  These are set via
+  // `setFileActionServices` after construction to avoid a circular dep.
+  private _stacService?: StacService;
+  private _resultsPanelService?: ResultsPanelService;
+  private _getCurrentPlotKey?: () => { storePath: string; itemPath: string } | undefined;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
@@ -125,6 +142,22 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     this._sessionChangeDisposable = this._sessionManager.onActiveSessionChange((session) =>
       this._handleActiveSessionChange(session)
     );
+  }
+
+  /**
+   * Wire the services needed by the Associated Files dropdown action
+   * handler (Feature: 178-vscode-tabular-results — FR-015 … FR-018).
+   *
+   * Called from `extension.ts` after the ResultsPanelService is created.
+   */
+  public setFileActionServices(
+    stacService: StacService,
+    resultsPanelService: ResultsPanelService,
+    getCurrentPlotKey: () => { storePath: string; itemPath: string } | undefined,
+  ): void {
+    this._stacService = stacService;
+    this._resultsPanelService = resultsPanelService;
+    this._getCurrentPlotKey = getCurrentPlotKey;
   }
 
   /**
@@ -480,8 +513,107 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             value: message.payload.value,
           });
           break;
+
+        case 'file:action':
+          // Feature: 178-vscode-tabular-results — Open / Reveal / OpenWith / Delete
+          void this._handleFileAction(
+            message.payload.file,
+            message.payload.action,
+          );
+          break;
       }
     });
+  }
+
+  /**
+   * Handle an Associated Files dropdown action.
+   *
+   * - `open`     — reopen a saved CSV as a new tab in the Results panel
+   * - `reveal`   — reveal the file in VS Code's Explorer view
+   * - `openWith` — show VS Code's editor picker
+   * - `delete`   — confirm, then unregister the STAC asset and delete the file
+   */
+  private async _handleFileAction(
+    file: AssociatedFile,
+    action: 'open' | 'openWith' | 'reveal' | 'delete',
+  ): Promise<void> {
+    const plotKey = this._getCurrentPlotKey?.();
+    if (!plotKey) {
+      return;
+    }
+
+    // All four actions reference the file via the fully-resolved filesystem path.
+    const absolutePath = `${plotKey.storePath}/${plotKey.itemPath.replace(/[^/]+$/, '')}${file.path}`;
+
+    switch (action) {
+      case 'open': {
+        // Reopen the CSV as a Results panel tab via the service.
+        if (this._resultsPanelService) {
+          const lastSlash = file.path.lastIndexOf('/');
+          const filename = lastSlash >= 0 ? file.path.slice(lastSlash + 1) : file.path;
+          await this._resultsPanelService.openSavedFile({
+            plotKey,
+            assetFilename: filename,
+          });
+        }
+        break;
+      }
+      case 'reveal': {
+        try {
+          await vscode.commands.executeCommand(
+            'revealInExplorer',
+            vscode.Uri.file(absolutePath),
+          );
+        } catch {
+          // `revealInExplorer` is the desktop name; code-server uses
+          // `revealFileInOS`.  Fall through and let VS Code surface the
+          // built-in error.
+        }
+        break;
+      }
+      case 'openWith': {
+        try {
+          await vscode.commands.executeCommand(
+            'explorer.openWith',
+            vscode.Uri.file(absolutePath),
+          );
+        } catch {
+          // Non-fatal — user can retry via the tree view.
+        }
+        break;
+      }
+      case 'delete': {
+        const answer = await vscode.window.showWarningMessage(
+          `Delete ${file.name}?`,
+          { modal: true },
+          'Delete',
+        );
+        if (answer !== 'Delete') {return;}
+
+        if (this._stacService) {
+          const lastSlash = file.path.lastIndexOf('/');
+          const filename = lastSlash >= 0 ? file.path.slice(lastSlash + 1) : file.path;
+          try {
+            await this._stacService.deleteResultAsset(
+              plotKey.storePath,
+              plotKey.itemPath,
+              filename,
+            );
+            // Remove from the dropdown state.
+            this._resultFiles = this._resultFiles.filter(
+              (f) => f.path !== file.path,
+            );
+            this._resultsChanged = true;
+            this._sendLayersUpdate();
+          } catch (err) {
+            void vscode.window.showErrorMessage(
+              `Failed to delete ${file.name}: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          }
+        }
+        break;
+      }
+    }
   }
 
   /**

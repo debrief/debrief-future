@@ -49,6 +49,14 @@ function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
     queue.push({ html: generateWebviewHtml('mapView'), allowScripts: true });
   }
 
+  // Results panel is the panel-area webview (Feature: 178).  It is
+  // typically the third webview to fire `webview-ready` — after the
+  // activity panel and the map view.  Added to the queue so tests that
+  // reveal the Debrief Results panel get real bundle content injected.
+  if (hasWebviewBundle('resultsPanel')) {
+    queue.push({ html: generateWebviewHtml('resultsPanel'), allowScripts: true });
+  }
+
   return queue;
 }
 

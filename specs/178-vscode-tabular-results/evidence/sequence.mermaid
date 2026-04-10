@@ -1,0 +1,50 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant ET as executeTool command
+    participant Calc as CalcService
+    participant Log as LogService
+    participant RPS as ResultsPanelService
+    participant RPW as Results webview
+    participant Stac as StacService
+    participant APV as ActivityPanelViewProvider
+
+    Note over User,APV: Phase 1 — tool runs and a result tab appears
+    User->>ET: click track-stats
+    ET->>Calc: executeTool(toolId, featureIds, params)
+    Calc-->>ET: ToolExecutionResult { success, features }
+    ET->>Log: recordToolResult(result, expanded, storePath, itemPath)
+    Log-->>ET: RecordResult { activity_id: "act-1" }
+    ET->>RPS: addDatasetsForToolResult({plotKey, toolId, result, sourceFeatureIds, parameters, parentActivityId: "act-1"})
+    Note over RPS: Extracts __datasets or synthesizes from statistics
+    RPS-->>RPW: results:setVisibility { visible: true }
+    RPS-->>RPW: results:setTabs { tabs, activeTabId }
+    RPW-->>User: Results panel appears, tab w/ unsaved dot
+
+    Note over User,APV: Phase 2 — user clicks Save (R5: host is the source of truth)
+    User->>RPW: click Save
+    RPW->>RPS: results:save { tabId }
+    RPS->>RPS: buildCsvContent(tab.envelope.data)
+    RPS->>RPS: generateCsvFilename(toolId)
+    RPS->>Stac: addResultAsset(storePath, itemPath, filename, csv, text/csv, {parentActivityId: "act-1", ...})
+    alt STAC registration fails
+        Stac-->>RPS: Error
+        RPS-->>RPW: results:setTabs { tab.state=error }
+        RPW-->>User: Error banner; file is NOT on disk (FR-011)
+    else STAC succeeds
+        Stac-->>RPS: destPath
+        RPS->>Log: recordFileSaved(storePath, itemPath, "act-1", "assets/<csv>", timestamp) (R7)
+        Log-->>RPS: { activity_id: "act-2" }
+        Note over Log: New FileSavedEvent<br/>was_generated_by.tool = "debrief.fileSave"<br/>used = ["act-1"]<br/>generated = ["assets/<csv>"]
+        RPS->>APV: addResultFile(title, "assets/<csv>")
+        APV->>APV: _sendLayersUpdate({resultsChanged: true})
+        APV-->>User: Associated Files dropdown refreshes (FR-013/FR-014)
+        RPS->>RPS: tab.state = { kind: "saved", filename, savedActivityId: "act-2" }
+        RPS-->>RPW: results:setTabs { tabs with isSaved=true }
+        RPW-->>User: Unsaved dot cleared; Save disabled (FR-012)
+    end
+
+    Note over User,APV: Phase 3 — plot close cleanup (FR-021 — partial)
+    User->>RPS: plot close event
+    RPS->>RPS: filter out unsaved tabs
+    Note over Log: Orphan ToolRunEvent (no paired FileSavedEvent) deletion<br/>deferred pending LogService.deleteEntry API

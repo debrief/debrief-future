@@ -1,0 +1,25 @@
+{
+  "activity_id": "01JQK8C0EJQV1PKH2B1N8K7X4Y",
+  "timestamp": "2026-04-08T10:15:42.000Z",
+  "was_generated_by": {
+    "tool": "debrief.fileSave",
+    "tool_version": "1",
+    "parameters": {
+      "parent_activity_id": {
+        "value": "01JQK8BR1NMNJ3PJJ8CDFQ7YBW",
+        "default": false,
+        "tunable": false
+      },
+      "filename": {
+        "value": "assets/track-stats--2026-04-08T10-15-42.csv",
+        "default": false,
+        "tunable": false
+      }
+    }
+  },
+  "used": ["01JQK8BR1NMNJ3PJJ8CDFQ7YBW"],
+  "generated": ["assets/track-stats--2026-04-08T10-15-42.csv"],
+  "execution_duration": "PT0S",
+  "generated_result_id": null,
+  "tune": null
+}

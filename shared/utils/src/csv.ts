@@ -1,7 +1,9 @@
 /**
  * CSV formatting and filename sanitization utilities.
- * Feature: 177-tabular-results-panel
+ * Feature: 177-tabular-results-panel, 178-vscode-tabular-results (round-trip parser)
  */
+
+import type { DatasetEnvelope } from './types.js';
 
 /**
  * Sanitize a string for use as a filename component.
@@ -85,4 +87,158 @@ export function buildCsvContent(
   );
 
   return [headerLine, ...rows].join('\n') + '\n';
+}
+
+/**
+ * Tokenise a full CSV string into rows of string fields.  Handles quoted
+ * fields with embedded newlines and escaped double quotes.
+ *
+ * Internal helper for `parseCsvToTableDataset`.
+ */
+function tokeniseCsv(csv: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = '';
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < csv.length) {
+    const ch = csv[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (csv[i + 1] === '"') {
+          field += '"';
+          i += 2;
+          continue;
+        }
+        inQuotes = false;
+        i++;
+        continue;
+      }
+      field += ch;
+      i++;
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      i++;
+      continue;
+    }
+
+    if (ch === ',') {
+      row.push(field);
+      field = '';
+      i++;
+      continue;
+    }
+
+    if (ch === '\n' || ch === '\r') {
+      // End of row — ignore \r (CRLF support), flush on \n
+      if (ch === '\r' && csv[i + 1] === '\n') {
+        i += 2;
+      } else {
+        i++;
+      }
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = '';
+      continue;
+    }
+
+    field += ch;
+    i++;
+  }
+
+  // Flush trailing field/row if the file did not end with a newline.
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  if (inQuotes) {
+    throw new Error('Malformed CSV: unterminated quoted field');
+  }
+
+  // Drop purely empty trailing rows (e.g. caused by a final \n).
+  while (rows.length > 0) {
+    const last = rows[rows.length - 1];
+    if (last && last.length === 1 && last[0] === '') {
+      rows.pop();
+      continue;
+    }
+    break;
+  }
+
+  return rows;
+}
+
+/**
+ * Inverse of `buildCsvContent` — parse a CSV string into a flat-table
+ * `DatasetEnvelope` suitable for display in the Results panel.
+ *
+ * The resulting envelope uses `displayHint: 'table'` and carries one
+ * record per data row.  Numeric-looking values are coerced to `number`;
+ * everything else is retained as a string.
+ *
+ * Feature: 178-vscode-tabular-results (R3)
+ *
+ * @throws Error if the CSV is malformed (unterminated quotes) or empty.
+ */
+export function parseCsvToTableDataset(
+  csv: string,
+  title: string,
+): DatasetEnvelope {
+  if (csv.trim().length === 0) {
+    throw new Error('Cannot parse empty CSV');
+  }
+
+  const rows = tokeniseCsv(csv);
+  if (rows.length === 0) {
+    throw new Error('Cannot parse empty CSV');
+  }
+
+  const header = rows[0];
+  if (!header || header.length === 0) {
+    throw new Error('Cannot parse CSV without a header row');
+  }
+
+  const data: Record<string, unknown>[] = [];
+  for (let r = 1; r < rows.length; r++) {
+    const rowValues = rows[r];
+    if (!rowValues) continue;
+    const record: Record<string, unknown> = {};
+    for (let c = 0; c < header.length; c++) {
+      const key = header[c] ?? '';
+      const raw = rowValues[c] ?? '';
+
+      if (raw === '') {
+        record[key] = '';
+        continue;
+      }
+
+      // Try to coerce to a number if the field looks numeric.
+      // Preserves locale-independent decimal (.) from buildCsvContent.
+      const asNumber = Number(raw);
+      if (!Number.isNaN(asNumber) && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(raw)) {
+        record[key] = asNumber;
+      } else {
+        record[key] = raw;
+      }
+    }
+    data.push(record);
+  }
+
+  return {
+    type: 'csv_table',
+    title,
+    displayHint: 'table',
+    metadata: {
+      xAxis: { label: header[0] ?? 'Column', type: 'nominal' },
+      yAxis: { label: 'Value', type: 'quantitative' },
+    },
+    data,
+  };
 }

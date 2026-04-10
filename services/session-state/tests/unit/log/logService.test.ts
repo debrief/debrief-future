@@ -204,4 +204,97 @@ describe('createLogService', () => {
       await expect(service.branchFrom('act-1')).rejects.toThrow('BranchService');
     });
   });
+
+  describe('recordFileSaved (Feature: 178)', () => {
+    it('appends a FileSavedEvent linked to the parent ToolRunEvent', async () => {
+      const deps = createMockDeps();
+      const service = createLogService(deps);
+
+      const result = await service.recordFileSaved(
+        '/store',
+        'item.json',
+        'act-2',
+        'assets/track-stats--2026-04-07T10-00-00.csv',
+        '2026-04-07T10:00:00.000Z',
+      );
+
+      expect(result.activity_id).toBeTruthy();
+      expect(deps.appendProvenance).toHaveBeenCalledTimes(1);
+      const call = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls[0];
+      expect(call).toBeDefined();
+      const provArg = call![2] as Array<{ feature_id: string; entry: Record<string, unknown> }>;
+      // Parent (act-2) is on track-2 only → attach there
+      expect(provArg).toHaveLength(1);
+      expect(provArg[0]!.feature_id).toBe('track-2');
+      const entry = provArg[0]!.entry;
+      const wgb = entry.was_generated_by as Record<string, unknown>;
+      expect(wgb.tool).toBe('debrief.fileSave');
+      expect(entry.used).toEqual(['act-2']);
+      expect(entry.generated).toEqual(['assets/track-stats--2026-04-07T10-00-00.csv']);
+      expect(deps.markDirty).toHaveBeenCalled();
+    });
+
+    it('throws when filename does not begin with "assets/"', async () => {
+      const deps = createMockDeps();
+      const service = createLogService(deps);
+      await expect(
+        service.recordFileSaved(
+          '/store',
+          'item.json',
+          'act-1',
+          'outside/foo.csv',
+          '2026-04-07T10:00:00.000Z',
+        ),
+      ).rejects.toThrow('assets/');
+      expect(deps.appendProvenance).not.toHaveBeenCalled();
+    });
+
+    it('throws when the timestamp is not ISO-8601', async () => {
+      const deps = createMockDeps();
+      const service = createLogService(deps);
+      await expect(
+        service.recordFileSaved(
+          '/store',
+          'item.json',
+          'act-1',
+          'assets/foo.csv',
+          'not-a-timestamp',
+        ),
+      ).rejects.toThrow('ISO-8601');
+    });
+
+    it('falls back to the first feature when no parent match exists', async () => {
+      const deps = createMockDeps();
+      const service = createLogService(deps);
+
+      await service.recordFileSaved(
+        '/store',
+        'item.json',
+        'act-nonexistent',
+        'assets/orphan.csv',
+        '2026-04-07T10:00:00.000Z',
+      );
+
+      const call = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls[0];
+      const provArg = call![2] as Array<{ feature_id: string }>;
+      expect(provArg).toHaveLength(1);
+      expect(provArg[0]!.feature_id).toBe('track-1');
+    });
+
+    it('sentinel tool name is exactly "debrief.fileSave"', async () => {
+      const deps = createMockDeps();
+      const service = createLogService(deps);
+      await service.recordFileSaved(
+        '/store',
+        'item.json',
+        'act-1',
+        'assets/foo.csv',
+        '2026-04-07T10:00:00.000Z',
+      );
+      const call = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls[0];
+      const provArg = call![2] as Array<{ entry: Record<string, unknown> }>;
+      const wgb = provArg[0]!.entry.was_generated_by as Record<string, unknown>;
+      expect(wgb.tool).toBe('debrief.fileSave');
+    });
+  });
 });
