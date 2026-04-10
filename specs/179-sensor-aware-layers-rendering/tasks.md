@@ -49,8 +49,8 @@
 
 **Purpose**: Create evidence directory and confirm clean baseline before changes
 
-- [ ] T001 Create evidence directories `specs/179-sensor-aware-layers-rendering/evidence/screenshots/`
-- [ ] T002 Run `task verify` to confirm clean baseline before changes
+- [x] T001 Create evidence directories `specs/179-sensor-aware-layers-rendering/evidence/screenshots/`
+- [x] T002 Run `task verify` to confirm clean baseline before changes
 
 **Checkpoint**: Baseline confirmed clean — ready to begin foundational changes
 
@@ -60,12 +60,12 @@
 
 **Purpose**: Extend the `DisplayItem` type system, add formatting helpers, and update course padding — all three block every user story
 
-- [ ] T003 Extend `DisplayItemType` union with `'group' | 'sensor' | 'contact'` values `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T004 [P] Add `formatBearing` helper for zero-padded 3-digit bearings with ambiguous slash-separated format `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T005 [P] Update `getPositionSublabel` to zero-pad course to 3 digits via `.padStart(3, '0')` (FR-018) `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T006 [P] Add `SensorData` and `SensorContact` to the import list from `../utils/types` or `@debrief/schemas` `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T007 [test] Update existing course-format assertions in tests to expect zero-padded values `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T008 Run `pnpm --filter @debrief/components test` to confirm existing tests pass with course-format refresh
+- [x] T003 Extend `DisplayItemType` union with `'group' | 'sensor' | 'contact'` values `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T004 [P] Add `formatBearing` helper for zero-padded 3-digit bearings with ambiguous slash-separated format `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T005 [P] Update `getPositionSublabel` to zero-pad course to 3 digits via `.padStart(3, '0')` (FR-018) `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T006 [P] Add `SensorData` and `SensorContact` to the import list from `../utils/types` or `@debrief/schemas` `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T007 [test] Update existing course-format assertions in tests to expect zero-padded values `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T008 Run `pnpm --filter @debrief/components test` to confirm existing tests pass with course-format refresh
 
 **Checkpoint**: Foundation ready — new types and helpers available, existing tests green with refreshed assertions
 
@@ -81,28 +81,28 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation
 
-- [ ] T009 [P][test] Case A: simple track renders positions as direct children (unchanged except course padding) `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T010 [P][test] Case A: track with empty `sensors: []` falls through to Case A `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T011 [P][test] Case B: compound track without sensors gets `Track Segments (N)` wrapper at depth 1 (decision 3B — adds wrapper for symmetry with Case D) `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T012 [P][test] Case C: track with sensors gets `Positions (N)` + `Sensors (N)` groups at depth 1 `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T013 [P][test] Case D: compound track with sensors gets `Track Segments (N)` + `Sensors (N)` groups `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T014 [P][test] Sensor rows use `name` as label and `"N contacts"` as sublabel `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T015 [P][test] Contact rows show zero-padded bearing sublabel (e.g. `045°`) `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T016 [P][test] Ambiguous bearing renders as single contact row with `"045° / 225°"` sublabel `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T017 [P][test] Zero-contact sensor shows `"0 contacts"` sublabel and `"No contacts"` placeholder on expand `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T018 [P][test] Group row labels include count in parentheses `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T019 [P][test] Contact rows render in input order (no sort applied) `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T020 [P][test] Sensor row IDs stable under `SensorData[]` reordering (keyed by name, not index) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T009 [P][test] Case A: simple track renders positions as direct children (unchanged except course padding) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T010 [P][test] Case A: track with empty `sensors: []` falls through to Case A `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T011 [P][test] Case B: compound track without sensors gets `Track Segments (N)` wrapper at depth 1 (decision 3B — adds wrapper for symmetry with Case D) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T012 [P][test] Case C: track with sensors gets `Positions (N)` + `Sensors (N)` groups at depth 1 `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T013 [P][test] Case D: compound track with sensors gets `Track Segments (N)` + `Sensors (N)` groups `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T014 [P][test] Sensor rows use `name` as label and `"N contacts"` as sublabel `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T015 [P][test] Contact rows show zero-padded bearing sublabel (e.g. `045°`) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T016 [P][test] Ambiguous bearing renders as single contact row with `"045° / 225°"` sublabel `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T017 [P][test] Zero-contact sensor shows `"0 contacts"` sublabel and `"No contacts"` placeholder on expand `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T018 [P][test] Group row labels include count in parentheses `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T019 [P][test] Contact rows render in input order (no sort applied) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T020 [P][test] Sensor row IDs stable under `SensorData[]` reordering (keyed by name, not index) `shared/components/src/FeatureList/flattenFeatures.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Implement four-case dispatcher in `flattenTrackChildren` based on `(hasSensors, segmentCount)` `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T022 [US1] Implement `flattenSensors` helper: emits sensor rows, each expandable to contacts `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T023 [US1] Implement `flattenContacts` helper: emits contact rows with `formatBearing`, handles zero-contact placeholder `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T024 [US1] Add `'contact'` to the info-icon type-check predicate in FeatureRow (FR-017) `shared/components/src/FeatureList/FeatureRow.tsx`
-- [ ] T025 [US1] Create test fixtures: tracks for Cases A/B/C/D + edge cases (empty sensors, zero contacts, ambiguous bearing, large sensor) `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T026 [US1] Add `TracksWithSensors` Storybook story with all fixture tracks `shared/components/src/FeatureList/FeatureList.stories.tsx`
-- [ ] T027 [US1] Run `pnpm --filter @debrief/components test` to confirm all unit tests pass
+- [x] T021 [US1] Implement four-case dispatcher in `flattenTrackChildren` based on `(hasSensors, segmentCount)` `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T022 [US1] Implement `flattenSensors` helper: emits sensor rows, each expandable to contacts `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T023 [US1] Implement `flattenContacts` helper: emits contact rows with `formatBearing`, handles zero-contact placeholder `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T024 [US1] Add `'contact'` to the info-icon type-check predicate in FeatureRow (FR-017) `shared/components/src/FeatureList/FeatureRow.tsx`
+- [x] T025 [US1] Create test fixtures: tracks for Cases A/B/C/D + edge cases (empty sensors, zero contacts, ambiguous bearing, large sensor) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T026 [US1] Add `TracksWithSensors` Storybook story with all fixture tracks `shared/components/src/FeatureList/FeatureList.stories.tsx`
+- [x] T027 [US1] Run `pnpm --filter @debrief/components test` to confirm all unit tests pass
 
 **Checkpoint**: All four cases render correctly; sensor/contact/group rows appear with correct labels, depths, and IDs. Info icon plumbed to contact rows.
 
@@ -116,10 +116,10 @@
 
 ### Tests for User Story 2
 
-- [ ] T028 [P][test] Clicking a group row selects only the group path ID (no fan-out) `shared/components/src/FeatureList/FeatureList.test.tsx`
-- [ ] T029 [P][test] Clicking a contact row selects only that contact's path ID `shared/components/src/FeatureList/FeatureList.test.tsx`
-- [ ] T030 [P][test] `hasChildSelected` propagates: contact selected → parent sensor → parent Sensors group → parent track `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T031 [US2] Run `pnpm --filter @debrief/components test` to confirm selection tests pass
+- [x] T028 [P][test] Clicking a group row selects only the group path ID (no fan-out) `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T029 [P][test] Clicking a contact row selects only that contact's path ID `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T030 [P][test] `hasChildSelected` propagates: contact selected → parent sensor → parent Sensors group → parent track `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T031 [US2] Run `pnpm --filter @debrief/components test` to confirm selection tests pass
 
 **Checkpoint**: Selection works for all new row kinds — no implementation changes required (rides on existing `handleRowClick`)
 
@@ -133,9 +133,9 @@
 
 ### Tests for User Story 3
 
-- [ ] T032 [P][test] Sensor row in `hiddenIds` renders with hidden state `shared/components/src/FeatureList/FeatureList.test.tsx`
-- [ ] T033 [P][test] Contact row in `hiddenIds` renders with hidden state `shared/components/src/FeatureList/FeatureList.test.tsx`
-- [ ] T034 [US3] Run `pnpm --filter @debrief/components test` to confirm visibility tests pass
+- [x] T032 [P][test] Sensor row in `hiddenIds` renders with hidden state `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T033 [P][test] Contact row in `hiddenIds` renders with hidden state `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T034 [US3] Run `pnpm --filter @debrief/components test` to confirm visibility tests pass
 
 **Checkpoint**: Visibility toggles work for sensor and contact rows — no implementation changes required
 
@@ -149,8 +149,8 @@
 
 ### Verification for User Story 4
 
-- [ ] T035 [US4] Verify Case B fixture in `TracksWithSensors` story renders `Track Segments (N)` wrapper with segments at depth 2
-- [ ] T036 [US4] Verify Case D fixture renders both `Track Segments (N)` and `Sensors (N)` as sibling groups at depth 1
+- [x] T035 [US4] Verify Case B fixture in `TracksWithSensors` story renders `Track Segments (N)` wrapper with segments at depth 2
+- [x] T036 [US4] Verify Case D fixture renders both `Track Segments (N)` and `Sensors (N)` as sibling groups at depth 1
 
 **Checkpoint**: All four cases verified — consistent visual hierarchy
 
@@ -164,11 +164,11 @@
 
 ### Storybook E2E Tests
 
-- [ ] T037 [P] Create Playwright test for TracksWithSensors story: expand track → verify group rows appear `shared/components/e2e/FeatureList.spec.ts`
-- [ ] T038 [P] Add theme variant tests (light, dark, vscode) with screenshots captured to evidence `shared/components/e2e/FeatureList.spec.ts`
-- [ ] T039 [P] Add interaction test: expand Sensors → expand sensor → verify contact rows `shared/components/e2e/FeatureList.spec.ts`
-- [ ] T040 Capture interaction GIF showing expand track → sensors → contacts flow `specs/179-sensor-aware-layers-rendering/evidence/screenshots/interaction.gif`
-- [ ] T041 Run Storybook E2E suite: `pnpm --filter @debrief/components test:e2e FeatureList`
+- [x] T037 [P] Create Playwright test for TracksWithSensors story: expand track → verify group rows appear `shared/components/e2e/FeatureList.spec.ts`
+- [x] T038 [P] Add theme variant tests (light, dark, vscode) with screenshots captured to evidence `shared/components/e2e/FeatureList.spec.ts`
+- [x] T039 [P] Add interaction test: expand Sensors → expand sensor → verify contact rows `shared/components/e2e/FeatureList.spec.ts`
+- [x] T040 Capture interaction GIF showing expand track → sensors → contacts flow `specs/179-sensor-aware-layers-rendering/evidence/screenshots/interaction.gif`
+- [x] T041 Run Storybook E2E suite: `pnpm --filter @debrief/components test:e2e FeatureList`
 
 **Checkpoint**: E2E tests pass — automated visual evidence captured for all themes
 
@@ -178,8 +178,8 @@
 
 **Purpose**: Additional tests identified during /speckit.review to cover ActivityPanel contact handler wiring and getRootFeatureId utility
 
-- [ ] T050 [test] ActivityPanel contact handler resolves contact path ID to correct SensorContact properties and populates info dialog `shared/components/src/FeatureList/FeatureList.test.tsx` (or `ActivityPanel.test.tsx` if exists)
-- [ ] T051 [test] `getRootFeatureId` utility: simple feature ID returns itself, sensor path returns root, contact path returns root (3 assertions) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T050 [test] ActivityPanel contact handler resolves contact path ID to correct SensorContact properties and populates info dialog `shared/components/src/FeatureList/FeatureList.test.tsx` (or `ActivityPanel.test.tsx` if exists)
+- [x] T051 [test] `getRootFeatureId` utility: simple feature ID returns itself, sensor path returns root, contact path returns root (3 assertions) `shared/components/src/FeatureList/flattenFeatures.test.ts`
 
 **Checkpoint**: Review-identified gaps covered — contact handler and path utility both tested
 
@@ -191,23 +191,23 @@
 
 ### Final Verification
 
-- [ ] T042 Run `task verify` to confirm full CI check passes (lint + typecheck + test)
+- [x] T042 Run `task verify` to confirm full CI check passes (lint + typecheck + test)
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T043 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/179-sensor-aware-layers-rendering/evidence/test-summary.md`
-- [ ] T044 Create usage demonstration (Storybook walkthrough of Cases A-D) in `specs/179-sensor-aware-layers-rendering/evidence/usage-example.md`
-- [ ] T045 [P] Capture theme screenshots (light/dark/vscode) to `specs/179-sensor-aware-layers-rendering/evidence/screenshots/`
-- [ ] T046 [P] Document E2E results in `specs/179-sensor-aware-layers-rendering/evidence/e2e-summary.md`
+- [x] T043 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/179-sensor-aware-layers-rendering/evidence/test-summary.md`
+- [x] T044 Create usage demonstration (Storybook walkthrough of Cases A-D) in `specs/179-sensor-aware-layers-rendering/evidence/usage-example.md`
+- [x] T045 [P] Capture theme screenshots (light/dark/vscode) to `specs/179-sensor-aware-layers-rendering/evidence/screenshots/`
+- [x] T046 [P] Document E2E results in `specs/179-sensor-aware-layers-rendering/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T047 Create shipped blog post in `specs/179-sensor-aware-layers-rendering/media/shipped-post.md`
-- [ ] T048 [P] Create LinkedIn shipped summary in `specs/179-sensor-aware-layers-rendering/media/linkedin-shipped.md`
+- [x] T047 Create shipped blog post in `specs/179-sensor-aware-layers-rendering/media/shipped-post.md`
+- [x] T048 [P] Create LinkedIn shipped summary in `specs/179-sensor-aware-layers-rendering/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T049 Create PR and publish blog: run /speckit.pr
+- [x] T049 Create PR and publish blog: run /speckit.pr
 
 **Task T049 must run last. It depends on all evidence and media tasks being complete.**
 
