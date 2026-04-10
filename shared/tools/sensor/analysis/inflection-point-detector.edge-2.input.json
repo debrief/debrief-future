@@ -11,13 +11,34 @@
           "sensor_name": "HULL_SONAR",
           "source_frequency_hz": 200.0,
           "residuals": [
-            {"time": "2024-01-15T10:00:00Z", "residual_hz": 0.150},
-            {"time": "2024-01-15T10:01:00Z", "residual_hz": 0.120},
-            {"time": "2024-01-15T10:02:00Z", "residual_hz": -0.005},
-            {"time": "2024-01-15T10:03:00Z", "residual_hz": 0.010},
-            {"time": "2024-01-15T10:04:00Z", "residual_hz": -0.008},
-            {"time": "2024-01-15T10:05:00Z", "residual_hz": -0.060},
-            {"time": "2024-01-15T10:06:00Z", "residual_hz": -0.120}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "residual_hz": 0.15
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "residual_hz": 0.12
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "residual_hz": -0.005
+            },
+            {
+              "time": "2024-01-15T10:03:00Z",
+              "residual_hz": 0.01
+            },
+            {
+              "time": "2024-01-15T10:04:00Z",
+              "residual_hz": -0.008
+            },
+            {
+              "time": "2024-01-15T10:05:00Z",
+              "residual_hz": -0.06
+            },
+            {
+              "time": "2024-01-15T10:06:00Z",
+              "residual_hz": -0.12
+            }
           ]
         }
       }

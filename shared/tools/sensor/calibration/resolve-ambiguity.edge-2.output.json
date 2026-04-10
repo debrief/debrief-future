@@ -4,10 +4,13 @@
       "type": "resource",
       "uri": "feature://sensor-already-resolved",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-already-resolved\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"TOWED_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous\":false,\"frequency\":150.1,\"origin\":[-1.0,50.0]},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":47.0,\"ambiguous\":false,\"frequency\":150.2,\"origin\":[-0.99,50.005]},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":49.0,\"ambiguous\":false,\"frequency\":150.3,\"origin\":[-0.98,50.01]}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-already-resolved\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"TOWED_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous\":false,\"frequency\":150.1,\"origin\":[-1.0,50.0],\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":47.0,\"ambiguous\":false,\"frequency\":150.2,\"origin\":[-0.99,50.005],\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":49.0,\"ambiguous\":false,\"frequency\":150.3,\"origin\":[-0.98,50.01],\"has_bearing\":true,\"has_frequency\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/resolved",
-        "debrief:sourceFeatures": ["sensor-already-resolved", "track-target"],
+        "debrief:sourceFeatures": [
+          "sensor-already-resolved",
+          "track-target"
+        ],
         "debrief:label": "No ambiguous cuts found on TOWED_ARRAY; 0 cut(s) resolved"
       }
     }

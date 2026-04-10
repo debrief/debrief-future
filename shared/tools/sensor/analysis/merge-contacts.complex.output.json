@@ -4,10 +4,14 @@
       "type": "resource",
       "uri": "feature://merged-sensor-001",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"merged-sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Combined Detection\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"h-001\",\"time\":\"2024-01-15T08:00:00Z\",\"bearing\":45.0,\"range\":5000.0,\"frequency\":100.0,\"source_sensor\":\"Hull Sonar\"},{\"id\":\"t-001\",\"time\":\"2024-01-15T08:02:00Z\",\"bearing\":44.5,\"frequency\":100.5,\"source_sensor\":\"Towed Array\"},{\"id\":\"r-001\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":46.0,\"range\":4900.0,\"source_sensor\":\"Radar\"},{\"id\":\"h-002\",\"time\":\"2024-01-15T08:10:00Z\",\"bearing\":47.0,\"range\":4800.0,\"frequency\":102.0,\"source_sensor\":\"Hull Sonar\"},{\"id\":\"t-002\",\"time\":\"2024-01-15T08:12:00Z\",\"bearing\":46.5,\"frequency\":102.5,\"source_sensor\":\"Towed Array\"},{\"id\":\"h-003\",\"time\":\"2024-01-15T08:20:00Z\",\"bearing\":50.0,\"range\":4600.0,\"frequency\":105.0,\"source_sensor\":\"Hull Sonar\"},{\"id\":\"t-003\",\"time\":\"2024-01-15T08:22:00Z\",\"bearing\":49.5,\"frequency\":105.5,\"source_sensor\":\"Towed Array\"}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"merged-sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Combined Detection\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"h-001\",\"time\":\"2024-01-15T08:00:00Z\",\"bearing\":45.0,\"range\":5000.0,\"frequency\":100.0,\"source_sensor\":\"Hull Sonar\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"id\":\"t-001\",\"time\":\"2024-01-15T08:02:00Z\",\"bearing\":44.5,\"frequency\":100.5,\"source_sensor\":\"Towed Array\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"id\":\"r-001\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":46.0,\"range\":4900.0,\"source_sensor\":\"Radar\",\"has_bearing\":true,\"visible\":true},{\"id\":\"h-002\",\"time\":\"2024-01-15T08:10:00Z\",\"bearing\":47.0,\"range\":4800.0,\"frequency\":102.0,\"source_sensor\":\"Hull Sonar\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"id\":\"t-002\",\"time\":\"2024-01-15T08:12:00Z\",\"bearing\":46.5,\"frequency\":102.5,\"source_sensor\":\"Towed Array\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"id\":\"h-003\",\"time\":\"2024-01-15T08:20:00Z\",\"bearing\":50.0,\"range\":4600.0,\"frequency\":105.0,\"source_sensor\":\"Hull Sonar\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true},{\"id\":\"t-003\",\"time\":\"2024-01-15T08:22:00Z\",\"bearing\":49.5,\"frequency\":105.5,\"source_sensor\":\"Towed Array\",\"has_bearing\":true,\"has_frequency\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "addition/sensor/merged",
-        "debrief:sourceFeatures": ["sensor-hull", "sensor-towed", "sensor-radar"],
+        "debrief:sourceFeatures": [
+          "sensor-hull",
+          "sensor-towed",
+          "sensor-radar"
+        ],
         "debrief:label": "Merged 7 contacts from 3 sensors into Combined Detection"
       }
     }
