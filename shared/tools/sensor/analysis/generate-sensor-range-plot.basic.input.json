@@ -7,7 +7,28 @@
         "id": "sensor-towed-array",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01], [-0.97, 50.015], [-0.96, 50.02]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ],
+            [
+              -0.97,
+              50.015
+            ],
+            [
+              -0.96,
+              50.02
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -20,31 +41,61 @@
               "time": "2024-01-15T10:00:00Z",
               "bearing": 45.0,
               "frequency": 150.1,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:01:00Z",
               "bearing": 47.0,
               "frequency": 150.2,
-              "origin": [-0.99, 50.005]
+              "origin": [
+                -0.99,
+                50.005
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:02:00Z",
               "bearing": 49.0,
               "frequency": 150.3,
-              "origin": [-0.98, 50.01]
+              "origin": [
+                -0.98,
+                50.01
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:03:00Z",
               "bearing": 51.0,
               "frequency": 150.25,
-              "origin": [-0.97, 50.015]
+              "origin": [
+                -0.97,
+                50.015
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:04:00Z",
               "bearing": 53.0,
               "frequency": 150.15,
-              "origin": [-0.96, 50.02]
+              "origin": [
+                -0.96,
+                50.02
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }
@@ -54,7 +105,28 @@
         "id": "track-ownship",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01], [-0.97, 50.015], [-0.96, 50.02]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ],
+            [
+              -0.97,
+              50.015
+            ],
+            [
+              -0.96,
+              50.02
+            ]
+          ]
         },
         "properties": {
           "kind": "TRACK",
@@ -64,11 +136,51 @@
           "start_time": "2024-01-15T10:00:00Z",
           "end_time": "2024-01-15T10:04:00Z",
           "positions": [
-            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 45.0, "speed": 12.0},
-            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.99, 50.005], "course": 45.0, "speed": 12.0},
-            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.98, 50.01], "course": 45.0, "speed": 12.0},
-            {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.97, 50.015], "course": 45.0, "speed": 12.0},
-            {"time": "2024-01-15T10:04:00Z", "coordinates": [-0.96, 50.02], "course": 45.0, "speed": 12.0}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "coordinates": [
+                -1.0,
+                50.0
+              ],
+              "course": 45.0,
+              "speed": 12.0
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "coordinates": [
+                -0.99,
+                50.005
+              ],
+              "course": 45.0,
+              "speed": 12.0
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "coordinates": [
+                -0.98,
+                50.01
+              ],
+              "course": 45.0,
+              "speed": 12.0
+            },
+            {
+              "time": "2024-01-15T10:03:00Z",
+              "coordinates": [
+                -0.97,
+                50.015
+              ],
+              "course": 45.0,
+              "speed": 12.0
+            },
+            {
+              "time": "2024-01-15T10:04:00Z",
+              "coordinates": [
+                -0.96,
+                50.02
+              ],
+              "course": 45.0,
+              "speed": 12.0
+            }
           ]
         }
       },
@@ -77,7 +189,28 @@
         "id": "track-target",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-0.95, 50.05], [-0.94, 50.055], [-0.93, 50.06], [-0.92, 50.065], [-0.91, 50.07]]
+          "coordinates": [
+            [
+              -0.95,
+              50.05
+            ],
+            [
+              -0.94,
+              50.055
+            ],
+            [
+              -0.93,
+              50.06
+            ],
+            [
+              -0.92,
+              50.065
+            ],
+            [
+              -0.91,
+              50.07
+            ]
+          ]
         },
         "properties": {
           "kind": "TRACK",
@@ -87,11 +220,51 @@
           "start_time": "2024-01-15T10:00:00Z",
           "end_time": "2024-01-15T10:04:00Z",
           "positions": [
-            {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.95, 50.05], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.94, 50.055], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.93, 50.06], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.92, 50.065], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:04:00Z", "coordinates": [-0.91, 50.07], "course": 30.0, "speed": 10.0}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "coordinates": [
+                -0.95,
+                50.05
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "coordinates": [
+                -0.94,
+                50.055
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "coordinates": [
+                -0.93,
+                50.06
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:03:00Z",
+              "coordinates": [
+                -0.92,
+                50.065
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:04:00Z",
+              "coordinates": [
+                -0.91,
+                50.07
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            }
           ]
         }
       }

@@ -120,6 +120,8 @@ export {
   type LogService,
   type LogServiceDeps,
   createLogService,
+  // Feature: 178-vscode-tabular-results — sentinel used by recordFileSaved
+  FILE_SAVE_TOOL_SENTINEL,
   // Replay Engine (Feature: 076)
   createReplayEngine,
   validateParameter,

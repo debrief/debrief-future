@@ -7,7 +7,40 @@
         "id": "sensor-towed-array",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01], [-0.97, 50.015], [-0.96, 50.02], [-0.955, 50.03], [-0.95, 50.04], [-0.945, 50.05]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ],
+            [
+              -0.97,
+              50.015
+            ],
+            [
+              -0.96,
+              50.02
+            ],
+            [
+              -0.955,
+              50.03
+            ],
+            [
+              -0.95,
+              50.04
+            ],
+            [
+              -0.945,
+              50.05
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -22,7 +55,14 @@
               "ambiguous_bearing": 315.0,
               "ambiguous": true,
               "frequency": 150.1,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:01:00Z",
@@ -30,7 +70,14 @@
               "ambiguous_bearing": 313.0,
               "ambiguous": true,
               "frequency": 150.2,
-              "origin": [-0.99, 50.005]
+              "origin": [
+                -0.99,
+                50.005
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:02:00Z",
@@ -38,7 +85,14 @@
               "ambiguous_bearing": 311.0,
               "ambiguous": true,
               "frequency": 150.3,
-              "origin": [-0.98, 50.01]
+              "origin": [
+                -0.98,
+                50.01
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:03:00Z",
@@ -46,7 +100,14 @@
               "ambiguous_bearing": 309.0,
               "ambiguous": true,
               "frequency": 150.25,
-              "origin": [-0.97, 50.015]
+              "origin": [
+                -0.97,
+                50.015
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:04:00Z",
@@ -54,7 +115,14 @@
               "ambiguous_bearing": 307.0,
               "ambiguous": true,
               "frequency": 150.15,
-              "origin": [-0.96, 50.02]
+              "origin": [
+                -0.96,
+                50.02
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:05:00Z",
@@ -62,7 +130,14 @@
               "ambiguous_bearing": 80.0,
               "ambiguous": true,
               "frequency": 150.0,
-              "origin": [-0.955, 50.03]
+              "origin": [
+                -0.955,
+                50.03
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:06:00Z",
@@ -70,7 +145,14 @@
               "ambiguous_bearing": 78.0,
               "ambiguous": true,
               "frequency": 149.9,
-              "origin": [-0.95, 50.04]
+              "origin": [
+                -0.95,
+                50.04
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:07:00Z",
@@ -78,7 +160,14 @@
               "ambiguous_bearing": 76.0,
               "ambiguous": true,
               "frequency": 149.8,
-              "origin": [-0.945, 50.05]
+              "origin": [
+                -0.945,
+                50.05
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }

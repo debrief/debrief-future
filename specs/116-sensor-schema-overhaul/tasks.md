@@ -46,11 +46,11 @@
 
 **Purpose**: Add new enumerations and the MeasuredArrayPosition class that all user stories depend on.
 
-- [ ] T001 Add ArrayCentreModeEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
-- [ ] T002 [P] Add LineStyleEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
-- [ ] T003 [P] Add LabelLocationEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
-- [ ] T004 [P] Add LineLabelPositionEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
-- [ ] T005 Add MeasuredArrayPosition class to LinkML schema `shared/schemas/src/linkml/geojson.yaml`
+- [x] T001 Add ArrayCentreModeEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
+- [x] T002 [P] Add LineStyleEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
+- [x] T003 [P] Add LabelLocationEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
+- [x] T004 [P] Add LineLabelPositionEnum to LinkML enums `shared/schemas/src/linkml/common.yaml`
+- [x] T005 Add MeasuredArrayPosition class to LinkML schema `shared/schemas/src/linkml/geojson.yaml`
 
 ---
 
@@ -62,27 +62,27 @@
 
 ### SensorContact Schema Expansion
 
-- [ ] T006 Add boolean presence flags (has_bearing, has_ambiguous, has_frequency) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T007 [P] Add display properties (color, visible, show_label) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T008 [P] Add enum-typed display properties (line_style, label_location, put_label_at) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T009 [P] Add origin coordinate pair field to SensorContact `shared/schemas/src/linkml/geojson.yaml`
+- [x] T006 Add boolean presence flags (has_bearing, has_ambiguous, has_frequency) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
+- [x] T007 [P] Add display properties (color, visible, show_label) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
+- [x] T008 [P] Add enum-typed display properties (line_style, label_location, put_label_at) to SensorContact `shared/schemas/src/linkml/geojson.yaml`
+- [x] T009 [P] Add origin coordinate pair field to SensorContact `shared/schemas/src/linkml/geojson.yaml`
 
 ### SensorData Schema Expansion
 
-- [ ] T010 Add array_centre_mode enum field to SensorData `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T011 [P] Add display properties (color, visible, line_thickness) to SensorData `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T012 [P] Add measured_positions array field to SensorData `shared/schemas/src/linkml/geojson.yaml`
+- [x] T010 Add array_centre_mode enum field to SensorData `shared/schemas/src/linkml/geojson.yaml`
+- [x] T011 [P] Add display properties (color, visible, line_thickness) to SensorData `shared/schemas/src/linkml/geojson.yaml`
+- [x] T012 [P] Add measured_positions array field to SensorData `shared/schemas/src/linkml/geojson.yaml`
 
 ### Schema Generation
 
-- [ ] T013 Run schema generation pipeline and verify output `shared/schemas/scripts/generate.py`
-- [ ] T014 Verify generated Pydantic models have all new fields `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T015 [P] Verify generated TypeScript interfaces have all new fields `shared/schemas/src/generated/typescript/types.ts`
-- [ ] T016 [P] Verify generated JSON Schema has all new fields `shared/schemas/src/generated/json-schema/`
+- [x] T013 Run schema generation pipeline and verify output `shared/schemas/scripts/generate.py`
+- [x] T014 Verify generated Pydantic models have all new fields `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T015 [P] Verify generated TypeScript interfaces have all new fields `shared/schemas/src/generated/typescript/types.ts`
+- [x] T016 [P] Verify generated JSON Schema has all new fields `shared/schemas/src/generated/json-schema/`
 
 ### Generation Verification (Review Decision #2)
 
-- [ ] T058 [test] Verify generated code handles optional float[2] coordinate pairs correctly (MeasuredArrayPosition.location, SensorContact.origin) `shared/schemas/tests/test_schema_compare.py`
+- [x] T058 [test] Verify generated code handles optional float[2] coordinate pairs correctly (MeasuredArrayPosition.location, SensorContact.origin) `shared/schemas/tests/test_schema_compare.py`
 
 **Checkpoint**: Schema expanded and all generated code reflects new fields. Fixture and test work can now begin.
 
@@ -96,20 +96,20 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [test] [US1] Create comprehensive valid fixture with ALL new SensorContact and SensorData fields `shared/schemas/src/fixtures/valid/track-feature-sensors-02.json`
-- [ ] T018 [P][test] [US1] Create minimal valid fixture with only required fields (time, bearing, name, contacts) `shared/schemas/src/fixtures/valid/track-feature-sensors-minimal-01.json`
-- [ ] T019 [US1] Run golden fixture validation tests to confirm both fixtures pass `shared/schemas/tests/test_golden.py`
-- [ ] T020 [US1] Run round-trip tests to confirm comprehensive fixture survives Python-JSON-Python cycle `shared/schemas/tests/test_roundtrip.py`
-- [ ] T021 [US1] Verify existing track-feature-sensors-01.json still validates (backward compatibility) `shared/schemas/src/fixtures/valid/track-feature-sensors-01.json`
+- [x] T017 [test] [US1] Create comprehensive valid fixture with ALL new SensorContact and SensorData fields `shared/schemas/src/fixtures/valid/track-feature-sensors-02.json`
+- [x] T018 [P][test] [US1] Create minimal valid fixture with only required fields (time, bearing, name, contacts) `shared/schemas/src/fixtures/valid/track-feature-sensors-minimal-01.json`
+- [x] T019 [US1] Run golden fixture validation tests to confirm both fixtures pass `shared/schemas/tests/test_golden.py`
+- [x] T020 [US1] Run round-trip tests to confirm comprehensive fixture survives Python-JSON-Python cycle `shared/schemas/tests/test_roundtrip.py`
+- [x] T021 [US1] Verify existing track-feature-sensors-01.json still validates (backward compatibility) `shared/schemas/src/fixtures/valid/track-feature-sensors-01.json`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Verify optional fields default correctly in Pydantic model (visible=true, has_bearing=true, show_label=false)
-- [ ] T023 [US1] Verify TypeScript interface accepts both comprehensive and minimal fixtures
+- [x] T022 [US1] Verify optional fields default correctly in Pydantic model (visible=true, has_bearing=true, show_label=false)
+- [x] T023 [US1] Verify TypeScript interface accepts both comprehensive and minimal fixtures
 
 ### TypeScript Round-Trip (Review Decision #8)
 
-- [ ] T059 [test] [US1] Add vitest TypeScript round-trip test: JSON → TS deserialize → TS serialize → JSON for sensor fixtures `shared/schemas/tests/ts/test_sensor_roundtrip.test.ts`
+- [x] T059 [test] [US1] Add vitest TypeScript round-trip test: JSON → TS deserialize → TS serialize → JSON for sensor fixtures `shared/schemas/tests/ts/test_sensor_roundtrip.test.ts`
 
 **Checkpoint**: Round-trip fidelity proven for all sensor fields in both Python and TypeScript. Backward compatibility confirmed.
 
@@ -123,13 +123,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T024 [test] [US2] Verify comprehensive fixture (T017) includes display properties at both SensorData and SensorContact levels `shared/schemas/src/fixtures/valid/track-feature-sensors-02.json`
-- [ ] T025 [test] [US2] Verify contact with null color serializes correctly (inheritance case) — covered by minimal fixture
+- [x] T024 [test] [US2] Verify comprehensive fixture (T017) includes display properties at both SensorData and SensorContact levels `shared/schemas/src/fixtures/valid/track-feature-sensors-02.json`
+- [x] T025 [test] [US2] Verify contact with null color serializes correctly (inheritance case) — covered by minimal fixture
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Verify Pydantic serialization preserves color, line_style, label_location, put_label_at, visible, show_label for SensorContact
-- [ ] T027 [US2] Verify Pydantic serialization preserves color, visible, line_thickness for SensorData
+- [x] T026 [US2] Verify Pydantic serialization preserves color, line_style, label_location, put_label_at, visible, show_label for SensorContact
+- [x] T027 [US2] Verify Pydantic serialization preserves color, visible, line_thickness for SensorData
 
 **Checkpoint**: Display properties round-trip correctly. Color inheritance (null contact color → inherit from sensor) is schema-compatible.
 
@@ -143,15 +143,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T028 [test] [US3] Create valid fixture with MEASURED mode and measured_positions array `shared/schemas/src/fixtures/valid/track-feature-sensors-measured-01.json`
-- [ ] T029 [test] [US3] Run golden fixture validation for measured positions fixture `shared/schemas/tests/test_golden.py`
-- [ ] T030 [test] [US3] Run round-trip test for measured positions fixture `shared/schemas/tests/test_roundtrip.py`
+- [x] T028 [test] [US3] Create valid fixture with MEASURED mode and measured_positions array `shared/schemas/src/fixtures/valid/track-feature-sensors-measured-01.json`
+- [x] T029 [test] [US3] Run golden fixture validation for measured positions fixture `shared/schemas/tests/test_golden.py`
+- [x] T030 [test] [US3] Run round-trip test for measured positions fixture `shared/schemas/tests/test_roundtrip.py`
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Verify PLAIN mode with no measured_positions validates correctly (covered by comprehensive fixture T017)
-- [ ] T032 [US3] Verify MEASURED mode with empty measured_positions array validates correctly
-- [ ] T033 [US3] Verify MeasuredArrayPosition fields (time, location as float[2] [lon, lat]) are all required and typed correctly
+- [x] T031 [US3] Verify PLAIN mode with no measured_positions validates correctly (covered by comprehensive fixture T017)
+- [x] T032 [US3] Verify MEASURED mode with empty measured_positions array validates correctly
+- [x] T033 [US3] Verify MeasuredArrayPosition fields (time, location as float[2] [lon, lat]) are all required and typed correctly
 
 **Checkpoint**: All three array centre modes validate. MEASURED mode with position time-series round-trips correctly.
 
@@ -165,20 +165,20 @@
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] Update doppler-curve fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/doppler-curve.*.json`
-- [ ] T035 [P] [US4] Update generate-new-sensor-contact fixtures (basic input/output) `shared/tools/sensor/analysis/generate-new-sensor-contact.*.json`
-- [ ] T036 [P] [US4] Update generate-sensor-range-plot fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/generate-sensor-range-plot.*.json`
-- [ ] T037 [P] [US4] Update inflection-point-detector fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/inflection-point-detector.*.json`
-- [ ] T038 [P] [US4] Update insert-sensor-arc fixtures (basic, complex, edge input/output) `shared/tools/sensor/analysis/insert-sensor-arc.*.json`
-- [ ] T039 [P] [US4] Update merge-contacts fixtures (basic, complex, edge input/output) `shared/tools/sensor/analysis/merge-contacts.*.json`
-- [ ] T040 [P] [US4] Update ambiguity-resolver fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/calibration/ambiguity-resolver.*.json`
-- [ ] T041 [P] [US4] Update delete-ambiguous-bearings fixtures (basic, complex, edge input/output) `shared/tools/sensor/calibration/delete-ambiguous-bearings.*.json`
-- [ ] T042 [P] [US4] Update resolve-ambiguity fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/calibration/resolve-ambiguity.*.json`
-- [ ] T043 [US4] Validate all updated tool fixtures pass schema validation
+- [x] T034 [US4] Update doppler-curve fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/doppler-curve.*.json`
+- [x] T035 [P] [US4] Update generate-new-sensor-contact fixtures (basic input/output) `shared/tools/sensor/analysis/generate-new-sensor-contact.*.json`
+- [x] T036 [P] [US4] Update generate-sensor-range-plot fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/generate-sensor-range-plot.*.json`
+- [x] T037 [P] [US4] Update inflection-point-detector fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/analysis/inflection-point-detector.*.json`
+- [x] T038 [P] [US4] Update insert-sensor-arc fixtures (basic, complex, edge input/output) `shared/tools/sensor/analysis/insert-sensor-arc.*.json`
+- [x] T039 [P] [US4] Update merge-contacts fixtures (basic, complex, edge input/output) `shared/tools/sensor/analysis/merge-contacts.*.json`
+- [x] T040 [P] [US4] Update ambiguity-resolver fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/calibration/ambiguity-resolver.*.json`
+- [x] T041 [P] [US4] Update delete-ambiguous-bearings fixtures (basic, complex, edge input/output) `shared/tools/sensor/calibration/delete-ambiguous-bearings.*.json`
+- [x] T042 [P] [US4] Update resolve-ambiguity fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/calibration/resolve-ambiguity.*.json`
+- [x] T043 [US4] Validate all updated tool fixtures pass schema validation
 
 ### Tool Fixture Schema Validation Test (Review Decision #7)
 
-- [ ] T060 [test] [US4] Add pytest parametrized test validating all tool fixture JSON files against SensorData/SensorContact Pydantic models `shared/schemas/tests/test_tool_fixtures.py`
+- [x] T060 [test] [US4] Add pytest parametrized test validating all tool fixture JSON files against SensorData/SensorContact Pydantic models `shared/schemas/tests/test_tool_fixtures.py`
 
 **Checkpoint**: All 62 tool fixture files updated and validated against new schema. Automated test prevents future fixture drift.
 
@@ -192,29 +192,29 @@
 
 ### Tests for User Story 5
 
-- [ ] T044 [test] [US5] Create invalid fixture: out-of-range enum value (array_centre_mode="INVALID") `shared/schemas/src/fixtures/invalid/track-feature-sensor-invalid-enum.json`
-- [ ] T045 [P][test] [US5] Create invalid fixture: origin with wrong cardinality (3 elements) `shared/schemas/src/fixtures/invalid/track-feature-sensor-invalid-origin.json`
-- [ ] T046 [P][test] [US5] Create invalid fixture: bearing outside 0-360 range `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-range.json`
+- [x] T044 [test] [US5] Create invalid fixture: out-of-range enum value (array_centre_mode="INVALID") `shared/schemas/src/fixtures/invalid/track-feature-sensor-invalid-enum.json`
+- [x] T045 [P][test] [US5] Create invalid fixture: origin with wrong cardinality (3 elements) `shared/schemas/src/fixtures/invalid/track-feature-sensor-invalid-origin.json`
+- [x] T046 [P][test] [US5] Create invalid fixture: bearing outside 0-360 range `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-range.json`
 
 ### Constraint Edge-Case Fixtures (Review Decision #11)
 
-- [ ] T063 [test] [US5] Create valid boundary fixture: bearing=0 and bearing=360, empty measured_positions array `shared/schemas/src/fixtures/valid/track-feature-sensors-boundary-01.json`
-- [ ] T064 [P][test] [US5] Create invalid fixture: bearing=-1 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-negative.json`
-- [ ] T065 [P][test] [US5] Create invalid fixture: bearing=361 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-over360.json`
-- [ ] T066 [P][test] [US5] Create invalid fixture: origin with 1 element `shared/schemas/src/fixtures/invalid/track-feature-sensor-origin-wrong-length.json`
+- [x] T063 [test] [US5] Create valid boundary fixture: bearing=0 and bearing=360, empty measured_positions array `shared/schemas/src/fixtures/valid/track-feature-sensors-boundary-01.json`
+- [x] T064 [P][test] [US5] Create invalid fixture: bearing=-1 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-negative.json`
+- [x] T065 [P][test] [US5] Create invalid fixture: bearing=361 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-over360.json`
+- [x] T066 [P][test] [US5] Create invalid fixture: origin with 1 element `shared/schemas/src/fixtures/invalid/track-feature-sensor-origin-wrong-length.json`
 
 ### Schema Comparison Extension (Review Decision #9)
 
-- [ ] T061 [test] [US5] Extend test_schema_compare.py to cover SensorData, SensorContact, and 4 new enums `shared/schemas/tests/test_schema_compare.py`
+- [x] T061 [test] [US5] Extend test_schema_compare.py to cover SensorData, SensorContact, and 4 new enums `shared/schemas/tests/test_schema_compare.py`
 
 ### Enum Exhaustiveness Test (Review Decision #10)
 
-- [ ] T062 [test] [US5] Add parametrized test validating every value of ArrayCentreModeEnum, LineStyleEnum, LabelLocationEnum, LineLabelPositionEnum `shared/schemas/tests/test_sensor_enums.py`
+- [x] T062 [test] [US5] Add parametrized test validating every value of ArrayCentreModeEnum, LineStyleEnum, LabelLocationEnum, LineLabelPositionEnum `shared/schemas/tests/test_sensor_enums.py`
 
 ### Implementation for User Story 5
 
-- [ ] T047 [US5] Run golden fixture validation: all invalid fixtures (including new boundary cases) fail with clear error messages `shared/schemas/tests/test_golden.py`
-- [ ] T048 [US5] Verify existing invalid fixture (track-feature-sensor-no-bearing.json) still fails correctly `shared/schemas/src/fixtures/invalid/track-feature-sensor-no-bearing.json`
+- [x] T047 [US5] Run golden fixture validation: all invalid fixtures (including new boundary cases) fail with clear error messages `shared/schemas/tests/test_golden.py`
+- [x] T048 [US5] Verify existing invalid fixture (track-feature-sensor-no-bearing.json) still fails correctly `shared/schemas/src/fixtures/invalid/track-feature-sensor-no-bearing.json`
 
 **Checkpoint**: Schema safety net is comprehensive. Invalid data is caught with useful error messages. Existing invalid fixtures still work. All enum values validated. Schema comparison covers sensor entities.
 
@@ -226,24 +226,24 @@
 
 ### Verification
 
-- [ ] T049 Run full schema test suite: `uv run pytest shared/schemas/tests/`
-- [ ] T050 Run full CI verification: `task verify`
-- [ ] T051 Verify quickstart.md checklist items all pass `specs/116-sensor-schema-overhaul/quickstart.md`
+- [x] T049 Run full schema test suite: `uv run pytest shared/schemas/tests/`
+- [x] T050 Run full CI verification: `task verify`
+- [x] T051 Verify quickstart.md checklist items all pass `specs/116-sensor-schema-overhaul/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T052 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/116-sensor-schema-overhaul/evidence/test-summary.md`
-- [ ] T053 Create usage demonstration `specs/116-sensor-schema-overhaul/evidence/usage-example.md`
-- [ ] T054 [P] Capture round-trip proof (Python -> JSON -> TypeScript -> JSON -> Python) `specs/116-sensor-schema-overhaul/evidence/round-trip-evidence.md`
+- [x] T052 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/116-sensor-schema-overhaul/evidence/test-summary.md`
+- [x] T053 Create usage demonstration `specs/116-sensor-schema-overhaul/evidence/usage-example.md`
+- [x] T054 [P] Capture round-trip proof (Python -> JSON -> TypeScript -> JSON -> Python) `specs/116-sensor-schema-overhaul/evidence/round-trip-evidence.md`
 
 ### Media Content
 
-- [ ] T055 Create shipped blog post `specs/116-sensor-schema-overhaul/media/shipped-post.md`
-- [ ] T056 [P] Create LinkedIn shipped summary `specs/116-sensor-schema-overhaul/media/linkedin-shipped.md`
+- [x] T055 Create shipped blog post `specs/116-sensor-schema-overhaul/media/shipped-post.md`
+- [x] T056 [P] Create LinkedIn shipped summary `specs/116-sensor-schema-overhaul/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T057 Create PR and publish blog: run /speckit.pr
+- [x] T057 Create PR and publish blog: run /speckit.pr
 
 **Task T057 must run last. It depends on all evidence and media tasks being complete.**
 

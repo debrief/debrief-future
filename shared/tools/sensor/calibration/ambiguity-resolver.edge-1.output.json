@@ -4,10 +4,12 @@
       "type": "resource",
       "uri": "feature://sensor-short-leg",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-short-leg\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"HULL_SONAR\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":90.0,\"ambiguous_bearing\":270.0,\"ambiguous\":true,\"frequency\":200.0,\"origin\":[-1.0,50.0]}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-short-leg\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"HULL_SONAR\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":90.0,\"ambiguous_bearing\":270.0,\"ambiguous\":true,\"frequency\":200.0,\"origin\":[-1.0,50.0],\"has_bearing\":true,\"has_ambiguous\":true,\"has_frequency\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/resolved",
-        "debrief:sourceFeatures": ["sensor-short-leg"],
+        "debrief:sourceFeatures": [
+          "sensor-short-leg"
+        ],
         "debrief:label": "Insufficient data for bearing rate analysis on HULL_SONAR; leg leg-1 has fewer than 2 cuts, 0 cut(s) resolved"
       }
     }

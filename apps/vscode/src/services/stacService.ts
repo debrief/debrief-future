@@ -805,6 +805,72 @@ export class StacService {
     return destPath;
   }
 
+  /**
+   * Delete a result asset from a STAC item and remove the file on disk.
+   *
+   * Feature: 178-vscode-tabular-results (FR-018)
+   *
+   * This is the inverse of `addResultAsset`:
+   *   1. Load the STAC item.
+   *   2. Find the asset key whose href points at the given filename (either
+   *      by filename match or full `./assets/<filename>` match).
+   *   3. Remove the asset entry from `item.assets`.
+   *   4. Delete the file on disk (best-effort — missing file is tolerated).
+   *   5. Persist the updated item and invalidate the cache.
+   *
+   * @returns `true` if an asset entry was removed, `false` if none matched.
+   */
+  async deleteResultAsset(
+    storePath: string,
+    itemPath: string,
+    filename: string
+  ): Promise<boolean> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Locate the asset key whose href matches the filename.
+    let matchedKey: string | undefined;
+    for (const [key, asset] of Object.entries(item.assets)) {
+      if (
+        asset.href === `./assets/${filename}` ||
+        asset.href === `assets/${filename}` ||
+        path.basename(asset.href) === filename
+      ) {
+        matchedKey = key;
+        break;
+      }
+    }
+
+    if (!matchedKey) {
+      return false;
+    }
+
+    delete item.assets[matchedKey];
+
+    // Delete the file from disk (best-effort).
+    const itemDir = path.dirname(fullItemPath);
+    const assetPath = path.join(itemDir, 'assets', filename);
+    try {
+      if (fs.existsSync(assetPath)) {
+        fs.unlinkSync(assetPath);
+      }
+    } catch (err) {
+      console.warn(
+        `[debrief] deleteResultAsset: failed to delete file ${assetPath}:`,
+        err
+      );
+    }
+
+    // Persist updated item and clear cache.
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+    this.itemCache.delete(fullItemPath);
+
+    return true;
+  }
+
   // ============================================================================
   // Snapshot Operations (Feature: 074-snapshots)
   // ============================================================================

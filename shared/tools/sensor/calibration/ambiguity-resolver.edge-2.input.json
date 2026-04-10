@@ -7,7 +7,20 @@
         "id": "sensor-no-ambiguity",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -21,21 +34,39 @@
               "bearing": 45.0,
               "ambiguous": false,
               "frequency": 150.1,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:01:00Z",
               "bearing": 47.0,
               "ambiguous": false,
               "frequency": 150.2,
-              "origin": [-0.99, 50.005]
+              "origin": [
+                -0.99,
+                50.005
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:02:00Z",
               "bearing": 49.0,
               "ambiguous": false,
               "frequency": 150.3,
-              "origin": [-0.98, 50.01]
+              "origin": [
+                -0.98,
+                50.01
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }

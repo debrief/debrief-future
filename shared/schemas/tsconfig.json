@@ -1,4 +1,4 @@
 {
   "extends": "./src/generated/typescript/tsconfig.json",
-  "include": ["src/generated/typescript/**/*.ts"]
+  "include": ["src/generated/typescript/**/*.ts", "tests/ts/**/*.ts"]
 }

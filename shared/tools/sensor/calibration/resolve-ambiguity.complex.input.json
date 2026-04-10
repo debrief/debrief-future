@@ -7,7 +7,24 @@
         "id": "sensor-port-array",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01], [-0.97, 50.015]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ],
+            [
+              -0.97,
+              50.015
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -22,7 +39,14 @@
               "ambiguous_bearing": 315.0,
               "ambiguous": true,
               "frequency": 150.1,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:01:00Z",
@@ -30,14 +54,27 @@
               "ambiguous_bearing": 313.0,
               "ambiguous": true,
               "frequency": 150.2,
-              "origin": [-0.99, 50.005]
+              "origin": [
+                -0.99,
+                50.005
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:02:00Z",
               "bearing": 49.0,
               "ambiguous": false,
               "frequency": 150.3,
-              "origin": [-0.98, 50.01]
+              "origin": [
+                -0.98,
+                50.01
+              ],
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:03:00Z",
@@ -45,7 +82,14 @@
               "ambiguous_bearing": 309.0,
               "ambiguous": true,
               "frequency": 150.25,
-              "origin": [-0.97, 50.015]
+              "origin": [
+                -0.97,
+                50.015
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }
@@ -55,7 +99,20 @@
         "id": "sensor-stbd-array",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.0, 50.0], [-0.99, 50.005], [-0.98, 50.01]]
+          "coordinates": [
+            [
+              -1.0,
+              50.0
+            ],
+            [
+              -0.99,
+              50.005
+            ],
+            [
+              -0.98,
+              50.01
+            ]
+          ]
         },
         "properties": {
           "kind": "SENSOR",
@@ -70,7 +127,14 @@
               "ambiguous_bearing": 80.0,
               "ambiguous": true,
               "frequency": 160.0,
-              "origin": [-1.0, 50.0]
+              "origin": [
+                -1.0,
+                50.0
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:01:00Z",
@@ -78,7 +142,14 @@
               "ambiguous_bearing": 78.0,
               "ambiguous": true,
               "frequency": 160.1,
-              "origin": [-0.99, 50.005]
+              "origin": [
+                -0.99,
+                50.005
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "time": "2024-01-15T10:02:00Z",
@@ -86,7 +157,14 @@
               "ambiguous_bearing": 76.0,
               "ambiguous": true,
               "frequency": 160.2,
-              "origin": [-0.98, 50.01]
+              "origin": [
+                -0.98,
+                50.01
+              ],
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }
@@ -96,7 +174,24 @@
         "id": "track-target-ne",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-0.95, 50.05], [-0.94, 50.055], [-0.93, 50.06], [-0.92, 50.065]]
+          "coordinates": [
+            [
+              -0.95,
+              50.05
+            ],
+            [
+              -0.94,
+              50.055
+            ],
+            [
+              -0.93,
+              50.06
+            ],
+            [
+              -0.92,
+              50.065
+            ]
+          ]
         },
         "properties": {
           "kind": "TRACK",
@@ -106,10 +201,42 @@
           "start_time": "2024-01-15T10:00:00Z",
           "end_time": "2024-01-15T10:03:00Z",
           "positions": [
-            {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.95, 50.05], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.94, 50.055], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.93, 50.06], "course": 30.0, "speed": 10.0},
-            {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.92, 50.065], "course": 30.0, "speed": 10.0}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "coordinates": [
+                -0.95,
+                50.05
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "coordinates": [
+                -0.94,
+                50.055
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "coordinates": [
+                -0.93,
+                50.06
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            },
+            {
+              "time": "2024-01-15T10:03:00Z",
+              "coordinates": [
+                -0.92,
+                50.065
+              ],
+              "course": 30.0,
+              "speed": 10.0
+            }
           ]
         }
       },
@@ -118,7 +245,20 @@
         "id": "track-target-w",
         "geometry": {
           "type": "LineString",
-          "coordinates": [[-1.15, 50.0], [-1.16, 50.005], [-1.17, 50.01]]
+          "coordinates": [
+            [
+              -1.15,
+              50.0
+            ],
+            [
+              -1.16,
+              50.005
+            ],
+            [
+              -1.17,
+              50.01
+            ]
+          ]
         },
         "properties": {
           "kind": "TRACK",
@@ -128,9 +268,33 @@
           "start_time": "2024-01-15T10:00:00Z",
           "end_time": "2024-01-15T10:02:00Z",
           "positions": [
-            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.15, 50.0], "course": 330.0, "speed": 8.0},
-            {"time": "2024-01-15T10:01:00Z", "coordinates": [-1.16, 50.005], "course": 330.0, "speed": 8.0},
-            {"time": "2024-01-15T10:02:00Z", "coordinates": [-1.17, 50.01], "course": 330.0, "speed": 8.0}
+            {
+              "time": "2024-01-15T10:00:00Z",
+              "coordinates": [
+                -1.15,
+                50.0
+              ],
+              "course": 330.0,
+              "speed": 8.0
+            },
+            {
+              "time": "2024-01-15T10:01:00Z",
+              "coordinates": [
+                -1.16,
+                50.005
+              ],
+              "course": 330.0,
+              "speed": 8.0
+            },
+            {
+              "time": "2024-01-15T10:02:00Z",
+              "coordinates": [
+                -1.17,
+                50.01
+              ],
+              "course": 330.0,
+              "speed": 8.0
+            }
           ]
         }
       }

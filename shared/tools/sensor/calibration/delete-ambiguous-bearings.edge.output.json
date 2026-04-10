@@ -4,10 +4,12 @@
       "type": "resource",
       "uri": "feature://sensor-clean",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-clean\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Hull Sonar\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"contact-a\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":90.0,\"ambiguous\":false},{\"id\":\"contact-b\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":92.0,\"ambiguous\":false}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-clean\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Hull Sonar\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"contact-a\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":90.0,\"ambiguous\":false,\"has_bearing\":true,\"visible\":true},{\"id\":\"contact-b\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":92.0,\"ambiguous\":false,\"has_bearing\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/filtered",
-        "debrief:sourceFeatures": ["sensor-clean"],
+        "debrief:sourceFeatures": [
+          "sensor-clean"
+        ],
         "debrief:deletedFeatures": [],
         "debrief:label": "Deleted 0 ambiguous bearing(s) from Hull Sonar (2 contacts remaining)"
       }

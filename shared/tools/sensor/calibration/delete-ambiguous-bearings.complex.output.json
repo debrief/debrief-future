@@ -4,11 +4,17 @@
       "type": "resource",
       "uri": "feature://sensor-port",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-port\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Port Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"pa-002\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":265.0,\"ambiguous\":false},{\"id\":\"pa-005\",\"time\":\"2024-01-15T08:20:00Z\",\"bearing\":250.0,\"ambiguous\":false}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-port\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Port Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"pa-002\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":265.0,\"ambiguous\":false,\"has_bearing\":true,\"visible\":true},{\"id\":\"pa-005\",\"time\":\"2024-01-15T08:20:00Z\",\"bearing\":250.0,\"ambiguous\":false,\"has_bearing\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/filtered",
-        "debrief:sourceFeatures": ["sensor-port"],
-        "debrief:deletedFeatures": ["pa-001", "pa-003", "pa-004"],
+        "debrief:sourceFeatures": [
+          "sensor-port"
+        ],
+        "debrief:deletedFeatures": [
+          "pa-001",
+          "pa-003",
+          "pa-004"
+        ],
         "debrief:label": "Deleted 3 ambiguous bearing(s) from Port Array (2 contacts remaining)"
       }
     },
@@ -16,11 +22,15 @@
       "type": "resource",
       "uri": "feature://sensor-stbd",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"sensor-stbd\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Starboard Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"sa-002\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":85.0,\"ambiguous\":false}]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-stbd\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Starboard Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"sa-002\",\"time\":\"2024-01-15T08:05:00Z\",\"bearing\":85.0,\"ambiguous\":false,\"has_bearing\":true,\"visible\":true}]}}",
       "annotations": {
         "debrief:resultType": "mutation/sensor/filtered",
-        "debrief:sourceFeatures": ["sensor-stbd"],
-        "debrief:deletedFeatures": ["sa-001"],
+        "debrief:sourceFeatures": [
+          "sensor-stbd"
+        ],
+        "debrief:deletedFeatures": [
+          "sa-001"
+        ],
         "debrief:label": "Deleted 1 ambiguous bearing(s) from Starboard Array (1 contacts remaining)"
       }
     }

@@ -83,4 +83,40 @@ describe('ExerciseListItemRow', () => {
     row.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
     expect(onSelect).toHaveBeenCalledWith('./test-1/item.json');
   });
+
+  it('uses default small thumbnail dimensions', () => {
+    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    render(<ExerciseListItemRow item={item} />);
+
+    const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
+    expect(img.width).toBe(60);
+    expect(img.height).toBe(45);
+  });
+
+  it('uses medium thumbnail dimensions when thumbnailSize is medium', () => {
+    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    render(<ExerciseListItemRow item={item} thumbnailSize="medium" />);
+
+    const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
+    expect(img.width).toBe(120);
+    expect(img.height).toBe(90);
+  });
+
+  it('uses large thumbnail dimensions when thumbnailSize is large', () => {
+    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
+
+    const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
+    expect(img.width).toBe(180);
+    expect(img.height).toBe(135);
+  });
+
+  it('passes correct dimensions to SpatialThumbnail for large size', () => {
+    const item = makeItem({ thumbnailSmHref: null, bbox: [-4, 50, -3, 51] });
+    render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
+
+    const spatial = screen.getByTestId('spatial-thumbnail');
+    expect(spatial.style.width).toBe('168px');
+    expect(spatial.style.height).toBe('168px');
+  });
 });

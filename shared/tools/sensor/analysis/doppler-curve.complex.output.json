@@ -7,7 +7,10 @@
       "text": "{\"title\":\"Doppler Curve: OWNSHIP vs Target Crossing\",\"source_frequency_hz\":150.0,\"speed_of_sound_kts\":3032,\"ownship\":\"OWNSHIP\",\"target\":\"Target Crossing\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"predicted_frequency_hz\":150.031,\"radial_velocity_kts\":-0.63,\"range_m\":3560.7,\"bearing_deg\":56.3},{\"time\":\"2024-01-15T10:01:00Z\",\"predicted_frequency_hz\":150.038,\"radial_velocity_kts\":-0.77,\"range_m\":2914.2,\"bearing_deg\":59.8},{\"time\":\"2024-01-15T10:02:00Z\",\"predicted_frequency_hz\":150.048,\"radial_velocity_kts\":-0.97,\"range_m\":2226.4,\"bearing_deg\":0.0},{\"time\":\"2024-01-15T10:03:00Z\",\"predicted_frequency_hz\":150.056,\"radial_velocity_kts\":-1.13,\"range_m\":1670.8,\"bearing_deg\":18.4},{\"time\":\"2024-01-15T10:04:00Z\",\"predicted_frequency_hz\":150.049,\"radial_velocity_kts\":-0.99,\"range_m\":1111.9,\"bearing_deg\":0.0},{\"time\":\"2024-01-15T10:05:00Z\",\"predicted_frequency_hz\":149.978,\"radial_velocity_kts\":0.44,\"range_m\":563.2,\"bearing_deg\":296.6},{\"time\":\"2024-01-15T10:06:00Z\",\"predicted_frequency_hz\":149.933,\"radial_velocity_kts\":1.36,\"range_m\":714.1,\"bearing_deg\":180.0},{\"time\":\"2024-01-15T10:07:00Z\",\"predicted_frequency_hz\":149.952,\"radial_velocity_kts\":0.97,\"range_m\":1200.5,\"bearing_deg\":204.2}],\"statistics\":{\"min_frequency_hz\":149.933,\"max_frequency_hz\":150.056,\"frequency_shift_hz\":0.123,\"data_points\":8,\"cpa_estimate\":{\"time\":\"2024-01-15T10:05:30Z\",\"range_m\":520.0,\"note\":\"Estimated from Doppler zero-crossing\"}}}",
       "annotations": {
         "debrief:resultType": "artifact/analysis/doppler_curve",
-        "debrief:sourceFeatures": ["track-ownship", "track-target-crossing"],
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target-crossing"
+        ],
         "debrief:label": "Doppler curve for OWNSHIP vs Target Crossing: 8 points, f_source=150.0Hz, crossing scenario with CPA near T+05:30",
         "debrief:href": "OWNSHIP-Target_Crossing-doppler.json"
       }

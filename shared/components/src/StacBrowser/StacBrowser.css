@@ -311,6 +311,48 @@
   font-size: 11px;
 }
 
+/* ─── Thumbnail size toggle in GoldenLayout header ───────────────────────── */
+.stac-browser__thumbnail-size-li {
+  width: auto !important;
+  height: auto !important;
+  float: none !important;
+  display: flex !important;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.stac-browser__thumbnail-size-toggle {
+  display: flex;
+  gap: 1px;
+  border: 1px solid var(--vscode-button-secondaryBackground, #ccc);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stac-browser__thumbnail-size-btn {
+  background: none;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground, #666);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 1px 5px;
+  line-height: 18px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.stac-browser__thumbnail-size-btn:hover {
+  background: var(--vscode-list-hoverBackground, #f0f0f0);
+  color: var(--vscode-foreground, #333);
+}
+
+.stac-browser__thumbnail-size-btn--active {
+  background: var(--vscode-focusBorder, #007fd4);
+  color: var(--vscode-button-foreground, #fff);
+}
+
 /* ─── Panel hide button (in header controls, Timeline/Map only) ──────────── */
 .stac-browser__hide-btn-li {
   width: auto !important;
