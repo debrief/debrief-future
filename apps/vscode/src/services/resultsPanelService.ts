@@ -297,17 +297,20 @@ export class ResultsPanelService {
     assetFilename: string;
   }): Promise<void> {
     const itemDir = this._getItemDirectoryPath(args.plotKey);
-    const csvPath = vscode.Uri.file(
-      `${itemDir}/assets/${args.assetFilename}`,
-    );
+    const csvPathStr = `${itemDir}/assets/${args.assetFilename}`;
+    this._log(`openSavedFile: path=${csvPathStr}`);
+    const csvPath = vscode.Uri.file(csvPathStr);
 
     let csv: string;
     try {
       const bytes = await vscode.workspace.fs.readFile(csvPath);
       csv = new TextDecoder('utf-8').decode(bytes);
+      this._log(`openSavedFile: read ${bytes.length} bytes`);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this._log(`openSavedFile: FAILED to read: ${msg}`);
       void vscode.window.showErrorMessage(
-        `Failed to read ${args.assetFilename}: ${err instanceof Error ? err.message : String(err)}`,
+        `Failed to read ${args.assetFilename}: ${msg}`,
       );
       return;
     }
@@ -315,9 +318,12 @@ export class ResultsPanelService {
     let envelope: DatasetEnvelope;
     try {
       envelope = parseCsvToTableDataset(csv, args.assetFilename);
+      this._log(`openSavedFile: parsed ${envelope.data?.length ?? 0} rows`);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this._log(`openSavedFile: FAILED to parse: ${msg}`);
       void vscode.window.showErrorMessage(
-        `Failed to parse ${args.assetFilename}: ${err instanceof Error ? err.message : String(err)}`,
+        `Failed to parse ${args.assetFilename}: ${msg}`,
       );
       return;
     }
@@ -566,7 +572,7 @@ export class ResultsPanelService {
     // Step 3: transition the tab and notify the activity panel dropdown.
     tab.state = { kind: 'saved', filename, savedActivityId };
     this._deps.activityPanelView.addResultFile(
-      tab.envelope.title || tab.toolId,
+      filename,
       `assets/${filename}`,
     );
 
