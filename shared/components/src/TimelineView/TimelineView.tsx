@@ -246,7 +246,11 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   // --- Pan via mouse drag ---
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (!effectiveView) return;
-    // Only pan on the chart area (not on bars — those have their own handlers)
+    // Don't initiate pan when clicking on bars or points — those handle double-click
+    const target = e.target as SVGElement;
+    const cl = target.classList;
+    if (cl.contains('timeline-view__bar') || cl.contains('timeline-view__point')) return;
+
     isPanning.current = true;
     panStartX.current = e.clientX;
     panStartRange.current = { ...effectiveView };
