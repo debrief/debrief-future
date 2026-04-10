@@ -71,6 +71,7 @@ def _parse_timestamp(date_str: str, time_str: str) -> str:
     dt = datetime(year, month, day, hour, minute, second, microsecond, tzinfo=UTC)
     return dt.isoformat()
 
+
 # Prefixes for sensor lines in REP files (checked in order — longest first)
 SENSOR_PREFIXES: tuple[str, ...] = (";SENSOR3:", ";SENSOR2:", ";SENSORARC", ";SENSOR:")
 

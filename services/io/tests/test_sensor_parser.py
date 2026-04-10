@@ -30,6 +30,7 @@ FIXTURES = Path(__file__).parent / "fixtures" / "valid"
 
 # ── is_sensor_line ─────────────────────────────────────────────────────
 
+
 class TestIsSensorLine:
     def test_sensor_v1(self) -> None:
         assert is_sensor_line(";SENSOR: 951212 050000 NELSON @C NULL 045.0 5000 TOWED")
@@ -38,7 +39,9 @@ class TestIsSensorLine:
         assert is_sensor_line(";SENSOR2: 951212 050000 FRIGATE @A NULL 032.8 12000 240 169 NULL S")
 
     def test_sensor_v3(self) -> None:
-        assert is_sensor_line(";SENSOR3: 951212 050000 FRIGATE @A NULL 032.8 12000 240 169 5 2 NULL S")
+        assert is_sensor_line(
+            ";SENSOR3: 951212 050000 FRIGATE @A NULL 032.8 12000 240 169 5 2 NULL S"
+        )
 
     def test_sensorarc(self) -> None:
         assert is_sensor_line(";SENSORARC 951212 050000 951212 050500 FRIGATE 270 90 0 5000")
@@ -51,6 +54,7 @@ class TestIsSensorLine:
 
 
 # ── SENSOR v1 ──────────────────────────────────────────────────────────
+
 
 class TestParseSensorV1:
     """T013-T020: SENSOR v1 line parsing tests."""
@@ -120,14 +124,28 @@ class TestParseSensorV1:
         """T019: contacts with same sensor name merge into single SensorData entry."""
         records = [
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:00:00+00:00",
-                bearing=45.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, color_code="C", line_number=1,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=45.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="C",
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:01:00+00:00",
-                bearing=50.0, has_bearing=True, range_m=5029.2, has_frequency=False,
-                has_ambiguous=False, color_code="C", line_number=2,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:01:00+00:00",
+                bearing=50.0,
+                has_bearing=True,
+                range_m=5029.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="C",
+                line_number=2,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -141,19 +159,37 @@ class TestParseSensorV1:
         """T020: contacts within SensorData are ordered by timestamp."""
         records = [
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:02:00+00:00",
-                bearing=55.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, line_number=3,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:02:00+00:00",
+                bearing=55.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                line_number=3,
             ),
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:00:00+00:00",
-                bearing=45.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, line_number=1,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=45.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:01:00+00:00",
-                bearing=50.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, line_number=2,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:01:00+00:00",
+                bearing=50.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                line_number=2,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -166,6 +202,7 @@ class TestParseSensorV1:
 
 
 # ── NULL/NAN Bearing (US5) ─────────────────────────────────────────────
+
 
 class TestNullNanBearing:
     """T025-T027: NULL and NAN bearing value handling."""
@@ -197,6 +234,7 @@ class TestNullNanBearing:
 
 # ── SENSOR v2 ──────────────────────────────────────────────────────────
 
+
 class TestParseSensorV2:
     """T030-T033: SENSOR2 line parsing tests."""
 
@@ -217,7 +255,9 @@ class TestParseSensorV2:
 
     def test_null_ambiguous_bearing(self) -> None:
         """T031: parse_sensor_v2 with NULL ambiguous bearing sets has_ambiguous=false."""
-        line = ";SENSOR2: 951212 050100.000 FRIGATE @A NULL 035.2 11500 NULL NULL NULL SENSOR_A second"
+        line = (
+            ";SENSOR2: 951212 050100.000 FRIGATE @A NULL 035.2 11500 NULL NULL NULL SENSOR_A second"
+        )
         result = parse_sensor_v2(line, 2)
         assert result is not None
         assert result.ambiguous_bearing is None
@@ -225,7 +265,9 @@ class TestParseSensorV2:
 
     def test_null_frequency(self) -> None:
         """T032: parse_sensor_v2 with NULL frequency sets has_frequency=false."""
-        line = ";SENSOR2: 951212 050100.000 FRIGATE @A NULL 035.2 11500 NULL NULL NULL SENSOR_A second"
+        line = (
+            ";SENSOR2: 951212 050100.000 FRIGATE @A NULL 035.2 11500 NULL NULL NULL SENSOR_A second"
+        )
         result = parse_sensor_v2(line, 2)
         assert result is not None
         assert result.frequency is None
@@ -235,15 +277,30 @@ class TestParseSensorV2:
         """T033: multiple SENSOR2 contacts merge into one SensorData entry."""
         records = [
             ParsedSensorContact(
-                parent_track="FRIGATE", sensor_name="SENSOR_A", time="1995-12-12T05:00:00+00:00",
-                bearing=32.8, has_bearing=True, range_m=10972.8, has_frequency=True,
-                has_ambiguous=True, frequency=169.4, ambiguous_bearing=240.5,
-                color_code="A", line_number=1,
+                parent_track="FRIGATE",
+                sensor_name="SENSOR_A",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=32.8,
+                has_bearing=True,
+                range_m=10972.8,
+                has_frequency=True,
+                has_ambiguous=True,
+                frequency=169.4,
+                ambiguous_bearing=240.5,
+                color_code="A",
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="FRIGATE", sensor_name="SENSOR_A", time="1995-12-12T05:01:00+00:00",
-                bearing=35.2, has_bearing=True, range_m=10516.8, has_frequency=False,
-                has_ambiguous=False, color_code="A", line_number=2,
+                parent_track="FRIGATE",
+                sensor_name="SENSOR_A",
+                time="1995-12-12T05:01:00+00:00",
+                bearing=35.2,
+                has_bearing=True,
+                range_m=10516.8,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="A",
+                line_number=2,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -262,6 +319,7 @@ class TestParseSensorV2:
 
 
 # ── SENSOR v3 ──────────────────────────────────────────────────────────
+
 
 class TestParseSensorV3:
     """T037-T039: SENSOR3 line parsing tests."""
@@ -298,19 +356,40 @@ class TestParseSensorV3:
         """T039: mixed SENSOR/SENSOR2/SENSOR3 lines merge into single SensorData."""
         records = [
             ParsedSensorContact(
-                parent_track="TESTSHIP", sensor_name="MERGE", time="1995-12-12T06:06:00+00:00",
-                bearing=100.0, has_bearing=True, range_m=2743.2, has_frequency=False,
-                has_ambiguous=False, color_code="D", line_number=1,
+                parent_track="TESTSHIP",
+                sensor_name="MERGE",
+                time="1995-12-12T06:06:00+00:00",
+                bearing=100.0,
+                has_bearing=True,
+                range_m=2743.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="D",
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="TESTSHIP", sensor_name="MERGE", time="1995-12-12T06:07:00+00:00",
-                bearing=110.0, has_bearing=True, range_m=2743.2, has_frequency=False,
-                has_ambiguous=False, color_code="D", line_number=2,
+                parent_track="TESTSHIP",
+                sensor_name="MERGE",
+                time="1995-12-12T06:07:00+00:00",
+                bearing=110.0,
+                has_bearing=True,
+                range_m=2743.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="D",
+                line_number=2,
             ),
             ParsedSensorContact(
-                parent_track="TESTSHIP", sensor_name="MERGE", time="1995-12-12T06:08:00+00:00",
-                bearing=120.0, has_bearing=True, range_m=2743.2, has_frequency=False,
-                has_ambiguous=False, color_code="D", line_number=3,
+                parent_track="TESTSHIP",
+                sensor_name="MERGE",
+                time="1995-12-12T06:08:00+00:00",
+                bearing=120.0,
+                has_bearing=True,
+                range_m=2743.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="D",
+                line_number=3,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -321,7 +400,9 @@ class TestParseSensorV3:
 
     def test_v3_null_accuracy_produces_same_as_v2(self) -> None:
         """SENSOR3 with NULL accuracy fields produces identical output to SENSOR2."""
-        v2_line = ";SENSOR2: 951212 050200.000 FRIGATE @A NULL 038.0 11000 242.0 170.0 NULL SENSOR_A test"
+        v2_line = (
+            ";SENSOR2: 951212 050200.000 FRIGATE @A NULL 038.0 11000 242.0 170.0 NULL SENSOR_A test"
+        )
         v3_line = ";SENSOR3: 951212 050200.000 FRIGATE @A NULL 038.0 11000 242.0 170.0 NULL NULL NULL SENSOR_A test"
         v2 = parse_sensor_v2(v2_line, 1)
         v3 = parse_sensor_v3(v3_line, 2)
@@ -337,6 +418,7 @@ class TestParseSensorV3:
 
 
 # ── SENSORARC ──────────────────────────────────────────────────────────
+
 
 class TestParseSensorarc:
     """T043-T045: SENSORARC line parsing tests."""
@@ -382,25 +464,47 @@ class TestParseSensorarc:
 
 # ── group_sensor_contacts ─────────────────────────────────────────────
 
+
 class TestGroupSensorContacts:
     """Tests for contact grouping logic."""
 
     def test_groups_by_track_and_sensor_name(self) -> None:
         records = [
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:00:00+00:00",
-                bearing=45.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, color_code="C", line_number=1,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=45.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="C",
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="HULL", time="1995-12-12T05:00:00+00:00",
-                bearing=90.0, has_bearing=True, range_m=2743.2, has_frequency=False,
-                has_ambiguous=False, color_code="A", line_number=2,
+                parent_track="NELSON",
+                sensor_name="HULL",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=90.0,
+                has_bearing=True,
+                range_m=2743.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="A",
+                line_number=2,
             ),
             ParsedSensorContact(
-                parent_track="FRIGATE", sensor_name="SONAR", time="1995-12-12T05:00:00+00:00",
-                bearing=32.8, has_bearing=True, range_m=10972.8, has_frequency=False,
-                has_ambiguous=False, color_code="A", line_number=3,
+                parent_track="FRIGATE",
+                sensor_name="SONAR",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=32.8,
+                has_bearing=True,
+                range_m=10972.8,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="A",
+                line_number=3,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -414,14 +518,28 @@ class TestGroupSensorContacts:
         """SensorData color derived from first contact's symbology code."""
         records = [
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:00:00+00:00",
-                bearing=45.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, color_code="C", line_number=1,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=45.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="C",
+                line_number=1,
             ),
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:01:00+00:00",
-                bearing=50.0, has_bearing=True, range_m=5029.2, has_frequency=False,
-                has_ambiguous=False, color_code="A", line_number=2,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:01:00+00:00",
+                bearing=50.0,
+                has_bearing=True,
+                range_m=5029.2,
+                has_frequency=False,
+                has_ambiguous=False,
+                color_code="A",
+                line_number=2,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -432,9 +550,15 @@ class TestGroupSensorContacts:
         """Contact dicts include has_bearing=false when bearing is absent."""
         records = [
             ParsedSensorContact(
-                parent_track="SHIP", sensor_name="PASSIVE", time="1995-12-12T06:00:00+00:00",
-                bearing=0.0, has_bearing=False, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, line_number=1,
+                parent_track="SHIP",
+                sensor_name="PASSIVE",
+                time="1995-12-12T06:00:00+00:00",
+                bearing=0.0,
+                has_bearing=False,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                line_number=1,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -446,9 +570,16 @@ class TestGroupSensorContacts:
         """Contact dicts include origin when explicit coordinates are provided."""
         records = [
             ParsedSensorContact(
-                parent_track="NELSON", sensor_name="TOWED", time="1995-12-12T05:00:00+00:00",
-                bearing=45.0, has_bearing=True, range_m=4572.0, has_frequency=False,
-                has_ambiguous=False, origin=[-21.698, 22.186], line_number=1,
+                parent_track="NELSON",
+                sensor_name="TOWED",
+                time="1995-12-12T05:00:00+00:00",
+                bearing=45.0,
+                has_bearing=True,
+                range_m=4572.0,
+                has_frequency=False,
+                has_ambiguous=False,
+                origin=[-21.698, 22.186],
+                line_number=1,
             ),
         ]
         grouped = group_sensor_contacts(records)
@@ -461,6 +592,7 @@ class TestGroupSensorContacts:
 
 
 # ── Edge Cases / Malformed Lines ───────────────────────────────────────
+
 
 class TestEdgeCases:
     """T049-T051: Edge case and malformed line tests."""
@@ -526,6 +658,7 @@ class TestEdgeCases:
 
 
 # ── Performance ────────────────────────────────────────────────────────
+
 
 class TestPerformance:
     """T051: Performance test for SC-008."""

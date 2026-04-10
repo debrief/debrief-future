@@ -491,8 +491,7 @@ class TestSensorIntegration:
 
         # Find DYNAMIC_TRACK_COVERAGE features
         coverage_features = [
-            f for f in result.features
-            if f["properties"].get("kind") == "DYNAMIC_TRACK_COVERAGE"
+            f for f in result.features if f["properties"].get("kind") == "DYNAMIC_TRACK_COVERAGE"
         ]
         assert len(coverage_features) == 1
         cov = coverage_features[0]
@@ -518,9 +517,7 @@ class TestSensorIntegration:
         result = handler.parse(content, "sensor_edge_cases.rep")
 
         testship_sensors = result.pending_sensor_data["TESTSHIP"]
-        merge_sensor = next(
-            (s for s in testship_sensors if s["name"] == "MERGE_SENSOR"), None
-        )
+        merge_sensor = next((s for s in testship_sensors if s["name"] == "MERGE_SENSOR"), None)
         assert merge_sensor is not None
         assert len(merge_sensor["contacts"]) == 3
 
@@ -530,10 +527,7 @@ class TestSensorIntegration:
         handler = REPHandler()
         result = handler.parse(content, "sensor_all_formats.rep")
 
-        track_features = [
-            f for f in result.features
-            if f["properties"].get("kind") == "TRACK"
-        ]
+        track_features = [f for f in result.features if f["properties"].get("kind") == "TRACK"]
         assert len(track_features) == 2
         track_names = {f["properties"]["platform_id"] for f in track_features}
         assert track_names == {"NELSON", "FRIGATE"}
