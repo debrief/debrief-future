@@ -55,6 +55,11 @@ export interface TimelineViewProps {
      * Wrapped in try/catch per Art. V.1 — errors fall back to default.
      */
     readonly colourFn?: ColourFn;
+    /**
+     * Increment to externally reset zoom to full extent.
+     * Used by "Clear All Filters" to reset the timeline after temporal zoom.
+     */
+    readonly resetKey?: number;
     /** Additional CSS class name for the container. */
     readonly className?: string;
 }
