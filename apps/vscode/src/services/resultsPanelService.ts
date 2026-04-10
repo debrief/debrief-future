@@ -114,6 +114,65 @@ function sourceLabelFromIds(ids: string[]): string {
   return `${ids[0]} +${ids.length - 1}`;
 }
 
+/**
+ * Build a human-readable tab title from the envelope title and source
+ * feature IDs.
+ *
+ * Examples:
+ *   "Range: 50d98485-... → 06b76d2d-..." → "Range"
+ *   "Range: HMS Defender → USS Freedom"  → "Range (HMS Defender → USS Freedom)"
+ *   "Track Alpha"                        → "Track Alpha"
+ *
+ * Strategy:
+ *   1. Extract the subject prefix (before ": " if present).
+ *   2. Extract the feature-name suffix (after ": ").
+ *   3. If the suffix looks like UUIDs (long hex strings), drop it.
+ *   4. Otherwise append it in parentheses.
+ *   5. Truncate to 60 chars.
+ */
+function buildShortTabTitle(
+  envelopeTitle: string,
+  sourceFeatureIds: string[],
+  _toolId: string,
+): string {
+  const colonIdx = envelopeTitle.indexOf(': ');
+  if (colonIdx < 0) {
+    // No colon — title is already short (e.g. "Track Alpha — Stats").
+    return envelopeTitle.length <= 60
+      ? envelopeTitle
+      : envelopeTitle.slice(0, 57) + '...';
+  }
+
+  const subject = envelopeTitle.slice(0, colonIdx); // e.g. "Range"
+  const suffix = envelopeTitle.slice(colonIdx + 2);  // e.g. "HMS Defender → USS Freedom"
+
+  // Detect UUID-heavy suffixes (>30 chars with hex patterns).
+  const looksLikeUuids =
+    suffix.length > 30 &&
+    /[0-9a-f]{8}-[0-9a-f]{4}/.test(suffix);
+
+  if (looksLikeUuids) {
+    // Use the source feature IDs instead — they might be more readable.
+    // If they're also UUIDs, just return the subject alone.
+    const shortIds = sourceFeatureIds
+      .map((id) => {
+        // If the ID itself is a UUID, truncate to first 8 chars.
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}/.test(id)) {
+          return id.slice(0, 8);
+        }
+        return id.length > 20 ? id.slice(0, 17) + '...' : id;
+      })
+      .join(' → ');
+    return shortIds
+      ? `${subject} (${shortIds})`.slice(0, 60)
+      : subject;
+  }
+
+  // Suffix is human-readable — include it.
+  const full = `${subject} (${suffix})`;
+  return full.length <= 60 ? full : `${subject} (${suffix.slice(0, 50)}...)`;
+}
+
 // ---------------------------------------------------------------------------
 // Service
 // ---------------------------------------------------------------------------
@@ -215,7 +274,18 @@ export class ResultsPanelService {
         id: generateTabId(),
         toolId: args.toolId,
         plotKey: args.plotKey,
-        envelope,
+        envelope: {
+          ...envelope,
+          // Build a shorter tab title.  The Python tool sets titles
+          // like "Range: 50d98485-ad0a-... → 06b76d2d-08c9-..." which
+          // are unreadable.  We replace with "{subject} ({sources})"
+          // e.g. "Range (HMS Defender → USS Freedom)".
+          title: buildShortTabTitle(
+            envelope.title,
+            args.sourceFeatureIds,
+            args.toolId,
+          ),
+        },
         sourceFeatureIds: [...args.sourceFeatureIds],
         parameters: args.parameters,
         parentActivityId: args.parentActivityId,
