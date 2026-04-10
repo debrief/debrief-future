@@ -83,7 +83,7 @@
 
 - [ ] T009 [P][test] Case A: simple track renders positions as direct children (unchanged except course padding) `shared/components/src/FeatureList/flattenFeatures.test.ts`
 - [ ] T010 [P][test] Case A: track with empty `sensors: []` falls through to Case A `shared/components/src/FeatureList/flattenFeatures.test.ts`
-- [ ] T011 [P][test] Case B: compound track gets `Track Segments (N)` wrapper at depth 1 `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [ ] T011 [P][test] Case B: compound track without sensors gets `Track Segments (N)` wrapper at depth 1 (decision 3B — adds wrapper for symmetry with Case D) `shared/components/src/FeatureList/flattenFeatures.test.ts`
 - [ ] T012 [P][test] Case C: track with sensors gets `Positions (N)` + `Sensors (N)` groups at depth 1 `shared/components/src/FeatureList/flattenFeatures.test.ts`
 - [ ] T013 [P][test] Case D: compound track with sensors gets `Track Segments (N)` + `Sensors (N)` groups `shared/components/src/FeatureList/flattenFeatures.test.ts`
 - [ ] T014 [P][test] Sensor rows use `name` as label and `"N contacts"` as sublabel `shared/components/src/FeatureList/flattenFeatures.test.ts`
@@ -171,6 +171,17 @@
 - [ ] T041 Run Storybook E2E suite: `pnpm --filter @debrief/components test:e2e FeatureList`
 
 **Checkpoint**: E2E tests pass — automated visual evidence captured for all themes
+
+---
+
+## Phase 7B: Review Amendments
+
+**Purpose**: Additional tests identified during /speckit.review to cover ActivityPanel contact handler wiring and getRootFeatureId utility
+
+- [ ] T050 [test] ActivityPanel contact handler resolves contact path ID to correct SensorContact properties and populates info dialog `shared/components/src/FeatureList/FeatureList.test.tsx` (or `ActivityPanel.test.tsx` if exists)
+- [ ] T051 [test] `getRootFeatureId` utility: simple feature ID returns itself, sensor path returns root, contact path returns root (3 assertions) `shared/components/src/FeatureList/flattenFeatures.test.ts`
+
+**Checkpoint**: Review-identified gaps covered — contact handler and path utility both tested
 
 ---
 

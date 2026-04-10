@@ -17,7 +17,7 @@ Extend the `FeatureList` row-tree so tracks carrying embedded sensor data (`Trac
 **Project Type**: Shared TypeScript component library (pnpm workspace package `@debrief/components`)
 **Performance Goals**: Maintain current `FeatureList` virtualisation budget — a track with 10,000 sensor contacts must expand without degrading scroll FPS by more than 10% (SC-003)
 **Constraints**: Constant row height (virtualiser contract FR-011); offline-capable (Article I); no schema changes (Article II — `TrackProperties.sensors` is already in the generated types); pure render-time logic — no side effects in `flattenFeatures`
-**Scale/Scope**: ~150 lines added to `flattenFeatures.ts`, ~20 lines added to `FeatureRow.tsx`, ~200 lines of new unit tests, ~100 lines of new Storybook fixtures, 1-line change to `getPositionSublabel`
+**Scale/Scope**: ~150 lines added to `flattenFeatures.ts` (incl. `getRootFeatureId` utility), ~20 lines added to `FeatureRow.tsx`, ~20 lines added to `ActivityPanel.tsx` (contact info handler), ~200 lines of new unit tests, ~100 lines of new Storybook fixtures, 1-line change to `getPositionSublabel`. 8 files touched (review-amended from original 5).
 
 ## Constitution Check
 
@@ -70,9 +70,13 @@ shared/components/src/FeatureList/
 
 shared/components/e2e/
 └── FeatureList.spec.ts         # EXTEND (or create) — Playwright E2E covering the new story across light/dark/vscode themes
+
+apps/vscode/src/panels/
+├── ActivityPanel.tsx            # EXTEND — wire handleChildInfoClick for contact rows: resolve path via getRootFeatureId, look up SensorContact, populate info dialog (review decision 1A)
+└── <InfoDialog types file>     # EXTEND — add optional `properties` field to InfoDialogState for contact data (review decision 4A)
 ```
 
-**Structure Decision**: Single-package component library edit. The feature is contained to one directory (`shared/components/src/FeatureList/`) and touches no other package, service, or schema. The VS Code extension and web-shell consume `@debrief/components` and will pick up the new row kinds automatically on the next build — no coordinated changes required downstream. Host apps can wire up the contact-row info icon handler at their own pace.
+**Structure Decision**: Single-package component library edit, plus two small host-app amendments. The core feature is contained to one directory (`shared/components/src/FeatureList/`) and touches no other package, service, or schema. The VS Code extension and web-shell consume `@debrief/components` and will pick up the new row kinds automatically on the next build — no coordinated changes required downstream. Review decision 1A adds the contact info handler in ActivityPanel.tsx now rather than deferring it, keeping the feature end-to-end complete.
 
 ## Media Components
 
@@ -116,6 +120,23 @@ shared/components/e2e/
 ## VS Code Webview E2E Testing
 
 None — the VS Code extension consumes `@debrief/components` without modification. The Activity Panel's FeatureList instance will show the new row kinds on the next build automatically. No extension-side changes, no webview patch updates, no new extension-layer E2E coverage. (A follow-up feature wiring the contact-row info popover in the VS Code host can add webview E2E coverage at that time.)
+
+## Review Decisions
+
+*Recorded during `/speckit.review` — 2026-04-10*
+
+| # | Question | Decision | Impact |
+|---|---|---|---|
+| 1 | Wire ActivityPanel contact info handler now or defer? | **1A: Wire now** | +1 file (ActivityPanel.tsx) |
+| 2 | Add CSS class for contact rows in FeatureRow? | **2B: No new CSS** | No change |
+| 3 | Case B (no sensors, >1 segment) adds Track Segments wrapper? | **3B: Yes** | Matches US4-AS2; T011 updated |
+| 4 | How does contact handler pass properties to dialog? | **4A: Extend InfoDialogState** | +1 type file |
+| 5 | How does handler resolve featureId from contact path? | **5A: Path-parsing utility** | +1 utility + tests (T051) |
+
+### Test Gaps Identified
+
+- **T050**: ActivityPanel contact handler test — proves path resolution and dialog population
+- **T051**: `getRootFeatureId` utility tests — 3 assertions (simple ID, sensor path, contact path)
 
 ## Complexity Tracking
 
