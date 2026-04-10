@@ -254,6 +254,24 @@ export default function App() {
     return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
   }, [plotFeatures, resultLayers, drawnFeatures]);
 
+  // Features visible on map (excludes those with visible === false)
+  const visibleFeatures = useMemo<DebriefFeature[]>(() => {
+    return allFeatures.filter(f => {
+      const props = featureProps(f);
+      return props.visible !== false; // default to visible
+    });
+  }, [allFeatures]);
+
+  // Derive hidden IDs set for the ActivityPanel's FeatureList / LayersToolbar
+  const hiddenFeatureIds = useMemo<Set<string>>(() => {
+    const hidden = new Set<string>();
+    for (const f of allFeatures) {
+      const props = featureProps(f);
+      if (props.visible === false) hidden.add(f.id);
+    }
+    return hidden;
+  }, [allFeatures]);
+
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
     const names: Record<string, string> = {};
@@ -298,6 +316,15 @@ export default function App() {
   const tools = useMemo<ToolsPanelItem[]>(() => {
     return calcService.getTools(selectedFeatures as Feature[]);
   }, [selectedFeatures]);
+
+  // Convert ToolsPanelItem[] to MatchResult[] for the Run dropdown in LayersToolbar
+  const toolMatches = useMemo(() => {
+    return tools.map(t => ({
+      tool: { id: t.id, name: t.name, description: t.description },
+      isActive: t.applicable,
+      explanation: t.explanation ?? '',
+    }));
+  }, [tools]);
 
   // --- Keyboard: Ctrl+Z / Ctrl+Y for undo/redo ---
   useEffect(() => {
@@ -1039,6 +1066,38 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:toggleVisibility': {
+        const targetIds = new Set(message.payload.featureIds);
+
+        // Determine toggle direction: if ALL targets are already hidden, show them; otherwise hide all
+        const allCurrentlyHidden = message.payload.featureIds.every(id => {
+          const f = allFeatures.find(feat => feat.id === id);
+          return f ? featureProps(f).visible === false : false;
+        });
+        const newVisible = allCurrentlyHidden; // true = show, false = hide
+
+        // Update plot features
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            if (!targetIds.has(String(f.id))) return f;
+            const props = (f.properties ?? {}) as { [key: string]: unknown };
+            return { ...f, properties: { ...props, visible: newVisible } };
+          });
+          return { ...plot, features: { ...plot.features, features: updatedFeatures } };
+        });
+
+        // Also update drawn features
+        setDrawnFeatures(prev =>
+          prev.map(f => {
+            if (!targetIds.has(f.id)) return f;
+            return Object.assign({}, f, {
+              properties: { ...f.properties, visible: newVisible },
+            });
+          }),
+        );
+        break;
+      }
       case 'layer:format': {
         const { featureIds, property, isPointOverride, positionIndex } = message.payload;
         // Coerce boolean string values ('true'/'false') to actual booleans
@@ -1126,7 +1185,7 @@ export default function App() {
       default:
         break;
     }
-  }, [playback, store, handleRunTool, handleFileSelect]);
+  }, [playback, store, handleRunTool, handleFileSelect, allFeatures]);
 
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
@@ -1216,13 +1275,15 @@ export default function App() {
       displayMode: toComponentMode(state.displayMode),
       timeUiState: timeExtent ? 'ready' : 'empty',
       tools,
+      toolMatches,
       features: allFeatures,
       selectedFeatureIds: state.selection.featureIds,
+      hiddenIds: hiddenFeatureIds,
       resultFiles: savedResultFiles,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
-      features: allFeatures,
+      features: visibleFeatures,
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
@@ -1268,7 +1329,8 @@ export default function App() {
   }), [
     panelComponents, currentPlot, timeExtent, playback.currentTime,
     playback.playbackState, playback.speed, state.displayMode,
-    tools, allFeatures, state.selection.featureIds, handleActivityMessage,
+    tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
+    hiddenFeatureIds, handleActivityMessage,
     selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,

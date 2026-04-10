@@ -337,16 +337,19 @@ export function MapView({
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       // eslint-disable-next-line no-restricted-syntax
       const style = props.style as Record<string, unknown> | undefined;
+      // For tracks, style properties are nested under style.line.*
+      // eslint-disable-next-line no-restricted-syntax
+      const lineStyle = style?.line as Record<string, unknown> | undefined;
       const color = getFeatureColor(debriefFeature);
       const fillColor = (style?.fill_color as string) ?? color;
 
       return {
         color,
-        weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
-        opacity: (style?.opacity as number) ?? 1,
+        weight: isSelected ? 4 : (lineStyle?.weight as number) ?? (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
+        opacity: (lineStyle?.opacity as number) ?? (style?.opacity as number) ?? 1,
         fillColor,
         fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
-        dashArray: (style?.dash_array as string) ?? undefined,
+        dashArray: (lineStyle?.dash_array as string) ?? (style?.dash_array as string) ?? undefined,
       };
     };
   }, [selectedIds]);
