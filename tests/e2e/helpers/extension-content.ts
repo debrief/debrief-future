@@ -23,7 +23,8 @@ export type WebviewBundle =
   | 'mapView'
   | 'catalogOverview'
   | 'logPanel'
-  | 'timeController';
+  | 'timeController'
+  | 'resultsPanel';
 
 /**
  * Generate HTML for a webview bundle with the JS inlined.

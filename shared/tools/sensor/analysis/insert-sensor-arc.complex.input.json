@@ -19,19 +19,28 @@
               "id": "existing-001",
               "time": "2024-01-15T08:00:00Z",
               "bearing": 30.0,
-              "frequency": 100.0
+              "frequency": 100.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "id": "existing-002",
               "time": "2024-01-15T09:00:00Z",
               "bearing": 35.0,
-              "frequency": 102.0
+              "frequency": 102.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             },
             {
               "id": "existing-003",
               "time": "2024-01-15T10:00:00Z",
               "bearing": 40.0,
-              "frequency": 105.0
+              "frequency": 105.0,
+              "has_bearing": true,
+              "has_frequency": true,
+              "visible": true
             }
           ]
         }

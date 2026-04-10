@@ -7,7 +7,10 @@
       "text": "{\"title\":\"Doppler Curve: OWNSHIP vs Target Alpha\",\"source_frequency_hz\":150.0,\"speed_of_sound_kts\":3032,\"ownship\":\"OWNSHIP\",\"target\":\"Target Alpha\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"predicted_frequency_hz\":150.087,\"radial_velocity_kts\":-1.76,\"range_m\":6576.8,\"bearing_deg\":45.0}],\"statistics\":{\"min_frequency_hz\":150.087,\"max_frequency_hz\":150.087,\"frequency_shift_hz\":0.087,\"data_points\":1}}",
       "annotations": {
         "debrief:resultType": "artifact/analysis/doppler_curve",
-        "debrief:sourceFeatures": ["track-ownship", "track-target"],
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
         "debrief:label": "Doppler curve for OWNSHIP vs Target Alpha: 1 point, f_source=150.0Hz, shift +0.087Hz",
         "debrief:href": "OWNSHIP-Target_Alpha-doppler.json"
       }

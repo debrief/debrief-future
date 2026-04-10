@@ -71,3 +71,47 @@ export interface ResolvedPositionStyle {
   showLabel: boolean;
   label: string | null;
 }
+
+/**
+ * Axis definition for chart dataset metadata.
+ * Mirrors `shared/components/src/ChartRenderer/types.ts#AxisDefinition`.
+ *
+ * Feature: 178-vscode-tabular-results — DatasetEnvelope lives in @debrief/utils
+ * so both shared components and service-side code (VS Code host, web-shell
+ * mocks) can reference it without a cycle through components.
+ */
+export interface AxisDefinition {
+  label: string;
+  type: 'nominal' | 'ordinal' | 'quantitative' | 'temporal';
+  units?: string;
+}
+
+/**
+ * Dataset metadata (axis configuration).
+ */
+export interface DatasetMetadata {
+  xAxis: AxisDefinition;
+  yAxis: AxisDefinition;
+}
+
+/**
+ * Named data series for multi-series charts.
+ */
+export interface DataSeries {
+  name: string;
+  data: Record<string, unknown>[];
+}
+
+/**
+ * Standard envelope describing a tool result dataset ready for rendering
+ * as a chart or a table.  The shared ChartPanelWrapper in
+ * `@debrief/components` accepts this shape at runtime.
+ */
+export interface DatasetEnvelope {
+  type: string;
+  title: string;
+  metadata: DatasetMetadata;
+  data?: Record<string, unknown>[];
+  series?: DataSeries[];
+  displayHint?: 'table' | 'chart';
+}

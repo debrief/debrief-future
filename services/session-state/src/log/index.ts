@@ -3,6 +3,8 @@
  * Feature: 071-log-recording-service (E02, Phase 1)
  */
 
+export { FILE_SAVE_TOOL_SENTINEL } from './types.js';
+
 export type {
   LogEntry,
   WasGeneratedBy,

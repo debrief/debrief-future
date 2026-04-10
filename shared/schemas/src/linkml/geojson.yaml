@@ -188,6 +188,23 @@ classes:
       after_leg:
         description: Name of following TMA leg (DYNAMIC_INFILL)
 
+  MeasuredArrayPosition:
+    description: >-
+      Timestamped geographic position of a towed array centre.
+      Used by MEASURED array centre mode for bearing line origin interpolation.
+    attributes:
+      time:
+        description: Position timestamp (ISO8601)
+        range: datetime
+        required: true
+      location:
+        description: Array centre position [longitude, latitude] (GeoJSON coordinate order)
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
+
   SensorContact:
     description: >-
       Single sensor measurement record. Represents one bearing/range
@@ -203,6 +220,17 @@ classes:
         required: true
         minimum_value: 0
         maximum_value: 360
+      has_bearing:
+        description: Controls bearing line display (true=show, false=hide). Data stored regardless.
+        range: boolean
+      ambiguous_bearing:
+        description: Ambiguous bearing (second solution) in degrees
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      has_ambiguous:
+        description: Controls ambiguous bearing display
+        range: boolean
       range:
         description: Range to contact in metres
         range: float
@@ -210,15 +238,37 @@ classes:
       frequency:
         description: Measured frequency in Hz
         range: float
-      ambiguous_bearing:
-        description: Ambiguous bearing (second solution) in degrees
-        range: float
-        minimum_value: 0
-        maximum_value: 360
+      has_frequency:
+        description: Controls frequency data display
+        range: boolean
       label:
         description: Display label
       comment:
         description: Operator note
+      color:
+        description: Contact color override (null = inherit from parent SensorData)
+        range: CSSColor
+      visible:
+        description: Contact visibility
+        range: boolean
+      show_label:
+        description: Label visibility
+        range: boolean
+      line_style:
+        description: Bearing line visual style
+        range: LineStyleEnum
+      label_location:
+        description: Label horizontal alignment
+        range: LabelLocationEnum
+      put_label_at:
+        description: Label position along bearing line
+        range: LineLabelPositionEnum
+      origin:
+        description: Explicit sensor location override [longitude, latitude]
+        range: float
+        multivalued: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
 
   SensorData:
     description: >-
@@ -234,14 +284,31 @@ classes:
       offset:
         description: Sensor offset from host platform in metres
         range: float
+      array_centre_mode:
+        description: How bearing line origin is calculated relative to host platform
+        range: ArrayCentreModeEnum
       worm_in_hole:
         description: Display mode flag
         range: boolean
+      color:
+        description: Default color for all contacts in this sensor
+        range: CSSColor
+      visible:
+        description: Sensor visibility
+        range: boolean
+      line_thickness:
+        description: Bearing line width in pixels
+        range: integer
       contacts:
         description: Array of sensor measurements
         range: SensorContact
         multivalued: true
         required: true
+        inlined_as_list: true
+      measured_positions:
+        description: Actual towed array positions for MEASURED array centre mode
+        range: MeasuredArrayPosition
+        multivalued: true
         inlined_as_list: true
 
   TUASolution:

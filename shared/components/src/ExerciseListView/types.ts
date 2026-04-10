@@ -95,6 +95,9 @@ export interface ExerciseListViewProps {
   /** Track data loaded via lazy loading, keyed by item ID. */
   readonly trackData?: ReadonlyMap<string, GeoJSONFeatureCollection>;
 
+  /** Thumbnail size preset (small/medium/large). Defaults to 'small'. */
+  readonly thumbnailSize?: ThumbnailSize;
+
   /** Additional CSS class for the container. */
   readonly className?: string;
 
@@ -121,6 +124,21 @@ export interface ExerciseListItemRowProps {
 
   /** Whether this row is currently highlighted/selected for preview (#174). */
   readonly highlighted?: boolean;
+
+  /** Thumbnail size preset controlling image dimensions. Defaults to 'small'. */
+  readonly thumbnailSize?: ThumbnailSize;
+}
+
+/** Thumbnail display size preset. */
+export type ThumbnailSize = 'small' | 'medium' | 'large';
+
+/** Dimensions configuration for a given thumbnail size preset. */
+export interface ThumbnailSizeConfig {
+  readonly rasterWidth: number;
+  readonly rasterHeight: number;
+  readonly spatialWidth: number;
+  readonly spatialHeight: number;
+  readonly rowHeight: number;
 }
 
 /** Props for the spatial thumbnail component. */

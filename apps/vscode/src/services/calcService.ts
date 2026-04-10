@@ -746,6 +746,25 @@ print(json.dumps(tools))
         toolVersion = item.annotations['debrief:toolVersion'];
       }
       if (item.annotations?.['debrief:href']) {
+        // Feature 178: dataset artifacts carry a GeoJSON feature with
+        // `__datasets` in its properties — route into geoFeatures so
+        // downstream code can hand them to the Results panel.  Mirrors
+        // the same fix in executeToolOnMcp above.
+        const resultTypeAnno = item.annotations['debrief:resultType'];
+        if (
+          typeof resultTypeAnno === 'string' &&
+          resultTypeAnno.startsWith('artifact/dataset/') &&
+          item.type === 'resource' &&
+          item.resource
+        ) {
+          try {
+            const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+            geoFeatures.push(feature);
+            continue;
+          } catch {
+            /* fall through */
+          }
+        }
         artifactHref = item.annotations['debrief:href'];
         continue;
       }
@@ -854,6 +873,36 @@ print(json.dumps(tools))
 
       // Detect artifact items via debrief:href annotation
       if (item.annotations?.['debrief:href']) {
+        // Feature 178: dataset artifacts carry a GeoJSON feature with
+        // `__datasets` (or `statistics`) in its properties.  The MCP
+        // result builder wraps these in `build_artifact()` with a
+        // `debrief:resultType` of `artifact/dataset/<subtype>`.  We
+        // detect that here and route the parsed feature into
+        // `geoFeatures` so the downstream executeTool carrier filter
+        // can hand it to the Results panel as an in-memory tab
+        // (FR-009 save-explicit contract).  The user must click
+        // Save / Save As to persist it — NOT the MCP adapter.
+        //
+        // Non-dataset artifacts (e.g. images) still go through the
+        // artifactData path unchanged.
+        const resultTypeAnno = item.annotations['debrief:resultType'];
+        const isDatasetArtifact =
+          typeof resultTypeAnno === 'string' &&
+          resultTypeAnno.startsWith('artifact/dataset/');
+        if (
+          isDatasetArtifact &&
+          item.type === 'resource' &&
+          item.resource
+        ) {
+          try {
+            const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+            geoFeatures.push(feature);
+            continue;
+          } catch (parseErr) {
+            this.log(`[debrief] executeToolOnMcp: failed to parse dataset artifact, falling back to artifact path: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`);
+            // Fall through to artifactData branch below.
+          }
+        }
         artifactHref = item.annotations['debrief:href'];
         if (item.type === 'resource' && item.resource) {
           artifactData = item.resource.text;
@@ -881,4 +930,92 @@ print(json.dumps(tools))
       parameters,
     };
   }
+}
+
+/**
+ * Parse an MCP response JSON string into a structured result.
+ *
+ * Pure function — extracted from `CalcService.executeToolOnMcp` so
+ * unit tests can feed real Python CLI output through it without
+ * having to spin up a full CalcService.  The logic here MUST stay
+ * in lock-step with `executeToolOnMcp`; they both consume the same
+ * MCP wire format.
+ *
+ * Feature 178: dataset artifacts (MCP `debrief:resultType` of
+ * `artifact/dataset/*`) are routed into the `features` array so the
+ * downstream executeTool carrier filter can hand them to the
+ * Results panel.  Non-dataset artifacts (images, etc.) still return
+ * `artifactData` / `artifactHref`.
+ *
+ * @throws Error when the stdout is an MCP error response.
+ */
+export function parseMcpResponseForTest(stdout: string): {
+  features: SafeFeatureCollection;
+  resultType?: string;
+  label?: string;
+  sourceFeatureIds?: string[];
+  artifactData?: string;
+  artifactHref?: string;
+} {
+  const parsed = JSON.parse(stdout.trim()) as MCPToolResponse | MCPErrorResponse;
+
+  if ('error' in parsed) {
+    const errResponse: MCPErrorResponse = parsed;
+    throw new Error(errResponse.error.message);
+  }
+
+  const response = parsed;
+  const geoFeatures: SafeFeatureCollection['features'] = [];
+  let resultType: string | undefined;
+  let label: string | undefined;
+  let sourceFeatureIds: string[] | undefined;
+  let artifactData: string | undefined;
+  let artifactHref: string | undefined;
+
+  for (const item of response.content) {
+    if (!resultType && item.annotations !== undefined) {
+      resultType = item.annotations['debrief:resultType'];
+      label = item.annotations['debrief:label'];
+      sourceFeatureIds = item.annotations['debrief:sourceFeatures'];
+    }
+
+    if (item.annotations?.['debrief:href']) {
+      const resultTypeAnno = item.annotations['debrief:resultType'];
+      const isDatasetArtifact =
+        typeof resultTypeAnno === 'string' &&
+        resultTypeAnno.startsWith('artifact/dataset/');
+      if (
+        isDatasetArtifact &&
+        item.type === 'resource' &&
+        item.resource
+      ) {
+        try {
+          const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+          geoFeatures.push(feature);
+          continue;
+        } catch {
+          /* fall through to artifact path */
+        }
+      }
+      artifactHref = item.annotations['debrief:href'];
+      if (item.type === 'resource' && item.resource) {
+        artifactData = item.resource.text;
+      }
+      continue;
+    }
+
+    if (item.type === 'resource' && item.resource) {
+      const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+      geoFeatures.push(feature);
+    }
+  }
+
+  return {
+    features: { type: 'FeatureCollection', features: geoFeatures },
+    resultType,
+    label,
+    sourceFeatureIds,
+    artifactData,
+    artifactHref,
+  };
 }

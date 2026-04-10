@@ -36,6 +36,11 @@ export const languages = {
 export const Uri = {
   file: vi.fn((path: string) => ({ fsPath: path, scheme: 'file', path })),
   parse: vi.fn((uri: string) => ({ fsPath: uri, scheme: 'file', path: uri })),
+  joinPath: vi.fn((base: { fsPath?: string; path?: string }, ...segments: string[]) => {
+    const basePath = base.fsPath ?? base.path ?? '';
+    const joined = [basePath, ...segments].join('/').replace(/\/+/g, '/');
+    return { fsPath: joined, scheme: 'file', path: joined };
+  }),
 };
 
 export class EventEmitter<T> {

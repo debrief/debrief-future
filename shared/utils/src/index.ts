@@ -47,6 +47,10 @@ export type {
   PositionStyle,
   PositionStyleOverride,
   ResolvedPositionStyle,
+  AxisDefinition,
+  DatasetMetadata,
+  DataSeries,
+  DatasetEnvelope,
 } from './types.js';
 
 // CSV utilities
@@ -55,7 +59,11 @@ export {
   generateCsvFilename,
   formatCsvValue,
   buildCsvContent,
+  parseCsvToTableDataset,
 } from './csv.js';
+
+// Dataset synthesis (Feature: 178)
+export { synthesizeTableDataset } from './datasetSynthesis.js';
 
 // MCP types
 export type {

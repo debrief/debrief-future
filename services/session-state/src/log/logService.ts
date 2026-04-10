@@ -23,9 +23,11 @@ import type {
   SnapshotLoader,
   ToolVersionResolver,
 } from './types.js';
+import { FILE_SAVE_TOOL_SENTINEL } from './types.js';
 import {
   buildLogEntry,
   extractActivityIdFromOutputFeatures,
+  generateActivityId,
 } from './entryBuilder.js';
 import { assembleTimeline } from './timeline.js';
 import { createReplayEngine } from './replayEngine.js';
@@ -184,6 +186,139 @@ export function createLogService(deps: LogServiceDeps): LogService {
         features_updated: featuresUpdated,
         entries: [entry],
       };
+    },
+
+    /**
+     * Append a FileSavedEvent to the analysis log.
+     *
+     * Implementation notes (Feature: 178-vscode-tabular-results, R7):
+     *   1. Reads the current FeatureCollection.
+     *   2. Locates every feature whose `properties.provenance` already
+     *      references `parentActivityId`.  (These are the source features
+     *      that the parent ToolRunEvent was attached to by `recordToolResult`.)
+     *   3. Builds a FileSavedEvent LogEntry with:
+     *        - was_generated_by.tool = FILE_SAVE_TOOL_SENTINEL
+     *        - used = [parentActivityId]
+     *        - generated = [filename]
+     *   4. Appends the entry to the provenance array of each matched
+     *      feature via the same persistence path as `recordToolResult`.
+     *   5. If no feature carries the parent entry (unusual — typically means
+     *      the parent is a file-only activity or the caller passed the
+     *      wrong id) the entry is still attached to the first feature in
+     *      the collection so the FileSavedEvent reaches the timeline.
+     *
+     * Throws if the filename does not begin with `assets/` or the timestamp
+     * does not parse as ISO-8601.
+     */
+    async recordFileSaved(
+      storePath: string,
+      itemPath: string,
+      parentActivityId: string,
+      filename: string,
+      timestamp: string
+    ): Promise<{ activity_id: string }> {
+      if (!filename.startsWith('assets/')) {
+        throw new Error(
+          `FileSavedEvent filename must begin with "assets/": ${filename}`
+        );
+      }
+      if (Number.isNaN(Date.parse(timestamp))) {
+        throw new Error(
+          `FileSavedEvent timestamp is not ISO-8601: ${timestamp}`
+        );
+      }
+
+      const fc = await deps.loadGeoJson(storePath, itemPath);
+      if (!fc) {
+        throw new Error(
+          `Cannot load GeoJSON for ${storePath}/${itemPath}`
+        );
+      }
+
+      const activity_id = generateActivityId();
+      const entry: LogEntry = {
+        activity_id,
+        timestamp,
+        was_generated_by: {
+          tool: FILE_SAVE_TOOL_SENTINEL,
+          tool_version: '1',
+          parameters: {
+            parent_activity_id: {
+              value: parentActivityId,
+              default: false,
+              tunable: false,
+            },
+            filename: {
+              value: filename,
+              default: false,
+              tunable: false,
+            },
+          },
+        },
+        used: [parentActivityId],
+        generated: [filename],
+        execution_duration: 'PT0S',
+        generated_result_id: null,
+        tune: null,
+      };
+
+      // Find feature ids whose provenance already contains the parent entry.
+      const featureIdsWithParent: string[] = [];
+      for (const feature of fc.features) {
+        const props = feature.properties as Record<string, unknown> | null;
+        if (!props) continue;
+        const rawProv = props.provenance;
+        const provEntries: unknown[] = Array.isArray(rawProv)
+          ? rawProv
+          : rawProv == null
+            ? []
+            : [rawProv];
+        for (const raw of provEntries) {
+          if (raw && typeof raw === 'object') {
+            const existing = raw as Record<string, unknown>;
+            if (existing.activity_id === parentActivityId) {
+              const fid = feature.id ?? props['id'] ?? props['feature_id'];
+              if (fid !== undefined && fid !== null) {
+                featureIdsWithParent.push(String(fid));
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      let targetFeatureIds = featureIdsWithParent;
+      if (targetFeatureIds.length === 0) {
+        // Fall back to the first feature so the FileSavedEvent still lands
+        // in the timeline (prevents silent drops if the parent entry is on
+        // an unusual carrier feature).
+        const first = fc.features[0];
+        if (first) {
+          const props = first.properties as Record<string, unknown> | null;
+          const fid = first.id ?? props?.['id'] ?? props?.['feature_id'];
+          if (fid !== undefined && fid !== null) {
+            targetFeatureIds = [String(fid)];
+          }
+        }
+      }
+
+      if (targetFeatureIds.length === 0) {
+        throw new Error(
+          'Cannot record FileSavedEvent: no feature in the collection to attach it to'
+        );
+      }
+
+      const provenance: FeatureProvenance[] = targetFeatureIds.map(
+        (feature_id) => ({
+          feature_id,
+          entry: entry as unknown as Record<string, unknown>,
+        })
+      );
+
+      await deps.appendProvenance(storePath, itemPath, provenance);
+      deps.markDirty();
+
+      return { activity_id };
     },
 
     async getTimeline(

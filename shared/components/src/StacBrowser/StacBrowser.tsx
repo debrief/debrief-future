@@ -28,8 +28,9 @@ import type { TemporalFilter } from '../TimelineView/types';
 import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
 import { ExerciseListView } from '../ExerciseListView';
-import type { ExerciseListItem, SortConfiguration, SortDimension, SortDirection } from '../ExerciseListView/types';
+import type { ExerciseListItem, SortConfiguration, SortDimension, SortDirection, ThumbnailSize } from '../ExerciseListView/types';
 import { ThumbnailPreview } from './ThumbnailPreview';
+import { ThumbnailSizeToggle } from './ThumbnailSizeToggle';
 import { TimelineView } from '../TimelineView';
 import { formatDateRange } from '../utils/timeline-helpers';
 import type { Bounds } from '../utils/types';
@@ -225,6 +226,8 @@ function buildLayoutForVisiblePanels(hidden: Set<string>): LayoutConfig {
 function cleanupInjectedControls(): void {
   if (sortHeaderRoot) { sortHeaderRoot.unmount(); sortHeaderRoot = null; }
   sortHeaderContainer = null;
+  if (thumbnailSizeRoot) { thumbnailSizeRoot.unmount(); thumbnailSizeRoot = null; }
+  thumbnailSizeContainer = null;
   for (const [, entry] of hideBtnRoots) { entry.root.unmount(); }
   hideBtnRoots.clear();
 }
@@ -341,6 +344,8 @@ interface BrowserPanelContext {
   colourFn?: (item: StacBrowserItem) => string | null;
   sort: SortConfiguration;
   onSortChange: (sort: SortConfiguration) => void;
+  thumbnailSize: ThumbnailSize;
+  onThumbnailSizeChange: (size: ThumbnailSize) => void;
 }
 
 // Use a module-level ref so panel renderers can access it
@@ -350,6 +355,10 @@ const mountedBrowserPanels = new Map<ComponentContainer, { root: Root; type: str
 // Sort dropdown injected into the Exercises GoldenLayout header
 let sortHeaderRoot: Root | null = null;
 let sortHeaderContainer: HTMLElement | null = null;
+
+// Thumbnail size toggle injected into the Exercises GoldenLayout header
+let thumbnailSizeRoot: Root | null = null;
+let thumbnailSizeContainer: HTMLElement | null = null;
 
 // ─── Panel hide/show ────────────────────────────────────────────────────────
 // When a panel is hidden, we rebuild the GoldenLayout with a config that
@@ -383,6 +392,16 @@ function renderSortHeader(): void {
 
   sortHeaderRoot.render(
     <SortHeaderDropdown sort={ctx.sort} onSortChange={ctx.onSortChange} />,
+  );
+}
+
+/** Render thumbnail size toggle into the GoldenLayout header. */
+function renderThumbnailSizeToggle(): void {
+  const ctx = currentBrowserContext;
+  if (!thumbnailSizeRoot || !ctx) return;
+
+  thumbnailSizeRoot.render(
+    <ThumbnailSizeToggle size={ctx.thumbnailSize} onSizeChange={ctx.onThumbnailSizeChange} />,
   );
 }
 
@@ -468,6 +487,7 @@ function renderPanel(type: string): React.ReactElement {
           sort={ctx.sort}
           onSortChange={ctx.onSortChange}
           hideSortBar
+          thumbnailSize={ctx.thumbnailSize}
         />
       );
       if (!previewItem) {
@@ -592,6 +612,10 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [sort, setSort] = useState<SortConfiguration>(DEFAULT_SORT);
   const handleSortChange = useCallback((s: SortConfiguration) => setSort(s), []);
 
+  // ─── Thumbnail size ──────────────────────────────────────────────────────────
+  const [thumbnailSize, setThumbnailSize] = useState<ThumbnailSize>('small');
+  const handleThumbnailSizeChange = useCallback((s: ThumbnailSize) => setThumbnailSize(s), []);
+
   // ─── Hidden panels (removed from GL, restore via filter bar buttons) ──────
   const [hiddenPanels, setHiddenPanels] = useState<Set<string>>(new Set());
 
@@ -693,7 +717,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     colourFn,
     sort,
     onSortChange: handleSortChange,
-  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, timelineResetKey, colourFn, sort, handleSortChange]);
+    thumbnailSize,
+    onThumbnailSizeChange: handleThumbnailSizeChange,
+  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, timelineResetKey, colourFn, sort, handleSortChange, thumbnailSize, handleThumbnailSizeChange]);
 
   // Update module-level context and re-render panels + sort header
   useEffect(() => {
@@ -703,6 +729,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       panel.root.render(renderPanel(panel.type));
     }
     renderSortHeader();
+    renderThumbnailSizeToggle();
   }, [contextValue]);
 
   // ─── Debounced layout save ────────────────────────────────────────────────
@@ -749,6 +776,15 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             controlsEl.insertBefore(sortHeaderContainer, controlsEl.firstChild);
             sortHeaderRoot = createRoot(sortHeaderContainer);
             renderSortHeader();
+          }
+
+          // Thumbnail size toggle — only for Exercises panel
+          if (componentType === PANEL_LIST && !thumbnailSizeContainer) {
+            thumbnailSizeContainer = document.createElement('li');
+            thumbnailSizeContainer.className = 'stac-browser__thumbnail-size-li';
+            controlsEl.insertBefore(thumbnailSizeContainer, sortHeaderContainer?.nextSibling ?? controlsEl.firstChild);
+            thumbnailSizeRoot = createRoot(thumbnailSizeContainer);
+            renderThumbnailSizeToggle();
           }
 
           // Hide button — only for Timeline and Map panels

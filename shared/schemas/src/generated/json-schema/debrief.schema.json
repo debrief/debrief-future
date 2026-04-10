@@ -1,5 +1,15 @@
 {
   "$defs": {
+    "ArrayCentreModeEnum": {
+      "description": "Array centre calculation mode for towed array sensors",
+      "enum": [
+        "PLAIN",
+        "WORM",
+        "MEASURED"
+      ],
+      "title": "ArrayCentreModeEnum",
+      "type": "string"
+    },
     "BranchOrigin": {
       "additionalProperties": false,
       "description": "Reverse link on a branch plot's system record, pointing to the source plot.",
@@ -661,6 +671,16 @@
       "title": "InputFeatureState",
       "type": "object"
     },
+    "LabelLocationEnum": {
+      "description": "Horizontal alignment of contact labels",
+      "enum": [
+        "LEFT",
+        "CENTER",
+        "RIGHT"
+      ],
+      "title": "LabelLocationEnum",
+      "type": "string"
+    },
     "LineAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).",
@@ -767,6 +787,16 @@
       "title": "LineJoinEnum",
       "type": "string"
     },
+    "LineLabelPositionEnum": {
+      "description": "Position along the bearing line where the label is placed",
+      "enum": [
+        "START",
+        "MIDDLE",
+        "END"
+      ],
+      "title": "LineLabelPositionEnum",
+      "type": "string"
+    },
     "LineProperties": {
       "additionalProperties": false,
       "description": "Styling schema for LineString and MultiLineString geometries. Follows Leaflet Polyline options naming conventions.",
@@ -821,6 +851,17 @@
       ],
       "title": "LineProperties",
       "type": "object"
+    },
+    "LineStyleEnum": {
+      "description": "Visual style for bearing lines",
+      "enum": [
+        "SOLID",
+        "DASHED",
+        "DOT",
+        "DASH_DOT"
+      ],
+      "title": "LineStyleEnum",
+      "type": "string"
     },
     "LocationTypeEnum": {
       "description": "Type of reference location",
@@ -936,6 +977,32 @@
       ],
       "title": "MarkerSymbolEnum",
       "type": "string"
+    },
+    "MeasuredArrayPosition": {
+      "additionalProperties": false,
+      "description": "Timestamped geographic position of a towed array centre. Used by MEASURED array centre mode for bearing line origin interpolation.",
+      "properties": {
+        "location": {
+          "description": "Array centre position [longitude, latitude] (GeoJSON coordinate order)",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "time": {
+          "description": "Position timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "location"
+      ],
+      "title": "MeasuredArrayPosition",
+      "type": "object"
     },
     "MultiPointFeature": {
       "additionalProperties": false,
@@ -2246,6 +2313,14 @@
           "minimum": 0,
           "type": "number"
         },
+        "color": {
+          "description": "Contact color override (null = inherit from parent SensorData)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "comment": {
           "description": "Operator note",
           "type": [
@@ -2260,12 +2335,57 @@
             "null"
           ]
         },
+        "has_ambiguous": {
+          "description": "Controls ambiguous bearing display",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "has_bearing": {
+          "description": "Controls bearing line display (true=show, false=hide). Data stored regardless.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "has_frequency": {
+          "description": "Controls frequency data display",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "label": {
           "description": "Display label",
           "type": [
             "string",
             "null"
           ]
+        },
+        "label_location": {
+          "$ref": "#/$defs/LabelLocationEnum",
+          "description": "Label horizontal alignment"
+        },
+        "line_style": {
+          "$ref": "#/$defs/LineStyleEnum",
+          "description": "Bearing line visual style"
+        },
+        "origin": {
+          "description": "Explicit sensor location override [longitude, latitude]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "put_label_at": {
+          "$ref": "#/$defs/LineLabelPositionEnum",
+          "description": "Label position along bearing line"
         },
         "range": {
           "description": "Range to contact in metres",
@@ -2275,10 +2395,24 @@
             "null"
           ]
         },
+        "show_label": {
+          "description": "Label visibility",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "time": {
           "description": "Contact measurement timestamp (ISO8601)",
           "format": "date-time",
           "type": "string"
+        },
+        "visible": {
+          "description": "Contact visibility",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -2292,10 +2426,22 @@
       "additionalProperties": false,
       "description": "Named sensor with contact measurements. Embedded in TrackProperties to associate sensor data with the host track.",
       "properties": {
+        "array_centre_mode": {
+          "$ref": "#/$defs/ArrayCentreModeEnum",
+          "description": "How bearing line origin is calculated relative to host platform"
+        },
         "base_frequency": {
           "description": "Reference frequency in Hz",
           "type": [
             "number",
+            "null"
+          ]
+        },
+        "color": {
+          "description": "Default color for all contacts in this sensor",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": [
+            "string",
             "null"
           ]
         },
@@ -2306,6 +2452,23 @@
           },
           "type": "array"
         },
+        "line_thickness": {
+          "description": "Bearing line width in pixels",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "measured_positions": {
+          "description": "Actual towed array positions for MEASURED array centre mode",
+          "items": {
+            "$ref": "#/$defs/MeasuredArrayPosition"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "name": {
           "description": "Sensor identifier (e.g., \"TOWED_ARRAY\")",
           "type": "string"
@@ -2314,6 +2477,13 @@
           "description": "Sensor offset from host platform in metres",
           "type": [
             "number",
+            "null"
+          ]
+        },
+        "visible": {
+          "description": "Sensor visibility",
+          "type": [
+            "boolean",
             "null"
           ]
         },

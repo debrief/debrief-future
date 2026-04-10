@@ -9,6 +9,7 @@ import {
   generateCsvFilename,
   formatCsvValue,
   buildCsvContent,
+  parseCsvToTableDataset,
 } from '../src/csv.js';
 
 describe('sanitizeFilename', () => {
@@ -133,5 +134,87 @@ describe('buildCsvContent', () => {
     const csv = buildCsvContent([{ x: 1 }]);
     expect(csv).not.toContain('\r');
     expect(csv.endsWith('\n')).toBe(true);
+  });
+});
+
+describe('parseCsvToTableDataset', () => {
+  it('throws on empty input', () => {
+    expect(() => parseCsvToTableDataset('', 'Test')).toThrow();
+    expect(() => parseCsvToTableDataset('   ', 'Test')).toThrow();
+  });
+
+  it('parses a header-only CSV into an empty-data envelope', () => {
+    const envelope = parseCsvToTableDataset('metric,value\n', 'Empty');
+    expect(envelope.title).toBe('Empty');
+    expect(envelope.displayHint).toBe('table');
+    expect(envelope.data).toEqual([]);
+    expect(envelope.metadata.xAxis.label).toBe('metric');
+  });
+
+  it('coerces numeric strings to numbers', () => {
+    const envelope = parseCsvToTableDataset(
+      'metric,value\nspeed,12.34\nbearing,45.67\n',
+      'Stats',
+    );
+    expect(envelope.data).toEqual([
+      { metric: 'speed', value: 12.34 },
+      { metric: 'bearing', value: 45.67 },
+    ]);
+  });
+
+  it('preserves string values that are not numeric', () => {
+    const envelope = parseCsvToTableDataset(
+      'name,value\nAlpha,fast\nBravo,slow\n',
+      'Names',
+    );
+    expect(envelope.data).toEqual([
+      { name: 'Alpha', value: 'fast' },
+      { name: 'Bravo', value: 'slow' },
+    ]);
+  });
+
+  it('handles quoted strings containing commas', () => {
+    const envelope = parseCsvToTableDataset(
+      'name,notes\nAlpha,"a, b, c"\nBravo,plain\n',
+      'Notes',
+    );
+    expect(envelope.data).toEqual([
+      { name: 'Alpha', notes: 'a, b, c' },
+      { name: 'Bravo', notes: 'plain' },
+    ]);
+  });
+
+  it('handles escaped double quotes', () => {
+    const envelope = parseCsvToTableDataset(
+      'name,saying\nAlpha,"say ""hi"""\n',
+      'Sayings',
+    );
+    expect(envelope.data).toEqual([
+      { name: 'Alpha', saying: 'say "hi"' },
+    ]);
+  });
+
+  it('handles embedded newlines inside quoted fields', () => {
+    const csv = 'name,desc\nAlpha,"line1\nline2"\n';
+    const envelope = parseCsvToTableDataset(csv, 'NL');
+    expect(envelope.data).toEqual([
+      { name: 'Alpha', desc: 'line1\nline2' },
+    ]);
+  });
+
+  it('round-trips buildCsvContent output', () => {
+    const original: Record<string, unknown>[] = [
+      { metric: 'speed', value: 12.34 },
+      { metric: 'bearing', value: 45.67 },
+    ];
+    const csv = buildCsvContent(original);
+    const envelope = parseCsvToTableDataset(csv, 'Round');
+    expect(envelope.data).toEqual(original);
+  });
+
+  it('throws on malformed input (unterminated quote)', () => {
+    expect(() =>
+      parseCsvToTableDataset('name,value\n"Alpha,fast\n', 'Bad'),
+    ).toThrow();
   });
 });

@@ -18,7 +18,9 @@
             {
               "id": "contact-001",
               "time": "2024-01-15T10:00:00Z",
-              "bearing": 45.0
+              "bearing": 45.0,
+              "has_bearing": true,
+              "visible": true
             }
           ]
         }

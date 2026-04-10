@@ -4,10 +4,13 @@
       "type": "resource",
       "uri": "artifact://doppler-curve/OWNSHIP-Target_Alpha-doppler.json",
       "mimeType": "application/json",
-      "text": "{\"title\":\"Doppler Curve: OWNSHIP vs Target Alpha\",\"source_frequency_hz\":150.0,\"speed_of_sound_kts\":3032,\"ownship\":\"OWNSHIP\",\"target\":\"Target Alpha\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"predicted_frequency_hz\":150.087,\"radial_velocity_kts\":-1.76,\"range_m\":6576.8,\"bearing_deg\":45.0},{\"time\":\"2024-01-15T10:01:00Z\",\"predicted_frequency_hz\":150.079,\"radial_velocity_kts\":-1.60,\"range_m\":6350.2,\"bearing_deg\":46.2},{\"time\":\"2024-01-15T10:02:00Z\",\"predicted_frequency_hz\":150.069,\"radial_velocity_kts\":-1.40,\"range_m\":6123.5,\"bearing_deg\":47.5},{\"time\":\"2024-01-15T10:03:00Z\",\"predicted_frequency_hz\":150.058,\"radial_velocity_kts\":-1.18,\"range_m\":5896.9,\"bearing_deg\":48.9},{\"time\":\"2024-01-15T10:04:00Z\",\"predicted_frequency_hz\":150.046,\"radial_velocity_kts\":-0.93,\"range_m\":5670.3,\"bearing_deg\":50.4}],\"statistics\":{\"min_frequency_hz\":150.046,\"max_frequency_hz\":150.087,\"frequency_shift_hz\":0.087,\"data_points\":5}}",
+      "text": "{\"title\":\"Doppler Curve: OWNSHIP vs Target Alpha\",\"source_frequency_hz\":150.0,\"speed_of_sound_kts\":3032,\"ownship\":\"OWNSHIP\",\"target\":\"Target Alpha\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"predicted_frequency_hz\":150.087,\"radial_velocity_kts\":-1.76,\"range_m\":6576.8,\"bearing_deg\":45.0},{\"time\":\"2024-01-15T10:01:00Z\",\"predicted_frequency_hz\":150.079,\"radial_velocity_kts\":-1.6,\"range_m\":6350.2,\"bearing_deg\":46.2},{\"time\":\"2024-01-15T10:02:00Z\",\"predicted_frequency_hz\":150.069,\"radial_velocity_kts\":-1.4,\"range_m\":6123.5,\"bearing_deg\":47.5},{\"time\":\"2024-01-15T10:03:00Z\",\"predicted_frequency_hz\":150.058,\"radial_velocity_kts\":-1.18,\"range_m\":5896.9,\"bearing_deg\":48.9},{\"time\":\"2024-01-15T10:04:00Z\",\"predicted_frequency_hz\":150.046,\"radial_velocity_kts\":-0.93,\"range_m\":5670.3,\"bearing_deg\":50.4}],\"statistics\":{\"min_frequency_hz\":150.046,\"max_frequency_hz\":150.087,\"frequency_shift_hz\":0.087,\"data_points\":5}}",
       "annotations": {
         "debrief:resultType": "artifact/analysis/doppler_curve",
-        "debrief:sourceFeatures": ["track-ownship", "track-target"],
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
         "debrief:label": "Doppler curve for OWNSHIP vs Target Alpha: 5 points, f_source=150.0Hz, shift +0.046 to +0.087Hz",
         "debrief:href": "OWNSHIP-Target_Alpha-doppler.json"
       }

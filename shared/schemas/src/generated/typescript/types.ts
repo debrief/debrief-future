@@ -251,6 +251,56 @@ export enum SystemStateTypeEnum {
     selection = "selection",
 };
 /**
+* Array centre calculation mode for towed array sensors
+*/
+export enum ArrayCentreModeEnum {
+    
+    /** Simple backtrack along vessel heading */
+    PLAIN = "PLAIN",
+    /** Follow vessel track path backwards */
+    WORM = "WORM",
+    /** Use actual measured array positions */
+    MEASURED = "MEASURED",
+};
+/**
+* Visual style for bearing lines
+*/
+export enum LineStyleEnum {
+    
+    /** Continuous line */
+    SOLID = "SOLID",
+    /** Evenly spaced dashes */
+    DASHED = "DASHED",
+    /** Evenly spaced dots */
+    DOT = "DOT",
+    /** Alternating dash and dot */
+    DASH_DOT = "DASH_DOT",
+};
+/**
+* Horizontal alignment of contact labels
+*/
+export enum LabelLocationEnum {
+    
+    /** Left-aligned text */
+    LEFT = "LEFT",
+    /** Center-aligned text */
+    CENTER = "CENTER",
+    /** Right-aligned text */
+    RIGHT = "RIGHT",
+};
+/**
+* Position along the bearing line where the label is placed
+*/
+export enum LineLabelPositionEnum {
+    
+    /** At the origin (sensor location) */
+    START = "START",
+    /** At the midpoint of the bearing line */
+    MIDDLE = "MIDDLE",
+    /** At the far end of the bearing line */
+    END = "END",
+};
+/**
 * Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
 */
 export enum OutputKindEnum {
@@ -659,6 +709,17 @@ export interface SegmentMetadata {
 
 
 /**
+ * Timestamped geographic position of a towed array centre. Used by MEASURED array centre mode for bearing line origin interpolation.
+ */
+export interface MeasuredArrayPosition {
+    /** Position timestamp (ISO8601) */
+    time: string,
+    /** Array centre position [longitude, latitude] (GeoJSON coordinate order) */
+    location: number[],
+}
+
+
+/**
  * Single sensor measurement record. Represents one bearing/range observation at a point in time.
  */
 export interface SensorContact {
@@ -666,16 +727,36 @@ export interface SensorContact {
     time: string,
     /** Bearing to contact in degrees (0-360) */
     bearing: number,
+    /** Controls bearing line display (true=show, false=hide). Data stored regardless. */
+    has_bearing?: boolean,
+    /** Ambiguous bearing (second solution) in degrees */
+    ambiguous_bearing?: number,
+    /** Controls ambiguous bearing display */
+    has_ambiguous?: boolean,
     /** Range to contact in metres */
     range?: number,
     /** Measured frequency in Hz */
     frequency?: number,
-    /** Ambiguous bearing (second solution) in degrees */
-    ambiguous_bearing?: number,
+    /** Controls frequency data display */
+    has_frequency?: boolean,
     /** Display label */
     label?: string,
     /** Operator note */
     comment?: string,
+    /** Contact color override (null = inherit from parent SensorData) */
+    color?: string,
+    /** Contact visibility */
+    visible?: boolean,
+    /** Label visibility */
+    show_label?: boolean,
+    /** Bearing line visual style */
+    line_style?: string,
+    /** Label horizontal alignment */
+    label_location?: string,
+    /** Label position along bearing line */
+    put_label_at?: string,
+    /** Explicit sensor location override [longitude, latitude] */
+    origin?: number[],
 }
 
 
@@ -689,10 +770,20 @@ export interface SensorData {
     base_frequency?: number,
     /** Sensor offset from host platform in metres */
     offset?: number,
+    /** How bearing line origin is calculated relative to host platform */
+    array_centre_mode?: string,
     /** Display mode flag */
     worm_in_hole?: boolean,
+    /** Default color for all contacts in this sensor */
+    color?: string,
+    /** Sensor visibility */
+    visible?: boolean,
+    /** Bearing line width in pixels */
+    line_thickness?: number,
     /** Array of sensor measurements */
     contacts: SensorContact[],
+    /** Actual towed array positions for MEASURED array centre mode */
+    measured_positions?: MeasuredArrayPosition[],
 }
 
 

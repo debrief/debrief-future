@@ -124,6 +124,165 @@ class TestEnumConsistency:
             f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
         )
 
+    def test_array_centre_mode_enum_values(self) -> None:
+        """ArrayCentreModeEnum should have consistent values."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        enum_def = main_schema.get("$defs", {}).get("ArrayCentreModeEnum", {})
+        enum_values = enum_def.get("enum", [])
+
+        expected = ["PLAIN", "WORM", "MEASURED"]
+        assert set(enum_values) == set(expected), (
+            f"ArrayCentreModeEnum values mismatch: {enum_values} vs {expected}"
+        )
+
+    def test_line_style_enum_values(self) -> None:
+        """LineStyleEnum should have consistent values."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        enum_def = main_schema.get("$defs", {}).get("LineStyleEnum", {})
+        enum_values = enum_def.get("enum", [])
+
+        expected = ["SOLID", "DASHED", "DOT", "DASH_DOT"]
+        assert set(enum_values) == set(expected), (
+            f"LineStyleEnum values mismatch: {enum_values} vs {expected}"
+        )
+
+    def test_label_location_enum_values(self) -> None:
+        """LabelLocationEnum should have consistent values."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        enum_def = main_schema.get("$defs", {}).get("LabelLocationEnum", {})
+        enum_values = enum_def.get("enum", [])
+
+        expected = ["LEFT", "CENTER", "RIGHT"]
+        assert set(enum_values) == set(expected), (
+            f"LabelLocationEnum values mismatch: {enum_values} vs {expected}"
+        )
+
+    def test_line_label_position_enum_values(self) -> None:
+        """LineLabelPositionEnum should have consistent values."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        enum_def = main_schema.get("$defs", {}).get("LineLabelPositionEnum", {})
+        enum_values = enum_def.get("enum", [])
+
+        expected = ["START", "MIDDLE", "END"]
+        assert set(enum_values) == set(expected), (
+            f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+        )
+
+
+class TestSensorSchemaStructure:
+    """Test that SensorData and SensorContact definitions are correct in JSON Schema."""
+
+    def test_sensor_data_properties_exist(self) -> None:
+        """SensorData should have all expected properties."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        sensor_data = main_schema.get("$defs", {}).get("SensorData", {})
+        properties = sensor_data.get("properties", {})
+
+        expected_fields = [
+            "name",
+            "base_frequency",
+            "offset",
+            "array_centre_mode",
+            "worm_in_hole",
+            "color",
+            "visible",
+            "line_thickness",
+            "contacts",
+            "measured_positions",
+        ]
+        for field in expected_fields:
+            assert field in properties, f"SensorData should have {field} property"
+
+    def test_sensor_contact_properties_exist(self) -> None:
+        """SensorContact should have all expected properties."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        sensor_contact = main_schema.get("$defs", {}).get("SensorContact", {})
+        properties = sensor_contact.get("properties", {})
+
+        expected_fields = [
+            "time",
+            "bearing",
+            "has_bearing",
+            "ambiguous_bearing",
+            "has_ambiguous",
+            "range",
+            "frequency",
+            "has_frequency",
+            "label",
+            "comment",
+            "color",
+            "visible",
+            "show_label",
+            "line_style",
+            "label_location",
+            "put_label_at",
+            "origin",
+        ]
+        for field in expected_fields:
+            assert field in properties, f"SensorContact should have {field} property"
+
+    def test_measured_array_position_properties_exist(self) -> None:
+        """MeasuredArrayPosition should have time and location."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        measured = main_schema.get("$defs", {}).get("MeasuredArrayPosition", {})
+        properties = measured.get("properties", {})
+
+        assert "time" in properties, "MeasuredArrayPosition should have time"
+        assert "location" in properties, "MeasuredArrayPosition should have location"
+
+    def test_sensor_data_required_fields(self) -> None:
+        """SensorData should require name and contacts."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        sensor_data = main_schema.get("$defs", {}).get("SensorData", {})
+        required = sensor_data.get("required", [])
+
+        assert "name" in required, "SensorData should require 'name'"
+        assert "contacts" in required, "SensorData should require 'contacts'"
+
+    def test_sensor_contact_required_fields(self) -> None:
+        """SensorContact should require time and bearing."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        sensor_contact = main_schema.get("$defs", {}).get("SensorContact", {})
+        required = sensor_contact.get("required", [])
+
+        assert "time" in required, "SensorContact should require 'time'"
+        assert "bearing" in required, "SensorContact should require 'bearing'"
+
+    def test_origin_coordinate_pair_schema(self) -> None:
+        """SensorContact.origin should be array of exactly 2 floats (nullable)."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        sensor_contact = main_schema.get("$defs", {}).get("SensorContact", {})
+        origin_prop = sensor_contact.get("properties", {}).get("origin", {})
+
+        # Nullable types use ["array", "null"] form
+        origin_type = origin_prop.get("type")
+        if isinstance(origin_type, list):
+            assert "array" in origin_type, "origin type should include 'array'"
+        else:
+            assert origin_type == "array", "origin should be array"
+        assert origin_prop.get("items", {}).get("type") == "number", (
+            "origin items should be numbers"
+        )
+
+    def test_measured_position_location_schema(self) -> None:
+        """MeasuredArrayPosition.location should be array of exactly 2 floats."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+        measured = main_schema.get("$defs", {}).get("MeasuredArrayPosition", {})
+        location_prop = measured.get("properties", {}).get("location", {})
+
+        location_type = location_prop.get("type")
+        if isinstance(location_type, list):
+            assert "array" in location_type, "location type should include 'array'"
+        else:
+            assert location_type == "array", "location should be array"
+        assert location_prop.get("items", {}).get("type") == "number", (
+            "location items should be numbers"
+        )
+
 
 class TestRequiredFields:
     """Test that required fields are properly defined."""

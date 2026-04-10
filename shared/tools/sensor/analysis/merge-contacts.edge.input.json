@@ -15,8 +15,20 @@
           "platform_id": "VESSEL-B",
           "sensor_type": "SONAR",
           "contacts": [
-            {"id": "c-001", "time": "2024-01-15T10:00:00Z", "bearing": 180.0},
-            {"id": "c-002", "time": "2024-01-15T10:05:00Z", "bearing": 182.0}
+            {
+              "id": "c-001",
+              "time": "2024-01-15T10:00:00Z",
+              "bearing": 180.0,
+              "has_bearing": true,
+              "visible": true
+            },
+            {
+              "id": "c-002",
+              "time": "2024-01-15T10:05:00Z",
+              "bearing": 182.0,
+              "has_bearing": true,
+              "visible": true
+            }
           ]
         }
       },

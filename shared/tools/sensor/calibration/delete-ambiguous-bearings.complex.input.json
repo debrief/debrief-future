@@ -20,33 +20,46 @@
               "time": "2024-01-15T08:00:00Z",
               "bearing": 270.0,
               "ambiguous": true,
-              "ambiguous_bearing": 90.0
+              "ambiguous_bearing": 90.0,
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "visible": true
             },
             {
               "id": "pa-002",
               "time": "2024-01-15T08:05:00Z",
               "bearing": 265.0,
-              "ambiguous": false
+              "ambiguous": false,
+              "has_bearing": true,
+              "visible": true
             },
             {
               "id": "pa-003",
               "time": "2024-01-15T08:10:00Z",
               "bearing": 260.0,
               "ambiguous": true,
-              "ambiguous_bearing": 100.0
+              "ambiguous_bearing": 100.0,
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "visible": true
             },
             {
               "id": "pa-004",
               "time": "2024-01-15T08:15:00Z",
               "bearing": 255.0,
               "ambiguous": true,
-              "ambiguous_bearing": 105.0
+              "ambiguous_bearing": 105.0,
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "visible": true
             },
             {
               "id": "pa-005",
               "time": "2024-01-15T08:20:00Z",
               "bearing": 250.0,
-              "ambiguous": false
+              "ambiguous": false,
+              "has_bearing": true,
+              "visible": true
             }
           ]
         }
@@ -69,13 +82,18 @@
               "time": "2024-01-15T08:00:00Z",
               "bearing": 90.0,
               "ambiguous": true,
-              "ambiguous_bearing": 270.0
+              "ambiguous_bearing": 270.0,
+              "has_bearing": true,
+              "has_ambiguous": true,
+              "visible": true
             },
             {
               "id": "sa-002",
               "time": "2024-01-15T08:05:00Z",
               "bearing": 85.0,
-              "ambiguous": false
+              "ambiguous": false,
+              "has_bearing": true,
+              "visible": true
             }
           ]
         }

@@ -327,13 +327,21 @@ export class CodeServerPage {
 
   /**
    * Execute a VS Code command via the command palette.
+   *
+   * IMPORTANT: Ctrl+Shift+P inserts a '>' prefix into the Quick Input box
+   * to put it in **command** mode. Using `fill(command)` would REPLACE that
+   * '>' prefix, turning the search into a file (Quick Open) search and
+   * yielding "No matching results" for every command. We prepend '>' if
+   * the caller didn't.
+   *
    * @param command - The command name to type (e.g., 'Debrief: Load File')
    */
   async executeCommand(command: string): Promise<void> {
     // Open command palette with Ctrl+Shift+P
     await this.page.keyboard.press('Control+Shift+KeyP');
     await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-    await this.commandInput.fill(command);
+    const prefixed = command.startsWith('>') ? command : `>${command}`;
+    await this.commandInput.fill(prefixed);
 
     // Wait for suggestions to appear, then select the first match
     await this.page.locator('.quick-input-list .monaco-list-row').first()
