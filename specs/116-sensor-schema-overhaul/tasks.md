@@ -20,9 +20,9 @@
 
 | Artifact | Description | Captured When |
 |----------|-------------|---------------|
-| test-summary.md | pytest results for schema tests (golden fixtures, round-trip, validation) | After all tests pass |
+| test-summary.md | pytest results for schema tests (golden fixtures, round-trip, validation, schema comparison, enum exhaustiveness) | After all tests pass |
 | usage-example.md | Python code creating SensorData with all new fields, serializing to JSON | After schema generation works |
-| round-trip-evidence.md | Full Python -> JSON -> TypeScript -> JSON -> Python proof for comprehensive sensor fixture | After round-trip tests pass |
+| round-trip-evidence.md | Full Python -> JSON -> TypeScript -> JSON -> Python proof for comprehensive sensor fixture (both Python and TypeScript legs) | After round-trip tests pass |
 
 ### Media Content
 
@@ -80,6 +80,10 @@
 - [ ] T015 [P] Verify generated TypeScript interfaces have all new fields `shared/schemas/src/generated/typescript/types.ts`
 - [ ] T016 [P] Verify generated JSON Schema has all new fields `shared/schemas/src/generated/json-schema/`
 
+### Generation Verification (Review Decision #2)
+
+- [ ] T058 [test] Verify generated code handles optional float[2] coordinate pairs correctly (MeasuredArrayPosition.location, SensorContact.origin) `shared/schemas/tests/test_schema_compare.py`
+
 **Checkpoint**: Schema expanded and all generated code reflects new fields. Fixture and test work can now begin.
 
 ---
@@ -103,7 +107,11 @@
 - [ ] T022 [US1] Verify optional fields default correctly in Pydantic model (visible=true, has_bearing=true, show_label=false)
 - [ ] T023 [US1] Verify TypeScript interface accepts both comprehensive and minimal fixtures
 
-**Checkpoint**: Round-trip fidelity proven for all sensor fields. Backward compatibility confirmed.
+### TypeScript Round-Trip (Review Decision #8)
+
+- [ ] T059 [test] [US1] Add vitest TypeScript round-trip test: JSON → TS deserialize → TS serialize → JSON for sensor fixtures `shared/schemas/tests/ts/test_sensor_roundtrip.test.ts`
+
+**Checkpoint**: Round-trip fidelity proven for all sensor fields in both Python and TypeScript. Backward compatibility confirmed.
 
 ---
 
@@ -143,7 +151,7 @@
 
 - [ ] T031 [US3] Verify PLAIN mode with no measured_positions validates correctly (covered by comprehensive fixture T017)
 - [ ] T032 [US3] Verify MEASURED mode with empty measured_positions array validates correctly
-- [ ] T033 [US3] Verify MeasuredArrayPosition fields (time, latitude, longitude) are all required and typed correctly
+- [ ] T033 [US3] Verify MeasuredArrayPosition fields (time, location as float[2] [lon, lat]) are all required and typed correctly
 
 **Checkpoint**: All three array centre modes validate. MEASURED mode with position time-series round-trips correctly.
 
@@ -168,7 +176,11 @@
 - [ ] T042 [P] [US4] Update resolve-ambiguity fixtures (basic, complex, edge-1, edge-2 input/output) `shared/tools/sensor/calibration/resolve-ambiguity.*.json`
 - [ ] T043 [US4] Validate all updated tool fixtures pass schema validation
 
-**Checkpoint**: All 62 tool fixture files updated and validated against new schema.
+### Tool Fixture Schema Validation Test (Review Decision #7)
+
+- [ ] T060 [test] [US4] Add pytest parametrized test validating all tool fixture JSON files against SensorData/SensorContact Pydantic models `shared/schemas/tests/test_tool_fixtures.py`
+
+**Checkpoint**: All 62 tool fixture files updated and validated against new schema. Automated test prevents future fixture drift.
 
 ---
 
@@ -184,12 +196,27 @@
 - [ ] T045 [P][test] [US5] Create invalid fixture: origin with wrong cardinality (3 elements) `shared/schemas/src/fixtures/invalid/track-feature-sensor-invalid-origin.json`
 - [ ] T046 [P][test] [US5] Create invalid fixture: bearing outside 0-360 range `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-range.json`
 
+### Constraint Edge-Case Fixtures (Review Decision #11)
+
+- [ ] T063 [test] [US5] Create valid boundary fixture: bearing=0 and bearing=360, empty measured_positions array `shared/schemas/src/fixtures/valid/track-feature-sensors-boundary-01.json`
+- [ ] T064 [P][test] [US5] Create invalid fixture: bearing=-1 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-negative.json`
+- [ ] T065 [P][test] [US5] Create invalid fixture: bearing=361 `shared/schemas/src/fixtures/invalid/track-feature-sensor-bearing-over360.json`
+- [ ] T066 [P][test] [US5] Create invalid fixture: origin with 1 element `shared/schemas/src/fixtures/invalid/track-feature-sensor-origin-wrong-length.json`
+
+### Schema Comparison Extension (Review Decision #9)
+
+- [ ] T061 [test] [US5] Extend test_schema_compare.py to cover SensorData, SensorContact, and 4 new enums `shared/schemas/tests/test_schema_compare.py`
+
+### Enum Exhaustiveness Test (Review Decision #10)
+
+- [ ] T062 [test] [US5] Add parametrized test validating every value of ArrayCentreModeEnum, LineStyleEnum, LabelLocationEnum, LineLabelPositionEnum `shared/schemas/tests/test_sensor_enums.py`
+
 ### Implementation for User Story 5
 
-- [ ] T047 [US5] Run golden fixture validation: all invalid fixtures fail with clear error messages `shared/schemas/tests/test_golden.py`
+- [ ] T047 [US5] Run golden fixture validation: all invalid fixtures (including new boundary cases) fail with clear error messages `shared/schemas/tests/test_golden.py`
 - [ ] T048 [US5] Verify existing invalid fixture (track-feature-sensor-no-bearing.json) still fails correctly `shared/schemas/src/fixtures/invalid/track-feature-sensor-no-bearing.json`
 
-**Checkpoint**: Schema safety net is comprehensive. Invalid data is caught with useful error messages. Existing invalid fixtures still work.
+**Checkpoint**: Schema safety net is comprehensive. Invalid data is caught with useful error messages. Existing invalid fixtures still work. All enum values validated. Schema comparison covers sensor entities.
 
 ---
 
@@ -250,9 +277,9 @@
 
 - Phase 1: T001-T004 (enum additions) can all run in parallel
 - Phase 2: T007-T009 (SensorContact display props) can all run in parallel; T010-T012 (SensorData fields) in parallel
-- Phase 3: T017-T018 (valid fixture creation) in parallel
-- Phase 6: T035-T042 (tool fixture updates) can ALL run in parallel (different files)
-- Phase 7: T044-T046 (invalid fixture creation) can all run in parallel
+- Phase 3: T017-T018 (valid fixture creation) in parallel; T059 (TS round-trip) after fixtures exist
+- Phase 6: T035-T042 (tool fixture updates) can ALL run in parallel (different files); T060 after all fixtures updated
+- Phase 7: T044-T046, T063-T066 (fixture creation) can all run in parallel; T061-T062 (test additions) in parallel
 
 ---
 
@@ -288,7 +315,8 @@ Task: T042 "Update resolve-ambiguity fixtures"
 
 - **Schema generation failure**: Run `generate.py` early (T013) to catch LinkML issues before creating fixtures
 - **Backward compatibility**: Verify existing fixture (T021) immediately after generation
-- **Tool fixture drift**: Validate all tool fixtures (T043) as a batch after updates
+- **Tool fixture drift**: Validate all tool fixtures (T043, T060) as a batch after updates
+- **Type drift**: TypeScript round-trip (T059) and schema comparison (T061) catch cross-language divergence early
 
 ---
 

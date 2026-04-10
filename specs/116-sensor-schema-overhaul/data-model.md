@@ -31,7 +31,7 @@ Single sensor observation at a point in time. Belongs to exactly one SensorData 
 | has_frequency | boolean | no | null | — | Frequency data presence flag |
 | label | string | no | null | — | Display label |
 | comment | string | no | null | — | Operator notes |
-| color | string | no | null | — | Contact color override (CSS hex; null = inherit from sensor) |
+| color | CSSColor | no | null | — | Contact color override (null = inherit from sensor) |
 | visible | boolean | no | true | — | Contact visibility |
 | show_label | boolean | no | false | — | Label visibility |
 | line_style | LineStyleEnum | no | null | SOLID, DASHED, DOT, DASH_DOT | Bearing line style |
@@ -69,7 +69,7 @@ Named sensor instrument attached to a track. Contains configuration, display def
 | offset | float | no | null | — | Array offset from platform reference (metres) |
 | array_centre_mode | ArrayCentreModeEnum | no | null | PLAIN, WORM, MEASURED | How bearing line origin is calculated |
 | worm_in_hole | boolean | no | false | — | Display mode flag |
-| color | string | no | null | — | Default color for all contacts (CSS hex) |
+| color | CSSColor | no | null | — | Default color for all contacts |
 | visible | boolean | no | true | — | Sensor visibility |
 | line_thickness | integer | no | null | — | Bearing line width |
 | contacts | SensorContact[] | yes | — | — | Time-ordered sensor observations |
@@ -93,8 +93,7 @@ Timestamped geographic position of a towed array centre.
 | Field | Type | Required | Default | Constraint | Notes |
 |-------|------|----------|---------|------------|-------|
 | time | datetime | yes | — | ISO8601 | Position timestamp |
-| latitude | float | yes | — | — | Array centre latitude |
-| longitude | float | yes | — | — | Array centre longitude |
+| location | float[2] | yes | — | [lon, lat] | Array centre position (GeoJSON coordinate order) |
 
 ## New Enumerations
 
@@ -119,6 +118,12 @@ Visual style for bearing lines.
 | DOT | Evenly spaced dots |
 | DASH_DOT | Alternating dash and dot |
 
+> **Rendering mapping**: At render time, LineStyleEnum maps to SVG/Leaflet `dash_array` values:
+> SOLID → `null` (no dash), DASHED → `"10, 5"`, DOT → `"2, 5"`, DASH_DOT → `"10, 5, 2, 5"`.
+> This mapping is defined as a code constant in the rendering layer (Phase 3, #118), not in the schema.
+> The existing `LineProperties.dash_array` field in `styling.yaml` is the lower-level representation;
+> `LineStyleEnum` is the semantic label stored in sensor data.
+
 ### LabelLocationEnum
 
 Horizontal alignment of contact labels.
@@ -138,6 +143,16 @@ Position along the bearing line where the label is placed.
 | START | At the origin (sensor location) |
 | MIDDLE | At the midpoint of the bearing line |
 | END | At the far end of the bearing line |
+
+## Boolean Presence Flag Pattern
+
+The `has_bearing`, `has_ambiguous`, and `has_frequency` flags follow a legacy pattern where the boolean controls **display**, not data presence. A contact with `has_bearing=false` and `bearing=045.0` is valid — the bearing value is stored but not displayed. This pattern exists because legacy Debrief stores raw sensor values unconditionally; the flags determine which values are shown to the operator.
+
+**Key implications for developers**:
+- Do NOT treat `has_bearing=false` as "bearing is absent" — the value is still there
+- Rendering code should check the flag before drawing bearing lines
+- Schema validation accepts any `bearing` value regardless of the flag
+- The same pattern applies to `has_ambiguous` and `has_frequency`
 
 ## Entity Relationships
 
