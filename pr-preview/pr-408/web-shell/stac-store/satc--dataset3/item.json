@@ -1,0 +1,131 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--dataset3",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "properties": {
+    "title": "Silent Resolve: Dataset3",
+    "datetime": "2016-10-10T12:00:00+00:00",
+    "description": "Silent Resolve: Dataset3 — Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Sutherland.",
+    "start_datetime": "2016-10-10T12:00:00+00:00",
+    "end_datetime": "2016-10-12T10:20:56+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "SAR",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "depth-charge",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "HDMS Sutherland"
+    ],
+    "debrief:nationalities": [
+      "DK"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Dataset3 (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/SATC/Dataset3.rep",
+      "title": "Dataset3.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Dataset3": {
+      "href": "./assets/Dataset3.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Dataset3.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/SATC/Dataset3.rep",
+        "load_timestamp": "2026-03-28T13:51:01.111444Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
