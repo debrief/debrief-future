@@ -342,16 +342,16 @@ describe('ExerciseListView', () => {
       const items = makeItems(3);
       const { container } = render(<ExerciseListView items={items} thumbnailSize="medium" />);
       const content = container.querySelector('.exercise-list-view__content') as HTMLElement;
-      // 3 items * 105px = 315px
-      expect(content.style.height).toBe('315px');
+      // 3 items * 135px = 405px
+      expect(content.style.height).toBe('405px');
     });
 
     it('uses tallest rows for large thumbnails', () => {
       const items = makeItems(3);
       const { container } = render(<ExerciseListView items={items} thumbnailSize="large" />);
       const content = container.querySelector('.exercise-list-view__content') as HTMLElement;
-      // 3 items * 135px = 405px
-      expect(content.style.height).toBe('405px');
+      // 3 items * 190px = 570px
+      expect(content.style.height).toBe('570px');
     });
   });
 

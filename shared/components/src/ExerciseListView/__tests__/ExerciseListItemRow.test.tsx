@@ -98,8 +98,8 @@ describe('ExerciseListItemRow', () => {
     render(<ExerciseListItemRow item={item} thumbnailSize="medium" />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
-    expect(img.width).toBe(90);
-    expect(img.height).toBe(68);
+    expect(img.width).toBe(120);
+    expect(img.height).toBe(90);
   });
 
   it('uses large thumbnail dimensions when thumbnailSize is large', () => {
@@ -107,8 +107,8 @@ describe('ExerciseListItemRow', () => {
     render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
-    expect(img.width).toBe(120);
-    expect(img.height).toBe(90);
+    expect(img.width).toBe(180);
+    expect(img.height).toBe(135);
   });
 
   it('passes correct dimensions to SpatialThumbnail for large size', () => {
@@ -116,7 +116,7 @@ describe('ExerciseListItemRow', () => {
     render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
 
     const spatial = screen.getByTestId('spatial-thumbnail');
-    expect(spatial.style.width).toBe('112px');
-    expect(spatial.style.height).toBe('112px');
+    expect(spatial.style.width).toBe('168px');
+    expect(spatial.style.height).toBe('168px');
   });
 });
