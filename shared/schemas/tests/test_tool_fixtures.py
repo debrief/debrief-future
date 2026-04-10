@@ -83,9 +83,7 @@ def test_tool_fixture_bearing_in_range(name: str, fixture_path: Path) -> None:
     for i, contact in enumerate(contacts):
         bearing = contact.get("bearing")
         if bearing is not None:
-            assert 0 <= bearing <= 360, (
-                f"{name}: contact[{i}] bearing={bearing} outside [0, 360]"
-            )
+            assert 0 <= bearing <= 360, f"{name}: contact[{i}] bearing={bearing} outside [0, 360]"
         ambiguous = contact.get("ambiguous_bearing")
         if ambiguous is not None:
             assert 0 <= ambiguous <= 360, (

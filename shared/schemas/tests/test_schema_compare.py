@@ -124,7 +124,6 @@ class TestEnumConsistency:
             f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
         )
 
-
     def test_array_centre_mode_enum_values(self) -> None:
         """ArrayCentreModeEnum should have consistent values."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
@@ -184,9 +183,16 @@ class TestSensorSchemaStructure:
         properties = sensor_data.get("properties", {})
 
         expected_fields = [
-            "name", "base_frequency", "offset", "array_centre_mode",
-            "worm_in_hole", "color", "visible", "line_thickness",
-            "contacts", "measured_positions",
+            "name",
+            "base_frequency",
+            "offset",
+            "array_centre_mode",
+            "worm_in_hole",
+            "color",
+            "visible",
+            "line_thickness",
+            "contacts",
+            "measured_positions",
         ]
         for field in expected_fields:
             assert field in properties, f"SensorData should have {field} property"
@@ -198,10 +204,23 @@ class TestSensorSchemaStructure:
         properties = sensor_contact.get("properties", {})
 
         expected_fields = [
-            "time", "bearing", "has_bearing", "ambiguous_bearing", "has_ambiguous",
-            "range", "frequency", "has_frequency", "label", "comment",
-            "color", "visible", "show_label", "line_style", "label_location",
-            "put_label_at", "origin",
+            "time",
+            "bearing",
+            "has_bearing",
+            "ambiguous_bearing",
+            "has_ambiguous",
+            "range",
+            "frequency",
+            "has_frequency",
+            "label",
+            "comment",
+            "color",
+            "visible",
+            "show_label",
+            "line_style",
+            "label_location",
+            "put_label_at",
+            "origin",
         ]
         for field in expected_fields:
             assert field in properties, f"SensorContact should have {field} property"
@@ -245,7 +264,9 @@ class TestSensorSchemaStructure:
             assert "array" in origin_type, "origin type should include 'array'"
         else:
             assert origin_type == "array", "origin should be array"
-        assert origin_prop.get("items", {}).get("type") == "number", "origin items should be numbers"
+        assert origin_prop.get("items", {}).get("type") == "number", (
+            "origin items should be numbers"
+        )
 
     def test_measured_position_location_schema(self) -> None:
         """MeasuredArrayPosition.location should be array of exactly 2 floats."""
@@ -258,7 +279,9 @@ class TestSensorSchemaStructure:
             assert "array" in location_type, "location type should include 'array'"
         else:
             assert location_type == "array", "location should be array"
-        assert location_prop.get("items", {}).get("type") == "number", "location items should be numbers"
+        assert location_prop.get("items", {}).get("type") == "number", (
+            "location items should be numbers"
+        )
 
 
 class TestRequiredFields:
