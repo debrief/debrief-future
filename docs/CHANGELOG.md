@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Added
+- **REP Sensor Import** — Parse `;SENSOR:` (v1), `;SENSOR2:` (v2), `;SENSOR3:` (v3), and `;SENSORARC` lines from REP files, embedding sensor contacts into `TrackFeature.properties.sensors[]` via `pending_sensor_data`. Replaces standalone annotation features.
+  - New module: `sensor_parser.py` with 4 parser functions + contact grouping
+  - Tests: 90/90 passing (56 new), 10k-line performance benchmark under 1s
+  - Evidence: test-summary.md, usage-example.md, sample-input.rep, parsed-output.json
 - **Tabular Results Panel** (#177) — Display `debrief-calc` tool outputs as tables (flat statistics) or charts (Vega-Lite time-series) in a panel beneath the map. Supports Save / Save As to CSV in the plot's assets folder, surfaces saved files in the LayersToolbar Associated Files dropdown, and wires Open / Reveal in Explorer / Open With file actions in the web-shell.
   - New components: `TableRenderer`, expanded `ChartPanelWrapper` with save UI and tab management
   - New utilities: `buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, `formatCsvValue` in `@debrief/utils`
