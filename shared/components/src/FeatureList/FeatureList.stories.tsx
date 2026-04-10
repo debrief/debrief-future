@@ -7,7 +7,7 @@ import type { FilterState } from '../LayersToolbar';
 import { ToolMatchService, createSelectionFromCounts } from '../ToolMatch';
 import { ThemeProvider } from '../ThemeProvider';
 import type { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
-import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
+import type { TrackFeature, ReferenceLocation, SensorData } from '@debrief/schemas';
 import { sampleSourceFiles, sampleResultFiles } from '../LayersToolbar/fixtures/files';
 import { sampleToolsWithCategories as sampleTools } from '../LayersToolbar/fixtures/tools';
 
@@ -490,6 +490,199 @@ export const WithToolbarDarkTheme: Story = {
     docs: {
       description: {
         story: 'Combined FeatureList + LayersToolbar in dark theme.',
+      },
+    },
+  },
+};
+
+// ── Sensor-aware track fixtures (Feature #179) ──────────────────────
+
+function makeSensorContacts(count: number, startBearing: number = 45): Array<{ time: string; bearing: number; ambiguous_bearing?: number }> {
+  return Array.from({ length: count }, (_, i) => ({
+    time: new Date(Date.UTC(2024, 0, 15, 8, i * 5, 0)).toISOString(),
+    bearing: (startBearing + i * 2) % 360,
+    ...(i === 0 && count > 5 ? { ambiguous_bearing: (startBearing + 180) % 360 } : {}),
+  }));
+}
+
+// Case A: simple track, no sensors (baseline — positions as direct children)
+const caseATrack: TrackFeature = {
+  type: 'Feature',
+  id: 'case-a-simple',
+  geometry: {
+    type: 'LineString',
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-A',
+    platform_name: 'Case A — Simple Track',
+    track_type: 'OWNSHIP',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [
+      { time: '2024-01-15T08:00:00Z', course: 90, speed: 12.5 },
+      { time: '2024-01-15T09:00:00Z', course: 95, speed: 13.0 },
+      { time: '2024-01-15T10:00:00Z', course: 100, speed: 12.0 },
+    ],
+  },
+} as unknown as TrackFeature;
+
+// Case B: compound track, no sensors (Track Segments wrapper)
+const caseBTrack: TrackFeature = {
+  type: 'Feature',
+  id: 'case-b-compound',
+  geometry: {
+    type: 'LineString',
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-B',
+    platform_name: 'Case B — Compound (No Sensors)',
+    track_type: 'SOLUTION',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [],
+    segments: [
+      { segment_type: 'TMA_SEGMENT', name: 'leg-alpha', start_time: '2024-01-15T08:00:00Z', end_time: '2024-01-15T10:00:00Z', positions: [{ time: '2024-01-15T08:00:00Z', course: 45, speed: 8 }, { time: '2024-01-15T09:00:00Z', course: 50, speed: 9 }] },
+      { segment_type: 'TMA_SEGMENT', name: 'leg-bravo', start_time: '2024-01-15T10:00:00Z', end_time: '2024-01-15T12:00:00Z', positions: [{ time: '2024-01-15T10:00:00Z', course: 120, speed: 7 }] },
+    ],
+  },
+} as unknown as TrackFeature;
+
+// Case C: simple track with sensors (Positions + Sensors groups)
+const caseCTrack: TrackFeature = {
+  type: 'Feature',
+  id: 'case-c-sensors',
+  geometry: {
+    type: 'LineString',
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-C',
+    platform_name: 'Case C — Track with Sensors',
+    track_type: 'OWNSHIP',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [
+      { time: '2024-01-15T08:00:00Z', course: 90, speed: 12.5 },
+      { time: '2024-01-15T09:00:00Z', course: 95, speed: 13.0 },
+      { time: '2024-01-15T10:00:00Z', course: 100, speed: 12.0 },
+    ],
+    sensors: [
+      { name: 'TOWED_ARRAY', contacts: makeSensorContacts(42) } as SensorData,
+      { name: 'HULL_ARRAY', contacts: makeSensorContacts(17, 200) } as SensorData,
+    ],
+  },
+} as unknown as TrackFeature;
+
+// Case D: compound track with sensors (Track Segments + Sensors groups)
+const caseDTrack: TrackFeature = {
+  type: 'Feature',
+  id: 'case-d-compound-sensors',
+  geometry: {
+    type: 'LineString',
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-D',
+    platform_name: 'Case D — Compound + Sensors',
+    track_type: 'SOLUTION',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [],
+    segments: [
+      { segment_type: 'TMA_SEGMENT', name: 'leg-one', start_time: '2024-01-15T08:00:00Z', end_time: '2024-01-15T10:00:00Z', positions: [{ time: '2024-01-15T08:00:00Z', course: 45, speed: 8 }] },
+      { segment_type: 'TMA_SEGMENT', name: 'leg-two', start_time: '2024-01-15T10:00:00Z', end_time: '2024-01-15T12:00:00Z', positions: [{ time: '2024-01-15T10:00:00Z', course: 120, speed: 7 }] },
+    ],
+    sensors: [
+      { name: 'BOW_ARRAY', contacts: makeSensorContacts(8, 90) } as SensorData,
+    ],
+  },
+} as unknown as TrackFeature;
+
+// Edge case: zero-contact sensor + ambiguous bearing
+const edgeCaseTrack: TrackFeature = {
+  type: 'Feature',
+  id: 'edge-cases',
+  geometry: {
+    type: 'LineString',
+    coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+  },
+  properties: {
+    kind: 'TRACK',
+    platform_id: 'PLT-E',
+    platform_name: 'Edge Cases — Zero/Ambiguous',
+    track_type: 'OWNSHIP',
+    start_time: '2024-01-15T08:00:00Z',
+    end_time: '2024-01-15T12:00:00Z',
+    positions: [
+      { time: '2024-01-15T08:00:00Z', course: 0, speed: 5 },
+    ],
+    sensors: [
+      { name: 'EMPTY_SENSOR', contacts: [] } as SensorData,
+      {
+        name: 'AMBIGUOUS_SENSOR',
+        contacts: [
+          { time: '2024-01-15T08:00:00Z', bearing: 45, ambiguous_bearing: 225 },
+          { time: '2024-01-15T08:05:00Z', bearing: 359 },
+        ],
+      } as SensorData,
+    ],
+  },
+} as unknown as TrackFeature;
+
+const sensorFeatures: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: [caseATrack, caseBTrack, caseCTrack, caseDTrack, edgeCaseTrack],
+};
+
+function TracksWithSensorsExample() {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <strong>Selected:</strong>{' '}
+        {selectedIds.size > 0 ? Array.from(selectedIds).join(', ') : 'None'}
+        {selectedIds.size > 0 && (
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            style={{ marginLeft: 12 }}
+          >
+            Clear
+          </button>
+        )}
+      </div>
+      <FeatureList
+        features={sensorFeatures}
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
+        showInfoIcon={true}
+        onChildInfoClick={(_e, item) => {
+          window.alert(`Info for: ${item.id}\nLabel: ${item.label}\nSublabel: ${item.sublabel ?? 'n/a'}`);
+        }}
+        height={500}
+      />
+    </div>
+  );
+}
+
+export const TracksWithSensors: Story = {
+  render: () => <TracksWithSensorsExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'All four layout cases for sensor-aware track rendering (#179). ' +
+          'Case A: simple track (positions as direct children). ' +
+          'Case B: compound track (Track Segments wrapper). ' +
+          'Case C: simple track + sensors (Positions + Sensors groups). ' +
+          'Case D: compound track + sensors (Track Segments + Sensors groups). ' +
+          'Plus edge cases: zero-contact sensor, ambiguous bearing.',
       },
     },
   },

@@ -308,7 +308,7 @@ export function FeatureRow({
         </span>
       )}
       {showInfoIcon && !feature && displayItem && onChildInfoClick &&
-        (displayItem.type === 'position' || displayItem.type === 'point' || displayItem.type === 'polygon') && (
+        (displayItem.type === 'position' || displayItem.type === 'point' || displayItem.type === 'polygon' || displayItem.type === 'contact') && (
         <span
           className="debrief-feature-row__info-icon"
           title="Info"

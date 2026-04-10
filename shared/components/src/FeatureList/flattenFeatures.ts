@@ -11,6 +11,7 @@ import type {
   PositionStyleOverride,
   SegmentMetadata,
 } from '../utils/types';
+import type { SensorData, SensorContact } from '@debrief/schemas';
 import {
   isTrackFeature,
   isMultiPointFeature,
@@ -20,7 +21,7 @@ import {
 
 // ─── Types ──────────────────────────────────────────────────────────
 
-export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment';
+export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment' | 'group' | 'sensor' | 'contact';
 
 export interface DisplayItem {
   /** Discriminator for the row kind */
@@ -71,12 +72,21 @@ function getPositionLabel(
 function getPositionSublabel(position: TimestampedPosition): string | null {
   const parts: string[] = [];
   if (position.course !== undefined && position.course !== null) {
-    parts.push(`${Math.round(position.course)}\u00B0`);
+    parts.push(`${Math.round(position.course).toString().padStart(3, '0')}\u00B0`);
   }
   if (position.speed !== undefined && position.speed !== null) {
     parts.push(`${position.speed.toFixed(1)}kts`);
   }
   return parts.length > 0 ? parts.join(' ') : null;
+}
+
+function formatBearing(bearing: number, ambiguousBearing?: number): string {
+  const primary = Math.round(bearing).toString().padStart(3, '0') + '\u00B0';
+  if (ambiguousBearing !== undefined && ambiguousBearing !== null) {
+    const secondary = Math.round(ambiguousBearing).toString().padStart(3, '0') + '\u00B0';
+    return `${primary} / ${secondary}`;
+  }
+  return primary;
 }
 
 function formatCoordinate(coord: number[]): string {
@@ -136,20 +146,83 @@ function flattenTrackChildren(
   expandedIds: Set<string>,
 ): void {
   const props = feature.properties;
+  const hasSensors = (props.sensors?.length ?? 0) > 0;
+  const segmentCount = props.segments?.length ?? 0;
 
-  if (props.segments && props.segments.length > 0) {
-    flattenSegments(items, props.segments, featureId, props.position_style_overrides, expandedIds);
-    return;
+  if (!hasSensors && segmentCount <= 1) {
+    // Case A: no sensors, single or no segments — unchanged legacy path
+    flattenPositionsDirect(items, props.positions, featureId, props.position_style_overrides, 1);
+  } else if (!hasSensors && segmentCount > 1) {
+    // Case B: no sensors, multiple segments — wrap in Track Segments group
+    const groupId = `${featureId}/segments`;
+    items.push({
+      type: 'group',
+      id: groupId,
+      label: `Track Segments (${segmentCount})`,
+      sublabel: null,
+      depth: 1,
+      parentId: featureId,
+      isExpandable: true,
+      feature: null,
+      index: null,
+    });
+    if (expandedIds.has(groupId)) {
+      flattenSegments(items, props.segments!, featureId, props.position_style_overrides, expandedIds, 2);
+    }
+  } else if (hasSensors && segmentCount <= 1) {
+    // Case C: sensors, single or no segments — Positions + Sensors groups
+    const posCount = props.positions?.length ?? 0;
+    const posGroupId = `${featureId}/positions`;
+    items.push({
+      type: 'group',
+      id: posGroupId,
+      label: `Positions (${posCount})`,
+      sublabel: null,
+      depth: 1,
+      parentId: featureId,
+      isExpandable: true,
+      feature: null,
+      index: null,
+    });
+    if (expandedIds.has(posGroupId)) {
+      flattenPositionsDirect(items, props.positions, featureId, props.position_style_overrides, 2);
+    }
+    flattenSensorsGroup(items, props.sensors!, featureId, expandedIds);
+  } else {
+    // Case D: sensors + multiple segments — Track Segments + Sensors groups
+    const segGroupId = `${featureId}/segments`;
+    items.push({
+      type: 'group',
+      id: segGroupId,
+      label: `Track Segments (${segmentCount})`,
+      sublabel: null,
+      depth: 1,
+      parentId: featureId,
+      isExpandable: true,
+      feature: null,
+      index: null,
+    });
+    if (expandedIds.has(segGroupId)) {
+      flattenSegments(items, props.segments!, featureId, props.position_style_overrides, expandedIds, 2);
+    }
+    flattenSensorsGroup(items, props.sensors!, featureId, expandedIds);
   }
+}
 
-  const positions = props.positions;
+function flattenPositionsDirect(
+  items: DisplayItem[],
+  positions: TimestampedPosition[] | undefined,
+  featureId: string,
+  overrides: PositionStyleOverride[] | undefined,
+  depth: number,
+): void {
   if (!positions || positions.length === 0) {
     items.push({
       type: 'position',
       id: `${featureId}/positions/empty`,
       label: 'No child items',
       sublabel: null,
-      depth: 1,
+      depth,
       parentId: featureId,
       isExpandable: false,
       feature: null,
@@ -158,15 +231,92 @@ function flattenTrackChildren(
     return;
   }
 
-  const overrides = props.position_style_overrides;
   for (let i = 0; i < positions.length; i++) {
     items.push({
       type: 'position',
       id: `${featureId}/positions/${i}`,
       label: getPositionLabel(positions[i]!, i, overrides),
       sublabel: getPositionSublabel(positions[i]!),
-      depth: 1,
+      depth,
       parentId: featureId,
+      isExpandable: false,
+      feature: null,
+      index: i,
+    });
+  }
+}
+
+function flattenSensorsGroup(
+  items: DisplayItem[],
+  sensors: SensorData[],
+  featureId: string,
+  expandedIds: Set<string>,
+): void {
+  const sensorsGroupId = `${featureId}/sensors`;
+  items.push({
+    type: 'group',
+    id: sensorsGroupId,
+    label: `Sensors (${sensors.length})`,
+    sublabel: null,
+    depth: 1,
+    parentId: featureId,
+    isExpandable: true,
+    feature: null,
+    index: null,
+  });
+
+  if (!expandedIds.has(sensorsGroupId)) return;
+
+  for (const sensor of sensors) {
+    const sensorId = `${featureId}/sensors/${sensor.name}`;
+    const contactCount = sensor.contacts.length;
+    items.push({
+      type: 'sensor',
+      id: sensorId,
+      label: sensor.name,
+      sublabel: `${contactCount} contact${contactCount !== 1 ? 's' : ''}`,
+      depth: 2,
+      parentId: sensorsGroupId,
+      isExpandable: true,
+      feature: null,
+      index: null,
+    });
+
+    if (!expandedIds.has(sensorId)) continue;
+
+    flattenContacts(items, sensor.contacts, sensorId);
+  }
+}
+
+function flattenContacts(
+  items: DisplayItem[],
+  contacts: SensorContact[],
+  sensorId: string,
+): void {
+  if (contacts.length === 0) {
+    items.push({
+      type: 'contact',
+      id: `${sensorId}/contacts/empty`,
+      label: 'No contacts',
+      sublabel: null,
+      depth: 3,
+      parentId: sensorId,
+      isExpandable: false,
+      feature: null,
+      index: null,
+    });
+    return;
+  }
+
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i]!;
+    items.push({
+      type: 'contact',
+      id: `${sensorId}/contacts/${i}`,
+      label: formatTime(contact.time),
+      sublabel: formatBearing(contact.bearing, contact.ambiguous_bearing),
+      depth: 3,
+      parentId: sensorId,
       isExpandable: false,
       feature: null,
       index: i,
@@ -180,6 +330,7 @@ function flattenSegments(
   featureId: string,
   _overrides: PositionStyleOverride[] | undefined,
   expandedIds: Set<string>,
+  baseDepth: number = 1,
 ): void {
   for (const segment of segments) {
     const segmentName = segment.name ?? segment.segment_type;
@@ -192,7 +343,7 @@ function flattenSegments(
       id: segmentPath,
       label: segmentName,
       sublabel: segment.segment_type !== segmentName ? segment.segment_type : null,
-      depth: 1,
+      depth: baseDepth,
       parentId: featureId,
       isExpandable: hasPositions,
       feature: null,
@@ -206,7 +357,7 @@ function flattenSegments(
           id: `${segmentPath}/positions/${i}`,
           label: getPositionLabel(segment.positions[i]!, i),
           sublabel: getPositionSublabel(segment.positions[i]!),
-          depth: 2,
+          depth: baseDepth + 1,
           parentId: segmentPath,
           isExpandable: false,
           feature: null,
@@ -293,6 +444,15 @@ function flattenMultiPolygonChildren(
       index: i,
     });
   }
+}
+
+/**
+ * Extract the root feature ID from any path in the DisplayItem ID scheme.
+ * E.g., 'track-001/sensors/TOWED/contacts/3' → 'track-001'
+ */
+export function getRootFeatureId(path: string): string {
+  const slashIndex = path.indexOf('/');
+  return slashIndex === -1 ? path : path.slice(0, slashIndex);
 }
 
 /**
