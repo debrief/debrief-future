@@ -37,6 +37,42 @@ coverage = [f for f in result.features
 
 No standalone `SENSOR` or `SENSOR_CONTACT` features are produced. If a sensor line references a track not found in the file, the data is kept in `pending_sensor_data` with a warning — the import pipeline may find the track in a companion file.
 
+Here's what the parser actually produces for a track with three SENSOR v1 contacts — one with explicit DMS coordinates, two with NULL location:
+
+```json
+{
+  "NELSON": [
+    {
+      "name": "TOWED_ARRAY",
+      "contacts": [
+        {
+          "time": "1995-12-12T05:00:00+00:00",
+          "bearing": 45.0,
+          "range": 4572.0,
+          "origin": [-21.698, 22.186],
+          "label": "contact_1"
+        },
+        {
+          "time": "1995-12-12T05:01:00+00:00",
+          "bearing": 50.0,
+          "range": 5029.2,
+          "label": "contact_2"
+        },
+        {
+          "time": "1995-12-12T05:02:00+00:00",
+          "bearing": 55.0,
+          "range": 5486.4,
+          "label": "contact_3"
+        }
+      ],
+      "color": "#FF0000"
+    }
+  ]
+}
+```
+
+The first contact has an `origin` from explicit DMS coordinates in the REP line. The other two have no origin — their position will be derived from the host track at render time. Range values are already converted from yards to metres.
+
 ## By the Numbers
 
 | | |
