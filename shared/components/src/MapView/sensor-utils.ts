@@ -287,6 +287,77 @@ export function resolveContactColor(
   return contact.color ?? sensor.color ?? trackColor ?? DEFAULT_SENSOR_COLOR;
 }
 
+// ── Port/Starboard Bearing Determination ────────────────────────────
+
+/**
+ * Compute relative bearing from vessel course to a target bearing.
+ * Returns value in range (-180, +180]:
+ *   negative = port side
+ *   positive = starboard side
+ */
+export function getRelativeBearing(courseDeg: number, bearingDeg: number): number {
+  let rel = bearingDeg - courseDeg;
+  while (rel > 180) rel -= 360;
+  while (rel < -180) rel += 360;
+  return rel;
+}
+
+/**
+ * Interpolate the host track's course at a given timestamp.
+ * Returns course in degrees, or null if time is out of range.
+ */
+export function interpolateTrackCourse(
+  positions: Array<{ time: string; course?: number }>,
+  targetTimeMs: number,
+): number | null {
+  if (positions.length === 0) return null;
+
+  const timestamps = positions.map((p) => Date.parse(p.time));
+
+  // Out of range
+  if (targetTimeMs < timestamps[0]! || targetTimeMs > timestamps[timestamps.length - 1]!) {
+    return null;
+  }
+
+  const idx = findNearestPointIndex(timestamps, targetTimeMs);
+  const pos = positions[idx];
+  return pos?.course ?? null;
+}
+
+/**
+ * Determine whether a bearing is to the port side of the vessel.
+ * Port = negative relative bearing.
+ */
+export function isBearingToPort(bearingDeg: number, courseDeg: number): boolean {
+  return getRelativeBearing(courseDeg, bearingDeg) < 0;
+}
+
+/**
+ * Assign colours for primary and ambiguous bearing lines based on
+ * port/starboard convention from legacy Debrief:
+ *   - Port-side bearing → base (brighter) colour
+ *   - Starboard-side bearing → darker colour
+ *
+ * This is independent of which bearing is "primary" vs "ambiguous".
+ */
+export function assignAmbiguousColors(
+  primaryBearing: number,
+  _ambiguousBearing: number,
+  courseDeg: number,
+  baseColor: string,
+): { primaryColor: string; ambiguousColor: string } {
+  const darkColor = darkenColor(baseColor);
+  const primaryIsPort = isBearingToPort(primaryBearing, courseDeg);
+
+  if (primaryIsPort) {
+    // Primary bearing is port → base colour; ambiguous is starboard → darker
+    return { primaryColor: baseColor, ambiguousColor: darkColor };
+  } else {
+    // Primary bearing is starboard → darker; ambiguous is port → base colour
+    return { primaryColor: darkColor, ambiguousColor: baseColor };
+  }
+}
+
 // ── Contact Preparation Pipeline ────────────────────────────────────
 
 /**
@@ -374,7 +445,29 @@ export function prepareSensorContacts(
       );
     }
 
-    const color = resolveContactColor(contact, sensor, trackColor);
+    const baseColor = resolveContactColor(contact, sensor, trackColor);
+
+    // Assign colours based on port/starboard convention when ambiguous
+    let primaryColor = baseColor;
+    let ambiguousColor = darkenColor(baseColor);
+
+    if (ambiguousFarEnd !== null) {
+      // Determine vessel course at this contact's time for port/starboard
+      const courseDeg = interpolateTrackCourse(
+        positions as Array<{ time: string; course?: number }>,
+        contactTimeMs,
+      );
+      if (courseDeg !== null) {
+        const colors = assignAmbiguousColors(
+          contact.bearing,
+          contact.ambiguous_bearing!,
+          courseDeg,
+          baseColor,
+        );
+        primaryColor = colors.primaryColor;
+        ambiguousColor = colors.ambiguousColor;
+      }
+    }
 
     result.push({
       contactIndex: i,
@@ -388,8 +481,8 @@ export function prepareSensorContacts(
       showLabel: contact.show_label ?? false,
       putLabelAt: contact.put_label_at ?? 'END',
       labelLocation: contact.label_location ?? 'RIGHT',
-      color,
-      darkenedColor: darkenColor(color),
+      color: primaryColor,
+      darkenedColor: ambiguousColor,
       lineStyle: contact.line_style ?? 'SOLID',
       lineThickness: sensor.line_thickness ?? 1,
       hasAmbiguous: ambiguousFarEnd !== null,

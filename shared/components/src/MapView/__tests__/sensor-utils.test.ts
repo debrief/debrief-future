@@ -12,6 +12,9 @@ import {
   calculateLabelPosition,
   labelLocationToTextAlign,
   computeArcPath,
+  getRelativeBearing,
+  isBearingToPort,
+  assignAmbiguousColors,
   LINE_STYLE_DASH_ARRAYS,
   MAXIMUM_SENSOR_BEARING_RANGE,
   DEFAULT_SENSOR_COLOR,
@@ -268,6 +271,84 @@ describe('resolveContactColor', () => {
   });
 });
 
+// ── Port/Starboard Bearing Determination ────────────────────────────
+
+describe('getRelativeBearing', () => {
+  it('returns 0 for bearing equal to course', () => {
+    expect(getRelativeBearing(45, 45)).toBe(0);
+  });
+
+  it('returns positive for starboard bearing', () => {
+    // Course 045, bearing 090 → 45° to starboard
+    expect(getRelativeBearing(45, 90)).toBe(45);
+  });
+
+  it('returns negative for port bearing', () => {
+    // Course 045, bearing 000 → 45° to port
+    expect(getRelativeBearing(45, 0)).toBe(-45);
+  });
+
+  it('handles 0/360 wraparound (course 350, bearing 010)', () => {
+    // 010 is 20° to starboard of 350
+    expect(getRelativeBearing(350, 10)).toBe(20);
+  });
+
+  it('handles 0/360 wraparound (course 010, bearing 350)', () => {
+    // 350 is 20° to port of 010
+    expect(getRelativeBearing(10, 350)).toBe(-20);
+  });
+
+  it('returns 180 for bearing directly behind', () => {
+    expect(getRelativeBearing(0, 180)).toBe(180);
+  });
+});
+
+describe('isBearingToPort', () => {
+  it('returns true for port-side bearing', () => {
+    // Course 045, bearing 000 → port
+    expect(isBearingToPort(0, 45)).toBe(true);
+  });
+
+  it('returns false for starboard-side bearing', () => {
+    // Course 045, bearing 090 → starboard
+    expect(isBearingToPort(90, 45)).toBe(false);
+  });
+
+  it('returns false for bearing dead ahead (rel=0)', () => {
+    expect(isBearingToPort(45, 45)).toBe(false);
+  });
+});
+
+describe('assignAmbiguousColors', () => {
+  const baseColor = '#FF0000';
+
+  it('assigns base colour to port bearing, dark to starboard', () => {
+    // Course 045: bearing 000 is port, bearing 090 is starboard
+    const result = assignAmbiguousColors(0, 90, 45, baseColor);
+    // Primary (000) is port → gets base colour
+    expect(result.primaryColor).toBe(baseColor);
+    expect(result.ambiguousColor).not.toBe(baseColor); // darker
+  });
+
+  it('swaps colours when primary bearing is starboard', () => {
+    // Course 045: bearing 090 is starboard, bearing 000 is port
+    const result = assignAmbiguousColors(90, 0, 45, baseColor);
+    // Primary (090) is starboard → gets dark colour
+    expect(result.primaryColor).not.toBe(baseColor); // darker
+    expect(result.ambiguousColor).toBe(baseColor); // port gets base
+  });
+
+  it('handles realistic towed-array ambiguity (mirror across heading)', () => {
+    // Course 045, target at 070 (stbd), ghost at 020 (port)
+    // ambig = (2*45 - 70) = 20
+    const result = assignAmbiguousColors(70, 20, 45, baseColor);
+    // Primary (070) is starboard → darker
+    expect(result.primaryColor).not.toBe(baseColor);
+    // Ambiguous (020) is port → base colour
+    expect(result.ambiguousColor).toBe(baseColor);
+  });
+});
+
 // ── Contact Filtering ───────────────────────────────────────────────
 
 describe('prepareSensorContacts', () => {
@@ -420,6 +501,46 @@ describe('prepareSensorContacts', () => {
     ]);
     const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
     expect(result).toHaveLength(0); // 09:00 is before track start (10:00)
+  });
+
+  it('assigns port/starboard colours for ambiguous bearings', () => {
+    // Track course = 45°. Bearing 090 is starboard, ambiguous 000 is port.
+    const { sensor, feature } = makeTrack([
+      {
+        time: '2026-01-27T10:30:00Z',
+        bearing: 90,
+        has_bearing: true,
+        ambiguous_bearing: 0,
+        has_ambiguous: true,
+        visible: true,
+      },
+    ]);
+    const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
+    expect(result).toHaveLength(1);
+    // Primary bearing (090) is starboard → should get DARKER colour
+    // Ambiguous bearing (000) is port → should get BASE (brighter) colour
+    expect(result[0]!.color).not.toBe('#FF0000'); // not the base sensor colour
+    expect(result[0]!.darkenedColor).toBe('#FF0000'); // ambiguous gets the base colour (port)
+  });
+
+  it('keeps base colour on primary when primary is port-side', () => {
+    // Track course = 45°. Bearing 000 is port, ambiguous 090 is starboard.
+    const { sensor, feature } = makeTrack([
+      {
+        time: '2026-01-27T10:30:00Z',
+        bearing: 0,
+        has_bearing: true,
+        ambiguous_bearing: 90,
+        has_ambiguous: true,
+        visible: true,
+      },
+    ]);
+    const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
+    expect(result).toHaveLength(1);
+    // Primary (000) is port → gets base colour
+    expect(result[0]!.color).toBe('#FF0000');
+    // Ambiguous (090) is starboard → gets darker colour
+    expect(result[0]!.darkenedColor).not.toBe('#FF0000');
   });
 });
 

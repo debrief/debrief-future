@@ -91,7 +91,7 @@ export const towedArraySensor: SensorData = {
       time: isoTime(15),
       bearing: 47,
       has_bearing: true,
-      ambiguous_bearing: 227,
+      ambiguous_bearing: 43, // mirror of 47 across course 045: (2*45 - 47) = 43
       has_ambiguous: true,
       range: 4500,
       visible: true,
@@ -115,7 +115,7 @@ export const towedArraySensor: SensorData = {
       time: isoTime(25),
       bearing: 53,
       has_bearing: true,
-      ambiguous_bearing: 307,
+      ambiguous_bearing: 37, // mirror of 53 across course 045: (2*45 - 53) = 37
       has_ambiguous: true,
       range: 3500,
       visible: true,

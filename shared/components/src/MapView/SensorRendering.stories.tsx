@@ -81,22 +81,32 @@ function AmbiguousBearingsDemo() {
   const [currentTime, setCurrentTime] = useState<number>(sensorTimeExtent[0] + 25 * 60_000);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
 
-  // Create a sensor with many ambiguous contacts for clear visualisation
+  // Create a sensor with realistic towed-array ambiguity.
+  // A towed array cannot distinguish port from starboard — the ambiguous
+  // bearing is the mirror image of the actual bearing across the vessel's
+  // heading.  With the host track heading 045°, a target at bearing 090°
+  // (45° to starboard) produces a ghost at bearing 000° (45° to port).
+  // Formula: ambiguous = (2 * course - bearing + 360) % 360
+  const vesselCourse = 45;
   const ambiguousSensor: SensorData = {
     name: 'AMBIGUOUS_ARRAY',
     color: '#FF4444',
     visible: true,
     line_thickness: 2,
-    contacts: Array.from({ length: 8 }, (_, i): SensorContact => ({
-      time: new Date(sensorTimeExtent[0] + (10 + i * 3) * 60_000).toISOString(),
-      bearing: 30 + i * 5,
-      has_bearing: true,
-      ambiguous_bearing: 210 + i * 5,
-      has_ambiguous: true,
-      range: 4000 + i * 200,
-      visible: true,
-      line_style: 'SOLID',
-    })),
+    contacts: Array.from({ length: 8 }, (_, i): SensorContact => {
+      const bearing = 70 + i * 5; // starboard of the 045 heading
+      const ambiguous = (2 * vesselCourse - bearing + 360) % 360;
+      return {
+        time: new Date(sensorTimeExtent[0] + (10 + i * 3) * 60_000).toISOString(),
+        bearing,
+        has_bearing: true,
+        ambiguous_bearing: ambiguous,
+        has_ambiguous: true,
+        range: 4000 + i * 200,
+        visible: true,
+        line_style: 'SOLID',
+      };
+    }),
   };
 
   const feature = createTrackWithSensors([ambiguousSensor]);
