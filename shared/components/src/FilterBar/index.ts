@@ -5,6 +5,7 @@
  */
 
 export { FilterBar } from './FilterBar';
+export { QuickSearch } from './QuickSearch';
 export { useFilterBar } from './useFilterBar';
 export { useDistinctValues } from './useDistinctValues';
 export { taxonomyToCascadingItems } from './taxonomyAdapter';
