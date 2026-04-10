@@ -366,6 +366,7 @@ export function ActivityPanel({
     featureName: string;
     geometryType: string;
     coordinates: number[] | number[][] | number[][][] | number[][][][];
+    properties?: Record<string, unknown>;
     position: { x: number; y: number };
   } | null>(null);
 
@@ -378,6 +379,8 @@ export function ActivityPanel({
         featureName: getFeatureLabel(feature),
         geometryType: feature.geometry?.type ?? 'None',
         coordinates: (feature.geometry?.coordinates ?? []) as number[] | number[][] | number[][][] | number[][][][],
+        // eslint-disable-next-line no-restricted-syntax
+        properties: feature.properties as unknown as Record<string, unknown>,
         position: { x: rect.right + 4, y: rect.top },
       });
     },
@@ -531,6 +534,7 @@ export function ActivityPanel({
               featureName={infoDialogState.featureName}
               geometryType={infoDialogState.geometryType}
               coordinates={infoDialogState.coordinates}
+              properties={infoDialogState.properties}
               anchorPosition={infoDialogState.position}
               onDismiss={() => setInfoDialogState(null)}
             />

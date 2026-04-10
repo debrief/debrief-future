@@ -254,6 +254,12 @@ export default function App() {
     return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
   }, [plotFeatures, resultLayers, drawnFeatures]);
 
+  // Features visible on map (excludes hidden)
+  const visibleFeatures = useMemo<DebriefFeature[]>(() => {
+    if (hiddenFeatureIds.size === 0) return allFeatures;
+    return allFeatures.filter(f => !hiddenFeatureIds.has(f.id));
+  }, [allFeatures, hiddenFeatureIds]);
+
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
     const names: Record<string, string> = {};
@@ -298,6 +304,18 @@ export default function App() {
   const tools = useMemo<ToolsPanelItem[]>(() => {
     return calcService.getTools(selectedFeatures as Feature[]);
   }, [selectedFeatures]);
+
+  // Convert ToolsPanelItem[] to MatchResult[] for the Run dropdown in LayersToolbar
+  const toolMatches = useMemo(() => {
+    return tools.map(t => ({
+      tool: { id: t.id, name: t.name, description: t.description },
+      isActive: t.applicable,
+      explanation: t.explanation ?? '',
+    }));
+  }, [tools]);
+
+  // Hidden feature IDs (visibility toggle state)
+  const [hiddenFeatureIds, setHiddenFeatureIds] = useState<Set<string>>(new Set());
 
   // --- Keyboard: Ctrl+Z / Ctrl+Y for undo/redo ---
   useEffect(() => {
@@ -362,6 +380,7 @@ export default function App() {
       });
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
+      setHiddenFeatureIds(new Set());
       freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
@@ -1039,6 +1058,22 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:toggleVisibility': {
+        const { featureIds } = message.payload;
+        setHiddenFeatureIds(prev => {
+          const next = new Set(prev);
+          const allHidden = featureIds.every(id => next.has(id));
+          if (allHidden) {
+            // Show all
+            for (const id of featureIds) next.delete(id);
+          } else {
+            // Hide all
+            for (const id of featureIds) next.add(id);
+          }
+          return next;
+        });
+        break;
+      }
       case 'layer:format': {
         const { featureIds, property, isPointOverride, positionIndex } = message.payload;
         // Coerce boolean string values ('true'/'false') to actual booleans
@@ -1216,13 +1251,15 @@ export default function App() {
       displayMode: toComponentMode(state.displayMode),
       timeUiState: timeExtent ? 'ready' : 'empty',
       tools,
+      toolMatches,
       features: allFeatures,
       selectedFeatureIds: state.selection.featureIds,
+      hiddenIds: hiddenFeatureIds,
       resultFiles: savedResultFiles,
       onMessage: handleActivityMessage,
     } : null,
     mapViewProps: currentPlot ? {
-      features: allFeatures,
+      features: visibleFeatures,
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
@@ -1268,7 +1305,8 @@ export default function App() {
   }), [
     panelComponents, currentPlot, timeExtent, playback.currentTime,
     playback.playbackState, playback.speed, state.displayMode,
-    tools, allFeatures, state.selection.featureIds, handleActivityMessage,
+    tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
+    hiddenFeatureIds, handleActivityMessage,
     selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
