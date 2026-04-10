@@ -9,6 +9,7 @@ import { isTrackFeature } from '../utils/types';
 import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
+import { SensorBearingLayer } from './SensorBearingLayer';
 import { LeafletToolbar } from './LeafletToolbar';
 import type { DrawingMode } from './LeafletToolbar';
 import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
@@ -567,6 +568,22 @@ export function MapView({
             onClick={onSelect}
           />
         ))}
+
+        {currentTime !== undefined && temporalFeatures
+          .filter(isTrackFeature)
+          .filter((f) => {
+            // eslint-disable-next-line no-restricted-syntax
+            const sensors = (f.properties as unknown as Record<string, unknown>).sensors as unknown[] | undefined;
+            return sensors && sensors.length > 0;
+          })
+          .map((f) => (
+            <SensorBearingLayer
+              key={`sensor-${String(f.id)}`}
+              feature={f}
+              currentTime={currentTime}
+              displayMode={displayMode}
+            />
+          ))}
       </MapContainer>
       <DrawingGuidanceOverlay drawingMode={drawingMode ?? null} />
     </div>
