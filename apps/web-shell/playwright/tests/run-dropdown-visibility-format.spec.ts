@@ -203,27 +203,25 @@ test.describe('Info Dialog', () => {
     // Select a track
     await selectTrackViaFeatureList(page);
 
-    // Apply a format change (line colour)
+    // Apply a format change (line colour) via the format menu
     const formatButton = page.locator('.debrief-layers-toolbar button[aria-label="Format"]');
     await formatButton.click();
 
-    // Wait for format menu to appear
-    const formatMenu = page.locator('.debrief-format-menu');
-    await expect(formatMenu).toBeVisible({ timeout: 2000 });
+    // The format menu renders a CascadingMenu inside a .format-menu wrapper
+    const cascadingMenu = page.locator('[data-testid="cascading-menu"]');
+    await expect(cascadingMenu).toBeVisible({ timeout: 2000 });
 
-    // Click on a colour category/submenu — find the first clickable colour item
-    const colorItem = formatMenu.locator('.debrief-format-menu__item').first();
-    if (await colorItem.isVisible()) {
-      // Hover over the colour category to open submenu
-      await colorItem.hover();
+    // Hover over the first category to open its submenu (e.g., Line > Colour)
+    const firstItem = cascadingMenu.locator('.debrief-cascading-menu__item').first();
+    await firstItem.hover();
+    await page.waitForTimeout(300);
+
+    // Click on the first swatch in the submenu
+    const submenu = page.locator('[data-testid="cascading-submenu"]');
+    if (await submenu.isVisible()) {
+      const swatch = submenu.locator('.debrief-cascading-menu__item').first();
+      await swatch.click();
       await page.waitForTimeout(200);
-
-      // Click on a colour swatch
-      const swatch = page.locator('.debrief-format-menu__submenu .debrief-format-menu__item').first();
-      if (await swatch.isVisible()) {
-        await swatch.click();
-        await page.waitForTimeout(200);
-      }
     }
 
     // Now open the info dialog on the same feature
@@ -281,25 +279,25 @@ test.describe('Format Property Verification', () => {
     const formatButton = page.locator('.debrief-layers-toolbar button[aria-label="Format"]');
     await formatButton.click();
 
-    const formatMenu = page.locator('.debrief-format-menu');
-    await expect(formatMenu).toBeVisible({ timeout: 2000 });
+    const cascadingMenu = page.locator('[data-testid="cascading-menu"]');
+    await expect(cascadingMenu).toBeVisible({ timeout: 2000 });
 
-    // Click on the first category (should be Line/Colour)
-    const firstCategory = formatMenu.locator('.debrief-format-menu__item').first();
+    // Hover over the first category to open submenu (e.g., Line > Colour)
+    const firstCategory = cascadingMenu.locator('.debrief-cascading-menu__item').first();
     await firstCategory.hover();
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(300);
 
-    // Click on a colour swatch in the submenu
-    const swatch = page.locator('.debrief-format-menu__submenu .debrief-format-menu__item').first();
-    if (await swatch.isVisible()) {
+    // Click on the first swatch in the submenu
+    const submenu = page.locator('[data-testid="cascading-submenu"]');
+    if (await submenu.isVisible()) {
+      const swatch = submenu.locator('.debrief-cascading-menu__item').first();
       await swatch.click();
       await page.waitForTimeout(200);
 
-      // Verify via session store that the style was applied
+      // Verify via window globals that the style was applied
       const features = await page.evaluate(() => window.__currentPlotFeatures);
       const track = (features as Array<{ properties: { name?: string; style?: Record<string, unknown> } }>)
         .find(f => f.properties.name === 'HMS Defender');
-      // Track should have a style property set
       if (track) {
         expect(track.properties.style).toBeDefined();
       }
@@ -314,11 +312,11 @@ test.describe('Format Property Verification', () => {
     const formatButton = page.locator('.debrief-layers-toolbar button[aria-label="Format"]');
     await formatButton.click();
 
-    const formatMenu = page.locator('.debrief-format-menu');
-    await expect(formatMenu).toBeVisible({ timeout: 2000 });
+    const cascadingMenu = page.locator('[data-testid="cascading-menu"]');
+    await expect(cascadingMenu).toBeVisible({ timeout: 2000 });
 
-    // Should show multiple format categories
-    const categories = formatMenu.locator('.debrief-format-menu__item');
+    // Should show multiple format categories (Line, Point, etc.)
+    const categories = cascadingMenu.locator('.debrief-cascading-menu__item');
     const count = await categories.count();
     expect(count).toBeGreaterThan(1);
   });
