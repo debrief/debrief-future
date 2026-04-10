@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- **Sensor Rendering** (#118) — Leaflet custom canvas layer for sensor bearing lines, ambiguous bearings, sensor arcs, snail mode time-trail fading, contact labels, and line styling. [E07 Phase 3]
+  - New components: `SensorBearingLayer.tsx` (canvas layer), `sensor-utils.ts` (geometry/interpolation/colour utilities)
+  - 7 Storybook stories covering all rendering modes
+  - Tests: 81/81 passing (67 unit + 14 component), no new dependencies
+  - Evidence: `specs/118-sensor-rendering/evidence/test-summary.md`, `usage-example.md`
 - **REP Sensor Import** — Parse `;SENSOR:` (v1), `;SENSOR2:` (v2), `;SENSOR3:` (v3), and `;SENSORARC` lines from REP files, embedding sensor contacts into `TrackFeature.properties.sensors[]` via `pending_sensor_data`. Replaces standalone annotation features.
   - New module: `sensor_parser.py` with 4 parser functions + contact grouping
   - Tests: 90/90 passing (56 new), 10k-line performance benchmark under 1s

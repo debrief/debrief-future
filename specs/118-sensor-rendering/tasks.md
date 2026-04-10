@@ -45,9 +45,9 @@
 
 **Purpose**: Create the file structure and test fixtures required for all subsequent phases
 
-- [ ] T001 Create test fixture file with sample sensor data `shared/components/src/MapView/__fixtures__/sampleSensors.ts`
-- [ ] T002 [P] Create sensor utility module skeleton with type exports `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T003 [P] Create SensorBearingLayer component skeleton `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T001 Create test fixture file with sample sensor data `shared/components/src/MapView/__fixtures__/sampleSensors.ts`
+- [x] T002 [P] Create sensor utility module skeleton with type exports `shared/components/src/MapView/sensor-utils.ts`
+- [x] T003 [P] Create SensorBearingLayer component skeleton `shared/components/src/MapView/SensorBearingLayer.tsx`
 
 **Checkpoint**: File structure in place, empty exports compile, fixture data available
 
@@ -59,16 +59,16 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Implement `parseHexColor` and `darkenColor` colour utilities in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T005 [P] Implement `geodesicDestination` haversine bearing/distance function in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T006 [P] Implement `computeBearingFarEnd` with MAXIMUM_SENSOR_BEARING_RANGE cap (5 degrees latitude) in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T007 Implement `interpolateTrackPosition` binary search + linear interpolation in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T008 [P] Implement `applySnailFade` and `calculateSnailProportion` in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T009 [P] Define `SensorRenderContact`, `SensorArcRenderData`, `SensorBearingLayerProps` TypeScript interfaces in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T010 [P] Define `LINE_STYLE_DASH_ARRAYS` constant mapping `LineStyleEnum` to canvas dash patterns in `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T011 [test] Write unit tests for `parseHexColor`, `darkenColor`, `geodesicDestination`, `computeBearingFarEnd` `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T012 [P][test] Write unit tests for `interpolateTrackPosition` including edge cases (before/after track, exact match) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T013 [P][test] Write unit tests for `applySnailFade`, `calculateSnailProportion` including boundary values `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T004 Implement `parseHexColor` and `darkenColor` colour utilities in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T005 [P] Implement `geodesicDestination` haversine bearing/distance function in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T006 [P] Implement `computeBearingFarEnd` with MAXIMUM_SENSOR_BEARING_RANGE cap (5 degrees latitude) in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T007 Implement `interpolateTrackPosition` binary search + linear interpolation in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T008 [P] Implement `applySnailFade` and `calculateSnailProportion` in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T009 [P] Define `SensorRenderContact`, `SensorArcRenderData`, `SensorBearingLayerProps` TypeScript interfaces in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T010 [P] Define `LINE_STYLE_DASH_ARRAYS` constant mapping `LineStyleEnum` to canvas dash patterns in `shared/components/src/MapView/sensor-utils.ts`
+- [x] T011 [test] Write unit tests for `parseHexColor`, `darkenColor`, `geodesicDestination`, `computeBearingFarEnd` `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T012 [P][test] Write unit tests for `interpolateTrackPosition` including edge cases (before/after track, exact match) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T013 [P][test] Write unit tests for `applySnailFade`, `calculateSnailProportion` including boundary values `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
 
 **Checkpoint**: All geometry and colour utilities pass unit tests. Foundation ready for rendering.
 
@@ -82,30 +82,30 @@
 
 ### Unit Tests for US1/US2
 
-- [ ] T014 [test] Write unit tests for contact filtering logic (time window, has_bearing, visible flags) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T015 [P][test] Write unit tests for colour inheritance (contact-level > sensor-level > track default) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T014 [test] Write unit tests for contact filtering logic (time window, has_bearing, visible flags) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T015 [P][test] Write unit tests for colour inheritance (contact-level > sensor-level > track default) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
 
 ### Component Tests for US1/US2
 
-- [ ] T016 [test] Write component rendering test: bearing lines appear for visible contacts `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T017 [P][test] Write component rendering test: contacts with has_bearing=false produce no lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T018 [P][test] Write component rendering test: ambiguous bearings produce two lines per contact with darker shade `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T016 [test] Write component rendering test: bearing lines appear for visible contacts `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T017 [P][test] Write component rendering test: contacts with has_bearing=false produce no lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T018 [P][test] Write component rendering test: ambiguous bearings produce two lines per contact with darker shade `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
 
 ### Implementation for US1/US2
 
-- [ ] T019 Implement contact preparation pipeline: filter by time/visibility, interpolate origins, compute far ends `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T020 Implement custom Leaflet canvas layer class with `onAdd`, `onRemove`, `_update`, and `_draw` methods `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T021 Implement bearing line canvas drawing: stroke from origin to far end with colour and line width `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T022 Implement ambiguous bearing line drawing with `darkenColor` shade `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T023 Implement viewport culling: skip contacts whose origin is outside map bounds `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T024 Implement colour inheritance chain (contact > sensor > track default > application default) `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T025 Implement bearing 0/360 wraparound handling in bearing geometry calculations `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T026 Integrate SensorBearingLayer into MapView for tracks with sensor data `shared/components/src/MapView/MapView.tsx`
+- [x] T019 Implement contact preparation pipeline: filter by time/visibility, interpolate origins, compute far ends `shared/components/src/MapView/sensor-utils.ts`
+- [x] T020 Implement custom Leaflet canvas layer class with `onAdd`, `onRemove`, `_update`, and `_draw` methods `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T021 Implement bearing line canvas drawing: stroke from origin to far end with colour and line width `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T022 Implement ambiguous bearing line drawing with `darkenColor` shade `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T023 Implement viewport culling: skip contacts whose origin is outside map bounds `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T024 Implement colour inheritance chain (contact > sensor > track default > application default) `shared/components/src/MapView/sensor-utils.ts`
+- [x] T025 Implement bearing 0/360 wraparound handling in bearing geometry calculations `shared/components/src/MapView/sensor-utils.ts`
+- [x] T026 Integrate SensorBearingLayer into MapView for tracks with sensor data `shared/components/src/MapView/MapView.tsx`
 
 ### Storybook Stories for US1/US2
 
-- [ ] T027 Create Storybook story: BearingLines -- basic bearing line rendering from fixture data `shared/components/src/MapView/SensorRendering.stories.tsx`
-- [ ] T028 [P] Create Storybook story: AmbiguousBearings -- primary + ambiguous bearing with darker shade `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T027 Create Storybook story: BearingLines -- basic bearing line rendering from fixture data `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T028 [P] Create Storybook story: AmbiguousBearings -- primary + ambiguous bearing with darker shade `shared/components/src/MapView/SensorRendering.stories.tsx`
 
 **Checkpoint**: Primary and ambiguous bearing lines render correctly on the map. Time-filtered contacts appear/disappear as currentTime changes.
 
@@ -119,20 +119,20 @@
 
 ### Tests for US3
 
-- [ ] T029 [test] Write unit tests for arc geometry calculations (donut wedge path, 0/360 wraparound) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T030 [P][test] Write component test: arc renders when currentTime is within start/end window `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T031 [P][test] Write component test: arc does not render when currentTime is outside window `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T029 [test] Write unit tests for arc geometry calculations (donut wedge path, 0/360 wraparound) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T030 [P][test] Write component test: arc renders when currentTime is within start/end window `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T031 [P][test] Write component test: arc does not render when currentTime is outside window `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
 
 ### Implementation for US3
 
-- [ ] T032 Implement arc geometry utility: compute canvas path for donut wedge (inner/outer arcs + radial lines) `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T033 Implement sensor arc canvas drawing in SensorBearingLayer with semi-transparent fill and outline `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T034 Implement arc time filtering (only show arcs when currentTime is within start/end range) `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T035 Add SensorArcRenderData preparation to the rendering pipeline `shared/components/src/MapView/sensor-utils.ts`
+- [x] T032 Implement arc geometry utility: compute canvas path for donut wedge (inner/outer arcs + radial lines) `shared/components/src/MapView/sensor-utils.ts`
+- [x] T033 Implement sensor arc canvas drawing in SensorBearingLayer with semi-transparent fill and outline `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T034 Implement arc time filtering (only show arcs when currentTime is within start/end range) `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T035 Add SensorArcRenderData preparation to the rendering pipeline `shared/components/src/MapView/sensor-utils.ts`
 
 ### Storybook Story for US3
 
-- [ ] T036 Create Storybook story: SensorArcs -- fan/wedge rendering with configurable angles and ranges `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T036 Create Storybook story: SensorArcs -- fan/wedge rendering with configurable angles and ranges `shared/components/src/MapView/SensorRendering.stories.tsx`
 
 **Checkpoint**: Sensor arcs render as semi-transparent wedges, appearing/disappearing with time filtering.
 
@@ -146,19 +146,19 @@
 
 ### Tests for US4
 
-- [ ] T037 [test] Write component test: snail mode fading produces visually distinct colours for contacts at different ages `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T038 [P][test] Write component test: contacts outside trail window are not rendered `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T039 [P][test] Write component test: full display mode renders all contacts at full colour `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T037 [test] Write component test: snail mode fading produces visually distinct colours for contacts at different ages `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T038 [P][test] Write component test: contacts outside trail window are not rendered `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T039 [P][test] Write component test: full display mode renders all contacts at full colour `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
 
 ### Implementation for US4
 
-- [ ] T040 Integrate snail mode proportion calculation into the contact preparation pipeline `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T041 Apply snail fade colour to bearing line canvas draw calls based on displayMode `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T042 Wire displayMode prop through MapView to SensorBearingLayer `shared/components/src/MapView/MapView.tsx`
+- [x] T040 Integrate snail mode proportion calculation into the contact preparation pipeline `shared/components/src/MapView/sensor-utils.ts`
+- [x] T041 Apply snail fade colour to bearing line canvas draw calls based on displayMode `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T042 Wire displayMode prop through MapView to SensorBearingLayer `shared/components/src/MapView/MapView.tsx`
 
 ### Storybook Story for US4
 
-- [ ] T043 Create Storybook story: SnailMode -- time-trail fading with adjustable time slider `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T043 Create Storybook story: SnailMode -- time-trail fading with adjustable time slider `shared/components/src/MapView/SensorRendering.stories.tsx`
 
 **Checkpoint**: Snail mode fading produces smooth visual gradient from full colour to black across the trail window.
 
@@ -172,19 +172,19 @@
 
 ### Tests for US5
 
-- [ ] T044 [test] Write unit tests for label position calculation (START/MIDDLE/END along a bearing line) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T045 [P][test] Write component test: labels render at correct positions with correct text `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T046 [P][test] Write component test: labels do not render when show_label=false or label is null `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T044 [test] Write unit tests for label position calculation (START/MIDDLE/END along a bearing line) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T045 [P][test] Write component test: labels render at correct positions with correct text `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T046 [P][test] Write component test: labels do not render when show_label=false or label is null `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
 
 ### Implementation for US5
 
-- [ ] T047 Implement label position calculation utility (point along line at START/MIDDLE/END) `shared/components/src/MapView/sensor-utils.ts`
-- [ ] T048 Implement canvas text drawing for labels with LEFT/CENTER/RIGHT alignment `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T049 Integrate label rendering into the contact drawing pipeline `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T047 Implement label position calculation utility (point along line at START/MIDDLE/END) `shared/components/src/MapView/sensor-utils.ts`
+- [x] T048 Implement canvas text drawing for labels with LEFT/CENTER/RIGHT alignment `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T049 Integrate label rendering into the contact drawing pipeline `shared/components/src/MapView/SensorBearingLayer.tsx`
 
 ### Storybook Story for US5
 
-- [ ] T050 Create Storybook story: Labels -- label text at different positions and alignments `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T050 Create Storybook story: Labels -- label text at different positions and alignments `shared/components/src/MapView/SensorRendering.stories.tsx`
 
 **Checkpoint**: Labels render at correct positions along bearing lines with correct alignment.
 
@@ -198,19 +198,19 @@
 
 ### Tests for US6
 
-- [ ] T051 [test] Write unit tests for LINE_STYLE_DASH_ARRAYS mapping (SOLID/DASHED/DOT/DASH_DOT to canvas dash arrays) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
-- [ ] T052 [P][test] Write component test: dashed line style produces dashed bearing lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
-- [ ] T053 [P][test] Write component test: line_thickness is applied to bearing lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T051 [test] Write unit tests for LINE_STYLE_DASH_ARRAYS mapping (SOLID/DASHED/DOT/DASH_DOT to canvas dash arrays) `shared/components/src/MapView/__tests__/sensor-utils.test.ts`
+- [x] T052 [P][test] Write component test: dashed line style produces dashed bearing lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
+- [x] T053 [P][test] Write component test: line_thickness is applied to bearing lines `shared/components/src/MapView/__tests__/sensor-rendering.test.tsx`
 
 ### Implementation for US6
 
-- [ ] T054 Apply canvas `setLineDash` based on contact/sensor line_style property `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T055 Apply canvas `lineWidth` based on sensor line_thickness property `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T056 Ensure colour inheritance fallback chain is used for line stroke colour `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T054 Apply canvas `setLineDash` based on contact/sensor line_style property `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T055 Apply canvas `lineWidth` based on sensor line_thickness property `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T056 Ensure colour inheritance fallback chain is used for line stroke colour `shared/components/src/MapView/SensorBearingLayer.tsx`
 
 ### Storybook Story for US6
 
-- [ ] T057 Create Storybook story: LineStyles -- SOLID, DASHED, DOT, DASH_DOT side by side `shared/components/src/MapView/SensorRendering.stories.tsx`
+- [x] T057 Create Storybook story: LineStyles -- SOLID, DASHED, DOT, DASH_DOT side by side `shared/components/src/MapView/SensorRendering.stories.tsx`
 
 **Checkpoint**: Bearing lines render with correct dash patterns, thickness, and inherited colours.
 
@@ -222,35 +222,35 @@
 
 ### Performance & Quality
 
-- [ ] T058 Verify rendering performance with 1000+ bearing lines (canvas batching, viewport culling) `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T059 [P] Add data-testid attributes to SensorBearingLayer container for E2E testing `shared/components/src/MapView/SensorBearingLayer.tsx`
-- [ ] T060 [P] Run quickstart.md validation -- verify development setup instructions `specs/118-sensor-rendering/quickstart.md`
+- [x] T058 Verify rendering performance with 1000+ bearing lines (canvas batching, viewport culling) `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T059 [P] Add data-testid attributes to SensorBearingLayer container for E2E testing `shared/components/src/MapView/SensorBearingLayer.tsx`
+- [x] T060 [P] Run quickstart.md validation -- verify development setup instructions `specs/118-sensor-rendering/quickstart.md`
 
 ### E2E Tests (Storybook)
 
 > **PLAYWRIGHT WORKS IN CLOUD SESSIONS** -- Do NOT skip these tests because you think browsers cannot be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T061 Create Playwright E2E test: BearingLines story renders lines in light/dark/vscode themes `shared/components/e2e/SensorRendering.spec.ts`
-- [ ] T062 [P] Create Playwright E2E test: AmbiguousBearings story renders two lines per contact `shared/components/e2e/SensorRendering.spec.ts`
-- [ ] T063 [P] Create Playwright E2E test: SnailMode story shows fading with time slider interaction `shared/components/e2e/SensorRendering.spec.ts`
-- [ ] T064 [P] Create Playwright E2E test: Labels story shows label text at configured positions `shared/components/e2e/SensorRendering.spec.ts`
-- [ ] T065 Run full E2E suite: `pnpm --filter @debrief/components test:e2e SensorRendering`
+- [x] T061 Create Playwright E2E test: BearingLines story renders lines in light/dark/vscode themes `shared/components/e2e/SensorRendering.spec.ts`
+- [x] T062 [P] Create Playwright E2E test: AmbiguousBearings story renders two lines per contact `shared/components/e2e/SensorRendering.spec.ts`
+- [x] T063 [P] Create Playwright E2E test: SnailMode story shows fading with time slider interaction `shared/components/e2e/SensorRendering.spec.ts`
+- [x] T064 [P] Create Playwright E2E test: Labels story shows label text at configured positions `shared/components/e2e/SensorRendering.spec.ts`
+- [x] T065 Run full E2E suite: `pnpm --filter @debrief/components test:e2e SensorRendering`
 
 ### Evidence Collection
 
-- [ ] T066 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/118-sensor-rendering/evidence/test-summary.md`
-- [ ] T067 Create usage demonstration `specs/118-sensor-rendering/evidence/usage-example.md`
-- [ ] T068 [P] Capture theme screenshots (light/dark/vscode) from Playwright E2E runs `specs/118-sensor-rendering/evidence/screenshots/`
-- [ ] T069 Capture interaction GIF showing snail mode time-trail fading via time slider `specs/118-sensor-rendering/evidence/screenshots/interaction.gif`
+- [x] T066 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/118-sensor-rendering/evidence/test-summary.md`
+- [x] T067 Create usage demonstration `specs/118-sensor-rendering/evidence/usage-example.md`
+- [x] T068 [P] Capture theme screenshots (light/dark/vscode) from Playwright E2E runs `specs/118-sensor-rendering/evidence/screenshots/`
+- [x] T069 Capture interaction GIF showing snail mode time-trail fading via time slider `specs/118-sensor-rendering/evidence/screenshots/interaction.gif`
 
 ### Media Content
 
-- [ ] T070 Create shipped blog post `specs/118-sensor-rendering/media/shipped-post.md`
-- [ ] T071 [P] Create LinkedIn shipped summary `specs/118-sensor-rendering/media/linkedin-shipped.md`
+- [x] T070 Create shipped blog post `specs/118-sensor-rendering/media/shipped-post.md`
+- [x] T071 [P] Create LinkedIn shipped summary `specs/118-sensor-rendering/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T072 Create PR and publish blog: run /speckit.pr
+- [x] T072 Create PR and publish blog: run /speckit.pr
 
 **Task T072 must run last. It depends on all evidence and media tasks being complete.**
 
