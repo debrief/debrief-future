@@ -399,6 +399,23 @@ export const VesselTaxonomyBranchSelection: Story = {
   },
 };
 
+export const QuickSearchDemo: Story = {
+  name: 'Quick Search',
+  render: () => (
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Type in the Quick Search box to filter exercises by title in real-time. ' +
+          'Press Enter to "graduate" the search into a title lozenge. ' +
+          'Press Escape to clear. Keyboard shortcuts: "/" or Ctrl+F to focus.',
+      },
+    },
+  },
+};
+
 export const WithSavedFilters: Story = {
   name: 'With Saved Filters',
   render: () => {

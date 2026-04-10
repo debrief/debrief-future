@@ -24,6 +24,7 @@ import { useTaxonomyMatchCounts } from './useTaxonomyMatchCounts';
 import { Lozenge } from './Lozenge';
 import { OrContainer } from './OrContainer';
 import { FilterTypeMenu } from './FilterTypeMenu';
+import { QuickSearch } from './QuickSearch';
 import { ValueEditor } from './ValueEditor';
 import { SaveFilterButton } from './SaveFilterButton';
 import { HistoricFiltersDropdown } from './HistoricFiltersDropdown';
@@ -74,6 +75,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [filteredItems, setFilteredItems] = useState<readonly StacBrowserItem[]>(items);
+  const [quickSearchText, setQuickSearchText] = useState('');
 
   const engine = useMemo(
     () => createFilterEngine({ taxonomy }),
@@ -87,29 +89,49 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
   const taxonomyCounts = useTaxonomyMatchCounts(filteredItems, taxonomy);
 
+  // Merge quick-search text into lozenge-based expression as an extra title predicate
+  const effectiveExpression: FilterExpression = useMemo(() => {
+    if (!quickSearchText) return expression;
+    return {
+      ...expression,
+      predicates: [
+        ...expression.predicates,
+        { type: 'title' as FilterType, value: quickSearchText },
+      ],
+    };
+  }, [expression, quickSearchText]);
+
   const cql2Json = useMemo(
-    () => engine.toCql2Json(expression),
-    [engine, expression],
+    () => engine.toCql2Json(effectiveExpression),
+    [engine, effectiveExpression],
   );
 
+  // Graduate quick-search into a title lozenge on Enter
+  const handleQuickSearchCommit = useCallback(
+    (text: string) => {
+      addLozenge('title' as FilterType, text);
+      setQuickSearchText('');
+    },
+    [addLozenge],
+  );
 
-  // Filter items whenever expression changes
+  // Filter items whenever effective expression changes
   const prevExpressionRef = useRef<FilterExpression | null>(null);
   useEffect(() => {
     // Skip if expression hasn't changed
-    if (prevExpressionRef.current === expression) return;
-    prevExpressionRef.current = expression;
+    if (prevExpressionRef.current === effectiveExpression) return;
+    prevExpressionRef.current = effectiveExpression;
 
     try {
-      const filtered = engine.filter(items, expression);
+      const filtered = engine.filter(items, effectiveExpression);
       setFilteredItems(filtered);
       onFilteredItems(filtered);
-      onExpressionChange?.(expression);
+      onExpressionChange?.(effectiveExpression);
       setError(null);
     } catch {
       setError(FILTER_ERROR_MESSAGE);
     }
-  }, [expression, items, engine, onFilteredItems, onExpressionChange]);
+  }, [effectiveExpression, items, engine, onFilteredItems, onExpressionChange]);
 
   // DnD sensors
   const sensors = useSensors(
@@ -227,6 +249,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         )}
 
         <div className="debrief-filter-bar__items" data-testid="filter-bar-items">
+          <QuickSearch
+            onSearchChange={setQuickSearchText}
+            onCommit={handleQuickSearchCommit}
+          />
+
           {state.items.map((item) => {
             if (item.kind === 'lozenge') {
               return (
@@ -269,7 +296,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             return null;
           })}
 
-          {isEmpty && (
+          {isEmpty && !quickSearchText && (
             <span className="debrief-filter-bar__hint" data-testid="filter-bar-hint">
               {EMPTY_STATE_HINT}
             </span>
