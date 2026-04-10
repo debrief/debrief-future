@@ -428,7 +428,7 @@ class TestSensorIntegration:
         # NELSON should have TOWED_ARRAY sensor data
         assert "NELSON" in result.pending_sensor_data
         nelson_sensors = result.pending_sensor_data["NELSON"]
-        sensor_names = {s["name"] for s in nelson_sensors}
+        sensor_names = {s.name for s in nelson_sensors}
         assert "TOWED_ARRAY" in sensor_names
 
     def test_orphaned_sensor_emits_warning(self) -> None:
@@ -449,13 +449,13 @@ class TestSensorIntegration:
 
         # NELSON should have TOWED_ARRAY with 3 contacts
         nelson_sensors = result.pending_sensor_data["NELSON"]
-        towed = next(s for s in nelson_sensors if s["name"] == "TOWED_ARRAY")
-        assert len(towed["contacts"]) == 3
+        towed = next(s for s in nelson_sensors if s.name == "TOWED_ARRAY")
+        assert len(towed.contacts) == 3
         # First contact should have explicit origin (DMS coords)
-        assert towed["contacts"][0].get("origin") is not None
+        assert towed.contacts[0].origin is not None
         # Second/third contacts should have no origin (NULL location)
-        assert towed["contacts"][1].get("origin") is None
-        assert towed["contacts"][2].get("origin") is None
+        assert towed.contacts[1].origin is None
+        assert towed.contacts[2].origin is None
 
     def test_sensor2_integration(self) -> None:
         """T036: SENSOR2 lines produce correct embedded sensor data."""
@@ -465,9 +465,9 @@ class TestSensorIntegration:
 
         # FRIGATE should have SENSOR_A
         frigate_sensors = result.pending_sensor_data["FRIGATE"]
-        sensor_a = next(s for s in frigate_sensors if s["name"] == "SENSOR_A")
+        sensor_a = next(s for s in frigate_sensors if s.name == "SENSOR_A")
         # 2 SENSOR2 + 1 SENSOR3 = 3 contacts for SENSOR_A
-        assert len(sensor_a["contacts"]) == 3
+        assert len(sensor_a.contacts) == 3
 
     def test_sensor3_mixed_format_integration(self) -> None:
         """T042: SENSOR3 lines in mixed-format REP file produce correct output."""
@@ -476,12 +476,12 @@ class TestSensorIntegration:
         result = handler.parse(content, "sensor_all_formats.rep")
 
         frigate_sensors = result.pending_sensor_data["FRIGATE"]
-        sensor_a = next(s for s in frigate_sensors if s["name"] == "SENSOR_A")
+        sensor_a = next(s for s in frigate_sensors if s.name == "SENSOR_A")
         # Third contact (from SENSOR3 line) should have ambiguous bearing
-        contacts = sensor_a["contacts"]
+        contacts = sensor_a.contacts
         # Sorted by time — the SENSOR3 line is 050200.000 (3rd chronologically)
         third = contacts[2]
-        assert third.get("ambiguous_bearing") is not None
+        assert third.ambiguous_bearing is not None
 
     def test_sensorarc_produces_coverage_annotation(self) -> None:
         """T048: SENSORARC lines produce coverage annotations alongside embedded sensors."""
@@ -508,7 +508,7 @@ class TestSensorIntegration:
         # "NEL STYLE" should be in pending_sensor_data
         assert "NEL STYLE" in result.pending_sensor_data
         nel_sensors = result.pending_sensor_data["NEL STYLE"]
-        assert nel_sensors[0]["name"] == "HULL_SONAR"
+        assert nel_sensors[0].name == "HULL_SONAR"
 
     def test_mixed_format_merge(self) -> None:
         """Sensor contacts from SENSOR/SENSOR2/SENSOR3 merge into one SensorData."""
@@ -517,9 +517,9 @@ class TestSensorIntegration:
         result = handler.parse(content, "sensor_edge_cases.rep")
 
         testship_sensors = result.pending_sensor_data["TESTSHIP"]
-        merge_sensor = next((s for s in testship_sensors if s["name"] == "MERGE_SENSOR"), None)
+        merge_sensor = next((s for s in testship_sensors if s.name == "MERGE_SENSOR"), None)
         assert merge_sensor is not None
-        assert len(merge_sensor["contacts"]) == 3
+        assert len(merge_sensor.contacts) == 3
 
     def test_track_features_still_valid(self) -> None:
         """Track features are still correctly produced alongside sensor data."""

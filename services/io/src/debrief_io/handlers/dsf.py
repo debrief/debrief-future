@@ -13,10 +13,10 @@ from __future__ import annotations
 import re
 import time
 from datetime import UTC, datetime
-from typing import Any
 
 from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
+from debrief_schemas import SensorContact, SensorData
 
 # Normalise tabs/multiple spaces to single spaces
 _WHITESPACE = re.compile(r"[\t ]+")
@@ -80,7 +80,7 @@ class _SensorContactRecord:
         self,
         parent_track: str,
         sensor_name: str,
-        time: str,
+        time: datetime,
         bearing: float | None,
         range: float | None = None,
         frequency: float | None = None,
@@ -94,18 +94,17 @@ class _SensorContactRecord:
         self.frequency = frequency
         self.label = label
 
-    def to_contact_dict(self) -> dict[str, Any]:
-        """Convert to SensorContact schema dict."""
-        entry: dict[str, Any] = {"time": self.time}
-        if self.bearing is not None:
-            entry["bearing"] = self.bearing
-        if self.range is not None:
-            entry["range"] = self.range
-        if self.frequency is not None:
-            entry["frequency"] = self.frequency
-        if self.label:
-            entry["label"] = self.label
-        return entry
+    def to_sensor_contact(self) -> SensorContact:
+        """Convert to typed SensorContact model."""
+        return SensorContact(
+            time=self.time,
+            bearing=self.bearing if self.bearing is not None else 0.0,
+            has_bearing=False if self.bearing is None else None,
+            range=self.range,
+            frequency=self.frequency,
+            has_frequency=False if self.frequency is None else None,
+            label=self.label if self.label else None,
+        )
 
 
 def _parse_sensor2_line(
@@ -149,7 +148,7 @@ def _parse_sensor2_line(
     return _SensorContactRecord(
         parent_track=track_name,
         sensor_name=sensor_name or "Unknown",
-        time=timestamp.isoformat(),
+        time=timestamp,
         bearing=bearing,
         range=range_val,
         frequency=frequency,
@@ -228,7 +227,7 @@ def _parse_sensor_line(
     return _SensorContactRecord(
         parent_track=track_name,
         sensor_name=sensor_name or "Unknown",
-        time=timestamp.isoformat(),
+        time=timestamp,
         bearing=bearing,
         range=range_val,
         label=label,
@@ -237,23 +236,24 @@ def _parse_sensor_line(
 
 def _group_contacts(
     records: list[_SensorContactRecord],
-) -> dict[str, list[dict[str, Any]]]:
-    """Group sensor contact records into SensorData dicts keyed by parent track.
+) -> dict[str, list[SensorData]]:
+    """Group sensor contact records into typed SensorData models keyed by parent track.
 
     Returns: {parent_track_name: [SensorData, ...]}
-    where SensorData = {name: str, contacts: [SensorContact, ...]}
     """
     # Group by (parent_track, sensor_name)
-    grouped: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    grouped: dict[str, dict[str, list[SensorContact]]] = {}
     for rec in records:
         track_sensors = grouped.setdefault(rec.parent_track, {})
         contacts = track_sensors.setdefault(rec.sensor_name, [])
-        contacts.append(rec.to_contact_dict())
+        contacts.append(rec.to_sensor_contact())
 
     # Convert to {parent_track: [SensorData, ...]}
-    result: dict[str, list[dict[str, Any]]] = {}
+    result: dict[str, list[SensorData]] = {}
     for track_name, sensors in grouped.items():
-        sensor_list = [{"name": sname, "contacts": contacts} for sname, contacts in sensors.items()]
+        sensor_list = [
+            SensorData(name=sname, contacts=contacts) for sname, contacts in sensors.items()
+        ]
         result[track_name] = sensor_list
 
     return result

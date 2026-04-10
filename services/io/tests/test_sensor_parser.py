@@ -74,7 +74,9 @@ class TestParseSensorV1:
         assert result.origin is not None
         assert len(result.origin) == 2
         assert result.line_number == 1
-        assert "1995-12-12" in result.time
+        assert result.time.year == 1995
+        assert result.time.month == 12
+        assert result.time.day == 12
 
     def test_quoted_track_name(self) -> None:
         """T014: parse_sensor_v1 handles quoted track name."""
@@ -152,8 +154,8 @@ class TestParseSensorV1:
         assert "NELSON" in grouped
         sensors = grouped["NELSON"]
         assert len(sensors) == 1
-        assert sensors[0]["name"] == "TOWED"
-        assert len(sensors[0]["contacts"]) == 2
+        assert sensors[0].name == "TOWED"
+        assert len(sensors[0].contacts) == 2
 
     def test_contacts_ordered_by_timestamp(self) -> None:
         """T020: contacts within SensorData are ordered by timestamp."""
@@ -193,12 +195,12 @@ class TestParseSensorV1:
             ),
         ]
         grouped = group_sensor_contacts(records)
-        contacts = grouped["NELSON"][0]["contacts"]
-        times = [c["time"] for c in contacts]
+        contacts = grouped["NELSON"][0].contacts
+        times = [c.time for c in contacts]
         assert times == sorted(times)
-        assert contacts[0]["bearing"] == 45.0
-        assert contacts[1]["bearing"] == 50.0
-        assert contacts[2]["bearing"] == 55.0
+        assert contacts[0].bearing == 45.0
+        assert contacts[1].bearing == 50.0
+        assert contacts[2].bearing == 55.0
 
 
 # ── NULL/NAN Bearing (US5) ─────────────────────────────────────────────
@@ -306,8 +308,8 @@ class TestParseSensorV2:
         grouped = group_sensor_contacts(records)
         assert len(grouped["FRIGATE"]) == 1
         sensor = grouped["FRIGATE"][0]
-        assert sensor["name"] == "SENSOR_A"
-        assert len(sensor["contacts"]) == 2
+        assert sensor.name == "SENSOR_A"
+        assert len(sensor.contacts) == 2
 
     def test_v2_nan_bearing(self) -> None:
         """SENSOR2 with NAN bearing produces has_bearing=false."""
@@ -395,8 +397,8 @@ class TestParseSensorV3:
         grouped = group_sensor_contacts(records)
         assert len(grouped["TESTSHIP"]) == 1
         sensor = grouped["TESTSHIP"][0]
-        assert sensor["name"] == "MERGE"
-        assert len(sensor["contacts"]) == 3
+        assert sensor.name == "MERGE"
+        assert len(sensor.contacts) == 3
 
     def test_v3_null_accuracy_produces_same_as_v2(self) -> None:
         """SENSOR3 with NULL accuracy fields produces identical output to SENSOR2."""
@@ -544,7 +546,7 @@ class TestGroupSensorContacts:
         ]
         grouped = group_sensor_contacts(records)
         sensor = grouped["NELSON"][0]
-        assert sensor["color"] == "#FF0000"  # C = Red (from first contact)
+        assert sensor.color == "#FF0000"  # C = Red (from first contact)
 
     def test_contact_dict_includes_boolean_flags(self) -> None:
         """Contact dicts include has_bearing=false when bearing is absent."""
@@ -562,9 +564,9 @@ class TestGroupSensorContacts:
             ),
         ]
         grouped = group_sensor_contacts(records)
-        contact = grouped["SHIP"][0]["contacts"][0]
-        assert contact["has_bearing"] is False
-        assert contact["bearing"] == 0.0
+        contact = grouped["SHIP"][0].contacts[0]
+        assert contact.has_bearing is False
+        assert contact.bearing == 0.0
 
     def test_contact_dict_includes_origin(self) -> None:
         """Contact dicts include origin when explicit coordinates are provided."""
@@ -583,8 +585,8 @@ class TestGroupSensorContacts:
             ),
         ]
         grouped = group_sensor_contacts(records)
-        contact = grouped["NELSON"][0]["contacts"][0]
-        assert contact["origin"] == [-21.698, 22.186]
+        contact = grouped["NELSON"][0].contacts[0]
+        assert contact.origin == [-21.698, 22.186]
 
     def test_empty_records_produces_empty_dict(self) -> None:
         grouped = group_sensor_contacts([])
@@ -618,13 +620,13 @@ class TestEdgeCases:
         result = parse_sensorarc(line, 1)
         assert result is None
 
-    def test_bearing_360_is_valid(self) -> None:
-        """Bearing of 360 is accepted as valid (equivalent to 0)."""
+    def test_bearing_360_normalises_to_0(self) -> None:
+        """Bearing of 360 is accepted and normalised to 0 (schema range 0-360)."""
         line = ";SENSOR: 951212 060300.000 TESTSHIP @A NULL 360.0 5000 TEST bearing_360"
         result = parse_sensor_v1(line, 1)
         assert result is not None
         assert result.has_bearing is True
-        assert result.bearing == 360.0
+        assert result.bearing == 0.0  # 360 % 360 = 0
 
     def test_zero_range(self) -> None:
         """Zero range is accepted."""

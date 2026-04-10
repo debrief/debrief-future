@@ -15,9 +15,11 @@ import logging
 import re
 import uuid
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 from debrief_io.symbology import COLOR_MAP, parse_color_code
+from debrief_schemas import SensorContact, SensorData
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +35,8 @@ def _parse_dms_coordinate(degrees: float, minutes: float, seconds: float, hemisp
     return decimal
 
 
-def _parse_timestamp(date_str: str, time_str: str) -> str:
-    """Parse YYMMDD/YYYYMMDD + HHMMSS[.SSS] into ISO 8601 string."""
-    from datetime import UTC, datetime
-
+def _parse_timestamp(date_str: str, time_str: str) -> datetime:
+    """Parse YYMMDD/YYYYMMDD + HHMMSS[.SSS] into datetime."""
     if len(date_str) == 8:
         year = int(date_str[0:4])
         month = int(date_str[4:6])
@@ -68,8 +68,7 @@ def _parse_timestamp(date_str: str, time_str: str) -> str:
         second = int(second_part)
         microsecond = 0
 
-    dt = datetime(year, month, day, hour, minute, second, microsecond, tzinfo=UTC)
-    return dt.isoformat()
+    return datetime(year, month, day, hour, minute, second, microsecond, tzinfo=UTC)
 
 
 # Prefixes for sensor lines in REP files (checked in order — longest first)
@@ -85,7 +84,7 @@ class ParsedSensorContact:
 
     parent_track: str
     sensor_name: str
-    time: str  # ISO 8601
+    time: datetime
     bearing: float  # 0 if has_bearing is False
     has_bearing: bool
     range_m: float | None  # metres (converted from yards)
@@ -124,12 +123,15 @@ def _is_null_or_nan(val: str) -> bool:
 def _parse_bearing(val: str) -> tuple[float, bool]:
     """Parse bearing value, returning (bearing, has_bearing).
 
-    NULL/NAN -> (0, False); valid float -> (value, True).
+    NULL/NAN -> (0, False); valid float -> (normalised value, True).
+    Normalises to 0-360 range (schema constraint).
     """
     if _is_null_or_nan(val):
         return 0.0, False
     try:
         bearing = float(val)
+        # Normalise to 0-360 range for schema compliance
+        bearing = bearing % 360
         return bearing, True
     except ValueError:
         return 0.0, False
@@ -249,12 +251,12 @@ def parse_sensor_v1(line: str, line_number: int) -> ParsedSensorContact | None:
         # Sensor name and label
         sensor_name, label = _extract_sensor_name_and_label(tokens, idx)
 
-        time_iso = _parse_timestamp(date_str, time_str)
+        timestamp = _parse_timestamp(date_str, time_str)
 
         return ParsedSensorContact(
             parent_track=track_name,
             sensor_name=sensor_name,
-            time=time_iso,
+            time=timestamp,
             bearing=bearing,
             has_bearing=has_bearing,
             range_m=range_m,
@@ -317,12 +319,12 @@ def parse_sensor_v2(line: str, line_number: int) -> ParsedSensorContact | None:
         sensor_idx = 10
         sensor_name, label = _extract_sensor_name_and_label(tokens, sensor_idx)
 
-        time_iso = _parse_timestamp(date_str, time_str)
+        timestamp = _parse_timestamp(date_str, time_str)
 
         return ParsedSensorContact(
             parent_track=track_name,
             sensor_name=sensor_name,
-            time=time_iso,
+            time=timestamp,
             bearing=bearing,
             has_bearing=has_bearing,
             range_m=range_m,
@@ -391,12 +393,12 @@ def parse_sensor_v3(line: str, line_number: int) -> ParsedSensorContact | None:
         sensor_idx = 12
         sensor_name, label = _extract_sensor_name_and_label(tokens, sensor_idx)
 
-        time_iso = _parse_timestamp(date_str, time_str)
+        timestamp = _parse_timestamp(date_str, time_str)
 
         return ParsedSensorContact(
             parent_track=track_name,
             sensor_name=sensor_name,
-            time=time_iso,
+            time=timestamp,
             bearing=bearing,
             has_bearing=has_bearing,
             range_m=range_m,
@@ -442,8 +444,8 @@ def parse_sensorarc(line: str, line_number: int) -> dict[str, Any] | None:
         inner_range = float(tokens[7])
         outer_range = float(tokens[8])
 
-        start_time_iso = _parse_timestamp(start_date, start_time_str)
-        end_time_iso = _parse_timestamp(end_date, end_time_str)
+        start_dt = _parse_timestamp(start_date, start_time_str)
+        end_dt = _parse_timestamp(end_date, end_time_str)
 
         return {
             "type": "Feature",
@@ -452,8 +454,8 @@ def parse_sensorarc(line: str, line_number: int) -> dict[str, Any] | None:
             "properties": {
                 "kind": "DYNAMIC_TRACK_COVERAGE",
                 "track_id": track_name,
-                "start_time": start_time_iso,
-                "end_time": end_time_iso,
+                "start_time": start_dt.isoformat(),
+                "end_time": end_dt.isoformat(),
                 "left_bearing": left_bearing,
                 "right_bearing": right_bearing,
                 "inner_range": inner_range,
@@ -468,11 +470,10 @@ def parse_sensorarc(line: str, line_number: int) -> dict[str, Any] | None:
 
 def group_sensor_contacts(
     records: list[ParsedSensorContact],
-) -> dict[str, list[dict[str, Any]]]:
-    """Group parsed sensor contacts into SensorData dicts keyed by parent track.
+) -> dict[str, list[SensorData]]:
+    """Group parsed sensor contacts into SensorData models keyed by parent track.
 
     Returns: {parent_track_name: [SensorData, ...]}
-    where SensorData = {name, color, contacts: [SensorContact, ...]}
     Contacts within each SensorData are sorted by time.
     """
     # Group by (parent_track, sensor_name) preserving insertion order
@@ -488,49 +489,39 @@ def group_sensor_contacts(
         if key not in first_color:
             first_color[key] = rec.color_code
 
-    result: dict[str, list[dict[str, Any]]] = {}
+    result: dict[str, list[SensorData]] = {}
     for track_name, sensors in grouped.items():
-        sensor_list: list[dict[str, Any]] = []
+        sensor_list: list[SensorData] = []
         for sensor_name, contact_records in sensors.items():
             # Sort contacts by time
             contact_records.sort(key=lambda r: r.time)
 
-            # Build contact dicts
-            contacts: list[dict[str, Any]] = []
+            # Build typed SensorContact models
+            contacts: list[SensorContact] = []
             for rec in contact_records:
-                contact: dict[str, Any] = {"time": rec.time, "bearing": rec.bearing}
-
-                # Boolean presence flags
-                if not rec.has_bearing:
-                    contact["has_bearing"] = False
-                if rec.range_m is not None:
-                    contact["range"] = rec.range_m
-                if rec.ambiguous_bearing is not None:
-                    contact["ambiguous_bearing"] = rec.ambiguous_bearing
-                if not rec.has_ambiguous:
-                    contact["has_ambiguous"] = False
-                if rec.frequency is not None:
-                    contact["frequency"] = rec.frequency
-                if not rec.has_frequency:
-                    contact["has_frequency"] = False
-                if rec.origin is not None:
-                    contact["origin"] = rec.origin
-                if rec.label:
-                    contact["label"] = rec.label
-
+                contact = SensorContact(
+                    time=rec.time,
+                    bearing=rec.bearing,
+                    has_bearing=False if not rec.has_bearing else None,
+                    range=rec.range_m,
+                    ambiguous_bearing=rec.ambiguous_bearing,
+                    has_ambiguous=False if not rec.has_ambiguous else None,
+                    frequency=rec.frequency,
+                    has_frequency=False if not rec.has_frequency else None,
+                    origin=rec.origin,
+                    label=rec.label if rec.label else None,
+                )
                 contacts.append(contact)
 
             # Resolve color from first contact's symbology code
             cc = first_color.get((track_name, sensor_name))
             color = COLOR_MAP.get(cc, None) if cc else None
 
-            sensor_data: dict[str, Any] = {
-                "name": sensor_name,
-                "contacts": contacts,
-            }
-            if color:
-                sensor_data["color"] = color
-
+            sensor_data = SensorData(
+                name=sensor_name,
+                contacts=contacts,
+                color=color,
+            )
             sensor_list.append(sensor_data)
         result[track_name] = sensor_list
 
