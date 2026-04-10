@@ -254,11 +254,23 @@ export default function App() {
     return [...plotFeatures, ...asDebriefFeatures(resultLayers as Feature[]), ...drawnFeatures];
   }, [plotFeatures, resultLayers, drawnFeatures]);
 
-  // Features visible on map (excludes hidden)
+  // Features visible on map (excludes those with visible === false)
   const visibleFeatures = useMemo<DebriefFeature[]>(() => {
-    if (hiddenFeatureIds.size === 0) return allFeatures;
-    return allFeatures.filter(f => !hiddenFeatureIds.has(f.id));
-  }, [allFeatures, hiddenFeatureIds]);
+    return allFeatures.filter(f => {
+      const props = featureProps(f);
+      return props.visible !== false; // default to visible
+    });
+  }, [allFeatures]);
+
+  // Derive hidden IDs set for the ActivityPanel's FeatureList / LayersToolbar
+  const hiddenFeatureIds = useMemo<Set<string>>(() => {
+    const hidden = new Set<string>();
+    for (const f of allFeatures) {
+      const props = featureProps(f);
+      if (props.visible === false) hidden.add(f.id);
+    }
+    return hidden;
+  }, [allFeatures]);
 
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
@@ -313,9 +325,6 @@ export default function App() {
       explanation: t.explanation ?? '',
     }));
   }, [tools]);
-
-  // Hidden feature IDs (visibility toggle state)
-  const [hiddenFeatureIds, setHiddenFeatureIds] = useState<Set<string>>(new Set());
 
   // --- Keyboard: Ctrl+Z / Ctrl+Y for undo/redo ---
   useEffect(() => {
@@ -380,7 +389,6 @@ export default function App() {
       });
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
-      setHiddenFeatureIds(new Set());
       freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
@@ -1059,19 +1067,35 @@ export default function App() {
         store.getState().setSelection(message.payload.featureIds);
         break;
       case 'layer:toggleVisibility': {
-        const { featureIds } = message.payload;
-        setHiddenFeatureIds(prev => {
-          const next = new Set(prev);
-          const allHidden = featureIds.every(id => next.has(id));
-          if (allHidden) {
-            // Show all
-            for (const id of featureIds) next.delete(id);
-          } else {
-            // Hide all
-            for (const id of featureIds) next.add(id);
-          }
-          return next;
+        const targetIds = new Set(message.payload.featureIds);
+
+        // Determine toggle direction: if ALL targets are already hidden, show them; otherwise hide all
+        const allCurrentlyHidden = message.payload.featureIds.every(id => {
+          const f = allFeatures.find(feat => feat.id === id);
+          return f ? featureProps(f).visible === false : false;
         });
+        const newVisible = allCurrentlyHidden; // true = show, false = hide
+
+        // Update plot features
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            if (!targetIds.has(String(f.id))) return f;
+            const props = (f.properties ?? {}) as { [key: string]: unknown };
+            return { ...f, properties: { ...props, visible: newVisible } };
+          });
+          return { ...plot, features: { ...plot.features, features: updatedFeatures } };
+        });
+
+        // Also update drawn features
+        setDrawnFeatures(prev =>
+          prev.map(f => {
+            if (!targetIds.has(f.id)) return f;
+            return Object.assign({}, f, {
+              properties: { ...f.properties, visible: newVisible },
+            });
+          }),
+        );
         break;
       }
       case 'layer:format': {
@@ -1161,7 +1185,7 @@ export default function App() {
       default:
         break;
     }
-  }, [playback, store, handleRunTool, handleFileSelect]);
+  }, [playback, store, handleRunTool, handleFileSelect, allFeatures]);
 
   // --- Panel workspace infrastructure ---
   // Create panel registry once (stable reference)
