@@ -1,0 +1,3095 @@
+{
+  "item_count": 71,
+  "available_fields": [
+    "bbox",
+    "datetime",
+    "debrief:feature_tags",
+    "debrief:nationalities",
+    "debrief:tags",
+    "debrief:track_names",
+    "debrief:vessel_classes",
+    "description",
+    "end_datetime",
+    "feature_count",
+    "feature_kinds",
+    "id",
+    "start_datetime",
+    "title"
+  ],
+  "items": [
+    {
+      "id": "core--bulk-blue-tracks",
+      "bbox": [
+        -0.040402777777777774,
+        0,
+        0.03963888888888889,
+        0.22360833333333335
+      ],
+      "feature_count": 3,
+      "feature_kinds": {
+        "TRACK": 3
+      },
+      "title": "Saxon Warrior: Bulk Blue Tracks",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Saxon Warrior: Bulk Blue Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including HMS Hamburg, USS Aquitaine, FS Mahan. Multi-national participation: FR, GB, US.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T20:13:14+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/corvette/visby",
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type26"
+      ],
+      "debrief:tags": [
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "HMS Hamburg",
+        "USS Aquitaine",
+        "FS Mahan"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "core--bulk-red-tracks",
+      "bbox": [
+        -0.010455555555555556,
+        -0.21599444444444446,
+        2.010752777777778,
+        2.0039
+      ],
+      "feature_count": 300,
+      "feature_kinds": {
+        "TRACK": 300
+      },
+      "title": "Saxon Warrior: Bulk Red Tracks",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Saxon Warrior: Bulk Red Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 300 platform track(s) recorded including FGS Iron Duke, HMS Duncan, USS Kent and 297 other(s). Multi-national participation: DE, FR, GB, US.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T20:13:14+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland",
+        "subsurface/submarine/ssk/type212",
+        "subsurface/submarine/ssn/astute",
+        "subsurface/submarine/ssn/trafalgar",
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "demo",
+        "gunnery",
+        "multi-national",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "visual-sighting",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "FGS Iron Duke",
+        "HMS Duncan",
+        "USS Kent",
+        "FS Provence",
+        "FGS De Zeven Provincien",
+        "HMS Truxtun",
+        "USS Roald Amundsen",
+        "FS Bretagne",
+        "FGS Bergamini",
+        "HMS Westminster",
+        "USS De Ruyter",
+        "FS Otto Sverdrup",
+        "FGS Ramage",
+        "HMS Auvergne",
+        "USS Hamburg",
+        "FS Roosevelt",
+        "FGS Gonzalez",
+        "HMS Argyll",
+        "USS Visby",
+        "FS Sachsen",
+        "FGS Dragon",
+        "HMS Mahan",
+        "USS Hessen",
+        "FS Diamond",
+        "FGS Evertsen",
+        "HMS Laboon",
+        "USS Fridtjof Nansen",
+        "FS Somerset",
+        "FGS Languedoc",
+        "HMS Helsingborg",
+        "USS Tromp",
+        "FS Richmond",
+        "FGS Cole",
+        "HMS Andrea Doria",
+        "USS Aquitaine",
+        "FS Lancaster",
+        "FGS Mason",
+        "HMS Northumberland",
+        "USS Sutherland",
+        "FS Dauntless",
+        "FGS Bainbridge",
+        "HMS Portland",
+        "USS Defender",
+        "FS Carney",
+        "FGS Ssk_153",
+        "HMS Ssk_005",
+        "USS Ssk_228",
+        "FS Ssk_034",
+        "FGS Ssk_272",
+        "HMS Ssk_032",
+        "USS Ssk_076",
+        "FS Ssk_169",
+        "FGS Ssk_193",
+        "HMS Ssk_154",
+        "USS Ssk_232",
+        "FS Ssk_244",
+        "FGS Ssk_281",
+        "HMS Ssk_294",
+        "USS Ssk_074",
+        "FS Ssk_226",
+        "FGS Ssk_148",
+        "HMS Ssk_293",
+        "USS Ssk_131",
+        "FS Ssk_065",
+        "FGS Ssk_195",
+        "HMS Ssk_015",
+        "USS Ssk_039",
+        "FS Ssk_049",
+        "FGS Ssk_070",
+        "HMS Ssk_266",
+        "USS Ssk_025",
+        "FS Ssk_087",
+        "FGS Ssk_121",
+        "HMS Ssk_177",
+        "USS Ssk_217",
+        "FS Ssk_208",
+        "FGS Ssk_077",
+        "HMS Ssk_116",
+        "USS Ssk_292",
+        "FS Ssk_078",
+        "FGS Ssk_166",
+        "HMS Ssk_050",
+        "USS Ssk_088",
+        "FS Ssk_149",
+        "FGS Ssk_205",
+        "HMS Ssk_238",
+        "USS Ssk_029",
+        "FS Ssk_151",
+        "FGS Ssk_161",
+        "HMS Ssk_191",
+        "USS Ssk_119",
+        "FS Ssk_268",
+        "FGS Ssk_286",
+        "HMS Ssk_008",
+        "USS Ssk_265",
+        "FS Ssk_095",
+        "FGS Ssk_299",
+        "HMS Ssk_018",
+        "USS Ssk_215",
+        "FS Ssk_152",
+        "FGS Ssk_224",
+        "HMS Ssk_229",
+        "USS Ssk_155",
+        "FS Ssk_258",
+        "FGS Ssk_106",
+        "HMS Ssk_213",
+        "USS Ssk_038",
+        "FS Ssk_108",
+        "FGS Ssk_231",
+        "HMS Ssk_010",
+        "USS Ssk_019",
+        "FS Ssk_053",
+        "FGS Ssk_130",
+        "HMS Ssk_091",
+        "USS Ssk_126",
+        "FS Ssk_233",
+        "FGS Ssk_125",
+        "HMS Ssk_157",
+        "USS Ssk_112",
+        "FS Ssk_114",
+        "FGS Ssk_241",
+        "HMS Ssk_064",
+        "USS Ssk_257",
+        "FS Ssk_253",
+        "FGS Ssk_097",
+        "HMS Ssk_225",
+        "USS Ssk_270",
+        "FS Ssk_042",
+        "FGS Ssk_220",
+        "HMS Ssk_031",
+        "USS Ssk_255",
+        "FS Ssk_046",
+        "FGS Ssk_101",
+        "HMS Ssk_001",
+        "USS Ssk_185",
+        "FS Ssk_274",
+        "FGS Ssk_189",
+        "HMS Ssk_003",
+        "USS Ssk_221",
+        "FS Ssk_041",
+        "FGS Ssk_280",
+        "HMS Ssk_115",
+        "USS Ssk_182",
+        "FS Ssk_036",
+        "FGS Ssk_219",
+        "HMS Ssk_117",
+        "USS Ssk_122",
+        "FS Ssk_172",
+        "FGS Ssk_187",
+        "HMS Ssk_163",
+        "USS Ssk_243",
+        "FS Ssk_118",
+        "FGS Ssk_048",
+        "HMS Ssk_028",
+        "USS Ssk_247",
+        "FS Ssk_139",
+        "FGS Ssk_082",
+        "HMS Ssk_102",
+        "USS Ssk_061",
+        "FS Ssk_162",
+        "FGS Ssk_235",
+        "HMS Ssk_269",
+        "USS Ssk_052",
+        "FS Ssk_186",
+        "FGS Ssk_147",
+        "HMS Ssk_227",
+        "USS Ssk_067",
+        "FS Ssk_138",
+        "FGS Ssk_086",
+        "HMS Ssk_298",
+        "USS Ssk_096",
+        "FS Ssk_174",
+        "FGS Ssk_287",
+        "HMS Ssk_201",
+        "USS Ssk_047",
+        "FS Ssk_194",
+        "FGS Ssk_004",
+        "HMS Ssk_145",
+        "USS Ssk_260",
+        "FS Ssk_275",
+        "FGS Ssk_178",
+        "HMS Ssk_079",
+        "USS Ssk_295",
+        "FS Ssk_068",
+        "FGS Ssk_014",
+        "HMS Ssk_026",
+        "USS Ssk_105",
+        "FS Ssk_203",
+        "FGS Ssk_283",
+        "HMS Ssk_134",
+        "USS Ssk_080",
+        "FS Ssk_267",
+        "FGS Ssk_180",
+        "HMS Ssk_136",
+        "USS Ssk_196",
+        "FS Ssk_100",
+        "FGS Ssk_056",
+        "HMS Ssk_222",
+        "USS Ssk_021",
+        "FS Ssk_199",
+        "FGS Ssk_006",
+        "HMS Ssk_200",
+        "USS Ssk_059",
+        "FS Ssk_276",
+        "FGS Ssk_040",
+        "HMS Ssk_093",
+        "USS Ssk_296",
+        "FS Ssk_297",
+        "FGS Ssk_188",
+        "HMS Ssk_176",
+        "USS Ssk_023",
+        "FS Ssk_289",
+        "FGS Ssk_263",
+        "HMS Ssk_252",
+        "USS Ssk_137",
+        "FS Ssk_107",
+        "FGS Ssk_081",
+        "HMS Ssk_165",
+        "USS Ssk_167",
+        "FS Ssk_113",
+        "FGS Ssk_127",
+        "HMS Ssk_024",
+        "USS Ssk_140",
+        "FS Ssk_256",
+        "FGS Ssk_277",
+        "HMS Ssk_282",
+        "USS Ssk_035",
+        "FS Ssk_210",
+        "FGS Ssk_099",
+        "HMS Ssk_262",
+        "USS Ssk_002",
+        "FS Ssk_218",
+        "FGS Ssk_285",
+        "HMS Ssk_173",
+        "USS Ssk_159",
+        "FS Ssk_094",
+        "FGS Ssk_216",
+        "HMS Ssk_141",
+        "USS Ssk_022",
+        "FS Ssk_044",
+        "FGS Ssk_051",
+        "HMS Ssk_033",
+        "USS Ssk_075",
+        "FS Ssk_055",
+        "FGS Ssk_043",
+        "HMS Ssk_248",
+        "USS Ssk_300",
+        "FS Ssk_027",
+        "FGS Ssk_164",
+        "HMS Ssk_171",
+        "USS Ssk_207",
+        "FS Ssk_259",
+        "FGS Ssk_085",
+        "HMS Ssk_144",
+        "USS Ssk_242",
+        "FS Ssk_236",
+        "FGS Ssk_181",
+        "HMS Ssk_190",
+        "USS Ssk_279",
+        "FS Ssk_212",
+        "FGS Ssk_142",
+        "HMS Ssk_045",
+        "USS Ssk_211",
+        "FS Ssk_129",
+        "FGS Ssk_132",
+        "HMS Ssk_009",
+        "USS Ssk_123",
+        "FS Ssk_066",
+        "FGS Ssk_204",
+        "HMS Ssk_234",
+        "USS Ssk_098",
+        "FS Ssk_103",
+        "FGS Ssk_069",
+        "HMS Ssk_192",
+        "USS Ssk_250",
+        "FS Ssk_111",
+        "FGS Ssk_012",
+        "HMS Ssk_264",
+        "USS Ssk_124",
+        "FS Ssk_284",
+        "FGS Ssk_020",
+        "HMS Ssk_240",
+        "USS Ssk_016",
+        "FS Ssk_179",
+        "FGS Ssk_160",
+        "HMS Ssk_062",
+        "USS Ssk_170",
+        "FS Ssk_288",
+        "FGS Ssk_128",
+        "HMS Ssk_206",
+        "USS Ssk_060",
+        "FS Ssk_291",
+        "FGS Ssk_143",
+        "HMS Ssk_237",
+        "USS Ssk_063",
+        "FS Ssk_057",
+        "FGS Ssk_089",
+        "HMS Ssk_251",
+        "USS Ssk_013",
+        "FS Ssk_278"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR",
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "core--analysis1-areas",
+      "bbox": [
+        -21.93165,
+        21.864075,
+        -21.471280555555555,
+        22.20677222222222
+      ],
+      "feature_count": 3,
+      "feature_kinds": {
+        "RECTANGLE": 3
+      },
+      "title": "Saxon Warrior: Analysis1 Areas",
+      "datetime": "2026-03-28T13:50:57.636617+00:00",
+      "description": "Saxon Warrior: Analysis1 Areas \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
+      "debrief:vessel_classes": [],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "demo",
+        "force-protection",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "torpedo-run"
+      ],
+      "debrief:track_names": [],
+      "debrief:nationalities": []
+    },
+    {
+      "id": "core--analysis2-track1",
+      "bbox": [
+        -21.866080555555556,
+        21.947094444444446,
+        -21.57978333333333,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Analysis2 Track1",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Analysis2 Track1 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "AAW",
+        "EW",
+        "escort",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--analysis3-track2",
+      "bbox": [
+        -21.812722222222224,
+        21.894219444444445,
+        -21.57275,
+        22.142258333333334
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Analysis3 Track2",
+      "datetime": "1995-12-12T05:03:00+00:00",
+      "description": "Saxon Warrior: Analysis3 Track2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Collingwood.",
+      "start_datetime": "1995-12-12T05:03:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "EW",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--review1-tracks",
+      "bbox": [
+        51.364580555555555,
+        26.101755555555556,
+        52.06401944444444,
+        26.454141666666665
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Review1 Tracks",
+      "datetime": "1970-01-03T01:34:25+00:00",
+      "description": "Saxon Warrior: Review1 Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FGS Bretagne, HMS Tromp. Multi-national participation: DE, GB.",
+      "start_datetime": "1970-01-03T01:34:25+00:00",
+      "end_datetime": "1970-01-03T04:17:25+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia",
+        "surface/warship/frigate/type26"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "gunnery",
+        "mine-clearance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FGS Bretagne",
+        "HMS Tromp"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "GB"
+      ]
+    },
+    {
+      "id": "core--trialsplanning3-sensor",
+      "bbox": [
+        -30.075269444444444,
+        -0.0951111111111111,
+        -30.002402777777778,
+        -0.010880555555555557
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Trialsplanning3 Sensor",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Saxon Warrior: Trialsplanning3 Sensor \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T13:13:14+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "missile-firing",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "active-search",
+        "helicopter-ops",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--trialsplanning3-subject",
+      "bbox": [
+        -30.119758333333333,
+        -0.07229166666666667,
+        -30,
+        0
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Trialsplanning3 Subject",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Saxon Warrior: Trialsplanning3 Subject \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T13:13:14+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "boarding",
+        "harbour-ops",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "minefield",
+        "prosecution",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--dynamicshapesettest",
+      "bbox": [
+        -21.8660806,
+        21.8942194,
+        -21.57275,
+        22.1862861
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Dynamicshapesettest",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Dynamicshapesettest \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Nelson, HMS Collingwood. Multi-national participation: GB, US.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "demo",
+        "force-protection",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "minefield",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson",
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "multi-static--gapstesttrack",
+      "bbox": [
+        30.8919782,
+        5.1585009,
+        30.9332722,
+        5.1943915
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Formidable Shield: Gapstesttrack",
+      "datetime": "2009-04-22T17:59:58.490000+00:00",
+      "description": "Formidable Shield: Gapstesttrack \u2014 Multi-static sonar exercise in the North Atlantic. 1 platform track(s) recorded including FS Fridtjof Nansen.",
+      "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+      "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "MCM",
+        "gunnery",
+        "multi-national",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FS Fridtjof Nansen"
+      ],
+      "debrief:nationalities": [
+        "FR"
+      ]
+    },
+    {
+      "id": "multi-static--offsettracks",
+      "bbox": [
+        0,
+        60.2,
+        0.5,
+        60.7
+      ],
+      "feature_count": 3,
+      "feature_kinds": {
+        "TRACK": 3
+      },
+      "title": "Formidable Shield: Offsettracks",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Formidable Shield: Offsettracks \u2014 Multi-static sonar exercise in the North Atlantic. 3 platform track(s) recorded including HNoMS Mahan, FS Roosevelt, Contact Alpha. Multi-national participation: FR, GB, NO.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T13:00:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "depth-charge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HNoMS Mahan",
+        "FS Roosevelt",
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB",
+        "NO"
+      ]
+    },
+    {
+      "id": "multi-static--sensor-offset-short",
+      "bbox": [
+        0.1572425,
+        60.1,
+        0.25,
+        60.18
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Formidable Shield: Sensor Offset Short",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Formidable Shield: Sensor Offset Short \u2014 Multi-static sonar exercise in the North Atlantic. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. Multi-national participation: GB, NO.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T12:18:40+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "multi-national",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond",
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB",
+        "NO"
+      ]
+    },
+    {
+      "id": "multi-static--vessel-with-sensor-offset",
+      "bbox": null,
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Formidable Shield: Vessel With Sensor Offset",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Formidable Shield: Vessel With Sensor Offset \u2014 Multi-static sonar exercise in the North Atlantic. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. Multi-national participation: FR, GB.",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "demo",
+        "force-protection",
+        "missile-firing",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha",
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB"
+      ],
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00"
+    },
+    {
+      "id": "multi-static--buoy-test-track",
+      "bbox": [
+        -21.8399,
+        21.894219444444445,
+        -21.57275,
+        22.142258333333334
+      ],
+      "feature_count": 5,
+      "feature_kinds": {
+        "TRACK": 4,
+        "TEXT": 1
+      },
+      "title": "Formidable Shield: Buoy Test Track",
+      "datetime": "1995-12-12T05:03:00+00:00",
+      "description": "Formidable Shield: Buoy Test Track \u2014 Multi-static sonar exercise in the North Atlantic. 4 platform track(s) recorded including HMS Collingwood, HNoMS Languedoc, FS Northumberland and 1 other(s). Multi-national participation: FR, GB, IT, NO.",
+      "start_datetime": "1995-12-12T05:03:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type26"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "SAR",
+        "boarding",
+        "demo",
+        "force-protection",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Collingwood",
+        "HNoMS Languedoc",
+        "FS Northumberland",
+        "ITS Sachsen"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB",
+        "IT",
+        "NO"
+      ]
+    },
+    {
+      "id": "multi-static--multistatics-buoyfield",
+      "bbox": [
+        -0.025919444444444446,
+        62.99496111111111,
+        0.02108611111111111,
+        63.03612777777778
+      ],
+      "feature_count": 5,
+      "feature_kinds": {
+        "TRACK": 5
+      },
+      "title": "Formidable Shield: Multistatics Buoyfield",
+      "datetime": "2014-12-12T12:00:00+00:00",
+      "description": "Formidable Shield: Multistatics Buoyfield \u2014 Multi-static sonar exercise in the North Atlantic. 5 platform track(s) recorded including FS Bretagne, ITS Hessen, HNLMS Laboon and 2 other(s). Multi-national participation: FR, GB, IT, NL, US.",
+      "start_datetime": "2014-12-12T12:00:00+00:00",
+      "end_datetime": "2014-12-12T12:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23",
+        "surface/warship/frigate/type26",
+        "surface/warship/patrol/river"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "certification",
+        "demo",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "minefield",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FS Bretagne",
+        "ITS Hessen",
+        "HNLMS Laboon",
+        "HMS Westminster",
+        "USS Hamburg"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB",
+        "IT",
+        "NL",
+        "US"
+      ]
+    },
+    {
+      "id": "core--freq-bluetrack",
+      "bbox": [
+        -0.005738888888888889,
+        60.12308055555555,
+        0.3601888888888889,
+        60.289858333333335
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Freq Bluetrack",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Freq Bluetrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "AAW",
+        "ASW",
+        "boarding",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--freq-redtrack",
+      "bbox": [
+        -0.24723333333333333,
+        60,
+        0,
+        60.258975
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Freq Redtrack",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Freq Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "mine-clearance",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "intercept",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--lots-of-os-legs",
+      "bbox": [
+        -0.2472333,
+        60,
+        0.3207417,
+        60.2793028
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Lots Of Os Legs",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Lots Of Os Legs \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 11 platform track(s) recorded including HMS Roosevelt, USS Mahan, FS Mason and 8 other(s). Multi-national participation: DE, FR, GB, US.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "subsurface/submarine/ssn/trafalgar",
+        "surface/warship/corvette/visby",
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/frigate/fremm",
+        "surface/warship/frigate/type23",
+        "surface/warship/patrol/river"
+      ],
+      "debrief:tags": [
+        "AAW",
+        "ASW",
+        "demo",
+        "gunnery",
+        "multi-national",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "track-merge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Roosevelt",
+        "USS Mahan",
+        "FS Mason",
+        "FGS Somerset",
+        "HMS Westminster",
+        "USS De Ruyter",
+        "FS Provence",
+        "FGS Bretagne",
+        "HMS Kent",
+        "USS De Zeven Provincien",
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR",
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "core--plotwithgeotiff",
+      "bbox": [
+        -87.662054,
+        41.8688789,
+        -87.5860062,
+        41.9081257
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Plotwithgeotiff",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Plotwithgeotiff \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Collingwood, HMS Nelson. Multi-national participation: DE, GB.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T05:26:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "force-protection",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "torpedo-run",
+        "track-merge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Collingwood",
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "GB"
+      ]
+    },
+    {
+      "id": "s2r--ambig-tracks2",
+      "bbox": null,
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Dynamic Mongoose: Ambig Tracks2",
+      "datetime": "2010-01-12T12:08:00+00:00",
+      "description": "Dynamic Mongoose: Ambig Tracks2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. Multi-national participation: GB, US.",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "AAW",
+        "ASW",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha",
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB",
+        "US"
+      ],
+      "start_datetime": "2010-01-12T12:08:00+00:00",
+      "end_datetime": "2010-01-12T15:54:00+00:00"
+    },
+    {
+      "id": "s2r--ambig-tracks3",
+      "bbox": [
+        0.2881556,
+        60.2396139,
+        0.5999861,
+        60.4822278
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Ambig Tracks3",
+      "datetime": "2010-01-12T12:08:00+00:00",
+      "description": "Dynamic Mongoose: Ambig Tracks3 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2010-01-12T12:08:00+00:00",
+      "end_datetime": "2010-01-12T15:54:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "escort",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "s2r--dodgy-track",
+      "bbox": [
+        51.38124722222222,
+        26.101755555555556,
+        51.79861388888889,
+        26.437475
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Dodgy Track",
+      "datetime": "1970-01-03T01:34:25+00:00",
+      "description": "Dynamic Mongoose: Dodgy Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Defender.",
+      "start_datetime": "1970-01-03T01:34:25+00:00",
+      "end_datetime": "1970-01-03T04:17:25+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "certification",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "visual-sighting",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "HNoMS Defender"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--mid-flow",
+      "bbox": [
+        29.8737112,
+        4.9211105,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Mid Flow",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Mid Flow \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including USS Mason.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "USS Mason"
+      ],
+      "debrief:nationalities": [
+        "US"
+      ]
+    },
+    {
+      "id": "s2r--midflow2",
+      "bbox": [
+        29.8737112,
+        4.9211105,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Midflow2",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Midflow2 \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including FS Bergamini.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "missile-firing",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FS Bergamini"
+      ],
+      "debrief:nationalities": [
+        "FR"
+      ]
+    },
+    {
+      "id": "s2r--midflow2a",
+      "bbox": [
+        29.8737112,
+        4.9211105,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Midflow2A",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Midflow2A \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Dauntless.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "mine-clearance",
+        "surveillance",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "track-merge"
+      ],
+      "debrief:track_names": [
+        "HNoMS Dauntless"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--midflow2b",
+      "bbox": [
+        29.8737112,
+        4.9211105,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Midflow2B",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Midflow2B \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Andrea Doria.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "prosecution",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HNoMS Andrea Doria"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--nonsuch",
+      "bbox": [
+        30,
+        5,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Nonsuch",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Nonsuch \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Truxtun.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "multi-national",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HNoMS Truxtun"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--nonsuch-otg",
+      "bbox": [
+        29.873711111111113,
+        4.921111111111111,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Nonsuch Otg",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Dynamic Mongoose: Nonsuch Otg \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Evertsen.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "escort",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HNoMS Evertsen"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--third-party-track",
+      "bbox": [
+        51.40026944444444,
+        27.405430555555554,
+        51.413580555555555,
+        27.425486111111113
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Third Party Track",
+      "datetime": "1970-01-03T01:44:25+00:00",
+      "description": "Dynamic Mongoose: Third Party Track \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Cole.",
+      "start_datetime": "1970-01-03T01:44:25+00:00",
+      "end_datetime": "1970-01-03T01:51:25+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "certification",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HNoMS Cole"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "s2r--turn",
+      "bbox": [
+        30.78280833333333,
+        5.1585009,
+        30.933272222222225,
+        5.200725
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Dynamic Mongoose: Turn",
+      "datetime": "2009-04-22T17:59:58.490000+00:00",
+      "description": "Dynamic Mongoose: Turn \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 2 platform track(s) recorded including USS Northumberland, FS Provence. Multi-national participation: FR, US.",
+      "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+      "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/trafalgar",
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "MCM",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "USS Northumberland",
+        "FS Provence"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "US"
+      ]
+    },
+    {
+      "id": "s2r--turn-single-point",
+      "bbox": [
+        30.923572222222223,
+        5.1826388888888895,
+        30.923572222222223,
+        5.1826388888888895
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Dynamic Mongoose: Turn Single Point",
+      "datetime": "2009-04-22T18:02:54.410000+00:00",
+      "description": "Dynamic Mongoose: Turn Single Point \u2014 Sensor-to-range ASW analysis in the North Atlantic / GIUK Gap. 1 platform track(s) recorded including HNoMS Roald Amundsen.",
+      "start_datetime": "2009-04-22T18:02:54.410000+00:00",
+      "end_datetime": "2009-04-22T18:02:54.410000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "gunnery",
+        "missile-firing",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HNoMS Roald Amundsen"
+      ],
+      "debrief:nationalities": [
+        "NO"
+      ]
+    },
+    {
+      "id": "core--bluetrack",
+      "bbox": [
+        -0.006230555555555555,
+        60.122119444444444,
+        0.3744944444444444,
+        60.29291388888889
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Bluetrack",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Bluetrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "force-protection",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--redtrack",
+      "bbox": [
+        -0.03338888888888889,
+        60.1,
+        0.25,
+        60.27423611111111
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Redtrack",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T14:00:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "EW",
+        "SAR",
+        "escort",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--twin-cpa",
+      "bbox": [
+        -0.0371639,
+        59.95,
+        0.5833472,
+        60.0503889
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Twin Cpa",
+      "datetime": "2010-01-12T12:00:00+00:00",
+      "description": "Saxon Warrior: Twin Cpa \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Richmond, Contact Alpha. Multi-national participation: FR, GB.",
+      "start_datetime": "2010-01-12T12:00:00+00:00",
+      "end_datetime": "2010-01-12T13:30:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "NGFS",
+        "boarding",
+        "demo",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "radar-detection",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond",
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "FR",
+        "GB"
+      ]
+    },
+    {
+      "id": "core--osshipaa-3",
+      "bbox": [
+        30,
+        5,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Osshipaa 3",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Saxon Warrior: Osshipaa 3 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Visby.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "boarding",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FS Visby"
+      ],
+      "debrief:nationalities": [
+        "FR"
+      ]
+    },
+    {
+      "id": "core--longer-track",
+      "bbox": [
+        29.902777777777775,
+        4.921111111111111,
+        30.029066666666665,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Longer Track",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Saxon Warrior: Longer Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "gunnery",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--shorter-os",
+      "bbox": [
+        29.8883759,
+        4.927321,
+        29.9800744,
+        4.9818109
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Shorter Os",
+      "datetime": "2009-07-22T04:08:20+00:00",
+      "description": "Saxon Warrior: Shorter Os \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Carney.",
+      "start_datetime": "2009-07-22T04:08:20+00:00",
+      "end_datetime": "2009-07-22T05:26:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "prosecution",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Carney"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--jumps",
+      "bbox": [
+        29.873711111111113,
+        4.921111111111111,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Jumps",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Saxon Warrior: Jumps \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Roosevelt.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "force-protection",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Roosevelt"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--b-rate-ownship",
+      "bbox": [
+        -153.26379444444444,
+        51.17722222222222,
+        -152.71352499999998,
+        51.48948888888889
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: B Rate Ownship",
+      "datetime": "1900-12-12T06:35:03.910000+00:00",
+      "description": "Silent Resolve: B Rate Ownship \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
+      "start_datetime": "1900-12-12T06:35:03.910000+00:00",
+      "end_datetime": "1900-12-12T10:00:07.910000+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "depth-charge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Defender"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--bluetrack",
+      "bbox": [
+        -30.075269444444444,
+        -0.0951111111111111,
+        -30.002402777777778,
+        -0.010880555555555557
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Bluetrack",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Silent Resolve: Bluetrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Richmond.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T13:13:14+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "demo",
+        "multi-national",
+        "prosecution",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Richmond"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--dataset1",
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Dataset1",
+      "datetime": "2016-10-10T12:00:00+00:00",
+      "description": "Silent Resolve: Dataset1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
+      "start_datetime": "2016-10-10T12:00:00+00:00",
+      "end_datetime": "2016-10-10T19:37:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "EW",
+        "missile-firing",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Fridtjof Nansen"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--dataset3",
+      "bbox": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Dataset3",
+      "datetime": "2016-10-10T12:00:00+00:00",
+      "description": "Silent Resolve: Dataset3 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Sutherland.",
+      "start_datetime": "2016-10-10T12:00:00+00:00",
+      "end_datetime": "2016-10-12T10:20:56+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "depth-charge",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HDMS Sutherland"
+      ],
+      "debrief:nationalities": [
+        "DK"
+      ]
+    },
+    {
+      "id": "satc--freqtracksquantized",
+      "bbox": [
+        29.8737112,
+        4.9211105,
+        30,
+        5
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Freqtracksquantized",
+      "datetime": "2009-07-22T03:50:04+00:00",
+      "description": "Silent Resolve: Freqtracksquantized \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS De Ruyter.",
+      "start_datetime": "2009-07-22T03:50:04+00:00",
+      "end_datetime": "2009-07-22T05:40:04+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "multi-national",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "FGS De Ruyter"
+      ],
+      "debrief:nationalities": [
+        "DE"
+      ]
+    },
+    {
+      "id": "satc--l1-ownshiptrack",
+      "bbox": [
+        -30.02416388888889,
+        -0.06666666666666667,
+        -30.002402777777778,
+        -0.025988888888888888
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: L1 Ownshiptrack",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Silent Resolve: L1 Ownshiptrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T12:30:14+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "passive-search",
+        "radar-detection",
+        "sonar-contact"
+      ],
+      "debrief:track_names": [
+        "HMS Defender"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--l1-subjecttrack",
+      "bbox": [
+        -30.041875,
+        0,
+        -30,
+        0
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: L1 Subjecttrack",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Silent Resolve: L1 Subjecttrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T12:29:59+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "mine-clearance",
+        "multi-national",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "active-search",
+        "towed-array",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--otherownship",
+      "bbox": [
+        -23.556172222222223,
+        43.21214444444445,
+        -21.101244444444447,
+        44.630652777777776
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Otherownship",
+      "datetime": "2011-03-21T22:08:02.380000+00:00",
+      "description": "Silent Resolve: Otherownship \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Portland.",
+      "start_datetime": "2011-03-21T22:08:02.380000+00:00",
+      "end_datetime": "2011-03-23T20:29:03.160000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/virginia"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "prosecution",
+        "replenishment"
+      ],
+      "debrief:feature_tags": [
+        "sprint-and-drift",
+        "track-merge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "FGS Portland"
+      ],
+      "debrief:nationalities": [
+        "DE"
+      ]
+    },
+    {
+      "id": "satc--otherownship-trimmed",
+      "bbox": [
+        -21.410166666666665,
+        44.14557222222222,
+        -21.101244444444447,
+        44.630652777777776
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Otherownship Trimmed",
+      "datetime": "2011-03-21T22:08:02.380000+00:00",
+      "description": "Silent Resolve: Otherownship Trimmed \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Argyll.",
+      "start_datetime": "2011-03-21T22:08:02.380000+00:00",
+      "end_datetime": "2011-03-22T04:47:54.870000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "SAR",
+        "missile-firing",
+        "prosecution",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "prosecution",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Argyll"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--redtrack",
+      "bbox": [
+        -30.119758333333333,
+        -0.07229166666666667,
+        -30,
+        0
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Redtrack",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Silent Resolve: Redtrack \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including Contact Alpha.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-12T13:13:14+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/astute"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "EW",
+        "boarding",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "minefield",
+        "prosecution",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "Contact Alpha"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--slicedemo",
+      "bbox": [
+        -21.697880555555557,
+        57.18628611111111,
+        -21.697880555555557,
+        57.18628611111111
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Slicedemo",
+      "datetime": "2001-01-01T14:00:47.812000+00:00",
+      "description": "Silent Resolve: Slicedemo \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Kent.",
+      "start_datetime": "2001-01-01T14:00:47.812000+00:00",
+      "end_datetime": "2001-01-01T18:00:49.546000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "mine-clearance",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "sprint-and-drift"
+      ],
+      "debrief:track_names": [
+        "FGS Kent"
+      ],
+      "debrief:nationalities": [
+        "DE"
+      ]
+    },
+    {
+      "id": "satc--old-turn-example",
+      "bbox": [
+        30.7566036,
+        5.1649972,
+        30.9332722,
+        5.212115
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Silent Resolve: Old Turn Example",
+      "datetime": "2009-04-22T17:59:58.490000+00:00",
+      "description": "Silent Resolve: Old Turn Example \u2014 Semi-auto track construction exercise in the Norwegian Sea. 2 platform track(s) recorded including HMS Bainbridge, FGS Evertsen. Multi-national participation: DE, SE.",
+      "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+      "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland",
+        "subsurface/submarine/ssn/trafalgar"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "boarding",
+        "gunnery",
+        "mine-clearance",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Bainbridge",
+        "FGS Evertsen"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "SE"
+      ]
+    },
+    {
+      "id": "satc--ownship-1",
+      "bbox": [
+        0.0119214169,
+        0.1820457141,
+        0.174582567,
+        0.2910438396
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Ownship 1",
+      "datetime": "1999-12-31T22:00:00+00:00",
+      "description": "Silent Resolve: Ownship 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
+      "start_datetime": "1999-12-31T22:00:00+00:00",
+      "end_datetime": "2000-01-01T05:37:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "EW",
+        "NGFS",
+        "harbour-ops",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "prosecution",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Defender"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--ownship-2",
+      "bbox": [
+        0.0241038144,
+        0.1857642387,
+        0.1665479622,
+        0.2910438396
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Ownship 2",
+      "datetime": "1999-12-31T22:00:00+00:00",
+      "description": "Silent Resolve: Ownship 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Defender.",
+      "start_datetime": "1999-12-31T22:00:00+00:00",
+      "end_datetime": "2000-01-01T02:01:40+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "force-protection",
+        "prosecution",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "sonar-contact",
+        "track-merge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Defender"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--source-1",
+      "bbox": [
+        0.0289292569,
+        -0.0068205947,
+        0.2264133274,
+        0.176904395
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Source 1",
+      "datetime": "1999-12-31T22:00:00+00:00",
+      "description": "Silent Resolve: Source 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HMS Otto Sverdrup.",
+      "start_datetime": "1999-12-31T22:00:00+00:00",
+      "end_datetime": "2000-01-01T05:37:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/gotland"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "radar-detection",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Otto Sverdrup"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "satc--source-2",
+      "bbox": [
+        0.0289292569,
+        -0.0068214947,
+        0.1979403367,
+        0.1769367926
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Source 2",
+      "datetime": "1999-12-31T22:00:00+00:00",
+      "description": "Silent Resolve: Source 2 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including FGS Portland.",
+      "start_datetime": "1999-12-31T22:00:00+00:00",
+      "end_datetime": "2000-01-01T02:01:40+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/trafalgar"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "NGFS",
+        "prosecution"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "FGS Portland"
+      ],
+      "debrief:nationalities": [
+        "DE"
+      ]
+    },
+    {
+      "id": "satc--tug-1",
+      "bbox": [
+        0.0311565919,
+        -0.006830494,
+        0.2267058057,
+        0.1770600835
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Silent Resolve: Tug 1",
+      "datetime": "1999-12-31T22:00:00+00:00",
+      "description": "Silent Resolve: Tug 1 \u2014 Semi-auto track construction exercise in the Norwegian Sea. 1 platform track(s) recorded including HDMS Mason.",
+      "start_datetime": "1999-12-31T22:00:00+00:00",
+      "end_datetime": "2000-01-01T05:37:00+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssk/type212"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "mine-clearance",
+        "prosecution",
+        "surveillance"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HDMS Mason"
+      ],
+      "debrief:nationalities": [
+        "DK"
+      ]
+    },
+    {
+      "id": "core--boat1",
+      "bbox": [
+        -21.866080555555556,
+        21.947094444444446,
+        -21.57978333333333,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Boat1",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Boat1 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "MCM",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "passive-search",
+        "radar-detection",
+        "sonar-contact"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--boat1t",
+      "bbox": [
+        -21.8660806,
+        21.9470944,
+        -21.5797833,
+        22.1862861
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Boat1T",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Boat1T \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "EW",
+        "mine-clearance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "radar-detection",
+        "track-merge"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--boat2",
+      "bbox": [
+        -21.812722222222224,
+        21.894219444444445,
+        -21.57275,
+        22.142258333333334
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Boat2",
+      "datetime": "1995-12-12T05:03:00+00:00",
+      "description": "Saxon Warrior: Boat2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Collingwood.",
+      "start_datetime": "1995-12-12T05:03:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "certification",
+        "multi-national",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "depth-charge",
+        "radar-detection",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--boattest",
+      "bbox": [
+        -21.866080555555556,
+        21.947094444444446,
+        -21.57978333333333,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Boattest",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Boattest \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T10:00:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "AAW",
+        "MCM",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "radar-detection",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--lightweight-test-tracks",
+      "bbox": [
+        -0.17006944444444444,
+        -0.2503611111111111,
+        2.8906277777777776,
+        2.9382722222222224
+      ],
+      "feature_count": 39,
+      "feature_kinds": {
+        "TRACK": 39
+      },
+      "title": "Saxon Warrior: Lightweight Test Tracks",
+      "datetime": "2010-01-12T12:13:14+00:00",
+      "description": "Saxon Warrior: Lightweight Test Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 39 platform track(s) recorded including USS Auvergne, FS Kent, FGS Sachsen and 36 other(s). Multi-national participation: DE, FR, GB, US.",
+      "start_datetime": "2010-01-12T12:13:14+00:00",
+      "end_datetime": "2010-01-15T12:13:14+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/carrier/queen-elizabeth",
+        "surface/warship/corvette/visby",
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/fremm",
+        "surface/warship/frigate/type23",
+        "surface/warship/frigate/type26",
+        "surface/warship/patrol/river"
+      ],
+      "debrief:tags": [
+        "SAR",
+        "amphibious",
+        "demo",
+        "multi-national",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "depth-charge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "USS Auvergne",
+        "FS Kent",
+        "FGS Sachsen",
+        "HMS Evertsen",
+        "USS Mason",
+        "FS Carney",
+        "FGS Helsingborg",
+        "HMS Westminster",
+        "USS Gonzalez",
+        "FS Hessen",
+        "FGS De Ruyter",
+        "HMS Bergamini",
+        "USS Bretagne",
+        "FS Dauntless",
+        "FGS Sutherland",
+        "HMS Hamburg",
+        "USS Diamond",
+        "FS Provence",
+        "FGS Iron Duke",
+        "HMS Portland",
+        "USS Bainbridge",
+        "FS Ramage",
+        "FGS Roald Amundsen",
+        "HMS Truxtun",
+        "USS Cole",
+        "FS Dragon",
+        "FGS Tromp",
+        "HMS De Zeven Provincien",
+        "USS Andrea Doria",
+        "FS Mahan",
+        "FGS Roosevelt",
+        "HMS Aquitaine",
+        "USS Defender",
+        "FS Visby",
+        "FGS Lancaster",
+        "HMS Somerset",
+        "USS Otto Sverdrup",
+        "FS Argyll",
+        "FGS Languedoc"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR",
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "other-formats--bad-boat2",
+      "bbox": [
+        -21.59394722222222,
+        21.913313888888887,
+        -21.586852777777775,
+        21.92915
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Talisman Sabre: Bad Boat2",
+      "datetime": "1995-12-12T05:19:00+00:00",
+      "description": "Talisman Sabre: Bad Boat2 \u2014 Indo-Pacific interoperability exercise in the Western Pacific. 1 platform track(s) recorded including HMS Collingwood.",
+      "start_datetime": "1995-12-12T05:19:00+00:00",
+      "end_datetime": "1995-12-12T05:34:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45"
+      ],
+      "debrief:tags": [
+        "certification",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--reverse-chrono",
+      "bbox": [
+        -21.704113888888887,
+        22.186252777777778,
+        -21.697880555555557,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Reverse Chrono",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Reverse Chrono \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T05:02:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "escort",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--sample",
+      "bbox": [
+        -21.8660806,
+        21.8942194,
+        -21.57275,
+        22.1862861
+      ],
+      "feature_count": 21,
+      "feature_kinds": {
+        "TRACK": 2,
+        "NARRATIVE": 19
+      },
+      "title": "Saxon Warrior: Sample",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Sample \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Nelson, HMS Collingwood. 19 narrative entries. Multi-national participation: DE, GB.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "certification",
+        "demo",
+        "mine-clearance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "intercept",
+        "sonar-contact",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson",
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "GB"
+      ]
+    },
+    {
+      "id": "core--sample-lots-of-sensors",
+      "bbox": [
+        -11.8660803,
+        11.8942194,
+        -11.57275,
+        12.1862861
+      ],
+      "feature_count": 21,
+      "feature_kinds": {
+        "TRACK": 2,
+        "NARRATIVE": 19
+      },
+      "title": "Saxon Warrior: Sample Lots Of Sensors",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Sample Lots Of Sensors \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Cole, USS Argyll. 19 narrative entries. Multi-national participation: GB, US.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/carrier/queen-elizabeth",
+        "surface/warship/destroyer/arleigh-burke"
+      ],
+      "debrief:tags": [
+        "EW",
+        "certification",
+        "demo",
+        "replenishment",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Cole",
+        "USS Argyll"
+      ],
+      "debrief:nationalities": [
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "core--samplescale",
+      "bbox": [
+        -21.8660806,
+        21.8942194,
+        -21.57275,
+        22.1862861
+      ],
+      "feature_count": 21,
+      "feature_kinds": {
+        "TRACK": 2,
+        "NARRATIVE": 19
+      },
+      "title": "Saxon Warrior: Samplescale",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Samplescale \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Nelson, HMS Collingwood. 19 narrative entries. Multi-national participation: GB, US.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:45:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "certification",
+        "replenishment",
+        "surveillance",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "intercept",
+        "prosecution",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson",
+        "HMS Collingwood"
+      ],
+      "debrief:nationalities": [
+        "GB",
+        "US"
+      ]
+    },
+    {
+      "id": "core--sen-tracks",
+      "bbox": [
+        51.364580555555555,
+        26.101755555555556,
+        52.06401944444444,
+        26.454141666666665
+      ],
+      "feature_count": 2,
+      "feature_kinds": {
+        "TRACK": 2
+      },
+      "title": "Saxon Warrior: Sen Tracks",
+      "datetime": "1970-01-03T01:34:25+00:00",
+      "description": "Saxon Warrior: Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mason, FGS Ramage. Multi-national participation: DE, FR.",
+      "start_datetime": "1970-01-03T01:34:25+00:00",
+      "end_datetime": "1970-01-03T04:17:25+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/trafalgar",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "amphibious",
+        "boarding",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "active-search",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "FS Mason",
+        "FGS Ramage"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR"
+      ]
+    },
+    {
+      "id": "core--sen-tracks-with-narrative",
+      "bbox": [
+        8.1202679,
+        54.1207039,
+        8.9350469,
+        54.47309
+      ],
+      "feature_count": 8,
+      "feature_kinds": {
+        "TRACK": 2,
+        "NARRATIVE": 6
+      },
+      "title": "Saxon Warrior: Sen Tracks With Narrative",
+      "datetime": "1970-01-03T01:34:00+00:00",
+      "description": "Saxon Warrior: Sen Tracks With Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mahan, FGS Otto Sverdrup. 6 narrative entries. Multi-national participation: DE, FR.",
+      "start_datetime": "1970-01-03T01:34:00+00:00",
+      "end_datetime": "1970-01-03T04:17:25+00:00",
+      "debrief:vessel_classes": [
+        "subsurface/submarine/ssn/trafalgar",
+        "surface/warship/patrol/river"
+      ],
+      "debrief:tags": [
+        "ASW",
+        "certification",
+        "demo",
+        "escort",
+        "missile-firing",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "datum",
+        "sonar-contact",
+        "visual-sighting",
+        "zig-zag"
+      ],
+      "debrief:track_names": [
+        "FS Mahan",
+        "FGS Otto Sverdrup"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR"
+      ]
+    },
+    {
+      "id": "core--sparse-track",
+      "bbox": [
+        -21.86593888888889,
+        21.96786111111111,
+        -21.592633333333332,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Sparse Track",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Sparse Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "harbour-ops",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "helicopter-ops",
+        "radar-detection",
+        "towed-array"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--sparse-track-self-split",
+      "bbox": [
+        -21.86593888888889,
+        21.96786111111111,
+        -21.592633333333332,
+        22.186286111111112
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Sparse Track Self Split",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Sparse Track Self Split \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "MCM",
+        "training",
+        "transit"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "HMS Nelson"
+      ],
+      "debrief:nationalities": [
+        "GB"
+      ]
+    },
+    {
+      "id": "core--split-sen-tracks",
+      "bbox": [
+        51.38124722222222,
+        26.101755555555556,
+        51.79861388888889,
+        27.425486111111113
+      ],
+      "feature_count": 3,
+      "feature_kinds": {
+        "TRACK": 3
+      },
+      "title": "Saxon Warrior: Split Sen Tracks",
+      "datetime": "1970-01-03T01:34:25+00:00",
+      "description": "Saxon Warrior: Split Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including USS Provence, FS Mason, FGS Sachsen. Multi-national participation: DE, FR, US.",
+      "start_datetime": "1970-01-03T01:34:25+00:00",
+      "end_datetime": "1970-01-03T04:17:25+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/destroyer/arleigh-burke",
+        "surface/warship/destroyer/type45",
+        "surface/warship/frigate/type23"
+      ],
+      "debrief:tags": [
+        "MCM",
+        "NGFS",
+        "demo",
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "radar-detection",
+        "track-merge",
+        "visual-sighting"
+      ],
+      "debrief:track_names": [
+        "USS Provence",
+        "FS Mason",
+        "FGS Sachsen"
+      ],
+      "debrief:nationalities": [
+        "DE",
+        "FR",
+        "US"
+      ]
+    },
+    {
+      "id": "core--uk-track",
+      "bbox": [
+        -6.129722222222222,
+        51.57485833333334,
+        -5.85703611111111,
+        51.814049999999995
+      ],
+      "feature_count": 1,
+      "feature_kinds": {
+        "TRACK": 1
+      },
+      "title": "Saxon Warrior: Uk Track",
+      "datetime": "1995-12-12T05:00:00+00:00",
+      "description": "Saxon Warrior: Uk Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Roald Amundsen.",
+      "start_datetime": "1995-12-12T05:00:00+00:00",
+      "end_datetime": "1995-12-12T11:41:00+00:00",
+      "debrief:vessel_classes": [
+        "surface/warship/frigate/type26"
+      ],
+      "debrief:tags": [
+        "replenishment",
+        "training"
+      ],
+      "debrief:feature_tags": [
+        "passive-search",
+        "radar-detection"
+      ],
+      "debrief:track_names": [
+        "FS Roald Amundsen"
+      ],
+      "debrief:nationalities": [
+        "FR"
+      ]
+    }
+  ]
+}
