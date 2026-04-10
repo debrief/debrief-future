@@ -111,7 +111,7 @@ function TimePeriodPanel({ filter }: { readonly filter: TemporalFilter | null })
           {new Date(filter.end).toISOString().replace('T', ' ').slice(0, 19)}
         </span>
       ) : (
-        <span style={{ color: '#666', fontStyle: 'italic' }}>Full extent (scroll to zoom, drag to pan)</span>
+        <span style={{ color: '#666', fontStyle: 'italic' }}>Full extent (Ctrl+scroll to zoom, drag to pan)</span>
       )}
     </div>
   );
@@ -128,7 +128,7 @@ export const Default: Story = {
   },
 };
 
-/** Interactive story with zoom/pan and time period panel */
+/** Interactive story with Ctrl+scroll zoom, drag-to-pan, and time period panel */
 export const WithZoomPan: Story = {
   render: () => {
     const [filter, setFilter] = useState<TemporalFilter | null>(null);
@@ -165,7 +165,7 @@ export const SingleDatetime: Story = {
   },
 };
 
-/** 100+ exercises for scroll testing (SC-003) */
+/** 100+ exercises — demonstrates vertical scrolling with fixed 30px row height */
 export const ManyItems: Story = {
   args: {
     items: MANY_ITEMS,

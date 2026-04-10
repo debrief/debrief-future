@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TimelineView } from '../TimelineView';
 import type { StacBrowserItem } from '../../filter-engine/types';
@@ -196,6 +196,85 @@ describe('TimelineView — US3: Exercise selection', () => {
     expect(point).not.toBeNull();
     fireEvent.doubleClick(point!);
     expect(onSelect).toHaveBeenCalledWith('exercises/sel-pt/item.json');
+  });
+});
+
+// ============================================================================
+// Fixed row height and scroll behaviour
+// ============================================================================
+
+describe('TimelineView — Fixed row height', () => {
+  it('SVG height equals items.length * 30 regardless of item count', () => {
+    const fiveItems = makeItemsWithRange(5);
+    const { container, unmount } = render(<TimelineView items={fiveItems} />);
+    const svg = container.querySelector('[data-testid="timeline-bars-svg"]');
+    expect(svg).not.toBeNull();
+    // viewBox height should be 5 * 30 = 150
+    const viewBox = svg!.getAttribute('viewBox')!;
+    const height = parseInt(viewBox.split(' ')[3], 10);
+    expect(height).toBe(150);
+    unmount();
+
+    const fiftyItems = makeItemsWithRange(50);
+    const { container: c2 } = render(<TimelineView items={fiftyItems} />);
+    const svg2 = c2.querySelector('[data-testid="timeline-bars-svg"]');
+    const viewBox2 = svg2!.getAttribute('viewBox')!;
+    const height2 = parseInt(viewBox2.split(' ')[3], 10);
+    expect(height2).toBe(1500);
+  });
+});
+
+describe('TimelineView — Ctrl+wheel zoom', () => {
+  it('plain wheel does not trigger temporal filter change', () => {
+    const onFilter = vi.fn();
+    const items = makeItemsWithRange(5);
+    const { container } = render(
+      <TimelineView items={items} onTemporalFilterChange={onFilter} />
+    );
+    // Reset mock after initial null emission
+    onFilter.mockClear();
+
+    const svg = container.querySelector('[data-testid="timeline-bars-svg"]');
+    expect(svg).not.toBeNull();
+
+    // Dispatch plain wheel event (no modifier keys)
+    act(() => {
+      const wheelEvent = new WheelEvent('wheel', {
+        deltaY: -100,
+        bubbles: true,
+        cancelable: true,
+      });
+      svg!.dispatchEvent(wheelEvent);
+    });
+
+    // Should not have been called again (no zoom occurred)
+    expect(onFilter).not.toHaveBeenCalled();
+  });
+
+  it('shows zoom hint on plain wheel scroll', () => {
+    const items = makeItemsWithRange(5);
+    const { container } = render(<TimelineView items={items} />);
+
+    const svg = container.querySelector('[data-testid="timeline-bars-svg"]');
+    expect(svg).not.toBeNull();
+
+    // No hint initially
+    expect(container.querySelector('[data-testid="timeline-zoom-hint"]')).toBeNull();
+
+    // Dispatch plain wheel event
+    act(() => {
+      const wheelEvent = new WheelEvent('wheel', {
+        deltaY: -100,
+        bubbles: true,
+        cancelable: true,
+      });
+      svg!.dispatchEvent(wheelEvent);
+    });
+
+    // Hint should appear
+    const hint = container.querySelector('[data-testid="timeline-zoom-hint"]');
+    expect(hint).not.toBeNull();
+    expect(hint!.textContent).toMatch(/scroll to zoom/);
   });
 });
 
