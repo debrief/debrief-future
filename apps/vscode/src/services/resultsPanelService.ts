@@ -317,8 +317,21 @@ export class ResultsPanelService {
 
     let envelope: DatasetEnvelope;
     try {
-      envelope = parseCsvToTableDataset(csv, args.assetFilename);
-      this._log(`openSavedFile: parsed ${envelope.data?.length ?? 0} rows`);
+      if (
+        args.assetFilename.endsWith('.dataset.json') ||
+        args.assetFilename.endsWith('.json')
+      ) {
+        // JSON: parse the full DatasetEnvelope directly.
+        envelope = JSON.parse(csv) as DatasetEnvelope;
+        this._log(
+          `openSavedFile: parsed JSON envelope type=${envelope.type} ` +
+          `series=${envelope.series?.length ?? 0} data=${envelope.data?.length ?? 0}`,
+        );
+      } else {
+        // CSV: parse into a flat table-style envelope.
+        envelope = parseCsvToTableDataset(csv, args.assetFilename);
+        this._log(`openSavedFile: parsed CSV ${envelope.data?.length ?? 0} rows`);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this._log(`openSavedFile: FAILED to parse: ${msg}`);
@@ -328,9 +341,10 @@ export class ResultsPanelService {
       return;
     }
 
+    const isJson = args.assetFilename.endsWith('.json');
     const tab: ResultTab = {
       id: generateTabId(),
-      toolId: 'csv-file',
+      toolId: isJson ? (envelope.type ?? 'dataset') : 'csv-file',
       plotKey: args.plotKey,
       envelope,
       sourceFeatureIds: [],
@@ -506,20 +520,48 @@ export class ResultsPanelService {
     baseName?: string,
     tag?: string,
   ): Promise<void> {
-    if (!tab.envelope.data || tab.envelope.data.length === 0) {
-      // Try to extract data from series[0].data as a fallback.
-      const seriesData = tab.envelope.series?.[0]?.data ?? [];
-      if (seriesData.length === 0) {
+    // Determine save format:
+    //   - table tabs (displayHint === 'table' with flat data) → CSV
+    //   - chart tabs (displayHint undefined or 'chart', or series) → JSON
+    //     (preserves the full DatasetEnvelope including series, metadata,
+    //     and type — the same format the web-shell uses)
+    const isTable = tab.envelope.displayHint === 'table' && Array.isArray(tab.envelope.data);
+
+    let fileContent: string;
+    let filename: string;
+    let mimeType: string;
+
+    if (isTable) {
+      // Table → CSV
+      const data = tab.envelope.data ?? [];
+      if (data.length === 0) {
         void vscode.window.showErrorMessage(
           'Cannot save: no tabular data in this result.',
         );
         return;
       }
+      fileContent = buildCsvContent(data);
+      filename = generateCsvFilename(tab.toolId, baseName, tag);
+      mimeType = 'text/csv';
+    } else {
+      // Chart → JSON (DatasetEnvelope)
+      fileContent = JSON.stringify(tab.envelope, null, 2);
+      if (baseName) {
+        const safeName = sanitizeFilename(baseName, 64);
+        const safeTag = tag ? sanitizeFilename(tag, 32) : undefined;
+        filename = safeTag
+          ? `${safeName}--${safeTag}.dataset.json`
+          : `${safeName}.dataset.json`;
+      } else {
+        const dateStamp = new Date()
+          .toISOString()
+          .replace(/[:.]/g, '-')
+          .slice(0, 19);
+        const safeTool = sanitizeFilename(tab.toolId, 32);
+        filename = `${safeTool}--${dateStamp}.dataset.json`;
+      }
+      mimeType = 'application/json';
     }
-
-    const data = tab.envelope.data ?? tab.envelope.series?.[0]?.data ?? [];
-    const csv = buildCsvContent(data);
-    const filename = generateCsvFilename(tab.toolId, baseName, tag);
 
     // Step 1: write the file + register with STAC (addResultAsset does both).
     let destPath: string;
@@ -528,8 +570,8 @@ export class ResultsPanelService {
         tab.plotKey.storePath,
         tab.plotKey.itemPath,
         filename,
-        csv,
-        'text/csv',
+        fileContent,
+        mimeType,
         {
           'debrief:toolId': tab.toolId,
           'debrief:sourceFeatures': tab.sourceFeatureIds,
