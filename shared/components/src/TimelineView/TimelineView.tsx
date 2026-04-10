@@ -2,7 +2,8 @@
  * TimelineView — Gantt-style timeline component for STAC exercises (#131).
  *
  * Displays horizontal bars for each exercise's temporal extent.
- * Supports mouse wheel zoom and drag-to-pan on the time axis.
+ * Supports Ctrl+wheel zoom and drag-to-pan on the time axis.
+ * Plain scroll navigates the exercise list vertically.
  * A reset button zooms out to show the full time range.
  */
 
@@ -20,23 +21,25 @@ import {
 import './TimelineView.css';
 
 // Layout constants
-const MAX_ROW_HEIGHT = 48;
-const MIN_ROW_HEIGHT = 16;
-const MIN_FONT_SIZE = 9;
-const MAX_FONT_SIZE = 13;
-const LABEL_WIDTH = 130;
+const ROW_HEIGHT = 30;
+const LABEL_FONT_SIZE = 11;
+const LABEL_WIDTH = 160;
 const CHART_LEFT = LABEL_WIDTH + 8;
 const CHART_RIGHT = 16;
 const SVG_WIDTH = 800;
 const AXIS_HEIGHT = 24;
-const CONTROLS_HEIGHT = 28;
 const DEFAULT_BAR_COLOUR = 'var(--co-accent, #007fd4)';
 const POINT_RADIUS = 5;
-const MIN_BAR_LABEL_CHARS = 18;
+const MIN_BAR_LABEL_CHARS = 24;
 
 // Zoom constants
 const ZOOM_FACTOR = 0.15;
 const MIN_RANGE_MS = 60_000; // 1 minute minimum visible range
+const ZOOM_HINT_TIMEOUT_MS = 2000;
+
+// Platform-aware zoom hint text
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const ZOOM_HINT_TEXT = isMac ? '\u2318 + scroll to zoom' : 'Ctrl + scroll to zoom';
 
 interface TooltipState {
   x: number;
@@ -50,25 +53,23 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onTemporalFilterChange,
   onItemSelect,
   colourFn,
+  resetKey,
   className,
 }) => {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState(0);
 
-  // Measure available container height for adaptive row sizing
+  // Zoom hint state (shown when user scrolls without Ctrl/Cmd)
+  const [showZoomHint, setShowZoomHint] = useState(false);
+  const zoomHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up zoom hint timer on unmount
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerHeight(entry.contentRect.height);
-      }
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      if (zoomHintTimerRef.current) clearTimeout(zoomHintTimerRef.current);
+    };
   }, []);
 
   // Full data time range
@@ -89,22 +90,23 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     prevFullRangeRef.current = fullRange;
   }, [fullRange]);
 
+  // De-duplicate guard for temporal filter emission — prevents re-emitting the
+  // same filter when only references change (e.g. after "Clear All Filters").
+  const lastEmittedFilterRef = useRef<{ start: number; end: number } | null | undefined>(undefined);
+
+  // External reset (e.g. "Clear All Filters") — zoom back to full extent
+  const prevResetKeyRef = useRef(resetKey);
+  useEffect(() => {
+    if (resetKey !== undefined && resetKey !== prevResetKeyRef.current) {
+      setViewRange(fullRange);
+      lastEmittedFilterRef.current = undefined; // Allow re-emission after reset
+    }
+    prevResetKeyRef.current = resetKey;
+  }, [resetKey, fullRange]);
+
   const effectiveView = viewRange ?? fullRange;
 
   const chartWidth = SVG_WIDTH - CHART_LEFT - CHART_RIGHT;
-
-  // Adaptive row height: compress rows to fit available space, but keep labels legible
-  const rowHeight = useMemo(() => {
-    if (items.length === 0 || containerHeight === 0) return MAX_ROW_HEIGHT;
-    const availableHeight = containerHeight - AXIS_HEIGHT - CONTROLS_HEIGHT - 8;
-    const computed = Math.floor(availableHeight / items.length);
-    return Math.max(MIN_ROW_HEIGHT, Math.min(MAX_ROW_HEIGHT, computed));
-  }, [items.length, containerHeight]);
-
-  const labelFontSize = useMemo(() => {
-    const t = (rowHeight - MIN_ROW_HEIGHT) / (MAX_ROW_HEIGHT - MIN_ROW_HEIGHT);
-    return MIN_FONT_SIZE + t * (MAX_FONT_SIZE - MIN_FONT_SIZE);
-  }, [rowHeight]);
 
   // Check if we're zoomed in
   const isZoomed = useMemo(() => {
@@ -112,12 +114,20 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     return effectiveView.min > fullRange.min || effectiveView.max < fullRange.max;
   }, [fullRange, effectiveView]);
 
-  // Emit temporal filter when view range changes
+  // Emit temporal filter when view range changes.
   useEffect(() => {
     if (!onTemporalFilterChange || !fullRange || !effectiveView) return;
     if (isZoomed) {
-      onTemporalFilterChange({ start: effectiveView.min, end: effectiveView.max });
+      const next = { start: effectiveView.min, end: effectiveView.max };
+      const prev = lastEmittedFilterRef.current;
+      if (prev && typeof prev === 'object' && prev.start === next.start && prev.end === next.end) {
+        return; // Same filter — skip re-emission
+      }
+      lastEmittedFilterRef.current = next;
+      onTemporalFilterChange(next);
     } else {
+      if (lastEmittedFilterRef.current === null) return; // Already emitted null
+      lastEmittedFilterRef.current = null;
       onTemporalFilterChange(null);
     }
   }, [effectiveView, fullRange, isZoomed, onTemporalFilterChange]);
@@ -150,13 +160,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         width: hasTime && !isPoint && effectiveView
           ? computeBarWidth(startEpoch!, endEpoch!, effectiveView, chartWidth)
           : 0,
-        y: i * rowHeight,
+        y: i * ROW_HEIGHT,
         isPoint: !!isPoint,
         colour,
         hasTime,
       };
     });
-  }, [items, effectiveView, chartWidth, colourFn, rowHeight]);
+  }, [items, effectiveView, chartWidth, colourFn]);
 
   // Generate axis tick labels from viewport
   const axisLabels = useMemo(() => {
@@ -187,11 +197,20 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     if (!svg) return;
 
     function onWheel(e: WheelEvent) {
+      // Only zoom on Ctrl+wheel (Cmd+wheel on Mac)
+      if (!e.ctrlKey && !e.metaKey) {
+        // Show zoom hint briefly, let event bubble for vertical scroll
+        setShowZoomHint(true);
+        if (zoomHintTimerRef.current) clearTimeout(zoomHintTimerRef.current);
+        zoomHintTimerRef.current = setTimeout(() => setShowZoomHint(false), ZOOM_HINT_TIMEOUT_MS);
+        return;
+      }
+
       const view = effectiveViewRef.current;
       const full = fullRangeRef.current;
       if (!view || !full) return;
 
-      e.preventDefault();
+      e.preventDefault(); // Prevent browser zoom when Ctrl/Cmd held
 
       const rect = svg!.getBoundingClientRect();
       const svgX = ((e.clientX - rect.left) / rect.width) * SVG_WIDTH;
@@ -227,7 +246,11 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   // --- Pan via mouse drag ---
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (!effectiveView) return;
-    // Only pan on the chart area (not on bars — those have their own handlers)
+    // Don't initiate pan when clicking on bars or points — those handle double-click
+    const target = e.target as SVGElement;
+    const cl = target.classList;
+    if (cl.contains('timeline-view__bar') || cl.contains('timeline-view__point')) return;
+
     isPanning.current = true;
     panStartX.current = e.clientX;
     panStartRange.current = { ...effectiveView };
@@ -331,7 +354,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     );
   }
 
-  const barsHeight = items.length * rowHeight;
+  const barsHeight = items.length * ROW_HEIGHT;
 
   return (
     <div ref={containerRef} className={`timeline-view ${className ?? ''}`} data-testid="timeline-view">
@@ -347,6 +370,44 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           {tooltip.dateRange}
         </div>
       )}
+
+      {/* Fixed top time axis — always visible above scroll area */}
+      <div className="timeline-view__top-axis" data-testid="timeline-top-axis">
+        <svg
+          width="100%"
+          height={AXIS_HEIGHT}
+          viewBox={`0 0 ${SVG_WIDTH} ${AXIS_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
+          className="timeline-view__axis-svg"
+        >
+          {/* Axis line */}
+          <line
+            x1={CHART_LEFT}
+            y1={AXIS_HEIGHT - 2}
+            x2={SVG_WIDTH - CHART_RIGHT}
+            y2={AXIS_HEIGHT - 2}
+            className="timeline-view__axis-line"
+          />
+
+          {/* Axis labels */}
+          {axisLabels.map((label, i) => (
+            <text
+              key={i}
+              x={CHART_LEFT + label.x}
+              y={AXIS_HEIGHT - 6}
+              className="timeline-view__axis-label"
+              data-testid="timeline-top-axis-label"
+              textAnchor={
+                i === 0 ? 'start' :
+                i === axisLabels.length - 1 ? 'end' :
+                'middle'
+              }
+            >
+              {label.text}
+            </text>
+          ))}
+        </svg>
+      </div>
 
       {/* Scrollable bar area */}
       <div
@@ -382,14 +443,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               x={0}
               y={bar.y}
               width={SVG_WIDTH}
-              height={rowHeight}
+              height={ROW_HEIGHT}
               className="timeline-view__row-bg"
             />
           ))}
 
           {/* Item rows */}
           {bars.map((bar) => {
-            const labelY = bar.y + rowHeight / 2;
+            const labelY = bar.y + ROW_HEIGHT / 2;
             const truncTitle = bar.item.title.length > MIN_BAR_LABEL_CHARS
               ? bar.item.title.slice(0, MIN_BAR_LABEL_CHARS - 1) + '\u2026'
               : bar.item.title;
@@ -402,7 +463,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   y={labelY}
                   className="timeline-view__label"
                   data-testid={`timeline-label-${bar.item.id}`}
-                  style={{ fontSize: `${labelFontSize}px` }}
+                  style={{ fontSize: `${LABEL_FONT_SIZE}px` }}
                 >
                   {truncTitle}
                 </text>
@@ -413,9 +474,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           {/* Clipped chart content — bars and points constrained to chart area */}
           <g clipPath="url(#chart-clip)">
             {bars.map((bar) => {
-              const labelY = bar.y + rowHeight / 2;
+              const labelY = bar.y + ROW_HEIGHT / 2;
               const barY = bar.y + 4;
-              const barHeight = rowHeight - 8;
+              const barHeight = ROW_HEIGHT - 8;
               const fillColour = bar.colour ?? DEFAULT_BAR_COLOUR;
 
               if (!bar.hasTime || !effectiveView) {
@@ -483,6 +544,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           )}
         </svg>
       </div>
+
+      {/* Zoom hint overlay */}
+      {showZoomHint && (
+        <div className="timeline-view__zoom-hint" data-testid="timeline-zoom-hint" role="status">
+          {ZOOM_HINT_TEXT}
+        </div>
+      )}
 
       {/* Fixed time axis + permanent zoom controls */}
       <div className="timeline-view__axis" data-testid="timeline-axis">

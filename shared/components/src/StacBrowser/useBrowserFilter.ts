@@ -144,21 +144,24 @@ export function useBrowserFilter({
     const isTemporalActive = temporalFilterActive && timeFilter !== null &&
       timeFilter.start !== null && timeFilter.end !== null &&
       timeFilter.start <= timeFilter.end;
-    if (!isTemporalActive) return filteredItems; // no temporal filter → same set
 
-    // Re-filter without the temporal axis
-    const viewportBounds = spatialFilterActive && viewport
-      ? viewportToBounds(viewport)
-      : null;
-    const effectiveSpatial = spatialFilterActive && viewportBounds !== null;
+    const result = isTemporalActive
+      ? (() => {
+        // Re-filter without the temporal axis
+        const viewportBounds = spatialFilterActive && viewport
+          ? viewportToBounds(viewport)
+          : null;
+        const effectiveSpatial = spatialFilterActive && viewportBounds !== null;
 
-    const result = items.filter((item) => {
-      if (metadataFilteredIds !== null && !metadataFilteredIds.has(item.id)) return false;
-      if (effectiveSpatial && viewportBounds !== null && item.bbox !== null) {
-        if (!bboxOverlapsViewport(item.bbox, viewportBounds)) return false;
-      }
-      return true;
-    });
+        return items.filter((item) => {
+          if (metadataFilteredIds !== null && !metadataFilteredIds.has(item.id)) return false;
+          if (effectiveSpatial && viewportBounds !== null && item.bbox !== null) {
+            if (!bboxOverlapsViewport(item.bbox, viewportBounds)) return false;
+          }
+          return true;
+        });
+      })()
+      : filteredItems; // no temporal filter → same set
 
     // Preserve reference identity if content is unchanged
     const prev = prevSpatialRef.current;
