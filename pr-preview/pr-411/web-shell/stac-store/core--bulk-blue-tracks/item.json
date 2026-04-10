@@ -1,0 +1,135 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--bulk-blue-tracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.040402777777777774,
+          0
+        ],
+        [
+          0.03963888888888889,
+          0
+        ],
+        [
+          0.03963888888888889,
+          0.22360833333333335
+        ],
+        [
+          -0.040402777777777774,
+          0.22360833333333335
+        ],
+        [
+          -0.040402777777777774,
+          0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.040402777777777774,
+    0,
+    0.03963888888888889,
+    0.22360833333333335
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Bulk Blue Tracks",
+    "datetime": "2010-01-12T12:13:14+00:00",
+    "description": "Saxon Warrior: Bulk Blue Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including HMS Hamburg, USS Aquitaine, FS Mahan. Multi-national participation: FR, GB, US.",
+    "start_datetime": "2010-01-12T12:13:14+00:00",
+    "end_datetime": "2010-01-12T20:13:14+00:00",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/type45",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "HMS Hamburg",
+      "USS Aquitaine",
+      "FS Mahan"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB",
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BULK_BLUE_TRACKS (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/BULK_BLUE_TRACKS.rep",
+      "title": "BULK_BLUE_TRACKS.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BULK_BLUE_TRACKS": {
+      "href": "./assets/BULK_BLUE_TRACKS.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BULK_BLUE_TRACKS.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/BULK_BLUE_TRACKS.rep",
+        "load_timestamp": "2026-03-28T13:50:56.757924Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
