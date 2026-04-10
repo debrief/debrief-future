@@ -122,12 +122,17 @@ function snapshotToChartTabData(snapshot: TabSnapshot): ChartTabData {
 function computeChartSpec(
   snapshot: TabSnapshot | null,
 ): ChartRendererProps['spec'] | null {
-  if (!snapshot || snapshot.displayHint !== 'chart') return null;
+  // Only skip if the tab is explicitly marked as a table — the default
+  // (undefined displayHint) is treated as a chart, which matches the
+  // Python tool convention: range-bearing and other dataset tools emit
+  // DatasetEnvelopes WITHOUT a displayHint field and expect chart
+  // rendering by default.  Previously this check was
+  // `displayHint !== 'chart'` which rejected undefined and caused the
+  // "Unable to render chart" error the user reported.
+  if (!snapshot || snapshot.displayHint === 'table') return null;
   const envelope = snapshot.datasetEnvelope;
   if (!envelope) return null;
   try {
-    // Cast is safe: the host sends the runtime DatasetEnvelope shape.
-    // transformDataset validates at runtime and returns { ok, spec | error }.
     const result = transformDataset(envelope as unknown as Parameters<typeof transformDataset>[0]);
     return result.ok ? result.spec : null;
   } catch (err) {
