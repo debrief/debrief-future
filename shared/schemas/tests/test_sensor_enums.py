@@ -36,13 +36,13 @@ class TestArrayCentreModeEnum:
 
     @pytest.mark.parametrize("value", EXPECTED)
     def test_value_accepted(self, value: str) -> None:
-        from debrief_schemas import SensorData, SensorContact
+        from debrief_schemas import SensorContact, SensorData
 
         sensor = SensorData(
             name="TEST",
-            array_centre_mode=value,
+            array_centre_mode=value,  # type: ignore[arg-type]  # Pydantic coerces str→enum
             contacts=[
-                SensorContact(time="2026-01-09T10:00:00Z", bearing=45.0)
+                SensorContact(time="2026-01-09T10:00:00Z", bearing=45.0),  # type: ignore[arg-type]
             ],
         )
         assert sensor.array_centre_mode == value
@@ -64,7 +64,7 @@ class TestLineStyleEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z", bearing=45.0, line_style=value
+            time="2026-01-09T10:00:00Z", bearing=45.0, line_style=value,  # type: ignore[arg-type]
         )
         assert contact.line_style == value
 
@@ -85,7 +85,7 @@ class TestLabelLocationEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z", bearing=45.0, label_location=value
+            time="2026-01-09T10:00:00Z", bearing=45.0, label_location=value,  # type: ignore[arg-type]
         )
         assert contact.label_location == value
 
@@ -106,7 +106,7 @@ class TestLineLabelPositionEnum:
         from debrief_schemas import SensorContact
 
         contact = SensorContact(
-            time="2026-01-09T10:00:00Z", bearing=45.0, put_label_at=value
+            time="2026-01-09T10:00:00Z", bearing=45.0, put_label_at=value,  # type: ignore[arg-type]
         )
         assert contact.put_label_at == value
 

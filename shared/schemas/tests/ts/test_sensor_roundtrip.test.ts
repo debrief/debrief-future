@@ -38,10 +38,10 @@ interface TrackFeature {
 describe("Sensor TypeScript round-trip", () => {
   describe("comprehensive fixture (sensors-02)", () => {
     const fixture = loadFixture<TrackFeature>("track-feature-sensors-02.json");
-    const sensor = fixture.properties.sensors![0];
+    const sensor = fixture.properties.sensors![0]!;
 
     it("preserves SensorData fields through round-trip", () => {
-      const result = roundTrip(sensor);
+      const result = roundTrip(sensor)!;
       expect(result.name).toBe(sensor.name);
       expect(result.base_frequency).toBe(sensor.base_frequency);
       expect(result.offset).toBe(sensor.offset);
@@ -55,8 +55,8 @@ describe("Sensor TypeScript round-trip", () => {
     });
 
     it("preserves SensorContact display properties", () => {
-      const contact = sensor.contacts[0];
-      const result = roundTrip(contact);
+      const contact = sensor.contacts[0]!;
+      const result = roundTrip(contact)!;
       expect(result.time).toBe(contact.time);
       expect(result.bearing).toBe(contact.bearing);
       expect(result.has_bearing).toBe(contact.has_bearing);
@@ -77,8 +77,8 @@ describe("Sensor TypeScript round-trip", () => {
     });
 
     it("preserves all contacts through round-trip", () => {
-      const result = roundTrip(sensor);
-      expect(result.contacts).toEqual(sensor.contacts);
+      const result = roundTrip(sensor)!;
+      expect(result.contacts).toEqual(sensor!.contacts);
     });
 
     it("full feature round-trip preserves entire structure", () => {
@@ -89,10 +89,10 @@ describe("Sensor TypeScript round-trip", () => {
 
   describe("minimal fixture (sensors-minimal-01)", () => {
     const fixture = loadFixture<TrackFeature>("track-feature-sensors-minimal-01.json");
-    const sensor = fixture.properties.sensors![0];
+    const sensor = fixture.properties.sensors![0]!;
 
     it("preserves minimal SensorData", () => {
-      const result = roundTrip(sensor);
+      const result = roundTrip(sensor)!;
       expect(result.name).toBe("HULL_SONAR");
       expect(result.contacts).toHaveLength(2);
       expect(result.base_frequency).toBeUndefined();
@@ -101,8 +101,8 @@ describe("Sensor TypeScript round-trip", () => {
     });
 
     it("preserves minimal SensorContact (time + bearing only)", () => {
-      const contact = sensor.contacts[0];
-      const result = roundTrip(contact);
+      const contact = sensor!.contacts[0]!;
+      const result = roundTrip(contact)!;
       expect(result.time).toBe(contact.time);
       expect(result.bearing).toBe(contact.bearing);
       expect(result.has_bearing).toBeUndefined();
@@ -113,24 +113,24 @@ describe("Sensor TypeScript round-trip", () => {
 
   describe("measured positions fixture (sensors-measured-01)", () => {
     const fixture = loadFixture<TrackFeature>("track-feature-sensors-measured-01.json");
-    const sensor = fixture.properties.sensors![0];
+    const sensor = fixture.properties.sensors![0]!;
 
     it("preserves measured_positions array", () => {
-      const result = roundTrip(sensor);
+      const result = roundTrip(sensor)!;
       expect(result.measured_positions).toBeDefined();
       expect(result.measured_positions).toHaveLength(3);
     });
 
     it("preserves MeasuredArrayPosition fields", () => {
-      const pos = sensor.measured_positions![0];
-      const result = roundTrip(pos);
+      const pos = sensor.measured_positions![0]!;
+      const result = roundTrip(pos)!;
       expect(result.time).toBe(pos.time);
       expect(result.location).toEqual(pos.location);
       expect(result.location).toHaveLength(2);
     });
 
     it("preserves array_centre_mode=MEASURED", () => {
-      const result = roundTrip(sensor);
+      const result = roundTrip(sensor)!;
       expect(result.array_centre_mode).toBe("MEASURED");
     });
   });
@@ -144,8 +144,8 @@ describe("Sensor TypeScript round-trip", () => {
     });
 
     it("existing contacts preserve original fields", () => {
-      const sensor = fixture.properties.sensors![0];
-      const result = roundTrip(sensor);
+      const sensor = fixture.properties.sensors![0]!;
+      const result = roundTrip(sensor)!;
       expect(result.contacts).toEqual(sensor.contacts);
     });
   });

@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
 
 TOOLS_DIR = Path(__file__).parent.parent.parent.parent / "shared" / "tools" / "sensor"
 
