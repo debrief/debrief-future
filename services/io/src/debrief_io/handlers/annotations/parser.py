@@ -30,8 +30,7 @@ ANNOTATION_PREFIXES = frozenset(
         ";DYNAMIC_RECT:",
         ";DYNAMIC_CIRCLE:",
         ";DYNAMIC_POLY:",
-        ";SENSOR:",
-        ";SENSOR2:",
+        # SENSOR/SENSOR2/SENSOR3/SENSORARC removed — intercepted by REP handler (#117)
         ";TMA_POS:",
         ";TMA_RB:",
         ";TRACKSPLIT",  # Note: no colon
@@ -163,8 +162,7 @@ def _parse_annotation(
         "DYNAMIC_RECT": builders.build_dynamic_rect,
         "DYNAMIC_CIRCLE": builders.build_dynamic_circle,
         "DYNAMIC_POLY": builders.build_dynamic_poly,
-        "SENSOR": builders.build_sensor,
-        "SENSOR2": builders.build_sensor2,
+        # SENSOR/SENSOR2 removed — handled by sensor_parser (#117)
         "TMA_POS": builders.build_tma,
         "TMA_RB": builders.build_tma,
         "TRACKSPLIT": builders.build_tracksplit,

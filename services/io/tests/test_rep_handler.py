@@ -392,3 +392,148 @@ class TestSmartIntervalsIntegration:
         # 12-24 hour tracks get PT30M symbols, PT2H labels
         assert props["symbol_interval"] == "PT30M"
         assert props["label_interval"] == "PT2H"
+
+
+# ── Sensor Integration Tests (#117) ───────────────────────────────────
+
+SENSOR_FIXTURES = Path(__file__).parent / "fixtures" / "valid"
+
+
+class TestSensorIntegration:
+    """Integration tests for REP sensor line parsing (#117).
+
+    Tests T005-T007 (Phase 2), T024 (Phase 3), T036 (Phase 5),
+    T042 (Phase 6), T048 (Phase 7).
+    """
+
+    def test_no_standalone_sensor_features(self) -> None:
+        """T005: REP parse produces no standalone SENSOR/SENSOR_CONTACT features."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        for feature in result.features:
+            kind = feature["properties"].get("kind", "")
+            assert kind not in ("SENSOR", "SENSOR_CONTACT", "SENSOR2"), (
+                f"Found standalone sensor feature with kind={kind}"
+            )
+
+    def test_sensor_lines_populate_pending_sensor_data(self) -> None:
+        """T006: sensor lines populate pending_sensor_data on ParseResult."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        assert len(result.pending_sensor_data) > 0
+        # NELSON should have TOWED_ARRAY sensor data
+        assert "NELSON" in result.pending_sensor_data
+        nelson_sensors = result.pending_sensor_data["NELSON"]
+        sensor_names = {s["name"] for s in nelson_sensors}
+        assert "TOWED_ARRAY" in sensor_names
+
+    def test_orphaned_sensor_emits_warning(self) -> None:
+        """T007: orphaned sensor data emits ORPHANED_SENSOR warning."""
+        content = (SENSOR_FIXTURES / "sensor_edge_cases.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_edge_cases.rep")
+
+        orphan_warnings = [w for w in result.warnings if w.code == "ORPHANED_SENSOR"]
+        assert len(orphan_warnings) >= 1
+        assert any("PHANTOM" in w.message for w in orphan_warnings)
+
+    def test_full_rep_parse_with_sensor_v1(self) -> None:
+        """T024: full REP parse with SENSOR v1 lines produces correct embedded sensors."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        # NELSON should have TOWED_ARRAY with 3 contacts
+        nelson_sensors = result.pending_sensor_data["NELSON"]
+        towed = next(s for s in nelson_sensors if s["name"] == "TOWED_ARRAY")
+        assert len(towed["contacts"]) == 3
+        # First contact should have explicit origin (DMS coords)
+        assert towed["contacts"][0].get("origin") is not None
+        # Second/third contacts should have no origin (NULL location)
+        assert towed["contacts"][1].get("origin") is None
+        assert towed["contacts"][2].get("origin") is None
+
+    def test_sensor2_integration(self) -> None:
+        """T036: SENSOR2 lines produce correct embedded sensor data."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        # FRIGATE should have SENSOR_A
+        frigate_sensors = result.pending_sensor_data["FRIGATE"]
+        sensor_a = next(s for s in frigate_sensors if s["name"] == "SENSOR_A")
+        # 2 SENSOR2 + 1 SENSOR3 = 3 contacts for SENSOR_A
+        assert len(sensor_a["contacts"]) == 3
+
+    def test_sensor3_mixed_format_integration(self) -> None:
+        """T042: SENSOR3 lines in mixed-format REP file produce correct output."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        frigate_sensors = result.pending_sensor_data["FRIGATE"]
+        sensor_a = next(s for s in frigate_sensors if s["name"] == "SENSOR_A")
+        # Third contact (from SENSOR3 line) should have ambiguous bearing
+        contacts = sensor_a["contacts"]
+        # Sorted by time — the SENSOR3 line is 050200.000 (3rd chronologically)
+        third = contacts[2]
+        assert third.get("ambiguous_bearing") is not None
+
+    def test_sensorarc_produces_coverage_annotation(self) -> None:
+        """T048: SENSORARC lines produce coverage annotations alongside embedded sensors."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        # Find DYNAMIC_TRACK_COVERAGE features
+        coverage_features = [
+            f for f in result.features
+            if f["properties"].get("kind") == "DYNAMIC_TRACK_COVERAGE"
+        ]
+        assert len(coverage_features) == 1
+        cov = coverage_features[0]
+        assert cov["properties"]["track_id"] == "FRIGATE"
+        assert cov["properties"]["left_bearing"] == 270.0
+        assert cov["properties"]["right_bearing"] == 90.0
+
+    def test_quoted_track_name_in_sensor(self) -> None:
+        """Quoted track names in SENSOR lines are correctly parsed."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        # "NEL STYLE" should be in pending_sensor_data
+        assert "NEL STYLE" in result.pending_sensor_data
+        nel_sensors = result.pending_sensor_data["NEL STYLE"]
+        assert nel_sensors[0]["name"] == "HULL_SONAR"
+
+    def test_mixed_format_merge(self) -> None:
+        """Sensor contacts from SENSOR/SENSOR2/SENSOR3 merge into one SensorData."""
+        content = (SENSOR_FIXTURES / "sensor_edge_cases.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_edge_cases.rep")
+
+        testship_sensors = result.pending_sensor_data["TESTSHIP"]
+        merge_sensor = next(
+            (s for s in testship_sensors if s["name"] == "MERGE_SENSOR"), None
+        )
+        assert merge_sensor is not None
+        assert len(merge_sensor["contacts"]) == 3
+
+    def test_track_features_still_valid(self) -> None:
+        """Track features are still correctly produced alongside sensor data."""
+        content = (SENSOR_FIXTURES / "sensor_all_formats.rep").read_text()
+        handler = REPHandler()
+        result = handler.parse(content, "sensor_all_formats.rep")
+
+        track_features = [
+            f for f in result.features
+            if f["properties"].get("kind") == "TRACK"
+        ]
+        assert len(track_features) == 2
+        track_names = {f["properties"]["platform_id"] for f in track_features}
+        assert track_names == {"NELSON", "FRIGATE"}

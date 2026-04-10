@@ -1,0 +1,47 @@
+;; Test fixture: sensor edge cases
+;; Feature: 117-rep-sensor-import
+;;
+;; NULL/NAN bearings, 360 bearing, zero range, degenerate SENSORARC,
+;; orphaned sensors, valid zero bearing
+
+;; Track positions for TESTSHIP
+951212 060000.000 TESTSHIP @A   22 00 00.00 N 21 00 00.00 W 000.0   0.0      0
+951212 060100.000 TESTSHIP @A   22 00 10.00 N 21 00 00.00 W 000.0   0.0      0
+
+;; NULL bearing (frequency-only contact)
+;SENSOR: 951212 060000.000 TESTSHIP @A NULL NULL 5000 PASSIVE_SONAR null_bearing_contact
+
+;; NAN bearing (frequency-only contact)
+;SENSOR: 951212 060100.000 TESTSHIP @A NULL NAN 5000 PASSIVE_SONAR nan_bearing_contact
+
+;; Valid zero bearing (true north)
+;SENSOR: 951212 060200.000 TESTSHIP @A NULL 0.0 5000 PASSIVE_SONAR zero_bearing_contact
+
+;; Bearing of 360 (valid, equivalent to 0)
+;SENSOR: 951212 060300.000 TESTSHIP @A NULL 360.0 5000 PASSIVE_SONAR bearing_360_contact
+
+;; Zero range
+;SENSOR: 951212 060400.000 TESTSHIP @A NULL 045.0 0 PASSIVE_SONAR zero_range_contact
+
+;; Range conversion test: 5000 yards = 4572.0 metres
+;SENSOR: 951212 060500.000 TESTSHIP @A NULL 090.0 5000 RANGE_TEST range_conversion
+
+;; Orphaned sensor (track PHANTOM has no position data)
+;SENSOR: 951212 060000.000 PHANTOM @C NULL 045.0 3000 HULL_SONAR orphan_contact
+
+;; SENSOR2 with all NULL optional fields
+;SENSOR2: 951212 060000.000 TESTSHIP @A NULL 045.0 5000 NULL NULL NULL TEST_SENSOR2 no_ambig_no_freq
+
+;; SENSOR2 with NAN bearing
+;SENSOR2: 951212 060100.000 TESTSHIP @A NULL NAN 5000 NULL NULL NULL TEST_SENSOR2 nan_bearing
+
+;; SENSOR3 with NULL accuracy fields
+;SENSOR3: 951212 060200.000 TESTSHIP @A NULL 045.0 5000 200.0 150.0 NULL NULL NULL TEST_SENSOR3 with_freq
+
+;; Mixed formats same sensor: merge test
+;SENSOR: 951212 060600.000 TESTSHIP @D NULL 100.0 3000 MERGE_SENSOR v1_contact
+;SENSOR2: 951212 060700.000 TESTSHIP @D NULL 110.0 3000 NULL NULL NULL MERGE_SENSOR v2_contact
+;SENSOR3: 951212 060800.000 TESTSHIP @D NULL 120.0 3000 NULL NULL NULL NULL NULL MERGE_SENSOR v3_contact
+
+;; Degenerate SENSORARC (inner = outer range)
+;SENSORARC 951212 060000.000 951212 060500.000 TESTSHIP 0 360 5000 5000
