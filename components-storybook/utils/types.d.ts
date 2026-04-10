@@ -1,8 +1,8 @@
-import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride, NarrativeEntry, CircleAnnotation, RectangleAnnotation, LineAnnotation, TextAnnotation, VectorAnnotation, PolyAnnotation, DebriefFeature } from '@debrief/schemas';
+import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride, NarrativeEntry, CircleAnnotation, RectangleAnnotation, LineAnnotation, TextAnnotation, VectorAnnotation, PolyAnnotation, DebriefFeature } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride, NarrativeEntry, CircleAnnotation, RectangleAnnotation, LineAnnotation, TextAnnotation, VectorAnnotation, PolyAnnotation, };
-export type { SchemaAnnotationFeature, DebriefFeature, DebriefFeatureCollection, } from '@debrief/schemas';
-export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, } from '@debrief/schemas';
+export type { SchemaAnnotationFeature, DebriefFeature, DebriefFeatureCollection, } from '../../../schemas/src/generated/typescript/index.ts';
+export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, } from '../../../schemas/src/generated/typescript/index.ts';
 export type { DisplayMode } from '../TimeController/types';
 export type { Bounds } from '@debrief/utils';
 /**

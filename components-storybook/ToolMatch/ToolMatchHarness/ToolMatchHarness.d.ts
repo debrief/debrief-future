@@ -1,5 +1,5 @@
 import { CSSProperties } from '../../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
-import { Tool } from '@debrief/schemas';
+import { Tool } from '../../../../schemas/src/generated/typescript/index.ts';
 import { SimpleFeature } from './fixtures/features';
 
 export interface ToolMatchHarnessProps {

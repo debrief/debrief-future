@@ -1,4 +1,4 @@
-import { PointProperties, PolygonProperties, LineProperties } from '@debrief/schemas';
+import { PointProperties, PolygonProperties, LineProperties } from '../../../../schemas/src/generated/typescript/index.ts';
 
 /** Default styling for drawn point features — green, distinct from track colours */
 export declare const DEFAULT_DRAWN_POINT_STYLE: PointProperties;

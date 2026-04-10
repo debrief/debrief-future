@@ -1,5 +1,5 @@
 import { DebriefFeature, DebriefFeatureCollection, TimeExtent } from './types';
-import { PositionStyle, PositionStyleOverride } from '@debrief/schemas';
+import { PositionStyle, PositionStyleOverride } from '../../../schemas/src/generated/typescript/index.ts';
 
 /**
  * Calculate the time extent (start/end times) for a collection of features.

@@ -1,4 +1,4 @@
-import { Tool, SelectionRequirement } from '@debrief/schemas';
+import { Tool, SelectionRequirement } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { Tool, SelectionRequirement };
 /**

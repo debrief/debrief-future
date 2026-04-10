@@ -1,4 +1,4 @@
-import { TrackFeature } from '@debrief/schemas';
+import { TrackFeature } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type SymbolShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
 export interface PositionSymbolsLayerProps {

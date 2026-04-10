@@ -1,4 +1,4 @@
-import { ParameterValue, InputFeatureState } from '@debrief/schemas';
+import { ParameterValue, InputFeatureState } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { ParameterValue, InputFeatureState };
 /**

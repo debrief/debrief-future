@@ -1,4 +1,4 @@
-import { Tool } from '@debrief/schemas';
+import { Tool } from '../../../../schemas/src/generated/typescript/index.ts';
 import { MatchResult } from '../../ToolMatch/types';
 
 /** Extended Tool with category for Run dropdown grouping */

@@ -1,4 +1,4 @@
-import { TrackFeature, ReferenceLocation } from '@debrief/schemas';
+import { TrackFeature, ReferenceLocation } from '../../../../schemas/src/generated/typescript/index.ts';
 import { DebriefFeature } from '../../utils/types';
 
 /**

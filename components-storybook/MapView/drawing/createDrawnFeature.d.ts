@@ -1,4 +1,4 @@
-import { LineProperties, PointProperties, PolygonProperties, ReferenceLocation, RectangleAnnotation, PolyAnnotation, LineAnnotation } from '@debrief/schemas';
+import { LineProperties, PointProperties, PolygonProperties, ReferenceLocation, RectangleAnnotation, PolyAnnotation, LineAnnotation } from '../../../../schemas/src/generated/typescript/index.ts';
 import { DrawingMode } from '../LeafletToolbar';
 
 /** Provenance metadata for a user-drawn feature (FR-012) */
