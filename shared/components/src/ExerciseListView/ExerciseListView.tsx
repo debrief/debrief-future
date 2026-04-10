@@ -13,6 +13,7 @@ import type {
   SortDirection,
 } from './types';
 import { ExerciseListItemRow } from './ExerciseListItemRow';
+import { THUMBNAIL_SIZE_CONFIGS } from './constants';
 import { sortComparators, formatRelativeTime } from './utils';
 import './ExerciseListView.css';
 
@@ -33,9 +34,6 @@ const DEFAULT_DIRECTIONS: Record<SortDimension, SortDirection> = {
   duration: 'desc',
 };
 
-/** Row height estimate for virtualiser. */
-const ROW_HEIGHT = 80;
-
 export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   items,
   recentItems = [],
@@ -48,9 +46,11 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   hideSortBar,
   onRequestTrackData,
   trackData,
+  thumbnailSize = 'small',
   className,
   height,
 }) => {
+  const rowHeight = THUMBNAIL_SIZE_CONFIGS[thumbnailSize].rowHeight;
   const [internalSort, setInternalSort] = useState<SortConfiguration>(initialSort ?? DEFAULT_SORT);
   const sort = controlledSort ?? internalSort;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
   const virtualizer = useVirtualizer({
     count: sortedItems.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: useCallback(() => ROW_HEIGHT, []),
+    estimateSize: useCallback(() => rowHeight, [rowHeight]),
     overscan: 5,
   });
 
@@ -223,6 +223,7 @@ export const ExerciseListView: React.FC<ExerciseListViewProps> = ({
                   onSelect={onItemSelect}
                   onHighlight={onItemHighlight}
                   highlighted={highlightedItemId === item.id}
+                  thumbnailSize={thumbnailSize}
                 />
               </div>
             );
