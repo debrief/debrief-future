@@ -10,6 +10,7 @@ Tests cover:
 - Edge cases (malformed lines, missing fields, bearing=360, zero range)
 """
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -128,7 +129,7 @@ class TestParseSensorV1:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=45.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -140,7 +141,7 @@ class TestParseSensorV1:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:01:00+00:00",
+                time=datetime(1995, 12, 12, 5, 1, 0, tzinfo=UTC),
                 bearing=50.0,
                 has_bearing=True,
                 range_m=5029.2,
@@ -163,7 +164,7 @@ class TestParseSensorV1:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:02:00+00:00",
+                time=datetime(1995, 12, 12, 5, 2, 0, tzinfo=UTC),
                 bearing=55.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -174,7 +175,7 @@ class TestParseSensorV1:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=45.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -185,7 +186,7 @@ class TestParseSensorV1:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:01:00+00:00",
+                time=datetime(1995, 12, 12, 5, 1, 0, tzinfo=UTC),
                 bearing=50.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -281,7 +282,7 @@ class TestParseSensorV2:
             ParsedSensorContact(
                 parent_track="FRIGATE",
                 sensor_name="SENSOR_A",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=32.8,
                 has_bearing=True,
                 range_m=10972.8,
@@ -295,7 +296,7 @@ class TestParseSensorV2:
             ParsedSensorContact(
                 parent_track="FRIGATE",
                 sensor_name="SENSOR_A",
-                time="1995-12-12T05:01:00+00:00",
+                time=datetime(1995, 12, 12, 5, 1, 0, tzinfo=UTC),
                 bearing=35.2,
                 has_bearing=True,
                 range_m=10516.8,
@@ -360,7 +361,7 @@ class TestParseSensorV3:
             ParsedSensorContact(
                 parent_track="TESTSHIP",
                 sensor_name="MERGE",
-                time="1995-12-12T06:06:00+00:00",
+                time=datetime(1995, 12, 12, 6, 6, 0, tzinfo=UTC),
                 bearing=100.0,
                 has_bearing=True,
                 range_m=2743.2,
@@ -372,7 +373,7 @@ class TestParseSensorV3:
             ParsedSensorContact(
                 parent_track="TESTSHIP",
                 sensor_name="MERGE",
-                time="1995-12-12T06:07:00+00:00",
+                time=datetime(1995, 12, 12, 6, 7, 0, tzinfo=UTC),
                 bearing=110.0,
                 has_bearing=True,
                 range_m=2743.2,
@@ -384,7 +385,7 @@ class TestParseSensorV3:
             ParsedSensorContact(
                 parent_track="TESTSHIP",
                 sensor_name="MERGE",
-                time="1995-12-12T06:08:00+00:00",
+                time=datetime(1995, 12, 12, 6, 8, 0, tzinfo=UTC),
                 bearing=120.0,
                 has_bearing=True,
                 range_m=2743.2,
@@ -475,7 +476,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=45.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -487,7 +488,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="HULL",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=90.0,
                 has_bearing=True,
                 range_m=2743.2,
@@ -499,7 +500,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="FRIGATE",
                 sensor_name="SONAR",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=32.8,
                 has_bearing=True,
                 range_m=10972.8,
@@ -522,7 +523,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=45.0,
                 has_bearing=True,
                 range_m=4572.0,
@@ -534,7 +535,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:01:00+00:00",
+                time=datetime(1995, 12, 12, 5, 1, 0, tzinfo=UTC),
                 bearing=50.0,
                 has_bearing=True,
                 range_m=5029.2,
@@ -554,7 +555,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="SHIP",
                 sensor_name="PASSIVE",
-                time="1995-12-12T06:00:00+00:00",
+                time=datetime(1995, 12, 12, 6, 0, 0, tzinfo=UTC),
                 bearing=0.0,
                 has_bearing=False,
                 range_m=4572.0,
@@ -574,7 +575,7 @@ class TestGroupSensorContacts:
             ParsedSensorContact(
                 parent_track="NELSON",
                 sensor_name="TOWED",
-                time="1995-12-12T05:00:00+00:00",
+                time=datetime(1995, 12, 12, 5, 0, 0, tzinfo=UTC),
                 bearing=45.0,
                 has_bearing=True,
                 range_m=4572.0,
