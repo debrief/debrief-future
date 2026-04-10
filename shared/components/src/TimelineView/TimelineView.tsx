@@ -53,6 +53,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onTemporalFilterChange,
   onItemSelect,
   colourFn,
+  resetKey,
   className,
 }) => {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
@@ -89,6 +90,20 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     prevFullRangeRef.current = fullRange;
   }, [fullRange]);
 
+  // De-duplicate guard for temporal filter emission — prevents re-emitting the
+  // same filter when only references change (e.g. after "Clear All Filters").
+  const lastEmittedFilterRef = useRef<{ start: number; end: number } | null | undefined>(undefined);
+
+  // External reset (e.g. "Clear All Filters") — zoom back to full extent
+  const prevResetKeyRef = useRef(resetKey);
+  useEffect(() => {
+    if (resetKey !== undefined && resetKey !== prevResetKeyRef.current) {
+      setViewRange(fullRange);
+      lastEmittedFilterRef.current = undefined; // Allow re-emission after reset
+    }
+    prevResetKeyRef.current = resetKey;
+  }, [resetKey, fullRange]);
+
   const effectiveView = viewRange ?? fullRange;
 
   const chartWidth = SVG_WIDTH - CHART_LEFT - CHART_RIGHT;
@@ -99,12 +114,20 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     return effectiveView.min > fullRange.min || effectiveView.max < fullRange.max;
   }, [fullRange, effectiveView]);
 
-  // Emit temporal filter when view range changes
+  // Emit temporal filter when view range changes.
   useEffect(() => {
     if (!onTemporalFilterChange || !fullRange || !effectiveView) return;
     if (isZoomed) {
-      onTemporalFilterChange({ start: effectiveView.min, end: effectiveView.max });
+      const next = { start: effectiveView.min, end: effectiveView.max };
+      const prev = lastEmittedFilterRef.current;
+      if (prev && typeof prev === 'object' && prev.start === next.start && prev.end === next.end) {
+        return; // Same filter — skip re-emission
+      }
+      lastEmittedFilterRef.current = next;
+      onTemporalFilterChange(next);
     } else {
+      if (lastEmittedFilterRef.current === null) return; // Already emitted null
+      lastEmittedFilterRef.current = null;
       onTemporalFilterChange(null);
     }
   }, [effectiveView, fullRange, isZoomed, onTemporalFilterChange]);

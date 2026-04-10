@@ -337,6 +337,7 @@ interface BrowserPanelContext {
   colorMap?: ReadonlyMap<string, string>;
   onViewportChange: (bounds: Bounds | null) => void;
   onTemporalFilterChange: (filter: TemporalFilter | null) => void;
+  timelineResetKey: number;
   colourFn?: (item: StacBrowserItem) => string | null;
   sort: SortConfiguration;
   onSortChange: (sort: SortConfiguration) => void;
@@ -499,6 +500,7 @@ function renderPanel(type: string): React.ReactElement {
             onTemporalFilterChange={ctx.onTemporalFilterChange}
             onItemSelect={ctx.onItemSelect}
             colourFn={ctx.colourFn}
+            resetKey={ctx.timelineResetKey}
           />
         </div>
       );
@@ -612,11 +614,13 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [spatialFilterActive, setSpatialFilterActive] = useState(false);
   const [timeFilter, setTimeFilter] = useState<{ start: number | null; end: number | null } | null>(null);
   const [temporalFilterActive, setTemporalFilterActive] = useState(false);
+  const [timelineResetKey, setTimelineResetKey] = useState(0);
 
   const clearAllFilters = useCallback(() => {
     setMetadataFilteredIds(null);
     setSpatialFilterActive(false);
     setTemporalFilterActive(false);
+    setTimelineResetKey(k => k + 1);
   }, []);
 
   const { filteredItems, spatialFilteredItems, activeFilterCount, hasNoResults } = useBrowserFilter({
@@ -685,10 +689,11 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     colorMap,
     onViewportChange: handleViewportChange,
     onTemporalFilterChange: handleTemporalFilterChange,
+    timelineResetKey,
     colourFn,
     sort,
     onSortChange: handleSortChange,
-  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn, sort, handleSortChange]);
+  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, timelineResetKey, colourFn, sort, handleSortChange]);
 
   // Update module-level context and re-render panels + sort header
   useEffect(() => {
