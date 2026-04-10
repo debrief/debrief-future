@@ -6,6 +6,7 @@
 
 import type { MCPToolDefinition } from '../../../services/toolService';
 import type { DebriefFeature } from '@debrief/schemas';
+import { OutputKindEnum } from '@debrief/schemas';
 import type { GeoJSONFeature } from '@debrief/utils';
 
 type Position = number[];
@@ -48,7 +49,7 @@ export const toolDefinition: MCPToolDefinition = {
     ],
     'debrief:category': 'region/analysis',
     'debrief:version': '1.0.0',
-    'debrief:outputKind': 'region/statistics',
+    'debrief:outputKind': OutputKindEnum.regionSOLIDUSstatistics,
   },
 };
 

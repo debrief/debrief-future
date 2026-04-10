@@ -16,6 +16,7 @@ from typing import Any
 
 from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
+from debrief_schemas import OutputKindEnum
 
 
 def _point_in_bbox(lon: float, lat: float, bbox: list[float]) -> bool:
@@ -82,7 +83,7 @@ def _bounds_from_features(features: list[GeoJSONFeatureDict]) -> list[float] | N
     name="area-summary",
     description="Summarize the geographic extent and properties of selected features or a region",
     input_kinds=["TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "REGION", "POLYGON", "POLY"],
-    output_kind="region/statistics",
+    output_kind=OutputKindEnum.regionSOLIDUSstatistics,
     context_type=ContextType.MULTI,
     parameters=[
         ToolParameter(
