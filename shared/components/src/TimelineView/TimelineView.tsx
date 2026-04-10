@@ -344,6 +344,44 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         </div>
       )}
 
+      {/* Fixed top time axis — always visible above scroll area */}
+      <div className="timeline-view__top-axis" data-testid="timeline-top-axis">
+        <svg
+          width="100%"
+          height={AXIS_HEIGHT}
+          viewBox={`0 0 ${SVG_WIDTH} ${AXIS_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
+          className="timeline-view__axis-svg"
+        >
+          {/* Axis line */}
+          <line
+            x1={CHART_LEFT}
+            y1={AXIS_HEIGHT - 2}
+            x2={SVG_WIDTH - CHART_RIGHT}
+            y2={AXIS_HEIGHT - 2}
+            className="timeline-view__axis-line"
+          />
+
+          {/* Axis labels */}
+          {axisLabels.map((label, i) => (
+            <text
+              key={i}
+              x={CHART_LEFT + label.x}
+              y={AXIS_HEIGHT - 6}
+              className="timeline-view__axis-label"
+              data-testid="timeline-top-axis-label"
+              textAnchor={
+                i === 0 ? 'start' :
+                i === axisLabels.length - 1 ? 'end' :
+                'middle'
+              }
+            >
+              {label.text}
+            </text>
+          ))}
+        </svg>
+      </div>
+
       {/* Scrollable bar area */}
       <div
         ref={scrollRef}
