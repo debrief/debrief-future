@@ -71,7 +71,14 @@
             ],
             "execution_duration": "PT0.000062S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Roald Amundsen",
+        "nationality": "NO",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "vessel_type": "type212",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

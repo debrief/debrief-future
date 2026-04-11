@@ -8590,7 +8590,14 @@
             ],
             "execution_duration": "PT0.008085S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Dauntless",
+        "nationality": "NO",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "vessel_type": "type212",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

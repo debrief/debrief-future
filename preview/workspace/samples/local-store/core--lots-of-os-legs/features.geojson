@@ -1602,7 +1602,14 @@
             ],
             "execution_duration": "PT0.002532S"
           }
-        ]
+        ],
+        "display_name": "FGS Bretagne",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     },
     {
@@ -2719,7 +2726,14 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "display_name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "vessel_type": "astute",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": false
       }
     }
   ]

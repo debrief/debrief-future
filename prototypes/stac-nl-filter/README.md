@@ -9,9 +9,53 @@ This is a throwaway prototype — no build step, no framework, just an HTML file
 | File | Purpose |
 |------|---------|
 | `index.html`       | Entry point. Loads React/Babel from CDN, then `catalog-data.js` and `app.jsx`. |
-| `catalog-data.js`  | Auto-generated JS constants: `window.CATALOG_FULL` (70 items, all fields) and `window.CATALOG_COMPACT` (same items, no `description` or `track_names` — fed to the LLM). |
+| `catalog-data.js`  | Auto-generated JS constants: `window.CATALOG_FULL` (70 items, full slug with descriptions) and `window.CATALOG_COMPACT` (LLM-facing subset). |
 | `app.jsx`          | React app. Transpiled in-browser by Babel standalone. |
 | `styles.css`       | Light theme with chip colour coding per SRD §4.5. |
+| `build-catalog.py` | Two-phase build: enriches `features.geojson` with per-platform metadata, then regenerates `catalog-data.js` from the enriched features. |
+| `test-harness.mjs` | Headless Node runner — unit tests + typical-phrase integration tests. |
+
+## Slug shape (v2)
+
+`features.geojson` is the source of truth. Each TRACK feature is enriched in place (by `build-catalog.py`) with: `display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, `domain`, `synthetic`. For the 10 platform IDs in the hardcoded `PLATFORM_VESSEL_MAP`, those values are authoritative; the remaining ~92 platforms get a deterministic assignment (zip alphabetically-sorted unknown IDs against each item's aggregate `debrief:track_names` / `debrief:vessel_classes`) and are flagged `synthetic: true`.
+
+Per-item slug in `CATALOG_FULL` / `CATALOG_COMPACT`:
+
+```jsonc
+{
+  "id": "core--sample",
+  "title": "Saxon Warrior: Sample",
+  "exercise": "Saxon Warrior",
+  "plot_name": "Sample",
+  "bbox": [...],
+  "start_datetime": "...", "end_datetime": "...",
+  "year": 1995, "duration_hours": 6.75,
+  "feature_kinds": { "TRACK": 2, "NARRATIVE": 19 },
+  "platform_count": 2, "narrative_count": 19,
+  "platforms": [
+    {
+      "id": "NELSON", "name": "HMS Nelson",
+      "nationality": "GB", "vessel_class": "surface/warship/frigate/type23",
+      "vessel_type": "type23", "vessel_role": "frigate", "domain": "surface",
+      "synthetic": false
+    }
+  ],
+  "nationalities": ["GB"], "domains": ["surface"], "vessel_types": ["type23", "type45"],
+  "has_submarine": false, "has_warship": true,
+  "tags": [...], "feature_tags": [...]
+}
+```
+
+The key improvement over v1: per-platform records let the LLM answer **joined queries** that were impossible before, e.g. "UK submarines" → `platforms[*]` where `nationality=="GB" AND domain=="subsurface"`. v1's flat `nationalities` + `vessel_classes` aggregates lost those joins.
+
+`CATALOG_COMPACT` (fed to the LLM, ~65 KB) drops `description` and the per-platform `max_depth_m` / `track_duration_hours`. `CATALOG_FULL` (used for card rendering, ~130 KB) keeps everything.
+
+## Rebuilding the catalog
+
+```sh
+python3 prototypes/stac-nl-filter/build-catalog.py --dry   # preview
+python3 prototypes/stac-nl-filter/build-catalog.py         # live: rewrites features.geojson + catalog-data.js
+```
 
 ## Running
 
@@ -51,25 +95,7 @@ Model returns { chips: {...}, ids: ["core--sample", ...] }
 Client resolves IDs against CATALOG_FULL and renders cards
 ```
 
-The LLM never sees `description` or `track_names` (saved for rendering only), and the outlier `core--bulk-red-tracks` (300-entry track_names array) is excluded entirely — so the catalog the model reasons over is **70 items**.
-
-## Data source
-
-`catalog-data.js` is regenerated from `stac-metadata-only.json` at the repo root. To refresh after the catalog dump changes:
-
-```sh
-python3 -c "
-import json
-from pathlib import Path
-meta = json.loads(Path('stac-metadata-only.json').read_text())
-items = [i for i in meta['items'] if i['id'] != 'core--bulk-red-tracks']
-compact = [{k: v for k, v in i.items() if k not in {'description', 'debrief:track_names'}} for i in items]
-with open('prototypes/stac-nl-filter/catalog-data.js', 'w') as f:
-    f.write('// Auto-generated from stac-metadata-only.json\n\n')
-    f.write('window.CATALOG_FULL = '  + json.dumps(items,   indent=2) + ';\n\n')
-    f.write('window.CATALOG_COMPACT = ' + json.dumps(compact, indent=2) + ';\n')
-"
-```
+The LLM never sees `description` (saved for rendering only), and the outlier `core--bulk-red-tracks` is excluded entirely — so the catalog the model reasons over is **70 items**.
 
 ## Headless test harness (`test-harness.mjs`)
 
@@ -86,7 +112,7 @@ It builds the same system prompt the browser app does, then spawns `claude -p` (
 # Unit tests only (no LLM calls — fast, offline)
 node prototypes/stac-nl-filter/test-harness.mjs --unit
 
-# Full suite: unit tests + 7 typical-phrase integration tests (LLM calls)
+# Full suite: unit tests + 9 typical-phrase integration tests (LLM calls)
 node prototypes/stac-nl-filter/test-harness.mjs
 
 # Single ad-hoc query
@@ -95,19 +121,21 @@ node prototypes/stac-nl-filter/test-harness.mjs --query "plots involving Type 45
 
 ### Typical-phrase coverage
 
-The integration tests cover seven query shapes and validate the results with light assertions against item fields (not exact ID matches, which would be brittle):
+Integration tests validate results against fields in the v2 slug. The three rows marked **(join)** exercise per-platform queries that the v1 flat-aggregate slug could not answer:
 
 | Test | Query | Validator |
 |---|---|---|
-| UK-only filter              | "Plots involving British Royal Navy ships only"               | All results have `GB` in `debrief:nationalities` |
+| UK-only filter              | "Plots involving British Royal Navy ships only"               | `nationalities == ["GB"]` (strict) |
+| **UK submarines (join)**    | "Plots that feature a UK submarine"                           | `platforms[*]` has `nationality=="GB" AND domain=="subsurface"` |
+| **German frigates (join)**  | "German frigates"                                             | `platforms[*]` has `nationality=="DE" AND vessel_role=="frigate"` |
 | NATO ASW exercises          | "NATO anti-submarine warfare training exercises"              | ≥1 result has an ASW/submarine tag |
-| Submarine-specific          | "plots featuring submarines"                                  | ≥1 result has a `subsurface/...` vessel class |
-| Multi-national              | "Multi-national exercises with at least 3 different nationalities" | All results have ≥3 nationalities |
+| Multi-national ≥3 nations   | "Multi-national exercises with at least 3 different nationalities" | `nationalities.length >= 3` |
+| **Type 23 frigates**        | "plots featuring Type 23 frigates"                            | `platforms[*].vessel_type=="type23"` |
 | Vague query returns all     | "show me everything"                                          | Returns ≥ all-but-2 items |
-| Year-range filter           | "exercises from the 1990s"                                    | All results have `start_datetime` in 1990–1999 |
-| Narrative content           | "plots with many narrative entries"                           | All results have `feature_kinds.NARRATIVE > 0` |
+| Year-range filter           | "exercises from the 1990s"                                    | `year` in 1990–1999 |
+| Narrative content           | "plots with many narrative entries"                           | `narrative_count > 0` |
 
-Last run: **13/13 unit + 7/7 integration passed.** Integration calls take ~10–40 s each (Sonnet 4.6).
+Last run on v2 slug: **21/21 unit + 9/9 integration passed.** Integration calls take ~6–50 s each (Sonnet 4.6).
 
 ### Requirements
 

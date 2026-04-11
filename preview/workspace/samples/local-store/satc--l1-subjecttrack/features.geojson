@@ -731,7 +731,14 @@
             ],
             "execution_duration": "PT0.000457S"
           }
-        ]
+        ],
+        "display_name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "vessel_type": "astute",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": false
       }
     }
   ]

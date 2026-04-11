@@ -30051,7 +30051,14 @@
             ],
             "execution_duration": "PT0.031884S"
           }
-        ]
+        ],
+        "display_name": "HMS Argyll",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "vessel_type": "astute",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

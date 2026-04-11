@@ -4071,7 +4071,14 @@
             ],
             "execution_duration": "PT0.002491S"
           }
-        ]
+        ],
+        "display_name": "FS Roald Amundsen",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/frigate/type26",
+        "vessel_type": "type26",
+        "vessel_role": "frigate",
+        "domain": "surface",
+        "synthetic": true
       }
     }
   ]

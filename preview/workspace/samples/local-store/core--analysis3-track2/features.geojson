@@ -4081,7 +4081,14 @@
             ],
             "execution_duration": "PT0.002671S"
           }
-        ]
+        ],
+        "display_name": "HMS Collingwood",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": false
       }
     }
   ]

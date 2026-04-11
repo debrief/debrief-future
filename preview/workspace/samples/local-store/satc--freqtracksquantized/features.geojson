@@ -9891,7 +9891,14 @@
             ],
             "execution_duration": "PT0.008585S"
           }
-        ]
+        ],
+        "display_name": "FGS De Ruyter",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

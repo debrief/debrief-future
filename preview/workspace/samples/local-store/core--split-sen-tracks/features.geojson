@@ -151,7 +151,14 @@
             ],
             "execution_duration": "PT0.001128S"
           }
-        ]
+        ],
+        "display_name": "FS Mason",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -284,7 +291,14 @@
             ],
             "execution_duration": "PT0.001128S"
           }
-        ]
+        ],
+        "display_name": "USS Provence",
+        "nationality": "US",
+        "vessel_class": "surface/warship/frigate/type23",
+        "vessel_type": "type23",
+        "vessel_role": "frigate",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -3049,7 +3063,14 @@
               }
             ]
           }
-        ]
+        ],
+        "display_name": "FGS Sachsen",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "vessel_type": "arleigh-burke",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": true
       }
     }
   ]

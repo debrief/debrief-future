@@ -208631,7 +208631,14 @@
             ],
             "execution_duration": "PT0.149749S"
           }
-        ]
+        ],
+        "display_name": "FGS Portland",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

@@ -751,7 +751,14 @@
             ],
             "execution_duration": "PT0.000459S"
           }
-        ]
+        ],
+        "display_name": "HMS Defender",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": false
       }
     }
   ]

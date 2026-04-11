@@ -5851,7 +5851,14 @@
             ],
             "execution_duration": "PT0.003587S"
           }
-        ]
+        ],
+        "display_name": "FGS Portland",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

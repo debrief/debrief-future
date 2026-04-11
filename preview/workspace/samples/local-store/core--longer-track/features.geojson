@@ -8311,7 +8311,14 @@
             ],
             "execution_duration": "PT0.004477S"
           }
-        ]
+        ],
+        "display_name": "HMS Richmond",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

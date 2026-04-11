@@ -5498,7 +5498,14 @@
             ],
             "execution_duration": "PT0.005681S"
           }
-        ]
+        ],
+        "display_name": "FS Provence",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     },
     {
@@ -10841,7 +10848,14 @@
             ],
             "execution_duration": "PT0.00318S"
           }
-        ]
+        ],
+        "display_name": "USS Northumberland",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

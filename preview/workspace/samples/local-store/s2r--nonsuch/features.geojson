@@ -8311,7 +8311,14 @@
             ],
             "execution_duration": "PT0.004984S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Truxtun",
+        "nationality": "NO",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "vessel_type": "astute",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

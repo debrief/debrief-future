@@ -5498,7 +5498,14 @@
             ],
             "execution_duration": "PT0.005212S"
           }
-        ]
+        ],
+        "display_name": "FS Fridtjof Nansen",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "vessel_type": "astute",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

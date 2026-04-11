@@ -70688,7 +70688,14 @@
             ],
             "execution_duration": "PT0.094959S"
           }
-        ]
+        ],
+        "display_name": "USS Argyll",
+        "nationality": "US",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "vessel_type": "arleigh-burke",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -74786,7 +74793,14 @@
             ],
             "execution_duration": "PT0.094959S"
           }
-        ]
+        ],
+        "display_name": "HMS Cole",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "vessel_type": "queen-elizabeth",
+        "vessel_role": "carrier",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {

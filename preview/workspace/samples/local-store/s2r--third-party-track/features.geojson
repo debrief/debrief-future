@@ -131,7 +131,14 @@
             ],
             "execution_duration": "PT0.000091S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Cole",
+        "nationality": "NO",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

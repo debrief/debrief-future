@@ -8311,7 +8311,14 @@
             ],
             "execution_duration": "PT0.004558S"
           }
-        ]
+        ],
+        "display_name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

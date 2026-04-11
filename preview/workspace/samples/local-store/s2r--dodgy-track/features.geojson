@@ -1611,7 +1611,14 @@
             ],
             "execution_duration": "PT0.001178S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Defender",
+        "nationality": "NO",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

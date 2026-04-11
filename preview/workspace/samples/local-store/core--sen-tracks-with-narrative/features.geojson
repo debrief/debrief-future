@@ -1691,7 +1691,14 @@
             ],
             "execution_duration": "PT0.018704S"
           }
-        ]
+        ],
+        "display_name": "FGS Otto Sverdrup",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn",
+        "domain": "subsurface",
+        "synthetic": true
       }
     },
     {
@@ -3616,7 +3623,14 @@
               }
             ]
           }
-        ]
+        ],
+        "display_name": "FS Mahan",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/patrol/river",
+        "vessel_type": "river",
+        "vessel_role": "patrol",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {

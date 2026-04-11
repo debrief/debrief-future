@@ -4081,7 +4081,14 @@
             ],
             "execution_duration": "PT0.00259S"
           }
-        ]
+        ],
+        "display_name": "HMS Collingwood",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": false
       }
     },
     {
@@ -4154,7 +4161,14 @@
             ],
             "execution_duration": "PT0.00259S"
           }
-        ]
+        ],
+        "display_name": "FS Northumberland",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "vessel_type": "arleigh-burke",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -4227,7 +4241,14 @@
             ],
             "execution_duration": "PT0.00259S"
           }
-        ]
+        ],
+        "display_name": "HNoMS Languedoc",
+        "nationality": "NO",
+        "vessel_class": "surface/warship/frigate/type26",
+        "vessel_type": "type26",
+        "vessel_role": "frigate",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -4300,7 +4321,14 @@
             ],
             "execution_duration": "PT0.00259S"
           }
-        ]
+        ],
+        "display_name": "ITS Sachsen",
+        "nationality": "IT",
+        "vessel_class": "surface/warship/frigate/type26",
+        "vessel_type": "type26",
+        "vessel_role": "frigate",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {

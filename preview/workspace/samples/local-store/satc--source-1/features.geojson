@@ -9191,7 +9191,14 @@
             ],
             "execution_duration": "PT0.005532S"
           }
-        ]
+        ],
+        "display_name": "HMS Otto Sverdrup",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

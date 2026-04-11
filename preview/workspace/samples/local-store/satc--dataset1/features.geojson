@@ -274261,7 +274261,14 @@
             ],
             "execution_duration": "PT0.169677S"
           }
-        ]
+        ],
+        "display_name": "HMS Fridtjof Nansen",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "vessel_type": "gotland",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

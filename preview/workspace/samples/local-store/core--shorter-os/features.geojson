@@ -6170,7 +6170,14 @@
             ],
             "execution_duration": "PT0.005857S"
           }
-        ]
+        ],
+        "display_name": "HMS Carney",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "vessel_type": "type212",
+        "vessel_role": "ssk",
+        "domain": "subsurface",
+        "synthetic": true
       }
     }
   ]

@@ -43,7 +43,7 @@ const { full: CATALOG_FULL, compact: CATALOG_COMPACT } = loadCatalogs();
 const ITEMS_BY_ID = Object.fromEntries(CATALOG_FULL.map(i => [i.id, i]));
 const TOTAL_ITEMS = CATALOG_FULL.length;
 
-// ===== Prompt builder — duplicated from app.jsx =====
+// ===== Prompt builder — duplicated from app.jsx (keep in sync) =====
 function buildSystemPrompt() {
   return `You are a search assistant for a STAC catalog of maritime exercise plots.
 
@@ -57,14 +57,45 @@ RULES:
 3. If the query is too vague to filter on, return ALL catalog IDs with an empty "chips" object.
 4. Only return IDs that appear in the catalog below.
 
+SLUG SHAPE — each catalog item has this structure:
+{
+  id, title, exercise, plot_name,
+  bbox, start_datetime, end_datetime, year, duration_hours,
+  feature_kinds: { TRACK, NARRATIVE, ... },
+  platform_count, narrative_count,
+  platforms: [                              // PER-PLATFORM records — use these for joined queries
+    {
+      id,                                   // raw platform_id
+      name,                                 // display name (e.g. "HMS Nelson")
+      nationality,                          // ISO 2-letter code
+      vessel_class,                         // full path e.g. "surface/warship/frigate/type23"
+      vessel_type,                          // leaf, e.g. "type23"
+      vessel_role,                          // role, e.g. "frigate" | "destroyer" | "submarine"
+      domain,                               // "surface" | "subsurface" | "air"
+      synthetic                             // true = metadata was fabricated (not authoritative)
+    }
+  ],
+  nationalities, domains, vessel_types,     // derived aggregates across platforms[]
+  has_submarine, has_warship,               // derived booleans
+  tags, feature_tags
+}
+
+KEY REASONING PATTERNS:
+- "UK submarines"          → platforms[*] where nationality=="GB" AND domain=="subsurface"
+- "Type 23 frigates"       → platforms[*].vessel_type=="type23"
+- "German warships"        → platforms[*] where nationality=="DE" AND vessel_role in {frigate,destroyer,corvette,carrier,patrol}
+- "Anglo-American ASW"     → nationalities ⊇ {GB,US} AND tags ∋ "ASW"
+- "Multi-platform plots"   → platform_count >= 3
+- "Submerged operations"   → has_submarine == true
+When a user asks about a specific nationality + vessel combination, you MUST match via platforms[] — the aggregate nationalities/vessel_types fields do not preserve the join.
+
 CHIP KEYS (all optional — omit any with no value):
 - nationality: string[]   — ISO 2-letter country codes (e.g. ["GB", "US"])
-- vesselType:  string[]   — leaf node names from debrief:vessel_classes paths (e.g. "astute", "type45", "ssn", "ssk")
-- exercise:    string[]   — exercise names. Titles follow the pattern "<Exercise Name>: <Plot Name>"
-- tag:         string[]   — tag values matching debrief:tags or debrief:feature_tags
-- year:        { from: number, to: number } — year range inferred from start_datetime/end_datetime/datetime
-
-REASONING FIELDS: When matching, consider title, datetime/start_datetime/end_datetime, feature_count, feature_kinds, debrief:nationalities, debrief:vessel_classes, debrief:tags, debrief:feature_tags, and bbox (geographic filtering).
+- vesselType:  string[]   — leaf values from platforms[*].vessel_type (e.g. "astute", "type45")
+- domain:      string[]   — "surface" | "subsurface" | "air"
+- exercise:    string[]   — exercise names (first half of "<Exercise>: <Plot>")
+- tag:         string[]   — values matching tags or feature_tags
+- year:        { from: number, to: number } — year range
 
 CATALOG (${TOTAL_ITEMS} items):
 ${JSON.stringify(CATALOG_COMPACT)}
@@ -169,10 +200,39 @@ function runUnitTests() {
     !ITEMS_BY_ID['core--bulk-red-tracks']);
   assert('compact omits description',
     CATALOG_COMPACT.every(i => !('description' in i)));
-  assert('compact omits debrief:track_names',
-    CATALOG_COMPACT.every(i => !('debrief:track_names' in i)));
   assert('full retains description for most items',
     CATALOG_FULL.filter(i => i.description).length > 60);
+
+  // v2 slug shape — per-platform records
+  assert('every item has platforms array',
+    CATALOG_FULL.every(i => Array.isArray(i.platforms)));
+  assert('every item has platform_count matching platforms.length',
+    CATALOG_FULL.every(i => i.platform_count === i.platforms.length));
+  assert('every platform has nationality + vessel_class + domain',
+    CATALOG_FULL.every(i => i.platforms.every(p =>
+      p.nationality && p.vessel_class && p.domain)));
+  assert('derived nationalities matches platforms[*].nationality (set)',
+    CATALOG_FULL.every(i => {
+      const derived = new Set(i.platforms.map(p => p.nationality));
+      const stored = new Set(i.nationalities);
+      return derived.size === stored.size && [...derived].every(n => stored.has(n));
+    }));
+  assert('has_submarine matches any platform domain=="subsurface"',
+    CATALOG_FULL.every(i => i.has_submarine === i.platforms.some(p => p.domain === 'subsurface')));
+
+  // NELSON/COLLINGWOOD are known platforms (not synthetic)
+  const sample = ITEMS_BY_ID['core--sample'];
+  assert('core--sample has HMS Nelson and HMS Collingwood',
+    sample && sample.platforms.some(p => p.name === 'HMS Nelson')
+           && sample.platforms.some(p => p.name === 'HMS Collingwood'));
+  assert('core--sample platforms are not synthetic',
+    sample && sample.platforms.every(p => p.synthetic === false));
+
+  // At least some items have submarines (the whole point of the enrichment)
+  assert('at least one plot has has_submarine=true',
+    CATALOG_FULL.some(i => i.has_submarine));
+  assert('at least one plot has UK submarine (GB+subsurface join)',
+    CATALOG_FULL.some(i => i.platforms.some(p => p.nationality === 'GB' && p.domain === 'subsurface')));
 
   // extractJson
   assert('extractJson: raw passthrough',
@@ -184,33 +244,56 @@ function runUnitTests() {
   assert('extractJson: trims whitespace',
     extractJson('   {"ok":true}   ') === '{"ok":true}');
 
-  // System prompt contains catalog
+  // System prompt references the v2 shape
   const sp = buildSystemPrompt();
-  assert('system prompt contains compact catalog JSON',
-    sp.includes(JSON.stringify(CATALOG_COMPACT).slice(0, 100)));
+  assert('system prompt describes per-platform slug',
+    sp.includes('platforms: [') && sp.includes('PER-PLATFORM records'));
   assert('system prompt mentions 70 items',
     sp.includes('70 items'));
-  assert('system prompt excludes description field',
-    !sp.includes('"description":'));
+  assert('system prompt gives UK-submarine example',
+    sp.includes('UK submarines'));
 
   return results;
 }
 
 // ===== Integration tests — typical analyst phrases =====
-// Each test has a query and a "validator" that runs against the result.
-// Validators are lenient — they check for reasonable behaviour rather than
-// exact ID matches, since the LLM may interpret queries slightly differently
-// across runs.
+// Validators assert against fields on the v2 slug (platforms[], nationalities,
+// domains, vessel_types, has_submarine, etc). They're lenient about exact ID
+// lists — they verify the *shape* of the result, not a golden set.
 const TYPICAL_QUERIES = [
   {
     name: 'UK-only filter',
     query: 'Plots involving British Royal Navy ships only',
     validate: r => {
-      const hasGB = r.matched.every(item =>
-        (item['debrief:nationalities'] || []).includes('GB'));
+      const allGB = r.matched.every(item =>
+        (item.nationalities || []).length === 1 && item.nationalities[0] === 'GB');
       return {
-        pass: r.matched.length > 0 && hasGB,
-        note: `${r.matched.length} matched; all GB: ${hasGB}`,
+        pass: r.matched.length > 0 && allGB,
+        note: `${r.matched.length} matched; all strictly GB-only: ${allGB}`,
+      };
+    },
+  },
+  {
+    name: 'UK submarines (per-platform join)',
+    query: 'Plots that feature a UK submarine',
+    validate: r => {
+      const everyHasUKSub = r.matched.every(item =>
+        (item.platforms || []).some(p => p.nationality === 'GB' && p.domain === 'subsurface'));
+      return {
+        pass: r.matched.length > 0 && everyHasUKSub,
+        note: `${r.matched.length} matched; every one has a GB subsurface platform: ${everyHasUKSub}`,
+      };
+    },
+  },
+  {
+    name: 'German frigates (per-platform join)',
+    query: 'German frigates',
+    validate: r => {
+      const everyHasDEFrigate = r.matched.every(item =>
+        (item.platforms || []).some(p => p.nationality === 'DE' && p.vessel_role === 'frigate'));
+      return {
+        pass: r.matched.length > 0 && everyHasDEFrigate,
+        note: `${r.matched.length} matched; every one has a DE frigate: ${everyHasDEFrigate}`,
       };
     },
   },
@@ -219,33 +302,20 @@ const TYPICAL_QUERIES = [
     query: 'NATO anti-submarine warfare training exercises',
     validate: r => {
       const hasASWTag = r.matched.some(item => {
-        const tags = [...(item['debrief:tags'] || []), ...(item['debrief:feature_tags'] || [])];
+        const tags = [...(item.tags || []), ...(item.feature_tags || [])];
         return tags.some(t => t.toLowerCase().includes('asw') || t.toLowerCase().includes('submarine'));
       });
       return {
-        pass: r.matched.length > 0,
+        pass: r.matched.length > 0 && hasASWTag,
         note: `${r.matched.length} matched; any ASW-tagged: ${hasASWTag}`,
       };
     },
   },
   {
-    name: 'Submarine-specific',
-    query: 'plots featuring submarines',
-    validate: r => {
-      const hasSubVessel = r.matched.some(item =>
-        (item['debrief:vessel_classes'] || []).some(v => v.startsWith('subsurface/')));
-      return {
-        pass: r.matched.length > 0 && hasSubVessel,
-        note: `${r.matched.length} matched; any subsurface vessel: ${hasSubVessel}`,
-      };
-    },
-  },
-  {
-    name: 'Multi-national',
+    name: 'Multi-national ≥3 nations',
     query: 'Multi-national exercises with at least 3 different nationalities',
     validate: r => {
-      const allMulti = r.matched.every(item =>
-        (item['debrief:nationalities'] || []).length >= 3);
+      const allMulti = r.matched.every(item => (item.nationalities || []).length >= 3);
       return {
         pass: r.matched.length > 0 && allMulti,
         note: `${r.matched.length} matched; all have ≥3 nats: ${allMulti}`,
@@ -253,10 +323,22 @@ const TYPICAL_QUERIES = [
     },
   },
   {
+    name: 'Type 23 frigates',
+    query: 'plots featuring Type 23 frigates',
+    validate: r => {
+      const everyHasT23 = r.matched.every(item =>
+        (item.platforms || []).some(p => p.vessel_type === 'type23'));
+      return {
+        pass: r.matched.length > 0 && everyHasT23,
+        note: `${r.matched.length} matched; all contain a Type 23: ${everyHasT23}`,
+      };
+    },
+  },
+  {
     name: 'Vague query returns all',
     query: 'show me everything',
     validate: r => ({
-      pass: r.matched.length >= TOTAL_ITEMS - 2, // allow for small rounding
+      pass: r.matched.length >= TOTAL_ITEMS - 2,
       note: `${r.matched.length}/${TOTAL_ITEMS} returned`,
     }),
   },
@@ -264,10 +346,7 @@ const TYPICAL_QUERIES = [
     name: 'Year-range filter',
     query: 'exercises from the 1990s',
     validate: r => {
-      const in90s = r.matched.every(item => {
-        const y = parseInt((item.start_datetime || item.datetime || '').slice(0, 4), 10);
-        return y >= 1990 && y <= 1999;
-      });
+      const in90s = r.matched.every(item => item.year >= 1990 && item.year <= 1999);
       return {
         pass: r.matched.length > 0 && in90s,
         note: `${r.matched.length} matched; all in 1990s: ${in90s}`,
@@ -278,8 +357,7 @@ const TYPICAL_QUERIES = [
     name: 'Narrative content',
     query: 'plots with many narrative entries',
     validate: r => {
-      const hasNarrative = r.matched.every(item =>
-        (item.feature_kinds || {}).NARRATIVE > 0);
+      const hasNarrative = r.matched.every(item => (item.narrative_count || 0) > 0);
       return {
         pass: r.matched.length > 0 && hasNarrative,
         note: `${r.matched.length} matched; all have narratives: ${hasNarrative}`,

@@ -1021,7 +1021,14 @@
             ],
             "execution_duration": "PT0.002053S"
           }
-        ]
+        ],
+        "display_name": "USS Aquitaine",
+        "nationality": "US",
+        "vessel_class": "surface/warship/frigate/type26",
+        "vessel_type": "type26",
+        "vessel_role": "frigate",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -2044,7 +2051,14 @@
             ],
             "execution_duration": "PT0.002053S"
           }
-        ]
+        ],
+        "display_name": "FS Mahan",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/corvette/visby",
+        "vessel_type": "visby",
+        "vessel_role": "corvette",
+        "domain": "surface",
+        "synthetic": true
       }
     },
     {
@@ -3067,7 +3081,14 @@
             ],
             "execution_duration": "PT0.002053S"
           }
-        ]
+        ],
+        "display_name": "HMS Hamburg",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer",
+        "domain": "surface",
+        "synthetic": true
       }
     }
   ]
