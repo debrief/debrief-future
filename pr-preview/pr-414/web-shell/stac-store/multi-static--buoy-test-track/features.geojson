@@ -4087,8 +4087,7 @@
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     },
     {
@@ -4167,8 +4166,7 @@
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {
@@ -4247,8 +4245,7 @@
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {
@@ -4327,8 +4324,7 @@
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {

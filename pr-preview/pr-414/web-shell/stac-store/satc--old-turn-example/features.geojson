@@ -5666,8 +5666,7 @@
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     },
     {
@@ -5956,8 +5955,7 @@
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     }
   ]

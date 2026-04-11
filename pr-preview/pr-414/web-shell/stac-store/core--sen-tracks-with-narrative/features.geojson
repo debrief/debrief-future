@@ -1697,8 +1697,7 @@
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     },
     {
@@ -3629,8 +3628,7 @@
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {

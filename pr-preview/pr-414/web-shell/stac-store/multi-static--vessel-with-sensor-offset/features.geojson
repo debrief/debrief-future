@@ -3667,8 +3667,7 @@
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     },
     {
@@ -12081,8 +12080,7 @@
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     }
   ]

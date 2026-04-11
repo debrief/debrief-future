@@ -4077,8 +4077,7 @@
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     }
   ]
