@@ -1,0 +1,329 @@
+/* STAC Catalog NL Filter — Discovery PoC */
+
+:root {
+  --bg: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --error: #dc2626;
+
+  /* Chip colours */
+  --chip-nationality-bg: #dbeafe;
+  --chip-nationality-fg: #1e40af;
+  --chip-vessel-bg: #d1fae5;
+  --chip-vessel-fg: #065f46;
+  --chip-exercise-bg: #ede9fe;
+  --chip-exercise-fg: #5b21b6;
+  --chip-tag-bg: #fef3c7;
+  --chip-tag-fg: #92400e;
+  --chip-year-bg: #fee2e2;
+  --chip-year-fg: #991b1b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#root {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ===== Header ===== */
+.header {
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.header .subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ===== API key bar ===== */
+.api-key-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.api-key-bar label {
+  font-weight: 500;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+.api-key-bar input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #fde68a;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: white;
+}
+
+.api-key-bar.saved {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.api-key-bar.saved label {
+  color: #166534;
+}
+
+/* ===== Query bar ===== */
+.query-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.query-bar input[type="text"] {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: white;
+  color: var(--text);
+}
+
+.query-bar input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.query-bar button {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.query-bar button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.query-bar button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ===== Recent searches ===== */
+.recent-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.recent-bar select {
+  flex: 1;
+  max-width: 420px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  color: var(--text);
+  font-size: 12px;
+}
+
+/* ===== Status line ===== */
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  min-height: 20px;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-line.error {
+  color: var(--error);
+}
+
+/* ===== Filter chips ===== */
+.chips-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chip-nationality { background: var(--chip-nationality-bg); color: var(--chip-nationality-fg); }
+.chip-vesselType  { background: var(--chip-vessel-bg);      color: var(--chip-vessel-fg); }
+.chip-exercise    { background: var(--chip-exercise-bg);    color: var(--chip-exercise-fg); }
+.chip-tag         { background: var(--chip-tag-bg);         color: var(--chip-tag-fg); }
+.chip-year        { background: var(--chip-year-bg);        color: var(--chip-year-fg); }
+
+.chip-label {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-right: 2px;
+}
+
+.clear-all {
+  margin-left: 8px;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.clear-all:hover {
+  background: var(--border);
+}
+
+/* ===== Results count ===== */
+.results-count {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ===== Card grid ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.card-year {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-nationality { background: var(--chip-nationality-bg); color: var(--chip-nationality-fg); }
+.badge-vessel      { background: var(--chip-vessel-bg);      color: var(--chip-vessel-fg); }
+.badge-tag         { background: var(--chip-tag-bg);         color: var(--chip-tag-fg); }
+
+/* ===== Empty state ===== */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .icon {
+  font-size: 40px;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+
+.empty-state .hint {
+  font-size: 13px;
+  margin-top: 8px;
+}
