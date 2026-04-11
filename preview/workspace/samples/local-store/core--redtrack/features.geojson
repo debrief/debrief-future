@@ -1507,8 +1507,7 @@
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     }
   ]

@@ -25,90 +25,28 @@ import vm from 'node:vm';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CATALOG_JS_PATH = path.join(__dirname, 'catalog-data.js');
+const LIB_JS_PATH = path.join(__dirname, 'lib.js');
 const ISOLATED_CWD = '/tmp/claude-isolated-nl-filter';
 
-// ===== Load catalog-data.js into a sandboxed window shim =====
-function loadCatalogs() {
-  const src = readFileSync(CATALOG_JS_PATH, 'utf8');
+// ===== Load catalog-data.js + lib.js into a single sandboxed window shim =====
+// This is the Node equivalent of the browser loading both <script> tags.
+// Result: one vm context with window.CATALOG_FULL, window.CATALOG_COMPACT,
+// and window.NLFilterLib all available.
+function loadSandbox() {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  vm.runInContext(src, sandbox);
-  return {
-    full: sandbox.window.CATALOG_FULL,
-    compact: sandbox.window.CATALOG_COMPACT,
-  };
+  vm.runInContext(readFileSync(CATALOG_JS_PATH, 'utf8'), sandbox);
+  vm.runInContext(readFileSync(LIB_JS_PATH, 'utf8'), sandbox);
+  return sandbox.window;
 }
 
-const { full: CATALOG_FULL, compact: CATALOG_COMPACT } = loadCatalogs();
+const SANDBOX = loadSandbox();
+const CATALOG_FULL = SANDBOX.CATALOG_FULL;
+const CATALOG_COMPACT = SANDBOX.CATALOG_COMPACT;
+const { buildSystemPrompt, extractJson } = SANDBOX.NLFilterLib;
+
 const ITEMS_BY_ID = Object.fromEntries(CATALOG_FULL.map(i => [i.id, i]));
 const TOTAL_ITEMS = CATALOG_FULL.length;
-
-// ===== Prompt builder — duplicated from app.jsx (keep in sync) =====
-function buildSystemPrompt() {
-  return `You are a search assistant for a STAC catalog of maritime exercise plots.
-
-Given a user's natural-language query, identify which plots in the catalog match the query, and return a JSON object describing what you understood.
-
-RULES:
-1. Respond with RAW JSON only — no markdown code fences, no explanatory text, no preamble.
-2. The JSON must have two top-level keys:
-   - "chips": an object summarising what filters you extracted (all sub-keys optional)
-   - "ids":   an array of matching plot ID strings from the catalog
-3. If the query is too vague to filter on, return ALL catalog IDs with an empty "chips" object.
-4. Only return IDs that appear in the catalog below.
-
-SLUG SHAPE — each catalog item has this structure:
-{
-  id, title, exercise, plot_name,
-  bbox, start_datetime, end_datetime, year, duration_hours,
-  feature_kinds: { TRACK, NARRATIVE, ... },
-  platform_count, narrative_count,
-  platforms: [                              // PER-PLATFORM records — use these for joined queries
-    {
-      id,                                   // raw platform_id
-      name,                                 // display name (e.g. "HMS Nelson")
-      nationality,                          // ISO 2-letter code
-      vessel_class,                         // full path e.g. "surface/warship/frigate/type23"
-      vessel_type,                          // leaf, e.g. "type23"
-      vessel_role,                          // role, e.g. "frigate" | "destroyer" | "submarine"
-      domain,                               // "surface" | "subsurface" | "air"
-      synthetic                             // true = metadata was fabricated (not authoritative)
-    }
-  ],
-  nationalities, domains, vessel_types,     // derived aggregates across platforms[]
-  has_submarine, has_warship,               // derived booleans
-  tags, feature_tags
-}
-
-KEY REASONING PATTERNS:
-- "UK submarines"          → platforms[*] where nationality=="GB" AND domain=="subsurface"
-- "Type 23 frigates"       → platforms[*].vessel_type=="type23"
-- "German warships"        → platforms[*] where nationality=="DE" AND vessel_role in {frigate,destroyer,corvette,carrier,patrol}
-- "Anglo-American ASW"     → nationalities ⊇ {GB,US} AND tags ∋ "ASW"
-- "Multi-platform plots"   → platform_count >= 3
-- "Submerged operations"   → has_submarine == true
-When a user asks about a specific nationality + vessel combination, you MUST match via platforms[] — the aggregate nationalities/vessel_types fields do not preserve the join.
-
-CHIP KEYS (all optional — omit any with no value):
-- nationality: string[]   — ISO 2-letter country codes (e.g. ["GB", "US"])
-- vesselType:  string[]   — leaf values from platforms[*].vessel_type (e.g. "astute", "type45")
-- domain:      string[]   — "surface" | "subsurface" | "air"
-- exercise:    string[]   — exercise names (first half of "<Exercise>: <Plot>")
-- tag:         string[]   — values matching tags or feature_tags
-- year:        { from: number, to: number } — year range
-
-CATALOG (${TOTAL_ITEMS} items):
-${JSON.stringify(CATALOG_COMPACT)}
-
-Return ONLY the JSON object.`;
-}
-
-// ===== JSON extraction (tolerates accidental markdown fences) =====
-function extractJson(text) {
-  const trimmed = (text || '').trim();
-  const fenceMatch = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
-  return fenceMatch ? fenceMatch[1].trim() : trimmed;
-}
 
 // ===== Spawn `claude -p` and capture its result =====
 function runClaudeQuery(query, { timeoutMs = 120000 } = {}) {
@@ -119,7 +57,7 @@ function runClaudeQuery(query, { timeoutMs = 120000 } = {}) {
       '-p',
       '--output-format', 'json',
       '--model', 'sonnet',
-      '--system-prompt', buildSystemPrompt(),
+      '--system-prompt', buildSystemPrompt(CATALOG_COMPACT, TOTAL_ITEMS),
     ];
 
     const child = spawn('claude', args, {
@@ -220,13 +158,13 @@ function runUnitTests() {
   assert('has_submarine matches any platform domain=="subsurface"',
     CATALOG_FULL.every(i => i.has_submarine === i.platforms.some(p => p.domain === 'subsurface')));
 
-  // NELSON/COLLINGWOOD are known platforms (not synthetic)
+  // NELSON/COLLINGWOOD resolve to their authoritative display names
   const sample = ITEMS_BY_ID['core--sample'];
   assert('core--sample has HMS Nelson and HMS Collingwood',
     sample && sample.platforms.some(p => p.name === 'HMS Nelson')
            && sample.platforms.some(p => p.name === 'HMS Collingwood'));
-  assert('core--sample platforms are not synthetic',
-    sample && sample.platforms.every(p => p.synthetic === false));
+  assert('no platform carries a synthetic marker',
+    CATALOG_FULL.every(i => i.platforms.every(p => !('synthetic' in p))));
 
   // At least some items have submarines (the whole point of the enrichment)
   assert('at least one plot has has_submarine=true',
@@ -245,13 +183,15 @@ function runUnitTests() {
     extractJson('   {"ok":true}   ') === '{"ok":true}');
 
   // System prompt references the v2 shape
-  const sp = buildSystemPrompt();
+  const sp = buildSystemPrompt(CATALOG_COMPACT, TOTAL_ITEMS);
   assert('system prompt describes per-platform slug',
     sp.includes('platforms: [') && sp.includes('PER-PLATFORM records'));
   assert('system prompt mentions 70 items',
     sp.includes('70 items'));
   assert('system prompt gives UK-submarine example',
     sp.includes('UK submarines'));
+  assert('system prompt does not mention synthetic flag',
+    !sp.includes('synthetic'));
 
   return results;
 }
@@ -408,7 +348,7 @@ async function main() {
 
   console.log('=== STAC NL Filter — Headless Test Harness ===');
   console.log(`Catalog: ${CATALOG_FULL.length} items (full) / ${CATALOG_COMPACT.length} items (compact)`);
-  console.log(`System prompt size: ${(buildSystemPrompt().length / 1024).toFixed(1)} KB`);
+  console.log(`System prompt size: ${(buildSystemPrompt(CATALOG_COMPACT, TOTAL_ITEMS).length / 1024).toFixed(1)} KB`);
 
   // Unit tests always run
   console.log('\n--- Unit tests ---');

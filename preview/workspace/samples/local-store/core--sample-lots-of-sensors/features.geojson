@@ -70694,8 +70694,7 @@
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {
@@ -74799,8 +74798,7 @@
         "vessel_class": "surface/warship/carrier/queen-elizabeth",
         "vessel_type": "queen-elizabeth",
         "vessel_role": "carrier",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     },
     {

@@ -5857,8 +5857,7 @@
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     }
   ]

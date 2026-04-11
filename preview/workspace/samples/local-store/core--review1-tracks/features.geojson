@@ -1697,8 +1697,7 @@
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     },
     {
@@ -3397,8 +3396,7 @@
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     }
   ]

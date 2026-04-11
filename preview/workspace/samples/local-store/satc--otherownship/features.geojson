@@ -208637,8 +208637,7 @@
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     }
   ]

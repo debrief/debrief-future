@@ -4,14 +4,13 @@ Two-phase build for the enriched STAC search slug.
 
 Phase 1 — Enrich features.geojson in place:
   For every TRACK feature across all 70 plots, populate these new properties:
-    display_name, nationality, vessel_class, vessel_type, vessel_role, domain, synthetic
+    display_name, nationality, vessel_class, vessel_type, vessel_role, domain
 
   Known platform_ids are looked up in PLATFORM_VESSEL_MAP (imported from
   scripts/enrich-legacy-catalog.py — the existing registry). Unknown platforms
   are assigned deterministically by zipping the remainder of each item's
   aggregate debrief:track_names / debrief:vessel_classes lists alphabetically
-  against the item's unknown-track platform_ids. Unknown platforms get
-  synthetic=true so the LLM knows their metadata was fabricated.
+  against the item's unknown-track platform_ids.
 
 Phase 2 — Rebuild catalog-data.js from enriched features:
   Walks the (now enriched) features.geojson + item.json for each plot and
@@ -114,7 +113,6 @@ def assign_platforms(track_features: list[dict], item_props: dict) -> dict[int, 
                 "display_name": name,
                 "nationality": nat,
                 "vessel_class": cls,
-                "synthetic": False,
             }
             used_names.add(name)
             used_classes.add(cls)
@@ -144,17 +142,16 @@ def assign_platforms(track_features: list[dict], item_props: dict) -> dict[int, 
             "display_name": name,
             "nationality": nat,
             "vessel_class": cls,
-            "synthetic": True,
         }
 
     return assignments
 
 
-def enrich_features(plot_dir: Path, item_props: dict, dry: bool) -> tuple[int, int]:
-    """Enrich features.geojson in place. Returns (tracks, unknown_count)."""
+def enrich_features(plot_dir: Path, item_props: dict, dry: bool) -> int:
+    """Enrich features.geojson in place. Returns the number of tracks enriched."""
     fg_path = plot_dir / "features.geojson"
     if not fg_path.exists():
-        return 0, 0
+        return 0
 
     fc = json.loads(fg_path.read_text())
     features = fc.get("features") or []
@@ -162,10 +159,9 @@ def enrich_features(plot_dir: Path, item_props: dict, dry: bool) -> tuple[int, i
     track_indices = [i for i, f in enumerate(features) if (f.get("properties") or {}).get("kind") == "TRACK"]
     track_features = [features[i] for i in track_indices]
     if not track_features:
-        return 0, 0
+        return 0
 
     assignments = assign_platforms(track_features, item_props)
-    unknown_count = sum(1 for a in assignments.values() if a.get("synthetic"))
 
     for local_idx, global_idx in enumerate(track_indices):
         meta = assignments[local_idx]
@@ -178,7 +174,8 @@ def enrich_features(plot_dir: Path, item_props: dict, dry: bool) -> tuple[int, i
         props["vessel_type"]   = vessel_type
         props["vessel_role"]   = vessel_role
         props["domain"]        = domain
-        props["synthetic"]     = meta["synthetic"]
+        # Drop any leftover synthetic flag from previous runs
+        props.pop("synthetic", None)
         feat["properties"] = props
         features[global_idx] = feat
 
@@ -186,7 +183,7 @@ def enrich_features(plot_dir: Path, item_props: dict, dry: bool) -> tuple[int, i
     if not dry:
         fg_path.write_text(json.dumps(fc, indent=2) + "\n")
 
-    return len(track_features), unknown_count
+    return len(track_features)
 
 
 # ---------------------------------------------------------------------------
@@ -218,7 +215,6 @@ def build_slug(item: dict, fc: dict) -> dict:
             "domain": props.get("domain"),
             "max_depth_m": round(max_depth, 1),
             "track_duration_hours": track_duration,
-            "synthetic": props.get("synthetic", False),
         })
 
     # Derived aggregates
@@ -309,15 +305,9 @@ def main() -> int:
 
     # Phase 1 — enrich features.geojson
     total_tracks = 0
-    total_unknown = 0
     for plot_id, plot_dir, item in plot_dirs:
-        n_tracks, n_unknown = enrich_features(plot_dir, item.get("properties") or {}, dry)
-        total_tracks += n_tracks
-        total_unknown += n_unknown
-
-    known = total_tracks - total_unknown
-    pct = (known / total_tracks * 100) if total_tracks else 0
-    print(f"Phase 1: enriched {total_tracks} tracks ({known} known, {total_unknown} synthetic = {pct:.1f}% authoritative)")
+        total_tracks += enrich_features(plot_dir, item.get("properties") or {}, dry)
+    print(f"Phase 1: enriched {total_tracks} tracks across {len(plot_dirs)} plots")
 
     # Phase 2 — rebuild catalog-data.js
     full_items = []

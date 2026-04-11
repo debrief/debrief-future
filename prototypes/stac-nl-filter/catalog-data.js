@@ -35,8 +35,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 6.0,
-        "track_duration_hours": 8.0,
-        "synthetic": true
+        "track_duration_hours": 8.0
       },
       {
         "id": "HVU",
@@ -47,8 +46,7 @@ window.CATALOG_FULL = [
         "vessel_role": "corvette",
         "domain": "surface",
         "max_depth_m": 6.0,
-        "track_duration_hours": 8.0,
-        "synthetic": true
+        "track_duration_hours": 8.0
       },
       {
         "id": "T23_A",
@@ -59,8 +57,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 6.0,
-        "track_duration_hours": 8.0,
-        "synthetic": true
+        "track_duration_hours": 8.0
       }
     ],
     "nationalities": [
@@ -157,8 +154,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -213,8 +209,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -267,8 +262,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       },
       {
         "id": "New_SSK",
@@ -279,8 +273,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 40.0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       }
     ],
     "nationalities": [
@@ -339,8 +332,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": false
+        "track_duration_hours": 1.0
       }
     ],
     "nationalities": [
@@ -395,8 +387,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": false
+        "track_duration_hours": 1.0
       }
     ],
     "nationalities": [
@@ -453,8 +444,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       },
       {
         "id": "COLLINGWOOD",
@@ -465,8 +455,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -523,8 +512,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 18.8,
-        "track_duration_hours": 1.17,
-        "synthetic": true
+        "track_duration_hours": 1.17
       }
     ],
     "nationalities": [
@@ -581,8 +569,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": true
+        "track_duration_hours": 1.0
       },
       {
         "id": "SENSOR_1",
@@ -593,8 +580,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": true
+        "track_duration_hours": 1.0
       },
       {
         "id": "SUBJECT",
@@ -605,8 +591,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": false
+        "track_duration_hours": 1.0
       }
     ],
     "nationalities": [
@@ -667,8 +652,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.31,
-        "synthetic": false
+        "track_duration_hours": 0.31
       },
       {
         "id": "SUBJECT",
@@ -679,8 +663,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.31,
-        "synthetic": false
+        "track_duration_hours": 0.31
       }
     ],
     "nationalities": [
@@ -733,8 +716,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       },
       {
         "id": "SENSOR",
@@ -745,8 +727,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       }
     ],
     "nationalities": [
@@ -807,8 +788,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       },
       {
         "id": "B11",
@@ -819,8 +799,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "B12",
@@ -831,8 +810,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "B13",
@@ -843,8 +821,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       }
     ],
     "nationalities": [
@@ -908,8 +885,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.75,
-        "synthetic": true
+        "track_duration_hours": 0.75
       },
       {
         "id": "RX_1",
@@ -920,8 +896,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.75,
-        "synthetic": true
+        "track_duration_hours": 0.75
       },
       {
         "id": "Contact",
@@ -932,8 +907,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.75,
-        "synthetic": true
+        "track_duration_hours": 0.75
       },
       {
         "id": "RX_2",
@@ -944,8 +918,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.75,
-        "synthetic": true
+        "track_duration_hours": 0.75
       },
       {
         "id": "RX_3",
@@ -956,8 +929,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.75,
-        "synthetic": true
+        "track_duration_hours": 0.75
       }
     ],
     "nationalities": [
@@ -1023,8 +995,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 86.3,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       }
     ],
     "nationalities": [
@@ -1080,8 +1051,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       }
     ],
     "nationalities": [
@@ -1137,8 +1107,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 84.2,
-        "track_duration_hours": 1.89,
-        "synthetic": true
+        "track_duration_hours": 1.89
       },
       {
         "id": "SUBJECT",
@@ -1149,8 +1118,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.49,
-        "synthetic": false
+        "track_duration_hours": 1.49
       }
     ],
     "nationalities": [
@@ -1212,8 +1180,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.38,
-        "synthetic": false
+        "track_duration_hours": 0.38
       },
       {
         "id": "NELSON",
@@ -1224,8 +1191,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.43,
-        "synthetic": false
+        "track_duration_hours": 0.43
       }
     ],
     "nationalities": [
@@ -1277,8 +1243,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 3.77,
-        "synthetic": false
+        "track_duration_hours": 3.77
       },
       {
         "id": "SENSOR",
@@ -1289,8 +1254,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 3.77,
-        "synthetic": false
+        "track_duration_hours": 3.77
       }
     ],
     "nationalities": [
@@ -1347,8 +1311,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 3.77,
-        "synthetic": false
+        "track_duration_hours": 3.77
       }
     ],
     "nationalities": [
@@ -1404,8 +1367,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       }
     ],
     "nationalities": [
@@ -1462,8 +1424,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1517,8 +1478,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1572,8 +1532,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1630,8 +1589,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1687,8 +1645,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 31.9,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1742,8 +1699,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -1799,8 +1755,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.12,
-        "synthetic": true
+        "track_duration_hours": 0.12
       }
     ],
     "nationalities": [
@@ -1855,8 +1810,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 18.8,
-        "track_duration_hours": 1.17,
-        "synthetic": true
+        "track_duration_hours": 1.17
       },
       {
         "id": "MAYO",
@@ -1867,8 +1821,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 19.3,
-        "track_duration_hours": 1.17,
-        "synthetic": true
+        "track_duration_hours": 1.17
       }
     ],
     "nationalities": [
@@ -1924,8 +1877,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 18.3,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       }
     ],
     "nationalities": [
@@ -1980,8 +1932,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       }
     ],
     "nationalities": [
@@ -2034,8 +1985,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.0,
-        "synthetic": false
+        "track_duration_hours": 2.0
       }
     ],
     "nationalities": [
@@ -2091,8 +2041,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.5,
-        "synthetic": false
+        "track_duration_hours": 1.5
       },
       {
         "id": "SUBJECT",
@@ -2103,8 +2052,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.5,
-        "synthetic": false
+        "track_duration_hours": 1.5
       }
     ],
     "nationalities": [
@@ -2164,8 +2112,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.9,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -2221,8 +2168,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 32.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -2276,8 +2222,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.3,
-        "synthetic": true
+        "track_duration_hours": 1.3
       }
     ],
     "nationalities": [
@@ -2332,8 +2277,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -2388,8 +2332,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 60.9,
-        "track_duration_hours": 3.42,
-        "synthetic": false
+        "track_duration_hours": 3.42
       }
     ],
     "nationalities": [
@@ -2445,8 +2388,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": false
+        "track_duration_hours": 1.0
       }
     ],
     "nationalities": [
@@ -2504,8 +2446,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 7.62,
-        "synthetic": true
+        "track_duration_hours": 7.62
       }
     ],
     "nationalities": [
@@ -2560,8 +2501,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 46.35,
-        "synthetic": true
+        "track_duration_hours": 46.35
       }
     ],
     "nationalities": [
@@ -2617,8 +2557,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 31.0,
-        "track_duration_hours": 1.83,
-        "synthetic": true
+        "track_duration_hours": 1.83
       }
     ],
     "nationalities": [
@@ -2673,8 +2612,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.28,
-        "synthetic": false
+        "track_duration_hours": 0.28
       }
     ],
     "nationalities": [
@@ -2730,8 +2668,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.28,
-        "synthetic": false
+        "track_duration_hours": 0.28
       }
     ],
     "nationalities": [
@@ -2789,8 +2726,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 87.8,
-        "track_duration_hours": 46.35,
-        "synthetic": true
+        "track_duration_hours": 46.35
       }
     ],
     "nationalities": [
@@ -2846,8 +2782,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 87.2,
-        "track_duration_hours": 6.66,
-        "synthetic": true
+        "track_duration_hours": 6.66
       }
     ],
     "nationalities": [
@@ -2904,8 +2839,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.0,
-        "synthetic": false
+        "track_duration_hours": 1.0
       }
     ],
     "nationalities": [
@@ -2962,8 +2896,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 4.0,
-        "synthetic": true
+        "track_duration_hours": 4.0
       }
     ],
     "nationalities": [
@@ -3018,8 +2951,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 19.3,
-        "track_duration_hours": 1.17,
-        "synthetic": true
+        "track_duration_hours": 1.17
       },
       {
         "id": "T-second attempt",
@@ -3030,8 +2962,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.37,
-        "synthetic": true
+        "track_duration_hours": 0.37
       }
     ],
     "nationalities": [
@@ -3089,8 +3020,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 93.3,
-        "track_duration_hours": 7.62,
-        "synthetic": false
+        "track_duration_hours": 7.62
       }
     ],
     "nationalities": [
@@ -3147,8 +3077,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 93.3,
-        "track_duration_hours": 4.03,
-        "synthetic": false
+        "track_duration_hours": 4.03
       }
     ],
     "nationalities": [
@@ -3205,8 +3134,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 50.8,
-        "track_duration_hours": 7.62,
-        "synthetic": true
+        "track_duration_hours": 7.62
       }
     ],
     "nationalities": [
@@ -3262,8 +3190,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 19661.1,
-        "track_duration_hours": 4.03,
-        "synthetic": true
+        "track_duration_hours": 4.03
       }
     ],
     "nationalities": [
@@ -3318,8 +3245,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssk",
         "domain": "subsurface",
         "max_depth_m": 4.6,
-        "track_duration_hours": 7.62,
-        "synthetic": true
+        "track_duration_hours": 7.62
       }
     ],
     "nationalities": [
@@ -3376,8 +3302,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -3432,8 +3357,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -3489,8 +3413,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -3547,8 +3470,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 5.0,
-        "synthetic": false
+        "track_duration_hours": 5.0
       }
     ],
     "nationalities": [
@@ -3605,8 +3527,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_012",
@@ -3617,8 +3538,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_023",
@@ -3629,8 +3549,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 64.67,
-        "synthetic": true
+        "track_duration_hours": 64.67
       },
       {
         "id": "FisherOne_010",
@@ -3641,8 +3560,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 47.67,
-        "synthetic": true
+        "track_duration_hours": 47.67
       },
       {
         "id": "FisherOne_014",
@@ -3653,8 +3571,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_018",
@@ -3665,8 +3582,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 49.5,
-        "synthetic": true
+        "track_duration_hours": 49.5
       },
       {
         "id": "FisherOne_005",
@@ -3677,8 +3593,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_017",
@@ -3689,8 +3604,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_024",
@@ -3701,8 +3615,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_016",
@@ -3713,8 +3626,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_007",
@@ -3725,8 +3637,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_004",
@@ -3737,8 +3648,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 38.83,
-        "synthetic": true
+        "track_duration_hours": 38.83
       },
       {
         "id": "FisherOne_011",
@@ -3749,8 +3659,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_022",
@@ -3761,8 +3670,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 47.83,
-        "synthetic": true
+        "track_duration_hours": 47.83
       },
       {
         "id": "FisherOne_008",
@@ -3773,8 +3681,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_021",
@@ -3785,8 +3692,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_020",
@@ -3797,8 +3703,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 67.17,
-        "synthetic": true
+        "track_duration_hours": 67.17
       },
       {
         "id": "FisherOne_002",
@@ -3809,8 +3714,7 @@ window.CATALOG_FULL = [
         "vessel_role": "carrier",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 1.33,
-        "synthetic": true
+        "track_duration_hours": 1.33
       },
       {
         "id": "FisherOne_009",
@@ -3821,8 +3725,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_003",
@@ -3833,8 +3736,7 @@ window.CATALOG_FULL = [
         "vessel_role": "corvette",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 5.83,
-        "synthetic": true
+        "track_duration_hours": 5.83
       },
       {
         "id": "FisherOne_015",
@@ -3845,8 +3747,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_013",
@@ -3857,8 +3758,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "FisherOne_019",
@@ -3869,8 +3769,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 67.83,
-        "synthetic": true
+        "track_duration_hours": 67.83
       },
       {
         "id": "FisherOne_006",
@@ -3881,8 +3780,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 64.83,
-        "synthetic": true
+        "track_duration_hours": 64.83
       },
       {
         "id": "FisherOne_315_single",
@@ -3893,8 +3791,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "FisherOne_410_Single",
@@ -3905,8 +3802,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "FisherOne_516_single",
@@ -3917,8 +3813,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "FisherOne_610_Single",
@@ -3929,8 +3824,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "FisherOne_622_Single",
@@ -3941,8 +3835,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.0,
-        "synthetic": true
+        "track_duration_hours": 0.0
       },
       {
         "id": "RadarOne_010",
@@ -3953,8 +3846,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_008",
@@ -3965,8 +3857,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_007",
@@ -3977,8 +3868,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_009",
@@ -3989,8 +3879,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_002",
@@ -4001,8 +3890,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_006",
@@ -4013,8 +3901,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_003",
@@ -4025,8 +3912,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_001",
@@ -4037,8 +3923,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_004",
@@ -4049,8 +3934,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       },
       {
         "id": "RadarOne_005",
@@ -4061,8 +3945,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 72.0,
-        "synthetic": true
+        "track_duration_hours": 72.0
       }
     ],
     "nationalities": [
@@ -4130,8 +4013,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.25,
-        "synthetic": false
+        "track_duration_hours": 0.25
       }
     ],
     "nationalities": [
@@ -4184,8 +4066,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.03,
-        "synthetic": false
+        "track_duration_hours": 0.03
       }
     ],
     "nationalities": [
@@ -4239,8 +4120,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       },
       {
         "id": "COLLINGWOOD",
@@ -4251,8 +4131,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -4312,8 +4191,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": true
+        "track_duration_hours": 6.68
       },
       {
         "id": "ALLIANCE",
@@ -4324,8 +4202,7 @@ window.CATALOG_FULL = [
         "vessel_role": "carrier",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": true
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -4386,8 +4263,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       },
       {
         "id": "COLLINGWOOD",
@@ -4398,8 +4274,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.7,
-        "synthetic": false
+        "track_duration_hours": 6.7
       }
     ],
     "nationalities": [
@@ -4457,8 +4332,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       },
       {
         "id": "New_SSK",
@@ -4469,8 +4343,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 40.0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       }
     ],
     "nationalities": [
@@ -4531,8 +4404,7 @@ window.CATALOG_FULL = [
         "vessel_role": "ssn",
         "domain": "subsurface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       },
       {
         "id": "New_SSK",
@@ -4543,8 +4415,7 @@ window.CATALOG_FULL = [
         "vessel_role": "patrol",
         "domain": "surface",
         "max_depth_m": 40.0,
-        "track_duration_hours": 2.72,
-        "synthetic": true
+        "track_duration_hours": 2.72
       }
     ],
     "nationalities": [
@@ -4608,8 +4479,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -4665,8 +4535,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": false
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -4721,8 +4590,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.15,
-        "synthetic": true
+        "track_duration_hours": 0.15
       },
       {
         "id": "PreFrigate2",
@@ -4733,8 +4601,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 0.12,
-        "synthetic": true
+        "track_duration_hours": 0.12
       },
       {
         "id": "Frigate",
@@ -4745,8 +4612,7 @@ window.CATALOG_FULL = [
         "vessel_role": "destroyer",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 2.42,
-        "synthetic": true
+        "track_duration_hours": 2.42
       }
     ],
     "nationalities": [
@@ -4808,8 +4674,7 @@ window.CATALOG_FULL = [
         "vessel_role": "frigate",
         "domain": "surface",
         "max_depth_m": 0,
-        "track_duration_hours": 6.68,
-        "synthetic": true
+        "track_duration_hours": 6.68
       }
     ],
     "nationalities": [
@@ -4863,8 +4728,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "HVU",
@@ -4873,8 +4737,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/corvette/visby",
         "vessel_type": "visby",
         "vessel_role": "corvette",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "T23_A",
@@ -4883,8 +4746,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -4977,8 +4839,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5030,8 +4891,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5081,8 +4941,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "New_SSK",
@@ -5091,8 +4950,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5148,8 +5006,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5201,8 +5058,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5256,8 +5112,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "COLLINGWOOD",
@@ -5266,8 +5121,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5321,8 +5175,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5376,8 +5229,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "SENSOR_1",
@@ -5386,8 +5238,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "SUBJECT",
@@ -5396,8 +5247,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5455,8 +5305,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "SUBJECT",
@@ -5465,8 +5314,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5516,8 +5364,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       },
       {
         "id": "SENSOR",
@@ -5526,8 +5373,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5585,8 +5431,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "B11",
@@ -5595,8 +5440,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "B12",
@@ -5605,8 +5449,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "B13",
@@ -5615,8 +5458,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5677,8 +5519,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RX_1",
@@ -5687,8 +5528,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "Contact",
@@ -5697,8 +5537,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RX_2",
@@ -5707,8 +5546,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RX_3",
@@ -5717,8 +5555,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5781,8 +5618,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -5835,8 +5671,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5889,8 +5724,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "SUBJECT",
@@ -5899,8 +5733,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -5959,8 +5792,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "NELSON",
@@ -5969,8 +5801,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -6019,8 +5850,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       },
       {
         "id": "SENSOR",
@@ -6029,8 +5859,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -6084,8 +5913,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -6138,8 +5966,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6193,8 +6020,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6245,8 +6071,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6297,8 +6122,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6352,8 +6176,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6406,8 +6229,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6458,8 +6280,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6512,8 +6333,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6565,8 +6385,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "MAYO",
@@ -6575,8 +6394,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6629,8 +6447,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6682,8 +6499,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -6733,8 +6549,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6787,8 +6602,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "SUBJECT",
@@ -6797,8 +6611,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6855,8 +6668,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6909,8 +6721,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -6961,8 +6772,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7014,8 +6824,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7067,8 +6876,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -7121,8 +6929,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -7177,8 +6984,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7230,8 +7036,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7284,8 +7089,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7337,8 +7141,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -7391,8 +7194,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7447,8 +7249,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/virginia",
         "vessel_type": "virginia",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7501,8 +7302,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7556,8 +7356,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/astute",
         "vessel_type": "astute",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": false
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7611,8 +7410,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7664,8 +7462,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "T-second attempt",
@@ -7674,8 +7471,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7730,8 +7526,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -7785,8 +7580,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -7840,8 +7634,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/gotland",
         "vessel_type": "gotland",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7894,8 +7687,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -7947,8 +7739,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssk/type212",
         "vessel_type": "type212",
         "vessel_role": "ssk",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       }
     ],
     "nationalities": [
@@ -8002,8 +7793,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8055,8 +7845,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8109,8 +7898,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8164,8 +7952,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8219,8 +8006,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_012",
@@ -8229,8 +8015,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_023",
@@ -8239,8 +8024,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_010",
@@ -8249,8 +8033,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_014",
@@ -8259,8 +8042,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_018",
@@ -8269,8 +8051,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_005",
@@ -8279,8 +8060,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_017",
@@ -8289,8 +8069,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_024",
@@ -8299,8 +8078,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_016",
@@ -8309,8 +8087,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_007",
@@ -8319,8 +8096,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_004",
@@ -8329,8 +8105,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_011",
@@ -8339,8 +8114,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_022",
@@ -8349,8 +8123,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_008",
@@ -8359,8 +8132,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_021",
@@ -8369,8 +8141,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_020",
@@ -8379,8 +8150,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_002",
@@ -8389,8 +8159,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/carrier/queen-elizabeth",
         "vessel_type": "queen-elizabeth",
         "vessel_role": "carrier",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_009",
@@ -8399,8 +8168,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_003",
@@ -8409,8 +8177,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/corvette/visby",
         "vessel_type": "visby",
         "vessel_role": "corvette",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_015",
@@ -8419,8 +8186,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_013",
@@ -8429,8 +8195,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_019",
@@ -8439,8 +8204,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_006",
@@ -8449,8 +8213,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/fremm",
         "vessel_type": "fremm",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_315_single",
@@ -8459,8 +8222,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_410_Single",
@@ -8469,8 +8231,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_516_single",
@@ -8479,8 +8240,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_610_Single",
@@ -8489,8 +8249,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "FisherOne_622_Single",
@@ -8499,8 +8258,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_010",
@@ -8509,8 +8267,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_008",
@@ -8519,8 +8276,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_007",
@@ -8529,8 +8285,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_009",
@@ -8539,8 +8294,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_002",
@@ -8549,8 +8303,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_006",
@@ -8559,8 +8312,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_003",
@@ -8569,8 +8321,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_001",
@@ -8579,8 +8330,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_004",
@@ -8589,8 +8339,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "RadarOne_005",
@@ -8599,8 +8348,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8665,8 +8413,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8716,8 +8463,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8768,8 +8514,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "COLLINGWOOD",
@@ -8778,8 +8523,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8836,8 +8580,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "ALLIANCE",
@@ -8846,8 +8589,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/carrier/queen-elizabeth",
         "vessel_type": "queen-elizabeth",
         "vessel_role": "carrier",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8905,8 +8647,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       },
       {
         "id": "COLLINGWOOD",
@@ -8915,8 +8656,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -8971,8 +8711,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "New_SSK",
@@ -8981,8 +8720,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -9040,8 +8778,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "subsurface/submarine/ssn/trafalgar",
         "vessel_type": "trafalgar",
         "vessel_role": "ssn",
-        "domain": "subsurface",
-        "synthetic": true
+        "domain": "subsurface"
       },
       {
         "id": "New_SSK",
@@ -9050,8 +8787,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/patrol/river",
         "vessel_type": "river",
         "vessel_role": "patrol",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -9112,8 +8848,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -9166,8 +8901,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": false
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -9219,8 +8953,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/type45",
         "vessel_type": "type45",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "PreFrigate2",
@@ -9229,8 +8962,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type23",
         "vessel_type": "type23",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       },
       {
         "id": "Frigate",
@@ -9239,8 +8971,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/destroyer/arleigh-burke",
         "vessel_type": "arleigh-burke",
         "vessel_role": "destroyer",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
@@ -9299,8 +9030,7 @@ window.CATALOG_COMPACT = [
         "vessel_class": "surface/warship/frigate/type26",
         "vessel_type": "type26",
         "vessel_role": "frigate",
-        "domain": "surface",
-        "synthetic": true
+        "domain": "surface"
       }
     ],
     "nationalities": [
