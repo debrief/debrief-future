@@ -46,8 +46,8 @@
 
 **Purpose**: Add the `debrief-data` dependency so the import pipeline can access the platform registry.
 
-- [ ] T001 Add `debrief-data` to dependencies in `services/io/pyproject.toml`
-- [ ] T002 Run `uv sync` to install the new dependency
+- [x] T001 Add `debrief-data` to dependencies in `services/io/pyproject.toml`
+- [x] T002 Run `uv sync` to install the new dependency
 
 ---
 
@@ -61,18 +61,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [test] Create unit test file `services/io/tests/test_platform_validation.py`
-- [ ] T004 [P][test] Test: all registered platforms produce no warnings `services/io/tests/test_platform_validation.py`
-- [ ] T005 [P][test] Test: unregistered platform produces warning with correct code and message `services/io/tests/test_platform_validation.py`
-- [ ] T006 [P][test] Test: empty and whitespace-only platform IDs are skipped `services/io/tests/test_platform_validation.py`
-- [ ] T007 [P][test] Test: duplicate platform IDs across features produce only one warning `services/io/tests/test_platform_validation.py`
-- [ ] T008 [P][test] Test: case-sensitive lookup ("nelson" vs "NELSON") `services/io/tests/test_platform_validation.py`
-- [ ] T009 [P][test] Test: features with no platform_id property are skipped `services/io/tests/test_platform_validation.py`
+- [x] T003 [test] Create unit test file `services/io/tests/test_platform_validation.py`
+- [x] T004 [P][test] Test: all registered platforms produce no warnings `services/io/tests/test_platform_validation.py`
+- [x] T005 [P][test] Test: unregistered platform produces warning with correct code and message `services/io/tests/test_platform_validation.py`
+- [x] T006 [P][test] Test: empty and whitespace-only platform IDs are skipped `services/io/tests/test_platform_validation.py`
+- [x] T007 [P][test] Test: duplicate platform IDs across features produce only one warning `services/io/tests/test_platform_validation.py`
+- [x] T008 [P][test] Test: case-sensitive lookup ("nelson" vs "NELSON") `services/io/tests/test_platform_validation.py`
+- [x] T009 [P][test] Test: features with no platform_id property are skipped `services/io/tests/test_platform_validation.py`
 
 ### Implementation
 
-- [ ] T010 Implement `_validate_platform_ids()` function in `services/io/src/debrief_io/import_catalog.py`
-- [ ] T011 Verify all unit tests pass
+- [x] T010 Implement `_validate_platform_ids()` function in `services/io/src/debrief_io/import_catalog.py`
+- [x] T011 Verify all unit tests pass
 
 **Checkpoint**: Validation function works in isolation. All unit tests green.
 
