@@ -9,6 +9,9 @@ export { parseTaxonomy, buildDescendantMap, buildTaxonomyLabelMap, resolveTaxono
 export type { RawTaxonomy, RawTaxonomyNode, DescendantMap, TaxonomyLabelMap } from "./taxonomy";
 export type {
   CatalogOverviewItem,
+  PlatformField,
+  CompoundPredicate,
+  ArrayFilterPredicate,
   FilterType,
   DurationBucket,
   ModifiedBucket,
