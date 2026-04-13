@@ -140,6 +140,7 @@ Large features broken down into multiple backlog items.
 | E07 | Sensor Data Pipeline | [Port legacy sensor capabilities in 7 phases: schema, import, rendering, array offsets, residuals, TMA, interactive drag](docs/ideas/E07-sensor-data-pipeline.md) | proposed | ~~#116~~, #117, #118, #119, ~~#179~~, #120, #121, #122 |
 | ~~E08~~ | ~~STAC Stack Browser Discovery UI~~ | ~~[Analyst-facing discovery interface: filter bar, list/map/timeline views, vessel taxonomy, colour schemes](docs/stac-browser-srd.md)~~ | ~~complete~~ | ~~#125~~, ~~#126~~, ~~#127~~, ~~#128~~, ~~#129~~, ~~#130~~, ~~#131~~, ~~#132~~, ~~#133~~, ~~#134~~, ~~#136~~, ~~#174~~ |
 | E09 | Provenance Graph | [Reference data currency tracking and solution comparison (shadow tracks)](docs/provenance-graph-spec.md) | proposed | #145, #146, #147, #148, #150, #151, #149 |
+| E10 | NL-Assisted Catalog Discovery | [Natural language search over STAC catalog, integrated with CQL2 filter engine](docs/ideas/E10-nl-assisted-catalog-discovery.md) | proposed | #180, #181, #182, #183, #184, #185, #186, #187, #188, #189, #190 |
 
 ## Items
 
