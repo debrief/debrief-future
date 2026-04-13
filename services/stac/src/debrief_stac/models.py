@@ -88,20 +88,21 @@ class CollectionSummaries(BaseModel):
     """Pre-aggregated distinct values for extension properties.
 
     Each array contains the sorted, deduplicated values across all items.
+    Platform-level details (vessel classes, nationalities, track names) are
+    derived at query time from the ``platforms`` summary array.
 
     Attributes:
-        vessel_classes: Distinct vessel class paths
+        platforms: Aggregated platform records across all items (deduplicated by id)
         tags: Distinct plot-level tags
         feature_tags: Distinct feature-level tags
-        track_names: Distinct track names
-        nationalities: Distinct nationality codes (ISO 3166-1 alpha-2)
     """
 
-    vessel_classes: list[str] = Field(default_factory=list, description="Distinct vessel classes")
+    platforms: list[dict] = Field(
+        default_factory=list,
+        description="Aggregated platform records (deduplicated by id)",
+    )
     tags: list[str] = Field(default_factory=list, description="Distinct plot-level tags")
     feature_tags: list[str] = Field(default_factory=list, description="Distinct feature-level tags")
-    track_names: list[str] = Field(default_factory=list, description="Distinct track names")
-    nationalities: list[str] = Field(default_factory=list, description="Distinct nationality codes")
 
 
 class TemporalExtent(BaseModel):

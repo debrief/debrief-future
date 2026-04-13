@@ -26,7 +26,7 @@ describe("CQL2 JSON serialisation", () => {
     };
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "a_containedBy",
-      args: [["GB"], { property: "debrief:nationalities" }],
+      args: [["GB"], { property: "debrief:platforms[*].nationality" }],
     });
   });
 
@@ -64,7 +64,7 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "and",
       args: [
-        { op: "a_containedBy", args: [["GB"], { property: "debrief:nationalities" }] },
+        { op: "a_containedBy", args: [["GB"], { property: "debrief:platforms[*].nationality" }] },
         { op: "=", args: [{ property: "debrief:author" }, "Smith"] },
       ],
     });
@@ -86,8 +86,8 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "or",
       args: [
-        { op: "a_containedBy", args: [["type23"], { property: "debrief:vessel_classes" }] },
-        { op: "a_containedBy", args: [["type45"], { property: "debrief:vessel_classes" }] },
+        { op: "a_containedBy", args: [["type23"], { property: "debrief:platforms[*].vessel_class" }] },
+        { op: "a_containedBy", args: [["type45"], { property: "debrief:platforms[*].vessel_class" }] },
       ],
     });
   });
@@ -108,12 +108,12 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "and",
       args: [
-        { op: "a_containedBy", args: [["GB"], { property: "debrief:nationalities" }] },
+        { op: "a_containedBy", args: [["GB"], { property: "debrief:platforms[*].nationality" }] },
         {
           op: "or",
           args: [
-            { op: "a_containedBy", args: [["type23"], { property: "debrief:vessel_classes" }] },
-            { op: "a_containedBy", args: [["type45"], { property: "debrief:vessel_classes" }] },
+            { op: "a_containedBy", args: [["type23"], { property: "debrief:platforms[*].vessel_class" }] },
+            { op: "a_containedBy", args: [["type45"], { property: "debrief:platforms[*].vessel_class" }] },
           ],
         },
       ],
@@ -132,16 +132,16 @@ describe("CQL2 JSON serialisation", () => {
     // Single OR predicate should not produce an "or" wrapper
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "a_containedBy",
-      args: [["GB"], { property: "debrief:nationalities" }],
+      args: [["GB"], { property: "debrief:platforms[*].nationality" }],
     });
   });
 
   it("serialises all array-valued filter types", () => {
     const arrayTypes = [
-      { type: "vessel-class" as const, prop: "debrief:vessel_classes" },
+      { type: "vessel-class" as const, prop: "debrief:platforms[*].vessel_class" },
       { type: "tag" as const, prop: "debrief:tags" },
-      { type: "track-name" as const, prop: "debrief:track_names" },
-      { type: "nationality" as const, prop: "debrief:nationalities" },
+      { type: "track-name" as const, prop: "debrief:platforms[*].name" },
+      { type: "nationality" as const, prop: "debrief:platforms[*].nationality" },
     ];
 
     for (const { type, prop } of arrayTypes) {

@@ -8,6 +8,8 @@
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { SafeFeatureCollection } from '@debrief/utils';
+import type { PlatformRecord } from '@debrief/schemas';
+export type { PlatformRecord };
 
 // ============================================================================
 // Base Types
@@ -488,11 +490,9 @@ export interface ExerciseListItemMessage {
   readonly datetime: string | null;
   readonly startDatetime: string | null;
   readonly endDatetime: string | null;
-  readonly vesselClasses: readonly string[];
+  readonly platforms: readonly PlatformRecord[];
   readonly tags: readonly string[];
   readonly author: string | null;
-  readonly nationalities: readonly string[];
-  readonly trackNames: readonly string[];
   readonly trackDataHref: string | null;
 }
 

@@ -2,6 +2,9 @@
  * STAC-related type definitions for the Debrief VS Code Extension
  */
 
+import type { PlatformRecord } from '@debrief/schemas';
+export type { PlatformRecord };
+
 /**
  * Store availability status
  */
@@ -56,10 +59,9 @@ export interface Catalog {
  * Schema equivalent: @debrief/schemas#StacItemSummary
  * Not migrated: the generated StacItemSummary uses snake_case field names
  * (item_path, catalog_id, store_id, start_datetime, end_datetime,
- * vessel_classes, feature_tags, track_names) while this type uses camelCase.
- * All consumers (stacService, stacTreeProvider, catalogOverviewPanel) depend
- * on camelCase field access. Rename would require coordinated update across
- * all consumers.
+ * feature_tags) while this type uses camelCase. All consumers
+ * (stacService, stacTreeProvider, catalogOverviewPanel) depend on camelCase
+ * field access. Rename would require coordinated update across all consumers.
  */
 export interface StacItemSummary {
   /** STAC Item ID */
@@ -89,20 +91,14 @@ export interface StacItemSummary {
   /** Range end datetime (ISO 8601) */
   endDatetime?: string | null;
 
-  /** Vessel taxonomy paths from debrief:vessel_classes */
-  vesselClasses?: readonly string[];
+  /** Per-platform metadata from debrief:platforms */
+  platforms?: readonly PlatformRecord[];
 
   /** Plot-level tags from debrief:tags */
   tags?: readonly string[];
 
   /** Feature-level tags from debrief:feature_tags */
   featureTags?: readonly string[];
-
-  /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
-  nationalities?: readonly string[];
-
-  /** Track platform names from debrief:track_names */
-  trackNames?: readonly string[];
 
   /** Href to large thumbnail PNG (800x600), or null if not captured */
   thumbnailHref?: string | null;
@@ -180,11 +176,9 @@ export interface StacExtent {
  * Pre-aggregated summaries of extension properties across all items
  */
 export interface StacSummaries {
-  'debrief:vessel_classes'?: string[];
+  'debrief:platforms'?: PlatformRecord[];
   'debrief:tags'?: string[];
   'debrief:feature_tags'?: string[];
-  'debrief:track_names'?: string[];
-  'debrief:nationalities'?: string[];
 }
 
 /**

@@ -10,6 +10,7 @@
  */
 
 import type { CatalogOverviewItem } from '@debrief/components';
+import type { PlatformRecord } from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
 
 // Import fixture data via Vite's JSON import (bundled fallback for production builds)
@@ -27,11 +28,9 @@ interface StacItem {
     datetime?: string;
     start_datetime?: string;
     end_datetime?: string;
-    'debrief:vessel_classes'?: string[];
+    'debrief:platforms'?: PlatformRecord[];
     'debrief:tags'?: string[];
     'debrief:feature_tags'?: string[];
-    'debrief:nationalities'?: string[];
-    'debrief:track_names'?: string[];
   };
   assets?: Record<string, { href: string; type?: string; roles?: string[] }>;
   links?: Array<{ rel: string; href: string }>;
@@ -85,11 +84,9 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     datetime: item.properties.datetime ?? null,
     startDatetime: item.properties.start_datetime ?? null,
     endDatetime: item.properties.end_datetime ?? null,
-    vesselClasses: item.properties['debrief:vessel_classes'] ?? [],
+    platforms: item.properties['debrief:platforms'] ?? [],
     tags: item.properties['debrief:tags'] ?? [],
     featureTags: item.properties['debrief:feature_tags'] ?? [],
-    nationalities: item.properties['debrief:nationalities'] ?? [],
-    trackNames: item.properties['debrief:track_names'] ?? [],
     thumbnailHref: thumbAsset ? resolveStacHref(itemPath, thumbAsset.href) : null,
     thumbnailSmHref: thumbSmAsset ? resolveStacHref(itemPath, thumbSmAsset.href) : null,
   };
