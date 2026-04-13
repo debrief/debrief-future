@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- **Import Platform Warnings** (#182) — Post-parse validation checks extracted `platform_id` values against the platform registry after import; emits advisory `UNREGISTERED_PLATFORM` warnings for unregistered platforms. Import always succeeds regardless of registry coverage. [E10 Phase 2]
+  - New function: `_validate_platform_ids()` in `import_catalog.py` with registry loading and graceful fallback
+  - Warning codes: `UNREGISTERED_PLATFORM` (per platform per file), `REGISTRY_UNAVAILABLE` (registry load failure)
+  - Tests: 17/17 passing (9 unit + 8 integration), 344 existing tests unaffected
+  - Evidence: `specs/182-import-platform-warnings/evidence/test-summary.md`, `usage-example.md`, `sample-warnings.json`
 - **LinkML Per-Platform Override Fields** (#181) — Six optional override fields on TrackProperties, new PlatformRecord entity, and `debrief:platforms` structured array replacing flat aggregates on STAC extension. Full consumer code migration across filter engine, VS Code, web-shell, and Python services. [E10 Phase 1]
   - Schema: 3 LinkML YAML files modified, VesselDomainEnum moved to common.yaml for cross-module use
   - New entity: PlatformRecord (id required + 6 optional classification fields)
