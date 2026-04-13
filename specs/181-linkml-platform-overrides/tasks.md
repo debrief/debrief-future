@@ -40,8 +40,8 @@
 
 **Purpose**: Branch hygiene and schema infrastructure preparation
 
-- [ ] T001 Verify branch 181-linkml-platform-overrides is up to date with main
-- [ ] T002 Verify `make generate` runs successfully in `shared/schemas/` before any changes (baseline)
+- [x] T001 Verify branch 181-linkml-platform-overrides is up to date with main
+- [x] T002 Verify `make generate` runs successfully in `shared/schemas/` before any changes (baseline)
 
 ---
 
@@ -53,26 +53,26 @@
 
 ### Move VesselDomainEnum
 
-- [ ] T003 Move VesselDomainEnum from stac-extension.yaml to common.yaml `shared/schemas/src/linkml/common.yaml`
-- [ ] T004 Remove VesselDomainEnum from stac-extension.yaml and add `common` import `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T003 Move VesselDomainEnum from stac-extension.yaml to common.yaml `shared/schemas/src/linkml/common.yaml`
+- [x] T004 Remove VesselDomainEnum from stac-extension.yaml and add `common` import `shared/schemas/src/linkml/stac-extension.yaml`
 
 ### Add Override Fields to TrackProperties
 
-- [ ] T005 Add six optional override fields (display_name, nationality, vessel_class, vessel_type, vessel_role, domain) to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T005 Add six optional override fields (display_name, nationality, vessel_class, vessel_type, vessel_role, domain) to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
 
 ### Add PlatformRecord and Replace Flat Fields
 
-- [ ] T006 Define PlatformRecord class with id (required), name, nationality, vessel_class, vessel_type, vessel_role, domain (all optional) `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T007 Add platforms field (optional, multivalued PlatformRecord) to StacExtensionProperties `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T008 Remove vessel_classes, nationalities, track_names from StacExtensionProperties `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T009 Add platforms field (optional, multivalued PlatformRecord) to StacItemSummary `shared/schemas/src/linkml/stac-extension.yaml`
-- [ ] T010 Remove vessel_classes, nationalities, track_names from StacItemSummary `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T006 Define PlatformRecord class with id (required), name, nationality, vessel_class, vessel_type, vessel_role, domain (all optional) `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T007 Add platforms field (optional, multivalued PlatformRecord) to StacExtensionProperties `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T008 Remove vessel_classes, nationalities, track_names from StacExtensionProperties `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T009 Add platforms field (optional, multivalued PlatformRecord) to StacItemSummary `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T010 Remove vessel_classes, nationalities, track_names from StacItemSummary `shared/schemas/src/linkml/stac-extension.yaml`
 
 ### Regenerate Types
 
-- [ ] T011 Run `make generate` to regenerate Pydantic, TypeScript, and JSON Schema from updated LinkML `shared/schemas/Makefile`
-- [ ] T012 Verify generated Pydantic model includes TrackProperties override fields and PlatformRecord `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T013 Verify generated TypeScript types include TrackProperties override fields and PlatformRecord `shared/schemas/src/generated/typescript/types.ts`
+- [x] T011 Run `make generate` to regenerate Pydantic, TypeScript, and JSON Schema from updated LinkML `shared/schemas/Makefile`
+- [x] T012 Verify generated Pydantic model includes TrackProperties override fields and PlatformRecord `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T013 Verify generated TypeScript types include TrackProperties override fields and PlatformRecord `shared/schemas/src/generated/typescript/types.ts`
 
 **Checkpoint**: Schema source of truth updated, types regenerated. Generated types will have new fields and missing old fields — consumer code will not compile yet.
 
@@ -86,11 +86,11 @@
 
 ### Implementation
 
-- [ ] T014 [P] Create valid fixture: TrackFeature with all six override fields populated `shared/schemas/src/fixtures/valid/track-feature-platform-overrides-01.json`
-- [ ] T015 [P] Create valid fixture: TrackFeature with partial overrides (display_name only) `shared/schemas/src/fixtures/valid/track-feature-platform-overrides-minimal-01.json`
-- [ ] T016 [P] Create invalid fixture: TrackFeature with three-letter nationality code `shared/schemas/src/fixtures/invalid/track-feature-invalid-nationality.json`
-- [ ] T017 [P] Create invalid fixture: TrackFeature with domain value outside VesselDomainEnum `shared/schemas/src/fixtures/invalid/track-feature-invalid-domain.json`
-- [ ] T018 Run golden fixture tests to verify new TrackFeature fixtures pass/fail correctly `shared/schemas/tests/test_golden.py`
+- [x] T014 [P] Create valid fixture: TrackFeature with all six override fields populated `shared/schemas/src/fixtures/valid/track-feature-platform-overrides-01.json`
+- [x] T015 [P] Create valid fixture: TrackFeature with partial overrides (display_name only) `shared/schemas/src/fixtures/valid/track-feature-platform-overrides-minimal-01.json`
+- [x] T016 [P] Create invalid fixture: TrackFeature with three-letter nationality code `shared/schemas/src/fixtures/invalid/track-feature-invalid-nationality.json`
+- [x] T017 [P] Create invalid fixture: TrackFeature with domain value outside VesselDomainEnum `shared/schemas/src/fixtures/invalid/track-feature-invalid-domain.json`
+- [x] T018 Run golden fixture tests to verify new TrackFeature fixtures pass/fail correctly `shared/schemas/tests/test_golden.py`
 
 **Checkpoint**: TrackProperties override fields validated via golden fixtures.
 
@@ -104,23 +104,23 @@
 
 ### STAC Extension Fixtures
 
-- [ ] T019 [P] Create valid fixture: StacExtensionProperties with fully-populated platforms array `shared/schemas/fixtures/stac-browser/valid/extension-platforms-full.json`
-- [ ] T020 [P] Create valid fixture: StacExtensionProperties with sparse platform record (id only) `shared/schemas/fixtures/stac-browser/valid/extension-platforms-sparse.json`
-- [ ] T021 [P] Create invalid fixture: PlatformRecord with three-letter nationality `shared/schemas/fixtures/stac-browser/invalid/invalid-platform-nationality.json`
-- [ ] T022 Update extension-basic.json: replace flat fields with platforms array `shared/schemas/fixtures/stac-browser/valid/extension-basic.json`
-- [ ] T023 [P] Update extension-partial-path.json: replace flat fields with platforms array `shared/schemas/fixtures/stac-browser/valid/extension-partial-path.json`
-- [ ] T024 [P] Update extension-empty-arrays.json: replace flat fields with empty platforms array `shared/schemas/fixtures/stac-browser/valid/extension-empty-arrays.json`
-- [ ] T025 Update invalid-uppercase-vessel.json: repurpose for platforms[].vessel_class uppercase test `shared/schemas/fixtures/stac-browser/invalid/invalid-uppercase-vessel.json`
+- [x] T019 [P] Create valid fixture: StacExtensionProperties with fully-populated platforms array `shared/schemas/fixtures/stac-browser/valid/extension-platforms-full.json`
+- [x] T020 [P] Create valid fixture: StacExtensionProperties with sparse platform record (id only) `shared/schemas/fixtures/stac-browser/valid/extension-platforms-sparse.json`
+- [x] T021 [P] Create invalid fixture: PlatformRecord with three-letter nationality `shared/schemas/fixtures/stac-browser/invalid/invalid-platform-nationality.json`
+- [x] T022 Update extension-basic.json: replace flat fields with platforms array `shared/schemas/fixtures/stac-browser/valid/extension-basic.json`
+- [x] T023 [P] Update extension-partial-path.json: replace flat fields with platforms array `shared/schemas/fixtures/stac-browser/valid/extension-partial-path.json`
+- [x] T024 [P] Update extension-empty-arrays.json: replace flat fields with empty platforms array `shared/schemas/fixtures/stac-browser/valid/extension-empty-arrays.json`
+- [x] T025 Update invalid-uppercase-vessel.json: repurpose for platforms[].vessel_class uppercase test `shared/schemas/fixtures/stac-browser/invalid/invalid-uppercase-vessel.json`
 
 ### Exercise Fixture Regeneration
 
-- [ ] T026 Update exercise fixture generation script to produce debrief:platforms instead of flat aggregate fields `shared/schemas/scripts/generate-stac-fixtures.py`
-- [ ] T027 Regenerate all 100 exercise fixtures with debrief:platforms format `shared/schemas/fixtures/stac-browser/`
+- [x] T026 Update exercise fixture generation script to produce debrief:platforms instead of flat aggregate fields `shared/schemas/scripts/generate-stac-fixtures.py`
+- [x] T027 Regenerate all 100 exercise fixtures with debrief:platforms format `shared/schemas/fixtures/stac-browser/`
 
 ### STAC Extension Test Updates
 
-- [ ] T028 Update test_stac_extension.py: remove flat-field assertions, add platforms validation and round-trip tests `shared/schemas/tests/test_stac_extension.py`
-- [ ] T029 Run STAC extension tests to verify all pass `shared/schemas/tests/test_stac_extension.py`
+- [x] T028 Update test_stac_extension.py: remove flat-field assertions, add platforms validation and round-trip tests `shared/schemas/tests/test_stac_extension.py`
+- [x] T029 Run STAC extension tests to verify all pass `shared/schemas/tests/test_stac_extension.py`
 
 **Checkpoint**: All STAC extension fixtures use platforms format, no flat aggregate fields remain in fixtures or schema.
 
@@ -134,58 +134,58 @@
 
 ### TypeScript Type Definitions
 
-- [ ] T030 Update StacBrowserItem: replace vesselClasses, nationalities, trackNames with platforms array `apps/vscode/src/types/stac.ts`
-- [ ] T031 [P] Update CatalogOverviewItem: replace flat fields with platforms array `shared/components/src/filter-engine/types.ts`
-- [ ] T032 [P] Update ExerciseListView types: replace flat fields with platforms `shared/components/src/ExerciseListView/types.ts`
-- [ ] T033 [P] Update CatalogItem message type: replace flat fields with platforms `apps/vscode/src/webview/messages.ts`
+- [x] T030 Update StacBrowserItem: replace vesselClasses, nationalities, trackNames with platforms array `apps/vscode/src/types/stac.ts`
+- [x] T031 [P] Update CatalogOverviewItem: replace flat fields with platforms array `shared/components/src/filter-engine/types.ts`
+- [x] T032 [P] Update ExerciseListView types: replace flat fields with platforms `shared/components/src/ExerciseListView/types.ts`
+- [x] T033 [P] Update CatalogItem message type: replace flat fields with platforms `apps/vscode/src/webview/messages.ts`
 
 ### TypeScript Services and Data Layer
 
-- [ ] T034 Update stacService.ts: read debrief:platforms from STAC item properties, map to camelCase platforms on StacBrowserItem `apps/vscode/src/services/stacService.ts`
-- [ ] T035 [P] Update catalogOverviewPanel.ts: map platforms to message format `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T036 [P] Update web-shell App.tsx: transform platforms to CatalogOverviewItem format `apps/web-shell/src/App.tsx`
+- [x] T034 Update stacService.ts: read debrief:platforms from STAC item properties, map to camelCase platforms on StacBrowserItem `apps/vscode/src/services/stacService.ts`
+- [x] T035 [P] Update catalogOverviewPanel.ts: map platforms to message format `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T036 [P] Update web-shell App.tsx: transform platforms to CatalogOverviewItem format `apps/web-shell/src/App.tsx`
 
 ### Filter Engine Migration
 
-- [ ] T037 Update matchers.ts: match on platforms[].vessel_class and platforms[].nationality instead of flat arrays `shared/components/src/filter-engine/matchers.ts`
-- [ ] T038 [P] Update cql2-json.ts: update STAC property name mappings for platforms `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T039 Update useDistinctValues.ts: derive distinct nationalities, vessel classes, track names from platforms array `shared/components/src/FilterBar/useDistinctValues.ts`
-- [ ] T040 [P] Update useTaxonomyMatchCounts.ts: iterate platforms[].vessel_class for counting `shared/components/src/FilterBar/useTaxonomyMatchCounts.ts`
-- [ ] T041 [P] Update ExerciseListItemRow.tsx: derive vessel classes from platforms for display `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T037 Update matchers.ts: match on platforms[].vessel_class and platforms[].nationality instead of flat arrays `shared/components/src/filter-engine/matchers.ts`
+- [x] T038 [P] Update cql2-json.ts: update STAC property name mappings for platforms `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T039 Update useDistinctValues.ts: derive distinct nationalities, vessel classes, track names from platforms array `shared/components/src/FilterBar/useDistinctValues.ts`
+- [x] T040 [P] Update useTaxonomyMatchCounts.ts: iterate platforms[].vessel_class for counting `shared/components/src/FilterBar/useTaxonomyMatchCounts.ts`
+- [x] T041 [P] Update ExerciseListItemRow.tsx: derive vessel classes from platforms for display `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
 
 ### Python Consumer Migration
 
-- [ ] T042 Update collection.py: aggregate summaries from platforms array instead of flat fields `services/stac/src/debrief_stac/collection.py`
-- [ ] T043 [P] Update models.py: CatalogSummaries uses platforms structure `services/stac/src/debrief_stac/models.py`
-- [ ] T044 Update enrich-legacy-catalog.py: write debrief:platforms instead of flat aggregate properties `scripts/enrich-legacy-catalog.py`
+- [x] T042 Update collection.py: aggregate summaries from platforms array instead of flat fields `services/stac/src/debrief_stac/collection.py`
+- [x] T043 [P] Update models.py: CatalogSummaries uses platforms structure `services/stac/src/debrief_stac/models.py`
+- [x] T044 Update enrich-legacy-catalog.py: write debrief:platforms instead of flat aggregate properties `scripts/enrich-legacy-catalog.py`
 
 ### Mock Data and Stories
 
-- [ ] T045 [P] Update web-shell mock stacService: use platforms in mock data `apps/web-shell/src/mocks/stacService.ts`
-- [ ] T046 [P] Update StacBrowser stories: use platforms in mock items `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
-- [ ] T047 [P] Update FilterBar stories: use platforms in mock items `shared/components/src/FilterBar/FilterBar.stories.tsx`
-- [ ] T048 [P] Update SavedFilters stories: use platforms in mock items `shared/components/src/FilterBar/SavedFilters.stories.tsx`
-- [ ] T049 [P] Update TimelineView stories: use platforms in mock items `shared/components/src/TimelineView/TimelineView.stories.tsx`
-- [ ] T050 [P] Update catalogOverview.tsx webview: derive display values from platforms `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T045 [P] Update web-shell mock stacService: use platforms in mock data `apps/web-shell/src/mocks/stacService.ts`
+- [x] T046 [P] Update StacBrowser stories: use platforms in mock items `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
+- [x] T047 [P] Update FilterBar stories: use platforms in mock items `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T048 [P] Update SavedFilters stories: use platforms in mock items `shared/components/src/FilterBar/SavedFilters.stories.tsx`
+- [x] T049 [P] Update TimelineView stories: use platforms in mock items `shared/components/src/TimelineView/TimelineView.stories.tsx`
+- [x] T050 [P] Update catalogOverview.tsx webview: derive display values from platforms `apps/vscode/src/webview/web/catalogOverview.tsx`
 
 ### Test Updates
 
-- [ ] T051 [P] Update filter engine matchers.test.ts: mock data and assertions use platforms `shared/components/src/filter-engine/__tests__/matchers.test.ts`
-- [ ] T052 [P] Update cql2-json.test.ts: property name assertions `shared/components/src/filter-engine/__tests__/cql2-json.test.ts`
-- [ ] T053 [P] Update filter engine fixtures.ts: mock item builder uses platforms `shared/components/src/filter-engine/__tests__/fixtures.ts`
-- [ ] T054 [P] Update useBrowserFilter.test.ts: mock items use platforms `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T055 [P] Update useDistinctValues.test.ts: mock data and assertions `shared/components/src/FilterBar/__tests__/useDistinctValues.test.ts`
-- [ ] T056 [P] Update useTaxonomyMatchCounts.test.ts: mock data and assertions `shared/components/src/FilterBar/__tests__/useTaxonomyMatchCounts.test.ts`
-- [ ] T057 [P] Update ExerciseListView test: mock data uses platforms `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T058 [P] Update ExerciseListView mockData.ts: fixtures use platforms `shared/components/src/ExerciseListView/__fixtures__/mockData.ts`
-- [ ] T059 [P] Update timeline-helpers.test.ts: mock items use platforms `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T060 [P] Update stacTreeProvider.test.ts: mock data uses platforms `apps/vscode/tests/unit/stacTreeProvider.test.ts`
-- [ ] T061 [P] Update messages.test.ts: mock data uses platforms `apps/vscode/src/webview/messages.test.ts`
-- [ ] T062 Update test_collection.py: summary assertions use platforms `services/stac/tests/test_collection.py`
+- [x] T051 [P] Update filter engine matchers.test.ts: mock data and assertions use platforms `shared/components/src/filter-engine/__tests__/matchers.test.ts`
+- [x] T052 [P] Update cql2-json.test.ts: property name assertions `shared/components/src/filter-engine/__tests__/cql2-json.test.ts`
+- [x] T053 [P] Update filter engine fixtures.ts: mock item builder uses platforms `shared/components/src/filter-engine/__tests__/fixtures.ts`
+- [x] T054 [P] Update useBrowserFilter.test.ts: mock items use platforms `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T055 [P] Update useDistinctValues.test.ts: mock data and assertions `shared/components/src/FilterBar/__tests__/useDistinctValues.test.ts`
+- [x] T056 [P] Update useTaxonomyMatchCounts.test.ts: mock data and assertions `shared/components/src/FilterBar/__tests__/useTaxonomyMatchCounts.test.ts`
+- [x] T057 [P] Update ExerciseListView test: mock data uses platforms `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T058 [P] Update ExerciseListView mockData.ts: fixtures use platforms `shared/components/src/ExerciseListView/__fixtures__/mockData.ts`
+- [x] T059 [P] Update timeline-helpers.test.ts: mock items use platforms `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T060 [P] Update stacTreeProvider.test.ts: mock data uses platforms `apps/vscode/tests/unit/stacTreeProvider.test.ts`
+- [x] T061 [P] Update messages.test.ts: mock data uses platforms `apps/vscode/src/webview/messages.test.ts`
+- [x] T062 Update test_collection.py: summary assertions use platforms `services/stac/tests/test_collection.py`
 
 ### Verification
 
-- [ ] T063 Run `task verify` — lint, typecheck, and all tests must pass with zero failures
+- [x] T063 Run `task verify` — lint, typecheck, and all tests must pass with zero failures
 
 **Checkpoint**: All consumer code migrated. Zero references to removed flat fields in source code. `task verify` passes.
 
@@ -197,10 +197,10 @@
 
 **Independent Test**: Run round-trip tests: `uv run pytest tests/test_roundtrip.py -v` in `shared/schemas/`.
 
-- [ ] T064 Verify TrackProperties round-trip: Python -> JSON -> Python with override fields `shared/schemas/tests/test_roundtrip.py`
-- [ ] T065 [P] Verify PlatformRecord round-trip: Python -> JSON -> Python `shared/schemas/tests/test_roundtrip.py`
-- [ ] T066 [P] Verify StacExtensionProperties round-trip with platforms array `shared/schemas/tests/test_stac_extension.py`
-- [ ] T067 Run full schema test suite: `uv run pytest tests/ -v` in shared/schemas `shared/schemas/tests/`
+- [x] T064 Verify TrackProperties round-trip: Python -> JSON -> Python with override fields `shared/schemas/tests/test_roundtrip.py`
+- [x] T065 [P] Verify PlatformRecord round-trip: Python -> JSON -> Python `shared/schemas/tests/test_roundtrip.py`
+- [x] T066 [P] Verify StacExtensionProperties round-trip with platforms array `shared/schemas/tests/test_stac_extension.py`
+- [x] T067 Run full schema test suite: `uv run pytest tests/ -v` in shared/schemas `shared/schemas/tests/`
 
 **Checkpoint**: All round-trip tests pass, types are verified cross-language.
 
@@ -212,9 +212,9 @@
 
 **Independent Test**: Run `uv run pytest tests/test_golden.py tests/test_stac_extension.py -v` in `shared/schemas/`.
 
-- [ ] T068 Verify all 100 exercise fixtures pass validation with platforms format `shared/schemas/tests/test_stac_extension.py`
-- [ ] T069 Verify no fixture files contain debrief:vessel_classes, debrief:nationalities, or debrief:track_names
-- [ ] T070 Run complete schema test suite one final time: `uv run pytest tests/ -v`
+- [x] T068 Verify all 100 exercise fixtures pass validation with platforms format `shared/schemas/tests/test_stac_extension.py`
+- [x] T069 Verify no fixture files contain debrief:vessel_classes, debrief:nationalities, or debrief:track_names
+- [x] T070 Run complete schema test suite one final time: `uv run pytest tests/ -v`
 
 **Checkpoint**: All fixtures conform to updated schema. Full test suite green.
 
@@ -226,19 +226,19 @@
 
 ### Final Verification
 
-- [ ] T071 Run `task verify` (lint + typecheck + test) — must pass with zero failures
-- [ ] T072 Grep source code for residual references to removed fields (vessel_classes, nationalities, track_names on STAC types) — confirm zero in non-documentation files
+- [x] T071 Run `task verify` (lint + typecheck + test) — must pass with zero failures
+- [x] T072 Grep source code for residual references to removed fields (vessel_classes, nationalities, track_names on STAC types) — confirm zero in non-documentation files
 
 ### Evidence Collection
 
-- [ ] T073 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/181-linkml-platform-overrides/evidence/test-summary.md`
-- [ ] T074 Create usage demonstration showing PlatformRecord validation in Python and TypeScript `specs/181-linkml-platform-overrides/evidence/usage-example.md`
-- [ ] T075 [P] Capture round-trip proof (Python -> JSON -> TypeScript -> JSON) `specs/181-linkml-platform-overrides/evidence/round-trip-evidence.md`
+- [x] T073 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/181-linkml-platform-overrides/evidence/test-summary.md`
+- [x] T074 Create usage demonstration showing PlatformRecord validation in Python and TypeScript `specs/181-linkml-platform-overrides/evidence/usage-example.md`
+- [x] T075 [P] Capture round-trip proof (Python -> JSON -> TypeScript -> JSON) `specs/181-linkml-platform-overrides/evidence/round-trip-evidence.md`
 
 ### Media Content
 
-- [ ] T076 Create shipped blog post `specs/181-linkml-platform-overrides/media/shipped-post.md`
-- [ ] T077 [P] Create LinkedIn shipped summary `specs/181-linkml-platform-overrides/media/linkedin-shipped.md`
+- [x] T076 Create shipped blog post `specs/181-linkml-platform-overrides/media/shipped-post.md`
+- [x] T077 [P] Create LinkedIn shipped summary `specs/181-linkml-platform-overrides/media/linkedin-shipped.md`
 
 ### PR Creation
 
