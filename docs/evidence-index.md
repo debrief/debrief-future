@@ -15,4 +15,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 117-rep-sensor-import | 4 | md, json, rep | 2026-04-10 | current | [#411](https://github.com/debrief/debrief-future/pull/411) |
 | 118-sensor-rendering | 2 | md | 2026-04-10 | current | [#413](https://github.com/debrief/debrief-future/pull/413) |
 | 180-platform-registry | 3 | md, txt | 2026-04-13 | current | [#416](https://github.com/debrief/debrief-future/pull/416) |
-| 181-linkml-platform-overrides | 3 | md | 2026-04-13 | current | — |
+| 181-linkml-platform-overrides | 3 | md | 2026-04-13 | current | [#421](https://github.com/debrief/debrief-future/pull/421) |
