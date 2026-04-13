@@ -1,22 +1,16 @@
-/**
- * Type definitions for the CQL2 Filter Engine (#126).
- *
- * Defines the filter expression model, STAC browser item type,
- * and vessel taxonomy structure.
- *
- * CatalogOverviewItem is the canonical home for the base STAC item type
- * (migrated from CatalogOverview/types.ts in #132-three-view-sync).
- */
+import { PlatformRecord } from '../../../schemas/src/generated/typescript/index.ts';
+
+export type { PlatformRecord };
 /**
  * A single item in a STAC catalog overview.
  * Canonical definition — previously in CatalogOverview/types.ts.
  *
  * Schema equivalent: @debrief/schemas#StacItemSummary
  * Not migrated: the generated StacItemSummary uses snake_case field names
- * (item_path, start_datetime, end_datetime, vessel_classes, feature_tags,
- * track_names) while this type uses camelCase. All consumers (ExerciseListView,
- * FilterBar, timeline helpers) depend on camelCase field access. Rename would
- * require coordinated update across many consumers.
+ * (item_path, start_datetime, end_datetime, feature_tags) while this type uses
+ * camelCase. All consumers (ExerciseListView, FilterBar, timeline helpers)
+ * depend on camelCase field access. Rename would require coordinated update
+ * across many consumers.
  */
 export interface CatalogOverviewItem {
     /** STAC Item ID */
@@ -33,16 +27,12 @@ export interface CatalogOverviewItem {
     startDatetime: string | null;
     /** Range end datetime (ISO 8601) */
     endDatetime: string | null;
-    /** Vessel taxonomy paths from debrief:vessel_classes */
-    vesselClasses?: readonly string[];
+    /** Per-platform metadata from debrief:platforms */
+    platforms?: readonly PlatformRecord[];
     /** Plot-level tags from debrief:tags */
     tags?: readonly string[];
     /** Feature-level tags from debrief:feature_tags */
     featureTags?: readonly string[];
-    /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
-    nationalities?: readonly string[];
-    /** Track platform names from debrief:track_names */
-    trackNames?: readonly string[];
     /** Href to large thumbnail PNG (800x600), or null if not captured */
     thumbnailHref?: string | null;
     /** Href to small thumbnail PNG (200x150), or null if not captured */
@@ -74,12 +64,10 @@ export interface FilterExpression {
  * Extends CatalogOverviewItem with the properties defined by #125.
  */
 export interface StacBrowserItem extends CatalogOverviewItem {
-    readonly vesselClasses: readonly string[];
+    readonly platforms: readonly PlatformRecord[];
     readonly tags: readonly string[];
     readonly featureTags: readonly string[];
     readonly author: string | null;
-    readonly trackNames: readonly string[];
-    readonly nationalities: readonly string[];
     readonly collection: string | null;
     /** ISO 8601 datetime when the item was last modified */
     readonly modified: string | null;
