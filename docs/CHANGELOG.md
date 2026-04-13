@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- **Regenerate Sample Catalog** (#184) — New `scripts/regenerate-sample-catalog.py` orchestration script that nukes and rebuilds `preview/workspace/samples/local-store/` via the enriched import pipeline. 73 items regenerated, all with `debrief:platforms` structured arrays; zero deprecated flat aggregate fields remain. Extends `enrich-legacy-catalog.py` with `derive_vessel_fields()` to populate `vessel_type`/`vessel_role`/`domain` from the `vessel_class` path (FR-006). [E10 Phase 3] ([#427](https://github.com/debrief/debrief-future/pull/427))
+  - Pipeline: extract → stage → delete → reimport → enrich (safe-by-construction, `--stage-only` dry-run supported)
+  - Idempotent: two consecutive runs produce identical 73 items / 500 warnings (`random.Random(42)`)
+  - Tests: 1,643 Python passed, all TypeScript passed, 79 Playwright E2E passed
+  - Evidence: `specs/184-regenerate-sample-catalog/evidence/test-summary.md`, `usage-example.md`, `validation-output.txt`, `item-before.json`, `item-after.json`
 - **Import Platform Warnings** (#182) — Post-parse validation checks extracted `platform_id` values against the platform registry after import; emits advisory `UNREGISTERED_PLATFORM` warnings for unregistered platforms. Import always succeeds regardless of registry coverage. [E10 Phase 2]
   - New function: `_validate_platform_ids()` in `import_catalog.py` with registry loading and graceful fallback
   - Warning codes: `UNREGISTERED_PLATFORM` (per platform per file), `REGISTRY_UNAVAILABLE` (registry load failure)
