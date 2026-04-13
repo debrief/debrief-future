@@ -40,28 +40,36 @@ Represents fully-resolved metadata for a single platform within a STAC item. Pro
 
 ### Modified: StacExtensionProperties (stac-extension.yaml)
 
-**New field**:
+**Added**:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `platforms` | PlatformRecord[] | No | Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data. |
 
-**Existing fields preserved** (backward compatibility):
-- `vessel_classes` -- flat list of taxonomy paths
-- `tags` -- plot-level tags
-- `feature_tags` -- union of feature-level tags
-- `track_names` -- flat list of track names
-- `nationalities` -- flat list of nationality codes
+**Removed** (replaced by `platforms`):
+
+| Field | Reason |
+|-------|--------|
+| `vessel_classes` | Flat list of taxonomy paths -- now `platforms[].vessel_class` |
+| `nationalities` | Flat list of country codes -- now `platforms[].nationality` |
+| `track_names` | Flat list of track names -- now `platforms[].name` |
+
+**Retained** (not platform-related):
+- `tags` -- plot-level tags (independent of platforms)
+- `feature_tags` -- union of feature-level tags (independent of platforms)
 
 ### Modified: StacItemSummary (stac-extension.yaml)
 
-**New field**:
+**Added**:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `platforms` | PlatformRecord[] | No | Same structure as StacExtensionProperties.platforms. Carried on the summary for filtering. |
 
-**Existing fields preserved**: All 15 current fields unchanged.
+**Removed** (same three fields as StacExtensionProperties):
+- `vessel_classes`, `nationalities`, `track_names`
+
+**Retained**: `id`, `title`, `datetime`, `item_path`, `catalog_id`, `store_id`, `bbox`, `start_datetime`, `end_datetime`, `tags`, `feature_tags`, `platforms`.
 
 ## Enum Changes
 

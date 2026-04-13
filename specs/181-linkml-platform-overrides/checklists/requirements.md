@@ -35,3 +35,4 @@
 - UI Feature Validation section skipped -- this is a schema/infrastructure feature with no user-facing interface.
 - The spec intentionally avoids naming specific technologies (LinkML, Pydantic, TypeScript) in functional requirements, using generic terms like "schema", "generated models", and "generated types" instead. Technology names appear only in the header metadata and assumptions section where they provide necessary project context.
 - Specs without UI sections should skip the UI Feature Validation checklist entirely.
+- **Scope expanded (2026-04-13)**: Per user direction, flat aggregate fields (`vessel_classes`, `nationalities`, `track_names`) are being removed (not preserved). All consumer code and fixtures are migrated atomically. Constitution Article XIV (Pre-Release Freedom) permits this breaking change.
