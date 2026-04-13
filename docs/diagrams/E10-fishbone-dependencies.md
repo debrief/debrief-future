@@ -64,12 +64,12 @@ graph LR
     %% ── Converge on goal ─────────────────────────────────
     P4 --> GOAL
 
-    %% ── External dependencies (upstream features) ───────
-    subgraph EXT["External Dependencies"]
+    %% ── External dependencies (upstream — all complete) ──
+    subgraph EXT["External Dependencies (all complete)"]
         direction TB
-        E126(["#126 CQL2 Filter Engine"])
-        E127(["#127 Filter Bar Lozenge UI"])
-        E125(["#125 STAC Extension Mock Data"])
+        E126(["#126 CQL2 Filter Engine ✅"])
+        E127(["#127 Filter Bar Lozenge UI ✅"])
+        E125(["#125 STAC Extension Mock Data ✅"])
     end
 
     E126 -.->|"extended by"| B185
@@ -79,7 +79,7 @@ graph LR
     %% ── Styling ─────────────────────────────────────────
     classDef complete fill:#4caf50,stroke:#2e7d32,color:#fff
     classDef proposed fill:#42a5f5,stroke:#1565c0,color:#fff
-    classDef external fill:#ff9800,stroke:#e65100,color:#fff
+    classDef external fill:#4caf50,stroke:#2e7d32,color:#fff,stroke-dasharray: 5 5
     classDef goal fill:#ab47bc,stroke:#6a1b9a,color:#fff
 
     class B180 complete
@@ -118,7 +118,7 @@ This 8-item chain determines the minimum elapsed time. The critical path runs th
 
 ## Legend
 
-- 🟢 **Green** — Complete
+- 🟢 **Green (solid)** — Complete (E10 items)
+- 🟢 **Green (dashed)** — Complete (external dependencies)
 - 🔵 **Blue** — Proposed (not yet started)
-- 🟠 **Orange** — External dependency (upstream feature)
 - 🟣 **Purple** — Epic goal
