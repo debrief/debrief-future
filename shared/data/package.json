@@ -1,0 +1,33 @@
+{
+  "name": "@debrief/data",
+  "version": "0.1.0",
+  "description": "Shared reference data and loaders for Debrief v4.x",
+  "type": "module",
+  "main": "./dist/ts/index.js",
+  "types": "./dist/ts/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/ts/index.d.ts",
+      "import": "./dist/ts/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "platform-registry.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "SEE LICENSE IN ../../LICENSE"
+}
