@@ -44,28 +44,51 @@
     "datetime": null,
     "start_datetime": "2020-02-28T19:00:00Z",
     "end_datetime": "2020-03-12T09:21:19Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/supply/fort-victoria",
-      "surface/auxiliary/survey/echo"
+    "debrief:platforms": [
+      {
+        "id": "HMS-BAINBRIDGE",
+        "name": "HMS Bainbridge",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/supply/fort-victoria",
+        "domain": "surface",
+        "vessel_role": "supply",
+        "vessel_type": "fort-victoria"
+      },
+      {
+        "id": "ROKS-COLE",
+        "name": "ROKS Cole",
+        "nationality": "KR",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      },
+      {
+        "id": "INS-DEFENDER",
+        "name": "INS Defender",
+        "nationality": "IN"
+      },
+      {
+        "id": "HMS-KENT",
+        "name": "HMS Kent",
+        "nationality": "SE"
+      },
+      {
+        "id": "ROKS-CARNEY",
+        "name": "ROKS Carney",
+        "nationality": "KR"
+      },
+      {
+        "id": "INS-WESTMINSTER",
+        "name": "INS Westminster",
+        "nationality": "IN"
+      }
     ],
     "debrief:tags": [
       "boarding"
     ],
     "debrief:feature_tags": [
       "sonar-contact"
-    ],
-    "debrief:track_names": [
-      "HMS Bainbridge",
-      "ROKS Cole",
-      "INS Defender",
-      "HMS Kent",
-      "ROKS Carney",
-      "INS Westminster"
-    ],
-    "debrief:nationalities": [
-      "SE",
-      "KR",
-      "IN"
     ]
   },
   "links": [

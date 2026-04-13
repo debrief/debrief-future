@@ -42,8 +42,14 @@
     "title": "Exercise Single Point 001",
     "description": "Single Point 001 \u2014 North Atlantic exercise. 1 track(s), 2 nation(s). Single-point observation, no time range.",
     "datetime": "2024-05-15T03:00:00Z",
-    "debrief:vessel_classes": [
-      "unknown"
+    "debrief:platforms": [
+      {
+        "id": "FS-COLE",
+        "name": "FS Cole",
+        "nationality": "FR",
+        "vessel_class": "unknown",
+        "domain": "unknown"
+      }
     ],
     "debrief:tags": [
       "SAR",
@@ -54,13 +60,6 @@
     "debrief:feature_tags": [
       "passive-search",
       "active-search"
-    ],
-    "debrief:track_names": [
-      "FS Cole"
-    ],
-    "debrief:nationalities": [
-      "FR",
-      "CA"
     ]
   },
   "links": [

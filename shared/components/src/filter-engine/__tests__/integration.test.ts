@@ -33,7 +33,7 @@ describe("integration: vessel-class (hierarchical)", () => {
     expect(result.length).toBeGreaterThan(0);
     for (const item of result) {
       expect(
-        item.vesselClasses.some((vc) => vc.includes("type23")),
+        item.platforms.some((p) => p.vessel_class?.includes("type23")),
       ).toBe(true);
     }
   });
@@ -75,7 +75,7 @@ describe("integration: nationality", () => {
     expect(result.length).toBeGreaterThan(0);
     for (const item of result) {
       expect(
-        item.nationalities.some((n) => n.toUpperCase() === "GB"),
+        item.platforms.some((p) => p.nationality?.toUpperCase() === "GB"),
       ).toBe(true);
     }
   });
@@ -159,10 +159,10 @@ describe("integration: combined AND + OR", () => {
     const result = engine.filter(items, expr);
     for (const item of result) {
       expect(
-        item.nationalities.some((n) => n.toUpperCase() === "GB"),
+        item.platforms.some((p) => p.nationality?.toUpperCase() === "GB"),
       ).toBe(true);
-      const hasFrigOrDest = item.vesselClasses.some(
-        (vc) => vc.includes("frigate") || vc.includes("destroyer"),
+      const hasFrigOrDest = item.platforms.some(
+        (p) => p.vessel_class?.includes("frigate") || p.vessel_class?.includes("destroyer"),
       );
       expect(hasFrigOrDest).toBe(true);
     }
@@ -171,14 +171,14 @@ describe("integration: combined AND + OR", () => {
 
 describe("integration: edge cases", () => {
   it("handles items with missing properties gracefully", () => {
-    // Items with empty vesselClasses should not match vessel-class filter
+    // Items with empty platforms should not match vessel-class filter
     const expr: FilterExpression = {
       predicates: [{ type: "vessel-class", value: "warship" }],
       orGroups: [],
     };
     const result = engine.filter(items, expr);
     for (const item of result) {
-      expect(item.vesselClasses.length).toBeGreaterThan(0);
+      expect(item.platforms.some((p) => p.vessel_class)).toBe(true);
     }
   });
 });

@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2026-10-19T12:00:00Z",
     "end_datetime": "2026-10-19T16:50:45Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia",
-      "subsurface/submarine/ssbn/vanguard"
+    "debrief:platforms": [
+      {
+        "id": "HMS-ROOSEVELT",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_role": "ssn",
+        "vessel_type": "virginia"
+      },
+      {
+        "id": "HMCS-NORTHUMBERLAND",
+        "name": "HMCS Northumberland",
+        "nationality": "CA",
+        "vessel_class": "subsurface/submarine/ssbn/vanguard",
+        "domain": "subsurface",
+        "vessel_role": "ssbn",
+        "vessel_type": "vanguard"
+      },
+      {
+        "id": "JS-BRETAGNE",
+        "name": "JS Bretagne",
+        "nationality": "JP"
+      }
     ],
     "debrief:tags": [
       "certification",
@@ -59,16 +80,6 @@
       "torpedo-run",
       "prosecution",
       "helicopter-ops"
-    ],
-    "debrief:track_names": [
-      "HMS Roosevelt",
-      "HMCS Northumberland",
-      "JS Bretagne"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "CA",
-      "JP"
     ]
   },
   "links": [

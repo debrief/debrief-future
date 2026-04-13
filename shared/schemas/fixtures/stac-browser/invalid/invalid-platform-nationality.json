@@ -1,0 +1,11 @@
+{
+  "platforms": [
+    {
+      "id": "BAD-NAT",
+      "name": "Bad Nationality Ship",
+      "nationality": "GBR"
+    }
+  ],
+  "tags": [],
+  "feature_tags": []
+}

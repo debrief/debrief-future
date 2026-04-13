@@ -11,12 +11,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: null,
     endDatetime: null,
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -33,8 +31,8 @@ describe('computeDistinctValues', () => {
 
   it('extracts and deduplicates nationalities', () => {
     const items = [
-      makeItem('1', { nationalities: ['French', 'British'] }),
-      makeItem('2', { nationalities: ['French', 'German'] }),
+      makeItem('1', { platforms: [{ id: 'P1', nationality: 'French' }, { id: 'P2', nationality: 'British' }] }),
+      makeItem('2', { platforms: [{ id: 'P3', nationality: 'French' }, { id: 'P4', nationality: 'German' }] }),
     ];
     const result = computeDistinctValues(items);
     expect(result['nationality']).toEqual(['British', 'French', 'German']);
@@ -42,7 +40,7 @@ describe('computeDistinctValues', () => {
 
   it('sorts values alphabetically', () => {
     const items = [
-      makeItem('1', { nationalities: ['German', 'French', 'British'] }),
+      makeItem('1', { platforms: [{ id: 'P1', nationality: 'German' }, { id: 'P2', nationality: 'French' }, { id: 'P3', nationality: 'British' }] }),
     ];
     const result = computeDistinctValues(items);
     expect(result['nationality']).toEqual(['British', 'French', 'German']);
@@ -70,8 +68,8 @@ describe('computeDistinctValues', () => {
 
   it('extracts vessel classes', () => {
     const items = [
-      makeItem('1', { vesselClasses: ['surface/warship/frigate/type23'] }),
-      makeItem('2', { vesselClasses: ['surface/warship/destroyer/type45'] }),
+      makeItem('1', { platforms: [{ id: 'P1', vessel_class: 'surface/warship/frigate/type23' }] }),
+      makeItem('2', { platforms: [{ id: 'P2', vessel_class: 'surface/warship/destroyer/type45' }] }),
     ];
     const result = computeDistinctValues(items);
     expect(result['vessel-class']).toEqual([
@@ -100,8 +98,8 @@ describe('computeDistinctValues', () => {
 
   it('extracts track names', () => {
     const items = [
-      makeItem('1', { trackNames: ['HMS Foo', 'HMS Bar'] }),
-      makeItem('2', { trackNames: ['HMS Bar', 'HMS Baz'] }),
+      makeItem('1', { platforms: [{ id: 'P1', name: 'HMS Foo' }, { id: 'P2', name: 'HMS Bar' }] }),
+      makeItem('2', { platforms: [{ id: 'P3', name: 'HMS Bar' }, { id: 'P4', name: 'HMS Baz' }] }),
     ];
     const result = computeDistinctValues(items);
     expect(result['track-name']).toEqual(['HMS Bar', 'HMS Baz', 'HMS Foo']);

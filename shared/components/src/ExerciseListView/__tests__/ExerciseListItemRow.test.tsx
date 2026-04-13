@@ -12,11 +12,9 @@ function makeItem(overrides: Partial<ExerciseListItem> = {}): ExerciseListItem {
     datetime: '2024-01-01T00:00:00Z',
     startDatetime: '2024-01-01T00:00:00Z',
     endDatetime: '2024-01-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     author: null,
-    nationalities: [],
-    trackNames: [],
     trackDataHref: null,
     ...overrides,
   };

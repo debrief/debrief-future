@@ -1,9 +1,10 @@
 {
-  "vessel_classes": [
-    "SURFACE/WARSHIP/FRIGATE/TYPE23"
+  "platforms": [
+    {
+      "id": "BAD-VESSEL",
+      "vessel_class": "SURFACE/WARSHIP/FRIGATE/TYPE23"
+    }
   ],
   "tags": [],
-  "feature_tags": [],
-  "track_names": [],
-  "nationalities": []
+  "feature_tags": []
 }

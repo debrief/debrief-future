@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2020-04-25T15:00:00Z",
     "end_datetime": "2020-04-26T09:11:03Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/cargo/bulk",
-      "subsurface/submarine/ssn/astute"
+    "debrief:platforms": [
+      {
+        "id": "HMS-ANDREA-DORIA",
+        "name": "HMS Andrea Doria",
+        "nationality": "GB",
+        "vessel_class": "surface/merchant/cargo/bulk",
+        "domain": "surface",
+        "vessel_role": "cargo",
+        "vessel_type": "bulk"
+      },
+      {
+        "id": "JS-SACHSEN",
+        "name": "JS Sachsen",
+        "nationality": "JP",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_role": "ssn",
+        "vessel_type": "astute"
+      },
+      {
+        "id": "HMS-BRETAGNE",
+        "name": "HMS Bretagne",
+        "nationality": "GB"
+      }
     ],
     "debrief:tags": [
       "surveillance",
@@ -57,15 +78,6 @@
       "intercept",
       "depth-charge",
       "prosecution"
-    ],
-    "debrief:track_names": [
-      "HMS Andrea Doria",
-      "JS Sachsen",
-      "HMS Bretagne"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "JP"
     ]
   },
   "links": [

@@ -5,6 +5,7 @@ import { ThemeProvider } from '../ThemeProvider';
 import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState } from './types';
+import type { PlatformRecord } from '@debrief/schemas';
 
 // --- Mock Data ---
 
@@ -17,12 +18,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -32,56 +31,60 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 const MOCK_ITEMS: StacBrowserItem[] = [
   makeItem('ex-001', {
     title: 'CASEX Alpha',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'CONTACT-BRAVO', name: 'Contact Bravo', domain: 'unknown' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'blue-water'],
-    vesselClasses: ['surface/warship/frigate/type23'],
     author: 'CDR Smith',
-    trackNames: ['HMS Argyll', 'Contact Bravo'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T04:00:00Z',
   }),
   makeItem('ex-002', {
     title: 'CASEX Bravo',
-    nationalities: ['British'],
+    platforms: [
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+      { id: 'UNKNOWN-ALPHA', name: 'Unknown Alpha', domain: 'unknown' },
+    ] satisfies PlatformRecord[],
     tags: ['asw', 'shallow-water'],
-    vesselClasses: ['surface/warship/destroyer/type45'],
     author: 'CDR Jones',
-    trackNames: ['HMS Diamond', 'Unknown Alpha'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-02T12:00:00Z',
   }),
   makeItem('ex-003', {
     title: 'GROUPEX Charlie',
-    nationalities: ['French', 'British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'GB', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+      { id: 'AQUITAINE', name: 'FS Aquitaine', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'asw'],
-    vesselClasses: ['surface/warship/frigate/type23', 'surface/warship/destroyer/type45'],
     author: 'CDR Smith',
     featureTags: ['high-priority', 'reviewed'],
-    trackNames: ['HMS Argyll', 'HMS Diamond', 'FS Aquitaine'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-04T00:00:00Z',
   }),
   makeItem('ex-004', {
     title: 'TACEX Delta',
-    nationalities: ['German'],
+    platforms: [
+      { id: 'SACHSEN', name: 'FGS Sachsen', nationality: 'DE', vessel_class: 'surface/warship/frigate/type26', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['surface-action'],
-    vesselClasses: ['surface/warship/frigate/type26'],
     author: 'CDR Mueller',
-    trackNames: ['FGS Sachsen'],
     collection: 'training-2025',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-15T00:00:00Z',
   }),
   makeItem('ex-005', {
     title: 'ASW Exercise Echo',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'RUBIS', name: 'FS Rubis', nationality: 'FR', vessel_class: 'subsurface/submarine/ssn', vessel_role: 'ssn', domain: 'subsurface' },
+    ] satisfies PlatformRecord[],
     tags: ['asw'],
-    vesselClasses: ['submarine/nuclear/ssn'],
     author: 'CDR Dupont',
-    trackNames: ['FS Rubis'],
     collection: 'training-2025',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T02:00:00Z',

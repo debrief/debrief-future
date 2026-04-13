@@ -513,6 +513,7 @@ EDGE_CASES: list[EdgeCase] = [
             "vessel_classes": [],
             "track_names": [],
             "nationalities": [],
+            "platforms_override": [],
             "description_note": "Empty plot with no track data.",
         },
     ),
@@ -654,16 +655,49 @@ def generate_item(
         f"{desc_note}"
     ).strip()
 
+    # Build platforms array from track_names, nationalities, vessel_classes
+    if "platforms_override" in overrides:
+        platforms: list[dict[str, Any]] = overrides["platforms_override"]
+    else:
+        platforms = []
+        for t_idx in range(n_tracks):
+            platform: dict[str, Any] = {}
+            # Use track name as id (slugified) and name
+            if t_idx < len(track_names):
+                t_name = track_names[t_idx]
+                platform["id"] = t_name.upper().replace(" ", "-")
+                platform["name"] = t_name
+            else:
+                platform["id"] = f"PLATFORM-{t_idx + 1:02d}"
+
+            # Assign nationality round-robin
+            if nationalities:
+                nat = nationalities[t_idx % len(nationalities)]
+                platform["nationality"] = nat
+
+            # Assign vessel class round-robin
+            if vessel_classes and t_idx < len(vessel_classes):
+                vc = vessel_classes[t_idx]
+                platform["vessel_class"] = vc
+                # Derive domain, role, type from path
+                parts = vc.split("/")
+                if len(parts) >= 1:
+                    platform["domain"] = parts[0]
+                if len(parts) >= 3:
+                    platform["vessel_role"] = parts[2]
+                if len(parts) >= 4:
+                    platform["vessel_type"] = parts[3]
+
+            platforms.append(platform)
+
     # Build properties
     properties: dict[str, Any] = {
         "title": f"Exercise {name}",
         "description": description,
         **properties_temporal,
-        "debrief:vessel_classes": vessel_classes,
+        "debrief:platforms": platforms,
         "debrief:tags": tags,
         "debrief:feature_tags": feature_tags,
-        "debrief:track_names": track_names,
-        "debrief:nationalities": nationalities,
     }
 
     item: dict[str, Any] = {
@@ -857,10 +891,12 @@ def main() -> None:
                 break
         region_counts[region_name] = region_counts.get(region_name, 0) + 1
 
-        for n in props["debrief:nationalities"]:
-            nat_counts[n] = nat_counts.get(n, 0) + 1
+        for p in props.get("debrief:platforms", []):
+            nat = p.get("nationality")
+            if nat:
+                nat_counts[nat] = nat_counts.get(nat, 0) + 1
 
-        n_tracks = len(props["debrief:track_names"])
+        n_tracks = len(props.get("debrief:platforms", []))
         track_total += n_tracks
         if n_tracks == 0:
             empty_count += 1

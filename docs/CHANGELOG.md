@@ -8,6 +8,14 @@
   - Warning codes: `UNREGISTERED_PLATFORM` (per platform per file), `REGISTRY_UNAVAILABLE` (registry load failure)
   - Tests: 17/17 passing (9 unit + 8 integration), 344 existing tests unaffected
   - Evidence: `specs/182-import-platform-warnings/evidence/test-summary.md`, `usage-example.md`, `sample-warnings.json`
+- **LinkML Per-Platform Override Fields** (#181) — Six optional override fields on TrackProperties, new PlatformRecord entity, and `debrief:platforms` structured array replacing flat aggregates on STAC extension. Full consumer code migration across filter engine, VS Code, web-shell, and Python services. [E10 Phase 1]
+  - Schema: 3 LinkML YAML files modified, VesselDomainEnum moved to common.yaml for cross-module use
+  - New entity: PlatformRecord (id required + 6 optional classification fields)
+  - Breaking: removed vessel_classes, nationalities, track_names from StacExtensionProperties/StacItemSummary
+  - Migration: ~40 files updated across TypeScript (types, services, filter engine, stories, tests) and Python (STAC service, collection summaries)
+  - Fixtures: 100 exercise fixtures regenerated with debrief:platforms format, 7 new golden fixtures
+  - Tests: 2921/2921 passing, 0 failures
+  - Evidence: `specs/181-linkml-platform-overrides/evidence/test-summary.md`, `usage-example.md`, `round-trip-evidence.md`
 - **Platform Registry** (#180) — Shared JSON registry defining a vessel class taxonomy tree with 10 seeded platforms. Dual Python (`debrief-data`) and TypeScript (`@debrief/data`) loaders with resolve, enumerate, tree traversal, and class validation APIs. [E10 Phase 0]
   - New package: `shared/data/` with `platform-registry.json`, Python `registry.py`, TypeScript `registry.ts`
   - Golden fixture cross-language parity: both loaders produce identical results

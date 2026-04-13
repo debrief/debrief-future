@@ -45,10 +45,11 @@ function matchVesselClass(
   value: string,
   descendantMap: DescendantMap,
 ): boolean {
-  if (!item.vesselClasses || item.vesselClasses.length === 0) return false;
+  const platforms = item.platforms ?? [];
+  if (platforms.length === 0) return false;
   const expandedPaths = descendantMap.get(value);
   if (!expandedPaths) return false;
-  return item.vesselClasses.some((vc) => expandedPaths.has(vc));
+  return platforms.some((p) => p.vessel_class && expandedPaths.has(p.vessel_class));
 }
 
 /** Match duration against a bucket */
@@ -127,10 +128,14 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
   title: (item, value) => matchTitle(item, value),
   filename: (item, value) => matchFilename(item, value),
   "plot-contents": (item, value) => matchPlotContents(item, value),
-  "track-name": (item, value) =>
-    arrayContainsCaseInsensitive(item.trackNames, value),
-  nationality: (item, value) =>
-    arrayContainsCaseInsensitive(item.nationalities, value),
+  "track-name": (item, value) => {
+    const lower = value.toLowerCase();
+    return (item.platforms ?? []).some((p) => p.name != null && p.name.toLowerCase() === lower);
+  },
+  nationality: (item, value) => {
+    const upper = value.toUpperCase();
+    return (item.platforms ?? []).some((p) => p.nationality != null && p.nationality.toUpperCase() === upper);
+  },
   collection: (item, value) => matchCollection(item, value),
 };
 

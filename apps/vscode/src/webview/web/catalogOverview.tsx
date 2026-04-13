@@ -34,12 +34,10 @@ interface CatalogData {
 function toStacBrowserItem(item: CatalogOverviewItem): StacBrowserItem {
   return {
     ...item,
-    vesselClasses: item.vesselClasses ?? [],
+    platforms: item.platforms ?? [],
     tags: item.tags ?? [],
     featureTags: item.featureTags ?? [],
     author: null,
-    trackNames: item.trackNames ?? [],
-    nationalities: item.nationalities ?? [],
     collection: null,
     modified: null,
   };

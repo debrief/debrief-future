@@ -40,12 +40,12 @@ function makeItem(overrides: Partial<StacBrowserItem> = {}): StacBrowserItem {
     datetime: null,
     startDatetime: "2025-06-01T00:00:00Z",
     endDatetime: "2025-06-01T04:00:00Z",
-    vesselClasses: ["surface/warship/frigate/type23"],
+    platforms: [
+      { id: "ARGYLL", name: "HMS Argyll", nationality: "GB", vessel_class: "surface/warship/frigate/type23", domain: "surface" },
+    ],
     tags: ["ASW", "training"],
     featureTags: ["sonar-contact"],
     author: "Lt Cmdr Smith",
-    trackNames: ["HMS Argyll", "USS Porter"],
-    nationalities: ["GB", "US"],
     collection: "exercises-2025",
     modified: "2025-06-01T10:00:00Z",
     ...overrides,
@@ -75,8 +75,8 @@ describe("vessel-class matcher", () => {
     expect(match(makeItem(), "nonexistent", DESC_MAP)).toBe(false);
   });
 
-  it("returns false for empty vesselClasses", () => {
-    expect(match(makeItem({ vesselClasses: [] }), "frigate", DESC_MAP)).toBe(false);
+  it("returns false for empty platforms", () => {
+    expect(match(makeItem({ platforms: [] }), "frigate", DESC_MAP)).toBe(false);
   });
 });
 

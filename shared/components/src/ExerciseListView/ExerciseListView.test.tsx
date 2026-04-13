@@ -15,11 +15,9 @@ function makeItem(overrides: Partial<ExerciseListItem> = {}): ExerciseListItem {
     datetime: '2024-03-15T08:00:00Z',
     startDatetime: '2024-03-15T08:00:00Z',
     endDatetime: '2024-03-17T18:00:00Z',
-    vesselClasses: ['Destroyer'],
+    platforms: [{ id: 'DEFENDER', name: 'HMS Defender', nationality: 'GB', vessel_class: 'surface/warship/destroyer', domain: 'surface' }],
     tags: ['training'],
     author: 'Jane Smith',
-    nationalities: ['GB'],
-    trackNames: ['HMS Defender'],
     trackDataHref: 'exercises/alpha/data.geojson',
     ...overrides,
   };
@@ -79,7 +77,10 @@ describe('ExerciseListView', () => {
 
     it('T012: displays title, metadata summary, date, thumbnail for each item', () => {
       const item = makeItem({
-        vesselClasses: ['Destroyer', 'Submarine'],
+        platforms: [
+          { id: 'P1', name: 'HMS Defender', vessel_class: 'surface/warship/destroyer', domain: 'surface' },
+          { id: 'P2', name: 'HMS Ambush', vessel_class: 'subsurface/submarine', domain: 'subsurface' },
+        ],
         tags: ['training'],
         author: 'Jane Smith',
       });
@@ -87,14 +88,20 @@ describe('ExerciseListView', () => {
 
       expect(screen.getByTestId('exercise-item-title')).toHaveTextContent('Exercise Alpha');
       expect(screen.getByTestId('exercise-item-date')).toBeInTheDocument();
-      expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('Destroyer');
+      expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('surface/warship/destroyer');
       expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('Jane Smith');
       expect(screen.getByTestId('spatial-thumbnail')).toBeInTheDocument();
     });
 
     it('T013: truncates metadata with "+N more" for long arrays', () => {
       const item = makeItem({
-        vesselClasses: ['Frigate', 'Destroyer', 'Submarine', 'Carrier', 'Cruiser'],
+        platforms: [
+          { id: 'P1', vessel_class: 'surface/warship/frigate' },
+          { id: 'P2', vessel_class: 'surface/warship/destroyer' },
+          { id: 'P3', vessel_class: 'subsurface/submarine' },
+          { id: 'P4', vessel_class: 'surface/warship/carrier' },
+          { id: 'P5', vessel_class: 'surface/warship/cruiser' },
+        ],
       });
       render(<ExerciseListView items={[item]} />);
 

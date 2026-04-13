@@ -12,12 +12,10 @@ function makeItem(id: string, vesselClasses: string[]): StacBrowserItem {
     datetime: null,
     startDatetime: null,
     endDatetime: null,
-    vesselClasses,
+    platforms: vesselClasses.map((vc, i) => ({ id: `${id}-p${i}`, vessel_class: vc })),
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
   };

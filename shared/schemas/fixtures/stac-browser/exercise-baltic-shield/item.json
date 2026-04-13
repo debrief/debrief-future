@@ -44,7 +44,7 @@
     "datetime": null,
     "start_datetime": "2024-01-12T11:00:00Z",
     "end_datetime": "2024-01-16T16:26:41Z",
-    "debrief:vessel_classes": [],
+    "debrief:platforms": [],
     "debrief:tags": [
       "EW",
       "training"
@@ -52,12 +52,6 @@
     "debrief:feature_tags": [
       "torpedo-run",
       "active-search"
-    ],
-    "debrief:track_names": [],
-    "debrief:nationalities": [
-      "DK",
-      "CA",
-      "JP"
     ]
   },
   "links": [

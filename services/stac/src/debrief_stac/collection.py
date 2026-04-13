@@ -34,13 +34,12 @@ if TYPE_CHECKING:
     from debrief_stac.models import CollectionExtent, CollectionSummaries
     from debrief_stac.types import BoundingBox, CatalogPath, STACCatalog, STACItem
 
-# Extension property keys that appear in item.properties and Collection summaries
+# Extension property keys (list-of-string) that appear in item.properties and
+# Collection summaries.  Platform-level data is handled separately via
+# ``debrief:platforms`` (list of PlatformRecord dicts).
 _SUMMARY_PROPERTIES = [
-    "debrief:vessel_classes",
     "debrief:tags",
     "debrief:feature_tags",
-    "debrief:track_names",
-    "debrief:nationalities",
 ]
 
 
@@ -79,7 +78,7 @@ def _extract_item_extent(
     return bbox, start_dt, end_dt
 
 
-def _extract_item_summaries(item_data: STACItem) -> dict[str, list[str]]:
+def _extract_item_summaries(item_data: STACItem) -> dict[str, list]:
     """Extract debrief extension properties from a STAC Item.
 
     Args:
@@ -87,14 +86,24 @@ def _extract_item_summaries(item_data: STACItem) -> dict[str, list[str]]:
 
     Returns:
         Dictionary mapping extension property names to their values.
+        ``debrief:platforms`` contains a list of platform dicts (PlatformRecord
+        serialisations).  All other keys contain lists of strings.
         Only non-null properties with list values are included.
     """
     props = item_data.get("properties", {})
-    result: dict[str, list[str]] = {}
+    result: dict[str, list] = {}
+
+    # String-list summary properties
     for key in _SUMMARY_PROPERTIES:
         val = props.get(key)
         if val is not None and isinstance(val, list):
             result[key] = [str(v) for v in val if v is not None]
+
+    # Platform records (list of dicts)
+    platforms_raw = props.get("debrief:platforms")
+    if platforms_raw is not None and isinstance(platforms_raw, list):
+        result["debrief:platforms"] = [p for p in platforms_raw if isinstance(p, dict)]
+
     return result
 
 
@@ -160,9 +169,13 @@ def _merge_extent(
 
 def _merge_summaries(
     current_summaries: dict | None,
-    item_summaries: dict[str, list[str]],
+    item_summaries: dict[str, list],
 ) -> dict:
     """Incrementally merge item's extension properties into Collection summaries.
+
+    String-list properties (tags, feature_tags) are deduplicated and sorted.
+    Platform records are deduplicated by their ``id`` field; the first record
+    seen for a given id wins.
 
     Args:
         current_summaries: Existing summaries dict (may be None)
@@ -173,12 +186,24 @@ def _merge_summaries(
     """
     if current_summaries is None:
         current_summaries = {key: [] for key in _SUMMARY_PROPERTIES}
+        current_summaries["debrief:platforms"] = []
 
+    # Merge string-list summary properties
     for key in _SUMMARY_PROPERTIES:
         existing = set(current_summaries.get(key, []))
         new_values = set(item_summaries.get(key, []))
         merged = sorted(existing | new_values)
         current_summaries[key] = merged
+
+    # Merge platform records — deduplicate by id, preserve first-seen record
+    existing_platforms: list[dict] = current_summaries.get("debrief:platforms", [])
+    seen_ids: set[str] = {p["id"] for p in existing_platforms if "id" in p}
+    for platform in item_summaries.get("debrief:platforms", []):
+        pid = platform.get("id")
+        if pid is not None and pid not in seen_ids:
+            existing_platforms.append(platform)
+            seen_ids.add(pid)
+    current_summaries["debrief:platforms"] = existing_platforms
 
     return current_summaries
 
@@ -279,7 +304,7 @@ def rebuild_collection_summaries(
             "spatial": {"bbox": [[-180, -90, 180, 90]]},
             "temporal": {"interval": [[None, None]]},
         }
-        catalog_data["summaries"] = {key: [] for key in _SUMMARY_PROPERTIES}
+        catalog_data["summaries"] = {key: [] for key in [*_SUMMARY_PROPERTIES, "debrief:platforms"]}
 
 
 def read_collection_summaries(
@@ -338,11 +363,9 @@ def read_collection_summaries(
         summaries_data = {}
 
     summaries = CollectionSummaries(
-        vessel_classes=summaries_data.get("debrief:vessel_classes", []),
+        platforms=summaries_data.get("debrief:platforms", []),
         tags=summaries_data.get("debrief:tags", []),
         feature_tags=summaries_data.get("debrief:feature_tags", []),
-        track_names=summaries_data.get("debrief:track_names", []),
-        nationalities=summaries_data.get("debrief:nationalities", []),
     )
 
     return extent, summaries

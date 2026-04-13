@@ -5,6 +5,7 @@ import { ThemeProvider } from '../ThemeProvider';
 import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState, SavedFiltersCollection } from './types';
+import type { PlatformRecord } from '@debrief/schemas';
 
 // --- Mock Data (reused from FilterBar.stories) ---
 
@@ -17,12 +18,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -32,27 +31,31 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 const MOCK_ITEMS: StacBrowserItem[] = [
   makeItem('ex-001', {
     title: 'CASEX Alpha',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'blue-water'],
-    vesselClasses: ['surface/warship/frigate/type23'],
     author: 'CDR Smith',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T04:00:00Z',
   }),
   makeItem('ex-002', {
     title: 'CASEX Bravo',
-    nationalities: ['British'],
+    platforms: [
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['asw', 'shallow-water'],
-    vesselClasses: ['surface/warship/destroyer/type45'],
     author: 'CDR Jones',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-02T12:00:00Z',
   }),
   makeItem('ex-003', {
     title: 'GROUPEX Charlie',
-    nationalities: ['French', 'British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'asw'],
-    vesselClasses: ['surface/warship/frigate/type23', 'surface/warship/destroyer/type45'],
     author: 'CDR Smith',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-04T00:00:00Z',

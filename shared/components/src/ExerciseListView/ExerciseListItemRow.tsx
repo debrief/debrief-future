@@ -59,7 +59,10 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
   const dateLabel = formatDateRange(item.startDatetime, item.endDatetime, item.datetime);
   const folderName = item.itemPath.replace(/^\.\//, '').replace(/\/item\.json$/, '');
 
-  const vesselInfo = truncateArray(item.vesselClasses, MAX_VISIBLE_TAGS);
+  const vesselClasses = (item.platforms ?? [])
+    .map((p) => p.vessel_class)
+    .filter((v): v is string => v != null);
+  const vesselInfo = truncateArray(vesselClasses, MAX_VISIBLE_TAGS);
   const tagInfo = truncateArray(item.tags, MAX_VISIBLE_TAGS);
 
   const rowClass = [
