@@ -382,6 +382,31 @@ def determine_domain(item_id: str) -> str:
     return "core"
 
 
+def derive_vessel_fields(vessel_class: str) -> dict[str, str]:
+    """Derive ``domain``, ``vessel_role`` and ``vessel_type`` from a slash-path.
+
+    For example, ``surface/warship/frigate/type23`` becomes::
+
+        {"domain": "surface", "vessel_role": "frigate", "vessel_type": "type23"}
+
+    Shorter paths populate only the fields they can support.
+    """
+    if not vessel_class:
+        return {}
+    parts = [p for p in vessel_class.split("/") if p]
+    out: dict[str, str] = {}
+    if parts:
+        head = parts[0]
+        # Domain must be one of VesselDomainEnum values
+        if head in ("surface", "subsurface", "unknown"):
+            out["domain"] = head
+    if len(parts) >= 1:
+        out["vessel_type"] = parts[-1]
+    if len(parts) >= 2:
+        out["vessel_role"] = parts[-2]
+    return out
+
+
 def assign_platforms(
     tracks: list[dict[str, Any]],
     domain: str,
@@ -390,7 +415,11 @@ def assign_platforms(
     """Assign realistic vessel metadata to tracks and return as PlatformRecord dicts.
 
     Each returned dict corresponds to one track and contains the fields of a
-    PlatformRecord: ``id``, ``name``, ``nationality``, ``vessel_class``.
+    PlatformRecord: ``id``, ``name``, ``nationality``, ``vessel_class``,
+    ``vessel_type``, ``vessel_role``, ``domain``.
+
+    The last three are derived from ``vessel_class`` (which follows the
+    slash-delimited classification path, e.g. ``surface/warship/frigate/type23``).
 
     Returns:
         List of platform dicts, one per track.
@@ -432,7 +461,14 @@ def assign_platforms(
                 vc = rng.choice(VESSEL_CLASSES.get(cat, VESSEL_CLASSES["surface_warship"]))
 
         assigned_nationalities.add(nat)
-        platforms.append({"id": pid, "name": name, "nationality": nat, "vessel_class": vc})
+        record: dict[str, Any] = {
+            "id": pid,
+            "name": name,
+            "nationality": nat,
+            "vessel_class": vc,
+        }
+        record.update(derive_vessel_fields(vc))
+        platforms.append(record)
 
     # Ensure multi-track items show nationality diversity — patch the last platform
     if len(tracks) > 1 and len(assigned_nationalities) < 2:
