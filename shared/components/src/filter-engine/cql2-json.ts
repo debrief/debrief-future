@@ -134,26 +134,35 @@ function arrayFilterToCql2(af: ArrayFilterPredicate): Record<string, unknown> {
   return expr;
 }
 
+/** Shape of a CQL2 JSON node used in array_filter parsing */
+interface Cql2Node {
+  readonly op?: string;
+  readonly args?: readonly Cql2NodeArg[];
+}
+
+/** A CQL2 JSON arg can be a node, a property ref, or a scalar */
+type Cql2NodeArg = Cql2Node | { readonly property: string } | string;
+
 /** Parse a CQL2 JSON node into a CompoundPredicate */
-function parseCql2Predicate(node: Record<string, unknown>): CompoundPredicate {
-  const op = node["op"] as string;
-  const args = node["args"] as unknown[];
+function parseCql2Predicate(node: Cql2Node): CompoundPredicate {
+  const op = node.op;
+  const args = node.args ?? [];
 
   switch (op) {
     case "=": {
-      const propRef = args[0] as { property: string };
+      const propRef = args[0] as { readonly property: string };
       const value = args[1] as string;
       return { kind: "comparison", field: propRef.property as PlatformField, value };
     }
     case "and":
       return {
         kind: "and",
-        children: (args as Record<string, unknown>[]).map(parseCql2Predicate),
+        children: (args as readonly Cql2Node[]).map(parseCql2Predicate),
       };
     case "or":
       return {
         kind: "or",
-        children: (args as Record<string, unknown>[]).map(parseCql2Predicate),
+        children: (args as readonly Cql2Node[]).map(parseCql2Predicate),
       };
     default:
       throw new Error(`Unsupported CQL2 operator in array_filter: ${op}`);
@@ -170,20 +179,20 @@ export function cql2JsonToArrayFilters(
   cql2: Record<string, unknown>,
 ): ArrayFilterPredicate[] {
   const results: ArrayFilterPredicate[] = [];
-  walkCql2(cql2, results);
+  walkCql2(cql2 as Cql2Node, results);
   return results;
 }
 
 function walkCql2(
-  node: Record<string, unknown>,
+  node: Cql2Node,
   results: ArrayFilterPredicate[],
 ): void {
-  const op = node["op"] as string | undefined;
+  const op = node.op;
   if (!op) return;
 
   if (op === "array_filter") {
-    const args = node["args"] as unknown[];
-    const predicateNode = args[1] as Record<string, unknown>;
+    const args = node.args ?? [];
+    const predicateNode = args[1] as Cql2Node;
     results.push({
       array: "platforms",
       predicate: parseCql2Predicate(predicateNode),
@@ -193,11 +202,11 @@ function walkCql2(
   }
 
   if (op === "not") {
-    const args = node["args"] as Record<string, unknown>[];
-    const inner = args[0];
-    if (inner && (inner["op"] as string) === "array_filter") {
-      const innerArgs = inner["args"] as unknown[];
-      const predicateNode = innerArgs[1] as Record<string, unknown>;
+    const args = node.args ?? [];
+    const inner = args[0] as Cql2Node | undefined;
+    if (inner?.op === "array_filter") {
+      const innerArgs = inner.args ?? [];
+      const predicateNode = innerArgs[1] as Cql2Node;
       results.push({
         array: "platforms",
         predicate: parseCql2Predicate(predicateNode),
@@ -209,9 +218,9 @@ function walkCql2(
 
   // Walk into AND/OR children
   if (op === "and" || op === "or") {
-    const args = node["args"] as Record<string, unknown>[];
+    const args = node.args ?? [];
     for (const child of args) {
-      walkCql2(child, results);
+      walkCql2(child as Cql2Node, results);
     }
   }
 }

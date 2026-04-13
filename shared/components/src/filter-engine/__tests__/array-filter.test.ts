@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createFilterEngine } from "../engine";
 import { parseTaxonomy } from "../taxonomy";
-import type { ArrayFilterPredicate, FilterExpression, StacBrowserItem } from "../types";
+import type { FilterExpression, StacBrowserItem } from "../types";
 
 const TAXONOMY = parseTaxonomy({
   surface: {

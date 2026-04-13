@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createFilterEngine } from "../engine";
 import { parseTaxonomy } from "../taxonomy";
 import { filterExpressionToCql2Json, cql2JsonToArrayFilters } from "../cql2-json";
-import type { ArrayFilterPredicate, FilterExpression, StacBrowserItem } from "../types";
+import type { FilterExpression, StacBrowserItem } from "../types";
 
 const TAXONOMY = parseTaxonomy({
   surface: {
