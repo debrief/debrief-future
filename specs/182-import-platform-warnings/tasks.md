@@ -151,19 +151,19 @@
 
 ### Verification
 
-- [ ] T025 Run `task verify` (lint + typecheck + full test suite) and fix any failures
-- [ ] T026 Verify quickstart.md steps match actual implementation `specs/182-import-platform-warnings/quickstart.md`
+- [x] T025 Run `task verify` (lint + typecheck + full test suite) and fix any failures
+- [x] T026 Verify quickstart.md steps match actual implementation `specs/182-import-platform-warnings/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T027 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/182-import-platform-warnings/evidence/test-summary.md`
-- [ ] T028 Create usage demonstration in `specs/182-import-platform-warnings/evidence/usage-example.md`
-- [ ] T029 [P] Capture sample warning output in `specs/182-import-platform-warnings/evidence/sample-warnings.json`
+- [x] T027 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/182-import-platform-warnings/evidence/test-summary.md`
+- [x] T028 Create usage demonstration in `specs/182-import-platform-warnings/evidence/usage-example.md`
+- [x] T029 [P] Capture sample warning output in `specs/182-import-platform-warnings/evidence/sample-warnings.json`
 
 ### Media Content
 
-- [ ] T030 Create shipped blog post in `specs/182-import-platform-warnings/media/shipped-post.md`
-- [ ] T031 [P] Create LinkedIn shipped summary in `specs/182-import-platform-warnings/media/linkedin-shipped.md`
+- [x] T030 Create shipped blog post in `specs/182-import-platform-warnings/media/shipped-post.md`
+- [x] T031 [P] Create LinkedIn shipped summary in `specs/182-import-platform-warnings/media/linkedin-shipped.md`
 
 ### PR Creation
 

@@ -13,12 +13,14 @@ import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from debrief_data import PlatformRegistry
 from debrief_io.models import ImportFileError, ImportResult, ImportWarning
 from debrief_io.parser import parse
 from debrief_schemas import SensorData  # noqa: TC001 — runtime model_dump()
+
+if TYPE_CHECKING:
+    from debrief_data import PlatformRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -314,7 +316,7 @@ def import_legacy_data(
         FileNotFoundError: If source_dir does not exist.
         FileExistsError: If catalog_path already exists.
     """
-    from debrief_data import RegistryError, load_registry
+    from debrief_data import RegistryError, load_registry  # isort: skip
     from debrief_stac.assets import add_asset
     from debrief_stac.catalog import create_catalog
     from debrief_stac.features import add_features

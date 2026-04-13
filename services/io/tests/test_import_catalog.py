@@ -511,7 +511,7 @@ class TestPlatformValidationIntegration:
         import debrief_data
 
         # Monkeypatch load_registry to raise FileNotFoundError
-        def _failing_load(*_args, **_kwargs):
+        def _failing_load(*_args: object, **_kwargs: object) -> None:
             raise FileNotFoundError("registry not found")
 
         monkeypatch.setattr(debrief_data, "load_registry", _failing_load)
