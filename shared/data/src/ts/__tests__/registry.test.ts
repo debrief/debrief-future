@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve as resolvePath, dirname } from 'node:path';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { resolve as resolvePath, dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { loadRegistry } from '../registry.js';
-import type { ResolvedPlatform } from '../registry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -235,28 +235,22 @@ describe('validation', () => {
   });
 
   it('throws for invalid JSON', () => {
-    const { writeFileSync, mkdtempSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
-    const tmpDir = mkdtempSync(join(require('node:os').tmpdir(), 'reg-'));
-    const badFile = join(tmpDir, 'bad.json');
+    const tmp = mkdtempSync(join(tmpdir(), 'reg-'));
+    const badFile = join(tmp, 'bad.json');
     writeFileSync(badFile, 'not json at all', 'utf-8');
     expect(() => loadRegistry(badFile)).toThrow('Invalid registry format');
   });
 
   it('throws for missing vessel_classes root', () => {
-    const { writeFileSync, mkdtempSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
-    const tmpDir = mkdtempSync(join(require('node:os').tmpdir(), 'reg-'));
-    const badFile = join(tmpDir, 'no-root.json');
+    const tmp = mkdtempSync(join(tmpdir(), 'reg-'));
+    const badFile = join(tmp, 'no-root.json');
     writeFileSync(badFile, JSON.stringify({ platforms: {} }), 'utf-8');
     expect(() => loadRegistry(badFile)).toThrow("vessel_classes");
   });
 
   it('throws for duplicate platform ID', () => {
-    const { writeFileSync, mkdtempSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
-    const tmpDir = mkdtempSync(join(require('node:os').tmpdir(), 'reg-'));
-    const badFile = join(tmpDir, 'dupes.json');
+    const tmp = mkdtempSync(join(tmpdir(), 'reg-'));
+    const badFile = join(tmp, 'dupes.json');
     writeFileSync(
       badFile,
       JSON.stringify({
@@ -273,10 +267,8 @@ describe('validation', () => {
   });
 
   it('throws for platform missing name', () => {
-    const { writeFileSync, mkdtempSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
-    const tmpDir = mkdtempSync(join(require('node:os').tmpdir(), 'reg-'));
-    const badFile = join(tmpDir, 'no-name.json');
+    const tmp = mkdtempSync(join(tmpdir(), 'reg-'));
+    const badFile = join(tmp, 'no-name.json');
     writeFileSync(
       badFile,
       JSON.stringify({
@@ -292,10 +284,8 @@ describe('validation', () => {
   });
 
   it('throws for platform missing nationality', () => {
-    const { writeFileSync, mkdtempSync } = require('node:fs') as typeof import('node:fs');
-    const { join } = require('node:path') as typeof import('node:path');
-    const tmpDir = mkdtempSync(join(require('node:os').tmpdir(), 'reg-'));
-    const badFile = join(tmpDir, 'no-nat.json');
+    const tmp = mkdtempSync(join(tmpdir(), 'reg-'));
+    const badFile = join(tmp, 'no-nat.json');
     writeFileSync(
       badFile,
       JSON.stringify({

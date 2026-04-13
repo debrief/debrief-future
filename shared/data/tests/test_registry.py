@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
-
-from debrief_data import PlatformRegistry, RegistryError, ResolvedPlatform, load_registry
+from debrief_data import PlatformRegistry, RegistryError, load_registry
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 GOLDEN_FIXTURE = FIXTURES_DIR / "expected-platforms.json"
@@ -96,7 +94,7 @@ class TestListPlatforms:
         platforms = registry.list_platforms()
         assert len(platforms) == len(golden_platforms)
 
-        for platform, expected in zip(platforms, golden_platforms):
+        for platform, expected in zip(platforms, golden_platforms, strict=True):
             assert platform.id == expected["id"]
             assert platform.name == expected["name"]
             assert platform.short_name == expected.get("short_name")

@@ -97,12 +97,12 @@ def _collect_platforms(
             _collect_platforms(value, results, index)
 
 
-def _is_platform_entry(value: Any) -> bool:
+def _is_platform_entry(value: object) -> bool:
     """A node is a platform if it's a dict with a 'name' field."""
     return isinstance(value, dict) and "name" in value
 
 
-def _is_leaf_entry(value: Any) -> bool:
+def _is_leaf_entry(value: object) -> bool:
     """A node is a leaf if it's a dict where any non-underscore value is not a dict.
 
     This catches malformed platforms (e.g., missing 'name' but has 'nationality').
