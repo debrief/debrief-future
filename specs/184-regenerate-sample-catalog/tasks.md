@@ -48,9 +48,9 @@
 
 **Purpose**: Create the orchestration script skeleton and verify prerequisites
 
-- [ ] T001 Capture a sample item.json before regeneration for before/after evidence `specs/184-regenerate-sample-catalog/evidence/item-before.json`
-- [ ] T002 Create orchestration script skeleton with argument parsing and logging `scripts/regenerate-sample-catalog.py`
-- [ ] T003 Add script docstring with usage instructions matching quickstart.md `scripts/regenerate-sample-catalog.py`
+- [x] T001 Capture a sample item.json before regeneration for before/after evidence `specs/184-regenerate-sample-catalog/evidence/item-before.json`
+- [x] T002 Create orchestration script skeleton with argument parsing and logging `scripts/regenerate-sample-catalog.py`
+- [x] T003 Add script docstring with usage instructions matching quickstart.md `scripts/regenerate-sample-catalog.py`
 
 ---
 
@@ -58,10 +58,10 @@
 
 **Purpose**: Implement safe source file extraction from the existing catalog before any destructive operations. This BLOCKS the regeneration pipeline.
 
-- [ ] T004 [US3] Implement source file discovery — walk `local-store/*/assets/` and collect all `.rep`/`.dpf`/`.dsf` file paths `scripts/regenerate-sample-catalog.py`
-- [ ] T005 [US3] Implement staging — copy discovered source files to a temporary directory preserving filenames `scripts/regenerate-sample-catalog.py`
-- [ ] T006 [US3] Add source file count logging — report total files found and staged `scripts/regenerate-sample-catalog.py`
-- [ ] T007 [US3] Add error handling — abort if no source files found or if staging fails `scripts/regenerate-sample-catalog.py`
+- [x] T004 [US3] Implement source file discovery — walk `local-store/*/assets/` and collect all `.rep`/`.dpf`/`.dsf` file paths `scripts/regenerate-sample-catalog.py`
+- [x] T005 [US3] Implement staging — copy discovered source files to a temporary directory preserving filenames `scripts/regenerate-sample-catalog.py`
+- [x] T006 [US3] Add source file count logging — report total files found and staged `scripts/regenerate-sample-catalog.py`
+- [x] T007 [US3] Add error handling — abort if no source files found or if staging fails `scripts/regenerate-sample-catalog.py`
 
 **Checkpoint**: Source files can be safely extracted to a staging directory. No destructive operations yet.
 
@@ -75,14 +75,14 @@
 
 ### Implementation
 
-- [ ] T008 [US1] Implement catalog deletion — `shutil.rmtree` on `local-store/` with safety check that staging completed `scripts/regenerate-sample-catalog.py`
-- [ ] T009 [US1] Implement reimport — call `import_legacy_data(staging_dir, catalog_path)` from debrief_io `scripts/regenerate-sample-catalog.py`
-- [ ] T010 [US1] Add import result logging — report files processed, succeeded, failed, warnings `scripts/regenerate-sample-catalog.py`
-- [ ] T011 [US1] Add staging directory cleanup after successful import `scripts/regenerate-sample-catalog.py`
-- [ ] T012 [US1] Wire end-to-end flow: extract → nuke → import → cleanup `scripts/regenerate-sample-catalog.py`
-- [ ] T013 [US1] Run the script against the actual catalog and verify item count `scripts/regenerate-sample-catalog.py`
-- [ ] T014 [US1] Validate no deprecated flat fields in any regenerated item.json `preview/workspace/samples/local-store/`
-- [ ] T015 [US3] Validate every regenerated item has a source file asset in its `assets/` directory `preview/workspace/samples/local-store/`
+- [x] T008 [US1] Implement catalog deletion — `shutil.rmtree` on `local-store/` with safety check that staging completed `scripts/regenerate-sample-catalog.py`
+- [x] T009 [US1] Implement reimport — call `import_legacy_data(staging_dir, catalog_path)` from debrief_io `scripts/regenerate-sample-catalog.py`
+- [x] T010 [US1] Add import result logging — report files processed, succeeded, failed, warnings `scripts/regenerate-sample-catalog.py`
+- [x] T011 [US1] Add staging directory cleanup after successful import `scripts/regenerate-sample-catalog.py`
+- [x] T012 [US1] Wire end-to-end flow: extract → nuke → import → cleanup `scripts/regenerate-sample-catalog.py`
+- [x] T013 [US1] Run the script against the actual catalog and verify item count `scripts/regenerate-sample-catalog.py`
+- [x] T014 [US1] Validate no deprecated flat fields in any regenerated item.json `preview/workspace/samples/local-store/`
+- [x] T015 [US3] Validate every regenerated item has a source file asset in its `assets/` directory `preview/workspace/samples/local-store/`
 
 **Checkpoint**: Fresh catalog exists with raw imported data. Source files preserved as assets. No flat aggregate fields.
 
@@ -96,9 +96,9 @@
 
 ### Implementation
 
-- [ ] T016 [US2] Verify platform registry contains all 10 known legacy platforms from `PLATFORM_VESSEL_MAP` `shared/data/platform-registry.json`
-- [ ] T017 [US2] Check import result warnings for `UNREGISTERED_PLATFORM` entries and log unregistered platform IDs `scripts/regenerate-sample-catalog.py`
-- [ ] T018 [US2] Add any missing platforms to registry if needed `shared/data/platform-registry.json`
+- [x] T016 [US2] Verify platform registry contains all 10 known legacy platforms from `PLATFORM_VESSEL_MAP` `shared/data/platform-registry.json`
+- [x] T017 [US2] Check import result warnings for `UNREGISTERED_PLATFORM` entries and log unregistered platform IDs `scripts/regenerate-sample-catalog.py`
+- [x] T018 [US2] Add any missing platforms to registry if needed `shared/data/platform-registry.json`
 
 **Checkpoint**: Platform registry is complete for known platforms. Unregistered platforms are documented via import warnings.
 
@@ -112,11 +112,11 @@
 
 ### Implementation
 
-- [ ] T019 [US4] Add enrichment step to orchestration script — invoke `enrich-legacy-catalog.py` as subprocess after import `scripts/regenerate-sample-catalog.py`
-- [ ] T020 [US4] Add enrichment result logging — report enriched item count `scripts/regenerate-sample-catalog.py`
-- [ ] T021 [US4] Validate enrichment output — check sample item has `debrief:platforms` with name, nationality, vessel_class, vessel_type, vessel_role, domain `preview/workspace/samples/local-store/`
-- [ ] T022 [US4] Validate collection summaries in catalog.json contain `debrief:platforms` and `debrief:tags` (no flat aggregate fields) `preview/workspace/samples/local-store/catalog.json`
-- [ ] T023 [US4] Capture a sample item.json after enrichment for before/after evidence `specs/184-regenerate-sample-catalog/evidence/item-after.json`
+- [x] T019 [US4] Add enrichment step to orchestration script — invoke `enrich-legacy-catalog.py` as subprocess after import `scripts/regenerate-sample-catalog.py`
+- [x] T020 [US4] Add enrichment result logging — report enriched item count `scripts/regenerate-sample-catalog.py`
+- [x] T021 [US4] Validate enrichment output — check sample item has `debrief:platforms` with name, nationality, vessel_class, vessel_type, vessel_role, domain `preview/workspace/samples/local-store/`
+- [x] T022 [US4] Validate collection summaries in catalog.json contain `debrief:platforms` and `debrief:tags` (no flat aggregate fields) `preview/workspace/samples/local-store/catalog.json`
+- [x] T023 [US4] Capture a sample item.json after enrichment for before/after evidence `specs/184-regenerate-sample-catalog/evidence/item-after.json`
 
 **Checkpoint**: All items enriched with exercise metadata and structured platform records. Collection summaries clean.
 
@@ -130,11 +130,11 @@
 
 ### Implementation
 
-- [ ] T024 [US5] Add `main()` entry point with `if __name__ == "__main__"` guard `scripts/regenerate-sample-catalog.py`
-- [ ] T025 [US5] Add type annotations to all functions and run pyright to verify `scripts/regenerate-sample-catalog.py`
-- [ ] T026 [US5] Run ruff linter on the script and fix any issues `scripts/regenerate-sample-catalog.py`
-- [ ] T027 [US5] Run full `task verify` — lint, typecheck, test must all pass
-- [ ] T028 [US5] Verify idempotency — run the full regeneration a second time (nuke + reimport + enrich) and confirm same item count
+- [x] T024 [US5] Add `main()` entry point with `if __name__ == "__main__"` guard `scripts/regenerate-sample-catalog.py`
+- [x] T025 [US5] Add type annotations to all functions and run pyright to verify `scripts/regenerate-sample-catalog.py`
+- [x] T026 [US5] Run ruff linter on the script and fix any issues `scripts/regenerate-sample-catalog.py`
+- [x] T027 [US5] Run full `task verify` — lint, typecheck, test must all pass
+- [x] T028 [US5] Verify idempotency — run the full regeneration a second time (nuke + reimport + enrich) and confirm same item count
 
 **Checkpoint**: Script is CI-clean, typed, linted, and produces consistent output across runs.
 
@@ -146,14 +146,14 @@
 
 ### Evidence Collection
 
-- [ ] T029 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/184-regenerate-sample-catalog/evidence/test-summary.md`
-- [ ] T030 Create usage demonstration showing full script invocation and output `specs/184-regenerate-sample-catalog/evidence/usage-example.md`
-- [ ] T031 [P] Capture validation output from regeneration run `specs/184-regenerate-sample-catalog/evidence/validation-output.txt`
+- [x] T029 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/184-regenerate-sample-catalog/evidence/test-summary.md`
+- [x] T030 Create usage demonstration showing full script invocation and output `specs/184-regenerate-sample-catalog/evidence/usage-example.md`
+- [x] T031 [P] Capture validation output from regeneration run `specs/184-regenerate-sample-catalog/evidence/validation-output.txt`
 
 ### Media Content
 
-- [ ] T032 Create shipped blog post `specs/184-regenerate-sample-catalog/media/shipped-post.md`
-- [ ] T033 [P] Create LinkedIn shipped summary `specs/184-regenerate-sample-catalog/media/linkedin-shipped.md`
+- [x] T032 Create shipped blog post `specs/184-regenerate-sample-catalog/media/shipped-post.md`
+- [x] T033 [P] Create LinkedIn shipped summary `specs/184-regenerate-sample-catalog/media/linkedin-shipped.md`
 
 ### PR Creation
 
