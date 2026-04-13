@@ -44,8 +44,41 @@
     "datetime": null,
     "start_datetime": "2025-12-15T10:00:00Z",
     "end_datetime": "2025-12-15T17:12:32Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide"
+    "debrief:platforms": [
+      {
+        "id": "HMS-LANGUEDOC",
+        "name": "HMS Languedoc",
+        "nationality": "GB",
+        "vessel_class": "surface/auxiliary/tanker/tide",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "tide"
+      },
+      {
+        "id": "HMS-BRETAGNE",
+        "name": "HMS Bretagne",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-DAUNTLESS",
+        "name": "HMS Dauntless",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-AQUITAINE",
+        "name": "HMS Aquitaine",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-HARNOSAND",
+        "name": "HMS Harnosand",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-DIAMOND",
+        "name": "HMS Diamond",
+        "nationality": "GB"
+      }
     ],
     "debrief:tags": [
       "transit",
@@ -56,17 +89,6 @@
       "visual-sighting",
       "depth-charge",
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "HMS Languedoc",
-      "HMS Bretagne",
-      "HMS Dauntless",
-      "HMS Aquitaine",
-      "HMS Harnosand",
-      "HMS Diamond"
-    ],
-    "debrief:nationalities": [
-      "GB"
     ]
   },
   "links": [

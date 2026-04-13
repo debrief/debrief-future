@@ -44,21 +44,22 @@
     "datetime": null,
     "start_datetime": "2026-04-14T20:00:00Z",
     "end_datetime": "2026-04-15T03:38:29Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssbn/vanguard"
+    "debrief:platforms": [
+      {
+        "id": "HMS-SOMERSET",
+        "name": "HMS Somerset",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssbn/vanguard",
+        "domain": "subsurface",
+        "vessel_role": "ssbn",
+        "vessel_type": "vanguard"
+      }
     ],
     "debrief:tags": [
       "multi-national"
     ],
     "debrief:feature_tags": [
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "HMS Somerset"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "IN"
     ]
   },
   "links": [

@@ -44,8 +44,31 @@
     "datetime": null,
     "start_datetime": "2021-06-25T15:00:00Z",
     "end_datetime": "2021-06-29T23:15:24Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide"
+    "debrief:platforms": [
+      {
+        "id": "ITS-RAMAGE",
+        "name": "ITS Ramage",
+        "nationality": "IT",
+        "vessel_class": "surface/auxiliary/tanker/tide",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "tide"
+      },
+      {
+        "id": "HMCS-IRON-DUKE",
+        "name": "HMCS Iron Duke",
+        "nationality": "CA"
+      },
+      {
+        "id": "ITS-DEFENDER",
+        "name": "ITS Defender",
+        "nationality": "IT"
+      },
+      {
+        "id": "HMCS-DIAMOND",
+        "name": "HMCS Diamond",
+        "nationality": "CA"
+      }
     ],
     "debrief:tags": [
       "certification",
@@ -57,16 +80,6 @@
       "intercept",
       "track-merge",
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "ITS Ramage",
-      "HMCS Iron Duke",
-      "ITS Defender",
-      "HMCS Diamond"
-    ],
-    "debrief:nationalities": [
-      "IT",
-      "CA"
     ]
   },
   "links": [

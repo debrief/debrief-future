@@ -44,10 +44,34 @@
     "datetime": null,
     "start_datetime": "2022-03-02T08:00:00Z",
     "end_datetime": "2022-03-02T20:30:03Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide",
-      "surface/auxiliary/survey/echo",
-      "surface/auxiliary/supply/fort-victoria"
+    "debrief:platforms": [
+      {
+        "id": "HNOMS-BAINBRIDGE",
+        "name": "HNoMS Bainbridge",
+        "nationality": "NO",
+        "vessel_class": "surface/auxiliary/tanker/tide",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "tide"
+      },
+      {
+        "id": "SPS-EVERTSEN",
+        "name": "SPS Evertsen",
+        "nationality": "ES",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      },
+      {
+        "id": "HNOMS-CAIO-DUILIO",
+        "name": "HNoMS Caio Duilio",
+        "nationality": "NO",
+        "vessel_class": "surface/auxiliary/supply/fort-victoria",
+        "domain": "surface",
+        "vessel_role": "supply",
+        "vessel_type": "fort-victoria"
+      }
     ],
     "debrief:tags": [
       "EW",
@@ -55,15 +79,6 @@
     ],
     "debrief:feature_tags": [
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "HNoMS Bainbridge",
-      "SPS Evertsen",
-      "HNoMS Caio Duilio"
-    ],
-    "debrief:nationalities": [
-      "NO",
-      "ES"
     ]
   },
   "links": [

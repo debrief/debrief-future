@@ -44,10 +44,32 @@
     "datetime": null,
     "start_datetime": "2022-12-19T20:00:00Z",
     "end_datetime": "2022-12-31T08:59:37Z",
-    "debrief:vessel_classes": [
-      "unknown",
-      "surface/warship/patrol/river",
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "FGS-DAUNTLESS",
+        "name": "FGS Dauntless",
+        "nationality": "DE",
+        "vessel_class": "unknown",
+        "domain": "unknown"
+      },
+      {
+        "id": "USS-TROMP",
+        "name": "USS Tromp",
+        "nationality": "US",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "FGS-HESSEN",
+        "name": "FGS Hessen",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      }
     ],
     "debrief:tags": [
       "EW",
@@ -58,15 +80,6 @@
     ],
     "debrief:feature_tags": [
       "intercept"
-    ],
-    "debrief:track_names": [
-      "FGS Dauntless",
-      "USS Tromp",
-      "FGS Hessen"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "US"
     ]
   },
   "links": [

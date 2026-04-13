@@ -1,16 +1,12 @@
 {
-  "vessel_classes": [
-    "surface/warship",
-    "unknown"
+  "platforms": [
+    {
+      "id": "SHEFFIELD",
+      "name": "HMS Sheffield",
+      "nationality": "GB",
+      "vessel_class": "surface/warship"
+    }
   ],
-  "tags": [
-    "escort"
-  ],
-  "feature_tags": [],
-  "track_names": [
-    "UNKNOWN VESSEL"
-  ],
-  "nationalities": [
-    "FR"
-  ]
+  "tags": [],
+  "feature_tags": []
 }

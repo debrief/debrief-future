@@ -44,9 +44,40 @@
     "datetime": null,
     "start_datetime": "2024-09-11T21:00:00Z",
     "end_datetime": "2024-09-13T02:52:01Z",
-    "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "HMS-GONZALEZ",
+        "name": "HMS Gonzalez",
+        "nationality": "SE",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      },
+      {
+        "id": "INS-ROALD-AMUNDSEN",
+        "name": "INS Roald Amundsen",
+        "nationality": "IN",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "HMS-LABOON",
+        "name": "HMS Laboon",
+        "nationality": "SE"
+      },
+      {
+        "id": "INS-SOMERSET",
+        "name": "INS Somerset",
+        "nationality": "IN"
+      },
+      {
+        "id": "HMS-CARNEY",
+        "name": "HMS Carney",
+        "nationality": "SE"
+      }
     ],
     "debrief:tags": [
       "escort",
@@ -60,17 +91,6 @@
       "torpedo-run",
       "minefield",
       "visual-sighting"
-    ],
-    "debrief:track_names": [
-      "HMS Gonzalez",
-      "INS Roald Amundsen",
-      "HMS Laboon",
-      "INS Somerset",
-      "HMS Carney"
-    ],
-    "debrief:nationalities": [
-      "SE",
-      "IN"
     ]
   },
   "links": [
