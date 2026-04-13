@@ -22,11 +22,9 @@ function makeItem(overrides: Partial<ExerciseListItem> = {}): ExerciseListItem {
     datetime: '2024-03-15T08:00:00Z',
     startDatetime: '2024-03-15T08:00:00Z',
     endDatetime: '2024-03-17T18:00:00Z',
-    vesselClasses: ['Destroyer'],
+    platforms: [{ id: 'DEFENDER', name: 'HMS Defender', nationality: 'GB', vessel_class: 'surface/warship/destroyer', domain: 'surface' }],
     tags: ['training'],
     author: 'Jane Smith',
-    nationalities: ['GB'],
-    trackNames: ['HMS Defender'],
     trackDataHref: 'exercises/test-1/data.geojson',
     ...overrides,
   };
