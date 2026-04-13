@@ -1,0 +1,134 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "satc--old-turn-example",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.7566036,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.1649972
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.7566036,
+    5.1649972,
+    30.9332722,
+    5.212115
+  ],
+  "properties": {
+    "title": "Silent Resolve: Old Turn Example",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Silent Resolve: Old Turn Example — Semi-auto track construction exercise in the Norwegian Sea. 2 platform track(s) recorded including HMS Bainbridge, FGS Evertsen. Multi-national participation: DE, SE.",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland",
+      "subsurface/submarine/ssn/trafalgar"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "boarding",
+      "gunnery",
+      "mine-clearance",
+      "prosecution"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "HMS Bainbridge",
+      "FGS Evertsen"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "old_turn_example (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/SATC/old_turn_example.dpf",
+      "title": "old_turn_example.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-old_turn_example": {
+      "href": "./assets/old_turn_example.dpf",
+      "type": "application/octet-stream",
+      "title": "old_turn_example.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/SATC/old_turn_example.dpf",
+        "load_timestamp": "2026-03-28T13:51:01.864216Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
