@@ -1,0 +1,96 @@
+{
+  "vessel_classes": {
+    "surface": {
+      "_class": { "full_name": "Surface Vessel" },
+      "warship": {
+        "_class": { "full_name": "Warship" },
+        "frigate": {
+          "_class": { "full_name": "Frigate" },
+          "type23": {
+            "_class": { "full_name": "Type 23 (Duke-class)" },
+            "NELSON": {
+              "name": "HMS Nelson",
+              "short_name": "NLSN",
+              "nationality": "GB"
+            },
+            "FRIGATE": {
+              "name": "HMS Argyll",
+              "short_name": "ARGL",
+              "nationality": "GB"
+            },
+            "SENSOR": {
+              "name": "HMS Richmond",
+              "short_name": "RCHM",
+              "nationality": "GB"
+            },
+            "OWNSHIP_A": {
+              "name": "HMS Lancaster",
+              "short_name": "LNCS",
+              "nationality": "GB"
+            }
+          }
+        },
+        "destroyer": {
+          "_class": { "full_name": "Destroyer" },
+          "type45": {
+            "_class": { "full_name": "Type 45 (Daring-class)" },
+            "COLLINGWOOD": {
+              "name": "HMS Collingwood",
+              "short_name": "CLNG",
+              "nationality": "GB"
+            },
+            "OWNSHIP": {
+              "name": "HMS Defender",
+              "short_name": "DFNR",
+              "nationality": "GB"
+            }
+          },
+          "arleigh-burke": {
+            "_class": { "full_name": "Arleigh Burke-class" },
+            "OWNSHIP_B": {
+              "name": "USS Mason",
+              "short_name": "MSN",
+              "nationality": "US"
+            }
+          }
+        }
+      }
+    },
+    "subsurface": {
+      "_class": { "full_name": "Subsurface Vessel" },
+      "submarine": {
+        "_class": { "full_name": "Submarine" },
+        "ssn": {
+          "_class": { "full_name": "Nuclear Attack Submarine (SSN)" },
+          "astute": {
+            "_class": { "full_name": "Astute-class" },
+            "SUBJECT": {
+              "name": "Contact Alpha",
+              "short_name": "ALFA",
+              "nationality": "GB"
+            }
+          },
+          "trafalgar": {
+            "_class": { "full_name": "Trafalgar-class" },
+            "TMA_TRACK": {
+              "name": "TMA Solution Track",
+              "short_name": "TMA",
+              "nationality": "GB"
+            }
+          }
+        },
+        "ssk": {
+          "_class": { "full_name": "Diesel-Electric Submarine (SSK)" },
+          "type212": {
+            "_class": { "full_name": "Type 212" },
+            "TARGET": {
+              "name": "Contact Bravo",
+              "short_name": "BRVO",
+              "nationality": "GB"
+            }
+          }
+        }
+      }
+    }
+  }
+}

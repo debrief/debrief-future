@@ -40,14 +40,14 @@
 
 **Purpose**: Create the `shared/data/` dual-language package structure
 
-- [ ] T001 Create Python package scaffolding `shared/data/pyproject.toml`
-- [ ] T002 [P] Create Python source directory with __init__.py `shared/data/src/debrief_data/__init__.py`
-- [ ] T003 [P] Create TypeScript package config `shared/data/package.json`
-- [ ] T004 [P] Create TypeScript compiler config `shared/data/tsconfig.json`
-- [ ] T005 [P] Create Vitest config `shared/data/vitest.config.ts`
-- [ ] T006 Register Python package in root uv workspace `pyproject.toml`
-- [ ] T007 Create test directories `shared/data/tests/` and `shared/data/src/ts/__tests__/`
-- [ ] T008 Verify workspace integration: `uv sync && pnpm install`
+- [x] T001 Create Python package scaffolding `shared/data/pyproject.toml`
+- [x] T002 [P] Create Python source directory with __init__.py `shared/data/src/debrief_data/__init__.py`
+- [x] T003 [P] Create TypeScript package config `shared/data/package.json`
+- [x] T004 [P] Create TypeScript compiler config `shared/data/tsconfig.json`
+- [x] T005 [P] Create Vitest config `shared/data/vitest.config.ts`
+- [x] T006 Register Python package in root uv workspace `pyproject.toml`
+- [x] T007 Create test directories `shared/data/tests/` and `shared/data/src/ts/__tests__/`
+- [x] T008 Verify workspace integration: `uv sync && pnpm install`
 
 **Checkpoint**: Package scaffolding complete — both `debrief-data` (Python) and `@debrief/data` (TypeScript) are valid workspace members.
 
@@ -59,14 +59,14 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Author the platform registry JSON file seeded with 10 known platforms `shared/data/platform-registry.json`
-- [ ] T010 [P] Define ResolvedPlatform dataclass and PlatformRegistry class signature (Python) `shared/data/src/debrief_data/registry.py`
-- [ ] T011 [P] Define ResolvedPlatform interface and PlatformRegistry class signature (TypeScript) `shared/data/src/ts/registry.ts`
-- [ ] T012 [P] Create TypeScript barrel export `shared/data/src/ts/index.ts`
-- [ ] T013 Create golden fixture with expected resolution for all 10 platforms `shared/data/tests/fixtures/expected-platforms.json`
-- [ ] T014 Implement tree-walking parser that reads JSON, discriminates nodes vs platforms vs _class metadata, and builds platform index (Python) `shared/data/src/debrief_data/registry.py`
-- [ ] T015 [P] Implement tree-walking parser with same logic (TypeScript) `shared/data/src/ts/registry.ts`
-- [ ] T016 [P] Export load_registry, PlatformRegistry, ResolvedPlatform from Python __init__.py `shared/data/src/debrief_data/__init__.py`
+- [x] T009 Author the platform registry JSON file seeded with 10 known platforms `shared/data/platform-registry.json`
+- [x] T010 [P] Define ResolvedPlatform dataclass and PlatformRegistry class signature (Python) `shared/data/src/debrief_data/registry.py`
+- [x] T011 [P] Define ResolvedPlatform interface and PlatformRegistry class signature (TypeScript) `shared/data/src/ts/registry.ts`
+- [x] T012 [P] Create TypeScript barrel export `shared/data/src/ts/index.ts`
+- [x] T013 Create golden fixture with expected resolution for all 10 platforms `shared/data/tests/fixtures/expected-platforms.json`
+- [x] T014 Implement tree-walking parser that reads JSON, discriminates nodes vs platforms vs _class metadata, and builds platform index (Python) `shared/data/src/debrief_data/registry.py`
+- [x] T015 [P] Implement tree-walking parser with same logic (TypeScript) `shared/data/src/ts/registry.ts`
+- [x] T016 [P] Export load_registry, PlatformRegistry, ResolvedPlatform from Python __init__.py `shared/data/src/debrief_data/__init__.py`
 
 **Checkpoint**: Foundation ready — registry JSON exists, both loaders can parse the tree and build an internal index. User story implementation can now begin.
 
@@ -80,15 +80,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [test] Write Python tests for resolve(): known ID, unknown ID, empty/null ID `shared/data/tests/test_registry.py`
-- [ ] T018 [P][test] Write TypeScript tests for resolve(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T017 [test] Write Python tests for resolve(): known ID, unknown ID, empty/null ID `shared/data/tests/test_registry.py`
+- [x] T018 [P][test] Write TypeScript tests for resolve(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T019 Implement resolve() method on PlatformRegistry (Python) — index lookup returning ResolvedPlatform or None `shared/data/src/debrief_data/registry.py`
-- [ ] T020 [P] Implement resolve() method on PlatformRegistry (TypeScript) — same semantics, returns ResolvedPlatform or undefined `shared/data/src/ts/registry.ts`
-- [ ] T021 Run Python tests: `uv run pytest shared/data/tests/test_registry.py -k "resolve" -v`
-- [ ] T022 [P] Run TypeScript tests: `pnpm --filter @debrief/data test -- --grep "resolve"`
+- [x] T019 Implement resolve() method on PlatformRegistry (Python) — index lookup returning ResolvedPlatform or None `shared/data/src/debrief_data/registry.py`
+- [x] T020 [P] Implement resolve() method on PlatformRegistry (TypeScript) — same semantics, returns ResolvedPlatform or undefined `shared/data/src/ts/registry.ts`
+- [x] T021 Run Python tests: `uv run pytest shared/data/tests/test_registry.py -k "resolve" -v`
+- [x] T022 [P] Run TypeScript tests: `pnpm --filter @debrief/data test -- --grep "resolve"`
 
 **Checkpoint**: `resolve()` works in both languages. Any platform ID can be looked up to get full metadata.
 
@@ -102,17 +102,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T023 [test] Write Python tests for list_platforms(): count, sort order, all fields match golden fixture `shared/data/tests/test_registry.py`
-- [ ] T024 [P][test] Write TypeScript tests for listPlatforms(): same assertions against same golden fixture `shared/data/src/ts/__tests__/registry.test.ts`
-- [ ] T025 [P][test] Write cross-language parity test (Python): load golden fixture, resolve each platform, assert field-by-field equality `shared/data/tests/test_registry.py`
-- [ ] T026 [P][test] Write cross-language parity test (TypeScript): same fixture, same assertions `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T023 [test] Write Python tests for list_platforms(): count, sort order, all fields match golden fixture `shared/data/tests/test_registry.py`
+- [x] T024 [P][test] Write TypeScript tests for listPlatforms(): same assertions against same golden fixture `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T025 [P][test] Write cross-language parity test (Python): load golden fixture, resolve each platform, assert field-by-field equality `shared/data/tests/test_registry.py`
+- [x] T026 [P][test] Write cross-language parity test (TypeScript): same fixture, same assertions `shared/data/src/ts/__tests__/registry.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T027 Implement list_platforms() on PlatformRegistry (Python) — return sorted list of all ResolvedPlatform `shared/data/src/debrief_data/registry.py`
-- [ ] T028 [P] Implement listPlatforms() on PlatformRegistry (TypeScript) — same semantics `shared/data/src/ts/registry.ts`
-- [ ] T029 Run all Python tests: `uv run pytest shared/data/tests/ -v`
-- [ ] T030 [P] Run all TypeScript tests: `pnpm --filter @debrief/data test`
+- [x] T027 Implement list_platforms() on PlatformRegistry (Python) — return sorted list of all ResolvedPlatform `shared/data/src/debrief_data/registry.py`
+- [x] T028 [P] Implement listPlatforms() on PlatformRegistry (TypeScript) — same semantics `shared/data/src/ts/registry.ts`
+- [x] T029 Run all Python tests: `uv run pytest shared/data/tests/ -v`
+- [x] T030 [P] Run all TypeScript tests: `pnpm --filter @debrief/data test`
 
 **Checkpoint**: Enumeration works; cross-language parity confirmed via golden fixture for all 10 platforms.
 
@@ -126,19 +126,19 @@
 
 ### Tests for User Story 3
 
-- [ ] T031 [test] Write Python tests for find_by_class(): by domain, by role, by type; empty class node; invalid path `shared/data/tests/test_registry.py`
-- [ ] T032 [P][test] Write TypeScript tests for findByClass(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
-- [ ] T033 [P][test] Write Python tests for is_valid_class(): valid path, invalid path, empty string `shared/data/tests/test_registry.py`
-- [ ] T034 [P][test] Write TypeScript tests for isValidClass(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T031 [test] Write Python tests for find_by_class(): by domain, by role, by type; empty class node; invalid path `shared/data/tests/test_registry.py`
+- [x] T032 [P][test] Write TypeScript tests for findByClass(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T033 [P][test] Write Python tests for is_valid_class(): valid path, invalid path, empty string `shared/data/tests/test_registry.py`
+- [x] T034 [P][test] Write TypeScript tests for isValidClass(): same scenarios `shared/data/src/ts/__tests__/registry.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T035 Implement find_by_class() on PlatformRegistry (Python) — walk subtree, collect platforms, sort by ID `shared/data/src/debrief_data/registry.py`
-- [ ] T036 [P] Implement findByClass() on PlatformRegistry (TypeScript) — same semantics `shared/data/src/ts/registry.ts`
-- [ ] T037 [P] Implement is_valid_class() on PlatformRegistry (Python) `shared/data/src/debrief_data/registry.py`
-- [ ] T038 [P] Implement isValidClass() on PlatformRegistry (TypeScript) `shared/data/src/ts/registry.ts`
-- [ ] T039 Run all Python tests: `uv run pytest shared/data/tests/ -v`
-- [ ] T040 [P] Run all TypeScript tests: `pnpm --filter @debrief/data test`
+- [x] T035 Implement find_by_class() on PlatformRegistry (Python) — walk subtree, collect platforms, sort by ID `shared/data/src/debrief_data/registry.py`
+- [x] T036 [P] Implement findByClass() on PlatformRegistry (TypeScript) — same semantics `shared/data/src/ts/registry.ts`
+- [x] T037 [P] Implement is_valid_class() on PlatformRegistry (Python) `shared/data/src/debrief_data/registry.py`
+- [x] T038 [P] Implement isValidClass() on PlatformRegistry (TypeScript) `shared/data/src/ts/registry.ts`
+- [x] T039 Run all Python tests: `uv run pytest shared/data/tests/ -v`
+- [x] T040 [P] Run all TypeScript tests: `pnpm --filter @debrief/data test`
 
 **Checkpoint**: All 4 API operations work in both languages. Tree traversal and class validation are complete.
 
@@ -150,14 +150,14 @@
 
 ### Tests
 
-- [ ] T041 [test] Write Python validation tests: missing file, invalid JSON, missing vessel_classes root, duplicate platform ID, missing name, missing nationality `shared/data/tests/test_registry.py`
-- [ ] T042 [P][test] Write TypeScript validation tests: same error scenarios `shared/data/src/ts/__tests__/registry.test.ts`
+- [x] T041 [test] Write Python validation tests: missing file, invalid JSON, missing vessel_classes root, duplicate platform ID, missing name, missing nationality `shared/data/tests/test_registry.py`
+- [x] T042 [P][test] Write TypeScript validation tests: same error scenarios `shared/data/src/ts/__tests__/registry.test.ts`
 
 ### Implementation
 
-- [ ] T043 Add load-time validation to Python loader: check root key, detect duplicates, validate required fields per contract error table `shared/data/src/debrief_data/registry.py`
-- [ ] T044 [P] Add load-time validation to TypeScript loader: same checks, same error messages `shared/data/src/ts/registry.ts`
-- [ ] T045 Run full test suite both languages: `uv run pytest shared/data/tests/ -v && pnpm --filter @debrief/data test`
+- [x] T043 Add load-time validation to Python loader: check root key, detect duplicates, validate required fields per contract error table `shared/data/src/debrief_data/registry.py`
+- [x] T044 [P] Add load-time validation to TypeScript loader: same checks, same error messages `shared/data/src/ts/registry.ts`
+- [x] T045 Run full test suite both languages: `uv run pytest shared/data/tests/ -v && pnpm --filter @debrief/data test`
 
 **Checkpoint**: All validation error conditions produce clear, actionable error messages in both languages.
 
@@ -169,23 +169,23 @@
 
 ### Verification
 
-- [ ] T046 Run full CI check: `task verify` (or fallback: ruff + eslint + pyright + tsc + pytest + vitest)
-- [ ] T047 Validate quickstart.md examples work end-to-end
+- [x] T046 Run full CI check: `task verify` (or fallback: ruff + eslint + pyright + tsc + pytest + vitest)
+- [x] T047 Validate quickstart.md examples work end-to-end
 
 ### Evidence Collection
 
-- [ ] T048 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/180-platform-registry/evidence/test-summary.md`
-- [ ] T049 Create usage demonstration with Python and TypeScript examples and output `specs/180-platform-registry/evidence/usage-example.md`
-- [ ] T050 [P] Capture validation error output showing load-time error messages for malformed registries `specs/180-platform-registry/evidence/validation-output.txt`
+- [x] T048 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/180-platform-registry/evidence/test-summary.md`
+- [x] T049 Create usage demonstration with Python and TypeScript examples and output `specs/180-platform-registry/evidence/usage-example.md`
+- [x] T050 [P] Capture validation error output showing load-time error messages for malformed registries `specs/180-platform-registry/evidence/validation-output.txt`
 
 ### Media Content
 
-- [ ] T051 Create shipped blog post `specs/180-platform-registry/media/shipped-post.md`
-- [ ] T052 [P] Create LinkedIn shipped summary `specs/180-platform-registry/media/linkedin-shipped.md`
+- [x] T051 Create shipped blog post `specs/180-platform-registry/media/shipped-post.md`
+- [x] T052 [P] Create LinkedIn shipped summary `specs/180-platform-registry/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T053 Create PR and publish blog: run /speckit.pr
+- [x] T053 Create PR and publish blog: run /speckit.pr
 
 **Task T053 must run last. It depends on all evidence and media tasks being complete.**
 

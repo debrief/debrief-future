@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 ### Added
+- **Platform Registry** (#180) — Shared JSON registry defining a vessel class taxonomy tree with 10 seeded platforms. Dual Python (`debrief-data`) and TypeScript (`@debrief/data`) loaders with resolve, enumerate, tree traversal, and class validation APIs. [E10 Phase 0]
+  - New package: `shared/data/` with `platform-registry.json`, Python `registry.py`, TypeScript `registry.ts`
+  - Golden fixture cross-language parity: both loaders produce identical results
+  - Load-time validation: duplicate IDs, missing fields, malformed JSON
+  - Tests: 66/66 passing (33 Python + 33 TypeScript), zero new dependencies
+  - Evidence: `specs/180-platform-registry/evidence/test-summary.md`, `usage-example.md`, `validation-output.txt`
 - **Sensor Rendering** (#118) — Leaflet custom canvas layer for sensor bearing lines, ambiguous bearings, sensor arcs, snail mode time-trail fading, contact labels, and line styling. [E07 Phase 3]
   - New components: `SensorBearingLayer.tsx` (canvas layer), `sensor-utils.ts` (geometry/interpolation/colour utilities)
   - 7 Storybook stories covering all rendering modes

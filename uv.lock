@@ -12,6 +12,7 @@ members = [
     "debrief-calc",
     "debrief-cli",
     "debrief-config",
+    "debrief-data",
     "debrief-io",
     "debrief-schemas",
     "debrief-session",
@@ -502,6 +503,7 @@ dev = [
     { name = "debrief-calc" },
     { name = "debrief-cli" },
     { name = "debrief-config" },
+    { name = "debrief-data" },
     { name = "debrief-io" },
     { name = "debrief-schemas" },
     { name = "debrief-stac" },
@@ -522,6 +524,7 @@ dev = [
     { name = "debrief-calc", editable = "services/calc" },
     { name = "debrief-cli", editable = "services/cli" },
     { name = "debrief-config", editable = "services/config" },
+    { name = "debrief-data", editable = "shared/data" },
     { name = "debrief-io", editable = "services/io" },
     { name = "debrief-schemas", editable = "shared/schemas" },
     { name = "debrief-stac", editable = "services/stac" },
@@ -609,6 +612,24 @@ requires-dist = [
     { name = "filelock", specifier = ">=3.0.0" },
     { name = "platformdirs", specifier = ">=4.0.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+]
+provides-extras = ["dev"]
+
+[[package]]
+name = "debrief-data"
+version = "0.1.0"
+source = { editable = "shared/data" }
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
+[package.metadata]
+requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
 ]
