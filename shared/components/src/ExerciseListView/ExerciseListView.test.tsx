@@ -88,7 +88,7 @@ describe('ExerciseListView', () => {
 
       expect(screen.getByTestId('exercise-item-title')).toHaveTextContent('Exercise Alpha');
       expect(screen.getByTestId('exercise-item-date')).toBeInTheDocument();
-      expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('Destroyer');
+      expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('surface/warship/destroyer');
       expect(screen.getByTestId('exercise-item-meta')).toHaveTextContent('Jane Smith');
       expect(screen.getByTestId('spatial-thumbnail')).toBeInTheDocument();
     });

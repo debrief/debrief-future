@@ -132,8 +132,10 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
     const lower = value.toLowerCase();
     return (item.platforms ?? []).some((p) => p.name != null && p.name.toLowerCase() === lower);
   },
-  nationality: (item, value) =>
-    (item.platforms ?? []).some((p) => p.nationality === value),
+  nationality: (item, value) => {
+    const upper = value.toUpperCase();
+    return (item.platforms ?? []).some((p) => p.nationality != null && p.nationality.toUpperCase() === upper);
+  },
   collection: (item, value) => matchCollection(item, value),
 };
 

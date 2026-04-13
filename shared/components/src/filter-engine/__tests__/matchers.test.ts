@@ -42,7 +42,6 @@ function makeItem(overrides: Partial<StacBrowserItem> = {}): StacBrowserItem {
     endDatetime: "2025-06-01T04:00:00Z",
     platforms: [
       { id: "ARGYLL", name: "HMS Argyll", nationality: "GB", vessel_class: "surface/warship/frigate/type23", domain: "surface" },
-      { id: "PORTER", name: "USS Porter", nationality: "US", vessel_class: "surface/warship/destroyer/type45", domain: "surface" },
     ],
     tags: ["ASW", "training"],
     featureTags: ["sonar-contact"],

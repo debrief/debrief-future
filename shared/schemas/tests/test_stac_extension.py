@@ -22,7 +22,7 @@ import pytest
 from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
-from debrief_schemas import PlatformRecord, StacExtensionProperties
+from debrief_schemas import PlatformRecord, StacExtensionProperties, VesselDomainEnum
 
 STAC_BROWSER_DIR: Path = Path(__file__).parent.parent / "fixtures" / "stac-browser"
 VALID_DIR: Path = STAC_BROWSER_DIR / "valid"
@@ -416,14 +416,14 @@ class TestRoundTrip:
                     vessel_class="surface/warship/frigate/type23",
                     vessel_type="type23",
                     vessel_role="frigate",
-                    domain="surface",
+                    domain=VesselDomainEnum.surface,
                 ),
                 PlatformRecord(
                     id="SC01",
                     name="SUBMERGED CONTACT 01",
                     nationality="US",
                     vessel_class="subsurface/submarine",
-                    domain="subsurface",
+                    domain=VesselDomainEnum.subsurface,
                 ),
             ],
             tags=["ASW", "training"],
