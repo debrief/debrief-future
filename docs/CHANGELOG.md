@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- **Import Platform Warnings** (#182) — Post-parse validation checks extracted `platform_id` values against the platform registry after import; emits advisory `UNREGISTERED_PLATFORM` warnings for unregistered platforms. Import always succeeds regardless of registry coverage. [E10 Phase 2]
+  - New function: `_validate_platform_ids()` in `import_catalog.py` with registry loading and graceful fallback
+  - Warning codes: `UNREGISTERED_PLATFORM` (per platform per file), `REGISTRY_UNAVAILABLE` (registry load failure)
+  - Tests: 17/17 passing (9 unit + 8 integration), 344 existing tests unaffected
+  - Evidence: `specs/182-import-platform-warnings/evidence/test-summary.md`, `usage-example.md`, `sample-warnings.json`
 - **Platform Registry** (#180) — Shared JSON registry defining a vessel class taxonomy tree with 10 seeded platforms. Dual Python (`debrief-data`) and TypeScript (`@debrief/data`) loaders with resolve, enumerate, tree traversal, and class validation APIs. [E10 Phase 0]
   - New package: `shared/data/` with `platform-registry.json`, Python `registry.py`, TypeScript `registry.ts`
   - Golden fixture cross-language parity: both loaders produce identical results
