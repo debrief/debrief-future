@@ -25,9 +25,9 @@ interface LoadCatalogOverviewMessage {
       datetime: string | null;
       startDatetime: string | null;
       endDatetime: string | null;
-      platforms: PlatformRecord[];
-      tags: string[];
-      featureTags: string[];
+      platforms: readonly PlatformRecord[];
+      tags: readonly string[];
+      featureTags: readonly string[];
       thumbnailHref: string | null;
       thumbnailSmHref: string | null;
     }>;

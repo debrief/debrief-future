@@ -101,8 +101,18 @@ class TestExtractItemSummaries:
 
     def test_extracts_platforms(self) -> None:
         platforms = [
-            {"id": "NELSON", "name": "HMS Nelson", "nationality": "GB", "vessel_class": "surface/warship/frigate"},
-            {"id": "MASON", "name": "USS Mason", "nationality": "US", "vessel_class": "surface/warship/destroyer"},
+            {
+                "id": "NELSON",
+                "name": "HMS Nelson",
+                "nationality": "GB",
+                "vessel_class": "surface/warship/frigate",
+            },
+            {
+                "id": "MASON",
+                "name": "USS Mason",
+                "nationality": "US",
+                "vessel_class": "surface/warship/destroyer",
+            },
         ]
         item = _make_item(platforms=platforms)
         result = _extract_item_summaries(item)
@@ -169,13 +179,19 @@ class TestMergeSummaries:
     """Tests for _merge_summaries helper."""
 
     def test_first_item_sets_platforms(self) -> None:
-        platforms = [{"id": "NELSON", "vessel_class": "frigate"}, {"id": "MASON", "vessel_class": "destroyer"}]
+        platforms = [
+            {"id": "NELSON", "vessel_class": "frigate"},
+            {"id": "MASON", "vessel_class": "destroyer"},
+        ]
         result = _merge_summaries(None, {"debrief:platforms": platforms})
         assert result["debrief:platforms"] == platforms
 
     def test_merges_platforms_deduplicated_by_id(self) -> None:
         existing_platforms = [{"id": "NELSON", "vessel_class": "frigate"}]
-        new_platforms = [{"id": "NELSON", "vessel_class": "updated-frigate"}, {"id": "MASON", "vessel_class": "destroyer"}]
+        new_platforms = [
+            {"id": "NELSON", "vessel_class": "updated-frigate"},
+            {"id": "MASON", "vessel_class": "destroyer"},
+        ]
         existing = {"debrief:platforms": existing_platforms}
         result = _merge_summaries(existing, {"debrief:platforms": new_platforms})
         # NELSON already seen — first record wins; MASON is new
