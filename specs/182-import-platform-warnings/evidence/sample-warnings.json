@@ -1,0 +1,33 @@
+{
+  "scenario": "Import REP file with mixed registered and unregistered platforms",
+  "import_result": {
+    "catalog_path": "/workspace/local-store",
+    "files_processed": 1,
+    "files_succeeded": 1,
+    "files_failed": 0,
+    "total_tracks": 3,
+    "total_sensors": 0,
+    "total_narratives": 0,
+    "warnings": [
+      {
+        "file": "exercise1.rep",
+        "code": "UNREGISTERED_PLATFORM",
+        "message": "Platform 'CONTACT_BRAVO' is not registered in the platform registry"
+      },
+      {
+        "file": "exercise1.rep",
+        "code": "UNREGISTERED_PLATFORM",
+        "message": "Platform 'PHANTOM' is not registered in the platform registry"
+      }
+    ],
+    "errors": [],
+    "duration_seconds": 0.05
+  },
+  "notes": {
+    "registered_platforms": ["NELSON"],
+    "unregistered_platforms": ["CONTACT_BRAVO", "PHANTOM"],
+    "warnings_sorted": true,
+    "one_warning_per_unique_id": true,
+    "import_succeeded": true
+  }
+}
