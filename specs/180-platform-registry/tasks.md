@@ -174,14 +174,14 @@
 
 ### Evidence Collection
 
-- [ ] T048 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/180-platform-registry/evidence/test-summary.md`
-- [ ] T049 Create usage demonstration with Python and TypeScript examples and output `specs/180-platform-registry/evidence/usage-example.md`
-- [ ] T050 [P] Capture validation error output showing load-time error messages for malformed registries `specs/180-platform-registry/evidence/validation-output.txt`
+- [x] T048 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/180-platform-registry/evidence/test-summary.md`
+- [x] T049 Create usage demonstration with Python and TypeScript examples and output `specs/180-platform-registry/evidence/usage-example.md`
+- [x] T050 [P] Capture validation error output showing load-time error messages for malformed registries `specs/180-platform-registry/evidence/validation-output.txt`
 
 ### Media Content
 
-- [ ] T051 Create shipped blog post `specs/180-platform-registry/media/shipped-post.md`
-- [ ] T052 [P] Create LinkedIn shipped summary `specs/180-platform-registry/media/linkedin-shipped.md`
+- [x] T051 Create shipped blog post `specs/180-platform-registry/media/shipped-post.md`
+- [x] T052 [P] Create LinkedIn shipped summary `specs/180-platform-registry/media/linkedin-shipped.md`
 
 ### PR Creation
 
