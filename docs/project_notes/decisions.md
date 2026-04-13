@@ -331,3 +331,173 @@ Specifically:
 - ✅ Encourages use of generated types and runtime validators (Zod, Pydantic)
 - ❌ Legitimate casts require a comment — minor friction
 - ❌ New ESLint rules may flag existing code that needs migration
+
+### ADR-012: VesselDomainEnum Placement in common.yaml (2026-04-13)
+
+**Context:**
+Feature 181 (LinkML platform overrides) added a `domain` field to both `TrackProperties` in `geojson.yaml` and `PlatformRecord` in `stac-extension.yaml`. Both fields use `VesselDomainEnum` (surface/subsurface/unknown). The enum was previously defined in `stac-extension.yaml`, but `geojson.yaml` does not import `stac-extension.yaml` — and having GeoJSON depend on the STAC extension module is semantically backwards. GeoJSON features are more fundamental than STAC extensions; the dependency should flow from extension to core, not the reverse.
+
+**Decision:**
+Move `VesselDomainEnum` from `stac-extension.yaml` to `common.yaml`. The `common.yaml` module is the shared foundation already imported by both `geojson.yaml` and `stac-extension.yaml`, making it the natural home for domain-level classification enums alongside `TrackTypeEnum` and `FeatureKindEnum`.
+
+Note: this decision was documented in 181's research.md and planning post. As of this writing, the enum has not yet been physically moved — it remains in `stac-extension.yaml` with `geojson.yaml` using a direct import. This ADR is the definitive record that the move to `common.yaml` is the intended target state.
+
+**Alternatives Considered:**
+- Add `stac-extension` import to `geojson.yaml` → Rejected: creates a backwards semantic dependency where GeoJSON features depend on a STAC extension module.
+- Duplicate the enum in both files → Rejected: violates single source of truth (Constitution Article II.1). Two copies would inevitably drift.
+- Use a string with pattern constraint instead of enum → Rejected: loses schema-level validation and type safety. Downstream consumers would need to validate domain values themselves, duplicating logic.
+
+**Consequences:**
+- ✅ Both `geojson.yaml` and `stac-extension.yaml` can reference the enum through their existing `common.yaml` import
+- ✅ Dependency direction is clean: extension modules depend on core, never the reverse
+- ✅ Consistent with the placement of other domain-level enums (`TrackTypeEnum`, `FeatureKindEnum`) in `common.yaml`
+- ❌ `stac-extension.yaml` gains a `common.yaml` import (minor — consistent with project patterns)
+- ❌ Downstream features must import from `common` module rather than `stac-extension` for this enum
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+### ADR-013: PlatformRecord Is a STAC Extension Entity (2026-04-13)
+
+**Context:**
+Feature 181 introduced `PlatformRecord` — a class representing fully-resolved platform metadata (id, name, nationality, vessel_class, vessel_type, vessel_role, domain). This record is produced at save-time by merging platform registry lookups (#180) with analyst-set overrides on `TrackProperties`. The question was where to define this class in the LinkML schema hierarchy: `common.yaml` (shared foundation), `geojson.yaml` (GeoJSON features), or `stac-extension.yaml` (STAC extension properties).
+
+**Decision:**
+Define `PlatformRecord` in `stac-extension.yaml`. It is a STAC extension concept — it represents the fully-resolved metadata that appears on STAC items via the `debrief:platforms` array. Both of its consumers (`StacExtensionProperties.platforms` and `StacItemSummary.platforms`) are already defined in `stac-extension.yaml`.
+
+`PlatformRecord` is not a general-purpose domain type. It exists specifically to carry the resolved output of the save-time enrichment pipeline onto STAC items, where it enables compound catalog queries like "British submarines." The GeoJSON `TrackProperties` carries the raw override fields; `PlatformRecord` carries the resolved result.
+
+**Alternatives Considered:**
+- Define in `common.yaml` → Rejected: `PlatformRecord` is STAC-specific (resolved metadata on STAC items), not a general-purpose domain type. Placing it in `common.yaml` would blur the boundary between core domain types and extension-specific structures.
+- Define in `geojson.yaml` → Rejected: `PlatformRecord` is not a GeoJSON concept. GeoJSON carries per-track override fields; the resolved platform record belongs to the STAC catalog layer.
+
+**Consequences:**
+- ✅ Clear separation: `TrackProperties` (GeoJSON) has raw overrides; `PlatformRecord` (STAC extension) has resolved metadata
+- ✅ Both consumers are co-located in the same schema module
+- ✅ After ADR-012, `stac-extension.yaml` imports `common.yaml`, giving access to `VesselDomainEnum` for the `domain` field
+- ❌ Consumers outside the STAC extension layer must import from `stac-extension` types to work with platform records
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+### ADR-014: Flat Aggregate Fields Removed, Not Retained (2026-04-13)
+
+**Context:**
+Prior to feature 181, STAC items carried platform metadata as three flat aggregate arrays: `debrief:vessel_classes` (list of vessel class paths), `debrief:nationalities` (list of ISO country codes), and `debrief:track_names` (list of platform display names). These lists were disconnected — there was no way to associate which nationality belonged to which vessel, making compound queries like "British submarines" impossible.
+
+Feature 181 introduced `debrief:platforms` — an array of `PlatformRecord` objects where each platform carries its own nationality, vessel class, domain, and type as a unit. The question was whether to retain the flat fields alongside `debrief:platforms` during a transition period, or remove them immediately.
+
+The 181 planning post initially proposed keeping flat fields during the transition. This ADR records the revised decision that was actually implemented, which aligns with Constitution Article XIV.
+
+**Decision:**
+The flat aggregate fields (`debrief:vessel_classes`, `debrief:nationalities`, `debrief:track_names`) are **removed** from both `StacExtensionProperties` and `StacItemSummary`. `debrief:platforms` is the sole mechanism for per-item platform metadata. All existing fixtures and sample data are regenerated to conform to the new structure.
+
+This is a clean break, not a gradual transition. The governing rationale:
+- **Article XIV.1** (breaking changes permitted): there are no production users of the pre-release schema — no backward compatibility obligation exists.
+- **Article XIV.3** (deprecation rules suspended): no deprecation period is required before v4.0.0.
+- **Article XIV.4** (strict on import): maintaining two parallel representations (flat fields + platforms array) would require consumers to accept multiple input formats, which is explicitly prohibited.
+- **Article XIV.5** (fix the data, never relax the schema): existing fixtures that use the old flat format must be fixed to conform to the current schema, not preserved alongside new-format fixtures.
+
+**Alternatives Considered:**
+- Keep flat fields during transition, remove later → Rejected: creates dual-representation ambiguity with no production users to protect. Every downstream feature (#185 CQL2 array filter, #186 filter bar UI, #188 NL queries) would need to handle both formats. Constitution Article XIV.4 explicitly prohibits accepting multiple input formats.
+- Formal deprecation period → Rejected: Constitution Article XIV.3 suspends deprecation rules before v4.0.0. A deprecation period would delay a clean break with no benefit — there are no external consumers.
+
+**Consequences:**
+- ✅ Single canonical format eliminates ambiguity about which fields are authoritative
+- ✅ Downstream features build against one structure (`debrief:platforms`), not two
+- ✅ No tech debt from maintaining parallel representations or planning a future removal
+- ✅ Aligns with Constitution Article XIV principles for pre-release development
+- ❌ All consumers must migrate atomically in the same feature (see research.md Decision 6 for blast radius: ~15 TypeScript files, ~5 Python files, ~10 test files, ~100 exercise fixtures)
+- ❌ Any code searching for flat field names (e.g., `debrief:nationalities`) must be updated
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+### ADR-015: PlatformRecord Only Requires `id` (2026-04-13)
+
+**Context:**
+`PlatformRecord` carries up to seven fields: `id`, `name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, and `domain`. The question was which fields to make required. In practice, a track's `platform_id` may not match any entry in the platform registry (#180), and the analyst may not have set any override fields on the track. This results in a platform record where only the identifier is known.
+
+**Decision:**
+Only `id` is required on `PlatformRecord`. All other fields (`name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, `domain`) are optional. A record with just `{id: "UNKNOWN_CONTACT"}` is valid.
+
+Sparse records are a natural state in the data lifecycle, not an error condition:
+- **Unregistered platform**: A track with `platform_id: "UNKNOWN_CONTACT"` has no registry entry and no analyst overrides. The resulting `PlatformRecord` is `{id: "UNKNOWN_CONTACT"}` — all metadata fields are absent.
+- **Partial registry match**: A platform exists in the registry but with incomplete data (e.g., known nationality but unknown vessel class). The record carries what's available.
+- **Analyst-enriched**: An analyst has set overrides that fill in the gaps. The record carries both registry-derived and analyst-provided values.
+
+**Alternatives Considered:**
+- Require all fields, using sentinel values for unknowns (e.g., `nationality: "XX"`, `vessel_class: "unknown"`) → Rejected: sentinel values corrupt queries. A CQL2 filter for `nationality = 'XX'` would match "explicitly unknown" and "not yet resolved" indistinguishably. Absent fields are semantically distinct from sentinel values.
+- Require a minimum set (e.g., `id` + `domain`) → Rejected: `domain` is not always derivable. An unregistered platform with no analyst input has no known domain. Requiring it would force a sentinel value or prevent valid records from being created.
+
+**Consequences:**
+- ✅ Accurately models the real-world data lifecycle from unknown contact to fully-resolved platform
+- ✅ Downstream consumers can progressively enrich records without structural changes
+- ✅ No sentinel values to pollute queries or complicate filter logic
+- ✅ CQL2 `array_filter` (#185) can distinguish "field absent" from "field has value" naturally
+- ❌ Consumers must handle missing fields (null checks) — cannot assume any field beyond `id` is populated
+- ❌ Display code must have fallback rendering for sparse records (e.g., showing just the ID when name is absent)
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+### ADR-016: Override Field Pattern Constraints (2026-04-13)
+
+**Context:**
+Feature 181 added six optional override fields to `TrackProperties` in `geojson.yaml`: `display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, and `domain`. These are analyst-set overrides — populated only when someone explicitly provides values that differ from the platform registry (#180). The question was what validation constraints to apply to each field to ensure data quality while remaining compatible with established project conventions.
+
+**Decision:**
+Apply the following pattern constraints, reusing existing conventions where they exist:
+
+| Field | Type | Constraint | Rationale |
+|-------|------|-----------|-----------|
+| `display_name` | string | None | Free-text, any human-readable name |
+| `nationality` | string | `^[A-Z]{2}$` | ISO 3166-1 alpha-2, matches existing `nationalities` pattern on `StacExtensionProperties` |
+| `vessel_class` | string | `^[a-z0-9-]+(/[a-z0-9-]+){0,3}$` | 1–4 slash-delimited lowercase segments, matches existing `vessel_classes` pattern and the platform registry tree structure (#180) |
+| `vessel_type` | string | `^[a-z0-9-]+$` | Leaf segment of vessel class path — single lowercase segment |
+| `vessel_role` | string | `^[a-z0-9-]+$` | Parent of leaf segment — single lowercase segment |
+| `domain` | VesselDomainEnum | Enum constraint | Reuses existing enum (surface/subsurface/unknown) from `common.yaml` (ADR-012) |
+
+The same constraints apply to the corresponding fields on `PlatformRecord` in `stac-extension.yaml`, ensuring that override values and resolved values are validated identically.
+
+**Alternatives Considered:**
+- No pattern constraints (free-text strings) → Rejected: allows invalid data to enter the system. A nationality of "British" instead of "GB" would silently break CQL2 queries that expect ISO codes. Constitution Article XIV.4 mandates strict input validation.
+- Stricter constraints (e.g., nationality validated against a known country code list) → Rejected for now: a pattern constraint catches format errors (wrong length, wrong case) without requiring a maintained enumeration of valid country codes. The platform registry (#180) provides the authoritative list at runtime; schema-level validation catches structural violations.
+- Derive `vessel_type` and `vessel_role` at runtime instead of storing them → Considered but deferred: these fields provide query convenience. Whether to keep or drop them is a question about query patterns that will be informed by the CQL2 array filter implementation (#185). Recorded as a feedback question in the planning post.
+
+**Consequences:**
+- ✅ No new conventions to learn — all patterns reuse existing project conventions
+- ✅ Schema-level validation catches format errors before data reaches consumers
+- ✅ Consistent constraints between `TrackProperties` overrides and `PlatformRecord` resolved values
+- ✅ Compatible with the platform registry tree structure (#180)
+- ❌ Pattern constraints cannot validate semantic correctness (e.g., "ZZ" matches `^[A-Z]{2}$` but is not a real country code)
+- ❌ `vessel_class` depth limit (4 segments) is a design choice that may need revision if the vessel class taxonomy deepens
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+### ADR-017: Complete Fixture Regeneration for Schema Changes (2026-04-13)
+
+**Context:**
+Feature 181 removed the flat aggregate fields (`debrief:vessel_classes`, `debrief:nationalities`, `debrief:track_names`) and replaced them with `debrief:platforms` (ADR-014). This left all existing fixtures in a non-compliant state: 100 exercise STAC items (generated by `shared/schemas/scripts/generate-stac-fixtures.py`), STAC browser validation fixtures (`shared/schemas/fixtures/stac-browser/`), and legacy sample catalog items.
+
+The 181 planning post initially proposed targeted fixtures — adding ~7 new golden fixtures for the new structures without modifying the existing 100-item exercise set (deferring exercise regeneration to #184). This ADR records the revised decision that follows from ADR-014: if flat fields are removed (not retained), existing data must be fixed to conform.
+
+**Decision:**
+All existing fixtures are regenerated to use the `debrief:platforms` structure and remove the flat aggregate fields. Additionally, ~7 new golden fixtures are created for the new structures. Specifically:
+
+1. **Exercise fixtures** (100 items): The generation script (`generate-stac-fixtures.py`) is updated to produce `debrief:platforms` format. All 100 exercises are regenerated. No old-format exercises are retained.
+2. **STAC browser fixtures**: Existing valid fixtures (`extension-basic.json`, `extension-partial-path.json`, `extension-empty-arrays.json`) are updated to use `platforms` instead of flat fields. Invalid fixtures are updated or repurposed to test new structure constraints.
+3. **New golden fixtures** (~7): Cover fully-populated platform records, sparse records (id-only), and invalid values (bad nationality pattern, invalid domain).
+4. **Legacy sample catalog** (#184): Regenerated separately in a downstream feature, but the schema and fixture generation tooling established here applies.
+
+This follows directly from ADR-014 (flat field removal) and Constitution Article XIV.5 (fix the data, never relax the schema).
+
+**Alternatives Considered:**
+- Targeted fixtures only (add new, don't modify existing) → Rejected: directly contradicts ADR-014. If the flat fields are removed from the schema, existing fixtures that reference them will fail validation. Constitution Article XIV.5 mandates fixing data to conform to the current schema.
+- Manual fixture updates → Rejected: the 100 exercise items are script-generated. Manually editing generated files creates maintenance burden and drift risk. Update the script and regenerate.
+
+**Consequences:**
+- ✅ All fixtures validate against the current schema — no legacy-format holdouts
+- ✅ Test suite runs against the actual data structures that downstream features (#185, #186, #188) will consume
+- ✅ Single fixture format eliminates test ambiguity about which structure to assert against
+- ✅ Fixture generation script serves as executable documentation of the expected data shape
+- ❌ Large diff in a single feature (~100 regenerated JSON files) — mitigated by the fact that these are script-generated, not hand-written
+- ❌ Downstream feature #184 (sample catalog regeneration) becomes simpler but still needed for the preview workspace data
+
+**Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
