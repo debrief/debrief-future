@@ -46,8 +46,8 @@
 
 **Purpose**: Add the `debrief-data` dependency so the import pipeline can access the platform registry.
 
-- [ ] T001 Add `debrief-data` to dependencies in `services/io/pyproject.toml`
-- [ ] T002 Run `uv sync` to install the new dependency
+- [x] T001 Add `debrief-data` to dependencies in `services/io/pyproject.toml`
+- [x] T002 Run `uv sync` to install the new dependency
 
 ---
 
@@ -61,18 +61,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [test] Create unit test file `services/io/tests/test_platform_validation.py`
-- [ ] T004 [P][test] Test: all registered platforms produce no warnings `services/io/tests/test_platform_validation.py`
-- [ ] T005 [P][test] Test: unregistered platform produces warning with correct code and message `services/io/tests/test_platform_validation.py`
-- [ ] T006 [P][test] Test: empty and whitespace-only platform IDs are skipped `services/io/tests/test_platform_validation.py`
-- [ ] T007 [P][test] Test: duplicate platform IDs across features produce only one warning `services/io/tests/test_platform_validation.py`
-- [ ] T008 [P][test] Test: case-sensitive lookup ("nelson" vs "NELSON") `services/io/tests/test_platform_validation.py`
-- [ ] T009 [P][test] Test: features with no platform_id property are skipped `services/io/tests/test_platform_validation.py`
+- [x] T003 [test] Create unit test file `services/io/tests/test_platform_validation.py`
+- [x] T004 [P][test] Test: all registered platforms produce no warnings `services/io/tests/test_platform_validation.py`
+- [x] T005 [P][test] Test: unregistered platform produces warning with correct code and message `services/io/tests/test_platform_validation.py`
+- [x] T006 [P][test] Test: empty and whitespace-only platform IDs are skipped `services/io/tests/test_platform_validation.py`
+- [x] T007 [P][test] Test: duplicate platform IDs across features produce only one warning `services/io/tests/test_platform_validation.py`
+- [x] T008 [P][test] Test: case-sensitive lookup ("nelson" vs "NELSON") `services/io/tests/test_platform_validation.py`
+- [x] T009 [P][test] Test: features with no platform_id property are skipped `services/io/tests/test_platform_validation.py`
 
 ### Implementation
 
-- [ ] T010 Implement `_validate_platform_ids()` function in `services/io/src/debrief_io/import_catalog.py`
-- [ ] T011 Verify all unit tests pass
+- [x] T010 Implement `_validate_platform_ids()` function in `services/io/src/debrief_io/import_catalog.py`
+- [x] T011 Verify all unit tests pass
 
 **Checkpoint**: Validation function works in isolation. All unit tests green.
 
@@ -88,17 +88,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [test] Add integration test: import REP file with registered platforms — no UNREGISTERED_PLATFORM warnings `services/io/tests/test_import_catalog.py`
-- [ ] T013 [P][test] Add integration test: import REP file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
-- [ ] T014 [P][test] Add integration test: import DPF file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
-- [ ] T015 [P][test] Add integration test: registry unavailable — REGISTRY_UNAVAILABLE warning emitted, import still succeeds `services/io/tests/test_import_catalog.py`
+- [x] T012 [test] Add integration test: import REP file with registered platforms — no UNREGISTERED_PLATFORM warnings `services/io/tests/test_import_catalog.py`
+- [x] T013 [P][test] Add integration test: import REP file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
+- [x] T014 [P][test] Add integration test: import DPF file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
+- [x] T015 [P][test] Add integration test: registry unavailable — REGISTRY_UNAVAILABLE warning emitted, import still succeeds `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
-- [ ] T016 Add registry loading with graceful fallback at the start of `import_legacy_data()` in `services/io/src/debrief_io/import_catalog.py`
-- [ ] T017 Call `_validate_platform_ids()` after each file parse in `import_legacy_data()` `services/io/src/debrief_io/import_catalog.py`
-- [ ] T018 Verify all integration tests pass
-- [ ] T019 Verify all existing import tests still pass (regression check)
+- [x] T016 Add registry loading with graceful fallback at the start of `import_legacy_data()` in `services/io/src/debrief_io/import_catalog.py`
+- [x] T017 Call `_validate_platform_ids()` after each file parse in `import_legacy_data()` `services/io/src/debrief_io/import_catalog.py`
+- [x] T018 Verify all integration tests pass
+- [x] T019 Verify all existing import tests still pass (regression check)
 
 **Checkpoint**: Core feature works end-to-end. Import with mixed platforms produces correct warnings. Import never fails due to registry gaps.
 
@@ -112,14 +112,14 @@
 
 ### Tests
 
-- [ ] T020 [test] Add integration test: file with many positions for one unregistered platform — exactly one warning `services/io/tests/test_import_catalog.py`
-- [ ] T021 [P][test] Add integration test: file with multiple unregistered platforms — exactly one warning per unique ID `services/io/tests/test_import_catalog.py`
+- [x] T020 [test] Add integration test: file with many positions for one unregistered platform — exactly one warning `services/io/tests/test_import_catalog.py`
+- [x] T021 [P][test] Add integration test: file with multiple unregistered platforms — exactly one warning per unique ID `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
 > Deduplication is already built into `_validate_platform_ids()` (Phase 2, T010 — uses a `set()` of unique IDs). These tests verify the behaviour at the integration level.
 
-- [ ] T022 Verify deduplication integration tests pass
+- [x] T022 Verify deduplication integration tests pass
 
 **Checkpoint**: Warning deduplication verified at both unit and integration levels.
 
@@ -133,13 +133,13 @@
 
 ### Tests
 
-- [ ] T023 [test] Add integration test: batch import with different unregistered platforms in different files — each warning references correct source file `services/io/tests/test_import_catalog.py`
+- [x] T023 [test] Add integration test: batch import with different unregistered platforms in different files — each warning references correct source file `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
 > File attribution is already built into `_validate_platform_ids()` (Phase 2, T010 — `file_rel` parameter populates `ImportWarning.file`). This test verifies the behaviour at the integration level.
 
-- [ ] T024 Verify source file attribution integration test passes
+- [x] T024 Verify source file attribution integration test passes
 
 **Checkpoint**: All user stories complete and independently verified.
 
@@ -151,23 +151,23 @@
 
 ### Verification
 
-- [ ] T025 Run `task verify` (lint + typecheck + full test suite) and fix any failures
-- [ ] T026 Verify quickstart.md steps match actual implementation `specs/182-import-platform-warnings/quickstart.md`
+- [x] T025 Run `task verify` (lint + typecheck + full test suite) and fix any failures
+- [x] T026 Verify quickstart.md steps match actual implementation `specs/182-import-platform-warnings/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T027 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/182-import-platform-warnings/evidence/test-summary.md`
-- [ ] T028 Create usage demonstration in `specs/182-import-platform-warnings/evidence/usage-example.md`
-- [ ] T029 [P] Capture sample warning output in `specs/182-import-platform-warnings/evidence/sample-warnings.json`
+- [x] T027 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/182-import-platform-warnings/evidence/test-summary.md`
+- [x] T028 Create usage demonstration in `specs/182-import-platform-warnings/evidence/usage-example.md`
+- [x] T029 [P] Capture sample warning output in `specs/182-import-platform-warnings/evidence/sample-warnings.json`
 
 ### Media Content
 
-- [ ] T030 Create shipped blog post in `specs/182-import-platform-warnings/media/shipped-post.md`
-- [ ] T031 [P] Create LinkedIn shipped summary in `specs/182-import-platform-warnings/media/linkedin-shipped.md`
+- [x] T030 Create shipped blog post in `specs/182-import-platform-warnings/media/shipped-post.md`
+- [x] T031 [P] Create LinkedIn shipped summary in `specs/182-import-platform-warnings/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T032 Create PR and publish blog: run /speckit.pr
+- [x] T032 Create PR and publish blog: run /speckit.pr
 
 **Task T032 must run last. It depends on all evidence and media tasks being complete.**
 
