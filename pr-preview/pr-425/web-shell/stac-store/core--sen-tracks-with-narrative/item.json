@@ -1,0 +1,139 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--sen-tracks-with-narrative",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          8.1202679,
+          54.1207039
+        ],
+        [
+          8.9350469,
+          54.1207039
+        ],
+        [
+          8.9350469,
+          54.47309
+        ],
+        [
+          8.1202679,
+          54.47309
+        ],
+        [
+          8.1202679,
+          54.1207039
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    8.1202679,
+    54.1207039,
+    8.9350469,
+    54.47309
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Sen Tracks With Narrative",
+    "datetime": "1970-01-03T01:34:00+00:00",
+    "description": "Saxon Warrior: Sen Tracks With Narrative — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mahan, FGS Otto Sverdrup. 6 narrative entries. Multi-national participation: DE, FR.",
+    "start_datetime": "1970-01-03T01:34:00+00:00",
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/trafalgar",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "demo",
+      "escort",
+      "missile-firing",
+      "replenishment",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "sonar-contact",
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:track_names": [
+      "FS Mahan",
+      "FGS Otto Sverdrup"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sen_tracks_with_narrative (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
+      "title": "sen_tracks_with_narrative.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sen_tracks_with_narrative": {
+      "href": "./assets/sen_tracks_with_narrative.dpf",
+      "type": "application/octet-stream",
+      "title": "sen_tracks_with_narrative.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
+        "load_timestamp": "2026-03-28T13:51:04.117114Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
