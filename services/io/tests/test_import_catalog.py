@@ -506,7 +506,9 @@ class TestPlatformValidationIntegration:
         unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
         assert any("GHOST_SHIP" in w.message for w in unreg_warns)
 
-    def test_registry_unavailable_still_succeeds(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_registry_unavailable_still_succeeds(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """When registry cannot be loaded, import succeeds with REGISTRY_UNAVAILABLE warning."""
         import debrief_data
 
