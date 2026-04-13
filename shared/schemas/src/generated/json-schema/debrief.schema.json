@@ -1417,6 +1417,64 @@
       "title": "ParameterValue",
       "type": "object"
     },
+    "PlatformRecord": {
+      "additionalProperties": false,
+      "description": "Fully-resolved metadata for a single platform within a STAC item. Produced by save-time resolution merging registry lookups with analyst overrides. Only id is required; all other fields may be absent for unregistered platforms.",
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/VesselDomainEnum",
+          "description": "Top-level vessel domain classification"
+        },
+        "id": {
+          "description": "Platform identifier (e.g., \"NELSON\"). Matches platform_id on TrackProperties.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable platform name (e.g., \"HMS Nelson\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nationality": {
+          "description": "ISO 3166-1 alpha-2 country code (e.g., GB, US)",
+          "pattern": "^[A-Z]{2}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_class": {
+          "description": "Full vessel classification path using slash-separated notation (e.g., surface/warship/frigate/type23).\n",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_role": {
+          "description": "Vessel role \u2014 parent of leaf in classification path (e.g., frigate)",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_type": {
+          "description": "Vessel type \u2014 leaf of classification path (e.g., type23)",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "PlatformRecord",
+      "type": "object"
+    },
     "PlotSummary": {
       "additionalProperties": false,
       "description": "Projection of a STAC Item for UI consumption (e.g., browser tree rows). Carries only the fields required for listing and opening a plot, derived from the STAC Item plus its debrief: extension properties. Replaces the Plot interface from apps/vscode/src/types/plot.ts as the canonical summary type.",
@@ -2567,11 +2625,10 @@
             "null"
           ]
         },
-        "nationalities": {
-          "description": "Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.\n",
+        "platforms": {
+          "description": "Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.\n",
           "items": {
-            "pattern": "^[A-Z]{2}$",
-            "type": "string"
+            "$ref": "#/$defs/PlatformRecord"
           },
           "type": [
             "array",
@@ -2581,27 +2638,6 @@
         "tags": {
           "description": "Plot-level tags \u2014 free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.\n",
           "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "track_names": {
-          "description": "Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "vessel_classes": {
-          "description": "Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).\n",
-          "items": {
-            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
             "type": "string"
           },
           "type": [
@@ -2665,10 +2701,10 @@
           "description": "Path to item.json relative to store root",
           "type": "string"
         },
-        "nationalities": {
-          "description": "ISO 3166-1 alpha-2 nationality codes from debrief:nationalities\n",
+        "platforms": {
+          "description": "Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.\n",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/PlatformRecord"
           },
           "type": [
             "array",
@@ -2699,26 +2735,6 @@
         "title": {
           "description": "Item title",
           "type": "string"
-        },
-        "track_names": {
-          "description": "Track platform names from debrief:track_names",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "vessel_classes": {
-          "description": "Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
         }
       },
       "required": [
@@ -3361,6 +3377,17 @@
           "$ref": "#/$defs/PositionStyle",
           "description": "Default styling applied to all positions"
         },
+        "display_name": {
+          "description": "Human-readable platform display name override. When set, overrides the registry-derived name for this track.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "domain": {
+          "$ref": "#/$defs/VesselDomainEnum",
+          "description": "Vessel domain override. When set, overrides the registry-derived domain."
+        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -3374,6 +3401,14 @@
         "label_interval": {
           "description": "ISO 8601 duration for interval-based label display. Null means no interval-based labels.",
           "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nationality": {
+          "description": "ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality.",
+          "pattern": "^[A-Z]{2}$",
           "type": [
             "string",
             "null"
@@ -3483,6 +3518,30 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "vessel_class": {
+          "description": "Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path.",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_role": {
+          "description": "Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_type": {
+          "description": "Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
             "null"
           ]
         }

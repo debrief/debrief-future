@@ -464,6 +464,24 @@ class LineCapEnum(str, Enum):
     """
 
 
+class VesselDomainEnum(str, Enum):
+    """
+    Top-level vessel domain classification
+    """
+    surface = "surface"
+    """
+    Surface vessels (warships, auxiliaries, merchant)
+    """
+    subsurface = "subsurface"
+    """
+    Subsurface vessels (submarines)
+    """
+    unknown = "unknown"
+    """
+    Vessel domain not determined or not applicable
+    """
+
+
 class LineJoinEnum(str, Enum):
     """
     How line segment joints are rendered (SVG/CSS standard)
@@ -693,24 +711,6 @@ class FileProvDirectionEnum(str, Enum):
     target = "target"
     """
     This file is the target of the branch
-    """
-
-
-class VesselDomainEnum(str, Enum):
-    """
-    Top-level vessel domain classification
-    """
-    surface = "surface"
-    """
-    Surface vessels (warships, auxiliaries, merchant)
-    """
-    subsurface = "subsurface"
-    """
-    Subsurface vessels (submarines)
-    """
-    unknown = "unknown"
-    """
-    Vessel domain not determined or not applicable
     """
 
 
@@ -1308,6 +1308,7 @@ class SegmentMetadata(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     style: Optional[LineProperties] = Field(default=None, description="""Per-segment line styling override""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
@@ -1404,6 +1405,7 @@ class SensorData(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     base_frequency: Optional[float] = Field(default=None, description="""Reference frequency in Hz""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SensorData']} })
@@ -1469,6 +1471,7 @@ class TUAData(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     host_track_name: str = Field(default=..., description="""Name of track this TUA set relates to""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
@@ -1522,6 +1525,12 @@ class TrackProperties(BaseFeatureProperties):
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    display_name: Optional[str] = Field(default=None, description="""Human-readable platform display name override. When set, overrides the registry-derived name for this track.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    nationality: Optional[str] = Field(default=None, description="""ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_class: Optional[str] = Field(default=None, description="""Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_type: Optional[str] = Field(default=None, description="""Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_role: Optional[str] = Field(default=None, description="""Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    domain: Optional[VesselDomainEnum] = Field(default=None, description="""Vessel domain override. When set, overrides the registry-derived domain.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
@@ -1552,6 +1561,58 @@ class TrackProperties(BaseFeatureProperties):
                     raise ValueError(err_msg)
         elif isinstance(v, str) and not pattern.match(v):
             err_msg = f"Invalid label_interval format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('nationality')
+    def pattern_nationality(cls, v):
+        pattern=re.compile(r"^[A-Z]{2}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid nationality format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid nationality format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_class')
+    def pattern_vessel_class(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+){0,3}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_class format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_class format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_type')
+    def pattern_vessel_type(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_type format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_type format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_role')
+    def pattern_vessel_role(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_role format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_role format: {v}"
             raise ValueError(err_msg)
         return v
 
@@ -1601,6 +1662,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -1655,6 +1717,7 @@ class PointMetadataEntry(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
 
@@ -1688,6 +1751,7 @@ class ReferenceLocationProperties(BaseFeatureProperties):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     location_type: LocationTypeEnum = Field(default=..., description="""Type of reference""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
@@ -1775,6 +1839,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -1892,6 +1957,7 @@ class SystemState(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2044,6 +2110,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2189,6 +2256,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2445,6 +2513,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2588,6 +2657,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2729,6 +2799,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -2870,6 +2941,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3000,6 +3072,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3144,6 +3217,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3287,6 +3361,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3364,6 +3439,7 @@ class Tool(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3374,6 +3450,7 @@ class Tool(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     description: Optional[str] = Field(default=None, description="""Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
@@ -3399,6 +3476,7 @@ class ToolParameter(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     type: str = Field(default=..., description="""Value type discriminator: string, number, boolean, enum""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -3552,6 +3630,100 @@ class FileProvEntry(ConfiguredBaseModel):
     direction: Optional[FileProvDirectionEnum] = Field(default=None, description="""'source' or 'target' (for branch events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['FileProvEntry']} })
 
 
+class PlatformRecord(ConfiguredBaseModel):
+    """
+    Fully-resolved metadata for a single platform within a STAC item. Produced by save-time resolution merging registry lookups with analyst overrides. Only id is required; all other fields may be absent for unregistered platforms.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    id: str = Field(default=..., description="""Platform identifier (e.g., \"NELSON\"). Matches platform_id on TrackProperties.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlatformRecord',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'GeoJSONFeature']} })
+    name: Optional[str] = Field(default=None, description="""Human-readable platform name (e.g., \"HMS Nelson\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'SensorData',
+                       'TUAData',
+                       'PointMetadataEntry',
+                       'ReferenceLocationProperties',
+                       'Tool',
+                       'ToolParameter',
+                       'PlatformRecord',
+                       'LevelDefinition',
+                       'DatasetSeries']} })
+    nationality: Optional[str] = Field(default=None, description="""ISO 3166-1 alpha-2 country code (e.g., GB, US)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_class: Optional[str] = Field(default=None, description="""Full vessel classification path using slash-separated notation (e.g., surface/warship/frigate/type23).
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_type: Optional[str] = Field(default=None, description="""Vessel type — leaf of classification path (e.g., type23)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    vessel_role: Optional[str] = Field(default=None, description="""Vessel role — parent of leaf in classification path (e.g., frigate)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+    domain: Optional[VesselDomainEnum] = Field(default=None, description="""Top-level vessel domain classification""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'PlatformRecord']} })
+
+    @field_validator('nationality')
+    def pattern_nationality(cls, v):
+        pattern=re.compile(r"^[A-Z]{2}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid nationality format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid nationality format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_class')
+    def pattern_vessel_class(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+){0,3}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_class format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_class format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_type')
+    def pattern_vessel_type(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_type format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_type format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('vessel_role')
+    def pattern_vessel_role(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_role format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_role format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+
 class StacExtensionProperties(ConfiguredBaseModel):
     """
     Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
@@ -3559,9 +3731,9 @@ class StacExtensionProperties(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
 
-    vessel_classes: Optional[list[str]] = Field(default=[], description="""Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+    platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
-         'slot_uri': 'debrief:vessel_classes'} })
+         'slot_uri': 'debrief:platforms'} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
@@ -3570,38 +3742,6 @@ class StacExtensionProperties(ConfiguredBaseModel):
     feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
          'slot_uri': 'debrief:feature_tags'} })
-    track_names: Optional[list[str]] = Field(default=[], description="""Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
-         'slot_uri': 'debrief:track_names'} })
-    nationalities: Optional[list[str]] = Field(default=[], description="""Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
-         'slot_uri': 'debrief:nationalities'} })
-
-    @field_validator('vessel_classes')
-    def pattern_vessel_classes(cls, v):
-        pattern=re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+){0,3}$")
-        if isinstance(v, list):
-            for element in v:
-                if isinstance(element, str) and not pattern.match(element):
-                    err_msg = f"Invalid vessel_classes format: {element}"
-                    raise ValueError(err_msg)
-        elif isinstance(v, str) and not pattern.match(v):
-            err_msg = f"Invalid vessel_classes format: {v}"
-            raise ValueError(err_msg)
-        return v
-
-    @field_validator('nationalities')
-    def pattern_nationalities(cls, v):
-        pattern=re.compile(r"^[A-Z]{2}$")
-        if isinstance(v, list):
-            for element in v:
-                if isinstance(element, str) and not pattern.match(element):
-                    err_msg = f"Invalid nationalities format: {element}"
-                    raise ValueError(err_msg)
-        elif isinstance(v, str) and not pattern.match(v):
-            err_msg = f"Invalid nationalities format: {v}"
-            raise ValueError(err_msg)
-        return v
 
 
 class PlotTimeExtent(ConfiguredBaseModel):
@@ -3635,6 +3775,7 @@ class PlotSummary(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3674,6 +3815,7 @@ class StacItemSummary(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -3690,15 +3832,12 @@ class StacItemSummary(ConfiguredBaseModel):
                        'StacItemSummary']} })
     start_datetime: Optional[str] = Field(default=None, description="""Range start datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
     end_datetime: Optional[str] = Field(default=None, description="""Range end datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
-    vessel_classes: Optional[list[str]] = Field(default=[], description="""Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.
+    platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
     tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags from debrief:tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Feature-level tags from debrief:feature_tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
-    nationalities: Optional[list[str]] = Field(default=[], description="""ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
-    track_names: Optional[list[str]] = Field(default=[], description="""Track platform names from debrief:track_names""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
 
 
 class TimeInstant(ConfiguredBaseModel):
@@ -3795,6 +3934,7 @@ class LevelDefinition(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     addressingMode: AddressingMode = Field(default=..., description="""How addresses at this level are interpreted""", json_schema_extra = { "linkml_meta": {'domain_of': ['LevelDefinition']} })
@@ -3944,6 +4084,7 @@ class GeoJSONFeature(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool',
+                       'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
                        'GeoJSONFeature']} })
@@ -4201,6 +4342,7 @@ class DatasetSeries(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'Tool',
                        'ToolParameter',
+                       'PlatformRecord',
                        'LevelDefinition',
                        'DatasetSeries']} })
     data_points: list[DatasetDataPoint] = Field(default=..., description="""Array of structured data records for this series. Each record carries open x/y/domain fields; see DatasetDataPoint.
@@ -4309,6 +4451,7 @@ SnapshotRef.model_rebuild()
 BranchRecord.model_rebuild()
 BranchOrigin.model_rebuild()
 FileProvEntry.model_rebuild()
+PlatformRecord.model_rebuild()
 StacExtensionProperties.model_rebuild()
 PlotTimeExtent.model_rebuild()
 PlotSummary.model_rebuild()
