@@ -33,5 +33,5 @@
 
 - All items pass. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
 - UI Feature Validation section not applicable — this is an infrastructure feature with no user interface.
-- The spec references specific file paths (`shared/data/platform-registry.yaml`, `scripts/enrich-legacy-catalog.py`) as domain context, not implementation prescriptions — these are existing project conventions.
+- The spec references specific file paths (`shared/data/platform-registry.json`, `scripts/enrich-legacy-catalog.py`) as domain context, not implementation prescriptions — these are existing project conventions.
 - FR-006 and FR-007 mention "Python loader" and "TypeScript loader" as capability requirements (what the system must provide), not implementation details (how to build them).

@@ -10,10 +10,9 @@
 
 | File | Purpose |
 |------|---------|
-| `shared/data/platform-registry.yaml` | Registry data — vessel class tree with platform instances |
+| `shared/data/platform-registry.json` | Registry data — vessel class tree with platform instances |
 | `shared/data/src/debrief_data/registry.py` | Python loader — resolve, enumerate, traverse |
 | `shared/data/src/ts/registry.ts` | TypeScript loader — same API surface |
-| `shared/data/scripts/yaml-to-json.ts` | Build script — converts YAML → JSON for TypeScript |
 | `shared/data/tests/fixtures/expected-platforms.json` | Golden fixture for cross-language parity tests |
 | `shared/data/tests/test_registry.py` | Python unit tests |
 | `shared/data/src/ts/__tests__/registry.test.ts` | TypeScript unit tests |
@@ -21,9 +20,6 @@
 ## Development
 
 ```bash
-# Build JSON from YAML (required before TypeScript tests/usage)
-cd shared/data && pnpm build
-
 # Run Python tests
 uv run pytest shared/data/tests/
 
@@ -37,34 +33,33 @@ pnpm --filter @debrief/data typecheck
 
 ## Adding a New Platform
 
-1. Edit `shared/data/platform-registry.yaml`
+1. Edit `shared/data/platform-registry.json`
 2. Add platform under the appropriate vessel class node:
-   ```yaml
-   type23:
-     _class: { full_name: "Type 23 (Duke-class)" }
-     NELSON:      { name: "HMS Nelson",      short_name: "NLSN", nationality: "GB" }
-     # Add new platform here:
-     WESTMINSTER: { name: "HMS Westminster", short_name: "WMST", nationality: "GB" }
+   ```json
+   "type23": {
+     "_class": { "full_name": "Type 23 (Duke-class)" },
+     "NELSON": { "name": "HMS Nelson", "short_name": "NLSN", "nationality": "GB" },
+     "WESTMINSTER": { "name": "HMS Westminster", "short_name": "WMST", "nationality": "GB" }
+   }
    ```
-3. Rebuild JSON: `cd shared/data && pnpm build`
-4. Update the golden fixture if adding to the parity test suite
-5. No loader code changes required — the new platform is resolvable immediately
+3. Update the golden fixture if adding to the parity test suite
+4. No loader code changes required — the new platform is resolvable immediately
 
 ## Adding a New Vessel Class
 
-1. Edit `shared/data/platform-registry.yaml`
+1. Edit `shared/data/platform-registry.json`
 2. Add a new interior node at the appropriate level:
-   ```yaml
-   frigate:
-     type23:
-       _class: { full_name: "Type 23 (Duke-class)" }
-       # ... existing platforms
-     type31:
-       _class: { full_name: "Type 31 (Inspiration-class)" }
-       # Platforms can be added later
+   ```json
+   "frigate": {
+     "type23": {
+       "_class": { "full_name": "Type 23 (Duke-class)" }
+     },
+     "type31": {
+       "_class": { "full_name": "Type 31 (Inspiration-class)" }
+     }
+   }
    ```
-3. Rebuild JSON: `cd shared/data && pnpm build`
-4. No loader code changes required
+3. No loader code changes required
 
 ## Usage Examples
 

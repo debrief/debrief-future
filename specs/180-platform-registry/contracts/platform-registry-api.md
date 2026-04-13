@@ -26,7 +26,7 @@ All fields present when a platform is successfully resolved.
 
 | Field | Type | Nullable | Description |
 |-------|------|----------|-------------|
-| `id` | string | No | Platform ID (YAML key) |
+| `id` | string | No | Platform ID (JSON key) |
 | `name` | string | No | Human-readable display name |
 | `short_name` | string | Yes | Abbreviated identifier |
 | `nationality` | string | No | ISO 3166-1 alpha-2 code |
@@ -39,7 +39,7 @@ All fields present when a platform is successfully resolved.
 
 ### `loadRegistry(path?)`
 
-Load and validate the platform registry from a YAML file (Python) or JSON file (TypeScript).
+Load and validate the platform registry from a JSON file.
 
 **Parameters**:
 | Name | Type | Required | Default | Description |
@@ -52,7 +52,7 @@ Load and validate the platform registry from a YAML file (Python) or JSON file (
 | Condition | Error |
 |-----------|-------|
 | File not found | `FileNotFoundError` / `Error("Registry file not found: ...")` |
-| Invalid YAML/JSON | `ValueError` / `Error("Invalid registry format: ...")` |
+| Invalid JSON | `ValueError` / `Error("Invalid registry format: ...")` |
 | Missing `vessel_classes` root | `ValueError` / `Error("Registry must have 'vessel_classes' root key")` |
 | Duplicate platform ID | `ValueError` / `Error("Duplicate platform ID 'X' found at paths ...")` |
 | Platform missing `name` | `ValueError` / `Error("Platform 'X' missing required field 'name'")` |

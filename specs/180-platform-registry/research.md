@@ -5,48 +5,45 @@
 
 ## R1: Package Placement — Where Do the Registry and Loaders Live?
 
-**Decision**: Create a new `shared/data/` directory as a dual-language package housing both the YAML registry file and its Python + TypeScript loaders.
+**Decision**: Create a new `shared/data/` directory as a dual-language package housing both the JSON registry file and its Python + TypeScript loaders.
 
 **Rationale**: The platform registry is domain knowledge, not storage infrastructure or UI. It sits at the same architectural level as `shared/schemas/` (which is already a dual-language package with both `pyproject.toml` and `package.json`). Placing registry + loaders together follows the repository's established convention of co-locating related Python and TypeScript code under `shared/`.
 
 **Alternatives considered**:
-- **YAML in `shared/data/`, Python loader in `services/stac/`, TS loader in `@debrief/utils`**: Rejected because it fragments the feature across three packages. Downstream consumers would import the resolver from different locations depending on language, complicating discoverability. Also violates the "single source of truth" principle — the loader code should live next to the data it loads.
-- **YAML in `shared/schemas/`**: Rejected because the registry is not a schema. It's reference data that happens to be consumed by schema-typed code. Conflating the two would blur the boundary between data definitions and data instances.
+- **JSON in `shared/data/`, Python loader in `services/stac/`, TS loader in `@debrief/utils`**: Rejected because it fragments the feature across three packages. Downstream consumers would import the resolver from different locations depending on language, complicating discoverability. Also violates the "single source of truth" principle — the loader code should live next to the data it loads.
+- **JSON in `shared/schemas/`**: Rejected because the registry is not a schema. It's reference data that happens to be consumed by schema-typed code. Conflating the two would blur the boundary between data definitions and data instances.
 - **Plain directory, no package**: Rejected because the loaders need to be importable from services (`debrief-stac`, `debrief-io`) and from TypeScript frontends. Making `shared/data/` a workspace member enables clean `from debrief_data import ...` and `import { ... } from '@debrief/data'` patterns.
 
 **Package details**:
 - Python: `debrief-data` (uv workspace member at `shared/data/`, src layout `src/debrief_data/`)
 - TypeScript: `@debrief/data` (pnpm workspace member at `shared/data/`)
-- YAML file: `shared/data/platform-registry.yaml` (consumed at import/build time)
+- JSON file: `shared/data/platform-registry.json` (consumed at load time by both languages)
 
-## R2: YAML File Format — Tree Structure and Convention
+## R2: JSON File Format — Tree Structure and Convention
 
-**Decision**: Use the unified tree structure from the E10 epic design. `vessel_classes` is the root key. Interior nodes are vessel class categories. Leaf entries with a `name` field are platforms. `_class` entries carry class-level metadata.
+**Decision**: Use JSON with the unified tree structure from the E10 epic design. `vessel_classes` is the root key. Interior nodes are vessel class categories. Leaf entries with a `name` field are platforms. `_class` entries carry class-level metadata.
 
-**Rationale**: The epic's validated prototype confirmed this structure works for platform resolution, enumeration, and tree traversal. The `_class` convention (underscore prefix) cleanly separates class metadata from child nodes and platform entries, with no ambiguity — platform entries always have a `name` field, `_class` entries have a `full_name` field.
+**Rationale**: JSON is the project's standard data interchange format — STAC items, GeoJSON, the vessel-taxonomy fixture, and schema fixtures all use JSON. Using JSON for the registry avoids introducing a new format and eliminates any need for build-time conversion or additional parser dependencies. Both Python and TypeScript read JSON natively. The `_class` convention (underscore prefix) cleanly separates class metadata from child nodes and platform entries, with no ambiguity — platform entries always have a `name` field, `_class` entries have a `full_name` field.
 
 **Alternatives considered**:
-- **Flat list with parent references**: Rejected because it loses the structural information and requires reconstructing the tree at load time. The YAML tree naturally encodes hierarchy.
+- **YAML instead of JSON**: Considered for readability (YAML's indentation-based nesting is visually cleaner for deep trees). Rejected because: (1) no other data file in the project uses YAML — it would introduce a new technology; (2) it would require PyYAML as an explicit dependency and either `js-yaml` or a build-time conversion step for TypeScript; (3) analysts will never edit the file by hand — a future custom UI will read/write JSON directly, making YAML's human-editing advantage irrelevant.
+- **Flat list with parent references**: Rejected because it loses the structural information and requires reconstructing the tree at load time. The JSON tree naturally encodes hierarchy.
 - **Separate files for taxonomy and platforms**: Rejected because it creates a join dependency — you'd need to resolve a platform's class by looking up a separate taxonomy file. The unified tree makes this implicit.
-- **JSON instead of YAML**: Rejected because the tree is 5+ levels deep with nested objects. YAML's indentation-based nesting is significantly more readable and editable for human maintainers. Both languages can parse either format, but YAML is the better authoring experience.
 
 **Node discrimination rules**:
 - A key starting with `_` is metadata (currently only `_class`)
 - A key whose value has a `name` property is a platform leaf
 - All other keys are child class nodes (recurse)
 
-## R3: TypeScript YAML Loading Strategy
+## R3: Loading Strategy — Native JSON in Both Languages
 
-**Decision**: Build-time YAML → JSON conversion. The TypeScript loader consumes a pre-built JSON file, not the raw YAML.
+**Decision**: Both Python and TypeScript loaders read the same JSON file directly using their standard library JSON parsers. No build step, no format conversion, no additional dependencies.
 
-**Rationale**: Adding `js-yaml` as a runtime dependency violates Article IX (minimal dependencies) — it's a 2MB package for a one-time file read. Since the YAML file changes only when a developer edits it (not at runtime), converting at build time eliminates the runtime dependency entirely. The JSON file is generated into `shared/data/dist/platform-registry.json` by a build script and committed (or generated as a build step).
+**Rationale**: JSON is natively supported by both `json` (Python stdlib) and `JSON.parse` (JavaScript/TypeScript built-in). Since the registry is already in JSON format, both loaders can read it directly at load time. This is the simplest possible approach — no build scripts, no generated artifacts, no dependency management concerns. It also means the file is immediately consumable by any future tooling (editors, validation scripts, CI checks) without requiring a parser library.
 
 **Alternatives considered**:
-- **Runtime `js-yaml` parsing**: Rejected per Article IX. The YAML file is static domain knowledge, not dynamic data. Runtime parsing adds unnecessary dependency and startup cost.
-- **Runtime `yaml` (npm package)**: Same reasoning — any runtime YAML parser is unnecessary overhead.
-- **Inline the data in TypeScript**: Rejected because it would require regenerating a TypeScript module on every YAML edit, and loses the advantage of having a single human-editable source file.
-
-**Build script**: A simple Node.js script (`shared/data/scripts/yaml-to-json.ts`) reads the YAML file and writes JSON. This runs as part of the `@debrief/data` build step and is invoked by `pnpm build` in the workspace.
+- **YAML source with build-time conversion**: The original plan. Rejected because it adds a build step, a conversion script, and a generated artifact to manage. The only benefit (YAML readability) was outweighed by the cost of introducing a new format to the project.
+- **TypeScript module with embedded data**: Rejected because it would require regenerating the module on every registry edit and loses the advantage of having a single, tool-agnostic source file.
 
 ## R4: Cross-Language Parity Testing Strategy
 
@@ -64,9 +61,9 @@
 
 **Decision**: The platform registry and `vessel-taxonomy.json` are complementary, not competing. The taxonomy fixture defines the classification hierarchy for UI rendering (labels, nesting). The platform registry defines which real-world vessels belong to which class. They share the same tree structure but serve different consumers.
 
-**Rationale**: `vessel-taxonomy.json` (#133) provides `VesselTaxonomyNode` objects with `label` and `children` for driving the CascadingMenu UI. The platform registry provides platform instances with `name`, `nationality`, and `short_name` for data enrichment. They are both derived from the same conceptual tree but are consumed in different contexts (UI display vs data resolution). The registry YAML is the authoritative source; the taxonomy fixture could eventually be generated from it (out of scope for this feature).
+**Rationale**: `vessel-taxonomy.json` (#133) provides `VesselTaxonomyNode` objects with `label` and `children` for driving the CascadingMenu UI. The platform registry provides platform instances with `name`, `nationality`, and `short_name` for data enrichment. They are both derived from the same conceptual tree but are consumed in different contexts (UI display vs data resolution). The registry JSON is the authoritative source; the taxonomy fixture could eventually be generated from it (out of scope for this feature).
 
-**Consistency guarantee**: The vessel class path structure (e.g., `surface/warship/frigate/type23`) uses the same slash-separated convention in both files, ensuring interoperability between registry lookups and taxonomy-based filtering.
+**Consistency guarantee**: The vessel class path structure (e.g., `surface/warship/frigate/type23`) uses the same slash-separated convention in both files, ensuring interoperability between registry lookups and taxonomy-based filtering. Both files are JSON, making format handling consistent across the project.
 
 ## R6: Handling `vessel_role` Derivation at Varying Tree Depths
 

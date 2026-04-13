@@ -5,16 +5,18 @@
 
 ## Entities
 
-### PlatformEntry (YAML leaf node)
+### PlatformEntry (JSON leaf node)
 
-The raw platform data as authored in the YAML registry file.
+The raw platform data as authored in the JSON registry file.
 
-```yaml
-# Example: NELSON entry under surface > warship > frigate > type23
-NELSON:
-  name: "HMS Nelson"
-  short_name: "NLSN"
-  nationality: "GB"
+```json
+{
+  "NELSON": {
+    "name": "HMS Nelson",
+    "short_name": "NLSN",
+    "nationality": "GB"
+  }
+}
 ```
 
 | Field | Type | Required | Description |
@@ -23,16 +25,18 @@ NELSON:
 | `short_name` | string | No | Abbreviated identifier for compact display (e.g., "NLSN") |
 | `nationality` | string | Yes | ISO 3166-1 alpha-2 country code (e.g., "GB", "US") |
 
-The YAML key (e.g., `NELSON`) serves as the platform ID. Platform IDs are case-sensitive.
+The JSON object key (e.g., `"NELSON"`) serves as the platform ID. Platform IDs are case-sensitive.
 
-### VesselClassMeta (YAML `_class` node)
+### VesselClassMeta (JSON `_class` node)
 
 Optional metadata attached to a vessel class node in the tree.
 
-```yaml
-type23:
-  _class:
-    full_name: "Type 23 (Duke-class)"
+```json
+{
+  "type23": {
+    "_class": { "full_name": "Type 23 (Duke-class)" }
+  }
+}
 ```
 
 | Field | Type | Required | Description |
@@ -45,7 +49,7 @@ The complete metadata for a platform, combining leaf-level attributes with posit
 
 ```typescript
 interface ResolvedPlatform {
-  readonly id: string;            // Platform ID (YAML key, e.g., "NELSON")
+  readonly id: string;            // Platform ID (JSON key, e.g., "NELSON")
   readonly name: string;          // From leaf: "HMS Nelson"
   readonly short_name?: string;   // From leaf: "NLSN" (optional)
   readonly nationality: string;   // From leaf: "GB"
@@ -59,7 +63,7 @@ interface ResolvedPlatform {
 ```python
 @dataclass(frozen=True)
 class ResolvedPlatform:
-    id: str               # Platform ID (YAML key)
+    id: str               # Platform ID (JSON key)
     name: str             # From leaf
     nationality: str      # From leaf
     vessel_class: str     # Derived: full path to parent
@@ -85,7 +89,7 @@ interface VesselClassNode {
 ## Relationships
 
 ```
-platform-registry.yaml
+platform-registry.json
     │
     └──[loadRegistry()]──→ PlatformRegistry (parsed tree + index)
                                 │
@@ -98,14 +102,13 @@ platform-registry.yaml
 
 ## Data Flow
 
-1. **Build time**: `platform-registry.yaml` → YAML-to-JSON script → `platform-registry.json` (for TypeScript)
-2. **Load time (Python)**: `platform-registry.yaml` → PyYAML parse → tree walk → `PlatformRegistry` instance
-3. **Load time (TypeScript)**: `platform-registry.json` → JSON parse → tree walk → `PlatformRegistry` instance
-4. **Resolve time**: Consumer calls `registry.resolve("NELSON")` → walks tree to find platform → derives positional fields → returns `ResolvedPlatform`
+1. **Load time (Python)**: `platform-registry.json` → `json.load()` → tree walk → `PlatformRegistry` instance
+2. **Load time (TypeScript)**: `platform-registry.json` → `JSON.parse()` / `import` → tree walk → `PlatformRegistry` instance
+3. **Resolve time**: Consumer calls `registry.resolve("NELSON")` → walks index to find platform → returns `ResolvedPlatform` with derived positional fields
 
 ## Validation Rules
 
-- The YAML file MUST have `vessel_classes` as the root key
+- The JSON file MUST have `vessel_classes` as the root key
 - Each platform entry MUST have `name` (non-empty string) and `nationality` (2-letter uppercase string)
 - Platform IDs MUST be unique across the entire tree (not just within a branch)
 - Platform IDs are case-sensitive strings
@@ -132,4 +135,4 @@ platform-registry.yaml
 
 ## State Transitions
 
-N/A — the registry is a static, immutable data file. It has no runtime state transitions. Changes require editing the YAML file and reloading.
+N/A — the registry is a static, immutable data file. It has no runtime state transitions. Changes require editing the JSON file and reloading.
