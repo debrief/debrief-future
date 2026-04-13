@@ -314,6 +314,7 @@ def import_legacy_data(
         FileNotFoundError: If source_dir does not exist.
         FileExistsError: If catalog_path already exists.
     """
+    from debrief_data import RegistryError, load_registry
     from debrief_stac.assets import add_asset
     from debrief_stac.catalog import create_catalog
     from debrief_stac.features import add_features
@@ -329,6 +330,19 @@ def import_legacy_data(
     start_time = time.perf_counter()
 
     result = ImportResult(catalog_path=str(catalog_path))
+
+    # Load platform registry for post-parse validation (best-effort)
+    registry: PlatformRegistry | None = None
+    try:
+        registry = load_registry()
+    except (FileNotFoundError, RegistryError) as e:
+        result.warnings.append(
+            ImportWarning(
+                file="",
+                code="REGISTRY_UNAVAILABLE",
+                message=f"Platform registry could not be loaded: {e}. Platform validation skipped.",
+            )
+        )
 
     # Collect source files
     source_files = sorted(
@@ -375,6 +389,10 @@ def import_legacy_data(
                 result.warnings.append(
                     ImportWarning(file=file_rel, code=sw.code, message=sw.message)
                 )
+
+            # Validate platform IDs against registry (advisory only)
+            if registry is not None and parse_result.features:
+                _validate_platform_ids(parse_result.features, file_rel, registry, result.warnings)
 
             if not parse_result.features:
                 if not parse_result.pending_sensor_data:

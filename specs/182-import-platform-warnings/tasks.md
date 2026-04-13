@@ -88,17 +88,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [test] Add integration test: import REP file with registered platforms — no UNREGISTERED_PLATFORM warnings `services/io/tests/test_import_catalog.py`
-- [ ] T013 [P][test] Add integration test: import REP file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
-- [ ] T014 [P][test] Add integration test: import DPF file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
-- [ ] T015 [P][test] Add integration test: registry unavailable — REGISTRY_UNAVAILABLE warning emitted, import still succeeds `services/io/tests/test_import_catalog.py`
+- [x] T012 [test] Add integration test: import REP file with registered platforms — no UNREGISTERED_PLATFORM warnings `services/io/tests/test_import_catalog.py`
+- [x] T013 [P][test] Add integration test: import REP file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
+- [x] T014 [P][test] Add integration test: import DPF file with unregistered platforms — correct warnings emitted and import succeeds `services/io/tests/test_import_catalog.py`
+- [x] T015 [P][test] Add integration test: registry unavailable — REGISTRY_UNAVAILABLE warning emitted, import still succeeds `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
-- [ ] T016 Add registry loading with graceful fallback at the start of `import_legacy_data()` in `services/io/src/debrief_io/import_catalog.py`
-- [ ] T017 Call `_validate_platform_ids()` after each file parse in `import_legacy_data()` `services/io/src/debrief_io/import_catalog.py`
-- [ ] T018 Verify all integration tests pass
-- [ ] T019 Verify all existing import tests still pass (regression check)
+- [x] T016 Add registry loading with graceful fallback at the start of `import_legacy_data()` in `services/io/src/debrief_io/import_catalog.py`
+- [x] T017 Call `_validate_platform_ids()` after each file parse in `import_legacy_data()` `services/io/src/debrief_io/import_catalog.py`
+- [x] T018 Verify all integration tests pass
+- [x] T019 Verify all existing import tests still pass (regression check)
 
 **Checkpoint**: Core feature works end-to-end. Import with mixed platforms produces correct warnings. Import never fails due to registry gaps.
 
@@ -112,14 +112,14 @@
 
 ### Tests
 
-- [ ] T020 [test] Add integration test: file with many positions for one unregistered platform — exactly one warning `services/io/tests/test_import_catalog.py`
-- [ ] T021 [P][test] Add integration test: file with multiple unregistered platforms — exactly one warning per unique ID `services/io/tests/test_import_catalog.py`
+- [x] T020 [test] Add integration test: file with many positions for one unregistered platform — exactly one warning `services/io/tests/test_import_catalog.py`
+- [x] T021 [P][test] Add integration test: file with multiple unregistered platforms — exactly one warning per unique ID `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
 > Deduplication is already built into `_validate_platform_ids()` (Phase 2, T010 — uses a `set()` of unique IDs). These tests verify the behaviour at the integration level.
 
-- [ ] T022 Verify deduplication integration tests pass
+- [x] T022 Verify deduplication integration tests pass
 
 **Checkpoint**: Warning deduplication verified at both unit and integration levels.
 
@@ -133,13 +133,13 @@
 
 ### Tests
 
-- [ ] T023 [test] Add integration test: batch import with different unregistered platforms in different files — each warning references correct source file `services/io/tests/test_import_catalog.py`
+- [x] T023 [test] Add integration test: batch import with different unregistered platforms in different files — each warning references correct source file `services/io/tests/test_import_catalog.py`
 
 ### Implementation
 
 > File attribution is already built into `_validate_platform_ids()` (Phase 2, T010 — `file_rel` parameter populates `ImportWarning.file`). This test verifies the behaviour at the integration level.
 
-- [ ] T024 Verify source file attribution integration test passes
+- [x] T024 Verify source file attribution integration test passes
 
 **Checkpoint**: All user stories complete and independently verified.
 
