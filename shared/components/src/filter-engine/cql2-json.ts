@@ -4,7 +4,7 @@
  * Converts the internal filter model to OGC CQL2 JSON encoding.
  */
 
-import type { FilterExpression, FilterType, Predicate } from "./types";
+import type { ArrayFilterPredicate, CompoundPredicate, FilterExpression, FilterType, PlatformField, Predicate } from "./types";
 
 /** CQL2 property name mapping for each filter type */
 const PROPERTY_MAP: Record<FilterType, string> = {
@@ -93,7 +93,125 @@ export function filterExpressionToCql2Json(
     }
   }
 
+  // Array filter predicates
+  for (const af of expression.arrayFilters ?? []) {
+    allParts.push(arrayFilterToCql2(af));
+  }
+
   if (allParts.length === 0) return {};
   if (allParts.length === 1) return allParts[0]!;
   return { op: "and", args: allParts };
+}
+
+/** Convert a CompoundPredicate to CQL2 JSON */
+function compoundPredicateToCql2(pred: CompoundPredicate): Record<string, unknown> {
+  switch (pred.kind) {
+    case "comparison":
+      return { op: "=", args: [{ property: pred.field }, pred.value] };
+    case "and": {
+      if (pred.children.length === 1) return compoundPredicateToCql2(pred.children[0]!);
+      return { op: "and", args: pred.children.map(compoundPredicateToCql2) };
+    }
+    case "or": {
+      if (pred.children.length === 1) return compoundPredicateToCql2(pred.children[0]!);
+      return { op: "or", args: pred.children.map(compoundPredicateToCql2) };
+    }
+  }
+}
+
+/** Convert an ArrayFilterPredicate to CQL2 JSON */
+function arrayFilterToCql2(af: ArrayFilterPredicate): Record<string, unknown> {
+  const expr: Record<string, unknown> = {
+    op: "array_filter",
+    args: [
+      { property: "debrief:platforms" },
+      compoundPredicateToCql2(af.predicate),
+    ],
+  };
+  if (af.negated) {
+    return { op: "not", args: [expr] };
+  }
+  return expr;
+}
+
+/** Parse a CQL2 JSON node into a CompoundPredicate */
+function parseCql2Predicate(node: Record<string, unknown>): CompoundPredicate {
+  const op = node["op"] as string;
+  const args = node["args"] as unknown[];
+
+  switch (op) {
+    case "=": {
+      const propRef = args[0] as { property: string };
+      const value = args[1] as string;
+      return { kind: "comparison", field: propRef.property as PlatformField, value };
+    }
+    case "and":
+      return {
+        kind: "and",
+        children: (args as Record<string, unknown>[]).map(parseCql2Predicate),
+      };
+    case "or":
+      return {
+        kind: "or",
+        children: (args as Record<string, unknown>[]).map(parseCql2Predicate),
+      };
+    default:
+      throw new Error(`Unsupported CQL2 operator in array_filter: ${op}`);
+  }
+}
+
+/**
+ * Extract ArrayFilterPredicate[] from a CQL2 JSON tree.
+ *
+ * Walks the tree looking for `array_filter` function calls
+ * (optionally wrapped in `not`).
+ */
+export function cql2JsonToArrayFilters(
+  cql2: Record<string, unknown>,
+): ArrayFilterPredicate[] {
+  const results: ArrayFilterPredicate[] = [];
+  walkCql2(cql2, results);
+  return results;
+}
+
+function walkCql2(
+  node: Record<string, unknown>,
+  results: ArrayFilterPredicate[],
+): void {
+  const op = node["op"] as string | undefined;
+  if (!op) return;
+
+  if (op === "array_filter") {
+    const args = node["args"] as unknown[];
+    const predicateNode = args[1] as Record<string, unknown>;
+    results.push({
+      array: "platforms",
+      predicate: parseCql2Predicate(predicateNode),
+      negated: false,
+    });
+    return;
+  }
+
+  if (op === "not") {
+    const args = node["args"] as Record<string, unknown>[];
+    const inner = args[0];
+    if (inner && (inner["op"] as string) === "array_filter") {
+      const innerArgs = inner["args"] as unknown[];
+      const predicateNode = innerArgs[1] as Record<string, unknown>;
+      results.push({
+        array: "platforms",
+        predicate: parseCql2Predicate(predicateNode),
+        negated: true,
+      });
+      return;
+    }
+  }
+
+  // Walk into AND/OR children
+  if (op === "and" || op === "or") {
+    const args = node["args"] as Record<string, unknown>[];
+    for (const child of args) {
+      walkCql2(child, results);
+    }
+  }
 }
