@@ -44,8 +44,51 @@
     "datetime": null,
     "start_datetime": "2023-04-12T08:00:00Z",
     "end_datetime": "2023-04-12T20:07:33Z",
-    "debrief:vessel_classes": [
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "HDMS-DE-ZEVEN-PROVINCIEN",
+        "name": "HDMS De Zeven Provincien",
+        "nationality": "DK",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "HMS-PROVENCE",
+        "name": "HMS Provence",
+        "nationality": "GB"
+      },
+      {
+        "id": "INS-HAMBURG",
+        "name": "INS Hamburg",
+        "nationality": "IN"
+      },
+      {
+        "id": "FGS-ROALD-AMUNDSEN",
+        "name": "FGS Roald Amundsen",
+        "nationality": "DE"
+      },
+      {
+        "id": "USS-MAHAN",
+        "name": "USS Mahan",
+        "nationality": "US"
+      },
+      {
+        "id": "HMAS-BERGAMINI",
+        "name": "HMAS Bergamini",
+        "nationality": "AU"
+      },
+      {
+        "id": "HDMS-SACHSEN",
+        "name": "HDMS Sachsen",
+        "nationality": "DK"
+      },
+      {
+        "id": "HMS-NYKOPING",
+        "name": "HMS Nykoping",
+        "nationality": "GB"
+      }
     ],
     "debrief:tags": [
       "multi-national",
@@ -59,24 +102,6 @@
       "helicopter-ops",
       "passive-search",
       "sprint-and-drift"
-    ],
-    "debrief:track_names": [
-      "HDMS De Zeven Provincien",
-      "HMS Provence",
-      "INS Hamburg",
-      "FGS Roald Amundsen",
-      "USS Mahan",
-      "HMAS Bergamini",
-      "HDMS Sachsen",
-      "HMS Nykoping"
-    ],
-    "debrief:nationalities": [
-      "DK",
-      "GB",
-      "IN",
-      "DE",
-      "US",
-      "AU"
     ]
   },
   "links": [

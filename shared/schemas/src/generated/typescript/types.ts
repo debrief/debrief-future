@@ -213,6 +213,18 @@ export enum LineCapEnum {
     square = "square",
 };
 /**
+* Top-level vessel domain classification
+*/
+export enum VesselDomainEnum {
+    
+    /** Surface vessels (warships, auxiliaries, merchant) */
+    surface = "surface",
+    /** Subsurface vessels (submarines) */
+    subsurface = "subsurface",
+    /** Vessel domain not determined or not applicable */
+    unknown = "unknown",
+};
+/**
 * How line segment joints are rendered (SVG/CSS standard)
 */
 export enum LineJoinEnum {
@@ -363,18 +375,6 @@ export enum FileProvDirectionEnum {
     source = "source",
     /** This file is the target of the branch */
     target = "target",
-};
-/**
-* Top-level vessel domain classification
-*/
-export enum VesselDomainEnum {
-    
-    /** Surface vessels (warships, auxiliaries, merchant) */
-    surface = "surface",
-    /** Subsurface vessels (submarines) */
-    subsurface = "subsurface",
-    /** Vessel domain not determined or not applicable */
-    unknown = "unknown",
 };
 /**
 * Current state of time playback
@@ -865,6 +865,18 @@ export interface TrackProperties extends BaseFeatureProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
+    /** Human-readable platform display name override. When set, overrides the registry-derived name for this track. */
+    display_name?: string,
+    /** ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality. */
+    nationality?: string,
+    /** Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path. */
+    vessel_class?: string,
+    /** Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type. */
+    vessel_type?: string,
+    /** Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role. */
+    vessel_role?: string,
+    /** Vessel domain override. When set, overrides the registry-derived domain. */
+    domain?: string,
 }
 
 
@@ -1499,25 +1511,42 @@ export interface FileProvEntry {
 
 
 /**
+ * Fully-resolved metadata for a single platform within a STAC item. Produced by save-time resolution merging registry lookups with analyst overrides. Only id is required; all other fields may be absent for unregistered platforms.
+
+ */
+export interface PlatformRecord {
+    /** Platform identifier (e.g., "NELSON"). Matches platform_id on TrackProperties. */
+    id: string,
+    /** Human-readable platform name (e.g., "HMS Nelson") */
+    name?: string,
+    /** ISO 3166-1 alpha-2 country code (e.g., GB, US) */
+    nationality?: string,
+    /** Full vessel classification path using slash-separated notation (e.g., surface/warship/frigate/type23).
+ */
+    vessel_class?: string,
+    /** Vessel type — leaf of classification path (e.g., type23) */
+    vessel_type?: string,
+    /** Vessel role — parent of leaf in classification path (e.g., frigate) */
+    vessel_role?: string,
+    /** Top-level vessel domain classification */
+    domain?: string,
+}
+
+
+/**
  * Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
 
  */
 export interface StacExtensionProperties {
-    /** Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+    /** Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
  */
-    vessel_classes?: string[],
+    platforms?: PlatformRecord[],
     /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
  */
     tags?: string[],
     /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
  */
     feature_tags?: string[],
-    /** Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
- */
-    track_names?: string[],
-    /** Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
- */
-    nationalities?: string[],
 }
 
 
@@ -1584,18 +1613,13 @@ export interface StacItemSummary {
     start_datetime?: string,
     /** Range end datetime (ISO 8601) */
     end_datetime?: string,
-    /** Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.
+    /** Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
  */
-    vessel_classes?: string[],
+    platforms?: PlatformRecord[],
     /** Plot-level tags from debrief:tags */
     tags?: string[],
     /** Feature-level tags from debrief:feature_tags */
     feature_tags?: string[],
-    /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
- */
-    nationalities?: string[],
-    /** Track platform names from debrief:track_names */
-    track_names?: string[],
 }
 
 

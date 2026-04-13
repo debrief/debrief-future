@@ -44,9 +44,35 @@
     "datetime": null,
     "start_datetime": "2024-09-17T13:00:00Z",
     "end_datetime": "2024-09-18T17:57:29Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssbn/vanguard",
-      "subsurface/submarine/ssn/virginia"
+    "debrief:platforms": [
+      {
+        "id": "JS-ROALD-AMUNDSEN",
+        "name": "JS Roald Amundsen",
+        "nationality": "JP",
+        "vessel_class": "subsurface/submarine/ssbn/vanguard",
+        "domain": "subsurface",
+        "vessel_role": "ssbn",
+        "vessel_type": "vanguard"
+      },
+      {
+        "id": "JS-MAHAN",
+        "name": "JS Mahan",
+        "nationality": "JP",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_role": "ssn",
+        "vessel_type": "virginia"
+      },
+      {
+        "id": "JS-OTTO-SVERDRUP",
+        "name": "JS Otto Sverdrup",
+        "nationality": "JP"
+      },
+      {
+        "id": "JS-NORDRHEIN-WESTFALEN",
+        "name": "JS Nordrhein-Westfalen",
+        "nationality": "JP"
+      }
     ],
     "debrief:tags": [
       "surveillance",
@@ -57,15 +83,6 @@
     "debrief:feature_tags": [
       "zig-zag",
       "radar-detection"
-    ],
-    "debrief:track_names": [
-      "JS Roald Amundsen",
-      "JS Mahan",
-      "JS Otto Sverdrup",
-      "JS Nordrhein-Westfalen"
-    ],
-    "debrief:nationalities": [
-      "JP"
     ]
   },
   "links": [

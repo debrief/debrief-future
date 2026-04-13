@@ -12,12 +12,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -25,10 +23,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 }
 
 const mockItems: StacBrowserItem[] = [
-  makeItem('1', { nationalities: ['French'], tags: ['alpha'] }),
-  makeItem('2', { nationalities: ['British'], tags: ['beta'] }),
-  makeItem('3', { nationalities: ['French', 'German'], tags: ['alpha', 'gamma'] }),
-  makeItem('4', { nationalities: ['German'], tags: ['beta'] }),
+  makeItem('1', { platforms: [{ id: 'P1', nationality: 'French' }], tags: ['alpha'] }),
+  makeItem('2', { platforms: [{ id: 'P2', nationality: 'British' }], tags: ['beta'] }),
+  makeItem('3', { platforms: [{ id: 'P3', nationality: 'French' }, { id: 'P4', nationality: 'German' }], tags: ['alpha', 'gamma'] }),
+  makeItem('4', { platforms: [{ id: 'P5', nationality: 'German' }], tags: ['beta'] }),
 ];
 
 const mockTaxonomy: VesselTaxonomyNode[] = [

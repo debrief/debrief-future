@@ -41,12 +41,10 @@ function makeItem(
     datetime: null,
     startDatetime: "2025-06-01T00:00:00Z",
     endDatetime: "2025-06-01T12:00:00Z",
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -55,23 +53,19 @@ function makeItem(
 
 const ITEMS: StacBrowserItem[] = [
   makeItem("1", {
-    vesselClasses: ["surface/warship/frigate/type23"],
-    nationalities: ["GB"],
+    platforms: [{ id: "ARGYLL", vessel_class: "surface/warship/frigate/type23", nationality: "GB", domain: "surface" }],
     tags: ["ASW"],
   }),
   makeItem("2", {
-    vesselClasses: ["surface/warship/destroyer/type45"],
-    nationalities: ["US"],
+    platforms: [{ id: "PORTER", vessel_class: "surface/warship/destroyer/type45", nationality: "US", domain: "surface" }],
     tags: ["training"],
   }),
   makeItem("3", {
-    vesselClasses: ["surface/warship/frigate/type26"],
-    nationalities: ["GB"],
+    platforms: [{ id: "KENT", vessel_class: "surface/warship/frigate/type26", nationality: "GB", domain: "surface" }],
     tags: ["ASW", "multi-national"],
   }),
   makeItem("4", {
-    vesselClasses: [],
-    nationalities: ["FR"],
+    platforms: [{ id: "FORBIN", vessel_class: "surface/warship/frigate/type-f70", nationality: "FR", domain: "surface" }],
     tags: [],
   }),
 ];

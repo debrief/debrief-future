@@ -44,9 +44,25 @@
     "datetime": null,
     "start_datetime": "2025-02-15T14:00:00Z",
     "end_datetime": "2025-03-11T04:27:08Z",
-    "debrief:vessel_classes": [
-      "surface/warship/patrol/river",
-      "surface/warship/destroyer/arleigh-burke"
+    "debrief:platforms": [
+      {
+        "id": "HMS-DEFENDER",
+        "name": "HMS Defender",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "HMS-BAINBRIDGE",
+        "name": "HMS Bainbridge",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      }
     ],
     "debrief:tags": [
       "missile-firing",
@@ -57,13 +73,6 @@
     "debrief:feature_tags": [
       "intercept",
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "HMS Defender",
-      "HMS Bainbridge"
-    ],
-    "debrief:nationalities": [
-      "GB"
     ]
   },
   "links": [

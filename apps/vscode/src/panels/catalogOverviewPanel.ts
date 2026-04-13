@@ -8,7 +8,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import type { StacItemSummary, Catalog } from '../types/stac';
+import type { StacItemSummary, Catalog, PlatformRecord } from '../types/stac';
 
 /** Message sent from extension to webview */
 interface LoadCatalogOverviewMessage {
@@ -25,6 +25,9 @@ interface LoadCatalogOverviewMessage {
       datetime: string | null;
       startDatetime: string | null;
       endDatetime: string | null;
+      platforms: readonly PlatformRecord[];
+      tags: readonly string[];
+      featureTags: readonly string[];
       thumbnailHref: string | null;
       thumbnailSmHref: string | null;
     }>;
@@ -167,11 +170,9 @@ export class CatalogOverviewPanel {
         datetime: item.datetime ?? null,
         startDatetime: item.startDatetime ?? null,
         endDatetime: item.endDatetime ?? null,
-        vesselClasses: item.vesselClasses ?? [],
+        platforms: item.platforms ?? [],
         tags: item.tags ?? [],
         featureTags: item.featureTags ?? [],
-        nationalities: item.nationalities ?? [],
-        trackNames: item.trackNames ?? [],
         thumbnailHref,
         thumbnailSmHref,
       };

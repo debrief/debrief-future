@@ -44,9 +44,25 @@
     "datetime": null,
     "start_datetime": "2023-02-27T02:00:00Z",
     "end_datetime": "2023-02-27T15:12:45Z",
-    "debrief:vessel_classes": [
-      "surface/warship/frigate/type26",
-      "surface/warship/carrier/queen-elizabeth"
+    "debrief:platforms": [
+      {
+        "id": "SPS-IRON-DUKE",
+        "name": "SPS Iron Duke",
+        "nationality": "ES",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "HMCS-EVERTSEN",
+        "name": "HMCS Evertsen",
+        "nationality": "CA",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      }
     ],
     "debrief:tags": [
       "transit",
@@ -54,16 +70,6 @@
     ],
     "debrief:feature_tags": [
       "prosecution"
-    ],
-    "debrief:track_names": [
-      "SPS Iron Duke",
-      "HMCS Evertsen"
-    ],
-    "debrief:nationalities": [
-      "ES",
-      "CA",
-      "KR",
-      "GB"
     ]
   },
   "links": [

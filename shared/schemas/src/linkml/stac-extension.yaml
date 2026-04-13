@@ -22,35 +22,59 @@ default_range: string
 
 imports:
   - linkml:types
-
-enums:
-  VesselDomainEnum:
-    description: Top-level vessel domain classification
-    permissible_values:
-      surface:
-        description: Surface vessels (warships, auxiliaries, merchant)
-      subsurface:
-        description: Subsurface vessels (submarines)
-      unknown:
-        description: Vessel domain not determined or not applicable
+  - common
 
 classes:
+  PlatformRecord:
+    description: >
+      Fully-resolved metadata for a single platform within a STAC item.
+      Produced by save-time resolution merging registry lookups with analyst overrides.
+      Only id is required; all other fields may be absent for unregistered platforms.
+    attributes:
+      id:
+        description: Platform identifier (e.g., "NELSON"). Matches platform_id on TrackProperties.
+        required: true
+      name:
+        description: Human-readable platform name (e.g., "HMS Nelson")
+        required: false
+      nationality:
+        description: ISO 3166-1 alpha-2 country code (e.g., GB, US)
+        required: false
+        pattern: "^[A-Z]{2}$"
+      vessel_class:
+        description: >
+          Full vessel classification path using slash-separated notation
+          (e.g., surface/warship/frigate/type23).
+        required: false
+        pattern: "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$"
+      vessel_type:
+        description: Vessel type — leaf of classification path (e.g., type23)
+        required: false
+        pattern: "^[a-z0-9-]+$"
+      vessel_role:
+        description: Vessel role — parent of leaf in classification path (e.g., frigate)
+        required: false
+        pattern: "^[a-z0-9-]+$"
+      domain:
+        description: Top-level vessel domain classification
+        range: VesselDomainEnum
+        required: false
+
   StacExtensionProperties:
     description: >
       Extension properties added to STAC item.properties under the debrief: namespace.
       All properties are optional — existing items without extension properties remain valid.
       These properties enable filtering, searching, and colour-coding in the Discovery UI.
     attributes:
-      vessel_classes:
+      platforms:
         description: >
-          Hierarchical vessel classification paths using slash-separated notation.
-          Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23).
-          Partial paths allowed for imprecise classification (e.g., surface/warship).
-        range: string
+          Fully-resolved per-platform metadata array. Each entry represents one
+          platform in the plot with merged registry + override data.
+        range: PlatformRecord
         multivalued: true
         required: false
-        pattern: "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$"
-        slot_uri: debrief:vessel_classes
+        inlined_as_list: true
+        slot_uri: debrief:platforms
 
       tags:
         description: >
@@ -70,25 +94,6 @@ classes:
         multivalued: true
         required: false
         slot_uri: debrief:feature_tags
-
-      track_names:
-        description: >
-          Names of all tracks in the plot's GeoJSON FeatureCollection.
-          Corresponds to track features where properties.kind == TRACK.
-        range: string
-        multivalued: true
-        required: false
-        slot_uri: debrief:track_names
-
-      nationalities:
-        description: >
-          Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2
-          country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
-        range: string
-        multivalued: true
-        required: false
-        pattern: "^[A-Z]{2}$"
-        slot_uri: debrief:nationalities
 
   PlotTimeExtent:
     description: >
@@ -206,13 +211,14 @@ classes:
         description: Range end datetime (ISO 8601)
         range: string
         required: false
-      vessel_classes:
+      platforms:
         description: >
-          Vessel taxonomy paths from debrief:vessel_classes.
-          Inherited from StacExtensionProperties semantics.
-        range: string
+          Fully-resolved per-platform metadata array for filtering.
+          Same structure as StacExtensionProperties.platforms.
+        range: PlatformRecord
         multivalued: true
         required: false
+        inlined_as_list: true
       tags:
         description: Plot-level tags from debrief:tags
         range: string
@@ -220,17 +226,6 @@ classes:
         required: false
       feature_tags:
         description: Feature-level tags from debrief:feature_tags
-        range: string
-        multivalued: true
-        required: false
-      nationalities:
-        description: >
-          ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
-        range: string
-        multivalued: true
-        required: false
-      track_names:
-        description: Track platform names from debrief:track_names
         range: string
         multivalued: true
         required: false

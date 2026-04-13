@@ -3,11 +3,18 @@
  * Generates realistic exercise items for testing and Storybook stories.
  */
 
-import type { ExerciseListItem, RecentlyOpenedEntry, GeoJSONFeatureCollection, GeoJSONFeature } from '../types';
+import type { ExerciseListItem, RecentlyOpenedEntry, GeoJSONFeatureCollection, GeoJSONFeature, PlatformRecord } from '../types';
 
 const VESSEL_CLASSES = [
-  'Frigate', 'Destroyer', 'Submarine', 'Carrier', 'Corvette',
-  'Cruiser', 'Patrol Vessel', 'Mine Sweeper', 'Tanker', 'Helicopter',
+  'surface/warship/frigate', 'surface/warship/destroyer', 'subsurface/submarine',
+  'surface/warship/carrier', 'surface/warship/corvette',
+  'surface/warship/cruiser', 'surface/patrol', 'surface/auxiliary/minesweeper',
+  'surface/auxiliary/tanker', 'air/helicopter',
+];
+
+const PLATFORM_NAMES = [
+  'HMS Argyll', 'USS Porter', 'FS Aquitaine', 'FGS Sachsen', 'HNoMS Fridtjof Nansen',
+  'HDMS Iver Huitfeldt', 'HNLMS De Ruyter', 'ITS Carabiniere', 'SPS Álvaro de Bazán', 'HMCS Halifax',
 ];
 
 const TAGS = [
@@ -52,12 +59,22 @@ export function createMockExerciseItem(index: number): ExerciseListItem {
 
   const numVessels = Math.floor(Math.random() * 4) + 1;
   const numTags = Math.floor(Math.random() * 3) + 1;
-  const numNations = Math.floor(Math.random() * 3) + 1;
-  const numTracks = Math.floor(Math.random() * 5) + 1;
 
   const centerLon = -10 + Math.random() * 30; // -10 to 20
   const centerLat = 40 + Math.random() * 20; // 40 to 60
   const bboxSize = 2 + Math.random() * 5;
+
+  const platforms: PlatformRecord[] = Array.from({ length: numVessels }, (_, i) => ({
+    id: `${name.toLowerCase()}-${index}-p${i}`,
+    name: PLATFORM_NAMES[(index + i) % PLATFORM_NAMES.length],
+    nationality: NATIONALITIES[(index + i) % NATIONALITIES.length],
+    vessel_class: VESSEL_CLASSES[(index + i) % VESSEL_CLASSES.length],
+    domain: (VESSEL_CLASSES[(index + i) % VESSEL_CLASSES.length] ?? '').startsWith('subsurface')
+      ? ('subsurface' as const)
+      : (VESSEL_CLASSES[(index + i) % VESSEL_CLASSES.length] ?? '').startsWith('air')
+        ? ('unknown' as const)
+        : ('surface' as const),
+  }));
 
   return {
     id: `exercise-${String(index).padStart(3, '0')}`,
@@ -72,11 +89,9 @@ export function createMockExerciseItem(index: number): ExerciseListItem {
     datetime: startDate.toISOString(),
     startDatetime: startDate.toISOString(),
     endDatetime: endDate.toISOString(),
-    vesselClasses: pickRandom(VESSEL_CLASSES, numVessels),
+    platforms,
     tags: pickRandom(TAGS, numTags),
     author: AUTHORS[index % AUTHORS.length] ?? null,
-    nationalities: pickRandom(NATIONALITIES, numNations),
-    trackNames: Array.from({ length: numTracks }, (_, i) => `Track ${i + 1}`),
     trackDataHref: `exercises/${name.toLowerCase()}/data.geojson`,
   };
 }

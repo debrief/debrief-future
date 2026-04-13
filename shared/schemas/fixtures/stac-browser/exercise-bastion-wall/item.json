@@ -44,8 +44,36 @@
     "datetime": null,
     "start_datetime": "2026-12-24T09:00:00Z",
     "end_datetime": "2027-01-05T10:53:43Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/tanker/vlcc"
+    "debrief:platforms": [
+      {
+        "id": "FGS-BRETAGNE",
+        "name": "FGS Bretagne",
+        "nationality": "DE",
+        "vessel_class": "surface/merchant/tanker/vlcc",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "vlcc"
+      },
+      {
+        "id": "ITS-TROMP",
+        "name": "ITS Tromp",
+        "nationality": "IT"
+      },
+      {
+        "id": "FGS-LANCASTER",
+        "name": "FGS Lancaster",
+        "nationality": "DE"
+      },
+      {
+        "id": "ITS-HELGE-INGSTAD",
+        "name": "ITS Helge Ingstad",
+        "nationality": "IT"
+      },
+      {
+        "id": "FGS-RICHMOND",
+        "name": "FGS Richmond",
+        "nationality": "DE"
+      }
     ],
     "debrief:tags": [
       "MCM",
@@ -54,17 +82,6 @@
     "debrief:feature_tags": [
       "zig-zag",
       "torpedo-run"
-    ],
-    "debrief:track_names": [
-      "FGS Bretagne",
-      "ITS Tromp",
-      "FGS Lancaster",
-      "ITS Helge Ingstad",
-      "FGS Richmond"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "IT"
     ]
   },
   "links": [

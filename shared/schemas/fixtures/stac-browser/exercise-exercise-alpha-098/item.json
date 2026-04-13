@@ -44,8 +44,31 @@
     "datetime": null,
     "start_datetime": "2025-06-05T17:00:00Z",
     "end_datetime": "2025-06-08T23:54:32Z",
-    "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth"
+    "debrief:platforms": [
+      {
+        "id": "HDMS-COLE",
+        "name": "HDMS Cole",
+        "nationality": "DK",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      },
+      {
+        "id": "FS-SOMERSET",
+        "name": "FS Somerset",
+        "nationality": "FR"
+      },
+      {
+        "id": "HDMS-BAINBRIDGE",
+        "name": "HDMS Bainbridge",
+        "nationality": "DK"
+      },
+      {
+        "id": "FS-PORTLAND",
+        "name": "FS Portland",
+        "nationality": "FR"
+      }
     ],
     "debrief:tags": [
       "gunnery",
@@ -54,16 +77,6 @@
     "debrief:feature_tags": [
       "towed-array",
       "depth-charge"
-    ],
-    "debrief:track_names": [
-      "HDMS Cole",
-      "FS Somerset",
-      "HDMS Bainbridge",
-      "FS Portland"
-    ],
-    "debrief:nationalities": [
-      "DK",
-      "FR"
     ]
   },
   "links": [

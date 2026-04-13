@@ -382,19 +382,21 @@ def determine_domain(item_id: str) -> str:
     return "core"
 
 
-def assign_track_names(
+def assign_platforms(
     tracks: list[dict[str, Any]],
     domain: str,
     rng: random.Random,
-) -> tuple[list[str], list[str], list[str]]:
-    """Assign realistic vessel names, nationalities, and classes to tracks.
+) -> list[dict[str, Any]]:
+    """Assign realistic vessel metadata to tracks and return as PlatformRecord dicts.
 
-    Returns (track_names, nationalities, vessel_classes).
+    Each returned dict corresponds to one track and contains the fields of a
+    PlatformRecord: ``id``, ``name``, ``nationality``, ``vessel_class``.
+
+    Returns:
+        List of platform dicts, one per track.
     """
     profile = DOMAIN_PROFILES.get(domain, DOMAIN_PROFILES["core"])
-    track_names: list[str] = []
-    nationalities: set[str] = set()
-    vessel_classes: set[str] = set()
+    platforms: list[dict[str, Any]] = []
     available_ships = list(SHIP_NAMES)
     rng.shuffle(available_ships)
 
@@ -402,46 +404,44 @@ def assign_track_names(
     nat_pool = list(profile["primary_nationalities"])
     nat_idx = rng.randint(0, len(nat_pool) - 1)
 
+    assigned_nationalities: set[str] = set()
+
     for track in tracks:
         pid = track["platform_id"]
 
         # Check known mapping first
         if pid in PLATFORM_VESSEL_MAP:
             name, nat, vc = PLATFORM_VESSEL_MAP[pid]
-            track_names.append(name)
-            nationalities.add(nat)
-            vessel_classes.add(vc)
-            continue
-
-        # Rotate through nationalities for multi-national feel
-        nat = nat_pool[nat_idx % len(nat_pool)]
-        nat_idx += 1
-        nationalities.add(nat)
-        prefix = rng.choice(TRACK_NAME_PREFIXES.get(nat, ["WARSHIP"]))
-
-        if available_ships:
-            ship = available_ships.pop()
-            name = f"{prefix} {ship}"
         else:
-            name = f"{prefix} {pid.title()}"
+            # Rotate through nationalities for multi-national feel
+            nat = nat_pool[nat_idx % len(nat_pool)]
+            nat_idx += 1
+            prefix = rng.choice(TRACK_NAME_PREFIXES.get(nat, ["WARSHIP"]))
 
-        track_names.append(name)
+            if available_ships:
+                ship = available_ships.pop()
+                name = f"{prefix} {ship}"
+            else:
+                name = f"{prefix} {pid.title()}"
 
-        # Assign vessel class
-        if track.get("has_depth"):
-            vc = rng.choice(VESSEL_CLASSES["subsurface"])
-        else:
-            cat = profile["vessel_category"]
-            vc = rng.choice(VESSEL_CLASSES.get(cat, VESSEL_CLASSES["surface_warship"]))
-        vessel_classes.add(vc)
+            # Assign vessel class
+            if track.get("has_depth"):
+                vc = rng.choice(VESSEL_CLASSES["subsurface"])
+            else:
+                cat = profile["vessel_category"]
+                vc = rng.choice(VESSEL_CLASSES.get(cat, VESSEL_CLASSES["surface_warship"]))
 
-    # Ensure multi-track items show nationality diversity
-    if len(tracks) > 1 and len(nationalities) < 2:
-        extras = [n for n in nat_pool if n not in nationalities]
-        if extras:
-            nationalities.add(rng.choice(extras))
+        assigned_nationalities.add(nat)
+        platforms.append({"id": pid, "name": name, "nationality": nat, "vessel_class": vc})
 
-    return track_names, sorted(nationalities), sorted(vessel_classes)
+    # Ensure multi-track items show nationality diversity — patch the last platform
+    if len(tracks) > 1 and len(assigned_nationalities) < 2:
+        extras = [n for n in nat_pool if n not in assigned_nationalities]
+        if extras and platforms:
+            extra_nat = rng.choice(extras)
+            platforms[-1] = {**platforms[-1], "nationality": extra_nat}
+
+    return platforms
 
 
 def assign_tags(
@@ -504,8 +504,7 @@ def build_description(
     item_id: str,
     exercise_name: str,
     feature_meta: dict[str, Any],
-    nationalities: list[str],
-    track_names: list[str],
+    platforms: list[dict[str, Any]],
 ) -> str:
     """Build a rich, narrative description for the STAC item."""
     profile = DOMAIN_PROFILES.get(domain, DOMAIN_PROFILES["core"])
@@ -513,6 +512,9 @@ def build_description(
     n_sensors = feature_meta["sensors"]
     n_narratives = feature_meta["narratives"]
     region = profile["region"]
+
+    track_names = [p["name"] for p in platforms if p.get("name")]
+    nationalities = sorted({p["nationality"] for p in platforms if p.get("nationality")})
 
     parts = [f"{exercise_name} — {profile['description_prefix']} in the {region}."]
 
@@ -558,25 +560,19 @@ def enrich_item(
     feature_meta = extract_features_metadata(features_path)
 
     # Assign rich metadata
-    track_names, nationalities, vessel_classes = assign_track_names(
-        feature_meta["tracks"], domain, rng
-    )
+    platforms = assign_platforms(feature_meta["tracks"], domain, rng)
     tags, feature_tags = assign_tags(domain, feature_meta, rng)
 
     # Build description
-    description = build_description(
-        domain, item_id, exercise_name, feature_meta, nationalities, track_names
-    )
+    description = build_description(domain, item_id, exercise_name, feature_meta, platforms)
 
     # Update item
     item["stac_extensions"] = list(STAC_EXTENSIONS)
     item["properties"]["title"] = exercise_name
     item["properties"]["description"] = description
-    item["properties"]["debrief:vessel_classes"] = vessel_classes
+    item["properties"]["debrief:platforms"] = platforms
     item["properties"]["debrief:tags"] = tags
     item["properties"]["debrief:feature_tags"] = feature_tags
-    item["properties"]["debrief:track_names"] = track_names
-    item["properties"]["debrief:nationalities"] = nationalities
 
     # Write back
     with open(item_path, "w") as f:
@@ -592,26 +588,24 @@ def update_catalog_summaries(catalog_path: Path, all_items: list[dict[str, Any]]
     with open(catalog_file) as f:
         catalog = json.load(f)
 
-    all_vessel_classes: set[str] = set()
     all_tags: set[str] = set()
     all_feature_tags: set[str] = set()
-    all_track_names: set[str] = set()
-    all_nationalities: set[str] = set()
+    # Platforms deduplicated by id; first record seen wins
+    platform_by_id: dict[str, dict[str, Any]] = {}
 
     for item in all_items:
         props = item["properties"]
-        all_vessel_classes.update(props.get("debrief:vessel_classes", []))
         all_tags.update(props.get("debrief:tags", []))
         all_feature_tags.update(props.get("debrief:feature_tags", []))
-        all_track_names.update(props.get("debrief:track_names", []))
-        all_nationalities.update(props.get("debrief:nationalities", []))
+        for platform in props.get("debrief:platforms", []):
+            pid = platform.get("id")
+            if pid is not None and pid not in platform_by_id:
+                platform_by_id[pid] = platform
 
     catalog["summaries"] = {
-        "debrief:vessel_classes": sorted(all_vessel_classes),
+        "debrief:platforms": list(platform_by_id.values()),
         "debrief:tags": sorted(all_tags),
         "debrief:feature_tags": sorted(all_feature_tags),
-        "debrief:track_names": sorted(all_track_names),
-        "debrief:nationalities": sorted(all_nationalities),
     }
 
     with open(catalog_file, "w") as f:
@@ -680,17 +674,24 @@ def main() -> None:
     print(f"\n{'=' * 60}")
     print(f"Enriched {len(all_enriched)} items")
 
-    all_vc = set()
-    all_nat = set()
-    all_tags = set()
-    all_ft = set()
+    all_platform_ids: set[str] = set()
+    all_vc: set[str] = set()
+    all_nat: set[str] = set()
+    all_tags: set[str] = set()
+    all_ft: set[str] = set()
     for item in all_enriched:
         props = item["properties"]
-        all_vc.update(props.get("debrief:vessel_classes", []))
-        all_nat.update(props.get("debrief:nationalities", []))
+        for platform in props.get("debrief:platforms", []):
+            if platform.get("id"):
+                all_platform_ids.add(platform["id"])
+            if platform.get("vessel_class"):
+                all_vc.add(platform["vessel_class"])
+            if platform.get("nationality"):
+                all_nat.add(platform["nationality"])
         all_tags.update(props.get("debrief:tags", []))
         all_ft.update(props.get("debrief:feature_tags", []))
 
+    print(f"  Unique platforms:      {len(all_platform_ids)}")
     print(f"  Unique vessel classes: {len(all_vc)}")
     print(f"  Unique nationalities:  {len(all_nat)} — {sorted(all_nat)}")
     print(f"  Unique tags:           {len(all_tags)}")

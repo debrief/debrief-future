@@ -218,6 +218,16 @@ enums:
       square:
         description: Square projection beyond endpoint
 
+  VesselDomainEnum:
+    description: Top-level vessel domain classification
+    permissible_values:
+      surface:
+        description: Surface vessels (warships, auxiliaries, merchant)
+      subsurface:
+        description: Subsurface vessels (submarines)
+      unknown:
+        description: Vessel domain not determined or not applicable
+
   LineJoinEnum:
     description: How line segment joints are rendered (SVG/CSS standard)
     permissible_values:

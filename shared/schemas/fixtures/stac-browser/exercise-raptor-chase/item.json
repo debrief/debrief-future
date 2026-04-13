@@ -44,8 +44,51 @@
     "datetime": null,
     "start_datetime": "2022-12-01T12:00:00Z",
     "end_datetime": "2022-12-01T14:16:20Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45"
+    "debrief:platforms": [
+      {
+        "id": "FS-PROVENCE",
+        "name": "FS Provence",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "FS-DIAMOND",
+        "name": "FS Diamond",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-NORTHUMBERLAND",
+        "name": "FS Northumberland",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-NYKOPING",
+        "name": "FS Nykoping",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-DE-ZEVEN-PROVINCIEN",
+        "name": "FS De Zeven Provincien",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-EVERTSEN",
+        "name": "FS Evertsen",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-LABOON",
+        "name": "FS Laboon",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-RAMAGE",
+        "name": "FS Ramage",
+        "nationality": "FR"
+      }
     ],
     "debrief:tags": [
       "multi-national",
@@ -57,19 +100,6 @@
     "debrief:feature_tags": [
       "visual-sighting",
       "minefield"
-    ],
-    "debrief:track_names": [
-      "FS Provence",
-      "FS Diamond",
-      "FS Northumberland",
-      "FS Nykoping",
-      "FS De Zeven Provincien",
-      "FS Evertsen",
-      "FS Laboon",
-      "FS Ramage"
-    ],
-    "debrief:nationalities": [
-      "FR"
     ]
   },
   "links": [

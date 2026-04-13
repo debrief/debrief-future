@@ -44,9 +44,50 @@
     "datetime": null,
     "start_datetime": "2024-03-11T19:00:00Z",
     "end_datetime": "2024-03-13T10:17:21Z",
-    "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "USS-SOMERSET",
+        "name": "USS Somerset",
+        "nationality": "US",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      },
+      {
+        "id": "USS-PROVENCE",
+        "name": "USS Provence",
+        "nationality": "US",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "USS-HELGE-INGSTAD",
+        "name": "USS Helge Ingstad",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-MASON",
+        "name": "USS Mason",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-BERGAMINI",
+        "name": "USS Bergamini",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-HARNOSAND",
+        "name": "USS Harnosand",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-SUTHERLAND",
+        "name": "USS Sutherland",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "multi-national",
@@ -56,18 +97,6 @@
     "debrief:feature_tags": [
       "active-search",
       "radar-detection"
-    ],
-    "debrief:track_names": [
-      "USS Somerset",
-      "USS Provence",
-      "USS Helge Ingstad",
-      "USS Mason",
-      "USS Bergamini",
-      "USS Harnosand",
-      "USS Sutherland"
-    ],
-    "debrief:nationalities": [
-      "US"
     ]
   },
   "links": [

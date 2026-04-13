@@ -44,9 +44,25 @@
     "datetime": null,
     "start_datetime": "2021-01-16T21:00:00Z",
     "end_datetime": "2021-01-17T23:25:18Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/passenger/ferry",
-      "surface/merchant/cargo/container"
+    "debrief:platforms": [
+      {
+        "id": "HMS-FRIDTJOF-NANSEN",
+        "name": "HMS Fridtjof Nansen",
+        "nationality": "GB",
+        "vessel_class": "surface/merchant/passenger/ferry",
+        "domain": "surface",
+        "vessel_role": "passenger",
+        "vessel_type": "ferry"
+      },
+      {
+        "id": "HMAS-LANCASTER",
+        "name": "HMAS Lancaster",
+        "nationality": "AU",
+        "vessel_class": "surface/merchant/cargo/container",
+        "domain": "surface",
+        "vessel_role": "cargo",
+        "vessel_type": "container"
+      }
     ],
     "debrief:tags": [
       "EW",
@@ -55,15 +71,7 @@
       "AAW",
       "force-protection"
     ],
-    "debrief:feature_tags": [],
-    "debrief:track_names": [
-      "HMS Fridtjof Nansen",
-      "HMAS Lancaster"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "AU"
-    ]
+    "debrief:feature_tags": []
   },
   "links": [
     {

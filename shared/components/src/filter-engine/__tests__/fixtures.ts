@@ -7,7 +7,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { StacBrowserItem, VesselTaxonomyNode } from "../types";
+import type { StacBrowserItem, VesselTaxonomyNode, PlatformRecord } from "../types";
 import { parseTaxonomy, type RawTaxonomy } from "../taxonomy";
 
 const FIXTURES_DIR = path.resolve(
@@ -23,12 +23,10 @@ interface StacItemJson {
     datetime: string | null;
     start_datetime?: string | null;
     end_datetime?: string | null;
-    "debrief:vessel_classes"?: string[];
+    "debrief:platforms"?: PlatformRecord[];
     "debrief:tags"?: string[];
     "debrief:feature_tags"?: string[];
     "debrief:author"?: string | null;
-    "debrief:track_names"?: string[];
-    "debrief:nationalities"?: string[];
   };
   collection?: string;
 }
@@ -43,12 +41,10 @@ function stacJsonToItem(json: StacItemJson, itemPath: string): StacBrowserItem {
     datetime: props.datetime,
     startDatetime: props.start_datetime ?? null,
     endDatetime: props.end_datetime ?? null,
-    vesselClasses: props["debrief:vessel_classes"] ?? [],
+    platforms: props["debrief:platforms"] ?? [],
     tags: props["debrief:tags"] ?? [],
     featureTags: props["debrief:feature_tags"] ?? [],
     author: props["debrief:author"] ?? null,
-    trackNames: props["debrief:track_names"] ?? [],
-    nationalities: props["debrief:nationalities"] ?? [],
     collection: json.collection ?? null,
     modified: null,
   };

@@ -45,12 +45,10 @@ function makeStacItem(overrides: Partial<StacBrowserItem>): StacBrowserItem {
     datetime: null,
     startDatetime: null,
     endDatetime: null,
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     ...overrides,
   };

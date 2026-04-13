@@ -44,10 +44,49 @@
     "datetime": null,
     "start_datetime": "2025-07-07T20:00:00Z",
     "end_datetime": "2025-07-08T04:39:42Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/passenger/ferry",
-      "surface/merchant/tanker/vlcc",
-      "surface/merchant/cargo/container"
+    "debrief:platforms": [
+      {
+        "id": "FGS-ARGYLL",
+        "name": "FGS Argyll",
+        "nationality": "DE",
+        "vessel_class": "surface/merchant/passenger/ferry",
+        "domain": "surface",
+        "vessel_role": "passenger",
+        "vessel_type": "ferry"
+      },
+      {
+        "id": "INS-BERGAMINI",
+        "name": "INS Bergamini",
+        "nationality": "IN",
+        "vessel_class": "surface/merchant/tanker/vlcc",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "vlcc"
+      },
+      {
+        "id": "FGS-HELSINGBORG",
+        "name": "FGS Helsingborg",
+        "nationality": "DE",
+        "vessel_class": "surface/merchant/cargo/container",
+        "domain": "surface",
+        "vessel_role": "cargo",
+        "vessel_type": "container"
+      },
+      {
+        "id": "INS-HELGE-INGSTAD",
+        "name": "INS Helge Ingstad",
+        "nationality": "IN"
+      },
+      {
+        "id": "FGS-NORDRHEIN-WESTFALEN",
+        "name": "FGS Nordrhein-Westfalen",
+        "nationality": "DE"
+      },
+      {
+        "id": "INS-PROVENCE",
+        "name": "INS Provence",
+        "nationality": "IN"
+      }
     ],
     "debrief:tags": [
       "replenishment",
@@ -57,18 +96,6 @@
       "active-search",
       "zig-zag",
       "torpedo-run"
-    ],
-    "debrief:track_names": [
-      "FGS Argyll",
-      "INS Bergamini",
-      "FGS Helsingborg",
-      "INS Helge Ingstad",
-      "FGS Nordrhein-Westfalen",
-      "INS Provence"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "IN"
     ]
   },
   "links": [

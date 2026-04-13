@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2022-04-11T06:00:00Z",
     "end_datetime": "2022-04-13T10:33:29Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide",
-      "surface/auxiliary/survey/echo"
+    "debrief:platforms": [
+      {
+        "id": "HMS-HAMBURG",
+        "name": "HMS Hamburg",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/tanker/tide",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "tide"
+      },
+      {
+        "id": "HNLMS-HESSEN",
+        "name": "HNLMS Hessen",
+        "nationality": "NL",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      },
+      {
+        "id": "HMS-CARNEY",
+        "name": "HMS Carney",
+        "nationality": "SE"
+      }
     ],
     "debrief:tags": [
       "boarding",
@@ -54,15 +75,6 @@
     ],
     "debrief:feature_tags": [
       "active-search"
-    ],
-    "debrief:track_names": [
-      "HMS Hamburg",
-      "HNLMS Hessen",
-      "HMS Carney"
-    ],
-    "debrief:nationalities": [
-      "SE",
-      "NL"
     ]
   },
   "links": [

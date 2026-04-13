@@ -44,9 +44,35 @@
     "datetime": null,
     "start_datetime": "2022-12-23T09:00:00Z",
     "end_datetime": "2022-12-23T17:17:32Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45",
-      "surface/warship/carrier/queen-elizabeth"
+    "debrief:platforms": [
+      {
+        "id": "SPS-GONZALEZ",
+        "name": "SPS Gonzalez",
+        "nationality": "ES",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "SPS-BAINBRIDGE",
+        "name": "SPS Bainbridge",
+        "nationality": "ES",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      },
+      {
+        "id": "SPS-DEFENDER",
+        "name": "SPS Defender",
+        "nationality": "ES"
+      },
+      {
+        "id": "SPS-HARNOSAND",
+        "name": "SPS Harnosand",
+        "nationality": "ES"
+      }
     ],
     "debrief:tags": [
       "gunnery",
@@ -56,15 +82,6 @@
     ],
     "debrief:feature_tags": [
       "towed-array"
-    ],
-    "debrief:track_names": [
-      "SPS Gonzalez",
-      "SPS Bainbridge",
-      "SPS Defender",
-      "SPS Harnosand"
-    ],
-    "debrief:nationalities": [
-      "ES"
     ]
   },
   "links": [

@@ -5,26 +5,21 @@
  * Review decisions: 5A (extends CatalogOverviewItem), 1A (import RecentPlot shape).
  */
 
-import type { CatalogOverviewItem } from '../filter-engine/types';
+import type { CatalogOverviewItem, PlatformRecord } from '../filter-engine/types';
+export type { PlatformRecord };
 import type { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
 export type { GeoJSONFeature, GeoJSONFeatureCollection };
 
 /** Exercise data for list view display. Extends CatalogOverviewItem with STAC extension metadata. */
 export interface ExerciseListItem extends CatalogOverviewItem {
-  /** Vessel taxonomy paths from debrief:vessel_classes */
-  readonly vesselClasses: readonly string[];
+  /** Per-platform metadata from debrief:platforms */
+  readonly platforms: readonly PlatformRecord[];
 
   /** Plot-level tags from debrief:tags */
   readonly tags: readonly string[];
 
   /** Exercise author from debrief:author */
   readonly author: string | null;
-
-  /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
-  readonly nationalities: readonly string[];
-
-  /** Track platform names from debrief:track_names */
-  readonly trackNames: readonly string[];
 
   /** Path to GeoJSON track data for spatial thumbnail */
   readonly trackDataHref: string | null;

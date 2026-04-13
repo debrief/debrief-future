@@ -44,10 +44,59 @@
     "datetime": null,
     "start_datetime": "2022-11-05T04:00:00Z",
     "end_datetime": "2022-11-05T10:12:31Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/tanker/vlcc",
-      "surface/merchant/passenger/ferry",
-      "surface/merchant/cargo/bulk"
+    "debrief:platforms": [
+      {
+        "id": "HNOMS-HESSEN",
+        "name": "HNoMS Hessen",
+        "nationality": "NO",
+        "vessel_class": "surface/merchant/tanker/vlcc",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "vlcc"
+      },
+      {
+        "id": "HNOMS-LANGUEDOC",
+        "name": "HNoMS Languedoc",
+        "nationality": "NO",
+        "vessel_class": "surface/merchant/passenger/ferry",
+        "domain": "surface",
+        "vessel_role": "passenger",
+        "vessel_type": "ferry"
+      },
+      {
+        "id": "HNOMS-ROALD-AMUNDSEN",
+        "name": "HNoMS Roald Amundsen",
+        "nationality": "NO",
+        "vessel_class": "surface/merchant/cargo/bulk",
+        "domain": "surface",
+        "vessel_role": "cargo",
+        "vessel_type": "bulk"
+      },
+      {
+        "id": "HNOMS-AUVERGNE",
+        "name": "HNoMS Auvergne",
+        "nationality": "NO"
+      },
+      {
+        "id": "HNOMS-RAMAGE",
+        "name": "HNoMS Ramage",
+        "nationality": "NO"
+      },
+      {
+        "id": "HNOMS-GONZALEZ",
+        "name": "HNoMS Gonzalez",
+        "nationality": "NO"
+      },
+      {
+        "id": "HNOMS-DAUNTLESS",
+        "name": "HNoMS Dauntless",
+        "nationality": "NO"
+      },
+      {
+        "id": "HNOMS-DIAMOND",
+        "name": "HNoMS Diamond",
+        "nationality": "NO"
+      }
     ],
     "debrief:tags": [
       "AAW"
@@ -57,19 +106,6 @@
       "depth-charge",
       "sonar-contact",
       "minefield"
-    ],
-    "debrief:track_names": [
-      "HNoMS Hessen",
-      "HNoMS Languedoc",
-      "HNoMS Roald Amundsen",
-      "HNoMS Auvergne",
-      "HNoMS Ramage",
-      "HNoMS Gonzalez",
-      "HNoMS Dauntless",
-      "HNoMS Diamond"
-    ],
-    "debrief:nationalities": [
-      "NO"
     ]
   },
   "links": [

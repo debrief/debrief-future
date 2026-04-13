@@ -33,7 +33,9 @@ export type DistinctValuesMap = Readonly<Record<FilterType, readonly string[]>>;
 
 export function computeDistinctValues(items: readonly StacBrowserItem[]): DistinctValuesMap {
   return {
-    'vessel-class': flatDistinct(items, (i) => i.vesselClasses),
+    'vessel-class': flatDistinct(items, (i) =>
+      (i.platforms ?? []).map((p) => p.vessel_class).filter((v): v is string => v != null),
+    ),
     'tag': flatDistinct(items, (i) => [...i.tags, ...i.featureTags]),
     'author': distinctSorted(items.map((i) => i.author)),
     'duration': [], // Duration uses fixed buckets, not distinct values
@@ -41,8 +43,12 @@ export function computeDistinctValues(items: readonly StacBrowserItem[]): Distin
     'title': [], // Title uses free-text input
     'filename': distinctSorted(items.map((i) => i.id)),
     'plot-contents': [], // Plot contents uses free-text input
-    'track-name': flatDistinct(items, (i) => i.trackNames),
-    'nationality': flatDistinct(items, (i) => i.nationalities),
+    'track-name': flatDistinct(items, (i) =>
+      (i.platforms ?? []).map((p) => p.name).filter((v): v is string => v != null),
+    ),
+    'nationality': flatDistinct(items, (i) =>
+      (i.platforms ?? []).map((p) => p.nationality).filter((v): v is string => v != null),
+    ),
     'collection': distinctSorted(items.map((i) => i.collection)),
   };
 }

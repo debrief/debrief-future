@@ -8,7 +8,7 @@ import type { FilterExpression, FilterType, Predicate } from "./types";
 
 /** CQL2 property name mapping for each filter type */
 const PROPERTY_MAP: Record<FilterType, string> = {
-  "vessel-class": "debrief:vessel_classes",
+  "vessel-class": "debrief:platforms[*].vessel_class",
   tag: "debrief:tags",
   author: "debrief:author",
   duration: "duration",
@@ -16,8 +16,8 @@ const PROPERTY_MAP: Record<FilterType, string> = {
   title: "title",
   filename: "debrief:filename",
   "plot-contents": "debrief:plot_contents",
-  "track-name": "debrief:track_names",
-  nationality: "debrief:nationalities",
+  "track-name": "debrief:platforms[*].name",
+  nationality: "debrief:platforms[*].nationality",
   collection: "collection",
 };
 

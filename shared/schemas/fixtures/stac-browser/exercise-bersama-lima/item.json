@@ -44,26 +44,52 @@
     "datetime": null,
     "start_datetime": "2021-10-28T20:00:00Z",
     "end_datetime": "2021-11-25T18:34:49Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
+    "debrief:platforms": [
+      {
+        "id": "USS-RAMAGE",
+        "name": "USS Ramage",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/gotland",
+        "domain": "subsurface",
+        "vessel_role": "ssk",
+        "vessel_type": "gotland"
+      },
+      {
+        "id": "USS-MAHAN",
+        "name": "USS Mahan",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-AUVERGNE",
+        "name": "USS Auvergne",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-CARNEY",
+        "name": "USS Carney",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-TRUXTUN",
+        "name": "USS Truxtun",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-MASON",
+        "name": "USS Mason",
+        "nationality": "US"
+      },
+      {
+        "id": "USS-HELGE-INGSTAD",
+        "name": "USS Helge Ingstad",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "replenishment"
     ],
     "debrief:feature_tags": [
       "sprint-and-drift"
-    ],
-    "debrief:track_names": [
-      "USS Ramage",
-      "USS Mahan",
-      "USS Auvergne",
-      "USS Carney",
-      "USS Truxtun",
-      "USS Mason",
-      "USS Helge Ingstad"
-    ],
-    "debrief:nationalities": [
-      "US"
     ]
   },
   "links": [

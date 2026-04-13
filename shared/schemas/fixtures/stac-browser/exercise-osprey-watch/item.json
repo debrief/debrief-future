@@ -44,10 +44,49 @@
     "datetime": null,
     "start_datetime": "2022-09-22T03:00:00Z",
     "end_datetime": "2022-09-22T04:40:40Z",
-    "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/frigate/type26",
-      "surface/warship/destroyer/type45"
+    "debrief:platforms": [
+      {
+        "id": "FS-HARNOSAND",
+        "name": "FS Harnosand",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_role": "carrier",
+        "vessel_type": "queen-elizabeth"
+      },
+      {
+        "id": "FS-CARNEY",
+        "name": "FS Carney",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "FS-EVERTSEN",
+        "name": "FS Evertsen",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "FS-PROVENCE",
+        "name": "FS Provence",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-RAMAGE",
+        "name": "FS Ramage",
+        "nationality": "FR"
+      },
+      {
+        "id": "FS-AUVERGNE",
+        "name": "FS Auvergne",
+        "nationality": "FR"
+      }
     ],
     "debrief:tags": [
       "certification"
@@ -55,17 +94,6 @@
     "debrief:feature_tags": [
       "prosecution",
       "radar-detection"
-    ],
-    "debrief:track_names": [
-      "FS Harnosand",
-      "FS Carney",
-      "FS Evertsen",
-      "FS Provence",
-      "FS Ramage",
-      "FS Auvergne"
-    ],
-    "debrief:nationalities": [
-      "FR"
     ]
   },
   "links": [

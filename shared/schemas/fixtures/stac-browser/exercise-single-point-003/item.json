@@ -42,24 +42,32 @@
     "title": "Exercise Single Point 003",
     "description": "Single Point 003 \u2014 Indo-Pacific exercise. 2 track(s), 2 nation(s). Single-point observation, no time range.",
     "datetime": "2026-05-11T19:00:00Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide",
-      "surface/merchant/passenger/ferry"
+    "debrief:platforms": [
+      {
+        "id": "USS-DAUNTLESS",
+        "name": "USS Dauntless",
+        "nationality": "US",
+        "vessel_class": "surface/auxiliary/tanker/tide",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "tide"
+      },
+      {
+        "id": "HMS-TROMP",
+        "name": "HMS Tromp",
+        "nationality": "SE",
+        "vessel_class": "surface/merchant/passenger/ferry",
+        "domain": "surface",
+        "vessel_role": "passenger",
+        "vessel_type": "ferry"
+      }
     ],
     "debrief:tags": [
       "missile-firing",
       "force-protection",
       "AAW"
     ],
-    "debrief:feature_tags": [],
-    "debrief:track_names": [
-      "USS Dauntless",
-      "HMS Tromp"
-    ],
-    "debrief:nationalities": [
-      "US",
-      "SE"
-    ]
+    "debrief:feature_tags": []
   },
   "links": [
     {

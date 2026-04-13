@@ -44,9 +44,23 @@
     "datetime": null,
     "start_datetime": "2020-03-01T15:00:00Z",
     "end_datetime": "2020-03-03T01:25:30Z",
-    "debrief:vessel_classes": [
-      "unknown",
-      "surface/warship/corvette/visby"
+    "debrief:platforms": [
+      {
+        "id": "USS-FRIDTJOF-NANSEN",
+        "name": "USS Fridtjof Nansen",
+        "nationality": "US",
+        "vessel_class": "unknown",
+        "domain": "unknown"
+      },
+      {
+        "id": "FS-SACHSEN",
+        "name": "FS Sachsen",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_role": "corvette",
+        "vessel_type": "visby"
+      }
     ],
     "debrief:tags": [
       "transit",
@@ -59,14 +73,6 @@
       "prosecution",
       "minefield",
       "depth-charge"
-    ],
-    "debrief:track_names": [
-      "USS Fridtjof Nansen",
-      "FS Sachsen"
-    ],
-    "debrief:nationalities": [
-      "US",
-      "FR"
     ]
   },
   "links": [

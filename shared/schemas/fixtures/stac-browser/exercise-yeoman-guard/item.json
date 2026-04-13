@@ -44,10 +44,39 @@
     "datetime": null,
     "start_datetime": "2025-05-07T00:00:00Z",
     "end_datetime": "2025-05-07T01:35:27Z",
-    "debrief:vessel_classes": [
-      "surface/merchant/cargo/bulk",
-      "surface/merchant/tanker/vlcc",
-      "surface/merchant/passenger/ferry"
+    "debrief:platforms": [
+      {
+        "id": "HMS-ROOSEVELT",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "surface/merchant/cargo/bulk",
+        "domain": "surface",
+        "vessel_role": "cargo",
+        "vessel_type": "bulk"
+      },
+      {
+        "id": "JS-COLE",
+        "name": "JS Cole",
+        "nationality": "JP",
+        "vessel_class": "surface/merchant/tanker/vlcc",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "vlcc"
+      },
+      {
+        "id": "HMS-KENT",
+        "name": "HMS Kent",
+        "nationality": "GB",
+        "vessel_class": "surface/merchant/passenger/ferry",
+        "domain": "surface",
+        "vessel_role": "passenger",
+        "vessel_type": "ferry"
+      },
+      {
+        "id": "JS-MASON",
+        "name": "JS Mason",
+        "nationality": "JP"
+      }
     ],
     "debrief:tags": [
       "mine-clearance",
@@ -56,16 +85,6 @@
     "debrief:feature_tags": [
       "minefield",
       "intercept"
-    ],
-    "debrief:track_names": [
-      "HMS Roosevelt",
-      "JS Cole",
-      "HMS Kent",
-      "JS Mason"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "JP"
     ]
   },
   "links": [

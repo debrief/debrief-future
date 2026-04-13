@@ -44,9 +44,45 @@
     "datetime": null,
     "start_datetime": "2020-02-01T15:00:00Z",
     "end_datetime": "2020-02-04T03:21:07Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/arleigh-burke",
-      "subsurface/submarine/ssn/virginia"
+    "debrief:platforms": [
+      {
+        "id": "HMS-ARGYLL",
+        "name": "HMS Argyll",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      },
+      {
+        "id": "HMS-DE-RUYTER",
+        "name": "HMS De Ruyter",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_role": "ssn",
+        "vessel_type": "virginia"
+      },
+      {
+        "id": "HMS-RICHMOND",
+        "name": "HMS Richmond",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-SOMERSET",
+        "name": "HMS Somerset",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-VISBY",
+        "name": "HMS Visby",
+        "nationality": "GB"
+      },
+      {
+        "id": "HMS-DUNCAN",
+        "name": "HMS Duncan",
+        "nationality": "GB"
+      }
     ],
     "debrief:tags": [
       "AAW",
@@ -55,17 +91,6 @@
     "debrief:feature_tags": [
       "datum",
       "active-search"
-    ],
-    "debrief:track_names": [
-      "HMS Argyll",
-      "HMS De Ruyter",
-      "HMS Richmond",
-      "HMS Somerset",
-      "HMS Visby",
-      "HMS Duncan"
-    ],
-    "debrief:nationalities": [
-      "GB"
     ]
   },
   "links": [

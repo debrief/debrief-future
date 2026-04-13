@@ -232,12 +232,10 @@ export default function App() {
     void catalogRevision; // dependency — re-compute when store items arrive
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
-      vesselClasses: item.vesselClasses ?? [],
+      platforms: item.platforms ?? [],
       tags: item.tags ?? [],
       featureTags: item.featureTags ?? [],
       author: null,
-      trackNames: item.trackNames ?? [],
-      nationalities: item.nationalities ?? [],
       collection: null,
       modified: null,
     }));

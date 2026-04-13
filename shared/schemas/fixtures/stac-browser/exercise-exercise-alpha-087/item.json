@@ -44,10 +44,44 @@
     "datetime": null,
     "start_datetime": "2022-03-07T17:00:00Z",
     "end_datetime": "2022-03-08T11:43:42Z",
-    "debrief:vessel_classes": [
-      "surface/warship/patrol/river",
-      "surface/warship/destroyer/type45",
-      "surface/warship/destroyer/arleigh-burke"
+    "debrief:platforms": [
+      {
+        "id": "HMS-EVERTSEN",
+        "name": "HMS Evertsen",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "HDMS-IRON-DUKE",
+        "name": "HDMS Iron Duke",
+        "nationality": "DK",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "HMS-BRETAGNE",
+        "name": "HMS Bretagne",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      },
+      {
+        "id": "HDMS-BAINBRIDGE",
+        "name": "HDMS Bainbridge",
+        "nationality": "DK"
+      },
+      {
+        "id": "HMS-DE-RUYTER",
+        "name": "HMS De Ruyter",
+        "nationality": "GB"
+      }
     ],
     "debrief:tags": [
       "ASW",
@@ -57,17 +91,6 @@
     "debrief:feature_tags": [
       "depth-charge",
       "helicopter-ops"
-    ],
-    "debrief:track_names": [
-      "HMS Evertsen",
-      "HDMS Iron Duke",
-      "HMS Bretagne",
-      "HDMS Bainbridge",
-      "HMS De Ruyter"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "DK"
     ]
   },
   "links": [

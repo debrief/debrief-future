@@ -44,8 +44,16 @@
     "datetime": null,
     "start_datetime": "2021-05-15T15:00:00Z",
     "end_datetime": "2021-06-05T19:42:57Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/survey/echo"
+    "debrief:platforms": [
+      {
+        "id": "HMS-PORTLAND",
+        "name": "HMS Portland",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      }
     ],
     "debrief:tags": [
       "AAW",
@@ -56,13 +64,6 @@
     "debrief:feature_tags": [
       "active-search",
       "intercept"
-    ],
-    "debrief:track_names": [
-      "HMS Portland"
-    ],
-    "debrief:nationalities": [
-      "SE",
-      "AU"
     ]
   },
   "links": [
