@@ -25,54 +25,61 @@ Analysts need to find relevant plots in a growing STAC catalog using natural lan
 
 ### 1. Platform Registry (`shared/data/platform-registry.yaml`)
 
-A static YAML file defining the vessel class taxonomy and known platforms. Structure:
+A static YAML file defining a **unified tree** where vessel classes are interior nodes and known platforms are leaf instances. A platform's `vessel_class`, `vessel_type`, `vessel_role`, and `domain` are all derived from its position in the tree — no string references, no possibility of typos or inconsistencies.
 
 ```yaml
-# Vessel class taxonomy — tree of domain / category / role / class
+# Unified vessel class + platform tree.
+# Interior nodes are classes; leaves are platform instances.
+# A platform's vessel_class path is its position in the tree.
 vessel_classes:
   surface:
     warship:
       frigate:
-        type23: { full_name: "Type 23 (Duke-class)" }
-        type26: { full_name: "Type 26 (City-class)" }
-        fremm:  { full_name: "FREMM" }
+        type23:
+          _class: { full_name: "Type 23 (Duke-class)" }
+          NELSON:      { name: "HMS Nelson",      short_name: "NLSN", nationality: "GB" }
+          COLLINGWOOD: { name: "HMS Collingwood",  short_name: "CLWD", nationality: "GB" }
+          ARGYLL:      { name: "HMS Argyll",       short_name: "ARGL", nationality: "GB" }
+        type26:
+          _class: { full_name: "Type 26 (City-class)" }
+        fremm:
+          _class: { full_name: "FREMM" }
       destroyer:
-        type45:        { full_name: "Type 45 (Daring-class)" }
-        arleigh-burke: { full_name: "Arleigh Burke-class" }
-      # ...
-    auxiliary:
-      # ...
+        type45:
+          _class: { full_name: "Type 45 (Daring-class)" }
+          DEFENDER:    { name: "HMS Defender",     short_name: "DFND", nationality: "GB" }
+        arleigh-burke:
+          _class: { full_name: "Arleigh Burke-class" }
+          MASON:       { name: "USS Mason",        short_name: "MASN", nationality: "US" }
   subsurface:
     submarine:
       ssn:
-        astute:    { full_name: "Astute-class" }
-        trafalgar: { full_name: "Trafalgar-class" }
-        virginia:  { full_name: "Virginia-class" }
+        astute:
+          _class: { full_name: "Astute-class" }
+        trafalgar:
+          _class: { full_name: "Trafalgar-class" }
+        virginia:
+          _class: { full_name: "Virginia-class" }
       ssk:
-        type212: { full_name: "Type 212" }
-        gotland: { full_name: "Gotland-class" }
-
-# Known platforms — looked up by platform_id at import time
-platforms:
-  NELSON:
-    name: "HMS Nelson"
-    short_name: "NLSN"
-    nationality: "GB"
-    vessel_class: "surface/warship/frigate/type23"
-  COLLINGWOOD:
-    name: "HMS Collingwood"
-    short_name: "CLWD"
-    nationality: "GB"
-    vessel_class: "surface/warship/destroyer/type45"
-  # ... (seeded with existing 10 entries, expanded as sample data is processed)
+        type212:
+          _class: { full_name: "Type 212" }
+        gotland:
+          _class: { full_name: "Gotland-class" }
 ```
+
+**Derived fields from position** (e.g. for platform `NELSON` at `surface/warship/frigate/type23/NELSON`):
+- `domain` = `surface` (first segment)
+- `vessel_role` = `frigate` (grandparent of leaf)
+- `vessel_type` = `type23` (parent of leaf)
+- `vessel_class` = `surface/warship/frigate/type23` (full path to parent)
 
 **Design decisions:**
 - Lives in `shared/data/`, not in a service — the registry is domain knowledge, not storage infrastructure. If the storage backend changes, the registry survives.
 - Loaded by both Python (via PyYAML) and TypeScript (via js-yaml or build-time JSON conversion) at import/build time.
+- Seeded with the existing 10 known platforms from the enrich script; expanded as sample data is processed.
 - Extensible: organisations can overlay via `contrib/` in future (out of scope for this epic).
 
-### 2. LinkML Schema Updates
+### 2. LinkML Schema Updates + Registry-as-Fallback Pattern
 
 **TrackProperties** (`shared/schemas/src/linkml/geojson.yaml`): Add optional fields:
 
@@ -85,9 +92,19 @@ platforms:
 | `vessel_role` | string, optional | Parent of leaf (e.g. "frigate") |
 | `domain` | string, optional | First segment of class path ("surface" \| "subsurface") |
 
-All fields are **optional** — analysts may load data for vessels not in the registry, or where platform details aren't known. Fields can be left empty and filled in later (e.g. via a track feature property editor — out of scope for this epic).
+These fields are **override slots**, not the primary store. The resolution model:
 
-**STAC extension** (`debrief:platforms`): Replace the three flat aggregate properties with a single structured array:
+1. **features.geojson stores only `platform_id` by default.** The remaining fields are only present when explicitly set by the analyst (e.g. correcting a registry value, or providing metadata for an unregistered platform).
+2. **At save/display time, missing fields are resolved from the platform registry** by looking up `platform_id` in the tree. The platform's position in the tree determines its `vessel_class`, `vessel_type`, `vessel_role`, and `domain`; its leaf entry provides `name`, `short_name`, `nationality`.
+3. **Analyst-set values win.** If a field is explicitly present on the TRACK feature, it overrides the registry value.
+4. **UI indicates provenance.** Registry-derived values are visually distinguished from analyst-set values (e.g. italic or dimmed) so the analyst knows which are lookups.
+
+This means:
+- Features.geojson stays lean — typically just `platform_id` and raw track data.
+- Registry changes propagate automatically on next save (without re-importing).
+- Analysts can override the registry for specific tracks when needed.
+
+**STAC extension** (`debrief:platforms`): Replace the three flat aggregate properties with a single structured array. This array is the **fully resolved view** — at save time, the save handler merges feature-level overrides with registry lookups to produce the complete record:
 
 ```jsonc
 // OLD (removed)
@@ -95,7 +112,7 @@ All fields are **optional** — analysts may load data for vessels not in the re
 "debrief:vessel_classes": ["surface/warship/frigate/type23", "subsurface/submarine/ssn/astute"],
 "debrief:track_names": ["HMS Nelson", "Contact Alpha"],
 
-// NEW
+// NEW — fully resolved at save time
 "debrief:platforms": [
   {
     "id": "NELSON",
@@ -109,26 +126,29 @@ All fields are **optional** — analysts may load data for vessels not in the re
 ]
 ```
 
+Platforms with no registry entry and no analyst overrides appear with only `"id"` populated; remaining fields are null.
+
 Regenerate Pydantic models, JSON Schema, and TypeScript types from the updated LinkML.
 
-### 3. Import Pipeline Enrichment
+### 3. Import Pipeline
 
-When `services/io/handlers/dpf.py` or `rep.py` processes a legacy file:
+The import handlers (`services/io/handlers/dpf.py`, `rep.py`) continue to write `platform_id` to TRACK features as they do today. They do **not** write enrichment fields — those are resolved from the registry at save time.
 
-1. Extract `platform_id` from the source data (as today).
-2. Look up `platform_id` in the platform registry.
-3. **If found:** populate `display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, `domain` on the TRACK feature.
-4. **If not found:** leave enrichment fields empty. Log a warning listing all unregistered `platform_id` values encountered during this import — gives the analyst a "to-do list" of platforms to register.
+New behaviour: after import, the handler checks all extracted `platform_id` values against the registry. Any unregistered `platform_id` values are logged as a warning, giving the analyst a "to-do list" of platforms to add to the registry.
 
-The enrichment script (`scripts/enrich-legacy-catalog.py`) is **not** updated. Import-time enrichment replaces it for this use case.
+The enrichment script (`scripts/enrich-legacy-catalog.py`) is **not** updated. Save-time registry resolution replaces it for this use case.
 
 ### 4. Save-Time Item Regeneration
 
-When a plot is saved, `services/stac/` regenerates `item.json` from `features.geojson`:
+When a plot is saved, `services/stac/` regenerates `item.json` from `features.geojson` + the platform registry:
 
-- Walk TRACK features, build `debrief:platforms` array from the per-feature enrichment fields.
-- Derive convenience aggregates if needed (e.g. `has_submarine`, `nationalities` as a flat list for simple CQL2 queries) — or drop flat aggregates entirely if the `array_filter` extension handles all queries.
-- Record provenance in the TRACK feature's `provenance` block: how each platform's metadata was derived (registry lookup vs. empty/unknown).
+1. Walk TRACK features.
+2. For each feature, resolve `platform_id` against the registry tree. The platform's position in the tree provides `vessel_class`, `vessel_type`, `vessel_role`, `domain`, `name`, `nationality`.
+3. Overlay any analyst-set fields from the TRACK feature's optional properties (these take precedence over registry values).
+4. Emit the fully resolved `debrief:platforms` array on item.json.
+5. Platforms with no registry entry and no overrides appear with only `id` populated.
+
+This means registry changes (adding a new platform, correcting a nationality) propagate to item.json on the next save — without re-importing.
 
 ### 5. CQL2 `array_filter` Extension
 
@@ -174,12 +194,13 @@ NL input produces CQL2 chips → chips filter the card grid via the extended CQL
 
 ## Success Criteria
 
-- [ ] Platform registry exists at `shared/data/platform-registry.yaml` with vessel class taxonomy and known platforms
-- [ ] LinkML schema declares optional per-platform fields on TrackProperties
+- [ ] Platform registry exists at `shared/data/platform-registry.yaml` as a unified tree (platforms are leaves under their vessel class)
+- [ ] LinkML schema declares optional per-platform override fields on TrackProperties
 - [ ] Pydantic + TypeScript types regenerated and passing adherence tests
-- [ ] Import handlers consult registry; unregistered platforms log warnings
+- [ ] Import handlers log warnings for unregistered platform_ids
+- [ ] Save-time regeneration resolves platform_id against registry, overlays analyst overrides
 - [ ] Sample catalog regenerated cleanly from legacy sources through enriched pipeline
-- [ ] `debrief:platforms` replaces flat aggregates on item.json
+- [ ] `debrief:platforms` (fully resolved) replaces flat aggregates on item.json
 - [ ] CQL2 engine evaluates `array_filter()` expressions
 - [ ] LLM generates CQL2 from NL queries using schema + enum prompt (no catalog in prompt)
 - [ ] Stakeholder can type a query, see chips appear, see filtered card grid update
@@ -188,8 +209,8 @@ NL input produces CQL2 chips → chips filter the card grid via the extended CQL
 
 ## Constraints
 
-- Enrichment fields on TrackProperties are **optional** — the system must function correctly when they are empty (unregistered platforms, incomplete data)
-- Platform registry is a static file, not a runtime service
+- TrackProperties enrichment fields are **optional override slots** — features.geojson typically stores only `platform_id`; the system must function correctly when overrides are absent and the platform is not in the registry
+- Platform registry is a static file, not a runtime service; changes propagate on next save
 - No build step for the demo UI (HTML + CDN React + Babel standalone)
 - Auth/transport for LLM calls is TBD — the epic must not be blocked by this decision
 
@@ -224,16 +245,16 @@ NL input produces CQL2 chips → chips filter the card grid via the extended CQL
 
 | Item | Description | Dependencies |
 |------|-------------|--------------|
-| 180 | [E10] Platform registry schema + seed data — define vessel class taxonomy and known platforms in `shared/data/platform-registry.yaml`; create Python + TypeScript loaders | None |
-| 181 | [E10] LinkML schema update — add optional per-platform fields to TrackProperties (`display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, `domain`); update STAC extension with `debrief:platforms` replacing flat aggregates; regenerate Pydantic + TS types; update golden fixtures | #180 |
+| 180 | [E10] Platform registry — unified vessel class + platform tree in `shared/data/platform-registry.yaml`; platforms are leaf instances under their class node; seed with existing 10 known platforms; create Python + TypeScript loaders that resolve `platform_id` → full metadata from tree position | None |
+| 181 | [E10] LinkML schema update — add optional per-platform override fields to TrackProperties (`display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, `domain`); update STAC extension with `debrief:platforms` replacing flat aggregates; regenerate Pydantic + TS types; update golden fixtures | #180 |
 
 ### Phase 1: Import Pipeline
 
 | Item | Description | Dependencies |
 |------|-------------|--------------|
-| 182 | [E10] Import handler enrichment — update `services/io/handlers/dpf.py` and `rep.py` to consult platform registry at import time; populate enrichment fields for known platforms; log warnings for unregistered platform_ids | #180, #181 |
-| 183 | [E10] Save-time item regeneration — update `services/stac/` to regenerate `item.json` from enriched `features.geojson` with `debrief:platforms` array (no flat aggregates); record enrichment provenance | #181, #182 |
-| 184 | [E10] Nuke + regenerate sample catalog — delete `preview/workspace/samples/local-store/`, re-import all 72 legacy files through the enriched pipeline; populate registry as we process; all schema tests pass | #182, #183 |
+| 182 | [E10] Import handler warnings — update `services/io/handlers/dpf.py` and `rep.py` to check extracted `platform_id` values against the registry after import; log warnings listing unregistered platform_ids (import still succeeds with empty enrichment) | #180 |
+| 183 | [E10] Save-time registry resolution — update `services/stac/` save handler to resolve each TRACK feature's `platform_id` against the registry tree; overlay any analyst-set override fields from the feature; emit fully resolved `debrief:platforms` array on `item.json` (no flat aggregates) | #180, #181 |
+| 184 | [E10] Nuke + regenerate sample catalog — delete `preview/workspace/samples/local-store/`, re-import all 72 legacy files through the pipeline; add platforms to registry as encountered; all schema tests pass | #182, #183 |
 
 ### Phase 2: CQL2 Extension
 
