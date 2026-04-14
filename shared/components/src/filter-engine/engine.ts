@@ -12,7 +12,7 @@ import type {
   StacBrowserItem,
 } from "./types";
 import { buildDescendantMap } from "./taxonomy";
-import { getMatcher } from "./matchers";
+import { getMatcher, matchArrayFilter } from "./matchers";
 import { filterExpressionToCql2Json } from "./cql2-json";
 
 /**
@@ -28,10 +28,13 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
     item: StacBrowserItem,
     expression: FilterExpression,
   ): boolean {
+    const arrayFilters = expression.arrayFilters ?? [];
+
     // Empty expression matches all
     if (
       expression.predicates.length === 0 &&
-      expression.orGroups.length === 0
+      expression.orGroups.length === 0 &&
+      arrayFilters.length === 0
     ) {
       return true;
     }
@@ -57,6 +60,13 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
       }
     }
 
+    // All array filters must match (AND)
+    for (const af of arrayFilters) {
+      if (!matchArrayFilter(item, af, descendantMap)) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -67,7 +77,8 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
     // Fast path: empty expression returns all items
     if (
       expression.predicates.length === 0 &&
-      expression.orGroups.length === 0
+      expression.orGroups.length === 0 &&
+      (expression.arrayFilters ?? []).length === 0
     ) {
       return [...items];
     }

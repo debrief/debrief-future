@@ -5,7 +5,8 @@
  * returning true if the item matches the predicate.
  */
 
-import type { DurationBucket, ModifiedBucket, FilterType, StacBrowserItem } from "./types";
+import type { PlatformRecord } from '@debrief/schemas';
+import type { ArrayFilterPredicate, CompoundPredicate, DurationBucket, ModifiedBucket, FilterType, PlatformField, StacBrowserItem } from "./types";
 import type { DescendantMap } from "./taxonomy";
 
 /** Duration bucket thresholds in milliseconds */
@@ -142,4 +143,55 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
 /** Get the matcher function for a filter type */
 export function getMatcher(type: FilterType): MatcherFn {
   return MATCHERS[type];
+}
+
+/** Read a platform field value by field name */
+function getPlatformField(platform: PlatformRecord, field: PlatformField): string | undefined {
+  switch (field) {
+    case "id": return platform.id;
+    case "name": return platform.name;
+    case "nationality": return platform.nationality;
+    case "vessel_class": return platform.vessel_class;
+    case "vessel_type": return platform.vessel_type;
+    case "vessel_role": return platform.vessel_role;
+    case "domain": return platform.domain;
+  }
+}
+
+/** Evaluate a compound predicate against a single platform record */
+function evaluateCompound(
+  platform: PlatformRecord,
+  pred: CompoundPredicate,
+  descendantMap: DescendantMap,
+): boolean {
+  switch (pred.kind) {
+    case "comparison": {
+      const fieldValue = getPlatformField(platform, pred.field);
+      if (fieldValue == null) return false;
+      if (pred.field === "vessel_class") {
+        const expandedPaths = descendantMap.get(pred.value);
+        return expandedPaths != null && expandedPaths.has(fieldValue);
+      }
+      if (pred.field === "id") {
+        return fieldValue === pred.value;
+      }
+      return fieldValue.toLowerCase() === pred.value.toLowerCase();
+    }
+    case "and":
+      return pred.children.every((c) => evaluateCompound(platform, c, descendantMap));
+    case "or":
+      return pred.children.some((c) => evaluateCompound(platform, c, descendantMap));
+  }
+}
+
+/** Evaluate an array_filter predicate against a STAC item */
+export function matchArrayFilter(
+  item: StacBrowserItem,
+  af: ArrayFilterPredicate,
+  descendantMap: DescendantMap,
+): boolean {
+  const platforms = item.platforms ?? [];
+  if (platforms.length === 0) return af.negated === true;
+  const result = platforms.some((p) => evaluateCompound(p, af.predicate, descendantMap));
+  return af.negated ? !result : result;
 }
