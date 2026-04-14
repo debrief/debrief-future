@@ -4,8 +4,13 @@
  * @module filter-engine
  */
 
-export { createFilterEngine } from "./engine";
-export { cql2JsonToArrayFilters } from "./cql2-json";
+export { createFilterEngine, filterByCql2Json } from "./engine";
+export {
+  cql2JsonToArrayFilters,
+  cql2JsonToFilterExpression,
+  Cql2ParseError,
+  PROPERTY_MAP,
+} from "./cql2-json";
 export { parseTaxonomy, buildDescendantMap, buildTaxonomyLabelMap, resolveTaxonomyLabel } from "./taxonomy";
 export type { RawTaxonomy, RawTaxonomyNode, DescendantMap, TaxonomyLabelMap } from "./taxonomy";
 export type {

@@ -59,10 +59,10 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 **Purpose**: Scaffolding that blocks nothing else but must exist before implementation.
 
-- [ ] T001 Create the new module directory tree `shared/components/src/nl-cql2/`
-- [ ] T002 Create the test-only directory tree `shared/components/src/nl-cql2/__tests__/fixtures/`
-- [ ] T003 Create vitest globalSetup that resolves repo root via `pnpm-workspace.yaml` find-up and exports `DEBRIEF_REPO_ROOT` (decision 14A) `shared/components/vitest.globalSetup.ts`
-- [ ] T004 Wire globalSetup into vitest config (add `globalSetup: ['./vitest.globalSetup.ts']`) `shared/components/vitest.config.ts`
+- [x] T001 Create the new module directory tree `shared/components/src/nl-cql2/`
+- [x] T002 Create the test-only directory tree `shared/components/src/nl-cql2/__tests__/fixtures/`
+- [x] T003 Create vitest globalSetup that resolves repo root via `pnpm-workspace.yaml` find-up and exports `DEBRIEF_REPO_ROOT` (decision 14A) `shared/components/vitest.globalSetup.ts`
+- [x] T004 Wire globalSetup into vitest config (add `globalSetup: ['./vitest.globalSetup.ts']`) `shared/components/vitest.config.ts`
 
 ---
 
@@ -72,14 +72,14 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 **⚠️ CRITICAL**: No user-story work can begin until Phase 2 is complete.
 
-- [ ] T005 Export `PROPERTY_MAP` from `cql2-json.ts` (promote existing internal constant; decision 3A) `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T006 Implement `cql2JsonToFilterExpression(cql2)` reverse parser covering `=`, `like`, `a_containedBy`, `not`, `and`, `or`, and `array_filter` operators; throw typed errors for unsupported operators and bad arg arity `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T007 Implement `filterByCql2Json(items, cql2)` one-liner convenience wrapper `shared/components/src/filter-engine/engine.ts`
-- [ ] T008 Export `PROPERTY_MAP`, `cql2JsonToFilterExpression`, and `filterByCql2Json` from the filter-engine barrel `shared/components/src/filter-engine/index.ts`
-- [ ] T009 [P][test] Reverse-parser happy-path tests — round-trip `filterExpressionToCql2Json` → `cql2JsonToFilterExpression` across all `FilterType` values and one compound `array_filter` `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
-- [ ] T010 [P][test] Reverse-parser throw-path tests — unsupported operator, bad arg arity, unknown property path (decision 10A, feeds `cql2-evaluation-failed` reason) `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
-- [ ] T011 [P][test] `filterByCql2Json` integration test — evaluate one CQL2 expression against `StacBrowserItem[]` and assert match counts align with `filter(items, filterExpressionToCql2Json…)` invoked via the forward path `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
-- [ ] T012 Capture round-trip evidence across the corpus (forward + reverse) `specs/188-nl-cql2-prompt/evidence/round-trip-evidence.md`
+- [x] T005 Export `PROPERTY_MAP` from `cql2-json.ts` (promote existing internal constant; decision 3A) `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T006 Implement `cql2JsonToFilterExpression(cql2)` reverse parser covering `=`, `like`, `a_containedBy`, `not`, `and`, `or`, and `array_filter` operators; throw typed errors for unsupported operators and bad arg arity `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T007 Implement `filterByCql2Json(items, cql2)` one-liner convenience wrapper `shared/components/src/filter-engine/engine.ts`
+- [x] T008 Export `PROPERTY_MAP`, `cql2JsonToFilterExpression`, and `filterByCql2Json` from the filter-engine barrel `shared/components/src/filter-engine/index.ts`
+- [x] T009 [P][test] Reverse-parser happy-path tests — round-trip `filterExpressionToCql2Json` → `cql2JsonToFilterExpression` across all `FilterType` values and one compound `array_filter` `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
+- [x] T010 [P][test] Reverse-parser throw-path tests — unsupported operator, bad arg arity, unknown property path (decision 10A, feeds `cql2-evaluation-failed` reason) `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
+- [x] T011 [P][test] `filterByCql2Json` integration test — evaluate one CQL2 expression against `StacBrowserItem[]` and assert match counts align with `filter(items, filterExpressionToCql2Json…)` invoked via the forward path `shared/components/src/filter-engine/__tests__/cql2-json-reverse.test.ts`
+- [x] T012 Capture round-trip evidence across the corpus (forward + reverse) `specs/188-nl-cql2-prompt/evidence/round-trip-evidence.md`
 
 **Checkpoint**: Filter-engine extensions merged and green. US1/US2/US3 work can now begin.
 

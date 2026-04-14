@@ -4,10 +4,15 @@
  * Converts the internal filter model to OGC CQL2 JSON encoding.
  */
 
-import type { ArrayFilterPredicate, CompoundPredicate, FilterExpression, FilterType, PlatformField, Predicate } from "./types";
+import type { ArrayFilterPredicate, CompoundPredicate, FilterExpression, FilterType, OrGroup, PlatformField, Predicate } from "./types";
 
-/** CQL2 property name mapping for each filter type */
-const PROPERTY_MAP: Record<FilterType, string> = {
+/**
+ * CQL2 property name mapping for each filter type.
+ *
+ * Exported so the NL → CQL2 prompt builder can derive its schema description
+ * from the same table the evaluator uses (single source of truth; decision 3A).
+ */
+export const PROPERTY_MAP: Readonly<Record<FilterType, string>> = {
   "vessel-class": "debrief:platforms[*].vessel_class",
   tag: "debrief:tags",
   author: "debrief:author",
@@ -223,4 +228,305 @@ function walkCql2(
       walkCql2(child as Cql2Node, results);
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Reverse parser: CQL2-JSON → FilterExpression (#188, decision 1A)
+// ---------------------------------------------------------------------------
+
+/**
+ * Error thrown by `cql2JsonToFilterExpression` when the input uses an
+ * operator, property, or arg arity the filter-engine does not support.
+ *
+ * Callers (the NL → CQL2 parse pipeline) surface this via the
+ * `cql2-evaluation-failed` generation-error reason (decision 8A/10A).
+ */
+export class Cql2ParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "Cql2ParseError";
+  }
+}
+
+/** Reverse of PROPERTY_MAP — property string → FilterType. Built lazily. */
+let PROPERTY_TO_FILTER_TYPE: ReadonlyMap<string, FilterType> | null = null;
+function propertyToFilterType(): ReadonlyMap<string, FilterType> {
+  if (PROPERTY_TO_FILTER_TYPE === null) {
+    const map = new Map<string, FilterType>();
+    const entries = Object.entries(PROPERTY_MAP) as [FilterType, string][];
+    for (const [filterType, property] of entries) {
+      map.set(property, filterType);
+    }
+    PROPERTY_TO_FILTER_TYPE = map;
+  }
+  return PROPERTY_TO_FILTER_TYPE;
+}
+
+/** Narrow an unknown value to an object with `.property: string`. */
+function asPropertyRef(value: unknown): { property: string } | null {
+  if (
+    value !== null &&
+    typeof value === "object" &&
+    "property" in value &&
+    typeof (value as { property: unknown }).property === "string"
+  ) {
+    return { property: (value as { property: string }).property };
+  }
+  return null;
+}
+
+/** Narrow an unknown value to a CQL2 node (`.op` + optional `.args`). */
+function asCql2Node(value: unknown): Cql2Node | null {
+  if (
+    value !== null &&
+    typeof value === "object" &&
+    "op" in value &&
+    typeof (value as { op: unknown }).op === "string"
+  ) {
+    return value as Cql2Node;
+  }
+  return null;
+}
+
+/** Look up the FilterType for a CQL2 property reference, throw if unknown. */
+function resolveFilterType(property: string): FilterType {
+  const filterType = propertyToFilterType().get(property);
+  if (filterType === undefined) {
+    throw new Cql2ParseError(
+      `CQL2 references property "${property}" not in PROPERTY_MAP`,
+    );
+  }
+  return filterType;
+}
+
+/**
+ * Parse a single leaf comparison node (`=`, `like`, `a_containedBy`) into
+ * a Predicate. Throws on arity / shape errors.
+ */
+function parseComparison(node: Cql2Node): Predicate {
+  const args = node.args ?? [];
+  const op = node.op;
+
+  if (op === "=") {
+    if (args.length !== 2) {
+      throw new Cql2ParseError(
+        `CQL2 "=" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const propRef = asPropertyRef(args[0]);
+    if (propRef === null) {
+      throw new Cql2ParseError(`CQL2 "=" expects first arg to be a property ref`);
+    }
+    const rawValue = args[1];
+    if (typeof rawValue !== "string") {
+      throw new Cql2ParseError(
+        `CQL2 "=" on "${propRef.property}" expects a string value, got ${typeof rawValue}`,
+      );
+    }
+    return {
+      type: resolveFilterType(propRef.property),
+      value: rawValue,
+    };
+  }
+
+  if (op === "like") {
+    if (args.length !== 2) {
+      throw new Cql2ParseError(
+        `CQL2 "like" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const propRef = asPropertyRef(args[0]);
+    if (propRef === null) {
+      throw new Cql2ParseError(`CQL2 "like" expects first arg to be a property ref`);
+    }
+    const pattern = args[1];
+    if (typeof pattern !== "string") {
+      throw new Cql2ParseError(
+        `CQL2 "like" on "${propRef.property}" expects a string pattern`,
+      );
+    }
+    // Forward path wraps values in %value% — strip those wildcards on reverse.
+    let value = pattern;
+    if (value.startsWith("%")) value = value.slice(1);
+    if (value.endsWith("%")) value = value.slice(0, -1);
+    return {
+      type: resolveFilterType(propRef.property),
+      value,
+    };
+  }
+
+  if (op === "a_containedBy") {
+    if (args.length !== 2) {
+      throw new Cql2ParseError(
+        `CQL2 "a_containedBy" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const valueArray = args[0];
+    const propRef = asPropertyRef(args[1]);
+    if (propRef === null) {
+      throw new Cql2ParseError(
+        `CQL2 "a_containedBy" expects second arg to be a property ref`,
+      );
+    }
+    if (!Array.isArray(valueArray) || valueArray.length !== 1) {
+      throw new Cql2ParseError(
+        `CQL2 "a_containedBy" on "${propRef.property}" expects a single-element value array`,
+      );
+    }
+    const firstValue = (valueArray as readonly unknown[])[0];
+    if (typeof firstValue !== "string") {
+      throw new Cql2ParseError(
+        `CQL2 "a_containedBy" on "${propRef.property}" expects a string value`,
+      );
+    }
+    return {
+      type: resolveFilterType(propRef.property),
+      value: firstValue,
+    };
+  }
+
+  throw new Cql2ParseError(
+    `Unsupported CQL2 operator "${op ?? "<missing>"}" in reverse parser`,
+  );
+}
+
+/** Walk a `not(...)` wrapper and return the negated Predicate or ArrayFilterPredicate. */
+function parseNot(
+  node: Cql2Node,
+): { kind: "predicate"; predicate: Predicate } | { kind: "arrayFilter"; af: ArrayFilterPredicate } {
+  const args = node.args ?? [];
+  if (args.length !== 1) {
+    throw new Cql2ParseError(
+      `CQL2 "not" requires exactly 1 arg, got ${args.length}`,
+    );
+  }
+  const inner = asCql2Node(args[0]);
+  if (inner === null) {
+    throw new Cql2ParseError(`CQL2 "not" expects a node arg`);
+  }
+  if (inner.op === "array_filter") {
+    const af = parseArrayFilter(inner);
+    return { kind: "arrayFilter", af: { ...af, negated: true } };
+  }
+  const predicate = parseComparison(inner);
+  return { kind: "predicate", predicate: { ...predicate, negated: true } };
+}
+
+/** Parse an `array_filter(platforms, <compound>)` node. */
+function parseArrayFilter(node: Cql2Node): ArrayFilterPredicate {
+  const args = node.args ?? [];
+  if (args.length !== 2) {
+    throw new Cql2ParseError(
+      `CQL2 "array_filter" requires exactly 2 args, got ${args.length}`,
+    );
+  }
+  const propRef = asPropertyRef(args[0]);
+  if (propRef === null || propRef.property !== "debrief:platforms") {
+    throw new Cql2ParseError(
+      `CQL2 "array_filter" expects first arg to be {property: "debrief:platforms"}`,
+    );
+  }
+  const predicateNode = asCql2Node(args[1]);
+  if (predicateNode === null) {
+    throw new Cql2ParseError(`CQL2 "array_filter" expects second arg to be a predicate node`);
+  }
+  return {
+    array: "platforms",
+    predicate: parseCql2Predicate(predicateNode),
+    negated: false,
+  };
+}
+
+/**
+ * Reverse of `filterExpressionToCql2Json`: walk a CQL2-JSON tree and build
+ * the internal `FilterExpression` model.
+ *
+ * Throws `Cql2ParseError` on unknown operators, bad arg arity, or property
+ * references missing from `PROPERTY_MAP`.
+ *
+ * - `{}` → empty expression (match-all).
+ * - A single comparison / `like` / `a_containedBy` node → one predicate.
+ * - An `array_filter` (optionally negated) → one arrayFilter.
+ * - `and` at top level → collect children into predicates / orGroups / arrayFilters.
+ * - `or` at top level → single orGroup.
+ */
+export function cql2JsonToFilterExpression(
+  cql2: Record<string, unknown>,
+): FilterExpression {
+  // Empty object = match all
+  if (cql2 === null || typeof cql2 !== "object" || Object.keys(cql2).length === 0) {
+    return { predicates: [], orGroups: [], arrayFilters: [] };
+  }
+
+  const node = asCql2Node(cql2);
+  if (node === null) {
+    throw new Cql2ParseError(
+      `CQL2 reverse parser: expected a node with "op", got ${JSON.stringify(cql2)}`,
+    );
+  }
+
+  const predicates: Predicate[] = [];
+  const orGroups: OrGroup[] = [];
+  const arrayFilters: ArrayFilterPredicate[] = [];
+
+  absorb(node);
+
+  function absorb(n: Cql2Node): void {
+    const op = n.op;
+    if (op === "and") {
+      const args = n.args ?? [];
+      for (const child of args) {
+        const childNode = asCql2Node(child);
+        if (childNode === null) {
+          throw new Cql2ParseError(`CQL2 "and" expects all args to be nodes`);
+        }
+        absorb(childNode);
+      }
+      return;
+    }
+
+    if (op === "or") {
+      const args = n.args ?? [];
+      const groupPredicates: Predicate[] = [];
+      for (const child of args) {
+        const childNode = asCql2Node(child);
+        if (childNode === null) {
+          throw new Cql2ParseError(`CQL2 "or" expects all args to be nodes`);
+        }
+        if (childNode.op === "not") {
+          const unwrapped = parseNot(childNode);
+          if (unwrapped.kind !== "predicate") {
+            throw new Cql2ParseError(
+              `CQL2 "or" over array_filter not supported`,
+            );
+          }
+          groupPredicates.push(unwrapped.predicate);
+        } else {
+          groupPredicates.push(parseComparison(childNode));
+        }
+      }
+      orGroups.push({ predicates: groupPredicates });
+      return;
+    }
+
+    if (op === "array_filter") {
+      arrayFilters.push(parseArrayFilter(n));
+      return;
+    }
+
+    if (op === "not") {
+      const unwrapped = parseNot(n);
+      if (unwrapped.kind === "predicate") {
+        predicates.push(unwrapped.predicate);
+      } else {
+        arrayFilters.push(unwrapped.af);
+      }
+      return;
+    }
+
+    // Leaf comparison
+    predicates.push(parseComparison(n));
+  }
+
+  return { predicates, orGroups, arrayFilters };
 }

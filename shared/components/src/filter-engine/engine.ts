@@ -13,7 +13,10 @@ import type {
 } from "./types";
 import { buildDescendantMap } from "./taxonomy";
 import { getMatcher, matchArrayFilter } from "./matchers";
-import { filterExpressionToCql2Json } from "./cql2-json";
+import {
+  cql2JsonToFilterExpression,
+  filterExpressionToCql2Json,
+} from "./cql2-json";
 
 /**
  * Create a filter engine instance.
@@ -93,4 +96,20 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
   }
 
   return { filter, matches, toCql2Json };
+}
+
+/**
+ * One-liner convenience: parse a CQL2-JSON object and filter items with an
+ * empty-taxonomy engine. Callers needing taxonomy-aware vessel-class
+ * descendant matching should build their own engine via `createFilterEngine`.
+ *
+ * Added in #188 for the NL → CQL2 harness (decision 1A).
+ */
+export function filterByCql2Json<T extends StacBrowserItem>(
+  items: readonly T[],
+  cql2: Record<string, unknown>,
+): T[] {
+  const expression = cql2JsonToFilterExpression(cql2);
+  const engine = createFilterEngine({ taxonomy: [] });
+  return items.filter((item) => engine.matches(item, expression)) as T[];
 }
