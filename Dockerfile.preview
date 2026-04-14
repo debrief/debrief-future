@@ -62,12 +62,14 @@ COPY services/io /workspace/services/io
 COPY services/stac /workspace/services/stac
 COPY services/calc /workspace/services/calc
 COPY shared/schemas /workspace/shared/schemas
+COPY shared/data /workspace/shared/data
 
 # Install Python services in a virtual environment
 WORKDIR /workspace
 RUN uv venv /opt/debrief-venv && \
     VIRTUAL_ENV=/opt/debrief-venv uv pip install \
     ./shared/schemas \
+    ./shared/data \
     ./services/io \
     ./services/stac \
     ./services/calc
