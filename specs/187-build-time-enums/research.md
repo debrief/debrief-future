@@ -140,6 +140,22 @@ This document captures the design decisions taken before implementation, alterna
 - *Use a STAC SDK (`pystac`) to traverse the catalog*: rejected — adds a dependency for behaviour we can do in 20 lines of `pathlib`. The catalog layout is known and stable for our purposes.
 - *Recursively walk arbitrary depth*: rejected — the current layout is one level deep; any future change to a nested layout should be an explicit, reviewed update to the script.
 
+## Decision 11 — Hand-written JSON Schema for the bundle (Article II exemption)
+
+**Decision**: `contracts/enum-bundle.schema.json` is authored by hand rather than generated from a LinkML source model.
+
+**Rationale**:
+- Article II principle 1 states that LinkML master schemas define "all data structures", with Pydantic, JSON Schema and TypeScript representations derived from them. The constitutional intent is to prevent the derived representations of *domain* data (tracks, plots, items, features) from drifting out of sync with the master model.
+- The enum bundle is **not a domain data structure**. It is a build-time artefact consumed by one consumer (the LLM prompt builder in #188) and thrown away on every rerun. It carries no user data, no provenance of analytical value, and no exchange format obligations between services.
+- Promoting the bundle to LinkML would add a LinkML source, a Pydantic model, a TypeScript type and an adherence test for a schema whose only consumer reads a JSON file. The round-trip ceremony would outweigh the benefit.
+- The hand-written JSON Schema still serves its real purpose: it is the contract pinned in the PR review so that the prompt builder in #188 can validate against a stable shape, and T014 enforces conformance in the test suite.
+
+**Alternatives considered**:
+- *Author the schema in LinkML and derive the JSON Schema*: rejected — pays the cost for zero domain benefit; see above.
+- *No schema at all*: rejected — then the contract with #188 is implicit, and any drift in the script silently breaks the prompt builder.
+
+**Promotion trigger**: If the bundle ever becomes an exchange format consumed by more than one subsystem (e.g. a second LLM integration, a service API, or a user-facing export), re-author the schema in LinkML at that point and derive the JSON Schema. Revisit this decision as part of that work.
+
 ## Open Questions Carried Forward
 
 None. All decisions above are final for this feature. Future work (a discrete `debrief:exercise` field, multiple-format output, automatic CI regeneration) is captured in the spec's Out of Scope section.

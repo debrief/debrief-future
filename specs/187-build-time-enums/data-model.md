@@ -117,6 +117,21 @@ class EnumBundle(TypedDict):
 
 No `Any` is used anywhere in the implementation (Article XV).
 
+## Internal Types (Not Serialised)
+
+A single intermediate dataclass lives in `enum_bundle.py` to keep `scan_catalog`'s return value typed rather than a tuple of loose lists. It is not part of the bundle contract and never leaves the module.
+
+```python
+@dataclass(frozen=True)
+class CatalogScanResult:
+    nationalities: list[str]      # deduplicated, sorted (case-insensitive)
+    exercise_names: list[str]     # deduplicated, sorted (case-insensitive)
+    tags: list[str]               # deduplicated, sorted (case-insensitive)
+    feature_tags: list[str]       # deduplicated, sorted (case-insensitive)
+```
+
+`build_bundle` consumes a `CatalogScanResult` plus a `PlatformRegistry`, unions the nationalities with the registry's, and produces the final `EnumBundle`. This split lets the catalog-side extraction be tested in isolation from registry resolution.
+
 ## Relationships
 
 ```text

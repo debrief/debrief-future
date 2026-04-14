@@ -11,6 +11,8 @@ description: "Task list for feature 187-build-time-enums"
 
 **Organization**: Tasks are grouped by user story so each can be implemented and verified independently. P1 (US1) delivers the bundle producer; P2 (US2) layers determinism/drift verification on top; P3 (US3) confirms diagnostic visibility for unknown vocabulary.
 
+**Revision history**: Updated after `/speckit.analyze` to close MEDIUM findings C1 (bundle-size assertion), C2 (CLI exit-code tests), C3 (vessel-class drift test) and LOW findings U1 (granular missing-field coverage), C4 (explicit dependency-surface check).
+
 ---
 
 ## Evidence Requirements
@@ -54,7 +56,7 @@ This is an **Infrastructure / CLI Tool / Library** feature. Evidence proves the 
 
 **Purpose**: Scaffolding for the new module and its test file. No logic yet.
 
-- [ ] T001 Add empty `enum_bundle` module exporting `BundleMeta`/`EnumBundle` `TypedDict`s and the public function signatures (no implementation) `shared/data/src/debrief_data/enum_bundle.py`
+- [ ] T001 Add empty `enum_bundle` module exporting `BundleMeta`/`EnumBundle` `TypedDict`s and the `CatalogScanResult` dataclass + public function signatures (no implementation) `shared/data/src/debrief_data/enum_bundle.py`
 - [ ] T002 [P] Re-export `enum_bundle` symbols from the package `__init__` so callers import via `debrief_data` `shared/data/src/debrief_data/__init__.py`
 - [ ] T003 [P] Create empty pytest test file with imports and the fixture-catalog directory `shared/data/tests/test_enum_bundle.py`
 - [ ] T004 [P] Create the smallest possible fixture catalog (catalog.json + 2 item.json files covering tags, feature_tags, exercise prefix, and platform nationality) `shared/data/tests/fixtures/catalog/`
@@ -88,21 +90,23 @@ This is an **Infrastructure / CLI Tool / Library** feature. Evidence proves the 
 ### Tests for User Story 1 (write FIRST, ensure they FAIL before implementation)
 
 - [ ] T010 [P][test] [US1] Test `extract_class_tree(registry)` strips platform-instance leaves and preserves interior nodes including `_class` blocks `shared/data/tests/test_enum_bundle.py`
-- [ ] T011 [P][test] [US1] Test `scan_catalog(catalog_dir)` returns deduplicated tags + feature_tags + nationalities + exercise names from the fixture catalog `shared/data/tests/test_enum_bundle.py`
-- [ ] T012 [P][test] [US1] Test `scan_catalog(catalog_dir)` skips items missing optional fields (no `debrief:tags`, no parseable exercise prefix) without crashing or polluting output `shared/data/tests/test_enum_bundle.py`
+- [ ] T011 [P][test] [US1] Test `scan_catalog(catalog_dir)` returns a `CatalogScanResult` with deduplicated tags + feature_tags + nationalities + exercise names from the fixture catalog `shared/data/tests/test_enum_bundle.py`
+- [ ] T012 [P][test] [US1] Test `scan_catalog(catalog_dir)` skips each optional field independently without crashing: (a) item with no `debrief:tags` → `tags` empty/unpolluted; (b) item with no `debrief:feature_tags` → `feature_tags` empty/unpolluted; (c) item with no `properties.title` → no exercise contribution; (d) item with no `debrief:platforms` → no nationality contribution; (e) item with `debrief:platforms[].nationality` absent on an individual entry → entry skipped, others preserved `shared/data/tests/test_enum_bundle.py`
 - [ ] T013 [P][test] [US1] Test `build_bundle(registry, catalog_dir)` unions registry + catalog nationalities and includes the `_meta` header `shared/data/tests/test_enum_bundle.py`
 - [ ] T014 [P][test] [US1] Test `serialize(bundle)` produces JSON that conforms to `specs/187-build-time-enums/contracts/enum-bundle.schema.json` (use `jsonschema`) `shared/data/tests/test_enum_bundle.py`
+- [ ] T015 [P][test] [US1] Test `serialize(build_bundle(real_registry, real_catalog))` produces output under 65,536 bytes — enforces FR-009 / SC-002 so the bundle cannot silently balloon beyond an LLM-prompt-friendly size `shared/data/tests/test_enum_bundle.py`
+- [ ] T016 [P][test] [US1] Test CLI exit codes via subprocess: (a) missing `--registry` path exits with code 1 and prints the missing path to stderr; (b) malformed registry JSON exits with code 2 and names the offending key/path to stderr — enforces FR-010 `shared/data/tests/test_enum_bundle.py`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement `extract_class_tree(registry: PlatformRegistry) -> dict[str, object]` walking the registry's `_tree` and dropping nodes that match `_is_platform_entry` `shared/data/src/debrief_data/enum_bundle.py`
-- [ ] T016 [US1] Implement `scan_catalog(catalog_dir: Path) -> CatalogScanResult` that walks `local-store/*/item.json` in sorted order, harvesting tags, feature_tags, nationalities (from `debrief:platforms[].nationality`), and exercise names (from titles via `_parse_exercise_name`) `shared/data/src/debrief_data/enum_bundle.py`
-- [ ] T017 [US1] Implement `build_bundle(registry: PlatformRegistry, catalog_dir: Path) -> EnumBundle` composing the five sections and `_meta` `shared/data/src/debrief_data/enum_bundle.py`
-- [ ] T018 [US1] Implement `serialize(bundle: EnumBundle) -> str` using `json.dumps(..., indent=2, sort_keys=True, ensure_ascii=False)` plus trailing newline `shared/data/src/debrief_data/enum_bundle.py`
-- [ ] T019 [US1] Implement `scripts/extract-enum-bundle.py` CLI: `argparse` with `--registry`/`--catalog`/`--output` flags defaulting to canonical paths; loads registry, calls `build_bundle`, writes file, prints count summary to stdout, errors to stderr with non-zero exit codes (1 = missing input, 2 = malformed registry) `scripts/extract-enum-bundle.py`
-- [ ] T020 [US1] Run the script against real inputs and commit the generated artefact `shared/data/enum-bundle.json`
+- [ ] T017 [US1] Implement `extract_class_tree(registry: PlatformRegistry) -> dict[str, object]` walking the registry's `_tree` and dropping nodes that match `_is_platform_entry` `shared/data/src/debrief_data/enum_bundle.py`
+- [ ] T018 [US1] Implement `scan_catalog(catalog_dir: Path) -> CatalogScanResult` that walks `local-store/*/item.json` in sorted order, harvesting tags, feature_tags, nationalities (from `debrief:platforms[].nationality`), and exercise names (from titles via `_parse_exercise_name`) `shared/data/src/debrief_data/enum_bundle.py`
+- [ ] T019 [US1] Implement `build_bundle(registry: PlatformRegistry, catalog_dir: Path) -> EnumBundle` composing the five sections and `_meta` `shared/data/src/debrief_data/enum_bundle.py`
+- [ ] T020 [US1] Implement `serialize(bundle: EnumBundle) -> str` using `json.dumps(..., indent=2, sort_keys=True, ensure_ascii=False)` plus trailing newline `shared/data/src/debrief_data/enum_bundle.py`
+- [ ] T021 [US1] Implement `scripts/extract-enum-bundle.py` CLI: `argparse` with `--registry`/`--catalog`/`--output` flags defaulting to canonical paths; loads registry, calls `build_bundle`, writes file, prints count summary to stdout, errors to stderr with non-zero exit codes (1 = missing input, 2 = malformed registry) `scripts/extract-enum-bundle.py`
+- [ ] T022 [US1] Run the script against real inputs and commit the generated artefact `shared/data/enum-bundle.json`
 
-**Checkpoint**: Bundle exists in the repo; counts match the registry + catalog; all US1 tests green.
+**Checkpoint**: Bundle exists in the repo; counts match the registry + catalog; all US1 tests green including size (T015) and exit-code (T016) assertions.
 
 ---
 
@@ -110,20 +114,21 @@ This is an **Infrastructure / CLI Tool / Library** feature. Evidence proves the 
 
 **Goal**: Re-running the script after an input change updates the bundle predictably; re-running with no change produces a byte-identical file.
 
-**Independent Test**: `sha256sum` the bundle, re-run the script, `sha256sum` again — identical hashes. Add a fake nationality to the registry, re-run, observe the new code in the bundle.
+**Independent Test**: `sha256sum` the bundle, re-run the script, `sha256sum` again — identical hashes. Add a fake nationality (or vessel class, or tag) to the registry/catalog, re-run, observe the new code in the bundle.
 
 ### Tests for User Story 2
 
-- [ ] T021 [P][test] [US2] Test `serialize(build_bundle(...))` is byte-identical across two consecutive runs with the same fixture inputs `shared/data/tests/test_enum_bundle.py`
-- [ ] T022 [P][test] [US2] Test that adding a new nationality to a fixture registry causes that nationality to appear in the resulting bundle `shared/data/tests/test_enum_bundle.py`
-- [ ] T023 [P][test] [US2] Test that adding a new tag to a fixture item causes that tag to appear in the bundle `shared/data/tests/test_enum_bundle.py`
-- [ ] T024 [P][test] [US2] Test that adding a new exercise prefix to a fixture item title causes that exercise to appear in the bundle `shared/data/tests/test_enum_bundle.py`
+- [ ] T023 [P][test] [US2] Test `serialize(build_bundle(...))` is byte-identical across two consecutive runs with the same fixture inputs `shared/data/tests/test_enum_bundle.py`
+- [ ] T024 [P][test] [US2] Test that adding a new interior vessel class (e.g. `surface/warship/cruiser`) to a fixture registry causes that class to appear in the bundle's `vessel_class_tree` — enforces US2 AC1 `shared/data/tests/test_enum_bundle.py`
+- [ ] T025 [P][test] [US2] Test that adding a new nationality to a fixture registry causes that nationality to appear in the resulting bundle `shared/data/tests/test_enum_bundle.py`
+- [ ] T026 [P][test] [US2] Test that adding a new tag to a fixture item causes that tag to appear in the bundle `shared/data/tests/test_enum_bundle.py`
+- [ ] T027 [P][test] [US2] Test that adding a new exercise prefix to a fixture item title causes that exercise to appear in the bundle `shared/data/tests/test_enum_bundle.py`
 
 ### Implementation for User Story 2
 
 No new production code — US2 confirms determinism/drift behaviour delivered by US1. If any test fails, fix the underlying bug in `enum_bundle.py` (likely a non-deterministic iteration or a missed deduplication site).
 
-**Checkpoint**: Determinism proven; drift detection works; US1 + US2 green.
+**Checkpoint**: Determinism proven; drift detection works for all four dimensions (vessel class, nationality, tag, exercise); US1 + US2 green.
 
 ---
 
@@ -135,9 +140,9 @@ No new production code — US2 confirms determinism/drift behaviour delivered by
 
 ### Tests for User Story 3
 
-- [ ] T025 [P][test] [US3] Test that a tag appearing in only one fixture item still surfaces in the bundle's `tags` list `shared/data/tests/test_enum_bundle.py`
-- [ ] T026 [P][test] [US3] Test that a nationality appearing only on a catalog item (not in the registry) appears in the bundle's `nationalities` list `shared/data/tests/test_enum_bundle.py`
-- [ ] T027 [P][test] [US3] Test that an item whose title has no `": "` separator contributes no exercise name (no spurious entries) `shared/data/tests/test_enum_bundle.py`
+- [ ] T028 [P][test] [US3] Test that a tag appearing in only one fixture item still surfaces in the bundle's `tags` list `shared/data/tests/test_enum_bundle.py`
+- [ ] T029 [P][test] [US3] Test that a nationality appearing only on a catalog item (not in the registry) appears in the bundle's `nationalities` list `shared/data/tests/test_enum_bundle.py`
+- [ ] T030 [P][test] [US3] Test that an item whose title has no `": "` separator contributes no exercise name (no spurious entries) `shared/data/tests/test_enum_bundle.py`
 
 ### Implementation for User Story 3
 
@@ -153,31 +158,32 @@ No new production code — US3 confirms the conservative-extraction behaviour de
 
 ### Quality Gates
 
-- [ ] T028 Run `task verify` from repo root; fix any lint/typecheck/test failures introduced
-- [ ] T029 [P] Confirm `pyright` passes on `shared/data/src/debrief_data/enum_bundle.py` with strict typing (no `Any`)
-- [ ] T030 [P] Run `quickstart.md` end-to-end as a documentation smoke test (steps 1–5 produce expected output) `specs/187-build-time-enums/quickstart.md`
+- [ ] T031 Run `task verify` from repo root; fix any lint/typecheck/test failures introduced
+- [ ] T032 [P] Confirm `pyright` passes on `shared/data/src/debrief_data/enum_bundle.py` with strict typing (no `Any`)
+- [ ] T033 [P] Run `quickstart.md` end-to-end as a documentation smoke test (steps 1–5 produce expected output) `specs/187-build-time-enums/quickstart.md`
+- [ ] T034 [P] Verify no new third-party dependencies were introduced: diff `pyproject.toml`, `shared/data/pyproject.toml`, and `uv.lock` against `main` and confirm only the new module is added — enforces FR-013 `pyproject.toml`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T031 Create evidence directory `specs/187-build-time-enums/evidence/`
-- [ ] T032 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/187-build-time-enums/evidence/test-summary.md`
-- [ ] T033 [P] Create usage demonstration with one-command invocation, sample stdout, and screenshot of the bundle contents `specs/187-build-time-enums/evidence/usage-example.md`
-- [ ] T034 [P] Capture full terminal session (default run + fixture-overrides run) `specs/187-build-time-enums/evidence/cli-demo.txt`
-- [ ] T035 [P] Snapshot the generated bundle (truncated to the first ~200 lines if large) `specs/187-build-time-enums/evidence/sample-bundle.json`
-- [ ] T036 [P] Capture `jsonschema.validate(bundle, schema)` output proving conformance with `contracts/enum-bundle.schema.json` `specs/187-build-time-enums/evidence/schema-validation-output.txt`
-- [ ] T037 [P] Capture two consecutive `sha256sum shared/data/enum-bundle.json` runs proving byte-identical output `specs/187-build-time-enums/evidence/determinism-proof.txt`
-- [ ] T038 [P] Capture `python scripts/extract-enum-bundle.py --help` output documenting the CLI surface `specs/187-build-time-enums/evidence/config-sample.txt`
+- [ ] T035 Create evidence directory `specs/187-build-time-enums/evidence/`
+- [ ] T036 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/187-build-time-enums/evidence/test-summary.md`
+- [ ] T037 [P] Create usage demonstration with one-command invocation, sample stdout, and screenshot of the bundle contents `specs/187-build-time-enums/evidence/usage-example.md`
+- [ ] T038 [P] Capture full terminal session (default run + fixture-overrides run) `specs/187-build-time-enums/evidence/cli-demo.txt`
+- [ ] T039 [P] Snapshot the generated bundle (truncated to the first ~200 lines if large) `specs/187-build-time-enums/evidence/sample-bundle.json`
+- [ ] T040 [P] Capture `jsonschema.validate(bundle, schema)` output proving conformance with `contracts/enum-bundle.schema.json` `specs/187-build-time-enums/evidence/schema-validation-output.txt`
+- [ ] T041 [P] Capture two consecutive `sha256sum shared/data/enum-bundle.json` runs proving byte-identical output `specs/187-build-time-enums/evidence/determinism-proof.txt`
+- [ ] T042 [P] Capture `python scripts/extract-enum-bundle.py --help` output documenting the CLI surface `specs/187-build-time-enums/evidence/config-sample.txt`
 
 ### Media Content
 
-- [ ] T039 Create shipped blog post via Content Specialist agent (read `.claude/agents/media/content.md`); include "What We Built", lessons learned (e.g. canonicalisation trade-off, decision to commit the artefact), what's next (#188 prompt design) `specs/187-build-time-enums/media/shipped-post.md`
-- [ ] T040 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link placeholder) `specs/187-build-time-enums/media/linkedin-shipped.md`
+- [ ] T043 Create shipped blog post via Content Specialist agent (read `.claude/agents/media/content.md`); include "What We Built", lessons learned (e.g. canonicalisation trade-off, decision to commit the artefact), what's next (#188 prompt design) `specs/187-build-time-enums/media/shipped-post.md`
+- [ ] T044 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link placeholder) `specs/187-build-time-enums/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T041 Create PR and publish blog: run `/speckit.pr`
+- [ ] T045 Create PR and publish blog: run `/speckit.pr`
 
-**Task T041 must run last. It depends on every preceding task being complete.**
+**Task T045 must run last. It depends on every preceding task being complete.**
 
 ---
 
@@ -209,9 +215,9 @@ No new production code — US3 confirms the conservative-extraction behaviour de
 
 - **Phase 1**: T002, T003, T004 are all `[P]` — different files, no shared state.
 - **Phase 2**: T006, T007 are `[P]` — independent helpers. T009 depends on T005–T008.
-- **Phase 3 tests (T010–T014)**: All `[P]` — same file, but each test function is independent. Authors can write them in parallel.
-- **Phase 4/5 tests (T021–T027)**: All `[P]` — independent confirmation tests.
-- **Polish evidence tasks (T032–T038)**: T033–T038 are `[P]` — different files. T032 (test summary) waits on T028.
+- **Phase 3 tests (T010–T016)**: All `[P]` — same file, but each test function is independent. Authors can write them in parallel.
+- **Phase 4/5 tests (T023–T030)**: All `[P]` — independent confirmation tests.
+- **Polish evidence tasks (T036–T042)**: T037–T042 are `[P]` — different files. T036 (test summary) waits on T031.
 
 ---
 
@@ -219,19 +225,21 @@ No new production code — US3 confirms the conservative-extraction behaviour de
 
 ```bash
 # Write all US1 tests in parallel:
-Task: "Test extract_class_tree strips platform leaves"     # T010
-Task: "Test scan_catalog deduplicates harvested values"    # T011
-Task: "Test scan_catalog skips missing optional fields"    # T012
-Task: "Test build_bundle unions registry + catalog data"   # T013
-Task: "Test serialize produces JSON conforming to schema"  # T014
+Task: "Test extract_class_tree strips platform leaves"          # T010
+Task: "Test scan_catalog deduplicates harvested values"         # T011
+Task: "Test scan_catalog skips each optional field"             # T012
+Task: "Test build_bundle unions registry + catalog data"        # T013
+Task: "Test serialize produces JSON conforming to schema"       # T014
+Task: "Test serialized bundle stays under 65 KiB"               # T015
+Task: "Test CLI exit codes via subprocess"                      # T016
 
 # Then implement sequentially (each depends on the previous):
-Task: "Implement extract_class_tree"      # T015
-Task: "Implement scan_catalog"            # T016
-Task: "Implement build_bundle"            # T017
-Task: "Implement serialize"               # T018
-Task: "Implement CLI script"              # T019
-Task: "Run end-to-end and commit bundle"  # T020
+Task: "Implement extract_class_tree"      # T017
+Task: "Implement scan_catalog"            # T018
+Task: "Implement build_bundle"            # T019
+Task: "Implement serialize"               # T020
+Task: "Implement CLI script"              # T021
+Task: "Run end-to-end and commit bundle"  # T022
 ```
 
 ---

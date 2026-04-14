@@ -104,7 +104,7 @@ As the catalog grows, new exercise names, tags, or nationalities will appear tha
 - **SC-003**: Every controlled vocabulary visible on a catalog item (nationalities, vessel classes, tags, feature_tags, exercise) is reachable from the bundle — i.e. an audit of any sample item finds zero values missing from the bundle.
 - **SC-004**: Re-running the script with no input changes produces a byte-identical bundle, demonstrating that the output is reproducible and safe to commit alongside the script.
 - **SC-005**: A reviewer reading the bundle can answer "what nationalities does the catalog know about?" and "what vessel classes does the registry define?" in under one minute, without consulting any other file.
-- **SC-006**: The script completes in well under one minute on the current sample catalog, so it can be re-run interactively during prompt-design iteration without disrupting the developer's flow.
+- **SC-006**: The script completes in 5 seconds or less on the current ~70-item sample catalog, and within 30 seconds on a catalog of ~700 items, so it can be re-run interactively during prompt-design iteration without disrupting the developer's flow.
 
 ## Assumptions
 
