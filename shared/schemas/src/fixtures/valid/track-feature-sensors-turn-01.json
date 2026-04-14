@@ -1,0 +1,419 @@
+{
+  "type": "Feature",
+  "id": "track-sensors-turn-01",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [
+        -5.0,
+        49.97
+      ],
+      [
+        -5.0,
+        49.972
+      ],
+      [
+        -5.0,
+        49.974
+      ],
+      [
+        -5.0,
+        49.976
+      ],
+      [
+        -5.0,
+        49.978
+      ],
+      [
+        -5.0,
+        49.98
+      ],
+      [
+        -5.0,
+        49.982
+      ],
+      [
+        -5.0,
+        49.984
+      ],
+      [
+        -5.0,
+        49.986
+      ],
+      [
+        -5.0,
+        49.988
+      ],
+      [
+        -5.0,
+        49.99
+      ],
+      [
+        -5.0,
+        49.992
+      ],
+      [
+        -5.0,
+        49.994
+      ],
+      [
+        -5.0,
+        49.996
+      ],
+      [
+        -5.0,
+        49.998
+      ],
+      [
+        -4.997,
+        50.0
+      ],
+      [
+        -4.994,
+        50.0
+      ],
+      [
+        -4.991,
+        50.0
+      ],
+      [
+        -4.988,
+        50.0
+      ],
+      [
+        -4.985,
+        50.0
+      ],
+      [
+        -4.982,
+        50.0
+      ],
+      [
+        -4.979,
+        50.0
+      ],
+      [
+        -4.976,
+        50.0
+      ],
+      [
+        -4.973,
+        50.0
+      ],
+      [
+        -4.97,
+        50.0
+      ],
+      [
+        -4.967,
+        50.0
+      ],
+      [
+        -4.964,
+        50.0
+      ],
+      [
+        -4.961,
+        50.0
+      ],
+      [
+        -4.958,
+        50.0
+      ],
+      [
+        -4.955,
+        50.0
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "TRACK",
+    "platform_id": "PLT-E07-119",
+    "platform_name": "HMS Turner",
+    "track_type": "OWNSHIP",
+    "start_time": "2026-01-27T10:00:00Z",
+    "end_time": "2026-01-27T10:29:00Z",
+    "positions": [
+      {
+        "time": "2026-01-27T10:00:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:01:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:02:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:03:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:04:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:05:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:06:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:07:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:08:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:09:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:10:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:11:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:12:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:13:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:14:00Z",
+        "course": 0,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:15:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:16:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:17:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:18:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:19:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:20:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:21:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:22:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:23:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:24:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:25:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:26:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:27:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:28:00Z",
+        "course": 90,
+        "speed": 12
+      },
+      {
+        "time": "2026-01-27T10:29:00Z",
+        "course": 90,
+        "speed": 12
+      }
+    ],
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#4CAF50",
+        "weight": 2.5,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round"
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 3,
+        "fill": true,
+        "fill_color": "#4CAF50",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    },
+    "default_position_style": {
+      "show_symbol": false,
+      "symbol": "circle",
+      "show_label": false
+    },
+    "sensors": [
+      {
+        "name": "TOWED_ARRAY",
+        "base_frequency": 150.0,
+        "offset": 1500.0,
+        "array_centre_mode": "WORM",
+        "worm_in_hole": false,
+        "color": "#8E24AA",
+        "visible": true,
+        "line_thickness": 2,
+        "contacts": [
+          {
+            "time": "2026-01-27T10:16:00Z",
+            "bearing": 40,
+            "has_bearing": true,
+            "range": 3500,
+            "visible": true,
+            "label": "C1",
+            "show_label": true,
+            "put_label_at": "END",
+            "label_location": "RIGHT",
+            "line_style": "SOLID"
+          },
+          {
+            "time": "2026-01-27T10:19:00Z",
+            "bearing": 55,
+            "has_bearing": true,
+            "range": 3500,
+            "visible": true,
+            "label": "C2",
+            "show_label": true,
+            "put_label_at": "END",
+            "label_location": "RIGHT",
+            "line_style": "SOLID"
+          },
+          {
+            "time": "2026-01-27T10:22:00Z",
+            "bearing": 70,
+            "has_bearing": true,
+            "range": 3500,
+            "visible": true,
+            "label": "C3",
+            "show_label": true,
+            "put_label_at": "END",
+            "label_location": "RIGHT",
+            "line_style": "SOLID"
+          },
+          {
+            "time": "2026-01-27T10:25:00Z",
+            "bearing": 85,
+            "has_bearing": true,
+            "range": 3500,
+            "visible": true,
+            "label": "C4",
+            "show_label": true,
+            "put_label_at": "END",
+            "label_location": "RIGHT",
+            "line_style": "SOLID"
+          },
+          {
+            "time": "2026-01-27T10:28:00Z",
+            "bearing": 100,
+            "has_bearing": true,
+            "range": 3500,
+            "visible": true,
+            "label": "C5",
+            "show_label": true,
+            "put_label_at": "END",
+            "label_location": "RIGHT",
+            "line_style": "SOLID"
+          }
+        ],
+        "measured_positions": [
+          {
+            "time": "2026-01-27T10:14:00Z",
+            "location": [
+              -4.975,
+              49.996
+            ]
+          },
+          {
+            "time": "2026-01-27T10:18:00Z",
+            "location": [
+              -4.964,
+              49.996
+            ]
+          },
+          {
+            "time": "2026-01-27T10:22:00Z",
+            "location": [
+              -4.953,
+              49.996
+            ]
+          },
+          {
+            "time": "2026-01-27T10:26:00Z",
+            "location": [
+              -4.94,
+              49.996
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

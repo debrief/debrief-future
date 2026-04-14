@@ -448,101 +448,39 @@ export const Performance: StoryObj = {
 
 // ── Array Offset Comparison (feature 119) ──────────────────────────
 
+// eslint-disable-next-line no-restricted-syntax
+import sensorsTurnFixture from '../../../schemas/src/fixtures/valid/track-feature-sensors-turn-01.json';
+
 /**
- * Builds the shared scenario exercised in
- * specs/119-array-offset-calc/evidence — a vessel sails north then turns
- * 90° east and reports five bearing cuts after the turn.
+ * Loads the shared `track-feature-sensors-turn-01.json` fixture and tweaks
+ * the sensor's mode / colour so each of the three modes renders visibly
+ * differently.  The rest of the fixture (track geometry, contacts,
+ * measured positions) is identical across panels — exactly what the
+ * evidence comparison plots use.
  */
 function buildArrayOffsetTrack(mode: 'PLAIN' | 'WORM' | 'MEASURED'): TrackFeature {
-  const baseTime = new Date('2026-01-27T10:00:00Z').getTime();
-  const minute = 60_000;
-
-  const coordinates: [number, number][] = [];
-  const positions: Array<{ time: string; course: number; speed: number }> = [];
-
-  // Northbound leg (fixes 0-14)
-  for (let i = 0; i < 15; i++) {
-    coordinates.push([-5.0, 49.97 + i * 0.002]);
-    positions.push({
-      time: new Date(baseTime + i * minute).toISOString(),
-      course: 0,
-      speed: 12,
-    });
-  }
-  // Eastbound leg (fixes 15-29)
-  for (let i = 0; i < 15; i++) {
-    coordinates.push([-5.0 + (i + 1) * 0.003, 50.0]);
-    positions.push({
-      time: new Date(baseTime + (15 + i) * minute).toISOString(),
-      course: 90,
-      speed: 12,
-    });
-  }
-
-  const contacts: SensorContact[] = [16, 19, 22, 25, 28].map((t, idx) => ({
-    time: new Date(baseTime + t * minute).toISOString(),
-    bearing: 40 + idx * 15, // 40, 55, 70, 85, 100
-    has_bearing: true,
-    range: 3500,
-    visible: true,
-    label: `C${idx + 1}`,
-    show_label: true,
-    put_label_at: 'END',
-    label_location: 'RIGHT',
-    line_style: 'SOLID',
-  }));
-
-  const measuredPositions = [
-    { time: new Date(baseTime + 14 * minute).toISOString(), location: [-4.975, 49.996] },
-    { time: new Date(baseTime + 18 * minute).toISOString(), location: [-4.964, 49.996] },
-    { time: new Date(baseTime + 22 * minute).toISOString(), location: [-4.953, 49.996] },
-    { time: new Date(baseTime + 26 * minute).toISOString(), location: [-4.940, 49.996] },
-  ];
-
   const colourByMode = {
     PLAIN: '#FF8F00',
     WORM: '#8E24AA',
     MEASURED: '#00838F',
   } as const;
 
-  const sensor: SensorData = {
-    name: `TOWED_ARRAY_${mode}`,
-    color: colourByMode[mode],
-    visible: true,
-    line_thickness: 2,
-    offset: 1500,
-    array_centre_mode: mode,
-    contacts,
-    measured_positions: mode === 'MEASURED' ? measuredPositions : undefined,
-  };
-
-  return {
-    type: 'Feature',
-    id: `track-array-offset-${mode.toLowerCase()}`,
-    geometry: {
-      type: 'LineString',
-      // eslint-disable-next-line no-restricted-syntax
-      coordinates: coordinates as unknown as number[],
-    },
-    properties: {
-      kind: 'TRACK',
-      platform_id: 'PLT-E07-119',
-      platform_name: `HMS Turner (${mode})`,
-      track_type: 'OWNSHIP',
-      start_time: positions[0]!.time,
-      end_time: positions[positions.length - 1]!.time,
-      positions,
-      style: {
-        line: {
-          color: '#4CAF50',
-          weight: 2.5,
-          opacity: 1,
-        },
-      },
-      sensors: [sensor],
-    },
-    // eslint-disable-next-line no-restricted-syntax
-  } as unknown as TrackFeature;
+  // eslint-disable-next-line no-restricted-syntax
+  const cloned = JSON.parse(JSON.stringify(sensorsTurnFixture)) as Record<string, unknown>;
+  // eslint-disable-next-line no-restricted-syntax
+  const props = cloned.properties as Record<string, unknown>;
+  // eslint-disable-next-line no-restricted-syntax
+  const sensors = props.sensors as Array<Record<string, unknown>>;
+  const sensor = sensors[0]!;
+  sensor.array_centre_mode = mode;
+  sensor.color = colourByMode[mode];
+  sensor.name = `TOWED_ARRAY_${mode}`;
+  if (mode !== 'MEASURED') {
+    delete sensor.measured_positions;
+  }
+  cloned.id = `track-array-offset-${mode.toLowerCase()}`;
+  // eslint-disable-next-line no-restricted-syntax
+  return cloned as unknown as TrackFeature;
 }
 
 function ArrayOffsetComparisonDemo() {
@@ -563,9 +501,12 @@ function ArrayOffsetComparisonDemo() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      data-testid="array-offset-comparison-root"
+    >
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <div style={panelStyle}>
+        <div style={panelStyle} data-testid="array-offset-panel-plain">
           <div style={{ padding: '6px 10px', background: '#FF8F00', color: 'white', fontWeight: 600 }}>
             PLAIN — backtrack along current heading
           </div>
@@ -579,7 +520,7 @@ function ArrayOffsetComparisonDemo() {
             />
           </div>
         </div>
-        <div style={panelStyle}>
+        <div style={panelStyle} data-testid="array-offset-panel-worm">
           <div style={{ padding: '6px 10px', background: '#8E24AA', color: 'white', fontWeight: 600 }}>
             WORM — walk backward along recorded track
           </div>
@@ -593,7 +534,10 @@ function ArrayOffsetComparisonDemo() {
             />
           </div>
         </div>
-        <div style={{ ...panelStyle, borderRight: 'none' }}>
+        <div
+          style={{ ...panelStyle, borderRight: 'none' }}
+          data-testid="array-offset-panel-measured"
+        >
           <div style={{ padding: '6px 10px', background: '#00838F', color: 'white', fontWeight: 600 }}>
             MEASURED — interpolate measured positions (PLAIN fallback out of range)
           </div>

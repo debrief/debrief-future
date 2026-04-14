@@ -1,12 +1,20 @@
 # Visual Evidence: PLAIN vs WORM vs MEASURED through a vessel turn
 
-**Captured**: 2026-04-14 at `e2af89b` (refreshed from real algorithm output)
+**Captured**: 2026-04-14 — screenshots refreshed from the real Leaflet
+renderer via the Storybook story `ArrayOffsetComparison`, captured by the
+Playwright spec `shared/components/e2e/ArrayOffsetComparison.spec.ts`.
+Algorithmic SVG plots below are generated separately by
+`scripts/119-render-comparison-plots.py`.
 
-Every coordinate on these plots is produced by the real
-`compute_array_centre` dispatcher in
-`services/calc/debrief_calc/tools/sensor/array_offset.py` — the generator
-script (`scripts/119-render-comparison-plots.py`) imports the module and
-projects its actual outputs. No mocks, no hand-drawn illustrations.
+Two orthogonal pieces of evidence:
+
+1. **Real renderer screenshots** (`screenshots/`) — Storybook → Playwright →
+   `SensorBearingLayer` → Leaflet.  The bearing lines you see are drawn by
+   the production rendering pipeline using the real
+   `computeArrayCentre` outputs.
+2. **Algorithm-accurate SVG plots** (`plot-*.svg`) — hand-projected from
+   the same `compute_array_centre` dispatcher in Python, useful for exact
+   coordinate readouts and per-panel numeric breakdowns.
 
 ## Scenario
 
@@ -21,17 +29,45 @@ projects its actual outputs. No mocks, no hand-drawn illustrations.
   eastbound leg, spanning contacts 1–4. Contact 5 falls outside the
   measured range, forcing the documented PLAIN fallback (FR-004).
 
-## Side-by-side comparison
+## Side-by-side comparison (real renderer)
 
-![Three modes compared](./plot-comparison.svg)
+![Three-panel Storybook screenshot](./screenshots/array-offset-comparison-default.png)
 
-## Per-mode plots
+Each panel is a separate live Leaflet instance showing the same track
+fixture (`track-feature-sensors-turn-01.json`) with the sensor's
+`array_centre_mode` set to PLAIN, WORM, or MEASURED respectively.  The
+coloured bearing lines are drawn by `SensorBearingLayer` — the production
+rendering layer — using the origins computed by `computeArrayCentre`.
+
+### Theme variants
+
+| Theme | Screenshot |
+|-------|------------|
+| light | ![light](./screenshots/array-offset-comparison-light.png) |
+| dark  | ![dark](./screenshots/array-offset-comparison-dark.png) |
+| vscode | ![vscode](./screenshots/array-offset-comparison-vscode.png) |
+
+## Per-mode real-renderer crops
+
+| Mode | Screenshot |
+|------|------------|
+| **PLAIN** — every bearing line originates from a point 1.5 km west of the vessel at the contact time | ![plain](./screenshots/array-offset-plain.png) |
+| **WORM** — origins distributed along the track path; contacts C1 and C2 (shortly after the turn) anchor on the pre-turn northbound leg | ![worm](./screenshots/array-offset-worm.png) |
+| **MEASURED** — origins sit on the measured position time-series south of the eastbound leg; out-of-range contacts fall back to PLAIN | ![measured](./screenshots/array-offset-measured.png) |
+
+## Algorithmic plots (with exact coordinates)
+
+The SVG plots below complement the screenshots: hand-projected from
+`compute_array_centre` so every point is labelled and every origin marker
+lines up with a readable coordinate.
+
+![Three modes compared (algorithmic)](./plot-comparison.svg)
 
 | Mode | Plot |
 |------|------|
-| **PLAIN** — backtrack along current heading | ![plain](./plot-plain.svg) |
-| **WORM** — walk backward along recorded track | ![worm](./plot-worm.svg) |
-| **MEASURED** — interpolate measured positions, fall back to PLAIN out of range | ![measured](./plot-measured.svg) |
+| PLAIN | ![plain](./plot-plain.svg) |
+| WORM | ![worm](./plot-worm.svg) |
+| MEASURED | ![measured](./plot-measured.svg) |
 
 ## Key observations from the plots
 
@@ -70,16 +106,46 @@ settle, PLAIN and WORM agree. The plot confirms this visually — at contact
 | 4 | 10:25 | `(-4.9670, 50.0000)` | `(-4.9880, 50.0000)` | `(-4.9880, 50.0000)` | `(-4.9433, 49.9960)` |
 | 5 | 10:28 | `(-4.9580, 50.0000)` | `(-4.9790, 50.0000)` | `(-4.9790, 50.0000)` | `(-4.9790, 50.0000)` *(fallback)* |
 
-## Reproducing the plots
+## Reproducing the evidence
+
+**Real-renderer screenshots**:
+
+```sh
+# Terminal 1
+cd shared/components && pnpm exec storybook dev -p 6006 --no-open
+
+# Terminal 2 (in Claude Code sessions; omit CLAUDE_CODE=1 elsewhere and
+# use the Playwright-bundled Chromium)
+cd shared/components && CLAUDE_CODE=1 pnpm exec playwright test \
+  --config=playwright.config.ts ArrayOffsetComparison.spec.ts
+```
+
+Outputs seven PNGs into `specs/119-array-offset-calc/evidence/screenshots/`
+— one per-panel crop for each of the three modes, a full-width
+comparison, and three theme variants (light/dark/vscode).
+
+**Algorithm-accurate SVG plots**:
 
 ```sh
 uv run python scripts/119-render-comparison-plots.py
 ```
 
 Regenerates all four SVGs (`plot-plain.svg`, `plot-worm.svg`,
-`plot-measured.svg`, `plot-comparison.svg`) from the current algorithm.
-The script imports `debrief_calc.tools.sensor.array_offset` directly, so any
-change to the dispatcher is immediately visible in the plots.
+`plot-measured.svg`, `plot-comparison.svg`) from the current Python
+dispatcher. The script imports `debrief_calc.tools.sensor.array_offset`
+directly, so any change to the dispatcher is immediately visible in the
+plots.
+
+**Regenerating the shared fixture**:
+
+```sh
+uv run python scripts/119-generate-sensor-turn-fixture.py
+```
+
+Rewrites `shared/schemas/src/fixtures/valid/track-feature-sensors-turn-01.json`
+from the canonical scenario. The fixture is consumed by both the Storybook
+story (and therefore the screenshots) and the schemas test suite (which
+validates it as a legitimate `TrackFeature`).
 
 ## Relationship to the golden fixture
 
