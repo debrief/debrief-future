@@ -14,16 +14,16 @@
           -0.07229166666666667
         ],
         [
-          -30,
+          -30.0,
           -0.07229166666666667
         ],
         [
-          -30,
-          0
+          -30.0,
+          -0.0
         ],
         [
           -30.119758333333333,
-          0
+          -0.0
         ],
         [
           -30.119758333333333,
@@ -35,34 +35,34 @@
   "bbox": [
     -30.119758333333333,
     -0.07229166666666667,
-    -30,
-    0
+    -30.0,
+    -0.0
   ],
   "properties": {
     "title": "Saxon Warrior: Trialsplanning3 Subject",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Trialsplanning3 Subject — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Saxon Warrior: Trialsplanning3 Subject \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T13:13:14+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute"
+    "debrief:platforms": [
+      {
+        "id": "SUBJECT",
+        "name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
     ],
     "debrief:tags": [
-      "boarding",
-      "harbour-ops",
-      "training",
-      "transit"
+      "certification",
+      "training"
     ],
     "debrief:feature_tags": [
-      "minefield",
-      "prosecution",
+      "passive-search",
+      "towed-array",
       "visual-sighting"
-    ],
-    "debrief:track_names": [
-      "Contact Alpha"
-    ],
-    "debrief:nationalities": [
-      "GB"
     ]
   },
   "links": [
@@ -86,7 +86,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/Demo-Trialsplanning/TrialsPlanning3_subject.rep",
+      "href": "file:///tmp/debrief-regen-4x2tftum/TrialsPlanning3_subject.rep",
       "title": "TrialsPlanning3_subject.rep"
     }
   ],
@@ -107,26 +107,10 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/Demo-Trialsplanning/TrialsPlanning3_subject.rep",
-        "load_timestamp": "2026-03-28T13:50:57.694433Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/TrialsPlanning3_subject.rep",
+        "load_timestamp": "2026-04-13T23:12:32.540635Z",
         "tool_version": "0.1.0"
       }
-    },
-    "thumbnail": {
-      "href": "./thumbnail.png",
-      "type": "image/png",
-      "title": "Plot thumbnail",
-      "roles": [
-        "thumbnail"
-      ]
-    },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
-      "type": "image/png",
-      "title": "Plot thumbnail (small)",
-      "roles": [
-        "thumbnail"
-      ]
     }
   }
 }

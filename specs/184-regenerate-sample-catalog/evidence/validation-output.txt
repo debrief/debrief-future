@@ -1,0 +1,240 @@
+/home/user/debrief-future/shared/schemas/src/generated/python/debrief_schemas/__init__.py:4171: UserWarning: Field name "schema" in "SessionFile" shadows an attribute in parent "ConfiguredBaseModel"
+  class SessionFile(ConfiguredBaseModel):
+INFO [regenerate-sample-catalog] Discovered 74 asset files + 5 standalone files = 79 total sources
+INFO [regenerate-sample-catalog] Staged 79 source files to /tmp/debrief-regen-upvmg03c
+INFO [regenerate-sample-catalog] Deleting existing catalog at /home/user/debrief-future/preview/workspace/samples/local-store
+INFO [regenerate-sample-catalog] Running import_legacy_data(/tmp/debrief-regen-upvmg03c, /home/user/debrief-future/preview/workspace/samples/local-store)
+WARNING [debrief_io.models] Parser output schema warning for feature[0]: SchemaValidationError at parser_output: Feature 'b50e2426-7efb-464e-9961-ebd2899e5493' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[1]: SchemaValidationError at parser_output: Feature '951d5bbf-7f51-4743-922a-c64e6350454f' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[2]: SchemaValidationError at parser_output: Feature '48a094b7-1870-4b1b-8003-e6b95b3264b1' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[3]: SchemaValidationError at parser_output: Feature 'badd5b87-4b38-485f-83ff-1b274809d8b4' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[4]: SchemaValidationError at parser_output: Feature '99058cff-8e99-46c1-9ff1-7b2d983a378e' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[5]: SchemaValidationError at parser_output: Feature '5ba379ff-4dc8-4f9e-9ab0-feaa7f29c493' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[6]: SchemaValidationError at parser_output: Feature '5f5426d3-3b25-4e47-ad58-ca71227842ba' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[7]: SchemaValidationError at parser_output: Feature '6bccb647-f7a9-41f3-9d32-f02b5338e9f1' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[8]: SchemaValidationError at parser_output: Feature 'd4be0d08-2af6-4eb0-a6db-679c8ead408b' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[9]: SchemaValidationError at parser_output: Feature '536841ba-1122-4650-a7f6-5637ccb56e72' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[10]: SchemaValidationError at parser_output: Feature 'f393028d-8e4d-4071-9bb1-adbc8149a757' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[11]: SchemaValidationError at parser_output: Feature 'a2aef5bd-7224-44ed-992d-8580c626d0bc' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[12]: SchemaValidationError at parser_output: Feature '23a1aba5-e957-4d16-bf0a-d027b3ce98a9' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[13]: SchemaValidationError at parser_output: Feature 'cee388fd-c2e4-4397-9ead-6c92a821679b' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[14]: SchemaValidationError at parser_output: Feature '71c5b8b4-34e4-4a26-acf5-b233d9a2e3a1' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[15]: SchemaValidationError at parser_output: Feature '54dd3614-d79a-4af9-8a86-2b148566ddb5' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[16]: SchemaValidationError at parser_output: Feature 'bc603bcd-420c-4b3f-bc6e-0844a05c4e41' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[17]: SchemaValidationError at parser_output: Feature '5e671bbb-b412-4268-9ec0-f710e14a6fe1' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[18]: SchemaValidationError at parser_output: Feature '5d6e2226-6670-4943-90f1-ab2c2211caeb' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+ERROR [debrief_io.import_catalog] Failed to import narrative.rep: SchemaValidationError at catalog_write: Feature 'b50e2426-7efb-464e-9961-ebd2899e5493' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[78]: SchemaValidationError at parser_output: Feature 'fd1ba55c-0eac-4bdf-a701-110617f6c758' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[79]: SchemaValidationError at parser_output: Feature 'e5cb3e9f-4e73-4766-8c15-c15d54c6ae2a' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[80]: SchemaValidationError at parser_output: Feature '6f2886de-f6b0-4fd7-bc96-03abb284a989' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[81]: SchemaValidationError at parser_output: Feature '5ffa897a-4b8b-4229-a766-625d101549ad' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[82]: SchemaValidationError at parser_output: Feature '1a6bfbda-acbd-47bd-b336-aac927aa571a' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[83]: SchemaValidationError at parser_output: Feature 'f1986bf8-c170-400d-8956-15c029215124' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+WARNING [debrief_io.models] Parser output schema warning for feature[84]: SchemaValidationError at parser_output: Feature 'e76cba2d-9b78-445e-8784-174e005183b0' (ELLIPSE2)
+  - properties.kind: Unknown feature kind: ELLIPSE2
+WARNING [debrief_io.models] Parser output schema warning for feature[86]: SchemaValidationError at parser_output: Feature 'f61936ca-5fda-4b84-b6a1-fda096a5a1b1' (POLYLINE)
+  - properties.kind: Unknown feature kind: POLYLINE
+WARNING [debrief_io.models] Parser output schema warning for feature[87]: SchemaValidationError at parser_output: Feature '1ce954f5-a9c3-49e3-a941-c6177d2128f5' (WHEEL)
+  - properties.kind: Unknown feature kind: WHEEL
+WARNING [debrief_io.models] Parser output schema warning for feature[88]: SchemaValidationError at parser_output: Feature '83de1b98-1a54-403d-8e21-79a0a69f2589' (TIMETEXT)
+  - properties.kind: Unknown feature kind: TIMETEXT
+WARNING [debrief_io.models] Parser output schema warning for feature[89]: SchemaValidationError at parser_output: Feature 'f69db13a-23db-4d2c-a206-026247017cd1' (PERIODTEXT)
+  - properties.kind: Unknown feature kind: PERIODTEXT
+WARNING [debrief_io.models] Parser output schema warning for feature[90]: SchemaValidationError at parser_output: Feature '6e97b70b-0a14-478d-a696-70bc7364f6ea' (PERIODTEXT)
+  - properties.kind: Unknown feature kind: PERIODTEXT
+WARNING [debrief_io.models] Parser output schema warning for feature[91]: SchemaValidationError at parser_output: Feature 'f5f01aca-6898-4296-9e68-36eb156f816d' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[92]: SchemaValidationError at parser_output: Feature '694d45ca-f588-4878-bbb4-b02a133ea8cc' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+WARNING [debrief_io.models] Parser output schema warning for feature[93]: SchemaValidationError at parser_output: Feature 'a3f12e3f-1ea7-4682-9cfc-b206701f6f32' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[94]: SchemaValidationError at parser_output: Feature 'ecc0d399-0e28-481c-a652-cfd0f0ac4ff7' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[95]: SchemaValidationError at parser_output: Feature '890d865e-070d-44ff-88ed-b55012a52c4e' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[96]: SchemaValidationError at parser_output: Feature '40ca8bf3-8404-4c5a-a000-f39dc4729612' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[97]: SchemaValidationError at parser_output: Feature '3f6f212c-8581-4c3c-ab3a-6586f174fc5b' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[98]: SchemaValidationError at parser_output: Feature '310bd990-5c83-44e6-ad15-a508fc45d517' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[99]: SchemaValidationError at parser_output: Feature 'c146b786-1737-49ee-b206-c3b1cfec596f' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[100]: SchemaValidationError at parser_output: Feature '15ddd23e-652b-404e-a735-0faa622fee83' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[101]: SchemaValidationError at parser_output: Feature '0d41d577-fd2a-4e07-9723-0dc1329441cf' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[102]: SchemaValidationError at parser_output: Feature '6e3dd8a5-64de-40ee-8a10-7a5f7d4911e2' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[103]: SchemaValidationError at parser_output: Feature '0e285c5b-9940-4c00-a7fe-cda1f71e7eb7' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[104]: SchemaValidationError at parser_output: Feature 'dcfe4861-90a9-4bc9-a10c-94b82b2fec66' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[105]: SchemaValidationError at parser_output: Feature '5d43413a-a418-4777-90d8-6d3caebc9f8d' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[106]: SchemaValidationError at parser_output: Feature '4c63169a-38ab-47e3-9279-1c9c2aa0f694' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[107]: SchemaValidationError at parser_output: Feature '5a9bc526-f7cd-4669-bc8d-5e1a93b9d4e3' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[108]: SchemaValidationError at parser_output: Feature 'ccbb173f-945e-4880-b4bb-5f732bd0bdc2' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[109]: SchemaValidationError at parser_output: Feature 'd654ada4-60ca-4fd0-a53d-cbce337e8696' (DYNAMIC_POLY)
+  - properties.kind: Unknown feature kind: DYNAMIC_POLY
+WARNING [debrief_io.models] Parser output schema warning for feature[110]: SchemaValidationError at parser_output: Feature '66d453d3-0607-40d4-85ce-3944ee226c02' (DYNAMIC_POLY)
+  - properties.kind: Unknown feature kind: DYNAMIC_POLY
+WARNING [debrief_io.models] Parser output schema warning for feature[111]: SchemaValidationError at parser_output: Feature 'e07eb977-3d89-40c3-aaa6-e3a3f5646749' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[112]: SchemaValidationError at parser_output: Feature '079ef6cc-e913-4892-956e-adf1f98d212b' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[113]: SchemaValidationError at parser_output: Feature '4c90c7f2-5e7f-4b7d-ad0a-cd477d8f3b43' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[114]: SchemaValidationError at parser_output: Feature '3ffe917a-68f7-4a9c-8145-98eb806a4441' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[115]: SchemaValidationError at parser_output: Feature 'd44999d2-847d-4146-ab36-92b1a90d6b9e' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[116]: SchemaValidationError at parser_output: Feature 'dd46091f-1365-4e9f-8063-cf083c3fef8b' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[117]: SchemaValidationError at parser_output: Feature '844bf979-a968-439c-ba09-1866b8f23d3a' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[118]: SchemaValidationError at parser_output: Feature '0e962802-60fb-4e41-98b3-e0e83efed273' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[119]: SchemaValidationError at parser_output: Feature '4cfa3ac2-d412-4c2d-89a6-d0619c70a506' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[120]: SchemaValidationError at parser_output: Feature 'fbc4c272-ca75-4870-8d4f-8d0c5b3dd762' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[121]: SchemaValidationError at parser_output: Feature '8636465e-9796-4a66-8382-4652f7b6758f' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[122]: SchemaValidationError at parser_output: Feature '8cb74fea-ff8b-4140-b17c-3c6e302ffd8f' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[123]: SchemaValidationError at parser_output: Feature '75783f89-c5cd-4be1-a286-a7e5845c0e44' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[124]: SchemaValidationError at parser_output: Feature 'c77d684f-0100-4702-9eb8-ee089b05ade7' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[125]: SchemaValidationError at parser_output: Feature '600a473e-6fe0-4612-8da5-ebb72a1d0236' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[126]: SchemaValidationError at parser_output: Feature 'd04298b6-d924-462e-b121-d2b621462c02' (DYNAMIC_CIRCLE)
+  - properties.kind: Unknown feature kind: DYNAMIC_CIRCLE
+WARNING [debrief_io.models] Parser output schema warning for feature[127]: SchemaValidationError at parser_output: Feature '8db5b904-7594-450f-8b9e-492665ea1a9d' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[128]: SchemaValidationError at parser_output: Feature 'b8dc48cb-4b42-4d0d-9e68-52615872c9db' (DYNAMIC_RECT)
+  - properties.kind: Unknown feature kind: DYNAMIC_RECT
+WARNING [debrief_io.models] Parser output schema warning for feature[129]: SchemaValidationError at parser_output: Feature '048c32dd-62eb-42e2-8415-c9fcbebbdf29' (TMA_POS)
+  - properties.kind: Unknown feature kind: TMA_POS
+WARNING [debrief_io.models] Parser output schema warning for feature[130]: SchemaValidationError at parser_output: Feature '6282cc9b-1509-40cc-81f3-d1abce4d4bea' (TMA_POS)
+  - properties.kind: Unknown feature kind: TMA_POS
+WARNING [debrief_io.models] Parser output schema warning for feature[131]: SchemaValidationError at parser_output: Feature '0caefa1d-8d85-4d55-b196-b0f9f68c4fc3' (TMA_POS)
+  - properties.kind: Unknown feature kind: TMA_POS
+WARNING [debrief_io.models] Parser output schema warning for feature[132]: SchemaValidationError at parser_output: Feature '23f25563-e1f3-4892-9a55-0491a2ac329d' (TMA_POS)
+  - properties.kind: Unknown feature kind: TMA_POS
+WARNING [debrief_io.models] Parser output schema warning for feature[133]: SchemaValidationError at parser_output: Feature '37d8cd5c-993f-4c4d-a1b3-393569bbc028' (TMA_POS)
+  - properties.kind: Unknown feature kind: TMA_POS
+WARNING [debrief_io.models] Parser output schema warning for feature[134]: SchemaValidationError at parser_output: Feature '93de19ea-a720-4561-af78-212803064f0c' (TRACKSPLIT)
+  - properties.kind: Unknown feature kind: TRACKSPLIT
+WARNING [debrief_io.models] Parser output schema warning for feature[136]: SchemaValidationError at parser_output: Feature '80cf637b-fde7-4339-b6a2-c978b2f017cc' (TIMETEXT)
+  - properties.kind: Unknown feature kind: TIMETEXT
+WARNING [debrief_io.models] Parser output schema warning for feature[137]: SchemaValidationError at parser_output: Feature '452b24bc-9312-4b01-a267-609f272ade20' (PERIODTEXT)
+  - properties.kind: Unknown feature kind: PERIODTEXT
+ERROR [debrief_io.import_catalog] Failed to import shapes.rep: SchemaValidationError at catalog_write: Feature 'fd1ba55c-0eac-4bdf-a701-110617f6c758' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+INFO [debrief_io.import_catalog] Merged sensor data for 'RX_1' into plot 'core--multistatics-buoyfield'
+INFO [debrief_io.import_catalog] Merged sensor data for 'RX_2' into plot 'core--multistatics-buoyfield'
+INFO [debrief_io.import_catalog] Merged sensor data for 'RX_3' into plot 'core--multistatics-buoyfield'
+============================================================
+Import Summary
+============================================================
+Catalog: /home/user/debrief-future/preview/workspace/samples/local-store
+Duration: 4.4s
+
+Files processed: 77
+Files succeeded: 75
+Files failed:    2
+
+Total tracks:     437
+Total sensors:    15257
+Total narratives: 63
+
+Warnings (500):
+  [UNKNOWN_RECORD] BAD_boat2.rep: Unknown record type: 951212 05AAA2500.000 COLLINGWOOD  @A   21 55 13.49...
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'HVU' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'T23_A' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'T23_B' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_001' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_002' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_003' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_004' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_005' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_006' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_007' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_008' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_009' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_010' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_011' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_012' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_013' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_014' is not registered in the platform registry
+  [UNKNOWN_RECORD] BAD_boat2.rep: Unknown record type: 951212 05AAA2500.000 COLLINGWOOD  @A   21 55 13.49...
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'HVU' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'T23_A' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_BLUE_TRACKS.rep: Platform 'T23_B' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_001' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_002' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_003' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_004' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_005' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_006' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_007' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_008' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_009' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_010' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_011' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_012' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_013' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_014' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_015' is not registered in the platform registry
+  [UNREGISTERED_PLATFORM] BULK_RED_TRACKS.rep: Platform 'SSK_016' is not registered in the platform registry
+  ... and 480 more
+
+Errors (2):
+  narrative.rep: SchemaValidationError at catalog_write: Feature 'b50e2426-7efb-464e-9961-ebd2899e5493' (NARRATIVE)
+  - geometry.coordinates: List should have at least 2 items after validation, not 0
+  shapes.rep: SchemaValidationError at catalog_write: Feature 'fd1ba55c-0eac-4bdf-a701-110617f6c758' (ELLIPSE)
+  - properties.kind: Unknown feature kind: ELLIPSE
+============================================================
+INFO [regenerate-sample-catalog] Warning summary: {'UNKNOWN_RECORD': 18, 'UNREGISTERED_PLATFORM': 402, 'NO_FEATURES': 1, 'SCHEMA_VALIDATION': 77, 'ORPHAN_SENSOR': 2}
+WARNING [regenerate-sample-catalog] Unregistered platform IDs found (380): ALLIANCE, B11, B12, B13, Contact, DATA_ONE, DATA_THREE, FisherOne_002, FisherOne_003, FisherOne_004, FisherOne_005, FisherOne_006, FisherOne_007, FisherOne_008, FisherOne_009, FisherOne_010, FisherOne_011, FisherOne_012, FisherOne_013, FisherOne_014, FisherOne_015, FisherOne_016, FisherOne_017, FisherOne_018, FisherOne_019, FisherOne_020, FisherOne_021, FisherOne_022, FisherOne_023, FisherOne_024, FisherOne_315_single, FisherOne_410_Single, FisherOne_516_single, FisherOne_610_Single, FisherOne_622_Single, Frigate, HVU, LIGHT_1, LIGHT_2, LIGHT_3, LIGHT_4, MAYO, MISSILE_ROTATION, MISSILE_TRACK, NEL STYLE, NEL_STYLE2, NEL_STYLE3, NEL_STYLE4, NONSUCH, New_SSK, OS, OSPREY, PreFrigate, PreFrigate2, RX_1, RX_2, RX_3, RadarOne_001, RadarOne_002, RadarOne_003, RadarOne_004, RadarOne_005, RadarOne_006, RadarOne_007, RadarOne_008, RadarOne_009, RadarOne_010, SENSOR_1, SENSOR_2, SOURCE, SPLENDID, SSK_001, SSK_002, SSK_003, SSK_004, SSK_005, SSK_006, SSK_007, SSK_008, SSK_009, SSK_010, SSK_011, SSK_012, SSK_013, SSK_014, SSK_015, SSK_016, SSK_017, SSK_018, SSK_019, SSK_020, SSK_021, SSK_022, SSK_023, SSK_024, SSK_025, SSK_026, SSK_027, SSK_028, SSK_029, SSK_030, SSK_031, SSK_032, SSK_033, SSK_034, SSK_035, SSK_036, SSK_037, SSK_038, SSK_039, SSK_040, SSK_041, SSK_042, SSK_043, SSK_044, SSK_045, SSK_046, SSK_047, SSK_048, SSK_049, SSK_050, SSK_051, SSK_052, SSK_053, SSK_054, SSK_055, SSK_056, SSK_057, SSK_058, SSK_059, SSK_060, SSK_061, SSK_062, SSK_063, SSK_064, SSK_065, SSK_066, SSK_067, SSK_068, SSK_069, SSK_070, SSK_071, SSK_072, SSK_073, SSK_074, SSK_075, SSK_076, SSK_077, SSK_078, SSK_079, SSK_080, SSK_081, SSK_082, SSK_083, SSK_084, SSK_085, SSK_086, SSK_087, SSK_088, SSK_089, SSK_090, SSK_091, SSK_092, SSK_093, SSK_094, SSK_095, SSK_096, SSK_097, SSK_098, SSK_099, SSK_100, SSK_101, SSK_102, SSK_103, SSK_104, SSK_105, SSK_106, SSK_107, SSK_108, SSK_109, SSK_110, SSK_111, SSK_112, SSK_113, SSK_114, SSK_115, SSK_116, SSK_117, SSK_118, SSK_119, SSK_120, SSK_121, SSK_122, SSK_123, SSK_124, SSK_125, SSK_126, SSK_127, SSK_128, SSK_129, SSK_130, SSK_131, SSK_132, SSK_133, SSK_134, SSK_135, SSK_136, SSK_137, SSK_138, SSK_139, SSK_140, SSK_141, SSK_142, SSK_143, SSK_144, SSK_145, SSK_146, SSK_147, SSK_148, SSK_149, SSK_150, SSK_151, SSK_152, SSK_153, SSK_154, SSK_155, SSK_156, SSK_157, SSK_158, SSK_159, SSK_160, SSK_161, SSK_162, SSK_163, SSK_164, SSK_165, SSK_166, SSK_167, SSK_168, SSK_169, SSK_170, SSK_171, SSK_172, SSK_173, SSK_174, SSK_175, SSK_176, SSK_177, SSK_178, SSK_179, SSK_180, SSK_181, SSK_182, SSK_183, SSK_184, SSK_185, SSK_186, SSK_187, SSK_188, SSK_189, SSK_190, SSK_191, SSK_192, SSK_193, SSK_194, SSK_195, SSK_196, SSK_197, SSK_198, SSK_199, SSK_200, SSK_201, SSK_202, SSK_203, SSK_204, SSK_205, SSK_206, SSK_207, SSK_208, SSK_209, SSK_210, SSK_211, SSK_212, SSK_213, SSK_214, SSK_215, SSK_216, SSK_217, SSK_218, SSK_219, SSK_220, SSK_221, SSK_222, SSK_223, SSK_224, SSK_225, SSK_226, SSK_227, SSK_228, SSK_229, SSK_230, SSK_231, SSK_232, SSK_233, SSK_234, SSK_235, SSK_236, SSK_237, SSK_238, SSK_239, SSK_240, SSK_241, SSK_242, SSK_243, SSK_244, SSK_245, SSK_246, SSK_247, SSK_248, SSK_249, SSK_250, SSK_251, SSK_252, SSK_253, SSK_254, SSK_255, SSK_256, SSK_257, SSK_258, SSK_259, SSK_260, SSK_261, SSK_262, SSK_263, SSK_264, SSK_265, SSK_266, SSK_267, SSK_268, SSK_269, SSK_270, SSK_271, SSK_272, SSK_273, SSK_274, SSK_275, SSK_276, SSK_277, SSK_278, SSK_279, SSK_280, SSK_281, SSK_282, SSK_283, SSK_284, SSK_285, SSK_286, SSK_287, SSK_288, SSK_289, SSK_290, SSK_291, SSK_292, SSK_293, SSK_294, SSK_295, SSK_296, SSK_297, SSK_298, SSK_299, SSK_300, T-second attempt, T23, T23_A, T23_B, TP_Track, TRIAL_ALPHA, TUG, TX_1, bSENSOR
+WARNING [regenerate-sample-catalog] 2 source files failed to import (see errors above)
+INFO [regenerate-sample-catalog] Running enrichment: uv run python /home/user/debrief-future/scripts/enrich-legacy-catalog.py
+INFO [regenerate-sample-catalog] Enrichment completed:
+  Unique platforms:      375
+  Unique vessel classes: 13
+  Unique nationalities:  4 — ['DE', 'FR', 'GB', 'US']
+  Unique tags:           20
+  Unique feature tags:   16
+Done.
+INFO [regenerate-sample-catalog] Regeneration complete: 73 items, 500 warnings, 4.8s
