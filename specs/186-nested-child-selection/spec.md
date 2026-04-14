@@ -12,6 +12,7 @@
 - Q: What happens when the user Ctrl+clicks an element that is already in the current selection? → A: Toggle — the path is removed if present, added otherwise. Selection entries are unique by path.
 - Q: Does the selection persist across sessions/reloads, and at what scope? → A: Per-plot persistence — the selection is stored with the plot/workspace and restored whenever the plot is reopened or refocused, including navigating away to another tab and back.
 - Q: How granular is the visual distinction between parent and child selections? → A: Binary styles (whole-feature vs. any nested child) plus an independent overlay marking the primary selection at any depth — no per-depth colour ramp.
+- Q: Which selection mechanisms are in scope? → A: Click + Ctrl+click + Shift+click range. Rubber-band/box selection, "select all positions", keyboard navigation, and list-panel-initiated selection are explicitly deferred to separate features.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -66,6 +67,24 @@ In a forward-looking scenario, a track is composed of multiple segments, and eac
 
 ---
 
+### User Story 5 - Shift+Click Range Selection (Priority: P2)
+
+An analyst wants to select a contiguous range of positions along a track — for example, to analyse a 10-minute manoeuvre. They click the first position of the range, then hold Shift and click the last position of the range. The system selects every position between the two endpoints, inclusive, along the same parent (same track, or same segment within a track). The anchor-to-target range replaces any prior selection of positions on that same parent; selections on unrelated parents are not affected.
+
+**Why this priority**: Analysts frequently need to work with a contiguous slice of a track rather than isolated positions. Without range selection they must Ctrl+click every intermediate position, which is tedious and error-prone on long manoeuvres.
+
+**Independent Test**: Click position 4, then Shift+click position 9 on the same track, and confirm positions 4 through 9 (inclusive) are all in the selection and no others on that track.
+
+**Acceptance Scenarios**:
+
+1. **Given** position 4 on track A is the last-clicked element, **When** the user Shift+clicks position 9 on track A, **Then** the selection contains exactly positions 4, 5, 6, 7, 8, 9 on track A.
+2. **Given** position 9 on track A is the last-clicked element, **When** the user Shift+clicks position 4 on track A, **Then** the selection contains exactly positions 4, 5, 6, 7, 8, 9 on track A (range direction is inclusive either way).
+3. **Given** position 3 on track A is the last-clicked element, **When** the user Shift+clicks a position on track B, **Then** the two endpoints do not share a common parent; the action falls back to a single-click replace — the selection contains only the track B position.
+4. **Given** a range is already selected on track A and a whole track B is also selected, **When** the user Shift+clicks a new endpoint on track A, **Then** the track A range is recomputed against the new endpoint; the track B selection is unaffected.
+5. **Given** no prior last-clicked element exists (empty selection), **When** the user Shift+clicks a position, **Then** the action falls back to a single-click — the selection contains only that one position.
+
+---
+
 ### User Story 4 - Tool Receives Leaf-Only Selection (Priority: P2)
 
 A calc tool is invoked while the user has a specific position selected within a track. The tool receives only the exact leaf selection path — the parent track is not implicitly added as a second selection entry. If the tool needs parent information, it derives that by parsing the path upward. Similarly, a tool that requires a whole-track selection does not match when only a child position is selected.
@@ -115,6 +134,10 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-018**: On restore, each persisted path MUST be re-resolved against the current data. Paths that still resolve MUST be reinstated normally; paths that no longer resolve MUST be retained and flagged as unresolvable per FR-014. Restoration MUST NOT silently drop entries.
 - **FR-019**: The UI MUST apply exactly two selection styles on the map — one for whole-feature selection (single-segment paths) and one for any nested-child selection (multi-segment paths). There MUST NOT be a per-depth visual ramp; all nested-child depths share the same style.
 - **FR-020**: The UI MUST apply an independent visual overlay to mark the primary selection, applied on top of the whole-feature or nested-child style. The primary overlay MUST be orthogonal to the whole-vs-nested distinction so that a primary whole-feature selection and a primary nested-child selection are both visually identifiable as primary.
+- **FR-021**: The system MUST track the last-clicked selection path (the "anchor") separately from the primary designation, so that Shift+click range selection has a well-defined starting endpoint.
+- **FR-022**: Shift+click MUST select the contiguous range of siblings from the anchor to the Shift+clicked target, inclusive of both endpoints, when the anchor and target share the same immediate parent (for example, two positions on the same track, or two positions in the same segment). The range replaces any prior selection under that shared parent; selections on other parents are unaffected.
+- **FR-023**: If the Shift+click anchor and target do not share the same immediate parent, or if no anchor exists (empty selection), Shift+click MUST fall back to single-click behaviour (replace the selection with only the target path).
+- **FR-024**: Shift+click ranges MUST only be meaningful for index-based levels (for example, `positions`), where ordering is well-defined. Shift+click across ID-based siblings (for example, two segments with unrelated IDs) MUST fall back to single-click replace behaviour unless the Level Registry explicitly defines a canonical order for that level.
 
 ### Key Entities
 
@@ -129,7 +152,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **Primary Goal**: Select a specific element within a hierarchical feature (for example, a single position within a track) so that properties, tools, and other panels can respond to that precise selection.
 - **Key Decisions**:
   1. Which element to select — the whole feature (parent level) or a specific child within it.
-  2. Whether to replace the current selection or add to it (single-click replaces; Ctrl+click extends).
+  2. Whether to replace the current selection, toggle an individual entry, or select a contiguous range (single-click replaces; Ctrl+click toggles an individual entry; Shift+click selects an inclusive range of siblings under a shared parent).
   3. Whether to designate a selected element as the primary focus (the element whose details drive property panels when multiple are selected).
 - **Decision Inputs**: The map display shows tracks as lines and positions as discrete points along those lines. Clicking a track line selects the whole track; clicking a discrete position point selects that position. Visual highlighting distinguishes selected elements at every level and distinguishes parent-level selection from child-level selection. The cursor hit-target changes (for example, line vs. point) so users can anticipate what a click will select.
 
@@ -164,6 +187,18 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **SC-007**: When a selection path cannot be resolved against current data, the entry is retained and visually marked as unresolvable in every view that renders it, and no errors are surfaced to the user.
 - **SC-008**: Every level name appearing in any selection path across the system resolves to an addressing mode via the Level Registry; paths referencing undefined level names are rejected at the boundary and never reach application code.
 - **SC-009**: 100% of selections survive tab-switch and plot reopen — closing and reopening a plot (or navigating away and back) restores the exact same set of selected paths, with any paths that no longer resolve marked as unresolvable rather than silently dropped.
+- **SC-010**: Users can select a contiguous range of N siblings (for example, positions on a track) in exactly two clicks — a click on one endpoint followed by Shift+click on the other — regardless of the range length N.
+
+## Out of Scope
+
+The following capabilities are explicitly deferred to separate features and MUST NOT be implemented as part of 186:
+
+- **Rubber-band / box selection** — dragging a rectangle on the map to select every element inside it.
+- **"Select all" actions** — menu or keyboard shortcuts to select all positions on a track, all tracks in a plot, or all children of a given parent.
+- **Keyboard navigation** — using arrow keys, Tab, or other keys to move selection through positions or between tracks.
+- **List-panel-initiated selection** — clicking entries in a list/tree panel to drive map selection. (Panels still *reflect* the current selection, they just do not initiate it in this feature.)
+- **Lasso / polygon selection** — drawing an arbitrary shape to select elements within it.
+- **Cross-plot selection** — selecting elements on multiple plots simultaneously. Persistence is per-plot only (FR-017).
 
 ## Assumptions
 
