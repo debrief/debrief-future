@@ -21,9 +21,12 @@ Writes these files into ``specs/119-array-offset-calc/evidence/``:
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "services" / "calc"))
@@ -41,13 +44,11 @@ from debrief_calc.tools.sensor.array_offset import (  # noqa: E402
 # large (comparable to the track-leg length) so the PLAIN/WORM/MEASURED
 # differences are clearly visible at chart scale.
 
-BASE_TIME = datetime(2026, 1, 27, 10, 0, 0, tzinfo=timezone.utc)
+BASE_TIME = datetime(2026, 1, 27, 10, 0, 0, tzinfo=UTC)
 
 
 def iso(offset_seconds: float) -> str:
-    return (BASE_TIME + timedelta(seconds=offset_seconds)).isoformat().replace(
-        "+00:00", "Z"
-    )
+    return (BASE_TIME + timedelta(seconds=offset_seconds)).isoformat().replace("+00:00", "Z")
 
 
 # Thirty fixes: 15 northbound, 15 eastbound.  Each fix is 60 s apart.
@@ -60,18 +61,14 @@ def _build_track() -> tuple[list[list[float]], list[dict[str, Any]]]:
         lon = -5.0
         lat = 49.97 + i * 0.002  # ~222 m per step
         coords.append([lon, lat])
-        positions.append(
-            {"time": iso(i * 60), "course": 0.0, "speed": 12.0}
-        )
+        positions.append({"time": iso(i * 60), "course": 0.0, "speed": 12.0})
 
     # Eastbound leg (after turn)
     for i in range(15):
         lon = -5.0 + (i + 1) * 0.003  # ~215 m per step at lat 50°
         lat = 50.0
         coords.append([lon, lat])
-        positions.append(
-            {"time": iso((15 + i) * 60), "course": 90.0, "speed": 12.0}
-        )
+        positions.append({"time": iso((15 + i) * 60), "course": 90.0, "speed": 12.0})
 
     return coords, positions
 
@@ -133,7 +130,9 @@ def _compute_origins(mode: str) -> list[tuple[float, float]]:
     return origins
 
 
-def _bearing_endpoint(origin: tuple[float, float], bearing_deg: float, range_metres: float = 3500.0) -> tuple[float, float]:
+def _bearing_endpoint(
+    origin: tuple[float, float], bearing_deg: float, range_metres: float = 3500.0
+) -> tuple[float, float]:
     return _geodesic_destination(origin[0], origin[1], bearing_deg, range_metres)
 
 
@@ -151,7 +150,7 @@ def _make_projector(
     width: int,
     height: int,
     padding: int = 30,
-):
+) -> Callable[[float, float], tuple[float, float]]:
     min_lon, min_lat, max_lon, max_lat = bounds
     dlon = max_lon - min_lon
     dlat = max_lat - min_lat
@@ -201,13 +200,9 @@ def _panel_svg(
     # Clip + background
     clip_id = f"clip-{mode.lower()}"
     parts.append(f'<g transform="translate({x0},{y0})">')
-    parts.append(
-        f'<clipPath id="{clip_id}"><rect width="{width}" height="{height}"/></clipPath>'
-    )
+    parts.append(f'<clipPath id="{clip_id}"><rect width="{width}" height="{height}"/></clipPath>')
     parts.append(f'<g clip-path="url(#{clip_id})">')
-    parts.append(
-        f'<rect width="{width}" height="{height}" fill="#FAFAFA" stroke="#CCC"/>'
-    )
+    parts.append(f'<rect width="{width}" height="{height}" fill="#FAFAFA" stroke="#CCC"/>')
 
     # Title
     parts.append(
@@ -218,34 +213,25 @@ def _panel_svg(
     # Track path
     track_pts = [project(c[0], c[1]) for c in TRACK_COORDS]
     track_d = " ".join(
-        f"{'M' if i == 0 else 'L'}{x:.1f},{y:.1f}"
-        for i, (x, y) in enumerate(track_pts)
+        f"{'M' if i == 0 else 'L'}{x:.1f},{y:.1f}" for i, (x, y) in enumerate(track_pts)
     )
-    parts.append(
-        f'<path d="{track_d}" stroke="#4CAF50" stroke-width="2.5" fill="none"/>'
-    )
+    parts.append(f'<path d="{track_d}" stroke="#4CAF50" stroke-width="2.5" fill="none"/>')
 
     # Track fix markers (every 3rd for clarity)
     for i, (x, y) in enumerate(track_pts):
         if i % 3 == 0:
-            parts.append(
-                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.8" fill="#2E7D32"/>'
-            )
+            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.8" fill="#2E7D32"/>')
 
     # Mark the turn point
     turn_idx = 14
     tx, ty = track_pts[turn_idx]
-    parts.append(
-        f'<circle cx="{tx:.1f}" cy="{ty:.1f}" r="3.5" fill="#1B5E20"/>'
-    )
+    parts.append(f'<circle cx="{tx:.1f}" cy="{ty:.1f}" r="3.5" fill="#1B5E20"/>')
 
     # Host positions at contact times (reference — where the vessel is)
     for t_iso in CONTACT_TIMES:
         host_lon, host_lat, _ = _interp(t_iso)
         hx, hy = project(host_lon, host_lat)
-        parts.append(
-            f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="3" fill="#1976D2"/>'
-        )
+        parts.append(f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="3" fill="#1976D2"/>')
 
     # Bearing lines from origins
     colours = {"PLAIN": "#FF8F00", "WORM": "#8E24AA", "MEASURED": "#00838F"}
@@ -265,9 +251,11 @@ def _panel_svg(
             f'stroke="#333" stroke-width="0.8"/>'
         )
         # Dashed host-to-origin connector
-        hx, hy = project(*_interp(  # just recompute
-            CONTACT_TIMES[CONTACT_BEARINGS.index(bearing)]
-        )[:2])
+        hx, hy = project(
+            *_interp(  # just recompute
+                CONTACT_TIMES[CONTACT_BEARINGS.index(bearing)]
+            )[:2]
+        )
         parts.append(
             f'<line x1="{hx:.1f}" y1="{hy:.1f}" x2="{ox:.1f}" y2="{oy:.1f}" '
             f'stroke="{origin_colour}" stroke-width="0.8" stroke-dasharray="3,3" '
@@ -353,9 +341,9 @@ def _comparison_svg(
         style="font: bold 16px sans-serif; fill: #333">
     Same track, same contacts — three array offset modes compared (1500 m offset)
   </text>
-  {_panel_svg('PLAIN', plain_origins, x0=spacing, y0=title_h, width=panel_w, height=panel_h)}
-  {_panel_svg('WORM', worm_origins, x0=panel_w + 2 * spacing, y0=title_h, width=panel_w, height=panel_h)}
-  {_panel_svg('MEASURED', measured_origins, x0=2 * panel_w + 3 * spacing, y0=title_h, width=panel_w, height=panel_h)}
+  {_panel_svg("PLAIN", plain_origins, x0=spacing, y0=title_h, width=panel_w, height=panel_h)}
+  {_panel_svg("WORM", worm_origins, x0=panel_w + 2 * spacing, y0=title_h, width=panel_w, height=panel_h)}
+  {_panel_svg("MEASURED", measured_origins, x0=2 * panel_w + 3 * spacing, y0=title_h, width=panel_w, height=panel_h)}
   {_legend_svg(spacing, title_h + panel_h + spacing)}
 </svg>
 """
@@ -375,9 +363,7 @@ def main() -> None:
     (out_dir / "plot-plain.svg").write_text(_full_svg("PLAIN", plain))
     (out_dir / "plot-worm.svg").write_text(_full_svg("WORM", worm))
     (out_dir / "plot-measured.svg").write_text(_full_svg("MEASURED", measured))
-    (out_dir / "plot-comparison.svg").write_text(
-        _comparison_svg(plain, worm, measured)
-    )
+    (out_dir / "plot-comparison.svg").write_text(_comparison_svg(plain, worm, measured))
 
     # Emit the numeric values so they can be embedded in the evidence doc
     print("Scenario: northbound leg → 90° right turn → eastbound leg")
