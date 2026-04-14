@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/specs/187-build-time-enums/enum-bundle.schema.json",
+  "title": "EnumBundle",
+  "description": "Compact controlled-vocabulary bundle emitted by scripts/extract-enum-bundle.py for consumption by the LLM prompt builder (#188).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_meta",
+    "vessel_class_tree",
+    "nationalities",
+    "exercise_names",
+    "tags",
+    "feature_tags"
+  ],
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "description": "Provenance metadata. Informational; ignored by the prompt builder.",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "generated_from_registry",
+        "generated_from_catalog",
+        "exercise_parse_rule",
+        "canonicalisation"
+      ],
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "generated_from_registry": { "type": "string", "minLength": 1 },
+        "generated_from_catalog": { "type": "string", "minLength": 1 },
+        "exercise_parse_rule": { "type": "string", "minLength": 1 },
+        "canonicalisation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "vessel_class_tree": {
+      "$ref": "#/$defs/ClassTreeNode",
+      "description": "Hierarchical projection of the platform registry's vessel-class tree. Platform-instance leaves are stripped."
+    },
+    "nationalities": {
+      "type": "array",
+      "description": "Sorted, deduplicated nationality codes from registry + catalog.",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "exercise_names": {
+      "type": "array",
+      "description": "Sorted, deduplicated exercise names parsed from item titles (substring before first ': ').",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "tags": {
+      "type": "array",
+      "description": "Sorted, deduplicated values from debrief:tags across all catalog items.",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "feature_tags": {
+      "type": "array",
+      "description": "Sorted, deduplicated values from debrief:feature_tags across all catalog items.",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "ClassTreeNode": {
+      "type": "object",
+      "description": "Recursive vessel-class node. May carry a _class block of display metadata; all other keys are interior child nodes (no platform leaves).",
+      "properties": {
+        "_class": {
+          "type": "object",
+          "description": "Display metadata passed through from the registry.",
+          "additionalProperties": false,
+          "required": ["full_name"],
+          "properties": {
+            "full_name": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "patternProperties": {
+        "^(?!_)[A-Za-z0-9][A-Za-z0-9_-]*$": {
+          "$ref": "#/$defs/ClassTreeNode"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
