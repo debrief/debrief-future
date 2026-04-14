@@ -88,22 +88,25 @@ A calc tool is invoked while the user has a specific position selected within a 
 
 - **FR-001**: The system MUST represent each selection entry as a path string made of forward-slash-separated segments, following JSON Pointer (RFC 6901) escaping conventions (`~0` for `~`, `~1` for `/`).
 - **FR-002**: The system MUST support selection paths of arbitrary depth (1 level, 2 levels, 3 levels, or more) with no hard-coded depth limit.
-- **FR-003**: Each level in a path MUST be interpreted according to a shared level definition: some levels use ID-based addressing (for example, segments addressed by a segment ID), while others use index-based addressing (for example, positions addressed by a numeric index). The shared definition is the single source of truth for all consumers.
-- **FR-004**: Child selection MUST be leaf-only: selecting a child element does not implicitly add the parent to the selection. Only the exact path the user pointed at is recorded.
-- **FR-005**: The system MUST support a multi-selection that contains paths at mixed depths simultaneously (for example, a whole track alongside a position within a different track).
-- **FR-006**: The system MUST support a multi-selection that contains children from different parents (for example, positions from two different tracks in the same selection).
-- **FR-007**: A single-segment path (for example, `track-hms-defender`) MUST remain valid and MUST behave identically to the existing whole-feature selection, preserving backward compatibility.
-- **FR-008**: The primary selection designation MUST accept a full path string at any depth, so that any selected element — whole feature or nested child — can be designated as primary.
-- **FR-009**: The system MUST validate selection paths for well-formedness (non-empty, no trailing slash after normalisation, no invalid escape sequences) and reject malformed paths.
-- **FR-010**: The system MUST normalise selection paths consistently (strip trailing slashes, decode escape sequences only when interpreting segments) so that equivalent paths compare as equal.
-- **FR-011**: When a selection path cannot be resolved against current data (for example, an index that no longer exists), the entry MUST be retained in the selection and flagged as unresolvable rather than silently removed.
-- **FR-012**: Clearing the selection MUST remove all entries regardless of their depth.
+- **FR-003**: Each level in a path MUST be interpreted according to a canonical Level Registry that maps every level name to its addressing mode (ID-based or index-based). Some levels use ID-based addressing (for example, segments addressed by a segment ID); others use index-based addressing (for example, positions addressed by a numeric index). The registry is the single source of truth; no consumer may hardcode or infer a level's addressing mode.
+- **FR-004**: The Level Registry MUST be defined in the master schema (LinkML) so that Python, TypeScript, and JSON Schema consumers derive an identical view of level semantics. Changing a level's addressing mode is a breaking schema change.
+- **FR-005**: Every level name appearing in any selection path MUST be present in the Level Registry. Paths that reference an undefined level name MUST be rejected as malformed.
+- **FR-006**: A selection path MUST have the shape `feature-id` (single segment, whole-feature selection) or `feature-id/<level-name>/<address>[/...]` — levels always appear as level-name/address pairs after the feature ID. Paths that break this alternation MUST be rejected.
+- **FR-007**: Child selection MUST be leaf-only: selecting a child element does not implicitly add the parent to the selection. Only the exact path the user pointed at is recorded.
+- **FR-008**: The system MUST support a multi-selection that contains paths at mixed depths simultaneously (for example, a whole track alongside a position within a different track).
+- **FR-009**: The system MUST support a multi-selection that contains children from different parents (for example, positions from two different tracks in the same selection).
+- **FR-010**: Whole-feature selection MUST be expressed as a single-segment path (for example, `track-hms-defender`). The selection model does not expose a separate "flat ID" form — the single-segment path is the canonical representation.
+- **FR-011**: The primary selection designation MUST accept a full path string at any depth, so that any selected element — whole feature or nested child — can be designated as primary.
+- **FR-012**: The system MUST validate selection paths for well-formedness (non-empty, no trailing slash after normalisation, no invalid escape sequences, alternating level-name/address pairs after the feature ID) and reject malformed paths.
+- **FR-013**: The system MUST normalise selection paths consistently (strip trailing slashes, decode escape sequences only when interpreting segments) so that equivalent paths compare as equal.
+- **FR-014**: When a selection path cannot be resolved against current data (for example, an index that no longer exists, or an ID-addressed child that was deleted), the entry MUST be retained in the selection and flagged as unresolvable rather than silently removed.
+- **FR-015**: Clearing the selection MUST remove all entries regardless of their depth.
 
 ### Key Entities
 
 - **Selection Path**: A forward-slash-separated string identifying a specific element at any depth within a feature hierarchy. The first segment is always a feature ID. Subsequent segments alternate between level names and addresses (IDs or indices). Examples: `track-hms-defender`, `track-hms-defender/positions/4`, `track-hms-defender/segments/leg-alpha/positions/3`.
-- **Level Definition**: A named nesting level within the feature hierarchy with an associated addressing mode — ID-based or index-based. Examples: `segments` (ID-based), `positions` (index-based). Defined centrally so all consumers agree on addressing semantics.
-- **Feature Selection**: The complete selection state, comprising an ordered collection of selection paths, a primary path (itself a path string), and a timestamp. Extends the existing whole-feature selection concept to accept paths at any depth.
+- **Level Registry**: The canonical, schema-defined mapping from every supported level name (for example, `segments`, `positions`) to its addressing mode (ID-based or index-based). Authored in LinkML; derived into Pydantic, TypeScript, and JSON Schema. The only permitted source of level semantics — consumers resolve every path segment's mode by looking the level name up in this registry.
+- **Feature Selection**: The complete selection state, comprising an ordered collection of selection paths, a primary path (itself a path string), and a timestamp. Every entry — whole-feature or nested child — is a path; there is no second form.
 
 ## User Interface Flow
 
@@ -139,17 +142,18 @@ A calc tool is invoked while the user has a specific position selected within a 
 
 - **SC-001**: Users can select an individual position within a track in a single click, and the resulting selection state correctly identifies both the parent track and the specific position in 100% of cases.
 - **SC-002**: The selection model supports at least 4 levels of nesting depth without degradation in selection responsiveness, display update time, or serialisation correctness.
-- **SC-003**: Existing workflows that select whole features continue to work identically — single-segment paths behave exactly as the current whole-feature selection, with no observable change in behaviour for pre-existing users.
+- **SC-003**: Every selection entry in the system is a path (single-segment for whole features, multi-segment for nested children); no consumer handles an alternative flat-ID form, and no code path exists to read or produce one.
 - **SC-004**: 100% of selection paths round-trip correctly through serialisation and deserialisation, including paths containing escaped characters (`~0` for `~` and `~1` for `/`).
 - **SC-005**: Tools that require whole-feature selections never falsely match when only a child element within those features is selected — leaf-only semantics are enforced in every tool-eligibility evaluation.
 - **SC-006**: Users can hold a mixed-depth multi-selection that contains whole features and child elements from different parents simultaneously, and every selected element is visually distinguishable on the map at the same time.
 - **SC-007**: When a selection path cannot be resolved against current data, the entry is retained and visually marked as unresolvable in every view that renders it, and no errors are surfaced to the user.
+- **SC-008**: Every level name appearing in any selection path across the system resolves to an addressing mode via the Level Registry; paths referencing undefined level names are rejected at the boundary and never reach application code.
 
 ## Assumptions
 
-- The existing selection state structure will be extended (not replaced): the selection entries array will accept path strings in addition to flat feature IDs, maintaining backward compatibility for all current consumers.
-- The canonical set of level names (for example, `positions`, `segments`) and their addressing modes (ID-based or index-based) will be defined centrally in a shared schema so that every consumer — services, extensions, webviews — agrees on addressing semantics.
+- Pre-v4.0.0 constitutional freedom applies (Article XIV.1): this feature is delivered as a breaking schema change. The selection state schema will be rewritten so that every entry is a path — there is no dual-form "flat ID or path" accommodation and no deprecation path. All producers and consumers are updated together in a single coordinated change.
+- The Level Registry is authored as a LinkML enumeration/slot definition in the master schema, in keeping with Article II.1 (single source of truth). Pydantic and TypeScript bindings are derived, never hand-written.
 - Position-level click detection on the map is a prerequisite that may require additional work in the map rendering layer (detecting clicks on individual coordinate points within a LineString). The selection model itself is independent of how the click is captured.
 - RFC 6901 escaping is sufficient for expected feature ID characters; no more complex encoding scheme is required.
 - "Primary" selection designation applies equally at every depth — the same notion of a single primary focus used for whole-feature selection extends unchanged to child-level paths.
-- The set of selection-aware consumers (properties panel, tools, other panels, serialisers) will be updated together; no consumer is expected to gracefully handle paths without understanding depth.
+- The set of selection-aware consumers (properties panel, tools, other panels, serialisers) will be updated together; no consumer is expected to gracefully handle paths without understanding depth or to silently tolerate unknown level names.

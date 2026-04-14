@@ -41,4 +41,4 @@
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
 - **UI Feature Validation items only apply if the spec contains a "User Interface Flow" section**
 - Specs without UI sections should skip the UI Feature Validation checklist entirely
-- Note: An earlier iteration of this specification exists at `specs/053-nested-child-selection/` (merged via PR #187). This spec re-states the same feature as a fresh input artifact and is ready for independent planning.
+- An earlier iteration of this specification exists at `specs/053-nested-child-selection/` (merged via PR #187). This spec restates the feature with explicit schema-governance for the Level Registry (FR-003–FR-006) and drops backward-compatibility framing per Constitution Article XIV.1 (Pre-Release Freedom). Ready for independent planning.
