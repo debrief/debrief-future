@@ -13,6 +13,7 @@
 - Q: Does the selection persist across sessions/reloads, and at what scope? → A: Per-plot persistence — the selection is stored with the plot/workspace and restored whenever the plot is reopened or refocused, including navigating away to another tab and back.
 - Q: How granular is the visual distinction between parent and child selections? → A: Binary styles (whole-feature vs. any nested child) plus an independent overlay marking the primary selection at any depth — no per-depth colour ramp.
 - Q: Which selection mechanisms are in scope? → A: Click + Ctrl+click + Shift+click range. Rubber-band/box selection, "select all positions", keyboard navigation, and list-panel-initiated selection are explicitly deferred to separate features.
+- Q: What is the supported upper bound on selection size that must remain responsive? → A: ~1,000 selected paths with selection-change response under 100 ms end-to-end (click to visual highlight and downstream panel update).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -138,6 +139,8 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-022**: Shift+click MUST select the contiguous range of siblings from the anchor to the Shift+clicked target, inclusive of both endpoints, when the anchor and target share the same immediate parent (for example, two positions on the same track, or two positions in the same segment). The range replaces any prior selection under that shared parent; selections on other parents are unaffected.
 - **FR-023**: If the Shift+click anchor and target do not share the same immediate parent, or if no anchor exists (empty selection), Shift+click MUST fall back to single-click behaviour (replace the selection with only the target path).
 - **FR-024**: Shift+click ranges MUST only be meaningful for index-based levels (for example, `positions`), where ordering is well-defined. Shift+click across ID-based siblings (for example, two segments with unrelated IDs) MUST fall back to single-click replace behaviour unless the Level Registry explicitly defines a canonical order for that level.
+- **FR-025**: The selection model MUST remain responsive for selections containing up to 1,000 paths. "Responsive" means every selection change (single-click replace, Ctrl+click toggle, Shift+click range, clear) completes end-to-end — from click to updated map highlights AND updated downstream panels (properties, tools) — in under 100 ms on the target hardware baseline.
+- **FR-026**: Selections containing more than 1,000 paths MUST NOT fail or crash. Behaviour above 1,000 is best-effort: correctness is preserved, but the 100 ms response target does not apply.
 
 ### Key Entities
 
@@ -170,7 +173,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 ### UI States
 
 - **Empty State**: No elements are selected. The properties panel shows a plot-level summary or a "No selection" message. Tools requiring a selection are disabled with a tooltip explaining why.
-- **Loading State**: Not applicable — selection changes respond instantaneously to user input from local data. If a data reload is in progress, selection input is accepted but resolution is deferred until data is available.
+- **Loading State**: Not applicable for typical selections — selection changes complete in under 100 ms end-to-end for up to 1,000 paths (FR-025). If a data reload is in progress, selection input is accepted but resolution is deferred until data is available.
 - **Error State**: If a selection path cannot be resolved (for example, the referenced index no longer exists after a data reload), the entry remains in the selection and the UI indicates an unresolvable status — for example, a dimmed highlight on the last-known location (if any), a badge or icon in the properties panel, and a tooltip explaining that the path could not be resolved.
 - **Success State**: Every selected element is visually highlighted on the map using one of exactly two styles: a whole-feature style for single-segment paths, and a nested-child style shared by every multi-segment path regardless of depth. An independent visual overlay (for example, a bolder outline or accent marker) is applied on top of either style to indicate the primary selection. The properties panel shows details appropriate to the primary selection's depth.
 
@@ -179,7 +182,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 ### Measurable Outcomes
 
 - **SC-001**: Users can select an individual position within a track in a single click, and the resulting selection state correctly identifies both the parent track and the specific position in 100% of cases.
-- **SC-002**: The selection model supports at least 4 levels of nesting depth without degradation in selection responsiveness, display update time, or serialisation correctness.
+- **SC-002**: The selection model supports at least 4 levels of nesting depth with correct serialisation and resolution at every depth (measured against fixtures, not a wall-clock target).
 - **SC-003**: Every selection entry in the system is a path (single-segment for whole features, multi-segment for nested children); no consumer handles an alternative flat-ID form, and no code path exists to read or produce one.
 - **SC-004**: 100% of selection paths round-trip correctly through serialisation and deserialisation, including paths containing escaped characters (`~0` for `~` and `~1` for `/`).
 - **SC-005**: Tools that require whole-feature selections never falsely match when only a child element within those features is selected — leaf-only semantics are enforced in every tool-eligibility evaluation.
@@ -188,6 +191,8 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **SC-008**: Every level name appearing in any selection path across the system resolves to an addressing mode via the Level Registry; paths referencing undefined level names are rejected at the boundary and never reach application code.
 - **SC-009**: 100% of selections survive tab-switch and plot reopen — closing and reopening a plot (or navigating away and back) restores the exact same set of selected paths, with any paths that no longer resolve marked as unresolvable rather than silently dropped.
 - **SC-010**: Users can select a contiguous range of N siblings (for example, positions on a track) in exactly two clicks — a click on one endpoint followed by Shift+click on the other — regardless of the range length N.
+- **SC-011**: Every selection change (replace, toggle, range, clear) with up to 1,000 paths completes end-to-end in under 100 ms on the target hardware baseline, measured from click event to visual highlight update plus downstream panel update.
+- **SC-012**: Selections exceeding 1,000 paths never fail or crash the system; correctness is preserved and the UI degrades gracefully without blocking the application.
 
 ## Out of Scope
 
