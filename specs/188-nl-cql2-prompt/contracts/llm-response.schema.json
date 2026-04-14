@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.github.io/schemas/188/llm-response.schema.json",
+  "title": "NL → CQL2 LLM response",
+  "description": "The JSON object the LLM is prompted to return. Validated at the boundary (parseResponse.ts) before the generator returns a GenerationResult. Any deviation populates GenerationResult.error. Shape reflects review decisions 2A/5A (lozenges reuse the FilterBar chip seed shape) and 8A (cql2-evaluation-failed reason).",
+  "type": "object",
+  "required": ["cql2", "lozenges", "unrecognised_terms"],
+  "additionalProperties": false,
+  "properties": {
+    "cql2": {
+      "description": "A CQL2-JSON object. Empty object {} means no filter (match all). Must round-trip via cql2JsonToFilterExpression and must reference only CQL2 properties declared in the filter-engine's PROPERTY_MAP.",
+      "type": "object"
+    },
+    "lozenges": {
+      "description": "One entry per human-intelligible filter dimension. Uses the seed shape — Pick<LozengeItem, 'filterType'|'value'|'negated'> — so consumers assemble the full LozengeItem with their own ID generation. Compound predicates (e.g. nationality + domain) are expressed as separate seeds only when the filter-engine would model them as separate Predicates; a single array_filter over platforms produces one seed with filterType='vessel-class' (or similar platform-scoped type).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filterType", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "filterType": {
+            "description": "Must match a value in the filter-engine FilterType union. Prompt derives the allowed list from PROPERTY_MAP at build time; parseResponse validates it at runtime.",
+            "type": "string",
+            "enum": [
+              "vessel-class",
+              "tag",
+              "author",
+              "duration",
+              "modified",
+              "title",
+              "filename",
+              "plot-contents",
+              "track-name",
+              "nationality",
+              "collection"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "negated": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "unrecognised_terms": {
+      "description": "Terms from the phrase that did not match any enum value. Must not appear as predicate values inside cql2; parseResponse enforces this via a tree-walking visitor.",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
