@@ -11,6 +11,7 @@
 
 - Q: What happens when the user Ctrl+clicks an element that is already in the current selection? → A: Toggle — the path is removed if present, added otherwise. Selection entries are unique by path.
 - Q: Does the selection persist across sessions/reloads, and at what scope? → A: Per-plot persistence — the selection is stored with the plot/workspace and restored whenever the plot is reopened or refocused, including navigating away to another tab and back.
+- Q: How granular is the visual distinction between parent and child selections? → A: Binary styles (whole-feature vs. any nested child) plus an independent overlay marking the primary selection at any depth — no per-depth colour ramp.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -112,6 +113,8 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-016**: Selection entries MUST be unique by path. Ctrl+click on a path already present in the selection MUST remove that entry (toggle behaviour); Ctrl+click on a path not present MUST append it. Duplicate paths MUST never coexist in a single selection.
 - **FR-017**: The Feature Selection MUST persist with the plot/workspace and MUST be restored whenever the plot is reopened or refocused (for example, navigating to another tab and back). Persistence scope is per-plot — a given plot's selection is not shared with other plots or workspaces.
 - **FR-018**: On restore, each persisted path MUST be re-resolved against the current data. Paths that still resolve MUST be reinstated normally; paths that no longer resolve MUST be retained and flagged as unresolvable per FR-014. Restoration MUST NOT silently drop entries.
+- **FR-019**: The UI MUST apply exactly two selection styles on the map — one for whole-feature selection (single-segment paths) and one for any nested-child selection (multi-segment paths). There MUST NOT be a per-depth visual ramp; all nested-child depths share the same style.
+- **FR-020**: The UI MUST apply an independent visual overlay to mark the primary selection, applied on top of the whole-feature or nested-child style. The primary overlay MUST be orthogonal to the whole-vs-nested distinction so that a primary whole-feature selection and a primary nested-child selection are both visually identifiable as primary.
 
 ### Key Entities
 
@@ -146,7 +149,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **Empty State**: No elements are selected. The properties panel shows a plot-level summary or a "No selection" message. Tools requiring a selection are disabled with a tooltip explaining why.
 - **Loading State**: Not applicable — selection changes respond instantaneously to user input from local data. If a data reload is in progress, selection input is accepted but resolution is deferred until data is available.
 - **Error State**: If a selection path cannot be resolved (for example, the referenced index no longer exists after a data reload), the entry remains in the selection and the UI indicates an unresolvable status — for example, a dimmed highlight on the last-known location (if any), a badge or icon in the properties panel, and a tooltip explaining that the path could not be resolved.
-- **Success State**: Every selected element is visually highlighted on the map. Child-level selections use a distinct highlight style from parent/whole-feature selections so the user can distinguish selection depth at a glance. The properties panel shows details appropriate to the primary selection's depth.
+- **Success State**: Every selected element is visually highlighted on the map using one of exactly two styles: a whole-feature style for single-segment paths, and a nested-child style shared by every multi-segment path regardless of depth. An independent visual overlay (for example, a bolder outline or accent marker) is applied on top of either style to indicate the primary selection. The properties panel shows details appropriate to the primary selection's depth.
 
 ## Success Criteria *(mandatory)*
 
