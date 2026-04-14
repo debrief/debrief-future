@@ -145,7 +145,9 @@ def extract_class_tree(registry: PlatformRegistry) -> dict[str, object]:
     interior nodes are preserved — including their ``_class`` blocks — so the
     LLM can still reason about class-level queries (e.g. "frigates").
     """
-    tree = registry._tree  # internal by convention — loader reuse is explicit per research.md Decision 2
+    tree = (
+        registry._tree
+    )  # internal by convention — loader reuse is explicit per research.md Decision 2
     return _project_tree(tree)
 
 

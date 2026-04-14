@@ -28,9 +28,7 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 FIXTURE_CATALOG = FIXTURES_DIR / "catalog"
 REAL_REGISTRY = Path(__file__).parent.parent / "platform-registry.json"
 REAL_CATALOG = REPO_ROOT / "preview/workspace/samples/local-store"
-SCHEMA_PATH = (
-    REPO_ROOT / "specs/187-build-time-enums/contracts/enum-bundle.schema.json"
-)
+SCHEMA_PATH = REPO_ROOT / "specs/187-build-time-enums/contracts/enum-bundle.schema.json"
 SCRIPT_PATH = REPO_ROOT / "scripts/extract-enum-bundle.py"
 
 
@@ -350,9 +348,7 @@ class TestDeterminism:
         assert first == second
 
 
-def _copy_and_mutate_registry(
-    tmp_path: Path, mutator: object
-) -> Path:
+def _copy_and_mutate_registry(tmp_path: Path, mutator: object) -> Path:
     """Copy the real registry to tmp_path and apply a mutation callback."""
     src = REAL_REGISTRY
     dst = tmp_path / "platform-registry.json"
@@ -446,9 +442,7 @@ class TestDriftDetection:
 
 
 class TestConservativeExtraction:
-    def test_unique_tag_surfaces_even_if_only_on_one_item(
-        self, tmp_path: Path
-    ) -> None:
+    def test_unique_tag_surfaces_even_if_only_on_one_item(self, tmp_path: Path) -> None:
         catalog = tmp_path / "cat"
         shutil.copytree(FIXTURE_CATALOG, catalog)
         item_path = catalog / "fx--alpha" / "item.json"
@@ -472,9 +466,7 @@ class TestConservativeExtraction:
                     "geometry": None,
                     "properties": {
                         "title": "Ex: Stranger",
-                        "debrief:platforms": [
-                            {"id": "XX", "name": "Unknown", "nationality": "XX"}
-                        ],
+                        "debrief:platforms": [{"id": "XX", "name": "Unknown", "nationality": "XX"}],
                     },
                     "links": [],
                     "assets": {},
@@ -486,9 +478,7 @@ class TestConservativeExtraction:
         bundle = build_bundle(registry, catalog)
         assert "XX" in bundle["nationalities"]
 
-    def test_title_without_separator_contributes_nothing(
-        self, tmp_path: Path
-    ) -> None:
+    def test_title_without_separator_contributes_nothing(self, tmp_path: Path) -> None:
         catalog = tmp_path / "cat"
         catalog.mkdir()
         item_dir = catalog / "fx--plain"
@@ -525,5 +515,3 @@ def test_bundle_round_trips_as_json() -> None:
     text = serialize(bundle)
     reloaded = json.loads(text)
     assert reloaded["_meta"]["tool"] == "scripts/extract-enum-bundle.py"
-
-
