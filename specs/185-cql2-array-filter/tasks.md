@@ -46,8 +46,8 @@
 
 **Purpose**: Create evidence directory and verify existing infrastructure
 
-- [ ] T001 Create evidence directory `specs/185-cql2-array-filter/evidence/`
-- [ ] T002 Verify existing filter engine tests pass: run `pnpm --filter @debrief/components test`
+- [x] T001 Create evidence directory `specs/185-cql2-array-filter/evidence/`
+- [x] T002 Verify existing filter engine tests pass: run `pnpm --filter @debrief/components test`
 
 ---
 
@@ -57,12 +57,12 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Add `PlatformField` type union to `shared/components/src/filter-engine/types.ts`
-- [ ] T004 [P] Add `CompoundPredicate` discriminated union type to `shared/components/src/filter-engine/types.ts`
-- [ ] T005 Add `ArrayFilterPredicate` interface to `shared/components/src/filter-engine/types.ts`
-- [ ] T006 Add optional `arrayFilters` field to `FilterExpression` interface in `shared/components/src/filter-engine/types.ts`
-- [ ] T007 Export new types from `shared/components/src/filter-engine/index.ts`
-- [ ] T008 Verify all existing tests still pass (backward compatibility check): run `pnpm --filter @debrief/components test`
+- [x] T003 Add `PlatformField` type union to `shared/components/src/filter-engine/types.ts`
+- [x] T004 [P] Add `CompoundPredicate` discriminated union type to `shared/components/src/filter-engine/types.ts`
+- [x] T005 Add `ArrayFilterPredicate` interface to `shared/components/src/filter-engine/types.ts`
+- [x] T006 Add optional `arrayFilters` field to `FilterExpression` interface in `shared/components/src/filter-engine/types.ts`
+- [x] T007 Export new types from `shared/components/src/filter-engine/index.ts`
+- [x] T008 Verify all existing tests still pass (backward compatibility check): run `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Foundation ready — type model complete, all existing tests green. User story implementation can begin.
 
@@ -78,23 +78,23 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T009 [US1] Create test file with test scaffolding `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T010 [P][test] [US1] Write test: mixed platforms (GB surface + DE subsurface) with GB+subsurface compound filter returns NO match `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T011 [P][test] [US1] Write test: single platform (GB subsurface) with GB+subsurface filter returns match `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T012 [P][test] [US1] Write test: two GB platforms (surface + subsurface) with GB+subsurface filter returns match via second element `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T013 [P][test] [US1] Write test: OR sub-predicate (nationality GB OR US) AND domain subsurface `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T014 [P][test] [US1] Write test: empty platforms array returns false `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T015 [P][test] [US1] Write test: null/missing platform fields return false for that element `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T016 [P][test] [US1] Write test: multiple arrayFilters in one expression are AND'd together `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T017 [P][test] [US1] Write test: empty arrayFilters field matches all items (no-op) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T018 [P][test] [US1] Write test: mixed expression with existing predicates + arrayFilters `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T009 [US1] Create test file with test scaffolding `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T010 [P][test] [US1] Write test: mixed platforms (GB surface + DE subsurface) with GB+subsurface compound filter returns NO match `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T011 [P][test] [US1] Write test: single platform (GB subsurface) with GB+subsurface filter returns match `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T012 [P][test] [US1] Write test: two GB platforms (surface + subsurface) with GB+subsurface filter returns match via second element `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T013 [P][test] [US1] Write test: OR sub-predicate (nationality GB OR US) AND domain subsurface `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T014 [P][test] [US1] Write test: empty platforms array returns false `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T015 [P][test] [US1] Write test: null/missing platform fields return false for that element `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T016 [P][test] [US1] Write test: multiple arrayFilters in one expression are AND'd together `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T017 [P][test] [US1] Write test: empty arrayFilters field matches all items (no-op) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T018 [P][test] [US1] Write test: mixed expression with existing predicates + arrayFilters `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] Implement `evaluateCompound()` internal function in `shared/components/src/filter-engine/matchers.ts`
-- [ ] T020 [US1] Implement `matchArrayFilter()` exported function in `shared/components/src/filter-engine/matchers.ts`
-- [ ] T021 [US1] Extend `matches()` in engine.ts to evaluate `expression.arrayFilters` as AND conditions `shared/components/src/filter-engine/engine.ts`
-- [ ] T022 [US1] Run all tests and verify US1 tests pass: `pnpm --filter @debrief/components test`
+- [x] T019 [US1] Implement `evaluateCompound()` internal function in `shared/components/src/filter-engine/matchers.ts`
+- [x] T020 [US1] Implement `matchArrayFilter()` exported function in `shared/components/src/filter-engine/matchers.ts`
+- [x] T021 [US1] Extend `matches()` in engine.ts to evaluate `expression.arrayFilters` as AND conditions `shared/components/src/filter-engine/engine.ts`
+- [x] T022 [US1] Run all tests and verify US1 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Compound platform filtering works. Items can be filtered by per-element compound predicates with AND/OR logic.
 
@@ -110,24 +110,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T023 [US2] Create test file with test scaffolding `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T024 [P][test] [US2] Write test: serialize compound AND to CQL2 JSON with correct structure `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T025 [P][test] [US2] Write test: serialize compound OR to CQL2 JSON `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T026 [P][test] [US2] Write test: serialize mixed expression (predicates + arrayFilters) `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T027 [P][test] [US2] Write test: deserialize CQL2 JSON array_filter to ArrayFilterPredicate[] `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T028 [P][test] [US2] Write test: deserialize nested AND/OR compound predicate `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T029 [P][test] [US2] Write test: round-trip serialize → deserialize → evaluate produces same results `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T030 [P][test] [US2] Write test: deserialize CQL2 JSON with no array_filter returns empty array `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T023 [US2] Create test file with test scaffolding `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T024 [P][test] [US2] Write test: serialize compound AND to CQL2 JSON with correct structure `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T025 [P][test] [US2] Write test: serialize compound OR to CQL2 JSON `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T026 [P][test] [US2] Write test: serialize mixed expression (predicates + arrayFilters) `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T027 [P][test] [US2] Write test: deserialize CQL2 JSON array_filter to ArrayFilterPredicate[] `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T028 [P][test] [US2] Write test: deserialize nested AND/OR compound predicate `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T029 [P][test] [US2] Write test: round-trip serialize → deserialize → evaluate produces same results `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T030 [P][test] [US2] Write test: deserialize CQL2 JSON with no array_filter returns empty array `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Implement `compoundPredicateToCql2()` internal function in `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T032 [US2] Implement `arrayFilterToCql2()` internal function in `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T033 [US2] Extend `filterExpressionToCql2Json()` to include arrayFilters in output `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T034 [US2] Implement `parseCql2Predicate()` internal function for deserialization `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T035 [US2] Implement `cql2JsonToArrayFilters()` exported function `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T036 [US2] Export `cql2JsonToArrayFilters` from `shared/components/src/filter-engine/index.ts`
-- [ ] T037 [US2] Run all tests and verify US2 tests pass: `pnpm --filter @debrief/components test`
+- [x] T031 [US2] Implement `compoundPredicateToCql2()` internal function in `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T032 [US2] Implement `arrayFilterToCql2()` internal function in `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T033 [US2] Extend `filterExpressionToCql2Json()` to include arrayFilters in output `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T034 [US2] Implement `parseCql2Predicate()` internal function for deserialization `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T035 [US2] Implement `cql2JsonToArrayFilters()` exported function `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T036 [US2] Export `cql2JsonToArrayFilters` from `shared/components/src/filter-engine/index.ts`
+- [x] T037 [US2] Run all tests and verify US2 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: CQL2 JSON serialization and deserialization work. Expressions round-trip without information loss.
 
@@ -143,16 +143,16 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T038 [test] [US3] Write test: GB nationality + vessel_class=frigate matches platform with vessel_class=surface/warship/frigate/type23 `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T039 [P][test] [US3] Write test: DE nationality + vessel_class=frigate does NOT match GB type23 platform (nationality mismatch on same element) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T040 [P][test] [US3] Write test: vessel_class=warship expands to match all warship descendants `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T041 [P][test] [US3] Write test: vessel_class with unknown taxonomy node returns false `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T038 [test] [US3] Write test: GB nationality + vessel_class=frigate matches platform with vessel_class=surface/warship/frigate/type23 `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T039 [P][test] [US3] Write test: DE nationality + vessel_class=frigate does NOT match GB type23 platform (nationality mismatch on same element) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T040 [P][test] [US3] Write test: vessel_class=warship expands to match all warship descendants `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T041 [P][test] [US3] Write test: vessel_class with unknown taxonomy node returns false `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T042 [US3] Pass `DescendantMap` to `evaluateCompound()` and `matchArrayFilter()` in `shared/components/src/filter-engine/matchers.ts`
-- [ ] T043 [US3] Add taxonomy-expanded comparison branch for `vessel_class` field in `evaluateCompound()` `shared/components/src/filter-engine/matchers.ts`
-- [ ] T044 [US3] Run all tests and verify US3 tests pass: `pnpm --filter @debrief/components test`
+- [x] T042 [US3] Pass `DescendantMap` to `evaluateCompound()` and `matchArrayFilter()` in `shared/components/src/filter-engine/matchers.ts`
+- [x] T043 [US3] Add taxonomy-expanded comparison branch for `vessel_class` field in `evaluateCompound()` `shared/components/src/filter-engine/matchers.ts`
+- [x] T044 [US3] Run all tests and verify US3 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Hierarchical vessel class matching works inside compound predicates. "British frigates" query correctly matches all frigate subtypes.
 
@@ -168,18 +168,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T045 [test] [US4] Write test: negated GB+subsurface filter excludes item with British submarine platform `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T046 [P][test] [US4] Write test: negated GB+subsurface filter includes item with only surface platforms `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T047 [P][test] [US4] Write test: negated array_filter with empty platforms returns true (no element to match) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
-- [ ] T048 [P][test] [US4] Write test: serialization of negated array_filter wraps in NOT operator `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
-- [ ] T049 [P][test] [US4] Write test: deserialization of NOT-wrapped array_filter sets negated=true `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T045 [test] [US4] Write test: negated GB+subsurface filter excludes item with British submarine platform `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T046 [P][test] [US4] Write test: negated GB+subsurface filter includes item with only surface platforms `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T047 [P][test] [US4] Write test: negated array_filter with empty platforms returns true (no element to match) `shared/components/src/filter-engine/__tests__/array-filter.test.ts`
+- [x] T048 [P][test] [US4] Write test: serialization of negated array_filter wraps in NOT operator `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
+- [x] T049 [P][test] [US4] Write test: deserialization of NOT-wrapped array_filter sets negated=true `shared/components/src/filter-engine/__tests__/array-filter-cql2.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T050 [US4] Implement negation handling in `matchArrayFilter()` via XOR with `af.negated` `shared/components/src/filter-engine/matchers.ts`
-- [ ] T051 [US4] Implement NOT wrapping in `arrayFilterToCql2()` when `af.negated` is true `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T052 [US4] Handle NOT-wrapped array_filter in `cql2JsonToArrayFilters()` deserialization `shared/components/src/filter-engine/cql2-json.ts`
-- [ ] T053 [US4] Run all tests and verify US4 tests pass: `pnpm --filter @debrief/components test`
+- [x] T050 [US4] Implement negation handling in `matchArrayFilter()` via XOR with `af.negated` `shared/components/src/filter-engine/matchers.ts`
+- [x] T051 [US4] Implement NOT wrapping in `arrayFilterToCql2()` when `af.negated` is true `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T052 [US4] Handle NOT-wrapped array_filter in `cql2JsonToArrayFilters()` deserialization `shared/components/src/filter-engine/cql2-json.ts`
+- [x] T053 [US4] Run all tests and verify US4 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Negation works for compound predicates. All 4 user stories are independently functional.
 
@@ -191,26 +191,26 @@
 
 ### Verification
 
-- [ ] T054 Run full test suite and verify all existing + new tests pass: `pnpm --filter @debrief/components test`
-- [ ] T055 Run typecheck to verify no type errors: `pnpm -r typecheck`
-- [ ] T056 Run lint to verify code quality: `pnpm lint`
-- [ ] T057 Run full CI check: `task verify`
-- [ ] T058 Validate quickstart.md examples are accurate against implementation `specs/185-cql2-array-filter/quickstart.md`
+- [x] T054 Run full test suite and verify all existing + new tests pass: `pnpm --filter @debrief/components test`
+- [x] T055 Run typecheck to verify no type errors: `pnpm -r typecheck`
+- [x] T056 Run lint to verify code quality: `pnpm lint`
+- [x] T057 Run full CI check: `task verify`
+- [x] T058 Validate quickstart.md examples are accurate against implementation `specs/185-cql2-array-filter/quickstart.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T059 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/185-cql2-array-filter/evidence/test-summary.md`
-- [ ] T060 Create usage demonstration with code examples and expected output `specs/185-cql2-array-filter/evidence/usage-example.md`
-- [ ] T061 [P] Capture code example output showing compound filter evaluation results `specs/185-cql2-array-filter/evidence/code-example-output.txt`
+- [x] T059 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/185-cql2-array-filter/evidence/test-summary.md`
+- [x] T060 Create usage demonstration with code examples and expected output `specs/185-cql2-array-filter/evidence/usage-example.md`
+- [x] T061 [P] Capture code example output showing compound filter evaluation results `specs/185-cql2-array-filter/evidence/code-example-output.txt`
 
 ### Media Content
 
-- [ ] T062 Create shipped blog post `specs/185-cql2-array-filter/media/shipped-post.md`
-- [ ] T063 [P] Create LinkedIn shipped summary `specs/185-cql2-array-filter/media/linkedin-shipped.md`
+- [x] T062 Create shipped blog post `specs/185-cql2-array-filter/media/shipped-post.md`
+- [x] T063 [P] Create LinkedIn shipped summary `specs/185-cql2-array-filter/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T064 Create PR and publish blog: run /speckit.pr
+- [x] T064 Create PR and publish blog: run /speckit.pr
 
 **Task T064 must run last. It depends on all evidence and media tasks being complete.**
 

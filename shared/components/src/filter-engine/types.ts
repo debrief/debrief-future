@@ -49,6 +49,22 @@ export interface CatalogOverviewItem {
   thumbnailSmHref?: string | null;
 }
 
+/** Fields on PlatformRecord that can be compared within array_filter */
+export type PlatformField = "id" | "name" | "nationality" | "vessel_class" | "vessel_type" | "vessel_role" | "domain";
+
+/** A recursive boolean expression tree for compound predicates */
+export type CompoundPredicate =
+  | { readonly kind: "comparison"; readonly field: PlatformField; readonly value: string }
+  | { readonly kind: "and"; readonly children: readonly CompoundPredicate[] }
+  | { readonly kind: "or"; readonly children: readonly CompoundPredicate[] };
+
+/** An array_filter() call — compound predicate evaluated per-element */
+export interface ArrayFilterPredicate {
+  readonly array: "platforms";
+  readonly predicate: CompoundPredicate;
+  readonly negated?: boolean;
+}
+
 /** All supported metadata filter types from SRD Section 4.4 */
 export type FilterType =
   | "vessel-class"
@@ -81,10 +97,11 @@ export interface OrGroup {
   readonly predicates: readonly Predicate[];
 }
 
-/** The complete filter state: AND of top-level predicates + OR groups */
+/** The complete filter state: AND of top-level predicates + OR groups + array filters */
 export interface FilterExpression {
   readonly predicates: readonly Predicate[];
   readonly orGroups: readonly OrGroup[];
+  readonly arrayFilters?: readonly ArrayFilterPredicate[];
 }
 
 /**
