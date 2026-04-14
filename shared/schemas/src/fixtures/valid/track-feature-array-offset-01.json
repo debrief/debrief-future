@@ -1,0 +1,91 @@
+{
+  "description": "Cross-language golden fixture for feature 119 (array offset calculations). Expected values are the reference outputs used to verify TypeScript and Python implementations produce identical results within the stated tolerance.",
+  "cases": [
+    {
+      "id": "case-1-plain-eastward",
+      "mode": "PLAIN",
+      "host_position": [0.0, 50.0],
+      "course_deg": 90.0,
+      "offset_metres": 500.0,
+      "expected_origin": [-0.006995480231292392, 49.99999978971712],
+      "tolerance_metres": 1.0,
+      "description": "Heading east from (0, 50°N); backtrack 500m along reverse bearing 270° (due west)."
+    },
+    {
+      "id": "case-2-plain-northward",
+      "mode": "PLAIN",
+      "host_position": [-5.0, 50.0],
+      "course_deg": 0.0,
+      "offset_metres": 1000.0,
+      "expected_origin": [-5.0, 49.99100678394081],
+      "tolerance_metres": 1.0,
+      "description": "Heading north from (-5°, 50°N); backtrack 1000m along reverse bearing 180° (due south)."
+    },
+    {
+      "id": "case-3-worm-straight",
+      "mode": "WORM",
+      "track_coordinates": [[-5.0, 49.98], [-5.0, 49.99], [-5.0, 50.0]],
+      "track_times": [
+        "2026-01-01T10:00:00Z",
+        "2026-01-01T10:30:00Z",
+        "2026-01-01T11:00:00Z"
+      ],
+      "contact_time": "2026-01-01T11:00:00Z",
+      "offset_metres": 500.0,
+      "expected_origin": [-5.0, 49.99550339197041],
+      "tolerance_metres": 1.0,
+      "description": "Straight northward track; WORM backtrack 500m collapses to PLAIN-equivalent result."
+    },
+    {
+      "id": "case-4-worm-through-turn",
+      "mode": "WORM",
+      "track_coordinates": [[-5.0, 49.98], [-5.0, 50.0], [-4.98, 50.0]],
+      "track_times": [
+        "2026-01-01T10:00:00Z",
+        "2026-01-01T10:30:00Z",
+        "2026-01-01T11:00:00Z"
+      ],
+      "contact_time": "2026-01-01T11:00:00Z",
+      "offset_metres": 2000.0,
+      "expected_origin": [-5.0, 49.994869320037054],
+      "tolerance_metres": 5.0,
+      "description": "Track turns east at 50.0N; backtrack 2km passes through the turn onto the southbound leg."
+    },
+    {
+      "id": "case-5-measured-midpoint",
+      "mode": "MEASURED",
+      "measured_positions": [
+        {"time": "2026-01-01T10:00:00Z", "location": [-5.001, 49.998]},
+        {"time": "2026-01-01T11:00:00Z", "location": [-4.901, 50.098]}
+      ],
+      "contact_time": "2026-01-01T10:30:00Z",
+      "expected_origin": [-4.951, 50.048],
+      "tolerance_metres": 1.0,
+      "description": "Midpoint linear interpolation between two measured array positions."
+    },
+    {
+      "id": "case-6-measured-fallback-plain",
+      "mode": "MEASURED",
+      "measured_positions": [
+        {"time": "2026-01-01T11:00:00Z", "location": [-4.901, 50.098]}
+      ],
+      "contact_time": "2026-01-01T10:00:00Z",
+      "host_position": [-5.0, 50.0],
+      "course_deg": 45.0,
+      "offset_metres": 300.0,
+      "expected_origin": [-5.00296781314724, 49.998092212932896],
+      "tolerance_metres": 1.0,
+      "description": "Contact time before measured range triggers PLAIN-mode fallback (reverse bearing 225°, 300m)."
+    },
+    {
+      "id": "case-7-zero-offset",
+      "mode": "PLAIN",
+      "host_position": [-5.0, 50.0],
+      "course_deg": 90.0,
+      "offset_metres": 0.0,
+      "expected_origin": [-5.0, 50.0],
+      "tolerance_metres": 0.0,
+      "description": "Zero offset returns host position unchanged regardless of mode."
+    }
+  ]
+}

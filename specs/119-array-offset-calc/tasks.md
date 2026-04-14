@@ -59,9 +59,9 @@ description: "Task list for Array Offset Calculations (119)"
 
 **Purpose**: Project scaffolding — directory structure and module stubs
 
-- [ ] T001 Create TypeScript module stub `shared/components/src/MapView/array-offset.ts` (empty exports for `computeArrayCentre`, `computePlainOffset`, `backtrackAlongTrack`, `interpolateMeasuredPosition`, `haversineDistanceMetres`)
-- [ ] T002 [P] Create Python package scaffold `services/calc/debrief_calc/tools/sensor/array_offset.py` (empty function stubs matching contract signatures)
-- [ ] T003 [P] Create evidence + test fixture directories `specs/119-array-offset-calc/evidence/` and `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` (placeholder — real content in Phase 2)
+- [x] T001 Create TypeScript module stub `shared/components/src/MapView/array-offset.ts` (empty exports for `computeArrayCentre`, `computePlainOffset`, `backtrackAlongTrack`, `interpolateMeasuredPosition`, `haversineDistanceMetres`)
+- [x] T002 [P] Create Python package scaffold `services/calc/debrief_calc/tools/sensor/array_offset.py` (empty function stubs matching contract signatures)
+- [x] T003 [P] Create evidence + test fixture directories `specs/119-array-offset-calc/evidence/` and `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` (placeholder — real content in Phase 2)
 
 ---
 
@@ -73,23 +73,23 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Shared Geo Primitive
 
-- [ ] T004 [P] Implement `haversineDistanceMetres(lon1, lat1, lon2, lat2)` in `shared/components/src/MapView/array-offset.ts` (uses mean earth radius 6371000m; pure function, no dependencies)
-- [ ] T005 [P] Implement `haversine_distance_metres(lon1, lat1, lon2, lat2)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` (stdlib math only — parity with TS implementation)
-- [ ] T006 [P][test] Write haversine unit tests in `shared/components/src/MapView/array-offset.test.ts` covering zero distance, equatorial distance, polar distance, antimeridian crossing
-- [ ] T007 [P][test] Write haversine unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` with identical cases to T006
+- [x] T004 [P] Implement `haversineDistanceMetres(lon1, lat1, lon2, lat2)` in `shared/components/src/MapView/array-offset.ts` (uses mean earth radius 6371000m; pure function, no dependencies)
+- [x] T005 [P] Implement `haversine_distance_metres(lon1, lat1, lon2, lat2)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` (stdlib math only — parity with TS implementation)
+- [x] T006 [P][test] Write haversine unit tests in `shared/components/src/MapView/array-offset.test.ts` covering zero distance, equatorial distance, polar distance, antimeridian crossing
+- [x] T007 [P][test] Write haversine unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` with identical cases to T006
 
 ### Golden Test Fixture
 
-- [ ] T008 Create cross-language golden test fixture `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` covering all 7 contract test cases (PLAIN x2, WORM x2, MEASURED x2, zero-offset)
-- [ ] T009 [P][test] Add fixture validation test `shared/components/src/MapView/array-offset.test.ts` that loads the fixture and asserts fixture schema (track coordinates, sensor config, expected origins per case)
-- [ ] T010 [P][test] Add fixture validation test `services/calc/tests/tools/sensor/test_array_offset.py` that loads the same fixture and asserts identical schema
+- [x] T008 Create cross-language golden test fixture `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` covering all 7 contract test cases (PLAIN x2, WORM x2, MEASURED x2, zero-offset)
+- [x] T009 [P][test] Add fixture validation test `shared/components/src/MapView/array-offset.test.ts` that loads the fixture and asserts fixture schema (track coordinates, sensor config, expected origins per case)
+- [x] T010 [P][test] Add fixture validation test `services/calc/tests/tools/sensor/test_array_offset.py` that loads the same fixture and asserts identical schema
 
 ### Primary Dispatch Scaffold
 
-- [ ] T011 Implement `computeArrayCentre()` dispatcher skeleton in `shared/components/src/MapView/array-offset.ts` — returns hostPosition when offset is null/0 or mode is null; stubs throw for PLAIN/WORM/MEASURED until stories complete
-- [ ] T012 [P] Implement `compute_array_centre()` dispatcher skeleton in `services/calc/debrief_calc/tools/sensor/array_offset.py` — mirrors TS dispatch logic
-- [ ] T013 [test] Write dispatcher unit tests for null offset, zero offset, null mode, explicit `contact.origin` override in `shared/components/src/MapView/array-offset.test.ts`
-- [ ] T014 [P][test] Write dispatcher unit tests (mirror of T013) in `services/calc/tests/tools/sensor/test_array_offset.py`
+- [x] T011 Implement `computeArrayCentre()` dispatcher skeleton in `shared/components/src/MapView/array-offset.ts` — returns hostPosition when offset is null/0 or mode is null; stubs throw for PLAIN/WORM/MEASURED until stories complete
+- [x] T012 [P] Implement `compute_array_centre()` dispatcher skeleton in `services/calc/debrief_calc/tools/sensor/array_offset.py` — mirrors TS dispatch logic
+- [x] T013 [test] Write dispatcher unit tests for null offset, zero offset, null mode, explicit `contact.origin` override in `shared/components/src/MapView/array-offset.test.ts`
+- [x] T014 [P][test] Write dispatcher unit tests (mirror of T013) in `services/calc/tests/tools/sensor/test_array_offset.py`
 
 **Checkpoint**: Foundation ready — shared haversine, golden fixture, and dispatcher scaffolding in place. All three mode stories can now proceed in parallel.
 
@@ -103,18 +103,18 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Tests for User Story 1 (write FIRST, ensure they FAIL before implementation) ⚠️
 
-- [ ] T015 [P][US1][test] Write PLAIN mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 1, 2, 7 (eastward, northward, zero-offset) plus acceptance scenarios from spec US1
-- [ ] T016 [P][US1][test] Write PLAIN mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T015 with identical expected values
-- [ ] T017 [P][US1][test] Write cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — asserts Python and TS PLAIN outputs match golden fixture within 1m tolerance
+- [x] T015 [P][US1][test] Write PLAIN mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 1, 2, 7 (eastward, northward, zero-offset) plus acceptance scenarios from spec US1
+- [x] T016 [P][US1][test] Write PLAIN mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T015 with identical expected values
+- [x] T017 [P][US1][test] Write cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — asserts Python and TS PLAIN outputs match golden fixture within 1m tolerance
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Implement `computePlainOffset(hostPosition, courseDeg, offsetMetres)` in `shared/components/src/MapView/array-offset.ts` — uses existing `geodesicDestination()` from `sensor-utils.ts` with reverse bearing `(courseDeg + 180) % 360`
-- [ ] T019 [P][US1] Implement `compute_plain_offset(host_position, course_deg, offset_metres)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with TS; implements `geodesic_destination()` helper locally if not available
-- [ ] T020 [US1] Wire PLAIN branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` — call `interpolateTrackCourse()` from `sensor-utils.ts` to resolve course at contact timestamp (depends on T018)
-- [ ] T021 [P][US1] Wire PLAIN branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T019)
-- [ ] T022 [US1] Integrate `computeArrayCentre()` into `prepareSensorContacts()` in `shared/components/src/MapView/sensor-utils.ts` — replace direct host position assignment with dispatcher call (preserves explicit `contact.origin` override)
-- [ ] T023 [US1][test] Update `shared/components/src/MapView/sensor-utils.test.ts` to cover the new integration path — verify existing tests still pass and new PLAIN-mode test case produces expected origin shift
+- [x] T018 [US1] Implement `computePlainOffset(hostPosition, courseDeg, offsetMetres)` in `shared/components/src/MapView/array-offset.ts` — uses existing `geodesicDestination()` from `sensor-utils.ts` with reverse bearing `(courseDeg + 180) % 360`
+- [x] T019 [P][US1] Implement `compute_plain_offset(host_position, course_deg, offset_metres)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with TS; implements `geodesic_destination()` helper locally if not available
+- [x] T020 [US1] Wire PLAIN branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` — call `interpolateTrackCourse()` from `sensor-utils.ts` to resolve course at contact timestamp (depends on T018)
+- [x] T021 [P][US1] Wire PLAIN branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T019)
+- [x] T022 [US1] Integrate `computeArrayCentre()` into `prepareSensorContacts()` in `shared/components/src/MapView/sensor-utils.ts` — replace direct host position assignment with dispatcher call (preserves explicit `contact.origin` override)
+- [x] T023 [US1][test] Update `shared/components/src/MapView/sensor-utils.test.ts` to cover the new integration path — verify existing tests still pass and new PLAIN-mode test case produces expected origin shift
 
 **Checkpoint**: PLAIN mode fully functional, rendered bearing lines originate from backtracked position, cross-language parity verified. User Story 1 is independently testable and deliverable.
 
@@ -128,16 +128,16 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Tests for User Story 2 (write FIRST, ensure they FAIL before implementation) ⚠️
 
-- [ ] T024 [P][US2][test] Write WORM mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 3 (straight line, matches PLAIN) and 4 (through-turn), plus acceptance scenarios from spec US2 (track exhaustion fallback, single-position track)
-- [ ] T025 [P][US2][test] Write WORM mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T024 with identical expected values
-- [ ] T026 [P][US2][test] Extend cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — assert Python and TS WORM outputs match golden fixture within 5m tolerance (accounts for accumulated rounding)
+- [x] T024 [P][US2][test] Write WORM mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 3 (straight line, matches PLAIN) and 4 (through-turn), plus acceptance scenarios from spec US2 (track exhaustion fallback, single-position track)
+- [x] T025 [P][US2][test] Write WORM mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T024 with identical expected values
+- [x] T026 [P][US2][test] Extend cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — assert Python and TS WORM outputs match golden fixture within 5m tolerance (accounts for accumulated rounding)
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Implement `backtrackAlongTrack(trackCoordinates, trackPositions, contactTimeMs, offsetMetres)` in `shared/components/src/MapView/array-offset.ts` — binary search for starting index, walk backward accumulating haversine segment distances, interpolate on final segment, clamp to earliest point when track exhausted
-- [ ] T028 [P][US2] Implement `backtrack_along_track(track_coordinates, track_positions, contact_time_iso, offset_metres)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with T027
-- [ ] T029 [US2] Wire WORM branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` (depends on T027)
-- [ ] T030 [P][US2] Wire WORM branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T028)
+- [x] T027 [US2] Implement `backtrackAlongTrack(trackCoordinates, trackPositions, contactTimeMs, offsetMetres)` in `shared/components/src/MapView/array-offset.ts` — binary search for starting index, walk backward accumulating haversine segment distances, interpolate on final segment, clamp to earliest point when track exhausted
+- [x] T028 [P][US2] Implement `backtrack_along_track(track_coordinates, track_positions, contact_time_iso, offset_metres)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with T027
+- [x] T029 [US2] Wire WORM branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` (depends on T027)
+- [x] T030 [P][US2] Wire WORM branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T028)
 
 **Checkpoint**: WORM mode fully functional and independently deliverable. Bearing line origins visibly shift through vessel manoeuvres.
 
@@ -151,16 +151,16 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Tests for User Story 3 (write FIRST, ensure they FAIL before implementation) ⚠️
 
-- [ ] T031 [P][US3][test] Write MEASURED mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 5 (midpoint interpolation), 6 (fallback to PLAIN), plus acceptance scenarios from spec US3 (exact timestamp match, empty measured_positions, unsorted input)
-- [ ] T032 [P][US3][test] Write MEASURED mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T031 with identical expected values
-- [ ] T033 [P][US3][test] Extend cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — assert Python and TS MEASURED outputs match golden fixture within 1m tolerance including fallback case
+- [x] T031 [P][US3][test] Write MEASURED mode unit tests in `shared/components/src/MapView/array-offset.test.ts` — covers contract Cases 5 (midpoint interpolation), 6 (fallback to PLAIN), plus acceptance scenarios from spec US3 (exact timestamp match, empty measured_positions, unsorted input)
+- [x] T032 [P][US3][test] Write MEASURED mode unit tests in `services/calc/tests/tools/sensor/test_array_offset.py` — mirror of T031 with identical expected values
+- [x] T033 [P][US3][test] Extend cross-language parity test in `services/calc/tests/tools/sensor/test_array_offset_parity.py` — assert Python and TS MEASURED outputs match golden fixture within 1m tolerance including fallback case
 
 ### Implementation for User Story 3
 
-- [ ] T034 [US3] Implement `interpolateMeasuredPosition(measuredPositions, contactTimeMs)` in `shared/components/src/MapView/array-offset.ts` — sort positions by time if unsorted, binary search for bracket, linear interpolate lon/lat; return null when out of range
-- [ ] T035 [P][US3] Implement `interpolate_measured_position(measured_positions, contact_time_iso)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with T034
-- [ ] T036 [US3] Wire MEASURED branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` — on null result, fall through to `computePlainOffset()` call (FR-004) (depends on T034)
-- [ ] T037 [P][US3] Wire MEASURED branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T035)
+- [x] T034 [US3] Implement `interpolateMeasuredPosition(measuredPositions, contactTimeMs)` in `shared/components/src/MapView/array-offset.ts` — sort positions by time if unsorted, binary search for bracket, linear interpolate lon/lat; return null when out of range
+- [x] T035 [P][US3] Implement `interpolate_measured_position(measured_positions, contact_time_iso)` in `services/calc/debrief_calc/tools/sensor/array_offset.py` — parity with T034
+- [x] T036 [US3] Wire MEASURED branch into `computeArrayCentre()` dispatcher in `shared/components/src/MapView/array-offset.ts` — on null result, fall through to `computePlainOffset()` call (FR-004) (depends on T034)
+- [x] T037 [P][US3] Wire MEASURED branch into `compute_array_centre()` dispatcher in `services/calc/debrief_calc/tools/sensor/array_offset.py` (depends on T035)
 
 **Checkpoint**: All three modes (PLAIN, WORM, MEASURED) fully functional. Bearing lines render with correct array centres for every sensor configuration.
 
@@ -174,9 +174,9 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T038 [P][US4][test] Write integration test in `shared/components/src/MapView/sensor-utils.test.ts` — call `prepareSensorContacts()` with mode=PLAIN, then mode=WORM (same inputs otherwise), assert origins differ where vessel manoeuvred (FR-005)
-- [ ] T039 [P][US4][test] Write integration test in `shared/components/src/MapView/sensor-utils.test.ts` — call `prepareSensorContacts()` with offset=500m, then offset=1000m, assert origins differ by correct backtrack delta (FR-006)
-- [ ] T040 [P][US4][test] Write performance benchmark in `shared/components/src/MapView/array-offset.test.ts` — generate 1000 contacts, measure `prepareSensorContacts()` runtime in WORM mode, assert < 1000ms (SC-004)
+- [x] T038 [P][US4][test] Write integration test in `shared/components/src/MapView/sensor-utils.test.ts` — call `prepareSensorContacts()` with mode=PLAIN, then mode=WORM (same inputs otherwise), assert origins differ where vessel manoeuvred (FR-005)
+- [x] T039 [P][US4][test] Write integration test in `shared/components/src/MapView/sensor-utils.test.ts` — call `prepareSensorContacts()` with offset=500m, then offset=1000m, assert origins differ by correct backtrack delta (FR-006)
+- [x] T040 [P][US4][test] Write performance benchmark in `shared/components/src/MapView/array-offset.test.ts` — generate 1000 contacts, measure `prepareSensorContacts()` runtime in WORM mode, assert < 1000ms (SC-004)
 
 ### Implementation for User Story 4
 
@@ -192,8 +192,8 @@ No new code — this story is satisfied by the existing stateless render pipelin
 
 ### Cross-Cutting Polish
 
-- [ ] T041 Run full test suite (`uv run pytest services/calc/tests/tools/sensor/` and `pnpm --filter @debrief/components test -- --grep "array-offset|sensor-utils"`) and fix any remaining failures
-- [ ] T042 Run `task verify` (lint + typecheck + test) from repo root to match CI gate
+- [x] T041 Run full test suite (`uv run pytest services/calc/tests/tools/sensor/` and `pnpm --filter @debrief/components test -- --grep "array-offset|sensor-utils"`) and fix any remaining failures
+- [x] T042 Run `task verify` (lint + typecheck + test) from repo root to match CI gate
 
 ### Evidence Collection (REQUIRED)
 

@@ -13,6 +13,7 @@
 
 import type { SensorContact, SensorData, TrackFeature } from '@debrief/schemas';
 import type { DisplayMode } from '../utils/types';
+import { computeArrayCentre } from './array-offset';
 import { findNearestPointIndex } from './temporal-utils';
 
 // ── Constants ───────────────────────────────────────────────────────
@@ -418,12 +419,26 @@ export function prepareSensorContacts(
       }
     }
 
-    // Compute origin: use explicit origin or interpolate from host track
+    // Compute origin: use explicit override, otherwise compute via array-offset dispatcher
     let origin: [number, number] | null = null;
     if (contact.origin && contact.origin.length >= 2) {
       origin = [contact.origin[0]!, contact.origin[1]!];
     } else {
-      origin = interpolateTrackPosition(coords, positions, contactTimeMs);
+      const hostPosition = interpolateTrackPosition(coords, positions, contactTimeMs);
+      if (hostPosition) {
+        const hostCourse = interpolateTrackCourse(
+          positions as Array<{ time: string; course?: number }>,
+          contactTimeMs,
+        );
+        origin = computeArrayCentre(
+          hostPosition,
+          hostCourse,
+          sensor,
+          contactTimeMs,
+          coords,
+          positions,
+        );
+      }
     }
 
     if (!origin) continue;
