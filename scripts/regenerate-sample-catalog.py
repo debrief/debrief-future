@@ -297,8 +297,7 @@ def regenerate_catalog(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Nuke and regenerate the sample STAC catalog via the enriched "
-            "import pipeline."
+            "Nuke and regenerate the sample STAC catalog via the enriched import pipeline."
         ),
     )
     parser.add_argument(

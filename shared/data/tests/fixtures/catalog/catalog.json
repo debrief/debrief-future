@@ -1,0 +1,12 @@
+{
+  "type": "Catalog",
+  "id": "fx-fixture",
+  "stac_version": "1.0.0",
+  "description": "Minimal fixture catalog for enum-bundle tests.",
+  "links": [
+    { "rel": "root", "href": "./catalog.json", "type": "application/json" },
+    { "rel": "self", "href": "./catalog.json", "type": "application/json" },
+    { "rel": "item", "href": "./fx--alpha/item.json", "type": "application/geo+json" },
+    { "rel": "item", "href": "./fx--bravo/item.json", "type": "application/geo+json" }
+  ]
+}

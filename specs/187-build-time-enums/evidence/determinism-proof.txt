@@ -1,0 +1,12 @@
+# Determinism proof
+
+Two consecutive runs produce byte-identical output (FR-008, SC-004).
+
+$ sha256sum shared/data/enum-bundle.json
+694c3dd6ffb4c9fdae22dee6db15ef01b24d930f03ae99a38051a81f45d465d6  shared/data/enum-bundle.json
+
+$ uv run python scripts/extract-enum-bundle.py 2>&1 | tail -1
+  feature tags       : 16
+
+$ sha256sum shared/data/enum-bundle.json
+694c3dd6ffb4c9fdae22dee6db15ef01b24d930f03ae99a38051a81f45d465d6  shared/data/enum-bundle.json

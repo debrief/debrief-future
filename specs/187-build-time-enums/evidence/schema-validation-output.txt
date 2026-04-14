@@ -1,0 +1,6 @@
+jsonschema.validate passed — bundle conforms to contracts/enum-bundle.schema.json
+
+Schema draft: https://json-schema.org/draft/2020-12/schema
+Schema $id : https://debrief.info/specs/187-build-time-enums/enum-bundle.schema.json
+Required top-level keys: ['_meta', 'vessel_class_tree', 'nationalities', 'exercise_names', 'tags', 'feature_tags']
+Bundle keys: ['_meta', 'exercise_names', 'feature_tags', 'nationalities', 'tags', 'vessel_class_tree']

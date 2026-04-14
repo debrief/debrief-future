@@ -1,0 +1,14 @@
+$ uv run python scripts/extract-enum-bundle.py --help
+usage: extract-enum-bundle [-h] [--registry REGISTRY] [--catalog CATALOG]
+                           [--output OUTPUT]
+
+Extract a compact enum bundle for the LLM prompt builder.
+
+options:
+  -h, --help           show this help message and exit
+  --registry REGISTRY  Platform registry JSON file (default:
+                       shared/data/platform-registry.json)
+  --catalog CATALOG    STAC catalog directory (default:
+                       preview/workspace/samples/local-store)
+  --output OUTPUT      Output bundle path (default: shared/data/enum-
+                       bundle.json)
