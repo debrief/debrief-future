@@ -14,17 +14,19 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
-from debrief_data.registry import PlatformRegistry
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from debrief_data.registry import PlatformRegistry
 
 # --- Constants ----------------------------------------------------------------
 
 EXERCISE_SEPARATOR = ": "
 """Literal separator used to parse an exercise-name prefix from an item title."""
 
-_BUNDLE_META_DEFAULTS: "BundleMeta" = {
+_BUNDLE_META_DEFAULTS: "BundleMeta" = {  # noqa: UP037 -- BundleMeta defined below
     "tool": "scripts/extract-enum-bundle.py",
     "generated_from_registry": "shared/data/platform-registry.json",
     "generated_from_catalog": "preview/workspace/samples/local-store",
@@ -289,5 +291,5 @@ def serialize(bundle: EnumBundle) -> str:
     """
     # ``bundle`` is a ``TypedDict`` and ``json.dumps`` expects ``object``; the
     # cast narrows the structural typing without introducing ``Any``.
-    payload = cast(object, bundle)
+    payload = cast("object", bundle)
     return json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n"

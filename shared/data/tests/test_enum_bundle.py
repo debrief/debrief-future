@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 import jsonschema
-import pytest
 from debrief_data import (
     CatalogScanResult,
     build_bundle,
@@ -352,7 +351,7 @@ class TestDeterminism:
 
 
 def _copy_and_mutate_registry(
-    tmp_path: Path, mutator: "object"
+    tmp_path: Path, mutator: object
 ) -> Path:
     """Copy the real registry to tmp_path and apply a mutation callback."""
     src = REAL_REGISTRY
@@ -528,7 +527,3 @@ def test_bundle_round_trips_as_json() -> None:
     assert reloaded["_meta"]["tool"] == "scripts/extract-enum-bundle.py"
 
 
-@pytest.fixture(autouse=True)
-def _cleanup_catalog_fixture() -> None:
-    """No-op fixture placeholder to keep the test file consistent with others."""
-    yield
