@@ -1,1 +1,0 @@
-{"version":3,"file":"MobileTabLayout.d.ts","sourceRoot":"","sources":["../../src/MobileTabLayout/MobileTabLayout.tsx"],"names":[],"mappings":"AAAA;;;;;;;;GAQG;AAQH,OAAO,uBAAuB,CAAC;AAsC/B,MAAM,WAAW,oBAAoB;IACnC,4EAA4E;IAC5E,UAAU,CAAC,EAAE,OAAO,CAAC;IACrB,gCAAgC;IAChC,SAAS,CAAC,EAAE,MAAM,CAAC;CACpB;AAED,wBAAgB,eAAe,CAAC,EAAE,UAAU,EAAE,SAAS,EAAE,EAAE,oBAAoB,2CAkC9E"}
