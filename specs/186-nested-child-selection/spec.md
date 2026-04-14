@@ -141,6 +141,8 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-024**: Shift+click ranges MUST only be meaningful for index-based levels (for example, `positions`), where ordering is well-defined. Shift+click across ID-based siblings (for example, two segments with unrelated IDs) MUST fall back to single-click replace behaviour unless the Level Registry explicitly defines a canonical order for that level.
 - **FR-025**: The selection model MUST remain responsive for selections containing up to 1,000 paths. "Responsive" means every selection change (single-click replace, Ctrl+click toggle, Shift+click range, clear) completes end-to-end — from click to updated map highlights AND updated downstream panels (properties, tools) — in under 100 ms on the target hardware baseline.
 - **FR-026**: Selections containing more than 1,000 paths MUST NOT fail or crash. Behaviour above 1,000 is best-effort: correctness is preserved, but the 100 ms response target does not apply.
+- **FR-027**: Every unresolvable-path occurrence MUST emit a structured log entry via the standard logging channel (LogService). The entry MUST include the unresolved path, the reason (for example, `index-out-of-bounds`, `id-not-found`, `level-not-in-registry`), and the discovery context (`click-time` or `restore-time`). Log level is `warning` — user-visible degradation, not a system fault.
+- **FR-028**: The properties panel MUST display an aggregate count of unresolvable entries in the current selection whenever that count is greater than zero, so the user can see at a glance that some of their selected elements are no longer resolvable against current data.
 
 ### Key Entities
 
@@ -193,6 +195,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **SC-010**: Users can select a contiguous range of N siblings (for example, positions on a track) in exactly two clicks — a click on one endpoint followed by Shift+click on the other — regardless of the range length N.
 - **SC-011**: Every selection change (replace, toggle, range, clear) with up to 1,000 paths completes end-to-end in under 100 ms on the target hardware baseline, measured from click event to visual highlight update plus downstream panel update.
 - **SC-012**: Selections exceeding 1,000 paths never fail or crash the system; correctness is preserved and the UI degrades gracefully without blocking the application.
+- **SC-013**: 100% of unresolvable-path occurrences — whether discovered at click-time or restore-time — produce a structured log entry with the path, reason, and context, and the properties panel displays the aggregate count whenever it is greater than zero.
 
 ## Out of Scope
 

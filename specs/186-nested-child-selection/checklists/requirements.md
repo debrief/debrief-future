@@ -42,3 +42,4 @@
 - **UI Feature Validation items only apply if the spec contains a "User Interface Flow" section**
 - Specs without UI sections should skip the UI Feature Validation checklist entirely
 - An earlier iteration of this specification exists at `specs/053-nested-child-selection/` (merged via PR #187). This spec restates the feature with explicit schema-governance for the Level Registry (FR-003–FR-006) and drops backward-compatibility framing per Constitution Article XIV.1 (Pre-Release Freedom). Ready for independent planning.
+- All five `/speckit.clarify` questions answered (see `## Clarifications` section of spec.md). Observability (FR-027, FR-028, SC-013) and rejected alternatives ([research.md](../research.md)) resolved post-quota. Coverage is fully Resolved or N/A across all taxonomy categories.
