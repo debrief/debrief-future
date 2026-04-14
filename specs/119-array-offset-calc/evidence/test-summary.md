@@ -88,7 +88,7 @@ coverage_pct: 73
 ## Cross-language parity
 
 All 7 contract cases reproduce the shared golden fixture
-(`shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json`) in
+(`shared/schemas/src/fixtures/valid/array-offset-golden-01.json`) in
 both TypeScript and Python within the declared tolerance. See
 [`golden-parity.md`](./golden-parity.md) for the per-case table.
 

@@ -48,9 +48,7 @@ def _parse_iso_to_ms(time_iso: str) -> int:
 # ── Geo primitives ──────────────────────────────────────────────────
 
 
-def haversine_distance_metres(
-    lon1: float, lat1: float, lon2: float, lat2: float
-) -> float:
+def haversine_distance_metres(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
     """Geodesic distance between two points in metres.
 
     Uses the haversine formula with the mean Earth radius (6371000m).
@@ -69,10 +67,7 @@ def haversine_distance_metres(
     d_phi = math.radians(lat2 - lat1)
     d_lambda = math.radians(lon2 - lon1)
 
-    a = (
-        math.sin(d_phi / 2) ** 2
-        + math.cos(phi1) * math.cos(phi2) * math.sin(d_lambda / 2) ** 2
-    )
+    a = math.sin(d_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(d_lambda / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return EARTH_RADIUS_METRES * c
 
@@ -124,9 +119,7 @@ def compute_plain_offset(
     if offset_metres <= 0:
         return host_position
     reverse_bearing = ((course_deg + 180.0) % 360.0 + 360.0) % 360.0
-    return _geodesic_destination(
-        host_position[0], host_position[1], reverse_bearing, offset_metres
-    )
+    return _geodesic_destination(host_position[0], host_position[1], reverse_bearing, offset_metres)
 
 
 def _interpolate_track_position(
@@ -200,9 +193,7 @@ def backtrack_along_track(
     contact_time_ms = _parse_iso_to_ms(contact_time_iso)
     timestamps = [_parse_iso_to_ms(p["time"]) for p in track_positions]
 
-    start_point = _interpolate_track_position(
-        track_coordinates, track_positions, contact_time_ms
-    )
+    start_point = _interpolate_track_position(track_coordinates, track_positions, contact_time_ms)
     if start_point is None:
         first = track_coordinates[0]
         start_point = (float(first[0]), float(first[1]))

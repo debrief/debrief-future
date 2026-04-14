@@ -61,7 +61,7 @@ description: "Task list for Array Offset Calculations (119)"
 
 - [x] T001 Create TypeScript module stub `shared/components/src/MapView/array-offset.ts` (empty exports for `computeArrayCentre`, `computePlainOffset`, `backtrackAlongTrack`, `interpolateMeasuredPosition`, `haversineDistanceMetres`)
 - [x] T002 [P] Create Python package scaffold `services/calc/debrief_calc/tools/sensor/array_offset.py` (empty function stubs matching contract signatures)
-- [x] T003 [P] Create evidence + test fixture directories `specs/119-array-offset-calc/evidence/` and `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` (placeholder — real content in Phase 2)
+- [x] T003 [P] Create evidence + test fixture directories `specs/119-array-offset-calc/evidence/` and `shared/schemas/src/fixtures/valid/array-offset-golden-01.json` (placeholder — real content in Phase 2)
 
 ---
 
@@ -80,7 +80,7 @@ description: "Task list for Array Offset Calculations (119)"
 
 ### Golden Test Fixture
 
-- [x] T008 Create cross-language golden test fixture `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json` covering all 7 contract test cases (PLAIN x2, WORM x2, MEASURED x2, zero-offset)
+- [x] T008 Create cross-language golden test fixture `shared/schemas/src/fixtures/valid/array-offset-golden-01.json` covering all 7 contract test cases (PLAIN x2, WORM x2, MEASURED x2, zero-offset)
 - [x] T009 [P][test] Add fixture validation test `shared/components/src/MapView/array-offset.test.ts` that loads the fixture and asserts fixture schema (track coordinates, sensor config, expected origins per case)
 - [x] T010 [P][test] Add fixture validation test `services/calc/tests/tools/sensor/test_array_offset.py` that loads the same fixture and asserts identical schema
 

@@ -28,7 +28,7 @@ FIXTURE_PATH = (
     / "src"
     / "fixtures"
     / "valid"
-    / "track-feature-array-offset-01.json"
+    / "array-offset-golden-01.json"
 )
 
 

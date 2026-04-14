@@ -33,7 +33,7 @@ FIXTURE_PATH = (
     / "src"
     / "fixtures"
     / "valid"
-    / "track-feature-array-offset-01.json"
+    / "array-offset-golden-01.json"
 )
 
 
@@ -65,9 +65,7 @@ def _run_case(case: dict) -> tuple[float, float]:
         )
 
     if case["id"] == "case-5-measured-midpoint":
-        result = interpolate_measured_position(
-            case["measured_positions"], case["contact_time"]
-        )
+        result = interpolate_measured_position(case["measured_positions"], case["contact_time"])
         assert result is not None, "Midpoint interpolation must not return None"
         return result
 
@@ -94,9 +92,7 @@ def test_python_matches_golden_fixture(case: dict) -> None:
 
     actual = _run_case(case)
 
-    distance = haversine_distance_metres(
-        actual[0], actual[1], expected[0], expected[1]
-    )
+    distance = haversine_distance_metres(actual[0], actual[1], expected[0], expected[1])
     assert distance <= tol, (
         f"{case['id']}: actual={actual}, expected={expected}, "
         f"distance={distance:.4f}m > tolerance={tol}m"

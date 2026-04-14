@@ -1,6 +1,6 @@
 # Cross-Language Golden Parity
 
-**Fixture**: `shared/schemas/src/fixtures/valid/track-feature-array-offset-01.json`
+**Fixture**: `shared/schemas/src/fixtures/valid/array-offset-golden-01.json`
 **Captured**: 2026-04-14 at `3d42aa0`
 **Constitution article**: I.4 (reproducibility — same inputs ⇒ same outputs in every language)
 

@@ -18,7 +18,7 @@ const __dirname = dirname(__filename);
 // Load the cross-language golden fixture
 const FIXTURE_PATH = resolve(
   __dirname,
-  '../../../../schemas/src/fixtures/valid/track-feature-array-offset-01.json',
+  '../../../../schemas/src/fixtures/valid/array-offset-golden-01.json',
 );
 const fixture = JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as {
   cases: Array<Record<string, unknown>>;
