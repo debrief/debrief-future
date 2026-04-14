@@ -210,7 +210,7 @@ No new code — this story is satisfied by the existing stateless render pipelin
 
 ### PR Creation (REQUIRED — must be final task)
 
-- [ ] T050 Create PR and publish blog: run `/speckit.pr`
+- [x] T050 Create PR and publish blog: run `/speckit.pr`
 
 **Task T050 must run last. It depends on all evidence, media, and polish tasks being complete.**
 
