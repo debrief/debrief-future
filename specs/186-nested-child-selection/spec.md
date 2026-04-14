@@ -5,6 +5,12 @@
 **Status**: Draft
 **Input**: User description: "Add specification for nested child selection feature — enabling users to select individual child elements (e.g., positions within tracks) rather than only whole features. Defines the selection model, user workflows, and acceptance criteria for supporting arbitrary-depth hierarchical selection using RFC 6901 path-based selection with mixed-depth multi-selection and leaf-only semantics."
 
+## Clarifications
+
+### Session 2026-04-14
+
+- Q: What happens when the user Ctrl+clicks an element that is already in the current selection? → A: Toggle — the path is removed if present, added otherwise. Selection entries are unique by path.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Select a Position Within a Track (Priority: P1)
@@ -38,6 +44,7 @@ An analyst needs to compare information across different levels of detail. They 
 2. **Given** a mixed-depth selection exists, **When** the user clears the selection, **Then** all entries at every depth are removed.
 3. **Given** position 3 on track A is selected, **When** the user Ctrl+clicks position 8 on track B, **Then** both position paths coexist in the selection.
 4. **Given** a mixed-depth selection exists, **When** a tool or panel inspects the selection, **Then** it receives the full collection of paths preserving each entry's exact depth.
+5. **Given** position 5 on track B is already in the selection, **When** the user Ctrl+clicks position 5 on track B again, **Then** that path is removed from the selection and the remaining entries are unchanged.
 
 ---
 
@@ -101,6 +108,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-013**: The system MUST normalise selection paths consistently (strip trailing slashes, decode escape sequences only when interpreting segments) so that equivalent paths compare as equal.
 - **FR-014**: When a selection path cannot be resolved against current data (for example, an index that no longer exists, or an ID-addressed child that was deleted), the entry MUST be retained in the selection and flagged as unresolvable rather than silently removed.
 - **FR-015**: Clearing the selection MUST remove all entries regardless of their depth.
+- **FR-016**: Selection entries MUST be unique by path. Ctrl+click on a path already present in the selection MUST remove that entry (toggle behaviour); Ctrl+click on a path not present MUST append it. Duplicate paths MUST never coexist in a single selection.
 
 ### Key Entities
 
@@ -126,8 +134,9 @@ A calc tool is invoked while the user has a specific position selected within a 
 | 1 | Map displaying tracks with positions | User clicks a position point on a track | The position is selected; a path identifying track + position is recorded |
 | 2 | Position selected | Properties panel updates automatically | Properties panel shows position-level details (timestamp, course, speed) |
 | 3 | Position selected | User Ctrl+clicks a whole track line on a different track | The track is added alongside the existing position; both coexist in the selection |
-| 4 | Mixed-depth selection | User opens the tools panel | Tool eligibility reflects the exact selection paths and respects leaf-only semantics |
-| 5 | Mixed-depth selection | User clicks an empty area of the map | The entire selection is cleared |
+| 4 | Mixed-depth selection | User Ctrl+clicks the position again | The position is removed from the selection (toggle); the track remains |
+| 5 | Mixed-depth selection | User opens the tools panel | Tool eligibility reflects the exact selection paths and respects leaf-only semantics |
+| 6 | Mixed-depth selection | User clicks an empty area of the map | The entire selection is cleared |
 
 ### UI States
 
