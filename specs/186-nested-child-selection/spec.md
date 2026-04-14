@@ -10,6 +10,7 @@
 ### Session 2026-04-14
 
 - Q: What happens when the user Ctrl+clicks an element that is already in the current selection? → A: Toggle — the path is removed if present, added otherwise. Selection entries are unique by path.
+- Q: Does the selection persist across sessions/reloads, and at what scope? → A: Per-plot persistence — the selection is stored with the plot/workspace and restored whenever the plot is reopened or refocused, including navigating away to another tab and back.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -109,12 +110,14 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **FR-014**: When a selection path cannot be resolved against current data (for example, an index that no longer exists, or an ID-addressed child that was deleted), the entry MUST be retained in the selection and flagged as unresolvable rather than silently removed.
 - **FR-015**: Clearing the selection MUST remove all entries regardless of their depth.
 - **FR-016**: Selection entries MUST be unique by path. Ctrl+click on a path already present in the selection MUST remove that entry (toggle behaviour); Ctrl+click on a path not present MUST append it. Duplicate paths MUST never coexist in a single selection.
+- **FR-017**: The Feature Selection MUST persist with the plot/workspace and MUST be restored whenever the plot is reopened or refocused (for example, navigating to another tab and back). Persistence scope is per-plot — a given plot's selection is not shared with other plots or workspaces.
+- **FR-018**: On restore, each persisted path MUST be re-resolved against the current data. Paths that still resolve MUST be reinstated normally; paths that no longer resolve MUST be retained and flagged as unresolvable per FR-014. Restoration MUST NOT silently drop entries.
 
 ### Key Entities
 
 - **Selection Path**: A forward-slash-separated string identifying a specific element at any depth within a feature hierarchy. The first segment is always a feature ID. Subsequent segments alternate between level names and addresses (IDs or indices). Examples: `track-hms-defender`, `track-hms-defender/positions/4`, `track-hms-defender/segments/leg-alpha/positions/3`.
 - **Level Registry**: The canonical, schema-defined mapping from every supported level name (for example, `segments`, `positions`) to its addressing mode (ID-based or index-based). Authored in LinkML; derived into Pydantic, TypeScript, and JSON Schema. The only permitted source of level semantics — consumers resolve every path segment's mode by looking the level name up in this registry.
-- **Feature Selection**: The complete selection state, comprising an ordered collection of selection paths, a primary path (itself a path string), and a timestamp. Every entry — whole-feature or nested child — is a path; there is no second form.
+- **Feature Selection**: The complete selection state, comprising an ordered collection of selection paths, a primary path (itself a path string), and a timestamp. Every entry — whole-feature or nested child — is a path; there is no second form. Persisted alongside the plot/workspace so it survives tab switches, plot reopens, and session restarts.
 
 ## User Interface Flow
 
@@ -157,6 +160,7 @@ A calc tool is invoked while the user has a specific position selected within a 
 - **SC-006**: Users can hold a mixed-depth multi-selection that contains whole features and child elements from different parents simultaneously, and every selected element is visually distinguishable on the map at the same time.
 - **SC-007**: When a selection path cannot be resolved against current data, the entry is retained and visually marked as unresolvable in every view that renders it, and no errors are surfaced to the user.
 - **SC-008**: Every level name appearing in any selection path across the system resolves to an addressing mode via the Level Registry; paths referencing undefined level names are rejected at the boundary and never reach application code.
+- **SC-009**: 100% of selections survive tab-switch and plot reopen — closing and reopening a plot (or navigating away and back) restores the exact same set of selected paths, with any paths that no longer resolve marked as unresolvable rather than silently dropped.
 
 ## Assumptions
 
