@@ -197,16 +197,16 @@ No new code — this story is satisfied by the existing stateless render pipelin
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T043 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/119-array-offset-calc/evidence/test-summary.md` — include YAML front matter (feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct) and describe key scenarios (PLAIN straight-line, WORM through-turn, MEASURED fallback, 1000-contact benchmark)
-- [ ] T044 [P] Create usage demonstration in `specs/119-array-offset-calc/evidence/usage-example.md` — side-by-side TypeScript and Python code invoking `computeArrayCentre()` for each of the three modes, with expected outputs
-- [ ] T045 [P] Capture cross-language parity proof in `specs/119-array-offset-calc/evidence/golden-parity.md` — table of 7 golden test cases with TS output, Python output, delta metres, tolerance status (all PASS)
-- [ ] T046 [P] Capture WORM-through-turn visual evidence `specs/119-array-offset-calc/evidence/worm-through-turn.png` — screenshot of map showing bearing line origins for the same contacts in PLAIN (straight backtrack) vs WORM (follows track through turn)
-- [ ] T047 [P] Capture performance benchmark in `specs/119-array-offset-calc/evidence/benchmark.md` — 1000-contact recalculation timing for each mode, confirming SC-004 (< 1s)
+- [x] T043 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/119-array-offset-calc/evidence/test-summary.md` — include YAML front matter (feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct) and describe key scenarios (PLAIN straight-line, WORM through-turn, MEASURED fallback, 1000-contact benchmark)
+- [x] T044 [P] Create usage demonstration in `specs/119-array-offset-calc/evidence/usage-example.md` — side-by-side TypeScript and Python code invoking `computeArrayCentre()` for each of the three modes, with expected outputs
+- [x] T045 [P] Capture cross-language parity proof in `specs/119-array-offset-calc/evidence/golden-parity.md` — table of 7 golden test cases with TS output, Python output, delta metres, tolerance status (all PASS)
+- [x] T046 [P] Capture WORM-through-turn visual evidence `specs/119-array-offset-calc/evidence/worm-through-turn.png` — screenshot of map showing bearing line origins for the same contacts in PLAIN (straight backtrack) vs WORM (follows track through turn)
+- [x] T047 [P] Capture performance benchmark in `specs/119-array-offset-calc/evidence/benchmark.md` — 1000-contact recalculation timing for each mode, confirming SC-004 (< 1s)
 
 ### Media Content (REQUIRED)
 
-- [ ] T048 Create shipped blog post in `specs/119-array-offset-calc/media/shipped-post.md` using Content Specialist agent (`.claude/agents/media/content.md`) — sections: What We Built (three modes + golden parity), Screenshots (WORM-through-turn), Lessons Learned (cross-language parity, haversine sufficiency), What's Next (Phase 5 residuals #120 deferred)
-- [ ] T049 [P] Create LinkedIn shipped summary in `specs/119-array-offset-calc/media/linkedin-shipped.md` — 150-200 words, hook opening, link to full shipped post
+- [x] T048 Create shipped blog post in `specs/119-array-offset-calc/media/shipped-post.md` using Content Specialist agent (`.claude/agents/media/content.md`) — sections: What We Built (three modes + golden parity), Screenshots (WORM-through-turn), Lessons Learned (cross-language parity, haversine sufficiency), What's Next (Phase 5 residuals #120 deferred)
+- [x] T049 [P] Create LinkedIn shipped summary in `specs/119-array-offset-calc/media/linkedin-shipped.md` — 150-200 words, hook opening, link to full shipped post
 
 ### PR Creation (REQUIRED — must be final task)
 
