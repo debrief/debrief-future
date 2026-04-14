@@ -1,0 +1,43 @@
+# Terminal session: scripts/extract-enum-bundle.py
+
+## 1. Standard run against the real registry + sample catalog
+
+$ uv run python scripts/extract-enum-bundle.py
+[extract-enum-bundle] reading registry: /home/user/debrief-future/shared/data/platform-registry.json
+[extract-enum-bundle] reading catalog : /home/user/debrief-future/preview/workspace/samples/local-store
+[extract-enum-bundle] wrote           : /home/user/debrief-future/shared/data/enum-bundle.json
+  vessel-class nodes : 14
+  nationalities      : 4
+  exercise names     : 1
+  tags               : 20
+  feature tags       : 16
+
+## 2. Run against the fixture catalog (no network, no mutation of committed outputs)
+
+$ uv run python scripts/extract-enum-bundle.py \
+    --registry shared/data/platform-registry.json \
+    --catalog  shared/data/tests/fixtures/catalog \
+    --output   /tmp/fixture-bundle.json
+[extract-enum-bundle] reading registry: shared/data/platform-registry.json
+[extract-enum-bundle] reading catalog : shared/data/tests/fixtures/catalog
+[extract-enum-bundle] wrote           : /tmp/fixture-bundle.json
+  vessel-class nodes : 14
+  nationalities      : 2
+  exercise names     : 2
+  tags               : 3
+  feature tags       : 3
+
+$ jq '._meta' /tmp/fixture-bundle.json
+{
+  "canonicalisation": "trim + lowercase dedup, first-seen casing preserved",
+  "exercise_parse_rule": "title prefix before ': '",
+  "generated_from_catalog": "preview/workspace/samples/local-store",
+  "generated_from_registry": "shared/data/platform-registry.json",
+  "tool": "scripts/extract-enum-bundle.py"
+}
+
+## 3. Missing-registry failure (exit 1)
+
+$ uv run python scripts/extract-enum-bundle.py --registry /tmp/does-not-exist.json
+Registry file not found: /tmp/does-not-exist.json
+(exit 1)

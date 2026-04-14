@@ -158,26 +158,26 @@ No new production code — US3 confirms the conservative-extraction behaviour de
 
 ### Quality Gates
 
-- [ ] T031 Run `task verify` from repo root; fix any lint/typecheck/test failures introduced
-- [ ] T032 [P] Confirm `pyright` passes on `shared/data/src/debrief_data/enum_bundle.py` with strict typing (no `Any`)
-- [ ] T033 [P] Run `quickstart.md` end-to-end as a documentation smoke test (steps 1–5 produce expected output) `specs/187-build-time-enums/quickstart.md`
-- [ ] T034 [P] Verify no new third-party dependencies were introduced: diff `pyproject.toml`, `shared/data/pyproject.toml`, and `uv.lock` against `main` and confirm only the new module is added — enforces FR-013 `pyproject.toml`
+- [x] T031 Run `task verify` from repo root; fix any lint/typecheck/test failures introduced
+- [x] T032 [P] Confirm `pyright` passes on `shared/data/src/debrief_data/enum_bundle.py` with strict typing (no `Any`)
+- [x] T033 [P] Run `quickstart.md` end-to-end as a documentation smoke test (steps 1–5 produce expected output) `specs/187-build-time-enums/quickstart.md`
+- [x] T034 [P] Verify no new third-party dependencies were introduced: diff `pyproject.toml`, `shared/data/pyproject.toml`, and `uv.lock` against `main` and confirm only the new module is added — enforces FR-013 `pyproject.toml`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T035 Create evidence directory `specs/187-build-time-enums/evidence/`
-- [ ] T036 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/187-build-time-enums/evidence/test-summary.md`
-- [ ] T037 [P] Create usage demonstration with one-command invocation, sample stdout, and screenshot of the bundle contents `specs/187-build-time-enums/evidence/usage-example.md`
-- [ ] T038 [P] Capture full terminal session (default run + fixture-overrides run) `specs/187-build-time-enums/evidence/cli-demo.txt`
-- [ ] T039 [P] Snapshot the generated bundle (truncated to the first ~200 lines if large) `specs/187-build-time-enums/evidence/sample-bundle.json`
-- [ ] T040 [P] Capture `jsonschema.validate(bundle, schema)` output proving conformance with `contracts/enum-bundle.schema.json` `specs/187-build-time-enums/evidence/schema-validation-output.txt`
-- [ ] T041 [P] Capture two consecutive `sha256sum shared/data/enum-bundle.json` runs proving byte-identical output `specs/187-build-time-enums/evidence/determinism-proof.txt`
-- [ ] T042 [P] Capture `python scripts/extract-enum-bundle.py --help` output documenting the CLI surface `specs/187-build-time-enums/evidence/config-sample.txt`
+- [x] T035 Create evidence directory `specs/187-build-time-enums/evidence/`
+- [x] T036 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/187-build-time-enums/evidence/test-summary.md`
+- [x] T037 [P] Create usage demonstration with one-command invocation, sample stdout, and screenshot of the bundle contents `specs/187-build-time-enums/evidence/usage-example.md`
+- [x] T038 [P] Capture full terminal session (default run + fixture-overrides run) `specs/187-build-time-enums/evidence/cli-demo.txt`
+- [x] T039 [P] Snapshot the generated bundle (truncated to the first ~200 lines if large) `specs/187-build-time-enums/evidence/sample-bundle.json`
+- [x] T040 [P] Capture `jsonschema.validate(bundle, schema)` output proving conformance with `contracts/enum-bundle.schema.json` `specs/187-build-time-enums/evidence/schema-validation-output.txt`
+- [x] T041 [P] Capture two consecutive `sha256sum shared/data/enum-bundle.json` runs proving byte-identical output `specs/187-build-time-enums/evidence/determinism-proof.txt`
+- [x] T042 [P] Capture `python scripts/extract-enum-bundle.py --help` output documenting the CLI surface `specs/187-build-time-enums/evidence/config-sample.txt`
 
 ### Media Content
 
-- [ ] T043 Create shipped blog post via Content Specialist agent (read `.claude/agents/media/content.md`); include "What We Built", lessons learned (e.g. canonicalisation trade-off, decision to commit the artefact), what's next (#188 prompt design) `specs/187-build-time-enums/media/shipped-post.md`
-- [ ] T044 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link placeholder) `specs/187-build-time-enums/media/linkedin-shipped.md`
+- [x] T043 Create shipped blog post via Content Specialist agent (read `.claude/agents/media/content.md`); include "What We Built", lessons learned (e.g. canonicalisation trade-off, decision to commit the artefact), what's next (#188 prompt design) `specs/187-build-time-enums/media/shipped-post.md`
+- [x] T044 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link placeholder) `specs/187-build-time-enums/media/linkedin-shipped.md`
 
 ### PR Creation
 
