@@ -170,6 +170,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators) (181-linkml-platform-overrides)
 - Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing) (182-import-platform-warnings)
 - Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment) (184-regenerate-sample-catalog)
+- Read-only access to `shared/data/platform-registry.json` and `preview/workspace/samples/local-store/`; writes one JSON file at a stable repo-root output path (committed artefact) (187-build-time-enums)
 
 ## Before Pushing
 
@@ -214,6 +215,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 187-build-time-enums: Added Python 3.11 (existing toolchain — same as `scripts/regenerate-sample-catalog.py` and the `debrief-data` package) + `debrief-data` (registry loader, already a workspace member); standard library only for the rest (`json`, `pathlib`, `argparse`, `re`)
 - 184-regenerate-sample-catalog: Added Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment)
 - 182-import-platform-warnings: Added Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing)
-- 181-linkml-platform-overrides: Added Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators)
