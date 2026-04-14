@@ -41,27 +41,30 @@
   "properties": {
     "title": "Saxon Warrior: Redtrack",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Redtrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Saxon Warrior: Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T14:00:00+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/astute"
+    "debrief:platforms": [
+      {
+        "id": "SUBJECT",
+        "name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
     ],
     "debrief:tags": [
-      "EW",
-      "SAR",
-      "escort",
-      "training"
+      "boarding",
+      "harbour-ops",
+      "training",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "visual-sighting",
-      "zig-zag"
-    ],
-    "debrief:track_names": [
-      "Contact Alpha"
-    ],
-    "debrief:nationalities": [
-      "GB"
+      "minefield",
+      "prosecution",
+      "visual-sighting"
     ]
   },
   "links": [
@@ -85,7 +88,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/S2R-2553-Missing-Sensor-Data/RedTrack.rep",
+      "href": "file:///tmp/debrief-regen-4x2tftum/RedTrack.rep",
       "title": "RedTrack.rep"
     }
   ],
@@ -106,26 +109,10 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/S2R-2553-Missing-Sensor-Data/RedTrack.rep",
-        "load_timestamp": "2026-03-28T13:50:59.367318Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/RedTrack.rep",
+        "load_timestamp": "2026-04-13T23:12:32.491972Z",
         "tool_version": "0.1.0"
       }
-    },
-    "thumbnail": {
-      "href": "./thumbnail.png",
-      "type": "image/png",
-      "title": "Plot thumbnail",
-      "roles": [
-        "thumbnail"
-      ]
-    },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
-      "type": "image/png",
-      "title": "Plot thumbnail (small)",
-      "roles": [
-        "thumbnail"
-      ]
     }
   }
 }

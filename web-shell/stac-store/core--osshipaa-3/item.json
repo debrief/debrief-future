@@ -10,58 +10,60 @@
     "coordinates": [
       [
         [
-          30,
-          5
+          30.0,
+          5.0
         ],
         [
-          30,
-          5
+          30.0,
+          5.0
         ],
         [
-          30,
-          5
+          30.0,
+          5.0
         ],
         [
-          30,
-          5
+          30.0,
+          5.0
         ],
         [
-          30,
-          5
+          30.0,
+          5.0
         ]
       ]
     ]
   },
   "bbox": [
-    30,
-    5,
-    30,
-    5
+    30.0,
+    5.0,
+    30.0,
+    5.0
   ],
   "properties": {
     "title": "Saxon Warrior: Osshipaa 3",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Saxon Warrior: Osshipaa 3 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Visby.",
+    "description": "Saxon Warrior: Osshipaa 3 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FGS Visby.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/type212"
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "FGS Visby",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      }
     ],
     "debrief:tags": [
       "ASW",
-      "SAR",
-      "boarding",
+      "amphibious",
       "training"
     ],
     "debrief:feature_tags": [
-      "intercept",
+      "active-search",
+      "depth-charge",
       "visual-sighting"
-    ],
-    "debrief:track_names": [
-      "FS Visby"
-    ],
-    "debrief:nationalities": [
-      "FR"
     ]
   },
   "links": [
@@ -85,7 +87,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/S2R-Freq/osshipaa_3.rep",
+      "href": "file:///tmp/debrief-regen-4x2tftum/osshipaa_3.rep",
       "title": "osshipaa_3.rep"
     }
   ],
@@ -106,26 +108,10 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/S2R-Freq/osshipaa_3.rep",
-        "load_timestamp": "2026-03-28T13:50:59.429812Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/osshipaa_3.rep",
+        "load_timestamp": "2026-04-13T23:12:33.271557Z",
         "tool_version": "0.1.0"
       }
-    },
-    "thumbnail": {
-      "href": "./thumbnail.png",
-      "type": "image/png",
-      "title": "Plot thumbnail",
-      "roles": [
-        "thumbnail"
-      ]
-    },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
-      "type": "image/png",
-      "title": "Plot thumbnail (small)",
-      "roles": [
-        "thumbnail"
-      ]
     }
   }
 }
