@@ -542,6 +542,156 @@ describe('prepareSensorContacts', () => {
     // Ambiguous (090) is starboard → gets darker colour
     expect(result[0]!.darkenedColor).not.toBe('#FF0000');
   });
+
+  // ── Array offset integration (feature 119) ────────────────────────
+
+  describe('array offset integration', () => {
+    function makeOffsetTrack(
+      sensorOverrides: Partial<SensorData>,
+      contact: SensorContact,
+    ): { sensor: SensorData; feature: TrackFeature } {
+      // Straight north-east leg then eastward turn so WORM differs from PLAIN.
+      const positions = [
+        { time: '2026-01-27T10:00:00Z', course: 45, speed: 12 },
+        { time: '2026-01-27T11:00:00Z', course: 45, speed: 12 },
+        { time: '2026-01-27T12:00:00Z', course: 90, speed: 12 },
+      ];
+      const coords: [number, number][] = [
+        [-5.0, 49.98],
+        [-5.0, 50.0],
+        [-4.98, 50.0],
+      ];
+
+      const sensor: SensorData = {
+        name: 'TOWED_ARRAY',
+        color: '#FF0000',
+        line_thickness: 2,
+        contacts: [contact],
+        ...sensorOverrides,
+      } as SensorData;
+
+      const feature = {
+        type: 'Feature',
+        id: 'track-offset',
+        geometry: { type: 'LineString', coordinates: coords as unknown as number[] },
+        properties: {
+          kind: 'TRACK',
+          platform_id: 'PLT-119',
+          track_type: 'OWNSHIP',
+          start_time: positions[0]!.time,
+          end_time: positions[positions.length - 1]!.time,
+          positions,
+          style: { line: { color: '#4CAF50' } },
+          sensors: [sensor],
+        },
+      } as unknown as TrackFeature;
+
+      return { sensor, feature };
+    }
+
+    it('leaves origin at interpolated host position when mode is unset', () => {
+      const { sensor, feature } = makeOffsetTrack(
+        {},
+        { time: '2026-01-27T11:30:00Z', bearing: 45, has_bearing: true, visible: true },
+      );
+      const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
+      expect(result).toHaveLength(1);
+      // Interpolated position between (-5.0, 50.0) and (-4.98, 50.0) at 11:30 (midpoint)
+      expect(result[0]!.origin[0]).toBeCloseTo(-4.99, 4);
+      expect(result[0]!.origin[1]).toBeCloseTo(50.0, 5);
+    });
+
+    it('PLAIN mode shifts the origin backward along the course', () => {
+      const contact: SensorContact = {
+        time: '2026-01-27T12:00:00Z',
+        bearing: 45,
+        has_bearing: true,
+        visible: true,
+      };
+      const { sensor, feature } = makeOffsetTrack(
+        { offset: 500, array_centre_mode: 'PLAIN' },
+        contact,
+      );
+      const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
+      expect(result).toHaveLength(1);
+      // At 12:00 vessel is at (-4.98, 50.0) with course 90°
+      // PLAIN backtrack 500m along reverse 270° → slightly west
+      expect(result[0]!.origin[0]).toBeLessThan(-4.98);
+      expect(result[0]!.origin[1]).toBeCloseTo(50.0, 5);
+    });
+
+    it('WORM mode produces a different origin than PLAIN when vessel turned (FR-005)', () => {
+      const contact: SensorContact = {
+        time: '2026-01-27T12:00:00Z',
+        bearing: 45,
+        has_bearing: true,
+        visible: true,
+      };
+      const { sensor: plainSensor, feature: plainFeature } = makeOffsetTrack(
+        { offset: 2000, array_centre_mode: 'PLAIN' },
+        contact,
+      );
+      const plainResult = prepareSensorContacts(plainSensor, plainFeature, undefined, 'full', 0);
+
+      const { sensor: wormSensor, feature: wormFeature } = makeOffsetTrack(
+        { offset: 2000, array_centre_mode: 'WORM' },
+        contact,
+      );
+      const wormResult = prepareSensorContacts(wormSensor, wormFeature, undefined, 'full', 0);
+
+      // Both should produce origins, and they should differ because the vessel turned
+      expect(plainResult).toHaveLength(1);
+      expect(wormResult).toHaveLength(1);
+      const plainOrigin = plainResult[0]!.origin;
+      const wormOrigin = wormResult[0]!.origin;
+      // The origins differ in either longitude or latitude beyond 1e-4
+      const dLon = Math.abs(plainOrigin[0] - wormOrigin[0]);
+      const dLat = Math.abs(plainOrigin[1] - wormOrigin[1]);
+      expect(dLon + dLat).toBeGreaterThan(1e-4);
+    });
+
+    it('larger offset produces origin further from host position (FR-006)', () => {
+      const contact: SensorContact = {
+        time: '2026-01-27T12:00:00Z',
+        bearing: 45,
+        has_bearing: true,
+        visible: true,
+      };
+      const { sensor: smallSensor, feature: smallFeature } = makeOffsetTrack(
+        { offset: 500, array_centre_mode: 'PLAIN' },
+        contact,
+      );
+      const smallRes = prepareSensorContacts(smallSensor, smallFeature, undefined, 'full', 0);
+
+      const { sensor: bigSensor, feature: bigFeature } = makeOffsetTrack(
+        { offset: 1000, array_centre_mode: 'PLAIN' },
+        contact,
+      );
+      const bigRes = prepareSensorContacts(bigSensor, bigFeature, undefined, 'full', 0);
+
+      // Both at vessel position (-4.98, 50.0) course 90°
+      // 500m backtrack produces a smaller |Δlon| than 1000m backtrack
+      const smallDLon = Math.abs(smallRes[0]!.origin[0] - -4.98);
+      const bigDLon = Math.abs(bigRes[0]!.origin[0] - -4.98);
+      expect(bigDLon).toBeGreaterThan(smallDLon * 1.5);
+    });
+
+    it('explicit contact.origin still overrides array offset calculation', () => {
+      const contact: SensorContact = {
+        time: '2026-01-27T12:00:00Z',
+        bearing: 45,
+        has_bearing: true,
+        visible: true,
+        origin: [-3.0, 51.0],
+      };
+      const { sensor, feature } = makeOffsetTrack(
+        { offset: 1000, array_centre_mode: 'WORM' },
+        contact,
+      );
+      const result = prepareSensorContacts(sensor, feature, undefined, 'full', 0);
+      expect(result[0]!.origin).toEqual([-3.0, 51.0]);
+    });
+  });
 });
 
 // ── Label Position ──────────────────────────────────────────────────
