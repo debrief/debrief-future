@@ -148,9 +148,7 @@ def main() -> None:
     OUT_PATH.write_text(json.dumps(fixture, indent=2) + "\n")
     print(f"Wrote {OUT_PATH.relative_to(ROOT)}")
     print(f"  - {len(fixture['geometry']['coordinates'])} track fixes")
-    print(
-        f"  - {len(fixture['properties']['sensors'][0]['contacts'])} sensor contacts"
-    )
+    print(f"  - {len(fixture['properties']['sensors'][0]['contacts'])} sensor contacts")
     print(
         f"  - {len(fixture['properties']['sensors'][0]['measured_positions'])} measured positions"
     )
