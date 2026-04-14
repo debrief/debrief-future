@@ -93,35 +93,35 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Shared types and enum-bundle access
 
-- [ ] T013 [US1] Define all exported types in `types.ts`: `Cql2Json`, `LozengeSeed` (`Pick<LozengeItem, 'filterType'|'value'|'negated'>`), `GenerationErrorReason` (5 values per 8A), `GenerationError`, `GenerationDiagnostics`, `GenerationResult`, `LLMClient`, `RecordedResponse`, `ResponseMap`, `EnumBundle`, `GenerateDeps`, `CorpusRecord`, `CorpusExpectation`, `HarnessPass`, `HarnessFail`, `HarnessReport` `shared/components/src/nl-cql2/types.ts`
-- [ ] T014 [US1] Implement enum-bundle loader that reads `shared/data/enum-bundle.json` via `DEBRIEF_REPO_ROOT`, narrows to the `EnumBundle` interface, and throws loudly if required keys are missing `shared/components/src/nl-cql2/loadEnumBundle.ts`
+- [x] T013 [US1] Define all exported types in `types.ts`: `Cql2Json`, `LozengeSeed` (`Pick<LozengeItem, 'filterType'|'value'|'negated'>`), `GenerationErrorReason` (5 values per 8A), `GenerationError`, `GenerationDiagnostics`, `GenerationResult`, `LLMClient`, `RecordedResponse`, `ResponseMap`, `EnumBundle`, `GenerateDeps`, `CorpusRecord`, `CorpusExpectation`, `HarnessPass`, `HarnessFail`, `HarnessReport` `shared/components/src/nl-cql2/types.ts`
+- [x] T014 [US1] Implement enum-bundle loader that reads `shared/data/enum-bundle.json` via `DEBRIEF_REPO_ROOT`, narrows to the `EnumBundle` interface, and throws loudly if required keys are missing `shared/components/src/nl-cql2/loadEnumBundle.ts`
 
 ### Prompt composition
 
-- [ ] T015 [US1] Implement `schemaDescription()` importing `PROPERTY_MAP` + `FilterType` union from filter-engine, emitting a string block pairing each filter type with its CQL2 property path, with a compile-time `never`-default that forces exhaustiveness (decision 3A) `shared/components/src/nl-cql2/schemaDescription.ts`
-- [ ] T016 [US1] Implement `buildPrompt(phrase, enums)` concatenating role framing, schema description, enum bundle, two worked examples (one single-dimension, one compound `array_filter`), and the user phrase in the fixed order from research.md §5 `shared/components/src/nl-cql2/buildPrompt.ts`
-- [ ] T017 [P][test] [US1] Test that `buildPrompt` output contains every `FilterType` property path, the worked examples, and ends with the phrase suffix; also assert prompt size < 20480 bytes for the current enum bundle `shared/components/src/nl-cql2/__tests__/buildPrompt.test.ts`
-- [ ] T018 [P][test] [US1] PROPERTY_MAP exhaustiveness test — every value of the `FilterType` union is a key in `PROPERTY_MAP` (decision 11A) `shared/components/src/nl-cql2/__tests__/schemaDescription.test.ts`
-- [ ] T019 [P][test] [US1] Test that `schemaDescription()` output references every `PROPERTY_MAP` value verbatim (guards against drift at the prompt-assembly boundary) `shared/components/src/nl-cql2/__tests__/schemaDescription.test.ts`
+- [x] T015 [US1] Implement `schemaDescription()` importing `PROPERTY_MAP` + `FilterType` union from filter-engine, emitting a string block pairing each filter type with its CQL2 property path, with a compile-time `never`-default that forces exhaustiveness (decision 3A) `shared/components/src/nl-cql2/schemaDescription.ts`
+- [x] T016 [US1] Implement `buildPrompt(phrase, enums)` concatenating role framing, schema description, enum bundle, two worked examples (one single-dimension, one compound `array_filter`), and the user phrase in the fixed order from research.md §5 `shared/components/src/nl-cql2/buildPrompt.ts`
+- [x] T017 [P][test] [US1] Test that `buildPrompt` output contains every `FilterType` property path, the worked examples, and ends with the phrase suffix; also assert prompt size < 20480 bytes for the current enum bundle `shared/components/src/nl-cql2/__tests__/buildPrompt.test.ts`
+- [x] T018 [P][test] [US1] PROPERTY_MAP exhaustiveness test — every value of the `FilterType` union is a key in `PROPERTY_MAP` (decision 11A) `shared/components/src/nl-cql2/__tests__/schemaDescription.test.ts`
+- [x] T019 [P][test] [US1] Test that `schemaDescription()` output references every `PROPERTY_MAP` value verbatim (guards against drift at the prompt-assembly boundary) `shared/components/src/nl-cql2/__tests__/schemaDescription.test.ts`
 
 ### Response parsing and validation
 
-- [ ] T020 [US1] Implement `parseResponse(phrase, rawResponse, promptHash, promptVersion)` with the five-stage pipeline: JSON parse → JSON Schema shape → `cql2JsonToFilterExpression` round-trip → `PROPERTY_MAP` field check → unrecognised-term leak visitor; returns `GenerationResult` with `error` populated on any failure (decisions 8A, 10A) `shared/components/src/nl-cql2/parseResponse.ts`
-- [ ] T021 [US1] Implement the unrecognised-term leak visitor as a pure tree walker over CQL2-JSON that descends into `args[]`, `array_filter` predicates, `and`/`or` children, and `a_containedBy` value arrays `shared/components/src/nl-cql2/parseResponse.ts`
-- [ ] T022 [P][test] [US1] One test per `GenerationErrorReason` value (5 reasons × minimum 1 test each) — malformed JSON, schema violation, hallucinated field, unrecognised-term leaked across `array_filter`/`or`/`a_containedBy` nestings, CQL2 evaluation failure (decision 10A) `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
-- [ ] T023 [P][test] [US1] Happy-path test — a well-formed recorded response parses to a `GenerationResult` with `error: null` and the expected `lozenges`/`unrecognisedTerms` `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
+- [x] T020 [US1] Implement `parseResponse(phrase, rawResponse, promptHash, promptVersion)` with the five-stage pipeline: JSON parse → JSON Schema shape → `cql2JsonToFilterExpression` round-trip → `PROPERTY_MAP` field check → unrecognised-term leak visitor; returns `GenerationResult` with `error` populated on any failure (decisions 8A, 10A) `shared/components/src/nl-cql2/parseResponse.ts`
+- [x] T021 [US1] Implement the unrecognised-term leak visitor as a pure tree walker over CQL2-JSON that descends into `args[]`, `array_filter` predicates, `and`/`or` children, and `a_containedBy` value arrays `shared/components/src/nl-cql2/parseResponse.ts`
+- [x] T022 [P][test] [US1] One test per `GenerationErrorReason` value (5 reasons × minimum 1 test each) — malformed JSON, schema violation, hallucinated field, unrecognised-term leaked across `array_filter`/`or`/`a_containedBy` nestings, CQL2 evaluation failure (decision 10A) `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
+- [x] T023 [P][test] [US1] Happy-path test — a well-formed recorded response parses to a `GenerationResult` with `error: null` and the expected `lozenges`/`unrecognisedTerms` `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
 
 ### LLM clients
 
-- [ ] T024 [US1] Implement `createRecordedLLMClient(responses)` — canonicalises phrase on lookup, throws loudly on miss or `promptHash` mismatch with a "re-record" diagnostic `shared/components/src/nl-cql2/clients.ts`
-- [ ] T025 [US1] Implement `createPassthroughLLMClient(fn)` trivial wrapper `shared/components/src/nl-cql2/clients.ts`
-- [ ] T026 [P][test] [US1] Client unit tests — RecordedLLMClient hit/miss/hash-mismatch, PassthroughLLMClient forwards correctly `shared/components/src/nl-cql2/__tests__/clients.test.ts`
+- [x] T024 [US1] Implement `createRecordedLLMClient(responses)` — canonicalises phrase on lookup, throws loudly on miss or `promptHash` mismatch with a "re-record" diagnostic `shared/components/src/nl-cql2/clients.ts`
+- [x] T025 [US1] Implement `createPassthroughLLMClient(fn)` trivial wrapper `shared/components/src/nl-cql2/clients.ts`
+- [x] T026 [P][test] [US1] Client unit tests — RecordedLLMClient hit/miss/hash-mismatch, PassthroughLLMClient forwards correctly `shared/components/src/nl-cql2/__tests__/clients.test.ts`
 
 ### Generator
 
-- [ ] T027 [US1] Implement `generateCql2(phrase, deps)` — short-circuit empty/whitespace phrases (`usedLlm: false`, empty CQL2, empty lozenges), otherwise build prompt → call `LLMClient.generate` → delegate to `parseResponse` → return `GenerationResult` `shared/components/src/nl-cql2/generate.ts`
-- [ ] T028 [US1] Implement public barrel exporting `generateCql2`, `buildPrompt`, `schemaDescription`, `createRecordedLLMClient`, `createPassthroughLLMClient`, and all public types (but NOT the harness, which stays under `__tests__/`) `shared/components/src/nl-cql2/index.ts`
-- [ ] T029 [P][test] [US1] Generator tests — empty phrase short-circuit, whitespace-only phrase short-circuit, happy path calls LLM once and returns populated result, LLM client throwing surfaces the error correctly `shared/components/src/nl-cql2/__tests__/generate.test.ts`
+- [x] T027 [US1] Implement `generateCql2(phrase, deps)` — short-circuit empty/whitespace phrases (`usedLlm: false`, empty CQL2, empty lozenges), otherwise build prompt → call `LLMClient.generate` → delegate to `parseResponse` → return `GenerationResult` `shared/components/src/nl-cql2/generate.ts`
+- [x] T028 [US1] Implement public barrel exporting `generateCql2`, `buildPrompt`, `schemaDescription`, `createRecordedLLMClient`, `createPassthroughLLMClient`, and all public types (but NOT the harness, which stays under `__tests__/`) `shared/components/src/nl-cql2/index.ts`
+- [x] T029 [P][test] [US1] Generator tests — empty phrase short-circuit, whitespace-only phrase short-circuit, happy path calls LLM once and returns populated result, LLM client throwing surfaces the error correctly `shared/components/src/nl-cql2/__tests__/generate.test.ts`
 
 ### Harness — only the core corpus runner (US1's acceptance)
 
@@ -133,7 +133,7 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Prompt-size measurement
 
-- [ ] T035 [US1] Measure current prompt size for the current enum bundle; extrapolate to 30 and 50 platform registry sizes (duplicate platform entries in a throwaway bundle, re-run `buildPrompt`, record bytes); fill in research.md §11 table and copy to evidence `specs/188-nl-cql2-prompt/research.md` + `specs/188-nl-cql2-prompt/evidence/prompt-size-measurements.md`
+- [x] T035 [US1] Measure current prompt size for the current enum bundle; extrapolate to 30 and 50 platform registry sizes (duplicate platform entries in a throwaway bundle, re-run `buildPrompt`, record bytes); fill in research.md §11 table and copy to evidence `specs/188-nl-cql2-prompt/research.md` + `specs/188-nl-cql2-prompt/evidence/prompt-size-measurements.md`
 
 **Checkpoint**: US1 green. `pnpm --filter @debrief/components test` passes including corpus.test.ts. Analyst phrases produce correct CQL2 against the sample catalog.
 

@@ -238,13 +238,17 @@ The generator DOES throw on programmer errors: missing enum bundle at constructi
 
 **Decision**: During implementation, measure the prompt size produced against the current enum bundle and record the result here. Extrapolate to 30 and 50 registered platforms (the plausible near-term ranges as #180's registry fills in during samples work) and confirm the extrapolation stays under SC-004's 20 KB ceiling. If headroom is tight, note the trigger point at which enum summarisation (e.g. collapsing vessel_type → vessel_role leaves, dropping rarely-used tags) becomes necessary.
 
-**Placeholder values — to be filled during implementation**:
+**Measurements (captured 2026-04-14 via `promptSize.test.ts`)**:
 
-| Registry size (platforms) | Enum bundle size | Prompt size (bytes) | Headroom vs 20 KB |
-|---------------------------|------------------|---------------------|-------------------|
-| 10 (current) | _tbc_ | _tbc_ | _tbc_ |
-| 30 (projected) | _tbc_ | _tbc_ | _tbc_ |
-| 50 (projected) | _tbc_ | _tbc_ | _tbc_ |
+| Registry size (platforms) | Prompt size (bytes) | Headroom vs 20 480 B |
+|---------------------------|---------------------|----------------------|
+| 10 (current)              | 5 112               | 15 368 (75.0%)       |
+| 30 (projected, 3×)        | 6 322               | 14 158 (69.1%)       |
+| 50 (projected, 5×)        | 7 452               | 13 028 (63.6%)       |
+
+See `evidence/prompt-size-measurements.md` for reproduction. Full measurements
+assert-tested on every CI run (`buildPrompt.test.ts` at current size,
+`promptSize.test.ts` at 5×).
 
 **Rationale**:
 - SC-004 is enforced at runtime by decision 15A, but a CI-only gate gives no advance warning — the first sign of trouble would be a failing build during unrelated registry work. Measuring the trajectory now gives the team a documented ceiling estimate before #180 expands.
