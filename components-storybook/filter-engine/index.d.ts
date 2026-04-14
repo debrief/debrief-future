@@ -4,7 +4,8 @@
  * @module filter-engine
  */
 export { createFilterEngine } from './engine';
+export { cql2JsonToArrayFilters } from './cql2-json';
 export { parseTaxonomy, buildDescendantMap, buildTaxonomyLabelMap, resolveTaxonomyLabel } from './taxonomy';
 export type { RawTaxonomy, RawTaxonomyNode, DescendantMap, TaxonomyLabelMap } from './taxonomy';
-export type { CatalogOverviewItem, FilterType, DurationBucket, ModifiedBucket, Predicate, OrGroup, FilterExpression, StacBrowserItem, VesselTaxonomyNode, FilterEngineConfig, FilterEngine, } from './types';
+export type { CatalogOverviewItem, PlatformField, CompoundPredicate, ArrayFilterPredicate, FilterType, DurationBucket, ModifiedBucket, Predicate, OrGroup, FilterExpression, StacBrowserItem, VesselTaxonomyNode, FilterEngineConfig, FilterEngine, } from './types';
 //# sourceMappingURL=index.d.ts.map
