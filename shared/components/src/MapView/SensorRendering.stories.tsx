@@ -445,3 +445,191 @@ export const Performance: StoryObj = {
     },
   },
 };
+
+// ── Array Offset Comparison (feature 119) ──────────────────────────
+
+/**
+ * Builds the shared scenario exercised in
+ * specs/119-array-offset-calc/evidence — a vessel sails north then turns
+ * 90° east and reports five bearing cuts after the turn.
+ */
+function buildArrayOffsetTrack(mode: 'PLAIN' | 'WORM' | 'MEASURED'): TrackFeature {
+  const baseTime = new Date('2026-01-27T10:00:00Z').getTime();
+  const minute = 60_000;
+
+  const coordinates: [number, number][] = [];
+  const positions: Array<{ time: string; course: number; speed: number }> = [];
+
+  // Northbound leg (fixes 0-14)
+  for (let i = 0; i < 15; i++) {
+    coordinates.push([-5.0, 49.97 + i * 0.002]);
+    positions.push({
+      time: new Date(baseTime + i * minute).toISOString(),
+      course: 0,
+      speed: 12,
+    });
+  }
+  // Eastbound leg (fixes 15-29)
+  for (let i = 0; i < 15; i++) {
+    coordinates.push([-5.0 + (i + 1) * 0.003, 50.0]);
+    positions.push({
+      time: new Date(baseTime + (15 + i) * minute).toISOString(),
+      course: 90,
+      speed: 12,
+    });
+  }
+
+  const contacts: SensorContact[] = [16, 19, 22, 25, 28].map((t, idx) => ({
+    time: new Date(baseTime + t * minute).toISOString(),
+    bearing: 40 + idx * 15, // 40, 55, 70, 85, 100
+    has_bearing: true,
+    range: 3500,
+    visible: true,
+    label: `C${idx + 1}`,
+    show_label: true,
+    put_label_at: 'END',
+    label_location: 'RIGHT',
+    line_style: 'SOLID',
+  }));
+
+  const measuredPositions = [
+    { time: new Date(baseTime + 14 * minute).toISOString(), location: [-4.975, 49.996] },
+    { time: new Date(baseTime + 18 * minute).toISOString(), location: [-4.964, 49.996] },
+    { time: new Date(baseTime + 22 * minute).toISOString(), location: [-4.953, 49.996] },
+    { time: new Date(baseTime + 26 * minute).toISOString(), location: [-4.940, 49.996] },
+  ];
+
+  const colourByMode = {
+    PLAIN: '#FF8F00',
+    WORM: '#8E24AA',
+    MEASURED: '#00838F',
+  } as const;
+
+  const sensor: SensorData = {
+    name: `TOWED_ARRAY_${mode}`,
+    color: colourByMode[mode],
+    visible: true,
+    line_thickness: 2,
+    offset: 1500,
+    array_centre_mode: mode,
+    contacts,
+    measured_positions: mode === 'MEASURED' ? measuredPositions : undefined,
+  };
+
+  return {
+    type: 'Feature',
+    id: `track-array-offset-${mode.toLowerCase()}`,
+    geometry: {
+      type: 'LineString',
+      // eslint-disable-next-line no-restricted-syntax
+      coordinates: coordinates as unknown as number[],
+    },
+    properties: {
+      kind: 'TRACK',
+      platform_id: 'PLT-E07-119',
+      platform_name: `HMS Turner (${mode})`,
+      track_type: 'OWNSHIP',
+      start_time: positions[0]!.time,
+      end_time: positions[positions.length - 1]!.time,
+      positions,
+      style: {
+        line: {
+          color: '#4CAF50',
+          weight: 2.5,
+          opacity: 1,
+        },
+      },
+      sensors: [sensor],
+    },
+    // eslint-disable-next-line no-restricted-syntax
+  } as unknown as TrackFeature;
+}
+
+function ArrayOffsetComparisonDemo() {
+  const baseTime = new Date('2026-01-27T10:00:00Z').getTime();
+  const [currentTime, setCurrentTime] = useState<number>(baseTime + 28 * 60_000);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
+
+  const plainTrack = buildArrayOffsetTrack('PLAIN');
+  const wormTrack = buildArrayOffsetTrack('WORM');
+  const measuredTrack = buildArrayOffsetTrack('MEASURED');
+
+  const panelStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    borderRight: '1px solid #ccc',
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <div style={panelStyle}>
+          <div style={{ padding: '6px 10px', background: '#FF8F00', color: 'white', fontWeight: 600 }}>
+            PLAIN — backtrack along current heading
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[plainTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+        <div style={panelStyle}>
+          <div style={{ padding: '6px 10px', background: '#8E24AA', color: 'white', fontWeight: 600 }}>
+            WORM — walk backward along recorded track
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[wormTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+        <div style={{ ...panelStyle, borderRight: 'none' }}>
+          <div style={{ padding: '6px 10px', background: '#00838F', color: 'white', fontWeight: 600 }}>
+            MEASURED — interpolate measured positions (PLAIN fallback out of range)
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[measuredTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: '8px', borderTop: '1px solid #ccc', background: '#1e1e1e' }}>
+        <TimeController
+          timeExtent={[baseTime, baseTime + 30 * 60_000]}
+          initialTime={currentTime}
+          initialDisplayMode={displayMode}
+          onTimeChange={setCurrentTime}
+          onDisplayModeChange={setDisplayMode}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const ArrayOffsetComparison: StoryObj = {
+  render: () => <ArrayOffsetComparisonDemo />,
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        story:
+          'Three-panel comparison of PLAIN, WORM, and MEASURED array offset modes (feature 119). A vessel sails north, turns 90° east, and reports five bearing cuts after the turn. The towed-array sensor offset is a deliberately large 1500 m so the bearing-line origins are visibly displaced from the vessel position. WORM places the array centre on the pre-turn leg for contacts shortly after the manoeuvre; PLAIN places it 1500 m west along the new heading; MEASURED uses the sensor\'s measured position time-series and falls back to PLAIN for the final contact (outside the measured time range).',
+      },
+    },
+  },
+};

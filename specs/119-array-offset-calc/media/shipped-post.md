@@ -22,6 +22,18 @@ Every sensor bearing line now originates from the *calculated* array centre, cho
 
 The calculation is wired directly into `prepareSensorContacts()`, so the moment a sensor declares `offset` and `array_centre_mode`, bearing lines render from the correct origin. No downstream rendering changes were needed — the integration is one function call per contact.
 
+## What It Looks Like
+
+Three panels, same track, same sensor cuts, one minute after a 90° starboard turn:
+
+![PLAIN vs WORM vs MEASURED comparison](../evidence/plot-comparison.svg)
+
+Contact 1 (just after the turn) is where the modes diverge most. PLAIN plants the array centre 1.5 km straight west of the ship, because the ship is heading east. WORM correctly drops it 1.5 km *south* — on the northbound leg the ship just left — because the cable is still dragging the array through the turn. MEASURED uses the instrumented positions (the little squares); the fifth contact falls outside the measured time range and transparently falls back to PLAIN.
+
+By contact 5 (thirteen minutes later) the ship has been on a straight course long enough for the array to settle, and PLAIN/WORM converge to the same origin.
+
+Every coordinate on that plot is generated from the actual `compute_array_centre` dispatcher — `scripts/119-render-comparison-plots.py` imports the module and projects its outputs directly into SVG. There's no mock, no hand-drawn illustration; the plot regenerates from the current algorithm on demand.
+
 ## How It Works
 
 Three pure functions (`computePlainOffset`, `backtrackAlongTrack`, `interpolateMeasuredPosition`) plus a one-line dispatcher. Each has a bit-identical twin in Python under `services/calc/debrief_calc/tools/sensor/array_offset.py`, because the calc tools that generate range plots and insert sensor arcs need the same array centres the browser draws.
