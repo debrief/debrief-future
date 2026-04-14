@@ -170,6 +170,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators) (181-linkml-platform-overrides)
 - Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing) (182-import-platform-warnings)
 - Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment) (184-regenerate-sample-catalog)
+- Per-plot persistence of the selection alongside other session state in the plot/workspace JSON payload; no new storage layer. Re-resolution happens against live data at restore time — paths that no longer resolve remain in the persisted entry and surface as unresolvable. (186-nested-child-selection)
 
 ## Before Pushing
 
@@ -214,6 +215,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 186-nested-child-selection: Added TypeScript 5.x (session-state, VS Code extension, shared components, web-shell), Python 3.11 (LinkML schemas and Pydantic model generation) + Zustand ^5.0.0 (session-state store), React 18.x + react-leaflet 4.2 (map), Leaflet 1.9.x, LinkML >= 1.7.0 (schema source), gen-pydantic / gen-typescript (derived bindings), VS Code Extension API ^1.85.0, `@debrief/schemas` (generated types), `@debrief/session-state` (store + LogService), `@debrief/components` (MapView, FeatureList)
 - 184-regenerate-sample-catalog: Added Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment)
 - 182-import-platform-warnings: Added Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing)
-- 181-linkml-platform-overrides: Added Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators)

@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Golden fixtures for 186-nested-child-selection. Consumed by vitest (TypeScript) and pytest (Python via LinkML round-trip). Extending 053 fixtures with range, toggle, persistence, and unresolvable cases.",
+
+  "parse_cases": [
+    {
+      "name": "single-segment-whole-feature",
+      "input": "track-hms-defender",
+      "expected": {
+        "normalised": "track-hms-defender",
+        "root": "track-hms-defender",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "name": "depth-1-position",
+      "input": "track-hms-defender/positions/4",
+      "expected": {
+        "normalised": "track-hms-defender/positions/4",
+        "root": "track-hms-defender",
+        "levels": [
+          { "levelName": "positions", "address": "4", "addressingMode": "index" }
+        ],
+        "depth": 1
+      }
+    },
+    {
+      "name": "depth-2-segment-position",
+      "input": "track-hms-defender/segments/leg-alpha/positions/3",
+      "expected": {
+        "normalised": "track-hms-defender/segments/leg-alpha/positions/3",
+        "root": "track-hms-defender",
+        "levels": [
+          { "levelName": "segments", "address": "leg-alpha", "addressingMode": "id" },
+          { "levelName": "positions", "address": "3", "addressingMode": "index" }
+        ],
+        "depth": 2
+      }
+    },
+    {
+      "name": "escaped-slash-in-feature-id",
+      "input": "track~1alpha",
+      "expected": {
+        "normalised": "track~1alpha",
+        "root": "track/alpha",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "name": "escaped-tilde-in-feature-id",
+      "input": "track~0special",
+      "expected": {
+        "normalised": "track~0special",
+        "root": "track~special",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "name": "strip-trailing-slash-on-normalise",
+      "input": "track-001/",
+      "expected": {
+        "normalised": "track-001",
+        "root": "track-001",
+        "levels": [],
+        "depth": 0
+      }
+    }
+  ],
+
+  "reject_cases": [
+    { "name": "empty-string", "input": "", "reason": "empty-path" },
+    { "name": "whitespace-only", "input": "   ", "reason": "empty-path" },
+    { "name": "double-slash", "input": "track//positions/4", "reason": "empty-segment" },
+    { "name": "unknown-level-name", "input": "track-001/bananas/4", "reason": "level-not-in-registry" },
+    { "name": "invalid-escape", "input": "track-001/positions~2/4", "reason": "invalid-escape-sequence" },
+    { "name": "odd-trailing-level-without-address", "input": "track-001/positions", "reason": "level-without-address" },
+    { "name": "id-address-where-index-required", "input": "track-001/positions/leg-alpha", "reason": "invalid-address-for-index-level" }
+  ],
+
+  "range_cases": [
+    {
+      "name": "simple-ascending-range",
+      "anchor": "track-A/positions/4",
+      "target": "track-A/positions/9",
+      "expected": [
+        "track-A/positions/4",
+        "track-A/positions/5",
+        "track-A/positions/6",
+        "track-A/positions/7",
+        "track-A/positions/8",
+        "track-A/positions/9"
+      ]
+    },
+    {
+      "name": "reverse-direction-same-range",
+      "anchor": "track-A/positions/9",
+      "target": "track-A/positions/4",
+      "expected": [
+        "track-A/positions/4",
+        "track-A/positions/5",
+        "track-A/positions/6",
+        "track-A/positions/7",
+        "track-A/positions/8",
+        "track-A/positions/9"
+      ]
+    },
+    {
+      "name": "single-point-degenerate-range",
+      "anchor": "track-A/positions/7",
+      "target": "track-A/positions/7",
+      "expected": ["track-A/positions/7"]
+    },
+    {
+      "name": "nested-range-same-segment",
+      "anchor": "track-A/segments/leg-alpha/positions/2",
+      "target": "track-A/segments/leg-alpha/positions/4",
+      "expected": [
+        "track-A/segments/leg-alpha/positions/2",
+        "track-A/segments/leg-alpha/positions/3",
+        "track-A/segments/leg-alpha/positions/4"
+      ]
+    },
+    {
+      "name": "cross-parent-fails",
+      "anchor": "track-A/positions/3",
+      "target": "track-B/positions/5",
+      "expected": null
+    },
+    {
+      "name": "cross-segment-fails",
+      "anchor": "track-A/segments/leg-alpha/positions/2",
+      "target": "track-A/segments/leg-bravo/positions/4",
+      "expected": null
+    },
+    {
+      "name": "id-level-fails",
+      "anchor": "track-A/segments/leg-alpha",
+      "target": "track-A/segments/leg-bravo",
+      "expected": null,
+      "note": "ID-based levels have no canonical order in the registry; FR-024"
+    }
+  ],
+
+  "toggle_cases": [
+    {
+      "name": "toggle-adds-new",
+      "initial": { "featureIds": ["track-A"], "primary": "track-A", "anchor": "track-A" },
+      "action": { "toggle": "track-B/positions/4" },
+      "expected": {
+        "featureIds": ["track-A", "track-B/positions/4"],
+        "primary": "track-B/positions/4",
+        "anchor": "track-B/positions/4"
+      }
+    },
+    {
+      "name": "toggle-removes-existing",
+      "initial": {
+        "featureIds": ["track-A", "track-B/positions/4"],
+        "primary": "track-B/positions/4",
+        "anchor": "track-B/positions/4"
+      },
+      "action": { "toggle": "track-B/positions/4" },
+      "expected": {
+        "featureIds": ["track-A"],
+        "primary": "track-A",
+        "anchor": "track-B/positions/4",
+        "note": "Primary rebinds to remaining entry; anchor retains the last-clicked path even though it was just removed"
+      }
+    },
+    {
+      "name": "toggle-last-entry-goes-to-empty",
+      "initial": {
+        "featureIds": ["track-A/positions/4"],
+        "primary": "track-A/positions/4",
+        "anchor": "track-A/positions/4"
+      },
+      "action": { "toggle": "track-A/positions/4" },
+      "expected": {
+        "featureIds": [],
+        "primary": null,
+        "anchor": "track-A/positions/4"
+      }
+    }
+  ],
+
+  "persistence_cases": [
+    {
+      "name": "roundtrip-resolvable-paths",
+      "persisted": {
+        "featureIds": ["track-A", "track-A/positions/4"],
+        "primary": "track-A/positions/4",
+        "anchor": "track-A/positions/4",
+        "timestamp": { "iso": "2026-04-14T12:00:00Z" }
+      },
+      "featureCollection": {
+        "track-A": { "positions": 20 }
+      },
+      "expected_selection": {
+        "featureIds": ["track-A", "track-A/positions/4"],
+        "primary": "track-A/positions/4",
+        "anchor": "track-A/positions/4"
+      },
+      "expected_unresolvable": []
+    },
+    {
+      "name": "index-out-of-bounds-after-shrink",
+      "persisted": {
+        "featureIds": ["track-A/positions/15"],
+        "primary": "track-A/positions/15",
+        "anchor": "track-A/positions/15",
+        "timestamp": { "iso": "2026-04-14T12:00:00Z" }
+      },
+      "featureCollection": {
+        "track-A": { "positions": 10 }
+      },
+      "expected_selection": {
+        "featureIds": ["track-A/positions/15"],
+        "primary": "track-A/positions/15",
+        "anchor": "track-A/positions/15"
+      },
+      "expected_unresolvable": [
+        {
+          "path": "track-A/positions/15",
+          "reason": "index-out-of-bounds",
+          "discoveredAt": "restore-time"
+        }
+      ]
+    },
+    {
+      "name": "feature-not-found",
+      "persisted": {
+        "featureIds": ["track-ghost"],
+        "primary": "track-ghost",
+        "anchor": "track-ghost",
+        "timestamp": { "iso": "2026-04-14T12:00:00Z" }
+      },
+      "featureCollection": {},
+      "expected_selection": {
+        "featureIds": ["track-ghost"],
+        "primary": "track-ghost",
+        "anchor": "track-ghost"
+      },
+      "expected_unresolvable": [
+        {
+          "path": "track-ghost",
+          "reason": "feature-not-found",
+          "discoveredAt": "restore-time"
+        }
+      ]
+    }
+  ]
+}

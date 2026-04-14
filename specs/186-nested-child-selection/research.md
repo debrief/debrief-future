@@ -95,3 +95,103 @@ Keep the existing flat feature-ID form as a first-class alternative representati
 - [CONSTITUTION.md](../../CONSTITUTION.md) — Articles II, XIV, XV
 - [specs/053-nested-child-selection/](../053-nested-child-selection/) — earlier iteration of this feature; retained for historical context
 - [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) — JSON Pointer escaping conventions
+
+---
+
+## Phase 0: Integration & Dependency Patterns
+
+This section records the implementation-phase decisions raised by `/speckit.plan` Phase 0 — integration patterns with existing infrastructure, dependency posture, and cross-cutting concerns.
+
+### Integration with existing `selectionPath.ts` (from feature 053)
+
+**Decision**: Retain and refactor the existing `services/session-state/src/utils/selectionPath.ts` rather than replace it.
+
+**Rationale**: The module already implements `parsePath`, `buildPath`, `getRoot`, `getDepth`, `getParent`, `escapeSegment`, `unescapeSegment`, and a hardcoded `LEVEL_REGISTRY`. The 186 delta is to (a) replace the hardcoded registry with a LinkML-derived binding (FR-004), (b) add strict validation that rejects unknown level names at the boundary (FR-005), (c) add a `computeRange(anchor, target)` helper for FR-022, and (d) remove any remaining flat-ID fallback logic from callers.
+
+**Alternatives considered**:
+
+- *Rewrite from scratch.* Rejected — the existing utilities have golden-fixture coverage; re-deriving the same API adds risk without benefit.
+- *Leave registry hardcoded, add a comment that LinkML is aspirational.* Rejected — violates Article II.1 (single source of truth); defers work that is already in scope.
+
+### Level Registry binding path
+
+**Decision**: The Level Registry source lives in LinkML (`shared/schemas/src/linkml/session-state.yaml`). TypeScript binding is generated via `gen-typescript`; Pydantic binding via `gen-pydantic`. The runtime TypeScript `LEVEL_REGISTRY` constant is populated at module-load time by importing the generated enum/values, not by hand-authored entries.
+
+**Rationale**: Article II.1 requires LinkML to be the single source of truth; Article XV.4 requires generated types to be fully typed with no `any`. A runtime lookup table derived from the generated enum satisfies both.
+
+**Alternatives considered**:
+
+- *Generate the registry as a JSON file consumed at runtime.* Rejected — adds a file format boundary for no gain when the TypeScript binding can carry the data directly.
+- *Duplicate the registry in both Python and TypeScript and test they agree.* Rejected — the schema adherence tests already exist; generating from a single source is simpler and less error-prone.
+
+### Persistence integration
+
+**Decision**: Extend `services/session-state/src/persistence/{save.ts,load.ts}` to write/read the `FeatureSelection` (including the new `anchor` field) with the plot's other session state. Add a new `resolve.ts` module responsible for re-resolving persisted paths against live feature data and flagging entries that cannot be resolved. `load.ts` calls into `resolve.ts` after raw deserialisation.
+
+**Rationale**: The save/load pair already handles other session-state slices. Separating "deserialise bytes" from "validate against current data" is the cleanest boundary — `save.ts` and `load.ts` remain pure data plumbing, while `resolve.ts` encapsulates the new semantic check. This keeps unresolvable-handling testable in isolation.
+
+**Alternatives considered**:
+
+- *Resolve during selection, not on load.* Rejected — restore-time resolution is required by FR-018, and doing it lazily would let the UI render a stale selection before the user sees the flag.
+- *Store the resolved state alongside the raw paths.* Rejected — resolution is dynamic against current data, so any cached resolution would drift immediately. Re-resolving on load is cheap (one hash-map lookup per path) and always correct.
+
+### Observability integration — LogService
+
+**Decision**: Every unresolvable-path occurrence emits a structured log entry via the existing `@debrief/session-state` `LogService.recordEvent` path (the same hook used by `recordFileSaved` in feature 178). Schema for the entry is defined in `contracts/log-schema.ts`. Log level: `warning`.
+
+**Rationale**: LogService is the existing sanctioned observability channel in the TypeScript stack; routing through it gives us free integration with the Log Panel (feature 176) and any downstream telemetry without inventing a parallel signal path. `warning` level (not `error`) matches the user-visible-degradation framing of FR-027.
+
+**Alternatives considered**:
+
+- *console.warn / console.error.* Rejected — bypasses LogService and loses structured context; also strict-linting would flag it.
+- *Custom telemetry hook.* Rejected — no compliance driver, LogService suffices.
+
+### Click modifier dispatch (map → store)
+
+**Decision**: Map click handlers emit click events with an explicit modifier state object `{ shift: boolean, ctrl: boolean, meta: boolean }`. The store-side action router maps `{}` → `setSelection` (replace), `{ctrl}` → `toggleInSelection`, `{shift}` → `selectRange(anchor, target)`. Other modifier combinations (e.g. `{ctrl, shift}`) are reserved but not wired in 186 — they fall back to `toggleInSelection` to avoid silently doing nothing.
+
+**Rationale**: Keeping modifier state at the event boundary (not in global state) preserves testability — each store action has a clean, modifier-free signature. The VS Code webview click message already passes through `apps/vscode/src/webview/messages.ts`, so this is a schema extension, not a new channel.
+
+**Alternatives considered**:
+
+- *One action `handleMapClick(event)` that inspects modifiers internally.* Rejected — harder to unit test; each branch deserves its own action for golden fixtures.
+- *Per-modifier message types.* Rejected — explodes the message protocol for no semantic gain.
+
+### Ordering constraint for Shift+click range (FR-024)
+
+**Decision**: Range selection is computed by `computeRange(anchorPath, targetPath, registry)`. It requires the anchor and target to share their full prefix up to the last level-name segment, and that last level's addressing mode must be `index`. If either condition fails, the function returns `null` and the caller (`selectRange` action) falls back to `setSelection` per FR-023.
+
+**Rationale**: This makes the "same immediate parent" and "ordering available" checks explicit and unit-testable. It also naturally defers any future "canonical order for ID-based levels" (FR-024 extension) to a registry field — we can add `canonicalOrder` to `LevelDefinition` later without changing callers.
+
+**Alternatives considered**:
+
+- *Compute range at the store level with inline checks.* Rejected — puts domain logic in the store, hurting testability.
+- *Error out on cross-parent Shift+click.* Rejected — FR-023 explicitly requires fallback to single-click replace, not an error.
+
+### Performance strategy — 100 ms / 1,000 paths (FR-025)
+
+**Decision**: Selection-change response time is measured end-to-end from click dispatch to (a) map highlights applied AND (b) downstream panel updates flushed. Implementation strategy:
+
+- Store writes are O(N) in the selection size for toggle/range operations; acceptable at N ≤ 1,000.
+- Map rendering uses batched Leaflet style updates via a single `requestAnimationFrame` flush per selection change.
+- Panel subscriptions are already diffed by Zustand; no new subscription granularity required.
+- Benchmarks live in `services/session-state/tests/integration/selection-performance.test.ts` with a CI threshold; regressions beyond 100 ms fail CI.
+
+**Rationale**: The existing Zustand store already handles bulk updates cleanly. The bottleneck risk is in Leaflet — hundreds of individual marker style updates in a tight loop can jank. Batching into one animation frame keeps us within budget without pulling in a virtualisation library.
+
+**Alternatives considered**:
+
+- *Virtualise map markers.* Deferred — not required at 1,000-path scale; introduces complexity and a new dependency.
+- *Store selection as a Set instead of an array.* Rejected for now — uniqueness is enforced at the action layer (FR-016) and ordering matters for primary-designation tie-breaking. A Set would lose order.
+
+### Dependency posture — no new external dependencies
+
+**Decision**: The feature ships with no additions to `package.json`, `pyproject.toml`, or any lockfile.
+
+**Rationale**: Article IX.1 (minimal, vetted dependencies) and the offline-by-default reliability bar (Article I.1). Every piece of required functionality is achievable with the existing stack.
+
+**Alternatives considered**:
+
+- *Pull in `immer` for ergonomic immutable updates in the store.* Rejected — Zustand handles immutability idiomatically; adding `immer` would be unused lift.
+- *Pull in `fast-deep-equal` for range deduplication.* Rejected — paths are strings; `Set`-backed uniqueness is O(1) and dependency-free.
+
