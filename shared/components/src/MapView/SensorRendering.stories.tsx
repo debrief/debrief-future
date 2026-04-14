@@ -445,3 +445,135 @@ export const Performance: StoryObj = {
     },
   },
 };
+
+// ── Array Offset Comparison (feature 119) ──────────────────────────
+
+// eslint-disable-next-line no-restricted-syntax
+import sensorsTurnFixture from '../../../schemas/src/fixtures/valid/track-feature-sensors-turn-01.json';
+
+/**
+ * Loads the shared `track-feature-sensors-turn-01.json` fixture and tweaks
+ * the sensor's mode / colour so each of the three modes renders visibly
+ * differently.  The rest of the fixture (track geometry, contacts,
+ * measured positions) is identical across panels — exactly what the
+ * evidence comparison plots use.
+ */
+function buildArrayOffsetTrack(mode: 'PLAIN' | 'WORM' | 'MEASURED'): TrackFeature {
+  const colourByMode = {
+    PLAIN: '#FF8F00',
+    WORM: '#8E24AA',
+    MEASURED: '#00838F',
+  } as const;
+
+  // eslint-disable-next-line no-restricted-syntax
+  const cloned = JSON.parse(JSON.stringify(sensorsTurnFixture)) as Record<string, unknown>;
+  // eslint-disable-next-line no-restricted-syntax
+  const props = cloned.properties as Record<string, unknown>;
+  // eslint-disable-next-line no-restricted-syntax
+  const sensors = props.sensors as Array<Record<string, unknown>>;
+  const sensor = sensors[0]!;
+  sensor.array_centre_mode = mode;
+  sensor.color = colourByMode[mode];
+  sensor.name = `TOWED_ARRAY_${mode}`;
+  if (mode !== 'MEASURED') {
+    delete sensor.measured_positions;
+  }
+  cloned.id = `track-array-offset-${mode.toLowerCase()}`;
+  // eslint-disable-next-line no-restricted-syntax
+  return cloned as unknown as TrackFeature;
+}
+
+function ArrayOffsetComparisonDemo() {
+  const baseTime = new Date('2026-01-27T10:00:00Z').getTime();
+  const [currentTime, setCurrentTime] = useState<number>(baseTime + 28 * 60_000);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
+
+  const plainTrack = buildArrayOffsetTrack('PLAIN');
+  const wormTrack = buildArrayOffsetTrack('WORM');
+  const measuredTrack = buildArrayOffsetTrack('MEASURED');
+
+  const panelStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    borderRight: '1px solid #ccc',
+  };
+
+  return (
+    <div
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      data-testid="array-offset-comparison-root"
+    >
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <div style={panelStyle} data-testid="array-offset-panel-plain">
+          <div style={{ padding: '6px 10px', background: '#FF8F00', color: 'white', fontWeight: 600 }}>
+            PLAIN — backtrack along current heading
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[plainTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+        <div style={panelStyle} data-testid="array-offset-panel-worm">
+          <div style={{ padding: '6px 10px', background: '#8E24AA', color: 'white', fontWeight: 600 }}>
+            WORM — walk backward along recorded track
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[wormTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+        <div
+          style={{ ...panelStyle, borderRight: 'none' }}
+          data-testid="array-offset-panel-measured"
+        >
+          <div style={{ padding: '6px 10px', background: '#00838F', color: 'white', fontWeight: 600 }}>
+            MEASURED — interpolate measured positions (PLAIN fallback out of range)
+          </div>
+          <div style={{ flex: 1 }}>
+            <MapView
+              features={[measuredTrack]}
+              currentTime={currentTime}
+              displayMode={displayMode}
+              height="100%"
+              autoFitBounds
+            />
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: '8px', borderTop: '1px solid #ccc', background: '#1e1e1e' }}>
+        <TimeController
+          timeExtent={[baseTime, baseTime + 30 * 60_000]}
+          initialTime={currentTime}
+          initialDisplayMode={displayMode}
+          onTimeChange={setCurrentTime}
+          onDisplayModeChange={setDisplayMode}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const ArrayOffsetComparison: StoryObj = {
+  render: () => <ArrayOffsetComparisonDemo />,
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        story:
+          'Three-panel comparison of PLAIN, WORM, and MEASURED array offset modes (feature 119). A vessel sails north, turns 90° east, and reports five bearing cuts after the turn. The towed-array sensor offset is a deliberately large 1500 m so the bearing-line origins are visibly displaced from the vessel position. WORM places the array centre on the pre-turn leg for contacts shortly after the manoeuvre; PLAIN places it 1500 m west along the new heading; MEASURED uses the sensor\'s measured position time-series and falls back to PLAIN for the final contact (outside the measured time range).',
+      },
+    },
+  },
+};

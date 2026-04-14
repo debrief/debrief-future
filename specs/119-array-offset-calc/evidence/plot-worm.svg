@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 460"
+     font-family="Segoe UI, Arial, sans-serif">
+  <text x="250.0" y="22" text-anchor="middle"
+        style="font: bold 15px sans-serif; fill: #333">
+    Track + bearing cuts — WORM array offset mode (1500 m offset)
+  </text>
+  <g transform="translate(0,40)">
+<clipPath id="clip-worm"><rect width="500" height="380"/></clipPath>
+<g clip-path="url(#clip-worm)">
+<rect width="500" height="380" fill="#FAFAFA" stroke="#CCC"/>
+<text x="250.0" y="22" text-anchor="middle" style="font: 600 14px sans-serif; fill: #333">WORM mode</text>
+<path d="M28.0,352.0 L28.0,337.0 L28.0,322.1 L28.0,307.1 L28.0,292.2 L28.0,277.2 L28.0,262.3 L28.0,247.3 L28.0,232.3 L28.0,217.4 L28.0,202.4 L28.0,187.5 L28.0,172.5 L28.0,157.6 L28.0,142.6 L42.4,127.6 L56.8,127.6 L71.3,127.6 L85.7,127.6 L100.1,127.6 L114.5,127.6 L129.0,127.6 L143.4,127.6 L157.8,127.6 L172.2,127.6 L186.7,127.6 L201.1,127.6 L215.5,127.6 L229.9,127.6 L244.4,127.6" stroke="#4CAF50" stroke-width="2.5" fill="none"/>
+<circle cx="28.0" cy="352.0" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="307.1" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="262.3" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="217.4" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="172.5" r="1.8" fill="#2E7D32"/>
+<circle cx="42.4" cy="127.6" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="127.6" r="1.8" fill="#2E7D32"/>
+<circle cx="129.0" cy="127.6" r="1.8" fill="#2E7D32"/>
+<circle cx="172.2" cy="127.6" r="1.8" fill="#2E7D32"/>
+<circle cx="215.5" cy="127.6" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="142.6" r="3.5" fill="#1B5E20"/>
+<circle cx="56.8" cy="127.6" r="3" fill="#1976D2"/>
+<circle cx="100.1" cy="127.6" r="3" fill="#1976D2"/>
+<circle cx="143.4" cy="127.6" r="3" fill="#1976D2"/>
+<circle cx="186.7" cy="127.6" r="3" fill="#1976D2"/>
+<circle cx="229.9" cy="127.6" r="3" fill="#1976D2"/>
+<line x1="28.0" y1="208.3" x2="179.4" y2="28.0" stroke="#8E24AA" stroke-width="1.2" opacity="0.85"/>
+<circle cx="28.0" cy="208.3" r="4" fill="#8E24AA" stroke="#333" stroke-width="0.8"/>
+<line x1="56.8" y1="127.6" x2="28.0" y2="208.3" stroke="#8E24AA" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="28.0" y1="165.0" x2="220.9" y2="30.1" stroke="#8E24AA" stroke-width="1.2" opacity="0.85"/>
+<circle cx="28.0" cy="165.0" r="4" fill="#8E24AA" stroke="#333" stroke-width="0.8"/>
+<line x1="100.1" y1="127.6" x2="28.0" y2="165.0" stroke="#8E24AA" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="42.5" y1="127.6" x2="263.8" y2="47.2" stroke="#8E24AA" stroke-width="1.2" opacity="0.85"/>
+<circle cx="42.5" cy="127.6" r="4" fill="#8E24AA" stroke="#333" stroke-width="0.8"/>
+<line x1="143.4" y1="127.6" x2="42.5" y2="127.6" stroke="#8E24AA" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="85.8" y1="127.6" x2="320.3" y2="107.2" stroke="#8E24AA" stroke-width="1.2" opacity="0.85"/>
+<circle cx="85.8" cy="127.6" r="4" fill="#8E24AA" stroke="#333" stroke-width="0.8"/>
+<line x1="186.7" y1="127.6" x2="85.8" y2="127.6" stroke="#8E24AA" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="129.0" y1="127.6" x2="360.9" y2="168.6" stroke="#8E24AA" stroke-width="1.2" opacity="0.85"/>
+<circle cx="129.0" cy="127.6" r="4" fill="#8E24AA" stroke="#333" stroke-width="0.8"/>
+<line x1="229.9" y1="127.6" x2="129.0" y2="127.6" stroke="#8E24AA" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+</g>
+</g>
+  <text x="250.0" y="442" text-anchor="middle"
+        style="font: 11px sans-serif; fill: #777">
+    Vessel sails north, turns east at marked point; 5 contacts reported after the turn.
+  </text>
+</svg>
