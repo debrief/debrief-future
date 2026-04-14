@@ -113,7 +113,7 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### LLM clients
 
-- [ ] T024 [US1] Implement `createRecordedLLMClient(responses)` — canonicalises phrase on lookup, throws loudly on miss or `promptHash` mismatch with a "re-record" diagnostic `shared/components/src/nl-cql2/clients.ts`
+- [ ] T024 [US1] Implement `createRecordedLLMClient(responses)` — canonicalises phrase on lookup, throws loudly on miss or `promptHash` mismatch with a "re-author the fixture" diagnostic `shared/components/src/nl-cql2/clients.ts`
 - [ ] T025 [US1] Implement `createPassthroughLLMClient(fn)` trivial wrapper `shared/components/src/nl-cql2/clients.ts`
 - [ ] T026 [P][test] [US1] Client unit tests — RecordedLLMClient hit/miss/hash-mismatch, PassthroughLLMClient forwards correctly `shared/components/src/nl-cql2/__tests__/clients.test.ts`
 
@@ -128,7 +128,7 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 - [ ] T030 [US1] Implement `loadSampleCatalog()` under `__tests__/` — reads `${DEBRIEF_REPO_ROOT}/preview/workspace/samples/local-store/catalog.json` plus referenced items, returns `StacBrowserItem[]` `shared/components/src/nl-cql2/__tests__/harness.ts`
 - [ ] T031 [US1] Implement `runHarness(corpus, client, enums, catalog)` — per-phrase loop calling `generateCql2` then `filterByCql2Json`, capturing CQL2 on PASS (decision 12A), returning typed `HarnessReport` with `promptSizeBytes` and `elapsedMs` `shared/components/src/nl-cql2/__tests__/harness.ts`
 - [ ] T032 [US1] Author the 9-phrase corpus fixture covering every CQL2 dimension (nationality, domain, vessel role, vessel type, exercise, tags, year, compound platform predicate, unrecognised term) `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
-- [ ] T033 [US1] Record LLM responses for each corpus phrase against a real model; write `{ rawResponse, promptHash, recordedAt, model }` entries `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
+- [ ] T033 [US1] Hand-author LLM response fixtures for each corpus phrase — write `{ rawResponse, promptHash, authoredAt, authoredBy }` entries conforming to `llm-response.schema.json`. Authoring should be realistic (the CQL2 must actually evaluate to the expected match count via `filterByCql2Json`) rather than fabricated. No live model is invoked during authoring. `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
 - [ ] T034 [test] [US1] Corpus regression test — single assertion block: `report.failed.length === 0`, `report.promptSizeBytes < 20_480` (SC-004 per 15A), `report.elapsedMs < 120_000` (SC-003), formatting failures into the vitest error message `shared/components/src/nl-cql2/__tests__/corpus.test.ts`
 
 ### Prompt-size measurement
@@ -147,10 +147,10 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 - [ ] T036 [US2] Implement `createBadLLMClient(rawResponse)` test helper returning a client that always yields the given (deliberately-broken) response `shared/components/src/nl-cql2/__tests__/badClient.ts`
 - [ ] T037 [test] [US2] Harness self-test — asserts `report.failed.length > 0` with reason `malformed-json` when `BadLLMClient` is injected, automating SC-006 (decision 9A) `shared/components/src/nl-cql2/__tests__/harness-self-test.ts`
-- [ ] T038 [US2] Write a fixture-recording script that builds the prompt for each corpus phrase, calls a `PassthroughLLMClient`, and writes the raw responses + hashes back to `responses.json` `shared/components/scripts/record-nl-fixtures.ts`
+- [ ] T038 [US2] Write a fixture-maintenance script that rebuilds the prompt for each corpus phrase, recomputes `promptHash`, and rewrites those hashes into `responses.json` (leaving `rawResponse` bodies untouched). This lets an author update the prompt template, re-hash in one command, then hand-edit response bodies where semantic changes are needed. `shared/components/scripts/rehash-nl-fixtures.ts`
 - [ ] T039 [US2] Capture the harness report as evidence (all 9 phrases, CQL2 visible on PASS per 12A) `specs/188-nl-cql2-prompt/evidence/harness-report.txt`
 
-**Checkpoint**: US2 green. Developers have a self-verified harness plus a fixture-recording tool.
+**Checkpoint**: US2 green. Developers have a self-verified harness plus a fixture-maintenance tool.
 
 ---
 
@@ -161,7 +161,7 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 **Independent Test**: The corpus includes phrases like "Klingon warbirds" (expected `unrecognisedTerms: ["klingon", "warbirds"]`, `matchCount: null`); these phrases pass the harness.
 
 - [ ] T040 [US3] Add three unrecognised-term corpus phrases covering: (a) unknown nationality code, (b) well-formed query with one recognised + one unrecognised term, (c) entirely unrecognisable phrase `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
-- [ ] T041 [US3] Record LLM responses for the three new phrases and append to `responses.json` `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
+- [ ] T041 [US3] Hand-author LLM response fixtures for the three new unrecognised-term phrases and append to `responses.json` (same format as T033; no live model invoked) `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
 - [ ] T042 [P][test] [US3] Targeted parseResponse tests for the leak-visitor walking through `array_filter(platforms, nationality='leaked')`, `or` groups containing leaked values, and `a_containedBy` value arrays (extends T022 coverage with realistic shapes) `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
 
 **Checkpoint**: US3 green. The corpus now provably covers the P3 acceptance.
@@ -178,7 +178,7 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Media Content
 
-- [ ] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 transport, #190 demo UI) `specs/188-nl-cql2-prompt/media/shipped-post.md`
+- [ ] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 Stakeholder Demo UI, #190 Live LLM Transport) `specs/188-nl-cql2-prompt/media/shipped-post.md`
 - [ ] T047 [P] Draft the LinkedIn shipped summary (150–200 words, hook, link placeholder to shipped-post.md) `specs/188-nl-cql2-prompt/media/linkedin-shipped.md`
 
 ### PR Creation
@@ -203,7 +203,7 @@ Within Phase 3:
   T015 (schemaDescription) ──► T016 (buildPrompt) ──► T027 (generateCql2)
   T024/T025 (clients) ──► T027
   T027 ──► T031 (runHarness) ──► T034 (corpus.test.ts)
-  T032 (corpus fixture) ──► T033 (recorded responses) ──► T034
+  T032 (corpus fixture) ──► T033 (hand-authored response fixtures) ──► T034
   T035 (prompt-size) depends only on T016.
 
 Within Phase 4: T036 ──► T037. T038 can run in parallel with T036/T037.
@@ -226,7 +226,7 @@ Deliver in three landings:
 
 1. **Foundational** (Phases 1–2). Filter-engine reverse parser + `PROPERTY_MAP` export, green tests, round-trip evidence. Small, reviewable; can ship as a standalone PR if needed though the plan is to keep it bundled with 188.
 2. **US1 increment** (Phase 3). Full generator + corpus + 9 phrases green. This is the acceptance gate for the spec.
-3. **Polish + downstream unlocks** (Phases 4–6). Self-tests, recorder script, evidence, media, PR.
+3. **Polish + downstream unlocks** (Phases 4–6). Self-tests, fixture-maintenance script, evidence, media, PR.
 
 Each phase ends green with `task verify` passing before the next begins.
 

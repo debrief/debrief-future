@@ -8,7 +8,7 @@
 
 Build a natural-language → CQL2 generator that composes a fixed-size prompt (CQL2 schema + extracted enums + array_filter syntax) and returns a structured `GenerationResult` (CQL2 filter + `LozengeSeed[]` + unrecognised terms). Ship with a headless regression harness that replays a corpus of analyst phrases through the generator, evaluates the generated CQL2 against the local sample catalog using the existing filter-engine, and compares match counts to recorded baselines.
 
-The generator module lives inside the existing `shared/components` package next to the `filter-engine/`. The LLM call is behind an injectable `LLMClient` interface so transport/auth (owned by item #189) stays decoupled; CI runs against a recorded-response fixture for determinism.
+The generator module lives inside the existing `shared/components` package next to the `filter-engine/`. The LLM call is behind an injectable `LLMClient` interface so a future live-transport implementation (owned by item #190 — Live LLM Transport) can plug in without touching the generator. 188 itself ships only recorded/stub clients; CI and offline stakeholder demos run against a hand-authored fixture corpus for full determinism and zero live-LLM dependency.
 
 **Scope additions adopted from `/speckit.review`**:
 
@@ -24,7 +24,7 @@ These are in-scope for 188; the user chose to include them rather than defer.
 **Primary Dependencies**: existing `@debrief/components` workspace package; existing `filter-engine/` module (#126 + #185) — **modified** in 188 to add `cql2JsonToFilterExpression`, `filterByCql2Json`, and an exported `PROPERTY_MAP`; existing `FilterBar/types.ts` (#127) supplies the `LozengeItem` shape the generator reuses; `cql2-filters-parser` (already a transitive dep). No new runtime dependencies.
 **Storage**: None. Inputs are read-only JSON files on disk. The generator is stateless; the harness writes reports to stdout / vitest output only.
 **Testing**: vitest (already used across `shared/components`). The regression harness lives under `__tests__/` (per review decision 13A, not shipped in `dist/`) and runs as part of `pnpm --filter @debrief/components test`. Unit tests cover prompt composition, each `GenerationErrorReason` value, the new reverse parser's throw paths, `PROPERTY_MAP` exhaustiveness against the `FilterType` union, the harness self-test with a `BadLLMClient`, and the short-circuit for empty/whitespace phrases.
-**Target Platform**: Node 20+ for CI + harness; browser-compatible for future direct consumption in #189/#190 (no Node-only APIs used in the production module — only the harness under `__tests__/` touches `fs`).
+**Target Platform**: Node 20+ for CI + harness; browser-compatible for future direct consumption in #189 (Stakeholder Demo UI) and #190 (Live LLM Transport) — no Node-only APIs used in the production module; only the harness under `__tests__/` touches `fs`.
 **Project Type**: single TypeScript monorepo (pnpm workspaces); this feature adds one new module inside `@debrief/components` and modifies `filter-engine/`.
 **Performance Goals**: Harness completes in under 2 minutes against recorded fixtures (SC-003, asserted); prompt build for a single phrase under 10 ms (trivial string composition).
 **Constraints**: Offline by default — recorded-fixture mode MUST NOT attempt any network I/O. Prompt size under 20 KB for the current sample catalog (SC-004, asserted by decision 15A). No `any` types (Article XV). Strict-mode TypeScript.
@@ -36,18 +36,18 @@ These are in-scope for 188; the user chose to include them rather than defer.
 
 | Article | Applies? | How this plan complies |
 |---------|----------|------------------------|
-| I. Defence-Grade Reliability | Yes | Recorded-fixture mode makes the harness fully offline and reproducible (same prompt + recorded response → identical result). Live mode is opt-in for authoring. No silent failures: five enumerated `GenerationErrorReason` values cover every generator failure path; decision 8A's `cql2-evaluation-failed` closes the last loophole. Decision 12A keeps CQL2 visible on PASS so re-record drift cannot hide behind coincidental match counts. |
+| I. Defence-Grade Reliability | Yes | The harness runs fully offline and reproducible against hand-authored fixtures (same prompt + fixture → identical result). 188 does not invoke any live model; live-transport concerns are owned by #190. No silent failures: five enumerated `GenerationErrorReason` values cover every generator failure path; decision 8A's `cql2-evaluation-failed` closes the last loophole. Decision 12A keeps CQL2 visible on PASS so fixture drift cannot hide behind coincidental match counts. |
 | II. Schema Integrity | Yes | No LinkML changes. The prompt's CQL2 schema block imports `PROPERTY_MAP` from `filter-engine/cql2-json.ts` (decision 3A) — a single source of truth. Decision 11A adds an exhaustiveness test asserting every `FilterType` union value is a key in `PROPERTY_MAP`. The new reverse parser (`cql2JsonToFilterExpression`) is the canonical CQL2-JSON → FilterExpression path, replacing the risk of ad-hoc partial parsers drifting from the evaluator. |
 | III. Data Sovereignty | Yes | No telemetry. No network calls in default (recorded) mode. Provenance captured in `GenerationResult.diagnostics` (prompt version, response hash). |
-| IV. Architectural Boundaries | Yes | This is a library module — no UI, no persistence. Consumed by future frontends (#190) without coupling. Returns data only. Chip output uses the canonical `LozengeItem` shape (via `LozengeSeed`) so frontends need no mapper layer. |
-| V. Extensibility | Yes | `LLMClient` interface is the extension point; organisations can plug in alternative transports (MCP tool, proxy, local model) via #189 without editing the generator. |
+| IV. Architectural Boundaries | Yes | This is a library module — no UI, no persistence. Consumed by future frontends (#189 Stakeholder Demo UI) without coupling. Returns data only. Chip output uses the canonical `LozengeItem` shape (via `LozengeSeed`) so frontends need no mapper layer. |
+| V. Extensibility | Yes | `LLMClient` interface is the extension point; organisations can plug in alternative transports (MCP tool, proxy, local model) via #190 (Live LLM Transport) without editing the generator. |
 | VI. Testing | Yes | Vitest unit tests for prompt composition, each `GenerationErrorReason`, reverse parser throw paths, and `PROPERTY_MAP` exhaustiveness. Corpus-driven integration test is the acceptance gate. A dedicated harness self-test (decision 9A) automates SC-006 — the harness's own regression-detection capability. Wired into CI via the existing `pnpm test` step. |
 | VII. Test-Driven AI Collaboration | Yes | The phrase corpus IS the executable acceptance spec for the prompt. Checklist in the spec feeds the harness's comparison logic (by match count, not string equality). |
 | VIII. Documentation | Yes | Spec + plan + research captured in `specs/188-nl-cql2-prompt/`. Public API of the new module documented via TSDoc. |
 | IX. Dependencies | Yes | Zero new runtime dependencies. Harness uses only stdlib + existing dev-deps. |
-| X. Security | Yes | No secrets. LLM transport (where real API keys would live) is #189's concern; this item's library accepts a pre-configured `LLMClient` and never sees credentials. |
+| X. Security | Yes | No secrets. LLM transport (where real API keys would live) is #190's concern; this item's library accepts a pre-configured `LLMClient` and never sees credentials. 188 has no live-model code path at all. |
 | XI. Internationalisation | Noted | English-only in scope (documented assumption in spec). `LozengeSeed.value` is a plain string and the consumer's `Lozenge` component owns display formatting — future i18n sits at the display layer, not in the generator output. |
-| XII. Community Engagement | N/A | No user-visible feature here; #190 will handle stakeholder preview. |
+| XII. Community Engagement | N/A | No user-visible feature here; #189 (Stakeholder Demo UI) will handle stakeholder preview. |
 | XIII. Contribution Standards | Yes | Single feature branch; atomic commits; CI-gated. |
 | XIV. Pre-Release Freedom | Yes | Pre-v4.0.0 — free to evolve the prompt API as feedback arrives. |
 | XV. Strict Type Safety | Yes | No `any`. Every LLM-returned value crosses a typed validation boundary (`parseGenerationResult`) before entering application code. |
@@ -111,7 +111,7 @@ shared/components/
 
 ## Media Components
 
-None - backend/infrastructure feature. This item produces a library module and a headless test harness; it has no visual components. The stakeholder-facing UI that consumes the generated chips lives in item #190.
+None - backend/infrastructure feature. This item produces a library module and a headless test harness; it has no visual components. The stakeholder-facing UI that consumes the generated chips lives in item #189.
 
 ## Storybook E2E Testing
 
