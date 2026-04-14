@@ -170,6 +170,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators) (181-linkml-platform-overrides)
 - Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing) (182-import-platform-warnings)
 - Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment) (184-regenerate-sample-catalog)
+- TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use) (186-filter-chips)
 
 ## Before Pushing
 
@@ -214,6 +215,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 186-filter-chips: Added TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use)
 - 184-regenerate-sample-catalog: Added Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment)
 - 182-import-platform-warnings: Added Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing)
-- 181-linkml-platform-overrides: Added Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators)
