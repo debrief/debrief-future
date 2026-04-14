@@ -181,7 +181,7 @@ No new production code — US3 confirms the conservative-extraction behaviour de
 
 ### PR Creation
 
-- [ ] T045 Create PR and publish blog: run `/speckit.pr`
+- [x] T045 Create PR and publish blog: run `/speckit.pr`
 
 **Task T045 must run last. It depends on every preceding task being complete.**
 
