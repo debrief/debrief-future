@@ -1,0 +1,52 @@
+{
+  "phrase": "UK frigates",
+  "cql2": {
+    "op": "array_filter",
+    "args": [
+      {
+        "property": "debrief:platforms"
+      },
+      {
+        "op": "and",
+        "args": [
+          {
+            "op": "=",
+            "args": [
+              {
+                "property": "nationality"
+              },
+              "GB"
+            ]
+          },
+          {
+            "op": "=",
+            "args": [
+              {
+                "property": "vessel_role"
+              },
+              "frigate"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "lozenges": [
+    {
+      "filterType": "nationality",
+      "value": "GB"
+    },
+    {
+      "filterType": "vessel-class",
+      "value": "frigate"
+    }
+  ],
+  "unrecognisedTerms": [],
+  "error": null,
+  "diagnostics": {
+    "promptVersion": "2026-04-14.1",
+    "promptHash": "c05cb08fc7c3d1973840a33108a3b0b9743f08482071ce0614539cc0016aca75",
+    "responseHash": "6eb2c419bcb5e618382a85eb61a50b808d599a5f2bf2d12dc4e91e6b7c3e1fcc",
+    "usedLlm": true
+  }
+}

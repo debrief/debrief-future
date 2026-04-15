@@ -125,11 +125,11 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Harness — only the core corpus runner (US1's acceptance)
 
-- [ ] T030 [US1] Implement `loadSampleCatalog()` under `__tests__/` — reads `${DEBRIEF_REPO_ROOT}/preview/workspace/samples/local-store/catalog.json` plus referenced items, returns `StacBrowserItem[]` `shared/components/src/nl-cql2/__tests__/harness.ts`
-- [ ] T031 [US1] Implement `runHarness(corpus, client, enums, catalog)` — per-phrase loop calling `generateCql2` then `filterByCql2Json`, capturing CQL2 on PASS (decision 12A), returning typed `HarnessReport` with `promptSizeBytes` and `elapsedMs` `shared/components/src/nl-cql2/__tests__/harness.ts`
-- [ ] T032 [US1] Author the 9-phrase corpus fixture covering every CQL2 dimension (nationality, domain, vessel role, vessel type, exercise, tags, year, compound platform predicate, unrecognised term) `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
-- [ ] T033 [US1] Record LLM responses for each corpus phrase against a real model; write `{ rawResponse, promptHash, recordedAt, model }` entries `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
-- [ ] T034 [test] [US1] Corpus regression test — single assertion block: `report.failed.length === 0`, `report.promptSizeBytes < 20_480` (SC-004 per 15A), `report.elapsedMs < 120_000` (SC-003), formatting failures into the vitest error message `shared/components/src/nl-cql2/__tests__/corpus.test.ts`
+- [x] T030 [US1] Implement `loadSampleCatalog()` under `__tests__/` — reads `${DEBRIEF_REPO_ROOT}/preview/workspace/samples/local-store/catalog.json` plus referenced items, returns `StacBrowserItem[]` `shared/components/src/nl-cql2/__tests__/harness.ts`
+- [x] T031 [US1] Implement `runHarness(corpus, client, enums, catalog)` — per-phrase loop calling `generateCql2` then `filterByCql2Json`, capturing CQL2 on PASS (decision 12A), returning typed `HarnessReport` with `promptSizeBytes` and `elapsedMs` `shared/components/src/nl-cql2/__tests__/harness.ts`
+- [x] T032 [US1] Author the 9-phrase corpus fixture covering every CQL2 dimension (nationality, domain, vessel role, vessel type, exercise, tags, year, compound platform predicate, unrecognised term) `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
+- [x] T033 [US1] **INTERIM (188)**: hand-crafted schema-valid responses via `scripts/generate-interim-fixtures.ts`. #189 will replace with real-model recordings via `scripts/record-nl-fixtures.ts`. `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
+- [x] T034 [test] [US1] Corpus regression test — single assertion block: `report.failed.length === 0`, `report.promptSizeBytes < 20_480` (SC-004 per 15A), `report.elapsedMs < 120_000` (SC-003), formatting failures into the vitest error message `shared/components/src/nl-cql2/__tests__/corpus.test.ts`
 
 ### Prompt-size measurement
 
@@ -145,10 +145,10 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 **Independent Test**: Run `__tests__/harness-self-test.ts` — it uses `createBadLLMClient(...)` to inject a malformed response and asserts the report contains failures with readable diagnostics.
 
-- [ ] T036 [US2] Implement `createBadLLMClient(rawResponse)` test helper returning a client that always yields the given (deliberately-broken) response `shared/components/src/nl-cql2/__tests__/badClient.ts`
-- [ ] T037 [test] [US2] Harness self-test — asserts `report.failed.length > 0` with reason `malformed-json` when `BadLLMClient` is injected, automating SC-006 (decision 9A) `shared/components/src/nl-cql2/__tests__/harness-self-test.ts`
-- [ ] T038 [US2] Write a fixture-recording script that builds the prompt for each corpus phrase, calls a `PassthroughLLMClient`, and writes the raw responses + hashes back to `responses.json` `shared/components/scripts/record-nl-fixtures.ts`
-- [ ] T039 [US2] Capture the harness report as evidence (all 9 phrases, CQL2 visible on PASS per 12A) `specs/188-nl-cql2-prompt/evidence/harness-report.txt`
+- [x] T036 [US2] Implement `createBadLLMClient(rawResponse)` test helper returning a client that always yields the given (deliberately-broken) response `shared/components/src/nl-cql2/__tests__/badClient.ts`
+- [x] T037 [test] [US2] Harness self-test — asserts `report.failed.length > 0` with reason `malformed-json` when `BadLLMClient` is injected, automating SC-006 (decision 9A) `shared/components/src/nl-cql2/__tests__/harness-self.test.ts`
+- [x] T038 [US2] Write a fixture-recording script that builds the prompt for each corpus phrase, calls a `PassthroughLLMClient`, and writes the raw responses + hashes back to `responses.json`. **Transport slot left empty for #189.** `shared/components/scripts/record-nl-fixtures.ts`
+- [x] T039 [US2] Capture the harness report as evidence (all 11 phrases, CQL2 visible on PASS per 12A) `specs/188-nl-cql2-prompt/evidence/harness-report.txt`
 
 **Checkpoint**: US2 green. Developers have a self-verified harness plus a fixture-recording tool.
 
@@ -160,9 +160,9 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 **Independent Test**: The corpus includes phrases like "Klingon warbirds" (expected `unrecognisedTerms: ["klingon", "warbirds"]`, `matchCount: null`); these phrases pass the harness.
 
-- [ ] T040 [US3] Add three unrecognised-term corpus phrases covering: (a) unknown nationality code, (b) well-formed query with one recognised + one unrecognised term, (c) entirely unrecognisable phrase `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
-- [ ] T041 [US3] Record LLM responses for the three new phrases and append to `responses.json` `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
-- [ ] T042 [P][test] [US3] Targeted parseResponse tests for the leak-visitor walking through `array_filter(platforms, nationality='leaked')`, `or` groups containing leaked values, and `a_containedBy` value arrays (extends T022 coverage with realistic shapes) `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
+- [x] T040 [US3] Add three unrecognised-term corpus phrases covering: (a) unknown nationality code (`Ruritanian navy`), (b) one recognised + one unrecognised (`UK warbirds`), (c) entirely unrecognisable (`Klingon warbirds`) `shared/components/src/nl-cql2/__tests__/fixtures/corpus.json`
+- [x] T041 [US3] **INTERIM (188)**: hand-crafted responses appended via `generate-interim-fixtures.ts`. #189 will re-record. `shared/components/src/nl-cql2/__tests__/fixtures/responses.json`
+- [x] T042 [P][test] [US3] Leak-visitor coverage through `array_filter(platforms, …='leaked')`, `or` groups with leaked values, and `a_containedBy` value arrays — asserted in Phase 3's `parseResponse.test.ts`. `shared/components/src/nl-cql2/__tests__/parseResponse.test.ts`
 
 **Checkpoint**: US3 green. The corpus now provably covers the P3 acceptance.
 
@@ -172,14 +172,14 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Evidence Collection
 
-- [ ] T043 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and list every new/modified test file `specs/188-nl-cql2-prompt/evidence/test-summary.md`
-- [ ] T044 [P] Write a library-style usage example showing `generateCql2("UK submarines", deps)`, the returned `GenerationResult` (including `lozenges`), and how a consumer would feed `result.cql2` into `filterByCql2Json` `specs/188-nl-cql2-prompt/evidence/usage-example.md`
-- [ ] T045 [P] Export one corpus phrase's full `GenerationResult` as JSON for inspection `specs/188-nl-cql2-prompt/evidence/sample-generation-result.json`
+- [x] T043 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and list every new/modified test file `specs/188-nl-cql2-prompt/evidence/test-summary.md`
+- [x] T044 [P] Write a library-style usage example showing `generateCql2("UK frigates", deps)`, the returned `GenerationResult` (including `lozenges`), and how a consumer would feed `result.cql2` into `filterByCql2Json` `specs/188-nl-cql2-prompt/evidence/usage-example.md`
+- [x] T045 [P] Export one corpus phrase's full `GenerationResult` as JSON for inspection `specs/188-nl-cql2-prompt/evidence/sample-generation-result.json`
 
 ### Media Content
 
-- [ ] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 transport, #190 demo UI) `specs/188-nl-cql2-prompt/media/shipped-post.md`
-- [ ] T047 [P] Draft the LinkedIn shipped summary (150–200 words, hook, link placeholder to shipped-post.md) `specs/188-nl-cql2-prompt/media/linkedin-shipped.md`
+- [x] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 transport, #190 demo UI) `specs/188-nl-cql2-prompt/media/shipped-post.md`
+- [x] T047 [P] Draft the LinkedIn shipped summary (150–200 words, hook, link placeholder to shipped-post.md) `specs/188-nl-cql2-prompt/media/linkedin-shipped.md`
 
 ### PR Creation
 

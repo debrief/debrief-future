@@ -1,0 +1,43 @@
+NL → CQL2 Harness Report
+=========================
+corpus size     : 11
+passed          : 11
+failed          : 0
+elapsedMs       : 13
+promptSizeBytes : 5111 (ceiling 20480)
+
+PASS
+----
+  german-ships                 matchCount=15
+    phrase : German ships
+    cql2   : {"op":"a_containedBy","args":[["DE"],{"property":"debrief:platforms[*].nationality"}]}
+  surface-fleet                matchCount=47
+    phrase : surface fleet
+    cql2   : {"op":"array_filter","args":[{"property":"debrief:platforms"},{"op":"=","args":[{"property":"domain"},"surface"]}]}
+  carriers                     matchCount=7
+    phrase : carriers
+    cql2   : {"op":"array_filter","args":[{"property":"debrief:platforms"},{"op":"=","args":[{"property":"vessel_role"},"carrier"]}]}
+  type-23-frigates             matchCount=23
+    phrase : Type 23 frigates
+    cql2   : {"op":"array_filter","args":[{"property":"debrief:platforms"},{"op":"=","args":[{"property":"vessel_type"},"type23"]}]}
+  saxon-warrior-exercise       matchCount=73
+    phrase : Saxon Warrior exercise
+    cql2   : {"op":"like","args":[{"property":"title"},"%Saxon Warrior%"]}
+  asw-missions                 matchCount=33
+    phrase : anti-submarine warfare
+    cql2   : {"op":"a_containedBy","args":[["ASW"],{"property":"debrief:tags"}]}
+  hms-nelson                   matchCount=12
+    phrase : HMS Nelson
+    cql2   : {"op":"a_containedBy","args":[["HMS Nelson"],{"property":"debrief:platforms[*].name"}]}
+  uk-frigates                  matchCount=21
+    phrase : UK frigates
+    cql2   : {"op":"array_filter","args":[{"property":"debrief:platforms"},{"op":"and","args":[{"op":"=","args":[{"property":"nationality"},"GB"]},{"op":"=","args":[{"property":"vessel_role"},"frigate"]}]}]}
+  klingon-warbirds             matchCount=73
+    phrase : Klingon warbirds
+    cql2   : {}
+  ruritanian-navy              matchCount=73
+    phrase : Ruritanian navy
+    cql2   : {}
+  uk-warbirds                  matchCount=54
+    phrase : UK warbirds
+    cql2   : {"op":"a_containedBy","args":[["GB"],{"property":"debrief:platforms[*].nationality"}]}

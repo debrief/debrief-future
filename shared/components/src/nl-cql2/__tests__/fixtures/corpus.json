@@ -1,0 +1,77 @@
+[
+  {
+    "id": "german-ships",
+    "phrase": "German ships",
+    "expected": { "matchCount": 15 },
+    "notes": "Nationality dimension — simple a_containedBy on debrief:platforms[*].nationality. DE = 15 items in sample catalog."
+  },
+  {
+    "id": "surface-fleet",
+    "phrase": "surface fleet",
+    "expected": { "matchCount": 47 },
+    "notes": "Domain dimension — compound array_filter(platforms, domain='surface'). 47 items carry at least one surface platform."
+  },
+  {
+    "id": "carriers",
+    "phrase": "carriers",
+    "expected": { "matchCount": 7 },
+    "notes": "Vessel-role dimension — array_filter(platforms, vessel_role='carrier'). 7 items include a carrier."
+  },
+  {
+    "id": "type-23-frigates",
+    "phrase": "Type 23 frigates",
+    "expected": { "matchCount": 23 },
+    "notes": "Vessel-type dimension — array_filter(platforms, vessel_type='type23'). 23 items."
+  },
+  {
+    "id": "saxon-warrior-exercise",
+    "phrase": "Saxon Warrior exercise",
+    "expected": { "matchCount": 73 },
+    "notes": "Exercise dimension — title LIKE '%Saxon Warrior%'. All 73 items in the sample catalog are from this exercise."
+  },
+  {
+    "id": "asw-missions",
+    "phrase": "anti-submarine warfare",
+    "expected": { "matchCount": 33 },
+    "notes": "Tag dimension — a_containedBy on debrief:tags with 'ASW'. 33 items are tagged."
+  },
+  {
+    "id": "hms-nelson",
+    "phrase": "HMS Nelson",
+    "expected": { "matchCount": 12 },
+    "notes": "Track-name dimension (substituted for the spec's 'year' dimension — year is not a first-class FilterType in the current schema; track-name is). a_containedBy on debrief:platforms[*].name. 12 items feature HMS Nelson."
+  },
+  {
+    "id": "uk-frigates",
+    "phrase": "UK frigates",
+    "expected": { "matchCount": 21 },
+    "notes": "Compound platform predicate — array_filter(platforms, and(nationality='GB', vessel_role='frigate')). 21 items match the conjunction."
+  },
+  {
+    "id": "klingon-warbirds",
+    "phrase": "Klingon warbirds",
+    "expected": {
+      "matchCount": null,
+      "unrecognisedTerms": ["klingon", "warbirds"]
+    },
+    "notes": "US3 case (c) — entirely out-of-vocabulary phrase. unrecognisedTerms populated; cql2 must be {} and must NOT leak those terms (FR-013)."
+  },
+  {
+    "id": "ruritanian-navy",
+    "phrase": "Ruritanian navy",
+    "expected": {
+      "matchCount": null,
+      "unrecognisedTerms": ["ruritanian"]
+    },
+    "notes": "US3 case (a) — unknown nationality code. 'navy' is a generic English word with no FilterType mapping, so only 'ruritanian' surfaces as unrecognised; cql2 is empty."
+  },
+  {
+    "id": "uk-warbirds",
+    "phrase": "UK warbirds",
+    "expected": {
+      "matchCount": 54,
+      "unrecognisedTerms": ["warbirds"]
+    },
+    "notes": "US3 case (b) — one recognised (UK → GB) + one unrecognised ('warbirds'). cql2 filters on GB (54 items); 'warbirds' appears in unrecognisedTerms and must NOT leak into cql2."
+  }
+]

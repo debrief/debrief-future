@@ -1,0 +1,68 @@
+{
+  "german ships": {
+    "rawResponse": "{\"cql2\":{\"op\":\"a_containedBy\",\"args\":[[\"DE\"],{\"property\":\"debrief:platforms[*].nationality\"}]},\"lozenges\":[{\"filterType\":\"nationality\",\"value\":\"DE\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "367aa63d600bc1fb82be9347b00f5902c6eddbeb8c544f1ca9cf9ad21fdac5b1",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "surface fleet": {
+    "rawResponse": "{\"cql2\":{\"op\":\"array_filter\",\"args\":[{\"property\":\"debrief:platforms\"},{\"op\":\"=\",\"args\":[{\"property\":\"domain\"},\"surface\"]}]},\"lozenges\":[{\"filterType\":\"vessel-class\",\"value\":\"surface\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "4fe2f2cc8e174ca70266754b0b07315648eb0ea8ea934935068fb8baae3e2d18",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "carriers": {
+    "rawResponse": "{\"cql2\":{\"op\":\"array_filter\",\"args\":[{\"property\":\"debrief:platforms\"},{\"op\":\"=\",\"args\":[{\"property\":\"vessel_role\"},\"carrier\"]}]},\"lozenges\":[{\"filterType\":\"vessel-class\",\"value\":\"carrier\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "096ba819161ff4f113fb07f1bd875592ef03e39b272def53d74d6480e6693d29",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "type 23 frigates": {
+    "rawResponse": "{\"cql2\":{\"op\":\"array_filter\",\"args\":[{\"property\":\"debrief:platforms\"},{\"op\":\"=\",\"args\":[{\"property\":\"vessel_type\"},\"type23\"]}]},\"lozenges\":[{\"filterType\":\"vessel-class\",\"value\":\"type23\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "a31437e45c70555b5844d25479befdd1ac1b2553af61714aea8d5bd58a10db1b",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "saxon warrior exercise": {
+    "rawResponse": "{\"cql2\":{\"op\":\"like\",\"args\":[{\"property\":\"title\"},\"%Saxon Warrior%\"]},\"lozenges\":[{\"filterType\":\"title\",\"value\":\"Saxon Warrior\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "d796eae0773b4b06b3633de611c19aac48f353b1bbb26bedc64860ae34a48b37",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "anti-submarine warfare": {
+    "rawResponse": "{\"cql2\":{\"op\":\"a_containedBy\",\"args\":[[\"ASW\"],{\"property\":\"debrief:tags\"}]},\"lozenges\":[{\"filterType\":\"tag\",\"value\":\"ASW\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "26151c30a0b35ddeaf47e1331a39d5f59959d6cd7848642435ae662196c5aaff",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "hms nelson": {
+    "rawResponse": "{\"cql2\":{\"op\":\"a_containedBy\",\"args\":[[\"HMS Nelson\"],{\"property\":\"debrief:platforms[*].name\"}]},\"lozenges\":[{\"filterType\":\"track-name\",\"value\":\"HMS Nelson\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "d7948ebfb5438cae41457bc2ed379d75a911c5f17d68e3f0ffea0f81dd4ba31f",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "uk frigates": {
+    "rawResponse": "{\"cql2\":{\"op\":\"array_filter\",\"args\":[{\"property\":\"debrief:platforms\"},{\"op\":\"and\",\"args\":[{\"op\":\"=\",\"args\":[{\"property\":\"nationality\"},\"GB\"]},{\"op\":\"=\",\"args\":[{\"property\":\"vessel_role\"},\"frigate\"]}]}]},\"lozenges\":[{\"filterType\":\"nationality\",\"value\":\"GB\"},{\"filterType\":\"vessel-class\",\"value\":\"frigate\"}],\"unrecognisedTerms\":[]}",
+    "promptHash": "c05cb08fc7c3d1973840a33108a3b0b9743f08482071ce0614539cc0016aca75",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "klingon warbirds": {
+    "rawResponse": "{\"cql2\":{},\"lozenges\":[],\"unrecognisedTerms\":[\"klingon\",\"warbirds\"]}",
+    "promptHash": "cac63442c4e0e456240c1d5aefe7a1500a34b571255af90dbf898dae14805b6f",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "ruritanian navy": {
+    "rawResponse": "{\"cql2\":{},\"lozenges\":[],\"unrecognisedTerms\":[\"ruritanian\"]}",
+    "promptHash": "24463ef46953a2a709e4fe9c65d1669321d467bde9d19b8e1b660347fbbbb5f2",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  },
+  "uk warbirds": {
+    "rawResponse": "{\"cql2\":{\"op\":\"a_containedBy\",\"args\":[[\"GB\"],{\"property\":\"debrief:platforms[*].nationality\"}]},\"lozenges\":[{\"filterType\":\"nationality\",\"value\":\"GB\"}],\"unrecognisedTerms\":[\"warbirds\"]}",
+    "promptHash": "c088dc5d6db8d828e756cf372f79094deaddb09b62fdf7a840f9a317d724ab94",
+    "recordedAt": "2026-04-15T06:43:24.192Z",
+    "model": "hand-crafted-interim-188"
+  }
+}
