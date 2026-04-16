@@ -4,7 +4,7 @@ handoffs:
   - label: Implement Tasks
     agent: speckit.implement
     prompt: Execute the generated task plan
-    send: true
+    send: false
 ---
 
 ## User Input
