@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Debrief — NL Catalog Search Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!--
+      No-build-step React stack (FR-001).
+      React 18.3.1 + ReactDOM 18.3.1 + Babel standalone 7.24.7 are vendored
+      locally under ./data/vendor/ by `pnpm sync-data`. Vendoring keeps the
+      demo self-contained and CI-testable; the original spec called for CDN
+      loads but the cloud sandbox blocks third-party CDNs, and a static demo
+      should not depend on third-party uptime anyway.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "./data/vendor/runtime.js",
+          "react-dom/client": "./data/vendor/runtime.js",
+          "@debrief/nl-demo/lib": "./data/debrief-lib.js"
+        }
+      }
+    </script>
+
+    <script src="./data/vendor/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="boot-fallback">
+        Loading the demo… If you see this for more than a few seconds, check the
+        browser console — the CDN scripts may be blocked.
+      </div>
+    </div>
+
+    <!--
+      Babel transforms this script at runtime. We pin the data-presets explicitly
+      so JSX → React.createElement happens deterministically across browsers.
+    -->
+    <script type="text/babel" data-type="module" data-presets="react" src="./demo.jsx"></script>
+  </body>
+</html>
