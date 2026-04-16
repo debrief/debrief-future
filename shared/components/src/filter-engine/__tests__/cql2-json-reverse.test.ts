@@ -386,6 +386,7 @@ describe("filterByCql2Json — integration (T011)", () => {
     expect(keys).toContain("track-name");
     expect(keys).toContain("nationality");
     expect(keys).toContain("collection");
-    expect(keys).toHaveLength(11);
+    expect(keys).toContain("platform");
+    expect(keys).toHaveLength(12);
   });
 });

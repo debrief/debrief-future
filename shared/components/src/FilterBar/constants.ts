@@ -7,7 +7,7 @@
 import type { FilterTypeOption } from './types';
 import type { DurationBucket, ModifiedBucket } from '../filter-engine';
 
-/** All 10 filter types with labels and input methods */
+/** All 11 filter types with labels and input methods */
 export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
   { type: 'vessel-class', label: 'Vessel Class', inputMethod: 'hierarchical' },
   { type: 'tag', label: 'Tag', inputMethod: 'flat-dropdown' },
@@ -20,7 +20,38 @@ export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
   { type: 'track-name', label: 'Track Name', inputMethod: 'flat-dropdown' },
   { type: 'nationality', label: 'Nationality', inputMethod: 'flat-dropdown' },
   { type: 'collection', label: 'Collection', inputMethod: 'flat-dropdown' },
+  { type: 'platform', label: 'Platform', inputMethod: 'compound' },
 ] as const;
+
+/** Platform chip — attribute order for label composition (#186, research Decision 5) */
+export const PLATFORM_ATTRIBUTE_ORDER = [
+  'nationality',
+  'domain',
+  'vessel_role',
+  'vessel_type',
+  'vessel_class',
+] as const;
+
+/** Platform chip — UI labels for each attribute */
+export const PLATFORM_ATTRIBUTE_LABELS: Record<string, string> = {
+  nationality: 'Nationality',
+  domain: 'Domain',
+  vessel_role: 'Vessel Role',
+  vessel_type: 'Vessel Type',
+  vessel_class: 'Vessel Class',
+};
+
+/** Platform chip — hint text shown when no distinct values are available */
+export const PLATFORM_EMPTY_HINT = 'No platform metadata available in this catalog';
+
+/** Platform chip — placeholder shown in each attribute picker until a value is chosen */
+export const PLATFORM_ATTRIBUTE_PLACEHOLDER = 'Any';
+
+/** Platform chip — confirm button label */
+export const PLATFORM_CONFIRM_LABEL = 'Confirm';
+
+/** Platform chip — cancel button label */
+export const PLATFORM_CANCEL_LABEL = 'Cancel';
 
 /** Duration bucket options */
 export const DURATION_BUCKETS: readonly DurationBucket[] = [
