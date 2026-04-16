@@ -10,6 +10,11 @@
 /**
  * Emit the CQL2 schema description block for the prompt. Derives every line
  * from `PROPERTY_MAP` so the description cannot drift from the evaluator.
+ *
+ * The compound `platform` filter type is intentionally excluded from the flat
+ * schema table because it is not a leaf dimension — the prompt documents it
+ * separately via the `array_filter` paragraph below. Keeping it out of the
+ * flat table preserves the recorded LLM-fixture prompt hash (#186).
  */
 export declare function schemaDescription(): string;
 //# sourceMappingURL=schemaDescription.d.ts.map

@@ -1,4 +1,4 @@
-import { ArrayFilterPredicate, FilterExpression, FilterType } from './types';
+import { ArrayFilterPredicate, FilterExpression, FilterType, PlatformField } from './types';
 
 /** CQL2 property name mapping for each filter type. Exported (#188 decision 3A). */
 export declare const PROPERTY_MAP: Readonly<Record<FilterType, string>>;
@@ -30,6 +30,21 @@ export declare class Cql2ReverseParseError extends Error {
     readonly code: "unsupported-operator" | "bad-arg-arity" | "unknown-property" | "malformed-node";
     constructor(code: "unsupported-operator" | "bad-arg-arity" | "unknown-property" | "malformed-node", message: string);
 }
+/** Result of attempting to reconstruct a platform-chip attribute map (#186) */
+export interface PlatformAttributeReconstruction {
+    readonly attributes: Readonly<Partial<Record<PlatformField, string>>>;
+    readonly negated: boolean;
+}
+/**
+ * Reconstruct a platform-chip attribute map from an ArrayFilterPredicate,
+ * or return null if the predicate shape cannot be represented in the UI
+ * (OR sub-predicates, nested ANDs, unsupported fields).
+ *
+ * The FilterBar restore path calls this for each `array_filter` node to
+ * decide whether a saved filter can be reconstructed losslessly. Failures
+ * surface as a non-blocking error banner per `contracts/cql2-roundtrip.md`.
+ */
+export declare function arrayFilterToPlatformAttributes(af: ArrayFilterPredicate): PlatformAttributeReconstruction | null;
 /**
  * Reverse of `filterExpressionToCql2Json`. Accepts a CQL2-JSON object and
  * returns a typed `FilterExpression`. Empty input `{}` yields an empty

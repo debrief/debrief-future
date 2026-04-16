@@ -4,11 +4,21 @@ import { LozengeItem } from '../FilterBar/types';
 /** A CQL2-JSON object. Empty `{}` means no-op (match-all). */
 export type Cql2Json = Record<string, unknown>;
 /**
- * The chip seed the LLM emits. Picks the three persistable fields of
- * `LozengeItem` — the consumer assembles the full `LozengeItem` by adding
- * `kind: 'lozenge'` and a generated `id`. Decision 5A.
+ * The chip seed the LLM emits. Picks the three persistable fields of a
+ * simple `LozengeItem` — the consumer assembles the full `LozengeItem` by
+ * adding `kind: 'lozenge'`, `shape: 'simple'`, and a generated `id`.
+ * Decision 5A.
+ *
+ * Platform chips (#186) are not emitted by the NL generator; saved filters
+ * include them via the CQL2 round-trip path rather than a seed.
  */
-export type LozengeSeed = Pick<LozengeItem, "filterType" | "value" | "negated">;
+export type LozengeSeed = {
+    readonly filterType: Extract<LozengeItem, {
+        shape: 'simple';
+    }>['filterType'];
+    readonly value: string;
+    readonly negated?: boolean;
+};
 /** All five generator-level failure reasons (decision 8A). */
 export type GenerationErrorReason = "malformed-json" | "schema-violation" | "hallucinated-field" | "unrecognised-term-leaked" | "cql2-evaluation-failed";
 export interface GenerationError {

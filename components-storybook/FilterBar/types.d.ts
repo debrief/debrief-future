@@ -1,21 +1,41 @@
-import { FilterType, FilterExpression, StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
+import { FilterType, FilterExpression, PlatformField, StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 
 /** Input method used by a filter type's value editor */
-export type InputMethod = 'hierarchical' | 'flat-dropdown' | 'free-text' | 'bucket' | 'typeahead';
+export type InputMethod = 'hierarchical' | 'flat-dropdown' | 'free-text' | 'bucket' | 'typeahead' | 'compound';
 /** Metadata for a filter type option in the add menu */
 export interface FilterTypeOption {
     readonly type: FilterType;
     readonly label: string;
     readonly inputMethod: InputMethod;
 }
-/** A single filter lozenge */
-export interface LozengeItem {
+/**
+ * Map of platform attributes selected on a platform chip.
+ *
+ * A populated platform lozenge has at least one entry; each value is a
+ * non-empty string. Producers MUST enforce this invariant before dispatch;
+ * consumers MAY rely on it.
+ */
+export type PlatformAttributes = Partial<Record<PlatformField, string>>;
+/** A simple, single-value filter lozenge (existing shape from #127) */
+export interface SimpleLozengeItem {
     readonly kind: 'lozenge';
+    readonly shape: 'simple';
     readonly id: string;
-    readonly filterType: FilterType;
+    readonly filterType: Exclude<FilterType, 'platform'>;
     readonly value: string;
     readonly negated?: boolean;
 }
+/** A compound, same-platform filter lozenge (new in #186) */
+export interface PlatformLozengeItem {
+    readonly kind: 'lozenge';
+    readonly shape: 'platform';
+    readonly id: string;
+    readonly filterType: 'platform';
+    readonly attributes: PlatformAttributes;
+    readonly negated?: boolean;
+}
+/** A single filter lozenge */
+export type LozengeItem = SimpleLozengeItem | PlatformLozengeItem;
 /** An OR container grouping child lozenges with OR logic */
 export interface OrContainerItem {
     readonly kind: 'or-container';
@@ -31,7 +51,7 @@ export interface FilterBarState {
 /** Actions for the filter bar reducer */
 export type FilterBarAction = {
     type: 'ADD_LOZENGE';
-    filterType: FilterType;
+    filterType: Exclude<FilterType, 'platform'>;
     value: string;
 } | {
     type: 'REMOVE_LOZENGE';
@@ -48,7 +68,7 @@ export type FilterBarAction = {
 } | {
     type: 'ADD_CHILD_LOZENGE';
     containerId: string;
-    filterType: FilterType;
+    filterType: Exclude<FilterType, 'platform'>;
     value: string;
 } | {
     type: 'MOVE_TO_CONTAINER';
@@ -64,6 +84,17 @@ export type FilterBarAction = {
 } | {
     type: 'SET_STATE';
     state: FilterBarState;
+} | {
+    type: 'ADD_PLATFORM_LOZENGE';
+    attributes: PlatformAttributes;
+} | {
+    type: 'EDIT_PLATFORM_LOZENGE';
+    id: string;
+    attributes: PlatformAttributes;
+} | {
+    type: 'ADD_CHILD_PLATFORM_LOZENGE';
+    containerId: string;
+    attributes: PlatformAttributes;
 };
 /** A named, persisted filter configuration (#128) */
 export interface SavedFilterConfiguration {
@@ -92,5 +123,12 @@ export interface FilterBarProps {
     readonly onExpressionChange?: (expression: FilterExpression) => void;
     readonly initialFilterState?: FilterBarState;
     readonly savedFiltersStorage?: SavedFiltersStorage;
+}
+/** Distinct-value collection for platform-chip pickers (#186) */
+export interface PlatformDistinctValues {
+    readonly nationality: readonly string[];
+    readonly domain: readonly string[];
+    readonly vessel_role: readonly string[];
+    readonly vessel_type: readonly string[];
 }
 //# sourceMappingURL=types.d.ts.map
