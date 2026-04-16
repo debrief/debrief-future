@@ -77,7 +77,8 @@ export type FilterType =
   | "plot-contents"
   | "track-name"
   | "nationality"
-  | "collection";
+  | "collection"
+  | "platform";
 
 /** Valid duration bucket values */
 export type DurationBucket = "<6H" | "<24H" | "<72H" | "<10D" | ">10D";

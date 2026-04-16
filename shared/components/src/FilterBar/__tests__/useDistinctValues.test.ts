@@ -113,4 +113,64 @@ describe('computeDistinctValues', () => {
     const result = computeDistinctValues(items);
     expect(result['tag']).toEqual(['tag-a', 'tag-b', 'tag-c']);
   });
+
+  // U14 (#186)
+  it('U14: produces a platform sub-object with nationality/domain/vessel_role/vessel_type arrays', () => {
+    const items = [
+      makeItem('1', {
+        platforms: [
+          {
+            id: 'P1',
+            name: 'HMS Argyll',
+            nationality: 'GB',
+            vessel_class: 'surface/warship/frigate/type23',
+            vessel_role: 'frigate',
+            vessel_type: 'type23',
+            domain: 'surface',
+          },
+        ],
+      }),
+    ];
+    const result = computeDistinctValues(items);
+    expect(result.platform).toBeDefined();
+    expect(result.platform.nationality).toEqual(['GB']);
+    expect(result.platform.domain).toEqual(['surface']);
+    expect(result.platform.vessel_role).toEqual(['frigate']);
+    expect(result.platform.vessel_type).toEqual(['type23']);
+  });
+
+  // U15 (#186)
+  it('U15: platform sub-arrays deduplicate, filter empties, and locale-sort', () => {
+    const items = [
+      makeItem('1', {
+        platforms: [
+          { id: 'P1', nationality: 'GB', domain: 'surface', vessel_role: 'frigate' },
+          { id: 'P2', nationality: 'DE', domain: 'subsurface' },
+        ],
+      }),
+      makeItem('2', {
+        platforms: [
+          { id: 'P3', nationality: 'GB', domain: 'surface' },
+          { id: 'P4', nationality: 'US', domain: 'surface', vessel_role: 'destroyer' },
+          // empty string should be filtered
+          { id: 'P5', nationality: '' as unknown as string, domain: undefined },
+        ],
+      }),
+    ];
+    const result = computeDistinctValues(items);
+    expect(result.platform.nationality).toEqual(['DE', 'GB', 'US']);
+    expect(result.platform.domain).toEqual(['subsurface', 'surface']);
+    expect(result.platform.vessel_role).toEqual(['destroyer', 'frigate']);
+  });
+
+  // U16 (#186)
+  it('U16: empty catalogue yields empty platform arrays', () => {
+    const result = computeDistinctValues([]);
+    expect(result.platform).toEqual({
+      nationality: [],
+      domain: [],
+      vessel_role: [],
+      vessel_type: [],
+    });
+  });
 });

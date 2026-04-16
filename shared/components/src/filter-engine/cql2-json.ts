@@ -36,6 +36,10 @@ export const PROPERTY_MAP: Readonly<Record<FilterType, string>> = {
   "track-name": "debrief:platforms[*].name",
   nationality: "debrief:platforms[*].nationality",
   collection: "collection",
+  // The platform filter type never emits a flat CQL2 leaf — chips serialise
+  // directly to `array_filter` via arrayFilterToCql2. The entry exists only
+  // to keep the enum-complete record type satisfied for downstream tooling.
+  platform: "debrief:platforms",
 };
 
 /** Reverse lookup: CQL2 property path → FilterType. */
@@ -506,6 +510,63 @@ function absorbArrayFilter(
     predicate: parseCql2Predicate(predicateNode),
     negated: negated === true ? true : false,
   });
+}
+
+/** Result of attempting to reconstruct a platform-chip attribute map (#186) */
+export interface PlatformAttributeReconstruction {
+  readonly attributes: Readonly<Partial<Record<PlatformField, string>>>;
+  readonly negated: boolean;
+}
+
+/** Fields the filter-bar platform chip UI exposes (#186). */
+const PLATFORM_UI_FIELDS: ReadonlySet<PlatformField> = new Set([
+  'id',
+  'name',
+  'nationality',
+  'vessel_class',
+  'vessel_type',
+  'vessel_role',
+  'domain',
+]);
+
+/**
+ * Reconstruct a platform-chip attribute map from an ArrayFilterPredicate,
+ * or return null if the predicate shape cannot be represented in the UI
+ * (OR sub-predicates, nested ANDs, unsupported fields).
+ *
+ * The FilterBar restore path calls this for each `array_filter` node to
+ * decide whether a saved filter can be reconstructed losslessly. Failures
+ * surface as a non-blocking error banner per `contracts/cql2-roundtrip.md`.
+ */
+export function arrayFilterToPlatformAttributes(
+  af: ArrayFilterPredicate,
+): PlatformAttributeReconstruction | null {
+  const attrs: Partial<Record<PlatformField, string>> = {};
+  const pred = af.predicate;
+
+  const collect = (node: CompoundPredicate): boolean => {
+    if (node.kind === 'comparison') {
+      if (!PLATFORM_UI_FIELDS.has(node.field)) return false;
+      attrs[node.field] = node.value;
+      return true;
+    }
+    if (node.kind === 'and') {
+      for (const child of node.children) {
+        if (child.kind !== 'comparison') return false;
+        if (!collect(child)) return false;
+      }
+      return true;
+    }
+    // 'or' or any unhandled shape is unsupported in the UI
+    return false;
+  };
+
+  const ok = collect(pred);
+  if (!ok) return null;
+
+  const hasAny = Object.keys(attrs).length > 0;
+  if (!hasAny) return null;
+  return { attributes: attrs, negated: af.negated === true };
 }
 
 /**

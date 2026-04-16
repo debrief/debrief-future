@@ -1,0 +1,45 @@
+{
+  "_comment": "Live CQL2 round-trip sample for #186. A platform chip with attributes {nationality: 'GB', domain: 'subsurface'} produces the 'emitted' payload below; feeding the emitted payload back through cql2JsonToArrayFilters + arrayFilterToPlatformAttributes reconstructs the same attributes. Mirrors contracts/cql2-roundtrip.md.",
+  "chip": {
+    "shape": "platform",
+    "filterType": "platform",
+    "attributes": {
+      "nationality": "GB",
+      "domain": "subsurface"
+    },
+    "negated": false
+  },
+  "emitted": {
+    "op": "array_filter",
+    "args": [
+      { "property": "debrief:platforms" },
+      {
+        "op": "and",
+        "args": [
+          { "op": "=", "args": [{ "property": "nationality" }, "GB"] },
+          { "op": "=", "args": [{ "property": "domain" }, "subsurface"] }
+        ]
+      }
+    ]
+  },
+  "roundTrip": {
+    "reconstructedAttributes": {
+      "nationality": "GB",
+      "domain": "subsurface"
+    },
+    "reconstructedNegated": false,
+    "lossless": true
+  },
+  "negatedEmitted": {
+    "op": "not",
+    "args": [
+      {
+        "op": "array_filter",
+        "args": [
+          { "property": "debrief:platforms" },
+          { "op": "=", "args": [{ "property": "nationality" }, "GB"] }
+        ]
+      }
+    ]
+  }
+}

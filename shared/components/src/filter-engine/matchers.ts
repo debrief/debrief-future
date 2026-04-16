@@ -138,6 +138,11 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
     return (item.platforms ?? []).some((p) => p.nationality != null && p.nationality.toUpperCase() === upper);
   },
   collection: (item, value) => matchCollection(item, value),
+  // Platform chips are evaluated via array_filter, not via a flat string match.
+  // The Predicate channel is never populated with 'platform' by the FilterBar
+  // (the reducer emits ArrayFilterPredicate entries instead), so this matcher
+  // is a no-op guard for the enum completeness check.
+  platform: () => false,
 };
 
 /** Get the matcher function for a filter type */

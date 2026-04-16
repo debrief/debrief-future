@@ -30,6 +30,7 @@ const EXPECTED_FILTER_TYPES: readonly FilterType[] = [
   "track-name",
   "nationality",
   "collection",
+  "platform",
 ];
 
 describe("PROPERTY_MAP exhaustiveness (T018 / decision 11A)", () => {
