@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 460"
+     font-family="Segoe UI, Arial, sans-serif">
+  <text x="250.0" y="22" text-anchor="middle"
+        style="font: bold 15px sans-serif; fill: #333">
+    Track + bearing cuts — MEASURED array offset mode (1500 m offset)
+  </text>
+  <g transform="translate(0,40)">
+<clipPath id="clip-measured"><rect width="500" height="380"/></clipPath>
+<g clip-path="url(#clip-measured)">
+<rect width="500" height="380" fill="#FAFAFA" stroke="#CCC"/>
+<text x="250.0" y="22" text-anchor="middle" style="font: 600 14px sans-serif; fill: #333">MEASURED mode</text>
+<path d="M28.0,352.0 L28.0,339.1 L28.0,326.1 L28.0,313.2 L28.0,300.3 L28.0,287.3 L28.0,274.4 L28.0,261.5 L28.0,248.5 L28.0,235.6 L28.0,222.7 L28.0,209.7 L28.0,196.8 L28.0,183.9 L28.0,171.0 L40.5,158.0 L52.9,158.0 L65.4,158.0 L77.9,158.0 L90.4,158.0 L102.8,158.0 L115.3,158.0 L127.8,158.0 L140.2,158.0 L152.7,158.0 L165.2,158.0 L177.6,158.0 L190.1,158.0 L202.6,158.0 L215.1,158.0" stroke="#4CAF50" stroke-width="2.5" fill="none"/>
+<circle cx="28.0" cy="352.0" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="313.2" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="274.4" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="235.6" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="196.8" r="1.8" fill="#2E7D32"/>
+<circle cx="40.5" cy="158.0" r="1.8" fill="#2E7D32"/>
+<circle cx="77.9" cy="158.0" r="1.8" fill="#2E7D32"/>
+<circle cx="115.3" cy="158.0" r="1.8" fill="#2E7D32"/>
+<circle cx="152.7" cy="158.0" r="1.8" fill="#2E7D32"/>
+<circle cx="190.1" cy="158.0" r="1.8" fill="#2E7D32"/>
+<circle cx="28.0" cy="171.0" r="3.5" fill="#1B5E20"/>
+<circle cx="52.9" cy="158.0" r="3" fill="#1976D2"/>
+<circle cx="90.4" cy="158.0" r="3" fill="#1976D2"/>
+<circle cx="127.8" cy="158.0" r="3" fill="#1976D2"/>
+<circle cx="165.2" cy="158.0" r="3" fill="#1976D2"/>
+<circle cx="202.6" cy="158.0" r="3" fill="#1976D2"/>
+<line x1="154.8" y1="183.9" x2="285.7" y2="28.0" stroke="#00838F" stroke-width="1.2" opacity="0.85"/>
+<circle cx="154.8" cy="183.9" r="4" fill="#00838F" stroke="#333" stroke-width="0.8"/>
+<line x1="52.9" y1="158.0" x2="154.8" y2="183.9" stroke="#00838F" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="189.1" y1="183.9" x2="355.9" y2="67.2" stroke="#00838F" stroke-width="1.2" opacity="0.85"/>
+<circle cx="189.1" cy="183.9" r="4" fill="#00838F" stroke="#333" stroke-width="0.8"/>
+<line x1="90.4" y1="158.0" x2="189.1" y2="183.9" stroke="#00838F" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="223.4" y1="183.9" x2="414.7" y2="114.3" stroke="#00838F" stroke-width="1.2" opacity="0.85"/>
+<circle cx="223.4" cy="183.9" r="4" fill="#00838F" stroke="#333" stroke-width="0.8"/>
+<line x1="127.8" y1="158.0" x2="223.4" y2="183.9" stroke="#00838F" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="263.9" y1="183.9" x2="466.7" y2="166.2" stroke="#00838F" stroke-width="1.2" opacity="0.85"/>
+<circle cx="263.9" cy="183.9" r="4" fill="#00838F" stroke="#333" stroke-width="0.8"/>
+<line x1="165.2" y1="158.0" x2="263.9" y2="183.9" stroke="#00838F" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="115.3" y1="158.0" x2="315.8" y2="193.4" stroke="#00838F" stroke-width="1.2" opacity="0.85"/>
+<circle cx="115.3" cy="158.0" r="4" fill="#00838F" stroke="#333" stroke-width="0.8"/>
+<line x1="202.6" y1="158.0" x2="115.3" y2="158.0" stroke="#00838F" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<rect x="128.9" y="180.9" width="6" height="6" fill="none" stroke="#00838F" stroke-width="1.2"/>
+<rect x="174.6" y="180.9" width="6" height="6" fill="none" stroke="#00838F" stroke-width="1.2"/>
+<rect x="220.4" y="180.9" width="6" height="6" fill="none" stroke="#00838F" stroke-width="1.2"/>
+<rect x="274.4" y="180.9" width="6" height="6" fill="none" stroke="#00838F" stroke-width="1.2"/>
+</g>
+</g>
+  <text x="250.0" y="442" text-anchor="middle"
+        style="font: 11px sans-serif; fill: #777">
+    Vessel sails north, turns east at marked point; 5 contacts reported after the turn.
+  </text>
+</svg>

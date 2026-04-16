@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 460"
+     font-family="Segoe UI, Arial, sans-serif">
+  <text x="250.0" y="22" text-anchor="middle"
+        style="font: bold 15px sans-serif; fill: #333">
+    Track + bearing cuts — PLAIN array offset mode (1500 m offset)
+  </text>
+  <g transform="translate(0,40)">
+<clipPath id="clip-plain"><rect width="500" height="380"/></clipPath>
+<g clip-path="url(#clip-plain)">
+<rect width="500" height="380" fill="#FAFAFA" stroke="#CCC"/>
+<text x="250.0" y="22" text-anchor="middle" style="font: 600 14px sans-serif; fill: #333">PLAIN mode</text>
+<path d="M85.7,352.0 L85.7,340.0 L85.7,328.0 L85.7,316.1 L85.7,304.1 L85.7,292.1 L85.7,280.1 L85.7,268.2 L85.7,256.2 L85.7,244.2 L85.7,232.2 L85.7,220.3 L85.7,208.3 L85.7,196.3 L85.7,184.3 L97.2,172.4 L108.8,172.4 L120.3,172.4 L131.9,172.4 L143.4,172.4 L155.0,172.4 L166.5,172.4 L178.1,172.4 L189.6,172.4 L201.2,172.4 L212.7,172.4 L224.3,172.4 L235.8,172.4 L247.4,172.4 L258.9,172.4" stroke="#4CAF50" stroke-width="2.5" fill="none"/>
+<circle cx="85.7" cy="352.0" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="316.1" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="280.1" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="244.2" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="208.3" r="1.8" fill="#2E7D32"/>
+<circle cx="97.2" cy="172.4" r="1.8" fill="#2E7D32"/>
+<circle cx="131.9" cy="172.4" r="1.8" fill="#2E7D32"/>
+<circle cx="166.5" cy="172.4" r="1.8" fill="#2E7D32"/>
+<circle cx="201.2" cy="172.4" r="1.8" fill="#2E7D32"/>
+<circle cx="235.8" cy="172.4" r="1.8" fill="#2E7D32"/>
+<circle cx="85.7" cy="184.3" r="3.5" fill="#1B5E20"/>
+<circle cx="108.8" cy="172.4" r="3" fill="#1976D2"/>
+<circle cx="143.4" cy="172.4" r="3" fill="#1976D2"/>
+<circle cx="178.1" cy="172.4" r="3" fill="#1976D2"/>
+<circle cx="212.7" cy="172.4" r="3" fill="#1976D2"/>
+<circle cx="247.4" cy="172.4" r="3" fill="#1976D2"/>
+<line x1="28.0" y1="172.4" x2="149.2" y2="28.0" stroke="#FF8F00" stroke-width="1.2" opacity="0.85"/>
+<circle cx="28.0" cy="172.4" r="4" fill="#FF8F00" stroke="#333" stroke-width="0.8"/>
+<line x1="108.8" y1="172.4" x2="28.0" y2="172.4" stroke="#FF8F00" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="62.6" y1="172.4" x2="217.1" y2="64.3" stroke="#FF8F00" stroke-width="1.2" opacity="0.85"/>
+<circle cx="62.6" cy="172.4" r="4" fill="#FF8F00" stroke="#333" stroke-width="0.8"/>
+<line x1="143.4" y1="172.4" x2="62.6" y2="172.4" stroke="#FF8F00" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="97.3" y1="172.4" x2="274.5" y2="108.0" stroke="#FF8F00" stroke-width="1.2" opacity="0.85"/>
+<circle cx="97.3" cy="172.4" r="4" fill="#FF8F00" stroke="#333" stroke-width="0.8"/>
+<line x1="178.1" y1="172.4" x2="97.3" y2="172.4" stroke="#FF8F00" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="131.9" y1="172.4" x2="319.7" y2="156.0" stroke="#FF8F00" stroke-width="1.2" opacity="0.85"/>
+<circle cx="131.9" cy="172.4" r="4" fill="#FF8F00" stroke="#333" stroke-width="0.8"/>
+<line x1="212.7" y1="172.4" x2="131.9" y2="172.4" stroke="#FF8F00" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+<line x1="166.6" y1="172.4" x2="352.2" y2="205.2" stroke="#FF8F00" stroke-width="1.2" opacity="0.85"/>
+<circle cx="166.6" cy="172.4" r="4" fill="#FF8F00" stroke="#333" stroke-width="0.8"/>
+<line x1="247.4" y1="172.4" x2="166.6" y2="172.4" stroke="#FF8F00" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+</g>
+</g>
+  <text x="250.0" y="442" text-anchor="middle"
+        style="font: 11px sans-serif; fill: #777">
+    Vessel sails north, turns east at marked point; 5 contacts reported after the turn.
+  </text>
+</svg>

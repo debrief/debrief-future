@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "canonicalisation": "trim + lowercase dedup, first-seen casing preserved",
+    "exercise_parse_rule": "title prefix before ': '",
+    "generated_from_catalog": "preview/workspace/samples/local-store",
+    "generated_from_registry": "shared/data/platform-registry.json",
+    "tool": "scripts/extract-enum-bundle.py"
+  },
+  "exercise_names": [
+    "Saxon Warrior"
+  ],
+  "feature_tags": [
+    "active-search",
+    "datum",
+    "depth-charge",
+    "helicopter-ops",
+    "intercept",
+    "minefield",
+    "passive-search",
+    "prosecution",
+    "radar-detection",
+    "sonar-contact",
+    "sprint-and-drift",
+    "torpedo-run",
+    "towed-array",
+    "track-merge",
+    "visual-sighting",
+    "zig-zag"
+  ],
+  "nationalities": [
+    "DE",
+    "FR",
+    "GB",
+    "US"
+  ],
+  "tags": [
+    "AAW",
+    "amphibious",
+    "ASW",
+    "boarding",
+    "certification",
+    "escort",
+    "EW",
+    "force-protection",
+    "gunnery",
+    "harbour-ops",
+    "MCM",
+    "mine-clearance",
+    "missile-firing",
+    "multi-national",
+    "NGFS",
+    "replenishment",
+    "SAR",
+    "surveillance",
+    "training",
+    "transit"
+  ],
+  "vessel_class_tree": {
+    "subsurface": {
+      "_class": {
+        "full_name": "Subsurface Vessel"
+      },
+      "submarine": {
+        "_class": {
+          "full_name": "Submarine"
+        },
+        "ssk": {
+          "_class": {
+            "full_name": "Diesel-Electric Submarine (SSK)"
+          },
+          "type212": {
+            "_class": {
+              "full_name": "Type 212"
+            }
+          }
+        },
+        "ssn": {
+          "_class": {
+            "full_name": "Nuclear Attack Submarine (SSN)"
+          },
+          "astute": {
+            "_class": {
+              "full_name": "Astute-class"
+            }
+          },
+          "trafalgar": {
+            "_class": {
+              "full_name": "Trafalgar-class"
+            }
+          }
+        }
+      }
+    },
+    "surface": {
+      "_class": {
+        "full_name": "Surface Vessel"
+      },
+      "warship": {
+        "_class": {
+          "full_name": "Warship"
+        },
+        "destroyer": {
+          "_class": {
+            "full_name": "Destroyer"
+          },
+          "arleigh-burke": {
+            "_class": {
+              "full_name": "Arleigh Burke-class"
+            }
+          },
+          "type45": {
+            "_class": {
+              "full_name": "Type 45 (Daring-class)"
+            }
+          }
+        },
+        "frigate": {
+          "_class": {
+            "full_name": "Frigate"
+          },
+          "type23": {
+            "_class": {
+              "full_name": "Type 23 (Duke-class)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

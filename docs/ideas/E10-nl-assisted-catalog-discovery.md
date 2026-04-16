@@ -170,7 +170,13 @@ The LLM **never sees the catalog items**. The client applies the generated CQL2 
 
 **Build-time extraction script:** walks the platform registry + sample catalog, extracts all unique values, outputs a compact JSON consumed by the prompt builder.
 
-**Auth/transport:** TBD — options include an MCP tool on the STAC server, a local proxy, or direct browser API call. To be determined during implementation based on the deployment context for the demo.
+**Transport architecture — two implementations of one interface:**
+
+1. **Hand-authored fixture transport (owned by #188).** Ships with 188. The `LLMClient` interface is satisfied by a recorded-response client backed by a corpus of hand-authored fixtures. These fixtures are the CI gate and the offline demo data source — they work forever with zero live-LLM dependency. This is not a mock: it's a permanent first-class transport that stays useful even after the live one lands.
+
+2. **Live LLM transport (owned by #190 — deferred).** A second implementation of the same `LLMClient` interface that calls a real provider (authentication, endpoint, MCP/proxy/direct decision). Drops in as a config toggle; no changes to 188 or #189 required.
+
+The stakeholder demo UI (#189) consumes whichever transport is active and does not know which is wired in.
 
 ### 7. Stakeholder Demo UI
 
@@ -212,7 +218,7 @@ NL input produces CQL2 chips → chips filter the card grid via the extended CQL
 - TrackProperties enrichment fields are **optional override slots** — features.geojson typically stores only `platform_id`; the system must function correctly when overrides are absent and the platform is not in the registry
 - Platform registry is a static file, not a runtime service; changes propagate on next save
 - No build step for the demo UI (HTML + CDN React + Babel standalone)
-- Auth/transport for LLM calls is TBD — the epic must not be blocked by this decision
+- Auth/transport for live LLM calls is deferred to a dedicated item (#190); the epic's primary NL search flow is fully deliverable via the hand-authored fixture corpus shipped by #188, so the epic is not blocked by live-LLM readiness
 
 ## Out of Scope
 
@@ -268,11 +274,16 @@ NL input produces CQL2 chips → chips filter the card grid via the extended CQL
 | Item | Description | Dependencies |
 |------|-------------|--------------|
 | 187 | [E10] Build-time enum extraction — script that walks platform registry + catalog to extract all unique values (vessel class tree, nationalities, exercise names, tags, feature_tags); outputs compact JSON for the LLM prompt | #180, #184 |
-| 188 | [E10] NL → CQL2 prompt design + generation — system prompt with CQL2 schema, extracted enums, and `array_filter` syntax; LLM outputs CQL2 filter + chips summary; headless test harness with typical analyst phrases | #185, #187 |
-| 189 | [E10] LLM transport integration — wire NL input to LLM call; auth/transport mechanism TBD (MCP tool, local proxy, or other) | #188 |
+| 188 | [E10] NL → CQL2 prompt design + generation — system prompt with CQL2 schema, extracted enums, and `array_filter` syntax; LLM outputs CQL2 filter + chips summary; headless test harness with typical analyst phrases. **Ships a hand-authored fixture corpus** covering the prototype phrases + unrecognised-term cases; no live-LLM dependency. | #185, #187 |
 
 ### Phase 4: Stakeholder Demo
 
 | Item | Description | Dependencies |
 |------|-------------|--------------|
-| 190 | [E10] Prototype UI — no-build-step HTML/React playground; filter bar with NL input + CQL2 chips + card grid; NL queries produce chips that filter via the extended CQL2 engine; stakeholder-ready | #186, #189 |
+| 189 | [E10] Stakeholder demo UI — no-build-step HTML/React playground; query bar + filter chips + card grid; consumes #188's generator with the hand-authored fixture transport, so stakeholder demos run offline and deterministically. NL input produces chips that filter via the extended CQL2 engine. | #186, #188 |
+
+### Phase 5: Live LLM Transport (deferred)
+
+| Item | Description | Dependencies |
+|------|-------------|--------------|
+| 190 | [E10] Live LLM transport — second implementation of #188's `LLMClient` interface backed by a real provider; includes auth, endpoint config, and the MCP tool / local proxy / direct browser API decision. Drops in as a config toggle so #189 can expand beyond the fixture corpus to open-ended queries. | #188, #189 |
