@@ -15,11 +15,35 @@ The Filter Bar now has a **Platform** chip. Click the (+) button, pick "Platform
 
 The chip behaves like every other chip. Click to edit — the popover re-opens pre-filled with the current attributes. Toggle negate — the CQL2 output wraps in `not` and the result set inverts. Drag it into an OR container and you can build "British submarines OR German frigates" without any new mental model. Remove and the bar returns to baseline.
 
-## Screenshots
+## The Flow
 
-![Light theme](../evidence/screenshots/component-light.png)
-![Dark theme](../evidence/screenshots/component-dark.png)
-![VS Code theme](../evidence/screenshots/component-vscode.png)
+The whole user story is four screenshots.
+
+### 1 — Empty bar
+
+![Empty filter bar](../evidence/screenshots/interaction-1-empty.png)
+
+### 2 — Filter-type menu with the new "Platform" entry
+
+![Filter type dropdown showing Platform option](../evidence/screenshots/interaction-2-menu.png)
+
+### 3 — Compound editor with attributes selected
+
+![Platform value editor with nationality and domain picked, Confirm enabled](../evidence/screenshots/interaction-3-editor.png)
+
+### 4 — Confirmed chip
+
+![Confirmed platform chip in the filter bar, labelled Platform: DE · Subsurface](../evidence/screenshots/interaction-4-chip.png)
+
+## Theme Parity
+
+Tinted-blue background, anchor glyph, compound label — all additive styling, so existing chip themes are unchanged. The chip reads correctly in every variant we ship.
+
+![Platform chip in the light theme](../evidence/screenshots/component-light.png)
+
+![Platform chip in the dark theme](../evidence/screenshots/component-dark.png)
+
+![Platform chip in the VS Code theme](../evidence/screenshots/component-vscode.png)
 
 ## Lessons Learned
 
