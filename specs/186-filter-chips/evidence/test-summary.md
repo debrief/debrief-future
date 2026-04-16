@@ -53,12 +53,15 @@ coverage_pct: null
 
 ## Known Issues
 
-- Playwright E2E tests (`FilterBar.platform.spec.ts`) authored for E1–E7 but not executed during this implementation pass — Storybook+Chromium runtime bootstrapping not attempted in the cloud session. The spec file is complete and runnable via `node apps/web-shell/run-playwright.mjs FilterBar.platform`.
 - 4 pre-existing skipped tests in `nl-cql2` harness captures (unrelated to this feature).
+
+## Playwright E2E
+
+`shared/components/e2e/FilterBar.platform.spec.ts` — 10 tests, all passing. Covers E1–E7 + an interaction-keyframe capture test that writes `interaction-{1..4}-*.png` into `evidence/screenshots/`. Full results in `evidence/e2e-summary.md`.
 
 ## Environment
 
-- Runner: vitest (unit + component), Playwright (E2E, spec authored)
+- Runner: vitest (unit + component), Playwright on @sparticuz/chromium (E2E)
 - Branch: `claude/implement-speckit-186-eJ2Oy`
 - Node/pnpm: workspace-managed
 - Catalog fixture: inlined in each test file (no reliance on Storybook `MOCK_ITEMS`).

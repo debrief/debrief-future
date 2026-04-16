@@ -15,38 +15,64 @@ const EVIDENCE_DIR = '../../specs/186-filter-chips/evidence/screenshots';
 const PLATFORM_STORY = '/iframe.html?id=filterbar--with-platform-chip';
 const EMPTY_URL = '/iframe.html?id=filterbar--empty';
 const INTERACTIVE_URL = '/iframe.html?id=filterbar--interactive';
-const OR_STORY = '/iframe.html?id=filterbar--platform-chips-in-an-or-group';
+const OR_STORY = '/iframe.html?id=filterbar--platform-chip-or-group';
 
 const theme = (url: string, t: string) => `${url}&globals=theme:${t}`;
 
+const THEME_BG: Record<'light' | 'dark' | 'vscode', { bg: string; fg: string }> = {
+  light: { bg: '#ffffff', fg: '#222222' },
+  dark: { bg: '#1e1e1e', fg: '#d4d4d4' },
+  vscode: { bg: '#252526', fg: '#cccccc' },
+};
+
+async function captureThemedScreenshot(
+  page: import('@playwright/test').Page,
+  themeName: 'light' | 'dark' | 'vscode',
+  path: string,
+) {
+  await page.goto(theme(PLATFORM_STORY, themeName));
+  await page.waitForSelector('[data-testid="filter-bar"]');
+
+  // Apply the theme imperatively. Storybook's globals URL parameter doesn't
+  // always re-trigger the ThemeProvider decorator for the first paint, and
+  // Storybook owns the iframe <html>/<body> backgrounds. We set both the
+  // data-theme attribute (which the ThemeProvider honours) AND a CSS override
+  // that forces the backdrop so the theme is visually evident in the capture.
+  await page.evaluate(
+    ({ t, bg, fg }) => {
+      document.documentElement.setAttribute('data-theme', t);
+      const styleId = 'platform-chip-theme-override';
+      const prev = document.getElementById(styleId);
+      if (prev) prev.remove();
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        html, body, #storybook-root, .sb-show-main {
+          background: ${bg} !important;
+          color: ${fg} !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
+    { t: themeName, ...THEME_BG[themeName] },
+  );
+
+  await page.waitForTimeout(200);
+  await page.screenshot({ path, fullPage: true });
+}
+
 test.describe('Platform chip — theme variants (E7)', () => {
   test('renders in light theme', async ({ page }) => {
-    await page.goto(theme(PLATFORM_STORY, 'light'));
-    await page.waitForSelector('[data-testid="filter-bar"]');
-    // The chip id is seeded from the story data
+    await captureThemedScreenshot(page, 'light', `${EVIDENCE_DIR}/component-light.png`);
     await expect(page.getByTestId('lozenge-story-p1')).toBeVisible();
-    await page.screenshot({
-      path: `${EVIDENCE_DIR}/component-light.png`,
-      fullPage: true,
-    });
   });
 
   test('renders in dark theme', async ({ page }) => {
-    await page.goto(theme(PLATFORM_STORY, 'dark'));
-    await page.waitForSelector('[data-testid="filter-bar"]');
-    await page.screenshot({
-      path: `${EVIDENCE_DIR}/component-dark.png`,
-      fullPage: true,
-    });
+    await captureThemedScreenshot(page, 'dark', `${EVIDENCE_DIR}/component-dark.png`);
   });
 
   test('renders in vscode theme', async ({ page }) => {
-    await page.goto(theme(PLATFORM_STORY, 'vscode'));
-    await page.waitForSelector('[data-testid="filter-bar"]');
-    await page.screenshot({
-      path: `${EVIDENCE_DIR}/component-vscode.png`,
-      fullPage: true,
-    });
+    await captureThemedScreenshot(page, 'vscode', `${EVIDENCE_DIR}/component-vscode.png`);
   });
 });
 
@@ -115,7 +141,7 @@ test.describe('Platform chip — OR composition (E6)', () => {
     await page.waitForSelector('[data-testid="filter-bar"]');
 
     await expect(page.locator('[data-shape="platform"]')).toHaveCount(2);
-    await expect(page.locator('[data-testid^="or-container-"]')).toBeVisible();
+    await expect(page.locator('.debrief-or-container').first()).toBeVisible();
   });
 });
 
@@ -126,5 +152,41 @@ test.describe('Platform chip — edit flow (E2)', () => {
 
     await page.getByTestId('lozenge-body-story-p1').click();
     await expect(page.getByTestId('platform-value-editor')).toBeVisible();
+  });
+});
+
+test.describe('Platform chip — interaction keyframes (evidence)', () => {
+  test('captures four keyframes of the add flow', async ({ page }) => {
+    await page.goto(theme(EMPTY_URL, 'light'));
+    await page.waitForSelector('[data-testid="filter-bar"]');
+    await page.setViewportSize({ width: 900, height: 320 });
+
+    // Frame 1: empty filter bar
+    await page.screenshot({ path: `${EVIDENCE_DIR}/interaction-1-empty.png` });
+
+    // Frame 2: filter-type menu open
+    await page.click('[data-testid="filter-add-button"]');
+    await page.waitForSelector('[data-testid="filter-type-dropdown"]');
+    await page.screenshot({ path: `${EVIDENCE_DIR}/interaction-2-menu.png` });
+
+    // Frame 3: platform editor open with attributes selected
+    await page.click('[data-testid="filter-type-platform"]');
+    await page.waitForSelector('[data-testid="platform-value-editor"]');
+    const natSelect = page.getByTestId('platform-editor-select-nationality');
+    const natCount = await natSelect.locator('option').count();
+    if (natCount > 1) {
+      await natSelect.selectOption({ index: 1 });
+    }
+    const domSelect = page.getByTestId('platform-editor-select-domain');
+    const domCount = await domSelect.locator('option').count();
+    if (domCount > 1) {
+      await domSelect.selectOption({ index: 1 });
+    }
+    await page.screenshot({ path: `${EVIDENCE_DIR}/interaction-3-editor.png` });
+
+    // Frame 4: chip confirmed
+    await page.getByTestId('platform-editor-confirm').click();
+    await expect(page.locator('[data-shape="platform"]').first()).toBeVisible();
+    await page.screenshot({ path: `${EVIDENCE_DIR}/interaction-4-chip.png` });
   });
 });
