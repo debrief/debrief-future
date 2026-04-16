@@ -23,19 +23,28 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 3. **Read spec.md** from FEATURE_DIR for user stories and acceptance criteria.
 
-4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
-   - Correct feature name from plan.md
-   - **Evidence Requirements section** (see Evidence Planning Rules below)
-   - Phase 1: Setup tasks (project initialization)
-   - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from spec.md)
-   - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection, media content, AND PR creation tasks)
+4. **Generate tasks.md incrementally** (REQUIRED — do NOT write the full file in one call). A single `Write` call producing the entire file can exceed the stream idle timeout on dense features. Instead:
+
+   **Step 4a — Write skeleton** (`Write` tool, one call):
+   Create `tasks.md` with ONLY:
+   - Title (feature name from plan.md)
+   - Evidence Requirements section (full content — see Evidence Planning Rules below)
+   - Phase headings as empty placeholders (e.g. `## Phase 1: Setup`, `## Phase 2: Foundation`, one heading per user story, `## Phase N: Polish & Cross-Cutting Concerns`)
+   - Empty `## Dependencies` heading
+   - Empty `## Implementation Strategy` heading
+
+   **Step 4b — Fill each phase** (`Edit` tool, one call per phase):
+   For each phase placeholder in turn, replace it with the fully populated section:
+   - Story goal, independent test criteria, tests (if requested), implementation tasks
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
-   - Dependencies section showing story completion order
-   - Parallel execution examples per story
-   - Implementation strategy section (incremental delivery)
+   - Parallel execution examples inside the phase
+
+   **Step 4c — Fill cross-cutting sections** (`Edit` tool, one call each):
+   - Replace empty `## Dependencies` with story completion order
+   - Replace empty `## Implementation Strategy` with incremental delivery notes
+
+   Use `.specify/templates/tasks-template.md` as the structural reference. The Polish phase MUST include evidence collection, media content, AND PR creation tasks (see Evidence Planning Rules).
 
 5. **Plan evidence artifacts**: Determine what evidence should be captured to demonstrate the feature works:
    - **Test evidence**: What test output/summary will prove correctness?
