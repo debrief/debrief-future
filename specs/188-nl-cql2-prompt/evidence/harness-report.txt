@@ -1,0 +1,214 @@
+NL → CQL2 Harness Report
+========================
+Generated at: 2026-04-16T13:07:56.557Z
+Corpus size: 12
+Catalog items: 73
+Prompt size: 6018 bytes
+Elapsed:     13 ms
+Passed:      12
+Failed:      0
+
+Passes (CQL2 captured per decision 12A)
+----------------------------------------
+
+[french-platforms] "French platforms"
+  matchCount: 19
+  cql2: {
+          "op": "a_containedBy",
+          "args": [
+            [
+              "FR"
+            ],
+            {
+              "property": "debrief:platforms[*].nationality"
+            }
+          ]
+        }
+
+[submarines] "submarines"
+  matchCount: 34
+  cql2: {
+          "op": "array_filter",
+          "args": [
+            {
+              "property": "debrief:platforms"
+            },
+            {
+              "op": "=",
+              "args": [
+                {
+                  "property": "domain"
+                },
+                "subsurface"
+              ]
+            }
+          ]
+        }
+
+[uk-submarines] "UK submarines"
+  matchCount: 17
+  cql2: {
+          "op": "array_filter",
+          "args": [
+            {
+              "property": "debrief:platforms"
+            },
+            {
+              "op": "and",
+              "args": [
+                {
+                  "op": "=",
+                  "args": [
+                    {
+                      "property": "nationality"
+                    },
+                    "GB"
+                  ]
+                },
+                {
+                  "op": "=",
+                  "args": [
+                    {
+                      "property": "domain"
+                    },
+                    "subsurface"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+[type23-frigates] "Type 23 frigates"
+  matchCount: 23
+  cql2: {
+          "op": "a_containedBy",
+          "args": [
+            [
+              "type23"
+            ],
+            {
+              "property": "debrief:platforms[*].vessel_class"
+            }
+          ]
+        }
+
+[destroyers] "destroyers"
+  matchCount: 17
+  cql2: {
+          "op": "a_containedBy",
+          "args": [
+            [
+              "destroyer"
+            ],
+            {
+              "property": "debrief:platforms[*].vessel_class"
+            }
+          ]
+        }
+
+[saxon-warrior-exercise] "Saxon Warrior exercise"
+  matchCount: 73
+  cql2: {
+          "op": "like",
+          "args": [
+            {
+              "property": "title"
+            },
+            "%Saxon Warrior%"
+          ]
+        }
+
+[british-type23] "British Type 23"
+  matchCount: 20
+  cql2: {
+          "op": "array_filter",
+          "args": [
+            {
+              "property": "debrief:platforms"
+            },
+            {
+              "op": "and",
+              "args": [
+                {
+                  "op": "=",
+                  "args": [
+                    {
+                      "property": "nationality"
+                    },
+                    "GB"
+                  ]
+                },
+                {
+                  "op": "=",
+                  "args": [
+                    {
+                      "property": "vessel_type"
+                    },
+                    "type23"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+[saxon-warrior-submarines] "Saxon Warrior submarines"
+  matchCount: 34
+  cql2: {
+          "op": "and",
+          "args": [
+            {
+              "op": "like",
+              "args": [
+                {
+                  "property": "title"
+                },
+                "%Saxon Warrior%"
+              ]
+            },
+            {
+              "op": "array_filter",
+              "args": [
+                {
+                  "property": "debrief:platforms"
+                },
+                {
+                  "op": "=",
+                  "args": [
+                    {
+                      "property": "domain"
+                    },
+                    "subsurface"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+[klingon-warbirds] "Klingon warbirds"
+  matchCount: 73
+  cql2: {}
+
+[unknown-nationality] "ZZ warships"
+  matchCount: 73
+  cql2: {}
+
+[british-warp-drive] "British warp drive platforms"
+  matchCount: 54
+  cql2: {
+          "op": "a_containedBy",
+          "args": [
+            [
+              "GB"
+            ],
+            {
+              "property": "debrief:platforms[*].nationality"
+            }
+          ]
+        }
+
+[nonsense-phrase] "xyzzy foobar quuxes"
+  matchCount: 73
+  cql2: {}

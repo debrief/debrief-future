@@ -238,13 +238,32 @@ The generator DOES throw on programmer errors: missing enum bundle at constructi
 
 **Decision**: During implementation, measure the prompt size produced against the current enum bundle and record the result here. Extrapolate to 30 and 50 registered platforms (the plausible near-term ranges as #180's registry fills in during samples work) and confirm the extrapolation stays under SC-004's 20 KB ceiling. If headroom is tight, note the trigger point at which enum summarisation (e.g. collapsing vessel_type → vessel_role leaves, dropping rarely-used tags) becomes necessary.
 
-**Placeholder values — to be filled during implementation**:
+**Measured values (2026-04-16 — captured via `src/nl-cql2/__tests__/prompt-size.test.ts`)**:
 
-| Registry size (platforms) | Enum bundle size | Prompt size (bytes) | Headroom vs 20 KB |
-|---------------------------|------------------|---------------------|-------------------|
-| 10 (current) | _tbc_ | _tbc_ | _tbc_ |
-| 30 (projected) | _tbc_ | _tbc_ | _tbc_ |
-| 50 (projected) | _tbc_ | _tbc_ | _tbc_ |
+| Registry size (platforms) | Prompt size (bytes) | Headroom vs 20 KB |
+|---------------------------|---------------------|-------------------|
+| 10 (current shipped enum bundle) | 6,018 | 14,462 bytes |
+| 30 (projected — tree cloned to ~30 leaves) | 15,318 | 5,162 bytes |
+| 50 (projected — tree cloned to ~50 leaves) | 27,342 | **exceeds ceiling by 6,862 bytes** |
+
+**Interpretation**: At the current 10-leaf taxonomy the prompt sits at roughly
+30% of the 20 KB ceiling (SC-004 / decision 15A). Doubling the taxonomy
+keeps the prompt under the limit. Tripling it — i.e. moving to 50 registered
+platforms — breaks through the ceiling by ~7 KB. The tripping point is
+roughly 38–40 taxonomy leaves.
+
+**Trigger for action**: Once the platform registry (#180) crosses ~30
+registered platforms, we should revisit:
+
+- Collapsing the taxonomy rendering to `vessel_role` leaves only (drop
+  `vessel_type` names unless they introduce new roles).
+- Dropping the `full_name` labels from the prompt (keep ids only) — labels
+  are for human operators; the LLM does not require them.
+- Token-aware summarisation: group rare `tag` / `feature_tag` values under an
+  "… and N others" sentinel.
+
+None of these are needed today but the measurements give the team a
+documented threshold before CI starts failing on SC-004.
 
 **Rationale**:
 - SC-004 is enforced at runtime by decision 15A, but a CI-only gate gives no advance warning — the first sign of trouble would be a failing build during unrelated registry work. Measuring the trajectory now gives the team a documented ceiling estimate before #180 expands.

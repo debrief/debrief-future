@@ -1,0 +1,74 @@
+[
+  {
+    "id": "french-platforms",
+    "phrase": "French platforms",
+    "expected": { "matchCount": 19 },
+    "notes": "nationality-only query (FR-008 #1); uses a_containedBy over debrief:platforms[*].nationality"
+  },
+  {
+    "id": "submarines",
+    "phrase": "submarines",
+    "expected": { "matchCount": 34 },
+    "notes": "domain-only query (FR-008 #2); expressed via vessel-class=submarine with taxonomy expansion covering all submarine variants"
+  },
+  {
+    "id": "uk-submarines",
+    "phrase": "UK submarines",
+    "expected": { "matchCount": 17 },
+    "notes": "nationality+domain compound (FR-008 #3); MUST use array_filter(platforms, and(nationality=GB, domain=subsurface)) per FR-005"
+  },
+  {
+    "id": "type23-frigates",
+    "phrase": "Type 23 frigates",
+    "expected": { "matchCount": 23 },
+    "notes": "vessel-type query (FR-008 #4); single-dimension — a_containedBy on vessel-class=type23 with taxonomy expansion"
+  },
+  {
+    "id": "destroyers",
+    "phrase": "destroyers",
+    "expected": { "matchCount": 17 },
+    "notes": "vessel-role query (FR-008 #5); vessel-class=destroyer with taxonomy expansion"
+  },
+  {
+    "id": "saxon-warrior-exercise",
+    "phrase": "Saxon Warrior exercise",
+    "expected": { "matchCount": 73 },
+    "notes": "exercise-only query (FR-008 #6); expressed as like(title, %Saxon Warrior%) — current sample catalog has one exercise so count is whole-catalog but the dimension is genuinely exercised"
+  },
+  {
+    "id": "british-type23",
+    "phrase": "British Type 23",
+    "expected": { "matchCount": 20 },
+    "notes": "compound nationality+vessel-type (FR-008 #7); MUST use array_filter(platforms, and(nationality=GB, vessel_type=type23))"
+  },
+  {
+    "id": "saxon-warrior-submarines",
+    "phrase": "Saxon Warrior submarines",
+    "expected": { "matchCount": 34 },
+    "notes": "compound exercise+platform (FR-008 #8); top-level AND of like(title) + a_containedBy(vessel-class=submarine)"
+  },
+  {
+    "id": "klingon-warbirds",
+    "phrase": "Klingon warbirds",
+    "expected": { "matchCount": null, "unrecognisedTerms": ["klingon", "warbirds"] },
+    "notes": "unrecognised-term phrase (FR-008 #9 / FR-013); generator must emit {} and surface the terms in unrecognisedTerms"
+  },
+  {
+    "id": "unknown-nationality",
+    "phrase": "ZZ warships",
+    "expected": { "matchCount": null, "unrecognisedTerms": ["ZZ"] },
+    "notes": "US3 (a) — unknown nationality code alongside a recognised dimension; ZZ must NOT appear as a nationality value in CQL2, and the generator may emit an empty filter or a partial CQL2 that ignores the unknown term"
+  },
+  {
+    "id": "british-warp-drive",
+    "phrase": "British warp drive platforms",
+    "expected": { "matchCount": 54, "unrecognisedTerms": ["warp drive"] },
+    "notes": "US3 (b) — well-formed query with one recognised dimension (GB) and one unrecognised term (warp drive); CQL2 emits only the recognised predicate"
+  },
+  {
+    "id": "nonsense-phrase",
+    "phrase": "xyzzy foobar quuxes",
+    "expected": { "matchCount": null, "unrecognisedTerms": ["xyzzy", "foobar", "quuxes"] },
+    "notes": "US3 (c) — entirely unrecognisable phrase; the generator must surface all terms and emit an empty filter"
+  }
+]

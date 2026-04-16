@@ -1,13 +1,30 @@
 /**
  * CQL2 JSON serialisation for FilterExpression (#126).
  *
- * Converts the internal filter model to OGC CQL2 JSON encoding.
+ * Converts the internal filter model to OGC CQL2 JSON encoding and back.
+ *
+ * Scope additions in #188:
+ *   - PROPERTY_MAP is promoted to an exported constant (decision 3A) so the
+ *     NL→CQL2 prompt builder consumes the same source of truth as the
+ *     evaluator.
+ *   - `cql2JsonToFilterExpression` is the new full reverse parser (decision
+ *     1A). `cql2JsonToArrayFilters` remains exported for backwards
+ *     compatibility with #127's filter-bar imports; internally it delegates
+ *     to the new parser.
  */
 
-import type { ArrayFilterPredicate, CompoundPredicate, FilterExpression, FilterType, PlatformField, Predicate } from "./types";
+import type {
+  ArrayFilterPredicate,
+  CompoundPredicate,
+  FilterExpression,
+  FilterType,
+  OrGroup,
+  PlatformField,
+  Predicate,
+} from "./types";
 
-/** CQL2 property name mapping for each filter type */
-const PROPERTY_MAP: Record<FilterType, string> = {
+/** CQL2 property name mapping for each filter type. Exported (#188 decision 3A). */
+export const PROPERTY_MAP: Readonly<Record<FilterType, string>> = {
   "vessel-class": "debrief:platforms[*].vessel_class",
   tag: "debrief:tags",
   author: "debrief:author",
@@ -20,6 +37,13 @@ const PROPERTY_MAP: Record<FilterType, string> = {
   nationality: "debrief:platforms[*].nationality",
   collection: "collection",
 };
+
+/** Reverse lookup: CQL2 property path → FilterType. */
+const PROPERTY_TO_FILTER_TYPE: ReadonlyMap<string, FilterType> = new Map(
+  (Object.entries(PROPERTY_MAP) as [FilterType, string][]).map(
+    ([filterType, property]) => [property, filterType],
+  ),
+);
 
 /** Array-valued filter types that use a_containedBy operator */
 const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
@@ -141,7 +165,7 @@ interface Cql2Node {
 }
 
 /** A CQL2 JSON arg can be a node, a property ref, or a scalar */
-type Cql2NodeArg = Cql2Node | { readonly property: string } | string;
+type Cql2NodeArg = Cql2Node | { readonly property: string } | string | number | boolean;
 
 /** Parse a CQL2 JSON node into a CompoundPredicate */
 function parseCql2Predicate(node: Cql2Node): CompoundPredicate {
@@ -223,4 +247,296 @@ function walkCql2(
       walkCql2(child as Cql2Node, results);
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Full reverse parser (#188 decision 1A)
+// ---------------------------------------------------------------------------
+
+/**
+ * Error thrown by `cql2JsonToFilterExpression` when the input is not supported
+ * by the evaluator.
+ *
+ * The generator's `parseResponse` catches this and surfaces it as a
+ * `cql2-evaluation-failed` error reason (decision 8A) rather than letting it
+ * crash the caller.
+ */
+export class Cql2ReverseParseError extends Error {
+  public readonly code:
+    | "unsupported-operator"
+    | "bad-arg-arity"
+    | "unknown-property"
+    | "malformed-node";
+
+  public constructor(
+    code:
+      | "unsupported-operator"
+      | "bad-arg-arity"
+      | "unknown-property"
+      | "malformed-node",
+    message: string,
+  ) {
+    super(message);
+    this.name = "Cql2ReverseParseError";
+    this.code = code;
+  }
+}
+
+/** Leaf comparison: convert a top-level CQL2 expression into a Predicate. */
+function parseTopLevelComparison(
+  node: Cql2Node,
+  negated: boolean,
+): Predicate {
+  const op = node.op;
+  const args = node.args ?? [];
+
+  if (op === "=") {
+    if (args.length !== 2) {
+      throw new Cql2ReverseParseError(
+        "bad-arg-arity",
+        `"=" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const propRef = args[0] as { property?: string };
+    const value = args[1];
+    if (!propRef || typeof propRef.property !== "string") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"=" expected {property} as first arg`,
+      );
+    }
+    const filterType = PROPERTY_TO_FILTER_TYPE.get(propRef.property);
+    if (!filterType) {
+      throw new Cql2ReverseParseError(
+        "unknown-property",
+        `Unknown property path: ${propRef.property}`,
+      );
+    }
+    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"=" expected scalar value, got ${typeof value}`,
+      );
+    }
+    return { type: filterType, value: String(value), negated };
+  }
+
+  if (op === "like") {
+    if (args.length !== 2) {
+      throw new Cql2ReverseParseError(
+        "bad-arg-arity",
+        `"like" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const propRef = args[0] as { property?: string };
+    const value = args[1];
+    if (!propRef || typeof propRef.property !== "string") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"like" expected {property} as first arg`,
+      );
+    }
+    const filterType = PROPERTY_TO_FILTER_TYPE.get(propRef.property);
+    if (!filterType) {
+      throw new Cql2ReverseParseError(
+        "unknown-property",
+        `Unknown property path: ${propRef.property}`,
+      );
+    }
+    if (typeof value !== "string") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"like" expected string pattern, got ${typeof value}`,
+      );
+    }
+    // Strip leading/trailing % wildcards to recover the original value
+    const inner = value.replace(/^%/, "").replace(/%$/, "");
+    return { type: filterType, value: inner, negated };
+  }
+
+  if (op === "a_containedBy") {
+    if (args.length !== 2) {
+      throw new Cql2ReverseParseError(
+        "bad-arg-arity",
+        `"a_containedBy" requires exactly 2 args, got ${args.length}`,
+      );
+    }
+    const valueList = args[0];
+    const propRef = args[1] as { property?: string };
+    if (!Array.isArray(valueList) || valueList.length === 0) {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"a_containedBy" expected non-empty value array as first arg`,
+      );
+    }
+    if (!propRef || typeof propRef.property !== "string") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"a_containedBy" expected {property} as second arg`,
+      );
+    }
+    const filterType = PROPERTY_TO_FILTER_TYPE.get(propRef.property);
+    if (!filterType) {
+      throw new Cql2ReverseParseError(
+        "unknown-property",
+        `Unknown property path: ${propRef.property}`,
+      );
+    }
+    const first = valueList[0];
+    if (typeof first !== "string") {
+      throw new Cql2ReverseParseError(
+        "malformed-node",
+        `"a_containedBy" values must be strings, got ${typeof first}`,
+      );
+    }
+    return { type: filterType, value: first, negated };
+  }
+
+  throw new Cql2ReverseParseError(
+    "unsupported-operator",
+    `Unsupported top-level operator: ${op ?? "<undefined>"}`,
+  );
+}
+
+/**
+ * Top-level dispatch: reduce a CQL2 node into parts of a FilterExpression.
+ * Handles `array_filter` (with optional NOT wrapper) separately from leaf
+ * comparisons; recurses into `and` so mixed trees flatten correctly.
+ *
+ * OR wrapping: we only recognise an OR at the top level as a single OrGroup
+ * whose children are themselves leaf predicates (matches what
+ * `filterExpressionToCql2Json` emits for an `orGroups` entry).
+ */
+function absorbNode(
+  node: Cql2Node,
+  out: {
+    predicates: Predicate[];
+    orGroups: OrGroup[];
+    arrayFilters: ArrayFilterPredicate[];
+  },
+  negated: boolean,
+): void {
+  const op = node.op;
+
+  if (op === "and") {
+    const args = node.args ?? [];
+    for (const child of args) {
+      if (typeof child !== "object" || child === null || Array.isArray(child)) {
+        throw new Cql2ReverseParseError(
+          "malformed-node",
+          `"and" child must be an object node`,
+        );
+      }
+      absorbNode(child as Cql2Node, out, negated);
+    }
+    return;
+  }
+
+  if (op === "or") {
+    const args = node.args ?? [];
+    const orPredicates: Predicate[] = [];
+    for (const child of args) {
+      if (typeof child !== "object" || child === null || Array.isArray(child)) {
+        throw new Cql2ReverseParseError(
+          "malformed-node",
+          `"or" child must be an object node`,
+        );
+      }
+      orPredicates.push(parseTopLevelComparison(child as Cql2Node, false));
+    }
+    out.orGroups.push({ predicates: orPredicates });
+    return;
+  }
+
+  if (op === "not") {
+    const args = node.args ?? [];
+    if (args.length !== 1) {
+      throw new Cql2ReverseParseError(
+        "bad-arg-arity",
+        `"not" requires exactly 1 arg, got ${args.length}`,
+      );
+    }
+    const inner = args[0] as Cql2Node;
+    if (inner?.op === "array_filter") {
+      absorbArrayFilter(inner, out.arrayFilters, !negated);
+      return;
+    }
+    // Leaf predicate negation
+    out.predicates.push(parseTopLevelComparison(inner, !negated));
+    return;
+  }
+
+  if (op === "array_filter") {
+    absorbArrayFilter(node, out.arrayFilters, negated);
+    return;
+  }
+
+  // Leaf comparison
+  out.predicates.push(parseTopLevelComparison(node, negated));
+}
+
+function absorbArrayFilter(
+  node: Cql2Node,
+  arrayFilters: ArrayFilterPredicate[],
+  negated: boolean,
+): void {
+  const args = node.args ?? [];
+  if (args.length !== 2) {
+    throw new Cql2ReverseParseError(
+      "bad-arg-arity",
+      `"array_filter" requires exactly 2 args, got ${args.length}`,
+    );
+  }
+  const arrayRef = args[0] as { property?: string };
+  if (!arrayRef || arrayRef.property !== "debrief:platforms") {
+    throw new Cql2ReverseParseError(
+      "malformed-node",
+      `"array_filter" first arg must reference debrief:platforms`,
+    );
+  }
+  const predicateNode = args[1] as Cql2Node;
+  if (typeof predicateNode !== "object" || predicateNode === null) {
+    throw new Cql2ReverseParseError(
+      "malformed-node",
+      `"array_filter" second arg must be a predicate node`,
+    );
+  }
+  arrayFilters.push({
+    array: "platforms",
+    predicate: parseCql2Predicate(predicateNode),
+    negated: negated === true ? true : false,
+  });
+}
+
+/**
+ * Reverse of `filterExpressionToCql2Json`. Accepts a CQL2-JSON object and
+ * returns a typed `FilterExpression`. Empty input `{}` yields an empty
+ * FilterExpression (match-all).
+ *
+ * Throws `Cql2ReverseParseError` for unsupported operators, bad arg arity,
+ * unknown property paths, or malformed nodes. Callers in #188's generator
+ * pipeline catch this and surface it as a `cql2-evaluation-failed` error
+ * reason rather than letting it raise.
+ */
+export function cql2JsonToFilterExpression(
+  cql2: Record<string, unknown>,
+): FilterExpression {
+  // Empty object → match all (no-op filter)
+  if (Object.keys(cql2).length === 0) {
+    return { predicates: [], orGroups: [], arrayFilters: [] };
+  }
+
+  const out = {
+    predicates: [] as Predicate[],
+    orGroups: [] as OrGroup[],
+    arrayFilters: [] as ArrayFilterPredicate[],
+  };
+
+  absorbNode(cql2 as Cql2Node, out, false);
+
+  return {
+    predicates: out.predicates,
+    orGroups: out.orGroups,
+    arrayFilters: out.arrayFilters,
+  };
 }
