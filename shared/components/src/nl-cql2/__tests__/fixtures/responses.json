@@ -1,0 +1,74 @@
+{
+  "french platforms": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"a_containedBy\",\n    \"args\": [[\"FR\"], { \"property\": \"debrief:platforms[*].nationality\" }]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"nationality\", \"value\": \"FR\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "fa416988d4b73b59a34aebded187e37451a68a017c78a0cea0e3ac453e0b145c",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "submarines": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"array_filter\",\n    \"args\": [\n      { \"property\": \"debrief:platforms\" },\n      { \"op\": \"=\", \"args\": [{ \"property\": \"domain\" }, \"subsurface\"] }\n    ]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"vessel-class\", \"value\": \"submarine\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "35f1d8d5a708f3eb83c62209b9b594324e288da1783aa1eed83f9fee9b1b1494",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "uk submarines": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"array_filter\",\n    \"args\": [\n      { \"property\": \"debrief:platforms\" },\n      {\n        \"op\": \"and\",\n        \"args\": [\n          { \"op\": \"=\", \"args\": [{ \"property\": \"nationality\" }, \"GB\"] },\n          { \"op\": \"=\", \"args\": [{ \"property\": \"domain\" }, \"subsurface\"] }\n        ]\n      }\n    ]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"nationality\", \"value\": \"GB\" },\n    { \"filterType\": \"vessel-class\", \"value\": \"submarine\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "1f64452b69b59aee0d3f2aa12622cddddabf2bcb0255461e93aff8771afad7fa",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "type 23 frigates": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"a_containedBy\",\n    \"args\": [[\"type23\"], { \"property\": \"debrief:platforms[*].vessel_class\" }]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"vessel-class\", \"value\": \"type23\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "7ec346c375e168d5c3982cb05bd5a78a4b093841adecee60efe8446ad23929e3",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "destroyers": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"a_containedBy\",\n    \"args\": [[\"destroyer\"], { \"property\": \"debrief:platforms[*].vessel_class\" }]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"vessel-class\", \"value\": \"destroyer\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "ecd37585809dd780595da99708ab058d1bf48ee0ea6f2175e4ac32f046e2693e",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "saxon warrior exercise": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"like\",\n    \"args\": [{ \"property\": \"title\" }, \"%Saxon Warrior%\"]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"title\", \"value\": \"Saxon Warrior\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "ee5ed5cdb07a165aaf423c857cdae819c9b758e9ab61812bdcedb7e43583c155",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "british type 23": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"array_filter\",\n    \"args\": [\n      { \"property\": \"debrief:platforms\" },\n      {\n        \"op\": \"and\",\n        \"args\": [\n          { \"op\": \"=\", \"args\": [{ \"property\": \"nationality\" }, \"GB\"] },\n          { \"op\": \"=\", \"args\": [{ \"property\": \"vessel_type\" }, \"type23\"] }\n        ]\n      }\n    ]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"nationality\", \"value\": \"GB\" },\n    { \"filterType\": \"vessel-class\", \"value\": \"type23\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "f2eb3c91ec9ba5d09cbc252fddeef1e4e10c90b8ec627be85457e85dd2f66a0a",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "saxon warrior submarines": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"and\",\n    \"args\": [\n      { \"op\": \"like\", \"args\": [{ \"property\": \"title\" }, \"%Saxon Warrior%\"] },\n      {\n        \"op\": \"array_filter\",\n        \"args\": [\n          { \"property\": \"debrief:platforms\" },\n          { \"op\": \"=\", \"args\": [{ \"property\": \"domain\" }, \"subsurface\"] }\n        ]\n      }\n    ]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"title\", \"value\": \"Saxon Warrior\" },\n    { \"filterType\": \"vessel-class\", \"value\": \"submarine\" }\n  ],\n  \"unrecognised_terms\": []\n}",
+    "promptHash": "13ad2be3332d4dfb764bc5bfd1172bec23cf01b674b290498f6cbf08cc3297aa",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "klingon warbirds": {
+    "rawResponse": "{\n  \"cql2\": {},\n  \"lozenges\": [],\n  \"unrecognised_terms\": [\"klingon\", \"warbirds\"]\n}",
+    "promptHash": "8016c8c42a53fa1b527a5712c4733ae42731693cd177c678e8acf1f98dc27ef9",
+    "recordedAt": "2026-04-16T12:52:00Z",
+    "model": "hand-authored"
+  },
+  "zz warships": {
+    "rawResponse": "{\n  \"cql2\": {},\n  \"lozenges\": [],\n  \"unrecognised_terms\": [\"ZZ\"]\n}",
+    "promptHash": "e5b59ccb9b1480ebd50777e11c15a595e847c687c6d6634467fac6aa92c067a3",
+    "recordedAt": "2026-04-16T13:08:00Z",
+    "model": "hand-authored"
+  },
+  "british warp drive platforms": {
+    "rawResponse": "{\n  \"cql2\": {\n    \"op\": \"a_containedBy\",\n    \"args\": [[\"GB\"], { \"property\": \"debrief:platforms[*].nationality\" }]\n  },\n  \"lozenges\": [\n    { \"filterType\": \"nationality\", \"value\": \"GB\" }\n  ],\n  \"unrecognised_terms\": [\"warp drive\"]\n}",
+    "promptHash": "fdedeb1b5a244648d86e9bc0c635a6232093d1c5b68c5804eed30e7fe58158d6",
+    "recordedAt": "2026-04-16T13:08:00Z",
+    "model": "hand-authored"
+  },
+  "xyzzy foobar quuxes": {
+    "rawResponse": "{\n  \"cql2\": {},\n  \"lozenges\": [],\n  \"unrecognised_terms\": [\"xyzzy\", \"foobar\", \"quuxes\"]\n}",
+    "promptHash": "1006baab54a5eee6a6d33520d65e5e64442de68975cb161043107f5b9a4779df",
+    "recordedAt": "2026-04-16T13:08:00Z",
+    "model": "hand-authored"
+  }
+}
