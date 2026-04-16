@@ -27,6 +27,10 @@ const FIXTURE_RESPONSES = resolve(
   REPO_ROOT,
   "shared/components/src/nl-cql2/__tests__/fixtures/responses.json",
 );
+const FIXTURE_CORPUS = resolve(
+  REPO_ROOT,
+  "shared/components/src/nl-cql2/__tests__/fixtures/corpus.json",
+);
 const PLATFORM_REGISTRY = resolve(REPO_ROOT, "shared/data/platform-registry.json");
 const ENUM_BUNDLE = resolve(REPO_ROOT, "shared/data/enum-bundle.json");
 
@@ -65,8 +69,12 @@ async function copyFixtures() {
   if (!existsSync(FIXTURE_RESPONSES)) {
     throw new Error(`fixture corpus not found: ${FIXTURE_RESPONSES}`);
   }
+  if (!existsSync(FIXTURE_CORPUS)) {
+    throw new Error(`fixture corpus.json not found: ${FIXTURE_CORPUS}`);
+  }
   await copyFile(FIXTURE_RESPONSES, join(DATA_DIR, "responses.json"));
-  console.log("[sync-data] copied responses.json");
+  await copyFile(FIXTURE_CORPUS, join(DATA_DIR, "corpus.json"));
+  console.log("[sync-data] copied responses.json + corpus.json");
 }
 
 async function copyRegistries() {
@@ -99,6 +107,46 @@ async function bundleLibrary() {
   console.log(`[sync-data] bundled debrief-lib.js (${(stats.size / 1024).toFixed(1)} KB)`);
 }
 
+async function vendorRuntime() {
+  const VENDOR_DIR = resolve(DATA_DIR, "vendor");
+  await ensureDir(VENDOR_DIR);
+
+  // Bundle React + ReactDOM together so they share a single React instance.
+  // The importmap in index.html maps both `react` and `react-dom/client` to
+  // this same file.
+  const runtimeEntry = resolve(DEMO_ROOT, "scripts/runtime-entry.mjs");
+  await build({
+    entryPoints: [runtimeEntry],
+    outfile: resolve(VENDOR_DIR, "runtime.js"),
+    bundle: true,
+    format: "esm",
+    target: ["es2022"],
+    platform: "browser",
+    minify: true,
+    sourcemap: false,
+    logLevel: "warning",
+    define: { "process.env.NODE_ENV": JSON.stringify("production") },
+  });
+
+  // Babel-standalone: copy the prebuilt UMD bundle from node_modules.
+  const babelSrc = resolve(
+    REPO_ROOT,
+    "node_modules/@babel/standalone/babel.min.js",
+  );
+  const babelAlt = resolve(
+    DEMO_ROOT,
+    "node_modules/@babel/standalone/babel.min.js",
+  );
+  const src = existsSync(babelSrc) ? babelSrc : babelAlt;
+  if (!existsSync(src)) {
+    throw new Error(
+      `babel-standalone not found in node_modules — run pnpm install first`,
+    );
+  }
+  await copyFile(src, resolve(VENDOR_DIR, "babel.min.js"));
+  console.log("[sync-data] vendored react + react-dom + babel-standalone");
+}
+
 async function main() {
   console.log("[sync-data] starting from repo root:", REPO_ROOT);
   await ensureDir(DATA_DIR);
@@ -107,6 +155,7 @@ async function main() {
   await copyFixtures();
   await copyRegistries();
   await bundleLibrary();
+  await vendorRuntime();
 
   console.log("[sync-data] complete.");
 }

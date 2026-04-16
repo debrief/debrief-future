@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "sync-data": "node scripts/sync-data.mjs",
-    "serve": "pnpm dlx serve@14 --no-clipboard --listen 8080 .",
+    "serve": "node scripts/serve.mjs 8080",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node run-playwright.mjs",
@@ -17,9 +17,12 @@
     "@debrief/components": "workspace:*"
   },
   "devDependencies": {
+    "@babel/standalone": "^7.24.7",
     "@playwright/test": "^1.58.0",
     "@sparticuz/chromium": "^143.0.4",
     "esbuild": "^0.24.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "vitest": "^1.0.0"
   }
 }

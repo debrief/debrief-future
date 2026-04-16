@@ -8,6 +8,10 @@ export {
   generateCql2,
   createRecordedLLMClient,
   canonicalisePhrase,
+  buildPrompt,
 } from "../../../shared/components/src/nl-cql2/index.ts";
 
-export { filterByCql2Json } from "../../../shared/components/src/filter-engine/index.ts";
+export {
+  filterByCql2Json,
+  vesselClassTreeToTaxonomy,
+} from "../../../shared/components/src/filter-engine/index.ts";
