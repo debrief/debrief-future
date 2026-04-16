@@ -172,14 +172,14 @@ description: "Task breakdown for 188-nl-cql2-prompt"
 
 ### Evidence Collection
 
-- [ ] T043 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and list every new/modified test file `specs/188-nl-cql2-prompt/evidence/test-summary.md`
-- [ ] T044 [P] Write a library-style usage example showing `generateCql2("UK submarines", deps)`, the returned `GenerationResult` (including `lozenges`), and how a consumer would feed `result.cql2` into `filterByCql2Json` `specs/188-nl-cql2-prompt/evidence/usage-example.md`
-- [ ] T045 [P] Export one corpus phrase's full `GenerationResult` as JSON for inspection `specs/188-nl-cql2-prompt/evidence/sample-generation-result.json`
+- [x] T043 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and list every new/modified test file `specs/188-nl-cql2-prompt/evidence/test-summary.md`
+- [x] T044 [P] Write a library-style usage example showing `generateCql2("UK submarines", deps)`, the returned `GenerationResult` (including `lozenges`), and how a consumer would feed `result.cql2` into `filterByCql2Json` `specs/188-nl-cql2-prompt/evidence/usage-example.md`
+- [x] T045 [P] Export one corpus phrase's full `GenerationResult` as JSON for inspection `specs/188-nl-cql2-prompt/evidence/sample-generation-result.json`
 
 ### Media Content
 
-- [ ] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 Stakeholder Demo UI, #190 Live LLM Transport) `specs/188-nl-cql2-prompt/media/shipped-post.md`
-- [ ] T047 [P] Draft the LinkedIn shipped summary (150–200 words, hook, link placeholder to shipped-post.md) `specs/188-nl-cql2-prompt/media/linkedin-shipped.md`
+- [x] T046 Spawn Content Specialist (`.claude/agents/media/content.md`) to author the shipped blog post: What We Built, Screenshots (harness output), Lessons Learned (review decisions 1A/2A/3A), What's Next (#189 Stakeholder Demo UI, #190 Live LLM Transport) `specs/188-nl-cql2-prompt/media/shipped-post.md`
+- [x] T047 [P] Draft the LinkedIn shipped summary (150–200 words, hook, link placeholder to shipped-post.md) `specs/188-nl-cql2-prompt/media/linkedin-shipped.md`
 
 ### PR Creation
 
