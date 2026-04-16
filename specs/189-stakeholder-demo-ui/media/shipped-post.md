@@ -22,6 +22,10 @@ The NL-to-CQL2 translation comes from #188's `generateCql2`, wired through that 
 
 _Initial state: all plots visible, query bar focused, chip bar empty._
 
+![Animated walk-through: typing "uk submarines" produces nationality + vessel-class chips, the card grid filters, and clicking the × on the nationality chip broadens the result set](/assets/images/2026-04-16-nl-demo-ui/interaction.gif)
+
+_Chip removal in flight: the × on a chip drops it, `cql2FromChips` recomputes the filter from what remains, and the engine re-evaluates against the catalog — no LLM round-trip, because the chip itself is the source of truth for the filter once the initial generation has happened._
+
 ## Offline First — and Why That Pivot Mattered
 
 The spec originally called for React and Babel to load from CDN at runtime. During implementation we discovered that the cloud sandbox used for development blocks third-party CDN requests entirely. Rather than open a firewall exception, we vendored the libraries locally and adjusted the `pnpm sync-data` script to pull them into `data/vendor/` alongside the fixture files.
@@ -51,6 +55,10 @@ When a phrase is not in the corpus — or fails the hash check, which we treat i
 _Off-corpus state: the card grid does not change — no destructive update — and the user has a clear recovery path._
 
 The distinction between the off-corpus banner and the zero-match empty state matters. A phrase outside the corpus is a "we don't have a fixture for that" situation; a phrase that parses but matches nothing in the catalog is a different situation — the filter worked, it just produced an empty set. Both states get distinct messages and distinct recovery prompts.
+
+![Zero-match empty state: chips remain visible, the card grid is replaced with a helpful "No plots match — try rephrasing" card and a Clear all button](/assets/images/2026-04-16-nl-demo-ui/state-zero-match.png)
+
+_Zero-match state: the corpus deliberately includes `klingon warbirds` as a test phrase that parses successfully but matches nothing in the sample catalog. The chips stay visible so the user can tell exactly what their filter said, alongside a clear recovery path._
 
 ## By the Numbers
 
