@@ -108,4 +108,8 @@ export { PROPERTIES_PANEL_TOOL_SENTINEL, PROVENANCE_LOG_CAP, PROVENANCE_LOG_ARCH
 export type { PropertiesProvenanceEntry } from './PropertiesPanel/provenanceTypes';
 export { AUTO_DERIVED_FIELDS, isAutoDerivedField, } from './PropertiesPanel/autoDerivedFields';
 export type { AutoDerivedField } from './PropertiesPanel/autoDerivedFields';
+export { PropertiesForm, ArrayWidget, BboxWidget, DateTimeWidget, PlatformArrayWidget, resolveFieldSpec, } from './PropertiesPanel';
+export type { FieldSpec, FieldDerivationState, PropertiesFormField, PropertiesFormProps, } from './PropertiesPanel';
+export { BrowserSelectionContext, BrowserSelectionProvider, useBrowserSelection, PropertiesSidePanel, } from './StacBrowser';
+export type { BrowserSelection, BrowserSelectionProviderProps, PropertiesSidePanelProps, } from './StacBrowser';
 //# sourceMappingURL=index.d.ts.map
