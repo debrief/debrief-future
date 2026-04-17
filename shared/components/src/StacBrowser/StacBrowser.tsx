@@ -523,11 +523,11 @@ function renderPanel(type: string): React.ReactElement {
           style={{
             height: '100%',
             display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0,
+            flexDirection: 'row',
+            minWidth: 0,
           }}
         >
-          <div style={{ flex: '1 1 50%', minHeight: 0, overflow: 'auto' }}>
+          <div style={{ flex: '0 0 40%', minWidth: 0, overflow: 'auto' }}>
             <ThumbnailPreview
               item={previewItem}
               items={ctx.filteredItems}
@@ -536,10 +536,10 @@ function renderPanel(type: string): React.ReactElement {
           </div>
           <div
             style={{
-              flex: '1 1 50%',
-              minHeight: 0,
+              flex: '1 1 60%',
+              minWidth: 0,
               overflow: 'auto',
-              borderTop: '1px solid var(--vscode-panel-border, #3c3c3c)',
+              borderLeft: '1px solid var(--vscode-panel-border, #3c3c3c)',
             }}
             data-testid="stac-browser-properties-slot"
           >

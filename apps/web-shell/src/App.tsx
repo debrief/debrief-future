@@ -196,6 +196,12 @@ export default function App() {
   // StacBrowser preview so the stacked Properties slot can render its fields.
   const [propertiesHighlightedPath, setPropertiesHighlightedPath] =
     useState<string | null>(null);
+  // Demo-only: local overrides keyed by itemPath → field → value.
+  // Real hosts persist via stacService.updateItemMetadata; this mock just
+  // mutates in-memory so add/remove tag etc. round-trip visually.
+  const [propertiesOverrides, setPropertiesOverrides] = useState<
+    Record<string, Record<string, unknown>>
+  >({});
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -1369,12 +1375,18 @@ export default function App() {
       ? catalogItems.find((i) => i.itemPath === propertiesHighlightedPath) ?? null
       : null;
 
+    const overrides = highlightedItem
+      ? propertiesOverrides[highlightedItem.itemPath] ?? {}
+      : {};
+    const resolve = <T,>(key: string, fallback: T): T =>
+      key in overrides ? (overrides[key] as T) : fallback;
+
     const highlightedFields: PropertiesFormField[] = highlightedItem
       ? [
           {
             key: 'title',
             label: 'Title',
-            value: highlightedItem.title,
+            value: resolve('title', highlightedItem.title),
             spec: { kind: 'string' },
             derivation: 'user',
             required: true,
@@ -1383,7 +1395,7 @@ export default function App() {
           {
             key: 'datetime',
             label: 'Datetime',
-            value: highlightedItem.datetime ?? null,
+            value: resolve('datetime', highlightedItem.datetime ?? null),
             spec: { kind: 'datetime' },
             derivation: 'auto-derived',
             required: false,
@@ -1392,7 +1404,7 @@ export default function App() {
           {
             key: 'start_datetime',
             label: 'Start datetime',
-            value: highlightedItem.startDatetime ?? null,
+            value: resolve('start_datetime', highlightedItem.startDatetime ?? null),
             spec: { kind: 'datetime' },
             derivation: 'override',
             required: false,
@@ -1401,7 +1413,7 @@ export default function App() {
           {
             key: 'debrief:tags',
             label: 'Tags',
-            value: highlightedItem.tags ?? [],
+            value: resolve('debrief:tags', highlightedItem.tags ?? []),
             spec: { kind: 'string-array' },
             derivation: 'user',
             required: false,
@@ -1410,7 +1422,7 @@ export default function App() {
           {
             key: 'debrief:platforms',
             label: 'Platforms',
-            value: highlightedItem.platforms ?? [],
+            value: resolve('debrief:platforms', highlightedItem.platforms ?? []),
             spec: { kind: 'platform-array' },
             derivation: 'user',
             required: false,
@@ -1420,9 +1432,14 @@ export default function App() {
       : [];
 
     const handleDemoCommit: PropertiesFormProps['onCommitField'] = (key, value) => {
-      // Demo — commits log to the console. A real host posts `properties:commit`.
-      // eslint-disable-next-line no-console
-      console.log('[properties demo] commit', key, value);
+      if (!highlightedItem) return;
+      setPropertiesOverrides((prev) => ({
+        ...prev,
+        [highlightedItem.itemPath]: {
+          ...(prev[highlightedItem.itemPath] ?? {}),
+          [key]: value,
+        },
+      }));
     };
 
     const propertiesSlot = (
