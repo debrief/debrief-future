@@ -1446,29 +1446,30 @@ export default function App() {
       <div
         className="web-shell__properties-slot"
         style={{
-          // Force VS Code dark-theme variables so the Properties form
-          // renders with the same look it has inside the extension,
-          // regardless of the surrounding web-shell page theme.
-          colorScheme: 'dark',
-          ['--vscode-editor-background' as string]: '#1e1e1e',
-          ['--vscode-editor-foreground' as string]: '#d4d4d4',
-          ['--vscode-foreground' as string]: '#d4d4d4',
-          ['--vscode-descriptionForeground' as string]: '#9d9d9d',
-          ['--vscode-panel-border' as string]: '#424242',
-          ['--vscode-input-background' as string]: '#3c3c3c',
-          ['--vscode-input-foreground' as string]: '#cccccc',
-          ['--vscode-input-border' as string]: '#3c3c3c',
-          ['--vscode-badge-background' as string]: '#4d4d4d',
+          // Seed VS Code light-theme variables so the Properties form
+          // renders with legible contrast on the web-shell's light
+          // welcome surface (inside the extension, VS Code supplies
+          // these for both light and dark themes automatically).
+          colorScheme: 'light',
+          ['--vscode-editor-background' as string]: '#ffffff',
+          ['--vscode-editor-foreground' as string]: '#1f1f1f',
+          ['--vscode-foreground' as string]: '#1f1f1f',
+          ['--vscode-descriptionForeground' as string]: '#595959',
+          ['--vscode-panel-border' as string]: '#d4d4d4',
+          ['--vscode-input-background' as string]: '#ffffff',
+          ['--vscode-input-foreground' as string]: '#1f1f1f',
+          ['--vscode-input-border' as string]: '#cecece',
+          ['--vscode-badge-background' as string]: '#616161',
           ['--vscode-badge-foreground' as string]: '#ffffff',
-          ['--vscode-button-background' as string]: '#0e639c',
+          ['--vscode-button-background' as string]: '#005fb8',
           ['--vscode-button-foreground' as string]: '#ffffff',
-          ['--vscode-button-hoverBackground' as string]: '#1177bb',
-          ['--vscode-editorWarning-foreground' as string]: '#cca700',
+          ['--vscode-button-hoverBackground' as string]: '#0258a8',
+          ['--vscode-editorWarning-foreground' as string]: '#bf8803',
           padding: '8px 12px',
           height: '100%',
           overflowY: 'auto',
-          background: '#1e1e1e',
-          color: '#d4d4d4',
+          background: '#ffffff',
+          color: '#1f1f1f',
           fontSize: 13,
         }}
         aria-label="Properties Panel demo"
