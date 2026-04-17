@@ -57,6 +57,16 @@ echo "$PNG / $TOTAL"   # expect matching counts
 Script source: `apps/web-shell/scripts/generate-thumbnails.ts`. Backstory: spec
 174 T036a.
 
+**Fallback for flaky plots.** The first plot opened after web-shell load is
+occasionally missed by the main script (`setView('analysis')` race on the
+initial route). `apps/web-shell/scripts/capture-single.ts` runs a warmed-up
+browser session against a named list of plot IDs:
+
+```bash
+STAC_STORE_PATH="$(pwd)/preview/workspace/samples/local-store" \
+  npx tsx apps/web-shell/scripts/capture-single.ts core--ambig-tracks2 core--bulk-red-tracks
+```
+
 ### Technology Stack
 
 **Languages:**
