@@ -8,6 +8,7 @@
 import type { DebriefFeature } from '../utils/types';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
+import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -16,6 +17,7 @@ export interface ActivityPanelCollapseState {
   timeControllerCollapsed: boolean;
   toolsCollapsed: boolean;
   layersCollapsed: boolean;
+  propertiesCollapsed: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export const DEFAULT_COLLAPSE_STATE: ActivityPanelCollapseState = {
   timeControllerCollapsed: false,
   toolsCollapsed: false,
   layersCollapsed: false,
+  propertiesCollapsed: false,
 };
 
 /**
@@ -74,7 +77,8 @@ export type ActivityPanelMessage =
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } }
   | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean; isPointOverride?: boolean; positionIndex?: number; childType?: string } }
-  | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } };
+  | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } }
+  | PropertiesCommitMessage;
 
 /**
  * Props for the ActivityPanel component.

@@ -1,9 +1,10 @@
 /**
- * Offline-invariant test harness — patches `fetch` and `XMLHttpRequest` so any
- * accidental network egress from Properties Panel code surfaces as a loud
- * `OfflineInvariantError` during unit tests.
+ * Offline-invariant test harness — throws `OfflineInvariantError` on any
+ * `fetch` or `XMLHttpRequest` attempted by PropertiesPanel code during unit
+ * tests (FR-010, Decision 10, SC-005).
  *
- * Phase 1 placeholder — the full implementation lands in T022.
+ * Installed via vitest `setupFiles` so the invariant is enforced for every
+ * test in `@debrief/components` without per-file boilerplate.
  */
 
 export class OfflineInvariantError extends Error {
@@ -15,10 +16,39 @@ export class OfflineInvariantError extends Error {
   }
 }
 
+const shouldSkipInstall = (): boolean => {
+  // Allow opt-out via env var for harnesses that genuinely need the network
+  // (e.g. Storybook docs build).
+  return process.env.PROPERTIES_PANEL_OFFLINE_HARNESS === 'off';
+};
+
+let installed = false;
+
 export function installOfflineHarness(): void {
-  throw new Error('installOfflineHarness: placeholder — implemented in T022');
+  if (installed || shouldSkipInstall()) return;
+  installed = true;
+
+  const globalObj = globalThis as unknown as {
+    fetch?: unknown;
+    XMLHttpRequest?: unknown;
+  };
+
+  globalObj.fetch = ((input: RequestInfo | URL): Promise<Response> => {
+    const resource = typeof input === 'string' ? input : input.toString();
+    return Promise.reject(new OfflineInvariantError(resource));
+  }) as typeof fetch;
+
+  class BlockedXMLHttpRequest {
+    open(_method: string, url: string): void {
+      throw new OfflineInvariantError(url);
+    }
+  }
+  globalObj.XMLHttpRequest = BlockedXMLHttpRequest;
 }
 
 export function uninstallOfflineHarness(): void {
-  // Placeholder — real implementation arrives with installOfflineHarness.
+  installed = false;
 }
+
+// Install immediately when imported via setupFiles.
+installOfflineHarness();

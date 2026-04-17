@@ -4,6 +4,14 @@
  */
 
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine/types';
+import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+
+/**
+ * Messages sent from the StacBrowser surface to the host (VS Code extension).
+ * Today only the Properties Panel surface sends messages; further variants
+ * will be added as the StacBrowser grows.
+ */
+export type StacBrowserMessage = PropertiesCommitMessage;
 
 /**
  * Props for the StacBrowser component.
