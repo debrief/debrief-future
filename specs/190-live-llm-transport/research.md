@@ -48,19 +48,20 @@ Resolutions for the open technical decisions the spec deferred to planning (FR-0
 
 ## R3. Runtime configuration mechanism
 
-**Decision**: **Two-file split** — `apps/nl-demo/data/live-config.json` (browser-visible, gitignored) and `apps/nl-demo/.env` (proxy-only, gitignored).
+**Decision**: **Two-file split** — `apps/nl-demo/live-config.json` (browser-visible, gitignored, at the **app root** not `data/`) and `apps/nl-demo/.env` (proxy-only, gitignored).
 
 Shape (narrowed on load):
 
 ```jsonc
-// apps/nl-demo/data/live-config.json
+// apps/nl-demo/live-config.json  (app root — separate from sync-data's data/ territory)
 {
   "enabled": true,
   "proxyUrl": "http://127.0.0.1:8081/generate",
   "model": "claude-haiku-4-5-20251001",
   "timeoutMs": 12000,
   "maxCalls": 50,
-  "maxResponseBytes": 262144
+  "maxResponseBytes": 262144,
+  "proxyToken": ""  // empty when the proxy binds to 127.0.0.1; required when PROXY_ALLOW_REMOTE=true
 }
 ```
 
@@ -69,14 +70,19 @@ Shape (narrowed on load):
 ANTHROPIC_API_KEY=sk-ant-...
 ANTHROPIC_ENDPOINT=https://api.anthropic.com/v1/messages
 PROXY_PORT=8081
+# Optional — only set these when you understand the risk:
+# PROXY_BIND=0.0.0.0
+# PROXY_ALLOW_REMOTE=true
 ```
 
 **Rationale**:
 
+- **Physical separation from sync-data** (Article I, no silent failures): `sync-data.mjs` owns `apps/nl-demo/data/`, regenerating it on every run. Putting `live-config.json` at the app root ensures no future tweak to `sync-data` (e.g. `rm -rf data/` before copy) can silently wipe operator configuration.
 - **Structural credential isolation** (Article X, SC-006): the browser-visible file never contains a credential. The credential lives only in the proxy's env, loaded at proxy start.
 - **Default-off (FR-003)**: `live-config.json` is gitignored. A freshly-served demo bundle has no live config → the demo boots in fixture-only mode. No operator action → no live-provider call, ever.
 - **Malformed-config refuse-to-activate (FR-005)**: the config loader narrows each field and surfaces a single, specific diagnostic when any required field is absent or of the wrong type. The demo then falls back to fixture mode with a visible warning rather than crashing.
 - **Clear revocation path**: deleting `live-config.json` OR setting `enabled: false` OR stopping the proxy all revert the demo to fixture mode on next reload. Three independent revocation levers matches defence-grade reliability expectations.
+- **Non-loopback bind guard** (Article X, R1 follow-up): `PROXY_BIND=0.0.0.0` alone is rejected at proxy startup. Non-loopback bind requires both `PROXY_ALLOW_REMOTE=true` AND an `X-Proxy-Token` header on every `/generate`. The token is generated at proxy startup, printed to stderr, and placed by the operator into `live-config.json` (`proxyToken`). This prevents a well-meaning operator from accidentally turning the proxy into a LAN-visible open relay on their paid Anthropic key.
 
 **Alternatives considered**:
 
@@ -86,32 +92,37 @@ PROXY_PORT=8081
 
 ---
 
-## R4. Failure classification and mapping to `GenerationError`
+## R4. Failure classification and `LiveTransportError` shape
 
-**Decision**: The live client maps transport-layer failures into a **new extended error reason set** (`LiveTransportErrorReason`) that the demo UI then renders. #188's existing `GenerationError` stays untouched because response-parsing failures continue to flow through `parseResponse`.
+**Decision**: The live client maps transport-layer failures into a **new `LiveTransportError` type** (plain interface, not an Error subclass) that is **returned via `GenerationResult.error` with a `kind: "transport"` discriminator** — never thrown. Spec FR-008 is aligned accordingly. #188's existing `GenerationError` stays untouched because response-parsing failures continue to flow through `parseResponse` and populate `GenerationResult.error` with `kind: "generation"`.
 
 Mapping:
 
-| Proxy outcome | Client surfaces | UI message |
-|---|---|---|
-| HTTP 401 / 403 / missing-key envelope | `auth-failure` | "Provider rejected the request — check credentials." |
-| HTTP 429 / quota envelope | `rate-limit` | "Provider rate limit hit — try again in a moment." |
-| HTTP 5xx or provider-returned error body | `provider-error` | "The provider returned an error. Try a different phrase." |
-| Network failure / DNS / proxy-unreachable | `transport-error` | "Could not reach the language-model proxy. Is it running?" |
-| `AbortController` fires at `timeoutMs` | `timeout` | "The provider did not respond in time." |
-| Response body exceeds `maxResponseBytes` | `oversize-response` | "Provider response was too large — ignoring." |
-| Valid 200 JSON with malformed content | (falls through to `parseResponse`) | Existing `GenerationError` classes apply (malformed-json, schema-violation, hallucinated-field, etc.) |
-| Usage counter at cap | `usage-cap-reached` | "Live-mode call limit reached — reload to reset." |
+| Proxy outcome | HTTP from proxy | Client `LiveTransportError.reason` | UI message |
+|---|---|---|---|
+| HTTP 401 / 403 / missing-key envelope | 401 `{kind:"auth-failure"}` | `auth-failure` | "Provider rejected the request — check credentials." |
+| HTTP 429 / quota envelope | 429 `{kind:"rate-limit"}` | `rate-limit` | "Provider rate limit hit — try again in a moment." |
+| HTTP 5xx or provider-returned error body | 502 `{kind:"provider-error"}` | `provider-error` | "The provider returned an error. Try a different phrase." |
+| Network failure / DNS / proxy-unreachable | (no response) | `transport-error` | "Could not reach the language-model proxy. Is it running?" |
+| Proxy rejects malformed request | 400 `{kind:"bad-request"}` | `transport-error` | "Proxy rejected the request — check your client version." |
+| `AbortController` fires at `timeoutMs` | (abort) | `timeout` | "The provider did not respond in time." |
+| Response body exceeds `maxResponseBytes` | 502 `{kind:"oversize-response"}` OR client-side stream trip | `oversize-response` | "Provider response was too large — ignoring." |
+| Valid 200 JSON with malformed content | 200 | (falls through to `parseResponse`) | Existing `GenerationError` classes apply (malformed-json, schema-violation, hallucinated-field, etc.) |
+| Usage counter at cap | (no request issued) | `usage-cap-reached` | "Live-mode call limit reached — reload to reset." |
+
+`GenerationResult.error` becomes a discriminated union: `{ kind: "generation", error: GenerationError } | { kind: "transport", error: LiveTransportError }`. The demo's existing `result.error` handler adds a `switch (err.kind)` dispatch.
 
 **Rationale**:
 
 - Keeps the existing `GenerationError` responsibilities pure (LLM-output semantics) and introduces a parallel transport-error type that the demo renders through a shared banner component. Two orthogonal failure surfaces, two orthogonal types.
-- The live client still returns a `GenerationResult` — the transport-error case populates `error` with a `LiveTransportError` object the demo discriminates on a `kind` field. #188's code path that consumes `result.error` remains compatible; the generator does not need to know about transport errors.
+- Non-throwing preserves #188's "`generateCql2` never throws on normal failure paths" invariant, so call sites keep their existing shape.
+- `LiveTransportError` is a plain interface (not `extends Error`) — the value flows through `GenerationResult.error` as data, never through a `throw`/`catch` boundary.
 
 **Alternatives considered**:
 
 - **Reuse `GenerationError` by adding new reason codes** (rejected): pollutes the semantic meaning of `GenerationError` (which is about LLM-output semantics) with transport concerns. Cleaner to keep them separate.
 - **Throw transport errors** (rejected): `generateCql2` contract is "never throws on normal failure paths" — a transport failure is now a normal failure path.
+- **Add a distinct `bad-request` client reason** (rejected): a proxy-issued `bad-request` indicates a browser-client bug (e.g. prompt > 100 000 chars) and shouldn't be exposed as a separate user-facing failure class. Folding it into `transport-error` with a specific message is sufficient.
 
 ---
 
@@ -157,10 +168,28 @@ Stub script shape:
 - JSON scenarios are easier to extend than compiled TypeScript stubs and can be shared between vitest and Playwright tests.
 - Isolates the deterministic-failure corpus in one file instead of spreading it across test modules.
 
+**Playwright integration**: The Playwright spec lives at `apps/nl-demo/e2e/live-transport.spec.ts` (matching the existing `testDir: '../e2e'` convention). `playwright.config.ts`'s `webServer` field is converted from a single object to an array with two entries:
+
+1. `node scripts/serve.mjs $SERVER_PORT` — the static host for the demo (existing).
+2. `node scripts/live-proxy.mjs --stub e2e/fixtures/live-stub.json` on a fixed loopback port — launched in parallel, keeps behaviour bitwise-identical to a real live run.
+
+Scenarios file example:
+
+```json
+{
+  "default": { "kind": "success", "rawResponse": "{\"cql2\":{},\"lozenges\":[],\"unrecognised_terms\":[]}" },
+  "overrides": {
+    "timeout test": { "kind": "timeout" },
+    "auth test":    { "kind": "auth" }
+  }
+}
+```
+
 **Alternatives considered**:
 
 - **TypeScript stub class imported directly by tests** (rejected): cannot exercise the browser's `fetch` code path against a real `http://127.0.0.1:PORT/generate` URL, which is what the live client uses in production.
 - **`msw` or `nock` for HTTP mocking** (rejected): adds a dependency for something a 120-line Node script handles; conflicts with Article IX (minimal dependencies).
+- **Playwright `globalSetup` hook instead of a second `webServer` entry** (rejected): duplicates the orchestration concern `webServer` already handles; two spawn paths for the same need is a drift trap.
 
 ---
 
@@ -209,11 +238,34 @@ type TransportCallRecord = {
 
 | Parameter | Default | Rationale |
 |---|---|---|
-| `timeoutMs` | 12 000 | SC-007 requires p95 < 10 s. 12 s gives a 20% headroom before the timeout path fires. |
-| `maxCalls` | 50 | SC-008 explicitly validates the 50-call cap. A 30-minute demo typically runs < 20 queries; 50 absorbs exploratory iteration without surprises. |
-| `maxResponseBytes` | 262 144 (256 KB) | Typical Claude response for this prompt is 200–1000 B; 256 KB cap is ~256× headroom while protecting the UI from a pathological runaway response. |
+| `timeoutMs` (browser) | 12 000 | SC-007 requires p95 < 10 s. 12 s gives a 20% headroom before the timeout path fires. |
+| `maxCalls` (browser) | 50 | SC-008 explicitly validates the 50-call cap. A 30-minute demo typically runs < 20 queries; 50 absorbs exploratory iteration without surprises. |
+| `maxResponseBytes` (browser) | 262 144 (256 KB) | Typical Claude response for this prompt is 200–1000 B; 256 KB cap is ~256× headroom while protecting the UI from a pathological runaway response. |
+| `MAX_PROVIDER_BYTES` (proxy) | 524 288 (512 KB) | Defence-in-depth = 2× the browser cap. Ensures the browser cap fires first in default config; the proxy cap is reached only when an operator has deliberately raised the browser cap past 512 KB. |
+| `PROVIDER_TIMEOUT_MS` (proxy) | 20 000 | Longer than the browser `timeoutMs` so the browser's `AbortController` fires first; proxy's own timeout is a belt-and-braces safety net. |
 
-All three values are configurable via `live-config.json` — the spec only requires that caps exist and are configurable (FR-007, FR-010, FR-011), not that they take specific values.
+**Measurement units**: `maxResponseBytes` and `MAX_PROVIDER_BYTES` are UTF-8 byte counts (measured via `Buffer.byteLength(text, 'utf8')` on the proxy, and via a streamed-byte accumulator using `ReadableStream.getReader()` in the browser). NOT UTF-16 code units — a non-ASCII Claude response must not bypass the cap due to string-length-vs-byte-length confusion.
+
+**Oversize enforcement**: both sides stream-and-count. Proxy uses a chunk-by-chunk counter on the upstream HTTPS response; when the accumulated byte count exceeds `MAX_PROVIDER_BYTES`, it destroys the upstream stream and emits `502 {kind:"oversize-response"}`. Browser does the same against `maxResponseBytes` on the proxy response. Neither side buffers the full response before measuring.
+
+All browser values are configurable via `live-config.json`; proxy values via `.env`. The spec only requires that caps exist and are configurable (FR-007, FR-010, FR-011), not that they take specific values.
+
+---
+
+## R9. Upstream HTTPS connection reuse
+
+**Decision**: The proxy MUST construct a dedicated `https.Agent({ keepAlive: true, keepAliveMsecs: 30_000, maxSockets: 4 })` and pass it to every `https.request()` call. Not using `https.globalAgent` (which defaults to `keepAlive: false`).
+
+**Rationale**:
+
+- **Performance (SC-007, plan Technical Context)**: Without keepalive, every live call incurs a fresh TLS handshake (~100–300 ms). With keepalive, warm-call overhead drops to single-digit ms. The claimed "< 50 ms p50" warm overhead depends on connection reuse.
+- **Cold-start transparency**: First call after proxy startup still pays the TLS-handshake cost. This is documented so operators expect the first call to be slower than subsequent ones.
+- **`maxSockets: 4`**: the browser issues at most one in-flight call at a time (FR-012 cancels prior calls), so 4 concurrent upstream sockets is ample headroom without reserving a large socket pool.
+
+**Alternatives considered**:
+
+- **Use `fetch` in the proxy instead of `https.request`** (rejected for now): Node's `undici` fetch supports keepalive via its own `Agent`, but the interface adds nothing over `https.request` while changing the idiom. Staying on stdlib.
+- **Rely on `https.globalAgent`** (rejected): default `keepAlive: false` negates the performance target.
 
 ---
 
@@ -224,11 +276,13 @@ All three values are configurable via `live-config.json` — the spec only requi
 | FR-013 (transport style choice) | Local proxy (R1) |
 | Assumption §4 (style deferred to plan) | Local proxy (R1) |
 | Assumption §5 (provider choice) | Anthropic Claude Haiku 4.5, operator-overridable (R2) |
-| FR-004 (config source) | Two-file split, both gitignored (R3) |
-| FR-008 (failure classes) | New `LiveTransportErrorReason` + fall-through to `GenerationError` (R4) |
+| FR-004 (config source) | Two-file split at app root + .env, both gitignored; non-loopback bind requires opt-in + token (R3) |
+| FR-008 (failure classes) | New `LiveTransportError` interface returned via `GenerationResult.error` with `kind:"transport"` discriminator; malformed-response continues through #188's `GenerationError` path (R4) |
 | FR-012 (in-flight supersession) | `AbortController` + `cancelPending()` (R5) |
 | FR-010 (usage cap) | Closure counter, reload resets (R5) |
-| FR-015 (deterministic stub) | Stub-mode flag on the same proxy script (R6) |
+| FR-015 (deterministic stub) | Stub-mode flag on the same proxy script; Playwright launches it via `webServer` array (R6) |
 | FR-014 (call-record logging) | `console.info` with a scoped prefix and no sensitive fields (R7) |
+| FR-018 (transport-mode indicator) | Rendered near demo header; visible only when live mode is active AND proxy health check passed (R1 + plan) |
+| SC-007 (latency) | Proxy uses `https.Agent({ keepAlive: true })`; first-call cold-start documented (R9) |
 
 No unresolved `NEEDS CLARIFICATION` items remain.
