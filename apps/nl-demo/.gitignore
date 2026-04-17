@@ -6,3 +6,8 @@ playwright-report/
 test-results/
 node_modules/
 playwright/.chromium-path
+
+# #190 — Live LLM transport: operator-supplied runtime config + credentials.
+# Both files live at the app root (NOT data/) so they survive sync-data.
+/live-config.json
+/.env
