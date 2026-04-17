@@ -4,10 +4,9 @@
  * Returns a bounding-box polygon with area statistics.
  */
 
-import type { MCPToolDefinition } from '../../../services/toolService';
 import type { DebriefFeature } from '@debrief/schemas';
 import { OutputKindEnum } from '@debrief/schemas';
-import type { GeoJSONFeature } from '@debrief/utils';
+import type { GeoJSONFeature, MCPToolDefinition } from '@debrief/utils';
 
 type Position = number[];
 
