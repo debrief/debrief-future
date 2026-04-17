@@ -114,6 +114,21 @@ export interface MockStacService {
 
   /** Get item metadata */
   getItem(itemPath: string): StacItem | null;
+
+  /**
+   * Patch one or more properties on an in-memory item, rebuild its
+   * overview row, and notify subscribers. Mirrors the real
+   * `stacService.updateItemMetadata` contract (#193) without the
+   * disk write — suitable for the web-shell demo.
+   */
+  updateItemMetadata(itemPath: string, patch: Record<string, unknown>): void;
+
+  /**
+   * Subscribe to item-change events. The listener is called with the
+   * itemPath after every successful updateItemMetadata. Returns an
+   * unsubscribe function.
+   */
+  onItemsChanged(listener: (itemPath: string) => void): () => void;
 }
 
 /**
@@ -121,6 +136,7 @@ export interface MockStacService {
  */
 export function createMockStacService(): MockStacService {
   const itemMap = new Map<string, StacItem>();
+  const listeners = new Set<(itemPath: string) => void>();
   /** Guard against concurrent init calls (React 18 StrictMode fires effects twice). */
   let initPromise: Promise<void> | null = null;
 
@@ -220,6 +236,27 @@ export function createMockStacService(): MockStacService {
 
     getItem(itemPath: string): StacItem | null {
       return itemMap.get(itemPath) ?? null;
+    },
+
+    updateItemMetadata(itemPath: string, patch: Record<string, unknown>): void {
+      const item = itemMap.get(itemPath);
+      if (!item) return;
+      // Shallow-merge the patch into item.properties. Real hosts run
+      // a schema validator here and write an atomic temp+rename; this
+      // demo just mutates in place.
+      const nextProps = { ...item.properties, ...patch };
+      item.properties = nextProps as StacItem['properties'];
+      // Rebuild the cached overview row so `getItems()` returns the
+      // new values on the next render pass.
+      const overview = toOverviewItem(itemPath, item);
+      const idx = items.findIndex((i) => i.itemPath === itemPath);
+      if (idx >= 0) items[idx] = overview;
+      for (const listener of listeners) listener(itemPath);
+    },
+
+    onItemsChanged(listener): () => void {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
   };
 }
