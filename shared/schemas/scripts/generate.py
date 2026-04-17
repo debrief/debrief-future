@@ -472,10 +472,13 @@ def generate_markdown_docs() -> bool:
         "--render-imports",
         "--subfolder-type-separation",
         "--hierarchical-class-view",
-        "--include-top-level-diagram",
-        # Required when --include-top-level-diagram is set; linkml's docgen
-        # dereferences `self.diagram_type.value` unconditionally on the index
-        # page even though the CLI leaves diagram_type defaulting to None.
+        # Intentionally NOT passing --include-top-level-diagram: when the
+        # diagram type is mermaid_class_diagram, linkml's index template calls
+        # gen.mermaid_diagram() which returns None (the class-diagram path is
+        # handled only in per-class jinja templates). Jinja stringifies that
+        # to "None", producing a broken Mermaid block on the index page.
+        # Per-class diagrams are unaffected — they render via the
+        # class_diagram.md.jinja2 include in our template override.
         "--diagram-type",
         "mermaid_class_diagram",
         # Local template override adds a defensive fix for classes with
