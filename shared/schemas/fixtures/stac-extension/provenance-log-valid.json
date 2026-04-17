@@ -1,0 +1,21 @@
+{
+  "overrides": ["start_datetime", "debrief:tags"],
+  "provenance_log": [
+    {
+      "activity_id": "01HXK5G8P0Q1R2S3T4U5V6W7X8",
+      "timestamp": "2026-04-17T10:00:00Z",
+      "tool": "debrief.propertiesPanel",
+      "method": "properties-panel@1.0.0",
+      "fields": ["debrief:tags"],
+      "source": "user"
+    },
+    {
+      "activity_id": "01HXK5H9A0B1C2D3E4F5G6H7J8",
+      "timestamp": "2026-04-17T10:05:30Z",
+      "tool": "debrief.propertiesPanel",
+      "method": "properties-panel@1.0.0",
+      "fields": ["start_datetime"],
+      "source": "user"
+    }
+  ]
+}

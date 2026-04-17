@@ -103,7 +103,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': '/Users/ian/git/worktrees/193-properties-panel/shared/schemas/src/linkml/debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
@@ -2301,10 +2301,11 @@ class LogEntry(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
 
-    activity_id: str = Field(default=..., description="""Unique operation identifier (UUID v4). Shared across features in multi-feature operations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'FileProvEntry']} })
+    activity_id: str = Field(default=..., description="""Unique operation identifier (UUID v4). Shared across features in multi-feature operations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'FileProvEntry', 'PropertiesProvenanceEntry']} })
     timestamp: datetime  = Field(default=..., description="""When the operation occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
+                       'PropertiesProvenanceEntry',
                        'FeatureSelection']} })
     was_generated_by: WasGeneratedBy = Field(default=..., description="""Tool identity and parameters for this invocation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     used: list[str] = Field(default=..., description="""Feature IDs of inputs. May be empty for operations with no explicit inputs.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
@@ -2336,7 +2337,7 @@ class WasGeneratedBy(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
 
-    tool: str = Field(default=..., description="""Tool identifier (kebab-case, e.g., calculate-range).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy']} })
+    tool: str = Field(default=..., description="""Tool identifier (kebab-case, e.g., calculate-range).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'PropertiesProvenanceEntry']} })
     tool_version: str = Field(default=..., description="""Semantic version of the tool (e.g., 1.2.0).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy']} })
     parameters: list[ParameterValue] = Field(default=..., description="""Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict.""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy']} })
 
@@ -2403,6 +2404,7 @@ class TuneAnnotation(ConfiguredBaseModel):
     timestamp: datetime  = Field(default=..., description="""When the tuning occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
+                       'PropertiesProvenanceEntry',
                        'FeatureSelection']} })
     parameter: str = Field(default=..., description="""Name of the parameter that was changed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TuneAnnotation']} })
     previous_value: str = Field(default=..., description="""Value before tuning.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TuneAnnotation']} })
@@ -3595,7 +3597,7 @@ class FileProvEntry(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/system-record'})
 
-    activity_id: str = Field(default=..., description="""Unique event identifier.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'FileProvEntry']} })
+    activity_id: str = Field(default=..., description="""Unique event identifier.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'FileProvEntry', 'PropertiesProvenanceEntry']} })
     type: FileProvEventTypeEnum = Field(default=..., description="""Event type: snapshot or branch.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
@@ -3624,6 +3626,7 @@ class FileProvEntry(ConfiguredBaseModel):
     timestamp: datetime  = Field(default=..., description="""When the event occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
+                       'PropertiesProvenanceEntry',
                        'FeatureSelection']} })
     asset: Optional[str] = Field(default=None, description="""Path to snapshot file (for snapshot events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SnapshotRef', 'FileProvEntry']} })
     branch_id: Optional[str] = Field(default=None, description="""Branch identifier (for branch events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['BranchRecord', 'BranchOrigin', 'FileProvEntry']} })
@@ -3724,6 +3727,69 @@ class PlatformRecord(ConfiguredBaseModel):
         return v
 
 
+class PropertiesProvenanceEntry(ConfiguredBaseModel):
+    """
+    Single entry in item.properties[\"debrief:provenance_log\"] recording one Properties Panel commit. Appended by stacService.updateItemMetadata (single writer — Article IV.2). Immutable once written (Article III.3); archive rotation preserves entries by moving to a sibling provenance_log_archive.jsonl — entries are never mutated or deleted in place.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    activity_id: str = Field(default=..., description="""ULID generated by the service writer at commit time. Monotonic sort key for replay, undo, and LogPanel cross-referencing.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'FileProvEntry', 'PropertiesProvenanceEntry']} })
+    timestamp: str = Field(default=..., description="""ISO-8601 UTC timestamp set by the service at write time.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
+                       'TuneAnnotation',
+                       'FileProvEntry',
+                       'PropertiesProvenanceEntry',
+                       'FeatureSelection']} })
+    tool: str = Field(default=..., description="""Sentinel identifying the Properties Panel as the writer. MUST equal \"debrief.propertiesPanel\".
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'PropertiesProvenanceEntry']} })
+    method: str = Field(default=..., description="""Versioned method identifier matching ^properties-panel@.+$, populated from the @debrief/components package.json version.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['PropertiesProvenanceEntry']} })
+    fields: list[str] = Field(default=..., description="""Non-empty list of field names touched in this commit. Sorted alphabetically for deterministic replay.
+""", min_length=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PropertiesProvenanceEntry']} })
+    source: str = Field(default=..., description="""Origin of the edit. MUST equal \"user\" — Properties Panel edits are human-initiated.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['PropertiesProvenanceEntry']} })
+
+    @field_validator('tool')
+    def pattern_tool(cls, v):
+        pattern=re.compile(r"^debrief\.propertiesPanel$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid tool format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid tool format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('method')
+    def pattern_method(cls, v):
+        pattern=re.compile(r"^properties-panel@.+$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid method format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid method format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('source')
+    def pattern_source(cls, v):
+        pattern=re.compile(r"^user$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid source format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid source format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+
 class StacExtensionProperties(ConfiguredBaseModel):
     """
     Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
@@ -3742,6 +3808,10 @@ class StacExtensionProperties(ConfiguredBaseModel):
     feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary'],
          'slot_uri': 'debrief:feature_tags'} })
+    overrides: Optional[list[str]] = Field(default=[], description="""Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:overrides'} })
+    provenance_log: Optional[list[PropertiesProvenanceEntry]] = Field(default=[], description="""Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:provenance_log'} })
 
 
 class PlotTimeExtent(ConfiguredBaseModel):
@@ -3957,6 +4027,7 @@ class FeatureSelection(ConfiguredBaseModel):
     timestamp: TimeInstant = Field(default=..., description="""When selection was made""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
+                       'PropertiesProvenanceEntry',
                        'FeatureSelection']} })
 
 
@@ -4452,6 +4523,7 @@ BranchRecord.model_rebuild()
 BranchOrigin.model_rebuild()
 FileProvEntry.model_rebuild()
 PlatformRecord.model_rebuild()
+PropertiesProvenanceEntry.model_rebuild()
 StacExtensionProperties.model_rebuild()
 PlotTimeExtent.model_rebuild()
 PlotSummary.model_rebuild()

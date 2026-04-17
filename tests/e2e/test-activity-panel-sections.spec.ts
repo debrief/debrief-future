@@ -3,7 +3,7 @@
  *
  * Validates:
  * - The Debrief Activity panel is present in the sidebar
- * - Three child sections (Time Controller, Tools, Layers) exist
+ * - Four child sections (Time Controller, Tools, Layers, Properties) exist
  * - Each section can be collapsed and re-expanded via its header button
  * - The Tools section shows tool items or a status message (proves debrief-calc responded)
  *
@@ -15,7 +15,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Activity Panel Sections', () => {
   test.setTimeout(90_000);
 
-  test('activity panel is present with three collapsible sections', async ({
+  test('activity panel is present with four collapsible sections', async ({
     codeServerPage,
   }) => {
     await codeServerPage.dismissNotifications();
@@ -55,12 +55,12 @@ test.describe('Activity Panel Sections', () => {
     const frame = activityFrame!;
     console.log('  ✓ Activity panel found in webview frame');
 
-    // ─── Verify three section headers exist ───
+    // ─── Verify four section headers exist ───
     const sectionHeaders = frame.locator(
       '.debrief-activity-panel__section-header'
     );
     const headerCount = await sectionHeaders.count();
-    expect(headerCount).toBe(3);
+    expect(headerCount).toBe(4);
     console.log(`  ✓ Found ${headerCount} section headers`);
 
     // Verify section titles
@@ -73,16 +73,21 @@ test.describe('Activity Panel Sections', () => {
     const layersHeader = frame.locator(
       '.debrief-activity-panel__section-header:has-text("Layers")'
     );
+    const propertiesHeader = frame.locator(
+      '.debrief-activity-panel__section-header:has-text("Properties")'
+    );
     expect(await timeHeader.isVisible()).toBe(true);
     expect(await toolsHeader.isVisible()).toBe(true);
     expect(await layersHeader.isVisible()).toBe(true);
-    console.log('  ✓ All three sections visible: Time Controller, Tools, Layers');
+    expect(await propertiesHeader.isVisible()).toBe(true);
+    console.log('  ✓ All four sections visible: Time Controller, Tools, Layers, Properties');
 
     // ─── Test collapse/expand for each section ───
     const sections = [
       { name: 'Time Controller', header: timeHeader },
       { name: 'Tools', header: toolsHeader },
       { name: 'Layers', header: layersHeader },
+      { name: 'Properties', header: propertiesHeader },
     ];
 
     for (const { name, header } of sections) {
