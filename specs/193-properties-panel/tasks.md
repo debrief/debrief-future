@@ -244,8 +244,8 @@
 - [x] T083 Create usage demonstration (code + expected output for Scenarios 1–3 from quickstart.md) in `specs/193-properties-panel/evidence/usage-example.md`
 - [x] T084 [P] Capture `sample-item-before.json` + `sample-item-after.json` (demonstrating `debrief:overrides` + `debrief:provenance_log` appearing after one commit) in `specs/193-properties-panel/evidence/`
 - [x] T085 [P] Capture round-trip evidence (LinkML → Pydantic → JSON Schema → TypeScript → JSON → Python) for both new schema additions in `specs/193-properties-panel/evidence/round-trip-evidence.md`
-- [ ] T086 [P] Capture `PropertiesForm` Storybook screenshots in light/dark/vscode themes — `specs/193-properties-panel/evidence/screenshots/properties-form-{light,dark,vscode}.png`
-- [ ] T087 [P] Capture interaction GIF (< 5s, < 2MB) via Playwright `page.video()`: analyst expands Properties → edits tag → blur → assertion of saved state in `specs/193-properties-panel/evidence/screenshots/interaction.gif`
+- [x] T086 [P] Capture `PropertiesForm` Storybook screenshots in light/dark/vscode themes — `specs/193-properties-panel/evidence/screenshots/properties-form-{light,dark,vscode}.png`
+- [x] T087 [P] Capture interaction GIF (< 5s, < 2MB) via Playwright `page.video()`: analyst expands Properties → edits tag → blur → assertion of saved state in `specs/193-properties-panel/evidence/screenshots/interaction.gif`
 - [x] T088 [P] Capture stale-edit demo transcript (Scenario 4 outcome + banner screenshot) in `specs/193-properties-panel/evidence/stale-edit-demo.md`
 
 ### Full test-suite gate
@@ -316,8 +316,8 @@
 - [ ] T079 [test] Explicit offline-invariant regression: vitest case that fails if harness is uninstalled from `setupFiles` `shared/components/src/PropertiesPanel/__test__/offlineRegression.test.ts`
 - [ ] T080 [test] Schema-evolution smoke — `tests/fixtures/properties-panel/evolving-schema.yaml`; vitest generates TS + JSON Schema, asserts new input renders `shared/components/src/PropertiesPanel/schemaEvolution.test.ts`
 - [ ] T081 Add `properties-panel-schema-evolution` CI step to `.github/workflows/ci.yml`
-- [ ] T086 [P] Capture `PropertiesForm` screenshots in light/dark/vscode themes `specs/193-properties-panel/evidence/screenshots/properties-form-{light,dark,vscode}.png`
-- [ ] T087 [P] Capture interaction GIF (< 5s, < 2MB) of expand → edit → blur → saved-state `specs/193-properties-panel/evidence/screenshots/interaction.gif`
+- [x] T086 [P] Capture `PropertiesForm` screenshots in light/dark/vscode themes `specs/193-properties-panel/evidence/screenshots/properties-form-{light,dark,vscode}.png`
+- [x] T087 [P] Capture interaction GIF (< 5s, < 2MB) of expand → edit → blur → saved-state `specs/193-properties-panel/evidence/screenshots/interaction.gif`
 - [ ] T090 [test] Run `cd apps/web-shell && node run-playwright.mjs` for the webview E2E suite; resolve any failures
 
 ### New tasks surfaced during testing

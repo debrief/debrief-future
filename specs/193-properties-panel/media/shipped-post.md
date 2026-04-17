@@ -23,12 +23,27 @@ The provenance log is bounded. The active array on `item.properties["debrief:pro
 
 ## Screenshots
 
-Screenshots and an interaction GIF aren't captured yet — the Storybook stories and Playwright webview E2E are deferred follow-ups. This is a correctness-first landing. Visual polish and demo capture come next.
+The `PropertiesForm` rendering the metadata for a catalog item, captured from the web-shell preview against three VS Code theme variants. Two fields carry chips: `datetime` is `auto-derived` (computed from the plot's feature timestamps), `start_datetime` is `override` (the analyst overrode it once, so subsequent derivation passes skip it).
 
-- `evidence/screenshots/properties-form-light.png` — *pending*
-- `evidence/screenshots/properties-form-dark.png` — *pending*
-- `evidence/screenshots/properties-form-vscode.png` — *pending*
-- `evidence/screenshots/interaction.gif` — *pending*
+**Dark theme**
+
+![PropertiesForm in the dark theme — Title, Datetime with "auto-derived" chip, Start datetime with "override" chip, a chip-list of tags, Platforms](../evidence/screenshots/properties-form-dark.png)
+
+**Light theme**
+
+![PropertiesForm in the light theme — same layout, light background](../evidence/screenshots/properties-form-light.png)
+
+**VS Code sidebar theme**
+
+![PropertiesForm in the VS Code sidebar theme — neutral dark palette matching the editor chrome](../evidence/screenshots/properties-form-vscode.png)
+
+**Validation error**
+
+The panel rejects schema-invalid input inline — no disk write, no provenance entry. Here an invalid ISO-8601 datetime surfaces an inline error next to the field (the original value stays on disk until a valid commit):
+
+![PropertiesForm showing an inline validation error under the Datetime field — "Must be a valid ISO-8601 datetime (e.g. 2025-01-01T12:00:00Z)"](../evidence/screenshots/properties-form-validation-error.png)
+
+A short webm recording of the edit flow (add a tag → blur → chip appears) is checked in alongside the stills at `evidence/screenshots/interaction.webm`.
 
 ## By the Numbers
 
@@ -64,11 +79,11 @@ Screenshots and an interaction GIF aren't captured yet — the Storybook stories
 - ActivityPanel Properties section integration
 - Offline harness (fetch/XHR patched to throw) proving the whole form loop works without network
 
-**Deferred to follow-ups:**
-- Host-side hydration hook that computes `PropertiesFormField[]` from the live `item.json` (T043) — the `PropertiesForm` props are threaded through ActivityPanel, but the extension host doesn't yet feed them live values
+**Still on the list (tracked as T094–T098 in `tasks.md`):**
+- Host-side hydration hook that computes `PropertiesFormField[]` from the live `item.json` (T094) — the `PropertiesForm` props are threaded through ActivityPanel, but the extension host doesn't yet feed them live values
 - StacBrowser GoldenLayout integration (T062–T063) — `BrowserSelectionProvider` and `PropertiesSidePanel` are exported, but the GoldenLayout tree isn't yet wrapped by the provider
-- Storybook stories + screenshots (T086)
-- Playwright webview E2E (T051–T056)
+- Storybook stories (T046–T050, T067, T078)
+- Playwright webview E2E (T051–T056, T058–T060, T072)
 
 ## What's Next
 
