@@ -176,11 +176,11 @@
 ### Implementation — BrowserSelectionContext
 
 - [x] T061 Implement `BrowserSelectionContext` Provider + `useBrowserSelection` hook (throws clear error if used outside Provider) `shared/components/src/StacBrowser/BrowserSelectionContext.tsx`
-- [ ] T062 Wrap `StacBrowser` root in `BrowserSelectionProvider`; migrate existing `onItemSelect` callback to also update context (backward compatible with existing callers) `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T062 Wrap `StacBrowser` root in `BrowserSelectionProvider`; migrate existing `onItemSelect` callback to also update context (backward compatible with existing callers) `shared/components/src/StacBrowser/StacBrowser.tsx`
 
 ### Implementation — StacBrowser Properties area
 
-- [ ] T063 Add a stacked vertical split under `ThumbnailPreview` inside the existing `ResizableSplitPane` right panel — drag handle separates thumbnail (top) from Properties (bottom) `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T063 Add a stacked vertical split under `ThumbnailPreview` inside the existing `ResizableSplitPane` right panel — drag handle separates thumbnail (top) from Properties (bottom) `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [x] T064 Create `PropertiesSidePanel` host component — consumes `useBrowserSelection`, loads `item.json` for the selected path, hydrates `PropertiesFormField[]`, renders `PropertiesForm` `shared/components/src/StacBrowser/PropertiesSidePanel.tsx`
 - [x] T065 Wire `onCommitField` → `postMessage({type: 'properties:commit', storePath, itemPath, patch})` with the same optimistic+rollback pattern as the ActivityPanel surface `shared/components/src/StacBrowser/PropertiesSidePanel.tsx`
 - [x] T066 Handle `properties:commit` in the StacBrowser panel controller — same handler shape as ActivityPanel, identical service call `apps/vscode/src/panels/stacBrowserPanel.ts`
@@ -308,8 +308,8 @@
 - [ ] T058 [test] Webview E2E Story 2 — close plots → select catalog item → edit title → verify persistence `tests/e2e/test-properties-panel.spec.ts`
 - [ ] T059 [test] Webview E2E — routing when plot open on item A and StacBrowser on item B `tests/e2e/test-properties-panel.spec.ts`
 - [ ] T060 [test] Webview E2E — StacBrowser stale-edit banner `tests/e2e/test-properties-panel.spec.ts`
-- [ ] T062 Wrap `StacBrowser` GoldenLayout tree in `BrowserSelectionProvider`; migrate `onItemSelect` to also update context `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T063 Add stacked vertical split under `ThumbnailPreview` in the existing `ResizableSplitPane` right panel `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T062 Wrap `StacBrowser` GoldenLayout tree in `BrowserSelectionProvider`; migrate `onItemSelect` to also update context `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T063 Add stacked vertical split under `ThumbnailPreview` in the existing `ResizableSplitPane` right panel `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T067 [P] Add `StacBrowser.stories.tsx` "withPropertiesSidePanel" story `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
 - [ ] T072 [test] Webview E2E — override-survival scenario `tests/e2e/test-properties-panel.spec.ts`
 - [ ] T078 [P] Add `PropertiesForm.stories.tsx` "withOverrideChips" variant `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx`
@@ -326,7 +326,7 @@
 - [ ] T095 Host-side catalogOverview hydrate hook — equivalent of T094 for `CatalogOverviewPanel`. `apps/vscode/src/panels/catalogOverviewPanel.ts`
 - [ ] T096 Web-shell demo → real integration — replace the mock-field aside with `BrowserSelectionProvider` + `PropertiesSidePanel` fed by real catalog selection events. `apps/web-shell/src/App.tsx`
 - [ ] T097 Screenshots + blog update — update `specs/193-properties-panel/media/shipped-post.md` to embed the actual screenshots (not placeholders) and re-publish via `/publish`.
-- [ ] T098 Extend `StacBrowserProps` to expose `onItemHighlight` so consumers can differentiate "highlighted in list" from "open plot". `shared/components/src/StacBrowser/types.ts`
+- [x] T098 Extend `StacBrowserProps` to expose `onItemHighlight` so consumers can differentiate "highlighted in list" from "open plot". `shared/components/src/StacBrowser/types.ts`
 
 ### Execution order
 
