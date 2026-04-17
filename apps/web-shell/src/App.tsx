@@ -1417,12 +1417,17 @@ export default function App() {
           },
           {
             key: 'debrief:platforms',
-            label: 'Platforms',
+            label: 'Platforms (derived from features)',
             value: highlightedItem.platforms ?? [],
             spec: { kind: 'platform-array' },
-            derivation: 'user',
+            derivation: 'auto-derived',
             required: false,
             error: null,
+            // Platforms are re-synthesised from the plot's features on every
+            // save, so editing them from the Catalog Browser would be
+            // silently overwritten. Long-term the editor should push writes
+            // back into features.geojson; for now it's display-only.
+            readOnly: true,
           },
         ]
       : [];

@@ -19,6 +19,7 @@ function field(
     derivation: overrides.derivation ?? 'user',
     required: overrides.required ?? false,
     error: overrides.error ?? null,
+    ...(overrides.readOnly !== undefined ? { readOnly: overrides.readOnly } : {}),
   };
 }
 
@@ -203,6 +204,31 @@ describe('PropertiesForm', () => {
     );
     // ArrayWidget hides the input when disabled.
     expect(screen.queryByTestId('array-widget-input-tags')).toBeNull();
+  });
+
+  it('disables a single field when field.readOnly=true even with form editable', () => {
+    render(
+      <PropertiesForm
+        fields={[
+          field({ key: 'tags', value: ['a'], spec: { kind: 'string-array' } }),
+          field({
+            key: 'platforms',
+            value: [{ id: 'X' }],
+            spec: { kind: 'platform-array' },
+            readOnly: true,
+          }),
+        ]}
+        onCommitField={() => {}}
+        loading={false}
+        readOnly={false}
+        writeError={null}
+      />,
+    );
+    // Tag input still there (form-editable).
+    expect(screen.getByTestId('array-widget-input-tags')).toBeInTheDocument();
+    // Platform row rendered, but its add/delete affordances are gone.
+    expect(screen.queryByTestId('platform-array-add-platforms')).toBeNull();
+    expect(screen.queryByTestId('platform-array-delete-platforms-0')).toBeNull();
   });
 
   it('renders unsupported fields as disabled read-only with tooltip', () => {

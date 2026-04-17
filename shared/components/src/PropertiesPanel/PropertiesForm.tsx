@@ -103,7 +103,7 @@ function renderWidget(
   readOnly: boolean,
 ): React.ReactNode {
   const { key, label, value, spec, error } = field;
-  const disabled = readOnly;
+  const disabled = readOnly || field.readOnly === true;
   const noop = (): void => {};
 
   switch (spec.kind) {
