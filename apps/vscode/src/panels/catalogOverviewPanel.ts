@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { StacItemSummary, Catalog, PlatformRecord } from '../types/stac';
+import type { StacService } from '../services/stacService';
 
 /** Message sent from extension to webview */
 interface LoadCatalogOverviewMessage {
@@ -53,7 +54,19 @@ interface OverviewViewportChangedMessage {
   bounds: [number, number, number, number] | null;
 }
 
-type OverviewToExtensionMessage = OverviewItemSelectedMessage | OverviewWebviewReadyMessage | OverviewViewportChangedMessage;
+/** Properties Panel commit from the StacBrowser surface (#193 / backlog #191). */
+interface PropertiesCommitMessage {
+  type: 'properties:commit';
+  storePath: string;
+  itemPath: string;
+  patch: Record<string, unknown>;
+}
+
+type OverviewToExtensionMessage =
+  | OverviewItemSelectedMessage
+  | OverviewWebviewReadyMessage
+  | OverviewViewportChangedMessage
+  | PropertiesCommitMessage;
 
 export class CatalogOverviewPanel {
   public static readonly viewType = 'debrief.catalogOverview';
@@ -69,6 +82,15 @@ export class CatalogOverviewPanel {
   private catalogId = '';
   private storeId = '';
   private viewportBounds: [number, number, number, number] | null = null;
+  private stacService?: StacService;
+
+  /**
+   * Wire the StacService used by the Properties Panel commit handler
+   * (#193 / backlog #191). Optional so pre-feature tests still construct.
+   */
+  public setStacService(service: StacService): void {
+    this.stacService = service;
+  }
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -232,6 +254,57 @@ export class CatalogOverviewPanel {
         // Store viewport bounds for cross-view synchronisation (Feature: 130)
         this.viewportBounds = message.bounds;
         break;
+
+      case 'properties:commit':
+        // #193 / backlog #191 — direct-write item metadata via single-writer service.
+        void this.handlePropertiesCommit(message);
+        break;
+    }
+  }
+
+  private async handlePropertiesCommit(
+    message: PropertiesCommitMessage,
+  ): Promise<void> {
+    if (!this.stacService) {
+      void this.panel.webview.postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: 'ServiceUnavailable',
+        message: 'Properties write service not wired',
+      });
+      return;
+    }
+
+    try {
+      const packageVersion = vscode.extensions.getExtension('debrief.debrief-vscode')
+        ?.packageJSON?.version ?? '0.0.0';
+      const fields = Object.keys(message.patch).sort();
+      const result = await this.stacService.updateItemMetadata({
+        storePath: message.storePath,
+        itemPath: message.itemPath,
+        patch: message.patch,
+        overrideFields: fields,
+        provenance: {
+          tool: 'debrief.propertiesPanel',
+          fields,
+        },
+        packageVersion: String(packageVersion),
+      });
+      void this.panel.webview.postMessage({
+        type: 'properties:committed',
+        itemPath: message.itemPath,
+        updatedProperties: result.updatedProperties,
+        overrides: result.overrides,
+        activityId: result.activityId,
+      });
+    } catch (err) {
+      const e = err as Error & { name?: string };
+      void this.panel.webview.postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: e.name ?? 'Error',
+        message: e.message ?? 'Properties commit failed',
+      });
     }
   }
 

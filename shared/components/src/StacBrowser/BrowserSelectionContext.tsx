@@ -2,8 +2,6 @@
  * BrowserSelectionContext — surface-local React context exposing the STAC
  * browser's currently selected item path. Scoped to the StacBrowser (no global
  * session-state slice per FR-007 + Decision 2).
- *
- * Phase 1 scaffold. Real provider + hook land in T061 (Phase 4).
  */
 
 import React from 'react';
@@ -18,14 +16,37 @@ export const BrowserSelectionContext =
 
 export interface BrowserSelectionProviderProps {
   children: React.ReactNode;
+  initialSelectedItemPath?: string | null;
+  /** Optional controlled-component hook — when set, Provider forwards instead of owning state. */
+  value?: BrowserSelection;
 }
 
-export function BrowserSelectionProvider(
-  _props: BrowserSelectionProviderProps,
-): React.ReactElement {
-  throw new Error('BrowserSelectionProvider: placeholder — implemented in T061');
+export function BrowserSelectionProvider({
+  children,
+  initialSelectedItemPath = null,
+  value,
+}: BrowserSelectionProviderProps): React.ReactElement {
+  const [selectedItemPath, setSelectedItemPath] = React.useState<string | null>(
+    initialSelectedItemPath,
+  );
+  const owned = React.useMemo<BrowserSelection>(
+    () => ({ selectedItemPath, setSelectedItemPath }),
+    [selectedItemPath],
+  );
+  const delivered = value ?? owned;
+  return (
+    <BrowserSelectionContext.Provider value={delivered}>
+      {children}
+    </BrowserSelectionContext.Provider>
+  );
 }
 
 export function useBrowserSelection(): BrowserSelection {
-  throw new Error('useBrowserSelection: placeholder — implemented in T061');
+  const ctx = React.useContext(BrowserSelectionContext);
+  if (!ctx) {
+    throw new Error(
+      'useBrowserSelection: must be used inside <BrowserSelectionProvider>',
+    );
+  }
+  return ctx;
 }
