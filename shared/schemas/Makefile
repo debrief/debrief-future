@@ -1,4 +1,4 @@
-.PHONY: all generate generate-pydantic generate-jsonschema generate-typescript test test-python test-typescript clean help
+.PHONY: all generate generate-pydantic generate-jsonschema generate-typescript docs docs-md docs-html docs-serve test test-python test-typescript clean help
 
 # Default target
 all: generate test
@@ -22,6 +22,27 @@ generate-typescript:
 	@echo "Generating TypeScript interfaces..."
 	python scripts/generate.py --target typescript
 	@echo "[OK] TypeScript interfaces generated"
+
+# === Documentation Targets ===
+# Produces build/md/ (via linkml gen-doc) and build/html/ (via mkdocs build).
+# Neither output is committed — gh-pages is the canonical hosted surface.
+
+docs: docs-md docs-html
+	@echo "[OK] Documentation built: build/html/index.html"
+
+docs-md:
+	@echo "Generating Markdown docs (linkml gen-doc)..."
+	python scripts/generate.py --target docs
+	@echo "[OK] Markdown docs generated in build/md/"
+
+docs-html: docs-md
+	@echo "Building HTML site (mkdocs)..."
+	mkdocs build
+	@echo "[OK] HTML site built in build/html/"
+
+docs-serve: docs-md
+	@echo "Serving docs at http://localhost:8000 (Ctrl+C to stop)..."
+	mkdocs serve
 
 # === Test Targets ===
 
@@ -58,6 +79,7 @@ clean:
 	rm -rf src/generated/python/debrief_schemas/*.py
 	rm -rf src/generated/json-schema/*.json
 	rm -rf src/generated/typescript/*.ts
+	rm -rf build/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
 	@echo "[OK] Clean complete"
@@ -75,6 +97,10 @@ help:
 	@echo "  generate-pydantic   Generate Pydantic models only"
 	@echo "  generate-jsonschema Generate JSON Schema only"
 	@echo "  generate-typescript Generate TypeScript interfaces only"
+	@echo "  docs             Build Markdown + HTML documentation"
+	@echo "  docs-md          Run linkml gen-doc only (build/md/)"
+	@echo "  docs-html        Run mkdocs build only (build/html/)"
+	@echo "  docs-serve       Run mkdocs serve on localhost:8000"
 	@echo "  test             Run all tests"
 	@echo "  test-python      Run Python tests only"
 	@echo "  test-typescript  Run TypeScript tests only"

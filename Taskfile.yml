@@ -104,6 +104,24 @@ tasks:
       - task: typecheck
       - task: test
 
+  docs:generate:
+    desc: "Generate Markdown docs from LinkML schemas (shared/schemas/build/md/)"
+    deps: [install]
+    cmds:
+      - uv run --extra docs python shared/schemas/scripts/generate.py --target docs
+
+  docs:build:
+    desc: "Build HTML docs site via MkDocs (shared/schemas/build/html/)"
+    deps: [docs:generate]
+    cmds:
+      - cd shared/schemas && uv run --extra docs mkdocs build
+
+  docs:serve:
+    desc: "Serve docs locally on http://localhost:8000 (auto-reloads)"
+    deps: [docs:generate]
+    cmds:
+      - cd shared/schemas && uv run --extra docs mkdocs serve
+
   preview:build:
     desc: "Build the preview container (code-server + Debrief extension)"
     preconditions:
