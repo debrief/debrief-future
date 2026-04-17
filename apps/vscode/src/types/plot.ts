@@ -2,10 +2,6 @@
  * Plot-related type definitions for the Debrief VS Code Extension
  */
 
-// T014: Import and re-export schema feature types (TrackFeature, ReferenceLocation, PlotFeatureCollection)
-// T015: Import geometry types from @debrief/schemas instead of hand-writing LineString/Point
-// T016: Import PositionStyle, PositionStyleOverride from @debrief/schemas
-// T017: Import TimestampedPosition from @debrief/schemas
 import type {
   GeoJSONLineString,
   GeoJSONPoint,
@@ -17,8 +13,6 @@ import type {
   DebriefFeatureCollection,
 } from '@debrief/schemas';
 
-// T014: LocationFeature → SchemaReferenceLocation (matches schema type name ReferenceLocation)
-// T014: PlotFeatureCollection → DebriefFeatureCollection (schema's canonical collection type)
 export type {
   GeoJSONLineString,
   GeoJSONPoint,

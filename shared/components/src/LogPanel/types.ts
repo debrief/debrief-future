@@ -4,10 +4,8 @@
  * Feature: 072-log-panel (E02, Phase 2)
  */
 
-// T022: Import ParameterValue, InputFeatureState from @debrief/schemas instead of defining locally.
-// Note: schema ParameterValue uses `value: string` (wire format) and InputFeatureState uses
-// snake_case `feature_id` (wire format). Consumers accessing `value` as `unknown`
-// will need to update to use the schema field names.
+// Schema ParameterValue uses `value: string` (wire format); InputFeatureState uses
+// snake_case `feature_id` (wire format).
 import type { ParameterValue, InputFeatureState } from '@debrief/schemas';
 export type { ParameterValue, InputFeatureState };
 
