@@ -2,6 +2,11 @@
 Main entry point for debrief-cli.
 
 Provides the root CLI group and global options.
+
+``Context`` and ``pass_context`` live in ``debrief_cli.context`` so the
+subcommand groups (``catalog``, ``tools``, ``validate``) can import them
+without re-importing this module — that indirection broke the pylint
+``cyclic-import`` warning previously emitted here.
 """
 
 from __future__ import annotations
@@ -10,22 +15,11 @@ import sys
 
 import click
 
-from debrief_cli.output import OutputFormatter
+from debrief_cli.context import Context, pass_context
 
-
-# Global context object to store shared state
-class Context:
-    def __init__(self) -> None:
-        self.json_mode = False
-        self.formatter = None
-
-    def get_formatter(self) -> OutputFormatter:
-        if self.formatter is None:
-            self.formatter = OutputFormatter(json_mode=self.json_mode)
-        return self.formatter
-
-
-pass_context = click.make_pass_decorator(Context, ensure=True)
+# Re-exported so external callers that previously did
+# ``from debrief_cli.main import Context, pass_context`` continue to work.
+__all__ = ["Context", "cli", "main", "pass_context"]
 
 
 @click.group()

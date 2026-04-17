@@ -14,7 +14,11 @@
  */
 
 import type { SensorData } from '@debrief/schemas';
-import { geodesicDestination, interpolateTrackCourse, interpolateTrackPosition } from './sensor-utils';
+import {
+  geodesicDestination,
+  interpolateTrackCourse,
+  interpolateTrackPosition,
+} from './geo-primitives';
 import { findNearestPointIndex } from './temporal-utils';
 
 /** Mean Earth radius in metres (matches Python haversine_distance_metres) */

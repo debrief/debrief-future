@@ -5,7 +5,7 @@
 
 import { IpcMain } from 'electron';
 import { ServiceManager, spawnAndRequest } from './jsonrpc.js';
-import { getStorePaths } from './config.js';
+import { getStorePaths } from './configStore.js';
 import { getServiceCommand } from '../service-paths.js';
 import type { PlotInfo } from '../../renderer/types/store.js';
 import type { GeoJSONFeature } from '../../renderer/types/results.js';

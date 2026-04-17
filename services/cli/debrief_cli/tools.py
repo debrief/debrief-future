@@ -12,7 +12,7 @@ from typing import Any
 
 import click
 
-from debrief_cli.main import Context, pass_context
+from debrief_cli.context import Context, pass_context
 from debrief_cli.output import format_tool_metadata
 
 

@@ -558,7 +558,6 @@ EDGE_CASES: list[EdgeCase] = [
 
 
 def generate_item(
-    num: int,
     item_id: str,
     name: str,
     region: Region,
@@ -835,7 +834,6 @@ def main() -> None:
         track_count = rng.randint(tc_lo, tc_hi)
 
         item = generate_item(
-            num=i + 1,
             item_id=item_id,
             name=name,
             region=region,

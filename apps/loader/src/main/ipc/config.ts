@@ -1,61 +1,22 @@
 /**
  * debrief-config TypeScript integration.
  * Provides access to user configuration (STAC store locations).
+ *
+ * Low-level persistence (read/write/store-paths) lives in `configStore.ts`
+ * so that `stac.ts` can depend on it without creating a cycle with this
+ * module (which itself lazily imports `stac.ts` for plot-count display).
  */
 
 import { app, dialog, IpcMain } from 'electron';
 import { promises as fs } from 'fs';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import type { StacStoreInfo } from '../../renderer/types/store.js';
+import { getStorePaths, readConfig, writeConfig } from './configStore.js';
 
-const CONFIG_FILE = 'config.json';
-
-interface DebriefConfig {
-  stores: Array<{
-    id: string;
-    name: string;
-    path: string;
-  }>;
-}
-
-/**
- * Gets the path to the config file.
- */
-function getConfigPath(): string {
-  // Use XDG-compliant path
-  const configDir =
-    process.env.XDG_CONFIG_HOME || join(app.getPath('home'), '.config', 'debrief');
-  return join(configDir, CONFIG_FILE);
-}
-
-/**
- * Ensures config directory exists.
- */
-async function ensureConfigDir(): Promise<void> {
-  const configPath = getConfigPath();
-  const configDir = dirname(configPath);
-  await fs.mkdir(configDir, { recursive: true });
-}
-
-/**
- * Reads the configuration file.
- */
-async function readConfig(): Promise<DebriefConfig> {
-  try {
-    const data = await fs.readFile(getConfigPath(), 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return { stores: [] };
-  }
-}
-
-/**
- * Writes the configuration file.
- */
-async function writeConfig(config: DebriefConfig): Promise<void> {
-  await ensureConfigDir();
-  await fs.writeFile(getConfigPath(), JSON.stringify(config, null, 2));
-}
+// Re-export for external consumers of `./config.js` that previously relied on
+// these symbols being defined here. `stac.ts` now imports them directly from
+// `./configStore.js` to avoid the cycle.
+export { getStorePaths };
 
 /**
  * Checks if a store path is accessible.
@@ -145,14 +106,6 @@ export async function removeStore(storeId: string): Promise<void> {
   const config = await readConfig();
   config.stores = config.stores.filter((s) => s.id !== storeId);
   await writeConfig(config);
-}
-
-/**
- * Gets all store paths for debrief-stac configuration.
- */
-export async function getStorePaths(): Promise<string[]> {
-  const config = await readConfig();
-  return config.stores.map((s) => s.path);
 }
 
 // TODO: Add "Manage Stores" tab in the future for:

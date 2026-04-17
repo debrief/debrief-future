@@ -2,7 +2,15 @@
  * Type definitions for the TimeController component.
  */
 
-import type { TimeExtent } from '../utils/types';
+/**
+ * Time extent as [startTime, endTime] in milliseconds since epoch.
+ *
+ * Defined locally to avoid a cyclic import with `utils/types.ts`, which
+ * re-exports `DisplayMode` from this module. `utils/types.ts` still declares
+ * the canonical, externally-exported `TimeExtent` for consumers; this local
+ * alias only exists to satisfy type references within this file.
+ */
+type TimeExtent = [number, number];
 
 /**
  * Playback speed multiplier options.

@@ -3,8 +3,7 @@
  * Translates annotation shapes by compass bearing and distance using great-circle math.
  */
 
-import type { MCPToolDefinition } from '../../../services/toolService';
-import type { GeoJSONFeature } from '@debrief/utils';
+import type { GeoJSONFeature, MCPToolDefinition } from '@debrief/utils';
 
 export interface MoveShapeParams {
   direction?: number;

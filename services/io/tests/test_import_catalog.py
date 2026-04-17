@@ -173,7 +173,6 @@ class TestAttachProvenance:
             features,
             handler_name="Debrief REP Format",
             handler_version="1.0.0",
-            source_file_rel="boat1.rep",
             parse_time_ms=10.0,
         )
         for f in features:
@@ -191,7 +190,6 @@ class TestAttachProvenance:
             features,
             handler_name="Debrief DPF Format",
             handler_version="1.0.0",
-            source_file_rel="test.dpf",
             parse_time_ms=5.0,
         )
         aid1 = features[0]["properties"]["provenance"][0]["activity_id"]
@@ -204,7 +202,6 @@ class TestAttachProvenance:
             features,
             handler_name="Debrief DSF Format",
             handler_version="1.0.0",
-            source_file_rel="sensor.dsf",
             parse_time_ms=1.0,
         )
         tool = features[0]["properties"]["provenance"][0]["was_generated_by"]["tool"]

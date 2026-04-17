@@ -4,9 +4,8 @@
  * Port of the Python implementation in debrief_calc/tools/sensor/detection/buffer_zone_generator.py.
  */
 
-import type { MCPToolDefinition } from '../../../services/toolService';
+import type { MCPToolDefinition, SafeFeature } from '@debrief/utils';
 import type { TrackFeature } from '@debrief/schemas';
-import type { SafeFeature } from '@debrief/utils';
 
 // ============================================================
 // TYPES

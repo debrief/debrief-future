@@ -124,7 +124,6 @@ def _attach_provenance(
     *,
     handler_name: str,
     handler_version: str,
-    source_file_rel: str,
     parse_time_ms: float,
 ) -> None:
     """Attach PROV LogEntry to each feature in-place.
@@ -413,7 +412,6 @@ def import_legacy_data(
                 parse_result.features,
                 handler_name=parse_result.handler,
                 handler_version=parse_result.handler_version,
-                source_file_rel=file_rel,
                 parse_time_ms=parse_result.parse_time_ms,
             )
 
