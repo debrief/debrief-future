@@ -74,7 +74,18 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    - Spec: `specs/[feature]/spec.md`
    - Tasks: `specs/[feature]/tasks.md`
+
+   ---
+
+   📖 **Review in Spec Navigator**: https://debrief.github.io/debrief-future/spec-navigator/?pr=<num>
    ```
+
+   **Navigator link guard (added 2026-04-17, #191):** Before appending the
+   navigator link, search the PR body for the literal fragment
+   `spec-navigator/?pr=` — if it already appears, skip the append step.
+   This prevents duplicate links when `/speckit.pr` is re-run to update
+   an existing PR. The `<num>` token is the PR number returned by the
+   `gh pr view` / `gh pr create` response.
 
 6. **Generate or verify media content**:
    - Check for `FEATURE_DIR/media/` directory

@@ -1,0 +1,3 @@
+markdown-bench 50KB: avg=89.7ms (84, 86, 99)
+markdown-bench 150KB: avg=248.7ms (248, 230, 268)
+markdown-bench 300KB: avg=508.5ms (554, 509, 462)
