@@ -17,8 +17,8 @@ Alias: base_frequency
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
 | [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
+| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
 
 
 
