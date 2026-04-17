@@ -61,7 +61,11 @@ export interface GenerationResult {
   readonly cql2: Cql2Json;
   readonly lozenges: readonly LozengeSeed[];
   readonly unrecognisedTerms: readonly string[];
-  readonly error: GenerationError | null;
+  /**
+   * Discriminated union so the demo can route generator-level (#188) vs
+   * transport-level (#190) failures to the correct banner. `null` on success.
+   */
+  readonly error: GenerationResultError | null;
   readonly diagnostics: GenerationDiagnostics;
 }
 
@@ -178,6 +182,119 @@ export interface RunHarnessDeps {
   readonly catalog: readonly StacBrowserItem[];
   readonly filterConfig?: FilterEngineConfig;
   readonly promptVersion?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Live LLM transport (#190) — plugs a real provider behind the LLMClient
+// contract. Added here rather than a sibling file to match the package's
+// "one file per concern" convention (see plan.md → Structure Decision).
+// ---------------------------------------------------------------------------
+
+/**
+ * Runtime configuration for the live LLM client.
+ *
+ * Loaded at demo boot from `apps/nl-demo/live-config.json` (gitignored, app
+ * root). Credentials MUST NOT appear on this type — they live only in the
+ * proxy's environment (see `ProxyEnv` in data-model.md §2).
+ */
+export interface LiveConfig {
+  readonly enabled: boolean;
+  readonly proxyUrl: string;
+  readonly model: string;
+  readonly timeoutMs: number;
+  readonly maxCalls: number;
+  /** UTF-8 byte count (not UTF-16 code units). Enforced by a streaming reader. */
+  readonly maxResponseBytes: number;
+  /**
+   * Required only when the proxy was started with `PROXY_ALLOW_REMOTE=true`.
+   * Sent as `X-Proxy-Token` on every `/generate` and `/health` request.
+   * Omitted (or empty) for the default loopback-bound proxy.
+   */
+  readonly proxyToken?: string;
+}
+
+export interface LiveConfigValidationError {
+  readonly field: keyof LiveConfig;
+  readonly message: string;
+}
+
+export type LiveConfigValidationResult =
+  | { readonly ok: true; readonly value: LiveConfig }
+  | { readonly ok: false; readonly errors: readonly LiveConfigValidationError[] };
+
+/** Seven disjoint failure classes surfaced by the live transport. */
+export type LiveTransportErrorReason =
+  | "auth-failure"
+  | "rate-limit"
+  | "provider-error"
+  | "transport-error"
+  | "timeout"
+  | "oversize-response"
+  | "usage-cap-reached";
+
+/**
+ * Plain data interface — NOT an Error subclass. The live client returns this
+ * via `GenerationResult.error` with `kind: "transport"`. It is never thrown,
+ * preserving #188's "generateCql2 never throws on normal failure paths"
+ * invariant.
+ */
+export interface LiveTransportError {
+  readonly reason: LiveTransportErrorReason;
+  readonly message: string;
+  readonly providerStatus: number | null;
+  readonly durationMs: number;
+  readonly callIndex: number;
+}
+
+/**
+ * Observability record emitted via `console.info("[nl-demo/live]", record)`
+ * once per live call (success or failure). NEVER contains prompt, response,
+ * or credential content.
+ */
+export interface TransportCallRecord {
+  readonly ts: string;
+  readonly provider: "anthropic";
+  readonly model: string;
+  readonly durationMs: number;
+  readonly outcome: "success" | LiveTransportErrorReason;
+  /** UTF-8 byte count; null on non-success. */
+  readonly responseBytes: number | null;
+  readonly callIndex: number;
+}
+
+/**
+ * Discriminated error union carried by `GenerationResult.error`. Routes
+ * generator-level (#188) vs transport-level (#190) failures to the correct
+ * demo banner via a `switch (result.error.kind)` dispatch.
+ */
+export type GenerationResultError =
+  | { readonly kind: "generation"; readonly error: GenerationError }
+  | { readonly kind: "transport"; readonly error: LiveTransportError };
+
+/**
+ * LLMClient backed by a real provider. Extends the #188 contract with the
+ * methods the demo needs to implement FR-012 (supersession) and SC-008
+ * (usage cap surfacing).
+ *
+ * `generate()` returns `rawResponse: string` on success (matching the
+ * LLMClient contract). On transport failure it throws a `LiveTransportAbort`
+ * marker carrying the typed `LiveTransportError`; `generateCql2` catches and
+ * wraps it into `GenerationResult.error` with `kind: "transport"` — the
+ * LiveTransportError value itself is never thrown, preserving the
+ * "generateCql2 never throws on normal failure paths" invariant.
+ */
+export interface LiveLLMClient extends LLMClient {
+  /**
+   * Abort every in-flight `generate()` call. Used by the demo when a new
+   * phrase supersedes an older one (FR-012). Aborted calls settle as
+   * transport errors with `reason: "transport-error"` and
+   * `message: "superseded"`; the demo's existing submission-token filter
+   * discards these before they reach the UI.
+   */
+  cancelPending(): void;
+
+  /** Read-only view of the usage counter. */
+  readonly usage: { readonly used: number; readonly cap: number };
 }
 
 // ---------------------------------------------------------------------------

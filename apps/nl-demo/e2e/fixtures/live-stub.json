@@ -1,0 +1,21 @@
+{
+  "_comment": "Stub scenarios for apps/nl-demo/scripts/live-proxy.mjs --stub. Keyed by canonicalised phrase (lowercase, single-spaced). The default outcome is used for any phrase not in overrides — the Phase 5 failure-matrix test injects specific overrides at spin-up. See specs/190-live-llm-transport/data-model.md §6.",
+  "default": {
+    "kind": "success",
+    "rawResponse": "{\"cql2\": {\"op\": \"a_containedBy\", \"args\": [[\"KR\"], {\"property\": \"debrief:platforms[*].nationality\"}]}, \"lozenges\": [{\"filterType\": \"nationality\", \"value\": \"KR\"}], \"unrecognised_terms\": []}",
+    "providerLatencyMs": 42
+  },
+  "overrides": {
+    "south korean destroyers": {
+      "kind": "success",
+      "rawResponse": "{\"cql2\": {\"op\": \"and\", \"args\": [{\"op\": \"a_containedBy\", \"args\": [[\"KR\"], {\"property\": \"debrief:platforms[*].nationality\"}]}, {\"op\": \"like\", \"args\": [{\"property\": \"debrief:platforms[*].vessel_class\"}, \"%destroyer%\"]}]}, \"lozenges\": [{\"filterType\": \"nationality\", \"value\": \"KR\"}, {\"filterType\": \"vessel-class\", \"value\": \"destroyer\"}], \"unrecognised_terms\": []}",
+      "providerLatencyMs": 55
+    },
+    "auth-failure phrase": { "kind": "auth" },
+    "rate-limit phrase": { "kind": "rate-limit" },
+    "provider-error phrase": { "kind": "provider-error", "providerStatus": 500 },
+    "timeout phrase": { "kind": "timeout" },
+    "malformed phrase": { "kind": "malformed", "raw": "not valid json at all {[" },
+    "oversize phrase": { "kind": "oversize", "sizeBytes": 2000000 }
+  }
+}

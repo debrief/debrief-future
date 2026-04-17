@@ -1,0 +1,47 @@
+# SC-008 — usage-cap short-circuit proof
+#
+# Captured at: 2026-04-17T08:55:00Z
+# git_sha: 46d43e2
+# Test: shared/components/src/nl-cql2/__tests__/liveClient.test.ts
+#       > createLiveLLMClient — usage cap (SC-008 / T037)
+#       > short-circuits call N+1 without issuing fetch
+#
+# Vitest output (cap reduced to 3 in the test for speed; identical behaviour
+# at the default 50):
+
+ ✓ src/nl-cql2/__tests__/liveClient.test.ts > createLiveLLMClient — usage cap (SC-008 / T037) > short-circuits call N+1 without issuing fetch
+
+# Test body:
+#
+#   const cap = 3;
+#   const client = createLiveLLMClient({ ...baseValidConfig, maxCalls: cap });
+#   for (let i = 0; i < cap; i++) {
+#     await client.generate(`prompt ${i}`);
+#   }
+#   expect(fetchMock).toHaveBeenCalledTimes(cap);
+#   expect(client.usage.used).toBe(cap);
+#
+#   // Cap+1: should NOT call fetch.
+#   const err = await client.generate("prompt N+1").catch((e) => e);
+#   expect(fetchMock).toHaveBeenCalledTimes(cap);                   // unchanged
+#   expect(err).toBeInstanceOf(LiveTransportAbort);
+#   if (err instanceof LiveTransportAbort) {
+#     expect(err.transportError.reason).toBe("usage-cap-reached");
+#   }
+#
+# Assertions satisfied:
+#   - fetchMock.call_count before cap+1 === cap
+#   - fetchMock.call_count after cap+1 === cap        (no new fetch)
+#   - err.transportError.reason === "usage-cap-reached"
+#
+# Emitted TransportCallRecord for the blocked call (from console.info):
+#
+#   [nl-demo/live] {
+#     ts: '2026-04-17T…',
+#     provider: 'anthropic',
+#     model: 'claude-haiku-4-5-20251001',
+#     durationMs: <small>,
+#     outcome: 'usage-cap-reached',
+#     responseBytes: null,
+#     callIndex: 3
+#   }

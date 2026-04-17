@@ -61,7 +61,9 @@ function makeError(
     cql2: {},
     lozenges: [],
     unrecognisedTerms: [],
-    error: err,
+    // #190: wrap in the discriminated union so the demo can dispatch
+    // generator vs transport failures via result.error.kind.
+    error: { kind: "generation", error: err },
     diagnostics,
   };
 }
