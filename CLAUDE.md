@@ -172,6 +172,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment) (184-regenerate-sample-catalog)
 - TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use) (186-filter-chips)
 - Read-only access to `shared/data/platform-registry.json` and `preview/workspace/samples/local-store/`; writes one JSON file at a stable repo-root output path (committed artefact) (187-build-time-enums)
+- TypeScript 5.x (existing toolchain — shared components + nl-demo app; no new languages) + Node stdlib (`node:http`, `node:https`) for the live-proxy sidecar, browser-native `fetch` + `AbortController` (no SDK), Anthropic Claude API (Haiku 4.5 default, operator-overridable); credentials isolated to proxy env (`.env` gitignored), no new runtime dependencies (190-live-llm-transport)
 
 ## Before Pushing
 
@@ -216,6 +217,7 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 190-live-llm-transport: Added TypeScript 5.x (shared components + nl-demo app; existing toolchain) + Node stdlib HTTP proxy (`node:http`, `node:https`) forwarding to the Anthropic Claude API (Haiku 4.5 default), browser-native `fetch` + `AbortController` for the `createLiveLLMClient` implementation of #188's `LLMClient` contract; credentials isolated to `apps/nl-demo/.env` (gitignored), browser-visible `live-config.json` holds no secrets; deterministic `--stub` mode on the same proxy script powers CI without network or credentials
 - 186-filter-chips: Added TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use)
 - 187-build-time-enums: Added Python 3.11 (existing toolchain — same as `scripts/regenerate-sample-catalog.py` and the `debrief-data` package) + `debrief-data` (registry loader, already a workspace member); standard library only for the rest (`json`, `pathlib`, `argparse`, `re`)
 - 184-regenerate-sample-catalog: Added Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment)
