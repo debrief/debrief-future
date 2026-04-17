@@ -209,17 +209,25 @@ export async function runHarness(
     }
 
     if (result.error) {
+      // #190 split result.error into a discriminated union; the harness
+      // flattens both arms so harness consumers keep a single error surface.
+      const reason =
+        result.error.kind === "generation"
+          ? result.error.error.reason
+          : `transport-${result.error.error.reason}`;
+      const rawResponse =
+        result.error.kind === "generation" ? result.error.error.rawResponse : undefined;
       failed.push({
         id: record.id,
         phrase: record.phrase,
-        reason: result.error.reason,
+        reason,
         expected: record.expected,
         actual: {
           cql2: null,
           matchCount: null,
           unrecognisedTerms: result.unrecognisedTerms,
         },
-        rawResponse: result.error.rawResponse,
+        ...(rawResponse !== undefined ? { rawResponse } : {}),
       });
       continue;
     }
