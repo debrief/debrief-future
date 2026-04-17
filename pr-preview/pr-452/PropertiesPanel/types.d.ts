@@ -46,6 +46,13 @@ export interface PropertiesFormField {
     derivation: FieldDerivationState;
     required: boolean;
     error: string | null;
+    /**
+     * Per-field read-only flag. When true the widget renders disabled even
+     * when the form itself is editable. Use for fields that are synthesised
+     * elsewhere (e.g. `debrief:platforms` is re-derived from features on
+     * save, so editing it in the Catalog Browser would be overwritten).
+     */
+    readOnly?: boolean;
 }
 export interface PropertiesFormProps {
     fields: PropertiesFormField[];
