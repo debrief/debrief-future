@@ -24,6 +24,7 @@ Parse the following from user input:
 | `--feature-pr <url>` | URL of related feature PR (for cross-referencing) | `--feature-pr https://github.com/debrief/debrief-future/pull/28` |
 | `--date <YYYY-MM-DD>` | Override post date (defaults to today) | `--date 2026-01-10` |
 | `--components <path>` | Path to component bundles directory | `--components specs/016/media/components/` |
+| `--schema-docs` | Sync the latest built schema docs from gh-pages to the website | `--schema-docs` |
 | `--dry-run` | Preview changes without creating PR | `--dry-run` |
 
 When invoked from `/speckit.pr`, the `--feature-pr` argument will be provided automatically.
@@ -86,6 +87,36 @@ Based on user input, determine which workflow to execute:
 1. Delegate to Jekyll Specialist
 2. Execute changes in website repo directly
 3. Create PR with changes
+
+### 4. Schema Docs Sync
+
+**Trigger:** User passes `--schema-docs` or describes a schema-docs sync
+
+```
+/publish --schema-docs
+/publish sync the latest LinkML schema documentation to the website
+```
+
+**Purpose:** Schema docs at `debrief.github.io/future/schemas/` are kept in
+sync **automatically** by `.github/workflows/schema-docs.yml` on every push
+to `main` of debrief-future. Use this manual mode only when:
+
+- A schema change landed on `main` **before** the auto-sync workflow existed
+  (one-time backfill).
+- The auto-sync is wedged (e.g. `WEBSITE_PUSH_TOKEN` expired, target repo
+  rebase required) and needs a manual, PR-gated catch-up.
+- You want to preview the sync via PR instead of the direct push the
+  workflow performs.
+
+**Steps:**
+1. Fetch the latest built HTML from `debrief/debrief-future@gh-pages:schema-docs/`
+   using `git archive` (fastest, no full clone).
+2. Stage it into the website clone under `future/schemas/`.
+3. Create branch `future-debrief/schema-docs-sync-{YYYY-MM-DD}`, commit, push, PR.
+
+**Default behaviour:** copy the raw HTML tree directly — it preserves
+clickable Mermaid exactly as the MkDocs-Material build produces it. Only
+revisit if the Material theme clashes visibly with the Jekyll site chrome.
 
 ## Cross-Repo Publishing Workflow
 
@@ -293,6 +324,46 @@ No transformation needed - copy directly with layout: `future-default`
 **Target:** Various (`_config.yml`, `_layouts/`, `_includes/`, etc.)
 
 Direct modification with careful validation.
+
+### Schema Docs Snapshot
+
+**Target:** `future/schemas/` in debrief.github.io
+
+**Source:** `gh-pages` branch of `debrief/debrief-future`, path `schema-docs/`
+(kept fresh by `.github/workflows/schema-docs.yml` on every push to main).
+
+**Fetch and stage:**
+
+```bash
+# Fetch the built HTML tree from gh-pages without a full clone.
+mkdir -p "$WORK_DIR/schema-docs"
+git -C "$WORK_DIR" init --quiet
+git -C "$WORK_DIR" remote add origin https://github.com/debrief/debrief-future.git
+git -C "$WORK_DIR" fetch --depth 1 origin gh-pages --quiet
+git -C "$WORK_DIR" archive origin/gh-pages schema-docs | tar -x -C "$WORK_DIR/"
+
+# Stage into the website clone under future/schemas/
+rm -rf "$WORK_DIR/website/future/schemas"
+mkdir -p "$WORK_DIR/website/future/schemas"
+cp -r "$WORK_DIR/schema-docs/." "$WORK_DIR/website/future/schemas/"
+```
+
+**Branch + PR:**
+
+- Branch: `future-debrief/schema-docs-sync-$(date +%Y-%m-%d)`
+- Title: `Future Debrief: Schema Docs Sync ($(date +%Y-%m-%d))`
+- Body should call out that the content is auto-generated and link to the
+  source `gh-pages` commit SHA for traceability.
+
+**Preview URL** after merge: `https://debrief.github.io/future/schemas/`
+
+**Notes:**
+- Raw HTML copy preserves clickable Mermaid diagrams exactly as the
+  MkDocs-Material build produces them.
+- Expect ~120 `.html` files per snapshot. Commit message should be terse; the
+  diff is fully regenerated each sync.
+- Skip the blog-post transformation pipeline entirely — no front-matter
+  editing, no `_posts/` involvement.
 
 ## Agent Delegation
 
