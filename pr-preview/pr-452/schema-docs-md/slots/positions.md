@@ -17,8 +17,8 @@ Alias: positions
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
 | [TrackProperties](../classes/TrackProperties.md) | Properties for a TrackFeature |  no  |
+| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
 
 
 

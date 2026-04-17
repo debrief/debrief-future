@@ -17,8 +17,8 @@ Alias: data_points
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [DatasetSeries](../classes/DatasetSeries.md) | A named data series within a multi-series dataset |  no  |
 | [DatasetEntry](../classes/DatasetEntry.md) | Standard envelope for all tool result datasets, matching the runtime DatasetE... |  no  |
+| [DatasetSeries](../classes/DatasetSeries.md) | A named data series within a multi-series dataset |  no  |
 
 
 
