@@ -7,8 +7,13 @@
  * - Temporal data extraction from GeoJSON features
  */
 
+import { findNearestPointIndex, sliceTrackToTime } from '@debrief/utils';
 import type { DebriefFeature } from '../utils/types';
 import { isTrackFeature } from '../utils/types';
+
+// Re-export the canonical implementations from @debrief/utils so existing
+// imports of these helpers from './temporal-utils' keep working.
+export { findNearestPointIndex, sliceTrackToTime };
 
 /**
  * Extracted temporal data from a track feature.
@@ -18,75 +23,6 @@ export interface TemporalTrackData {
   coordinates: [number, number][];
   timestamps: number[];
   timeExtent: [number, number];
-}
-
-/**
- * Find the index of the coordinate nearest to the target time.
- * Uses binary search for O(log n) performance.
- *
- * @param timestamps Sorted array of timestamps (epoch ms)
- * @param targetTime Target time to find (epoch ms)
- * @returns Index of nearest timestamp, or -1 if array is empty
- */
-export function findNearestPointIndex(
-  timestamps: number[],
-  targetTime: number
-): number {
-  if (timestamps.length === 0) return -1;
-  if (timestamps.length === 1) return 0;
-
-  // Before first timestamp
-  if (targetTime <= timestamps[0]!) return 0;
-  // After last timestamp
-  if (targetTime >= timestamps[timestamps.length - 1]!) return timestamps.length - 1;
-
-  // Binary search
-  let low = 0;
-  let high = timestamps.length - 1;
-
-  while (low <= high) {
-    const mid = (low + high) >>> 1;
-    const midVal = timestamps[mid]!;
-    if (midVal === targetTime) return mid;
-    if (midVal < targetTime) {
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  // low is now the insertion point; compare low and low-1
-  if (low >= timestamps.length) return timestamps.length - 1;
-  if (low === 0) return 0;
-
-  const diffLow = Math.abs(timestamps[low]! - targetTime);
-  const diffHigh = Math.abs(timestamps[low - 1]! - targetTime);
-  return diffLow <= diffHigh ? low : low - 1;
-}
-
-/**
- * Slice track coordinates from start up to the point nearest to target time (inclusive).
- * Used for snail-trail mode rendering.
- *
- * @param coordinates Array of [lon, lat] coordinates
- * @param timestamps Array of timestamps (epoch ms), parallel to coordinates
- * @param targetTime Target time to slice at (epoch ms)
- * @returns Sliced coordinate array, or empty array if no valid data
- */
-export function sliceTrackToTime(
-  coordinates: [number, number][],
-  timestamps: number[],
-  targetTime: number
-): [number, number][] {
-  if (coordinates.length === 0 || timestamps.length === 0) return [];
-
-  const nearestIndex = findNearestPointIndex(timestamps, targetTime);
-  if (nearestIndex < 0) return [];
-
-  // If target time is before the track start, return empty (nothing to show yet)
-  if (targetTime < timestamps[0]!) return [];
-
-  return coordinates.slice(0, nearestIndex + 1);
 }
 
 /**
