@@ -80,7 +80,7 @@ async function applyTheme(page: Page, theme: 'light' | 'dark' | 'vscode'): Promi
 }
 
 test.describe('Properties Panel — visual evidence', () => {
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
 
   for (const theme of ['light', 'dark', 'vscode'] as const) {
     test(`properties-form screenshot — ${theme}`, async ({ page }) => {

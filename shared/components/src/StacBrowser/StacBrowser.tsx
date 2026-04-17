@@ -493,28 +493,9 @@ function renderPanel(type: string): React.ReactElement {
         />
       );
       if (!previewItem) {
-        if (!ctx.propertiesSlot) {
-          return (
-            <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
-              {listView}
-            </div>
-          );
-        }
-        // With a properties slot wired, keep the two-pane layout even before
-        // any item is highlighted — the slot renders its own empty state.
         return (
-          <div style={{ height: '100%' }} data-testid="stac-browser-list">
-            <ResizableSplitPane
-              left={listView}
-              right={
-                <div
-                  data-testid="stac-browser-properties-slot"
-                  style={{ height: '100%', overflow: 'auto' }}
-                >
-                  {ctx.propertiesSlot}
-                </div>
-              }
-            />
+          <div style={{ height: '100%', overflow: 'auto' }} data-testid="stac-browser-list">
+            {listView}
           </div>
         );
       }
