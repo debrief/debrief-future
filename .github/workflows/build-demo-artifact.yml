@@ -105,21 +105,34 @@ jobs:
 
       - name: Make venv relocatable
         run: |
-          # Rewrite shebang paths from build path to target path
+          # Rewrite build-path references to the runtime install path
+          # across every text file under venv/bin/. Python's `venv` emits
+          # two classes of scripts:
+          #   1. Shebanged tools (python, pip, ...) — previously handled.
+          #   2. Source-able activate scripts (activate, activate.fish,
+          #      activate.csh) that set VIRTUAL_ENV=<build path>. These
+          #      have NO shebang, so the old shebang-only check skipped
+          #      them — the verification step then flagged the leftover
+          #      build paths as a portability failure.
+          # The fix: rewrite any text file in venv/bin/, not just
+          # shebanged ones. Binary files are skipped via `file` check.
           BUILD_PATH="$PWD/artifact"
           TARGET_PATH="/opt/debrief"
 
-          # Update shebangs in bin scripts
           for script in artifact/venv/bin/*; do
-            if [ -f "$script" ] && head -1 "$script" | grep -q "^#!"; then
-              sed -i "s|$BUILD_PATH|$TARGET_PATH|g" "$script"
+            [ -f "$script" ] || continue
+            # Skip non-text files (e.g. precompiled binaries).
+            if ! file "$script" | grep -qE 'text|script|empty'; then
+              continue
             fi
+            sed -i "s|$BUILD_PATH|$TARGET_PATH|g" "$script"
           done
 
           # Verify rewrite
-          echo "Verifying path rewrite (first line of python script):"
+          echo "Verifying path rewrite:"
           head -1 artifact/venv/bin/python3 || true
           head -1 artifact/venv/bin/pip || true
+          grep '^VIRTUAL_ENV=' artifact/venv/bin/activate || true
 
       # T017: Build VS Code extension via pnpm workspace
       # The monorepo uses pnpm workspaces (pnpm-lock.yaml at repo root).
