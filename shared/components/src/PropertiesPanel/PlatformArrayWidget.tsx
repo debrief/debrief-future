@@ -32,16 +32,25 @@ type EditableField = keyof PlatformDraft;
 
 interface ColumnSpec {
   field: EditableField;
+  header: string;
   placeholder: string;
   flex: string;
   maxLength?: number;
+  centered?: boolean;
 }
 
 const COLUMNS: readonly ColumnSpec[] = [
-  { field: 'id', placeholder: 'id', flex: '1 1 25%' },
-  { field: 'name', placeholder: 'name', flex: '1 1 30%' },
-  { field: 'nationality', placeholder: 'nat', flex: '0 0 48px', maxLength: 3 },
-  { field: 'vessel_class', placeholder: 'class', flex: '1 1 25%' },
+  { field: 'id', header: 'ID', placeholder: 'id', flex: '1 1 25%' },
+  { field: 'name', header: 'Name', placeholder: 'name', flex: '1 1 30%' },
+  {
+    field: 'nationality',
+    header: 'Nat',
+    placeholder: 'GB',
+    flex: '0 0 32px',
+    maxLength: 2,
+    centered: true,
+  },
+  { field: 'vessel_class', header: 'Class', placeholder: 'class', flex: '1 1 25%' },
 ];
 
 function readStringField(entry: unknown, field: string): string {
@@ -181,6 +190,38 @@ export function PlatformArrayWidget({
 
   return (
     <div data-testid={`platform-array-widget-${name}`}>
+      {rows.length > 0 && (
+        <div
+          data-testid={`platform-array-header-${name}`}
+          style={{
+            display: 'flex',
+            gap: 8,
+            padding: '2px 6px',
+            marginBottom: 2,
+            fontSize: 10,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: 0.5,
+            color: 'var(--vscode-descriptionForeground, #bbb)',
+          }}
+        >
+          {COLUMNS.map((col) => (
+            <span
+              key={col.field}
+              style={{
+                flex: col.flex,
+                minWidth: 0,
+                textAlign: col.centered ? 'center' : 'left',
+              }}
+            >
+              {col.header}
+            </span>
+          ))}
+          {/* Spacer matching the delete-button column so headers align with rows. */}
+          <span style={{ flex: '0 0 auto', width: 20 }} aria-hidden="true" />
+        </div>
+      )}
+
       {rows.length === 0 && (
         <div
           style={{
@@ -224,7 +265,7 @@ export function PlatformArrayWidget({
                 style={{
                   flex: col.flex,
                   minWidth: 0,
-                  ...(col.field === 'nationality'
+                  ...(col.centered
                     ? { textAlign: 'center', textTransform: 'uppercase' }
                     : {}),
                 }}
@@ -270,7 +311,7 @@ export function PlatformArrayWidget({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  textAlign: col.field === 'nationality' ? 'center' : 'left',
+                  textAlign: col.centered ? 'center' : 'left',
                   opacity: row[col.field] ? 1 : 0.5,
                   fontStyle: row[col.field] ? 'normal' : 'italic',
                 }}
