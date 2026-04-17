@@ -30,6 +30,11 @@ PYTHON_OUT = GENERATED_DIR / "python" / "debrief_schemas"
 JSONSCHEMA_OUT = GENERATED_DIR / "json-schema"
 TYPESCRIPT_OUT = GENERATED_DIR / "typescript"
 
+# Documentation output (uncommitted — lives under build/, consumed by MkDocs)
+BUILD_DIR = SCHEMAS_ROOT / "build"
+DOCS_MD_OUT = BUILD_DIR / "md"
+DOCS_TEMPLATES = SCHEMAS_ROOT / "docs-templates"
+
 
 def run_command(cmd: list[str], description: str) -> bool:
     """Run a command and return success status."""
@@ -440,6 +445,62 @@ def generate_typescript() -> bool:
         return False
 
 
+def generate_markdown_docs() -> bool:
+    """Generate Markdown documentation from the LinkML schema via `gen-doc`.
+
+    Output goes to ``build/md/`` for MkDocs to consume. Flag choices:
+
+    - ``--render-imports`` — essential; ``debrief.yaml`` is a pure import
+      aggregator, so without this flag no content is rendered.
+    - ``--subfolder-type-separation`` — groups outputs into
+      ``classes/``, ``slots/``, ``enums/``, ``types/`` subdirectories for
+      cleaner navigation in MkDocs.
+    - ``--hierarchical-class-view`` — index page shows classes indented by
+      inheritance, making the ~91-class tree readable at a glance.
+    - ``--include-top-level-diagram`` — index page shows a Mermaid ER diagram
+      of the whole schema; individual class pages get their own diagrams by
+      default.
+    """
+    if not MASTER_SCHEMA.exists():
+        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
+        return False
+
+    DOCS_MD_OUT.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "gen-doc",
+        "--render-imports",
+        "--subfolder-type-separation",
+        "--hierarchical-class-view",
+        # Intentionally NOT passing --include-top-level-diagram: when the
+        # diagram type is mermaid_class_diagram, linkml's index template calls
+        # gen.mermaid_diagram() which returns None (the class-diagram path is
+        # handled only in per-class jinja templates). Jinja stringifies that
+        # to "None", producing a broken Mermaid block on the index page.
+        # Per-class diagrams are unaffected — they render via the
+        # class_diagram.md.jinja2 include in our template override.
+        "--diagram-type",
+        "mermaid_class_diagram",
+        # Local template override adds a defensive fix for classes with
+        # postcondition-only rules (see docs-templates/class.md.jinja2).
+        "--template-directory",
+        str(DOCS_TEMPLATES),
+        "--directory",
+        str(DOCS_MD_OUT),
+        str(MASTER_SCHEMA),
+    ]
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print(f"  [OK] Generated Markdown docs: {DOCS_MD_OUT}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"  [FAIL] gen-doc failed: {e.stderr}")
+        return False
+    except FileNotFoundError:
+        print("  [FAIL] gen-doc not found. Install with: pip install linkml")
+        return False
+
+
 def validate_fixtures() -> bool:
     """Validate all fixtures against the generated schemas."""
     fixtures_dir = SCHEMAS_ROOT / "src" / "fixtures"
@@ -464,9 +525,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--target",
-        choices=["pydantic", "jsonschema", "typescript", "all"],
+        choices=["pydantic", "jsonschema", "typescript", "docs", "all"],
         default="all",
-        help="Which schema(s) to generate (default: all)",
+        help=(
+            "Which schema(s) to generate (default: all). "
+            "'docs' runs gen-doc only and is NOT included in 'all' — "
+            "it's a separate, heavier pipeline consumed by mkdocs."
+        ),
     )
     parser.add_argument(
         "--validate-fixtures",
@@ -494,6 +559,11 @@ def main() -> None:
     if args.target in ("typescript", "all"):
         print("Generating TypeScript interfaces...")
         if not generate_typescript():
+            success = False
+
+    if args.target == "docs":
+        print("Generating Markdown documentation...")
+        if not generate_markdown_docs():
             success = False
 
     if args.validate_fixtures and not validate_fixtures():
