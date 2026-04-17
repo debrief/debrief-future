@@ -16,9 +16,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import PropertiesProvenanceEntry, StacExtensionProperties
 
-GENERATED_DIR: Path = (
-    Path(__file__).parent.parent / "src" / "generated" / "json-schema"
-)
+GENERATED_DIR: Path = Path(__file__).parent.parent / "src" / "generated" / "json-schema"
 
 
 def _load_schema(name: str) -> dict[str, object]:
@@ -53,9 +51,7 @@ class TestStacExtensionPropertiesNewFields:
         type_val = overrides_schema.get("type")
         assert type_val == "array" or (isinstance(type_val, list) and "array" in type_val)
         item_type = items.get("type")
-        assert item_type == "string" or (
-            isinstance(item_type, list) and "string" in item_type
-        )
+        assert item_type == "string" or (isinstance(item_type, list) and "string" in item_type)
 
     def test_provenance_log_field_present_in_jsonschema(self) -> None:
         schema = _load_schema("StacExtensionProperties")

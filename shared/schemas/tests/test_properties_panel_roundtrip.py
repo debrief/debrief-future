@@ -19,16 +19,12 @@ from pydantic import ValidationError
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import PropertiesProvenanceEntry, StacExtensionProperties
 
-FIXTURES_DIR: Path = (
-    Path(__file__).parent.parent / "fixtures" / "stac-extension"
-)
+FIXTURES_DIR: Path = Path(__file__).parent.parent / "fixtures" / "stac-extension"
 
 
 class TestOverridesFixture:
     def test_overrides_valid_fixture_roundtrip(self) -> None:
-        data: dict[str, object] = json.loads(
-            (FIXTURES_DIR / "overrides-valid.json").read_text()
-        )
+        data: dict[str, object] = json.loads((FIXTURES_DIR / "overrides-valid.json").read_text())
         original = StacExtensionProperties(**data)  # type: ignore[arg-type]
         json_str: str = original.model_dump_json()
         restored = StacExtensionProperties(**json.loads(json_str))  # type: ignore[arg-type]
