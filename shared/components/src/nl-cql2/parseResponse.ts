@@ -254,7 +254,7 @@ export async function parseResponse(
   // compliant payload inside fences is still accepted. rawResponse remains
   // untouched in error diagnostics.
   const fenceMatch = rawResponse.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```\s*$/);
-  const toParse = fenceMatch ? fenceMatch[1] : rawResponse;
+  const toParse = fenceMatch?.[1] ?? rawResponse;
   let parsed: unknown;
   try {
     parsed = JSON.parse(toParse);
