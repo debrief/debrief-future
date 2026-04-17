@@ -92,6 +92,7 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 - [ ] T011 [P][test] Vitest FR-012 supersession case: stub-proxy response 1 has 2 s delay; call 1 issued; call 2 issued after 100 ms via `cancelPending()`; assert call 1 rejects with `GenerationResult.error.kind === "transport"` + `reason === "transport-error"` + `message === "superseded"` AND only call 2's result reaches the consumer `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
 - [ ] T012 [P][test] Vitest FR-009 regression guard: `createLiveLLMClient` accepts any prompt (no `RESPONSES` map lookup), distinct from `createRecordedLLMClient` `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
 - [ ] T013 [P][test] Vitest `TransportCallRecord` emission: each `generate()` call emits exactly one `console.info("[nl-demo/live]", record)`; record has no `prompt`, no `rawResponse`, no credential, and `responseBytes` is UTF-8 byte count on success `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
+- [ ] T061 [P][test] Vitest FR-002 interchangeability regression guard: the same `generateCql2` call site accepts either `createRecordedLLMClient(RESPONSES)` or `createLiveLLMClient(config)` without type errors; for a matched input phrase each returns a `GenerationResult` with identical top-level shape (success path). Prevents future drift between the two `LLMClient` implementations `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
 
 ### Implementation — client
 
@@ -118,11 +119,12 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 ### End-to-end
 
 - [ ] T027 Extend Playwright config — convert `webServer` field to an array; keep `serve.mjs` on `$SERVER_PORT`; add second entry launching `node ../scripts/live-proxy.mjs --stub ../e2e/fixtures/live-stub.json` on a fixed loopback port (8082) with its own `url` for readiness check `apps/nl-demo/playwright/playwright.config.ts`
-- [ ] T028 [test] Create Playwright E2E happy-path scenario — stub returns canned CQL2 for an off-corpus phrase; assert chips render, card grid filters, no off-corpus banner, no console errors `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T062 Create Playwright live-config fixture + test-setup helper — (a) commit `e2e/fixtures/live-config.valid.json` pointing at `http://127.0.0.1:8082/generate` (the stub port from T027, NOT the operator default 8081) and `e2e/fixtures/live-config.malformed.json` missing `proxyUrl`; (b) export `withLiveConfig(fixture: "valid"|"malformed"|"absent")` from an `e2e/live-config-helper.ts` that copies the chosen fixture into the served directory in `beforeEach` and removes it in `afterEach`, so each scenario controls whether `live-config.json` is visible at the demo origin `apps/nl-demo/e2e/live-config-helper.ts`
+- [ ] T028 [test] Create Playwright E2E happy-path scenario — use `withLiveConfig("valid")` (T062); stub returns canned CQL2 for an off-corpus phrase; assert chips render, card grid filters, no off-corpus banner, no console errors `apps/nl-demo/e2e/live-transport.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-**Parallel opportunities**: T010–T013 are all test cases in the same file and typically serialised (single-test-file rule). T016, T021, T023 touch different files and can proceed in parallel once Phase 2 is green. T022 depends on T019.
+**Parallel opportunities**: T010–T013, T061 are all test cases in the same file and typically serialised (single-test-file rule). T016, T021, T023, T062 touch different files and can proceed in parallel once Phase 2 is green. T022 depends on T019. T028 depends on T062 (fixture helper). T061 depends on T014 (live client must exist).
 
 ---
 
@@ -135,8 +137,8 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 ### Tests (write before implementation)
 
 - [ ] T029 [P][test] Vitest: `validateLiveConfig` rejects absent `live-config.json` content (empty string, `null`, `undefined`, non-object) with `{ok: false, errors: [...]}`; rejects each required field missing with matching `field` in error `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
-- [ ] T030 [P][test] Playwright SC-003 network-spy scenario: before the test, ensure no `live-config.json` is served; drive all 9 corpus phrases + 2 off-corpus phrases; collect outbound URLs via `page.on('request')`; assert zero URLs match `/generate` or `anthropic.com`; save URL log to the run's artefacts for evidence capture `apps/nl-demo/e2e/live-transport.spec.ts`
-- [ ] T031 [P][test] Playwright malformed-config scenario: serve a `live-config.json` missing `proxyUrl`; load demo; assert banner text names `proxyUrl` specifically, transport-mode indicator is NOT shown, submitting a corpus phrase filters normally (fixture mode) `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T030 [P][test] Playwright SC-003 network-spy scenario: use `withLiveConfig("absent")` (T062) so no `live-config.json` is served; drive all 9 corpus phrases + 2 off-corpus phrases; collect outbound URLs via `page.on('request')`; assert zero URLs match `/generate` or `anthropic.com`; save URL log to the run's artefacts for evidence capture `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T031 [P][test] Playwright malformed-config scenario: use `withLiveConfig("malformed")` (T062) to serve a `live-config.json` missing `proxyUrl`; load demo; assert banner text names `proxyUrl` specifically, transport-mode indicator is NOT shown, submitting a corpus phrase filters normally (fixture mode) `apps/nl-demo/e2e/live-transport.spec.ts`
 
 ### Implementation
 
@@ -160,9 +162,9 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 - [ ] T036 [P][test] Vitest stub-harness coverage for all 7 `LiveTransportErrorReason` classes: `auth-failure`, `rate-limit`, `provider-error`, `transport-error`, `timeout`, `oversize-response`, `usage-cap-reached`; each scenario asserts `GenerationResult.error.kind === "transport"`, matching `reason`, non-null `durationMs`, increasing `callIndex` `shared/components/src/nl-cql2/__tests__/liveStub.test.ts`
 - [ ] T037 [P][test] Vitest SC-008 usage-cap short-circuit: drive 50 successful calls; assert 51st resolves with `reason: "usage-cap-reached"` WITHOUT issuing a fetch (mock `fetch` to assert zero additional calls after cap) `shared/components/src/nl-cql2/__tests__/liveStub.test.ts`
 - [ ] T038 [P][test] Vitest malformed-response fallthrough: stub returns 200 with `rawResponse` containing invalid JSON; assert live client returns the raw string; `parseResponse` produces `GenerationResult.error.kind === "generation"` with matching `GenerationError.reason` (e.g. `malformed-json`) `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
-- [ ] T039 [P][test] Playwright failure-class matrix: stub scenarios for each of the 7 transport reasons + 1 malformed-response; assert distinct banner text per class (matching the R4 mapping table), query bar remains enabled after each, no console errors `apps/nl-demo/e2e/live-transport.spec.ts`
-- [ ] T040 [P][test] Playwright cross-transport recovery: inject 3 consecutive live failures against the same phrase; then submit a fixture-corpus phrase; assert corpus phrase resolves normally via the fixture transport path (US3 AC4) `apps/nl-demo/e2e/live-transport.spec.ts`
-- [ ] T041 [P][test] Playwright proxy-down scenario: kill the stub proxy before page load; assert boot-time health-check failure shows the "proxy unreachable" banner, demo falls into fixture mode, transport-mode indicator is NOT shown `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T039 [P][test] Playwright failure-class matrix: use `withLiveConfig("valid")` (T062); stub scenarios for each of the 7 transport reasons + 1 malformed-response; assert distinct banner text per class (matching the R4 mapping table), query bar remains enabled after each, no console errors `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T040 [P][test] Playwright cross-transport recovery: use `withLiveConfig("valid")` (T062); inject 3 consecutive live failures against the same phrase; then submit a fixture-corpus phrase; assert corpus phrase resolves normally via the fixture transport path (US3 AC4) `apps/nl-demo/e2e/live-transport.spec.ts`
+- [ ] T041 [P][test] Playwright proxy-down scenario: use `withLiveConfig("valid")` (T062) BUT have the Playwright `webServer` teardown kill the stub proxy before page load (or point `proxyUrl` at an unused port via a separate `live-config.proxy-down.json` fixture); assert boot-time health-check failure shows the "proxy unreachable" banner, demo falls into fixture mode, transport-mode indicator is NOT shown `apps/nl-demo/e2e/live-transport.spec.ts`
 
 ### Implementation
 
@@ -222,9 +224,9 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 
 - **Phase 1**: T004 depends on T003 (workflow needs the config file). T001, T002, T003 parallel.
 - **Phase 2**: T007 depends on T005 (types). T008 depends on T005 + T007 (TDD). T009 depends on T005.
-- **Phase 3**: T014 depends on T010–T013 (TDD) + T005 (types). T015 depends on T014. T016–T020 (proxy) are sequential edits to the same file. T021 parallel with T016–T020 (different file). T022 depends on T019 (stub mode must exist). T023 depends on T014. T024, T025, T026 sequential in demo.jsx; T024 depends on T008 (validateLiveConfig) and T017 (health endpoint). T027 depends on T019 (stub mode). T028 depends on T026 + T027.
-- **Phase 4**: T029 depends on T008. T030, T031 depend on T024. T032, T033 edit demo.jsx — serialise. T034, T035 parallel (docs).
-- **Phase 5**: T036, T037 depend on T019 (stub mode) + T014 (client). T038 depends on T014. T039–T041 depend on T026, T027, T042. T042–T044 edit demo.jsx — serialise.
+- **Phase 3**: T014 depends on T010–T013 (TDD) + T005 (types). T015 depends on T014. T016–T020 (proxy) are sequential edits to the same file. T021 parallel with T016–T020 (different file). T022 depends on T019 (stub mode must exist). T023 depends on T014. T024, T025, T026 sequential in demo.jsx; T024 depends on T008 (validateLiveConfig) and T017 (health endpoint). T027 depends on T019 (stub mode). T061 depends on T014 (both clients must exist). T062 depends on T027 (stub port is known). T028 depends on T026 + T027 + T062 (fixture helper).
+- **Phase 4**: T029 depends on T008. T030, T031 depend on T024 + T062 (fixture helper). T032, T033 edit demo.jsx — serialise. T034, T035 parallel (docs).
+- **Phase 5**: T036, T037 depend on T019 (stub mode) + T014 (client). T038 depends on T014. T039–T041 depend on T026, T027, T042, T062 (fixture helper). T042–T044 edit demo.jsx — serialise.
 - **Phase 6**: evidence tasks depend on all implementation + test tasks; T058 depends on T045–T057 being present; T060 depends on all other Phase 6 tasks.
 
 ### Checkpoint after each user story
