@@ -10,38 +10,38 @@
     "coordinates": [
       [
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ],
         [
-          0.0,
-          0.0
+          0,
+          0
         ]
       ]
     ]
   },
   "bbox": [
-    0.0,
-    0.0,
-    0.0,
-    0.0
+    0,
+    0,
+    0,
+    0
   ],
   "properties": {
     "title": "Saxon Warrior: Dataset1",
     "datetime": "2016-10-10T12:00:00+00:00",
-    "description": "Saxon Warrior: Dataset1 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Carney.",
+    "description": "Saxon Warrior: Dataset1 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Carney.",
     "start_datetime": "2016-10-10T12:00:00+00:00",
     "end_datetime": "2016-10-10T19:37:00+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:31.277302Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
