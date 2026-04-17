@@ -47,6 +47,14 @@
     "./colour-engine": {
       "types": "./dist/colour-engine/index.d.ts",
       "import": "./dist/colour-engine/index.js"
+    },
+    "./PropertiesPanel/provenanceTypes": {
+      "types": "./src/PropertiesPanel/provenanceTypes.ts",
+      "import": "./src/PropertiesPanel/provenanceTypes.ts"
+    },
+    "./PropertiesPanel/autoDerivedFields": {
+      "types": "./src/PropertiesPanel/autoDerivedFields.ts",
+      "import": "./src/PropertiesPanel/autoDerivedFields.ts"
     }
   },
   "sideEffects": [
