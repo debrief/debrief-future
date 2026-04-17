@@ -1,0 +1,51 @@
+# gitleaks.toml — secret-scanning config for #190 Live LLM Transport
+#
+# This config augments gitleaks' default ruleset with Anthropic-specific
+# patterns. It is invoked by the CI `gitleaks` step (see
+# .github/workflows/ci.yml) on every PR.
+#
+# SC-006: zero credential values in the deployed demo bundle.
+# Scope: repo worktree + dist/ + apps/nl-demo/dist/ build artefacts.
+
+title = "debrief-future gitleaks config"
+
+[extend]
+# Inherit gitleaks' built-in rules (generic API keys, AWS keys, etc.).
+useDefault = true
+
+# Anthropic live API keys — the canonical leak pattern we care about.
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key (sk-ant-*) in committed sources or build artefacts"
+regex = '''sk-ant-[A-Za-z0-9_-]{20,}'''
+keywords = ["sk-ant"]
+
+# Bare dotenv assignment to an Anthropic key — catches `.env` files checked in
+# with a real value.
+[[rules]]
+id = "anthropic-api-key-env"
+description = "ANTHROPIC_API_KEY assignment with a non-placeholder value"
+regex = '''(?i)ANTHROPIC_API_KEY\s*=\s*(?!(REPLACE-ME|sk-ant-REPLACE-ME|""|''|\s*$))[^\s"']+'''
+keywords = ["ANTHROPIC_API_KEY"]
+
+[allowlist]
+description = "Allow documented placeholders"
+
+# .env.example intentionally contains the string `sk-ant-REPLACE-ME` so
+# operators know what shape a real key takes. It MUST NOT contain a real key.
+paths = [
+  '''apps/nl-demo/\.env\.example$''',
+  '''specs/190-live-llm-transport/(quickstart|spec|plan|research|data-model)\.md$''',
+  '''specs/190-live-llm-transport/contracts/proxy-http\.md$''',
+  '''gitleaks\.toml$''',
+]
+
+# Documentation strings used to teach operators what a leaked key looks like.
+regexes = [
+  '''sk-ant-REPLACE-ME''',
+  '''sk-ant-your-key-here''',
+  '''sk-ant-\*''',
+]
+
+# Commits known-safe before the policy started (none yet — fresh branch).
+# commits = []

@@ -55,10 +55,10 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 
 **Goal**: Add the gitignored config slots, credential-scan CI step, and example file so the feature's security posture is in place before any code lands.
 
-- [ ] T001 [P] Extend gitignore to exclude `/live-config.json` and `/.env` (app-root entries per research R3) `apps/nl-demo/.gitignore`
-- [ ] T002 [P] Create `.env.example` documenting `ANTHROPIC_API_KEY`, `ANTHROPIC_ENDPOINT`, `PROXY_PORT`, `PROXY_BIND`, `PROXY_ALLOW_REMOTE`, `MAX_PROVIDER_BYTES`, `PROVIDER_TIMEOUT_MS` without committing a real value `apps/nl-demo/.env.example`
-- [ ] T003 [P] Create gitleaks configuration with `sk-ant-*` + `ANTHROPIC_API_KEY=.+` rules and an allowlist for the `.env.example` placeholder (SC-006) `gitleaks.toml`
-- [ ] T004 Extend CI workflow with a `gitleaks` step scanning `dist/`, `apps/nl-demo/dist/`, and the committed worktree; fails PR on any hit `.github/workflows/ci.yml`
+- [x] T001 [P] Extend gitignore to exclude `/live-config.json` and `/.env` (app-root entries per research R3) `apps/nl-demo/.gitignore`
+- [x] T002 [P] Create `.env.example` documenting `ANTHROPIC_API_KEY`, `ANTHROPIC_ENDPOINT`, `PROXY_PORT`, `PROXY_BIND`, `PROXY_ALLOW_REMOTE`, `MAX_PROVIDER_BYTES`, `PROVIDER_TIMEOUT_MS` without committing a real value `apps/nl-demo/.env.example`
+- [x] T003 [P] Create gitleaks configuration with `sk-ant-*` + `ANTHROPIC_API_KEY=.+` rules and an allowlist for the `.env.example` placeholder (SC-006) `gitleaks.toml`
+- [x] T004 Extend CI workflow with a `gitleaks` step scanning `dist/`, `apps/nl-demo/dist/`, and the committed worktree; fails PR on any hit `.github/workflows/ci.yml`
 
 **Parallel opportunities**: T001, T002, T003 touch different files and run concurrently. T004 depends on T003 (needs the config file).
 
@@ -68,11 +68,11 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 
 **Goal**: Extend the existing `@debrief/components/nl-cql2` package with live-transport types, config validator, and type guard — the foundation every user story builds on. Folds into existing `types.ts` + `clients.ts` per plan's Structure Decision (no new files).
 
-- [ ] T005 [P] Extend shared types with `LiveConfig`, `LiveConfigValidationError`, `LiveTransportError` (plain interface — NOT Error subclass), `LiveTransportErrorReason` union, `TransportCallRecord`, `GenerationResultError` discriminated union (`{kind:"generation", error: GenerationError} | {kind:"transport", error: LiveTransportError}`) `shared/components/src/nl-cql2/types.ts`
-- [ ] T006 [P] Re-export new symbols (`createLiveLLMClient`, `validateLiveConfig`, `isLiveTransportError`, all new types) `shared/components/src/nl-cql2/index.ts`
-- [ ] T007 [test] Write vitest cases for `validateLiveConfig` covering every field validation rule in data-model §1 (valid config; each invalid-field diagnostic; optional `proxyToken`; rejects extra fields if schema is strict) `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
-- [ ] T008 Implement `validateLiveConfig(raw: unknown)` returning `{ok: true, value} | {ok: false, errors}` per contracts/live-client.ts `shared/components/src/nl-cql2/clients.ts`
-- [ ] T009 Implement `isLiveTransportError(value: unknown): value is LiveTransportError` type guard (shape check, not `instanceof`) `shared/components/src/nl-cql2/clients.ts`
+- [x] T005 [P] Extend shared types with `LiveConfig`, `LiveConfigValidationError`, `LiveTransportError` (plain interface — NOT Error subclass), `LiveTransportErrorReason` union, `TransportCallRecord`, `GenerationResultError` discriminated union (`{kind:"generation", error: GenerationError} | {kind:"transport", error: LiveTransportError}`) `shared/components/src/nl-cql2/types.ts`
+- [x] T006 [P] Re-export new symbols (`createLiveLLMClient`, `validateLiveConfig`, `isLiveTransportError`, all new types) `shared/components/src/nl-cql2/index.ts`
+- [x] T007 [test] Write vitest cases for `validateLiveConfig` covering every field validation rule in data-model §1 (valid config; each invalid-field diagnostic; optional `proxyToken`; rejects extra fields if schema is strict) `shared/components/src/nl-cql2/__tests__/liveClient.test.ts`
+- [x] T008 Implement `validateLiveConfig(raw: unknown)` returning `{ok: true, value} | {ok: false, errors}` per contracts/live-client.ts `shared/components/src/nl-cql2/clients.ts`
+- [x] T009 Implement `isLiveTransportError(value: unknown): value is LiveTransportError` type guard (shape check, not `instanceof`) `shared/components/src/nl-cql2/clients.ts`
 
 **Parallel opportunities**: T005 and T006 both edit small sections of different files and run concurrently. T007 depends on T005 (types must exist). T008 depends on T005 + T007 (TDD — test first). T009 depends on T005.
 

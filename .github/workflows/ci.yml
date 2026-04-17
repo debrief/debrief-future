@@ -13,6 +13,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # gitleaks needs the full history to audit the worktree. Default
+          # fetch-depth: 1 is enough for the committed-worktree scan we do.
+          fetch-depth: 1
+
+      # #190 SC-006 — fail any PR that accidentally commits a provider key.
+      # Scans the committed worktree against patterns in gitleaks.toml. The
+      # dist/ + apps/nl-demo/dist/ scans below run after build artefacts land.
+      - name: Scan worktree for leaked credentials (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: ${{ github.workspace }}/gitleaks.toml
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: true
+          GITLEAKS_ENABLE_SUMMARY: true
 
       - name: Install Task
         uses: arduino/setup-task@v2
@@ -52,3 +67,25 @@ jobs:
 
       - name: Run tests
         run: task test
+
+      # #190 SC-006 — post-build secret scan on the produced bundles. Fails if
+      # a provider key somehow entered dist/ or apps/nl-demo/dist/ (e.g. via
+      # accidental envsubst, embedded .env, or test-fixture leak).
+      - name: Scan build artefacts for leaked credentials (gitleaks)
+        if: always()
+        run: |
+          set -euo pipefail
+          command -v gitleaks >/dev/null 2>&1 || {
+            echo "[gitleaks-artefact-scan] installing gitleaks CLI"
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz \
+              | tar -xz -C /tmp gitleaks
+            sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          }
+          for dir in dist apps/nl-demo/dist; do
+            if [ -d "$dir" ]; then
+              echo "[gitleaks-artefact-scan] scanning $dir"
+              gitleaks detect --no-git --source "$dir" --config gitleaks.toml --redact --verbose
+            else
+              echo "[gitleaks-artefact-scan] $dir does not exist — skipping"
+            fi
+          done
