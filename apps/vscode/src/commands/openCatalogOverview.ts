@@ -49,6 +49,7 @@ export function createOpenCatalogOverviewCommand(
       store.path,
     );
 
+    panel.setStacService(stacService);
     panel.loadCatalog(catalog, store.path, items, store.id);
   };
 }

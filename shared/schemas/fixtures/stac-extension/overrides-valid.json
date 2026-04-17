@@ -1,0 +1,12 @@
+{
+  "platforms": [
+    {
+      "id": "NELSON",
+      "name": "HMS Nelson",
+      "nationality": "GB"
+    }
+  ],
+  "tags": ["exercise", "atlantic"],
+  "overrides": ["start_datetime"],
+  "provenance_log": []
+}

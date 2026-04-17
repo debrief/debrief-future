@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.github.io/debrief-future/schemas/spec-review-feedback-v1.schema.json",
+  "title": "Spec Review Feedback (v1)",
+  "description": "Structured payload embedded in a single PR comment produced by the Spec Navigator. The PR comment body contains (a) a trigger line, (b) a fenced code block tagged `json spec-review-feedback-v1` whose contents validate against this schema, and (c) a human-readable rendering of the same data. The rendering is derived from this object at POST time. Per reviewer decision 7C, the comment shape is unified across drafting and submission — draft-only timestamp fields (`createdAt`, `updatedAt`) are accepted as optional and simply carried through; the reader ignores them.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "feature",
+    "pr",
+    "originalHeadSha",
+    "submittedAtHeadSha",
+    "submittedAt",
+    "comments"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "spec-review-feedback-v1",
+      "description": "Literal version tag. MUST match the fenced-block language tag used in the PR-comment body."
+    },
+    "feature": {
+      "type": "string",
+      "pattern": "^\\d{3,}-[a-z0-9-]+$",
+      "description": "Feature folder basename, e.g. '186-filter-chips'."
+    },
+    "pr": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Pull-request number in the target repository."
+    },
+    "originalHeadSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full SHA-1 of the pull request's head commit at the moment the reviewer loaded the navigator. Every artefact the reviewer read was fetched pinned to this SHA."
+    },
+    "submittedAtHeadSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full SHA-1 of the pull request's head commit at the moment Submit was posted. When equal to originalHeadSha the PR was stable across the review session. When different, the PR was force-pushed (or otherwise re-pointed) between load and submit, and the reviewer acknowledged the stale-head modal before proceeding."
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp set at POST time."
+    },
+    "comments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One or more comments. An empty submission is not permitted (see FR-027).",
+      "items": { "$ref": "#/$defs/Comment" }
+    }
+  },
+  "$defs": {
+    "CommentTag": {
+      "type": "string",
+      "enum": ["question", "scope-concern", "test-gap", "nit", "blocker"],
+      "description": "Closed tag vocabulary (5 values). Matches spec.md FR-015. Each tag must be actionable by the PR watcher."
+    },
+    "IsoDateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "FeatureComment": {
+      "type": "object",
+      "required": ["id", "level", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 8, "maxLength": 64 },
+        "level": { "const": "feature" },
+        "body": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "tag": { "$ref": "#/$defs/CommentTag" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "DocumentComment": {
+      "type": "object",
+      "required": ["id", "level", "path", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 8, "maxLength": 64 },
+        "level": { "const": "document" },
+        "path": {
+          "type": "string",
+          "pattern": "^specs/\\d{3,}-[a-z0-9-]+/.+",
+          "description": "Repo-relative path to the target artefact."
+        },
+        "body": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "tag": { "$ref": "#/$defs/CommentTag" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "SelectionComment": {
+      "type": "object",
+      "required": [
+        "id",
+        "level",
+        "path",
+        "snippet",
+        "contextBefore",
+        "contextAfter",
+        "anchorHash",
+        "body"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 8, "maxLength": 64 },
+        "level": { "const": "selection" },
+        "path": {
+          "type": "string",
+          "pattern": "^specs/\\d{3,}-[a-z0-9-]+/.+"
+        },
+        "snippet": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Verbatim selected passage. Preserved across drafts and submission; the primary ground truth for relocating the comment."
+        },
+        "contextBefore": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Up to ~60 characters of source immediately before the snippet, trimmed on a word boundary where possible. Empty only when the snippet starts at offset 0."
+        },
+        "contextAfter": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Up to ~60 characters of source immediately after the snippet, trimmed on a word boundary where possible. Empty only when the snippet ends at end-of-file."
+        },
+        "anchorHash": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^.+\\u001F.+\\u001F\\d+$",
+          "description": "Pinned format: <first20chars-of-snippet>\\x1F<last20chars-of-snippet>\\x1F<char-offset-into-raw-source-at-fetch-time>. \\x1F is ASCII US (unit separator) — cannot appear in source markdown, so round-tripping is unambiguous."
+        },
+        "body": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "tag": { "$ref": "#/$defs/CommentTag" },
+        "createdAt": { "$ref": "#/$defs/IsoDateTime" },
+        "updatedAt": { "$ref": "#/$defs/IsoDateTime" }
+      }
+    },
+    "Comment": {
+      "oneOf": [
+        { "$ref": "#/$defs/FeatureComment" },
+        { "$ref": "#/$defs/DocumentComment" },
+        { "$ref": "#/$defs/SelectionComment" }
+      ]
+    }
+  }
+}

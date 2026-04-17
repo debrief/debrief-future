@@ -1,0 +1,286 @@
+# Schema Documentation Deployment
+#
+# Generates Markdown docs from LinkML schemas (`linkml gen-doc`) and builds
+# an HTML site with MkDocs-Material (+ mermaid2 for clickable class diagrams).
+# Publishes BOTH surfaces to the gh-pages branch for review:
+#
+# Preview URLs (PR):
+#   HTML: https://debrief.github.io/debrief-future/pr-preview/pr-{n}/schema-docs/
+#   MD:   https://github.com/debrief/debrief-future/tree/gh-pages/pr-preview/pr-{n}/schema-docs-md/
+#
+# Persistent URLs (main):
+#   HTML: https://debrief.github.io/debrief-future/schema-docs/
+#   MD:   https://github.com/debrief/debrief-future/tree/gh-pages/schema-docs-md/
+#
+# On push-to-main, ALSO syncs the built HTML tree into the public Jekyll site
+# at debrief/debrief.github.io under `future/schemas/`. Requires a repository
+# secret WEBSITE_PUSH_TOKEN (fine-grained PAT or GitHub App installation token)
+# with `contents: write` on debrief/debrief.github.io. See
+# docs/project_notes/key_facts.md for setup notes.
+
+name: Schema Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'shared/schemas/src/linkml/**'
+      - 'shared/schemas/mkdocs.yml'
+      - 'shared/schemas/scripts/generate.py'
+      - 'shared/schemas/pyproject.toml'
+      - '.github/workflows/schema-docs.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    paths:
+      - 'shared/schemas/src/linkml/**'
+      - 'shared/schemas/mkdocs.yml'
+      - 'shared/schemas/scripts/generate.py'
+      - 'shared/schemas/pyproject.toml'
+      - '.github/workflows/schema-docs.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Deploy persistent schema docs on push to main.
+  deploy-main:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: shared/schemas
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies (with docs extras)
+        run: uv sync --extra docs
+
+      - name: Generate Markdown docs
+        run: uv run python scripts/generate.py --target docs
+
+      - name: Build HTML site
+        run: uv run mkdocs build
+
+      - name: Deploy HTML to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./shared/schemas/build/html
+          destination_dir: schema-docs
+          keep_files: true
+
+      - name: Deploy Markdown sources to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./shared/schemas/build/md
+          destination_dir: schema-docs-md
+          keep_files: true
+
+      # Cross-repo sync to the public Jekyll site. Clones
+      # debrief/debrief.github.io, replaces future/schemas/ wholesale with the
+      # freshly-built HTML, and pushes only if something actually changed.
+      # A wholesale replace (rather than `rsync --delete`-style merge) ensures
+      # schema classes renamed or removed in the source repo are also purged
+      # from the public docs.
+      - name: Checkout debrief.github.io
+        uses: actions/checkout@v4
+        with:
+          repository: debrief/debrief.github.io
+          token: ${{ secrets.WEBSITE_PUSH_TOKEN }}
+          path: website-sync
+          ref: master
+          fetch-depth: 1
+
+      - name: Sync built schema docs into future/schemas/
+        working-directory: .
+        run: |
+          set -euo pipefail
+          SRC="${GITHUB_WORKSPACE}/shared/schemas/build/html"
+          DEST="${GITHUB_WORKSPACE}/website-sync/future/schemas"
+          rm -rf "${DEST}"
+          mkdir -p "${DEST}"
+          cp -r "${SRC}/." "${DEST}/"
+          cd "${GITHUB_WORKSPACE}/website-sync"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add future/schemas
+          if git diff --staged --quiet; then
+            echo "No changes in schema docs — skipping push."
+            exit 0
+          fi
+          git commit -m "Sync schema docs from debrief/debrief-future@${GITHUB_SHA:0:7}"
+          git push origin master
+
+  # Deploy PR preview + post sticky comment with URLs.
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    defaults:
+      run:
+        working-directory: shared/schemas
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies (with docs extras)
+        id: install
+        run: uv sync --extra docs
+
+      - name: Generate Markdown docs
+        id: gen_md
+        run: uv run python scripts/generate.py --target docs
+
+      - name: Build HTML site
+        id: build_html
+        run: uv run mkdocs build
+
+      - name: Deploy HTML preview
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./shared/schemas/build/html
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/schema-docs
+          keep_files: true
+
+      - name: Deploy Markdown preview
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./shared/schemas/build/md
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/schema-docs-md
+          keep_files: true
+
+      - name: Comment PR with preview links
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const htmlUrl = `https://debrief.github.io/debrief-future/pr-preview/pr-${prNumber}/schema-docs/`;
+            const mdUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/gh-pages/pr-preview/pr-${prNumber}/schema-docs-md/`;
+            const persistentHtmlUrl = `https://debrief.github.io/debrief-future/schema-docs/`;
+
+            // Identify failing step (if any) from the previous steps' outcomes.
+            const steps = {
+              'install dependencies': '${{ steps.install.outcome }}',
+              'gen-doc (Markdown)': '${{ steps.gen_md.outcome }}',
+              'mkdocs build (HTML)': '${{ steps.build_html.outcome }}',
+            };
+            const failingStep = Object.entries(steps).find(([_, outcome]) => outcome === 'failure');
+
+            const marker = '<!-- schema-docs-preview-comment -->';
+            const sha = context.sha.substring(0, 7);
+
+            let body;
+            if (failingStep) {
+              body = [
+                marker,
+                '## Schema Docs Preview — Build Failed',
+                '',
+                `**Failing step:** \`${failingStep[0]}\``,
+                `**CI run:** [${context.runId}](${runUrl})`,
+                '',
+                'Inspect the run log, fix the schema or docs config, and push again.',
+                '',
+                `> Last checked on commit ${sha}`,
+              ].join('\n');
+            } else {
+              body = [
+                marker,
+                '## Schema Docs Preview',
+                '',
+                '### Interactive site (clickable Mermaid, search, navigation)',
+                `[Open HTML preview](${htmlUrl})`,
+                '',
+                '### Markdown sources (textual review on GitHub)',
+                `[Browse Markdown on gh-pages](${mdUrl})`,
+                '',
+                '---',
+                '',
+                '<details>',
+                '<summary>All Links</summary>',
+                '',
+                '| Surface | This PR | Main branch |',
+                '|---------|---------|-------------|',
+                `| HTML | [Preview](${htmlUrl}) | [Persistent](${persistentHtmlUrl}) |`,
+                `| Markdown | [Preview](${mdUrl}) | [On gh-pages](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/gh-pages/schema-docs-md/) |`,
+                '',
+                '</details>',
+                '',
+                `> Updated on commit ${sha}`,
+              ].join('\n');
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+  # Clean up schema-docs subdirectories when a PR is closed.
+  # Narrow cleanup (only schema-docs* dirs) avoids collisions with the
+  # storybook-preview workflow's broader cleanup of pr-preview/pr-{n}/.
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Remove schema-docs preview directories
+        run: |
+          rm -rf pr-preview/pr-${{ github.event.pull_request.number }}/schema-docs
+          rm -rf pr-preview/pr-${{ github.event.pull_request.number }}/schema-docs-md
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -A
+          git diff --staged --quiet || git commit -m "Remove schema-docs preview for PR #${{ github.event.pull_request.number }}"
+          git push

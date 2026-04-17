@@ -58,6 +58,8 @@ tasks:
       - uv run pytest
       - pnpm --filter '!@debrief/web-shell' test
       - cd apps/web-shell && node run-playwright.mjs
+      - pnpm --filter @debrief/spec-navigator build
+      - cd apps/spec-navigator && node run-playwright.mjs
 
   build:
     desc: "Build all artifacts (Python wheels + TypeScript bundles)"
@@ -101,6 +103,24 @@ tasks:
       - task: lint
       - task: typecheck
       - task: test
+
+  docs:generate:
+    desc: "Generate Markdown docs from LinkML schemas (shared/schemas/build/md/)"
+    deps: [install]
+    cmds:
+      - uv run --extra docs python shared/schemas/scripts/generate.py --target docs
+
+  docs:build:
+    desc: "Build HTML docs site via MkDocs (shared/schemas/build/html/)"
+    deps: [docs:generate]
+    cmds:
+      - cd shared/schemas && uv run --extra docs mkdocs build
+
+  docs:serve:
+    desc: "Serve docs locally on http://localhost:8000 (auto-reloads)"
+    deps: [docs:generate]
+    cmds:
+      - cd shared/schemas && uv run --extra docs mkdocs serve
 
   preview:build:
     desc: "Build the preview container (code-server + Debrief extension)"

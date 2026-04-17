@@ -47,10 +47,80 @@ import type {
 // Canonical Safe GeoJSON types from @debrief/utils (T02)
 import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
 
+// Properties Panel (#191/#193) — provenance constants + type. Imported via
+// subpath so the service does not drag in the full components barrel (and its
+// Leaflet/DOM-dependent modules) in Node contexts.
+import {
+  PROVENANCE_LOG_CAP,
+  PROVENANCE_LOG_ARCHIVE_FILENAME,
+  PROPERTIES_PANEL_TOOL_SENTINEL,
+} from '@debrief/components/PropertiesPanel/provenanceTypes';
+import type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';
+
+/**
+ * Thrown when item.json was modified externally between the read and the
+ * write (mtime fingerprint differs). UI must treat this as a write-error and
+ * reload from disk.
+ */
+export class StaleItemJsonError extends Error {
+  override readonly name = 'StaleItemJsonError' as const;
+  constructor(
+    readonly storePath: string,
+    readonly itemPath: string,
+    message: string = 'item.json was modified externally since this edit began',
+  ) {
+    super(message);
+  }
+}
+
+/** Schema validation failed on the merged item.properties. */
+export class SchemaValidationError extends Error {
+  override readonly name = 'SchemaValidationError' as const;
+  constructor(
+    readonly violations: Array<{ field: string; message: string }>,
+    message: string = 'Merged item.properties failed schema validation',
+  ) {
+    super(message);
+  }
+}
+
+/** Disk / filesystem refused the write (EACCES / EROFS / read-only mount). */
+export class ReadOnlyFilesystemError extends Error {
+  override readonly name = 'ReadOnlyFilesystemError' as const;
+  constructor(
+    readonly path: string,
+    message: string = 'Cannot write item.json — filesystem is read-only',
+  ) {
+    super(message);
+  }
+}
+
+export interface UpdateItemMetadataInput {
+  storePath: string;
+  itemPath: string;
+  patch: Record<string, unknown>;
+  overrideFields: string[];
+  provenance: Pick<PropertiesProvenanceEntry, 'tool' | 'fields'>;
+  packageVersion: string;
+}
+
+export interface UpdateItemMetadataResult {
+  updatedProperties: Record<string, unknown>;
+  overrides: string[];
+  activityId: string;
+}
+
 /** Type-safe JSON.parse wrapper — returns `unknown` without `as unknown` cast. */
 function parseJsonSafe(text: string): unknown {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return JSON.parse(text);
+}
+
+/** Detect EACCES / EROFS filesystem errors from Node's fs.*Sync methods. */
+function isReadOnlyFsError(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) {return false;}
+  const code = (err as { code?: unknown }).code;
+  return code === 'EACCES' || code === 'EROFS' || code === 'EPERM';
 }
 
 export class StacService {
@@ -1094,12 +1164,242 @@ export class StacService {
       }
     }
 
-    if (earliest && latest) {
-      item.properties.datetime = earliest;
-      item.properties.start_datetime = earliest;
-      item.properties.end_datetime = latest;
+    if (!earliest || !latest) {return;}
+
+    // Feature 193 / backlog #191: respect analyst overrides and become
+    // idempotent. Skip any field listed in item.properties["debrief:overrides"],
+    // and skip the write entirely when no derived value actually changed.
+    const overridesRaw = (item.properties as Record<string, unknown>)['debrief:overrides'];
+    const overrides = new Set<string>(
+      Array.isArray(overridesRaw)
+        ? overridesRaw.filter((v): v is string => typeof v === 'string')
+        : [],
+    );
+
+    const proposed: Record<string, string> = {
+      datetime: earliest,
+      start_datetime: earliest,
+      end_datetime: latest,
+    };
+
+    const props = item.properties as unknown as Record<string, unknown>;
+    let changed = false;
+    for (const [field, value] of Object.entries(proposed)) {
+      if (overrides.has(field)) {continue;}
+      if (props[field] === value) {continue;}
+      props[field] = value;
+      changed = true;
+    }
+
+    if (changed) {
       fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
       this.itemCache.delete(fullItemPath);
+    }
+  }
+
+  /**
+   * Write item-level metadata to item.json in place.
+   *
+   * Implements the 11-step semantics in
+   * specs/193-properties-panel/contracts/stac-service-extension.ts.
+   *
+   * - Single write-gatekeeper (Article IV.2).
+   * - Direct-write, no session-state staging (Decision 2).
+   * - Provenance into item.properties["debrief:provenance_log"] (Decision 7).
+   * - Atomic temp+rename with mtime conflict check (Decision 9).
+   * - Bounded provenance log with JSONL archive rotation (Decision 12).
+   */
+  updateItemMetadata(
+    input: UpdateItemMetadataInput,
+  ): Promise<UpdateItemMetadataResult> {
+    try {
+      return Promise.resolve(this.updateItemMetadataSync(input));
+    } catch (err) {
+      return Promise.reject(err instanceof Error ? err : new Error(String(err)));
+    }
+  }
+
+  /**
+   * Synchronous core of updateItemMetadata. Exists because the contract
+   * mandates a Promise-returning method while the implementation is fully
+   * synchronous (fs.*Sync + in-memory transforms). Extracting a -Sync inner
+   * keeps the Promise wrapping explicit and avoids an `async` method without
+   * awaits.
+   */
+  private updateItemMetadataSync(
+    input: UpdateItemMetadataInput,
+  ): UpdateItemMetadataResult {
+    const {
+      storePath,
+      itemPath,
+      patch,
+      overrideFields,
+      provenance,
+      packageVersion,
+    } = input;
+
+    // Step 2: reject empty patch early (cheap check; avoids reading file).
+    if (Object.keys(patch).length === 0) {
+      throw new Error('updateItemMetadata: patch must contain at least one field');
+    }
+
+    // Validate provenance fields are non-empty (structural invariant).
+    if (!Array.isArray(provenance.fields) || provenance.fields.length === 0) {
+      throw new Error('updateItemMetadata: provenance.fields must be non-empty');
+    }
+
+    const fullItemPath = path.join(storePath, itemPath);
+
+    // Step 1: read item.json + record mtime fingerprint.
+    if (!fs.existsSync(fullItemPath)) {
+      throw new Error(`item.json not found: ${fullItemPath}`);
+    }
+    const content = fs.readFileSync(fullItemPath, 'utf-8');
+    let item: StacItem;
+    try {
+      item = JSON.parse(content) as StacItem;
+    } catch (err) {
+      throw new Error(`item.json is not valid JSON: ${fullItemPath}`);
+    }
+    const fingerprint = fs.statSync(fullItemPath).mtimeMs;
+
+    // Step 3: merge patch into properties.
+    const props = item.properties as Record<string, unknown>;
+    for (const [k, v] of Object.entries(patch)) {
+      props[k] = v;
+    }
+
+    // Step 4: merge overrideFields into debrief:overrides (dedupe + sort).
+    const existingOverrides = Array.isArray(props['debrief:overrides'])
+      ? (props['debrief:overrides'] as unknown[]).filter(
+          (x): x is string => typeof x === 'string',
+        )
+      : [];
+    const overridesSet = new Set<string>(existingOverrides);
+    for (const f of overrideFields) {
+      overridesSet.add(f);
+    }
+    const mergedOverrides = Array.from(overridesSet).sort();
+    props['debrief:overrides'] = mergedOverrides;
+
+    // Step 5: construct provenance entry.
+    const activityId = crypto.randomUUID();
+    const entry: PropertiesProvenanceEntry = {
+      activity_id: activityId,
+      timestamp: new Date().toISOString(),
+      tool: PROPERTIES_PANEL_TOOL_SENTINEL,
+      method: `properties-panel@${packageVersion}`,
+      source: 'user',
+      fields: [...provenance.fields].sort(),
+    };
+
+    // Step 6: append entry; rotate oldest entries when cap exceeded.
+    const existingLog = Array.isArray(props['debrief:provenance_log'])
+      ? (props['debrief:provenance_log'] as PropertiesProvenanceEntry[])
+      : [];
+    const log: PropertiesProvenanceEntry[] = [...existingLog, entry];
+    if (log.length > PROVENANCE_LOG_CAP) {
+      const overflowCount = log.length - PROVENANCE_LOG_CAP;
+      const toArchive = log.slice(0, overflowCount);
+      const itemDir = path.dirname(fullItemPath);
+      this.appendProvenanceArchive(itemDir, toArchive);
+      log.splice(0, overflowCount);
+    }
+    props['debrief:provenance_log'] = log;
+
+    // Step 7: LinkML schema validation skipped in v1 — only structural
+    // invariants above are enforced. TODO(#193-v2): validate merged
+    // item.properties against the generated JSON Schema and throw
+    // SchemaValidationError on violations.
+
+    // Step 8: re-stat + conflict check.
+    const currentMtime = fs.statSync(fullItemPath).mtimeMs;
+    if (currentMtime !== fingerprint) {
+      throw new StaleItemJsonError(storePath, itemPath);
+    }
+
+    // Step 9: atomic write — temp + rename. Clean up temp on failure.
+    const tempPath = `${fullItemPath}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+    const payload = JSON.stringify(item, null, 2);
+    try {
+      try {
+        fs.writeFileSync(tempPath, payload);
+      } catch (err) {
+        if (isReadOnlyFsError(err)) {
+          throw new ReadOnlyFilesystemError(fullItemPath);
+        }
+        throw err;
+      }
+      try {
+        fs.renameSync(tempPath, fullItemPath);
+      } catch (err) {
+        // Attempt best-effort cleanup of the temp; swallow cleanup errors.
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {
+          // ignore
+        }
+        if (isReadOnlyFsError(err)) {
+          throw new ReadOnlyFilesystemError(fullItemPath);
+        }
+        throw err;
+      }
+    } catch (err) {
+      // If temp file still exists (e.g., write succeeded but something else
+      // blew up), try to remove it.
+      if (fs.existsSync(tempPath)) {
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {
+          // ignore
+        }
+      }
+      throw err;
+    }
+
+    // Step 10: invalidate cache.
+    this.itemCache.delete(fullItemPath);
+
+    // Step 11: return result.
+    return {
+      updatedProperties: props,
+      overrides: mergedOverrides,
+      activityId,
+    };
+  }
+
+  /**
+   * Atomically append newline-delimited JSON entries to
+   * <itemDir>/provenance_log_archive.jsonl. One entry per line. Uses a
+   * temp-file copy+append+rename recipe so readers never see a half-written
+   * file.
+   */
+  private appendProvenanceArchive(
+    itemDir: string,
+    entries: PropertiesProvenanceEntry[],
+  ): void {
+    if (entries.length === 0) {return;}
+    const archivePath = path.join(itemDir, PROVENANCE_LOG_ARCHIVE_FILENAME);
+    const tempPath = `${archivePath}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+
+    const existing = fs.existsSync(archivePath)
+      ? fs.readFileSync(archivePath, 'utf-8')
+      : '';
+    const appended =
+      existing + entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
+
+    try {
+      fs.writeFileSync(tempPath, appended);
+      fs.renameSync(tempPath, archivePath);
+    } catch (err) {
+      if (fs.existsSync(tempPath)) {
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {
+          // ignore
+        }
+      }
+      throw err;
     }
   }
 

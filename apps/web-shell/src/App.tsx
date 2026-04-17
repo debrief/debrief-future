@@ -37,6 +37,11 @@ import {
   parseTaxonomy,
   useIsMobile,
   MobileTabLayout,
+  PropertiesForm,
+} from '@debrief/components';
+import type {
+  PropertiesFormField,
+  PropertiesFormProps,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -187,6 +192,11 @@ export default function App() {
   const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
   const [highlightedFilePaths, setHighlightedFilePaths] = useState<string[]>([]);
 
+  // Properties panel demo — tracks which catalog item is highlighted in the
+  // StacBrowser preview so the stacked Properties slot can render its fields.
+  const [propertiesHighlightedPath, setPropertiesHighlightedPath] =
+    useState<string | null>(null);
+
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
   const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
@@ -226,6 +236,14 @@ export default function App() {
       }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-render the catalog whenever an item's metadata is patched (Properties
+  // Panel commits → stacService.updateItemMetadata → bumps revision).
+  useEffect(() => {
+    return stacService.onItemsChanged(() => {
+      setCatalogRevision(r => r + 1);
+    });
+  }, []);
 
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
@@ -1355,6 +1373,144 @@ export default function App() {
 
   // Render welcome view
   if (view === 'welcome') {
+    const highlightedItem = propertiesHighlightedPath
+      ? catalogItems.find((i) => i.itemPath === propertiesHighlightedPath) ?? null
+      : null;
+
+    const highlightedFields: PropertiesFormField[] = highlightedItem
+      ? [
+          {
+            key: 'title',
+            label: 'Title',
+            value: highlightedItem.title,
+            spec: { kind: 'string' },
+            derivation: 'user',
+            required: true,
+            error: null,
+          },
+          {
+            key: 'datetime',
+            label: 'Datetime',
+            value: highlightedItem.datetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'auto-derived',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'start_datetime',
+            label: 'Start datetime',
+            value: highlightedItem.startDatetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'override',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:tags',
+            label: 'Tags',
+            value: highlightedItem.tags ?? [],
+            spec: { kind: 'string-array' },
+            derivation: 'user',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:platforms',
+            label: 'Platforms (derived from features)',
+            value: highlightedItem.platforms ?? [],
+            spec: { kind: 'platform-array' },
+            derivation: 'auto-derived',
+            required: false,
+            error: null,
+            // Platforms are re-synthesised from the plot's features on every
+            // save, so editing them from the Catalog Browser would be
+            // silently overwritten. Long-term the editor should push writes
+            // back into features.geojson; for now it's display-only.
+            readOnly: true,
+          },
+        ]
+      : [];
+
+    const handleDemoCommit: PropertiesFormProps['onCommitField'] = (key, value) => {
+      if (!highlightedItem) return;
+      // Route through the mock service so the commit path matches what a
+      // real host does: patch the in-memory item, rebuild its overview
+      // row, notify subscribers. The onItemsChanged subscription above
+      // then re-renders the catalog list so the edited row reflects the
+      // new title/tags/etc. immediately.
+      stacService.updateItemMetadata(highlightedItem.itemPath, {
+        [key]: value,
+      });
+    };
+
+    const propertiesSlot = (
+      <div
+        className="web-shell__properties-slot"
+        style={{
+          // Seed VS Code light-theme variables so the Properties form
+          // renders with legible contrast on the web-shell's light
+          // welcome surface (inside the extension, VS Code supplies
+          // these for both light and dark themes automatically).
+          colorScheme: 'light',
+          ['--vscode-editor-background' as string]: '#ffffff',
+          ['--vscode-editor-foreground' as string]: '#1f1f1f',
+          ['--vscode-foreground' as string]: '#1f1f1f',
+          ['--vscode-descriptionForeground' as string]: '#595959',
+          ['--vscode-panel-border' as string]: '#d4d4d4',
+          ['--vscode-input-background' as string]: '#ffffff',
+          ['--vscode-input-foreground' as string]: '#1f1f1f',
+          ['--vscode-input-border' as string]: '#cecece',
+          ['--vscode-badge-background' as string]: '#616161',
+          ['--vscode-badge-foreground' as string]: '#ffffff',
+          ['--vscode-button-background' as string]: '#005fb8',
+          ['--vscode-button-foreground' as string]: '#ffffff',
+          ['--vscode-button-hoverBackground' as string]: '#0258a8',
+          ['--vscode-editorWarning-foreground' as string]: '#bf8803',
+          padding: '8px 12px',
+          height: '100%',
+          overflowY: 'auto',
+          background: '#ffffff',
+          color: '#1f1f1f',
+          fontSize: 13,
+        }}
+        aria-label="Properties Panel demo"
+      >
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span>Properties</span>
+          <span style={{ fontSize: 11, opacity: 0.7 }}>#193 demo</span>
+        </div>
+        {highlightedItem ? (
+          <PropertiesForm
+            fields={highlightedFields}
+            onCommitField={handleDemoCommit}
+            loading={false}
+            readOnly={false}
+            writeError={null}
+          />
+        ) : (
+          <div
+            style={{
+              opacity: 0.65,
+              fontStyle: 'italic',
+              padding: '8px 0',
+            }}
+          >
+            Hover an exercise to preview its metadata here.
+          </div>
+        )}
+      </div>
+    );
+
     return (
       <div className="web-shell web-shell--welcome">
         <header className="web-shell__header">
@@ -1384,6 +1540,8 @@ export default function App() {
             items={catalogItems}
             taxonomy={VESSEL_TAXONOMY}
             onItemSelect={handlePlotSelect}
+            onItemHighlight={setPropertiesHighlightedPath}
+            propertiesSlot={propertiesSlot}
             className="web-shell__catalog"
           />
         </main>

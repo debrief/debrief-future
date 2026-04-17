@@ -81,6 +81,38 @@ describe("parseResponse — malformed-json (T022)", () => {
     expectReason(result, "malformed-json");
     expect(generationError(result).rawResponse).toBe("{ not valid json");
   });
+
+  it("accepts a compliant payload wrapped in ```json fences (Haiku 4.5 quirk)", async () => {
+    const inner = JSON.stringify({
+      cql2: {},
+      lozenges: [],
+      unrecognised_terms: [],
+    });
+    const fenced = "```json\n" + inner + "\n```";
+    const result = await parseResponse(
+      "UK platforms",
+      fenced,
+      PROMPT_HASH,
+      PROMPT_VERSION,
+    );
+    expect(result.error).toBeNull();
+  });
+
+  it("accepts a compliant payload wrapped in plain ``` fences", async () => {
+    const inner = JSON.stringify({
+      cql2: {},
+      lozenges: [],
+      unrecognised_terms: [],
+    });
+    const fenced = "```\n" + inner + "\n```";
+    const result = await parseResponse(
+      "UK platforms",
+      fenced,
+      PROMPT_HASH,
+      PROMPT_VERSION,
+    );
+    expect(result.error).toBeNull();
+  });
 });
 
 describe("parseResponse — schema-violation (T022)", () => {
