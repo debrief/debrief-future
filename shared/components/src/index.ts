@@ -289,3 +289,17 @@ export type {
   ColourDimensionSelectorProps,
   ColourLegendProps,
 } from './colour-engine';
+
+// PropertiesPanel (Feature: 193-properties-panel)
+export {
+  PROPERTIES_PANEL_TOOL_SENTINEL,
+  PROVENANCE_LOG_CAP,
+  PROVENANCE_LOG_ARCHIVE_FILENAME,
+  isValidPropertiesProvenanceEntry,
+} from './PropertiesPanel/provenanceTypes';
+export type { PropertiesProvenanceEntry } from './PropertiesPanel/provenanceTypes';
+export {
+  AUTO_DERIVED_FIELDS,
+  isAutoDerivedField,
+} from './PropertiesPanel/autoDerivedFields';
+export type { AutoDerivedField } from './PropertiesPanel/autoDerivedFields';
