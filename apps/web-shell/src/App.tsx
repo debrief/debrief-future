@@ -37,6 +37,11 @@ import {
   parseTaxonomy,
   useIsMobile,
   MobileTabLayout,
+  PropertiesForm,
+} from '@debrief/components';
+import type {
+  PropertiesFormField,
+  PropertiesFormProps,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -1355,6 +1360,64 @@ export default function App() {
 
   // Render welcome view
   if (view === 'welcome') {
+    const demoItem = catalogItems[0];
+    const demoFields: PropertiesFormField[] = demoItem
+      ? [
+          {
+            key: 'title',
+            label: 'Title',
+            value: demoItem.title,
+            spec: { kind: 'string' },
+            derivation: 'user',
+            required: true,
+            error: null,
+          },
+          {
+            key: 'datetime',
+            label: 'Datetime',
+            value: demoItem.datetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'auto-derived',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'start_datetime',
+            label: 'Start datetime',
+            value: demoItem.startDatetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'override',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:tags',
+            label: 'Tags',
+            value: demoItem.tags ?? [],
+            spec: { kind: 'string-array' },
+            derivation: 'user',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:platforms',
+            label: 'Platforms',
+            value: demoItem.platforms ?? [],
+            spec: { kind: 'platform-array' },
+            derivation: 'user',
+            required: false,
+            error: null,
+          },
+        ]
+      : [];
+
+    const handleDemoCommit: PropertiesFormProps['onCommitField'] = (key, value) => {
+      // Demo only — log the commit. Real integration would post
+      // a `properties:commit` message to the extension host.
+      // eslint-disable-next-line no-console
+      console.log('[properties demo] commit', key, value);
+    };
+
     return (
       <div className="web-shell web-shell--welcome">
         <header className="web-shell__header">
@@ -1379,13 +1442,39 @@ export default function App() {
             </a>
           </div>
         </header>
-        <main className="web-shell__main">
-          <StacBrowser
-            items={catalogItems}
-            taxonomy={VESSEL_TAXONOMY}
-            onItemSelect={handlePlotSelect}
-            className="web-shell__catalog"
-          />
+        <main className="web-shell__main" style={{ display: 'flex', minHeight: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <StacBrowser
+              items={catalogItems}
+              taxonomy={VESSEL_TAXONOMY}
+              onItemSelect={handlePlotSelect}
+              className="web-shell__catalog"
+            />
+          </div>
+          <aside
+            style={{
+              width: 340,
+              borderLeft: '1px solid var(--vscode-panel-border, #444)',
+              padding: 12,
+              overflowY: 'auto',
+              background: 'var(--vscode-editor-background, transparent)',
+            }}
+            aria-label="Properties Panel demo"
+          >
+            <h3 style={{ marginTop: 0 }}>Properties Panel (demo)</h3>
+            <p style={{ fontSize: 12, opacity: 0.75, marginTop: -4 }}>
+              #193 — schema-driven metadata editor. Wired here with mock fields
+              from the first catalog item. Commits log to the console; full
+              StacBrowser integration is deferred (tasks T062–T063).
+            </p>
+            <PropertiesForm
+              fields={demoFields}
+              onCommitField={handleDemoCommit}
+              loading={demoFields.length === 0}
+              readOnly={false}
+              writeError={null}
+            />
+          </aside>
         </main>
       </div>
     );

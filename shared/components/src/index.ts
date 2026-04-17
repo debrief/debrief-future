@@ -303,3 +303,28 @@ export {
   isAutoDerivedField,
 } from './PropertiesPanel/autoDerivedFields';
 export type { AutoDerivedField } from './PropertiesPanel/autoDerivedFields';
+export {
+  PropertiesForm,
+  ArrayWidget,
+  BboxWidget,
+  DateTimeWidget,
+  PlatformArrayWidget,
+  resolveFieldSpec,
+} from './PropertiesPanel';
+export type {
+  FieldSpec,
+  FieldDerivationState,
+  PropertiesFormField,
+  PropertiesFormProps,
+} from './PropertiesPanel';
+export {
+  BrowserSelectionContext,
+  BrowserSelectionProvider,
+  useBrowserSelection,
+  PropertiesSidePanel,
+} from './StacBrowser';
+export type {
+  BrowserSelection,
+  BrowserSelectionProviderProps,
+  PropertiesSidePanelProps,
+} from './StacBrowser';
