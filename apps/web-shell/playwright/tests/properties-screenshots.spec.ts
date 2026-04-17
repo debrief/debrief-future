@@ -90,19 +90,20 @@ test.describe('Properties Panel — visual evidence', () => {
       await page.waitForSelector('[data-testid="stac-browser-list"]', {
         timeout: 15_000,
       });
-      // Click an exercise so the Properties slot receives real fields.
-      const firstTitle = page
-        .locator('[data-testid="stac-browser-list"]')
-        .locator('text=/Saxon Warrior/')
+      // Wait for the list to actually populate (CI races with /stac-store/
+      // middleware; using a text-based row locator was crashing the browser
+      // when the fetch hadn't resolved yet).
+      await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
+        timeout: 15_000,
+      });
+      const firstRow = page
+        .locator('[data-testid="exercise-list-item-row"]')
         .first();
-      await firstTitle.click({ force: true }).catch(() => {});
-      await page.waitForTimeout(300);
-      await firstTitle.hover({ force: true }).catch(() => {});
-      await page.waitForTimeout(600);
-      await applyTheme(page, theme);
+      await firstRow.click();
       await page.waitForSelector('[data-testid="properties-form"]', {
         timeout: 15_000,
       });
+      await applyTheme(page, theme);
 
       const slot = page.locator('[data-testid="stac-browser-properties-slot"]');
       await expect(slot).toBeVisible();
@@ -127,14 +128,13 @@ test.describe('Properties Panel — visual evidence', () => {
     await page.waitForSelector('[data-testid="stac-browser-list"]', {
       timeout: 15_000,
     });
-    const firstTitle = page
-      .locator('[data-testid="stac-browser-list"]')
-      .locator('text=/Saxon Warrior/')
+    await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
+      timeout: 15_000,
+    });
+    const firstRow = page
+      .locator('[data-testid="exercise-list-item-row"]')
       .first();
-    await firstTitle.click({ force: true }).catch(() => {});
-    await page.waitForTimeout(300);
-    await firstTitle.hover({ force: true }).catch(() => {});
-    await page.waitForTimeout(400);
+    await firstRow.click();
     await page.waitForSelector('[data-testid="properties-form"]', {
       timeout: 15_000,
     });

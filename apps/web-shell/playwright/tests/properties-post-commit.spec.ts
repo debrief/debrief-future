@@ -22,15 +22,13 @@ test('properties-form post-commit still — dark', async ({ page }) => {
   await page.waitForSelector('[data-testid="stac-browser-list"]', {
     timeout: 15_000,
   });
-  // Click-hover a row so the properties slot populates.
-  const firstTitle = page
-    .locator('[data-testid="stac-browser-list"]')
-    .locator('text=/Saxon Warrior/')
+  await page.waitForSelector('[data-testid="exercise-list-item-row"]', {
+    timeout: 15_000,
+  });
+  const firstRow = page
+    .locator('[data-testid="exercise-list-item-row"]')
     .first();
-  await firstTitle.click({ force: true }).catch(() => {});
-  await page.waitForTimeout(300);
-  await firstTitle.hover({ force: true }).catch(() => {});
-  await page.waitForTimeout(400);
+  await firstRow.click();
   await page.waitForSelector('[data-testid="properties-form"]', {
     timeout: 15_000,
   });
