@@ -84,16 +84,30 @@ test.describe('Properties Panel — visual evidence', () => {
 
   for (const theme of ['light', 'dark', 'vscode'] as const) {
     test(`properties-form screenshot — ${theme}`, async ({ page }) => {
+      // Tall viewport so the full Properties form fits in its right-pane slot.
+      await page.setViewportSize({ width: 1400, height: 1100 });
       await page.goto('http://localhost:5173');
+      await page.waitForSelector('[data-testid="stac-browser-list"]', {
+        timeout: 15_000,
+      });
+      // Click an exercise so the Properties slot receives real fields.
+      const firstTitle = page
+        .locator('[data-testid="stac-browser-list"]')
+        .locator('text=/Saxon Warrior/')
+        .first();
+      await firstTitle.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(300);
+      await firstTitle.hover({ force: true }).catch(() => {});
+      await page.waitForTimeout(600);
+      await applyTheme(page, theme);
       await page.waitForSelector('[data-testid="properties-form"]', {
         timeout: 15_000,
       });
-      await applyTheme(page, theme);
 
-      const aside = page.locator('aside[aria-label="Properties Panel demo"]');
-      await expect(aside).toBeVisible();
+      const slot = page.locator('[data-testid="stac-browser-properties-slot"]');
+      await expect(slot).toBeVisible();
 
-      await aside.screenshot({
+      await slot.screenshot({
         path: join(EVIDENCE_DIR, `properties-form-${theme}.png`),
         omitBackground: false,
       });
@@ -110,14 +124,25 @@ test.describe('Properties Panel — visual evidence', () => {
     });
     const page = await context.newPage();
     await page.goto('http://localhost:5173');
+    await page.waitForSelector('[data-testid="stac-browser-list"]', {
+      timeout: 15_000,
+    });
+    const firstTitle = page
+      .locator('[data-testid="stac-browser-list"]')
+      .locator('text=/Saxon Warrior/')
+      .first();
+    await firstTitle.click({ force: true }).catch(() => {});
+    await page.waitForTimeout(300);
+    await firstTitle.hover({ force: true }).catch(() => {});
+    await page.waitForTimeout(400);
     await page.waitForSelector('[data-testid="properties-form"]', {
       timeout: 15_000,
     });
     await applyTheme(page, 'dark');
 
-    // Scroll the aside into view
+    // Scroll the properties slot into view
     await page
-      .locator('aside[aria-label="Properties Panel demo"]')
+      .locator('[data-testid="stac-browser-properties-slot"]')
       .scrollIntoViewIfNeeded();
 
     // Small pause to let the first frame capture the idle state.
@@ -125,7 +150,7 @@ test.describe('Properties Panel — visual evidence', () => {
 
     // Find an array-widget text input (ArrayWidget renders a textbox for adding chips).
     const tagInput = page
-      .locator('aside[aria-label="Properties Panel demo"]')
+      .locator('[data-testid="stac-browser-properties-slot"]')
       .locator('input[type="text"]')
       .first();
 
@@ -137,7 +162,7 @@ test.describe('Properties Panel — visual evidence', () => {
 
     // Also demonstrate a datetime edit
     const datetimeInputs = page
-      .locator('aside[aria-label="Properties Panel demo"]')
+      .locator('[data-testid="stac-browser-properties-slot"]')
       .locator('input');
     const dtInput = datetimeInputs.nth(1);
     await dtInput.click();

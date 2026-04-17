@@ -192,6 +192,11 @@ export default function App() {
   const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
   const [highlightedFilePaths, setHighlightedFilePaths] = useState<string[]>([]);
 
+  // Properties panel demo — tracks which catalog item is highlighted in the
+  // StacBrowser preview so the stacked Properties slot can render its fields.
+  const [propertiesHighlightedPath, setPropertiesHighlightedPath] =
+    useState<string | null>(null);
+
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
   const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
@@ -1360,13 +1365,16 @@ export default function App() {
 
   // Render welcome view
   if (view === 'welcome') {
-    const demoItem = catalogItems[0];
-    const demoFields: PropertiesFormField[] = demoItem
+    const highlightedItem = propertiesHighlightedPath
+      ? catalogItems.find((i) => i.itemPath === propertiesHighlightedPath) ?? null
+      : null;
+
+    const highlightedFields: PropertiesFormField[] = highlightedItem
       ? [
           {
             key: 'title',
             label: 'Title',
-            value: demoItem.title,
+            value: highlightedItem.title,
             spec: { kind: 'string' },
             derivation: 'user',
             required: true,
@@ -1375,7 +1383,7 @@ export default function App() {
           {
             key: 'datetime',
             label: 'Datetime',
-            value: demoItem.datetime ?? null,
+            value: highlightedItem.datetime ?? null,
             spec: { kind: 'datetime' },
             derivation: 'auto-derived',
             required: false,
@@ -1384,7 +1392,7 @@ export default function App() {
           {
             key: 'start_datetime',
             label: 'Start datetime',
-            value: demoItem.startDatetime ?? null,
+            value: highlightedItem.startDatetime ?? null,
             spec: { kind: 'datetime' },
             derivation: 'override',
             required: false,
@@ -1393,7 +1401,7 @@ export default function App() {
           {
             key: 'debrief:tags',
             label: 'Tags',
-            value: demoItem.tags ?? [],
+            value: highlightedItem.tags ?? [],
             spec: { kind: 'string-array' },
             derivation: 'user',
             required: false,
@@ -1402,7 +1410,7 @@ export default function App() {
           {
             key: 'debrief:platforms',
             label: 'Platforms',
-            value: demoItem.platforms ?? [],
+            value: highlightedItem.platforms ?? [],
             spec: { kind: 'platform-array' },
             derivation: 'user',
             required: false,
@@ -1412,11 +1420,56 @@ export default function App() {
       : [];
 
     const handleDemoCommit: PropertiesFormProps['onCommitField'] = (key, value) => {
-      // Demo only — log the commit. Real integration would post
-      // a `properties:commit` message to the extension host.
+      // Demo — commits log to the console. A real host posts `properties:commit`.
       // eslint-disable-next-line no-console
       console.log('[properties demo] commit', key, value);
     };
+
+    const propertiesSlot = (
+      <div
+        style={{
+          padding: '8px 12px',
+          height: '100%',
+          overflowY: 'auto',
+          background: 'var(--vscode-editor-background, transparent)',
+          fontSize: 13,
+        }}
+        aria-label="Properties Panel demo"
+      >
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span>Properties</span>
+          <span style={{ fontSize: 11, opacity: 0.7 }}>#193 demo</span>
+        </div>
+        {highlightedItem ? (
+          <PropertiesForm
+            fields={highlightedFields}
+            onCommitField={handleDemoCommit}
+            loading={false}
+            readOnly={false}
+            writeError={null}
+          />
+        ) : (
+          <div
+            style={{
+              opacity: 0.65,
+              fontStyle: 'italic',
+              padding: '8px 0',
+            }}
+          >
+            Hover an exercise to preview its metadata here.
+          </div>
+        )}
+      </div>
+    );
 
     return (
       <div className="web-shell web-shell--welcome">
@@ -1442,39 +1495,15 @@ export default function App() {
             </a>
           </div>
         </header>
-        <main className="web-shell__main" style={{ display: 'flex', minHeight: 0 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <StacBrowser
-              items={catalogItems}
-              taxonomy={VESSEL_TAXONOMY}
-              onItemSelect={handlePlotSelect}
-              className="web-shell__catalog"
-            />
-          </div>
-          <aside
-            style={{
-              width: 340,
-              borderLeft: '1px solid var(--vscode-panel-border, #444)',
-              padding: 12,
-              overflowY: 'auto',
-              background: 'var(--vscode-editor-background, transparent)',
-            }}
-            aria-label="Properties Panel demo"
-          >
-            <h3 style={{ marginTop: 0 }}>Properties Panel (demo)</h3>
-            <p style={{ fontSize: 12, opacity: 0.75, marginTop: -4 }}>
-              #193 — schema-driven metadata editor. Wired here with mock fields
-              from the first catalog item. Commits log to the console; full
-              StacBrowser integration is deferred (tasks T062–T063).
-            </p>
-            <PropertiesForm
-              fields={demoFields}
-              onCommitField={handleDemoCommit}
-              loading={demoFields.length === 0}
-              readOnly={false}
-              writeError={null}
-            />
-          </aside>
+        <main className="web-shell__main">
+          <StacBrowser
+            items={catalogItems}
+            taxonomy={VESSEL_TAXONOMY}
+            onItemSelect={handlePlotSelect}
+            onItemHighlight={setPropertiesHighlightedPath}
+            propertiesSlot={propertiesSlot}
+            className="web-shell__catalog"
+          />
         </main>
       </div>
     );
