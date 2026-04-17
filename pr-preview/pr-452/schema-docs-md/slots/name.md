@@ -17,16 +17,16 @@ Alias: name
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
-| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
-| [PlatformRecord](../classes/PlatformRecord.md) | Fully-resolved metadata for a single platform within a STAC item |  no  |
-| [PointMetadataEntry](../classes/PointMetadataEntry.md) | Metadata for a single point within a MultiPoint reference set |  no  |
 | [Tool](../classes/Tool.md) | An analysis operation with a name, description, version, and selection requir... |  no  |
-| [DatasetSeries](../classes/DatasetSeries.md) | A named data series within a multi-series dataset |  no  |
+| [LevelDefinition](../classes/LevelDefinition.md) | Named nesting level within a feature hierarchy (Feature 053, FR-010) |  no  |
+| [ToolParameter](../classes/ToolParameter.md) | A configurable parameter for a tool |  no  |
+| [PlatformRecord](../classes/PlatformRecord.md) | Fully-resolved metadata for a single platform within a STAC item |  no  |
 | [TUAData](../classes/TUAData.md) | Named TUA solution collection |  no  |
 | [ReferenceLocationProperties](../classes/ReferenceLocationProperties.md) | Properties for a ReferenceLocation |  no  |
-| [ToolParameter](../classes/ToolParameter.md) | A configurable parameter for a tool |  no  |
-| [LevelDefinition](../classes/LevelDefinition.md) | Named nesting level within a feature hierarchy (Feature 053, FR-010) |  no  |
+| [DatasetSeries](../classes/DatasetSeries.md) | A named data series within a multi-series dataset |  no  |
+| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
+| [PointMetadataEntry](../classes/PointMetadataEntry.md) | Metadata for a single point within a MultiPoint reference set |  no  |
+| [SegmentMetadata](../classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |  no  |
 
 
 
