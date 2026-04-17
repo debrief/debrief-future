@@ -1,0 +1,26 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "exercise-atlantic-2025",
+  "bbox": [-65.0, 35.0, -55.0, 45.0],
+  "properties": {
+    "title": "Atlantic ASW Exercise",
+    "datetime": "2025-03-10T12:00:00Z",
+    "start_datetime": "2025-03-10T09:00:00Z",
+    "end_datetime": "2025-03-10T18:00:00Z",
+    "debrief:tags": ["exercise", "asw"],
+    "debrief:platforms": [
+      { "id": "NELSON", "name": "HMS Nelson", "nationality": "GB" }
+    ]
+  },
+  "links": [
+    { "rel": "root", "href": "../catalog.json", "type": "application/json" },
+    { "rel": "self", "href": "./item.json", "type": "application/json" }
+  ],
+  "assets": {
+    "data": {
+      "href": "./features.geojson",
+      "type": "application/geo+json"
+    }
+  }
+}
