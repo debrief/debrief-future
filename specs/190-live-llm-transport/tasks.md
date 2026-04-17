@@ -182,24 +182,24 @@ Every artefact in the plan's Evidence table (plan.md → "Evidence Artefacts") h
 
 ### Evidence Collection
 
-- [ ] T045 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — include totals, pass/fail/skip, coverage %, key scenarios verified (FR-012 supersession, SC-008 cap, 7 transport classes, SC-003 zero-outbound) `specs/190-live-llm-transport/evidence/test-summary.md`
-- [ ] T046 Create usage demonstration — before/after: cold-start operator + `pnpm serve` + off-corpus phrase → chips render; include full command sequence and screenshot references `specs/190-live-llm-transport/evidence/usage-example.md`
-- [ ] T047 [P] Capture SC-001 off-corpus results — table of 5 phrases × (generated CQL2, chip set, card count, screenshot path); screenshots stored alongside `specs/190-live-llm-transport/evidence/sc-001-off-corpus-results.md`
-- [ ] T048 [P] Capture SC-002 corpus parity — JSON `{phrase, fixtureCount, liveCount, delta}` × 9 rows; assert `delta === 0` in a vitest test that writes this file as a side effect `specs/190-live-llm-transport/evidence/sc-002-corpus-parity.json`
-- [ ] T049 [P] Capture SC-003 zero-outbound URL log from Playwright test artefacts (produced by T030) `specs/190-live-llm-transport/evidence/sc-003-zero-outbound.json`
-- [ ] T050 [P] Capture SC-004 quickstart transcript — screen + terminal recording (optional `.webm`) of cold-start operator following quickstart.md from clean checkout to live-mode confirmation `specs/190-live-llm-transport/evidence/sc-004-quickstart-transcript.md`
-- [ ] T051 [P] Capture SC-005 failure-class banners — table of 8 classes × (injected scenario, banner text, screenshot path) `specs/190-live-llm-transport/evidence/sc-005-failure-classes.md`
-- [ ] T052 [P] Capture SC-006 gitleaks log — archived output from the CI step on a clean PR run `specs/190-live-llm-transport/evidence/sc-006-gitleaks.log`
-- [ ] T053 [P] Capture SC-007 latency distribution — run 30 trials against real Claude Haiku using `scripts/measure-latency.mjs` (add if absent); compute p50/p95/p99; commit the JSON `specs/190-live-llm-transport/evidence/sc-007-latency.json`
-- [ ] T054 [P] Capture SC-008 usage-cap log — vitest output showing call 51 short-circuit (produced by T037) `specs/190-live-llm-transport/evidence/sc-008-usage-cap.log`
-- [ ] T055 [P] Capture SC-009 `task verify` log from the feature branch `specs/190-live-llm-transport/evidence/sc-009-task-verify.log`
-- [ ] T056 [P] Capture FR-018 transport-mode indicator screenshots (fixture-mode baseline + live-mode active) `specs/190-live-llm-transport/evidence/screenshots/indicator-live.png`
-- [ ] T057 [P] Capture each failure-class banner as a separate PNG (7 transport reasons + malformed-response) `specs/190-live-llm-transport/evidence/screenshots/banner-auth-failure.png`
+- [x] T045 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — include totals, pass/fail/skip, coverage %, key scenarios verified (FR-012 supersession, SC-008 cap, 7 transport classes, SC-003 zero-outbound) `specs/190-live-llm-transport/evidence/test-summary.md`
+- [x] T046 Create usage demonstration — before/after: cold-start operator + `pnpm serve` + off-corpus phrase → chips render; include full command sequence and screenshot references `specs/190-live-llm-transport/evidence/usage-example.md`
+- [x] T047 [P] Capture SC-001 off-corpus results — table of 5 phrases × (generated CQL2, chip set, card count, screenshot path); screenshots stored alongside `specs/190-live-llm-transport/evidence/sc-001-off-corpus-results.md`
+- [x] T048 [P] Capture SC-002 corpus parity — JSON `{phrase, fixtureCount, liveCount, delta}` × 9 rows; assert `delta === 0` in a vitest test that writes this file as a side effect `specs/190-live-llm-transport/evidence/sc-002-corpus-parity.json`
+- [x] T049 [P] Capture SC-003 zero-outbound URL log from Playwright test artefacts (produced by T030) `specs/190-live-llm-transport/evidence/sc-003-zero-outbound.json`
+- [x] T050 [P] Capture SC-004 quickstart transcript — screen + terminal recording (optional `.webm`) of cold-start operator following quickstart.md from clean checkout to live-mode confirmation `specs/190-live-llm-transport/evidence/sc-004-quickstart-transcript.md`
+- [x] T051 [P] Capture SC-005 failure-class banners — table of 8 classes × (injected scenario, banner text, screenshot path) `specs/190-live-llm-transport/evidence/sc-005-failure-classes.md`
+- [x] T052 [P] Capture SC-006 gitleaks log — archived output from the CI step on a clean PR run `specs/190-live-llm-transport/evidence/sc-006-gitleaks.log`
+- [x] T053 [P] Capture SC-007 latency distribution — run 30 trials against real Claude Haiku using `scripts/measure-latency.mjs` (add if absent); compute p50/p95/p99; commit the JSON `specs/190-live-llm-transport/evidence/sc-007-latency.json`
+- [x] T054 [P] Capture SC-008 usage-cap log — vitest output showing call 51 short-circuit (produced by T037) `specs/190-live-llm-transport/evidence/sc-008-usage-cap.log`
+- [x] T055 [P] Capture SC-009 `task verify` log from the feature branch `specs/190-live-llm-transport/evidence/sc-009-task-verify.log`
+- [x] T056 [P] Capture FR-018 transport-mode indicator screenshots (fixture-mode baseline + live-mode active) `specs/190-live-llm-transport/evidence/screenshots/indicator-live.png`
+- [x] T057 [P] Capture each failure-class banner as a separate PNG (7 transport reasons + malformed-response) `specs/190-live-llm-transport/evidence/screenshots/banner-auth-failure.png`
 
 ### Media Content
 
-- [ ] T058 Create shipped blog post via content-specialist — "What We Built, Screenshots, Lessons Learned, What's Next" focus on the security-first transport design (loopback default, proxyToken on bind-remote, credential scan in CI) `specs/190-live-llm-transport/media/shipped-post.md`
-- [ ] T059 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link to full post) `specs/190-live-llm-transport/media/linkedin-shipped.md`
+- [x] T058 Create shipped blog post via content-specialist — "What We Built, Screenshots, Lessons Learned, What's Next" focus on the security-first transport design (loopback default, proxyToken on bind-remote, credential scan in CI) `specs/190-live-llm-transport/media/shipped-post.md`
+- [x] T059 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link to full post) `specs/190-live-llm-transport/media/linkedin-shipped.md`
 
 ### PR Creation
 

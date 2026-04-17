@@ -1,0 +1,17 @@
+{
+  "feature": "190-live-llm-transport",
+  "captured_at": "2026-04-17T08:55:00Z",
+  "git_sha": "46d43e2",
+  "method": "Playwright spec `apps/nl-demo/e2e/live-transport.spec.ts` test `SC-003 zero-outbound fixture default (T030)` drives 5 phrases against a freshly-served demo with no live-config.json present. Outbound URLs collected via `page.on('request')` filtered for `/generate` or `anthropic.com`.",
+  "outboundUrls": [],
+  "phrases": [
+    "UK submarines",
+    "NATO warships",
+    "Exercise Joint Warrior",
+    "Russian tankers",
+    "Polish corvettes"
+  ],
+  "assertion": "outboundUrls.length === 0",
+  "result": "pass",
+  "notes": "Transport-mode indicator verified absent. Full test output in evidence/sc-009-task-verify.log — the e2e run completes in ~2.5s."
+}
