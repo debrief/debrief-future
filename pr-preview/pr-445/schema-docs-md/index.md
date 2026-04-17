@@ -8,13 +8,6 @@ Name: debrief
 
 
 
-## Schema Diagram
-
-```mermaid
-None
-```
-
-
 ## Classes
 
 | Class | Description |

@@ -18,8 +18,8 @@ Alias: branch_id
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [BranchOrigin](../classes/BranchOrigin.md) | Reverse link on a branch plot's system record, pointing to the source plot |  no  |
-| [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
 | [BranchRecord](../classes/BranchRecord.md) | Reference to a branched plot |  no  |
+| [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
 
 
 
