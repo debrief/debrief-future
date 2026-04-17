@@ -173,6 +173,7 @@ Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use) (186-filter-chips)
 - Read-only access to `shared/data/platform-registry.json` and `preview/workspace/samples/local-store/`; writes one JSON file at a stable repo-root output path (committed artefact) (187-build-time-enums)
 - TypeScript 5.x (existing toolchain — shared components + nl-demo app; no new languages) + Node stdlib (`node:http`, `node:https`) for the live-proxy sidecar, browser-native `fetch` + `AbortController` (no SDK), Anthropic Claude API (Haiku 4.5 default, operator-overridable); credentials isolated to proxy env (`.env` gitignored), no new runtime dependencies (190-live-llm-transport)
+- TypeScript 5.x (strict), React 18.x (static SPA at `apps/spec-navigator/`) + Vite 5.x, `react-markdown` + `remark-gfm` + `rehype-slug` + `rehype-autolink-headings` + `rehype-highlight` + `highlight.js` (artefact rendering), `zod ^3.22.0` (GitHub REST boundary + payload validation), `@playwright/test` + `@axe-core/playwright` (E2E + a11y); no backend, no new Python modules (191-spec-navigator)
 
 ## Before Pushing
 
@@ -200,8 +201,9 @@ uv run pyright && pnpm -r typecheck
 # Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
 uv run pytest && pnpm --filter '!@debrief/web-shell' test
 
-# Step 4: Playwright E2E tests
+# Step 4: Playwright E2E tests (web-shell + spec-navigator)
 cd apps/web-shell && node run-playwright.mjs && cd ../..
+pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node run-playwright.mjs && cd ../..
 ```
 
 **Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
