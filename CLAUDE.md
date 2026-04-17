@@ -29,18 +29,25 @@ debrief/
 ├── apps/
 │   ├── loader/        # Electron mini-app
 │   └── vscode/        # VS Code extension
-├── demo/              # Browser-accessible demo environment
-│   ├── Dockerfile     # Container definition
-│   ├── fly.toml       # Fly.io configuration
-│   ├── bin/           # Entry scripts and test scripts
-│   ├── desktop/       # Desktop integration files
-│   └── samples/       # Sample data files
 └── docs/
 ```
 
 ## Demo Environment
 
-**URL**: https://debrief-demo.fly.dev — browser-accessible XFCE desktop via noVNC. See `demo/` directory and `.github/workflows/test-demo.yml` for 7-layer test suite.
+Per-PR preview apps are provisioned by **Heroku Review Apps** (configured via
+`heroku.yml` + `app.json`, built from `Dockerfile.preview`). When a PR opens,
+a GitHub Actions bot posts a "🚀 Preview Deployments" comment linking to:
+
+- **Code Server** — browser-based VS Code with the extension + sample data
+- **Web Shell** — standalone preview app (used for Playwright)
+- **Storybook** — component library browser
+
+Review apps at `https://<app>-pr-<n>.herokuapp.com`. Playwright against a
+review app is driven by `.github/workflows/heroku-e2e.yml` (manual dispatch).
+
+See ADR-018 in `docs/project_notes/decisions.md` for the history of this
+decision (the project previously ran a single persistent Fly.io demo at
+`https://debrief-demo.fly.dev` — retired 2026-04-17).
 
 ## Build Sequence (Tracer Bullet)
 

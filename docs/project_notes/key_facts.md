@@ -16,9 +16,16 @@ Project configuration, constants, and frequently-needed **non-sensitive** inform
 - Status: Pre-implementation planning phase
 
 **Demo Environment:**
-- URL: https://debrief-demo.fly.dev
-- Platform: Fly.io
-- Access: Browser-based VNC (noVNC)
+- Mechanism: Heroku Review Apps (per-PR, not a single persistent URL)
+- Config: `heroku.yml` + `app.json` + `Dockerfile.preview` at repo root
+- URL pattern: `https://<app>-pr-<num>.herokuapp.com` — posted to each PR by
+  the github-actions bot as a "🚀 Preview Deployments" comment linking to
+  Code Server, Web Shell, and Storybook apps
+- Playwright harness: `.github/workflows/heroku-e2e.yml` (manual dispatch,
+  takes a review-app URL as input)
+- History: a single persistent Fly.io demo at `https://debrief-demo.fly.dev`
+  was retired 2026-04-17 in favour of per-PR previews — see ADR-018 in
+  `decisions.md` for the reversal recipe.
 
 ### Technology Stack
 
@@ -49,11 +56,12 @@ Project configuration, constants, and frequently-needed **non-sensitive** inform
 
 ### Local Development
 
-**Demo Container:**
+**Demo Container (Heroku-style local build):**
 ```bash
-cd demo && docker build -t debrief-demo .
-docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
-# Access at http://localhost:3000
+# Build the preview image used by Heroku Review Apps
+docker build -f Dockerfile.preview -t debrief-preview .
+docker run -p 8080:8080 -e PORT=8080 debrief-preview
+# Access at http://localhost:8080
 ```
 
 ### Important URLs
@@ -65,7 +73,8 @@ docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
 - Roadmap: `docs/tracer-delivery-plan.md`
 
 **External:**
-- Demo: https://debrief-demo.fly.dev
+- Demo: per-PR Heroku Review Apps (see "Demo Environment" above for URL
+  pattern + how to reach them)
 
 ### CI Secrets
 
