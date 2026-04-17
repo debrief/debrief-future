@@ -50,10 +50,14 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: Determine version
         id: version
@@ -117,23 +121,35 @@ jobs:
           head -1 artifact/venv/bin/python3 || true
           head -1 artifact/venv/bin/pip || true
 
-      # T017: Build VS Code extension
+      # T017: Build VS Code extension via pnpm workspace
+      # The monorepo uses pnpm workspaces (pnpm-lock.yaml at repo root).
+      # We install once at the root so workspace symlinks resolve, then
+      # run the extension's `package` script to produce the .vsix.
+      - name: Install workspace dependencies
+        if: hashFiles('apps/vscode/package.json') != ''
+        run: pnpm install --frozen-lockfile
+
       - name: Build VS Code extension
         run: |
           if [ -d "apps/vscode" ]; then
-            cd apps/vscode
-            npm ci
-            npm run package || npm run build || echo "No package/build script found"
+            # vsce package runs vscode:prepublish → compile, which esbuilds
+            # apps/vscode against the generated dist/ of shared workspace
+            # packages. Build those first so the imports resolve.
+            pnpm --filter @debrief/utils build
+            pnpm --filter @debrief/components build
 
-            # Find and copy the .vsix file
-            VSIX=$(find . -name "*.vsix" -type f | head -1)
+            pnpm --filter debrief-vscode run package \
+              || pnpm --filter debrief-vscode run build \
+              || echo "No package/build script found"
+
+            # Find and copy the .vsix file (vsce drops it in the package cwd)
+            VSIX=$(find apps/vscode -maxdepth 2 -name "*.vsix" -type f | head -1)
             if [ -n "$VSIX" ]; then
-              cp "$VSIX" ../../artifact/extensions/debrief.vsix
+              cp "$VSIX" artifact/extensions/debrief.vsix
               echo "VS Code extension packaged: $VSIX"
             else
               echo "Warning: No .vsix file generated"
             fi
-            cd ../..
           else
             echo "Note: apps/vscode directory not found, skipping extension build"
           fi
