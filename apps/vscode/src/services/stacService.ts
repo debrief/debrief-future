@@ -1164,7 +1164,7 @@ export class StacService {
       }
     }
 
-    if (!earliest || !latest) return;
+    if (!earliest || !latest) {return;}
 
     // Feature 193 / backlog #191: respect analyst overrides and become
     // idempotent. Skip any field listed in item.properties["debrief:overrides"],
@@ -1185,8 +1185,8 @@ export class StacService {
     const props = item.properties as unknown as Record<string, unknown>;
     let changed = false;
     for (const [field, value] of Object.entries(proposed)) {
-      if (overrides.has(field)) continue;
-      if (props[field] === value) continue;
+      if (overrides.has(field)) {continue;}
+      if (props[field] === value) {continue;}
       props[field] = value;
       changed = true;
     }

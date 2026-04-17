@@ -277,8 +277,9 @@ export class CatalogOverviewPanel {
     }
 
     try {
-      const packageVersion = vscode.extensions.getExtension('debrief.debrief-vscode')
-        ?.packageJSON?.version ?? '0.0.0';
+      const pkgJson = vscode.extensions.getExtension('debrief.debrief-vscode')
+        ?.packageJSON as { version?: string } | undefined;
+      const packageVersion = pkgJson?.version ?? '0.0.0';
       const fields = Object.keys(message.patch).sort();
       // T077: only auto-derived fields go into debrief:overrides.
       const overrideFields = fields.filter((k) =>
