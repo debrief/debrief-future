@@ -17,6 +17,20 @@ export interface StacBrowserProps {
     readonly taxonomy: readonly VesselTaxonomyNode[];
     /** Callback when user double-clicks an exercise to open it. */
     readonly onItemSelect?: (itemPath: string) => void;
+    /**
+     * Callback fired when the preview highlight changes (T098 / backlog #191).
+     * Used by hosts to drive a Properties side panel fed off the currently
+     * highlighted item rather than the open plot. Null when no item is
+     * highlighted.
+     */
+    readonly onItemHighlight?: (itemPath: string | null) => void;
+    /**
+     * Optional React node rendered under the thumbnail inside the right pane
+     * of the exercises list. When set, stacks the thumbnail (top) and this
+     * node (bottom) with a simple vertical split. Typically used to render
+     * a `<PropertiesSidePanel>` that edits the currently-highlighted item.
+     */
+    readonly propertiesSlot?: import('../../../../node_modules/.pnpm/react@18.3.1/node_modules/react').ReactNode;
     /** Additional CSS class name for the root container. */
     readonly className?: string;
     /** Map from item ID to CSS colour string (for colour scheme engine). */
