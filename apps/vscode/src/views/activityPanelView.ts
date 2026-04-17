@@ -81,6 +81,13 @@ interface FileActionMessage {
   };
 }
 
+interface PropertiesCommitMessage {
+  type: 'properties:commit';
+  storePath: string;
+  itemPath: string;
+  patch: Record<string, unknown>;
+}
+
 interface WebviewReadyMessage {
   type: 'webviewReady';
 }
@@ -96,6 +103,7 @@ type WebviewMessage =
   | LayerSelectMessage
   | LayerFormatMessage
   | FileActionMessage
+  | PropertiesCommitMessage
   | WebviewReadyMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
@@ -521,8 +529,65 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             message.payload.action,
           );
           break;
+
+        case 'properties:commit':
+          // Feature: 193-properties-panel — direct-write item metadata
+          void this._handlePropertiesCommit(message);
+          break;
       }
     });
+  }
+
+  /**
+   * Handle a Properties Panel commit from the webview.
+   *
+   * Invokes stacService.updateItemMetadata (single-writer) and replies with
+   * a 'properties:committed' on success or 'properties:error' on failure.
+   */
+  private async _handlePropertiesCommit(
+    message: PropertiesCommitMessage,
+  ): Promise<void> {
+    if (!this._stacService) {
+      this._postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: 'ServiceUnavailable',
+        message: 'Properties write service not wired',
+      });
+      return;
+    }
+
+    try {
+      const packageVersion = vscode.extensions.getExtension('debrief.debrief-vscode')
+        ?.packageJSON?.version ?? '0.0.0';
+      const fields = Object.keys(message.patch).sort();
+      const result = await this._stacService.updateItemMetadata({
+        storePath: message.storePath,
+        itemPath: message.itemPath,
+        patch: message.patch,
+        overrideFields: fields,
+        provenance: {
+          tool: 'debrief.propertiesPanel',
+          fields,
+        },
+        packageVersion: String(packageVersion),
+      });
+      this._postMessage({
+        type: 'properties:committed',
+        itemPath: message.itemPath,
+        updatedProperties: result.updatedProperties,
+        overrides: result.overrides,
+        activityId: result.activityId,
+      });
+    } catch (err) {
+      const e = err as Error & { name?: string };
+      this._postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: e.name ?? 'Error',
+        message: e.message ?? 'Properties commit failed',
+      });
+    }
   }
 
   /**

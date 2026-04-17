@@ -9,6 +9,7 @@ import type { DebriefFeature } from '../utils/types';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
 import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+import type { PropertiesFormField } from '../PropertiesPanel/types';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -127,6 +128,20 @@ export interface ActivityPanelProps {
   collapseState?: ActivityPanelCollapseState;
   /** Callback when collapse state changes */
   onCollapseStateChange?: (state: ActivityPanelCollapseState) => void;
+
+  // Properties section (T042-T045)
+  /** Fields to render in the Properties section. Hydrated host-side from item.properties + JSON Schema. */
+  propertiesFields?: PropertiesFormField[];
+  /** True while the open plot's item.json / schema is still loading. */
+  propertiesLoading?: boolean;
+  /** True when the item.json is on a read-only filesystem. */
+  propertiesReadOnly?: boolean;
+  /** Last write error to surface as a banner above the Properties form. Cleared on next successful commit. */
+  propertiesWriteError?: string | null;
+  /** Absolute path to the STAC store root for the open plot — used when emitting commit messages. */
+  openItemStorePath?: string;
+  /** Relative path (from storePath) to the item.json for the open plot. */
+  openItemPath?: string;
 
   // Message callback for host communication
   /** Callback for messages sent to the host */

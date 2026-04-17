@@ -19,7 +19,10 @@ export class OfflineInvariantError extends Error {
 const shouldSkipInstall = (): boolean => {
   // Allow opt-out via env var for harnesses that genuinely need the network
   // (e.g. Storybook docs build).
-  return process.env.PROPERTIES_PANEL_OFFLINE_HARNESS === 'off';
+  const env =
+    (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process
+      ?.env;
+  return env?.PROPERTIES_PANEL_OFFLINE_HARNESS === 'off';
 };
 
 let installed = false;
