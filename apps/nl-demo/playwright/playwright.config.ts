@@ -48,6 +48,9 @@ const launchOptions = useSparticuz
 
 const SERVER_PORT = process.env.NL_DEMO_PORT ?? '8765';
 const BASE_URL = `http://localhost:${SERVER_PORT}`;
+// #190 — fixed loopback port for the live-proxy stub. e2e/fixtures/
+// live-config.valid.json points at this port. Keep stable.
+const STUB_PROXY_PORT = process.env.NL_DEMO_STUB_PROXY_PORT ?? '18082';
 
 export default defineConfig({
   testDir: '../e2e',
@@ -62,13 +65,29 @@ export default defineConfig({
     viewport: { width: 1280, height: 800 },
     launchOptions,
   },
-  webServer: {
-    // Pure-Node http-server avoids relying on `pnpm dlx` networked installs.
-    command: `node ../scripts/serve.mjs ${SERVER_PORT}`,
-    url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 30_000,
-    cwd: __dirname,
-  },
+  // #190: convert webServer to an array — Playwright starts both the demo's
+  // static server and a stub-mode live-proxy. The stub requires no credential
+  // and no network, so it runs fine in CI.
+  webServer: [
+    {
+      // Pure-Node http-server avoids relying on `pnpm dlx` networked installs.
+      command: `node ../scripts/serve.mjs ${SERVER_PORT}`,
+      url: BASE_URL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 30_000,
+      cwd: __dirname,
+    },
+    {
+      command: `node ../scripts/live-proxy.mjs --stub ../e2e/fixtures/live-stub.json`,
+      url: `http://127.0.0.1:${STUB_PROXY_PORT}/health`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 15_000,
+      cwd: __dirname,
+      env: {
+        PROXY_PORT: STUB_PROXY_PORT,
+        PROXY_BIND: '127.0.0.1',
+      },
+    },
+  ],
   timeout: 30_000,
 });

@@ -333,7 +333,7 @@ async function readBodyWithCap(
   const reader = body.getReader();
   const chunks: Uint8Array[] = [];
   let accumulated = 0;
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
     if (!value) continue;

@@ -16,6 +16,8 @@ import { createRoot } from "react-dom/client";
 import {
   generateCql2,
   createRecordedLLMClient,
+  createLiveLLMClient,
+  validateLiveConfig,
   filterByCql2Json,
   canonicalisePhrase,
   vesselClassTreeToTaxonomy,
@@ -260,6 +262,79 @@ function EmptyState({ onClearAll }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Live-mode diagnostic banners (#190 US2 + US3)
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-reason human-readable messages for LiveTransportError. Must stay in
+ * sync with research R4 table and with specs/190-live-llm-transport/spec.md §
+ * acceptance scenarios.
+ */
+const LIVE_BANNER_MESSAGES = {
+  "auth-failure":
+    "Provider rejected the request — check credentials, then restart the proxy.",
+  "rate-limit":
+    "Provider rate limit hit — try again in a moment or use a different phrase.",
+  "provider-error":
+    "The language-model provider returned an error. Try a different phrase.",
+  "transport-error":
+    "Could not reach the language-model proxy. Is it running?",
+  timeout:
+    "The provider did not respond in time. Try a different phrase or retry.",
+  "oversize-response":
+    "The provider's response was too large to process. Try a different phrase.",
+  "usage-cap-reached":
+    "Live-mode call limit reached — reload to reset.",
+};
+
+function LiveConfigBanner({ message }) {
+  return (
+    <div className="banner banner--warn" data-testid="live-config-banner">
+      <div className="banner__title">Live mode is not active</div>
+      <div>{message}</div>
+      <div style={{ marginTop: 6 }}>
+        Running in fixture-only mode. See{" "}
+        <code>specs/190-live-llm-transport/quickstart.md</code> to configure
+        live mode.
+      </div>
+    </div>
+  );
+}
+
+function LiveTransportBanner({ reason, message, onRetry }) {
+  const userMessage = LIVE_BANNER_MESSAGES[reason] ?? message ?? "Live-mode call failed.";
+  return (
+    <div
+      className="banner banner--error"
+      data-testid="live-transport-banner"
+      data-transport-reason={reason}
+    >
+      <div className="banner__title">Live-mode call failed</div>
+      <div>{userMessage}</div>
+      {onRetry ? (
+        <div style={{ marginTop: 6 }}>
+          <button type="button" className="clear-all" onClick={onRetry}>
+            Try again
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function TransportModeIndicator({ model }) {
+  return (
+    <span
+      className="transport-mode transport-mode--live"
+      data-testid="transport-mode-indicator"
+      data-mode="live"
+    >
+      Live · Anthropic · <code>{model}</code>
+    </span>
+  );
+}
+
 function OffCorpusBanner({ phrase, examples, onPick }) {
   return (
     <div className="banner banner--info" data-testid="off-corpus-banner">
@@ -332,6 +407,65 @@ function buildCanonicalIndex(corpus) {
   return index;
 }
 
+async function loadLiveConfig() {
+  let raw;
+  try {
+    const res = await fetch("./live-config.json", { cache: "no-store" });
+    if (res.status === 404) return { state: "absent" };
+    if (!res.ok) {
+      return {
+        state: "error",
+        message: `live-config.json HTTP ${res.status}`,
+      };
+    }
+    raw = await res.json();
+  } catch (err) {
+    // 404 with some servers throws; absent is the expected default, not a
+    // warning. Only treat a malformed existing file as an error.
+    if (err && typeof err === "object" && "message" in err && /JSON|parse/i.test(String(err.message))) {
+      return { state: "error", message: `live-config.json is not valid JSON: ${err.message}` };
+    }
+    return { state: "absent" };
+  }
+  const validation = validateLiveConfig(raw);
+  if (!validation.ok) {
+    const first = validation.errors[0];
+    return {
+      state: "invalid",
+      message: first
+        ? `live-config.json → ${first.field}: ${first.message}`
+        : "live-config.json is invalid.",
+    };
+  }
+  if (!validation.value.enabled) {
+    return { state: "disabled" };
+  }
+  return { state: "ok", config: validation.value };
+}
+
+async function healthCheck(config) {
+  const proxyOrigin = new URL(config.proxyUrl).origin;
+  const healthUrl = new URL("/health", proxyOrigin).toString();
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 2000);
+  try {
+    const headers = { Accept: "application/json" };
+    if (config.proxyToken) headers["X-Proxy-Token"] = config.proxyToken;
+    const res = await fetch(healthUrl, { signal: controller.signal, headers });
+    clearTimeout(t);
+    if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` };
+    const body = await res.json();
+    if (body?.ok !== true) return { ok: false, reason: "health body did not report ok" };
+    return { ok: true, body };
+  } catch (err) {
+    clearTimeout(t);
+    return {
+      ok: false,
+      reason: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
 function App() {
   // ------------------------------------------------------------------------
   // Bootstrap state
@@ -344,6 +478,9 @@ function App() {
   const [canonicalIndex, setCanonicalIndex] = useState(() => new Map());
   const [examplePhrases, setExamplePhrases] = useState([]);
 
+  // Live-mode bootstrap state. Always defined — `mode` drives everything else.
+  const [liveMode, setLiveMode] = useState({ mode: "fixture" });
+
   // ------------------------------------------------------------------------
   // Live UI state
   // ------------------------------------------------------------------------
@@ -353,11 +490,13 @@ function App() {
   const [filtered, setFiltered] = useState(false);
   const [zeroMatch, setZeroMatch] = useState(false);
   const [offCorpus, setOffCorpus] = useState(null); // { phrase } | null
+  const [transportBanner, setTransportBanner] = useState(null); // { reason, message } | null
   const [busy, setBusy] = useState(false);
 
   // Stale-state guard — track an in-flight token, ignore stale results
   // (Edge case in spec).
   const submissionToken = useRef(0);
+  const liveClientRef = useRef(null);
 
   // ------------------------------------------------------------------------
   // Bootstrap load
@@ -395,6 +534,40 @@ function App() {
         setVesselTypeIndex(buildVesselTypeIndex(registry));
         setCanonicalIndex(buildCanonicalIndex(corpusJson));
         setExamplePhrases(pickExamplePhrases(corpusJson));
+
+        // #190: probe live-config.json and the proxy before activating live
+        // mode. Any failure falls back to fixture mode — offline-by-default.
+        const loaded = await loadLiveConfig();
+        if (cancelled) return;
+        if (loaded.state === "ok") {
+          const health = await healthCheck(loaded.config);
+          if (cancelled) return;
+          if (health.ok) {
+            liveClientRef.current = createLiveLLMClient(loaded.config);
+            setLiveMode({
+              mode: "live",
+              config: loaded.config,
+              model: health.body?.model ?? loaded.config.model,
+            });
+          } else {
+            liveClientRef.current = null;
+            setLiveMode({
+              mode: "fixture",
+              notice: `Live mode configured but proxy unreachable at ${loaded.config.proxyUrl} — running in fixture mode. Did you start scripts/live-proxy.mjs? (${health.reason})`,
+            });
+          }
+        } else if (loaded.state === "invalid") {
+          liveClientRef.current = null;
+          setLiveMode({ mode: "fixture", notice: loaded.message });
+        } else if (loaded.state === "error") {
+          liveClientRef.current = null;
+          setLiveMode({ mode: "fixture", notice: loaded.message });
+        } else {
+          // absent or disabled → silent fixture-mode default (SC-003).
+          liveClientRef.current = null;
+          setLiveMode({ mode: "fixture" });
+        }
+
         setBootState({ kind: "ready" });
       } catch (err) {
         console.error("[nl-demo] bootstrap failed:", err);
@@ -408,14 +581,20 @@ function App() {
 
   // ------------------------------------------------------------------------
   // Memoised LLM client + generate deps (built once after fixtures load)
+  //
+  // #190 FR-006: when live mode is active, every non-empty phrase routes
+  // through the live client (not the recorded/fixture client). If live mode
+  // was disabled, misconfigured, or its health check failed at boot, this
+  // falls back to the recorded client — matching the #189 baseline.
   // ------------------------------------------------------------------------
   const generateDeps = useMemo(() => {
     if (!responses || !enums) return null;
-    return {
-      client: createRecordedLLMClient(responses),
-      enums,
-    };
-  }, [responses, enums]);
+    const client =
+      liveMode.mode === "live" && liveClientRef.current
+        ? liveClientRef.current
+        : createRecordedLLMClient(responses);
+    return { client, enums };
+  }, [responses, enums, liveMode]);
 
   // Pre-compute filter-engine config so descendant expansion (vessel-class
   // hierarchies) works for chip-removal CQL2 evaluation.
@@ -459,7 +638,13 @@ function App() {
   }, [allItems]);
 
   // ------------------------------------------------------------------------
-  // Submit flow (US1 + US2)
+  // Submit flow (US1 + US2 + US3)
+  //
+  // Live mode: every submission goes through the live client. Transport
+  // failures surface via GenerationResult.error.kind === "transport" (#190
+  // FR-008) and render a per-reason banner.
+  // Fixture mode: the RecordedLLMClient throws on miss — caught as before
+  // and rendered as the off-corpus banner.
   // ------------------------------------------------------------------------
   const submitPhrase = useCallback(
     async (rawPhrase) => {
@@ -474,17 +659,57 @@ function App() {
       }
 
       const token = ++submissionToken.current;
+
+      // FR-012: supersede any in-flight live call so earlier chip sets cannot
+      // land after a newer phrase is submitted.
+      if (liveMode.mode === "live" && liveClientRef.current) {
+        liveClientRef.current.cancelPending();
+      }
+
       setBusy(true);
       setOffCorpus(null);
+      setTransportBanner(null);
 
-      // Resolve typed phrase to the corpus's recorded original-case form so
-      // the prompt-hash check passes (see buildCanonicalIndex docstring).
-      const canonical = canonicalisePhrase(phrase);
-      const submitted = canonicalIndex.get(canonical) ?? phrase;
+      // In live mode we forward the typed phrase verbatim — there is no
+      // fixture to align case with.
+      let submitted = phrase;
+      if (liveMode.mode !== "live") {
+        const canonical = canonicalisePhrase(phrase);
+        submitted = canonicalIndex.get(canonical) ?? phrase;
+      }
 
       try {
         const result = await generateCql2(submitted, generateDeps);
         if (submissionToken.current !== token) return; // stale
+
+        if (result.error && result.error.kind === "transport") {
+          // The supersession path manifests as reason === "transport-error"
+          // with message === "superseded" — already ignored by the token
+          // guard above, but belt-and-braces:
+          if (result.error.error.message === "superseded") return;
+          setTransportBanner({
+            reason: result.error.error.reason,
+            message: result.error.error.message,
+          });
+          return;
+        }
+
+        if (result.error && result.error.kind === "generation") {
+          // In live mode a malformed response lands here — show the
+          // transport banner's provider-error variant (closest user-facing
+          // class). In fixture mode this path would have thrown.
+          if (liveMode.mode === "live") {
+            setTransportBanner({
+              reason: "provider-error",
+              message: result.error.error.message,
+            });
+            return;
+          }
+          // Fixture mode: treat as off-corpus (graceful fallback).
+          setOffCorpus({ phrase });
+          return;
+        }
+
         const newChips = result.lozenges.map((seed) =>
           describeChip(seed, vesselTypeIndex),
         );
@@ -492,17 +717,31 @@ function App() {
         applyCql2(result.cql2);
       } catch (err) {
         if (submissionToken.current !== token) return;
-        // RecordedLLMClient throws when the phrase is not in the corpus —
-        // that's our cue for the off-corpus banner (FR-008). Hash mismatches
-        // and other generator errors also fall through to the banner so the
-        // user sees a graceful message rather than a stack trace.
+        // RecordedLLMClient throws on corpus miss / hash mismatch — cue for
+        // the off-corpus banner (FR-008). The live client never throws on a
+        // normal transport failure; if we land here in live mode, something
+        // unexpected happened.
         console.warn("[nl-demo] generate failed:", err?.message ?? err);
-        setOffCorpus({ phrase });
+        if (liveMode.mode === "live") {
+          setTransportBanner({
+            reason: "transport-error",
+            message: err?.message ?? "Live-mode call failed unexpectedly.",
+          });
+        } else {
+          setOffCorpus({ phrase });
+        }
       } finally {
         if (submissionToken.current === token) setBusy(false);
       }
     },
-    [generateDeps, vesselTypeIndex, canonicalIndex, applyCql2, resetUnfiltered],
+    [
+      generateDeps,
+      vesselTypeIndex,
+      canonicalIndex,
+      applyCql2,
+      resetUnfiltered,
+      liveMode,
+    ],
   );
 
   // ------------------------------------------------------------------------
@@ -553,14 +792,24 @@ function App() {
   const total = allItems.length;
   const shown = filtered ? filteredItems.length : total;
 
+  const isLive = liveMode.mode === "live";
+  const subtitle = isLive
+    ? "Demo: live LLM transport"
+    : "Demo: hand-authored corpus, no live LLM";
+
   return (
     <div className="demo-shell">
       <header className="demo-header">
         <h1>Debrief — NL Catalog Search</h1>
-        <span className="subtitle">
-          Demo: hand-authored corpus, no live LLM
-        </span>
+        <span className="subtitle">{subtitle}</span>
+        {isLive ? (
+          <TransportModeIndicator model={liveMode.model ?? liveMode.config.model} />
+        ) : null}
       </header>
+
+      {!isLive && liveMode.notice ? (
+        <LiveConfigBanner message={liveMode.notice} />
+      ) : null}
 
       <QueryBar
         value={query}
@@ -569,6 +818,17 @@ function App() {
         disabled={!generateDeps}
         busy={busy}
       />
+
+      {transportBanner ? (
+        <LiveTransportBanner
+          reason={transportBanner.reason}
+          message={transportBanner.message}
+          onRetry={() => {
+            setTransportBanner(null);
+            if (query.trim().length > 0) submitPhrase(query);
+          }}
+        />
+      ) : null}
 
       {offCorpus ? (
         <OffCorpusBanner
