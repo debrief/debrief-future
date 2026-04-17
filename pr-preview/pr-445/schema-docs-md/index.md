@@ -1,3 +1,4 @@
+
 # Debrief Maritime Analysis Schemas
 
 LinkML schemas for Debrief v4.x maritime tactical analysis platform. Defines GeoJSON profile extensions for tracks and reference locations. This is a tracer bullet implementation covering core entity types.
@@ -5,6 +6,59 @@ LinkML schemas for Debrief v4.x maritime tactical analysis platform. Defines Geo
 URI: https://debrief.info/schemas/debrief
 
 Name: debrief
+
+## Featured Classes
+
+The schemas below see the most use across the Debrief codebase. Start here for a quick tour; the full alphabetical tree is below.
+
+### Plot features (GeoJSON)
+
+These classes define what actually gets drawn on the map and persisted in a STAC item's GeoJSON payload.
+
+- [TrackFeature](classes/TrackFeature.md) — vessel track with timestamped positions and styling
+- [ReferenceLocation](classes/ReferenceLocation.md) — fixed reference point or set of points
+- [SensorData](classes/SensorData.md) — named sensor and its bearing/range contact series
+- [SensorContact](classes/SensorContact.md) — a single bearing / range observation
+
+### Analysis tooling
+
+Metadata that describes the analysis tools exposed by `debrief-calc` and their inputs.
+
+- [Tool](classes/Tool.md) — analysis operation with name, version, selection requirements
+- [ToolParameter](classes/ToolParameter.md) — typed parameter declaration (string / number / bool / enum)
+- [SelectionRequirement](classes/SelectionRequirement.md) — feature-kind and cardinality constraints
+
+### Provenance and replay
+
+Every transformation records lineage so it can be replayed — these classes capture that chain.
+
+- [LogEntry](classes/LogEntry.md) — activity record (what ran, when, against which features)
+- [WasGeneratedBy](classes/WasGeneratedBy.md) — W3C PROV term linking outputs to tool + parameters
+- [ParameterValue](classes/ParameterValue.md) — typed parameter value preserved for replay
+- [InputFeatureState](classes/InputFeatureState.md) — pre-operation feature snapshot
+
+### Session state (live plot)
+
+The shape of the in-memory state a VS Code / web-shell session exposes to the rest of the app.
+
+- [GeoJSONFeature](classes/GeoJSONFeature.md) — tool-result feature layer entry
+- [FeatureSelection](classes/FeatureSelection.md) — currently-selected feature identifiers
+- [ViewportPolygon](classes/ViewportPolygon.md) — 4-corner polygon describing current view
+- [TimeInstant](classes/TimeInstant.md) — a single point in time (epoch + ISO forms)
+- [TimeRange](classes/TimeRange.md) — a temporal interval (start, end)
+
+### Catalog and platform metadata
+
+How Debrief identifies vessels and discovers their metadata from STAC catalogs.
+
+- [PlatformRecord](classes/PlatformRecord.md) — resolved metadata for a single platform (ship, aircraft, etc.)
+- [BranchRecord](classes/BranchRecord.md) — reference to a branched plot in the STAC catalog
+
+### Styling
+
+- [PositionStyle](classes/PositionStyle.md) — default styling applied to track positions
+
+---
 
 
 
