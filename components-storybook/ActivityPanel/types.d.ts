@@ -1,6 +1,8 @@
 import { DebriefFeature } from '../utils/types';
 import { MatchResult, ToolParameter } from '../ToolMatch/types';
 import { AssociatedFile } from '../LayersToolbar/types';
+import { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+import { PropertiesFormField } from '../PropertiesPanel/types';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -9,6 +11,7 @@ export interface ActivityPanelCollapseState {
     timeControllerCollapsed: boolean;
     toolsCollapsed: boolean;
     layersCollapsed: boolean;
+    propertiesCollapsed: boolean;
 }
 /**
  * Default collapse state - all sections expanded.
@@ -103,7 +106,7 @@ export type ActivityPanelMessage = {
         file: AssociatedFile;
         action: 'open' | 'openWith' | 'reveal' | 'delete';
     };
-};
+} | PropertiesCommitMessage;
 /**
  * Props for the ActivityPanel component.
  */
@@ -144,6 +147,18 @@ export interface ActivityPanelProps {
     collapseState?: ActivityPanelCollapseState;
     /** Callback when collapse state changes */
     onCollapseStateChange?: (state: ActivityPanelCollapseState) => void;
+    /** Fields to render in the Properties section. Hydrated host-side from item.properties + JSON Schema. */
+    propertiesFields?: PropertiesFormField[];
+    /** True while the open plot's item.json / schema is still loading. */
+    propertiesLoading?: boolean;
+    /** True when the item.json is on a read-only filesystem. */
+    propertiesReadOnly?: boolean;
+    /** Last write error to surface as a banner above the Properties form. Cleared on next successful commit. */
+    propertiesWriteError?: string | null;
+    /** Absolute path to the STAC store root for the open plot — used when emitting commit messages. */
+    openItemStorePath?: string;
+    /** Relative path (from storePath) to the item.json for the open plot. */
+    openItemPath?: string;
     /** Callback for messages sent to the host */
     onMessage?: (message: ActivityPanelMessage) => void;
     /** CSS class name */

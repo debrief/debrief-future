@@ -104,4 +104,12 @@ export { ColourDimensionSelector } from './colour-engine';
 export { computeColourAssignment, getDefaultColourAssignment } from './colour-engine';
 export { defaultPalette, builtInDimensions } from './colour-engine';
 export type { ColourDimension, ColourPalette, ColourAssignment, LegendModel, LegendEntry, GradientSpec, DimensionType, BuiltInDimensionId, ColourDimensionSelectorProps, ColourLegendProps, } from './colour-engine';
+export { PROPERTIES_PANEL_TOOL_SENTINEL, PROVENANCE_LOG_CAP, PROVENANCE_LOG_ARCHIVE_FILENAME, isValidPropertiesProvenanceEntry, } from './PropertiesPanel/provenanceTypes';
+export type { PropertiesProvenanceEntry } from './PropertiesPanel/provenanceTypes';
+export { AUTO_DERIVED_FIELDS, isAutoDerivedField, } from './PropertiesPanel/autoDerivedFields';
+export type { AutoDerivedField } from './PropertiesPanel/autoDerivedFields';
+export { PropertiesForm, ArrayWidget, BboxWidget, DateTimeWidget, PlatformArrayWidget, resolveFieldSpec, } from './PropertiesPanel';
+export type { FieldSpec, FieldDerivationState, PropertiesFormField, PropertiesFormProps, } from './PropertiesPanel';
+export { BrowserSelectionContext, BrowserSelectionProvider, useBrowserSelection, PropertiesSidePanel, } from './StacBrowser';
+export type { BrowserSelection, BrowserSelectionProviderProps, PropertiesSidePanelProps, } from './StacBrowser';
 //# sourceMappingURL=index.d.ts.map
