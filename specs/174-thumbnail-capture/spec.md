@@ -74,6 +74,7 @@ As a maintainer or developer, I want to run a CLI command that opens every plot 
 2. **Given** the backfill script is running, **When** it processes each plot, **Then** it opens the plot, fits the view to all visible features, waits for basemap tiles to load, and captures the map view.
 3. **Given** a plot fails to render during backfill (e.g., corrupt data), **When** the script encounters the error, **Then** it logs a warning and continues to the next plot without stopping.
 4. **Given** the backfill script completes, **When** the maintainer opens the catalog browser, **Then** all plots show raster thumbnails in both the list view and preview pane.
+5. **Given** the demo STAC catalog at `preview/workspace/samples/local-store/` contains ~70 sample plots imported before Save-time capture existed, **When** the maintainer runs the backfill script against that catalog as a one-off under this spec, **Then** every sample plot directory gains committed `thumbnail.png` + `thumbnail-sm.png` files and updated `item.json` asset entries, shipped as part of this feature.
 
 ---
 
@@ -117,6 +118,7 @@ As a developer or service consumer, I need thumbnail images to be stored as stan
 - **FR-011**: The batch generation script MUST continue processing remaining plots if an individual plot fails.
 - **FR-012**: Thumbnail storage MUST be idempotent — re-saving or re-running the backfill overwrites existing thumbnails cleanly.
 - **FR-013**: Thumbnails MUST include visible basemap tiles (land/sea context), not just track geometry.
+- **FR-014**: As a one-off under this spec, the backfill script MUST be executed against the committed demo STAC catalog (`preview/workspace/samples/local-store/`), and the resulting `thumbnail.png`, `thumbnail-sm.png`, and updated `item.json` files MUST be committed to the repository so the deployed demo ships with populated thumbnails for all existing sample plots.
 
 ### Key Entities
 
@@ -176,3 +178,4 @@ As a developer or service consumer, I need thumbnail images to be stored as stan
 - **SC-004**: Thumbnail capture adds no more than 2 seconds to the Save operation under normal conditions (tiles already cached).
 - **SC-005**: All thumbnails include visible basemap context (land and sea boundaries), not just track geometry on a blank background.
 - **SC-006**: The catalog list view displays raster thumbnails for items that have them, with seamless fallback to SVG thumbnails for items that don't.
+- **SC-007**: After the one-off retro-capture, 100% of the ~70 sample plots in `preview/workspace/samples/local-store/` have both thumbnail sizes committed alongside `item.json`, verified by a count check in the PR evidence.
