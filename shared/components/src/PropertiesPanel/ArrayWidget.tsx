@@ -86,6 +86,10 @@ export function ArrayWidget({
     [commitAdd],
   );
 
+  const handleBlur = useCallback(() => {
+    if (draft.trim()) commitAdd();
+  }, [draft, commitAdd]);
+
   const shownError = error ?? localError;
 
   return (
@@ -156,6 +160,7 @@ export function ArrayWidget({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
               disabled={atMax}
               placeholder={atMax ? `Max ${spec.maxItems} reached` : 'Add tag…'}
               data-testid={`array-widget-input-${name}`}

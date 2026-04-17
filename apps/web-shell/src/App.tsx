@@ -1444,11 +1444,31 @@ export default function App() {
 
     const propertiesSlot = (
       <div
+        className="web-shell__properties-slot"
         style={{
+          // Force VS Code dark-theme variables so the Properties form
+          // renders with the same look it has inside the extension,
+          // regardless of the surrounding web-shell page theme.
+          colorScheme: 'dark',
+          ['--vscode-editor-background' as string]: '#1e1e1e',
+          ['--vscode-editor-foreground' as string]: '#d4d4d4',
+          ['--vscode-foreground' as string]: '#d4d4d4',
+          ['--vscode-descriptionForeground' as string]: '#9d9d9d',
+          ['--vscode-panel-border' as string]: '#424242',
+          ['--vscode-input-background' as string]: '#3c3c3c',
+          ['--vscode-input-foreground' as string]: '#cccccc',
+          ['--vscode-input-border' as string]: '#3c3c3c',
+          ['--vscode-badge-background' as string]: '#4d4d4d',
+          ['--vscode-badge-foreground' as string]: '#ffffff',
+          ['--vscode-button-background' as string]: '#0e639c',
+          ['--vscode-button-foreground' as string]: '#ffffff',
+          ['--vscode-button-hoverBackground' as string]: '#1177bb',
+          ['--vscode-editorWarning-foreground' as string]: '#cca700',
           padding: '8px 12px',
           height: '100%',
           overflowY: 'auto',
-          background: 'var(--vscode-editor-background, transparent)',
+          background: '#1e1e1e',
+          color: '#d4d4d4',
           fontSize: 13,
         }}
         aria-label="Properties Panel demo"
