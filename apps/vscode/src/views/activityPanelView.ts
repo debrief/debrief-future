@@ -27,6 +27,7 @@ import type { MatchResult } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { AssociatedFile, StacService } from '../services/stacService';
 import type { ResultsPanelService } from '../services/resultsPanelService';
+import { AUTO_DERIVED_FIELDS } from '@debrief/components/PropertiesPanel/autoDerivedFields';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -561,11 +562,16 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       const packageVersion = vscode.extensions.getExtension('debrief.debrief-vscode')
         ?.packageJSON?.version ?? '0.0.0';
       const fields = Object.keys(message.patch).sort();
+      // T077: only auto-derived fields go into debrief:overrides — non-derived
+      // fields are plain user values and don't need a skip-list entry.
+      const overrideFields = fields.filter((k) =>
+        AUTO_DERIVED_FIELDS.includes(k as (typeof AUTO_DERIVED_FIELDS)[number]),
+      );
       const result = await this._stacService.updateItemMetadata({
         storePath: message.storePath,
         itemPath: message.itemPath,
         patch: message.patch,
-        overrideFields: fields,
+        overrideFields,
         provenance: {
           tool: 'debrief.propertiesPanel',
           fields,

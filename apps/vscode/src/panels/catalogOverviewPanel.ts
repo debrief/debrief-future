@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { StacItemSummary, Catalog, PlatformRecord } from '../types/stac';
 import type { StacService } from '../services/stacService';
+import { AUTO_DERIVED_FIELDS } from '@debrief/components/PropertiesPanel/autoDerivedFields';
 
 /** Message sent from extension to webview */
 interface LoadCatalogOverviewMessage {
@@ -279,11 +280,15 @@ export class CatalogOverviewPanel {
       const packageVersion = vscode.extensions.getExtension('debrief.debrief-vscode')
         ?.packageJSON?.version ?? '0.0.0';
       const fields = Object.keys(message.patch).sort();
+      // T077: only auto-derived fields go into debrief:overrides.
+      const overrideFields = fields.filter((k) =>
+        AUTO_DERIVED_FIELDS.includes(k as (typeof AUTO_DERIVED_FIELDS)[number]),
+      );
       const result = await this.stacService.updateItemMetadata({
         storePath: message.storePath,
         itemPath: message.itemPath,
         patch: message.patch,
-        overrideFields: fields,
+        overrideFields,
         provenance: {
           tool: 'debrief.propertiesPanel',
           fields,

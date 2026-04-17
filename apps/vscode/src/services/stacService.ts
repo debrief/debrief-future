@@ -1164,10 +1164,34 @@ export class StacService {
       }
     }
 
-    if (earliest && latest) {
-      item.properties.datetime = earliest;
-      item.properties.start_datetime = earliest;
-      item.properties.end_datetime = latest;
+    if (!earliest || !latest) return;
+
+    // Feature 193 / backlog #191: respect analyst overrides and become
+    // idempotent. Skip any field listed in item.properties["debrief:overrides"],
+    // and skip the write entirely when no derived value actually changed.
+    const overridesRaw = (item.properties as Record<string, unknown>)['debrief:overrides'];
+    const overrides = new Set<string>(
+      Array.isArray(overridesRaw)
+        ? overridesRaw.filter((v): v is string => typeof v === 'string')
+        : [],
+    );
+
+    const proposed: Record<string, string> = {
+      datetime: earliest,
+      start_datetime: earliest,
+      end_datetime: latest,
+    };
+
+    const props = item.properties as unknown as Record<string, unknown>;
+    let changed = false;
+    for (const [field, value] of Object.entries(proposed)) {
+      if (overrides.has(field)) continue;
+      if (props[field] === value) continue;
+      props[field] = value;
+      changed = true;
+    }
+
+    if (changed) {
       fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
       this.itemCache.delete(fullItemPath);
     }
