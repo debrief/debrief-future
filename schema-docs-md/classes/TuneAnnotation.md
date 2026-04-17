@@ -110,6 +110,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: datetime
     required: true
@@ -162,6 +163,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: datetime
     required: true

@@ -138,6 +138,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: TimeInstant
     required: true
@@ -189,6 +190,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: TimeInstant
     required: true

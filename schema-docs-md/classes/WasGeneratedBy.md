@@ -116,6 +116,7 @@ attributes:
     rank: 1000
     domain_of:
     - WasGeneratedBy
+    - PropertiesProvenanceEntry
     range: string
     required: true
   tool_version:
@@ -161,6 +162,7 @@ attributes:
     owner: WasGeneratedBy
     domain_of:
     - WasGeneratedBy
+    - PropertiesProvenanceEntry
     range: string
     required: true
   tool_version:

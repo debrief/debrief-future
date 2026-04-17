@@ -3,11 +3,6 @@
 # Slot: tool 
 
 
-_Tool identifier (kebab-case, e.g., calculate-range)._
-
-
-
-
 
 URI: [debrief:slot/tool](https://debrief.info/schemas/slot/tool)
 Alias: tool
@@ -22,6 +17,7 @@ Alias: tool
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
+| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
 | [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
 
 
@@ -33,8 +29,6 @@ Alias: tool
 
 * Range: [String](../types/String.md)
 
-* Required: True
-
 
 
 
@@ -42,13 +36,6 @@ Alias: tool
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -68,15 +55,11 @@ Alias: tool
 <details>
 ```yaml
 name: tool
-description: Tool identifier (kebab-case, e.g., calculate-range).
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: tool
-owner: WasGeneratedBy
 domain_of:
 - WasGeneratedBy
+- PropertiesProvenanceEntry
 range: string
-required: true
 
 ```
 </details>

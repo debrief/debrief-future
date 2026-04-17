@@ -121,6 +121,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [PolygonProperties](classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |
 | [PositionStyle](classes/PositionStyle.md) | Default styling configuration for track positions |
 | [PositionStyleOverride](classes/PositionStyleOverride.md) | Per-position style override |
+| [PropertiesProvenanceEntry](classes/PropertiesProvenanceEntry.md) | Single entry in item |
 | [RectangleAnnotation](classes/RectangleAnnotation.md) | GeoJSON Feature for rectangle annotations |
 | [ReferenceLocation](classes/ReferenceLocation.md) | GeoJSON Feature for fixed reference points or reference point sets |
 | [ResultsSlice](classes/ResultsSlice.md) | Accumulated tool result layers and last-execution record for undo support |
@@ -216,6 +217,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [featureCollectionUri](slots/featureCollectionUri.md) | Reference to external feature collection (FR-016) |
 | [featureIds](slots/featureIds.md) | Selected feature paths |
 | [features](slots/features.md) | Feature-related state |
+| [fields](slots/fields.md) | Non-empty list of field names touched in this commit |
 | [fill](slots/fill.md) | Whether to fill the shape |
 | [fill_color](slots/fill_color.md) | Fill color (CSS color string) |
 | [fill_opacity](slots/fill_opacity.md) | Fill transparency (0-1) |
@@ -259,6 +261,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [metadata](slots/metadata.md) | Axis definitions and display hints |
 | [metadata_expression](slots/metadata_expression.md) | Serialised CQL2 filter expression from the filter bar, stored as an opaque JS... |
 | [metadata_filtered_ids](slots/metadata_filtered_ids.md) | Set of exercise IDs passing the current metadata filter |
+| [method](slots/method.md) | Versioned method identifier matching ^properties-panel@ |
 | [min](slots/min.md) | Minimum number of features of this kind required |
 | [minima](slots/minima.md) | Semi-minor axis in metres |
 | [name](slots/name.md) | Human-readable segment name |
@@ -271,6 +274,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [opacity](slots/opacity.md) | Stroke transparency (0-1) |
 | [orientation](slots/orientation.md) | Ellipse orientation from north in degrees |
 | [origin](slots/origin.md) | Explicit sensor location override [longitude, latitude] |
+| [overrides](slots/overrides.md) | Flat list of field names on item |
 | [param_type](slots/param_type.md) | References a schema-defined parameter-type enum by name |
 | [parameter](slots/parameter.md) | Name of the parameter that was changed |
 | [parameters](slots/parameters.md) | Full resolved parameter set |
@@ -290,6 +294,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [properties](slots/properties.md) | Track metadata |
 | [prov_entry_count](slots/prov_entry_count.md) | Number of provenance entries in the snapshot |
 | [provenance](slots/provenance.md) | PROV-aligned provenance records (append-only log of tool operations) |
+| [provenance_log](slots/provenance_log.md) | Per-commit provenance entries written by the Properties Panel |
 | [put_label_at](slots/put_label_at.md) | Label position along bearing line |
 | [radius](slots/radius.md) | Marker radius in pixels |
 | [range](slots/range.md) | Range to contact in metres |
@@ -315,6 +320,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [show_symbol](slots/show_symbol.md) | Whether to display a symbol at positions |
 | [snapshot_links](slots/snapshot_links.md) | Doubly-linked snapshot chain |
 | [solutions](slots/solutions.md) | Array of TUA estimates |
+| [source](slots/source.md) | Origin of the edit |
 | [source_asset](slots/source_asset.md) | Relative path to the source plot file |
 | [source_feature_ids](slots/source_feature_ids.md) | IDs of the source features the tool operated on |
 | [source_features](slots/source_features.md) | IDs of input features used to generate this result |

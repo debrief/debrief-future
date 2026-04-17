@@ -173,6 +173,7 @@ attributes:
     domain_of:
     - LogEntry
     - FileProvEntry
+    - PropertiesProvenanceEntry
     range: string
     required: true
   timestamp:
@@ -184,6 +185,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: datetime
     required: true
@@ -307,6 +309,7 @@ attributes:
     domain_of:
     - LogEntry
     - FileProvEntry
+    - PropertiesProvenanceEntry
     range: string
     required: true
   timestamp:
@@ -320,6 +323,7 @@ attributes:
     - LogEntry
     - TuneAnnotation
     - FileProvEntry
+    - PropertiesProvenanceEntry
     - FeatureSelection
     range: datetime
     required: true
