@@ -267,10 +267,7 @@ export function prepareSensorContacts(
   // eslint-disable-next-line no-restricted-syntax
   const coords = feature.geometry.coordinates as unknown as [number, number][];
   const positions = feature.properties.positions;
-  // eslint-disable-next-line no-restricted-syntax
-  const trackColor = (feature.properties.style as unknown as Record<string, unknown>)?.line
-    ? ((feature.properties.style as unknown as Record<string, unknown>).line as Record<string, unknown>)?.color as string | undefined
-    : undefined;
+  const trackColor = feature.properties.style?.line?.color;
 
   const result: SensorRenderContact[] = [];
 
