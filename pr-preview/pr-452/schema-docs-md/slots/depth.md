@@ -17,8 +17,8 @@ Alias: depth
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 | [TUASolution](../classes/TUASolution.md) | Single Target Uncertainty Area estimate |  no  |
+| [TimestampedPosition](../classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |  no  |
 
 
 
