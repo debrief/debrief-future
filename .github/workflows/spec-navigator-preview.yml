@@ -1,0 +1,88 @@
+name: Preview Spec Navigator (branch)
+
+# Deploys a branch build of the Spec Navigator to
+#   https://debrief.github.io/debrief-future/spec-navigator-preview/<slug>/
+# where <slug> is the branch name with any non-[A-Za-z0-9-] characters
+# replaced by `-`. Preview deploys live next to production under the
+# same gh-pages branch; keep_files: true prevents this job from
+# clobbering /spec-navigator/ (the production build).
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to preview (default: the branch this workflow was dispatched from)'
+        required: false
+        type: string
+  push:
+    branches:
+      - 'preview/**'
+    paths:
+      - 'apps/spec-navigator/**'
+      - '.github/workflows/spec-navigator-preview.yml'
+
+jobs:
+  build-and-publish-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Resolve branch + slug
+        id: branch
+        run: |
+          BRANCH="${{ inputs.branch || github.ref_name }}"
+          SLUG=$(printf '%s' "$BRANCH" | tr -c 'A-Za-z0-9-' '-' | sed -E 's/-+/-/g;s/^-|-$//g')
+          if [ -z "$SLUG" ]; then
+            echo "::error::Could not derive slug from branch '$BRANCH'"
+            exit 1
+          fi
+          if [ "$SLUG" = "main" ]; then
+            echo "::error::Refusing to publish 'main' as a preview — use the production workflow."
+            exit 1
+          fi
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "base_url=/debrief-future/spec-navigator-preview/$SLUG/" >> "$GITHUB_OUTPUT"
+          echo "Resolved: branch=$BRANCH slug=$SLUG"
+
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.branch }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build spec-navigator (preview base URL)
+        env:
+          VITE_BASE_URL: ${{ steps.branch.outputs.base_url }}
+        run: pnpm --filter @debrief/spec-navigator build
+
+      - name: Deploy preview to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/spec-navigator/dist
+          destination_dir: spec-navigator-preview/${{ steps.branch.outputs.slug }}
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'chore(preview): deploy spec-navigator from ${{ steps.branch.outputs.branch }}'
+
+      - name: Summarise
+        run: |
+          echo "### Preview deployed :rocket:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Branch: \`${{ steps.branch.outputs.branch }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Slug: \`${{ steps.branch.outputs.slug }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: https://debrief.github.io/debrief-future/spec-navigator-preview/${{ steps.branch.outputs.slug }}/?pr=<n>" >> "$GITHUB_STEP_SUMMARY"
