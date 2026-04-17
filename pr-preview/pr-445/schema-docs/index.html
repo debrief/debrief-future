@@ -460,6 +460,89 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#featured-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Featured Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Featured Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plot-features-geojson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot features (GeoJSON)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analysis-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analysis tooling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provenance-and-replay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provenance and replay
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-state-live-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session state (live plot)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-and-platform-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog and platform metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#styling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Styling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#classes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11487,6 +11570,89 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#featured-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Featured Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Featured Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plot-features-geojson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot features (GeoJSON)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analysis-tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analysis tooling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provenance-and-replay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provenance and replay
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-state-live-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session state (live plot)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catalog-and-platform-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Catalog and platform metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#styling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Styling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#classes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11565,6 +11731,51 @@
 <p>LinkML schemas for Debrief v4.x maritime tactical analysis platform. Defines GeoJSON profile extensions for tracks and reference locations. This is a tracer bullet implementation covering core entity types.</p>
 <p>URI: https://debrief.info/schemas/debrief</p>
 <p>Name: debrief</p>
+<h2 id="featured-classes">Featured Classes<a class="headerlink" href="#featured-classes" title="Permanent link">&para;</a></h2>
+<p>The schemas below see the most use across the Debrief codebase. Start here for a quick tour; the full alphabetical tree is below.</p>
+<h3 id="plot-features-geojson">Plot features (GeoJSON)<a class="headerlink" href="#plot-features-geojson" title="Permanent link">&para;</a></h3>
+<p>These classes define what actually gets drawn on the map and persisted in a STAC item's GeoJSON payload.</p>
+<ul>
+<li><a href="classes/TrackFeature/">TrackFeature</a> — vessel track with timestamped positions and styling</li>
+<li><a href="classes/ReferenceLocation/">ReferenceLocation</a> — fixed reference point or set of points</li>
+<li><a href="classes/SensorData/">SensorData</a> — named sensor and its bearing/range contact series</li>
+<li><a href="classes/SensorContact/">SensorContact</a> — a single bearing / range observation</li>
+</ul>
+<h3 id="analysis-tooling">Analysis tooling<a class="headerlink" href="#analysis-tooling" title="Permanent link">&para;</a></h3>
+<p>Metadata that describes the analysis tools exposed by <code>debrief-calc</code> and their inputs.</p>
+<ul>
+<li><a href="classes/Tool/">Tool</a> — analysis operation with name, version, selection requirements</li>
+<li><a href="classes/ToolParameter/">ToolParameter</a> — typed parameter declaration (string / number / bool / enum)</li>
+<li><a href="classes/SelectionRequirement/">SelectionRequirement</a> — feature-kind and cardinality constraints</li>
+</ul>
+<h3 id="provenance-and-replay">Provenance and replay<a class="headerlink" href="#provenance-and-replay" title="Permanent link">&para;</a></h3>
+<p>Every transformation records lineage so it can be replayed — these classes capture that chain.</p>
+<ul>
+<li><a href="classes/LogEntry/">LogEntry</a> — activity record (what ran, when, against which features)</li>
+<li><a href="classes/WasGeneratedBy/">WasGeneratedBy</a> — W3C PROV term linking outputs to tool + parameters</li>
+<li><a href="classes/ParameterValue/">ParameterValue</a> — typed parameter value preserved for replay</li>
+<li><a href="classes/InputFeatureState/">InputFeatureState</a> — pre-operation feature snapshot</li>
+</ul>
+<h3 id="session-state-live-plot">Session state (live plot)<a class="headerlink" href="#session-state-live-plot" title="Permanent link">&para;</a></h3>
+<p>The shape of the in-memory state a VS Code / web-shell session exposes to the rest of the app.</p>
+<ul>
+<li><a href="classes/GeoJSONFeature/">GeoJSONFeature</a> — tool-result feature layer entry</li>
+<li><a href="classes/FeatureSelection/">FeatureSelection</a> — currently-selected feature identifiers</li>
+<li><a href="classes/ViewportPolygon/">ViewportPolygon</a> — 4-corner polygon describing current view</li>
+<li><a href="classes/TimeInstant/">TimeInstant</a> — a single point in time (epoch + ISO forms)</li>
+<li><a href="classes/TimeRange/">TimeRange</a> — a temporal interval (start, end)</li>
+</ul>
+<h3 id="catalog-and-platform-metadata">Catalog and platform metadata<a class="headerlink" href="#catalog-and-platform-metadata" title="Permanent link">&para;</a></h3>
+<p>How Debrief identifies vessels and discovers their metadata from STAC catalogs.</p>
+<ul>
+<li><a href="classes/PlatformRecord/">PlatformRecord</a> — resolved metadata for a single platform (ship, aircraft, etc.)</li>
+<li><a href="classes/BranchRecord/">BranchRecord</a> — reference to a branched plot in the STAC catalog</li>
+</ul>
+<h3 id="styling">Styling<a class="headerlink" href="#styling" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="classes/PositionStyle/">PositionStyle</a> — default styling applied to track positions</li>
+</ul>
+<hr />
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
