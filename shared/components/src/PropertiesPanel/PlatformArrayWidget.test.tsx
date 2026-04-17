@@ -21,11 +21,13 @@ describe('PlatformArrayWidget', () => {
       />,
     );
     fireEvent.click(screen.getByTestId('platform-array-add-debrief:platforms'));
+    // New row auto-enters edit mode → inputs now rendered.
     const idInput = screen.getByTestId(
       'platform-array-input-debrief:platforms-0-id',
     ) as HTMLInputElement;
     fireEvent.change(idInput, { target: { value: 'NELSON' } });
-    fireEvent.blur(idInput);
+    // Blur outside the row → commit + exit edit.
+    fireEvent.blur(idInput, { relatedTarget: document.body });
     expect(onCommit).toHaveBeenCalledWith('debrief:platforms', [{ id: 'NELSON' }]);
   });
 
@@ -39,17 +41,19 @@ describe('PlatformArrayWidget', () => {
         onCommit={onCommit}
       />,
     );
+    // Display row renders as a clickable cell. Click to enter edit mode.
+    fireEvent.click(screen.getByTestId('platform-array-row-p-0'));
     const nameInput = screen.getByTestId(
       'platform-array-input-p-0-name',
     ) as HTMLInputElement;
     fireEvent.change(nameInput, { target: { value: 'HMS Rodney' } });
-    fireEvent.blur(nameInput);
+    fireEvent.blur(nameInput, { relatedTarget: document.body });
     expect(onCommit).toHaveBeenCalledWith('p', [
       { id: 'NELSON', name: 'HMS Rodney' },
     ]);
   });
 
-  it('deletes a row and commits the resulting array', () => {
+  it('deletes a row (display mode) and commits the resulting array', () => {
     const onCommit = vi.fn();
     render(
       <PlatformArrayWidget
@@ -62,6 +66,7 @@ describe('PlatformArrayWidget', () => {
         onCommit={onCommit}
       />,
     );
+    // Delete button is available on the read-only display row — no edit mode needed.
     fireEvent.click(screen.getByTestId('platform-array-delete-p-0'));
     expect(onCommit).toHaveBeenCalledWith('p', [{ id: 'B', name: 'Bravo' }]);
   });
@@ -76,14 +81,15 @@ describe('PlatformArrayWidget', () => {
         onCommit={onCommit}
       />,
     );
+    fireEvent.click(screen.getByTestId('platform-array-row-p-0'));
     const idInput = screen.getByTestId('platform-array-input-p-0-id') as HTMLInputElement;
     fireEvent.change(idInput, { target: { value: '' } });
-    fireEvent.blur(idInput);
+    fireEvent.blur(idInput, { relatedTarget: document.body });
     expect(onCommit).not.toHaveBeenCalled();
     expect(screen.getByTestId('platform-array-error-p').textContent).toMatch(/non-empty id/);
   });
 
-  it('renders disabled (no add, no delete, inputs disabled)', () => {
+  it('renders disabled (no add, no delete, no edit entry)', () => {
     render(
       <PlatformArrayWidget
         name="p"
@@ -95,7 +101,8 @@ describe('PlatformArrayWidget', () => {
     );
     expect(screen.queryByTestId('platform-array-add-p')).toBeNull();
     expect(screen.queryByTestId('platform-array-delete-p-0')).toBeNull();
-    const idInput = screen.getByTestId('platform-array-input-p-0-id') as HTMLInputElement;
-    expect(idInput.disabled).toBe(true);
+    // Clicking the row in disabled mode must not open inputs.
+    fireEvent.click(screen.getByTestId('platform-array-row-p-0'));
+    expect(screen.queryByTestId('platform-array-input-p-0-id')).toBeNull();
   });
 });

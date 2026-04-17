@@ -1,14 +1,14 @@
 /**
- * PlatformArrayWidget — list editor for `platform-array` FieldSpec.
+ * PlatformArrayWidget — table-style editor for `platform-array` FieldSpec.
  *
- * Each platform row renders four text inputs (id, name, nationality,
- * vessel_class). Add, edit, and delete each fire `onCommit` with the full
- * replaced array — no batching, no partial writes.
- *
- * Row-level text edits commit on blur or Enter.
+ * Display mode renders each platform as a read-only row (id · name ·
+ * nationality · vessel_class) with a × button. Clicking a row enters edit
+ * mode for that row only (and `+ Add platform` spawns a blank row already
+ * in edit mode). Edits commit on blur / Enter; the full replaced array
+ * always goes through `onCommit` — no partial writes.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FieldSpec } from './types';
 
 export interface PlatformArrayWidgetProps {
@@ -29,11 +29,19 @@ interface PlatformDraft {
 }
 
 type EditableField = keyof PlatformDraft;
-const FIELDS: readonly EditableField[] = [
-  'id',
-  'name',
-  'nationality',
-  'vessel_class',
+
+interface ColumnSpec {
+  field: EditableField;
+  placeholder: string;
+  flex: string;
+  maxLength?: number;
+}
+
+const COLUMNS: readonly ColumnSpec[] = [
+  { field: 'id', placeholder: 'id', flex: '1 1 25%' },
+  { field: 'name', placeholder: 'name', flex: '1 1 30%' },
+  { field: 'nationality', placeholder: 'nat', flex: '0 0 48px', maxLength: 3 },
+  { field: 'vessel_class', placeholder: 'class', flex: '1 1 25%' },
 ];
 
 function readStringField(entry: unknown, field: string): string {
@@ -60,8 +68,6 @@ interface PlatformCommit {
 }
 
 function toCommitShape(rows: PlatformDraft[]): PlatformCommit[] {
-  // Strip empty optional fields so the patch matches the schema (optional
-  // fields omitted, not empty strings).
   return rows.map((row) => {
     const out: PlatformCommit = { id: row.id.trim() };
     if (row.name.trim()) out.name = row.name.trim();
@@ -80,27 +86,33 @@ export function PlatformArrayWidget({
 }: PlatformArrayWidgetProps): React.ReactElement {
   const incoming = useMemo(() => coerceToPlatforms(value), [value]);
   const [rows, setRows] = useState<PlatformDraft[]>(incoming);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  const rowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setRows(incoming);
-    setLocalError(null);
-  }, [incoming]);
+    // Only pull in new props when the user isn't mid-edit — otherwise their
+    // in-progress text would be wiped by every re-render.
+    if (editingIndex === null) {
+      setRows(incoming);
+      setLocalError(null);
+    }
+  }, [incoming, editingIndex]);
 
   const commitRows = useCallback(
     (next: PlatformDraft[]) => {
-      // Validate ids — each row must have a non-empty id.
       if (next.some((row) => !row.id.trim())) {
         setLocalError('Each platform row must have a non-empty id.');
-        return;
+        return false;
       }
       const ids = next.map((row) => row.id.trim());
       if (new Set(ids).size !== ids.length) {
         setLocalError('Platform ids must be unique.');
-        return;
+        return false;
       }
       setLocalError(null);
       onCommit(name, toCommitShape(next));
+      return true;
     },
     [name, onCommit],
   );
@@ -111,33 +123,22 @@ export function PlatformArrayWidget({
         const next = prev.slice();
         const current = next[index];
         if (!current) return prev;
-        const updated: PlatformDraft = {
-          id: current.id,
-          name: current.name,
-          nationality: current.nationality,
-          vessel_class: current.vessel_class,
-        };
-        updated[field] = v;
-        next[index] = updated;
+        next[index] = { ...current, [field]: v };
         return next;
       });
     },
     [],
   );
 
-  const commitFromRows = useCallback(() => {
-    commitRows(rows);
+  const exitEdit = useCallback(() => {
+    if (commitRows(rows)) setEditingIndex(null);
   }, [rows, commitRows]);
 
   const addRow = useCallback(() => {
-    const blank: PlatformDraft = {
-      id: '',
-      name: '',
-      nationality: '',
-      vessel_class: '',
-    };
-    setRows([...rows, blank]);
-    // We do NOT commit yet — wait for the user to fill in the id, then blur.
+    const blank: PlatformDraft = { id: '', name: '', nationality: '', vessel_class: '' };
+    const nextRows = [...rows, blank];
+    setRows(nextRows);
+    setEditingIndex(nextRows.length - 1);
   }, [rows]);
 
   const deleteRow = useCallback(
@@ -145,6 +146,7 @@ export function PlatformArrayWidget({
       const next = rows.slice();
       next.splice(index, 1);
       setRows(next);
+      setEditingIndex(null);
       commitRows(next);
     },
     [rows, commitRows],
@@ -154,10 +156,25 @@ export function PlatformArrayWidget({
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        commitFromRows();
+        exitEdit();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setRows(incoming);
+        setEditingIndex(null);
+        setLocalError(null);
       }
     },
-    [commitFromRows],
+    [exitEdit, incoming],
+  );
+
+  // When the user tabs/clicks away from the entire row, commit + exit.
+  const handleRowBlur = useCallback(
+    (e: React.FocusEvent<HTMLDivElement>) => {
+      const next = e.relatedTarget as Node | null;
+      if (next && e.currentTarget.contains(next)) return;
+      exitEdit();
+    },
+    [exitEdit],
   );
 
   const shownError = error ?? localError;
@@ -165,50 +182,120 @@ export function PlatformArrayWidget({
   return (
     <div data-testid={`platform-array-widget-${name}`}>
       {rows.length === 0 && (
-        <div style={{ fontSize: 12, color: 'var(--vscode-descriptionForeground)' }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--vscode-descriptionForeground)',
+            marginBottom: 4,
+          }}
+        >
           (No platforms)
         </div>
       )}
-      {rows.map((row, i) => (
-        <div
-          key={i}
-          data-testid={`platform-array-row-${name}-${i}`}
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 4,
-            marginBottom: 4,
-            alignItems: 'center',
-          }}
-        >
-          {FIELDS.map((field) => (
-            <input
-              key={field}
-              type="text"
-              value={row[field]}
-              onChange={(e) => updateField(i, field, e.target.value)}
-              onBlur={commitFromRows}
-              onKeyDown={handleKeyDown}
-              placeholder={field}
-              disabled={disabled}
-              data-testid={`platform-array-input-${name}-${i}-${field}`}
-              className="log-panel__param-editor-input-field"
-              style={{ width: 120 }}
-            />
-          ))}
-          {!disabled && (
-            <button
-              type="button"
-              onClick={() => deleteRow(i)}
-              data-testid={`platform-array-delete-${name}-${i}`}
-              aria-label={`Delete row ${i + 1}`}
-              className="log-panel__param-editor-btn log-panel__param-editor-btn--cancel"
-            >
-              {'\u00D7'}
-            </button>
-          )}
-        </div>
-      ))}
+
+      {rows.map((row, i) =>
+        editingIndex === i ? (
+          <div
+            key={i}
+            ref={i === editingIndex ? rowRef : undefined}
+            onBlur={handleRowBlur}
+            data-testid={`platform-array-row-${name}-${i}`}
+            data-editing="true"
+            style={{
+              display: 'flex',
+              gap: 4,
+              marginBottom: 4,
+              alignItems: 'center',
+            }}
+          >
+            {COLUMNS.map((col) => (
+              <input
+                key={col.field}
+                type="text"
+                value={row[col.field]}
+                onChange={(e) => updateField(i, col.field, e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={col.placeholder}
+                maxLength={col.maxLength}
+                disabled={disabled}
+                autoFocus={col.field === 'id' && row.id === ''}
+                data-testid={`platform-array-input-${name}-${i}-${col.field}`}
+                className="log-panel__param-editor-input-field"
+                style={{
+                  flex: col.flex,
+                  minWidth: 0,
+                  ...(col.field === 'nationality'
+                    ? { textAlign: 'center', textTransform: 'uppercase' }
+                    : {}),
+                }}
+              />
+            ))}
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => deleteRow(i)}
+                data-testid={`platform-array-delete-${name}-${i}`}
+                aria-label={`Delete platform ${i + 1}`}
+                className="log-panel__param-editor-btn log-panel__param-editor-btn--cancel"
+                style={{ flex: '0 0 auto' }}
+              >
+                {'\u00D7'}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div
+            key={i}
+            data-testid={`platform-array-row-${name}-${i}`}
+            onClick={() => !disabled && setEditingIndex(i)}
+            style={{
+              display: 'flex',
+              gap: 8,
+              padding: '4px 6px',
+              marginBottom: 2,
+              fontSize: 12,
+              alignItems: 'center',
+              cursor: disabled ? 'default' : 'pointer',
+              borderRadius: 3,
+              border: '1px solid transparent',
+              background: 'var(--vscode-input-background, transparent)',
+            }}
+          >
+            {COLUMNS.map((col) => (
+              <span
+                key={col.field}
+                style={{
+                  flex: col.flex,
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textAlign: col.field === 'nationality' ? 'center' : 'left',
+                  opacity: row[col.field] ? 1 : 0.5,
+                  fontStyle: row[col.field] ? 'normal' : 'italic',
+                }}
+              >
+                {row[col.field] || col.placeholder}
+              </span>
+            ))}
+            {!disabled && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteRow(i);
+                }}
+                data-testid={`platform-array-delete-${name}-${i}`}
+                aria-label={`Delete platform ${i + 1}`}
+                className="log-panel__param-editor-btn log-panel__param-editor-btn--cancel"
+                style={{ flex: '0 0 auto' }}
+              >
+                {'\u00D7'}
+              </button>
+            )}
+          </div>
+        ),
+      )}
 
       {!disabled && (
         <button
@@ -216,6 +303,7 @@ export function PlatformArrayWidget({
           onClick={addRow}
           data-testid={`platform-array-add-${name}`}
           className="log-panel__param-editor-btn log-panel__param-editor-btn--commit"
+          style={{ marginTop: 4 }}
         >
           + Add platform
         </button>
