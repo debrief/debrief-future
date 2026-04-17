@@ -11,6 +11,12 @@
 # Persistent URLs (main):
 #   HTML: https://debrief.github.io/debrief-future/schema-docs/
 #   MD:   https://github.com/debrief/debrief-future/tree/gh-pages/schema-docs-md/
+#
+# On push-to-main, ALSO syncs the built HTML tree into the public Jekyll site
+# at debrief/debrief.github.io under `future/schemas/`. Requires a repository
+# secret WEBSITE_PUSH_TOKEN (fine-grained PAT or GitHub App installation token)
+# with `contents: write` on debrief/debrief.github.io. See
+# docs/project_notes/key_facts.md for setup notes.
 
 name: Schema Docs
 
@@ -84,6 +90,41 @@ jobs:
           publish_dir: ./shared/schemas/build/md
           destination_dir: schema-docs-md
           keep_files: true
+
+      # Cross-repo sync to the public Jekyll site. Clones
+      # debrief/debrief.github.io, replaces future/schemas/ wholesale with the
+      # freshly-built HTML, and pushes only if something actually changed.
+      # A wholesale replace (rather than `rsync --delete`-style merge) ensures
+      # schema classes renamed or removed in the source repo are also purged
+      # from the public docs.
+      - name: Checkout debrief.github.io
+        uses: actions/checkout@v4
+        with:
+          repository: debrief/debrief.github.io
+          token: ${{ secrets.WEBSITE_PUSH_TOKEN }}
+          path: website-sync
+          ref: master
+          fetch-depth: 1
+
+      - name: Sync built schema docs into future/schemas/
+        working-directory: .
+        run: |
+          set -euo pipefail
+          SRC="${GITHUB_WORKSPACE}/shared/schemas/build/html"
+          DEST="${GITHUB_WORKSPACE}/website-sync/future/schemas"
+          rm -rf "${DEST}"
+          mkdir -p "${DEST}"
+          cp -r "${SRC}/." "${DEST}/"
+          cd "${GITHUB_WORKSPACE}/website-sync"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add future/schemas
+          if git diff --staged --quiet; then
+            echo "No changes in schema docs — skipping push."
+            exit 0
+          fi
+          git commit -m "Sync schema docs from debrief/debrief-future@${GITHUB_SHA:0:7}"
+          git push origin master
 
   # Deploy PR preview + post sticky comment with URLs.
   build-and-deploy:

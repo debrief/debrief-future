@@ -67,6 +67,24 @@ docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
 **External:**
 - Demo: https://debrief-demo.fly.dev
 
+### CI Secrets
+
+**WEBSITE_PUSH_TOKEN** (required for the schema-docs auto-sync in
+`.github/workflows/schema-docs.yml`):
+- **Purpose:** lets the `deploy-main` job push into
+  `debrief/debrief.github.io` under `future/schemas/` on every merge to
+  `main`.
+- **Type:** fine-grained PAT OR GitHub App installation token.
+- **Scope:** `contents: write` on `debrief/debrief.github.io` only.
+- **Where:** repository secret at
+  `debrief/debrief-future` → Settings → Secrets and variables → Actions.
+- **If missing:** the sync step fails loudly on the next push to main;
+  schema-docs on our own gh-pages still deploy fine (they run earlier in
+  the same job).
+- **Rotation:** if using a PAT, set a calendar reminder to rotate before
+  its expiry; expired tokens surface as a `401 Unauthorized` at the
+  `Checkout debrief.github.io` step.
+
 ### Dynamic Tool Selection (Calc Service)
 
 **How tool matching works:**

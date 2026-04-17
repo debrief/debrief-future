@@ -97,11 +97,16 @@ Based on user input, determine which workflow to execute:
 /publish sync the latest LinkML schema documentation to the website
 ```
 
-**Purpose:** The schema docs are continuously deployed to `gh-pages` on every
-schema change (see `.github/workflows/schema-docs.yml`). This mode creates a
-periodic snapshot PR on the Jekyll site so the docs surface at a stable
-`debrief.github.io/future/schemas/` URL without running MkDocs inside the
-Jekyll build.
+**Purpose:** Schema docs at `debrief.github.io/future/schemas/` are kept in
+sync **automatically** by `.github/workflows/schema-docs.yml` on every push
+to `main` of debrief-future. Use this manual mode only when:
+
+- A schema change landed on `main` **before** the auto-sync workflow existed
+  (one-time backfill).
+- The auto-sync is wedged (e.g. `WEBSITE_PUSH_TOKEN` expired, target repo
+  rebase required) and needs a manual, PR-gated catch-up.
+- You want to preview the sync via PR instead of the direct push the
+  workflow performs.
 
 **Steps:**
 1. Fetch the latest built HTML from `debrief/debrief-future@gh-pages:schema-docs/`
