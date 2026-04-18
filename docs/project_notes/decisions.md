@@ -541,3 +541,30 @@ This follows directly from ADR-014 (flat field removal) and Constitution Article
 - The Fly app `debrief-demo` itself needs manual teardown via `fly apps destroy debrief-demo` — the workflow-delete does not tear down the running Fly infrastructure.
 
 **Originating issue:** none (driven by red-main CI review after #460 landed)
+
+### ADR-019: Accept Type-Only Cycles in VS Code Extension View↔Service Layer (2026-04-18)
+
+**Context:**
+- The VS Code extension contains two `import type`-only cycles between view providers and the services they delegate to:
+  - **3-node cycle:** `apps/vscode/src/webview/mapPanel.ts` ↔ `apps/vscode/src/views/activityPanelView.ts` ↔ `apps/vscode/src/services/calcService.ts` ↔ back to `mapPanel.ts`. Specifically, `mapPanel.ts:25` does `import type { ActivityPanelViewProvider } from '../views/activityPanelView'`, `activityPanelView.ts:25` does `import type { CalcService } from '../services/calcService'`, and `calcService.ts:33` does `import type { MapPanel } from '../webview/mapPanel'`.
+  - **2-node cycle:** `apps/vscode/src/views/activityPanelView.ts` ↔ `apps/vscode/src/services/resultsPanelService.ts`. Specifically, `activityPanelView.ts:29` does `import type { ResultsPanelService } from '../services/resultsPanelService'` and `resultsPanelService.ts:16` does `import type { ActivityPanelViewProvider } from '../views/activityPanelView'`.
+- All edges in both cycles are **type-only** (`import type` declarations). Per the TypeScript handbook, `import type` declarations are erased at the JS-emit step — they leave no runtime require/import edge in the compiled output, so there is no actual runtime module graph cycle and no risk of partially-initialised module objects.
+- PR #465 surfaced these cycles during a code-quality review pass. The review concluded they were benign but undocumented, and that an undocumented benign cycle is a footgun: a future contributor sees the cycle, assumes it must be "wrong", and spends time on a refactor that adds churn without value. Documenting the trade-off prevents that.
+
+**Decision:**
+- Accept both cycles as-is for now. Do not refactor.
+- Document in this ADR (a) the exact module pairs and import-line numbers, (b) the fact that every edge is `import type` only and erased at runtime, and (c) the eventual remediation path so future readers do not have to re-derive it.
+- The eventual fix, when one of these layers next gets non-trivial work, is **interface extraction**: define the cross-cutting type contract in a separate, dependency-free module (e.g. `apps/vscode/src/views/types.ts` for the view-provider contract, `apps/vscode/src/services/types.ts` for the service contracts). Both the view and the service then depend on the contract module, removing the back-edge. This is a textbook structural fix and is incrementally applicable — one cycle at a time — so it does not need to land in one PR.
+
+**Alternatives considered:**
+- **Refactor now to interface extraction:** rejected — the cycles are runtime-inert, the refactor would touch six files across the most stable part of the extension, and the cleanup item that surfaced them (#199) is explicitly scoped to bundle small, low-risk follow-ups. Lifting interface extraction in this PR would inflate scope and reviewer cost without changing behaviour.
+- **Suppress the cycle warning in tooling:** rejected — the cycles are not currently flagged by tsc, ESLint, or knip; nothing needs suppressing. The risk being managed here is human (a contributor refactoring on autopilot), not tooling. An ADR addresses the human risk; a suppression rule does not.
+- **Add inline comments at each import line:** rejected — five separate inline notes drift independently and lack the "rationale + remediation" structure of an ADR. One ADR is the correct unit.
+
+**Consequences:**
+- ✅ A new contributor encountering either cycle can search `decisions.md` for "cycle" and "type-only" and immediately see (a) which cycles are accepted, (b) why, and (c) what the eventual fix is.
+- ✅ The fix path (interface extraction) is named, so a future PR that touches this code can pick it up incrementally without re-litigating the design.
+- ✅ Zero runtime change. Zero behaviour change. Zero CI-surface change.
+- ❌ If a future PR converts one of these `import type` edges into a runtime `import` (e.g. by needing the imported value rather than just its type), the cycle becomes a real runtime module-graph cycle. This ADR does not protect against that — the protection lives in the absence of such a conversion. A reviewer encountering a value-level import added to one of these files should treat it as an ADR-violation and require interface extraction first.
+
+**Originating issue:** PR #465 code-quality review pass (April 2026) — captured as backlog item #199 and resolved by feature spec `199-code-quality-cleanup`.
