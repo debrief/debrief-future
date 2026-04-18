@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.github.io/schemas/197-nl-audit-trail/audit-record.schema.json",
+  "title": "NL Search Audit Record (v1)",
+  "description": "One line of nl-audit.jsonl. Written by apps/vscode/src/services/auditSink.ts when debrief.nlSearch.audit.enabled is true. Designed for direct ingestion by enterprise SIEM tooling (Splunk, Elastic, Sentinel). See specs/197-nl-audit-trail/contracts/audit-record.ts for the authoritative TypeScript contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "callIndex",
+    "timestampUtc",
+    "provider",
+    "model",
+    "outcome",
+    "phrase",
+    "responseBody",
+    "responseBodyTruncated",
+    "durationMs"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "description": "Schema version tag. Currently '1'. SIEM parsers MAY branch on this field for future shape changes.",
+      "const": "1"
+    },
+    "callIndex": {
+      "description": "Joins to the #191 [nl-search/live] telemetry line for the same call. Unique per extension-host session, monotonically increasing from 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "timestampUtc": {
+      "description": "Instant at which llmProxy.ts saw the submission (not the instant of file write). ISO-8601 with explicit 'Z' suffix.",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "provider": {
+      "description": "Provider identifier. Currently always 'anthropic'; expandable via #196.",
+      "enum": ["anthropic"]
+    },
+    "model": {
+      "description": "Provider-specific model identifier, e.g. 'claude-haiku-4-5-20251001'.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "outcome": {
+      "description": "#191 LiveOutcome classification, stripped of the rawResponse field (which lives at AuditRecord.responseBody).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "durationMs", "responseBytes", "model"],
+          "properties": {
+            "kind": { "const": "success" },
+            "durationMs": { "type": "integer", "minimum": 0 },
+            "responseBytes": { "type": "integer", "minimum": 0 },
+            "model": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "providerStatus", "durationMs"],
+          "properties": {
+            "kind": { "const": "auth-failure" },
+            "providerStatus": { "type": "integer", "minimum": 100, "maximum": 599 },
+            "durationMs": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "providerStatus", "retryAfterSeconds", "durationMs"],
+          "properties": {
+            "kind": { "const": "rate-limit" },
+            "providerStatus": { "type": "integer", "minimum": 100, "maximum": 599 },
+            "retryAfterSeconds": {
+              "oneOf": [
+                { "type": "integer", "minimum": 0 },
+                { "type": "null" }
+              ]
+            },
+            "durationMs": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "providerStatus", "durationMs"],
+          "properties": {
+            "kind": { "const": "provider-error" },
+            "providerStatus": { "type": "integer", "minimum": 100, "maximum": 599 },
+            "durationMs": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "reason", "durationMs"],
+          "properties": {
+            "kind": { "const": "transport-error" },
+            "reason": { "enum": ["network", "cancelled", "unknown"] },
+            "durationMs": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "durationMs"],
+          "properties": {
+            "kind": { "const": "timeout" },
+            "durationMs": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "reason", "durationMs", "responseBytes"],
+          "properties": {
+            "kind": { "const": "malformed-response" },
+            "reason": { "enum": ["non-json", "oversize", "truncated"] },
+            "durationMs": { "type": "integer", "minimum": 0 },
+            "responseBytes": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "reason", "durationMs"],
+          "properties": {
+            "kind": { "const": "not-configured" },
+            "reason": { "enum": ["disabled", "no-key"] },
+            "durationMs": { "const": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ceiling", "durationMs"],
+          "properties": {
+            "kind": { "const": "ceiling-reached" },
+            "ceiling": { "type": "integer", "minimum": 1 },
+            "durationMs": { "const": 0 }
+          }
+        }
+      ]
+    },
+    "phrase": {
+      "description": "The full prompt submitted by FilterBar. Trimmed; max length matches FilterBar's 500-char cap.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "responseBody": {
+      "description": "Response body as received from the provider, bounded at #191's maxResponseBytes. null when no body ever arrived (not-configured, ceiling-reached, pre-response transport errors).",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "responseBodyTruncated": {
+      "description": "true iff responseBody was truncated at maxResponseBytes.",
+      "type": "boolean"
+    },
+    "durationMs": {
+      "description": "Wall-clock duration from submission to outcome classification.",
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}
