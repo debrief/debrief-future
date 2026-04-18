@@ -93,7 +93,7 @@ This feature creates no new runtime data structures, no schema files, and no per
 
 ## Entity 3 — Tracked TODO reference
 
-**Format**: Every remaining in-source TODO covered by this feature takes the shape `TODO(#NNN): <short summary>` where `NNN` is a GitHub issue number in `debrief/debrief-future`. The short summary is the first clause of the original TODO, preserved verbatim so readers do not need to open the issue to understand intent.
+**Format**: Every remaining in-source TODO covered by this feature takes the shape `TODO(#NNN): <short summary>` where `NNN` is a **real** GitHub issue number in `debrief/debrief-future`. The literal three-character string `NNN` is an **anti-pattern** — a pre-push guard (see contracts/README.md Contract 5b) MUST reject any diff containing `TODO(#NNN)` verbatim. The short summary is the first clause of the original TODO, preserved verbatim so readers do not need to open the issue to understand intent.
 
 **Instances**:
 
@@ -113,7 +113,60 @@ Promoted from in-source TODO at <file:line>.
 Source spec: specs/199-code-quality-cleanup
 ```
 
-**Validation**: grep for `TODO:` (no parenthesised issue number) in `apps/loader/src/main/ipc/config.ts` and `apps/loader/src/renderer/components/StoreSelector/index.tsx` returns zero matches after the PR lands. Each new `TODO(#NNN):` reference corresponds to an open issue in `debrief/debrief-future`.
+**Validation**: grep for `TODO:` (no parenthesised issue number) in `apps/loader/src/main/ipc/config.ts` and `apps/loader/src/renderer/components/StoreSelector/index.tsx` returns zero matches after the PR lands. Each `TODO(#...)` reference corresponds to an open issue in `debrief/debrief-future`. A second grep for the literal anti-pattern `TODO(#NNN)` MUST return zero matches across `apps/` (pre-push self-check per FR-020).
+
+---
+
+## Entity 4 — Pinned `knip` devDependency
+
+**Location**: root `package.json` `devDependencies` object, alongside the new `knip.json`.
+
+**Required form**: `"knip": "<pinned-semver>"` (e.g. `"knip": "5.31.0"`) — exact pinning, no `^` or `~`. Version chosen is whatever current major release matches the minimum fields used by `knip.json`.
+
+**Rationale**: Article I.4 (reproducibility) requires identical results across fresh clones for the same inputs and tool versions. Without a pinned devDep, `pnpm dlx knip` resolves to `@latest` at every invocation, which can change between contributors, CI, and review cycles. Pinning closes the silent-drift gap flagged by `/speckit.review` Issue 1.
+
+**Validation**: `grep -c '"knip":' package.json` == 1 after the PR lands. `pnpm install` succeeds. Optional wrapper script `pnpm knip` (or `pnpm exec knip`) runs the pinned version.
+
+---
+
+## Entity 5 — `useLoadWorkflow` plotName regression test
+
+**Location**: `apps/loader/tests/unit/useLoadWorkflow.test.ts` (new file, matching the loader package's `vitest.config.ts` include pattern `tests/unit/**/*.test.{ts,tsx}`).
+
+**Test shape** (schematic):
+
+```ts
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useLoadWorkflow } from '../../src/renderer/hooks/useLoadWorkflow';
+
+describe('useLoadWorkflow — existing-plot branch', () => {
+  it('returns plotName equal to display name (not id) when an existing plot is selected', async () => {
+    const plots = [
+      { id: 'plot-abc-123', name: 'Alpha Exercise Run' },
+      { id: 'plot-def-456', name: 'Bravo Exercise Run' },
+    ];
+    // ... arrange IPC mocks for parseFile, addFeatures, copyAsset
+    const { result } = renderHook(() => useLoadWorkflow(/* t mock */));
+    const output = await act(() => result.current.executeLoad({
+      mode: 'existing',
+      existingPlotId: 'plot-abc-123',
+      store: /* mock */,
+      sourceFile: /* mock */,
+      plots, // NEW parameter threaded through by FR-011
+      onProgress: vi.fn(),
+    }));
+    expect(output.plotName).toBe('Alpha Exercise Run');
+    expect(output.plotName).not.toBe('plot-abc-123');
+  });
+});
+```
+
+**Validation invariants**:
+
+- Test runs under `pnpm --filter @debrief/loader test`.
+- Test fails if `plotName === existingPlotId` (the pre-fix placeholder behaviour) is ever reintroduced.
+- Test is deterministic — all IPC calls are mocked; no real filesystem or network access.
 
 ---
 

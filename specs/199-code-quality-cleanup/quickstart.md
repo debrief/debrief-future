@@ -71,19 +71,29 @@ pnpm install
 task verify
 ```
 
-### 2d. knip ignore rule (Contract 4, SC-001)
+### 2d. knip ignore rule + pinned devDep (Contract 4, SC-001, SC-009)
 
 ```sh
 # Config file exists at repo root
 test -f knip.json && echo OK || echo MISSING-KNIP-CONFIG
 
-# Running knip reports zero specs/** entries
-pnpm dlx knip | grep -c "^specs/"
+# knip is pinned exactly in root devDependencies (no ^ or ~)
+grep -E '"knip": *"[0-9]+\.[0-9]+\.[0-9]+"' package.json
+# Expected: exactly one match (e.g. "knip": "5.31.0")
+
+# Fresh install picks up the pinned version
+pnpm install
+test -d node_modules/knip && echo OK || echo KNIP-NOT-INSTALLED
+
+# Running the pinned knip reports zero specs/** entries
+pnpm exec knip | grep -c "^specs/"
 # Expected: 0
 
-# Non-specs findings unchanged (capture baseline before the change, diff after)
-# Baseline from main:   pnpm dlx knip > /tmp/knip-main.txt    (run on main branch before work)
-# After:                pnpm dlx knip > /tmp/knip-branch.txt  (run on 199-code-quality-cleanup)
+# Non-specs findings unchanged (capture baseline before the change, diff after).
+# IMPORTANT: capture the baseline from the SAME pinned version so the comparison
+# isolates config change from version drift. Do not use `pnpm dlx knip@latest`.
+# Baseline from main:   pnpm exec knip > /tmp/knip-main.txt    (run on main branch with the pinned knip installed)
+# After:                pnpm exec knip > /tmp/knip-branch.txt  (run on 199-code-quality-cleanup)
 diff <(grep -v "^specs/" /tmp/knip-main.txt) <(grep -v "^specs/" /tmp/knip-branch.txt)
 # Expected: no diff (no non-specs findings were masked)
 ```
@@ -106,11 +116,20 @@ grep -n "TODO(#" apps/loader/src/renderer/components/StoreSelector/index.tsx
 grep -n "TODO(#137)" apps/vscode/src/services/stacService.ts
 # Expected: at least one match
 
-# Loader unit + E2E tests pass (exercises the plotName fix)
+# Pre-push guard for the literal anti-pattern (FR-020, SC-010)
+grep -rn "TODO(#NNN)" apps/ services/ shared/
+# Expected: zero matches. A non-zero result means a placeholder escaped review — DO NOT push.
+
+# Loader unit tests pass — exercises the plotName fix AND the new regression test (FR-021)
 pnpm --filter @debrief/loader test
+# Expected: tests/unit/useLoadWorkflow.test.ts is present and green.
+
+# Sanity: temporarily revert useLoadWorkflow.ts:~73 to `plotName = existingPlotId;`
+# and re-run the loader tests. The new test MUST go red. Revert the revert.
+# This confirms the test is a real gate, not a false gate (Contract 6 failure mode).
 ```
 
-**Manual UI check for the `plotName` fix**: open the loader Electron app, select an existing plot whose display name differs from its ID, load a REP file into it, and confirm the progress strings and final toast reference the plot's display name (not the UUID-like ID).
+**Manual UI check for the `plotName` fix**: open the loader Electron app, select an existing plot whose display name differs from its ID, load a REP file into it, and confirm the progress strings and final toast reference the plot's display name (not the UUID-like ID). The vitest above is the CI gate; this UI check is a belt-and-braces verification that the wiring reaches the screen.
 
 ---
 
@@ -131,12 +150,15 @@ After the PR opens, list the freshly-filed issues referenced by the `TODO(#NNN)`
 ## 4. Before-pushing checklist
 
 - [ ] `task verify` passes locally on the feature branch.
-- [ ] `pnpm dlx knip` shows zero `specs/**` entries and no new non-`specs/**` entries hidden.
+- [ ] `knip` is pinned exactly in root `package.json` `devDependencies` (no `^`/`~`); `pnpm install` succeeds.
+- [ ] `pnpm exec knip` (pinned, not `pnpm dlx knip@latest`) shows zero `specs/**` entries and no new non-`specs/**` entries hidden versus the same pinned version on `main`.
 - [ ] `grep -rn "LogTimelineProps\|LogByFeatureProps" shared/ apps/ services/` returns zero matches.
 - [ ] `shared/components/diff/` is deleted and no reference to it survives outside this spec dir.
 - [ ] `decisions.md` gains exactly one new ADR entry, discoverable by "cycle" and "type-only".
-- [ ] Loading an existing plot by a display name distinct from its ID shows the display name in the loader.
-- [ ] All `TODO(#NNN)` references in the diff resolve to open issues.
+- [ ] `pnpm --filter @debrief/loader test` is green and includes the new `useLoadWorkflow` regression test (FR-021).
+- [ ] Loading an existing plot by a display name distinct from its ID shows the display name in the loader (manual belt-and-braces check).
+- [ ] `grep -rn "TODO(#NNN)" apps/ services/ shared/` returns zero matches (FR-020 pre-push guard).
+- [ ] All `TODO(#...)` references in the diff resolve to **open** issues in `debrief/debrief-future`.
 - [ ] PR description lists the two new issue numbers and notes the `TODO(#137)` audit result.
 
 If every box is checked, this PR is ready for review.

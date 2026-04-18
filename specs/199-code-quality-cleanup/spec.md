@@ -153,9 +153,15 @@ A contributor exploring `shared/components/` encounters a `diff/` sub-package wi
 - **FR-014**: Each in-source TODO MUST be replaced with a reference to its tracking issue (e.g. `TODO(#NNN): <short summary>`), keeping the short summary so the reader does not need to open the issue to understand intent.
 - **FR-015**: If the `StoreSelector` reference in the source idea cannot be located because the module has moved or been removed, the PR description MUST record the disposition (issue filed against the new location, or explicitly descoped) rather than silently skipping it.
 
+**Reproducibility & guard rails** *(added 2026-04-18 post-review)*
+
+- **FR-019**: The feature MUST pin `knip` as a root `devDependency` in `package.json` alongside the new `knip.json`, so that `pnpm dlx knip` (or a future direct invocation) produces reproducible results over time (Article I.4).
+- **FR-020**: Each promoted TODO MUST be replaced with a **real** issue number, never a literal placeholder. A pre-push self-check `grep -rn "TODO(#NNN)" apps/` MUST return zero matches before any commit in this PR is pushed. The implementation tasks list MUST encode "file issue → capture number → replace placeholder" as one atomic task per TODO, making it impossible to ship a literal `NNN` string.
+- **FR-021**: The feature MUST add a vitest unit test under `apps/loader/tests/unit/` covering the `useLoadWorkflow.executeLoad` existing-plot branch. The test MUST mock a plot list where at least one plot's `name` differs from its `id`, invoke `executeLoad` with that plot's id, and assert that the returned `plotName` equals the display name (not the id). This test MUST run as part of `pnpm --filter @debrief/loader test` so a future regression is caught by CI (Article I.3 — no silent failures, Article VI — services require unit tests).
+
 **Bundling and independence**
 
-- **FR-016**: All six items (FR-001 through FR-015's work) MUST be delivered in a single PR against the feature branch.
+- **FR-016**: All items (FR-001 through FR-015's work plus the post-review FR-019/020/021 guard rails) MUST be delivered in a single PR against the feature branch.
 - **FR-017**: The feature MUST NOT introduce any dependency on other PR #465 follow-up items (#200, #201, #202, #206, or the LinkML-layer items #203/#204/#205, E11, E12).
 - **FR-018**: The feature MUST NOT modify any generated schema output, public TypeScript API surface outside the LogPanel prop rename, or any Python module.
 
@@ -177,6 +183,9 @@ A contributor exploring `shared/components/` encounters a `diff/` sub-package wi
 - **SC-006**: After the PR merges, a user loading a REP file into an existing plot sees the plot's display name (not its ID) in the loader's workflow UI strings and telemetry.
 - **SC-007**: The full CI verify sequence (`task verify` — lint, typecheck, unit tests, Playwright E2E) passes on the feature branch with no new failures, warnings, or regressions introduced by this change.
 - **SC-008**: Reviewer time for the resulting PR is bounded: the diff is confined to TypeScript, doc, and configuration edits (no Python, no generated schema files, no cross-package API changes beyond the LogPanel type rename).
+- **SC-009**: After the PR merges, `knip` appears as a pinned entry in root `package.json`'s `devDependencies`, and running `pnpm knip` (or equivalent) produces the same report across fresh clones.
+- **SC-010**: After the PR merges, a repo-wide grep for `TODO(#NNN)` (literal string) returns zero matches; every `TODO(#...)` in the diff resolves to an existing, open issue in `debrief/debrief-future`.
+- **SC-011**: After the PR merges, `pnpm --filter @debrief/loader test` includes a test that fails if the `useLoadWorkflow` existing-plot branch ever regresses to returning the plot id in place of the display name.
 
 ## Assumptions
 

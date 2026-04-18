@@ -5,7 +5,9 @@
 
 ## Summary
 
-Ship five low-risk code-quality follow-ups from the PR #465 review as a single bundled PR: (a) document residual VS Code view↔service type-only cycles in `decisions.md`, (b) collapse `LogTimelineProps` + `LogByFeatureProps` onto the existing `LogPanelProps`, (c) delete the orphaned `shared/components/diff/` sub-package, (d) add a minimal `knip.json` at the repo root that ignores `specs/**`, (e) resolve the `plotName` placeholder in `apps/loader/src/renderer/hooks/useLoadWorkflow.ts` by looking up the display name from the already-fetched plot list, plus promote the three surviving non-speckit TODOs to GitHub issues. No runtime behaviour changes, no schema edits, no Python edits, no cross-package API changes beyond the LogPanel prop-type rename.
+Ship five low-risk code-quality follow-ups from the PR #465 review as a single bundled PR: (a) document residual VS Code view↔service type-only cycles in `decisions.md`, (b) collapse `LogTimelineProps` + `LogByFeatureProps` onto the existing `LogPanelProps`, (c) delete the orphaned `shared/components/diff/` sub-package, (d) add a minimal `knip.json` at the repo root that ignores `specs/**` **plus pin `knip` as a root devDependency so the report is reproducible**, (e) resolve the `plotName` placeholder in `apps/loader/src/renderer/hooks/useLoadWorkflow.ts` by looking up the display name from the already-fetched plot list **and add a vitest that fails if this regresses**, plus promote the three surviving non-speckit TODOs to GitHub issues **with a pre-push guard that forbids shipping literal `TODO(#NNN)` placeholder strings**. No runtime behaviour changes, no schema edits, no Python edits, no cross-package API changes beyond the LogPanel prop-type rename.
+
+**Post-review amendments (2026-04-18)**: `/speckit.review` surfaced three silent-failure risks (knip version drift, TODO-placeholder shipping, plotName regression). All three are pulled in-scope as FR-019 / FR-020 / FR-021; no deferred BACKLOG items.
 
 ## Technical Context
 
@@ -17,7 +19,7 @@ Ship five low-risk code-quality follow-ups from the PR #465 review as a single b
 **Project Type**: Monorepo cleanup — modifies files across `shared/components/`, `apps/loader/`, `apps/vscode/`, `docs/`, and repo root
 **Performance Goals**: N/A — cleanup has no runtime component
 **Constraints**: `task verify` must pass with no new failures; no changes to generated schema output; the LogPanel prop-type rename is the only public API-surface change and must be mirrored in every in-repo consumer
-**Scale/Scope**: ~15–25 files modified (4 LogPanel files, 1 useLoadWorkflow hook, 1 decisions.md entry, 1 new `knip.json`, 1 deleted sub-package tree, 3 TODO replacements). Three new GitHub issues filed. Expected diff stat: well under 500 lines net (mostly deletions and one-line replacements).
+**Scale/Scope**: ~17–28 files modified after post-review amendments: 4 LogPanel files, 1 useLoadWorkflow hook, **1 new `apps/loader/tests/unit/useLoadWorkflow.test.ts` vitest file**, 1 decisions.md entry, 1 new `knip.json`, **root `package.json` (add pinned knip devDep)**, 1 deleted sub-package tree, 3 TODO replacements. Two new GitHub issues filed (third already tracked as `#137`). Expected diff stat: still well under 500 lines net.
 
 ## Constitution Check
 
@@ -31,8 +33,10 @@ Ship five low-risk code-quality follow-ups from the PR #465 review as a single b
 | VIII. Documentation | Architecture decisions recorded | **PASS** | New `decisions.md` entry directly strengthens the principle by recording the accepted-cycle trade-off. |
 | XIII. Contribution Standards | Atomic commits, CI green | **PASS** | Bundle is five small, independently-verifiable sub-changes delivered in one PR — size justified by Complexity Tracking below. |
 | XV. Strict Type Safety | Explicit types everywhere | **PASS** | No introduction of `any`/`Any`. LogPanel consumers switch from two near-identical interfaces to one fully-typed `LogPanelProps`. |
+| I. Defence-Grade Reliability | Reproducibility (I.4), No silent failures (I.3) | **PASS** (post-review) | FR-019 (pin knip) closes the reproducibility gap; FR-020 (pre-push grep) + FR-021 (vitest for plotName) close the two silent-failure gaps surfaced by `/speckit.review`. |
+| IX. Dependencies | Pinned versions | **PASS** (post-review) | FR-019 adds `knip` as a pinned root devDependency; no un-pinned `pnpm dlx knip@latest` invocation survives in the shipped config. |
 
-**Post-Phase 1 Re-check**: All gates remain PASS. No constitutional deviations; see Complexity Tracking for the single non-issue (bundled-PR size) that is explicitly sanctioned by the source idea and BACKLOG.md #199.
+**Post-Phase 1 Re-check**: All gates remain PASS. No constitutional deviations; see Complexity Tracking for the single non-issue (bundled-PR size) that is explicitly sanctioned by the source idea and BACKLOG.md #199. The `/speckit.review` pass (2026-04-18) added three in-scope guard rails (FR-019/020/021) that strengthen Articles I.3, I.4, VI, and IX.
 
 ## Project Structure
 
@@ -76,11 +80,15 @@ knip.json                                           # NEW — minimal config wit
 
 # Loader plot-name fix
 apps/loader/src/renderer/hooks/useLoadWorkflow.ts   # Resolve plotName from plot list instead of using existingPlotId placeholder
+apps/loader/tests/unit/useLoadWorkflow.test.ts      # NEW — vitest asserting plotName === display name for existing-plot branch (FR-021)
 
 # In-source TODO → GitHub issue references
 apps/loader/src/main/ipc/config.ts                                  # Line 158 — replace TODO with TODO(#NNN)
 apps/loader/src/renderer/components/StoreSelector/index.tsx         # Line 4 — replace TODO with TODO(#NNN)
 apps/vscode/src/services/stacService.ts                             # Line ~1119 — already tagged TODO(#137) (no work needed — just audit)
+
+# Reproducibility guard (post-review)
+package.json                                                        # Add `knip` pinned entry to devDependencies (FR-019)
 ```
 
 **Structure Decision**: No new project structure. All five sub-changes target existing locations. The only new file at repo root is `knip.json`; the only deleted tree is `shared/components/diff/`. All other changes are edits to existing files.

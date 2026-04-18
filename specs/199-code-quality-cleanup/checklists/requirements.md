@@ -35,3 +35,4 @@
 - Some file paths (e.g. `shared/components/src/LogPanel/types.ts`, `apps/loader/src/renderer/hooks/useLoadWorkflow.ts`) are referenced because they are the boundary of *what* changes, not *how*. This matches existing specs in the repo for tech-debt features.
 - FR-015 + the second acceptance scenario of User Story 5 intentionally anticipate that the `StoreSelector` TODO referenced in the source idea may not be locatable at its original path, and require that the disposition be recorded rather than silently skipped.
 - Spec contains no UI feature — the "User Interface Flow" section is intentionally omitted.
+- **`/speckit.review` amendments (2026-04-18)**: three silent-failure risks surfaced (knip version drift, literal `TODO(#NNN)` shipping, `plotName` regression) were pulled in-scope as FR-019 / FR-020 / FR-021 with matching SC-009 / SC-010 / SC-011. No deferred BACKLOG items. All review recommendations (1A, 2A, 3A) adopted.
