@@ -40,8 +40,8 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 **Goal**: apply the two small spec edits flagged by `/speckit.plan` so that `spec.md`, `plan.md`, and `tasks.md` are internally consistent before implementation begins.
 
-- [ ] T001 Update spec Assumption 3 to reflect CI-gate scope: replace "This feature does not require adding it to the CI gate — only cleaning its output." with "This feature adds the unused-code scanner as a new CI gate running alongside lint / typecheck / test; the gate fails the build if any non-declared unused file is reported under the scanned tree." `specs/201-knip-loader-config/spec.md`
-- [ ] T002 Update spec Dependencies section: replace "None. Per the backlog item, this work is fully parallel with sibling tech-debt items." with "Introduces one new pinned dev dependency (`knip`, in the root `devDependencies`). Coordinate with backlog #199 per research.md R-007 (the `knip.json` file is co-owned with #199). Otherwise fully parallel with sibling tech-debt items." `specs/201-knip-loader-config/spec.md`
+- [x] T001 Update spec Assumption 3 to reflect CI-gate scope: replace "This feature does not require adding it to the CI gate — only cleaning its output." with "This feature adds the unused-code scanner as a new CI gate running alongside lint / typecheck / test; the gate fails the build if any non-declared unused file is reported under the scanned tree." `specs/201-knip-loader-config/spec.md`
+- [x] T002 Update spec Dependencies section: replace "None. Per the backlog item, this work is fully parallel with sibling tech-debt items." with "Introduces one new pinned dev dependency (`knip`, in the root `devDependencies`). Coordinate with backlog #199 per research.md R-007 (the `knip.json` file is co-owned with #199). Otherwise fully parallel with sibling tech-debt items." `specs/201-knip-loader-config/spec.md`
 
 ---
 
