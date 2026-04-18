@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://debrief.github.io/debrief-future/specs/201-knip-loader-config/knip-config.schema.json",
+  "title": "Feature #201 contract — shape of the knip.json produced by this feature",
+  "description": "This schema is NOT a full knip-configuration schema. It constrains only the subset this feature is authorised to produce, enforcing FR-004/FR-005/FR-008 (minimum scope, no broader silencing). Any future feature that legitimately expands the config (e.g., adding another workspace) will relax this schema by opening a new feature with its own Constitution Check.",
+  "type": "object",
+  "required": ["$schema", "workspaces"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Pointer to knip's published JSON Schema. MUST pin major version 5.",
+      "pattern": "^https://unpkg\\.com/knip@5"
+    },
+    "workspaces": {
+      "type": "object",
+      "description": "Map keyed by workspace path. This feature is only permitted to add the 'apps/loader' key.",
+      "required": ["apps/loader"],
+      "additionalProperties": false,
+      "properties": {
+        "apps/loader": {
+          "type": "object",
+          "required": ["entry"],
+          "additionalProperties": false,
+          "properties": {
+            "entry": {
+              "type": "array",
+              "description": "Source paths (relative to apps/loader) that knip treats as reachable roots.",
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "src/main/index.ts",
+                  "src/preload/index.ts",
+                  "src/main.tsx"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": ["ignore"],
+        "description": "Rejected: 'ignore' patterns would violate FR-004/FR-008 — silencing broader than reachability is prohibited."
+      },
+      {
+        "required": ["ignoreDependencies"],
+        "description": "Rejected: unrelated to the loader false-positive problem; violates FR-005."
+      }
+    ]
+  }
+}
