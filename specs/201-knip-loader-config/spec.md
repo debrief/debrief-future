@@ -83,10 +83,10 @@ Before silencing any findings, the maintainer needs documented confidence that t
 
 - The twelve files currently flagged by the unused-code scanner under the loader's main-process tree are, at the moment this feature starts, reachable from a single declared Electron main entry. If verification contradicts this (per FR-002 and the edge cases), the feature pauses rather than proceeding with a whitelist.
 - The repository's unused-code scanner is configurable at the repository root (via a dedicated config file or a config stanza in the root package manifest). No changes to the scanner itself, or to CI wiring that runs it, are in scope.
-- No unused-code-scanner run currently blocks CI; the scanner is run ad-hoc by maintainers. This feature does not require adding it to the CI gate — only cleaning its output.
+- This feature adds the unused-code scanner as a new CI gate running alongside lint / typecheck / test; the gate fails the build if any non-declared unused file is reported under the scanned tree.
 - The loader remains in active scope for the project. If it is reclassified as dormant during verification, this feature pauses and the broader "archive the loader?" question is raised separately (per FR-009 and the first edge case).
 - "Minimum needed" (FR-008) is interpreted as: the narrowest declaration the scanner's configuration language supports that covers the loader's single declared entry and nothing broader.
 
 ## Dependencies
 
-- None. Per the backlog item, this work is fully parallel with sibling tech-debt items.
+- Introduces one new pinned dev dependency (`knip`, in the root `devDependencies`). Coordinate with backlog #199 per research.md R-007 (the `knip.json` file is co-owned with #199). Otherwise fully parallel with sibling tech-debt items.

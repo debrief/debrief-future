@@ -1,0 +1,2 @@
+$ npx -y ajv-cli@5 validate -s specs/201-knip-loader-config/contracts/knip-config.schema.json -d knip.json
+knip.json valid
