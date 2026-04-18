@@ -1,36 +1,50 @@
 ---
 layout: future-post
-title: "Planning: Knip config for the Electron loader"
+title: "Planning: Knip config for the Electron loader — plus a CI gate"
 date: 2026-04-18
 track: [momentum]
 author: Ian
-reading_time: 3
-tags: [tracer-bullet, tooling, loader, dev-experience]
-excerpt: "Twelve false positives are drowning one real finding. Fixing the scanner before fixing the code."
+reading_time: 4
+tags: [tracer-bullet, tooling, loader, dev-experience, ci]
+excerpt: "Two shortcuts would have made knip quiet. Neither would have made it honest. Here's what we chose instead."
 ---
 
 ## What We're Building
 
-Running `pnpm dlx knip` — our unused-code scanner — across the monorepo today reports twelve false positives under `apps/loader/src/main/**`. Knip can't infer where an Electron app starts, so from its point of view every main-process module looks like dead code. The signal-to-noise ratio for the loader is effectively zero.
+Running the unused-code scanner (`knip`) across the monorepo today reports twelve findings under `apps/loader/src/main/**`. Eleven are false positives — knip can't infer where an Electron app starts, so every main-process module looks unreachable. The twelfth, `apps/loader/src/main/updater.ts`, is a genuine orphan: a commented-out `electron-updater` import, zero call sites, no tests referencing it.
 
-The fix is small: a fifteen-line `knip.json` at the repo root that declares three entry points for `apps/loader` — the main process (`src/main/index.ts`), the preload script (`src/preload/index.ts`), and the renderer (`src/main.tsx`). Those three cover every way an Electron app can legitimately enter its own code.
+This feature does three things, not one:
+
+1. Adds a fifteen-line `knip.json` at the repo root declaring three entry points for `apps/loader` — main (`src/main/index.ts`), preload (`src/preload/index.ts`), renderer (`src/main.tsx`). The eleven false positives vanish.
+2. Deletes `updater.ts`. Wiring up auto-update is a real feature (needs the dependency, code signing, an update server) and belongs in its own spec. Until then, the module is weight.
+3. Adds a `task knip` target and a "Run knip" step to `.github/workflows/ci.yml` directly after the lint step. Knip becomes a gate, not a diagnostic.
+
+Twelve findings become zero, and stay zero.
 
 ## How It Fits
 
-This is a hygiene task, not a capability task. Nothing ships to users. No runtime behaviour changes. The value is that the next time someone runs the scanner — looking for genuinely stale code before a cleanup pass — they see findings they can act on, instead of scrolling past a wall of known-good modules.
+This is hygiene and infrastructure, not a capability. Nothing changes for users of Debrief. The audience is contributors — present and future — who run the scanner and want to trust its output.
 
-The config lives at the repo root next to `pnpm-workspace.yaml` so contributors find it where they'd expect monorepo tooling to live. Knip stays invoked via `pnpm dlx`; we're not pinning it as a dev dependency. Every dependency is a liability and an ad-hoc diagnostic tool doesn't earn a slot in the lockfile.
+The config sits at the repo root next to `pnpm-workspace.yaml`. Knip moves from ad-hoc (`pnpm dlx knip`) to a pinned dev dependency invoked via `pnpm exec knip`. That flip matters: once CI depends on knip's output, the version has to be reproducible. Article I.4 (reproducible builds) and Article IX.2 (pinned versions) together rule out `dlx` for anything on the critical path.
 
 ## Key Decisions
 
-- **One top-level config, not per-workspace.** Discoverability beats locality for a tool that runs across the whole monorepo.
-- **All three Electron entry categories in one pass.** Main, preload, renderer. Future contributors shouldn't hit a fresh cloud of false positives the moment they touch the loader.
-- **Don't silence the real finding.** While auditing, we found `apps/loader/src/main/updater.ts` is a genuine orphan — nothing imports it. It stays flagged. Deleting it or wiring up auto-update is a separate (tiny) decision for another PR. Adding `updater.ts` to an ignore list would have made the scanner output clean and the codebase quietly dishonest. That's the trade the feature refuses to make.
-- **Schema-enforced scope.** The `knip.json` contract under `specs/201-knip-loader-config/contracts/` rejects `ignore` patterns and extra workspace keys. If someone tries to quiet a future finding by expanding this file, validation fails before review does.
-- **Evidence captured.** A before/after knip transcript goes in `evidence/` so the next maintainer can audit the whitelist's premise in under five minutes — not trust it on faith.
+Two shortcuts were on the table. We refused both.
+
+- **Shortcut one: "just `dlx` it, don't pin it."** One line lighter in `package.json`. Refused — the moment CI consumes a tool's output, its version has to be locked. A silent knip upgrade shouldn't be able to turn a green build red, or a red build green.
+- **Shortcut two: "just add `ignore: [updater.ts]`, don't delete it."** Zero source changes. Refused — an ignore list would have made the scanner output clean and the codebase quietly dishonest. The scanner is supposed to tell us the truth. Silencing a true finding to get a green report is worse than no scanner at all.
+
+Both shortcuts would have left a *working* scanner. Neither would have left an *honest* one. "Engineered enough" for a scanner means it tells the truth under load.
+
+Other decisions worth naming:
+
+- **One top-level config, not per-workspace.** Discoverability beats locality for monorepo-wide tooling.
+- **All three Electron entry categories in one pass.** Future contributors shouldn't hit a fresh cloud of false positives the moment they touch the loader.
+- **Schema-enforced scope.** A JSON Schema under `specs/201-knip-loader-config/contracts/` rejects `ignore` keys and extra workspace stanzas on `knip.json`. If someone tries to quiet a future finding by expanding this file, validation fails before review does. Backlog item #199 wants to add `ignore: ["specs/**"]` to the same file — we've left a coordination note so whoever picks it up knows the schema needs updating alongside the config.
+- **Evidence captured.** A before/after knip transcript plus the first CI run log go in `evidence/`, so the next maintainer can audit the premise in under five minutes.
 
 ## What We'd Love Feedback On
 
-- Is there a fourth Electron entry we're missing? Test files and build scripts resolve through other tooling, but if your Electron app has a category these three don't cover, say so.
-- Should `updater.ts` be deleted or wired up? It's been sitting unreferenced; the call here affects whether the follow-up PR is a delete or a feature.
-- Anyone running knip in a similar monorepo shape who's hit a pitfall this config will walk into?
+- Is there a fourth Electron entry category we're missing? Test files and build scripts resolve through other tooling, but if your Electron app has a path these three don't cover, say so.
+- Anyone running knip as a CI gate in a similar monorepo shape? Pitfalls we should walk into with eyes open — flaky runs, memory footprint, cache invalidation — would be useful to hear before we commit.
+- The contract rejects `ignore`. Is that too strict? The argument for strictness is that every ignore entry is a finding we've chosen not to fix; the argument against is that genuine false positives will eventually show up elsewhere. Where's the line?
