@@ -4,6 +4,14 @@
  */
 
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine/types';
+import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+
+/**
+ * Messages sent from the StacBrowser surface to the host (VS Code extension).
+ * Today only the Properties Panel surface sends messages; further variants
+ * will be added as the StacBrowser grows.
+ */
+export type StacBrowserMessage = PropertiesCommitMessage;
 
 /**
  * Props for the StacBrowser component.
@@ -17,6 +25,22 @@ export interface StacBrowserProps {
 
   /** Callback when user double-clicks an exercise to open it. */
   readonly onItemSelect?: (itemPath: string) => void;
+
+  /**
+   * Callback fired when the preview highlight changes (T098 / backlog #191).
+   * Used by hosts to drive a Properties side panel fed off the currently
+   * highlighted item rather than the open plot. Null when no item is
+   * highlighted.
+   */
+  readonly onItemHighlight?: (itemPath: string | null) => void;
+
+  /**
+   * Optional React node rendered under the thumbnail inside the right pane
+   * of the exercises list. When set, stacks the thumbnail (top) and this
+   * node (bottom) with a simple vertical split. Typically used to render
+   * a `<PropertiesSidePanel>` that edits the currently-highlighted item.
+   */
+  readonly propertiesSlot?: import('react').ReactNode;
 
   /** Additional CSS class name for the root container. */
   readonly className?: string;

@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "model": "claude-haiku-4-5-20251001",
+  "timeoutMs": 4000,
+  "maxCalls": 50,
+  "maxResponseBytes": 262144
+}

@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Otherownship",
     "datetime": "2011-03-21T22:08:02.380000+00:00",
-    "description": "Saxon Warrior: Otherownship \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Truxtun.",
+    "description": "Saxon Warrior: Otherownship — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Truxtun.",
     "start_datetime": "2011-03-21T22:08:02.380000+00:00",
     "end_datetime": "2011-03-23T20:29:03.160000+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:32.370186Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

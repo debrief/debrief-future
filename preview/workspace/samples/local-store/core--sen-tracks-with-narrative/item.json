@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks With Narrative",
     "datetime": "1970-01-03T01:34:00+00:00",
-    "description": "Saxon Warrior: Sen Tracks With Narrative \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Roosevelt, USS Visby. 6 narrative entries. Multi-national participation: GB, US.",
+    "description": "Saxon Warrior: Sen Tracks With Narrative — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Roosevelt, USS Visby. 6 narrative entries. Multi-national participation: GB, US.",
     "start_datetime": "1970-01-03T01:34:00+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:platforms": [
@@ -124,6 +124,22 @@
         "load_timestamp": "2026-04-13T23:12:33.689270Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

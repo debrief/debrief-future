@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Saxon Warrior: Sen Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FGS Laboon, HMS Westminster. Multi-national participation: DE, GB.",
+    "description": "Saxon Warrior: Sen Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FGS Laboon, HMS Westminster. Multi-national participation: DE, GB.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:platforms": [
@@ -121,6 +121,22 @@
         "load_timestamp": "2026-04-13T23:12:33.674391Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

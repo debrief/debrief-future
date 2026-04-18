@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterExpressionToCql2Json } from "../cql2-json";
+import { cql2JsonToArrayFilters, filterExpressionToCql2Json } from "../cql2-json";
 import type { FilterExpression } from "../types";
 
 describe("CQL2 JSON serialisation", () => {
@@ -165,6 +165,58 @@ describe("CQL2 JSON serialisation", () => {
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "=",
       args: [{ property: "collection" }, "exercises-2025"],
+    });
+  });
+});
+
+describe("CQL2 JSON parsing (array_filter) — Haiku 4.5 quirks (#190)", () => {
+  it("accepts a_containedBy with a singleton literal inside array_filter body", () => {
+    const cql2 = {
+      op: "array_filter",
+      args: [
+        { property: "debrief:platforms" },
+        {
+          op: "and",
+          args: [
+            { op: "=", args: [{ property: "nationality" }, "GB"] },
+            {
+              op: "a_containedBy",
+              args: [["submarine"], { property: "vessel_class" }],
+            },
+          ],
+        },
+      ],
+    };
+    const filters = cql2JsonToArrayFilters(cql2);
+    expect(filters).toHaveLength(1);
+    expect(filters[0].predicate).toEqual({
+      kind: "and",
+      children: [
+        { kind: "comparison", field: "nationality", value: "GB" },
+        { kind: "comparison", field: "vessel_class", value: "submarine" },
+      ],
+    });
+  });
+
+  it("expands multi-literal a_containedBy inside array_filter into an OR", () => {
+    const cql2 = {
+      op: "array_filter",
+      args: [
+        { property: "debrief:platforms" },
+        {
+          op: "a_containedBy",
+          args: [["submarine", "destroyer"], { property: "vessel_class" }],
+        },
+      ],
+    };
+    const filters = cql2JsonToArrayFilters(cql2);
+    expect(filters).toHaveLength(1);
+    expect(filters[0].predicate).toEqual({
+      kind: "or",
+      children: [
+        { kind: "comparison", field: "vessel_class", value: "submarine" },
+        { kind: "comparison", field: "vessel_class", value: "destroyer" },
+      ],
     });
   });
 });

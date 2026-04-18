@@ -192,6 +192,33 @@ function parseCql2Predicate(node: Cql2Node): CompoundPredicate {
         kind: "or",
         children: (args as readonly Cql2Node[]).map(parseCql2Predicate),
       };
+    case "a_containedBy": {
+      // #190: Haiku 4.5 frequently emits `a_containedBy([literals], prop)`
+      // inside array_filter where the prompt asks for `=`. For scalar
+      // platform fields this is semantically `prop = literal` (singleton)
+      // or `or(prop = literal_i)` (multi). Normalise so real-world LLM
+      // output lands in the demo instead of tripping the generation-failed
+      // banner.
+      const literals = args[0] as readonly string[];
+      const propRef = args[1] as { readonly property: string };
+      const field = propRef.property as PlatformField;
+      if (!Array.isArray(literals) || literals.length === 0) {
+        throw new Error(
+          "a_containedBy inside array_filter requires a non-empty literal array",
+        );
+      }
+      if (literals.length === 1) {
+        return { kind: "comparison", field, value: literals[0] };
+      }
+      return {
+        kind: "or",
+        children: literals.map((value) => ({
+          kind: "comparison" as const,
+          field,
+          value,
+        })),
+      };
+    }
     default:
       throw new Error(`Unsupported CQL2 operator in array_filter: ${op}`);
   }

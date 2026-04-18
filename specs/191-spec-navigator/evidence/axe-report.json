@@ -1,0 +1,49 @@
+{
+  "schema": "axe-report-v1",
+  "captured_at": "2026-04-17T13:27:15.604Z",
+  "total_violations": 0,
+  "results": [
+    {
+      "state": "empty-drawer-settings-open",
+      "viewport": "desktop",
+      "violations": [],
+      "passes": 22,
+      "incomplete": 0
+    },
+    {
+      "state": "drafts-drawer",
+      "viewport": "desktop",
+      "violations": [],
+      "passes": 18,
+      "incomplete": 0
+    },
+    {
+      "state": "stale-head-modal",
+      "viewport": "desktop",
+      "violations": [],
+      "passes": 23,
+      "incomplete": 0
+    },
+    {
+      "state": "empty-drawer-settings-open",
+      "viewport": "mobile",
+      "violations": [],
+      "passes": 22,
+      "incomplete": 0
+    },
+    {
+      "state": "drafts-drawer",
+      "viewport": "mobile",
+      "violations": [],
+      "passes": 18,
+      "incomplete": 0
+    },
+    {
+      "state": "stale-head-modal",
+      "viewport": "mobile",
+      "violations": [],
+      "passes": 23,
+      "incomplete": 1
+    }
+  ]
+}

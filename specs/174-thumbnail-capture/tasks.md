@@ -160,8 +160,9 @@
 - [x] T034 Create backfill script: iterate catalog, open each plot, fit to window, wait for tiles, screenshot, resize with sharp, write PNGs + update item.json `apps/web-shell/scripts/generate-thumbnails.ts`
 - [x] T035 Add `"generate-thumbnails"` npm script to web-shell package.json `apps/web-shell/package.json`
 - [x] T036 Test: run backfill script against web-shell dev server and verify output files
+- [x] T036a One-off retro-capture: run `pnpm --filter @debrief/web-shell generate-thumbnails` against the committed demo catalog at `preview/workspace/samples/local-store/`, verify `thumbnail.png` + `thumbnail-sm.png` exist in every item directory (expected: ~70 plots), confirm each `item.json` has the two thumbnail asset entries, then commit the generated PNGs and `item.json` updates in a single bulk commit. Capture a count check (plots with thumbnails / total plots) in PR evidence.
 
-**Checkpoint**: All existing plots have thumbnails.
+**Checkpoint**: All existing plots have thumbnails; demo catalog ships with committed thumbnails for every sample plot.
 
 ---
 

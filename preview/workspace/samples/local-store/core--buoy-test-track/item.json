@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Buoy Test Track",
     "datetime": "1995-12-12T05:03:00+00:00",
-    "description": "Saxon Warrior: Buoy Test Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 4 platform track(s) recorded including HMS Collingwood, USS Provence, FS Richmond and 1 other(s). Multi-national participation: DE, FR, GB, US.",
+    "description": "Saxon Warrior: Buoy Test Track — Royal Navy training exercise in the English Channel / Western Approaches. 4 platform track(s) recorded including HMS Collingwood, USS Provence, FS Richmond and 1 other(s). Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "1995-12-12T05:03:00+00:00",
     "end_datetime": "1995-12-12T11:45:00+00:00",
     "debrief:platforms": [
@@ -139,6 +139,22 @@
         "load_timestamp": "2026-04-13T23:12:32.662126Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
