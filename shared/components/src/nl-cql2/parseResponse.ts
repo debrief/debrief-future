@@ -61,7 +61,9 @@ function makeError(
     cql2: {},
     lozenges: [],
     unrecognisedTerms: [],
-    error: err,
+    // #190: wrap in the discriminated union so the demo can dispatch
+    // generator vs transport failures via result.error.kind.
+    error: { kind: "generation", error: err },
     diagnostics,
   };
 }
@@ -247,9 +249,15 @@ export async function parseResponse(
   };
 
   // Stage 1: JSON parse
+  // Haiku 4.5 sometimes wraps output in ```json fences despite the prompt's
+  // "no code fences" instruction. Strip a wrapping fence before parsing so a
+  // compliant payload inside fences is still accepted. rawResponse remains
+  // untouched in error diagnostics.
+  const fenceMatch = rawResponse.match(/^\s*```(?:json)?\s*([\s\S]*?)\s*```\s*$/);
+  const toParse = fenceMatch?.[1] ?? rawResponse;
   let parsed: unknown;
   try {
-    parsed = JSON.parse(rawResponse);
+    parsed = JSON.parse(toParse);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return makeError(phrase, diagnostics, {

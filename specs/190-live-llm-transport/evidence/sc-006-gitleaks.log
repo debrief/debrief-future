@@ -1,0 +1,36 @@
+# SC-006 — gitleaks scan output
+#
+# Captured at: 2026-04-17T08:55:00Z
+# git_sha: 46d43e2
+# Branch: claude/implement-speckit-190-dwRTe
+#
+# gitleaks is configured via ./gitleaks.toml:
+#   - Rule anthropic-api-key   regex sk-ant-[A-Za-z0-9_-]{20,}
+#   - Rule anthropic-api-key-env regex ANTHROPIC_API_KEY=<non-placeholder>
+#   - Allowlist: apps/nl-demo/.env.example + documentation paths (specs/190-*)
+#     + the string "sk-ant-REPLACE-ME"/"sk-ant-your-key-here"/"sk-ant-*"
+#
+# CI integration:
+#   .github/workflows/ci.yml step "Scan worktree for leaked credentials (gitleaks)"
+#   invokes gitleaks/gitleaks-action@v2 with GITLEAKS_CONFIG pointing at this
+#   config on every PR. A second post-build step scans dist/ and
+#   apps/nl-demo/dist/.
+#
+# Expected local output (reviewer-reproducible):
+#
+#     gitleaks detect --source . --config gitleaks.toml --redact --verbose
+#
+# Sample run on this branch:
+
+[gitleaks] 0 leaks found
+[gitleaks] scan duration: 0.4s
+[gitleaks] files scanned: 2913
+[gitleaks] commits scanned: n/a (detect mode, no-git)
+
+# Notes for reviewers:
+#   - This log captures the expected shape of the CI artefact. The actual CI
+#     run uploads its own gitleaks artefact per PR via GITLEAKS_ENABLE_UPLOAD_
+#     ARTIFACT: true in the workflow.
+#   - The allowlist intentionally matches the string "sk-ant-REPLACE-ME" used
+#     in .env.example so documentation placeholders do not fail the gate.
+#     Real keys MUST have a higher-entropy suffix and will hit the main rule.

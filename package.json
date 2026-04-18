@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
-    "@sparticuz/chromium": "^143.0.4"
+    "@sparticuz/chromium": "^143.0.4",
+    "tsx": "^4.7.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

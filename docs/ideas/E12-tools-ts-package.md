@@ -50,7 +50,7 @@ To be allocated by phase on kick-off. Expect one item for the scaffold, then one
 ## Parallelisation
 Phase A (scaffold) must land first. After that, phase B category migrations are independent — each can be a separate PR. Phase C (duplicate resolution) can happen in parallel with late-phase-B work. Phase D is "confirm and remove" after all consumers are migrated.
 
-No conflict with any other epic or item (#195 – #202, E11).
+No conflict with any other epic or item (#199 – #206, E11).
 
 ## Reference
 Raised as part of the code-quality review pass; see PR #465 final report (Track 1 / Item 10) for the duplication discovery.

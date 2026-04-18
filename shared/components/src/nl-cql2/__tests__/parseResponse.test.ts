@@ -14,9 +14,35 @@
 
 import { describe, expect, it } from "vitest";
 import { parseResponse } from "../parseResponse";
+import type {
+  GenerationError,
+  GenerationErrorReason,
+  GenerationResult,
+} from "../types";
 
 const PROMPT_HASH = "deadbeef".repeat(8);
 const PROMPT_VERSION = "test-v1";
+
+/**
+ * Narrow a `GenerationResult.error` union to its `GenerationError` (#188) arm.
+ * #190 extended `result.error` to a discriminated union carrying either a
+ * generator-level (#188) or transport-level (#190) failure; `parseResponse`
+ * only emits the `"generation"` kind.
+ */
+function generationError(result: GenerationResult): GenerationError {
+  expect(result.error?.kind).toBe("generation");
+  if (result.error?.kind !== "generation") {
+    throw new Error("expected GenerationResult.error.kind === 'generation'");
+  }
+  return result.error.error;
+}
+
+function expectReason(
+  result: GenerationResult,
+  reason: GenerationErrorReason,
+): void {
+  expect(generationError(result).reason).toBe(reason);
+}
 
 describe("parseResponse — happy path (T023)", () => {
   it("parses a well-formed response into a GenerationResult", async () => {
@@ -52,8 +78,40 @@ describe("parseResponse — malformed-json (T022)", () => {
       PROMPT_HASH,
       PROMPT_VERSION,
     );
-    expect(result.error?.reason).toBe("malformed-json");
-    expect(result.error?.rawResponse).toBe("{ not valid json");
+    expectReason(result, "malformed-json");
+    expect(generationError(result).rawResponse).toBe("{ not valid json");
+  });
+
+  it("accepts a compliant payload wrapped in ```json fences (Haiku 4.5 quirk)", async () => {
+    const inner = JSON.stringify({
+      cql2: {},
+      lozenges: [],
+      unrecognised_terms: [],
+    });
+    const fenced = "```json\n" + inner + "\n```";
+    const result = await parseResponse(
+      "UK platforms",
+      fenced,
+      PROMPT_HASH,
+      PROMPT_VERSION,
+    );
+    expect(result.error).toBeNull();
+  });
+
+  it("accepts a compliant payload wrapped in plain ``` fences", async () => {
+    const inner = JSON.stringify({
+      cql2: {},
+      lozenges: [],
+      unrecognised_terms: [],
+    });
+    const fenced = "```\n" + inner + "\n```";
+    const result = await parseResponse(
+      "UK platforms",
+      fenced,
+      PROMPT_HASH,
+      PROMPT_VERSION,
+    );
+    expect(result.error).toBeNull();
   });
 });
 
@@ -61,7 +119,7 @@ describe("parseResponse — schema-violation (T022)", () => {
   it("fails when required keys are missing", async () => {
     const raw = JSON.stringify({ cql2: {} });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("schema-violation");
+    expectReason(result, "schema-violation");
   });
 
   it("fails when lozenges is not an array", async () => {
@@ -71,7 +129,7 @@ describe("parseResponse — schema-violation (T022)", () => {
       unrecognised_terms: [],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("schema-violation");
+    expectReason(result, "schema-violation");
   });
 
   it("fails when a lozenge uses an unknown filterType", async () => {
@@ -81,7 +139,7 @@ describe("parseResponse — schema-violation (T022)", () => {
       unrecognised_terms: [],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("schema-violation");
+    expectReason(result, "schema-violation");
   });
 });
 
@@ -99,9 +157,9 @@ describe("parseResponse — hallucinated-field (T022)", () => {
     // The reverse parser catches this as unknown-property before the
     // hallucinated-field stage runs — both land in the same user-visible
     // failure class (cql2-evaluation-failed OR hallucinated-field).
+    const reason = generationError(result).reason;
     expect(
-      result.error?.reason === "cql2-evaluation-failed" ||
-        result.error?.reason === "hallucinated-field",
+      reason === "cql2-evaluation-failed" || reason === "hallucinated-field",
     ).toBe(true);
   });
 
@@ -118,7 +176,7 @@ describe("parseResponse — hallucinated-field (T022)", () => {
       unrecognised_terms: [],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("hallucinated-field");
+    expectReason(result, "hallucinated-field");
   });
 });
 
@@ -130,7 +188,7 @@ describe("parseResponse — cql2-evaluation-failed (T022)", () => {
       unrecognised_terms: [],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("cql2-evaluation-failed");
+    expectReason(result, "cql2-evaluation-failed");
   });
 
   it("fails when the CQL2 has bad arg arity", async () => {
@@ -143,7 +201,7 @@ describe("parseResponse — cql2-evaluation-failed (T022)", () => {
       unrecognised_terms: [],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("cql2-evaluation-failed");
+    expectReason(result, "cql2-evaluation-failed");
   });
 });
 
@@ -158,7 +216,7 @@ describe("parseResponse — unrecognised-term-leaked (T022)", () => {
       unrecognised_terms: ["Klingon"],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("unrecognised-term-leaked");
+    expectReason(result, "unrecognised-term-leaked");
   });
 
   it("fails when an unrecognised term leaks inside an array_filter predicate", async () => {
@@ -174,7 +232,7 @@ describe("parseResponse — unrecognised-term-leaked (T022)", () => {
       unrecognised_terms: ["XX"],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("unrecognised-term-leaked");
+    expectReason(result, "unrecognised-term-leaked");
   });
 
   it("fails when an unrecognised term leaks inside an `or` group", async () => {
@@ -196,7 +254,7 @@ describe("parseResponse — unrecognised-term-leaked (T022)", () => {
       unrecognised_terms: ["XX"],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("unrecognised-term-leaked");
+    expectReason(result, "unrecognised-term-leaked");
   });
 
   it("fails when an unrecognised term leaks inside an a_containedBy value array", async () => {
@@ -209,7 +267,7 @@ describe("parseResponse — unrecognised-term-leaked (T022)", () => {
       unrecognised_terms: ["XX"],
     });
     const result = await parseResponse("x", raw, PROMPT_HASH, PROMPT_VERSION);
-    expect(result.error?.reason).toBe("unrecognised-term-leaked");
+    expectReason(result, "unrecognised-term-leaked");
   });
 
   it("passes when a term is unrecognised but genuinely omitted from cql2", async () => {

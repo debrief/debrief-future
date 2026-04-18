@@ -66,8 +66,26 @@ apps/nl-demo/
 └── playwright/            # Playwright config
 ```
 
+## Enabling live mode (#190)
+
+The demo supports an optional **live transport** that forwards off-corpus phrases to an actual language model (Anthropic Claude by default). The full walkthrough lives in [`specs/190-live-llm-transport/quickstart.md`](../../specs/190-live-llm-transport/quickstart.md) — short version:
+
+1. Copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` (gitignored — never commit).
+2. Create `apps/nl-demo/live-config.json` pointing at the proxy (gitignored — also never commit).
+3. In a second terminal: `pnpm exec node scripts/live-proxy.mjs`.
+4. Reload the page. A **Live · Anthropic · `<model>`** indicator appears near the page header when live mode is active.
+
+**Reverting to fixture mode** — any one of these is sufficient on next reload:
+
+- Delete `apps/nl-demo/live-config.json`.
+- Set `"enabled": false` inside `live-config.json`.
+- Stop the proxy (the demo surfaces a transport banner then reverts on reload).
+
+CI always runs in fixture mode — the Playwright suite launches the proxy in `--stub` mode so no credentials or network access are required.
+
 ## Troubleshooting
 
 - **Blank page**: check the browser console; Babel standalone needs network access for the initial CDN fetch.
 - **"Failed to load fixture corpus"** banner: run `pnpm sync-data` again.
 - **"No recorded response for phrase"** error in the console: the phrase is not in the fixture corpus. Add it to `shared/components/src/nl-cql2/__tests__/fixtures/responses.json` and re-sync.
+- **"Live mode is not active" banner**: see `specs/190-live-llm-transport/quickstart.md` §7 for field-specific diagnostics and the three revocation levers.

@@ -16,6 +16,10 @@ export {
   createRecordedLLMClient,
   createPassthroughLLMClient,
   extractPhraseFromPrompt,
+  createLiveLLMClient,
+  validateLiveConfig,
+  isLiveTransportError,
+  LiveTransportAbort,
 } from "./clients";
 export { canonicalisePhrase, sha256Hex } from "./hash";
 export { parseResponse } from "./parseResponse";
@@ -27,6 +31,7 @@ export type {
   GenerationError,
   GenerationDiagnostics,
   GenerationResult,
+  GenerationResultError,
   LLMClient,
   RecordedResponse,
   ResponseMap,
@@ -40,4 +45,11 @@ export type {
   HarnessFail,
   HarnessReport,
   RunHarnessDeps,
+  LiveConfig,
+  LiveConfigValidationError,
+  LiveConfigValidationResult,
+  LiveTransportError,
+  LiveTransportErrorReason,
+  LiveLLMClient,
+  TransportCallRecord,
 } from "./types";

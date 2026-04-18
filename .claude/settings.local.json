@@ -86,7 +86,10 @@
       "Bash(npx eslint:*)",
       "Bash(node run-playwright.mjs:*)",
       "Bash(lsof:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell dev:*)",
+      "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell generate-thumbnails:*)",
+      "Bash(STAC_STORE_PATH=* npx tsx apps/web-shell/scripts/capture-single.ts:*)"
     ]
   }
 }

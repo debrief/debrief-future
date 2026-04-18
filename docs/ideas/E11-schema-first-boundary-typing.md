@@ -16,7 +16,7 @@ Per the architectural principle:
 ## Proposed Solution
 Multi-phase rollout, one boundary at a time. Each phase is its own backlog item under this epic, landing as an independent PR. Acceptance for the epic is: zero `no-restricted-syntax` warnings in production code; all parse points either use a LinkML-generated type + generated-guard or a Zod/equivalent validator for single-domain shapes.
 
-### Phase inventory (initial — may grow from #202 audit)
+### Phase inventory (initial — may grow from #206 audit)
 
 | Phase | Target | Approach |
 |-------|--------|----------|
@@ -26,8 +26,8 @@ Multi-phase rollout, one boundary at a time. Each phase is its own backlog item 
 | Phase 4 | E2E test harness | Tighten harness types to use the same schema-derived types as production; replace hand-constructed payloads with builder helpers that produce schema-valid fakes. |
 | Phase 5 | localStorage | Each persisted key gets a Zod (or equivalent TS-only) schema co-located with its write path. Reads use `schema.parse()` — a failed parse means "missing or corrupt, fall back to default." |
 
-### Inputs from #202
-The type-audit report produced by #202 will likely add phases to this list (or expand an existing phase's scope). Each additional target gets its own backlog item under this epic.
+### Inputs from #206
+The type-audit report produced by #206 will likely add phases to this list (or expand an existing phase's scope). Each additional target gets its own backlog item under this epic.
 
 ## Success Criteria
 - Zero `no-restricted-syntax` ESLint warnings in production code
@@ -42,9 +42,9 @@ Proposed
 To be allocated on phase kick-off. First phase targets (tool-result + NL→CQL2) will be added as individual backlog entries once spec work starts.
 
 ## Parallelisation
-Phases 1 and 2 both edit LinkML — coordinate with #199, #200, #201 per their Parallelisation notes.
+Phases 1 and 2 both edit LinkML — coordinate with #203, #204, #205 per their Parallelisation notes.
 Phases 3, 4, 5 are TS-only and can run in parallel with each other and with phases 1/2.
-The audit (#202) should land first so the phase list is complete before heavy investment.
+The audit (#206) should land first so the phase list is complete before heavy investment.
 
 ## Reference
 - [ADR-011](docs/adr/011-strict-type-boundaries.md) (if present) / Constitution Article XV.7

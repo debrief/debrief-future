@@ -15,7 +15,11 @@ excerpt: "Save a plot and get a persistent PNG thumbnail; browse your catalog ga
 
 When you save a plot now, the system captures the current map view as a PNG — basemap tiles, track overlays, labels — and writes two sizes into the STAC item directory: 800x600 for the preview pane and 200x150 for the list. The thumbnails land as standard STAC assets with `"thumbnail"` roles, so they're not a Debrief-specific convention. Any STAC client knows what to do with them.
 
+![Catalog browser gallery preview pane showing the large thumbnail alongside the filtered list](../evidence/screenshots/preview-panel.png)
+
 The catalog browser has a new gallery preview pane. Click a plot in the list and the large thumbnail appears on the right. Press the arrow keys to move through filtered results. Single-click previews; double-click opens. For existing plots created before this feature landed, a Playwright-based backfill script automates the web-shell to open each plot, fit the view to visible features, wait for tiles, and capture.
+
+![Catalog list view with raster thumbnails rendered inline for every sample plot](../evidence/screenshots/welcome-thumbnails.png)
 
 The list view now shows raster thumbnails inline where they exist. The SVG spatial thumbnails remain as the fallback — they render without any prior save — so the list never goes blank.
 
@@ -41,6 +45,16 @@ The Python side follows the existing `store_artifact()` pattern. The new `store_
 One deliberate decision: thumbnail assets carry no provenance links. They're display artifacts, not analytical results. Adding `derived_from` links would pollute the provenance graph with noise. The `test_no_derived_from_links` test encodes this as a constraint so it doesn't quietly get added later.
 
 Capture is non-blocking by design. The 5-second timeout means a slow tile load during save doesn't hold up the analyst. If capture fails, the save completes, a warning is logged, and the backfill script can fill the gap later.
+
+## Retro-capture: the demo catalog
+
+The save-time capture path only helps plots saved *after* the feature landed. The demo STAC catalog at `preview/workspace/samples/local-store/` shipped long before, so all 73 sample plots had no thumbnails — the very gap the backfill script was built to close. Under T036a we ran a one-off retro-capture against the committed catalog and committed the generated PNGs plus the updated `item.json` asset entries back into the repo.
+
+Result: 73 of 73 plots now ship with both thumbnail sizes. Every first-run demo — whether on Heroku Review Apps or a fresh clone — opens to a populated gallery rather than a sea of SVG fallbacks.
+
+![Contact sheet of all 73 small (200x150) thumbnails produced by the retro-capture run](../evidence/screenshots/retro-capture-contact-sheet.png)
+
+The count check — `plots with thumbnail.png / total plots = 73/73`, and the same for `thumbnail-sm.png` and both asset entries — is recorded at [`evidence/retro-capture-count.md`](../evidence/retro-capture-count.md). It satisfies SC-007 (100% coverage) and FR-014 (one-off bulk-commit of the generated artefacts).
 
 ## What's Next
 

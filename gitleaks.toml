@@ -1,0 +1,66 @@
+# gitleaks.toml — secret-scanning config for #190 Live LLM Transport
+#
+# This config augments gitleaks' default ruleset with an Anthropic-specific
+# pattern. It is invoked by the CI `gitleaks` step (see
+# .github/workflows/ci.yml) on every PR.
+#
+# SC-006: zero credential values in the deployed demo bundle.
+# Scope: repo worktree + dist/ + apps/nl-demo/dist/ build artefacts.
+#
+# Note: gitleaks uses Go's RE2 engine which does NOT support Perl-style
+# lookaheads. Placeholder exclusion is done via the [allowlist] section
+# below, not via inline negative lookaheads.
+
+title = "debrief-future gitleaks config"
+
+[extend]
+# Inherit gitleaks' built-in rules (generic API keys, AWS keys, etc.).
+useDefault = true
+
+# Anthropic live API keys — canonical `sk-ant-` prefix with a high-entropy
+# suffix. Real keys are 95+ characters; the `{20,}` lower bound filters out
+# short documentation placeholders like `sk-ant-REPLACE-ME` (10 chars after
+# the prefix) and `sk-ant-your-key-here` (13 chars).
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key (sk-ant-*) in committed sources or build artefacts"
+regex = '''sk-ant-[A-Za-z0-9_-]{20,}'''
+keywords = ["sk-ant"]
+
+[allowlist]
+description = "Allow documented placeholders and this config file itself"
+
+# .env.example intentionally contains the string `sk-ant-REPLACE-ME` so
+# operators know what shape a real key takes. It MUST NOT contain a real key.
+paths = [
+  # Documentation placeholders + this config itself.
+  '''apps/nl-demo/\.env\.example$''',
+  '''specs/190-live-llm-transport/.*\.md$''',
+  '''specs/190-live-llm-transport/contracts/.*\.md$''',
+  '''gitleaks\.toml$''',
+
+  # Vendored dependencies — not our source; their own hygiene is out of scope.
+  # Gitleaks' default rules produce false positives on Python type stubs
+  # (pywin32), PyJWT docs, cryptography test vectors, etc.
+  '''(^|/)\.venv/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.git/''',
+  '''(^|/)dist/''',
+  '''(^|/)build/''',
+  '''(^|/)coverage/''',
+  '''(^|/)playwright-report/''',
+  '''(^|/)test-results/''',
+
+  # Generated schemas — round-trip outputs of LinkML, not hand-written.
+  '''shared/schemas/src/generated/''',
+]
+
+# Documentation strings used to teach operators what a leaked key looks like.
+# These are all shorter than the rule's 20-char minimum so the rule itself
+# will not flag them; listed here as belt-and-braces in case the minimum
+# is relaxed later.
+regexes = [
+  '''sk-ant-REPLACE-ME''',
+  '''sk-ant-your-key-here''',
+]
+

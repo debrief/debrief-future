@@ -346,6 +346,8 @@ interface BrowserPanelContext {
   onSortChange: (sort: SortConfiguration) => void;
   thumbnailSize: ThumbnailSize;
   onThumbnailSizeChange: (size: ThumbnailSize) => void;
+  /** Optional Properties slot rendered under ThumbnailPreview in the right pane of the list panel (#193). */
+  propertiesSlot?: React.ReactNode;
 }
 
 // Use a module-level ref so panel renderers can access it
@@ -497,18 +499,44 @@ function renderPanel(type: string): React.ReactElement {
           </div>
         );
       }
+      const previewContent = ctx.propertiesSlot ? (
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            minWidth: 0,
+          }}
+        >
+          <div style={{ flex: '0 0 40%', minWidth: 0, overflow: 'auto' }}>
+            <ThumbnailPreview
+              item={previewItem}
+              items={ctx.filteredItems}
+              onOpen={ctx.onItemSelect}
+            />
+          </div>
+          <div
+            style={{
+              flex: '1 1 60%',
+              minWidth: 0,
+              overflow: 'auto',
+              borderLeft: '1px solid var(--vscode-panel-border, #3c3c3c)',
+            }}
+            data-testid="stac-browser-properties-slot"
+          >
+            {ctx.propertiesSlot}
+          </div>
+        </div>
+      ) : (
+        <ThumbnailPreview
+          item={previewItem}
+          items={ctx.filteredItems}
+          onOpen={ctx.onItemSelect}
+        />
+      );
       return (
         <div style={{ height: '100%' }} data-testid="stac-browser-list">
-          <ResizableSplitPane
-            left={listView}
-            right={
-              <ThumbnailPreview
-                item={previewItem}
-                items={ctx.filteredItems}
-                onOpen={ctx.onItemSelect}
-              />
-            }
-          />
+          <ResizableSplitPane left={listView} right={previewContent} />
         </div>
       );
     }
@@ -592,6 +620,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   items,
   taxonomy,
   onItemSelect,
+  onItemHighlight,
+  propertiesSlot,
   className,
   colorMap,
 }) => {
@@ -603,9 +633,18 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   // ─── Preview highlight state (#174) ────────────────────────────────────────
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
 
-  const handleItemHighlight = useCallback((itemId: string) => {
-    setHighlightedItemId(itemId);
-  }, []);
+  const handleItemHighlight = useCallback(
+    (itemId: string) => {
+      setHighlightedItemId(itemId);
+      if (onItemHighlight) {
+        // Look up the itemPath from the items list. We pass a path (the
+        // host-facing identifier), not the internal id.
+        const match = items.find((i) => i.id === itemId) ?? null;
+        onItemHighlight(match?.itemPath ?? null);
+      }
+    },
+    [items, onItemHighlight],
+  );
 
   // ─── Sort state (lifted from ExerciseListView for header injection) ────────
   const DEFAULT_SORT: SortConfiguration = { dimension: 'recency', direction: 'desc' };
@@ -719,7 +758,8 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     onSortChange: handleSortChange,
     thumbnailSize,
     onThumbnailSizeChange: handleThumbnailSizeChange,
-  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, timelineResetKey, colourFn, sort, handleSortChange, thumbnailSize, handleThumbnailSizeChange]);
+    propertiesSlot,
+  }), [items, filteredItems, spatialFilteredItems, onItemSelect, handleItemHighlight, highlightedItemId, colorMap, handleViewportChange, handleTemporalFilterChange, timelineResetKey, colourFn, sort, handleSortChange, thumbnailSize, handleThumbnailSizeChange, propertiesSlot]);
 
   // Update module-level context and re-render panels + sort header
   useEffect(() => {

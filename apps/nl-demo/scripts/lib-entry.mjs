@@ -7,6 +7,9 @@
 export {
   generateCql2,
   createRecordedLLMClient,
+  createLiveLLMClient,
+  validateLiveConfig,
+  isLiveTransportError,
   canonicalisePhrase,
   buildPrompt,
 } from "../../../shared/components/src/nl-cql2/index.ts";

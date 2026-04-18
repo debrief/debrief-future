@@ -501,3 +501,43 @@ This follows directly from ADR-014 (flat field removal) and Constitution Article
 - ❌ Downstream feature #184 (sample catalog regeneration) becomes simpler but still needed for the preview workspace data
 
 **Originating feature:** 181 (LinkML platform overrides), E10 epic (NL-Assisted Catalog Discovery)
+
+
+---
+
+### ADR-018: Drop Fly.io Demo Hosting, Heroku Review Apps Take Over (2026-04-17)
+
+**Context:**
+- The original browser-accessible demo was a single persistent Fly.io app at `https://debrief-demo.fly.dev` — an `linuxserver/webtop:ubuntu-xfce` image running noVNC, built and bundled via `demo/Dockerfile` + `demo/fly.toml` and fed by the `debrief-demo.tar.gz` artifact produced by `.github/workflows/build-demo-artifact.yml`. Portability tests lived in `.github/workflows/test-demo.yml` and probed the Fly URL in 7 layers.
+- In parallel, Heroku Review Apps were introduced and matured to the point where each open PR auto-provisions its own preview app at `https://<app>-pr-<n>.herokuapp.com` via `heroku.yml` + `app.json` + `Dockerfile.preview` (Container-stack review environment `debrief-preview`). Preview links are posted back to the PR by a GitHub Actions bot; Playwright against each review app runs via `.github/workflows/heroku-e2e.yml`.
+- With two demo paths running side by side, the Fly side accumulated bit-rot: `test-demo.yml` had been red on main for weeks (Fly app unreachable — HTTP 000 from the URL-availability check, `Build Demo Artifact` failing on `npm ci` before #458 and on non-shebang activate scripts before #460).
+- Heroku Review Apps solve a better problem (per-PR previews with the reviewer-in-the-loop) than Fly's single persistent demo, at lower cost and without the auto-stop/auto-start UX friction Fly imposed.
+
+**Decision:**
+- Retire the Fly.io hosting entirely.
+- Delete:
+  - `demo/` (all of it — `Dockerfile`, `fly.toml`, `bin/test-url.sh`, `desktop/`, `samples/`, `99-debrief-setup/`). Fly-only infrastructure; nothing outside `specs/**` historical records consumes it.
+  - `.github/workflows/build-demo-artifact.yml` — produced the `.tar.gz` consumed only by `demo/Dockerfile`.
+  - `.github/workflows/test-demo.yml` — probed only the Fly URL; with per-PR Heroku review apps there is no single production URL to probe. E2E coverage of the deployed preview now lives in `heroku-e2e.yml`.
+- Rewrite the "Demo Environment" sections of `CLAUDE.md` and `docs/project_notes/key_facts.md` to document the Heroku path.
+- Keep all `specs/**` historical references untouched — they are immutable record of what was shipped at the time.
+
+**Alternatives considered:**
+- **Run both in parallel**: rejected — the Fly app has been unreachable for weeks with no user impact, proving the Fly demo is unused. Continuing to maintain a red CI check for a dead system adds noise and erodes "green main" discipline.
+- **Archive `demo/` under `.archived/` rather than delete**: rejected — git history is the archive. `demo/` on main carries 7 unrelated files and a Dockerfile that lies about the deployment path if anyone follows it.
+- **Keep `test-demo.yml` pointed at a specific Heroku review app**: rejected — review apps are ephemeral, so the URL is not stable. The right pattern is `heroku-e2e.yml`'s manual-dispatch-per-URL model, which already exists.
+
+**Consequences:**
+- ✅ Green CI restored — `Build Demo Artifact` and `Test Demo Environment` stop failing on every main merge.
+- ✅ One demo path to reason about: Heroku review apps + the existing preview-comment bot.
+- ✅ `npm ci`-in-a-pnpm-repo and venv-activate-rewrite fixes (#458, #460) become dead-code cleanups, which is fine — they documented the failure modes in case we ever return to a container-build workflow.
+- ❌ If Heroku Review Apps ever become too expensive or are discontinued, we would need to re-provision equivalent infrastructure. The Fly recipe is recoverable from git history at commit `d7c0d56d` (tip of main before this ADR).
+- ❌ Anyone who had bookmarked `https://debrief-demo.fly.dev` gets a dead link. Mitigation: the `CLAUDE.md` edit in this change points to the Heroku preview-comment flow as the replacement entry point.
+
+**Reversal recipe (for future archaeology):**
+- The last known-good Fly configuration is at commit `d7c0d56d` — `git show d7c0d56d:demo/fly.toml` and `git show d7c0d56d:demo/Dockerfile`.
+- The 7-layer test suite is at `d7c0d56d:.github/workflows/test-demo.yml`.
+- The artifact builder is at `d7c0d56d:.github/workflows/build-demo-artifact.yml` (with #458 and #460 patches applied, so the `npm ci` → pnpm and activate-script fixes are already baked in if you revive it).
+- The Fly app `debrief-demo` itself needs manual teardown via `fly apps destroy debrief-demo` — the workflow-delete does not tear down the running Fly infrastructure.
+
+**Originating issue:** none (driven by red-main CI review after #460 landed)

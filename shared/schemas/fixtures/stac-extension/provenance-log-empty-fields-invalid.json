@@ -1,0 +1,12 @@
+{
+  "provenance_log": [
+    {
+      "activity_id": "01HXK5G8P0Q1R2S3T4U5V6W7X8",
+      "timestamp": "2026-04-17T10:00:00Z",
+      "tool": "debrief.propertiesPanel",
+      "method": "properties-panel@1.0.0",
+      "fields": [],
+      "source": "user"
+    }
+  ]
+}
