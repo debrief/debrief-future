@@ -198,6 +198,7 @@ export function App() {
         newPlotName: state.newPlotForm.name,
         newPlotDescription: state.newPlotForm.description,
         existingPlotId: state.selectedPlot?.id,
+        plots: state.selectedPlot ? [state.selectedPlot] : undefined,
         onProgress: (progress, message) => {
           dispatch({ type: 'SET_PROGRESS', progress, message });
         },
