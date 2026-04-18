@@ -14,16 +14,16 @@
           -0.07229166666666667
         ],
         [
-          -30.0,
+          -30,
           -0.07229166666666667
         ],
         [
-          -30.0,
-          -0.0
+          -30,
+          0
         ],
         [
           -30.119758333333333,
-          -0.0
+          0
         ],
         [
           -30.119758333333333,
@@ -35,13 +35,13 @@
   "bbox": [
     -30.119758333333333,
     -0.07229166666666667,
-    -30.0,
-    -0.0
+    -30,
+    0
   ],
   "properties": {
     "title": "Saxon Warrior: Satc Redtrack Redtrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Satc Redtrack Redtrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Saxon Warrior: Satc Redtrack Redtrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T13:13:14+00:00",
     "debrief:platforms": [
@@ -112,6 +112,22 @@
         "load_timestamp": "2026-04-13T23:12:33.663595Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
