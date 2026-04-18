@@ -1,10 +1,12 @@
-Two TypeScript interfaces in the Debrief codebase, both called `ResolvedPositionStyle`, quietly drifted apart. One listed three marker shapes, the other five. One called a field `label`, the other `labelText`. Both were hand-typed next to the rendering code, independent of the LinkML schema that already defines the canonical list.
+A mis-typed JSON import used to draw a circle on the map, and nobody knew. If a legacy file listed a marker symbol of `"star"`, the resolver quietly fell through to the default. The track rendered. No warning, no error, no hint that the data had been misread.
 
-Next up: collapse them into one interface, anchored to the schema-generated enum via a template literal union. Callers keep passing shape names as plain strings. The set of legal values stays locked to the schema and extends automatically whenever a new shape is added.
+What started as a small type-consolidation job — two drifted `ResolvedPositionStyle` interfaces collapsed back to one, anchored to the LinkML schema — expanded under review. The drift was not one place, it was seven, all along the same axis: marker shapes, from schema to renderer to VS Code tool parameter.
 
-Zero rendering-change: markers on the map and timeline look identical before and after. The value is defensive — one less place where a hand-typed list can silently fall out of step with the source of truth.
+The expanded scope fixes root causes. One resolver, not two. A typed error when an unknown symbol arrives (Constitution Article I.3 — no silent failure). Exhaustive-switch enforcement on every renderer. Schema-narrowed types at the generator boundary. A schema adherence test pinning two deliberately-separate enums to the same value-set.
 
-Open question for the wider audit: how many other rendering-side types still parallel a LinkML enum by hand?
+The risky bit is post-processing generator output to narrow `string` to `PointShape`. Flagged as a research step; we will renegotiate scope before implementation if no tractable mechanism exists.
+
+Open question: how many other LinkML enums have the same drift pattern brewing?
 
 [LINK]
 

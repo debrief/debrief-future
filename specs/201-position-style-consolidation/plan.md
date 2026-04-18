@@ -5,19 +5,21 @@
 
 ## Summary
 
-Collapse the two drifted `ResolvedPositionStyle` interfaces (one in `@debrief/utils`, one in `@debrief/components`) into a single canonical definition in `@debrief/utils`. Type its `symbol` field via the LinkML-generated `PointShapeEnum` from `@debrief/schemas` (not a hand-typed string-literal union). Standardise on the field name `labelText` across the resolver, its tests, and all renderers. Behaviour-preserving refactor; no schema, rendering logic, or runtime-API changes.
+Collapse the two drifted `ResolvedPositionStyle` interfaces (one in `@debrief/utils`, one in `@debrief/components`) into a single canonical definition in `@debrief/utils`, published as a template-literal union over `PointShapeEnum` (not a hand-typed string-literal union). Standardise on the field name `labelText`. **Following `/speckit.review` (2026-04-18), the scope now also includes**: consolidating the two near-duplicate resolver implementations into one with explicit null-override semantics (FR-012, FR-013); adding a runtime guard against invalid shape values that throws `InvalidPointShapeError` (FR-015); requiring exhaustive `assertNever` default branches in the map renderer switches (FR-016); narrowing the schema-generated `PositionStyle.symbol` / `PositionStyleOverride.symbol` fields from `string` to `PointShape` via a post-process step in the schemas build (FR-014); and reconciling `MarkerSymbolEnum` with `PointShapeEnum` by pinning their value-set equality via a schema adherence test (FR-017 option 17B per R-012).
+
+Expected outcome: zero rendering-behaviour change on the shipped sample catalog (SC-004); every drift surface in the marker-shape codepath closed from LinkML down to the VS Code tool parameter. Effort is now Medium, not Low.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x (strict).
-**Primary Dependencies**: `@debrief/utils` (canonical location for the type), `@debrief/components` (local duplicate to be removed; already depends on `@debrief/utils` per `shared/components/package.json`), `@debrief/schemas` (consumed for `PointShapeEnum`; already generated from `shared/schemas/src/linkml/common.yaml`).
-**Storage**: N/A (types only; no persistent data).
-**Testing**: Existing `shared/utils/tests/interval.test.ts` (vitest). Existing `shared/components/e2e/*.spec.ts` (Playwright, theme variants) cover the consumer side unchanged. No new tests required, but existing vitest assertions must be updated from `.label` → `.labelText` (5 call sites identified across `shared/utils/tests/interval.test.ts`).
-**Target Platform**: Browser (webview) and Node (unit tests); monorepo packages consumed by `apps/vscode`, `apps/web-shell`, `apps/nl-demo`, `apps/spec-navigator`.
-**Project Type**: Single monorepo; shared libraries under `shared/`, apps under `apps/`. The refactor is scoped to `shared/utils/` and `shared/components/` (consumer updates only in those two plus index barrels).
-**Performance Goals**: N/A — same compiled output shape, same runtime values. Intent is zero runtime delta on the sample catalog (see SC-004).
-**Constraints**: Constitution Article XV (strict type safety) — no `any`/`as unknown as` shortcuts to paper over the rename; constitution Article II (schema integrity) — symbol type MUST derive from the generated schema enum; CI gate (Article VI and the `CLAUDE.md` §"Before Pushing" commands) — lint, typecheck, vitest, Playwright E2E all green.
-**Scale/Scope**: ~4 source files change (`shared/utils/src/types.ts`, `shared/utils/src/interval.ts`, `shared/components/src/utils/time.ts`, `shared/components/src/index.ts`) + 1 test file (`shared/utils/tests/interval.test.ts`). Exactly 1 removed interface declaration; exactly 5 renamed assertions; exactly 1 type field rename on the public interface; estimated < 60 lines of code touched in total.
+**Language/Version**: TypeScript 5.x (strict); LinkML >= 1.7.0 (schema YAML edit in FR-017); Python 3.11 (only if the FR-014 post-process step is implemented in Python — the existing schemas build scripts should be inspected first; Node/TypeScript is equally acceptable).
+**Primary Dependencies**: `@debrief/utils` (canonical location for the type, the resolver, `PointShape`, `InvalidPointShapeError`, `assertNever`), `@debrief/components` (local duplicate interface + resolver functions to be removed; already depends on `@debrief/utils`), `@debrief/schemas` (consumed for `PointShapeEnum`; its generator output is post-processed per FR-014).
+**Storage**: N/A (types and runtime validation only; no persistent data).
+**Testing**: Existing `shared/utils/tests/interval.test.ts` (vitest) gets 5 `.label` → `.labelText` renames plus 3 new unit tests (null-override semantics, invalid-symbol throw, exhaustive-switch negative check). Existing `shared/components/src/MapView/__tests__/position-symbols.test.ts` gets its import updated (`SymbolShape` → `PointShape`) plus 1 new test asserting `assertNever` triggers on an unreachable value. Existing `shared/components/e2e/*.spec.ts` (Playwright, theme variants) provide unchanged parity coverage for SC-004. One new schema adherence test pins `PointShapeEnum` and `MarkerSymbolEnum` value-set equality.
+**Target Platform**: Browser (webview) and Node (unit tests, schemas build scripts); monorepo packages consumed by `apps/vscode`, `apps/web-shell`, `apps/nl-demo`, `apps/spec-navigator`.
+**Project Type**: Single monorepo; shared libraries under `shared/`, apps under `apps/`. The refactor touches `shared/utils/`, `shared/components/`, `shared/schemas/` (LinkML + generated output + build-script + adherence tests), and `apps/vscode/src/tools/track/styling/`.
+**Performance Goals**: The invalid-symbol guard runs per-position-with-override on render-critical paths. Target: O(1) lookup via module-level `Set<string>` (see R-009). No regression on the 10k-position-track scenario.
+**Constraints**: Constitution Article XV (strict type safety) — no `any`/`as unknown as` shortcuts; Article II (schema integrity) — symbol types at every layer derive from `PointShapeEnum`; Article I.3 (no silent failures) — the invalid-symbol path MUST be loud (throw + log, not silent default); Article IV (thick services / thin frontends) — the resolver throws; the renderer catches and displays; Article VI (testing) — every new codepath has a unit test and the CI gate is green before push.
+**Scale/Scope**: ~13 production source files + 3 schema/generated files + 4 spec files + ~4 new tests ≈ **24 total artefacts** touched or added. Estimated **200–300 LOC** of source code change (up from ~60 in the original Low-complexity plan). One high-risk research item (R-011 — generator post-process mechanism) may gate FR-014 and trigger renegotiation before `tasks.md`.
 
 ## Constitution Check
 
@@ -27,12 +29,12 @@ The constitution (`.specify/memory/constitution.md`, v1.2.0) articles evaluated 
 
 | Article | Applies? | Verdict | Notes |
 |---------|----------|---------|-------|
-| I. Defence-Grade Reliability | Yes | ✅ Pass | No network, no silent failures introduced. Pure type consolidation — behaviour identical on same inputs. |
-| II. Schema Integrity | **Yes (central)** | ✅ Pass | The whole point: the `symbol` field moves from a hand-typed union to a schema-derived type from `@debrief/schemas`. No hand-written representation. No schema version change (no schema content modified). |
+| I. Defence-Grade Reliability | **Yes (central, post-expansion)** | ✅ Pass | No network introduced. Article I.3 ("no silent failures"): the pre-existing silent-fallback path for invalid runtime symbols is now explicitly addressed — FR-015 throws `InvalidPointShapeError`; FR-018 has the renderer catch + log + non-crash. Without this feature, a JSON with `symbol: "star"` draws a circle and the user never knows. |
+| II. Schema Integrity | **Yes (central)** | ✅ Pass | Every layer's `symbol` type derives from `PointShapeEnum`: `ResolvedPositionStyle.symbol` (FR-003), `PositionStyle.symbol` and `PositionStyleOverride.symbol` via post-process (FR-014), map renderer switches (FR-016), VS Code tool parameter (no FR — see plan.md §"Source Code"), LinkML enum reconciliation (FR-017). Schema content itself only gets the adherence-test addition (R-012 / 17B); no existing permissible values change. |
 | III. Data Sovereignty | No | N/A | No data transformations, no provenance, no exports. |
 | IV. Architectural Boundaries | Yes | ✅ Pass | Change is entirely inside shared TypeScript libraries. No service/frontend boundary crossings modified. No new MCP coupling. |
 | V. Extensibility | Yes | ✅ Pass | Extensions that render positions consume `@debrief/utils` or `@debrief/components` — both continue to export `ResolvedPositionStyle`. No breaking change for in-repo extensions. |
-| VI. Testing | Yes | ✅ Pass | Existing resolver tests are updated (not removed). CI (lint + tsc + vitest + Playwright E2E) is run per `CLAUDE.md` §"Before Pushing" before push. |
+| VI. Testing | **Yes (expanded)** | ✅ Pass | Existing resolver tests are updated (not removed). **New tests** added for: null-override semantics (R-007), invalid-symbol throw (R-008), exhaustive-switch negative-typecheck (FR-016), `MarkerSymbolEnum`/`PointShapeEnum` value-set equality (R-012). Full CI gate (lint + tsc + vitest + Playwright E2E + schema adherence) is run per `CLAUDE.md` §"Before Pushing" before push. |
 | VII. Test-Driven AI Collaboration | Yes | ✅ Pass | Acceptance criteria in spec.md (FR-001..FR-011, SC-001..SC-006) define "done"; vitest assertions are the executable spec. |
 | VIII. Documentation | Yes | ✅ Pass | Spec, plan, research, data-model, quickstart committed under `specs/201-...`. No ADR required (no architectural choice being changed, only a drift being removed). |
 | IX. Dependencies | Yes | ✅ Pass | Zero new dependencies. Uses existing workspace dep `@debrief/schemas` (already depended on by `@debrief/components` per `shared/components/package.json`; verified to be transitively available to `@debrief/utils` or added if not — see Phase 0 R-003). |
@@ -43,9 +45,14 @@ The constitution (`.specify/memory/constitution.md`, v1.2.0) articles evaluated 
 | XIV. Pre-Release Freedom | Yes | ✅ Pass | Pre-v4.0.0; field rename `label → labelText` is a permitted breaking change for any in-repo caller. Backlog explicitly scopes the rename (FR-004, FR-007). |
 | XV. Strict Type Safety | **Yes (central)** | ✅ Pass | Resolves a drift that previously relied on `as` casts between mismatched unions. The new canonical type is concretely linked to the schema enum, narrowing the drift surface rather than widening it. No `any` is introduced; no `as unknown as` bridges are added. Existing `as` casts in renderers (e.g., `SymbolShape` cast in `PositionSymbolsLayer.tsx`) are either removed or verified still valid against the new, wider type. |
 
-**Initial Gate (pre-Phase 0): PASS.** No violations, no deviations requiring justification. Complexity Tracking section left empty.
+**Initial Gate (pre-Phase 0, pre-expansion): PASS.** No violations.
 
-**Post-Design Gate (after Phase 1 artefacts): PASS.** The three design artefacts (research.md, data-model.md, contracts/resolved-position-style.ts, quickstart.md) together describe exactly one new type, no new dependencies, no new tests, no new workflows. None of the decisions in research.md introduce a new violation — R-001's template-literal approach keeps the type schema-derived (Article II) and concrete (Article XV), R-002 deliberately narrows scope to avoid behavioural risk (Article VI), R-003 adds no dep (Article IX), R-004/R-006 reuse existing test coverage (Article VI). Complexity Tracking remains empty.
+**Post-Design Gate (after Phase 1 artefacts, pre-`/speckit.review`): PASS.** The three design artefacts described exactly one new type, no new dependencies, no new tests, no new workflows.
+
+**Post-Review Gate (after `/speckit.review` scope expansion, 2026-04-18): PASS with one high-risk dependency flagged.**
+
+- All Constitution articles re-evaluated against the expanded scope. No new violations introduced; Article I.3 (no silent failures) is *resolved* rather than created by the expansion (FR-015 + FR-018); Article II (schema integrity) gains teeth (FR-014 narrows input types, FR-017 reconciles enums).
+- The single risk remaining is **R-011**: the FR-014 narrowing mechanism has not been prototyped. If no tractable approach is found, FR-014 is renegotiated *before* `tasks.md` is generated — explicit renegotiation, not silent deletion. Until the prototype succeeds, FR-014 counts as a contingent requirement. Noted in Complexity Tracking.
 
 ## Project Structure
 
@@ -67,26 +74,47 @@ specs/201-position-style-consolidation/
 
 ### Source Code (repository root)
 
-This is a focused cross-package refactor. The only directories touched:
+Cross-package refactor. Following the `/speckit.review` scope expansion, the plan now touches:
 
 ```text
 shared/
 ├── utils/
-│   └── src/
-│       ├── types.ts          # CANONICAL ResolvedPositionStyle lives here
-│       └── interval.ts       # resolver writes `labelText` instead of `label`
+│   ├── src/
+│   │   ├── types.ts          # CANONICAL ResolvedPositionStyle + PointShape alias + InvalidPointShapeError + assertNever
+│   │   ├── interval.ts       # CANONICAL resolver: writes `labelText`; filters `null` overrides (R-007);
+│   │   │                     # VALIDATES override.symbol against module-level Set (R-009); throws InvalidPointShapeError
+│   │   └── index.ts          # barrel adds: PointShape, InvalidPointShapeError, assertNever
 │   └── tests/
-│       └── interval.test.ts  # 5 assertions renamed from `.label` to `.labelText`
-└── components/
-    └── src/
-        ├── utils/
-        │   └── time.ts       # LOCAL ResolvedPositionStyle interface DELETED; imports from @debrief/utils
-        └── index.ts          # barrel re-export source updated: `from './utils/time'` → `from '@debrief/utils'` (for the type only)
+│       └── interval.test.ts  # 5 assertion renames + 3 NEW tests (null semantics, invalid-symbol throw, assertNever)
+├── components/
+│   └── src/
+│       ├── utils/
+│       │   └── time.ts       # DELETE local ResolvedPositionStyle AND local resolvePositionStyle/computeAllPositionStyles;
+│       │                     # keep only calculateTimeExtent/parseTime/formatTime/etc.
+│       ├── index.ts          # barrel re-exports ResolvedPositionStyle + resolvers + PointShape + InvalidPointShapeError from @debrief/utils
+│       └── MapView/
+│           ├── PositionSymbolsLayer.tsx  # rename SymbolShape → PointShape; add assertNever default branches to svgPathForShape AND the render-loop switch
+│           └── __tests__/
+│               └── position-symbols.test.ts  # import PointShape (not SymbolShape); new test for assertNever
+└── schemas/
+    ├── src/
+    │   └── linkml/
+    │       └── common.yaml   # R-012/FR-017: MarkerSymbolEnum kept; adherence test pins equality
+    ├── scripts/              # NEW OR EXISTING: post-process step that narrows PositionStyle.symbol and
+    │                          # PositionStyleOverride.symbol from `string` to `PointShape` (FR-014 / R-011)
+    ├── src/generated/typescript/types.ts  # regenerated output — symbol fields on PositionStyle and PositionStyleOverride narrowed
+    └── tests/
+        └── adherence/        # NEW test: PointShapeEnum.values === MarkerSymbolEnum.values
+
+apps/vscode/
+└── src/tools/track/styling/
+    └── applySymbolStyle.ts   # replace VALID_SYMBOLS tuple + SymbolType with PointShape (imported from @debrief/utils);
+                              # MCP inputSchema.properties.symbol.enum derived via Object.values(PointShapeEnum)
 ```
 
-Renderers (`shared/components/src/MapView/PositionSymbolsLayer.tsx`, `shared/components/src/TimelineGanttView/*`, etc.) already read `.labelText` and rely on the 5-shape union — no source change expected. Any renderer that proves to need an adjustment (e.g., a `switch` that only covered 3 shapes) is updated in the same PR.
+**Structure Decision**: Single-project monorepo; no new packages, no new directories. Work spans `shared/utils/`, `shared/components/`, `shared/schemas/` (LinkML + generated + scripts + adherence tests), and `apps/vscode/src/tools/track/styling/`. The public export name `ResolvedPositionStyle` is preserved on both `@debrief/utils` and `@debrief/components` barrels (FR-010), and the public signatures of `resolvePositionStyle` / `computeAllPositionStyles` are unchanged — only their internal override-null semantics and the new invalid-symbol error path change behaviour. The MCP tool parameter surface (`apps/vscode/.../applySymbolStyle.ts`) has identical permissible values as today (5 shapes), so no consumer-visible change.
 
-**Structure Decision**: Single-project monorepo; no new packages, no new directories. Work stays within `shared/utils/` and `shared/components/`. No `apps/` or `services/` source changes are planned (the refactor is transparent to every app because the public name `ResolvedPositionStyle` is preserved on both packages' barrels).
+**File count**: ~13 production files + 3 schema/generated files + 4 spec files + 4 new test files ≈ 24 artefacts touched or added.
 
 ## Media Components
 
@@ -123,4 +151,9 @@ None — no extension workflow changes. The VS Code extension imports `@debrief/
 
 ## Complexity Tracking
 
-Empty — no Constitution Check violations to justify.
+No Constitution Check violations to justify. One scope-expansion item needs an explicit risk note:
+
+| Item | Why added | Simpler alternative rejected because |
+|------|-----------|--------------------------------------|
+| FR-014 (narrow `PositionStyle.symbol` / `PositionStyleOverride.symbol` in generated TypeScript) | Root-cause fix for the hand-typed-union drift. Without narrowing, every producer of a PositionStyleOverride must either trust callers, run the runtime guard (FR-015), or hand-type its own union — which re-creates the problem we're trying to kill. | (1) "Hand-edit the generated file" — breaks the `generated/` invariant. (2) "Modify `gen-typescript` upstream" — out of our control. (3) "Drop out of auto-gen for these two attributes" — selective manual handling is a maintenance trap. (4) "Live with `string`" — accepted as the fallback if R-011 fails, but would leave the refactor half-done. |
+| FR-017 adherence-test (R-012 / 17B) instead of 17A enum removal | Respects feature #091's prior architectural decision (`specs/091-tool-parameter-context-menus/research.md` RQ-7) that `MarkerSymbolEnum` is semantically distinct from `PointShapeEnum`. Pins value-set equality via test rather than by unilateral deletion. | "Just delete `MarkerSymbolEnum`" would overturn a prior ADR without conversation with its stakeholders — not appropriate mid-refactor. |

@@ -1,12 +1,17 @@
 /**
- * Contract: canonical shape of ResolvedPositionStyle after feature 201.
+ * Contract: canonical shapes published from @debrief/utils after feature 201
+ * (including the 2026-04-18 scope expansion).
  *
  * This file is specification-only. It is NOT imported by any production code.
  * It exists so that reviewers (and the /speckit.implement phase) can check the
- * actual implementation against the exact shape planned here, and so that any
+ * actual implementation against the exact shapes planned here, and so that any
  * drift between plan and implementation is visible in diff.
  *
- * The canonical implementation target: shared/utils/src/types.ts
+ * Canonical implementation targets:
+ *   - shared/utils/src/types.ts    — ResolvedPositionStyle, PointShape
+ *   - shared/utils/src/errors.ts   — InvalidPointShapeError (new; exact path TBD)
+ *   - shared/utils/src/assert.ts   — assertNever (new or existing; check first)
+ *   - shared/utils/src/interval.ts — resolvePositionStyle + guard + Set cache
  */
 
 // ---------------------------------------------------------------------------
@@ -137,3 +142,92 @@ void _sampleLiteral;
 //   label: 'nope', // ts(2353): 'label' does not exist in type 'ResolvedPositionStyle'.
 //   labelText: 'ok',
 // };
+
+// ---------------------------------------------------------------------------
+// Expanded scope (2026-04-18): additional published contracts
+// ---------------------------------------------------------------------------
+
+/**
+ * Typed error thrown by `resolvePositionStyle` when a runtime override's
+ * symbol field is not in the PointShape union. Callers (specifically
+ * `PositionSymbolsLayer.tsx`) catch this and surface it via LogService — they
+ * must NOT silently substitute a default shape for the offending position.
+ *
+ * See FR-015 and FR-018.
+ */
+export class InvalidPointShapeError extends Error {
+  constructor(
+    public readonly offendingValue: string,
+    public readonly validShapes: readonly string[],
+  ) {
+    super(
+      `Invalid point shape: "${offendingValue}". Must be one of: ${validShapes.join(', ')}.`,
+    );
+    this.name = 'InvalidPointShapeError';
+  }
+}
+
+/**
+ * Standard TypeScript exhaustiveness helper. Used as the default branch of
+ * every `switch (symbol)` in the map renderer so that adding a new value to
+ * PointShape causes tsc to fail until every renderer handles the new value.
+ *
+ * See FR-016.
+ *
+ * If @debrief/utils already exports this (check first — it may exist as part
+ * of constitution Article XV compliance in another feature), this file's
+ * implementation target is deleted and the existing one is reused.
+ */
+export function assertNever(value: never): never {
+  throw new Error(`Unhandled case: ${JSON.stringify(value)}`);
+}
+
+// ---------------------------------------------------------------------------
+// Resolver signature (unchanged — for reference only)
+// ---------------------------------------------------------------------------
+
+// The consolidated resolver's SIGNATURE matches the existing one in
+// shared/utils/src/interval.ts. Only its INTERNAL semantics change:
+//
+//   (a) Override-null filtering — R-007 / FR-013: applies an override field
+//       only when it is neither `undefined` nor `null`.
+//
+//   (b) Invalid-symbol guard — R-008 / FR-015: before assigning an override's
+//       symbol to the output, checks it against a module-level
+//       `Set<string>(Object.values(PointShapeEnum))` (R-009) and throws
+//       InvalidPointShapeError if absent.
+//
+//   (c) Output field rename `label` → `labelText` — FR-004 / FR-005.
+//
+// export function resolvePositionStyle(
+//   index: number,
+//   defaultStyle: PositionStyle,
+//   symbolIntervalPositions: Set<number>,
+//   labelIntervalPositions: Set<number>,
+//   override: PositionStyleOverride | null | undefined,
+//   positionTime: string,
+// ): ResolvedPositionStyle; // throws InvalidPointShapeError
+
+// ---------------------------------------------------------------------------
+// Schema-generator output narrowing (FR-014 / R-011)
+// ---------------------------------------------------------------------------
+
+// After this feature, the generated TypeScript in
+// shared/schemas/src/generated/typescript/types.ts MUST emit:
+//
+//   export interface PositionStyle {
+//     show_symbol: boolean,
+//     symbol: PointShape,      // was: string
+//     show_label: boolean,
+//   }
+//
+//   export interface PositionStyleOverride {
+//     show_symbol?: boolean,
+//     symbol?: PointShape,     // was: string
+//     show_label?: boolean,
+//     label?: string,
+//   }
+//
+// Delivery mechanism: post-process step in the schemas build (R-011). If that
+// mechanism proves intractable, FR-014 is renegotiated before tasks.md; the
+// fallback leaves these fields as `string` and keeps all other FRs as-is.

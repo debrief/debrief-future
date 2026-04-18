@@ -1,38 +1,46 @@
 ---
 layout: future-post
-title: "Planning: Consolidating a drifted type back to the schema"
+title: "Planning: Closing the drift surface on marker shapes"
 date: 2026-04-18
 track: [momentum]
 author: Ian
-reading_time: 3
+reading_time: 4
 tags: [tracer-bullet, tech-debt, schemas, typescript]
-excerpt: "Two TypeScript interfaces with the same name drifted apart. We're collapsing them back to one, anchored to the LinkML schema."
+excerpt: "A review pass turned a small type fix into a root-cause job: close the drift from LinkML schema down to the VS Code tool parameter."
 ---
 
 ## What We're Building
 
-We have two TypeScript interfaces in the codebase both called `ResolvedPositionStyle`. One lives in `@debrief/utils` and lists three marker shapes. The other lives in `@debrief/components` and lists five. They also disagree on whether the label field is called `label` or `labelText`. Both were hand-typed independently of the LinkML schema that already defines the canonical list of point shapes, and they drifted.
+The job started narrow. Two TypeScript interfaces both called `ResolvedPositionStyle` had drifted apart — one listed three marker shapes, the other five, and they disagreed on whether the resolved label field was `label` or `labelText`. A quick consolidation, one interface anchored to the schema-generated `PointShapeEnum`, done.
 
-This work consolidates them down to one interface, living in `@debrief/utils`, with its shape union derived directly from the schema-generated `PointShapeEnum`. No rendering behaviour changes — markers on the map and timeline will look identical before and after. It is defensive housekeeping: one less place where a hand-typed list can fall out of step with the schema.
+Then a `/speckit.review` pass pushed back. If two hand-typed unions had drifted, where else had the same thing happened? The answer, once we looked, was: in six more places along the same axis. So the scope expanded — not to chase every hand-typed union in the codebase, but to close the drift surface for this one axis, marker shapes, from the LinkML schema all the way down to the VS Code tool parameter.
+
+The expanded set of changes:
+
+- One `resolvePositionStyle` / `computeAllPositionStyles` pair, not two. The components-side semantics wins — `null` means "use the default or interval value", matching the LinkML description.
+- A typed `InvalidPointShapeError` thrown at the resolver boundary when a JSON payload contains an unknown symbol. Previously, a mis-typed import drew a circle and nobody noticed.
+- `assertNever` default branches on every `switch (symbol)` in the map renderer, so adding a shape to the schema breaks the build until every renderer handles it.
+- `PositionStyle.symbol` and `PositionStyleOverride.symbol` narrowed from `string` to `PointShape` in the generated TypeScript, via a post-process step in the schemas build.
+- `SymbolShape` in the position symbols layer and `VALID_SYMBOLS` in the VS Code apply-style helper both deleted, replaced by the schema-derived type and `Object.values(PointShapeEnum)`.
+- A schema adherence test pinning `PointShapeEnum` and `MarkerSymbolEnum` to the same value-set. Feature #091 deliberately kept both for semantic separation (styling context versus tool-parameter context); we respect that ADR and close the drift surface with a test instead of a merge.
 
 ## How It Fits
 
-Future Debrief is built schema-first. LinkML is the source of truth, and we generate Pydantic models, JSON Schema, and TypeScript types from it. That discipline works well at the service boundary. It is less consistently applied on the rendering side, where it is tempting to write a quick union type next to the component that uses it. This change pulls one of those rendering-side types back into the schema-derived world, using a small TypeScript pattern (a template literal over the generated enum) that keeps the union open to string literals at call sites. That is important: callers can keep passing `'circle'` as a plain string, but the set of legal values now auto-extends whenever the schema grows a new shape.
+Future Debrief is built schema-first. LinkML is the source of truth, and we generate Pydantic, JSON Schema, and TypeScript from it. That discipline works well at the service boundary and less consistently at the rendering edge, where it is tempting to drop a quick five-shape union next to the component that needs it. Each of those quick unions is a drift site.
 
-It also sets up a wider audit, tracked separately in backlog item #206, of other rendering-side types that still parallel a LinkML enum by hand.
+Three Constitution articles sit behind the expanded scope. Article I.3 — no silent failure — drives the `InvalidPointShapeError`. Article II — schema integrity — drives the generated-type narrowing and the enum-parity test. Article XV — strict types — drives the exhaustive-switch enforcement. None of these are stretches; each bullet above maps to a specific article that the current state violates.
 
 ## Key Decisions
 
-- **Derive the shape union from the schema, not retype it.** We use `` `${PointShapeEnum}` `` — a template literal over the generated enum — rather than referencing the enum directly. The practical effect: callers keep using string literals like `'circle'` with no churn, and the list of valid shapes stays locked to the schema. When LinkML grows a new shape, the TypeScript type extends automatically.
-- **Standardise on `labelText`, not `label`.** The two interfaces disagreed on the field name for the resolved label. The renderer already uses `labelText`, and migrating the five test assertions on the utils side is a small change. The schema's `PositionStyleOverride.label` input field keeps its LinkML-defined name — only the resolved output field changes.
-- **Consolidate the type, not the resolver implementations.** Each package has its own near-identical `resolvePositionStyle` / `computeAllPositionStyles`. They differ subtly on null-versus-undefined handling of overrides. That is a separate question and is out of scope here; we've logged it as a follow-up. This change is scoped tightly so the behaviour-change risk is zero.
-
-Roughly 60 lines touched across 5 files. Behaviour is covered by existing vitest unit tests, existing Playwright E2E, and existing webview E2E. No new tests required — if anything goes wrong, the existing suite will catch it.
+- **Fix root causes, not just the symptom.** The original spec would have unified the drifted types and left the resolvers, the silent failure, the non-exhaustive switches, and the sibling hand-typed unions in place. We chose the wider fix because the review agent was right: leaving those in place guarantees we do this work again in six months.
+- **Respect the #091 ADR on `PointShapeEnum` vs `MarkerSymbolEnum`.** Semantic separation was a deliberate choice for a good reason. We close the drift risk with an adherence test, not by merging the enums.
+- **Narrow generator output via post-process, not upstream.** Patching gen-typescript upstream is a year-long conversation. A local post-process step keeps the change in our tree and gives us the narrow types today. This is the highest-risk item in the plan (R-011 in research.md) — if we cannot find a tractable post-process hook, we will renegotiate the scope before implementation rather than force it.
+- **Scope re-rated Medium, not Low.** The backlog item was rated Low. The honest rating is now Medium: roughly 13 production files, 3 schema/generated files, around 4 new tests, 200–300 lines touched. The review pass found what it found.
 
 ## What We'd Love Feedback On
 
-- Is the template-literal derivation (`` `${SomeEnum}` ``) the right idiom for "TypeScript type pinned to a schema-generated enum, but still assignment-compatible with string literals"? If we start using it in more places, is there a shared type-patterns doc where the pattern belongs?
-- How much other hand-typed drift is there? If you have spotted a rendering-side union that parallels a LinkML enum by hand, that is exactly the kind of thing #206 wants to hear about.
+- The post-process narrowing of generator output (FR-014) is the risky bit. If anyone has tried patching gen-typescript output in-tree and hit a wall, that would save us a week.
+- Backlog item #206 still tracks the wider hand-typed-union audit across all LinkML enums. This feature handles the marker-shape axis only. If you have spotted another enum where the same drift pattern is brewing, #206 is the place to log it.
 
-→ [Spec](https://github.com/debrief/debrief-future/blob/main/specs/201-position-style-consolidation/spec.md)
-→ [Plan](https://github.com/debrief/debrief-future/blob/main/specs/201-position-style-consolidation/plan.md)
+Spec: https://github.com/debrief/debrief-future/blob/main/specs/201-position-style-consolidation/spec.md
+Plan: https://github.com/debrief/debrief-future/blob/main/specs/201-position-style-consolidation/plan.md

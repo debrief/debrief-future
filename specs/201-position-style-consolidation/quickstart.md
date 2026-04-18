@@ -10,12 +10,14 @@ This quickstart is for **after** the refactor lands. It shows the import paths, 
 ```ts
 // Preferred — canonical location.
 import type { ResolvedPositionStyle, PointShape } from '@debrief/utils';
+import { resolvePositionStyle, computeAllPositionStyles, InvalidPointShapeError, assertNever } from '@debrief/utils';
 
-// Still works — components package re-exports the same type.
-import type { ResolvedPositionStyle } from '@debrief/components';
+// Still works — components package re-exports everything above unchanged.
+import type { ResolvedPositionStyle, PointShape } from '@debrief/components';
+import { resolvePositionStyle, computeAllPositionStyles, InvalidPointShapeError } from '@debrief/components';
 ```
 
-Both imports resolve to the exact same TypeScript type. There is no second definition hiding under `shared/components/src/utils/time.ts` any more.
+Both import paths resolve to the exact same TypeScript types and functions. There is no second definition hiding under `shared/components/src/utils/time.ts` any more — the interface, the resolver functions, and the `SymbolShape` alias all got collapsed into `@debrief/utils` by feature #201.
 
 ## The shape
 
@@ -53,18 +55,21 @@ console.log(style.labelText);    // string | null
 ## Consume one
 
 ```ts
+import { assertNever } from '@debrief/utils';
+
 function renderMarker(style: ResolvedPositionStyle): JSX.Element | null {
   if (!style.showSymbol && !style.showLabel) return null;
 
-  // `style.symbol` is the schema-wide union; an exhaustive switch is the
-  // safest pattern. If LinkML adds a new shape, tsc will warn about a missing
-  // case in files that enable exhaustiveness checking.
+  // `style.symbol` is the schema-wide PointShape union. The default branch
+  // calls `assertNever(shape)` so that adding a new shape to the LinkML
+  // schema causes tsc to fail until every renderer handles it.
   switch (style.symbol) {
     case 'circle':   return <Circle />;
     case 'square':   return <Square />;
     case 'triangle': return <Triangle />;
     case 'diamond':  return <Diamond />;
     case 'cross':    return <Cross />;
+    default:         return assertNever(style.symbol);
   }
 
   return style.showLabel && style.labelText
@@ -72,6 +77,33 @@ function renderMarker(style: ResolvedPositionStyle): JSX.Element | null {
     : null;
 }
 ```
+
+## Handle the invalid-shape error
+
+```ts
+import { InvalidPointShapeError, computeAllPositionStyles } from '@debrief/utils';
+import { logService } from 'apps/vscode/.../logService'; // your LogService
+
+let styles;
+try {
+  styles = computeAllPositionStyles(positions, defaultStyle, ...);
+} catch (err) {
+  if (err instanceof InvalidPointShapeError) {
+    logService.warn(
+      `Track "${trackId}" has an invalid override symbol: ${err.offendingValue}. ` +
+      `Valid shapes: ${err.validShapes.join(', ')}.`
+    );
+    // Render without overrides, or render a "broken override" indicator —
+    // project UX choice; FR-018 requires the error is logged and not silently
+    // swallowed, but leaves the per-position presentation to the caller.
+    styles = computeAllPositionStyles(positions, defaultStyle, ..., /* overrides */ null);
+  } else {
+    throw err;
+  }
+}
+```
+
+The resolver is the only component that throws `InvalidPointShapeError`; renderers never produce one and should not synthesise one.
 
 ## Migration from the old shape
 
@@ -138,9 +170,11 @@ If all four pass with no change to main, the refactor is done.
 
 ## Who consumes this type today?
 
-- `shared/utils/src/interval.ts` — the resolver (produces).
-- `shared/utils/tests/interval.test.ts` — asserts resolver output.
-- `shared/components/src/utils/time.ts` — a duplicate resolver (produces). Not de-duplicated in this feature (see spec.md Out of Scope).
-- `shared/components/src/MapView/PositionSymbolsLayer.tsx` — the map renderer (consumes).
+After feature #201 (expanded scope):
 
-That is the complete inventory as of 2026-04-18. If you add a new producer or consumer, import the type from `@debrief/utils` and never redeclare it locally.
+- `shared/utils/src/interval.ts` — the **sole** resolver (produces). The components-side duplicate has been deleted.
+- `shared/utils/tests/interval.test.ts` — asserts resolver output (including the new null-override semantics and invalid-symbol throw).
+- `shared/components/src/MapView/PositionSymbolsLayer.tsx` — the map renderer (consumes). Uses `PointShape` (no longer has a local `SymbolShape` alias) and calls `assertNever` in switch default branches.
+- `apps/vscode/src/tools/track/styling/applySymbolStyle.ts` — the MCP tool (consumes via `PointShape` for TS typing; via `Object.values(PointShapeEnum)` for the runtime inputSchema enum).
+
+If you add a new producer or consumer, import the types from `@debrief/utils` (or `@debrief/components`) and never redeclare them locally. Never hand-type a string-literal union of shape names — the whole point of #201 is to end that pattern.
