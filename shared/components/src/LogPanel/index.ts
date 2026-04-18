@@ -9,8 +9,6 @@ export { LogPanel } from './LogPanel';
 export type {
   LogPanelProps,
   LogEntryProps,
-  LogTimelineProps,
-  LogByFeatureProps,
   LogFilterRowProps,
   LogActionBarProps,
   SnapshotBoundaryProps,
