@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Dodgy Track",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Saxon Warrior: Dodgy Track \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Mahan.",
+    "description": "Saxon Warrior: Dodgy Track — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Mahan.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:32.669402Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

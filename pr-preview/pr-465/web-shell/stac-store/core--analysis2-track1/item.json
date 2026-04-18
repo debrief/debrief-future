@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Analysis2 Track1",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Analysis2 Track1 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+    "description": "Saxon Warrior: Analysis2 Track1 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
     "end_datetime": "1995-12-12T11:41:00+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:29.933342Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

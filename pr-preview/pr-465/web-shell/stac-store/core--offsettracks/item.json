@@ -10,7 +10,7 @@
     "coordinates": [
       [
         [
-          -0.0,
+          0,
           60.2
         ],
         [
@@ -22,18 +22,18 @@
           60.7
         ],
         [
-          -0.0,
+          0,
           60.7
         ],
         [
-          -0.0,
+          0,
           60.2
         ]
       ]
     ]
   },
   "bbox": [
-    -0.0,
+    0,
     60.2,
     0.5,
     60.7
@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Offsettracks",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Offsettracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including FGS Mahan, HMS Andrea Doria, Contact Alpha. Multi-national participation: DE, GB.",
+    "description": "Saxon Warrior: Offsettracks — Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including FGS Mahan, HMS Andrea Doria, Contact Alpha. Multi-national participation: DE, GB.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T13:00:00+00:00",
     "debrief:platforms": [
@@ -128,6 +128,22 @@
         "load_timestamp": "2026-04-13T23:12:31.891990Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

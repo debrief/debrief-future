@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Ambig Tracks2",
     "datetime": "2010-01-12T12:08:00+00:00",
-    "description": "Saxon Warrior: Ambig Tracks2 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. Multi-national participation: FR, GB.",
+    "description": "Saxon Warrior: Ambig Tracks2 — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including Contact Alpha, HMS Richmond. Multi-national participation: FR, GB.",
     "start_datetime": "2010-01-12T12:08:00+00:00",
     "end_datetime": "2010-01-12T15:54:00+00:00",
     "debrief:platforms": [
@@ -121,6 +121,22 @@
         "load_timestamp": "2026-04-13T23:12:29.906952Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
