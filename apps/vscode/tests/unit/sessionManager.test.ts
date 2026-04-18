@@ -6,9 +6,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SessionManager, type PlotSessionData } from '../../src/services/sessionManager';
-// T018: Track renamed to TrackViewModel; T019: update import
 import type { Plot, TrackViewModel, ReferenceLocationViewModel } from '../../src/types/plot';
-// Convenience aliases to avoid changing all existing test usages
+
 type Track = TrackViewModel;
 type ReferenceLocation = ReferenceLocationViewModel;
 

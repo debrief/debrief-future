@@ -58,7 +58,6 @@ import type {
   SafeFeature,
 } from '@debrief/utils';
 
-// T024: Import LogEntry from @debrief/schemas instead of defining locally
 import type { LogEntry } from '@debrief/schemas';
 
 import {
@@ -144,9 +143,7 @@ function durationMsToIso8601(durationMs: number): string {
   return `PT${formatted}S`;
 }
 
-// T024: LogEntry type is now imported from @debrief/schemas (above).
-// Schema LogEntry uses snake_case field names and stores parameters as ParameterValue[].
-
+// LogEntry uses snake_case field names and stores parameters as ParameterValue[].
 function createLogEntry(
   toolName: string,
   toolVersion: string,

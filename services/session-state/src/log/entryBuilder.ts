@@ -121,17 +121,6 @@ export function extractFromOutputFeatures(
 }
 
 /**
- * Extract parameters from Python-generated provenance on output features.
- * @deprecated Use extractFromOutputFeatures instead.
- */
-export function extractParametersFromOutputFeatures(
-  features: Array<Record<string, unknown>>,
-  activityId: string | undefined
-): Record<string, ParameterValue> | undefined {
-  return extractFromOutputFeatures(features, activityId).parameters;
-}
-
-/**
  * Build a WasGeneratedBy from available data.
  */
 function buildWasGeneratedBy(

@@ -5,8 +5,6 @@
  */
 
 import * as vscode from 'vscode';
-// T018: Track renamed to TrackViewModel; T019: update import
-// T019: ReferenceLocation (UI type) renamed to ReferenceLocationViewModel
 import type { TrackViewModel, ReferenceLocationViewModel } from '../types/plot';
 
 export class OutlineProvider implements vscode.DocumentSymbolProvider {

@@ -72,8 +72,12 @@ export {
   isAnnotationFeature,
 } from '@debrief/schemas';
 
-// Re-export DisplayMode from TimeController for use by MapView temporal rendering
-export type { DisplayMode } from '../TimeController/types';
+/**
+ * Track display mode.
+ * - 'full': Show entire track regardless of time position
+ * - 'trail': Show track history from start up to current time position
+ */
+export type DisplayMode = 'full' | 'trail';
 
 // Bounds type — canonical definition in @debrief/utils (T08)
 export type { Bounds } from '@debrief/utils';
