@@ -82,7 +82,7 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 - [x] T014 Add a new `knip` target to `Taskfile.yml` with `desc: "Run knip — fail if any non-declared unused files are detected"`, `deps: [install]`, and `cmds: [pnpm exec knip]`; place it adjacent to the existing `lint` / `typecheck` / `test` targets (alphabetic-adjacent or after `test`) `/home/user/debrief-future/Taskfile.yml`
 - [x] T015 Append `- task: knip` to the `cmds:` list of the existing `verify` target in `Taskfile.yml`, after `- task: test`; the verify pipeline becomes lint → typecheck → test → knip `/home/user/debrief-future/Taskfile.yml`
 - [x] T016 Add a new step named `Run knip` running `task knip` to `.github/workflows/ci.yml`, placed after the existing `Run linting` step and before `Run type checking`; use the same `runs-on` / indentation as neighbouring steps `/home/user/debrief-future/.github/workflows/ci.yml`
-- [ ] T017 Push the branch and confirm CI goes green on the new `Run knip` step; capture the CI run URL and append it to `evidence/ci-run-transcript.md` under a "CI verification" section `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
+- [x] T017 Push the branch and confirm CI goes green on the new `Run knip` step; capture the CI run URL and append it to `evidence/ci-run-transcript.md` under a "CI verification" section `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
 
 ### Regression-detection stress test (maps to SC-005 / User Story 1 Scenario 3)
 
@@ -123,7 +123,7 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 ### PR Creation
 
-- [ ] T027 Create the feature PR and publish the blog post by running `/speckit.pr`; this task depends on all evidence and media tasks (T019–T026) being complete. The PR description should include a paste of the coordination message for #199 (from research.md R-007) so whoever implements #199 sees it without having to dig `N/A`
+- [x] T027 Create the feature PR and publish the blog post by running `/speckit.pr`; this task depends on all evidence and media tasks (T019–T026) being complete. The PR description should include a paste of the coordination message for #199 (from research.md R-007) so whoever implements #199 sees it without having to dig `N/A`
 
 **Task T027 must run last.** It depends on Phases 1–5 being complete and all evidence + media artefacts being checked in.
 
