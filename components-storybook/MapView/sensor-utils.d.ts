@@ -1,6 +1,8 @@
 import { SensorContact, SensorData, TrackFeature } from '../../../schemas/src/generated/typescript/index.ts';
 import { DisplayMode } from '../utils/types';
+import { geodesicDestination, interpolateTrackCourse, interpolateTrackPosition } from './geo-utils';
 
+export { geodesicDestination, interpolateTrackCourse, interpolateTrackPosition };
 /** Maximum bearing line extent when no range is specified (5 degrees of latitude in metres) */
 export declare const MAXIMUM_SENSOR_BEARING_RANGE: number;
 /** Default sensor colour when no colour is specified at any level */
@@ -75,33 +77,11 @@ export declare function applySnailFade(baseColor: string, proportion: number): s
  */
 export declare function calculateSnailProportion(contactTimeMs: number, currentTimeMs: number, trailLengthMs: number): number | null;
 /**
- * Calculate the destination point given start point, bearing, and distance.
- * Uses haversine formula for geodesic accuracy.
- *
- * @param origin [lon, lat] starting point
- * @param bearing Degrees from north (0-360)
- * @param distanceMetres Distance in metres
- * @returns [lon, lat] destination point
- */
-export declare function geodesicDestination(origin: [number, number], bearing: number, distanceMetres: number): [number, number];
-/**
  * Calculate the far end of a bearing line.
  * If range is provided, uses it directly.
  * If no range, extends to MAXIMUM_SENSOR_BEARING_RANGE (5 degrees latitude).
  */
 export declare function computeBearingFarEnd(origin: [number, number], bearing: number, range: number | null): [number, number];
-/**
- * Interpolate the host track's position at a given timestamp.
- * Uses binary search + linear interpolation on the positions/coordinates arrays.
- *
- * @param coordinates Array of [lon, lat] from track geometry
- * @param positions Array of { time: string } from track properties
- * @param targetTimeMs Target timestamp (epoch ms)
- * @returns [lon, lat] interpolated position, or null if time is out of range
- */
-export declare function interpolateTrackPosition(coordinates: [number, number][], positions: Array<{
-    time: string;
-}>, targetTimeMs: number): [number, number] | null;
 /**
  * Resolve the colour for a sensor contact using the inheritance chain:
  * contact.color > sensor.color > track style colour > DEFAULT_SENSOR_COLOR
@@ -114,14 +94,6 @@ export declare function resolveContactColor(contact: SensorContact, sensor: Sens
  *   positive = starboard side
  */
 export declare function getRelativeBearing(courseDeg: number, bearingDeg: number): number;
-/**
- * Interpolate the host track's course at a given timestamp.
- * Returns course in degrees, or null if time is out of range.
- */
-export declare function interpolateTrackCourse(positions: Array<{
-    time: string;
-    course?: number;
-}>, targetTimeMs: number): number | null;
 /**
  * Determine whether a bearing is to the port side of the vessel.
  * Port = negative relative bearing.

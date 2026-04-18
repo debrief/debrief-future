@@ -3,7 +3,12 @@ import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProp
 export type { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride, NarrativeEntry, CircleAnnotation, RectangleAnnotation, LineAnnotation, TextAnnotation, VectorAnnotation, PolyAnnotation, };
 export type { SchemaAnnotationFeature, DebriefFeature, DebriefFeatureCollection, } from '../../../schemas/src/generated/typescript/index.ts';
 export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, } from '../../../schemas/src/generated/typescript/index.ts';
-export type { DisplayMode } from '../TimeController/types';
+/**
+ * Track display mode.
+ * - 'full': Show entire track regardless of time position
+ * - 'trail': Show track history from start up to current time position
+ */
+export type DisplayMode = 'full' | 'trail';
 export type { Bounds } from '@debrief/utils';
 /**
  * Time extent as [startTime, endTime] in milliseconds since epoch
