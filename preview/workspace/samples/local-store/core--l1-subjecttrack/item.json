@@ -11,37 +11,37 @@
       [
         [
           -30.041875,
-          -0.0
+          0
         ],
         [
-          -30.0,
-          -0.0
+          -30,
+          0
         ],
         [
-          -30.0,
-          -0.0
-        ],
-        [
-          -30.041875,
-          -0.0
+          -30,
+          0
         ],
         [
           -30.041875,
-          -0.0
+          0
+        ],
+        [
+          -30.041875,
+          0
         ]
       ]
     ]
   },
   "bbox": [
     -30.041875,
-    -0.0,
-    -30.0,
-    -0.0
+    0,
+    -30,
+    0
   ],
   "properties": {
     "title": "Saxon Warrior: L1 Subjecttrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: L1 Subjecttrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
+    "description": "Saxon Warrior: L1 Subjecttrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including Contact Alpha.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T12:29:59+00:00",
     "debrief:platforms": [
@@ -110,6 +110,22 @@
         "load_timestamp": "2026-04-13T23:12:31.871867Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Source 1",
     "datetime": "1999-12-31T22:00:00+00:00",
-    "description": "Saxon Warrior: Source 1 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Westminster.",
+    "description": "Saxon Warrior: Source 1 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Westminster.",
     "start_datetime": "1999-12-31T22:00:00+00:00",
     "end_datetime": "2000-01-01T05:37:00+00:00",
     "debrief:platforms": [
@@ -112,6 +112,22 @@
         "load_timestamp": "2026-04-13T23:12:33.754172Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

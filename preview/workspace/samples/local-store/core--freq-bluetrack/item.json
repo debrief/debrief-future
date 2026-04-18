@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Freq Bluetrack",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Freq Bluetrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
+    "description": "Saxon Warrior: Freq Bluetrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Richmond.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T14:00:00+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:31.840182Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

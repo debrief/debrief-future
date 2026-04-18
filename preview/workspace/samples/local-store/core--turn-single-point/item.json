@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Turn Single Point",
     "datetime": "2009-04-22T18:02:54.410000+00:00",
-    "description": "Saxon Warrior: Turn Single Point \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Laboon.",
+    "description": "Saxon Warrior: Turn Single Point — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Laboon.",
     "start_datetime": "2009-04-22T18:02:54.410000+00:00",
     "end_datetime": "2009-04-22T18:02:54.410000+00:00",
     "debrief:platforms": [
@@ -114,6 +114,22 @@
         "load_timestamp": "2026-04-13T23:12:33.858438Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }

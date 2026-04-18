@@ -41,7 +41,7 @@
   "properties": {
     "title": "Saxon Warrior: Slicedemo",
     "datetime": "2001-01-01T14:00:47.812000+00:00",
-    "description": "Saxon Warrior: Slicedemo \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Mahan.",
+    "description": "Saxon Warrior: Slicedemo — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Mahan.",
     "start_datetime": "2001-01-01T14:00:47.812000+00:00",
     "end_datetime": "2001-01-01T18:00:49.546000+00:00",
     "debrief:platforms": [
@@ -111,6 +111,22 @@
         "load_timestamp": "2026-04-13T23:12:32.522046Z",
         "tool_version": "0.1.0"
       }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
     }
   }
 }
