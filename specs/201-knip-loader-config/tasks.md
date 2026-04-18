@@ -51,10 +51,10 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 **Independent test**: `pnpm exec knip --version` prints a 5.x version string; `/tmp/knip-before.txt` exists and contains ≥12 loader-main-process findings.
 
-- [ ] T003 Capture pre-change knip baseline by running `pnpm dlx knip --reporter compact > /tmp/knip-before.txt 2>&1 || true` from the repo root (the `|| true` is intentional — knip exits non-zero when it finds unused files, and we want the report regardless); stash the file for Phase 3's diff step `/tmp/knip-before.txt`
-- [ ] T004 Add `knip` to root `devDependencies` pinned to the latest stable 5.x (use `pnpm add -Dw knip@^5` from the repo root); DO NOT commit `pnpm-lock.yaml` yet — T005 regenerates it in a clean step `/home/user/debrief-future/package.json`
-- [ ] T005 Regenerate the lockfile by running `pnpm install` at the repo root; verify the resulting `pnpm-lock.yaml` diff only touches the `knip` entry (and transitive deps of knip) — no unrelated packages should move `/home/user/debrief-future/pnpm-lock.yaml`
-- [ ] T006 Smoke-check the install by running `pnpm exec knip --version`; record the printed 5.x version (used later in the verification record Entity 4 §5) `N/A`
+- [x] T003 Capture pre-change knip baseline by running `pnpm dlx knip --reporter compact > /tmp/knip-before.txt 2>&1 || true` from the repo root (the `|| true` is intentional — knip exits non-zero when it finds unused files, and we want the report regardless); stash the file for Phase 3's diff step `/tmp/knip-before.txt`
+- [x] T004 Add `knip` to root `devDependencies` pinned to the latest stable 5.x (use `pnpm add -Dw knip@^5` from the repo root); DO NOT commit `pnpm-lock.yaml` yet — T005 regenerates it in a clean step `/home/user/debrief-future/package.json`
+- [x] T005 Regenerate the lockfile by running `pnpm install` at the repo root; verify the resulting `pnpm-lock.yaml` diff only touches the `knip` entry (and transitive deps of knip) — no unrelated packages should move `/home/user/debrief-future/pnpm-lock.yaml`
+- [x] T006 Smoke-check the install by running `pnpm exec knip --version`; record the printed 5.x version (used later in the verification record Entity 4 §5) `N/A`
 
 ---
 
@@ -66,27 +66,27 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 ### Config authoring + orphan removal
 
-- [ ] T007 Create `knip.json` at the repo root declaring three entries (`src/main/index.ts`, `src/preload/index.ts`, `src/main.tsx`) under `workspaces["apps/loader"]` per the contract at `specs/201-knip-loader-config/contracts/knip-config.schema.json`; include the `$schema` pointer pinned to `https://unpkg.com/knip@5/schema.json` `/home/user/debrief-future/knip.json`
-- [ ] T008 Validate the new config against the feature's contract schema by running `npx -y ajv-cli@5 validate -s specs/201-knip-loader-config/contracts/knip-config.schema.json -d knip.json` from repo root; save the transcript to `evidence/validation-output.txt` (overwrite) for use in Phase 5 `specs/201-knip-loader-config/evidence/validation-output.txt`
-- [ ] T009 Delete `apps/loader/src/main/updater.ts` via `git rm apps/loader/src/main/updater.ts`; confirm no inbound imports exist via `grep -rn "updater" apps/loader/src/` (expect zero matches outside the deleted file itself) `apps/loader/src/main/updater.ts`
-- [ ] T010 Smoke-check the loader still compiles by running `pnpm --filter debrief-loader build:main`; expect exit 0 `N/A`
+- [x] T007 Create `knip.json` at the repo root declaring three entries (`src/main/index.ts`, `src/preload/index.ts`, `src/main.tsx`) under `workspaces["apps/loader"]` per the contract at `specs/201-knip-loader-config/contracts/knip-config.schema.json`; include the `$schema` pointer pinned to `https://unpkg.com/knip@5/schema.json` `/home/user/debrief-future/knip.json`
+- [x] T008 Validate the new config against the feature's contract schema by running `npx -y ajv-cli@5 validate -s specs/201-knip-loader-config/contracts/knip-config.schema.json -d knip.json` from repo root; save the transcript to `evidence/validation-output.txt` (overwrite) for use in Phase 5 `specs/201-knip-loader-config/evidence/validation-output.txt`
+- [x] T009 Delete `apps/loader/src/main/updater.ts` via `git rm apps/loader/src/main/updater.ts`; confirm no inbound imports exist via `grep -rn "updater" apps/loader/src/` (expect zero matches outside the deleted file itself) `apps/loader/src/main/updater.ts`
+- [x] T010 Smoke-check the loader still compiles by running `pnpm --filter debrief-loader build:main`; expect exit 0 `N/A` — `build:main` is a pre-existing unrelated tsconfig failure on `main`; standard `pnpm -r typecheck` (after workspace build) passes. See `evidence/verification-record.md` §6.
 
 ### Local verification (maps to SC-001, SC-002)
 
-- [ ] T011 Run knip against the post-change tree with `pnpm exec knip --reporter compact > /tmp/knip-after.txt 2>&1 || true`; confirm `grep -cE '^apps/loader/src/main/' /tmp/knip-after.txt` returns `0` (SC-001 — 12 → 0) `/tmp/knip-after.txt`
-- [ ] T012 Confirm non-loader findings are byte-identical to baseline via `diff <(grep -vE '^apps/loader/src/main/' /tmp/knip-before.txt | sort) <(grep -vE '^apps/loader/src/main/' /tmp/knip-after.txt | sort)`; expect empty output (SC-002) `N/A`
-- [ ] T013 Save the diff transcript (from T012) plus the full `/tmp/knip-before.txt` and `/tmp/knip-after.txt` contents into `evidence/ci-run-transcript.md` as the "local verification" section (CI run URL added later in T017) `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
+- [x] T011 Run knip against the post-change tree with `pnpm exec knip --reporter compact > /tmp/knip-after.txt 2>&1 || true`; confirm `grep -cE '^apps/loader/src/main/' /tmp/knip-after.txt` returns `0` (SC-001 — 12 → 0) `/tmp/knip-after.txt`
+- [x] T012 Confirm non-loader findings are byte-identical to baseline via `diff <(grep -vE '^apps/loader/src/main/' /tmp/knip-before.txt | sort) <(grep -vE '^apps/loader/src/main/' /tmp/knip-after.txt | sort)`; expect empty output (SC-002) `N/A`
+- [x] T013 Save the diff transcript (from T012) plus the full `/tmp/knip-before.txt` and `/tmp/knip-after.txt` contents into `evidence/ci-run-transcript.md` as the "local verification" section (CI run URL added later in T017) `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
 
 ### CI-gate wiring
 
-- [ ] T014 Add a new `knip` target to `Taskfile.yml` with `desc: "Run knip — fail if any non-declared unused files are detected"`, `deps: [install]`, and `cmds: [pnpm exec knip]`; place it adjacent to the existing `lint` / `typecheck` / `test` targets (alphabetic-adjacent or after `test`) `/home/user/debrief-future/Taskfile.yml`
-- [ ] T015 Append `- task: knip` to the `cmds:` list of the existing `verify` target in `Taskfile.yml`, after `- task: test`; the verify pipeline becomes lint → typecheck → test → knip `/home/user/debrief-future/Taskfile.yml`
-- [ ] T016 Add a new step named `Run knip` running `task knip` to `.github/workflows/ci.yml`, placed after the existing `Run linting` step and before `Run type checking`; use the same `runs-on` / indentation as neighbouring steps `/home/user/debrief-future/.github/workflows/ci.yml`
+- [x] T014 Add a new `knip` target to `Taskfile.yml` with `desc: "Run knip — fail if any non-declared unused files are detected"`, `deps: [install]`, and `cmds: [pnpm exec knip]`; place it adjacent to the existing `lint` / `typecheck` / `test` targets (alphabetic-adjacent or after `test`) `/home/user/debrief-future/Taskfile.yml`
+- [x] T015 Append `- task: knip` to the `cmds:` list of the existing `verify` target in `Taskfile.yml`, after `- task: test`; the verify pipeline becomes lint → typecheck → test → knip `/home/user/debrief-future/Taskfile.yml`
+- [x] T016 Add a new step named `Run knip` running `task knip` to `.github/workflows/ci.yml`, placed after the existing `Run linting` step and before `Run type checking`; use the same `runs-on` / indentation as neighbouring steps `/home/user/debrief-future/.github/workflows/ci.yml`
 - [ ] T017 Push the branch and confirm CI goes green on the new `Run knip` step; capture the CI run URL and append it to `evidence/ci-run-transcript.md` under a "CI verification" section `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
 
 ### Regression-detection stress test (maps to SC-005 / User Story 1 Scenario 3)
 
-- [ ] T018 Stress test the CI gate locally: create a throwaway unused file with `printf 'export const never_called = () => {};\n' > apps/loader/src/main/stress_orphan.ts`, run `task knip`, confirm it exits non-zero and names `stress_orphan.ts`, then delete the file and run `task knip` again to confirm it exits 0; capture both transcripts in `evidence/ci-run-transcript.md` under a "stress test" section `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
+- [x] T018 Stress test the CI gate locally: create a throwaway unused file with `printf 'export const never_called = () => {};\n' > apps/loader/src/main/stress_orphan.ts`, run `task knip`, confirm it exits non-zero and names `stress_orphan.ts`, then delete the file and run `task knip` again to confirm it exits 0; capture both transcripts in `evidence/ci-run-transcript.md` under a "stress test" section `specs/201-knip-loader-config/evidence/ci-run-transcript.md`
 
 **Parallel opportunities within Phase 3**: T014 and T016 touch different files (`Taskfile.yml` vs `.github/workflows/ci.yml`) and can run in parallel once T007 is done, but serialisation is clearer here — keep them sequential. No `[P]` labels in this phase.
 
@@ -100,9 +100,9 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 **Independent test** (maps to spec User Story 2 Acceptance Scenarios 1, 2, 3): a future maintainer reading `evidence/verification-record.md` can identify the declared entry file(s), confirm each previously-flagged file was either reached from the entry or deleted, and see the CI gate was exercised — all without rerunning the reachability analysis.
 
-- [ ] T019 Create `evidence/verification-record.md` with YAML front matter (`feature: 201-knip-loader-config`, `captured_at: <ISO8601>`, `git_sha: <HEAD at capture time>`) per the template at `.specify/templates/evidence/test-summary-template.md` `specs/201-knip-loader-config/evidence/verification-record.md`
-- [ ] T020 Populate sections 1–5 of the verification record: §1 scope, §2 declared entry paths (copy from `knip.json`), §3 reachability table (11 files ✅ reachable via their import chain + 1 file 🗑 DELETED), §4 "No genuine orphans remain" assertion, §5 pinned knip version (from T006 output) `specs/201-knip-loader-config/evidence/verification-record.md`
-- [ ] T021 Populate sections 6–9: §6 build-smoke transcript (from T010), §7 pre/post knip counts (12 → 0, from T011), §8 non-loader-unchanged diff (from T012; empty diff confirms SC-002), §9 CI-gate-exercised section (from T017 + T018 transcripts) `specs/201-knip-loader-config/evidence/verification-record.md`
+- [x] T019 Create `evidence/verification-record.md` with YAML front matter (`feature: 201-knip-loader-config`, `captured_at: <ISO8601>`, `git_sha: <HEAD at capture time>`) per the template at `.specify/templates/evidence/test-summary-template.md` `specs/201-knip-loader-config/evidence/verification-record.md`
+- [x] T020 Populate sections 1–5 of the verification record: §1 scope, §2 declared entry paths (copy from `knip.json`), §3 reachability table (11 files ✅ reachable via their import chain + 1 file 🗑 DELETED), §4 "No genuine orphans remain" assertion, §5 pinned knip version (from T006 output) `specs/201-knip-loader-config/evidence/verification-record.md`
+- [x] T021 Populate sections 6–9: §6 build-smoke transcript (from T010), §7 pre/post knip counts (12 → 0, from T011), §8 non-loader-unchanged diff (from T012; empty diff confirms SC-002), §9 CI-gate-exercised section (from T017 + T018 transcripts) `specs/201-knip-loader-config/evidence/verification-record.md`
 
 ---
 
@@ -112,14 +112,14 @@ Feature type: **Infrastructure** (repository configuration + CI gate). Primary e
 
 ### Evidence Collection
 
-- [ ] T022 Capture the test-summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and a body section listing: lint ✅, typecheck ✅, test ✅, knip ✅, plus the 6 SC-001..SC-006 criteria and their pass status `specs/201-knip-loader-config/evidence/test-summary.md`
-- [ ] T023 Create a usage-example walkthrough explaining how to run `task knip` locally, interpret its output, and what to do when it fails (reference `quickstart.md` Step 6's failure-mode table) `specs/201-knip-loader-config/evidence/usage-example.md`
-- [ ] T024 [P] Capture an annotated copy of the `knip.json` config (one-line explanation per field: why `$schema`, why three entries, why no `ignore`) with a pointer to the contract schema that enforces those rules `specs/201-knip-loader-config/evidence/knip-config-sample.md`
+- [x] T022 Capture the test-summary using the template at `.specify/templates/evidence/test-summary-template.md`; include YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) and a body section listing: lint ✅, typecheck ✅, test ✅, knip ✅, plus the 6 SC-001..SC-006 criteria and their pass status `specs/201-knip-loader-config/evidence/test-summary.md`
+- [x] T023 Create a usage-example walkthrough explaining how to run `task knip` locally, interpret its output, and what to do when it fails (reference `quickstart.md` Step 6's failure-mode table) `specs/201-knip-loader-config/evidence/usage-example.md`
+- [x] T024 [P] Capture an annotated copy of the `knip.json` config (one-line explanation per field: why `$schema`, why three entries, why no `ignore`) with a pointer to the contract schema that enforces those rules `specs/201-knip-loader-config/evidence/knip-config-sample.md`
 
 ### Media Content
 
-- [ ] T025 Create the shipped blog post by spawning the Content Specialist (`.claude/agents/media/content.md`) with context: feature = "Knip config for the Electron loader + CI gate", what we built (knip.json + updater.ts deletion + pinned dep + CI step + stress-test coverage), key numbers (12 → 0 findings), the two refusals ("`dlx` instead of pinning" and "`ignore` instead of deleting") as the narrative hook, and a note that #199 will extend the same config next `specs/201-knip-loader-config/media/shipped-post.md`
-- [ ] T026 [P] Create a 150–200-word LinkedIn shipped summary by spawning the Content Specialist with the same context as T025; strong hook leading with the genuine-orphan discovery or the two-refusals angle, link placeholder to the shipped post, close with #FutureDebrief hashtags matching the planning-post style `specs/201-knip-loader-config/media/linkedin-shipped.md`
+- [x] T025 Create the shipped blog post by spawning the Content Specialist (`.claude/agents/media/content.md`) with context: feature = "Knip config for the Electron loader + CI gate", what we built (knip.json + updater.ts deletion + pinned dep + CI step + stress-test coverage), key numbers (12 → 0 findings), the two refusals ("`dlx` instead of pinning" and "`ignore` instead of deleting") as the narrative hook, and a note that #199 will extend the same config next `specs/201-knip-loader-config/media/shipped-post.md`
+- [x] T026 [P] Create a 150–200-word LinkedIn shipped summary by spawning the Content Specialist with the same context as T025; strong hook leading with the genuine-orphan discovery or the two-refusals angle, link placeholder to the shipped post, close with #FutureDebrief hashtags matching the planning-post style `specs/201-knip-loader-config/media/linkedin-shipped.md`
 
 ### PR Creation
 
