@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- **Knip Config for Electron Loader + CI Gate** (#202) — New root `knip.json` declaring the Electron loader's three entry points (main, preload, renderer); deletes `apps/loader/src/main/updater.ts` (a genuine orphan); pins `knip@^5` as a dev dependency; adds `task knip` target and `Run knip` step in CI between lint and typecheck. Loader main-tree unused-file findings: 10 → 0. ([#474](https://github.com/debrief/debrief-future/pull/474))
+  - Gate is specific to `apps/loader/src/main/` paths via `jq` on knip's JSON reporter; pre-existing findings elsewhere are visible but non-blocking
+  - Contract schema at `specs/201-knip-loader-config/contracts/knip-config.schema.json` rejects `ignore` keys to prevent future silencing
+  - Tests: 11/11 checks passing (contract validation, pre/post knip diff, stress test for regression detection)
+  - Evidence: `specs/201-knip-loader-config/evidence/verification-record.md`, `test-summary.md`, `usage-example.md`, `ci-run-transcript.md`, `knip-config-sample.md`, `validation-output.txt`
 - **Regenerate Sample Catalog** (#184) — New `scripts/regenerate-sample-catalog.py` orchestration script that nukes and rebuilds `preview/workspace/samples/local-store/` via the enriched import pipeline. 73 items regenerated, all with `debrief:platforms` structured arrays; zero deprecated flat aggregate fields remain. Extends `enrich-legacy-catalog.py` with `derive_vessel_fields()` to populate `vessel_type`/`vessel_role`/`domain` from the `vessel_class` path (FR-006). [E10 Phase 3] ([#427](https://github.com/debrief/debrief-future/pull/427))
   - Pipeline: extract → stage → delete → reimport → enrich (safe-by-construction, `--stage-only` dry-run supported)
   - Idempotent: two consecutive runs produce identical 73 items / 500 warnings (`random.Random(42)`)

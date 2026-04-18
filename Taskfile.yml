@@ -61,6 +61,27 @@ tasks:
       - pnpm --filter @debrief/spec-navigator build
       - cd apps/spec-navigator && node run-playwright.mjs
 
+  knip:
+    desc: "Run knip — fail if any non-declared unused files are detected under apps/loader/src/main/"
+    deps: [install]
+    cmds:
+      # Scans apps/loader. The gate's SC (see specs/201-knip-loader-config/spec.md
+      # SC-001, SC-005) is specifically about files under apps/loader/src/main/;
+      # we pipe knip's JSON reporter through jq to assert that set is empty,
+      # while leaving pre-existing findings elsewhere in the loader (renderer
+      # barrels, unused devDeps) visible but non-blocking for now.
+      - |
+        pnpm exec knip -W apps/loader --reporter json --no-exit-code > /tmp/knip.json
+        MAIN_FINDINGS=$(jq '[.files[] | select(startswith("apps/loader/src/main/"))] | length' /tmp/knip.json)
+        if [ "$MAIN_FINDINGS" -gt 0 ]; then
+          echo "task knip: FAIL — $MAIN_FINDINGS file(s) under apps/loader/src/main/ flagged as unused:"
+          jq -r '.files[] | select(startswith("apps/loader/src/main/"))' /tmp/knip.json
+          echo ""
+          echo "Either import the file from a declared entry (see knip.json) or delete it."
+          exit 1
+        fi
+        echo "task knip: PASS — zero unused files under apps/loader/src/main/."
+
   build:
     desc: "Build all artifacts (Python wheels + TypeScript bundles)"
     deps: [install]
@@ -97,12 +118,13 @@ tasks:
       - pnpm lint -- --fix
 
   verify:
-    desc: "Run full CI checks locally (lint + typecheck + test) before pushing"
+    desc: "Run full CI checks locally (lint + typecheck + test + knip) before pushing"
     deps: [install]
     cmds:
       - task: lint
       - task: typecheck
       - task: test
+      - task: knip
 
   docs:generate:
     desc: "Generate Markdown docs from LinkML schemas (shared/schemas/build/md/)"
