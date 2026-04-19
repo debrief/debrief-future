@@ -123,7 +123,14 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ## Assumptions
 
-*TODO*
+- The task is a non-functional refactor for the plot-open path (User Story 2) and a small correctness fix for the selection-zoom path (User Story 4). No new behaviour is added that a user could request; what changes is (a) a strictly-safer null-guard available to every consumer, and (b) the silent miss in `fitToSelection` for non-Point/non-LineString selections is resolved.
+- The two sub-options for resolving the `SafeFeature` / `GeoJSONFeature` input-type mismatch (widening the parameter to a structural minimum vs. giving both types a shared structural base inside `@debrief/utils`) are interchangeable from a specification standpoint. Either satisfies FR-006; the choice is a planning/implementation concern. The narrowing-gate requirement (FR-007) applies either way.
+- The VS Code map panel's `mapPanel.ts` is the only in-tree production consumer of the VS Code-local `bounds.ts` (confirmed by repo search at spec time). The duplicate unit test file is the only test consumer.
+- The consolidated utility continues to expose `boundsToLeaflet` and `isValidBounds` with their current signatures and behaviour — no consumer of those helpers needs to change.
+- The existing pre-computed `currentPlot.bbox` used by `fitToAllTracks()` remains the source of truth for "zoom to all tracks" and is **not** recomputed by this work. Only the *selection-subset* path (`fitToSelection`) is rewritten to use the consolidated utility.
+- This work does not create or alter any user-visible UI. The VS Code map's zoom-to-all behaviour is preserved exactly. The zoom-to-selection behaviour improves silently (previously-skipped geometry types are now included); no new buttons, dialogs, or copy are introduced.
+- The change is independent of, and parallelisable with, the other 200-series cleanup items (#199, #201, #202, #206, E11, E12, and the LinkML-layer items #203/#204/#205). No coordination dependency.
+- The narrowing gate (FR-007) does not require a new library or a schema; `unknown` is a first-class TypeScript type, and the narrowing step can be expressed with standard runtime type checks (`typeof`, `Array.isArray`) — the same shape the existing coordinate-extraction code already performs, hoisted to a visible location.
 
 ## Out of Scope
 
