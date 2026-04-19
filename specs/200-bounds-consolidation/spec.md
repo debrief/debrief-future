@@ -149,4 +149,19 @@ Additionally out of scope:
 
 ## Notes
 
-*TODO — including the supersede note for `origin/200-bounds-consolidation` (commits `b55c1d7e`, `38c2170c`).*
+### Supersedes prior unmerged work on `origin/200-bounds-consolidation`
+
+A prior session authored a spec (commit `b55c1d7e`) and a plan (commit `38c2170c`) for this same backlog item on the remote branch `200-bounds-consolidation`. That branch was not merged to main and has no associated implementation.
+
+This spec **supersedes** those commits. The implementation of #200 will land on `claude/specify-item-200-Tqp0d` (per harness-designated branch policy), and no PR will be opened from `origin/200-bounds-consolidation`. Before the implementation PR for #200 merges, the prior branch should be closed or abandoned to prevent accidental collision.
+
+### Version history
+
+- **v1** (commit `1e38c6da`): Initial spec on this branch. Identified by `/speckit.review` as having (a) an over-broad SC-001/FR-001 claim that was unverifiable given the `shared/components` copy, and (b) an unfixed silent-miss bug in `mapPanel.ts::fitToSelection()` that was adjacent to the consolidation work.
+- **v2** (this file, starting at skeleton commit `42b85a6a`): Narrowed SC-001/FR-001 to the generic-GeoJSON call-site family, added US4 and FR-008/FR-009 for the `fitToSelection` rewrite, added FR-007 for the explicit narrowing gate (Article XV.5), and added the four deferred backlog items to "Out of Scope".
+
+### Relationship to the constitution
+
+- **Article I.3 (no silent failures)**: The `fitToSelection` rewrite (US4, FR-008) directly resolves an existing silent failure — selected MultiPolygon features today contribute nothing to the "zoom to selection" viewport.
+- **Article VI (testing)**: SC-006 and SC-007 together raise the bounds-utility's unit-test floor to cover every geometry type the utility branches on, plus the null-geometry edge case that previously lived in VS Code-local tests.
+- **Article XV.5 (type boundaries are explicit)**: FR-007 makes the widened-parameter type safe by forcing its untyped portion through a single, reviewable narrowing gate rather than letting `unknown` be consumed implicitly by downstream code.
