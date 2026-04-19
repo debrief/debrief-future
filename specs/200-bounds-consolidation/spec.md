@@ -41,7 +41,17 @@ A user opens a plot in the VS Code extension. The map panel auto-zooms to fit th
 
 ### User Story 3 — VS Code feature types pass through without casts or type errors (Priority: P2)
 
-*TODO*
+A developer working in `apps/vscode` passes the VS Code feature array (whose element type derives from `SafeFeature`) into the consolidated `calculateBounds` and the code type-checks cleanly without `as`-casts or local re-aliasing. The shared utility accepts the input shape that real consumers actually have, and the untyped portion of that shape (`coordinates: unknown`) is narrowed through an explicit, reviewable gate at the utility's entry point rather than silently laundered.
+
+**Why this priority**: Without this, the consolidation forces every caller to add type-laundering boilerplate, which is exactly the smell the original duplication arose from. Resolving the input-type mismatch is what makes "import from `@debrief/utils`" a sustainable answer rather than a temporary one. The explicit narrowing gate is what makes the widened input type constitutional (Article XV.5 forbids untyped data entering application code without a typed-model boundary).
+
+**Independent Test**: After consolidation, `apps/vscode/src/webview/mapPanel.ts` imports `calculateBounds` and `mergeBounds` from `@debrief/utils` and passes its existing feature array directly into them. The VS Code package's type-check (`tsc --noEmit`) passes with no new errors and no new `as`-casts at the call site. A code reviewer inspecting the utility's source can point to a single, named narrowing step that turns untyped coordinate data into typed coordinate data before any other code sees it.
+
+**Acceptance Scenarios**:
+
+1. **Given** the consolidated utility's input type, **When** the VS Code map panel passes its feature array (whose element type derives from `SafeFeature`) into `calculateBounds`, **Then** the call type-checks without an explicit cast at the call site.
+2. **Given** the consolidated codebase, **When** the VS Code package runs its type-check, **Then** no new type errors are introduced compared to the pre-change baseline.
+3. **Given** the consolidated utility's source, **When** a reviewer reads the function that handles each feature's coordinates, **Then** there is exactly one explicit narrowing step (visibly named or commented) that converts the untyped `coordinates` input into a typed shape before the per-geometry-type branches run — no `as unknown as X` chain, no `any` escape hatch.
 
 ### User Story 4 — `fitToSelection` honours every geometry type (Priority: P2)
 
