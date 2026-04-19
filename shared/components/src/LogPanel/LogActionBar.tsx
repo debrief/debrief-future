@@ -6,10 +6,11 @@
  * Buttons disabled when no entry is selected.
  *
  * Feature: 072-log-panel (US6)
- * Updated: 176-log-panel-ux (unified 4-tab ViewMode, ARIA tablist)
+ * Updated: 176-log-panel-ux (unified 4-tab ViewMode, ARIA tablist,
+ *                            roving tabIndex + ←/→/Home/End keyboard nav)
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import type { LogActionBarProps, ActionType, ViewMode } from './types';
 import { LOG_PANEL_STRINGS } from './strings';
 
@@ -35,6 +36,44 @@ export function LogActionBar({
   className,
 }: LogActionBarProps): React.ReactElement {
   const hasSelection = selectedEntryId !== null;
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const focusTab = (index: number) => {
+    const btn = tabRefs.current[index];
+    if (btn) {
+      btn.focus();
+      onViewModeChange?.(VIEW_MODES[index]!.value);
+    }
+  };
+
+  const handleKeyDown = (index: number) => (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    switch (e.key) {
+      case 'ArrowLeft': {
+        e.preventDefault();
+        const next = (index - 1 + VIEW_MODES.length) % VIEW_MODES.length;
+        focusTab(next);
+        break;
+      }
+      case 'ArrowRight': {
+        e.preventDefault();
+        const next = (index + 1) % VIEW_MODES.length;
+        focusTab(next);
+        break;
+      }
+      case 'Home': {
+        e.preventDefault();
+        focusTab(0);
+        break;
+      }
+      case 'End': {
+        e.preventDefault();
+        focusTab(VIEW_MODES.length - 1);
+        break;
+      }
+      default:
+        break;
+    }
+  };
 
   return (
     <div className={`log-panel__action-bar ${className ?? ''}`} data-testid="log-action-bar">
@@ -57,7 +96,7 @@ export function LogActionBar({
         ))}
       </div>
 
-      {/* Unified 4-tab view mode with ARIA tablist */}
+      {/* Unified 4-tab view mode with ARIA tablist + roving tabIndex */}
       <div className="log-panel__action-bar-toggles">
         <div
           className="log-panel__toggle-group"
@@ -65,18 +104,26 @@ export function LogActionBar({
           aria-label="Log view mode"
           data-testid="log-view-mode-toggle"
         >
-          {VIEW_MODES.map((mode) => (
-            <button
-              key={mode.value}
-              className={`log-panel__toggle-btn ${viewMode === mode.value ? 'log-panel__toggle-btn--active' : ''}`}
-              role="tab"
-              aria-selected={viewMode === mode.value}
-              onClick={() => onViewModeChange?.(mode.value)}
-              data-testid={`log-view-mode-${mode.value}`}
-            >
-              {mode.label}
-            </button>
-          ))}
+          {VIEW_MODES.map((mode, index) => {
+            const isActive = viewMode === mode.value;
+            return (
+              <button
+                key={mode.value}
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
+                className={`log-panel__toggle-btn ${isActive ? 'log-panel__toggle-btn--active' : ''}`}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => onViewModeChange?.(mode.value)}
+                onKeyDown={handleKeyDown(index)}
+                data-testid={`log-view-mode-${mode.value}`}
+              >
+                {mode.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

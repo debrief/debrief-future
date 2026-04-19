@@ -16,16 +16,16 @@ describe('formatDuration', () => {
     expect(formatDuration('PT0.001S')).toBe('1ms');
   });
 
-  it('formats whole seconds', () => {
-    expect(formatDuration('PT1S')).toBe('1s');
-    expect(formatDuration('PT30S')).toBe('30s');
+  it('formats whole seconds with single decimal (FR-013)', () => {
+    expect(formatDuration('PT1S')).toBe('1.0s');
+    expect(formatDuration('PT30S')).toBe('30.0s');
   });
 
   it('formats seconds with decimal (>= 1s)', () => {
     expect(formatDuration('PT2.3S')).toBe('2.3s');
   });
 
-  it('formats minutes and seconds', () => {
+  it('formats minutes and seconds (no decimal when combined)', () => {
     expect(formatDuration('PT1M2S')).toBe('1m 2s');
   });
 

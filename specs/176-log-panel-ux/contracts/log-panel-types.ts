@@ -12,9 +12,14 @@
 /** Visual tool family classification. Declared in tool manifest. */
 export type ToolCategory = 'import' | 'style' | 'calc' | 'filter' | 'snapshot';
 
-/** Visual configuration for a tool category icon. */
+/**
+ * Visual configuration for a tool category icon.
+ *
+ * `category` is nullable to represent the neutral-grey fallback for tools
+ * that have no manifest entry.
+ */
 export interface ToolCategoryConfig {
-  readonly category: ToolCategory;
+  readonly category: ToolCategory | null;
   /** CSS background colour for the icon square. */
   readonly background: string;
   /** Emoji or codicon glyph displayed in the icon square. */
@@ -25,13 +30,6 @@ export interface ToolCategoryConfig {
 
 /** Complete category configuration map. */
 export type ToolCategoryMap = Record<ToolCategory, ToolCategoryConfig>;
-
-/** Neutral fallback for tools with no manifest category. */
-export interface ToolCategoryFallback {
-  readonly background: '#e5e5e5';
-  readonly glyph: '';
-  readonly label: string;
-}
 
 // ─── Parameter Chip Types ───────────────────────────────────────────────
 
