@@ -1,6 +1,7 @@
 import { DebriefFeature, DebriefFeatureCollection, TimeExtent } from './types';
-import { PositionStyle, PositionStyleOverride } from '../../../schemas/src/generated/typescript/index.ts';
 
+export type { PointShape, ResolvedPositionStyle } from '@debrief/utils';
+export { resolvePositionStyle, computeAllPositionStyles, } from '@debrief/utils';
 /**
  * Calculate the time extent (start/end times) for a collection of features.
  * Returns [startTime, endTime] in milliseconds since epoch, or null if no temporal data.
@@ -44,39 +45,4 @@ export declare function parseDuration(duration: string | null | undefined): numb
  * @returns Set of indices that should display symbols/labels
  */
 export declare function findIntervalPositions(timestamps: number[], intervalMs: number): Set<number>;
-/**
- * Resolved position style after applying cascade.
- */
-export interface ResolvedPositionStyle {
-    showSymbol: boolean;
-    symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
-    showLabel: boolean;
-    labelText: string | null;
-}
-/**
- * Resolve the final styling for a position by applying the cascade:
- * default_position_style → interval rules → position_style_overrides
- *
- * @param index - Position index
- * @param defaultStyle - Default position style from track properties
- * @param symbolIntervalPositions - Set of indices that match symbol_interval
- * @param labelIntervalPositions - Set of indices that match label_interval
- * @param override - Position-specific override (may be null)
- * @param positionTime - Position timestamp for default label text
- * @returns Resolved styling for this position
- */
-export declare function resolvePositionStyle(index: number, defaultStyle: PositionStyle, symbolIntervalPositions: Set<number>, labelIntervalPositions: Set<number>, override: PositionStyleOverride | null | undefined, positionTime: string | number | null): ResolvedPositionStyle;
-/**
- * Compute resolved styles for all positions in a track.
- *
- * @param positions - Array of position timestamps (ISO strings or ms)
- * @param defaultStyle - Default position style
- * @param symbolInterval - Symbol interval duration string (ISO 8601)
- * @param labelInterval - Label interval duration string (ISO 8601)
- * @param overrides - Array of position style overrides (sparse, may contain nulls)
- * @returns Array of resolved styles for each position
- */
-export declare function computeAllPositionStyles(positions: Array<{
-    time: string;
-}>, defaultStyle: PositionStyle, symbolInterval: string | null | undefined, labelInterval: string | null | undefined, overrides: Array<PositionStyleOverride | null> | Record<string, PositionStyleOverride> | undefined): ResolvedPositionStyle[];
 //# sourceMappingURL=time.d.ts.map
