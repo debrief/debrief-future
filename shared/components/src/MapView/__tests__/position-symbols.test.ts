@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { svgPathForShape } from '../PositionSymbolsLayer';
-import type { SymbolShape } from '../PositionSymbolsLayer';
+import type { PointShape } from '@debrief/utils';
 
 describe('svgPathForShape', () => {
   it('returns empty string for circle (handled by CircleMarker)', () => {
@@ -38,14 +38,15 @@ describe('svgPathForShape', () => {
   });
 
   it('returns unique paths for each non-circle shape', () => {
-    const shapes: SymbolShape[] = ['square', 'triangle', 'diamond', 'cross'];
+    const shapes: PointShape[] = ['square', 'triangle', 'diamond', 'cross'];
     const paths = shapes.map(s => svgPathForShape(s, 8));
     const unique = new Set(paths);
     expect(unique.size).toBe(shapes.length);
   });
 
-  it('returns empty string for unknown shape (fallback)', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(svgPathForShape('unknown' as any, 5)).toBe('');
+  it('throws via assertNever when given a shape outside PointShape (FR-016)', () => {
+    expect(() =>
+      svgPathForShape('unknown' as unknown as PointShape, 5)
+    ).toThrow(/assertNever/);
   });
 });
