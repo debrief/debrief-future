@@ -9,9 +9,12 @@ import {
   resolvePositionStyle,
   formatTimestampForLabel,
   computeAllPositionStyles,
+  type PointShape,
   type PositionStyle,
   type PositionStyleOverride,
+  type ResolvedPositionStyle,
 } from '../src/interval.js';
+import { InvalidPointShapeError } from '../src/errors.js';
 
 describe('findNearestPositionIndex', () => {
   it('returns -1 for empty array', () => {
@@ -118,7 +121,7 @@ describe('resolvePositionStyle', () => {
     expect(result.showSymbol).toBe(false);
     expect(result.symbol).toBe('circle');
     expect(result.showLabel).toBe(false);
-    expect(result.label).toBeNull();
+    expect(result.labelText).toBeNull();
   });
 
   it('enables symbol when position matches symbol interval', () => {
@@ -148,7 +151,7 @@ describe('resolvePositionStyle', () => {
     );
 
     expect(result.showLabel).toBe(true);
-    expect(result.label).not.toBeNull(); // Should have formatted timestamp
+    expect(result.labelText).not.toBeNull(); // Should have formatted timestamp
   });
 
   it('override takes precedence over interval', () => {
@@ -183,7 +186,7 @@ describe('resolvePositionStyle', () => {
     );
 
     expect(result.showLabel).toBe(true);
-    expect(result.label).toBe('Contact Alpha');
+    expect(result.labelText).toBe('Contact Alpha');
   });
 
   it('uses formatted timestamp when label enabled but not specified', () => {
@@ -199,7 +202,7 @@ describe('resolvePositionStyle', () => {
     );
 
     expect(result.showLabel).toBe(true);
-    expect(result.label).toContain('10:30:45'); // HH:MM:SS format
+    expect(result.labelText).toContain('10:30:45'); // HH:MM:SS format
   });
 
   it('override can change symbol shape', () => {
@@ -219,6 +222,174 @@ describe('resolvePositionStyle', () => {
 
     expect(result.showSymbol).toBe(true);
     expect(result.symbol).toBe('square');
+  });
+});
+
+describe('resolvePositionStyle — schema-linked symbol type', () => {
+  const defaultStyle: PositionStyle = {
+    show_symbol: true,
+    symbol: 'circle',
+    show_label: false,
+  };
+
+  it.each(['circle', 'square', 'triangle', 'diamond', 'cross'] as const)(
+    'accepts %s as a valid override symbol and preserves it on the result',
+    (shape) => {
+      const override: PositionStyleOverride = { symbol: shape };
+      const result = resolvePositionStyle(
+        0,
+        defaultStyle,
+        new Set(),
+        new Set(),
+        override,
+        '2026-01-09T10:00:00Z'
+      );
+      expect(result.symbol).toBe(shape);
+    }
+  );
+
+  it('lets a diamond literal assign to ResolvedPositionStyle.symbol', () => {
+    // Compile-time assertion: this would not type-check if the `symbol` union
+    // still excluded 'diamond'. Running the test exercises the runtime path
+    // but the real value is the tsc gate on this file.
+    const override: PositionStyleOverride = { symbol: 'diamond' };
+    const result: ResolvedPositionStyle = resolvePositionStyle(
+      0,
+      defaultStyle,
+      new Set(),
+      new Set(),
+      override,
+      '2026-01-09T10:00:00Z'
+    );
+    const symbol: PointShape = result.symbol;
+    expect(symbol).toBe('diamond');
+  });
+});
+
+describe('resolvePositionStyle — override null semantics (FR-013)', () => {
+  const defaultStyle: PositionStyle = {
+    show_symbol: true,
+    symbol: 'triangle',
+    show_label: true,
+  };
+
+  it('null show_symbol override preserves the cascaded default', () => {
+    const override = {
+      show_symbol: null,
+    } as unknown as PositionStyleOverride;
+    const result = resolvePositionStyle(
+      0,
+      defaultStyle,
+      new Set(),
+      new Set(),
+      override,
+      '2026-01-09T10:00:00Z'
+    );
+    expect(result.showSymbol).toBe(defaultStyle.show_symbol);
+  });
+
+  it('null symbol override preserves the cascaded default', () => {
+    const override = {
+      symbol: null,
+    } as unknown as PositionStyleOverride;
+    const result = resolvePositionStyle(
+      0,
+      defaultStyle,
+      new Set(),
+      new Set(),
+      override,
+      '2026-01-09T10:00:00Z'
+    );
+    expect(result.symbol).toBe(defaultStyle.symbol);
+  });
+
+  it('null show_label override preserves the cascaded default', () => {
+    const override = {
+      show_label: null,
+    } as unknown as PositionStyleOverride;
+    const result = resolvePositionStyle(
+      0,
+      defaultStyle,
+      new Set(),
+      new Set(),
+      override,
+      '2026-01-09T10:00:00Z'
+    );
+    expect(result.showLabel).toBe(defaultStyle.show_label);
+  });
+
+  it('null label override falls back to the formatted timestamp default', () => {
+    const override = {
+      label: null,
+    } as unknown as PositionStyleOverride;
+    const result = resolvePositionStyle(
+      0,
+      defaultStyle,
+      new Set(),
+      new Set(),
+      override,
+      '2026-01-09T10:30:45Z'
+    );
+    // showLabel comes from default (true); labelText falls through to the
+    // timestamp formatter because the null override is ignored.
+    expect(result.showLabel).toBe(true);
+    expect(result.labelText).toContain('10:30:45');
+  });
+});
+
+describe('resolvePositionStyle — invalid-shape runtime guard (FR-015)', () => {
+  const defaultStyle: PositionStyle = {
+    show_symbol: true,
+    symbol: 'circle',
+    show_label: false,
+  };
+
+  it('throws InvalidPointShapeError when override.symbol is not a known shape', () => {
+    const override = {
+      symbol: 'star',
+    } as unknown as PositionStyleOverride;
+
+    expect(() =>
+      resolvePositionStyle(
+        0,
+        defaultStyle,
+        new Set(),
+        new Set(),
+        override,
+        '2026-01-09T10:00:00Z'
+      )
+    ).toThrow(InvalidPointShapeError);
+  });
+
+  it('populates offendingValue and validShapes on the thrown error', () => {
+    const override = {
+      symbol: 'star',
+    } as unknown as PositionStyleOverride;
+
+    try {
+      resolvePositionStyle(
+        0,
+        defaultStyle,
+        new Set(),
+        new Set(),
+        override,
+        '2026-01-09T10:00:00Z'
+      );
+      throw new Error('resolver should have thrown');
+    } catch (err) {
+      expect(err).toBeInstanceOf(InvalidPointShapeError);
+      const typed = err as InvalidPointShapeError;
+      expect(typed.offendingValue).toBe('star');
+      expect(typed.validShapes).toEqual(
+        expect.arrayContaining([
+          'circle',
+          'square',
+          'triangle',
+          'diamond',
+          'cross',
+        ])
+      );
+    }
   });
 });
 
@@ -311,7 +482,7 @@ describe('computeAllPositionStyles', () => {
 
     expect(result[0].showSymbol).toBe(false);
     expect(result[1].showSymbol).toBe(true);
-    expect(result[1].label).toBe('Contact Alpha');
+    expect(result[1].labelText).toBe('Contact Alpha');
     expect(result[2].showSymbol).toBe(false);
   });
 });

@@ -12,10 +12,21 @@ import { CircleMarker, Marker, Tooltip, LayerGroup } from 'react-leaflet';
 import L from 'leaflet';
 import type { TrackFeature, PositionStyle } from '@debrief/schemas';
 import type { LatLngExpression } from 'leaflet';
-import { computeAllPositionStyles } from '../utils/time';
+import {
+  computeAllPositionStyles,
+  assertNever,
+  InvalidPointShapeError,
+  type PointShape,
+  type ResolvedPositionStyle,
+} from '@debrief/utils';
 import { getFeatureColor } from '../utils/labels';
 
-export type SymbolShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
+/**
+ * @deprecated Use `PointShape` from `@debrief/utils` (re-exported from
+ * `@debrief/components`). Preserved as an alias for any out-of-tree consumer
+ * that imported the name directly from this module.
+ */
+export type SymbolShape = PointShape;
 
 export interface PositionSymbolsLayerProps {
   feature: TrackFeature;
@@ -39,8 +50,12 @@ const DEFAULT_POSITION_STYLE: PositionStyle = {
  * Build an SVG path `d` attribute for a given shape, centred at (size, size)
  * within a (size*2 × size*2) viewBox.
  */
-export function svgPathForShape(shape: SymbolShape, size: number): string {
+export function svgPathForShape(shape: PointShape, size: number): string {
   switch (shape) {
+    case 'circle':
+      // Circle is rendered by Leaflet's CircleMarker; the SVG path is empty
+      // because there is no DivIcon to place for a circle.
+      return '';
     case 'square': {
       const half = size * 0.75;
       return `M${size - half},${size - half} h${half * 2} v${half * 2} h${-half * 2} Z`;
@@ -68,7 +83,7 @@ export function svgPathForShape(shape: SymbolShape, size: number): string {
       ].join(' ');
     }
     default:
-      return ''; // circle handled by CircleMarker
+      return assertNever(shape);
   }
 }
 
@@ -76,7 +91,7 @@ export function svgPathForShape(shape: SymbolShape, size: number): string {
  * Create a Leaflet DivIcon with an SVG symbol for non-circle shapes.
  */
 function createShapeIcon(
-  shape: SymbolShape,
+  shape: PointShape,
   size: number,
   fillColor: string,
   strokeColor: string,
@@ -125,24 +140,43 @@ export function PositionSymbolsLayer({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const defaultStyle: PositionStyle = explicitDps ?? (
     pointStyle?.shape
-      ? { show_symbol: false, symbol: pointStyle.shape as string, show_label: false }
+      ? { show_symbol: false, symbol: pointStyle.shape as PointShape, show_label: false }
       : DEFAULT_POSITION_STYLE
   );
   const symbolInterval = props.symbol_interval;
   const labelInterval = props.label_interval;
   const overrides = props.position_style_overrides;
 
-  // Compute resolved styles for all positions
-  const resolvedStyles = useMemo(() => {
+  // Compute resolved styles for all positions.
+  // If any override carries an unknown symbol, `resolvePositionStyle` throws
+  // `InvalidPointShapeError`; log to the console (the shared LogService is
+  // not currently wired through this component — see #201 evidence) and
+  // return an empty style list so the track still renders its polyline but
+  // no symbols/labels get drawn with stale-or-invalid styling (FR-018).
+  const resolvedStyles = useMemo<ResolvedPositionStyle[]>(() => {
     if (positions.length === 0) return [];
-    return computeAllPositionStyles(
-      positions,
-      defaultStyle,
-      symbolInterval,
-      labelInterval,
-      overrides
-    );
-  }, [positions, defaultStyle, symbolInterval, labelInterval, overrides]);
+    try {
+      return computeAllPositionStyles(
+        positions,
+        defaultStyle,
+        symbolInterval,
+        labelInterval,
+        overrides
+      );
+    } catch (err) {
+      if (err instanceof InvalidPointShapeError) {
+        const typed: InvalidPointShapeError = err;
+        // eslint-disable-next-line no-console
+        console.error(
+          `[PositionSymbolsLayer] feature=${String(feature.id)} invalid ` +
+            `override symbol ${JSON.stringify(typed.offendingValue)} — ` +
+            `expected one of ${typed.validShapes.join(', ')}`
+        );
+        return [];
+      }
+      throw err;
+    }
+  }, [feature.id, positions, defaultStyle, symbolInterval, labelInterval, overrides]);
 
   // Determine which positions are visible based on currentTime and displayMode
   const visibleRange = useMemo(() => {
@@ -204,49 +238,56 @@ export function PositionSymbolsLayer({
       const weight = isPositionSelected ? 3 : 2;
 
       if (shouldShowSymbol) {
-        const shape = style.symbol as SymbolShape;
-        if (shape === 'circle' || !shape) {
-          // Circle: use Leaflet's native CircleMarker (most performant)
-          items.push(
-            <CircleMarker
-              key={`symbol-${i}`}
-              center={position}
-              radius={markerRadius}
-              pathOptions={{
-                color: markerStrokeColor,
-                fillColor: markerFillColor,
-                fillOpacity: markerFillOpacity,
-                weight,
-                className: isPositionSelected ? 'debrief-map-feature--selected' : undefined,
-              }}
-            >
-              {style.showLabel && style.labelText && (
-                <Tooltip permanent direction="right" offset={[10, 0]}>
-                  {style.labelText}
-                </Tooltip>
-              )}
-            </CircleMarker>
-          );
-        } else {
-          // Non-circle shape: use Marker with SVG DivIcon
-          const icon = createShapeIcon(
-            shape, markerRadius, markerFillColor, markerStrokeColor,
-            markerFillOpacity, weight, isPositionSelected,
-          );
-          items.push(
-            <Marker
-              key={`symbol-${i}`}
-              position={position}
-              icon={icon}
-              interactive={false}
-            >
-              {style.showLabel && style.labelText && (
-                <Tooltip permanent direction="right" offset={[10, 0]}>
-                  {style.labelText}
-                </Tooltip>
-              )}
-            </Marker>
-          );
+        const shape: PointShape = style.symbol;
+        const tooltip = style.showLabel && style.labelText ? (
+          <Tooltip permanent direction="right" offset={[10, 0]}>
+            {style.labelText}
+          </Tooltip>
+        ) : null;
+
+        switch (shape) {
+          case 'circle':
+            // Leaflet's native CircleMarker is more performant than a DivIcon
+            // and is the only shape that does not need an SVG path.
+            items.push(
+              <CircleMarker
+                key={`symbol-${i}`}
+                center={position}
+                radius={markerRadius}
+                pathOptions={{
+                  color: markerStrokeColor,
+                  fillColor: markerFillColor,
+                  fillOpacity: markerFillOpacity,
+                  weight,
+                  className: isPositionSelected ? 'debrief-map-feature--selected' : undefined,
+                }}
+              >
+                {tooltip}
+              </CircleMarker>
+            );
+            break;
+          case 'square':
+          case 'triangle':
+          case 'diamond':
+          case 'cross': {
+            const icon = createShapeIcon(
+              shape, markerRadius, markerFillColor, markerStrokeColor,
+              markerFillOpacity, weight, isPositionSelected,
+            );
+            items.push(
+              <Marker
+                key={`symbol-${i}`}
+                position={position}
+                icon={icon}
+                interactive={false}
+              >
+                {tooltip}
+              </Marker>
+            );
+            break;
+          }
+          default:
+            assertNever(shape);
         }
       } else if (style.showLabel && style.labelText) {
         // Label only (no symbol)
@@ -276,8 +317,10 @@ export function PositionSymbolsLayer({
 /**
  * Get marker radius based on symbol shape.
  */
-function getRadiusForShape(shape: SymbolShape): number {
+function getRadiusForShape(shape: PointShape): number {
   switch (shape) {
+    case 'circle':
+      return 5;
     case 'square':
       return 6;
     case 'triangle':
@@ -286,8 +329,7 @@ function getRadiusForShape(shape: SymbolShape): number {
       return 7;
     case 'cross':
       return 7;
-    case 'circle':
     default:
-      return 5;
+      return assertNever(shape);
   }
 }

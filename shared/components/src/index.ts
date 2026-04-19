@@ -105,10 +105,14 @@ export {
   calculateTimeExtent,
   parseDuration,
   findIntervalPositions,
+} from './utils/time';
+export {
   resolvePositionStyle,
   computeAllPositionStyles,
-} from './utils/time';
-export type { ResolvedPositionStyle } from './utils/time';
+  assertNever,
+  InvalidPointShapeError,
+} from '@debrief/utils';
+export type { PointShape, ResolvedPositionStyle } from '@debrief/utils';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
 
 // ToolMatch

@@ -4,9 +4,20 @@
 
 // T020: Import PositionStyle, PositionStyleOverride from @debrief/schemas instead of defining locally
 import type { PositionStyle, PositionStyleOverride } from '@debrief/schemas';
+import { PointShapeEnum } from '@debrief/schemas';
 
 // Re-export for consumers that import from @debrief/utils
 export type { PositionStyle, PositionStyleOverride };
+
+/**
+ * Template-literal derivation of the permissible point-marker shapes from
+ * the canonical schema enum. The single place where a TypeScript union over
+ * marker shapes is named; consumed by `ResolvedPositionStyle.symbol`, by
+ * every `switch (symbol)` in the renderers, and by the VS Code track-styling
+ * tool's parameter type. Adding a new value to `PointShapeEnum` in LinkML
+ * widens this union automatically after schema regeneration.
+ */
+export type PointShape = `${PointShapeEnum}`;
 
 /**
  * GeoJSON Feature type
@@ -63,13 +74,17 @@ export interface SafeFeatureCollection {
 }
 
 /**
- * Resolved position style for rendering
+ * Resolved position style for rendering a single track position after the
+ * default-style → interval-rules → per-position-override cascade has been
+ * applied. `labelText` is null when no label should be displayed, or a
+ * formatted timestamp when a label should be shown but no custom text was
+ * supplied by the override.
  */
 export interface ResolvedPositionStyle {
   showSymbol: boolean;
-  symbol: 'circle' | 'square' | 'triangle';
+  symbol: PointShape;
   showLabel: boolean;
-  label: string | null;
+  labelText: string | null;
 }
 
 /**

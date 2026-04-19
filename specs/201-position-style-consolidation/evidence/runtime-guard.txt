@@ -1,0 +1,54 @@
+# runtime-guard.txt — vitest output pinning the FR-015 / FR-018 behaviour
+# Captured: 2026-04-19  git SHA: 6a6afe5
+
+## Resolver-side guard (FR-015) — resolvePositionStyle throws InvalidPointShapeError
+
+$ pnpm --filter @debrief/utils exec vitest run tests/interval.test.ts --reporter=verbose
+
+ ✓ resolvePositionStyle — schema-linked symbol type > accepts circle as a valid override symbol and preserves it on the result
+ ✓ resolvePositionStyle — schema-linked symbol type > accepts square as a valid override symbol and preserves it on the result
+ ✓ resolvePositionStyle — schema-linked symbol type > accepts triangle as a valid override symbol and preserves it on the result
+ ✓ resolvePositionStyle — schema-linked symbol type > accepts diamond as a valid override symbol and preserves it on the result
+ ✓ resolvePositionStyle — schema-linked symbol type > accepts cross as a valid override symbol and preserves it on the result
+ ✓ resolvePositionStyle — schema-linked symbol type > lets a diamond literal assign to ResolvedPositionStyle.symbol
+ ✓ resolvePositionStyle — override null semantics (FR-013) > null show_symbol override preserves the cascaded default
+ ✓ resolvePositionStyle — override null semantics (FR-013) > null symbol override preserves the cascaded default
+ ✓ resolvePositionStyle — override null semantics (FR-013) > null show_label override preserves the cascaded default
+ ✓ resolvePositionStyle — override null semantics (FR-013) > null label override falls back to the formatted timestamp default
+ ✓ resolvePositionStyle — invalid-shape runtime guard (FR-015) > throws InvalidPointShapeError when override.symbol is not a known shape
+ ✓ resolvePositionStyle — invalid-shape runtime guard (FR-015) > populates offendingValue and validShapes on the thrown error
+
+ Test Files  1 passed (1)
+      Tests  36 passed (36)
+
+Thrown error shape (from the second FR-015 test):
+    err.name          === "InvalidPointShapeError"
+    err.offendingValue === "star"
+    err.validShapes    === ["circle", "square", "triangle", "diamond", "cross"]
+    err.message        === "Invalid point shape: \"star\". Valid shapes: \"circle\", \"square\", \"triangle\", \"diamond\", \"cross\"."
+
+
+## Renderer-side catch (FR-018) — PositionSymbolsLayer does not crash
+
+$ pnpm --filter @debrief/components exec vitest run src/MapView/__tests__/position-symbols.test.ts
+
+ ✓ svgPathForShape > returns empty string for circle (handled by CircleMarker)
+ ✓ svgPathForShape > returns a valid SVG path for square
+ ✓ svgPathForShape > returns a valid SVG path for triangle
+ ✓ svgPathForShape > returns a valid SVG path for diamond
+ ✓ svgPathForShape > returns a valid SVG path for cross
+ ✓ svgPathForShape > returns unique paths for each non-circle shape
+ ✓ svgPathForShape > throws via assertNever when given a shape outside PointShape (FR-016)
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+
+The renderer's try/catch around `computeAllPositionStyles` logs
+`InvalidPointShapeError` via `console.error` with the offending value and the
+valid set, then returns an empty `resolvedStyles` array so the track's
+polyline still renders but no symbols/labels are drawn with stale styling
+(Constitution Article I.3 — no silent failures).
+
+Log format (from shared/components/src/MapView/PositionSymbolsLayer.tsx:171-177):
+    [PositionSymbolsLayer] feature=<id> invalid override symbol "star" —
+    expected one of circle, square, triangle, diamond, cross

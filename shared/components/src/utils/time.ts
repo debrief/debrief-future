@@ -1,6 +1,14 @@
 import type { DebriefFeature, DebriefFeatureCollection, TimeExtent } from './types';
 import { isTrackFeature, isReferenceLocation } from './types';
-import type { PositionStyle, PositionStyleOverride } from '@debrief/schemas';
+
+// Resolver + type are now canonical in @debrief/utils; re-export them from
+// this module so existing consumers of `@debrief/components`'s barrel
+// continue to work.
+export type { PointShape, ResolvedPositionStyle } from '@debrief/utils';
+export {
+  resolvePositionStyle,
+  computeAllPositionStyles,
+} from '@debrief/utils';
 
 /**
  * Calculate the time extent (start/end times) for a collection of features.
@@ -243,126 +251,3 @@ export function findIntervalPositions(
   return result;
 }
 
-/**
- * Resolved position style after applying cascade.
- */
-export interface ResolvedPositionStyle {
-  showSymbol: boolean;
-  symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
-  showLabel: boolean;
-  labelText: string | null;
-}
-
-/**
- * Resolve the final styling for a position by applying the cascade:
- * default_position_style → interval rules → position_style_overrides
- *
- * @param index - Position index
- * @param defaultStyle - Default position style from track properties
- * @param symbolIntervalPositions - Set of indices that match symbol_interval
- * @param labelIntervalPositions - Set of indices that match label_interval
- * @param override - Position-specific override (may be null)
- * @param positionTime - Position timestamp for default label text
- * @returns Resolved styling for this position
- */
-export function resolvePositionStyle(
-  index: number,
-  defaultStyle: PositionStyle,
-  symbolIntervalPositions: Set<number>,
-  labelIntervalPositions: Set<number>,
-  override: PositionStyleOverride | null | undefined,
-  positionTime: string | number | null
-): ResolvedPositionStyle {
-  // Start with defaults
-  let showSymbol = defaultStyle.show_symbol;
-  let symbol = defaultStyle.symbol as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
-  let showLabel = defaultStyle.show_label;
-  let labelText: string | null = null;
-
-  // Apply interval rules
-  if (symbolIntervalPositions.has(index)) {
-    showSymbol = true;
-  }
-  if (labelIntervalPositions.has(index)) {
-    showLabel = true;
-  }
-
-  // Apply overrides (highest priority)
-  if (override) {
-    if (override.show_symbol !== undefined && override.show_symbol !== null) {
-      showSymbol = override.show_symbol;
-    }
-    if (override.symbol) {
-      symbol = override.symbol as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
-    }
-    if (override.show_label !== undefined && override.show_label !== null) {
-      showLabel = override.show_label;
-    }
-    if (override.label) {
-      labelText = override.label;
-    }
-  }
-
-  // Generate default label text from timestamp if showing label but no custom text
-  if (showLabel && !labelText && positionTime) {
-    const timestamp = typeof positionTime === 'number'
-      ? positionTime
-      : Date.parse(positionTime);
-    if (!isNaN(timestamp)) {
-      labelText = new Date(timestamp).toLocaleTimeString();
-    }
-  }
-
-  return { showSymbol, symbol, showLabel, labelText };
-}
-
-/**
- * Compute resolved styles for all positions in a track.
- *
- * @param positions - Array of position timestamps (ISO strings or ms)
- * @param defaultStyle - Default position style
- * @param symbolInterval - Symbol interval duration string (ISO 8601)
- * @param labelInterval - Label interval duration string (ISO 8601)
- * @param overrides - Array of position style overrides (sparse, may contain nulls)
- * @returns Array of resolved styles for each position
- */
-export function computeAllPositionStyles(
-  positions: Array<{ time: string }>,
-  defaultStyle: PositionStyle,
-  symbolInterval: string | null | undefined,
-  labelInterval: string | null | undefined,
-  overrides: Array<PositionStyleOverride | null> | Record<string, PositionStyleOverride> | undefined
-): ResolvedPositionStyle[] {
-  // Parse timestamps
-  const timestamps = positions.map(p => Date.parse(p.time));
-
-  // Calculate interval positions
-  const symbolIntervalMs = parseDuration(symbolInterval);
-  const labelIntervalMs = parseDuration(labelInterval);
-
-  const symbolIntervalPositions = symbolIntervalMs
-    ? findIntervalPositions(timestamps, symbolIntervalMs)
-    : new Set<number>();
-
-  const labelIntervalPositions = labelIntervalMs
-    ? findIntervalPositions(timestamps, labelIntervalMs)
-    : new Set<number>();
-
-  // Normalize overrides: support both array and object (keyed by string index) formats
-  const isArrayOverrides = Array.isArray(overrides);
-
-  // Resolve each position
-  return positions.map((pos, index) => {
-    const override = isArrayOverrides
-      ? (overrides?.[index] ?? null)
-      : ((overrides as Record<string, PositionStyleOverride> | undefined)?.[String(index)] ?? null);
-    return resolvePositionStyle(
-      index,
-      defaultStyle,
-      symbolIntervalPositions,
-      labelIntervalPositions,
-      override,
-      pos.time
-    );
-  });
-}
