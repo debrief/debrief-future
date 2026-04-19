@@ -90,9 +90,9 @@ description: "Reduced task list for Feature 176 — Analysis Log Panel Rich Card
 
 ## Phase C: Storybook + E2E
 
-- [ ] T015 Add focused Storybook stories: `AllCategories` (5 categories + neutral fallback side-by-side), `AllChipTypes` (each of 5 chip types + plain-text fallback + non-default markers + "+N more" truncation), `EdgeCases` (snapshot entry + no-params entry + missing duration + multi-track wrap), `DisabledCard` in `shared/components/src/LogPanel/LogPanel.stories.tsx`
-- [ ] T016 Convert `tests/e2e/test-log-panel.spec.ts` from `test.describe.skip(...)` to `test.describe.fixme(...)` with explicit reference to issue #143 in the comment per Decision 9A in `tests/e2e/test-log-panel.spec.ts`
-- [ ] T017 [test] Create component Playwright E2E for rich-card render + 4-tab cycling + card selection in light + vscode theme variants; use `run-playwright.mjs` (bundled `@sparticuz/chromium`) per `docs/project_notes/playwright-installation-research.md` in `shared/components/e2e/LogPanel.spec.ts`
+- [x] T015 Add focused Storybook stories: `AllCategories` (5 categories + neutral fallback side-by-side), `AllChipTypes` (each of 5 chip types + plain-text fallback + non-default markers + "+N more" truncation), `EdgeCases` (snapshot entry + no-params entry + missing duration + multi-track wrap), `DisabledCard` in `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T016 Convert `tests/e2e/test-log-panel.spec.ts` from `test.describe.skip(...)` to `test.describe.fixme(...)` with explicit reference to issue #143 in the comment per Decision 9A in `tests/e2e/test-log-panel.spec.ts`
+- [x] T017 [test] Create component Playwright E2E for rich-card render + 4-tab cycling + card selection in light + vscode theme variants; use `run-playwright.mjs` (bundled `@sparticuz/chromium`) per `docs/project_notes/playwright-installation-research.md` in `shared/components/e2e/LogPanel.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — the `shared/components/e2e/` directory does not exist yet; T017 creates it. Run via `pnpm --filter @debrief/components test:e2e` (add the script to `shared/components/package.json` if missing).
 
