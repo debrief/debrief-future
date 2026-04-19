@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": ["specs/**"],
   "workspaces": {
     "apps/loader": {
       "entry": [
@@ -7,6 +8,9 @@
         "src/preload/index.ts",
         "src/main.tsx"
       ]
+    },
+    "apps/spec-navigator": {
+      "playwright": false
     }
   }
 }

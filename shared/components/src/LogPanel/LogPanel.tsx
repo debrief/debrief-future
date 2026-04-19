@@ -18,6 +18,7 @@ import type {
   ActionType,
   ParameterSchemaEntry,
 } from './types';
+import { DEFAULT_FILTER_STATE } from './types';
 import { LogTimeline } from './LogTimeline';
 import { LogByFeature } from './LogByFeature';
 import { LogFilterRow } from './LogFilterRow';
@@ -32,9 +33,9 @@ export function LogPanel({
   featureNames,
   viewMode,
   selectedEntryId,
-  filterState,
-  hasActiveSession,
-  actionResultMessage,
+  filterState = DEFAULT_FILTER_STATE,
+  hasActiveSession = false,
+  actionResultMessage = null,
   replayProgress,
   onMessage,
   onViewModeChange,

@@ -189,16 +189,25 @@ export type ExtensionToWebviewMessage =
 
 /**
  * Props for the LogPanel root component.
+ *
+ * As of feature 199 this is also the canonical prop type for the
+ * `LogTimeline` and `LogByFeature` view components — every field they
+ * consume is declared here as optional. The child-only fields are
+ * grouped at the bottom of this interface.
  */
 export interface LogPanelProps {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
   viewMode: ViewMode;
   selectedEntryId: string | null;
-  filterState: FilterState;
-  hasActiveSession: boolean;
-  plotName: string | null;
-  actionResultMessage: string | null;
+  /** LogPanel root only — the inner views (LogTimeline / LogByFeature) ignore this. */
+  filterState?: FilterState;
+  /** LogPanel root only. */
+  hasActiveSession?: boolean;
+  /** LogPanel root only. */
+  plotName?: string | null;
+  /** LogPanel root only. */
+  actionResultMessage?: string | null;
   onMessage?: (message: LogPanelMessage) => void;
   onViewModeChange?: (mode: ViewMode) => void;
   onFilterStateChange?: (state: FilterState) => void;
@@ -219,6 +228,30 @@ export interface LogPanelProps {
   /** Flip-card: update rationale text. Feature: 113 */
   onRationaleUpdate?: (activityId: string, rationale: string) => void;
   className?: string;
+
+  // --- Fields previously held by per-view child prop interfaces. ---
+  // Consolidated here per feature 199 (FR-004). All optional so no existing
+  // LogPanel call site needs to change.
+  onEntryClick?: (entry: TimelineEntry) => void;
+  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+  onRestoreClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: currently editing entry ID. Feature: 113 */
+  editingActivityId?: string | null;
+  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
+  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
+  /** Flip-card: whether the schema is loading. Feature: 113 */
+  schemaLoading?: boolean;
+  /** Flip-card: schema error message. Feature: 113 */
+  schemaError?: string | null;
+  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
+  rationaleRef?: React.Ref<HTMLTextAreaElement>;
+  /** Flip-card callbacks (pass-through). Feature: 113 */
+  onEditClick?: (entry: TimelineEntry) => void;
+  onDoneClick?: (entry: TimelineEntry) => void;
+  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
+  onDeleteClick?: (activityId: string) => void;
+  onRationaleChange?: (activityId: string, rationale: string) => void;
+  onRetrySchema?: (toolId: string) => void;
 }
 
 /**
@@ -260,70 +293,6 @@ export interface LogEntryProps {
   replayStatus?: CardReplayStatus;
   /** Chronological step number (1 = oldest operation). */
   stepIndex?: number;
-  className?: string;
-}
-
-/**
- * Props for the LogTimeline component.
- */
-export interface LogTimelineProps {
-  entries: TimelineEntry[];
-  featureNames: Record<string, string>;
-  viewMode: ViewMode;
-  selectedEntryId: string | null;
-  onEntryClick?: (entry: TimelineEntry) => void;
-  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
-  onRestoreClick?: (entry: TimelineEntry) => void;
-  /** Flip-card: currently editing entry ID. Feature: 113 */
-  editingActivityId?: string | null;
-  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
-  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
-  /** Flip-card: whether the schema is loading. Feature: 113 */
-  schemaLoading?: boolean;
-  /** Flip-card: schema error message. Feature: 113 */
-  schemaError?: string | null;
-  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
-  rationaleRef?: React.Ref<HTMLTextAreaElement>;
-  /** Flip-card callbacks (pass-through). Feature: 113 */
-  onEditClick?: (entry: TimelineEntry) => void;
-  onDoneClick?: (entry: TimelineEntry) => void;
-  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
-  onDisableToggle?: (activityId: string, disabled: boolean) => void;
-  onDeleteClick?: (activityId: string) => void;
-  onRationaleChange?: (activityId: string, rationale: string) => void;
-  onRetrySchema?: (toolId: string) => void;
-  className?: string;
-}
-
-/**
- * Props for the LogByFeature component.
- */
-export interface LogByFeatureProps {
-  entries: TimelineEntry[];
-  featureNames: Record<string, string>;
-  viewMode: ViewMode;
-  selectedEntryId: string | null;
-  onEntryClick?: (entry: TimelineEntry) => void;
-  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
-  onRestoreClick?: (entry: TimelineEntry) => void;
-  /** Flip-card: currently editing entry ID. Feature: 113 */
-  editingActivityId?: string | null;
-  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
-  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
-  /** Flip-card: whether the schema is loading. Feature: 113 */
-  schemaLoading?: boolean;
-  /** Flip-card: schema error message. Feature: 113 */
-  schemaError?: string | null;
-  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
-  rationaleRef?: React.Ref<HTMLTextAreaElement>;
-  /** Flip-card callbacks (pass-through). Feature: 113 */
-  onEditClick?: (entry: TimelineEntry) => void;
-  onDoneClick?: (entry: TimelineEntry) => void;
-  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
-  onDisableToggle?: (activityId: string, disabled: boolean) => void;
-  onDeleteClick?: (activityId: string) => void;
-  onRationaleChange?: (activityId: string, rationale: string) => void;
-  onRetrySchema?: (toolId: string) => void;
   className?: string;
 }
 
