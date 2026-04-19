@@ -107,7 +107,7 @@ describe('applySymbolStyle (T032)', () => {
     const feature = makeTrackFeature();
 
     expect(() => execute([feature], { symbol: 'hexagon' as unknown as ApplySymbolStyleParams['symbol'] })).toThrow(
-      'symbol must be one of: circle, square, diamond, triangle, cross',
+      /^symbol must be one of: circle, square, triangle, diamond, cross$/,
     );
   });
 
