@@ -104,7 +104,7 @@ description: "Reduced task list for Feature 176 — Analysis Log Panel Rich Card
 - [x] T019 [P] Capture light/dark/vscode theme screenshots + edge-cases + disabled-state + interaction GIF (< 5s, < 2MB) per quality rubric in `specs/176-log-panel-ux/evidence/screenshots/`
 - [x] T020 [P] Create usage demonstration showing host integration + sample timeline + expected rendering in `specs/176-log-panel-ux/evidence/usage-example.md`
 - [x] T021 [P] Create shipped blog post and LinkedIn summary via Content Specialist agent in `specs/176-log-panel-ux/media/shipped-post.md` and `specs/176-log-panel-ux/media/linkedin-shipped.md`
-- [ ] T022 Create PR and publish blog: run `/speckit.pr`
+- [x] T022 Create PR and publish blog: run `/speckit.pr` — Feature PR: https://github.com/debrief/debrief-future/pull/480
 
 **T022 must run last.** It depends on T018–T021 being complete and opens both the feature PR in `debrief/debrief-future` and the blog PR in `debrief.github.io`.
 
