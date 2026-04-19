@@ -86,7 +86,18 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ### Functional Requirements
 
-*TODO*
+- **FR-001**: For the family of call sites that operate on **generic GeoJSON feature arrays** (i.e. not the LinkML-typed `DebriefFeature` consumers of `shared/components`), the monorepo MUST contain exactly one implementation of `calculateBounds` and exactly one implementation of `mergeBounds`, both exported from `@debrief/utils`.
+- **FR-002**: The consolidated `calculateBounds` MUST skip any feature whose `geometry` is missing, `null`, or `undefined` rather than throw. This preserves, for every consumer, the null-guard behaviour that was previously exclusive to the VS Code copy.
+- **FR-003**: The local copy at `apps/vscode/src/utils/bounds.ts` MUST be removed.
+- **FR-004**: The duplicate test file at `apps/vscode/tests/unit/bounds.test.ts` MUST be removed; equivalent coverage MUST be present in `shared/utils/tests/bounds.test.ts`. That coverage MUST include a regression test for the preserved null-geometry behaviour (FR-002).
+- **FR-005**: `apps/vscode/src/webview/mapPanel.ts` MUST import `calculateBounds` and `mergeBounds` from `@debrief/utils` (not from a VS Code-local path).
+- **FR-006**: The consolidated utility MUST accept the VS Code feature array (whose element type derives from `SafeFeature`) without requiring an `as`-cast at the call site. The reconciliation of `SafeFeature` and `GeoJSONFeature` MUST happen at the `@debrief/utils` boundary (e.g. by widening the input type to a structural minimum); the precise widening shape is an implementation choice for the planning phase.
+- **FR-007**: The consolidated utility MUST perform **explicit, reviewable type narrowing** on any untyped portion of its input (in particular, coordinate values typed as `unknown`) at a single named gate at the function's entry point — before any per-geometry-type branch runs. The narrowing step MUST NOT use `any`, MUST NOT use double-cast patterns (`as unknown as X`), and SHOULD be anchored in source to Article XV.5 of the constitution via a comment or a named helper. (This is what makes the widened input type of FR-006 constitutional.)
+- **FR-008**: The inline bounds calculation in `apps/vscode/src/webview/mapPanel.ts::fitToSelection()` MUST be replaced with a call to the consolidated `calculateBounds`. After the change, `fitToSelection` MUST honour every geometry type the consolidated utility supports (Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon) — the previous silent-skip of non-Point/non-LineString geometries in the selection MUST no longer occur.
+- **FR-009**: The existing early-return behaviour of `fitToSelection` for an empty selection MUST be preserved — the map viewport MUST NOT change if no features are selected.
+- **FR-010**: All other existing call sites of `calculateBounds`, `mergeBounds`, `boundsToLeaflet`, and `isValidBounds` (across both `apps/vscode` and `shared/`) MUST continue to compile and behave identically after the change. `boundsToLeaflet` and `isValidBounds` signatures and behaviour MUST NOT change.
+- **FR-011**: The repository's lint, type-check, and full test suites MUST pass on the change with no new errors or warnings introduced.
+- **FR-012**: The change MUST NOT alter the publicly observable behaviour of the VS Code map's auto-zoom on plot open for any feature collection that already worked before the change. (`fitToSelection` is the one explicit exception to "no observable behaviour change" — its per-geometry-type correctness is intentionally improved per FR-008.)
 
 ### Key Entities
 
