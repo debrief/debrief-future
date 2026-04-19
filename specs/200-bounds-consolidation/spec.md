@@ -111,7 +111,15 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ### Measurable Outcomes
 
-*TODO*
+- **SC-001**: A monorepo-wide search for `export function calculateBounds` and `export function mergeBounds`, restricted to files under `shared/utils/` and `apps/`, returns exactly one match per symbol — both located inside `shared/utils/`. (Scoped deliberately: `shared/components/src/utils/bounds.ts` defines a separate, LinkML-typed `calculateBounds` that is out of scope per the "Out of Scope" section; that match is excluded from this criterion.)
+- **SC-002**: `apps/vscode` contains no file matching `**/bounds.ts` and no file matching `**/bounds.test.ts`.
+- **SC-003**: Approximately 116 lines of duplicated implementation code (the body of the VS Code-local `bounds.ts`) and the duplicated unit-test file are removed from `apps/vscode`, with no equivalent code reintroduced elsewhere. In addition, the inline bounds loop in `mapPanel.ts::fitToSelection()` (~30 lines) is replaced by a single call to the consolidated `calculateBounds`.
+- **SC-004**: The full repository CI gate (lint, type-check, unit tests, end-to-end tests) passes on the change with no new failures and no new warnings introduced.
+- **SC-005**: A manual smoke test of opening a plot in the VS Code extension confirms the map's zoom-to-bounds behaviour is unchanged on plot open, including for a feature collection containing at least one feature with a missing/null geometry.
+- **SC-006**: A regression test in `shared/utils/tests/bounds.test.ts` exercises the null-geometry-feature case end-to-end and passes — guaranteeing the behavioural difference that originally motivated the duplication is now covered at the canonical location.
+- **SC-007**: The same test file additionally asserts that `calculateBounds` produces correct, non-null bounds for each supported geometry type in isolation: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon. (This is what makes FR-008's "no silent miss in fitToSelection" durable — the test fails if any type is dropped from the utility.)
+- **SC-008**: A manual smoke test of "zoom to selection" in the VS Code extension, performed on a selection that contains at least one Polygon or MultiPolygon feature, confirms the map zooms to the selected extent rather than ignoring the Polygon/MultiPolygon subset. (The same smoke test on a Point/LineString-only selection produces the same viewport as the pre-change extension — no regression on the historically-supported path.)
+- **SC-009**: The consolidated utility's source contains exactly one explicit, named (or anchored-by-comment) narrowing gate for untyped coordinate input — reviewable in a single location, with zero uses of `any` and zero double-cast patterns (`as unknown as X`). Reviewed by inspection of the file's diff; enforced in perpetuity by the repo's existing ESLint / typecheck configuration (which already prohibits `any`).
 
 ## Assumptions
 
