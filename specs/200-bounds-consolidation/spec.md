@@ -27,7 +27,17 @@ A developer maintaining the platform searches the monorepo for `calculateBounds`
 
 ### User Story 2 — VS Code map auto-zoom continues to work (Priority: P1)
 
-*TODO*
+A user opens a plot in the VS Code extension. The map panel auto-zooms to fit the loaded features exactly as it did before consolidation — including the case where some features in the collection have no geometry (which previously triggered a null-guard only present in the VS Code copy). No regression is visible to the end user.
+
+**Why this priority**: The VS Code map's zoom-to-bounds is the only in-tree production consumer of the duplicated utility. If consolidation regressed it, the user-facing impact would be immediate: a thrown exception, a blank map, or the wrong viewport on import. This is the gating behavioural guarantee for the cleanup.
+
+**Independent Test**: With the change in place, open a sample plot in the VS Code extension preview and confirm the map auto-zooms to the feature extent. Repeat with a feature collection that contains at least one feature whose `geometry` is null/missing — the map must still auto-zoom to the bounds of the remaining features without throwing.
+
+**Acceptance Scenarios**:
+
+1. **Given** a feature collection where every feature has a valid geometry, **When** the map panel calculates bounds via the consolidated utility, **Then** it returns the same bounding box that the VS Code-local utility would have returned before this change.
+2. **Given** a feature collection where one or more features have a missing/null geometry, **When** the map panel calculates bounds via the consolidated utility, **Then** the offending features are skipped silently and bounds are computed from the rest (no exception, same result the VS Code-local utility produced).
+3. **Given** a feature collection where every feature lacks a usable geometry, **When** the map panel calculates bounds, **Then** the utility returns `null` and the map panel handles that gracefully (consistent with current behaviour).
 
 ### User Story 3 — VS Code feature types pass through without casts or type errors (Priority: P2)
 
