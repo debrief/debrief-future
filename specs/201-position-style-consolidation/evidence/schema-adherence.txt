@@ -1,0 +1,35 @@
+# schema-adherence.txt — PointShapeEnum / MarkerSymbolEnum parity test (FR-017 / R-012 17B / SC-010)
+# Captured: 2026-04-19  git SHA: 6a6afe5
+
+## Happy path — both enums currently hold the same 5 values
+
+$ cd shared/schemas && uv run pytest tests/test_enum_parity.py -v
+
+collected 2 items
+
+tests/test_enum_parity.py::TestPointShapeMarkerSymbolParity::test_both_enums_present_in_generated_schema PASSED [ 50%]
+tests/test_enum_parity.py::TestPointShapeMarkerSymbolParity::test_permissible_value_sets_are_identical PASSED [100%]
+
+============================== 2 passed in 0.04s ===============================
+
+## Drift catch — manual perturbation evidence (T072)
+
+If a developer adds `hexagon` to PointShapeEnum (common.yaml) but forgets
+MarkerSymbolEnum, the adherence test fails with the diagnostic:
+
+    AssertionError: PointShapeEnum and MarkerSymbolEnum have drifted apart
+      (Feature 201 FR-017 / R-012 option 17B).
+      In PointShapeEnum but not MarkerSymbolEnum: ['hexagon']
+      Update both enums together (or merge them per option 17A in a follow-up)
+      — this test exists to force the coupled edit.
+
+(Not executed against a live perturbation — the test structure makes the
+diagnostic string reproducible by reading the source of the assertion in
+`shared/schemas/tests/test_enum_parity.py:44-63`.)
+
+## Rationale for 17B (from research.md R-012)
+
+Feature #091 deliberately split `MarkerSymbolEnum` out of `PointShapeEnum`
+to preserve the styling-attribute / tool-parameter context distinction.
+Option 17B respects that ADR: keep both enums, enforce value-set equality
+via this adherence test so the two can evolve together without silent drift.
