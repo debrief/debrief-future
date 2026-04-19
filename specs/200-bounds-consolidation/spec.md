@@ -74,7 +74,13 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ### Edge Cases
 
-*TODO*
+- A feature's `geometry` is `null` or `undefined` → that feature is skipped; the rest of the collection still contributes to the bounds. (This was the null-guard exclusive to the VS Code copy and must be preserved in the consolidated utility — see User Story 2.)
+- The feature array is empty → utility returns `null`; callers must continue to handle `null` exactly as they do today (for the import-path caller, the VS Code map falls back to the existing `currentPlot.bbox`; for the selection caller, `fitToSelection` retains its existing early-return).
+- Every feature in the array has unusable geometry (null, missing, or a coordinate set that produces no usable lon/lat pair) → utility returns `null`; same behaviour as today.
+- One of the bounds inputs to `mergeBounds` is `null` → the other bounds is returned unchanged (existing behaviour, preserved).
+- A feature has a supported geometry type with malformed coordinates (e.g. a Point whose coordinates array has fewer than two numeric elements, or a numeric value that is `NaN`) → the malformed coordinate is skipped silently at the explicit narrowing step; the feature still contributes any other well-formed coordinates it has. (This matches the current behaviour of both pre-change copies. The narrowing step is the point at which "skipped silently" becomes "skipped deliberately and reviewably" — see User Story 3.)
+- A feature has a geometry type the utility does not branch on (e.g. `GeometryCollection`, which is valid GeoJSON) → that feature contributes nothing to the bounds, same as today. This is a pre-existing limitation; it is not introduced or fixed by this work. If it becomes visible to users, it is a separate defect to file.
+- The user's selection contains only features whose geometry types all happen to be unsupported or null → `fitToSelection` ends up with `null` bounds and must handle that without breaking the viewport (unchanged-viewport fallback is acceptable and matches the empty-selection case).
 
 ## Requirements *(mandatory)*
 
