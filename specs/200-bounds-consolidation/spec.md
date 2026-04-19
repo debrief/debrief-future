@@ -101,7 +101,11 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ### Key Entities
 
-*TODO*
+- **GeoJSON Feature (generic)**: A geospatial record with an optional `geometry` (containing a `type` such as Point / LineString / Polygon / Multi*, plus a coordinates payload) and arbitrary properties. This is the shape the consolidated utility consumes. The bounds utility cares only about the geometry's coordinates and tolerates a missing/null geometry by skipping the feature.
+- **Bounds**: A four-number tuple `[minLon, minLat, maxLon, maxLat]` representing the smallest axis-aligned rectangle containing all input coordinates, or `null` when no usable coordinate exists in the input. Treated as an opaque value by callers; the utility owns its construction.
+- **SafeFeature vs GeoJSONFeature**: Two existing, hand-written in-tree feature types that describe the same underlying entity with slightly different shapes — `GeoJSONFeature` has a required, typed `geometry`; `SafeFeature` has a nullable `geometry` with `coordinates: unknown` to absorb untrusted JSON-parse / MCP boundary data. The widened parameter (FR-006) plus the explicit narrowing gate (FR-007) lets both types reach the utility without per-call-site laundering.
+- **Selection**: The set of feature IDs currently selected in the session state. `fitToSelection` resolves those IDs to the corresponding features in the current plot and passes the resolved feature array into the consolidated `calculateBounds` (FR-008). An empty selection is a distinct state — it does not produce `null` bounds; it bypasses the utility entirely and leaves the viewport unchanged (FR-009).
+- **DebriefFeature (out of scope)**: The LinkML-typed feature shape consumed by `shared/components/src/utils/bounds.ts`. Named here only to disambiguate: the consolidated utility does **not** take DebriefFeature as input, and this work does not migrate the components-side utility. See "Out of Scope" below.
 
 ## Success Criteria *(mandatory)*
 
