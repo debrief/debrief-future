@@ -450,9 +450,7 @@ def generate_typescript() -> bool:
             # Find the closing brace that ends the PointShapeEnum declaration.
             enum_start = content.index(_point_shape_sentinel)
             enum_end = content.index("};\n", enum_start)
-            content = (
-                content[:enum_end] + _point_shape_decl + content[enum_end + len("};\n"):]
-            )
+            content = content[:enum_end] + _point_shape_decl + content[enum_end + len("};\n") :]
 
         _symbol_narrow_targets = ("PositionStyle", "PositionStyleOverride")
         for iface_name in _symbol_narrow_targets:

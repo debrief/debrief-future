@@ -59,13 +59,11 @@ class TestPointShapeMarkerSymbolParity:
             )
             if missing_from_marker:
                 diagnostic += (
-                    f"  In PointShapeEnum but not MarkerSymbolEnum: "
-                    f"{sorted(missing_from_marker)}\n"
+                    f"  In PointShapeEnum but not MarkerSymbolEnum: {sorted(missing_from_marker)}\n"
                 )
             if missing_from_point:
                 diagnostic += (
-                    f"  In MarkerSymbolEnum but not PointShapeEnum: "
-                    f"{sorted(missing_from_point)}\n"
+                    f"  In MarkerSymbolEnum but not PointShapeEnum: {sorted(missing_from_point)}\n"
                 )
             diagnostic += (
                 "  Update both enums together (or merge them per option "
