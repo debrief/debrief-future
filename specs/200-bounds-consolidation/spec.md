@@ -55,7 +55,22 @@ A developer working in `apps/vscode` passes the VS Code feature array (whose ele
 
 ### User Story 4 — `fitToSelection` honours every geometry type (Priority: P2)
 
-*TODO*
+A user selects one or more features on the VS Code map and invokes "zoom to selection". Today, the map zooms correctly only when the selected features are Points or LineStrings — selections that contain Polygon, MultiPoint, MultiLineString, or MultiPolygon features are silently under-represented (the map zooms to the Point/LineString subset and ignores the rest, or fails to zoom if the selection contains no Point/LineString). After this change, "zoom to selection" honours every geometry type the consolidated utility supports.
+
+**Why this priority**: The VS Code map panel already contains a second, inline bounds calculation in `fitToSelection()` that is limited to Point and LineString and silently skips everything else — a fourth copy of the "compute bounds from features" logic, with a latent correctness bug. Once the consolidated utility exists, retiring this inline copy is a one-line replacement that fixes the silent miss at the same time. Folding it into this PR is cheaper than capturing it as a separate follow-up, and aligns with the constitution's "no silent failures" principle (Article I.3).
+
+**Why P2 (not P1)**: The silent miss is a pre-existing bug that the backlog text did not explicitly scope into #200. We are choosing to fix it here because the cost is marginal, but the primary goal of this work (retiring the duplicate utility) succeeds even if this user story were cut. P1 stories gate the PR; P2 completes it.
+
+**Independent Test**: With the change in place, open a plot in the VS Code extension that contains a mix of geometry types (at minimum one Polygon or MultiPolygon feature and one Point or LineString feature). Select a feature of every type represented in the plot, one type at a time, and invoke "zoom to selection". The map must zoom to a viewport that tightly contains each selected feature's extent — regardless of its geometry type.
+
+**Acceptance Scenarios**:
+
+1. **Given** a selection containing only Point and LineString features, **When** the user invokes "zoom to selection", **Then** the map zooms to a viewport that contains every selected feature — identical to the behaviour users see today.
+2. **Given** a selection containing one or more Polygon features, **When** the user invokes "zoom to selection", **Then** the map zooms to a viewport that contains the full extent of every selected Polygon (today, selected Polygons contribute nothing and are silently missed).
+3. **Given** a selection containing one or more MultiPolygon features, **When** the user invokes "zoom to selection", **Then** the map zooms to a viewport that contains the union of all polygons in every selected MultiPolygon (today, selected MultiPolygons contribute nothing).
+4. **Given** a selection containing one or more MultiPoint or MultiLineString features, **When** the user invokes "zoom to selection", **Then** the map zooms to a viewport that contains the union of all sub-elements (today, selected Multi* features contribute nothing).
+5. **Given** a selection containing at least one feature whose `geometry` is null, **When** the user invokes "zoom to selection", **Then** that feature is skipped silently and the map zooms to the remaining selected features — no exception, no empty-selection fallback triggered unless every selected feature lacks a usable geometry.
+6. **Given** an empty selection, **When** the user invokes "zoom to selection", **Then** the existing early-return behaviour is preserved (no change in map viewport).
 
 ### Edge Cases
 
