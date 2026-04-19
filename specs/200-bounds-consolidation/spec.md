@@ -5,8 +5,6 @@
 **Status**: Draft (v2 — post `/speckit.review`)
 **Input**: User description: "item 200 from the backlog — Consolidate bounds utilities into @debrief/utils."
 
-<!-- Skeleton. Each section below is a placeholder to be filled in sequentially. -->
-
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Single canonical bounds utility for the generic-GeoJSON call sites (Priority: P1)
