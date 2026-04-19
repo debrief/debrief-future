@@ -134,7 +134,18 @@ A user selects one or more features on the VS Code map and invokes "zoom to sele
 
 ## Out of Scope
 
-*TODO*
+The four items below were considered during `/speckit.review` and explicitly deferred. Each is captured as a potential BACKLOG.md entry; the implementation phase of this spec should add those entries.
+
+- **Unifying `shared/components/src/utils/bounds.ts` with `@debrief/utils`**: that copy operates on LinkML-typed `DebriefFeature` arrays and carries additional helpers (`expandBounds`, `isPointInBounds`, `bboxOverlapsViewport`, `viewportToBounds`, `filterBySpatialExtent`). Unification requires reconciling three feature-type families (`DebriefFeature` / `SafeFeature` / `GeoJSONFeature`) and migrating four consumers. Legitimately separate scope; its own backlog entry.
+- **Drift-prevention rule** (lint / CI check that fails if a file matching `apps/*/src/utils/bounds.ts` reappears, or more generally if any `apps/*` file exports a symbol already exported from `@debrief/utils`). Makes the SC-001 guarantee durable. Its own backlog entry.
+- **Replacing hand-written `SafeFeature` / `GeoJSONFeature`** with LinkML-generated equivalents. Article II tripwire that predates this work. Its own backlog entry.
+- **Pre-computed-`bbox` fast-path** in `@debrief/utils` `calculateBounds` (honour `feature.bbox` when present, as `shared/components`'s copy already does). Convergent-behaviour improvement useful before any future unification with the components copy. Its own backlog entry.
+
+Additionally out of scope:
+
+- **GeometryCollection support** in `calculateBounds`. The utility does not branch on `GeometryCollection` today; adding that support is a separate behavioural change that warrants its own decision and tests.
+- **Any change to `mergeBounds`, `boundsToLeaflet`, or `isValidBounds`** beyond what is necessary to keep them compiling and behaving identically. Their bodies are byte-identical between the two pre-change copies and need no migration.
+- **Any change to `fitToAllTracks()`** in `mapPanel.ts`. That function consumes the pre-computed `currentPlot.bbox` and is unaffected by this work.
 
 ## Notes
 
