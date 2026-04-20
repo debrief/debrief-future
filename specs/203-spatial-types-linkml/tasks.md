@@ -96,26 +96,26 @@ T013 after T011 + T012.
 
 ### Delete duplicates (FR-008, FR-009, FR-010)
 
-- [ ] T016 Delete the entire duplicate file `shared/components/src/utils/spatial-types.ts`
-- [ ] T017 Remove `Coordinate`, `ViewportPolygon`, validator declarations, and `calculateViewportCenter` from this file; keep `SpatialSlice`, `SpatialActions`, `DrawingMode`, `DEFAULT_SPATIAL_SLICE`, `normalizeRotation`; add imports of the canonical types from `@debrief/schemas` and validators from `@debrief/utils` `services/session-state/src/types/spatial.ts`
-- [ ] T018 Remove `TimeFilter` declaration; import it from `@debrief/schemas` `services/session-state/src/types/temporal.ts`
-- [ ] T019 Bump `SCHEMA_VERSION` from `'1.0.0'` to `'1.1.0'` `services/session-state/src/types/index.ts`
-- [ ] T020 Extend `SCHEMA_VERSION_HISTORY` to `['1.0.0', '1.1.0']` and add a no-op `'1.0.0'` branch to `migrateSession` (viewport shape migration happens inline via `coerceViewport`, not here — see `contracts/persistence-migration.md` §`migrateSession` branch) `services/session-state/src/persistence/schema.ts`
+- [x] T016 Deleted the entire duplicate file `shared/components/src/utils/spatial-types.ts`
+- [x] T017 Removed `Coordinate`, `ViewportPolygon`, validator declarations, and `calculateViewportCenter` from session-state spatial.ts; kept `SpatialSlice`, `SpatialActions`, `DrawingMode`, `DEFAULT_SPATIAL_SLICE`, `normalizeRotation`; re-exports canonical types from `@debrief/schemas` and validators from `@debrief/utils` `services/session-state/src/types/spatial.ts`
+- [x] T018 Removed `TimeFilter` declaration; re-exports it from `@debrief/schemas` `services/session-state/src/types/temporal.ts`
+- [x] T019 Bumped `SCHEMA_VERSION` from `'1.0.0'` to `'1.1.0'` `services/session-state/src/types/index.ts`
+- [x] T020 Extended `SCHEMA_VERSION_HISTORY` to `['1.0.0', '1.1.0']` and added a no-op `'1.0.0'` branch to `migrateSession` (viewport shape migration happens inline via `coerceViewport`) `services/session-state/src/persistence/schema.ts`
 
 ### Swap imports & replace blind cast
 
-- [ ] T021 Replace the blind cast at `load.ts:125` — `store.getState().setViewport(spatial.viewport as never)` → `store.getState().setViewport(coerceViewport(spatial.viewport))`; remove the `as never`; ensure `coerceViewport` is imported `services/session-state/src/persistence/load.ts`
-- [ ] T022 [P] Swap imports of `Coordinate`/`ViewportPolygon`/validators to `@debrief/schemas` + `@debrief/utils` `services/session-state/src/store/slices/spatial.ts`
-- [ ] T023 [P] Swap `TimeFilter` import to `@debrief/schemas` `services/session-state/src/store/slices/temporal.ts`
-- [ ] T024 [P] Swap imports throughout; ensure every downstream file references the canonical source `services/session-state/src/store/subscriptions.ts`
-- [ ] T025 [P] Import `calculateViewportCenter` from `@debrief/utils` `services/session-state/src/server/tools/setViewport.ts`
-- [ ] T026 [P] Swap `ViewportPolygon` import to `@debrief/schemas` `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T027 Audit and swap imports across `apps/vscode/` — any file importing from the duplicate files must target `@debrief/schemas` (types) and `@debrief/utils` (validators/converters); capture the list of touched files in the commit message `apps/vscode/src/`
-- [ ] T028 Audit and swap imports across `apps/web-shell/` — same rule as T027 `apps/web-shell/src/`
+- [x] T021 Replaced the blind cast at `load.ts:125` with `coerceViewport(spatial.viewport)`; legacy-tuple payloads rehydrate cleanly `services/session-state/src/persistence/load.ts`
+- [x] T022 [P] Imports of `ViewportPolygon`/`Coordinate` via `@debrief/schemas`; validators from `@debrief/utils` `services/session-state/src/store/slices/spatial.ts`
+- [x] T023 [P] `TimeFilter` imported from `@debrief/schemas` `services/session-state/src/store/slices/temporal.ts`
+- [x] T024 [P] `ViewportPolygon` imported from `@debrief/schemas` `services/session-state/src/store/subscriptions.ts`
+- [x] T025 [P] `calculateViewportCenter` imported from `@debrief/utils`; input coordinates are object-form `services/session-state/src/server/tools/setViewport.ts`
+- [x] T026 [P] `ViewportPolygon`/`TimeFilter` imported from `@debrief/schemas` `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T027 `apps/vscode/src/webview/mapPanel.ts` uses `fromGeoJSONCoord` at the webview → session-state boundary; coordinate indexing uses `.longitude`/`.latitude` `apps/vscode/src/`
+- [x] T028 `apps/web-shell/` — no consumers of `Coordinate`/`ViewportPolygon`/`TimeFilter` from the duplicates. Viewport state reaches web-shell via the `@debrief/components` StacBrowser (already swapped) `apps/web-shell/src/`
 
 ### Verify independent test criterion
 
-- [ ] T029 Run `rg "^export (type|interface) (Coordinate|ViewportPolygon|TimeFilter)" --type ts` and confirm only `shared/schemas/src/generated/typescript/` matches; paste output into `evidence/call-site-audit.md` `specs/203-spatial-types-linkml/evidence/call-site-audit.md`
+- [x] T029 Ran `rg "^export (type|interface) (Coordinate|ViewportPolygon|TimeFilter)" --type ts` — only `shared/schemas/src/generated/typescript/types.ts` matches; see `evidence/call-site-audit.md` §SC-001 `specs/203-spatial-types-linkml/evidence/call-site-audit.md`
 
 **Parallel example**:
 ```
@@ -132,18 +132,18 @@ T027 and T028 in parallel — separate app packages.
 
 ### Rewrite tuple consumers (FR-011, FR-022, not just import-swap)
 
-- [ ] T030 Rewrite `viewportToBounds` in `shared/components/src/utils/bounds.ts:174-190` from tuple indexing (`c[0]`, `c[1]`) to object-field access (`c.longitude`, `c.latitude`); import `ViewportPolygon` from `@debrief/schemas`; add inline comment flagging the 4-corner-only constraint and the `Math.min(...lons)` scaling trap per FR-022 `shared/components/src/utils/bounds.ts`
-- [ ] T031 [test] Update `bounds.test.ts` to use object-form fixtures and add a case asserting correct bounds output from object-form coordinates `shared/components/src/utils/bounds.test.ts`
+- [x] T030 Rewrote `viewportToBounds` from tuple indexing to object-field access; `ViewportPolygon` imported from `@debrief/schemas`; docstring flags 4-corner constraint and the `Math.min(...lons)` scaling trap (FR-022) `shared/components/src/utils/bounds.ts`
+- [x] T031 [test] Updated `bounds.test.ts` to use object-form fixtures; added new case asserting correct bounds from object-form coordinates (Sydney-area regression) `shared/components/src/utils/bounds.test.ts`
 
 ### Boundary audit (FR-016)
 
-- [ ] T032 Audit GeoJSON-facing call sites for hand-rolled `[longitude, latitude]` or `[latitude, longitude]` tuple constructions: `apps/vscode/`, `apps/web-shell/`, `shared/components/`, `services/session-state/server/` — paste grep results before/after into the audit log; replace each with `toGeoJSONCoord`/`fromGeoJSONCoord` OR document as intentional (e.g. direct Leaflet `L.latLng` which is out of scope) `specs/203-spatial-types-linkml/evidence/call-site-audit.md`
-- [ ] T033 For each replaced site, confirm behaviour via existing unit/integration test; if no test covers the site, add a narrow assertion or flag for Phase 6 smoke testing
+- [x] T032 Audited GeoJSON-facing call sites across apps/vscode, apps/web-shell, shared/components, services/session-state/server — findings in `evidence/call-site-audit.md` §FR-016 `specs/203-spatial-types-linkml/evidence/call-site-audit.md`
+- [x] T033 Each replaced site is covered by existing unit tests (spatial.test.ts, bounds.test.ts, useBrowserFilter.test.ts, mcp.test.ts); no additional assertions needed at this stage
 
 ### Verify story-level independent test
 
-- [ ] T034 Run `pnpm --filter @debrief/utils test` and confirm converter + validator round-trip tests from T008/T009 remain green post-adoption
-- [ ] T035 Grep the diff: `git diff main -- '**/*.ts' | rg '\[.*longitude.*,.*latitude.*\]|\[.*\.longitude,.*\.latitude\]'` — any matches must be inside `spatial-converters.ts` itself or justified in the audit log
+- [x] T034 Ran `pnpm --filter @debrief/utils test` — 202 tests green post-adoption
+- [x] T035 Grep confirms: no hand-rolled `[longitude, latitude]` / `[lon, lat]` constructions outside `spatial-converters.ts` — documented in the audit log
 
 **Parallel example**:
 ```

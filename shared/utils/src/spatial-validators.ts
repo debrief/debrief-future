@@ -48,11 +48,19 @@ export function validateViewportPolygon(viewport: ViewportPolygon): boolean {
  * Calculate the geometric centre of a viewport polygon by averaging the
  * four corners.
  *
+ * Assumes a valid 4-corner viewport. The generated TypeScript type relaxes
+ * cardinality to `Coordinate[]` (FR-020) so the non-null assertions below
+ * document the runtime invariant enforced by `validateViewportPolygon`.
+ *
  * @param viewport — ViewportPolygon object assumed to be valid (4 corners).
  * @returns A Coordinate at the viewport's centre.
  */
 export function calculateViewportCenter(viewport: ViewportPolygon): Coordinate {
-  const [nw, ne, se, sw] = viewport.coordinates;
+  const coords = viewport.coordinates;
+  const nw = coords[0]!;
+  const ne = coords[1]!;
+  const se = coords[2]!;
+  const sw = coords[3]!;
   return {
     longitude: (nw.longitude + ne.longitude + se.longitude + sw.longitude) / 4,
     latitude: (nw.latitude + ne.latitude + se.latitude + sw.latitude) / 4,

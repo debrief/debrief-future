@@ -6,12 +6,12 @@
  */
 
 import type { SessionStoreApi } from './index.js';
+import type { ViewportPolygon } from '@debrief/schemas';
 import type {
   TemporalSlice,
   SpatialSlice,
   FeaturesSlice,
   DocumentSlice,
-  ViewportPolygon,
   FeatureSelection,
 } from '../types/index.js';
 

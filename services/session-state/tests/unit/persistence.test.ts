@@ -82,7 +82,7 @@ describe('Persistence', () => {
 
     it('should include schema version', () => {
       const persistent = extractPersistentState(store);
-      expect(persistent.schemaVersion).toBe('1.0.0');
+      expect(persistent.schemaVersion).toBe('1.1.0');
     });
 
     it('should include savedAt timestamp', () => {
@@ -101,7 +101,7 @@ describe('Persistence', () => {
     it('should include version header', () => {
       const json = serializeState(store);
       const parsed = JSON.parse(json);
-      expect(parsed.version).toBe('1.0.0');
+      expect(parsed.version).toBe('1.1.0');
     });
 
     it('should include savedAt', () => {
@@ -143,7 +143,7 @@ describe('Persistence', () => {
   describe('SCHEMA_VERSIONS', () => {
     it('should expose schema versions', () => {
       expect(SCHEMA_VERSIONS).toBeDefined();
-      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.0.0');
+      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.1.0');
       expect(SCHEMA_VERSIONS.MIN_SUPPORTED).toBe('1.0.0');
     });
   });

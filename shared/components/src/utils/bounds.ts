@@ -1,5 +1,5 @@
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
-import type { ViewportPolygon } from './spatial-types';
+import type { ViewportPolygon } from '@debrief/schemas';
 
 /**
  * Recursively extract all coordinates from a GeoJSON geometry coordinates array.
@@ -166,15 +166,22 @@ export function bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): bo
  * For rotated views, this computes the enclosing AABB.
  *
  * Returns null for degenerate polygons (zero area).
- * Feature: 132-three-view-sync
+ * Feature: 132-three-view-sync, updated: 203 (object-form Coordinate).
  *
- * @param viewport - 4-corner polygon [NW, NE, SE, SW]
+ * @remarks
+ * This function is specific to 4-corner ViewportPolygon inputs. It uses
+ * `Math.min(...lons)` / `Math.max(...lons)` which collapse to spread arguments —
+ * V8 rejects spreads with more than ~100k arguments, so do NOT reuse this on
+ * large coordinate arrays (FR-022). For large arrays, replace the spread with
+ * a for-loop accumulator.
+ *
+ * @param viewport - 4-corner polygon [NW, NE, SE, SW] with `{ longitude, latitude }` corners.
  * @returns Bounds tuple [minLon, minLat, maxLon, maxLat] or null if degenerate
  */
 export function viewportToBounds(viewport: ViewportPolygon): Bounds | null {
   const coords = viewport.coordinates;
-  const lons = coords.map((c: [number, number]) => c[0]);
-  const lats = coords.map((c: [number, number]) => c[1]);
+  const lons = coords.map((c) => c.longitude);
+  const lats = coords.map((c) => c.latitude);
 
   const minLon = Math.min(...lons);
   const maxLon = Math.max(...lons);

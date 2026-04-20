@@ -1,22 +1,21 @@
 /**
  * Spatial state slice implementation.
  * Feature: 024-document-session-state
+ * Updated: 203-spatial-types-linkml (canonical schemas + @debrief/utils).
  */
 
 import type { StateCreator } from 'zustand';
+import type { Coordinate, ViewportPolygon } from '@debrief/schemas';
+import {
+  validateViewportPolygon,
+  calculateViewportCenter,
+} from '@debrief/utils';
 import type {
   SpatialSlice,
   SpatialActions,
-  ViewportPolygon,
-  Coordinate,
   SessionStore,
 } from '../../types/index.js';
-import {
-  DEFAULT_SPATIAL_SLICE,
-  validateViewportPolygon,
-  calculateViewportCenter,
-  normalizeRotation,
-} from '../../types/index.js';
+import { DEFAULT_SPATIAL_SLICE, normalizeRotation } from '../../types/index.js';
 
 export type SpatialSliceWithActions = SpatialSlice & SpatialActions;
 
@@ -34,7 +33,7 @@ export const createSpatialSlice: StateCreator<
   setViewport: (viewport: ViewportPolygon | null) => {
     if (viewport !== null && !validateViewportPolygon(viewport)) {
       throw new Error(
-        'Invalid viewport coordinates: must be within [-180, 180] longitude and [-90, 90] latitude'
+        'Invalid viewport coordinates: must be within [-180, 180] longitude and [-90, 90] latitude',
       );
     }
     set({ viewport });

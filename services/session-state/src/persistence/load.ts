@@ -106,10 +106,12 @@ function applySessionState(
   }
   if (temporal.timeFilter) {
     const raw = temporal.timeFilter as Record<string, unknown>;
-    store.getState().setTimeFilter({
-      start: raw.start != null ? coerceEpoch(raw.start) as number : null,
-      end: raw.end != null ? coerceEpoch(raw.end) as number : null,
-    });
+    // Generated TimeFilter uses optional fields; missing/undefined means
+    // unbounded. Legacy payloads may carry nulls, which are coerced to
+    // undefined here (FR-021).
+    const start = raw.start != null ? (coerceEpoch(raw.start) as number) : undefined;
+    const end = raw.end != null ? (coerceEpoch(raw.end) as number) : undefined;
+    store.getState().setTimeFilter({ start, end });
   }
   if (temporal.stepSize) {
     store.getState().setStepSize(temporal.stepSize as never);
@@ -121,9 +123,11 @@ function applySessionState(
     store.getState().setDisplayMode(temporal.displayMode as never);
   }
 
-  // Apply spatial state
+  // Apply spatial state.
+  // coerceViewport handles both the current object-form and the legacy
+  // tuple-form coordinates from SCHEMA_VERSION 1.0.0 payloads (feature 203).
   if (spatial.viewport) {
-    store.getState().setViewport(spatial.viewport as never);
+    store.getState().setViewport(coerceViewport(spatial.viewport));
   }
   if (typeof spatial.rotation === 'number') {
     store.getState().setRotation(spatial.rotation);

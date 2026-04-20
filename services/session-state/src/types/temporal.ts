@@ -72,16 +72,14 @@ export interface TimeRange {
 
 /**
  * Constraints on the visible time window.
- * Uses plain epoch milliseconds (Review Decision 5C).
  *
- * Schema equivalent: @debrief/schemas#TimeFilter
- * Not migrated: generated TimeFilter uses { start?: TimeInstant, end?: TimeInstant }
- * while this type uses nullable numbers (Review Decision 5C).
+ * Canonical source (feature 203): @debrief/schemas#TimeFilter, which emits
+ * `{ start?: number; end?: number }` (optional epoch milliseconds; missing
+ * means unbounded). Runtime code uses `value != null` checks, which accept
+ * both `undefined` and any legacy `null` values (FR-021).
  */
-export interface TimeFilter {
-  start: number | null;
-  end: number | null;
-}
+import type { TimeFilter } from '@debrief/schemas';
+export type { TimeFilter };
 
 /**
  * Units for time step navigation.
