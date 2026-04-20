@@ -91,13 +91,45 @@ shared/
 
 services/
 └── session-state/
-    └── src/
-        ├── types/
-        │   ├── spatial.ts                  # EDIT: remove Coordinate/ViewportPolygon/validators;
-        │   │                               #       import from @debrief/schemas and @debrief/utils
-        │   └── temporal.ts                 # EDIT: remove TimeFilter; import from @debrief/schemas
-        └── persistence/
-            └── (rehydrate code)            # EDIT: add migrateSpatialTuples + version bump
+    ├── src/
+    │   ├── types/
+    │   │   ├── spatial.ts                  # EDIT: remove Coordinate/ViewportPolygon/validators;
+    │   │   │                               #       import from @debrief/schemas and @debrief/utils
+    │   │   ├── temporal.ts                 # EDIT: remove TimeFilter; import from @debrief/schemas
+    │   │   └── index.ts                    # EDIT: SCHEMA_VERSION 1.0.0 → 1.1.0
+    │   ├── persistence/
+    │   │   ├── load.ts                     # EDIT: add coerceViewport sibling to coerceEpoch;
+    │   │   │                               #       replace `setViewport(... as never)` at :125
+    │   │   └── schema.ts                   # EDIT: SCHEMA_VERSION_HISTORY + migrateSession branch
+    │   ├── store/
+    │   │   ├── slices/
+    │   │   │   ├── spatial.ts              # EDIT: import validators from @debrief/utils
+    │   │   │   └── temporal.ts             # EDIT: import TimeFilter from @debrief/schemas
+    │   │   └── subscriptions.ts            # EDIT: import swap
+    │   └── server/tools/setViewport.ts     # EDIT: import calculateViewportCenter from @debrief/utils
+    └── tests/unit/                         # EDIT (existing tests refit for new shapes):
+        ├── slices/spatial.test.ts          #   use object-form fixtures
+        ├── slices/temporal.test.ts         #   TimeFilter epoch int shape
+        ├── slices/browser-filter.test.ts   #   ViewportPolygon + TimeFilter object/epoch
+        ├── persistence.test.ts             #   coerceViewport integration + SCHEMA_VERSION 1.1.0
+        └── temporal.test.ts                #   TimeFilter epoch int shape
+
+shared/components/src/
+├── utils/
+│   ├── bounds.ts                           # EDIT: viewportToBounds (tuple→object access);
+│   │                                       #       add scaling-trap comment; import ViewportPolygon
+│   │                                       #       from @debrief/schemas
+│   └── bounds.test.ts                      # EDIT: object-form fixtures; new case asserting
+│                                           #       correct bounds from object-form coordinates
+├── StacBrowser/
+│   ├── useBrowserFilter.ts                 # EDIT: import from @debrief/schemas
+│   └── __tests__/useBrowserFilter.test.ts  # EDIT: object-form ViewportPolygon fixtures
+
+shared/schemas/
+└── fixtures/                               # NEW/EDIT: golden fixtures
+    ├── viewport-polygon-with-zoom.json     # NEW: exercise optional zoom
+    ├── viewport-polygon.json               # EDIT: object-form coordinates
+    └── time-filter.json                    # EDIT: nullable-integer shape
 
 apps/
 ├── vscode/                                 # AUDIT: any file importing Coordinate/ViewportPolygon/
@@ -106,6 +138,14 @@ apps/
 │                                           #        conversions in those files replaced with helpers
 └── web-shell/                              # AUDIT: same as above
 ```
+
+**Named consumers that must be rewritten (not just import-swapped)**:
+
+| File | Line(s) | Why it must change, not just import-swap |
+|------|--------:|------------------------------------------|
+| `shared/components/src/utils/bounds.ts` | 174-190 | `viewportToBounds` reads coords as tuples `c[0]`, `c[1]`. After consolidation, these are object fields `c.longitude`, `c.latitude`. Silent-NaN hazard if missed (FR-022). |
+| `services/session-state/src/types/spatial.ts` | 50-55 | `calculateViewportCenter` averages tuple indices. Translate to object fields; move to `@debrief/utils`. |
+| `services/session-state/src/persistence/load.ts` | 125 | Blind `setViewport(... as never)` cast must become `setViewport(coerceViewport(...))` (FR-018 + FR-021). |
 
 **Structure Decision**: Option 1 (single project / monorepo refactor). This is a cross-cutting change within the existing monorepo; no new packages, no new apps. Changes are surgical and concentrated in the files listed above.
 

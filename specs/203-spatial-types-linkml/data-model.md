@@ -95,6 +95,10 @@ export interface ViewportPolygon {
 - Each `coordinates[i]` MUST pass `validateCoordinate`.
 - `zoom`, if present, SHOULD be a non-negative number (not enforced in schema; convention matches Leaflet).
 
+**Static type guarantee — conscious delta (review Issue 3A)**:
+
+The hand-authored duplicate types declared `coordinates` as a fixed 4-tuple (`[Coordinate, Coordinate, Coordinate, Coordinate]`). `gen-typescript` emits the canonical LinkML cardinality constraint as `Coordinate[]` — unbounded. This means TypeScript no longer statically rejects `coordinates[5]`. Enforcement moves from the type level to the validator (`validateViewportPolygon`). We accept this trade because (a) the schema is canonical (Article II) and hand-layering a tighter type reintroduces the exact duplication this feature removes, and (b) every boundary that receives a `ViewportPolygon` from persistence, a service response, or user-supplied JSON already passes through the validator — the validator is the right enforcement point (Article I.3: no silent failures).
+
 **State**: Immutable value type. No transitions.
 
 **Where used**: `SpatialSlice.viewport` in the session-state store; persisted across sessions; emitted by the map on viewport change.
@@ -140,6 +144,10 @@ export interface TimeFilter {
 **Validation rules**:
 
 - `start` and `end` (when both present and non-null) SHOULD satisfy `start <= end`. This is a convention; the type does not enforce it. Consumers MAY normalise by swapping on disorder.
+
+**Nullability convention (review Issue 2A)**:
+
+The LinkML `range: integer` with `required: false` produces generated TypeScript `{ start?: number, end?: number }` — optional fields. The runtime writes the explicit value `null` (not `undefined`) for unset bounds, following the existing pattern at `load.ts:109-110`. Consumers MUST read these with `value != null` checks rather than strict `value !== null` or `value !== undefined`, so both forms are accepted. The convention is: **runtime writes `null`, TS type says optional, readers use loose-equality against `null`.** This is a stable pattern across the codebase.
 
 **State**: Immutable value type. Replaced wholesale on each user interaction.
 

@@ -94,41 +94,48 @@ TimeFilter:
 ### Impact
 
 - `shared/schemas/src/linkml/session-state.yaml` — `TimeFilter` class updated; `TimeInstant` class retained (still used by `TimeRange`).
-- Generated Pydantic `TimeFilter` shape changes from objects with `TimeInstant` attributes to nullable integers. This is a breaking change at the Python boundary — but `TimeFilter` has no known Python consumer today (the code path is TypeScript-only).
-- Round-trip tests for `TimeFilter` must be updated to exercise the new shape.
+- Generated Pydantic `TimeFilter` shape changes from objects with `TimeInstant` attributes to nullable integers. This is a breaking change at the Python boundary — but no Python consumer *calls* `TimeFilter` today. The class is re-exported by `services/session-state-py/src/debrief_session/types.py:22` and published in the public API, and that surface area must be re-verified before merge (see verification step below).
 
 ### Note on Python consumers
 
-A quick grep of the Python codebase for `TimeFilter` references is a P1 implementation step to confirm the "no known Python consumer" assertion. If a consumer exists, that service adopts the nullable-integer shape.
+A re-grep of the Python codebase for `TimeFilter(` and `TimeFilter.` calls is a P1 implementation step to confirm nothing constructs or reads a `TimeFilter` instance. The re-export in `session-state-py` is surface area, not active usage. If a real consumer surfaces, that service adopts the nullable-integer shape.
+
+### Note on TS nullability (review Issue 2A)
+
+`gen-typescript` with `required: false` emits optional fields `{ start?: number, end?: number }` — optional (undefined) rather than explicitly nullable. Runtime code writes `null` for unset filter bounds and uses `!= null` checks (already the pattern in `load.ts:109-110`), which accepts both `undefined` and `null`. This is the standing convention; document it in data-model.md so code reviewers recognise the intent rather than reading it as a type mismatch.
 
 ---
 
 ## R-003: Persisted state migration strategy
 
-**Context**: FR-018. The `@debrief/session-state` store persists across page reloads (web-shell) and VS Code workspace restarts (extension). Existing persisted state may contain tuple-form coordinates. Changing the canonical shape to objects means rehydration must handle legacy data.
+**Context**: FR-018. `services/session-state` has a file-based session persistence layer: `loadSession(path)` in `services/session-state/src/persistence/load.ts` reads a JSON session file, checks version compatibility, calls `migrateSession`, then hands the parsed payload to `applySessionState` which fans values out to store setters. Existing legacy session files may contain tuple-form `viewport.coordinates`. Changing the canonical shape to objects means `applySessionState` must handle both legacy and new shapes during the transition.
 
 ### Decision
 
-**Silent in-place migration on rehydration.** The rehydration layer detects tuple-shaped coordinates (arrays of length 2 with both elements as numbers) and converts them to object form before writing them to the store. The persistence schema version is bumped from its current value (see `services/session-state/src/persistence/`) to the next increment so mid-migration state is detectable.
+**Silent in-place migration inside `applySessionState`.** Follow the exact pattern already established for temporal data: add a `coerceViewport(value: unknown): ViewportPolygon | null` helper in `load.ts`, sibling to the existing `coerceEpoch` helper. It detects tuple-shaped coordinates (arrays of length 2 with both elements as numbers) and converts them to object form. Replace the current blind cast `store.getState().setViewport(spatial.viewport as never)` at `load.ts:125` with `store.getState().setViewport(coerceViewport(spatial.viewport))` — this simultaneously adds the migration and removes a standing Article I.3 silent-cast violation (review Issue 4A).
 
 ### Rationale
 
 - **Deterministic conversion** — tuple `[lon, lat]` → `{ longitude: lon, latitude: lat }` has no ambiguity. Every legacy tuple produces exactly one object-form coordinate.
+- **Mirrors the existing migration pattern exactly** — `coerceEpoch` at `load.ts:186-192` already handles `{ epoch, iso }` → `number` migration for temporal data. A sibling `coerceViewport` follows the same shape-sniffing approach; no new abstraction is introduced.
 - **Zero user-visible disruption** — users do not lose viewport state, do not see an error banner, do not need to reset their session.
 - **Article XIV (Pre-Release Freedom) permits a harder approach but does not require it** — we have the freedom to break persisted state, but if a smooth migration is cheap and correct, we take it.
-- **Version bump is cheap insurance** — if a future refactor needs to break persistence, the version guard tells us what shape we're reading.
-- **Migration code is self-removing** — a one-line comment annotates the migration as temporary; once all production sessions have migrated (trivial for a pre-release product), the migration branch can be deleted in a follow-up.
+- **The blind cast goes away for free** — the refactor replaces `as never` (an Article I.3 silent-failure pattern) with a typed coercion, tightening the load path.
+- **Migration code is self-removing** — a one-line comment annotates `coerceViewport` as temporary; once all production sessions have migrated (trivial for a pre-release product), the tuple branch can be deleted and the helper collapsed.
 
 ### Alternatives Considered
 
 - **Option B: Version bump with user-facing "session must be reset" message**. Rejected as too disruptive for a deterministic conversion. Appropriate if the conversion were lossy or ambiguous; it is neither.
-- **Option C: Defer — assume persisted state is empty in practice**. Rejected because we know persisted state exists (web-shell is used daily; VS Code workspaces persist). Assuming it is empty would produce "coordinate shape mismatch" runtime errors on every user's next session. Noisy and avoidable.
+- **Option C: Defer — assume persisted state is empty in practice**. Rejected because legacy session files do exist on user disks (the saved JSON is a first-class user artefact). Failing them loudly on the next open is noisy and avoidable.
 
 ### Impact
 
-- `services/session-state/src/persistence/` gains a narrow migration step invoked during rehydration.
-- Persistence schema version bumped by 1.
-- One migration-specific unit test: given a legacy tuple-shaped state blob, assert the rehydrated store holds object-shaped coordinates.
+- `services/session-state/src/persistence/load.ts` gains `coerceViewport`; `applySessionState:125` is rewritten to use it.
+- `SCHEMA_VERSION = '1.0.0'` in `services/session-state/src/types/index.ts:25` bumps to `1.1.0` (minor — still compatible under the existing major-only gating at `schema.ts:35-42`, but makes the migration detectable in logs and in `migrateSession`).
+- `migrateSession` gains a branch `if (fromVersion === '1.0.0') { migrateFrom_1_0_0(data) }` that walks `spatial.viewport.coordinates` and converts tuples.
+- One migration-specific unit test for `coerceViewport` (review Gap A): legacy tuple, already-object, partial-object, non-array, empty array.
+- One integration test for `loadSession` with a legacy payload fixture.
+- Existing `services/session-state/tests/unit/persistence.test.ts` updated to the new shape.
 
 ---
 
@@ -185,7 +192,7 @@ export function fromGeoJSONCoord(tuple: [number, number]): Coordinate;
 
 ### Rationale
 
-- `@debrief/utils` is already a zero-dependency shared utility package and is a natural home for schema-type helpers.
+- `@debrief/utils` already declares `@debrief/schemas` as a workspace dependency (`shared/utils/package.json:24-26`), so moving validators that take `Coordinate`/`ViewportPolygon` inputs adds no new dependency edge. (Corrects an earlier review-time claim that utils was zero-dependency.)
 - Moving preserves the existing tests (shape-adjusted to object form).
 - `calculateViewportCenter` is a compute helper (not a validator), so it stays in `services/session-state` and is adjusted to use canonical inputs/outputs — or moved alongside the validators if it's equally generic. Default: move it with the validators.
 

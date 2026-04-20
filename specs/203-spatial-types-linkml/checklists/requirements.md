@@ -31,9 +31,11 @@
 
 ## Notes
 
-- **3 [NEEDS CLARIFICATION] markers remain** at FR-003, FR-004, FR-018. These are the maximum allowed and represent genuine design decisions:
-  1. `zoom` placement on `ViewportPolygon` vs a sibling `ViewState` — affects schema shape and every downstream consumer
-  2. `TimeFilter` canonical shape — conflicts with Review Decision 5C (epoch-nullable numbers vs `TimeInstant` objects); material enough to require explicit resolution
-  3. Persisted-state migration strategy — choice between silent migration, version bump with reset, or defer
-- All three should be resolved before `/speckit.plan`. The `/speckit.clarify` workflow is the right next step.
+- All three original [NEEDS CLARIFICATION] markers resolved in `research.md` (R-001, R-002, R-003).
+- `/speckit.review` produced 8 review decisions applied in-place to spec.md, research.md, data-model.md, plan.md, and contracts/persistence-migration.md. Summary:
+  - Architecture: persistence seam corrected (1A), TF nullability documented (2A), 4-tuple relaxation documented (3A), blind cast removed (4A).
+  - Design: `viewportToBounds` named and rewrite mandated (5A), Python re-export caveat added (6A), utils-dep claim corrected (7A).
+  - Tests: coerceViewport unit tests (A-1), golden fixtures enumerated (B-1), existing test files listed (C-1), viewportToBounds object-form test (D-1).
+  - Performance: scale-trap comment required for `viewportToBounds` (8A).
+- Four follow-up items captured in spec.md's Follow-up Work section (per user direction) rather than in BACKLOG.md.
 - UI Feature Validation items skipped — spec correctly excludes the "User Interface Flow" section because this is a schema/type refactor with no user-facing UI changes.

@@ -133,7 +133,13 @@ A user loading a sample plot in the VS Code extension or the web-shell app sees 
 
 **State persistence**
 
-- **FR-018**: Persisted session state containing tuple-form coordinates MUST be handled on rehydration via a silent in-place migration that detects tuple-shaped coordinates and converts them to object form before hydration (research R-003). The persistence schema version MUST be bumped so mid-migration state is detectable; the migration branch is annotated as removable after all production sessions have migrated.
+- **FR-018**: Persisted session state containing tuple-form coordinates MUST be handled inside `applySessionState` in `services/session-state/src/persistence/load.ts` via a `coerceViewport` helper (sibling pattern to the existing `coerceEpoch` at `load.ts:186-192`) that detects tuple-shaped coordinates and converts them to object form before the value reaches `setViewport` (see research R-003 and `contracts/persistence-migration.md`). The migration replaces the existing blind `as never` cast at `load.ts:125`. `SCHEMA_VERSION` MUST bump from `'1.0.0'` to `'1.1.0'`. The legacy-tuple branch MUST be annotated `REMOVABLE:` so it can be deleted in a follow-up.
+
+- **FR-020**: TypeScript-level cardinality of `ViewportPolygon.coordinates` MUST be accepted as `Coordinate[]` (unbounded array) in the generated types — a relaxation from the current hand-authored 4-tuple guarantee. The 4-corner constraint MUST be enforced at the validator level via `validateViewportPolygon`, and the `data-model.md` MUST document this trade so future reviewers understand it is a conscious delta.
+
+- **FR-021**: The `TimeFilter` shape convention MUST be documented in `data-model.md`: runtime writes `{ start: number | null, end: number | null }`; generated TypeScript emits `{ start?: number, end?: number }` (optional). Consumers use `value != null` checks which accept both `undefined` and `null` — consistent with the existing pattern at `load.ts:109-110`.
+
+- **FR-022**: `shared/components/src/utils/bounds.ts#viewportToBounds` MUST be updated from tuple-indexed coordinate access (`c[0]`, `c[1]`) to object-field access (`c.longitude`, `c.latitude`), AND gain an inline comment flagging that the function is specific to 4-corner polygons and must not be reused on large arrays (because the `Math.min(...lons)` spread would hit V8's argument limit). A targeted unit test MUST assert correct bounds output given object-form coordinates.
 
 **Smoke test coverage**
 
@@ -189,5 +195,16 @@ Fully parallel with non-LinkML items (#199, #200, #201, #202, #206).
 - Changes to `SpatialSlice`, `TemporalSlice`, `TimeRange`, `TimeInstant`, `TimeStep`, or `DrawingMode` shapes.
 - A lint rule to prevent hand-rolled tuple conversions (see FR-017 — social enforcement only).
 - Changing Leaflet-boundary code to use these converters in places where it currently uses Leaflet's own `L.latLng` constructor.
-- Python-side converter helpers (`to_geojson_coord` / `from_geojson_coord`). Python consumers use Pydantic models with named attributes; tuple form only appears in GeoJSON payloads which `debrief-io` handles at its own boundary. May be added as follow-up if demand emerges.
+- Python-side converter helpers (`to_geojson_coord` / `from_geojson_coord`). Python consumers use Pydantic models with named attributes; tuple form only appears in GeoJSON payloads which `debrief-io` handles at its own boundary.
 - Retroactive cleanup of every existing hand-rolled tuple conversion in the codebase — FR-016 requires an audit and replacement of call sites touched by this change, not an exhaustive sweep.
+- Refactoring `viewportToBounds` to use for-loop accumulators (latent `Math.min(...lons)` scaling trap). We add a code comment flagging the constraint but defer the rewrite.
+- Removing `TimeFilter` from `session-state-py`'s public re-exports. Nothing consumes it today; the surface-area cleanup is a follow-up item, not a blocker.
+
+## Follow-up Work (not backlog entries, captured here for traceability)
+
+The review surfaced four candidate follow-up items. They are NOT being added to `BACKLOG.md`; they are documented here so that the spec remains the single place to discover them.
+
+1. **Python converter helpers (`to_geojson_coord` / `from_geojson_coord`)** — add symmetric Python helpers to `@debrief/utils`-equivalent Python utility package if/when a concrete call site emerges. Blocked on: a Python boundary-crossing consumer that benefits from named converters. No action until then.
+2. **ESLint rule forbidding hand-rolled `[coord.longitude, coord.latitude]` tuple construction** — an AST rule that nudges developers toward `toGeoJSONCoord` at the lint layer. Complements FR-017's social enforcement. No action until we see hand-rolled patterns reappear in review.
+3. **Delete the `coerceViewport` legacy-tuple migration branch** — once all production session files have been saved under `SCHEMA_VERSION = '1.1.0'`, remove the tuple-detection branch from `coerceViewport` and (optionally) the whole helper if shape coercion is no longer needed. Timing: suggest a follow-up review window after v4.0.0 release.
+4. **Remove `TimeFilter` from `services/session-state-py`'s public API** — currently re-exported at `services/session-state-py/src/debrief_session/__init__.py:18,33` and `types.py:22,32`. No consumer; surface-area cleanup only. Could be done opportunistically on the next `session-state-py` touch.
