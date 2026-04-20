@@ -1,10 +1,10 @@
 # Feature Specification: Storyboarding — Capture
 
-**Feature Branch**: `212-storyboarding-capture`
+**Feature Branch**: `216-storyboarding-capture`
 **Created**: 2026-04-20
 **Status**: Draft — ready for quality-checklist validation
 **Parent Epic**: #024 Storyboarding Briefings — [idea doc](../../docs/ideas/017-storyboarding-briefings.md)
-**Sibling Specs**: #211 (schema + CRUD core), #212 (this), #213 (panel + playback), #214 (edit suite + housekeeping)
+**Sibling Specs**: #215 (schema + CRUD core), #216 (this), #217 (panel + playback), #218 (edit suite + housekeeping)
 **Input**: Second of four sibling specs splitting epic #024. This slice delivers the capture flow — the first user-visible slice.
 
 ## Summary
@@ -19,7 +19,7 @@ Scope is deliberately narrow: capture only. A minimal Storyboard panel
 opens on first capture and confirms the Scene has been persisted (shows
 the Scene list) but provides **no playback transport, no editing
 affordances, no multi-storyboard dropdown, no on-map rectangles, and no
-stale indicator** — those belong to #213 and #214.
+stale indicator** — those belong to #217 and #218.
 
 The value of shipping this slice: after merge, an analyst can create
 durable, schema-validated Scenes from the Map Viewer with a single
@@ -40,7 +40,7 @@ captures append to that Storyboard.
 
 **Why this priority**: This is the sole scope of this spec and the
 gateway to every downstream spec. Without capture, nothing exists for
-#213 to play back or #214 to edit.
+#217 to play back or #218 to edit.
 
 **Independent Test**: With a plot open in the Map Viewer, press
 `Ctrl/Cmd+Alt+C` on a plot that has no Storyboards. Confirm: (a) the
@@ -48,7 +48,7 @@ panel prompts for a Storyboard name, (b) on confirmation a Scene Feature
 whose `viewport`, `timestamp`, `visible_feature_ids`, `feature_set_hash`,
 and `thumbnail_asset_ref` all match the current map state is persisted,
 (c) the plot is marked dirty, (d) save-close-reopen restores the Scene
-unchanged (schema round-trip via #211).
+unchanged (schema round-trip via #215).
 
 **Acceptance Scenarios**:
 
@@ -56,10 +56,10 @@ unchanged (schema round-trip via #211).
    analyst presses `Ctrl/Cmd+Alt+C` or clicks the capture button,
    **Then** the panel presents an inline quick-pick for a new Storyboard
    name, and on confirmation persists one Storyboard plus one Scene via
-   #211's CRUD module.
+   #215's CRUD module.
 2. **Given** a plot with exactly one active Storyboard, **When** the
    analyst captures again at a new timestamp, **Then** a new Scene is
-   appended to that Storyboard, ordered by `timestamp` (per #211).
+   appended to that Storyboard, ordered by `timestamp` (per #215).
 3. **Given** the #174 thumbnail pipeline returns an error for the
    current viewport, **When** capture is triggered, **Then** no Scene
    is persisted, an error toast surfaces the failure, and the plot's
@@ -88,14 +88,14 @@ unchanged (schema round-trip via #211).
   prevent overlapping #174 calls; UI surfaces a transient "capturing…"
   state.
 - **Active-Storyboard selection missing.** If more than one Storyboard
-  exists on the plot (created by a future run of #213) and none is
+  exists on the plot (created by a future run of #217) and none is
   currently selected, capture falls back to the one with the most
-  recent `last_modified_at` (via #211's `getActiveStoryboardDefault`).
-  This spec never offers a dropdown — that's #213.
+  recent `last_modified_at` (via #215's `getActiveStoryboardDefault`).
+  This spec never offers a dropdown — that's #217.
 - **Time-slider `timestamp` falls outside the plot's time range.**
   Capture is rejected with an error toast *before* the #174 call is
   made; no Scene is persisted. (This is a capture-time guard; the
-  hard-block at playback/edit time is #213/#214's concern.)
+  hard-block at playback/edit time is #217/#218's concern.)
 - **Quick-pick dismissed without a name.** No Storyboard and no Scene
   are persisted; the plot is not marked dirty.
 - **Duplicate Storyboard name** (if the plot already has a Storyboard
@@ -123,13 +123,13 @@ unchanged (schema round-trip via #211).
   collision inline and block confirmation until the analyst supplies a
   unique name.
 - **FR-CAP-005**: On subsequent captures, System MUST append the new
-  Scene to the Storyboard returned by #211's
+  Scene to the Storyboard returned by #215's
   `getActiveStoryboardDefault(plotFeatures)` (the one with the most
   recent `last_modified_at`) when no panel-selected Storyboard exists.
 - **FR-CAP-006**: At capture time the System MUST snapshot, in order:
   `viewport` (center / zoom / bearing = 0), the time-slider `timestamp`,
   the set of currently visible plot feature IDs, and
-  `feature_set_hash` computed by #211.
+  `feature_set_hash` computed by #215.
 - **FR-CAP-007**: At capture time the System MUST request a thumbnail
   from the #174 pipeline **synchronously** and MUST receive a STAC
   asset reference before persisting the Scene.
@@ -156,16 +156,16 @@ unchanged (schema round-trip via #211).
   dropdown are out of scope.
 - **FR-CAP-014**: Every successful capture MUST append a
   `HistoryEntry` with `op: "create"` to the Scene's `history` (handled
-  by #211).
+  by #215).
 - **FR-CAP-015**: Capture MUST NOT introduce a second active-
-  Storyboard concept beyond #211's "most-recent default"; multi-
-  Storyboard dropdown UX belongs to #213.
+  Storyboard concept beyond #215's "most-recent default"; multi-
+  Storyboard dropdown UX belongs to #217.
 
 ### Key Entities
 
 This slice creates `Storyboard` and `Scene` instances. Full schema
 definitions and invariants are authoritative in
-[#211 Key Entities](../211-storyboarding-schema/spec.md#key-entities-schema-first-authoritative).
+[#215 Key Entities](../215-storyboarding-schema/spec.md#key-entities-schema-first-authoritative).
 Attributes this spec populates at capture time:
 
 - **Storyboard** — on first-capture flow: `id` (ULID), `name` (analyst
@@ -207,7 +207,7 @@ Attributes this spec populates at capture time:
 |------|----------------|-------------|--------|
 | 1 | Plot in Map Viewer, no Storyboards, panel hidden | Frame map, move time slider, toggle tracks | Live state ready to freeze |
 | 2 | Same | Press `Ctrl/Cmd+Alt+C` | Inline quick-pick prompts for a Storyboard name |
-| 3 | Quick-pick open | Type a name (unique on this plot) and confirm | Storyboard + first Scene persisted via #211; #174 produces the thumbnail synchronously; plot marked dirty |
+| 3 | Quick-pick open | Type a name (unique on this plot) and confirm | Storyboard + first Scene persisted via #215; #174 produces the thumbnail synchronously; plot marked dirty |
 | 4 | Minimal Storyboard panel auto-opens, single Scene row with thumbnail + DTG title | — | Analyst sees the Scene confirmed; can re-frame and press `Ctrl/Cmd+Alt+C` again to append more |
 | 5 | Subsequent capture at a duplicate timestamp | Press `Ctrl/Cmd+Alt+C` | Collision prompt: Replace / Offset (+1 s) / Cancel; on resolution the Scene is persisted, offset retried, or the op abandoned |
 
@@ -259,7 +259,7 @@ Attributes this spec populates at capture time:
 - **SC-005 — Round-trip across save / reopen.** A Scene created by
   capture and persisted via the host's save path is byte-identical to
   its pre-save state after save-close-reopen on the reference plot
-  (delegated to #211's round-trip guarantee).
+  (delegated to #215's round-trip guarantee).
 - **SC-006 — Scoped shortcut.** The `Ctrl/Cmd+Alt+C` shortcut is
   triggerable only when the Map Viewer has focus; pressing it with any
   other VS Code view focused is a no-op with no error and no #174 call.
@@ -272,12 +272,12 @@ Attributes this spec populates at capture time:
 ## Assumptions
 
 - **DTG format**: `DDHHmmZ MMM YY` (ZULU); fallback ISO-8601 when DTG
-  cannot be formatted (formatter lives in #211's module).
+  cannot be formatted (formatter lives in #215's module).
 - **Default `transition_duration_ms`**: `500` (written by capture,
-  consumed by #213).
+  consumed by #217).
 - **Active Storyboard on non-first capture**: the most recently
   modified Storyboard on the plot. Analyst-driven selection is
-  introduced by #213.
+  introduced by #217.
 - **Duplicate-timestamp offset default**: `+1 second`, compounded per
   Offset press if the new timestamp also collides.
 - **Quick-pick is a VS Code native quick-pick** (or an equivalent
@@ -286,7 +286,7 @@ Attributes this spec populates at capture time:
 
 ## Dependencies
 
-- **#211 (Storyboarding: Schema + CRUD core)** (hard) — provides
+- **#215 (Storyboarding: Schema + CRUD core)** (hard) — provides
   `createStoryboard`, `createScene`, duplicate-timestamp detection,
   `feature_set_hash` computation, the DTG formatter, and
   `getActiveStoryboardDefault`.
@@ -304,12 +304,12 @@ Attributes this spec populates at capture time:
 
 - **Storyboard panel beyond a minimal Scene list** — dropdown, empty
   states beyond "no Storyboards", active-Storyboard switching,
-  overflow menu for create/rename/delete Storyboard → #213.
+  overflow menu for create/rename/delete Storyboard → #217.
 - **Playback transport, `flyTo`, time-slider tween, scrub-window
-  lock, on-map Scene rectangles, missing-data hard-block** → #213.
+  lock, on-map Scene rectangles, missing-data hard-block** → #217.
 - **Edit suite** (rename, description, delete+undo, update-to-
-  current, duplicate, copy-to-other-storyboard) → #214.
-- **Stale-thumbnail detection and refresh action** → #214.
+  current, duplicate, copy-to-other-storyboard) → #218.
+- **Stale-thumbnail detection and refresh action** → #218.
 - **Analysis Log (#176) integration** — the `HistoryEntry` is written
-  to the Feature's `history[]` by #211, but surfacing it in the Log
-  Panel is wired up by #214.
+  to the Feature's `history[]` by #215, but surfacing it in the Log
+  Panel is wired up by #218.

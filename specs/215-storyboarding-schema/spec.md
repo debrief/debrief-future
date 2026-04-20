@@ -1,10 +1,10 @@
 # Feature Specification: Storyboarding — Schema + CRUD Core
 
-**Feature Branch**: `211-storyboarding-schema`
+**Feature Branch**: `215-storyboarding-schema`
 **Created**: 2026-04-20
 **Status**: Draft — ready for quality-checklist validation
 **Parent Epic**: #024 Storyboarding Briefings — [idea doc](../../docs/ideas/017-storyboarding-briefings.md)
-**Sibling Specs**: #211 (this), #212 (capture), #213 (panel + playback), #214 (edit suite + housekeeping)
+**Sibling Specs**: #215 (this), #216 (capture), #217 (panel + playback), #218 (edit suite + housekeeping)
 **Input**: First of four sibling specs splitting epic #024. This slice delivers the headless foundation.
 
 ## Summary
@@ -17,8 +17,8 @@ bindings; and a **shared TypeScript CRUD module** at
 ordering, duplicate-timestamp rejection, `feature_set_hash` computation,
 missing-data detection, provenance append-only — *without any UI*.
 
-No capture shortcut, no panel, no playback. Downstream specs (#212, #213,
-#214) consume this module as their backing data layer. Shipping this slice
+No capture shortcut, no panel, no playback. Downstream specs (#216, #217,
+#218) consume this module as their backing data layer. Shipping this slice
 in isolation is valuable because it unblocks every follow-up spec in
 parallel and lands the Article II schema adherence tests that every later
 PR will depend on.
@@ -110,7 +110,7 @@ query to drive their hard-block prompts; the query itself does not
 mutate anything.
 
 **Why this priority**: The missing-data hard-block is shared between
-playback (#213) and edit (#214). Centralising the detection keeps both
+playback (#217) and edit (#218). Centralising the detection keeps both
 consumers aligned on one definition.
 
 **Independent Test**: Feed the query a matrix of Scenes (fully resolving
@@ -155,7 +155,7 @@ mutating any input.
 ### Functional Requirements
 
 All FRs in this spec concern the schema and the headless module. No UI
-FRs appear here; those live in #212–#214.
+FRs appear here; those live in #216–#218.
 
 - **FR-SCHEMA-001**: System MUST define `Storyboard`, `Scene`,
   `Viewport`, and `HistoryEntry` in the LinkML master schema under
@@ -231,7 +231,7 @@ FRs appear here; those live in #212–#214.
 ### Key Entities *(schema-first; authoritative)*
 
 This section is the **authoritative definition** for the whole epic.
-Sibling specs (#212, #213, #214) reference this section rather than
+Sibling specs (#216, #217, #218) reference this section rather than
 re-defining the entities.
 
 Storyboards capture an analyst's narrated walk-through of a plot. The
@@ -246,7 +246,7 @@ existing plot-edit path with no STAC API changes.
 
 **Purpose**: A named, ordered collection of Scenes attached to a single
 plot. A plot can carry multiple Storyboards; none are "active" on disk
-— active selection is an ephemeral UI concern handled by #213.
+— active selection is an ephemeral UI concern handled by #217.
 
 **GeoJSON shape**:
 - `type`: `"Feature"`
@@ -273,7 +273,7 @@ plot. A plot can carry multiple Storyboards; none are "active" on disk
 - `id` is immutable after creation.
 - `schema_version` is monotonically non-decreasing across edits.
 - The parent Storyboard Feature is **not rendered on the map** (panel-
-  only entity); this is enforced by the rendering layer in #213, not by
+  only entity); this is enforced by the rendering layer in #217, not by
   the schema.
 
 ---
@@ -302,7 +302,7 @@ plus a thumbnail.
 | `time_range` | `{start, end}` or `null` | no | **Reserved** — MUST be `null` in v1. |
 | `visible_feature_ids` | array of stable feature IDs | yes | IDs visible at capture. Order-insensitive. |
 | `feature_set_hash` | string | yes | Hash of sorted `visible_feature_ids`. |
-| `thumbnail_asset_ref` | STAC asset reference | yes | Populated by #212 at capture time via #174. |
+| `thumbnail_asset_ref` | STAC asset reference | yes | Populated by #216 at capture time via #174. |
 | `transition_duration_ms` | integer | yes | Playback override. Default `500`. |
 | `created_by` | actor string | yes | Provenance. |
 | `created_at` | ISO-8601 instant | yes | Provenance. |
@@ -348,7 +348,7 @@ adherence tests:
 1. **Golden fixtures** under `shared/schemas/fixtures/` covering at
    least: minimal valid, full-featured valid, duplicate-timestamp
    invalid, missing-thumbnail invalid (for consumers — enforced by
-   #212), bearing ≠ 0 invalid, non-null `time_range` invalid, orphan
+   #216), bearing ≠ 0 invalid, non-null `time_range` invalid, orphan
    Scene invalid.
 2. **Round-trip** Python → JSON → TypeScript → JSON → Python preserves
    every field.
@@ -393,7 +393,7 @@ adherence tests:
 
 - **ID scheme**: ULID for both Storyboard and Scene `id`.
 - **DTG format**: `DDHHmmZ MMM YY` (ZULU); the DTG formatter helper
-  lives in the module and is consumed by #212.
+  lives in the module and is consumed by #216.
 - **Zoom precision**: float (Leaflet-native) — the schema does not
   force an integer.
 - **Article IV narrow exception**: the shared TS module at
@@ -422,14 +422,14 @@ adherence tests:
 Everything UI-facing lives in sibling specs:
 
 - **Capture shortcut, first-capture quick-pick, synchronous thumbnail
-  integration** → #212.
+  integration** → #216.
 - **Storyboard panel, Scene list, dropdown, transport buttons / arrow
   keys, on-map Scene rectangles, `flyTo` + time-slider tween, scrub-
-  window lock, missing-data hard-block prompt** → #213.
+  window lock, missing-data hard-block prompt** → #217.
 - **Inline rename, markdown description editor, delete-with-toast-
   undo, update-to-current, duplicate, copy-to-other-storyboard UI
   affordance, stale-thumbnail badge + refresh button, Analysis Log
-  (#176) integration** → #214.
+  (#176) integration** → #218.
 - **Dedicated distraction-free briefing renderer**, animated time-
   range Scenes, antimeridian MultiPolygon splitting, Storyboard
   sharing / real-time collaboration, video export → deferred / phase-

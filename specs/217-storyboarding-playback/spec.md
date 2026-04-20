@@ -1,10 +1,10 @@
 # Feature Specification: Storyboarding — Panel + Playback
 
-**Feature Branch**: `213-storyboarding-playback`
+**Feature Branch**: `217-storyboarding-playback`
 **Created**: 2026-04-20
 **Status**: Draft — ready for quality-checklist validation
 **Parent Epic**: #024 Storyboarding Briefings — [idea doc](../../docs/ideas/017-storyboarding-briefings.md)
-**Sibling Specs**: #211 (schema + CRUD core), #212 (capture), #213 (this), #214 (edit suite + housekeeping)
+**Sibling Specs**: #215 (schema + CRUD core), #216 (capture), #217 (this), #218 (edit suite + housekeeping)
 **Input**: Third of four sibling specs splitting epic #024. This slice delivers the end-to-end briefing delivery flow — the epic's core value.
 
 ## Summary
@@ -17,12 +17,12 @@ arrow keys), `flyTo` + time-slider tween, the scrub-window lock, on-map
 Scene rectangle rendering for the active Storyboard, and the missing-
 data **hard-block** at playback entry.
 
-After this slice merges, an analyst who has captured Scenes via #212
+After this slice merges, an analyst who has captured Scenes via #216
 can walk a stakeholder audience through them in order with keyboard or
 on-screen transport, without leaving the Map Viewer. This is the epic's
 stated purpose — "guided walkthroughs of recorded exercises."
 
-Still deferred to #214: editing individual Scenes (rename, description,
+Still deferred to #218: editing individual Scenes (rename, description,
 delete+undo, update-to-current, duplicate, copy-to-other-storyboard),
 stale-thumbnail detection + refresh, and Analysis Log (#176)
 integration.
@@ -38,10 +38,10 @@ map animates between Scenes and the time slider moves with them;
 between Scenes the analyst can scrub within the current segment.
 
 **Why this priority**: This is the epic's stated value. Without it,
-capture (#212) produces data nobody can walk through inside the tool.
+capture (#216) produces data nobody can walk through inside the tool.
 
 **Independent Test**: Load a plot with a fixture Storyboard of at least
-three Scenes (no #212 capture run needed). Confirm: (a) the forward
+three Scenes (no #216 capture run needed). Confirm: (a) the forward
 button and scoped Right-arrow advance to the next Scene, (b) the map
 performs an animated `flyTo` and the time slider tweens to the Scene's
 `timestamp` over `transition_duration_ms`, (c) scrubbing is constrained
@@ -70,7 +70,7 @@ only for the active Storyboard.
    analyst tries to step onto that Scene, **Then** playback is **hard-
    blocked** with a prompt naming the missing data and offering to
    either (a) jump past this Scene, or (b) open it for editing in
-   #214. No partial animation occurs.
+   #218. No partial animation occurs.
 
 ---
 
@@ -108,7 +108,7 @@ Storyboard is chosen on re-open.
 4. **Given** a Storyboard, **When** the analyst deletes it from the
    overflow menu and confirms, **Then** it is removed from the dropdown
    and all its Scenes and their thumbnail assets are deleted via
-   #211's cascading delete.
+   #215's cascading delete.
 
 ---
 
@@ -130,14 +130,14 @@ Storyboard is chosen on re-open.
 - **Hard-block on a mid-sequence Scene.** Stepping past it is allowed
   (the prompt offers "Jump past this scene"); Backward onto a blocked
   Scene presents the same prompt.
-- **Empty active Storyboard** (all Scenes deleted by #214). Transport
+- **Empty active Storyboard** (all Scenes deleted by #218). Transport
   is disabled; the panel shows the per-Storyboard empty state.
 - **Active Storyboard deleted by another tab / window.** The panel
   refreshes the dropdown; active selection falls back to the most-
   recently-modified remaining Storyboard, or the empty state if none
   remain.
 - **Antimeridian-crossing viewport rectangle.** Rendered as a best-
-  effort Polygon (warned by #211). The on-map click-to-select still
+  effort Polygon (warned by #215). The on-map click-to-select still
   works against the best-effort geometry.
 - **Overlapping Scene rectangles** (multiple Scenes frame similar
   regions). Click targets the topmost rectangle; all rectangles remain
@@ -161,13 +161,13 @@ Storyboard is chosen on re-open.
 - **FR-PLAY-002**: The active Storyboard selection MUST be ephemeral
   (not persisted to disk). On plot open, System MUST default the
   active selection to the Storyboard with the most recent
-  `last_modified_at` (via #211's `getActiveStoryboardDefault`); if no
+  `last_modified_at` (via #215's `getActiveStoryboardDefault`); if no
   Storyboards exist, the panel MUST show an empty state.
 - **FR-PLAY-003**: Changing the dropdown selection MUST update the
   Scene list, the playback transport state, and the on-map Scene
   rectangles within the same user interaction (no visible stale state
   after the dropdown closes).
-- **FR-PLAY-004**: Deleting a Storyboard MUST invoke #211's cascading
+- **FR-PLAY-004**: Deleting a Storyboard MUST invoke #215's cascading
   delete (removing Scenes and their thumbnail assets). The dropdown
   MUST refresh and the active selection MUST fall back to the most-
   recently-modified remaining Storyboard, or to the empty state if
@@ -225,13 +225,13 @@ Storyboard is chosen on re-open.
 #### Missing-data hard-block (playback)
 
 - **FR-PLAY-019**: Before advancing onto a Scene, System MUST invoke
-  #211's `detectMissingDataForScene`. If the classification is not
+  #215's `detectMissingDataForScene`. If the classification is not
   `ok`, System MUST block the step with a prompt naming the specific
   missing features or out-of-range condition.
 - **FR-PLAY-020**: The hard-block prompt MUST offer two actions: (a)
   **Jump past this scene** (advance the transport without animating
   into the blocked Scene), and (b) **Open for editing** (which is
-  wired up by #214; until #214 lands the action opens the Scene in
+  wired up by #218; until #218 lands the action opens the Scene in
   read-only mode).
 - **FR-PLAY-021**: The hard-block MUST apply on both Forward and
   Backward transport and on click-to-select from the map.
@@ -241,14 +241,14 @@ Storyboard is chosen on re-open.
 - **FR-PLAY-022**: The Storyboard panel MUST be hidden by default and
   openable via the Command Palette or the view menu.
 - **FR-PLAY-023**: The panel and transport MUST operate exclusively
-  via #211's module API for all reads and writes; the transport MUST
+  via #215's module API for all reads and writes; the transport MUST
   NOT bypass the module to touch Features directly.
 
 ### Key Entities
 
 This slice reads `Storyboard` and `Scene` entities; full schema
 definitions are authoritative in
-[#211 Key Entities](../211-storyboarding-schema/spec.md#key-entities-schema-first-authoritative).
+[#215 Key Entities](../215-storyboarding-schema/spec.md#key-entities-schema-first-authoritative).
 Attributes this spec consumes:
 
 - **Storyboard** — `id`, `name`, `last_modified_at` (to default the
@@ -258,12 +258,12 @@ Attributes this spec consumes:
   `timestamp` (for ordering and time-slider tween),
   `transition_duration_ms` (per-Scene override), and
   `visible_feature_ids` + `feature_set_hash` (for the hard-block
-  check, via #211).
+  check, via #215).
 
 This slice **creates** Storyboards (via the overflow menu's Create
 action) and **deletes** them (via the cascading delete). It does not
-create / update / delete Scenes — those writers are #212 (capture)
-and #214 (edit suite).
+create / update / delete Scenes — those writers are #216 (capture)
+and #218 (edit suite).
 
 ## User Interface Flow *(UI feature)*
 
@@ -305,7 +305,7 @@ and #214 (edit suite).
 | 4 | Any state | Click a Scene rectangle on the map | Panel selection jumps; map animates to that Scene's viewport via the same transport path |
 | 5 | Any state | Switch the dropdown to a different Storyboard | Scene list, transport, and on-map rectangles update within the same interaction |
 | 6 | Forward onto a Scene with unresolved feature IDs | Press **Forward** | Hard-block prompt: *Jump past this scene / Open for editing*; no partial animation until the analyst chooses |
-| 7 | Any state | Open overflow menu → **Delete storyboard** → confirm | Storyboard and its Scenes (with thumbnails) are removed via #211's cascade; dropdown refreshes; active selection falls back |
+| 7 | Any state | Open overflow menu → **Delete storyboard** → confirm | Storyboard and its Scenes (with thumbnails) are removed via #215's cascade; dropdown refreshes; active selection falls back |
 
 ### UI States
 
@@ -367,9 +367,9 @@ and #214 (edit suite).
   focus in any VS Code view other than the Storyboard panel or Map
   Viewer MUST NOT step the transport (verified under a test harness
   that focuses unrelated views and presses the keys).
-- **SC-008 — No bypass of #211.** Automated inspection of this spec's
+- **SC-008 — No bypass of #215.** Automated inspection of this spec's
   code MUST show zero direct writes to Storyboard / Scene Features;
-  all writes flow through #211's module.
+  all writes flow through #215's module.
 - **SC-009 — Offline.** Full end-to-end playback (open panel, step
   forward, step backward, scrub, switch Storyboard, click rectangle)
   succeeds with no network access (Article I).
@@ -393,12 +393,12 @@ and #214 (edit suite).
 
 ## Dependencies
 
-- **#211 (Schema + CRUD core)** (hard) — Scene ordering,
+- **#215 (Schema + CRUD core)** (hard) — Scene ordering,
   `getActiveStoryboardDefault`, cascading `deleteStoryboard`,
   `detectMissingDataForScene`.
-- **#212 (Capture)** (hard in practice) — without capture, no Scenes
+- **#216 (Capture)** (hard in practice) — without capture, no Scenes
   exist to play back. Playback can still be tested against fixture
-  data without #212 present.
+  data without #216 present.
 - **VS Code Map Viewer** (hard) — host of the transport, the on-map
   rectangle layer, and the time-slider tween.
 - **Leaflet integration** (hard) — provides `flyTo` and the polygon
@@ -410,14 +410,14 @@ and #214 (edit suite).
 
 - **Creating or mutating Scenes** (capture, rename, description edit,
   delete+undo, update-to-current, duplicate, copy-to-other-storyboard)
-  → capture is #212; all Scene edits are #214.
-- **Stale-thumbnail detection and refresh action** → #214.
+  → capture is #216; all Scene edits are #218.
+- **Stale-thumbnail detection and refresh action** → #218.
 - **Analysis Log (#176) integration** for playback observability →
-  #214.
+  #218.
 - **Dedicated distraction-free briefing renderer** — this spec ships
   in-panel playback only; the distraction-free surface is a follow-
   up beyond the epic.
 - **Animated time-range Scenes** — all Scenes remain single-instant
-  in v1 (`time_range = null` per #211).
+  in v1 (`time_range = null` per #215).
 - **Drag-reorder of Scenes** — ordering is strictly derived from
   `timestamp`.
