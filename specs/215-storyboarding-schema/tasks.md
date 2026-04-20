@@ -64,11 +64,11 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 **Purpose**: Declare new runtime dependencies and create empty module scaffolding so every downstream task can write into existing folders.
 
-- [ ] T001 [P] Add `immer ^10.1.3` and `ulid ^3.0.2` to dependencies `shared/components/package.json`
-- [ ] T002 Run `pnpm install` at repo root to lock the new deps `pnpm-lock.yaml`
-- [ ] T003 [P] Create empty module scaffold with `index.ts` placeholder re-exports `shared/components/src/storyboard/index.ts`
-- [ ] T004 [P] Create empty `__tests__` directory with a `.gitkeep` so vitest discovers it early `shared/components/src/storyboard/__tests__/.gitkeep`
-- [ ] T005 [P] Re-export the new `storyboard` module from the package barrel `shared/components/src/index.ts`
+- [x] T001 [P] Add `immer ^10.1.3` and `ulid ^3.0.2` to dependencies `shared/components/package.json`
+- [x] T002 Run `pnpm install` at repo root to lock the new deps `pnpm-lock.yaml`
+- [x] T003 [P] Create empty module scaffold with `index.ts` placeholder re-exports `shared/components/src/storyboard/index.ts`
+- [x] T004 [P] Create empty `__tests__` directory with a `.gitkeep` so vitest discovers it early `shared/components/src/storyboard/__tests__/.gitkeep`
+- [x] T005 [P] Re-export the new `storyboard` module from the package barrel `shared/components/src/index.ts`
 
 **Checkpoint**: New deps are installed; empty module is importable (but exports nothing yet).
 
@@ -82,21 +82,21 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 ### Schema edits
 
-- [ ] T010 Extend `FeatureKindEnum` with `STORYBOARD` and `STORYBOARD_SCENE` permissible values `shared/schemas/src/linkml/common.yaml`
-- [ ] T011 Add optional `agent: string` slot to `LogEntry` `shared/schemas/src/linkml/log-entry.yaml`
-- [ ] T012 Create `storyboard.yaml` LinkML module defining `StoryboardProperties`, `SceneProperties`, `Viewport` (all inheriting `BaseFeatureProperties` where applicable); encode `time_range` absent-in-v1 and `bearing equals_number 0` reserved-slot constraints per research.md R2 `shared/schemas/src/linkml/storyboard.yaml`
-- [ ] T013 Import `storyboard` module from the master schema `shared/schemas/src/linkml/debrief.yaml`
+- [x] T010 Extend `FeatureKindEnum` with `STORYBOARD` and `STORYBOARD_SCENE` permissible values `shared/schemas/src/linkml/common.yaml`
+- [x] T011 Add optional `agent: string` slot to `LogEntry` `shared/schemas/src/linkml/log-entry.yaml`
+- [x] T012 Create `storyboard.yaml` LinkML module defining `StoryboardProperties`, `SceneProperties`, `Viewport` (all inheriting `BaseFeatureProperties` where applicable); encode `time_range` absent-in-v1 and `bearing equals_number 0` reserved-slot constraints per research.md R2 `shared/schemas/src/linkml/storyboard.yaml`
+- [x] T013 Import `storyboard` module from the master schema `shared/schemas/src/linkml/debrief.yaml`
 
 ### Generation pipeline
 
-- [ ] T014 Run `task schemas:generate` (or `uv run python -m debrief_schemas.build`) to regenerate Pydantic, JSON Schema, and TypeScript; verify no manual edits land in generated output `shared/schemas/src/generated/`
-- [ ] T015 Register `StoryboardFeature` and `SceneFeature` in the generated `@debrief/schemas` TypeScript barrel (confirm the LinkML `gen-typescript` pass emits them; add manual re-exports only if the generator doesn't do it automatically) `shared/schemas/src/ts/index.ts`
+- [x] T014 Run `task schemas:generate` (or `uv run python -m debrief_schemas.build`) to regenerate Pydantic, JSON Schema, and TypeScript; verify no manual edits land in generated output `shared/schemas/src/generated/`
+- [x] T015 Register `StoryboardFeature` and `SceneFeature` in the generated `@debrief/schemas` TypeScript barrel (confirm the LinkML `gen-typescript` pass emits them; add manual re-exports only if the generator doesn't do it automatically) `shared/schemas/src/ts/index.ts`
 
 ### Shared utility lift
 
-- [ ] T016 Create canonical async `sha256Hex(input: string): Promise<string>` helper at new shared location `shared/components/src/utils/hash.ts`
-- [ ] T017 Update `nl-cql2/hash.ts` to re-export from the new shared location (no behaviour change) `shared/components/src/nl-cql2/hash.ts`
-- [ ] T018 [test] Confirm existing nl-cql2 tests still pass against the re-exported symbol `shared/components/src/nl-cql2/__tests__/hash.test.ts`
+- [x] T016 Create canonical async `sha256Hex(input: string): Promise<string>` helper at new shared location `shared/components/src/utils/hash.ts`
+- [x] T017 Update `nl-cql2/hash.ts` to re-export from the new shared location (no behaviour change) `shared/components/src/nl-cql2/hash.ts`
+- [x] T018 [test] Confirm existing nl-cql2 tests still pass against the re-exported symbol `shared/components/src/nl-cql2/__tests__/hash.test.ts`
 
 **Checkpoint**: Schema edits regenerate cleanly; `@debrief/schemas` exposes the new types; `sha256Hex` is in its canonical location. Ready to start fixtures + the Python adherence tests (US1).
 
@@ -110,32 +110,32 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 ### Fixtures — valid (single-Feature, for round-trip harness)
 
-- [ ] T020 [P] [US1] Create minimal single-Feature Storyboard fixture (one `create` LogEntry) `shared/schemas/src/fixtures/valid/storyboard-single-minimal.json`
-- [ ] T021 [P] [US1] Create minimal single-Feature Scene fixture (`visible_feature_ids: []`, hash of empty canonical list, `time_range: null`, `bearing: 0`) `shared/schemas/src/fixtures/valid/storyboard-scene-single-minimal.json`
+- [x] T020 [P] [US1] Create minimal single-Feature Storyboard fixture (one `create` LogEntry) `shared/schemas/src/fixtures/valid/storyboard-single-minimal.json`
+- [x] T021 [P] [US1] Create minimal single-Feature Scene fixture (`visible_feature_ids: []`, hash of empty canonical list, `time_range: null`, `bearing: 0`) `shared/schemas/src/fixtures/valid/storyboard-scene-single-minimal.json`
 
 ### Fixtures — valid (FeatureCollection, for integration)
 
-- [ ] T022 [P] [US1] Create minimal FeatureCollection fixture (one Storyboard + one Scene) `shared/schemas/src/fixtures/valid/storyboard-scene-minimal.json`
-- [ ] T023 [P] [US1] Create full-featured FeatureCollection fixture (one Storyboard + three Scenes at distinct timestamps, realistic provenance chains) `shared/schemas/src/fixtures/valid/storyboard-full-featured.json`
+- [x] T022 [P] [US1] Create minimal FeatureCollection fixture (one Storyboard + one Scene) `shared/schemas/src/fixtures/valid/storyboard-scene-minimal.json`
+- [x] T023 [P] [US1] Create full-featured FeatureCollection fixture (one Storyboard + three Scenes at distinct timestamps, realistic provenance chains) `shared/schemas/src/fixtures/valid/storyboard-full-featured.json`
 
 ### Fixtures — invalid (one per negative invariant)
 
-- [ ] T024 [P] [US1] Create duplicate-timestamp invalid fixture (two Scenes, same `storyboard_id`, same `timestamp`) `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-timestamp.json`
-- [ ] T025 [P] [US1] Create non-null `time_range` invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-non-null-time-range.json`
-- [ ] T026 [P] [US1] Create `bearing: 3.14` invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-bearing-nonzero.json`
-- [ ] T027 [P] [US1] Create orphan-Scene invalid fixture (Scene `storyboard_id` has no matching Storyboard in the plot) `shared/schemas/src/fixtures/invalid/storyboard-scene-orphan.json`
+- [x] T024 [P] [US1] Create duplicate-timestamp invalid fixture (two Scenes, same `storyboard_id`, same `timestamp`) `shared/schemas/src/fixtures/invalid/storyboard-scene-duplicate-timestamp.json`
+- [x] T025 [P] [US1] Create non-null `time_range` invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-non-null-time-range.json`
+- [x] T026 [P] [US1] Create `bearing: 3.14` invalid fixture `shared/schemas/src/fixtures/invalid/storyboard-scene-bearing-nonzero.json`
+- [x] T027 [P] [US1] Create orphan-Scene invalid fixture (Scene `storyboard_id` has no matching Storyboard in the plot) `shared/schemas/src/fixtures/invalid/storyboard-scene-orphan.json`
 
 ### Python-side adherence tests
 
-- [ ] T028 [US1] Register `storyboard-scene` **before** `storyboard` in the `ROUNDTRIP_ENTITY_MAP` so prefix matching picks Scenes before Storyboards (filename-prefix collision called out in data-model.md §7) `shared/schemas/tests/test_roundtrip.py`
-- [ ] T029 [US1][test] Extend the existing positive round-trip test so both single-Feature fixtures are parsed as `StoryboardFeature` / `SceneFeature`, dumped, reparsed, and deep-equal against the loaded dict `shared/schemas/tests/test_roundtrip.py`
-- [ ] T030 [US1][test] Add negative cases for all four invalid fixtures; each assertion matches on the violated invariant name `shared/schemas/tests/test_validation.py`
-- [ ] T031 [US1][test] Add `test_storyboard_pydantic_vs_linkml_schema` — load both generated JSON Schemas and assert field-for-field equality (reuse the existing `deep_equal` helper) `shared/schemas/tests/test_schema_compare.py`
+- [x] T028 [US1] Register `storyboard-scene` **before** `storyboard` in the `ROUNDTRIP_ENTITY_MAP` so prefix matching picks Scenes before Storyboards (filename-prefix collision called out in data-model.md §7) `shared/schemas/tests/test_roundtrip.py`
+- [x] T029 [US1][test] Extend the existing positive round-trip test so both single-Feature fixtures are parsed as `StoryboardFeature` / `SceneFeature`, dumped, reparsed, and deep-equal against the loaded dict `shared/schemas/tests/test_roundtrip.py`
+- [x] T030 [US1][test] Add negative cases for all four invalid fixtures; each assertion matches on the violated invariant name `shared/schemas/tests/test_validation.py`
+- [x] T031 [US1][test] Add `test_storyboard_pydantic_vs_linkml_schema` — load both generated JSON Schemas and assert field-for-field equality (reuse the existing `deep_equal` helper) `shared/schemas/tests/test_schema_compare.py`
 
 ### Cross-language round-trip harness (FR-TEST-023, SC-001)
 
-- [ ] T032 [P] [US1] Create Node script that reads a JSON path from argv, parses + serialises via generated TS `StoryboardFeature`/`SceneFeature`, and prints the round-tripped JSON to stdout `shared/schemas/tests/helpers/crosslang_roundtrip_node.mjs`
-- [ ] T033 [US1][test] Create pytest suite that invokes the Node script via `subprocess.run(["node", ...])`, captures stdout, and deep-equals against the Pydantic-reparsed result for each single-Feature valid fixture `shared/schemas/tests/test_crosslang_roundtrip.py`
+- [x] T032 [P] [US1] Create Node script that reads a JSON path from argv, parses + serialises via generated TS `StoryboardFeature`/`SceneFeature`, and prints the round-tripped JSON to stdout `shared/schemas/tests/helpers/crosslang_roundtrip_node.mjs`
+- [x] T033 [US1][test] Create pytest suite that invokes the Node script via `subprocess.run(["node", ...])`, captures stdout, and deep-equals against the Pydantic-reparsed result for each single-Feature valid fixture `shared/schemas/tests/test_crosslang_roundtrip.py`
 
 **Checkpoint**: Article II gates — SC-001, SC-002, SC-003 — are green. The schema is durable and the invariant surface is fully negative-tested. US2 can now build on it.
 
@@ -149,66 +149,66 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 ### Types + error vocabulary
 
-- [ ] T040 [P] [US2] Define branded types (`StoryboardId`, `SceneId`, `Ulid`) and the `Plot` type alias `shared/components/src/storyboard/types.ts`
-- [ ] T041 [P] [US2] Define `StoryboardError` abstract base + all nine subclasses per research.md R7 (each carrying its named fields; `readonly code` assigned in constructor) `shared/components/src/storyboard/errors.ts`
+- [x] T040 [P] [US2] Define branded types (`StoryboardId`, `SceneId`, `Ulid`) and the `Plot` type alias `shared/components/src/storyboard/types.ts`
+- [x] T041 [P] [US2] Define `StoryboardError` abstract base + all nine subclasses per research.md R7 (each carrying its named fields; `readonly code` assigned in constructor) `shared/components/src/storyboard/errors.ts`
 
 ### Provenance helper (shared across every mutation)
 
-- [ ] T042 [US2] Implement `buildStoryboardCrudLogEntry(input)` emitting `was_generated_by.tool = "storyboard-crud"`, `was_generated_by.tool_version = "1.0.0"`, `agent`, `activity_id` (UUID v4, overridable for tests), `execution_duration = "PT0S"` per data-model.md §4 `shared/components/src/storyboard/provenance.ts`
-- [ ] T043 [US2] Implement derived read accessors `getCreatedAt`, `getLastModifiedAt`, `getCreatedBy`, `getLastModifiedBy` reading `provenance[0]` / `provenance[last]` `shared/components/src/storyboard/provenance.ts`
-- [ ] T044 [US2][test] Positive tests: every mutation appends exactly one entry with the correct `op`; append-only invariant (prior entries unchanged) `shared/components/src/storyboard/__tests__/provenance.test.ts`
+- [x] T042 [US2] Implement `buildStoryboardCrudLogEntry(input)` emitting `was_generated_by.tool = "storyboard-crud"`, `was_generated_by.tool_version = "1.0.0"`, `agent`, `activity_id` (UUID v4, overridable for tests), `execution_duration = "PT0S"` per data-model.md §4 `shared/components/src/storyboard/provenance.ts`
+- [x] T043 [US2] Implement derived read accessors `getCreatedAt`, `getLastModifiedAt`, `getCreatedBy`, `getLastModifiedBy` reading `provenance[0]` / `provenance[last]` `shared/components/src/storyboard/provenance.ts`
+- [x] T044 [US2][test] Positive tests: every mutation appends exactly one entry with the correct `op`; append-only invariant (prior entries unchanged) `shared/components/src/storyboard/__tests__/provenance.test.ts`
 
 ### Invariant helpers
 
-- [ ] T045 [P] [US2] Implement `canonicaliseVisibleFeatureIds` (sync: trim, reject empty → `ReservedSlotViolation`, dedupe, sort ascending) `shared/components/src/storyboard/hash.ts`
-- [ ] T046 [US2] Implement async `computeFeatureSetHash(ids)` calling `canonicaliseVisibleFeatureIds` then `sha256Hex(JSON.stringify(canonical))` from `utils/hash.ts` `shared/components/src/storyboard/hash.ts`
-- [ ] T047 [US2][test] Canonicalisation + hash tests: equal inputs → equal hash; dedup/sort/trim observably normalise; empty-string ID rejection; known-vector hash match `shared/components/src/storyboard/__tests__/hash.test.ts`
+- [x] T045 [P] [US2] Implement `canonicaliseVisibleFeatureIds` (sync: trim, reject empty → `ReservedSlotViolation`, dedupe, sort ascending) `shared/components/src/storyboard/hash.ts`
+- [x] T046 [US2] Implement async `computeFeatureSetHash(ids)` calling `canonicaliseVisibleFeatureIds` then `sha256Hex(JSON.stringify(canonical))` from `utils/hash.ts` `shared/components/src/storyboard/hash.ts`
+- [x] T047 [US2][test] Canonicalisation + hash tests: equal inputs → equal hash; dedup/sort/trim observably normalise; empty-string ID rejection; known-vector hash match `shared/components/src/storyboard/__tests__/hash.test.ts`
 
 ### DTG formatter
 
-- [ ] T048 [P] [US2] Implement `formatDtg(isoInstant)` returning `DDHHmmZ MMM YY`, falling back to input on parse failure `shared/components/src/storyboard/dtg.ts`
-- [ ] T049 [P] [US2][test] DTG round-trip tests including fallback on `"not-a-date"` and UTC boundary case `shared/components/src/storyboard/__tests__/dtg.test.ts`
+- [x] T048 [P] [US2] Implement `formatDtg(isoInstant)` returning `DDHHmmZ MMM YY`, falling back to input on parse failure `shared/components/src/storyboard/dtg.ts`
+- [x] T049 [P] [US2][test] DTG round-trip tests including fallback on `"not-a-date"` and UTC boundary case `shared/components/src/storyboard/__tests__/dtg.test.ts`
 
 ### Ordering + queries (synchronous)
 
-- [ ] T050 [P] [US2] Implement `listScenesOrdered(plot, storyboardId)` sorting by `properties.timestamp` ascending `shared/components/src/storyboard/ordering.ts`
-- [ ] T051 [P] [US2] Implement `getStoryboard`, `getScene`, `getActiveStoryboardDefault` (first Storyboard by `name` ascending) `shared/components/src/storyboard/queries.ts`
-- [ ] T052 [P] [US2] Implement `readSceneWithStaleness(plot, sceneId)` returning `{scene, storedHash, canonicalVisibleIds}` — sync per research.md R11 `shared/components/src/storyboard/queries.ts`
-- [ ] T053 [US2][test] Ordering tests covering arbitrary insertion order, ties asserting impossibility (duplicate timestamps rejected upstream) `shared/components/src/storyboard/__tests__/ordering.test.ts`
+- [x] T050 [P] [US2] Implement `listScenesOrdered(plot, storyboardId)` sorting by `properties.timestamp` ascending `shared/components/src/storyboard/ordering.ts`
+- [x] T051 [P] [US2] Implement `getStoryboard`, `getScene`, `getActiveStoryboardDefault` (first Storyboard by `name` ascending) `shared/components/src/storyboard/queries.ts`
+- [x] T052 [P] [US2] Implement `readSceneWithStaleness(plot, sceneId)` returning `{scene, storedHash, canonicalVisibleIds}` — sync per research.md R11 `shared/components/src/storyboard/queries.ts`
+- [x] T053 [US2][test] Ordering tests covering arbitrary insertion order, ties asserting impossibility (duplicate timestamps rejected upstream) `shared/components/src/storyboard/__tests__/ordering.test.ts`
 
 ### CRUD — Storyboards (async)
 
-- [ ] T054 [US2] Implement `createStoryboard` (ULID via `ulid`, duplicate-name check → `DuplicateStoryboardName`, `immer.produce`, provenance append) `shared/components/src/storyboard/crud.ts`
-- [ ] T055 [US2] Implement `renameStoryboard` (unknown → `UnknownStoryboard`, duplicate-name check, provenance append with `op: rename`) `shared/components/src/storyboard/crud.ts`
-- [ ] T056 [US2] Implement `deleteStoryboard` with cascading Scene removal + returned `removedSceneIds`, atomic (immer recipe) `shared/components/src/storyboard/crud.ts`
+- [x] T054 [US2] Implement `createStoryboard` (ULID via `ulid`, duplicate-name check → `DuplicateStoryboardName`, `immer.produce`, provenance append) `shared/components/src/storyboard/crud.ts`
+- [x] T055 [US2] Implement `renameStoryboard` (unknown → `UnknownStoryboard`, duplicate-name check, provenance append with `op: rename`) `shared/components/src/storyboard/crud.ts`
+- [x] T056 [US2] Implement `deleteStoryboard` with cascading Scene removal + returned `removedSceneIds`, atomic (immer recipe) `shared/components/src/storyboard/crud.ts`
 
 ### CRUD — Scenes (async)
 
-- [ ] T057 [US2] Implement `createScene` — canonicalise `visibleFeatureIds`, compute hash (`await computeFeatureSetHash`), duplicate-timestamp check within storyboard → `DuplicateTimestamp`, orphan check → `OrphanScene`, reserved-slot checks → `ReservedSlotViolation`, default `title` from `formatDtg(timestamp)`, emit `op: create` or `op: insert-middle` based on timestamp neighbours `shared/components/src/storyboard/crud.ts`
-- [ ] T058 [US2] Implement `updateScene` — patch-only fields; recompute hash only if `visibleFeatureIds` in patch; select `op: describe` vs `op: update-to-current` based on which fields changed `shared/components/src/storyboard/crud.ts`
-- [ ] T059 [US2] Implement `deleteScene` — unknown → `UnknownScene`; provenance entry appended **before** removal (consumer-side undo buffer concern) `shared/components/src/storyboard/crud.ts`
-- [ ] T060 [US2] Implement `duplicateScene` — fresh ULID, `newTimestamp` differs from source's, same `storyboard_id`, recomputed hash (identical canonical IDs but still explicitly computed), `op: duplicate` `shared/components/src/storyboard/crud.ts`
-- [ ] T061 [US2] Implement `copySceneToOtherStoryboard` — `await input.deepCopyThumbnail(…)` inside the `immer.produce` recipe; if it rejects, wrap in `ThumbnailDeepCopyFailed` and rethrow so the draft is discarded; new Scene gets destination `storyboard_id` + fresh ULID + `op: copy-in` `shared/components/src/storyboard/crud.ts`
+- [x] T057 [US2] Implement `createScene` — canonicalise `visibleFeatureIds`, compute hash (`await computeFeatureSetHash`), duplicate-timestamp check within storyboard → `DuplicateTimestamp`, orphan check → `OrphanScene`, reserved-slot checks → `ReservedSlotViolation`, default `title` from `formatDtg(timestamp)`, emit `op: create` or `op: insert-middle` based on timestamp neighbours `shared/components/src/storyboard/crud.ts`
+- [x] T058 [US2] Implement `updateScene` — patch-only fields; recompute hash only if `visibleFeatureIds` in patch; select `op: describe` vs `op: update-to-current` based on which fields changed `shared/components/src/storyboard/crud.ts`
+- [x] T059 [US2] Implement `deleteScene` — unknown → `UnknownScene`; provenance entry appended **before** removal (consumer-side undo buffer concern) `shared/components/src/storyboard/crud.ts`
+- [x] T060 [US2] Implement `duplicateScene` — fresh ULID, `newTimestamp` differs from source's, same `storyboard_id`, recomputed hash (identical canonical IDs but still explicitly computed), `op: duplicate` `shared/components/src/storyboard/crud.ts`
+- [x] T061 [US2] Implement `copySceneToOtherStoryboard` — `await input.deepCopyThumbnail(…)` inside the `immer.produce` recipe; if it rejects, wrap in `ThumbnailDeepCopyFailed` and rethrow so the draft is discarded; new Scene gets destination `storyboard_id` + fresh ULID + `op: copy-in` `shared/components/src/storyboard/crud.ts`
 
 ### CRUD tests
 
-- [ ] T062 [P] [US2][test] Happy-path tests for each CRUD op (create/rename/delete Storyboard; create/update/delete/duplicate/copy Scene) `shared/components/src/storyboard/__tests__/crud.test.ts`
-- [ ] T063 [P] [US2][test] Negative tests matching on `err.code` for every error class from research.md R7 `shared/components/src/storyboard/__tests__/crud-errors.test.ts`
-- [ ] T064 [P] [US2][test] Structural-sharing invariant (FR-MODULE-022): after any mutation, every unchanged Feature in `plot.features` is reference-equal (`===`) to its counterpart in the returned plot `shared/components/src/storyboard/__tests__/structural-sharing.test.ts`
-- [ ] T065 [P] [US2][test] Atomicity (SC-005): inject a `deepCopyThumbnail` that throws on second invocation; assert input plot is byte-identical post-call (deep-equal pre-snapshot) `shared/components/src/storyboard/__tests__/atomicity.test.ts`
-- [ ] T066 [P] [US2][test] Deep-copy-thumbnail (FR-MODULE-015): copied Scene's `thumbnail_asset_ref` differs from source's; the consumer-supplied `deepCopyThumbnail` is called exactly once with expected args `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T062 [P] [US2][test] Happy-path tests for each CRUD op (create/rename/delete Storyboard; create/update/delete/duplicate/copy Scene) `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [x] T063 [P] [US2][test] Negative tests matching on `err.code` for every error class from research.md R7 `shared/components/src/storyboard/__tests__/crud-errors.test.ts`
+- [x] T064 [P] [US2][test] Structural-sharing invariant (FR-MODULE-022): after any mutation, every unchanged Feature in `plot.features` is reference-equal (`===`) to its counterpart in the returned plot `shared/components/src/storyboard/__tests__/structural-sharing.test.ts`
+- [x] T065 [P] [US2][test] Atomicity (SC-005): inject a `deepCopyThumbnail` that throws on second invocation; assert input plot is byte-identical post-call (deep-equal pre-snapshot) `shared/components/src/storyboard/__tests__/atomicity.test.ts`
+- [x] T066 [P] [US2][test] Deep-copy-thumbnail (FR-MODULE-015): copied Scene's `thumbnail_asset_ref` differs from source's; the consumer-supplied `deepCopyThumbnail` is called exactly once with expected args `shared/components/src/storyboard/__tests__/crud.test.ts`
 
 ### Save-time validator + migration hook
 
-- [ ] T067 [P] [US2] Implement `validatePlot` throwing the first invariant violation encountered (`OrphanScene` | `DuplicateTimestamp` | `DuplicateStoryboardName` | `ReservedSlotViolation`) `shared/components/src/storyboard/validate.ts`
-- [ ] T068 [P] [US2][test] `validatePlot` tests: passes on `storyboard-full-featured.json`, throws on each of the four invalid fixtures `shared/components/src/storyboard/__tests__/validate.test.ts`
-- [ ] T069 [P] [US2] Implement `runPlotOpenMigrations(plot, registry)` chaining by target version; export `V1_MIGRATIONS` as a `Map<number, MigrationFn>` with a no-op at key `1` `shared/components/src/storyboard/migration.ts`
-- [ ] T070 [P] [US2][test] Migration hook tests: v1 no-op returns input reference; stub registry proves chain-by-target-version order; error inside migration wrapped as `SchemaMigrationFailed` `shared/components/src/storyboard/__tests__/migration.test.ts`
+- [x] T067 [P] [US2] Implement `validatePlot` throwing the first invariant violation encountered (`OrphanScene` | `DuplicateTimestamp` | `DuplicateStoryboardName` | `ReservedSlotViolation`) `shared/components/src/storyboard/validate.ts`
+- [x] T068 [P] [US2][test] `validatePlot` tests: passes on `storyboard-full-featured.json`, throws on each of the four invalid fixtures `shared/components/src/storyboard/__tests__/validate.test.ts`
+- [x] T069 [P] [US2] Implement `runPlotOpenMigrations(plot, registry)` chaining by target version; export `V1_MIGRATIONS` as a `Map<number, MigrationFn>` with a no-op at key `1` `shared/components/src/storyboard/migration.ts`
+- [x] T070 [P] [US2][test] Migration hook tests: v1 no-op returns input reference; stub registry proves chain-by-target-version order; error inside migration wrapped as `SchemaMigrationFailed` `shared/components/src/storyboard/__tests__/migration.test.ts`
 
 ### Public barrel
 
-- [ ] T071 [US2] Populate `index.ts` with every public re-export named in contracts/crud-module-api.md §§1–9 `shared/components/src/storyboard/index.ts`
-- [ ] T072 [US2][test] Build-time UI-coupling check (SC-008): static import graph asserts `src/storyboard/index.ts` has zero transitive imports from `react`, `vscode`, `leaflet`, `react-leaflet`, or `@debrief/components` visual-component paths `shared/components/src/storyboard/__tests__/no-ui-imports.test.ts`
+- [x] T071 [US2] Populate `index.ts` with every public re-export named in contracts/crud-module-api.md §§1–9 `shared/components/src/storyboard/index.ts`
+- [x] T072 [US2][test] Build-time UI-coupling check (SC-008): static import graph asserts `src/storyboard/index.ts` has zero transitive imports from `react`, `vscode`, `leaflet`, `react-leaflet`, or `@debrief/components` visual-component paths `shared/components/src/storyboard/__tests__/no-ui-imports.test.ts`
 
 **Checkpoint**: US2 complete. The CRUD module enforces every invariant, is async-first, uses `immer` for structural sharing, and has no UI framework imports on the core path.
 
@@ -222,15 +222,15 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 ### Implementation
 
-- [ ] T080 [US3] Implement `detectMissingDataForScene` — sync, pure, returns tagged union `{kind: "ok" | "missing-features" | "out-of-range", ...}`; intersect `scene.properties.visible_feature_ids` with `plotFeatures` IDs; bound-check `scene.properties.timestamp` against `plotTimeRange` `shared/components/src/storyboard/missing-data.ts`
-- [ ] T081 [US3] Wire `detectMissingDataForScene` into the public barrel `shared/components/src/storyboard/index.ts`
+- [x] T080 [US3] Implement `detectMissingDataForScene` — sync, pure, returns tagged union `{kind: "ok" | "missing-features" | "out-of-range", ...}`; intersect `scene.properties.visible_feature_ids` with `plotFeatures` IDs; bound-check `scene.properties.timestamp` against `plotTimeRange` `shared/components/src/storyboard/missing-data.ts`
+- [x] T081 [US3] Wire `detectMissingDataForScene` into the public barrel `shared/components/src/storyboard/index.ts`
 
 ### Tests
 
-- [ ] T082 [P] [US3][test] Happy path: Scene with fully-resolved `visible_feature_ids` and in-range timestamp → `{kind: "ok"}` `shared/components/src/storyboard/__tests__/missing-data.test.ts`
-- [ ] T083 [P] [US3][test] Missing features: one/some unresolved IDs → `{kind: "missing-features", missingIds: [...]}` with exact set match `shared/components/src/storyboard/__tests__/missing-data.test.ts`
-- [ ] T084 [P] [US3][test] Out of range: timestamp before `plotTimeRange.start` or after `plotTimeRange.end` → `{kind: "out-of-range"}` (takes precedence over missing-features — document decision via test) `shared/components/src/storyboard/__tests__/missing-data.test.ts`
-- [ ] T085 [P] [US3][test] Purity (SC-006): snapshot inputs, invoke detector across all classification branches, deep-equal snapshots post-call. No in-place `sort`, `push`, or property assignment ever observable on either argument `shared/components/src/storyboard/__tests__/missing-data.test.ts`
+- [x] T082 [P] [US3][test] Happy path: Scene with fully-resolved `visible_feature_ids` and in-range timestamp → `{kind: "ok"}` `shared/components/src/storyboard/__tests__/missing-data.test.ts`
+- [x] T083 [P] [US3][test] Missing features: one/some unresolved IDs → `{kind: "missing-features", missingIds: [...]}` with exact set match `shared/components/src/storyboard/__tests__/missing-data.test.ts`
+- [x] T084 [P] [US3][test] Out of range: timestamp before `plotTimeRange.start` or after `plotTimeRange.end` → `{kind: "out-of-range"}` (takes precedence over missing-features — document decision via test) `shared/components/src/storyboard/__tests__/missing-data.test.ts`
+- [x] T085 [P] [US3][test] Purity (SC-006): snapshot inputs, invoke detector across all classification branches, deep-equal snapshots post-call. No in-place `sort`, `push`, or property assignment ever observable on either argument `shared/components/src/storyboard/__tests__/missing-data.test.ts`
 
 **Checkpoint**: US3 complete. All three user stories are independently testable. Polish phase can run.
 
@@ -242,29 +242,29 @@ Not a UI component: **no** Storybook screenshots, no interaction GIF, no Playwri
 
 ### Performance benchmark (FR-TEST-024)
 
-- [ ] T090 [P] Create Vitest bench covering `createScene`, `updateScene`, `copySceneToOtherStoryboard` at 100 / 1k / 10k / 100k synthetic position reports; assert p95 < 10 ms at 100k on the CI runner `shared/components/src/storyboard/__tests__/perf.bench.ts`
-- [ ] T091 [P] Add `test:bench` script (or extend existing) so CI can invoke the bench on demand without blocking the main test run `shared/components/package.json`
+- [x] T090 [P] Create Vitest bench covering `createScene`, `updateScene`, `copySceneToOtherStoryboard` at 100 / 1k / 10k / 100k synthetic position reports; assert p95 < 10 ms at 100k on the CI runner `shared/components/src/storyboard/__tests__/perf.bench.ts`
+- [x] T091 [P] Add `test:bench` script (or extend existing) so CI can invoke the bench on demand without blocking the main test run `shared/components/package.json`
 
 ### Full suite verification
 
-- [ ] T092 Run `task verify` (lint + typecheck + test) at repo root and capture pass/fail summary
-- [ ] T093 Run `pnpm --filter @debrief/components test:bench` and capture the bench output table
+- [x] T092 Run `task verify` (lint + typecheck + test) at repo root and capture pass/fail summary
+- [x] T093 Run `pnpm --filter @debrief/components test:bench` and capture the bench output table
 
 ### Evidence collection (REQUIRED)
 
-- [ ] T094 Create evidence directory `specs/215-storyboarding-schema/evidence/`
-- [ ] T095 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) plus narrative of key scenarios verified `specs/215-storyboarding-schema/evidence/test-summary.md`
-- [ ] T096 [P] Create round-trip evidence narrative walking `storyboard-single-minimal.json` and `storyboard-scene-single-minimal.json` Py → JSON → TS → JSON → Py with byte-equality proof and a small diff on an intentionally-corrupted copy (showing the harness catches drift) `specs/215-storyboarding-schema/evidence/round-trip-evidence.md`
-- [ ] T097 [P] Write runnable TypeScript usage example: `createStoryboard → createScene → listScenesOrdered → readSceneWithStaleness` with comments keyed to each API, designed to run under `tsx` `specs/215-storyboarding-schema/evidence/usage-example.ts`
-- [ ] T098 [P] Write markdown usage walkthrough paralleling the TS file, with commentary on the async boundary, structural-sharing property, and provenance encoding `specs/215-storyboarding-schema/evidence/usage-example.md`
-- [ ] T099 [P] Capture console output from running `npx tsx evidence/usage-example.ts` `specs/215-storyboarding-schema/evidence/output.txt`
-- [ ] T100 [P] Capture Vitest bench output as a markdown table with the p95 < 10 ms verdict `specs/215-storyboarding-schema/evidence/perf-bench-results.md`
-- [ ] T101 [P] Capture empty-diff output from the schema-compare test to prove SC-002 `specs/215-storyboarding-schema/evidence/pydantic-vs-linkml-diff.txt`
+- [x] T094 Create evidence directory `specs/215-storyboarding-schema/evidence/`
+- [x] T095 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) plus narrative of key scenarios verified `specs/215-storyboarding-schema/evidence/test-summary.md`
+- [x] T096 [P] Create round-trip evidence narrative walking `storyboard-single-minimal.json` and `storyboard-scene-single-minimal.json` Py → JSON → TS → JSON → Py with byte-equality proof and a small diff on an intentionally-corrupted copy (showing the harness catches drift) `specs/215-storyboarding-schema/evidence/round-trip-evidence.md`
+- [x] T097 [P] Write runnable TypeScript usage example: `createStoryboard → createScene → listScenesOrdered → readSceneWithStaleness` with comments keyed to each API, designed to run under `tsx` `specs/215-storyboarding-schema/evidence/usage-example.ts`
+- [x] T098 [P] Write markdown usage walkthrough paralleling the TS file, with commentary on the async boundary, structural-sharing property, and provenance encoding `specs/215-storyboarding-schema/evidence/usage-example.md`
+- [x] T099 [P] Capture console output from running `npx tsx evidence/usage-example.ts` `specs/215-storyboarding-schema/evidence/output.txt`
+- [x] T100 [P] Capture Vitest bench output as a markdown table with the p95 < 10 ms verdict `specs/215-storyboarding-schema/evidence/perf-bench-results.md`
+- [x] T101 [P] Capture empty-diff output from the schema-compare test to prove SC-002 `specs/215-storyboarding-schema/evidence/pydantic-vs-linkml-diff.txt`
 
 ### Media content
 
-- [ ] T102 Create shipped blog post using the Content Specialist agent — structure per `.claude/agents/media/content.md`: What We Built, Design Decisions (async-first, immer, LogEntry provenance, kind discriminator), Testing Story (cross-lang harness, perf bench), Lessons Learned, What's Next (pointers to #216/#217/#218) `specs/215-storyboarding-schema/media/shipped-post.md`
-- [ ] T103 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link to full post, 2–3 relevant tags) `specs/215-storyboarding-schema/media/linkedin-shipped.md`
+- [x] T102 Create shipped blog post using the Content Specialist agent — structure per `.claude/agents/media/content.md`: What We Built, Design Decisions (async-first, immer, LogEntry provenance, kind discriminator), Testing Story (cross-lang harness, perf bench), Lessons Learned, What's Next (pointers to #216/#217/#218) `specs/215-storyboarding-schema/media/shipped-post.md`
+- [x] T103 [P] Create LinkedIn shipped summary (150–200 words, hook opening, link to full post, 2–3 relevant tags) `specs/215-storyboarding-schema/media/linkedin-shipped.md`
 
 ### PR creation
 
