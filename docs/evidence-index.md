@@ -20,3 +20,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 184-regenerate-sample-catalog | 5 | md, json, txt | 2026-04-13 | current | [#427](https://github.com/debrief/debrief-future/pull/427) |
 | 201-knip-loader-config | 6 | md, txt | 2026-04-18 | current | [#474](https://github.com/debrief/debrief-future/pull/474) |
 | 200-bounds-consolidation | 10 | md, txt | 2026-04-20 | current | [#482](https://github.com/debrief/debrief-future/pull/482) |
+| 203-spatial-types-linkml | 5 | md | 2026-04-21 | current | [#490](https://github.com/debrief/debrief-future/pull/490) |
