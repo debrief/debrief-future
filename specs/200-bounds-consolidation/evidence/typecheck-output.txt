@@ -1,0 +1,75 @@
+# VS Code package typecheck evidence (T014)
+
+**Feature**: 200-bounds-consolidation
+**Covers**: C4, FR-006, US3 AS-1/AS-2.
+**Date**: 2026-04-20
+**Git SHA**: `94089b5` (Phase 3 landed)
+
+---
+
+## VS Code package typecheck
+
+```
+$ cd apps/vscode && npx tsc --noEmit
+(no output)
+$ echo "exit=$?"
+exit=0
+```
+
+Zero errors. The widened signature (research R1) accepts the plot-open
+call site's `parseResult.features: SafeFeature[]` via TypeScript's
+structural subtyping — no cast at the call site.
+
+## Full monorepo typecheck (`pnpm -r typecheck`)
+
+```
+Scope: 11 of 12 workspace projects
+...
+shared/utils typecheck: Done
+services/session-state typecheck: Done
+apps/loader typecheck: Done
+shared/components typecheck: Done
+apps/web-shell typecheck: Done
+apps/spec-navigator typecheck: Done
+```
+
+All 11 workspace projects with typecheck scripts pass. (`apps/nl-demo`
+deliberately has no typecheck — it is Babel-standalone runtime JSX.)
+
+---
+
+## Call-site inspection — `mapPanel.ts:1250`
+
+```
+1249:      // Calculate bounds for zoom
+1250:      const newBounds = calculateBounds(parseResult.features);
+1251:      const mergedBounds = mergeBounds(
+1252:        currentPlot.bbox,
+1253:        newBounds
+1254:      );
+```
+
+No `as`-cast on `parseResult.features`. Compare against the nearby cast
+sites at lines 285, 861, 1024 etc. (which are unrelated to this feature
+and were present before this PR) — none of those are on a bounds
+call-site.
+
+```
+$ grep -n "as .* calculateBounds\|calculateBounds.*as " apps/vscode/src/webview/mapPanel.ts
+(no output)
+```
+
+Zero matches — no `as`-cast appears anywhere near a `calculateBounds`
+call site in `mapPanel.ts`. FR-006 is satisfied.
+
+---
+
+## Conclusion
+
+C4 verified. `pnpm -r typecheck` passes zero-errors, and manual
+inspection of `apps/vscode/src/webview/mapPanel.ts` near the
+`calculateBounds` call site shows no new `as`-cast. The cast-free
+consumption of `SafeFeature[]` at the plot-open call site is exactly
+what FR-006 / US3 AS-1 / US3 AS-2 specified.
+
+*(C4; FR-006; US3 AS-1, AS-2.)*
