@@ -45,8 +45,8 @@
 
 **Goal**: Prerequisites that unblock every downstream phase. No code changes yet.
 
-- [ ] T001 Pre-flight grep sweep of `apps/vscode/` for any consumer of `../utils/bounds` or of the symbols `calculateBounds` / `mergeBounds` that research R3 did not enumerate; record the exhaustive consumer set as a comment in this file before deletion tasks fan out `specs/200-bounds-consolidation/evidence/preflight-grep.txt`
-- [ ] T002 [P] Capture the four deferred backlog items (drift-prevention rule, shared/components unification, LinkML-ify SafeFeature/GeoJSONFeature, bbox fast-path) as new entries in the backlog `BACKLOG.md`
+- [x] T001 Pre-flight grep sweep of `apps/vscode/` for any consumer of `../utils/bounds` or of the symbols `calculateBounds` / `mergeBounds` that research R3 did not enumerate; record the exhaustive consumer set as a comment in this file before deletion tasks fan out `specs/200-bounds-consolidation/evidence/preflight-grep.txt`
+- [x] T002 [P] Capture the four deferred backlog items (drift-prevention rule, shared/components unification, LinkML-ify SafeFeature/GeoJSONFeature, bbox fast-path) as new entries in the backlog `BACKLOG.md`
 
 **Parallel execution**: T001 is a prerequisite for Phase 2 (you can't widen until you know the consumer set is what the spec claims). T002 is fully independent of everything else in this PR and can run alongside Phase 2.
 
@@ -56,12 +56,12 @@
 
 **Independent test criteria**: After Phase 2, `pnpm --filter @debrief/utils test --run bounds` passes with: (a) all pre-change assertions still green; (b) new null-geometry regression green; (c) six per-geometry-type assertions green; (d) narrowing-gate shape-mismatch assertions green. No consumer-side change is required to run these.
 
-- [ ] T003 Widen `calculateBounds`'s parameter to the structural minimum `ReadonlyArray<BoundsInputFeature>` **and** introduce the `coerceCoordinates(raw: unknown): CoordinateTree | null` narrowing gate with the Article XV.5 comment — both land together because the widened type is only constitutional once the gate exists (research R1 + R6, FR-006 + FR-007) `shared/utils/src/bounds.ts`
-- [ ] T004 [P][test] Add narrowing-gate shape-mismatch assertions: `coordinates: "oops"`, `null`, `[]`, `[["x"]]` each yield `bounds === null` with no throw (FR-007, SC-009, contract C7) `shared/utils/tests/bounds.test.ts`
-- [ ] T005 [test] Add failing null-geometry regression assertion: input mixing `{ geometry: null }` + valid features currently throws `TypeError` — this assertion fails at this commit and passes after T006 (research R2 step 2, FR-002, SC-006, contract C5) `shared/utils/tests/bounds.test.ts`
-- [ ] T006 Lift the null-guard (`if (!feature.geometry) continue;`) into the canonical loop in `calculateBounds` — T005 now passes (research R2 step 3, FR-002, US2 AS-2) `shared/utils/src/bounds.ts`
-- [ ] T007 [P][test] Add six per-geometry-type correctness assertions (Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon) — each asserts `calculateBounds([featureWithGivenGeometryType])` returns the correct four-number tuple; these lock in FR-008's no-silent-miss guarantee at the canonical location (SC-007, contract C6) `shared/utils/tests/bounds.test.ts`
-- [ ] T008 [test] Diff `apps/vscode/tests/unit/bounds.test.ts` against `shared/utils/tests/bounds.test.ts`; migrate any unique assertion from the vscode copy into the shared file (research R5 mitigation — ensures no coverage is silently lost at deletion) `shared/utils/tests/bounds.test.ts`
+- [x] T003 Widen `calculateBounds`'s parameter to the structural minimum `ReadonlyArray<BoundsInputFeature>` **and** introduce the `coerceCoordinates(raw: unknown): CoordinateTree | null` narrowing gate with the Article XV.5 comment — both land together because the widened type is only constitutional once the gate exists (research R1 + R6, FR-006 + FR-007) `shared/utils/src/bounds.ts`
+- [x] T004 [P][test] Add narrowing-gate shape-mismatch assertions: `coordinates: "oops"`, `null`, `[]`, `[["x"]]` each yield `bounds === null` with no throw (FR-007, SC-009, contract C7) `shared/utils/tests/bounds.test.ts`
+- [x] T005 [test] Add failing null-geometry regression assertion: input mixing `{ geometry: null }` + valid features currently throws `TypeError` — this assertion fails at this commit and passes after T006 (research R2 step 2, FR-002, SC-006, contract C5) `shared/utils/tests/bounds.test.ts`
+- [x] T006 Lift the null-guard (`if (!feature.geometry) continue;`) into the canonical loop in `calculateBounds` — T005 now passes (research R2 step 3, FR-002, US2 AS-2) `shared/utils/src/bounds.ts`
+- [x] T007 [P][test] Add six per-geometry-type correctness assertions (Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon) — each asserts `calculateBounds([featureWithGivenGeometryType])` returns the correct four-number tuple; these lock in FR-008's no-silent-miss guarantee at the canonical location (SC-007, contract C6) `shared/utils/tests/bounds.test.ts`
+- [x] T008 [test] Diff `apps/vscode/tests/unit/bounds.test.ts` against `shared/utils/tests/bounds.test.ts`; migrate any unique assertion from the vscode copy into the shared file (research R5 mitigation — ensures no coverage is silently lost at deletion) `shared/utils/tests/bounds.test.ts`
 
 **Parallel execution**: T004, T007, and T008 are all test-only edits to the same file and can be authored concurrently (one commit each). T005 and T006 are strictly sequential (T005 must fail before T006 makes it pass). T003 must land first — every other Phase 2 task depends on the widened signature being in place.
 
@@ -71,10 +71,10 @@
 
 **Independent test criteria**: `grep -rn "export function calculateBounds" --include="*.ts" shared/utils/ apps/` returns exactly one match (in `shared/utils/src/bounds.ts`). `find apps/vscode -name 'bounds.ts' -o -name 'bounds.test.ts'` returns zero rows. The VS Code package still type-checks.
 
-- [ ] T009 Flip the plot-open-path import in `mapPanel.ts` from `'../utils/bounds'` to `'@debrief/utils'` (also adding `boundsToLeaflet` to the named imports in anticipation of T016; do NOT change the `fitToSelection` body yet — that's Phase 6) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T010 [P] Delete the VS Code-local bounds utility now that no consumer references it (FR-003) `apps/vscode/src/utils/bounds.ts`
-- [ ] T011 [P] Delete the duplicate VS Code bounds test file now that its coverage has been subsumed into `shared/utils/tests/bounds.test.ts` by Phase 2 (FR-004) `apps/vscode/tests/unit/bounds.test.ts`
-- [ ] T012 [test] Run the SC-001 + SC-002 grep commands and pipe the output to the canonical-grep evidence file — the captured output must show exactly one definition per symbol and zero `bounds.ts` / `bounds.test.ts` files in `apps/vscode/` (contract C1 + C2) `specs/200-bounds-consolidation/evidence/canonical-grep.txt`
+- [x] T009 Flip the plot-open-path import in `mapPanel.ts` from `'../utils/bounds'` to `'@debrief/utils'` (also adding `boundsToLeaflet` to the named imports in anticipation of T016; do NOT change the `fitToSelection` body yet — that's Phase 6) `apps/vscode/src/webview/mapPanel.ts`
+- [x] T010 [P] Delete the VS Code-local bounds utility now that no consumer references it (FR-003) `apps/vscode/src/utils/bounds.ts`
+- [x] T011 [P] Delete the duplicate VS Code bounds test file now that its coverage has been subsumed into `shared/utils/tests/bounds.test.ts` by Phase 2 (FR-004) `apps/vscode/tests/unit/bounds.test.ts`
+- [x] T012 [test] Run the SC-001 + SC-002 grep commands and pipe the output to the canonical-grep evidence file — the captured output must show exactly one definition per symbol and zero `bounds.ts` / `bounds.test.ts` files in `apps/vscode/` (contract C1 + C2) `specs/200-bounds-consolidation/evidence/canonical-grep.txt`
 
 **Parallel execution**: T010 and T011 are both pure deletions and are independent once T009 has landed (T009 removes the last in-tree importer of the file being deleted in T010). T012 is verification-only and runs after T010 + T011.
 
@@ -84,7 +84,7 @@
 
 **Independent test criteria**: Opening a plot in the VS Code extension preview auto-zooms to the feature extent identically to the pre-change build. A plot whose feature collection contains at least one null-geometry feature still auto-zooms cleanly.
 
-- [ ] T013 [test] Manual smoke test per quickstart Step 6: open a sample plot in the VS Code extension, confirm map auto-zooms to the feature extent; if available, also open a plot containing a null-geometry feature and confirm the zoom still happens without throwing in the devtools console (SC-005, FR-012, contract C13) `specs/200-bounds-consolidation/evidence/plot-open-smoke.md`
+- [x] T013 [test] Manual smoke test per quickstart Step 6: open a sample plot in the VS Code extension, confirm map auto-zooms to the feature extent; if available, also open a plot containing a null-geometry feature and confirm the zoom still happens without throwing in the devtools console (SC-005, FR-012, contract C13) `specs/200-bounds-consolidation/evidence/plot-open-smoke.md`
 
 **Parallel execution**: Nothing to parallelise — single verification task. Depends on Phase 3 being complete (the import flip must be in place).
 
@@ -94,8 +94,8 @@
 
 **Independent test criteria**: `pnpm --filter apps/vscode typecheck` passes with no new errors. `grep -n "as " apps/vscode/src/webview/mapPanel.ts` near the `calculateBounds` call sites shows no newly-added cast. `grep -nE "\bany\b|as unknown as" shared/utils/src/bounds.ts` returns no output.
 
-- [ ] T014 [test] Run the VS Code package typecheck and confirm zero new errors versus the pre-change baseline; capture the command output and inspect the `mapPanel.ts` diff near the `calculateBounds(parseResult.features)` call site to confirm no `as`-cast was introduced (FR-006, US3 AS-1/AS-2, contract C4) `specs/200-bounds-consolidation/evidence/typecheck-output.txt`
-- [ ] T015 [test] Code-review inspection of `shared/utils/src/bounds.ts`: verify `coerceCoordinates` is the single named narrowing gate, that its definition has the Article XV.5 anchor comment, and that the file contains no `any` type and no `as unknown as X` double-cast pattern; capture the grep commands and outputs that back this up (FR-007, US3 AS-3, SC-009, contract C8) `specs/200-bounds-consolidation/evidence/narrowing-gate-source.md`
+- [x] T014 [test] Run the VS Code package typecheck and confirm zero new errors versus the pre-change baseline; capture the command output and inspect the `mapPanel.ts` diff near the `calculateBounds(parseResult.features)` call site to confirm no `as`-cast was introduced (FR-006, US3 AS-1/AS-2, contract C4) `specs/200-bounds-consolidation/evidence/typecheck-output.txt`
+- [x] T015 [test] Code-review inspection of `shared/utils/src/bounds.ts`: verify `coerceCoordinates` is the single named narrowing gate, that its definition has the Article XV.5 anchor comment, and that the file contains no `any` type and no `as unknown as X` double-cast pattern; capture the grep commands and outputs that back this up (FR-007, US3 AS-3, SC-009, contract C8) `specs/200-bounds-consolidation/evidence/narrowing-gate-source.md`
 
 **Parallel execution**: T014 and T015 are independent verification tasks and can run concurrently once Phase 2 + Phase 3 are complete.
 
@@ -105,8 +105,8 @@
 
 **Independent test criteria**: Selecting a Polygon-only set and invoking "zoom to selection" in the VS Code map zooms to the Polygon's extent (pre-change: did nothing or produced wrong viewport). Selecting a Point+LineString set zooms identically to pre-change behaviour (no regression). Empty-selection invocation leaves the viewport unchanged.
 
-- [ ] T016 Rewrite the body of `fitToSelection()`: remove the ~35-line inline loop over `selectedFeatures` with its hand-rolled min/max tracking; replace with `const bounds = calculateBounds(selectedFeatures); if (bounds === null) return; this.fitBounds(boundsToLeaflet(bounds));` — preserve the existing early-return for `selectedIds.size === 0` that sits above this block (FR-008, FR-009, US4 AS-1 through AS-6, contract C10 + C11) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T017 [test] Manual smoke test per quickstart Step 7: open a plot containing a mix of geometry types; verify (a) Point+LineString-only selection zooms identically to pre-change; (b) Polygon selection zooms correctly where pre-change silently missed; (c) MultiPolygon selection zooms to the union; (d) empty selection leaves viewport unchanged (SC-008, contract C9 + C10 + C11) `specs/200-bounds-consolidation/evidence/selection-zoom-smoke.md`
+- [x] T016 Rewrite the body of `fitToSelection()`: remove the ~35-line inline loop over `selectedFeatures` with its hand-rolled min/max tracking; replace with `const bounds = calculateBounds(selectedFeatures); if (bounds === null) return; this.fitBounds(boundsToLeaflet(bounds));` — preserve the existing early-return for `selectedIds.size === 0` that sits above this block (FR-008, FR-009, US4 AS-1 through AS-6, contract C10 + C11) `apps/vscode/src/webview/mapPanel.ts`
+- [x] T017 [test] Manual smoke test per quickstart Step 7: open a plot containing a mix of geometry types; verify (a) Point+LineString-only selection zooms identically to pre-change; (b) Polygon selection zooms correctly where pre-change silently missed; (c) MultiPolygon selection zooms to the union; (d) empty selection leaves viewport unchanged (SC-008, contract C9 + C10 + C11) `specs/200-bounds-consolidation/evidence/selection-zoom-smoke.md`
 
 **Parallel execution**: Nothing to parallelise — T016 is the only code change in this phase and T017 depends on it. Phase 6 depends on Phase 2 (the widened parameter and per-geometry-type tests must be in place before `DebriefFeature[]` can flow into `calculateBounds` with test-backed confidence) and Phase 3 (`boundsToLeaflet` is already in the imports thanks to T009).
 
@@ -116,16 +116,16 @@
 
 ### Evidence Collection
 
-- [ ] T018 Run the full CI gate (`task verify`) and capture the vitest results + coverage using the test-summary template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/200-bounds-consolidation/evidence/test-summary.md`
-- [ ] T019 Create a usage demonstration showing a consumer of the consolidated utility (VS Code map panel) passing its feature array through without an `as`-cast; include the actual one-line call shape for both plot-open and fitToSelection callers, plus the expected output shape `specs/200-bounds-consolidation/evidence/usage-example.md`
-- [ ] T020 [P] Capture the before/after of `fitToSelection()` — the ~35-line inline loop on one side, the three-line utility-call replacement on the other — as a side-by-side code-diff evidence artifact `specs/200-bounds-consolidation/evidence/before-after-fittoselection.md`
-- [ ] T021 [P] Capture the `coerceCoordinates` source snippet together with its Article XV.5 comment, plus the grep outputs proving no `any` and no double-cast pattern exists in `shared/utils/src/bounds.ts` (already produced by T015; this step formalises it as evidence) `specs/200-bounds-consolidation/evidence/narrowing-gate-source.md`
-- [ ] T022 [P] Tabulate the per-geometry-type assertions added in T007: list each type (Point / LineString / Polygon / MultiPoint / MultiLineString / MultiPolygon) against the input fixture and the expected bounds tuple `specs/200-bounds-consolidation/evidence/geometry-type-matrix.md`
+- [x] T018 Run the full CI gate (`task verify`) and capture the vitest results + coverage using the test-summary template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/200-bounds-consolidation/evidence/test-summary.md`
+- [x] T019 Create a usage demonstration showing a consumer of the consolidated utility (VS Code map panel) passing its feature array through without an `as`-cast; include the actual one-line call shape for both plot-open and fitToSelection callers, plus the expected output shape `specs/200-bounds-consolidation/evidence/usage-example.md`
+- [x] T020 [P] Capture the before/after of `fitToSelection()` — the ~35-line inline loop on one side, the three-line utility-call replacement on the other — as a side-by-side code-diff evidence artifact `specs/200-bounds-consolidation/evidence/before-after-fittoselection.md`
+- [x] T021 [P] Capture the `coerceCoordinates` source snippet together with its Article XV.5 comment, plus the grep outputs proving no `any` and no double-cast pattern exists in `shared/utils/src/bounds.ts` (already produced by T015; this step formalises it as evidence) `specs/200-bounds-consolidation/evidence/narrowing-gate-source.md`
+- [x] T022 [P] Tabulate the per-geometry-type assertions added in T007: list each type (Point / LineString / Polygon / MultiPoint / MultiLineString / MultiPolygon) against the input fixture and the expected bounds tuple `specs/200-bounds-consolidation/evidence/geometry-type-matrix.md`
 
 ### Media Content
 
-- [ ] T023 Use the Content Specialist agent (`.claude/agents/media/content.md`) to draft the Shipped Post. Sections: What We Built, Lessons Learned (the review gate catching the adjacent silent-miss bug), What's Next (the four deferred backlog items captured in T002). Tone consistent with the already-drafted `media/planning-post.md` — honest about scope expansion, credit the review gate `specs/200-bounds-consolidation/media/shipped-post.md`
-- [ ] T024 [P] Use the Content Specialist agent to draft a 150–200-word LinkedIn shipped summary with a strong hook, a link placeholder to the published post, and three technical tags `specs/200-bounds-consolidation/media/linkedin-shipped.md`
+- [x] T023 Use the Content Specialist agent (`.claude/agents/media/content.md`) to draft the Shipped Post. Sections: What We Built, Lessons Learned (the review gate catching the adjacent silent-miss bug), What's Next (the four deferred backlog items captured in T002). Tone consistent with the already-drafted `media/planning-post.md` — honest about scope expansion, credit the review gate `specs/200-bounds-consolidation/media/shipped-post.md`
+- [x] T024 [P] Use the Content Specialist agent to draft a 150–200-word LinkedIn shipped summary with a strong hook, a link placeholder to the published post, and three technical tags `specs/200-bounds-consolidation/media/linkedin-shipped.md`
 
 ### PR Creation
 
