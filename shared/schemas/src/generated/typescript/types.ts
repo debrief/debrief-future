@@ -1820,7 +1820,7 @@ export interface GeoJSONGeometry {
  * GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
 
  */
-export interface GeoJSONFeature {
+export interface GeoJSONFeature { // canonical — LinkML-generated schema type
     /** GeoJSON object type — always "Feature" */
     type: string,
     /** Optional feature identifier (string or numeric, stored as string) */

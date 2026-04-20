@@ -109,6 +109,7 @@ tasks:
       - uv run ruff check .
       - pnpm lint
       - node scripts/check-eslint-drift-wiring.cjs
+      - bash scripts/check-no-geojson-feature.sh
 
   lint:fix:
     desc: "Auto-fix code style issues"
