@@ -259,7 +259,166 @@ the thumbnail via the #174 pipeline and clears the flag, (c) the
 
 ### Functional Requirements
 
-> _Pending — will reference the Key Entities defined below._
+Requirements are grouped by theme. Every requirement is testable; "System"
+refers to the Storyboarding feature as a whole (panel + shared module +
+schema validators), not a specific implementation layer.
+
+#### Schema & persistence
+
+- **FR-001**: System MUST define Storyboard and Scene entities in the LinkML
+  master schema under `shared/schemas/`, and MUST generate Pydantic, JSON
+  Schema, and TypeScript bindings from that single source.
+- **FR-002**: Storyboard and Scene Features MUST persist inside the plot's
+  GeoJSON FeatureCollection — no separate storage, no STAC API changes.
+- **FR-003**: System MUST reject any persisted Scene whose
+  `thumbnail_asset_ref` does not resolve to an existing STAC asset.
+- **FR-004**: System MUST reject any persisted Scene with a non-null
+  `time_range` in schema version 1 (reserved slot).
+- **FR-005**: System MUST reject any persisted Scene with `viewport.bearing`
+  ≠ 0 in schema version 1 (reserved slot).
+- **FR-006**: System MUST reject two Scenes with the same `timestamp` in the
+  same Storyboard.
+- **FR-007**: System MUST reject any Scene whose `storyboard_id` does not
+  reference an existing Storyboard in the same FeatureCollection.
+- **FR-008**: System MUST pass all three Article II adherence tests
+  enumerated under *Schema-first obligations* in Key Entities (golden
+  fixtures, Python↔TS round-trip, Pydantic-vs-LinkML JSON Schema equality).
+- **FR-009**: System MUST carry a `schema_version` integer on every
+  Storyboard Feature and MUST run a plot-open migration hook; the hook
+  MUST be a no-op at version 1 but MUST be wired so future versions can
+  register migrations without touching the load path.
+- **FR-010**: System MUST treat every edit to a Storyboard or Scene as
+  dirtying the plot, requiring an explicit save by the analyst before
+  changes are durable.
+
+#### Capture
+
+- **FR-011**: System MUST provide a capture shortcut `Ctrl/Cmd+Alt+C`
+  scoped (via VS Code `when`-clause) to the Map Viewer.
+- **FR-012**: System MUST also provide a capture button in the Storyboard
+  panel with behaviour identical to the shortcut.
+- **FR-013**: On the first capture for a plot with no Storyboards, System
+  MUST prompt the analyst for a Storyboard name via an inline quick-pick
+  before persisting anything.
+- **FR-014**: On subsequent captures, System MUST append the new Scene to
+  the currently active Storyboard.
+- **FR-015**: At capture time System MUST snapshot: viewport
+  (center / zoom / bearing=0), current time-slider `timestamp`, the set of
+  currently visible plot feature IDs, and `feature_set_hash` over the
+  sorted visible-feature-ID set.
+- **FR-016**: At capture time System MUST request a thumbnail from the
+  #174 pipeline **synchronously**; on pipeline failure System MUST NOT
+  persist the Scene, MUST show an error toast, and MUST leave the plot
+  undirtied by the failed op.
+- **FR-017**: System MUST default the Scene `title` to the DTG of
+  `timestamp` in `DDHHmmZ MMM YY` (ZULU) format, falling back to ISO-8601
+  if the DTG format cannot be produced. The title MUST be inline-editable.
+- **FR-018**: When capture would produce a Scene whose `timestamp`
+  collides with an existing Scene in the active Storyboard, System MUST
+  prompt **Replace / Offset (+1 s) / Cancel** and MUST NOT write until
+  the prompt is resolved.
+
+#### Playback (in-VS-Code preview)
+
+- **FR-019**: System MUST provide forward and backward transport buttons
+  in the panel.
+- **FR-020**: System MUST bind scoped `Left` and `Right` arrow keys to the
+  backward / forward transport, active only when the Storyboard panel (or
+  the Map Viewer, when a Storyboard is active) has focus.
+- **FR-021**: On transport advance, System MUST animate the map via
+  `flyTo` to the target Scene's `viewport` and MUST tween the time slider
+  to the Scene's `timestamp` over `transition_duration_ms`.
+- **FR-022**: Default `transition_duration_ms` MUST be `500`; per-Scene
+  overrides are allowed.
+- **FR-023**: During playback, System MUST constrain time-slider scrubbing
+  to `[current_scene.timestamp, next_scene.timestamp]`; beyond the last
+  Scene, scrubbing past its `timestamp` MUST be disabled.
+- **FR-024**: System MUST hard-block playback onto any Scene whose
+  `visible_feature_ids` do not fully resolve in the current plot or whose
+  `timestamp` is outside the plot's time range; the block MUST present a
+  prompt to edit or remove the Scene.
+
+#### Edit operations
+
+- **FR-025**: System MUST support per-Scene **rename** (inline text edit).
+- **FR-026**: System MUST support per-Scene **markdown description** edit.
+- **FR-027**: System MUST support per-Scene **soft-delete with
+  toast-undo**; the undo window MUST be session-scoped (it does not
+  survive plot close/reopen).
+- **FR-028**: System MUST support per-Scene **update-to-current** — a
+  single atomic re-snapshot of viewport, timestamp, `visible_feature_ids`,
+  `feature_set_hash`, and `thumbnail_asset_ref` from the current map state.
+- **FR-029**: System MUST support per-Scene **duplicate**, prompting the
+  analyst for a new `timestamp` (default: source `timestamp` + 1 s) and
+  producing a new Scene with a fresh `id` on the same Storyboard.
+- **FR-030**: System MUST support **insert-middle** as the natural
+  consequence of capturing at an intermediate `timestamp` — no separate
+  op is required.
+- **FR-031**: System MUST support **copy-to-other-storyboard** via a
+  dropdown quick-pick of destination Storyboards on the same plot;
+  the copy MUST have a fresh `id`, the destination's `storyboard_id`, and
+  a **deep-copied** thumbnail asset distinct from the source's.
+- **FR-032**: System MUST NOT provide drag-reorder of Scenes; ordering
+  is derived from `timestamp` only.
+- **FR-033**: Every successful edit op MUST update `last_modified_by` and
+  `last_modified_at` and MUST append a `HistoryEntry` to the Scene or
+  Storyboard's `history` array.
+- **FR-034**: Every successful edit op MUST emit an entry to the Analysis
+  Log Panel (#176) with the Scene's thumbnail attached.
+
+#### Multi-storyboard management
+
+- **FR-035**: System MUST allow a plot to carry multiple Storyboards.
+- **FR-036**: The Storyboard panel header MUST present a dropdown listing
+  all Storyboards on the current plot.
+- **FR-037**: The panel header MUST offer an overflow menu with
+  **Create / Rename / Delete** actions for Storyboards.
+- **FR-038**: The "active" Storyboard is ephemeral (panel selection only)
+  and MUST NOT be persisted on disk.
+- **FR-039**: On plot open, the active Storyboard MUST default to the
+  one with the most recent `last_modified_at`; if no Storyboards exist,
+  the panel MUST show an empty state.
+- **FR-040**: Deleting a Storyboard MUST cascade to all its Scenes and
+  their thumbnail assets, and MUST emit a single Analysis Log entry
+  summarising the cascade.
+
+#### Panel behaviour
+
+- **FR-041**: The Storyboard panel MUST be hidden by default and opened
+  via the Command Palette or view menu.
+- **FR-042**: The first capture on a plot MUST auto-open the panel.
+- **FR-043**: The panel MUST surface the active Storyboard's Scene list
+  sorted by `timestamp` ascending, each row showing thumbnail, title, and
+  DTG.
+- **FR-044**: The panel MUST surface a **stale** indicator on each Scene
+  whose `feature_set_hash` no longer matches a recomputation at open time.
+- **FR-045**: The panel MUST provide a per-Scene **refresh thumbnail**
+  action that re-captures the thumbnail via the #174 pipeline and
+  recomputes `feature_set_hash`.
+
+#### Map rendering
+
+- **FR-046**: The parent Storyboard Feature MUST NOT render on the map
+  layer (it exists for the panel and for downstream renderers only).
+- **FR-047**: Scene viewport Polygons MUST render as faint rectangles on
+  the map **only** when their parent Storyboard is the active panel
+  selection.
+- **FR-048**: Clicking a Scene rectangle on the map MUST select that
+  Scene in the panel and animate the map to its viewport using the same
+  transport used by Forward/Backward.
+
+#### Provenance
+
+- **FR-049**: Every Storyboard and Scene Feature MUST carry
+  `created_by`, `created_at`, `last_modified_by`, `last_modified_at`, and
+  a `history[]` array.
+- **FR-050**: `history[]` MUST be append-only — existing entries MUST NOT
+  be mutated or removed by any edit op.
+
+#### Offline
+
+- **FR-051**: All capture, edit, playback, panel, and schema-validation
+  operations MUST work with no network access (Article I).
 
 ### Key Entities *(schema-first; authoritative)*
 
