@@ -149,14 +149,134 @@ Article VIII.3 requires significant technical choices to be documented with rati
 
 ---
 
+## Decision 6: Factory pattern for multi-package drift coverage *(added 2026-04-20 during `/speckit.review`)*
+
+### Decision
+
+**Extract a single `drift-rule-factory.cjs` module** at `shared/eslint-rules/` that takes `{ packageName, indexPath, anchorDir }` and returns `{ rules: RestrictedSyntaxEntry[] }`. Each of the five `@debrief/*` packages gets a three-line caller module (`no-redeclare-<pkg>-exports.cjs`) that imports the factory, invokes it with the package's inputs, and re-exports the resulting `rules`. Each `apps/*/.eslintrc.cjs` requires every caller module and spreads every resulting array into its `no-restricted-syntax` config.
+
+### Rationale
+
+- **DRY under forced plurality.** Five packages × seven selectors × one message template = five near-identical rule modules. Once the user's "fix them in this spec" directive forced plurality, the factory extraction stopped being premature abstraction and became the minimal-repetition shape.
+- **Each package is a pure parameter.** The AST selectors from Decision 3 are package-agnostic; only the forbidden-name set and the package identifier embedded in the message change. Parameterising those two inputs is a 10-line change from the single-package design.
+- **Adding a sixth package is a three-line file.** If `@debrief/mcp-common` or a future `@debrief/contrib-*` ever wants drift coverage, the cost is one new caller module + one line in the wiring-check parameter + one line per `apps/*/.eslintrc.cjs`. The spec's Assumptions bullet about "future drift-prevention guards SHOULD be ESLint rules" benefits from this factory as the precedent.
+- **Test surface is linear, not quadratic.** The factory gets full unit-test coverage (seven shapes × a synthetic single-name forbidden set). Each caller module gets a smoke test (1 positive + 1 negative) exercised against its real package — eight fixture files total for the four non-utils packages. The `@debrief/utils` caller keeps the full seven-shape fixture coverage as the canonical test bed.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|-------------|--------------|
+| **Separate, unrelated rule modules per package (no shared factory)** | Duplicates the selector-emission logic five times. When Decision 3's selector list ever grows (e.g., `TSAbstractClassDeclaration` becomes a thing), five files need the same edit. Rejected on DRY grounds. |
+| **Single omnibus module that internally iterates five packages and returns one combined `rules` array** | Conflates per-package config. A reviewer reading `apps/vscode/.eslintrc.cjs` would see one opaque spread rather than five named spreads. The wiring-forgotten meta-check (Decision 8) also becomes less precise — it can't distinguish "all drift rules missing" from "only schemas drift missing". Rejected on reviewability + meta-checkability grounds. |
+| **Generate the per-package caller modules from a JSON manifest at build time** | Adds a build step to a feature whose entire point is zero-infrastructure, static-analysis-only. The five caller modules are three lines each — hand-writing them is cheaper than the script that would generate them. |
+
+---
+
+## Decision 7: Transitive `export *` walking within a package's own `src/` tree *(added 2026-04-20 during `/speckit.review`)*
+
+### Decision
+
+**The factory's index-file parser MUST follow `export * from '<relative-path>'` edges within the same package's `src/` subtree** to enumerate the forwarded names. Depth is bounded by the tree's natural depth (no loops possible in a well-formed module graph; the parser does not cross package boundaries). `export * from '<bare-module-specifier>'` (non-relative) is NOT followed — cross-package forwarding is an escape hatch out of the package's own surface and outside the guard's scope.
+
+### Rationale
+
+- **`@debrief/session-state`'s `index.ts` uses `export * from './types/index.js'` plus several submodule forwards.** A parser that stopped at the top-level index would see literally zero forwarded names from that package and emit an empty forbidden set. The whole rule for `@debrief/session-state` would be silently degenerate — exactly the class of silent failure this feature exists to prevent (Article I.3 again).
+- **`@debrief/components`' `index.ts` uses many explicit `export { … } from './<component>'` specifier forwards plus some `export *`.** Both shapes need coverage.
+- **Parser is still AST-only.** Reading the forwarded module is another `typescript.createSourceFile` call. No type resolver, no symbol table, no program-wide analysis. Cost scales linearly with the forwarding tree depth (single-digit in practice).
+- **Bounded within the package.** The walker refuses to cross into `node_modules/`, refuses non-relative specifiers, and refuses absolute paths. This keeps the walk's scope predictable and protects against accidentally pulling in `@debrief/schemas`'s surface when walking `@debrief/session-state`.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|-------------|--------------|
+| **Do not walk `export *`; accept holes in coverage for packages that use it** | Silent-degeneracy failure mode, as above. Non-starter. |
+| **Use a type-checker-backed walk (TypeScript `Program`)** | Heavier, needs a full `tsconfig`-backed compilation unit per package at rule-init time. The AST-only walk gives the same answer for the shapes used in practice. |
+| **Only walk one level deep (`export *` → no further `export *`)** | Works for today's trees (verified: no package has a nested `export *` beyond one hop) but leaves a trip-wire. Full walking with depth-bounded cycle guard is ~5 extra lines and closes the question. |
+| **Require every package's `index.ts` to be rewritten as explicit `export { … }` barrels** | A large unrelated refactor of five packages across the monorepo. Not worth it; the parser change is cheaper. |
+
+### Testing implication
+
+The `session-state` smoke test specifically asserts that the forbidden set includes a name that is only reachable via `export *`. If a future refactor regresses the walker to stop at the top level, this test catches it.
+
+---
+
+## Decision 8: Wiring-forgotten meta-check — plain Node script invoked from `task lint` *(added 2026-04-20 during `/speckit.review`)*
+
+### Decision
+
+**Implement the wiring-forgotten meta-check as a standalone Node script** at `scripts/check-eslint-drift-wiring.cjs`, invoked from `task lint` alongside `pnpm lint`. The script enumerates `apps/*/`, for each sibling that contains a `.eslintrc.cjs` file it `require()`s the file and asserts the resulting config's `rules['no-restricted-syntax']` array contains (by identity comparison, not shallow-equal) every element of every per-package drift-rule array. It fails-closed with a clear message naming each offending `.eslintrc.cjs` and the specific caller-module whose spread is missing.
+
+### Rationale
+
+- **"Check that a check is wired" is meta-logic, not an ESLint rule.** ESLint rules run on source files; the wiring-forgotten check runs on `.eslintrc.cjs` files *as programs*, not as source to be lint-checked. A plain Node script is a better fit than a contrived meta-lint-rule.
+- **Identity comparison is the right contract.** Because each caller module's `rules` array is exported by reference (Node's require cache ensures the same array object is used across the whole lint run), identity comparison between the array stored in the caller module and the array spread into the apps' config is both cheap and precise. No need to compare element shapes; reference equality between the two says "this exact array was or wasn't spread".
+- **Doesn't duplicate the spec's "unwired script is anti-precedent" lesson.** The script is *itself* invoked from `task lint` — not deposited in `scripts/` without wiring. Being an example of its own principle is design-consistency, not irony.
+- **Reports actionable failures.** The script prints the offending `apps/<name>/.eslintrc.cjs` path and the specific missing `no-redeclare-<pkg>-exports.cjs` path, so the fix is an obvious two-line edit.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|-------------|--------------|
+| **A custom ESLint rule that lints `.eslintrc.cjs` files themselves** | ESLint-on-ESLint-configs is supported but bizarre. The config file must itself be listed in an `overrides:` section somewhere, and the rule would have to reverse-engineer what the config "means". The plain Node script's direct `require()` of the config is both simpler and more honest. |
+| **A `.eslintrc.base.cjs` that every apps/*/.eslintrc.cjs extends** | Would make the wiring structurally impossible to forget (good) but requires every app to adopt the shared base, which existing apps don't (and the per-app `.eslintrc.cjs` files already have file-local overrides for their own concerns). A larger refactor. Could be a follow-up if a second wiring-forgotten class ever emerges. |
+| **A Git pre-commit hook that greps for the spread** | Client-side only; can be skipped with `--no-verify`. Fails FR-016 (MUST run in CI). |
+
+---
+
+## Decision 9: `scripts/check-no-geojson-feature.sh` — wire into `task lint`, don't rewrite *(added 2026-04-20 during `/speckit.review`)*
+
+### Decision
+
+**Add a single line to `task lint` (in `Taskfile.yml`) that invokes `bash scripts/check-no-geojson-feature.sh`** alongside `pnpm lint` and the new `node scripts/check-eslint-drift-wiring.cjs`. The script's internal logic is NOT modified or ported. If the script ever grows enough complexity to justify a TypeScript/Node port, that migration is a separate backlog item.
+
+### Rationale
+
+- **Maximum leverage, minimum change.** The script is already correct, already has its own clean baseline, and already documents what it checks. The only bug is that it isn't invoked. Wiring it is a one-line edit that buys back the entire check's value immediately.
+- **Scope differs from the ESLint rules.** The script covers `apps/`, `shared/`, and `services/` for one specific identifier (`GeoJSONFeature`). The new ESLint drift rules cover `apps/*` only (per spec §Out of Scope). So the script is **not redundant** with the ESLint rules; it adds complementary coverage.
+- **Consistent with the spec's new Assumption.** The spec's final Assumption bullet says future drift-prevention guards SHOULD be ESLint rules rather than shell scripts. The existing script is grandfathered — this feature does not retroactively port it, but it does wire it so the spec's "unwired scripts are anti-precedent" claim becomes true at this commit.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|-------------|--------------|
+| **Delete the script** | Loses the `shared/` and `services/` coverage it provides. The ESLint rules do not cover those directories. Net loss. |
+| **Port the script to a Node module** | Doubles the delta of this feature without adding coverage (the ported script would be functionally identical). Good candidate for a later spec if motivation emerges. |
+| **Migrate the script's logic into the generalised drift-rule factory** | Would require expanding the factory's scope from `apps/*` to `apps/*` + `shared/*` + `services/*`, which reopens every scope decision in this spec and its predecessor. Rejected as out-of-proportion to the goal (wire one guard). |
+
+---
+
+## Decision 10: ADR record — updated scope *(revised 2026-04-20 during `/speckit.review`)*
+
+### Decision
+
+**Add a short ADR (1–2 paragraphs) to `docs/project_notes/decisions.md`** during the implementation task, capturing Decisions 1 *and* 6–9 as a single entry titled *"ADR-NNN: Drift-prevention guards as ESLint rules — generalised factory, wired meta-check, and grandfathered shell scripts"*. The entry names the precedent future guards should follow and lists the grandfathered exception (`check-no-geojson-feature.sh`).
+
+### Rationale
+
+Article VIII.3 requires significant technical choices to be documented with rationale. This decision set establishes *and* tightens the pattern future "guard-style" features will follow; pinning it in `decisions.md` avoids re-litigation. Replaces the original single-decision ADR (Decision 5) with the broader one reflecting the expanded scope.
+
+### Alternatives considered
+
+| Alternative | Why rejected |
+|-------------|--------------|
+| **Keep Decision 5's single-issue ADR; add nothing for the new decisions** | Understates the scope of the pattern the implementation PR will establish. A future maintainer reading only Decision 5's ADR would not learn that the factory+meta-check+wired-script triad is the intended shape. |
+| **Split into three separate ADRs (one per new decision)** | Creates three tiny ADRs on closely-related topics. A single ADR covering "drift-prevention guards: shape, wiring, exceptions" is the right unit. |
+
+---
+
 ## Open questions
 
-**None.** All four deferrals from `spec.md`'s Assumptions section are resolved:
+**None.** The four deferrals from `spec.md`'s original Assumptions section are resolved by Decisions 1–4. The three scope-expansion items folded in during `/speckit.review` are resolved by Decisions 6–9. ADR scope is captured by Decision 10.
 
 - Mechanism choice → Decision 1 (ESLint `no-restricted-syntax` generator).
-- Forbidden-name source → Decision 2 (parse `shared/utils/src/index.ts`).
-- Selector shape and coverage → Decision 3 (seven selectors).
-- Test harness → Decision 4 (Vitest + programmatic ESLint + fixture files).
+- Forbidden-name source → Decision 2 (parse each package's index barrel with a bounded transitive `export *` walk per Decision 7).
+- Selector shape and coverage → Decision 3 (seven selectors, package-agnostic).
+- Test harness → Decision 4 (Vitest + programmatic ESLint + fixture files), **with location per `/speckit.review` decision A1a: `shared/utils/tests/eslint-rules/`**.
+- Multi-package generalisation → Decision 6 (factory).
+- Transitive `export *` → Decision 7 (walk within package `src/`).
+- Wiring-forgotten meta-check → Decision 8 (plain Node script, `task lint` invocation).
+- `check-no-geojson-feature.sh` → Decision 9 (wire, don't rewrite).
+- ADR shape → Decision 10 (single combined ADR).
 
 ---
 
@@ -164,9 +284,11 @@ Article VIII.3 requires significant technical choices to be documented with rati
 
 | Question | Decision | Key FR / SC satisfied |
 |----------|----------|----------------------|
-| How is the guard implemented? | Config-generator module at `shared/eslint-rules/no-redeclare-utils-exports.cjs`, spread into `no-restricted-syntax` in each `apps/*/.eslintrc.cjs` | FR-001, FR-004, FR-005, SC-006 |
-| How does the guard know which names to forbid? | Parses `shared/utils/src/index.ts` at rule-init time using `typescript`'s AST | FR-006, FR-007, FR-010, SC-004 |
+| How is the guard implemented? | **Factory** at `shared/eslint-rules/drift-rule-factory.cjs` + five thin caller modules, each spread into `no-restricted-syntax` in each `apps/*/.eslintrc.cjs` | FR-001, FR-004, FR-005, FR-013, SC-006 |
+| How does the guard know which names to forbid? | Each caller module parses its package's index barrel at require time using `typescript`'s AST, **with a bounded transitive `export *` walk within the package's own `src/`** | FR-006, FR-007, FR-010, FR-015, SC-004, SC-011 |
 | How does the guard distinguish redeclaration from re-export? | Structural: AST selectors match only `ExportNamedDeclaration > <declaration>`, not specifier-based re-exports or `export *` | FR-002, FR-009, SC-003 |
-| How is the failure message shaped? | `'<N>' is exported by '@debrief/utils'. Do not redeclare it under apps/*. Replace this declaration with: import { <N> } from '@debrief/utils';` | FR-003, FR-008, SC-005 |
-| How is the rule tested? | Vitest + programmatic ESLint + real `.ts` fixtures under `shared/eslint-rules/__fixtures__/` | FR-011, FR-012, SC-007 |
-| How is the decision recorded? | ADR added to `docs/project_notes/decisions.md` during implementation | Article VIII.3 |
+| How is the failure message shaped? | `'<N>' is exported by '<@debrief/pkg>'. Do not redeclare it under apps/*. Replace this declaration with: import { <N> } from '<@debrief/pkg>';` (package name substituted per caller module) | FR-003, FR-008, FR-014, SC-005, SC-009 |
+| How does the monorepo guarantee the wiring is present everywhere? | Plain Node script `scripts/check-eslint-drift-wiring.cjs` invoked from `task lint`; asserts every `apps/*/.eslintrc.cjs` spreads every caller-module's `rules` array (identity comparison) | FR-016, FR-017, FR-018, SC-008 |
+| How is the pre-existing `check-no-geojson-feature.sh` enforced? | One-line addition to `task lint` invoking `bash scripts/check-no-geojson-feature.sh`; script logic unchanged | FR-019, SC-010 |
+| How is the rule tested? | Vitest + programmatic ESLint + real `.ts` fixtures under `shared/utils/tests/eslint-rules/__fixtures__/` (co-located with the `@debrief/utils` package per `/speckit.review` decision A1a) | FR-011, FR-012, FR-020, SC-007 |
+| How is the decision recorded? | Single combined ADR added to `docs/project_notes/decisions.md` during implementation, covering Decisions 1 + 6–9 | Article VIII.3 |

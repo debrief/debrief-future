@@ -1,10 +1,11 @@
-# Quickstart: Drift-Prevention Rule for `@debrief/utils` Re-duplication
+# Quickstart: Drift-Prevention Rules for `@debrief/*` Re-duplication
 
 **Feature**: 214-utils-drift-guard
 **Phase**: 1
 **Date**: 2026-04-20
+**Updated**: 2026-04-20 during `/speckit.review` — walks expanded to cover the four additional `@debrief/*` packages, the wiring-forgotten meta-check, and the wired-in `check-no-geojson-feature.sh`.
 
-This document shows how a contributor can — in about five minutes — run the guard, trigger a violation, observe the failure, and fix it. It doubles as a verification recipe for SC-001, SC-002, SC-003, SC-004, SC-005, SC-007.
+This document shows how a contributor can — in about ten minutes — run every guard component, trigger violations, observe the failures, and fix them. It doubles as a verification recipe for SC-001, SC-002, SC-003, SC-004, SC-005, SC-007, SC-008, SC-009, SC-010, SC-011.
 
 ---
 
@@ -194,21 +195,187 @@ This walk verifies that SC-005's "under 5 minutes" is easily achievable in the c
 
 ---
 
-## Walk 8 — End-to-end CI verification
+## Walk 9 — Verify generalised coverage across `@debrief/*` packages (SC-009)
 
-This is the verification reviewers should run on the implementation PR:
+Verify each of the four non-utils packages is covered. Each sub-walk: add a colliding export, run lint, observe the package-specific failure message, clean up.
+
+### 9a — `@debrief/schemas`
+
+Pick any name exported by `shared/schemas/src/generated/typescript/index.ts` — for example, `PlatformRecord`.
+
+```sh
+cat > apps/vscode/src/bad-schemas.ts <<'EOF'
+export type PlatformRecord = { id: string };
+EOF
+
+pnpm lint   # MUST fail; message MUST name '@debrief/schemas' (NOT '@debrief/utils')
+rm apps/vscode/src/bad-schemas.ts
+```
+
+### 9b — `@debrief/components`
+
+Pick any name exported by `shared/components/src/index.ts` — for example, `StacBrowser`.
+
+```sh
+cat > apps/web-shell/src/bad-components.ts <<'EOF'
+export const StacBrowser = () => null;
+EOF
+
+pnpm lint   # MUST fail; message MUST name '@debrief/components'
+rm apps/web-shell/src/bad-components.ts
+```
+
+### 9c — `@debrief/session-state` (exercises the transitive `export *` walk)
+
+Pick any name reached through `export *` forwards in `services/session-state/src/index.ts`. For example, a name exported from `./types/index.js` (which is reached via `export * from './types/index.js'` at the top of the barrel).
+
+```sh
+cat > apps/loader/src/bad-session-state.ts <<'EOF'
+export function getSessionStore(): never { throw new Error(); }
+EOF
+
+pnpm lint   # MUST fail; message MUST name '@debrief/session-state'
+rm apps/loader/src/bad-session-state.ts
+```
+
+**What this proves**: if the transitive `export *` walker is regressing, this walk would pass silently (wrong outcome). Its failure confirms the walker is contributing forwarded names to the forbidden set.
+
+### 9d — `@debrief/data`
+
+Pick a name from `shared/data/src/ts/index.ts` — for example, `loadRegistry`.
+
+```sh
+cat > apps/vscode/src/bad-data.ts <<'EOF'
+export function loadRegistry() { return null; }
+EOF
+
+pnpm lint   # MUST fail; message MUST name '@debrief/data'
+rm apps/vscode/src/bad-data.ts
+```
+
+**Expected (all four)**: each `pnpm lint` invocation fails with a message whose package-name substring matches the correct package (not `@debrief/utils`). If any sub-walk fails with the wrong package name, the caller module's `packageName` input is wired incorrectly.
+
+---
+
+## Walk 10 — Verify the wiring-forgotten meta-check (SC-008)
+
+This walk proves that a newly-introduced `apps/*` sibling without the drift-rule spreads fails the check.
+
+### 10a — Simulate a new sibling with broken wiring
+
+```sh
+mkdir -p apps/tutorial-sandbox
+cat > apps/tutorial-sandbox/.eslintrc.cjs <<'EOF'
+module.exports = {
+  root: false,
+  rules: {
+    // Deliberately NOT spreading any ...*DriftRules
+  },
+};
+EOF
+
+pnpm lint   # MAY pass (there's no src/ to lint in the sibling)
+node scripts/check-eslint-drift-wiring.cjs   # MUST fail
+```
+
+**Expected** (stderr of the check script):
+
+```text
+❌ ESLint drift-rule wiring check failed.
+
+The following apps/*/.eslintrc.cjs files are missing one or more drift-rule spreads:
+
+  apps/tutorial-sandbox/.eslintrc.cjs
+    Missing: ...utilsDriftRules        (expected from shared/eslint-rules/no-redeclare-utils-exports.cjs)
+    Missing: ...schemasDriftRules      (expected from shared/eslint-rules/no-redeclare-schemas-exports.cjs)
+    Missing: ...componentsDriftRules   (expected from shared/eslint-rules/no-redeclare-components-exports.cjs)
+    Missing: ...sessionStateDriftRules (expected from shared/eslint-rules/no-redeclare-session-state-exports.cjs)
+    Missing: ...dataDriftRules         (expected from shared/eslint-rules/no-redeclare-data-exports.cjs)
+```
+
+### 10b — Fix the wiring
+
+Replace the sibling's `.eslintrc.cjs` content with the template from `contracts/rule-contract.md` §3.2. Re-run:
+
+```sh
+node scripts/check-eslint-drift-wiring.cjs   # MUST pass
+```
+
+### 10c — Clean up
+
+```sh
+rm -rf apps/tutorial-sandbox
+node scripts/check-eslint-drift-wiring.cjs   # MUST pass (no new siblings)
+```
+
+### 10d — Regression sub-walk
+
+Temporarily remove one `<pkg>DriftRules` spread from `apps/vscode/.eslintrc.cjs`:
+
+```sh
+node scripts/check-eslint-drift-wiring.cjs   # MUST fail, naming only the one missing spread
+# Restore the spread
+node scripts/check-eslint-drift-wiring.cjs   # MUST pass
+```
+
+**Expected**: the check precisely names the one missing spread from the one offending file — not every spread, not every file.
+
+---
+
+## Walk 11 — Verify the `check-no-geojson-feature.sh` wiring (SC-010)
+
+This walk proves that the previously-unwired shell script is now invoked by `task lint`.
+
+### 11a — Clean baseline
+
+```sh
+bash scripts/check-no-geojson-feature.sh   # MUST pass — zero GeoJSONFeature redeclarations at t=0
+```
+
+### 11b — Introduce a violation outside the script's exclusion list
+
+The script already excludes `shared/utils/src/types.ts` (the canonical home). Add a violation anywhere else — for example:
+
+```sh
+cat > shared/components/src/bad-geojson.ts <<'EOF'
+export interface GeoJSONFeature { foo: string; }
+EOF
+
+bash scripts/check-no-geojson-feature.sh   # MUST fail with the script's error output
+task lint                                  # MUST also fail (the script is wired into task lint)
+rm shared/components/src/bad-geojson.ts
+task lint                                  # MUST pass again
+```
+
+**Expected**: both `scripts/check-no-geojson-feature.sh` and `task lint` fail on introduction and pass after removal. If only the script fails but `task lint` passes, the Taskfile wiring from `contracts/rule-contract.md` §8.1 is absent.
+
+### 11c — Note on scope
+
+Unlike the ESLint drift rules (which enforce only on `apps/*`), this script enforces across `apps/`, `shared/`, and `services/`. A violation introduced in any of those directories (outside the script's exclusion list) causes the guard to fire.
+
+---
+
+## Walk 12 — End-to-end CI verification
+
+This is the verification reviewers should run on the implementation PR. It exercises every guard component in aggregate.
 
 ```sh
 task verify
 ```
 
-**Expected**: exits with status 0 on the `main`-plus-implementation tree. Then, on a branch that intentionally contains a violation (e.g., a throwaway commit adding an `apps/vscode/src/utils/bounds.ts`):
+**Expected**: exits with status 0 on the `main`-plus-implementation tree. Then, on a branch that intentionally contains any of the violations exercised by Walks 2 / 9 / 10 / 11:
 
 ```sh
 task verify
 ```
 
-**Expected**: fails at the `lint` step with the `no-restricted-syntax` error. This mirrors what CI will do on a bad PR.
+**Expected**: fails at the `lint` step. Depending on which violation was introduced:
+
+- ESLint drift-rule violation → `no-restricted-syntax` error with the correct package name in the message.
+- Missing `.eslintrc.cjs` spread → stderr report from `scripts/check-eslint-drift-wiring.cjs`.
+- `interface GeoJSONFeature` redeclaration → output from `scripts/check-no-geojson-feature.sh`.
+
+This mirrors what CI will do on a bad PR. If `task verify` does not aggregate all three checks, the `Taskfile.yml` wiring is incomplete (see `contracts/rule-contract.md` §7.4 and §8.1).
 
 ---
 
@@ -216,11 +383,13 @@ task verify
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| `pnpm lint` passes when it should fail | The `apps/*/.eslintrc.cjs` for the package containing your test file doesn't spread `utilsDriftRules`. | Check §3 of `contracts/rule-contract.md` and the specific `.eslintrc.cjs`. |
-| Rule fires on a legitimate `export { x } from '@debrief/utils'` | Bug in the selector shape — this is never expected. | Open an issue referencing §4.3 of `contracts/rule-contract.md` and `research.md` Decision 3. |
-| Rule fails with "shared/utils/src/index.ts not found" | Running from a directory where the relative path resolves incorrectly, or `shared/utils/src/index.ts` was deleted or moved. | Run from repo root. If `index.ts` moved, update `no-redeclare-utils-exports.cjs` accordingly. |
-| Message contains ANSI escape codes or multi-line content | Regression against FR-008. | Fix the template in `no-redeclare-utils-exports.cjs`. |
-| Adding a new export to `@debrief/utils` does not extend the guard | The rule module is using a hand-maintained list somewhere (bug). | Inspect `no-redeclare-utils-exports.cjs`; FR-006 and FR-010 forbid hand-maintained lists. |
+| `pnpm lint` passes when it should fail | The `apps/*/.eslintrc.cjs` for the package containing your test file doesn't spread one of the `<pkg>DriftRules`. | Check §3 of `contracts/rule-contract.md` and the specific `.eslintrc.cjs`. Run `node scripts/check-eslint-drift-wiring.cjs` to catch this automatically. |
+| Rule fires on a legitimate `export { x } from '@debrief/<pkg>'` | Bug in the selector shape — this is never expected. | Open an issue referencing §4.3 of `contracts/rule-contract.md` and `research.md` Decision 3. |
+| Rule fails with "drift-rule-factory: indexPath not readable at <path>" | A package's index barrel was moved or deleted, or the caller module's `indexPath` input is wrong. | Run from repo root. If the barrel moved, update the corresponding `no-redeclare-<pkg>-exports.cjs` caller module. |
+| Message contains ANSI escape codes or multi-line content | Regression against FR-008. | Fix the template in `drift-rule-factory.cjs`. |
+| Adding a new export to a `@debrief/*` package does not extend the guard | Either a hand-maintained list snuck in (bug) or the transitive `export *` walker is not reaching the forwarded name. | Inspect `drift-rule-factory.cjs`; FR-006 / FR-010 / FR-015 forbid hand-maintained lists and require the transitive walk. |
+| `check-eslint-drift-wiring.cjs` reports a missing spread but the spread is visibly present in the `.eslintrc.cjs` source | Identity-comparison mismatch — most commonly caused by importing the same caller module through two different relative paths (breaks require-cache identity). | Normalise the require path in the offending `.eslintrc.cjs` to match the path the check script uses (`../../shared/eslint-rules/no-redeclare-<pkg>-exports.cjs`). |
+| `check-no-geojson-feature.sh` reports a violation on clean `main` | A pre-existing regression has been introduced since the last run. | Fix the offending file (not the script). The script's exclusion list is narrow and deliberate. |
 
 ---
 
@@ -230,6 +399,9 @@ task verify
 - Walk 3 — ≤ 1 minute.
 - Walk 5 — ≤ 3 minutes (the revert step is the slowest part).
 - Walk 7 — requires an editor; optional.
-- Walk 8 — ≤ 2 minutes on a warm cache.
+- Walks 9a–9d — ≤ 3 minutes combined (one package per sub-walk, ≤ 45 s each).
+- Walk 10 — ≤ 2 minutes (the mkdir / rm-rf is the slowest part).
+- Walk 11 — ≤ 1 minute.
+- Walk 12 — ≤ 2 minutes on a warm cache.
 
-**Total**: under 10 minutes end-to-end, well within SC-006's per-lint-invocation budget of ≤ 5 s added overhead.
+**Total**: under 15 minutes end-to-end, comfortably within SC-006's per-lint-invocation budget of ≤ 5 s added overhead (per-invocation cost, not per-walk).
