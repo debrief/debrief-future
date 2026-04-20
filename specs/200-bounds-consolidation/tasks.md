@@ -129,7 +129,7 @@
 
 ### PR Creation
 
-- [ ] T025 Create PR and publish blog: run `/speckit.pr` — opens the feature PR in `debrief-future` carrying all five Phase-2 Foundation commits + the Phase-3 deletions + the Phase-6 rewrite + the captured evidence, and publishes `shipped-post.md` to `debrief.github.io` `specs/200-bounds-consolidation/tasks.md`
+- [x] T025 Create PR and publish blog: run `/speckit.pr` — opens the feature PR in `debrief-future` carrying all five Phase-2 Foundation commits + the Phase-3 deletions + the Phase-6 rewrite + the captured evidence, and publishes `shipped-post.md` to `debrief.github.io` `specs/200-bounds-consolidation/tasks.md`
 
 **Task T025 must run last.** It depends on every evidence and media task above being complete. The PR description should cite SC-001 through SC-009 from the spec and link each to the evidence artefact that verifies it.
 
