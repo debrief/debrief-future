@@ -8,7 +8,10 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe.skip('Log Panel', () => { // blocked: webview iframe (#143)
+// Blocked by issue #143 (webview iframe selector instability in openvscode-server).
+// Converted from `skip` to `fixme` so CI flags it as a known-pending suite
+// rather than silently dropping the whole describe block. Feature 176 decision 9A.
+test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,

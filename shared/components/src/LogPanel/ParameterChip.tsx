@@ -6,6 +6,7 @@
 
 import React from 'react';
 import type { ParameterChipProps } from './types';
+import { LOG_PANEL_STRINGS } from './strings';
 
 /** Icon prefix per ParamType. */
 const PARAM_ICONS: Record<string, string> = {
@@ -56,8 +57,12 @@ export function ParameterChip({ chip, className }: ParameterChipProps): React.Re
       )}
       <span className="log-panel__chip-name">{chip.name}</span>
       <span className="log-panel__chip-value" data-testid={`tune-param-${chip.name}`}>{formatChipValue(chip)}</span>
-      {!chip.isDefault && (
-        <span className="log-panel__chip-marker" aria-label="non-default value" title="Non-default value">
+      {chip.isNonDefault && (
+        <span
+          className="log-panel__chip-marker"
+          aria-label={LOG_PANEL_STRINGS.chipNonDefaultTooltip}
+          title={LOG_PANEL_STRINGS.chipNonDefaultTooltip}
+        >
           {'\u25CF'}
         </span>
       )}

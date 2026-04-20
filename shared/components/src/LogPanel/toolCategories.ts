@@ -23,7 +23,7 @@ export const TOOL_CATEGORY_CONFIGS: Record<ToolCategory, ToolCategoryConfig> = {
 /**
  * Fallback config for unknown tools.
  */
-export const UNKNOWN_CATEGORY_CONFIG: Omit<ToolCategoryConfig, 'category'> & { category: null } = {
+export const UNKNOWN_CATEGORY_CONFIG: ToolCategoryConfig = {
   category: null,
   background: '#e5e5e5',
   glyph: '',
@@ -61,9 +61,7 @@ const TOOL_ID_TO_CATEGORY: Record<string, ToolCategory> = {
  * Resolve the tool category for a given tool name.
  * Returns the ToolCategoryConfig if known, or the fallback config.
  */
-export function resolveToolCategory(
-  toolName: string
-): ToolCategoryConfig | (Omit<ToolCategoryConfig, 'category'> & { category: null }) {
+export function resolveToolCategory(toolName: string): ToolCategoryConfig {
   const category = TOOL_ID_TO_CATEGORY[toolName];
   if (category) {
     return TOOL_CATEGORY_CONFIGS[category];

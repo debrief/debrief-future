@@ -26,9 +26,12 @@ export type ParamType = 'colour' | 'number' | 'boolean' | 'range' | 'enum';
 
 /**
  * Static config for a tool category's visual properties. Feature: 176-log-panel-ux
+ *
+ * `category` is nullable to accommodate the neutral-grey fallback for tools
+ * that have no manifest entry yet.
  */
 export interface ToolCategoryConfig {
-  readonly category: ToolCategory;
+  readonly category: ToolCategory | null;
   readonly background: string;
   readonly glyph: string;
   readonly label: string;
@@ -41,7 +44,7 @@ export interface ParamChipData {
   readonly name: string;
   readonly value: unknown;
   readonly paramType: ParamType | null;
-  readonly isDefault: boolean;
+  readonly isNonDefault: boolean;
   readonly unit?: string | null;
 }
 
