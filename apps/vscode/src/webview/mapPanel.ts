@@ -36,7 +36,7 @@ import {
   type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
-import { calculateBounds, mergeBounds } from '../utils/bounds';
+import { calculateBounds, mergeBounds } from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
