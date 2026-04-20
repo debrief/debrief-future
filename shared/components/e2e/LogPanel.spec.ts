@@ -92,9 +92,10 @@ test.describe('LogPanel — theme variants (evidence)', () => {
       await page.goto(withTheme(storyUrl('timeline-default'), theme));
       await page.waitForSelector('.log-panel__entry');
       await expect(page.locator('.log-panel__entry').first()).toBeVisible();
-      await page.screenshot({
+      // Screenshot the 320px panel container, not the full iframe body.
+      const panel = page.locator('#storybook-root > div').first();
+      await panel.screenshot({
         path: `${EVIDENCE_DIR}/component-${theme}.png`,
-        fullPage: true,
       });
     });
   }
@@ -102,18 +103,27 @@ test.describe('LogPanel — theme variants (evidence)', () => {
   test('edge-cases story captures edge-cases.png', async ({ page }) => {
     await page.goto(withTheme(storyUrl('edge-cases'), 'light'));
     await page.waitForSelector('.log-panel__entry');
-    await page.screenshot({
+    const panel = page.locator('#storybook-root > div').first();
+    await panel.screenshot({
       path: `${EVIDENCE_DIR}/edge-cases.png`,
-      fullPage: true,
     });
   });
 
   test('disabled-card story captures disabled-state.png', async ({ page }) => {
     await page.goto(withTheme(storyUrl('disabled-card'), 'light'));
     await page.waitForSelector('.log-panel__entry--disabled');
-    await page.screenshot({
+    const panel = page.locator('#storybook-root > div').first();
+    await panel.screenshot({
       path: `${EVIDENCE_DIR}/disabled-state.png`,
-      fullPage: true,
+    });
+  });
+
+  test('all-categories captures all-categories.png', async ({ page }) => {
+    await page.goto(withTheme(storyUrl('all-categories'), 'light'));
+    await page.waitForSelector('.log-panel__entry');
+    const panel = page.locator('#storybook-root > div').first();
+    await panel.screenshot({
+      path: `${EVIDENCE_DIR}/all-categories.png`,
     });
   });
 });
