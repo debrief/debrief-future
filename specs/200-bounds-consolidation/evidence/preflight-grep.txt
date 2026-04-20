@@ -1,0 +1,40 @@
+# Pre-flight grep sweep (T001) — consumer set for apps/vscode/src/utils/bounds.ts
+
+**Captured**: before any source change.
+**Command**: `rg -n 'utils/bounds|calculateBounds|mergeBounds' apps/vscode -g '*.ts'`
+
+## Raw output
+
+```
+apps/vscode/src/utils/bounds.ts:19:export function calculateBounds(features: GeoJSONFeature[]): Bounds | null {
+apps/vscode/src/utils/bounds.ts:52:export function mergeBounds(a: Bounds | null, b: Bounds | null): Bounds | null {
+apps/vscode/src/webview/mapPanel.ts:39:import { calculateBounds, mergeBounds } from '../utils/bounds';
+apps/vscode/src/webview/mapPanel.ts:1250:      const newBounds = calculateBounds(parseResult.features);
+apps/vscode/src/webview/mapPanel.ts:1251:      const mergedBounds = mergeBounds(
+apps/vscode/tests/unit/bounds.test.ts:7:  calculateBounds,
+apps/vscode/tests/unit/bounds.test.ts:8:  mergeBounds,
+apps/vscode/tests/unit/bounds.test.ts:11:} from '../../src/utils/bounds';
+apps/vscode/tests/unit/bounds.test.ts:14:describe('calculateBounds', ...
+... (remaining lines in bounds.test.ts reference the two symbols only)
+```
+
+## Exhaustive consumer set
+
+Two files reference `apps/vscode/src/utils/bounds.ts` or the `calculateBounds` /
+`mergeBounds` symbols in `apps/vscode/`:
+
+1. `apps/vscode/src/webview/mapPanel.ts` — **production consumer**. Imports both
+   symbols via `'../utils/bounds'`. Two call sites:
+   - line 1250: `calculateBounds(parseResult.features)` — plot-open path.
+   - line 1251: `mergeBounds(currentPlot.bbox, newBounds)` — plot-open path.
+2. `apps/vscode/tests/unit/bounds.test.ts` — **duplicate test file**. Imports
+   both symbols via `'../../src/utils/bounds'`.
+
+The definitions inside `apps/vscode/src/utils/bounds.ts` (lines 19, 52) are
+self-references, not external consumers.
+
+## Conclusion — matches research R3
+
+Research R3 enumerated the same two consumers. No additional consumer exists.
+FR-003 and FR-004 (delete `bounds.ts` and the duplicate test) are safe to
+execute after T009 flips `mapPanel.ts`'s import to `@debrief/utils`.
