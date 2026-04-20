@@ -34,6 +34,7 @@
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
+    "@debrief/schemas": "workspace:*",
     "@debrief/utils": "workspace:*",
     "better-sse": "^0.13.0",
     "cors": "^2.8.5",

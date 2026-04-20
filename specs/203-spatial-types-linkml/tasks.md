@@ -68,17 +68,17 @@ T003, T004, T005 in parallel — all touch distinct fixture files.
 
 ### Tests-First (TDD per Constitution Article VII)
 
-- [ ] T008 [P][test] Write converter round-trip unit tests per `contracts/converter-contracts.md` (10 edge cases incl. antimeridian, poles, London/Tokyo/NY/Sydney, sub-metre precision) `shared/utils/src/__tests__/spatial-converters.test.ts`
-- [ ] T009 [P][test] Write validator unit tests per `contracts/validator-contracts.md` (bounds cases for `validateCoordinate`, 4-corner cardinality for `validateViewportPolygon`, centre averaging for `calculateViewportCenter`) `shared/utils/src/__tests__/spatial-validators.test.ts`
-- [ ] T010 [P][test] Write `coerceViewport` unit tests per `contracts/persistence-migration.md` §Contract assertions — 6 cases: legacy tuple form, current object form, null/undefined, bad coordinates length, malformed entry, bad zoom `services/session-state/src/persistence/__tests__/coerceViewport.test.ts`
+- [x] T008 [P][test] Wrote converter round-trip unit tests per `contracts/converter-contracts.md` (10 edge cases incl. antimeridian, poles, London/Tokyo/NY/Sydney, sub-metre precision) `shared/utils/tests/spatial-converters.test.ts`
+- [x] T009 [P][test] Wrote validator unit tests per `contracts/validator-contracts.md` (bounds cases for `validateCoordinate`, 4-corner cardinality for `validateViewportPolygon`, centre averaging for `calculateViewportCenter`) `shared/utils/tests/spatial-validators.test.ts`
+- [x] T010 [P][test] Wrote `coerceViewport` unit tests per `contracts/persistence-migration.md` §Contract assertions — 6 cases: legacy tuple form, current object form, null/undefined, bad coordinates length, malformed entry, bad zoom `services/session-state/tests/unit/persistence/coerceViewport.test.ts`
 
 ### Implementation
 
-- [ ] T011 Implement `toGeoJSONCoord` and `fromGeoJSONCoord` with JSDoc explicitly stating GeoJSON axis order (RFC 7946 §3.1.1) per `contracts/converter-contracts.md` `shared/utils/src/spatial-converters.ts`
-- [ ] T012 Implement `validateCoordinate`, `validateViewportPolygon`, `calculateViewportCenter` operating on object-form `Coordinate` per `contracts/validator-contracts.md`; port logic from existing `services/session-state/src/types/spatial.ts` but adapt to object fields `shared/utils/src/spatial-validators.ts`
-- [ ] T013 Re-export new modules from the `@debrief/utils` public barrel `shared/utils/src/index.ts`
-- [ ] T014 Implement `coerceViewport` as a sibling to the existing `coerceEpoch` pattern at `load.ts:186-192`; annotate the legacy-tuple branch with `REMOVABLE:` comment per `contracts/persistence-migration.md` `services/session-state/src/persistence/load.ts`
-- [ ] T015 Run T008, T009, T010 suites and confirm all assertions pass before proceeding
+- [x] T011 Implemented `toGeoJSONCoord` and `fromGeoJSONCoord` with JSDoc explicitly stating GeoJSON axis order (RFC 7946 §3.1.1) per `contracts/converter-contracts.md` `shared/utils/src/spatial-converters.ts`
+- [x] T012 Implemented `validateCoordinate`, `validateViewportPolygon`, `calculateViewportCenter` operating on object-form `Coordinate` per `contracts/validator-contracts.md` `shared/utils/src/spatial-validators.ts`
+- [x] T013 Re-exported new modules from the `@debrief/utils` public barrel `shared/utils/src/index.ts`
+- [x] T014 Implemented `coerceViewport` as a sibling to `coerceEpoch`; legacy-tuple branch annotated `REMOVABLE:` per `contracts/persistence-migration.md` — not yet hooked up (Phase 3 T021 replaces the blind cast) `services/session-state/src/persistence/load.ts`
+- [x] T015 Ran T008, T009, T010 suites — all 32 tests green
 
 **Parallel example**:
 ```

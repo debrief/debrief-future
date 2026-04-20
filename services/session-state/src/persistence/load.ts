@@ -4,6 +4,7 @@
  */
 
 import { readFile } from 'fs/promises';
+import type { ViewportPolygon as SchemaViewportPolygon } from '@debrief/schemas';
 import type { SessionStoreApi } from '../store/index.js';
 import type { SessionState } from '../types/index.js';
 import { isVersionCompatible, isFutureVersion, migrateSession } from './schema.js';
@@ -189,6 +190,64 @@ function coerceEpoch(value: unknown): number | null {
     return (value as { epoch: number }).epoch;
   }
   return null;
+}
+
+/**
+ * Coerce an arbitrary persisted value into a ViewportPolygon or null.
+ *
+ * Handles both the current object-form shape (`{ longitude, latitude }`) and
+ * the legacy tuple-form shape that predates feature 203 (`[lon, lat]`).
+ * Returns null when the input is not a recognisable viewport — callers leave
+ * the viewport unset, which is loud enough to notice in the map UI but not
+ * catastrophic.
+ *
+ * Sibling to `coerceEpoch` — same "sniff shape, convert inline" pattern.
+ *
+ * REMOVABLE: the legacy-tuple branch may be deleted once all production
+ * sessions have rehydrated past SCHEMA_VERSION 1.1.0.
+ */
+export function coerceViewport(value: unknown): SchemaViewportPolygon | null {
+  if (value == null || typeof value !== 'object') return null;
+  const raw = value as Record<string, unknown>;
+  const coordinates = raw.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length !== 4) return null;
+
+  const migrated = coordinates.map((c) => {
+    // REMOVABLE: legacy tuple form (feature 203 SCHEMA_VERSION 1.0.0 → 1.1.0).
+    if (isLegacyCoordinateTuple(c)) {
+      return { longitude: c[0], latitude: c[1] };
+    }
+    if (
+      c != null &&
+      typeof c === 'object' &&
+      'longitude' in c &&
+      'latitude' in c &&
+      typeof (c as { longitude: unknown }).longitude === 'number' &&
+      typeof (c as { latitude: unknown }).latitude === 'number'
+    ) {
+      return c as { longitude: number; latitude: number };
+    }
+    return null;
+  });
+
+  if (migrated.some((c) => c == null)) return null;
+
+  const result: SchemaViewportPolygon = {
+    coordinates: migrated as SchemaViewportPolygon['coordinates'],
+  };
+  if (typeof raw.zoom === 'number') {
+    result.zoom = raw.zoom;
+  }
+  return result;
+}
+
+function isLegacyCoordinateTuple(value: unknown): value is [number, number] {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === 'number' &&
+    typeof value[1] === 'number'
+  );
 }
 
 /**
