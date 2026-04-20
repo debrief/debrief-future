@@ -194,6 +194,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                   geometry: { type: 'Point', coordinates: [0, 0] },
                   properties: { __datasets: payload.datasets },
                 },
+                // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               ] as unknown as Array<import('@debrief/utils').SafeFeature>,
             },
           },
@@ -281,6 +282,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           for (const feature of allFeatures) {
             const props = (feature as { properties?: unknown } | null)?.properties;
             if (props !== null && typeof props === 'object') {
+              // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               const propsMap = props as Record<string, unknown>;
               const hasDatasets =
                 Array.isArray(propsMap['__datasets']) &&
@@ -364,6 +366,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           for (const feature of allFeatures) {
             const props = (feature as { properties?: unknown } | null)?.properties;
             if (props !== null && typeof props === 'object') {
+              // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               const propsMap = props as Record<string, unknown>;
               const hasDatasets =
                 Array.isArray(propsMap['__datasets']) &&

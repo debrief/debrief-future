@@ -1,3 +1,5 @@
+const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+
 module.exports = {
   root: true,
   env: {
@@ -37,7 +39,7 @@ module.exports = {
       },
     ],
     'no-restricted-syntax': [
-      'warn',
+      'error',
       {
         selector: "TSAsExpression[typeAnnotation.typeName.name='Record']",
         message:
@@ -48,6 +50,7 @@ module.exports = {
         message:
           'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
       },
+      ...utilsDriftRules,
     ],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-inner-declarations': 'warn',

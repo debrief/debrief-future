@@ -561,6 +561,7 @@ export default function App() {
               geometry: JSON.parse(saved.geometry) as Feature['geometry'],
               properties: {
                 ...(f.properties ?? {}),
+                // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
                 ...(saved.properties ? JSON.parse(saved.properties) as Record<string, unknown> : {}),
               },
             };

@@ -8,8 +8,11 @@ export type { GeoJSONFeature };
 
 /**
  * Error codes for categorization.
+ *
+ * Loader-local codes distinct from `@debrief/utils`'s `ErrorCode` union.
+ * Kept separate to avoid the drift-guard redeclaration; see spec #214.
  */
-export type ErrorCode =
+export type LoaderErrorCode =
   | 'PARSE_ERROR'
   | 'STORE_ERROR'
   | 'WRITE_ERROR'
@@ -44,7 +47,7 @@ export interface LoadResult {
  */
 export interface LoaderError {
   /** Error code for categorization */
-  code: ErrorCode;
+  code: LoaderErrorCode;
 
   /** User-friendly error message */
   message: string;

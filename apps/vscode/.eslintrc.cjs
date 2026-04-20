@@ -1,4 +1,5 @@
 const { rules: snakeCaseRules } = require('../../shared/eslint-rules/provenance-snake-case.cjs');
+const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
 
 module.exports = {
   root: true,
@@ -43,7 +44,7 @@ module.exports = {
       },
     ],
     'no-restricted-syntax': [
-      'warn',
+      'error',
       {
         selector: "TSAsExpression[typeAnnotation.typeName.name='Record']",
         message:
@@ -55,6 +56,7 @@ module.exports = {
           'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
       },
       ...snakeCaseRules,
+      ...utilsDriftRules,
     ],
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/await-thenable': 'error',

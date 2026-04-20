@@ -495,6 +495,7 @@ export function createMockCalcService(): MockCalcService {
                           .join('-'));
                         datasets.push({
                           filename: `${toolId}-${srcNames}.dataset.json`,
+                          // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
                           envelope: envelope as unknown as Record<string, unknown>,
                         });
                       }
