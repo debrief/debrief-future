@@ -37,12 +37,16 @@ export declare function groupEntriesByFeature(entries: TimelineEntry[], featureN
 }>;
 /**
  * Format an ISO 8601 duration to a human-readable string.
- * e.g., "PT0.5S" → "500ms", "PT1M2S" → "1m 2s", "PT0.25S" → "250ms"
- * Feature 176: sub-second durations now display in milliseconds.
+ *
+ * Feature 176 (FR-013):
+ * - Sub-second values display as "Xms" (e.g. "250ms").
+ * - Whole-seconds-only values display as "X.Xs" (e.g. "1.0s", "30.0s").
+ * - Mixed h/m/s values display each unit ("1h 30m 15s").
  */
 export declare function formatDuration(isoDuration: string): string;
 /**
- * Format an ISO 8601 timestamp to a short display string.
+ * Format an ISO 8601 timestamp as "HH:MM:SS UTC" per FR-014.
+ * Timestamps are always rendered in UTC regardless of the viewer's timezone.
  */
 export declare function formatTimestamp(isoTimestamp: string): string;
 /**

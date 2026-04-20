@@ -7,14 +7,10 @@ export declare const TOOL_CATEGORY_CONFIGS: Record<ToolCategory, ToolCategoryCon
 /**
  * Fallback config for unknown tools.
  */
-export declare const UNKNOWN_CATEGORY_CONFIG: Omit<ToolCategoryConfig, 'category'> & {
-    category: null;
-};
+export declare const UNKNOWN_CATEGORY_CONFIG: ToolCategoryConfig;
 /**
  * Resolve the tool category for a given tool name.
  * Returns the ToolCategoryConfig if known, or the fallback config.
  */
-export declare function resolveToolCategory(toolName: string): ToolCategoryConfig | (Omit<ToolCategoryConfig, 'category'> & {
-    category: null;
-});
+export declare function resolveToolCategory(toolName: string): ToolCategoryConfig;
 //# sourceMappingURL=toolCategories.d.ts.map

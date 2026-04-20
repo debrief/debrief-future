@@ -84,7 +84,12 @@ export declare const LOG_PANEL_STRINGS: {
     readonly categorySnapshotLabel: "Snapshot";
     readonly categoryUnknownLabel: "Other";
     readonly chipNonDefaultTooltip: "Non-default value";
+    readonly trackBadgeDeletedSuffix: "deleted";
     readonly rationaleTooltip: (rationale: string) => string;
     readonly durationMs: (ms: number) => string;
+    readonly noParametersLabel: "No parameters";
+    readonly manualCheckpointLabel: "Manual checkpoint";
+    readonly paramOverflowLabel: (count: number) => string;
+    readonly cardAriaLabel: (step: number, toolName: string) => string;
 };
 //# sourceMappingURL=strings.d.ts.map
