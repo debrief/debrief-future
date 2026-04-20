@@ -1,0 +1,67 @@
+
+
+# Slot: title 
+
+
+
+URI: [debrief:slot/title](https://debrief.info/schemas/slot/title)
+Alias: title
+
+<!-- no inheritance hierarchy -->
+
+
+
+
+
+## Applicable Classes
+
+| Name | Description | Modifies Slot |
+| --- | --- | --- |
+| [DatasetEntry](../classes/DatasetEntry.md) | Standard envelope for all tool result datasets, matching the runtime DatasetE... |  no  |
+| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
+| [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
+
+
+
+
+
+
+## Properties
+
+* Range: [String](../types/String.md)
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | debrief:title |
+| native | debrief:title |
+
+
+
+
+## LinkML Source
+
+<details>
+```yaml
+name: title
+alias: title
+domain_of:
+- PlotSummary
+- StacItemSummary
+- DatasetEntry
+range: string
+
+```
+</details>
