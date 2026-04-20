@@ -1,0 +1,20 @@
+# GeoJSONFeature guard transcript — spec #214 / US6
+
+Demonstrates that `scripts/check-no-geojson-feature.sh` is now invoked by
+`task lint` and fails when a local `interface GeoJSONFeature` is introduced
+under shared/, apps/, or services/.
+
+=== Step 1 — introduce violation in shared/components/src/drift-demo-geojson.ts ===
++ bash scripts/check-no-geojson-feature.sh
+❌ GeoJSONFeature regression guard failed!
+
+The following files define a local GeoJSONFeature interface.
+Use SafeFeature from @debrief/utils or schema types from @debrief/schemas instead.
+
+shared/components/src/drift-demo-geojson.ts:1:export interface GeoJSONFeature { foo: string; }
+exit=1
+
+=== Step 2 — remove the violation ===
++ bash scripts/check-no-geojson-feature.sh
+✅ No local GeoJSONFeature definitions found (regression guard passed)
+exit=0

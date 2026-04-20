@@ -1,0 +1,2 @@
+✓ check-eslint-drift-wiring: all 5 drift-rule spread(s) are present in every apps/*/.eslintrc.cjs.
+---exit=0---
