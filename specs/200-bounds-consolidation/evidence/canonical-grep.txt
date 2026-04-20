@@ -1,0 +1,62 @@
+# Canonical-implementation grep evidence (T012)
+
+Captured after Phase 3 (T009–T011) landed; state reflects the import flip
+in `apps/vscode/src/webview/mapPanel.ts` and the deletion of
+`apps/vscode/src/utils/bounds.ts` + `apps/vscode/tests/unit/bounds.test.ts`.
+
+---
+
+## SC-001 — exactly one `calculateBounds` definition under `shared/utils/` + `apps/`
+
+```
+$ grep -rn 'export function calculateBounds' --include='*.ts' shared/utils/ apps/
+shared/utils/src/bounds.ts:118:export function calculateBounds(
+```
+
+**Result**: 1 match. ✓ (The separate `shared/components/src/utils/bounds.ts`
+implementation is legitimately out of scope per spec v2 "Out of Scope" — it
+consumes LinkML-typed `DebriefFeature` arrays and carries additional helpers;
+the grep scope above deliberately excludes `shared/components`.)
+
+## SC-001 — exactly one `mergeBounds` definition under `shared/utils/` + `apps/`
+
+```
+$ grep -rn 'export function mergeBounds' --include='*.ts' shared/utils/ apps/
+shared/utils/src/bounds.ts:156:export function mergeBounds(a: Bounds | null, b: Bounds | null): Bounds | null {
+```
+
+**Result**: 1 match. ✓
+
+## SC-002 — no `bounds.ts` or `bounds.test.ts` under `apps/vscode`
+
+```
+$ find apps/vscode -name 'bounds.ts' -o -name 'bounds.test.ts'
+(no output)
+```
+
+**Result**: 0 matches. ✓
+
+---
+
+## Import-path check (C3, FR-005)
+
+```
+$ grep -n "calculateBounds\|mergeBounds\|boundsToLeaflet" apps/vscode/src/webview/mapPanel.ts
+```
+
+After Phase 3:
+
+```
+39:import { calculateBounds, mergeBounds } from '@debrief/utils';
+1250:      const newBounds = calculateBounds(parseResult.features);
+1251:      const mergedBounds = mergeBounds(
+```
+
+(Phase 6 will add `boundsToLeaflet` + the `fitToSelection` rewrite.)
+
+**Result**: no reference to `'../utils/bounds'`. ✓
+
+---
+
+Captured at git SHA `5a836e3b36442c0186bb8f27ba946ffc917145ed`, UTC
+`2026-04-20T14:23:24Z`.

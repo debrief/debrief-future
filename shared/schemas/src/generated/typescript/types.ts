@@ -68,7 +68,7 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-    
+
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
@@ -80,6 +80,13 @@ export enum PointShapeEnum {
     /** Cross/plus shape */
     cross = "cross",
 };
+/**
+* Template-literal derivation of the permissible point-marker shapes
+* from PointShapeEnum. Narrows the `symbol` field on PositionStyle /
+* PositionStyleOverride so TypeScript rejects an unknown shape at
+* compile time (Feature 201 / FR-014).
+*/
+export type PointShape = `${PointShapeEnum}`;
 /**
 * Predefined named colours for styling tool parameters
 */
@@ -573,7 +580,7 @@ export interface PositionStyle {
     /** Whether to display a symbol at positions */
     show_symbol: boolean,
     /** Shape to use for position symbols */
-    symbol: string,
+    symbol: PointShape,
     /** Whether to display labels at positions */
     show_label: boolean,
 }
@@ -586,7 +593,7 @@ export interface PositionStyleOverride {
     /** Override whether to show symbol (null = use default/interval) */
     show_symbol?: boolean,
     /** Override symbol shape */
-    symbol?: string,
+    symbol?: PointShape,
     /** Override whether to show label */
     show_label?: boolean,
     /** Custom label text (null = use timestamp) */

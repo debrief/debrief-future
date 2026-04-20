@@ -44,6 +44,7 @@ export type {
   SafeGeometry,
   SafeFeature,
   SafeFeatureCollection,
+  PointShape,
   PositionStyle,
   PositionStyleOverride,
   ResolvedPositionStyle,
@@ -52,6 +53,12 @@ export type {
   DataSeries,
   DatasetEnvelope,
 } from './types.js';
+
+// Exhaustiveness helper
+export { assertNever } from './assert.js';
+
+// Errors
+export { InvalidPointShapeError } from './errors.js';
 
 // CSV utilities
 export {

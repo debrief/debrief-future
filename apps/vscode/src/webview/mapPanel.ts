@@ -36,7 +36,7 @@ import {
   type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
-import { calculateBounds, mergeBounds } from '../utils/bounds';
+import { calculateBounds, mergeBounds, boundsToLeaflet } from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
@@ -427,43 +427,11 @@ export class MapPanel {
       return;
     }
 
-    // Calculate bounds from selected features
-    let minLat = Infinity;
-    let maxLat = -Infinity;
-    let minLng = Infinity;
-    let maxLng = -Infinity;
-
-    for (const feature of selectedFeatures) {
-      const geom = feature.geometry as { type: string; coordinates: unknown };
-      const coords = geom.coordinates;
-      if (geom.type === 'LineString') {
-        for (const coord of coords as number[][]) {
-          const lng = coord[0];
-          const lat = coord[1];
-          if (typeof lng === 'number' && typeof lat === 'number') {
-            minLat = Math.min(minLat, lat);
-            maxLat = Math.max(maxLat, lat);
-            minLng = Math.min(minLng, lng);
-            maxLng = Math.max(maxLng, lng);
-          }
-        }
-      } else if (geom.type === 'Point') {
-        const coord = coords as number[];
-        if (coord.length >= 2) {
-          minLat = Math.min(minLat, coord[1]!);
-          maxLat = Math.max(maxLat, coord[1]!);
-          minLng = Math.min(minLng, coord[0]!);
-          maxLng = Math.max(maxLng, coord[0]!);
-        }
-      }
+    const bounds = calculateBounds(selectedFeatures);
+    if (bounds === null) {
+      return;
     }
-
-    if (minLat !== Infinity) {
-      this.fitBounds([
-        [minLat, minLng],
-        [maxLat, maxLng],
-      ]);
-    }
+    this.fitBounds(boundsToLeaflet(bounds));
   }
 
   /**

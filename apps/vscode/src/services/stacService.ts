@@ -41,6 +41,7 @@ import type {
   TrackFeature,
   ReferenceLocation,
   LogEntry as SchemaLogEntry,
+  PositionStyle,
   PositionStyleOverride,
 } from '@debrief/schemas';
 
@@ -466,7 +467,7 @@ export class StacService {
                 line: { color: (props.color as string) ?? '#0066cc' },
                 point: { shape: 'circle', radius: 3, fill: true, fill_color: (props.color as string) ?? '#0066cc', color: '#000000' },
               },
-              default_position_style: (props.default_position_style as { show_symbol: boolean; symbol: string; show_label: boolean }) ?? { show_symbol: true, symbol: 'circle', show_label: false },
+              default_position_style: (props.default_position_style as PositionStyle | undefined) ?? { show_symbol: true, symbol: 'circle', show_label: false },
               symbol_interval: props.symbol_interval as string | undefined,
               label_interval: props.label_interval as string | undefined,
               position_style_overrides: props.position_style_overrides as PositionStyleOverride[] | undefined,

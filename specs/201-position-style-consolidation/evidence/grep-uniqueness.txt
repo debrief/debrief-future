@@ -1,0 +1,53 @@
+# grep-uniqueness.txt — verification of SC-001 / SC-003 / SC-007 / SC-008 / SC-010
+# Captured: 2026-04-19  git SHA: fb2bf2e
+#
+# Greps exclude dist/ and node_modules/ so source-of-truth counts match SC targets.
+
+## SC-001: interface ResolvedPositionStyle — expect 1 match
+$ grep -rn 'interface ResolvedPositionStyle' shared/ --include='*.ts' --include='*.tsx'
+shared/utils/src/types.ts:83:export interface ResolvedPositionStyle {
+
+✅ SC-001 pass (1 match, as required).
+
+## SC-007: export function resolvePositionStyle — expect 1 match
+$ grep -rn 'export function resolvePositionStyle' shared/ --include='*.ts' --include='*.tsx'
+shared/utils/src/interval.ts:119:export function resolvePositionStyle(
+
+✅ SC-007 pass (1 resolver implementation).
+
+## SC-007: export function computeAllPositionStyles — expect 1 match
+$ grep -rn 'export function computeAllPositionStyles' shared/ --include='*.ts' --include='*.tsx'
+shared/utils/src/interval.ts:211:export function computeAllPositionStyles(
+
+✅ SC-007 pass (1 computeAll implementation).
+
+## SC-008: SymbolShape alias — only the @deprecated PointShape alias remains
+$ grep -rn 'SymbolShape' shared/components/src/ --include='*.ts' --include='*.tsx'
+shared/components/src/MapView/PositionSymbolsLayer.tsx:20: * @deprecated Use `PointShape` from `@debrief/utils` (re-exported from
+shared/components/src/MapView/PositionSymbolsLayer.tsx:24:export type SymbolShape = PointShape;
+
+✅ SC-008 pass (hand-typed union deleted; the @deprecated alias resolves to PointShape).
+
+## SC-010 / FR-017: MarkerSymbolEnum — expect 1 LinkML declaration + the parity test
+$ grep -rn 'MarkerSymbolEnum' shared/schemas/src/linkml/
+shared/schemas/src/linkml/common.yaml:166:  MarkerSymbolEnum:
+
+$ grep -rn 'MarkerSymbolEnum' shared/schemas/tests/
+shared/schemas/tests/test_enum_parity.py:15:  Feature #091 deliberately split them so the two contexts could evolve
+shared/schemas/tests/test_enum_parity.py:37:    def test_both_enums_present_in_generated_schema(self) -> None:
+shared/schemas/tests/test_enum_parity.py:44:            "PointShapeEnum and MarkerSymbolEnum have drifted apart"
+(plus 5 more references inside the adherence test body)
+
+✅ SC-010 pass (17B chosen — both enums kept, parity pinned by adherence test).
+
+## SC-003: .label reads on ResolvedPositionStyle — expect zero matches
+# All remaining .label hits target unrelated types (item.label, feature.label,
+# metadata.xAxis.label, etc.). The only hit inside the resolver reads
+# `override.label` — that is the SCHEMA PositionStyleOverride.label field,
+# not the ResolvedPositionStyle output. This is the intentional "input stays
+# `label`, output is renamed to `labelText`" split.
+
+$ grep -n '\\.label\\b' shared/utils/src/interval.ts | grep -v labelInterval
+shared/utils/src/interval.ts:173:    if (override.label !== undefined && override.label !== null) {
+
+✅ SC-003 pass: zero `.label` reads on a `ResolvedPositionStyle`-typed value.

@@ -69,37 +69,37 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Workspace scaffold
 
-- [ ] T001 Create workspace manifest with deps from `research.md` §10 (`react`, `react-dom`, `react-markdown`, `remark-gfm`, `rehype-slug`, `rehype-autolink-headings`, `rehype-highlight`, `highlight.js`, `zod ^3.22.0`; devDeps: `vite`, `@vitejs/plugin-react`, `typescript ^5`, `vitest ^1`, `@playwright/test ^1.58`, `@axe-core/playwright`, `@sparticuz/chromium` already at repo root) `apps/spec-navigator/package.json`
-- [ ] T002 [P] Configure Vite with `base: '/debrief-future/spec-navigator/'`, React plugin, build output to `dist/` `apps/spec-navigator/vite.config.ts`
-- [ ] T003 [P] Configure TypeScript with `strict: true`, no `any`, module resolution matching `apps/web-shell/tsconfig.json` `apps/spec-navigator/tsconfig.json`
-- [ ] T004 [P] Configure ESLint mirroring `apps/web-shell/.eslintrc.cjs` (no `any`, react-hooks, react) `apps/spec-navigator/.eslintrc.cjs`
-- [ ] T005 [P] Add Vitest config for unit tests + `vitest bench` support `apps/spec-navigator/vitest.config.ts`
-- [ ] T006 [P] Add Playwright wrapper using `@sparticuz/chromium` mirroring `apps/web-shell/run-playwright.mjs` `apps/spec-navigator/run-playwright.mjs`
-- [ ] T007 [P] Playwright config pointing at the built `dist/` served by `vite preview`, with a mock-GitHub fixture layer `apps/spec-navigator/playwright.config.ts`
+- [x] T001 Create workspace manifest with deps from `research.md` §10 (`react`, `react-dom`, `react-markdown`, `remark-gfm`, `rehype-slug`, `rehype-autolink-headings`, `rehype-highlight`, `highlight.js`, `zod ^3.22.0`; devDeps: `vite`, `@vitejs/plugin-react`, `typescript ^5`, `vitest ^1`, `@playwright/test ^1.58`, `@axe-core/playwright`, `@sparticuz/chromium` already at repo root) `apps/spec-navigator/package.json`
+- [x] T002 [P] Configure Vite with `base: '/debrief-future/spec-navigator/'`, React plugin, build output to `dist/` `apps/spec-navigator/vite.config.ts`
+- [x] T003 [P] Configure TypeScript with `strict: true`, no `any`, module resolution matching `apps/web-shell/tsconfig.json` `apps/spec-navigator/tsconfig.json`
+- [x] T004 [P] Configure ESLint mirroring `apps/web-shell/.eslintrc.cjs` (no `any`, react-hooks, react) `apps/spec-navigator/.eslintrc.cjs`
+- [x] T005 [P] Add Vitest config for unit tests + `vitest bench` support `apps/spec-navigator/vitest.config.ts`
+- [x] T006 [P] Add Playwright wrapper using `@sparticuz/chromium` mirroring `apps/web-shell/run-playwright.mjs` `apps/spec-navigator/run-playwright.mjs`
+- [x] T007 [P] Playwright config pointing at the built `dist/` served by `vite preview`, with a mock-GitHub fixture layer `apps/spec-navigator/playwright.config.ts`
 
 ### HTML entry, CSP, and app shell
 
-- [ ] T008 Create HTML entry with the CSP `<meta http-equiv="Content-Security-Policy">` tag carrying the exact directives from `plan.md` Technical Context → Constraints (default-src 'self'; connect-src 'self' api.github.com raw.githubusercontent.com; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' raw.githubusercontent.com data:; base-uri 'self'; form-action 'none') `apps/spec-navigator/index.html`
-- [ ] T009 Mount React root and render an empty `App` placeholder `apps/spec-navigator/src/main.tsx`
-- [ ] T010 Empty layout shell (two-pane + right drawer + top bar) with TODO stubs for later phases `apps/spec-navigator/src/App.tsx`
-- [ ] T011 [P] Centralised user-facing strings table (i18n-ready; no per-file literals) `apps/spec-navigator/src/strings.ts`
-- [ ] T012 [P] CSS tokens file with custom properties (colours, spacing, typography) mirroring `apps/web-shell/src/App.css` pattern `apps/spec-navigator/src/styles/tokens.css`
-- [ ] T013 [P] Base app CSS with two-pane + drawer layout — mobile-first, graceful narrow-viewport reflow `apps/spec-navigator/src/styles/app.css`
+- [x] T008 Create HTML entry with the CSP `<meta http-equiv="Content-Security-Policy">` tag carrying the exact directives from `plan.md` Technical Context → Constraints (default-src 'self'; connect-src 'self' api.github.com raw.githubusercontent.com; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' raw.githubusercontent.com data:; base-uri 'self'; form-action 'none') `apps/spec-navigator/index.html`
+- [x] T009 Mount React root and render an empty `App` placeholder `apps/spec-navigator/src/main.tsx`
+- [x] T010 Empty layout shell (two-pane + right drawer + top bar) with TODO stubs for later phases `apps/spec-navigator/src/App.tsx`
+- [x] T011 [P] Centralised user-facing strings table (i18n-ready; no per-file literals) `apps/spec-navigator/src/strings.ts`
+- [x] T012 [P] CSS tokens file with custom properties (colours, spacing, typography) mirroring `apps/web-shell/src/App.css` pattern `apps/spec-navigator/src/styles/tokens.css`
+- [x] T013 [P] Base app CSS with two-pane + drawer layout — mobile-first, graceful narrow-viewport reflow `apps/spec-navigator/src/styles/app.css`
 
 ### README and documentation
 
-- [ ] T014 [P] Write the reviewer-facing README: PAT setup steps, required fine-grained PAT scope, local-dev command, troubleshooting `apps/spec-navigator/README.md`
+- [x] T014 [P] Write the reviewer-facing README: PAT setup steps, required fine-grained PAT scope, local-dev command, troubleshooting `apps/spec-navigator/README.md`
 
 ### Build-time and infrastructure tests
 
-- [ ] T015 [test] `cspPresence.test.ts` — reads built `dist/index.html`, parses the CSP meta tag, asserts every directive matches the expected allowlist byte-for-byte `apps/spec-navigator/src/__tests__/cspPresence.test.ts`
-- [ ] T016 [P][test] `bundleSize.test.ts` — after `vite build`, reads `dist/assets/*.js`, fails if the largest gzipped chunk exceeds 400 KB; emits per-chunk gzip sizes to stdout so regressions are visible `apps/spec-navigator/src/__tests__/bundleSize.test.ts`
+- [x] T015 [test] `cspPresence.test.ts` — reads built `dist/index.html`, parses the CSP meta tag, asserts every directive matches the expected allowlist byte-for-byte `apps/spec-navigator/src/__tests__/cspPresence.test.ts`
+- [x] T016 [P][test] `bundleSize.test.ts` — after `vite build`, reads `dist/assets/*.js`, fails if the largest gzipped chunk exceeds 400 KB; emits per-chunk gzip sizes to stdout so regressions are visible `apps/spec-navigator/src/__tests__/bundleSize.test.ts`
 
 ### CI and deploy wiring
 
-- [ ] T017 New gh-pages deploy workflow mirroring `.github/workflows/storybook.yml` exactly: `peaceiris/actions-gh-pages@v4`, `destination_dir: spec-navigator`, `keep_files: true`, path-filter trigger on `apps/spec-navigator/**` `.github/workflows/spec-navigator-publish.yml`
-- [ ] T018 Add `@debrief/spec-navigator` to the existing CI matrix: explicit `pnpm --filter @debrief/spec-navigator lint / typecheck / test` steps, plus `node apps/spec-navigator/run-playwright.mjs` `.github/workflows/ci.yml`
-- [ ] T019 [P] Add spec-navigator to the "Active Technologies" list AND update the "Before Pushing" fallback chain to include `pnpm --filter @debrief/spec-navigator` for lint / typecheck / test / e2e (closes the local-vs-CI drift that decision 2B would otherwise leave open — per deferred-item 3 in the review) `CLAUDE.md`
+- [x] T017 New gh-pages deploy workflow mirroring `.github/workflows/storybook.yml` exactly: `peaceiris/actions-gh-pages@v4`, `destination_dir: spec-navigator`, `keep_files: true`, path-filter trigger on `apps/spec-navigator/**` `.github/workflows/spec-navigator-publish.yml`
+- [x] T018 Add `@debrief/spec-navigator` to the existing CI matrix: explicit `pnpm --filter @debrief/spec-navigator lint / typecheck / test` steps, plus `node apps/spec-navigator/run-playwright.mjs` `.github/workflows/ci.yml`
+- [x] T019 [P] Add spec-navigator to the "Active Technologies" list AND update the "Before Pushing" fallback chain to include `pnpm --filter @debrief/spec-navigator` for lint / typecheck / test / e2e (closes the local-vs-CI drift that decision 2B would otherwise leave open — per deferred-item 3 in the review) `CLAUDE.md`
 
 **Parallel opportunity**: T002–T007 are independent config files; T011–T014 touch different files; T015/T016 are in separate test files. Batch accordingly.
 
@@ -112,43 +112,43 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Unified type system
 
-- [ ] T020 Define the unified `Comment` discriminated union (feature / document / selection variants), `CommentTag`, `DraftCommentSet`, `Submission`, `FeatureScope`, `Artefact`, and `Credential` types per `data-model.md` — one exported module, no implementation yet `apps/spec-navigator/src/types.ts`
+- [x] T020 Define the unified `Comment` discriminated union (feature / document / selection variants), `CommentTag`, `DraftCommentSet`, `Submission`, `FeatureScope`, `Artefact`, and `Credential` types per `data-model.md` — one exported module, no implementation yet `apps/spec-navigator/src/types.ts`
 
 ### GitHub REST boundary (zod-narrowed)
 
-- [ ] T021 zod parsers for the four REST responses named in `contracts/github-rest-narrow.md` (pull request, directory listing, single file, issue-comment create) — strict, rejecting unknown-shape payloads `apps/spec-navigator/src/github/schemas.ts`
-- [ ] T022 [test] `github/schemas.test.ts` — zod parses known-good fixtures; rejects known-bad; verifies that PAT material is never interpolated into thrown errors `apps/spec-navigator/src/github/__tests__/schemas.test.ts`
-- [ ] T023 Typed REST wrapper using `fetch` + `Authorization: Bearer <pat>`, calling only `api.github.com` and `raw.githubusercontent.com`, mapping 401/403/404/422/rate-limit responses to discriminated error types from `strings.ts` `apps/spec-navigator/src/github/api.ts`
+- [x] T021 zod parsers for the four REST responses named in `contracts/github-rest-narrow.md` (pull request, directory listing, single file, issue-comment create) — strict, rejecting unknown-shape payloads `apps/spec-navigator/src/github/schemas.ts`
+- [x] T022 [test] `github/schemas.test.ts` — zod parses known-good fixtures; rejects known-bad; verifies that PAT material is never interpolated into thrown errors `apps/spec-navigator/src/github/__tests__/schemas.test.ts`
+- [x] T023 Typed REST wrapper using `fetch` + `Authorization: Bearer <pat>`, calling only `api.github.com` and `raw.githubusercontent.com`, mapping 401/403/404/422/rate-limit responses to discriminated error types from `strings.ts` `apps/spec-navigator/src/github/api.ts`
 
 ### Credential handling
 
-- [ ] T024 [P] PAT get/set/clear + "is-set" helpers with `localStorage` key `spec-navigator:github-pat`; in-memory cache invalidated on clear; never interpolates the PAT into log or error messages `apps/spec-navigator/src/github/auth.ts`
-- [ ] T025 [P][test] `github/auth.test.ts` — save/load/clear round-trip; clear wipes both storage and in-memory; PAT absent from any thrown `Error.message` `apps/spec-navigator/src/github/__tests__/auth.test.ts`
+- [x] T024 [P] PAT get/set/clear + "is-set" helpers with `localStorage` key `spec-navigator:github-pat`; in-memory cache invalidated on clear; never interpolates the PAT into log or error messages `apps/spec-navigator/src/github/auth.ts`
+- [x] T025 [P][test] `github/auth.test.ts` — save/load/clear round-trip; clear wipes both storage and in-memory; PAT absent from any thrown `Error.message` `apps/spec-navigator/src/github/__tests__/auth.test.ts`
 
 ### localStorage persistence
 
-- [ ] T026 Per-PR `DraftCommentSet` read/write with `schemaVersion` field (key pattern `spec-navigator:drafts:pr-<num>`); `QuotaExceededError` caught and re-raised as a typed error the reducer can surface; version-mismatch → quarantine path into `spec-navigator:quarantine:<timestamp>` `apps/spec-navigator/src/state/persistence.ts`
-- [ ] T027 [test] `persistence.test.ts` — per-PR isolation (drafts for PR A absent when reading PR B); version-mismatch quarantine path; `QuotaExceededError` surfaces a typed error and leaves the in-memory copy intact `apps/spec-navigator/src/state/__tests__/persistence.test.ts`
+- [x] T026 Per-PR `DraftCommentSet` read/write with `schemaVersion` field (key pattern `spec-navigator:drafts:pr-<num>`); `QuotaExceededError` caught and re-raised as a typed error the reducer can surface; version-mismatch → quarantine path into `spec-navigator:quarantine:<timestamp>` `apps/spec-navigator/src/state/persistence.ts`
+- [x] T027 [test] `persistence.test.ts` — per-PR isolation (drafts for PR A absent when reading PR B); version-mismatch quarantine path; `QuotaExceededError` surfaces a typed error and leaves the in-memory copy intact `apps/spec-navigator/src/state/__tests__/persistence.test.ts`
 
 ### Reducer
 
-- [ ] T028 Pure reducer covering `ADD_COMMENT` / `EDIT_COMMENT` / `DELETE_COMMENT` / `RETAG_COMMENT` / `CLEAR_ALL` / `LOAD_FROM_STORAGE` / `MARK_STALE_PATHS` / `SUBMIT_OK` actions over a unified `Comment[]`; rejects empty `body`, duplicate ids, and add operations when `comments.length >= 100` with a typed-error return `apps/spec-navigator/src/state/commentsReducer.ts`
-- [ ] T029 [test] `commentsReducer.test.ts` — one case per action, plus the rejection paths; covers stale-path marking when an `Artefact[]` no longer lists a path that a draft references `apps/spec-navigator/src/state/__tests__/commentsReducer.test.ts`
+- [x] T028 Pure reducer covering `ADD_COMMENT` / `EDIT_COMMENT` / `DELETE_COMMENT` / `RETAG_COMMENT` / `CLEAR_ALL` / `LOAD_FROM_STORAGE` / `MARK_STALE_PATHS` / `SUBMIT_OK` actions over a unified `Comment[]`; rejects empty `body`, duplicate ids, and add operations when `comments.length >= 100` with a typed-error return `apps/spec-navigator/src/state/commentsReducer.ts`
+- [x] T029 [test] `commentsReducer.test.ts` — one case per action, plus the rejection paths; covers stale-path marking when an `Artefact[]` no longer lists a path that a draft references `apps/spec-navigator/src/state/__tests__/commentsReducer.test.ts`
 
 ### Selection anchoring
 
-- [ ] T030 Implement `captureSelection(source, start, end)` returning `{ snippet, contextBefore, contextAfter, anchorHash }` with `anchorHash` in the pinned format `<first20>\x1F<last20>\x1F<offset>`; `contextBefore` / `contextAfter` trimmed at word boundary where possible `apps/spec-navigator/src/format/selectionAnchor.ts`
-- [ ] T031 [test] `selectionAnchor.test.ts` — three canonical captures diffed byte-exact against a golden fixture; re-resolve against slightly-edited source still locates the intended passage (top match is correct); handles start-of-file and end-of-file edge cases (empty `contextBefore` / `contextAfter` only in those positions) `apps/spec-navigator/src/format/__tests__/selectionAnchor.test.ts`
+- [x] T030 Implement `captureSelection(source, start, end)` returning `{ snippet, contextBefore, contextAfter, anchorHash }` with `anchorHash` in the pinned format `<first20>\x1F<last20>\x1F<offset>`; `contextBefore` / `contextAfter` trimmed at word boundary where possible `apps/spec-navigator/src/format/selectionAnchor.ts`
+- [x] T031 [test] `selectionAnchor.test.ts` — three canonical captures diffed byte-exact against a golden fixture; re-resolve against slightly-edited source still locates the intended passage (top match is correct); handles start-of-file and end-of-file edge cases (empty `contextBefore` / `contextAfter` only in those positions) `apps/spec-navigator/src/format/__tests__/selectionAnchor.test.ts`
 
 ### Feedback-comment renderer
 
-- [ ] T032 `renderFeedbackComment(submission: Submission): string` producing the trigger line + fenced `json spec-review-feedback-v1` block + human-readable sections per the rules in `contracts/pr-comment-body.example.md`, including the stale-head admonition when `originalHeadSha !== submittedAtHeadSha` `apps/spec-navigator/src/format/renderFeedbackComment.ts`
-- [ ] T033 [test] `renderFeedbackComment.test.ts` — golden markdown diffed byte-for-byte against `specs/191-spec-navigator/contracts/pr-comment-body.example.md` after normalising SHAs and timestamps; validates the embedded JSON against `spec-review-feedback-v1.schema.json` via zod in-test `apps/spec-navigator/src/format/__tests__/renderFeedbackComment.test.ts`
+- [x] T032 `renderFeedbackComment(submission: Submission): string` producing the trigger line + fenced `json spec-review-feedback-v1` block + human-readable sections per the rules in `contracts/pr-comment-body.example.md`, including the stale-head admonition when `originalHeadSha !== submittedAtHeadSha` `apps/spec-navigator/src/format/renderFeedbackComment.ts`
+- [x] T033 [test] `renderFeedbackComment.test.ts` — golden markdown diffed byte-for-byte against `specs/191-spec-navigator/contracts/pr-comment-body.example.md` after normalising SHAs and timestamps; validates the embedded JSON against `spec-review-feedback-v1.schema.json` via zod in-test `apps/spec-navigator/src/format/__tests__/renderFeedbackComment.test.ts`
 
 ### Shared utilities
 
-- [ ] T034 [P] `classifyArtefact(path): ArtefactKind` — maps `specs/NNN-<slug>/<file>` paths to `'spec' | 'plan' | 'tasks' | 'research' | 'data-model' | 'quickstart' | 'contract' | 'evidence-image' | 'evidence-doc' | 'other'` `apps/spec-navigator/src/format/classifyArtefact.ts`
-- [ ] T035 [P][test] `classifyArtefact.test.ts` — one case per kind plus the fallback `'other'` `apps/spec-navigator/src/format/__tests__/classifyArtefact.test.ts`
+- [x] T034 [P] `classifyArtefact(path): ArtefactKind` — maps `specs/NNN-<slug>/<file>` paths to `'spec' | 'plan' | 'tasks' | 'research' | 'data-model' | 'quickstart' | 'contract' | 'evidence-image' | 'evidence-doc' | 'other'` `apps/spec-navigator/src/format/classifyArtefact.ts`
+- [x] T035 [P][test] `classifyArtefact.test.ts` — one case per kind plus the fallback `'other'` `apps/spec-navigator/src/format/__tests__/classifyArtefact.test.ts`
 
 **Parallel opportunity**: T024/T025 (auth pair), T034/T035 (classifier pair), and T031/T033 (golden fixture tests) can all run in parallel once T020 exists. T021–T023 (schemas → api) must be sequential.
 
@@ -161,33 +161,33 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Scope resolution and initial load
 
-- [ ] T036 `useFeature(prNumber)` hook — calls `GET /pulls/:n`, narrows via zod, pins `head.sha` as `originalHeadSha`, computes `featureFolder` from the PR's changed files (first `specs/NNN-*/` prefix), lists the folder via `GET /contents/:path?ref=<sha>`, surfaces errors via the shared error type from `api.ts` `apps/spec-navigator/src/state/useFeature.ts`
-- [ ] T037 [P] `useComments(prNumber)` hook — wraps `commentsReducer` + `persistence`, restores on mount (quarantining on version mismatch), writes on every mutation `apps/spec-navigator/src/state/useComments.ts`
+- [x] T036 `useFeature(prNumber)` hook — calls `GET /pulls/:n`, narrows via zod, pins `head.sha` as `originalHeadSha`, computes `featureFolder` from the PR's changed files (first `specs/NNN-*/` prefix), lists the folder via `GET /contents/:path?ref=<sha>`, surfaces errors via the shared error type from `api.ts` `apps/spec-navigator/src/state/useFeature.ts`
+- [x] T037 [P] `useComments(prNumber)` hook — wraps `commentsReducer` + `persistence`, restores on mount (quarantining on version mismatch), writes on every mutation `apps/spec-navigator/src/state/useComments.ts`
 
 ### Tree, default view, and rendering (markdown path only)
 
-- [ ] T038 `ArtifactTree` component — renders grouped-by-kind list of artefacts using `classifyArtefact`; clicking selects; keyboard-navigable; visually marks the currently-selected artefact and any artefact with drafts against it `apps/spec-navigator/src/components/ArtifactTree.tsx`
-- [ ] T039 `ArtifactView` skeleton — dispatches by `mimeType`; for markdown, renders via `react-markdown` + `remark-gfm` + `rehype-slug` + `rehype-autolink-headings` + `rehype-highlight`; memoised with `React.memo` and stable-reference props (Phase 6 completes the non-markdown branches) `apps/spec-navigator/src/components/ArtifactView.tsx`
-- [ ] T040 `MarkdownView` — thin wrapper exposing a stable `remark`/`rehype` plugin list; safe-by-default (no `dangerouslySetInnerHTML`); paragraph-level key discipline so re-render cost scales with changed content `apps/spec-navigator/src/components/MarkdownView.tsx`
-- [ ] T041 Default to `spec.md` on load (FR-005); fall back to the first markdown artefact if no `spec.md` exists `apps/spec-navigator/src/App.tsx` (extend layout shell)
+- [x] T038 `ArtifactTree` component — renders grouped-by-kind list of artefacts using `classifyArtefact`; clicking selects; keyboard-navigable; visually marks the currently-selected artefact and any artefact with drafts against it `apps/spec-navigator/src/components/ArtifactTree.tsx`
+- [x] T039 `ArtifactView` skeleton — dispatches by `mimeType`; for markdown, renders via `react-markdown` + `remark-gfm` + `rehype-slug` + `rehype-autolink-headings` + `rehype-highlight`; memoised with `React.memo` and stable-reference props (Phase 6 completes the non-markdown branches) `apps/spec-navigator/src/components/ArtifactView.tsx`
+- [x] T040 `MarkdownView` — thin wrapper exposing a stable `remark`/`rehype` plugin list; safe-by-default (no `dangerouslySetInnerHTML`); paragraph-level key discipline so re-render cost scales with changed content `apps/spec-navigator/src/components/MarkdownView.tsx`
+- [x] T041 Default to `spec.md` on load (FR-005); fall back to the first markdown artefact if no `spec.md` exists `apps/spec-navigator/src/App.tsx` (extend layout shell)
 
 ### Feature-level commenting (minimum to close the submit loop)
 
-- [ ] T042 Feature-level "Comment on whole feature" button in the top bar, opens inline `CommentComposer` with level=`feature` `apps/spec-navigator/src/components/CommentComposer.tsx`
-- [ ] T043 [P] Error banner component for shared error surface (credential rejected, PR not found, network down, 422, rate limit, quota) — never renders the PAT, only the mapped error strings from `strings.ts` `apps/spec-navigator/src/components/ErrorBanner.tsx`
+- [x] T042 Feature-level "Comment on whole feature" button in the top bar, opens inline `CommentComposer` with level=`feature` `apps/spec-navigator/src/components/CommentComposer.tsx`
+- [x] T043 [P] Error banner component for shared error surface (credential rejected, PR not found, network down, 422, rate limit, quota) — never renders the PAT, only the mapped error strings from `strings.ts` `apps/spec-navigator/src/components/ErrorBanner.tsx`
 
 ### Submit flow with force-push detection
 
-- [ ] T044 `SubmitButton` component — disabled when `comments.length === 0`; single-flight via `submitting` flag; before POST re-fetches `GET /pulls/:n` and compares `head.sha` with `DraftCommentSet.originalHeadSha`; if different, holds submission and opens `StaleHeadModal` `apps/spec-navigator/src/components/SubmitButton.tsx`
-- [ ] T045 `StaleHeadModal` — shows both short SHAs, explains the situation in reviewer-friendly language from `strings.ts`, offers "Submit anyway" (proceeds, builds `Submission` with `originalHeadSha` and `submittedAtHeadSha` both set) vs "Cancel" (aborts; drafts preserved) `apps/spec-navigator/src/components/StaleHeadModal.tsx`
-- [ ] T046 On successful POST, render a success panel with the link from `html_url`, then clear the draft store; a subsequent reload MUST yield an empty drawer (FR-022) `apps/spec-navigator/src/components/SubmitButton.tsx` (extend T044)
+- [x] T044 `SubmitButton` component — disabled when `comments.length === 0`; single-flight via `submitting` flag; before POST re-fetches `GET /pulls/:n` and compares `head.sha` with `DraftCommentSet.originalHeadSha`; if different, holds submission and opens `StaleHeadModal` `apps/spec-navigator/src/components/SubmitButton.tsx`
+- [x] T045 `StaleHeadModal` — shows both short SHAs, explains the situation in reviewer-friendly language from `strings.ts`, offers "Submit anyway" (proceeds, builds `Submission` with `originalHeadSha` and `submittedAtHeadSha` both set) vs "Cancel" (aborts; drafts preserved) `apps/spec-navigator/src/components/StaleHeadModal.tsx`
+- [x] T046 On successful POST, render a success panel with the link from `html_url`, then clear the draft store; a subsequent reload MUST yield an empty drawer (FR-022) `apps/spec-navigator/src/components/SubmitButton.tsx` (extend T044)
 
 ### Tests for US1
 
-- [ ] T047 [test] `useFeature.test.ts` — stubs `api.ts`; asserts feature-folder resolution from a multi-file PR; asserts empty-folder surface shows the "No feature folder found" banner per edge case `apps/spec-navigator/src/state/__tests__/useFeature.test.ts`
-- [ ] T048 [P][test] `SubmitButton.test.ts` — single-flight behaviour (two rapid clicks → one POST); disabled when empty; SHA-recheck triggers `StaleHeadModal` when head moves `apps/spec-navigator/src/components/__tests__/SubmitButton.test.ts`
-- [ ] T049 [test] `e2e/submit.spec.ts` — Playwright against the mock GitHub server: load → render spec.md → feature-level comment → submit → exactly one POST whose body renderFeedbackComment+parse yields a payload validating against `spec-review-feedback-v1.schema.json`; assert `originalHeadSha === submittedAtHeadSha` in the stable-HEAD case; drawer is empty after success; success link visible `apps/spec-navigator/e2e/submit.spec.ts`
-- [ ] T050 [test] `e2e/stale-head.spec.ts` — mock server returns a different `head.sha` on the second `GET /pulls/:n`; assert `StaleHeadModal` appears; clicking "Submit anyway" POSTs a body with `originalHeadSha !== submittedAtHeadSha`; clicking "Cancel" preserves drafts and does not POST `apps/spec-navigator/e2e/stale-head.spec.ts`
+- [x] T047 [test] `useFeature.test.ts` — stubs `api.ts`; asserts feature-folder resolution from a multi-file PR; asserts empty-folder surface shows the "No feature folder found" banner per edge case `apps/spec-navigator/src/state/__tests__/useFeature.test.ts`
+- [x] T048 [P][test] `SubmitButton.test.ts` — single-flight behaviour (two rapid clicks → one POST); disabled when empty; SHA-recheck triggers `StaleHeadModal` when head moves `apps/spec-navigator/src/components/__tests__/SubmitButton.test.ts`
+- [x] T049 [test] `e2e/submit.spec.ts` — Playwright against the mock GitHub server: load → render spec.md → feature-level comment → submit → exactly one POST whose body renderFeedbackComment+parse yields a payload validating against `spec-review-feedback-v1.schema.json`; assert `originalHeadSha === submittedAtHeadSha` in the stable-HEAD case; drawer is empty after success; success link visible `apps/spec-navigator/e2e/submit.spec.ts`
+- [x] T050 [test] `e2e/stale-head.spec.ts` — mock server returns a different `head.sha` on the second `GET /pulls/:n`; assert `StaleHeadModal` appears; clicking "Submit anyway" POSTs a body with `originalHeadSha !== submittedAtHeadSha`; clicking "Cancel" preserves drafts and does not POST `apps/spec-navigator/e2e/stale-head.spec.ts`
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Run `node apps/spec-navigator/run-playwright.mjs` to extract and configure. See `docs/project_notes/playwright-installation-research.md`.
 
@@ -202,25 +202,25 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Document-level commenting
 
-- [ ] T051 Document-level "Comment on this document" button in `ArtifactView`'s header; opens `CommentComposer` pre-populated with `level='document'` + current `path` `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
-- [ ] T052 [P] Extend `CommentComposer` to accept `level`, `path?`, and selection-context props; emits an `ADD_COMMENT` action through `useComments`; guards empty `body` `apps/spec-navigator/src/components/CommentComposer.tsx` (extend T042)
+- [x] T051 Document-level "Comment on this document" button in `ArtifactView`'s header; opens `CommentComposer` pre-populated with `level='document'` + current `path` `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
+- [x] T052 [P] Extend `CommentComposer` to accept `level`, `path?`, and selection-context props; emits an `ADD_COMMENT` action through `useComments`; guards empty `body` `apps/spec-navigator/src/components/CommentComposer.tsx` (extend T042)
 
 ### Selection capture and composer wiring
 
-- [ ] T053 `SelectionAnchor` component — listens to `selectionchange` debounced at 150 ms on the artefact pane; when a non-whitespace selection exists, computes raw-source coordinates using the artefact's `content` string + the selection's DOM `Range`; renders a floating "Add comment on selection" chip positioned near the selection `apps/spec-navigator/src/components/SelectionAnchor.tsx`
-- [ ] T054 Wire the chip → `captureSelection` → `CommentComposer` with level=`selection`, path=current, and the captured `{ snippet, contextBefore, contextAfter, anchorHash }` pre-populated `apps/spec-navigator/src/components/SelectionAnchor.tsx` (extend T053)
-- [ ] T055 [P] Visible-selection marker overlay in the rendered pane so saved selection comments show a subtle highlight on their anchored passage while the reviewer is on that artefact (intentionally does NOT re-render the markdown — uses a position-absolute overlay keyed by `anchorHash`) `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
+- [x] T053 `SelectionAnchor` component — listens to `selectionchange` debounced at 150 ms on the artefact pane; when a non-whitespace selection exists, computes raw-source coordinates using the artefact's `content` string + the selection's DOM `Range`; renders a floating "Add comment on selection" chip positioned near the selection `apps/spec-navigator/src/components/SelectionAnchor.tsx`
+- [x] T054 Wire the chip → `captureSelection` → `CommentComposer` with level=`selection`, path=current, and the captured `{ snippet, contextBefore, contextAfter, anchorHash }` pre-populated `apps/spec-navigator/src/components/SelectionAnchor.tsx` (extend T053)
+- [x] T055 [P] Visible-selection marker overlay in the rendered pane so saved selection comments show a subtle highlight on their anchored passage while the reviewer is on that artefact (intentionally does NOT re-render the markdown — uses a position-absolute overlay keyed by `anchorHash`) `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
 
 ### Tag vocabulary and composer UX
 
-- [ ] T056 [P] Tag-select control inside `CommentComposer` exposing the 5 tags from `CommentTag` (`question`, `scope-concern`, `test-gap`, `nit`, `blocker`); "no tag" is a valid default `apps/spec-navigator/src/components/CommentComposer.tsx` (extend T052)
-- [ ] T057 [P] Mobile touch support — `selectionchange` already fires on long-press in modern Safari/Chrome; verify no bespoke touch handler is needed by adding a Playwright mobile-viewport sub-case in Phase 8 `apps/spec-navigator/src/components/SelectionAnchor.tsx` (validation-only, no code change unless the test fails)
+- [x] T056 [P] Tag-select control inside `CommentComposer` exposing the 5 tags from `CommentTag` (`question`, `scope-concern`, `test-gap`, `nit`, `blocker`); "no tag" is a valid default `apps/spec-navigator/src/components/CommentComposer.tsx` (extend T052)
+- [x] T057 [P] Mobile touch support — `selectionchange` already fires on long-press in modern Safari/Chrome; verify no bespoke touch handler is needed by adding a Playwright mobile-viewport sub-case in Phase 8 `apps/spec-navigator/src/components/SelectionAnchor.tsx` (validation-only, no code change unless the test fails)
 
 ### Tests for US2
 
-- [ ] T058 [test] `CommentComposer.test.ts` — renders with each level; tag picker shows all 5 values; empty body blocks save; save emits the expected action shape with the context fields intact `apps/spec-navigator/src/components/__tests__/CommentComposer.test.ts`
-- [ ] T059 [P][test] `SelectionAnchor.test.ts` — renders chip only when a non-empty selection exists; `Enter` on focused chip opens the composer; the captured record matches `captureSelection`'s output byte-for-byte `apps/spec-navigator/src/components/__tests__/SelectionAnchor.test.ts`
-- [ ] T060 [test] Extend `e2e/submit.spec.ts` (from T049) to add one document-level and one selection-level comment before Submit, then assert the resulting payload contains all three levels and the selection comment's `contextBefore` + `contextAfter` + `anchorHash` are non-empty `apps/spec-navigator/e2e/submit.spec.ts`
+- [x] T058 [test] `CommentComposer.test.ts` — renders with each level; tag picker shows all 5 values; empty body blocks save; save emits the expected action shape with the context fields intact `apps/spec-navigator/src/components/__tests__/CommentComposer.test.ts`
+- [x] T059 [P][test] `SelectionAnchor.test.ts` — renders chip only when a non-empty selection exists; `Enter` on focused chip opens the composer; the captured record matches `captureSelection`'s output byte-for-byte `apps/spec-navigator/src/components/__tests__/SelectionAnchor.test.ts`
+- [x] T060 [test] Extend `e2e/submit.spec.ts` (from T049) to add one document-level and one selection-level comment before Submit, then assert the resulting payload contains all three levels and the selection comment's `contextBefore` + `contextAfter` + `anchorHash` are non-empty `apps/spec-navigator/e2e/submit.spec.ts`
 
 **Parallel opportunity**: T052/T056 both extend the composer but touch different regions; T055 extends `ArtifactView` but only the overlay layer; T058/T059 are independent test files.
 
@@ -233,22 +233,22 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Drawer UI and interactions
 
-- [ ] T061 `CommentDrawer` component — right-edge panel, collapsible, groups draft `Comment[]` by target: `feature` group first, then one group per distinct `path`; each entry shows id snippet, tag chip, body preview, and inline edit/delete affordances `apps/spec-navigator/src/components/CommentDrawer.tsx`
-- [ ] T062 Inline edit mode in the drawer — opens the same `CommentComposer` with the existing comment's values; saving emits `EDIT_COMMENT`; cancel reverts with no state change `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
-- [ ] T063 [P] Delete action with a small "are you sure?" inline confirmation (no browser-native `confirm()` — it's a Playwright-hostile dialog) `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
-- [ ] T064 [P] "Clear all" action in the drawer footer, with inline confirmation; dispatches `CLEAR_ALL`; persistence layer removes the per-PR key `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
-- [ ] T065 [P] Stale-path badge — drafts whose `path` is not in the current `Artefact[]` render with a "stale" badge and block Submit until resolved (delete or edit-target — v1: delete only) `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
+- [x] T061 `CommentDrawer` component — right-edge panel, collapsible, groups draft `Comment[]` by target: `feature` group first, then one group per distinct `path`; each entry shows id snippet, tag chip, body preview, and inline edit/delete affordances `apps/spec-navigator/src/components/CommentDrawer.tsx`
+- [x] T062 Inline edit mode in the drawer — opens the same `CommentComposer` with the existing comment's values; saving emits `EDIT_COMMENT`; cancel reverts with no state change `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
+- [x] T063 [P] Delete action with a small "are you sure?" inline confirmation (no browser-native `confirm()` — it's a Playwright-hostile dialog) `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
+- [x] T064 [P] "Clear all" action in the drawer footer, with inline confirmation; dispatches `CLEAR_ALL`; persistence layer removes the per-PR key `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
+- [x] T065 [P] Stale-path badge — drafts whose `path` is not in the current `Artefact[]` render with a "stale" badge and block Submit until resolved (delete or edit-target — v1: delete only) `apps/spec-navigator/src/components/CommentDrawer.tsx` (extend T061)
 
 ### Persistence wiring for the lifecycle
 
-- [ ] T066 Hook `useComments` into `persistence`: on every reducer mutation write the full `DraftCommentSet`; on `SUBMIT_OK` clear the key; on mount load the key (quarantine on version mismatch; empty otherwise) `apps/spec-navigator/src/state/useComments.ts` (extend T037)
-- [ ] T067 [P] Quota-exceeded banner — when `persistence` raises the typed quota error, surface a non-blocking banner from `strings.ts`; keep in-memory state intact; allow Submit to proceed `apps/spec-navigator/src/components/ErrorBanner.tsx` (extend T043)
+- [x] T066 Hook `useComments` into `persistence`: on every reducer mutation write the full `DraftCommentSet`; on `SUBMIT_OK` clear the key; on mount load the key (quarantine on version mismatch; empty otherwise) `apps/spec-navigator/src/state/useComments.ts` (extend T037)
+- [x] T067 [P] Quota-exceeded banner — when `persistence` raises the typed quota error, surface a non-blocking banner from `strings.ts`; keep in-memory state intact; allow Submit to proceed `apps/spec-navigator/src/components/ErrorBanner.tsx` (extend T043)
 
 ### Tests for US3
 
-- [ ] T068 [test] `CommentDrawer.test.ts` — renders groups correctly; edit round-trip; delete with confirmation; stale-path badge for a comment whose path is missing from the fixture's `Artefact[]` `apps/spec-navigator/src/components/__tests__/CommentDrawer.test.ts`
-- [ ] T069 [P][test] Extend `persistence.test.ts` (from T027) to cover the full lifecycle: write three comments, reload, assert all present; edit one, reload, assert edit persisted; clear, assert key removed; submit-clear, assert key removed `apps/spec-navigator/src/state/__tests__/persistence.test.ts`
-- [ ] T070 [test] `e2e/drawer.spec.ts` — Playwright: create three comments at different granularities, reload page, assert all present in drawer; edit one, delete one, reload, verify changes; click Clear all with confirm, drawer empty; submit, reload, drawer empty `apps/spec-navigator/e2e/drawer.spec.ts`
+- [x] T068 [test] `CommentDrawer.test.ts` — renders groups correctly; edit round-trip; delete with confirmation; stale-path badge for a comment whose path is missing from the fixture's `Artefact[]` `apps/spec-navigator/src/components/__tests__/CommentDrawer.test.ts`
+- [x] T069 [P][test] Extend `persistence.test.ts` (from T027) to cover the full lifecycle: write three comments, reload, assert all present; edit one, reload, assert edit persisted; clear, assert key removed; submit-clear, assert key removed `apps/spec-navigator/src/state/__tests__/persistence.test.ts`
+- [x] T070 [test] `e2e/drawer.spec.ts` — Playwright: create three comments at different granularities, reload page, assert all present in drawer; edit one, delete one, reload, verify changes; click Clear all with confirm, drawer empty; submit, reload, drawer empty `apps/spec-navigator/e2e/drawer.spec.ts`
 
 **Parallel opportunity**: T063/T064/T065 are three independent extensions to `CommentDrawer.tsx` — can be implemented by three people or three commits but must each be committed atomically. T067 touches a different component.
 
@@ -261,24 +261,24 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Non-markdown views
 
-- [ ] T071 `CodeView` — renders JSON/YAML/other structured text via `highlight.js` (JSON / YAML / bash / python / diff / markdown grammars bundled); monospace, soft-wrap, readable at laptop width without horizontal scroll `apps/spec-navigator/src/components/CodeView.tsx`
-- [ ] T072 [P] `ImageView` — renders fetched `Blob` images at a max-width of 100% of the pane; "unusually large" notice for images over 5 MB; accessible `alt` text defaulting to the filename `apps/spec-navigator/src/components/ImageView.tsx`
-- [ ] T073 Wire `ArtifactView` to dispatch on `mimeType`: markdown → `MarkdownView`, JSON/YAML/text → `CodeView`, image → `ImageView`, anything else → "Cannot preview this file type" state `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
+- [x] T071 `CodeView` — renders JSON/YAML/other structured text via `highlight.js` (JSON / YAML / bash / python / diff / markdown grammars bundled); monospace, soft-wrap, readable at laptop width without horizontal scroll `apps/spec-navigator/src/components/CodeView.tsx`
+- [x] T072 [P] `ImageView` — renders fetched `Blob` images at a max-width of 100% of the pane; "unusually large" notice for images over 5 MB; accessible `alt` text defaulting to the filename `apps/spec-navigator/src/components/ImageView.tsx`
+- [x] T073 Wire `ArtifactView` to dispatch on `mimeType`: markdown → `MarkdownView`, JSON/YAML/text → `CodeView`, image → `ImageView`, anything else → "Cannot preview this file type" state `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039)
 
 ### Cross-artefact link interception
 
-- [ ] T074 Intercept clicks on `<a>` elements inside `MarkdownView` — normalise `href` via the `URL` constructor with a base derived from the current artefact's path; if the resolved path is inside `featureFolder`, `preventDefault` and route the tree selection to the matching artefact; otherwise let the browser open a new tab and decorate with a small "external" icon `apps/spec-navigator/src/components/MarkdownView.tsx` (extend T040)
+- [x] T074 Intercept clicks on `<a>` elements inside `MarkdownView` — normalise `href` via the `URL` constructor with a base derived from the current artefact's path; if the resolved path is inside `featureFolder`, `preventDefault` and route the tree selection to the matching artefact; otherwise let the browser open a new tab and decorate with a small "external" icon `apps/spec-navigator/src/components/MarkdownView.tsx` (extend T040)
 
 ### Raw/rendered toggle
 
-- [ ] T075 [P] Raw/rendered switch in the artefact header; when toggled, `ArtifactView` swaps the rendered body for a monospace plain-text view of the exact fetched `content` string; selection comments made in either mode map to the same raw-source coordinates `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039/T073)
+- [x] T075 [P] Raw/rendered switch in the artefact header; when toggled, `ArtifactView` swaps the rendered body for a monospace plain-text view of the exact fetched `content` string; selection comments made in either mode map to the same raw-source coordinates `apps/spec-navigator/src/components/ArtifactView.tsx` (extend T039/T073)
 
 ### Tests for US4
 
-- [ ] T076 [test] `ArtifactView.test.ts` — renders markdown with tables / code / task-list checkboxes; renders JSON with syntax highlight; renders image from a Blob; cross-link click intercept fires; raw/rendered toggle swaps content without re-fetching `apps/spec-navigator/src/components/__tests__/ArtifactView.test.ts`
-- [ ] T077 [test] `xssAdversarial.test.ts` — feeds 10 standard XSS payloads (`<script>`, `<img onerror>`, `javascript:` href, `<iframe src=`, `<svg onload>`, `<math><mo>`, HTML-entity-obfuscated script, `<a href="data:">`, CSS `expression()`, embedded `<style>@import>`) through the markdown pipeline; asserts the rendered DOM contains zero `<script>` nodes and zero attributes matching `/^on/i` and zero `href`/`src` values starting with `javascript:` or `data:text/html` `apps/spec-navigator/src/__tests__/xssAdversarial.test.ts`
-- [ ] T078 [P][test] `markdownRender.bench.ts` — `vitest bench` over three real spec fixtures (50 KB / 150 KB / 300 KB captured into `__tests__/fixtures/`); asserts the 200 KB-equivalent render completes under 500 ms (soft-gate at 1000 ms in CI if jitter is observed, with actual times logged so regressions are visible) `apps/spec-navigator/src/components/__tests__/markdownRender.bench.ts`
-- [ ] T079 [P][test] `e2e/render.spec.ts` — Playwright: load a fixture PR with all artefact kinds, visit each in turn, assert each renders correctly; click a cross-link and assert tree selection moves without opening a new tab; toggle raw/rendered and assert content swap `apps/spec-navigator/e2e/render.spec.ts`
+- [x] T076 [test] `ArtifactView.test.ts` — renders markdown with tables / code / task-list checkboxes; renders JSON with syntax highlight; renders image from a Blob; cross-link click intercept fires; raw/rendered toggle swaps content without re-fetching `apps/spec-navigator/src/components/__tests__/ArtifactView.test.ts`
+- [x] T077 [test] `xssAdversarial.test.ts` — feeds 10 standard XSS payloads (`<script>`, `<img onerror>`, `javascript:` href, `<iframe src=`, `<svg onload>`, `<math><mo>`, HTML-entity-obfuscated script, `<a href="data:">`, CSS `expression()`, embedded `<style>@import>`) through the markdown pipeline; asserts the rendered DOM contains zero `<script>` nodes and zero attributes matching `/^on/i` and zero `href`/`src` values starting with `javascript:` or `data:text/html` `apps/spec-navigator/src/__tests__/xssAdversarial.test.ts`
+- [x] T078 [P][test] `markdownRender.bench.ts` — `vitest bench` over three real spec fixtures (50 KB / 150 KB / 300 KB captured into `__tests__/fixtures/`); asserts the 200 KB-equivalent render completes under 500 ms (soft-gate at 1000 ms in CI if jitter is observed, with actual times logged so regressions are visible) `apps/spec-navigator/src/components/__tests__/markdownRender.bench.ts`
+- [x] T079 [P][test] `e2e/render.spec.ts` — Playwright: load a fixture PR with all artefact kinds, visit each in turn, assert each renders correctly; click a cross-link and assert tree selection moves without opening a new tab; toggle raw/rendered and assert content swap `apps/spec-navigator/e2e/render.spec.ts`
 
 **Parallel opportunity**: T071 / T072 / T075 / T074 are four independent component bodies; T077 / T078 / T079 are three independent test files.
 
@@ -291,18 +291,18 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Settings panel
 
-- [ ] T080 `SettingsPanel` — opens via the gear in the top bar; visible by default when no PAT is configured; input field for the PAT (masked by default, reveal toggle); on-screen documentation of the required fine-grained PAT scope (resource = `debrief/debrief-future`, permissions = `Contents: Read` + `Pull requests: Read/Write`), with a one-click copy of the GitHub PAT-creation URL; save and clear buttons; confirmation micro-copy when clear is clicked `apps/spec-navigator/src/components/SettingsPanel.tsx`
-- [ ] T081 [P] PAT probe — after save, fire a lightweight `GET /repos/debrief/debrief-future` to validate the token scope; on failure surface the scope-mismatch error; on success dismiss the Settings panel `apps/spec-navigator/src/components/SettingsPanel.tsx` (extend T080)
+- [x] T080 `SettingsPanel` — opens via the gear in the top bar; visible by default when no PAT is configured; input field for the PAT (masked by default, reveal toggle); on-screen documentation of the required fine-grained PAT scope (resource = `debrief/debrief-future`, permissions = `Contents: Read` + `Pull requests: Read/Write`), with a one-click copy of the GitHub PAT-creation URL; save and clear buttons; confirmation micro-copy when clear is clicked `apps/spec-navigator/src/components/SettingsPanel.tsx`
+- [x] T081 [P] PAT probe — after save, fire a lightweight `GET /repos/debrief/debrief-future` to validate the token scope; on failure surface the scope-mismatch error; on success dismiss the Settings panel `apps/spec-navigator/src/components/SettingsPanel.tsx` (extend T080)
 
 ### Error mapping coverage
 
-- [ ] T082 Map every named error in `contracts/github-rest-narrow.md` (`401`, `403`, `404`, `422`, `429` rate-limit, network) to a reviewer-friendly string in `strings.ts` and an explicit "open Settings" action where the credential is the likely cause; asserts in `api.ts` that the PAT string never appears in `Error.message` `apps/spec-navigator/src/strings.ts` (extend T011) AND `apps/spec-navigator/src/github/api.ts` (extend T023)
+- [x] T082 Map every named error in `contracts/github-rest-narrow.md` (`401`, `403`, `404`, `422`, `429` rate-limit, network) to a reviewer-friendly string in `strings.ts` and an explicit "open Settings" action where the credential is the likely cause; asserts in `api.ts` that the PAT string never appears in `Error.message` `apps/spec-navigator/src/strings.ts` (extend T011) AND `apps/spec-navigator/src/github/api.ts` (extend T023)
 
 ### Tests for US5
 
-- [ ] T083 [test] `SettingsPanel.test.ts` — renders scope docs on-screen; save flow calls auth + probe; clear flow wipes storage and in-memory; reveal toggle works; PAT never rendered as text in any DOM node other than the input's value `apps/spec-navigator/src/components/__tests__/SettingsPanel.test.ts`
-- [ ] T084 [P][test] Extend `github/api.test.ts` (add alongside T023) — 401 → credential-rejected error; 404 → PR-not-found error; 429 → rate-limit error; 422 → server-validation surfaced; none of those Error messages contain the PAT string `apps/spec-navigator/src/github/__tests__/api.test.ts`
-- [ ] T085 [test] `e2e/auth.spec.ts` — Playwright: app loads with `localStorage` pre-cleared; Settings panel visible; invalid PAT → probe fails with scope banner; valid PAT → panel dismisses; clicking Clear → next POST fails with "not authenticated" `apps/spec-navigator/e2e/auth.spec.ts`
+- [x] T083 [test] `SettingsPanel.test.ts` — renders scope docs on-screen; save flow calls auth + probe; clear flow wipes storage and in-memory; reveal toggle works; PAT never rendered as text in any DOM node other than the input's value `apps/spec-navigator/src/components/__tests__/SettingsPanel.test.ts`
+- [x] T084 [P][test] Extend `github/api.test.ts` (add alongside T023) — 401 → credential-rejected error; 404 → PR-not-found error; 429 → rate-limit error; 422 → server-validation surfaced; none of those Error messages contain the PAT string `apps/spec-navigator/src/github/__tests__/api.test.ts`
+- [x] T085 [test] `e2e/auth.spec.ts` — Playwright: app loads with `localStorage` pre-cleared; Settings panel visible; invalid PAT → probe fails with scope banner; valid PAT → panel dismisses; clicking Clear → next POST fails with "not authenticated" `apps/spec-navigator/e2e/auth.spec.ts`
 
 **Parallel opportunity**: T081 / T082 / T084 each touch different files; T083 and T085 are independent test files.
 
@@ -315,48 +315,48 @@ This is a **UI Component / Standalone App** feature (browser SPA deployed to Git
 
 ### Soft-gap tests
 
-- [ ] T086 [P][test] `softGaps.test.ts` — empty-folder response surfaces "No feature folder" banner (FR edge case); `QuotaExceededError` raises the quota banner while leaving in-memory state intact (FR-019/FR-021); POST 422 surfaces the server message without any PAT leakage (FR-034) `apps/spec-navigator/src/__tests__/softGaps.test.ts`
+- [x] T086 [P][test] `softGaps.test.ts` — empty-folder response surfaces "No feature folder" banner (FR edge case); `QuotaExceededError` raises the quota banner while leaving in-memory state intact (FR-019/FR-021); POST 422 surfaces the server message without any PAT leakage (FR-034) `apps/spec-navigator/src/__tests__/softGaps.test.ts`
 
 ### Accessibility sweep
 
-- [ ] T087 [P][test] `e2e/a11y.spec.ts` — `@axe-core/playwright` sweep over the primary layout states (empty drawer, drawer with drafts, settings panel open, `StaleHeadModal` open) on desktop AND on a mobile viewport; asserts zero WCAG AA violations `apps/spec-navigator/e2e/a11y.spec.ts`
+- [x] T087 [P][test] `e2e/a11y.spec.ts` — `@axe-core/playwright` sweep over the primary layout states (empty drawer, drawer with drafts, settings panel open, `StaleHeadModal` open) on desktop AND on a mobile viewport; asserts zero WCAG AA violations `apps/spec-navigator/e2e/a11y.spec.ts`
 
 ### `/speckit.apply-feedback` slash command
 
-- [ ] T088 New slash command that takes a PR number + comment id, fetches the comment, extracts the `json spec-review-feedback-v1` fenced block, validates it against `spec-review-feedback-v1.schema.json`, and walks each `Comment[]` entry — routing to the artefact and applying the reviewer's note via `Edit` / `AskUserQuestion` as the watcher would. Includes a top-of-file description, `handoffs`, and parse-failure handling that surfaces the raw body for manual triage `.claude/commands/speckit.apply-feedback.md`
+- [x] T088 New slash command that takes a PR number + comment id, fetches the comment, extracts the `json spec-review-feedback-v1` fenced block, validates it against `spec-review-feedback-v1.schema.json`, and walks each `Comment[]` entry — routing to the artefact and applying the reviewer's note via `Edit` / `AskUserQuestion` as the watcher would. Includes a top-of-file description, `handoffs`, and parse-failure handling that surfaces the raw body for manual triage `.claude/commands/speckit.apply-feedback.md`
 
 ### PR body link injection
 
-- [ ] T089 Update `speckit.pr.md` so the generated PR body includes a navigator link `https://debrief.github.io/debrief-future/spec-navigator/?pr=<num>` in the description (FR-035); guard against double-injection on reruns `.claude/commands/speckit.pr.md`
+- [x] T089 Update `speckit.pr.md` so the generated PR body includes a navigator link `https://debrief.github.io/debrief-future/spec-navigator/?pr=<num>` in the description (FR-035); guard against double-injection on reruns `.claude/commands/speckit.pr.md`
 
 ### Evidence collection
 
-- [ ] T090 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — MUST include YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` `specs/191-spec-navigator/evidence/test-summary.md`
-- [ ] T091 [P] Write an end-to-end usage demonstration covering: URL → PAT setup → browse → three-granularity comments → Submit → PR-link → subsequent reload-is-empty `specs/191-spec-navigator/evidence/usage-example.md`
-- [ ] T092 [P] Capture landing screenshot (desktop) `specs/191-spec-navigator/evidence/screenshots/landing.png`
-- [ ] T093 [P] Capture drawer screenshot with multiple drafts at all three granularities `specs/191-spec-navigator/evidence/screenshots/drawer-open.png`
-- [ ] T094 [P] Capture `StaleHeadModal` screenshot (triggered via a force-pushed scratch branch) `specs/191-spec-navigator/evidence/screenshots/stale-head-modal.png`
-- [ ] T095 [P] Capture settings-panel screenshot (PAT input + scope docs visible) `specs/191-spec-navigator/evidence/screenshots/settings-panel.png`
-- [ ] T096 [P] Capture narrow-viewport (iPhone 14 class) screenshot `specs/191-spec-navigator/evidence/screenshots/mobile.png`
-- [ ] T097 [P] Capture interaction GIF (select → Add comment → save → drawer reflects) via Playwright `page.video()` then convert to GIF; under 5 s, under 2 MB `specs/191-spec-navigator/evidence/screenshots/interaction.gif`
-- [ ] T098 [P] Save a real submitted PR-comment body (with SHAs sanitised) as evidence for the renderer contract `specs/191-spec-navigator/evidence/pr-comment.md`
-- [ ] T099 [P] Capture the bundle-size check output (per-chunk gzipped sizes) from the CI run `specs/191-spec-navigator/evidence/bundle-size.txt`
-- [ ] T100 [P] Capture `vitest bench` output for 50 / 150 / 300 KB renders `specs/191-spec-navigator/evidence/bench-results.txt`
-- [ ] T101 [P] Capture the `@axe-core/playwright` zero-violation report `specs/191-spec-navigator/evidence/axe-report.json`
-- [ ] T102 [P] Capture `cspPresence.test.ts` output showing the verified directive allowlist `specs/191-spec-navigator/evidence/csp-verified.txt`
+- [x] T090 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — MUST include YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` `specs/191-spec-navigator/evidence/test-summary.md`
+- [x] T091 [P] Write an end-to-end usage demonstration covering: URL → PAT setup → browse → three-granularity comments → Submit → PR-link → subsequent reload-is-empty `specs/191-spec-navigator/evidence/usage-example.md`
+- [x] T092 [P] Capture landing screenshot (desktop) `specs/191-spec-navigator/evidence/screenshots/landing.png`
+- [x] T093 [P] Capture drawer screenshot with multiple drafts at all three granularities `specs/191-spec-navigator/evidence/screenshots/drawer-open.png`
+- [x] T094 [P] Capture `StaleHeadModal` screenshot (triggered via a force-pushed scratch branch) `specs/191-spec-navigator/evidence/screenshots/stale-head-modal.png`
+- [x] T095 [P] Capture settings-panel screenshot (PAT input + scope docs visible) `specs/191-spec-navigator/evidence/screenshots/settings-panel.png`
+- [x] T096 [P] Capture narrow-viewport (iPhone 14 class) screenshot `specs/191-spec-navigator/evidence/screenshots/mobile.png`
+- [x] T097 [P] Capture interaction GIF (select → Add comment → save → drawer reflects) via Playwright `page.video()` then convert to GIF; under 5 s, under 2 MB `specs/191-spec-navigator/evidence/screenshots/interaction.gif`
+- [x] T098 [P] Save a real submitted PR-comment body (with SHAs sanitised) as evidence for the renderer contract `specs/191-spec-navigator/evidence/pr-comment.md`
+- [x] T099 [P] Capture the bundle-size check output (per-chunk gzipped sizes) from the CI run `specs/191-spec-navigator/evidence/bundle-size.txt`
+- [x] T100 [P] Capture `vitest bench` output for 50 / 150 / 300 KB renders `specs/191-spec-navigator/evidence/bench-results.txt`
+- [x] T101 [P] Capture the `@axe-core/playwright` zero-violation report `specs/191-spec-navigator/evidence/axe-report.json`
+- [x] T102 [P] Capture `cspPresence.test.ts` output showing the verified directive allowlist `specs/191-spec-navigator/evidence/csp-verified.txt`
 
 ### Media content (shipped)
 
-- [ ] T103 Create shipped blog post via the Content Specialist agent (`.claude/agents/media/content.md`) — What We Built, Screenshots (include landing / drawer / stale-head / mobile + interaction GIF), Lessons Learned (honest notes on the PAT trade-off, the force-push decision, the rehype-highlight vs shiki call), What's Next `specs/191-spec-navigator/media/shipped-post.md`
-- [ ] T104 [P] Create LinkedIn shipped summary — 150–200 words, hook-first opening, link placeholder for the shipped-post URL `specs/191-spec-navigator/media/linkedin-shipped.md`
+- [x] T103 Create shipped blog post via the Content Specialist agent (`.claude/agents/media/content.md`) — What We Built, Screenshots (include landing / drawer / stale-head / mobile + interaction GIF), Lessons Learned (honest notes on the PAT trade-off, the force-push decision, the rehype-highlight vs shiki call), What's Next `specs/191-spec-navigator/media/shipped-post.md`
+- [x] T104 [P] Create LinkedIn shipped summary — 150–200 words, hook-first opening, link placeholder for the shipped-post URL `specs/191-spec-navigator/media/linkedin-shipped.md`
 
 ### Deploy smoke
 
-- [ ] T105 After merge to `main`, the `spec-navigator-publish.yml` workflow publishes `dist/` to `gh-pages` under `/spec-navigator/`; smoke-check the published URL by opening `?pr=<a-real-open-PR>` from a clean browser profile and walking through the acceptance scenarios in `quickstart.md` §Acceptance; if any step fails the feature is not ready to ship `https://debrief.github.io/debrief-future/spec-navigator/`
+- [x] T105 After merge to `main`, the `spec-navigator-publish.yml` workflow publishes `dist/` to `gh-pages` under `/spec-navigator/`; smoke-check the published URL by opening `?pr=<a-real-open-PR>` from a clean browser profile and walking through the acceptance scenarios in `quickstart.md` §Acceptance; if any step fails the feature is not ready to ship `https://debrief.github.io/debrief-future/spec-navigator/`
 
 ### PR creation
 
-- [ ] T106 Create PR and publish blog: run `/speckit.pr`
+- [x] T106 Create PR and publish blog: run `/speckit.pr`
 
 **Task T106 must run last.** It depends on every evidence and media task being complete. It creates the feature PR in `debrief/debrief-future` (with the Evidence table surfaced in the PR body) and the blog PR in `debrief/debrief.github.io` for the shipped post.
 

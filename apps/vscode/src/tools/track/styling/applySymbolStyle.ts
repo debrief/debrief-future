@@ -4,14 +4,17 @@
  */
 
 import type { TrackFeature } from '@debrief/schemas';
-import { isTrackFeature } from '@debrief/schemas';
+import { isTrackFeature, PointShapeEnum } from '@debrief/schemas';
+import type { PointShape } from '@debrief/utils';
 import type { MCPToolDefinition } from '../../../types/tool';
 
-const VALID_SYMBOLS = ['circle', 'square', 'diamond', 'triangle', 'cross'] as const;
-type SymbolType = typeof VALID_SYMBOLS[number];
+// Schema-derived list of valid marker shapes — no hand-typed union here so
+// adding a value to LinkML `PointShapeEnum` widens the accepted set
+// automatically after regeneration (FR-014 / SC-006).
+const VALID_SYMBOLS = Object.values(PointShapeEnum) as readonly PointShape[];
 
 export interface ApplySymbolStyleParams {
-  symbol?: SymbolType;
+  symbol?: PointShape;
   radius?: number;
   fill_color?: string;
 }
@@ -26,7 +29,7 @@ export const toolDefinition: MCPToolDefinition = {
       params: {
         type: 'object',
         properties: {
-          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'square', 'x-debrief-param-type': 'MarkerSymbol' },
+          symbol: { type: 'string', enum: [...VALID_SYMBOLS] as string[], default: 'square', 'x-debrief-param-type': 'MarkerSymbol' },
           radius: { type: 'number', default: 4 },
           fill_color: { type: 'string' },
         },
@@ -46,9 +49,9 @@ export function execute(
   params: ApplySymbolStyleParams,
 ): TrackFeature[] {
   const { symbol: rawSymbol, radius = 4, fill_color } = params;
-  const symbol: SymbolType = rawSymbol || 'square';
+  const symbol: PointShape = rawSymbol || 'square';
 
-  if (!VALID_SYMBOLS.includes(symbol)) {
+  if (!(VALID_SYMBOLS as readonly string[]).includes(symbol)) {
     throw new Error(`symbol must be one of: ${VALID_SYMBOLS.join(', ')}`);
   }
 

@@ -170,8 +170,11 @@ export function groupEntriesByFeature(
 
 /**
  * Format an ISO 8601 duration to a human-readable string.
- * e.g., "PT0.5S" → "500ms", "PT1M2S" → "1m 2s", "PT0.25S" → "250ms"
- * Feature 176: sub-second durations now display in milliseconds.
+ *
+ * Feature 176 (FR-013):
+ * - Sub-second values display as "Xms" (e.g. "250ms").
+ * - Whole-seconds-only values display as "X.Xs" (e.g. "1.0s", "30.0s").
+ * - Mixed h/m/s values display each unit ("1h 30m 15s").
  */
 export function formatDuration(isoDuration: string): string {
   const match = isoDuration.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/);
@@ -191,25 +194,31 @@ export function formatDuration(isoDuration: string): string {
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
   if (seconds > 0) {
-    // Show decimal only when needed (e.g. 2.3s, not 2.0s)
-    const sStr = seconds % 1 === 0 ? `${seconds}` : `${seconds}`;
-    parts.push(`${sStr}s`);
+    // Seconds-only display uses single-decimal formatting per FR-013.
+    // When combined with h/m, keep integer rendering for readability.
+    if (hours === 0 && minutes === 0) {
+      parts.push(`${seconds.toFixed(1)}s`);
+    } else {
+      const sStr = seconds % 1 === 0 ? `${seconds}` : seconds.toFixed(1);
+      parts.push(`${sStr}s`);
+    }
   }
 
   return parts.length > 0 ? parts.join(' ') : '< 1s';
 }
 
 /**
- * Format an ISO 8601 timestamp to a short display string.
+ * Format an ISO 8601 timestamp as "HH:MM:SS UTC" per FR-014.
+ * Timestamps are always rendered in UTC regardless of the viewer's timezone.
  */
 export function formatTimestamp(isoTimestamp: string): string {
   try {
     const date = new Date(isoTimestamp);
-    return date.toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
+    if (Number.isNaN(date.getTime())) return isoTimestamp;
+    const hh = String(date.getUTCHours()).padStart(2, '0');
+    const mm = String(date.getUTCMinutes()).padStart(2, '0');
+    const ss = String(date.getUTCSeconds()).padStart(2, '0');
+    return `${hh}:${mm}:${ss} UTC`;
   } catch {
     return isoTimestamp;
   }

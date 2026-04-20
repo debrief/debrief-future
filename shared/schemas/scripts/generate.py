@@ -426,6 +426,44 @@ def generate_typescript() -> bool:
                 )
                 content = content[:idx] + fixed_block + content[brace_idx:]
 
+        # Post-process (Feature 201 / FR-014): narrow `symbol: string` on the
+        # two enum-ranged attributes (`PositionStyle.symbol`,
+        # `PositionStyleOverride.symbol`) to the template-literal union
+        # `PointShape` derived from `PointShapeEnum`. gen-typescript emits
+        # `string` for enum-ranged attributes; without this narrowing,
+        # callers cannot catch `{ symbol: 'star' }` at compile time. The
+        # `PointShape` type is injected immediately after the PointShapeEnum
+        # declaration (same file, no cross-package import — avoids a build-
+        # order cycle with @debrief/utils which consumes PointShapeEnum).
+        _point_shape_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible point-marker shapes\n"
+            "* from PointShapeEnum. Narrows the `symbol` field on PositionStyle /\n"
+            "* PositionStyleOverride so TypeScript rejects an unknown shape at\n"
+            "* compile time (Feature 201 / FR-014).\n"
+            "*/\n"
+            "export type PointShape = `${PointShapeEnum}`;\n"
+        )
+        _point_shape_sentinel = "export enum PointShapeEnum {"
+        if _point_shape_sentinel in content and "export type PointShape" not in content:
+            # Find the closing brace that ends the PointShapeEnum declaration.
+            enum_start = content.index(_point_shape_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _point_shape_decl + content[enum_end + len("};\n") :]
+
+        _symbol_narrow_targets = ("PositionStyle", "PositionStyleOverride")
+        for iface_name in _symbol_narrow_targets:
+            old_sig = f"export interface {iface_name}"
+            if old_sig in content:
+                idx = content.index(old_sig)
+                brace_idx = content.index("}", idx)
+                block = content[idx:brace_idx]
+                fixed_block = block.replace("symbol: string,", "symbol: PointShape,").replace(
+                    "symbol?: string,", "symbol?: PointShape,"
+                )
+                content = content[:idx] + fixed_block + content[brace_idx:]
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 

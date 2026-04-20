@@ -7,8 +7,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { execute } from '../../src/tools/track/styling/applySymbolStyle';
+import { execute, toolDefinition } from '../../src/tools/track/styling/applySymbolStyle';
 import type { ApplySymbolStyleParams } from '../../src/tools/track/styling/applySymbolStyle';
+import { PointShapeEnum } from '@debrief/schemas';
 
 interface TestTrackFeature {
   type: 'Feature';
@@ -106,7 +107,7 @@ describe('applySymbolStyle (T032)', () => {
     const feature = makeTrackFeature();
 
     expect(() => execute([feature], { symbol: 'hexagon' as unknown as ApplySymbolStyleParams['symbol'] })).toThrow(
-      'symbol must be one of: circle, square, diamond, triangle, cross',
+      /^symbol must be one of: circle, square, triangle, diamond, cross$/,
     );
   });
 
@@ -133,5 +134,22 @@ describe('applySymbolStyle (T032)', () => {
     expect(result).toHaveLength(1);
     const point = result[0].properties.style.point;
     expect(point.shape).toBe('square');
+  });
+});
+
+describe('apply-symbol-style — schema-derived enum (FR-014 / SC-006)', () => {
+  it('toolDefinition.inputSchema.properties.params.properties.symbol.enum matches PointShapeEnum', () => {
+    const params = (
+      toolDefinition.inputSchema as {
+        properties: {
+          params: {
+            properties: {
+              symbol: { enum: string[] };
+            };
+          };
+        };
+      }
+    ).properties.params.properties.symbol.enum;
+    expect([...params].sort()).toEqual([...Object.values(PointShapeEnum)].sort());
   });
 });

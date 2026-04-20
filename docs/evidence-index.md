@@ -18,3 +18,5 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 181-linkml-platform-overrides | 3 | md | 2026-04-13 | current | [#421](https://github.com/debrief/debrief-future/pull/421) |
 | 182-import-platform-warnings | 3 | md, json | 2026-04-13 | current | [#422](https://github.com/debrief/debrief-future/pull/422) |
 | 184-regenerate-sample-catalog | 5 | md, json, txt | 2026-04-13 | current | [#427](https://github.com/debrief/debrief-future/pull/427) |
+| 201-knip-loader-config | 6 | md, txt | 2026-04-18 | current | [#474](https://github.com/debrief/debrief-future/pull/474) |
+| 200-bounds-consolidation | 10 | md, txt | 2026-04-20 | current | [#482](https://github.com/debrief/debrief-future/pull/482) |
