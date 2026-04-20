@@ -42,34 +42,43 @@ describe('check-eslint-drift-wiring — synthetic tree (failure modes)', () => {
   const sharedEslintRules = (): string => path.join(tmpRoot, 'shared', 'eslint-rules');
   const scriptsDir = (): string => path.join(tmpRoot, 'scripts');
 
+  const CALLER_MODULE_BASENAMES = [
+    'no-redeclare-utils-exports.cjs',
+    'no-redeclare-schemas-exports.cjs',
+    'no-redeclare-components-exports.cjs',
+    'no-redeclare-session-state-exports.cjs',
+    'no-redeclare-data-exports.cjs',
+  ];
+
   beforeAll(() => {
     tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'drift-wiring-'));
     // Copy caller modules from the real tree so the tested script can
     // resolve them via `require()`.
     fs.mkdirSync(sharedEslintRules(), { recursive: true });
-    const realCaller = path.resolve(
-      REPO_ROOT,
-      'shared',
-      'eslint-rules',
-      'no-redeclare-utils-exports.cjs',
-    );
     const realFactory = path.resolve(
       REPO_ROOT,
       'shared',
       'eslint-rules',
       'drift-rule-factory.cjs',
     );
-    // We use absolute-path requires in the synthetic caller to avoid having
-    // to copy the factory + utils source tree.
-    const syntheticCaller = `
-      const rules = require(${JSON.stringify(realCaller)}).rules;
-      module.exports = { rules };
-    `;
-    fs.writeFileSync(
-      path.join(sharedEslintRules(), 'no-redeclare-utils-exports.cjs'),
-      syntheticCaller,
-    );
-    // Also reference the factory so it's discoverable from its expected name.
+    for (const basename of CALLER_MODULE_BASENAMES) {
+      const realCaller = path.resolve(
+        REPO_ROOT,
+        'shared',
+        'eslint-rules',
+        basename,
+      );
+      // Absolute-path require avoids having to copy the entire package src tree.
+      const syntheticCaller = `
+        const rules = require(${JSON.stringify(realCaller)}).rules;
+        module.exports = { rules };
+      `;
+      fs.writeFileSync(
+        path.join(sharedEslintRules(), basename),
+        syntheticCaller,
+      );
+    }
+    // Reference the factory so it's discoverable from its expected name.
     fs.writeFileSync(
       path.join(sharedEslintRules(), 'drift-rule-factory.cjs'),
       `module.exports = require(${JSON.stringify(realFactory)});`,
@@ -119,14 +128,24 @@ describe('check-eslint-drift-wiring — synthetic tree (failure modes)', () => {
     fs.mkdirSync(appsDir(), { recursive: true });
   }
 
-  it('(a) passes when every apps/*/.eslintrc.cjs spreads the caller module', () => {
+  it('(a) passes when every apps/*/.eslintrc.cjs spreads every caller module', () => {
     clearAppsDir();
     writeAppEslintrc(
       'ok-app',
       `const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+       const { rules: schemasDriftRules } = require('../../shared/eslint-rules/no-redeclare-schemas-exports.cjs');
+       const { rules: componentsDriftRules } = require('../../shared/eslint-rules/no-redeclare-components-exports.cjs');
+       const { rules: sessionStateDriftRules } = require('../../shared/eslint-rules/no-redeclare-session-state-exports.cjs');
+       const { rules: dataDriftRules } = require('../../shared/eslint-rules/no-redeclare-data-exports.cjs');
        module.exports = {
          rules: {
-           'no-restricted-syntax': ['error', ...utilsDriftRules],
+           'no-restricted-syntax': ['error',
+             ...utilsDriftRules,
+             ...schemasDriftRules,
+             ...componentsDriftRules,
+             ...sessionStateDriftRules,
+             ...dataDriftRules,
+           ],
          },
        };`,
     );
@@ -135,7 +154,7 @@ describe('check-eslint-drift-wiring — synthetic tree (failure modes)', () => {
     expect(result.stdout).toContain('✓ check-eslint-drift-wiring');
   });
 
-  it('(b) fails when an app omits the spread', () => {
+  it('(b) fails when an app omits every spread — names all 5 missing caller modules', () => {
     clearAppsDir();
     writeAppEslintrc(
       'missing-app',
@@ -150,6 +169,37 @@ describe('check-eslint-drift-wiring — synthetic tree (failure modes)', () => {
     expect(result.stderr).toContain('❌ ESLint drift-rule wiring check failed');
     expect(result.stderr).toContain('apps/missing-app/.eslintrc.cjs');
     expect(result.stderr).toContain('...utilsDriftRules');
+    expect(result.stderr).toContain('...schemasDriftRules');
+    expect(result.stderr).toContain('...componentsDriftRules');
+    expect(result.stderr).toContain('...sessionStateDriftRules');
+    expect(result.stderr).toContain('...dataDriftRules');
+  });
+
+  it('(b2) fails when an app is missing only one of the five spreads', () => {
+    clearAppsDir();
+    writeAppEslintrc(
+      'partial-app',
+      `const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+       const { rules: schemasDriftRules } = require('../../shared/eslint-rules/no-redeclare-schemas-exports.cjs');
+       const { rules: componentsDriftRules } = require('../../shared/eslint-rules/no-redeclare-components-exports.cjs');
+       const { rules: sessionStateDriftRules } = require('../../shared/eslint-rules/no-redeclare-session-state-exports.cjs');
+       // dataDriftRules intentionally omitted.
+       module.exports = {
+         rules: {
+           'no-restricted-syntax': ['error',
+             ...utilsDriftRules,
+             ...schemasDriftRules,
+             ...componentsDriftRules,
+             ...sessionStateDriftRules,
+           ],
+         },
+       };`,
+    );
+    const result = runSyntheticScript();
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('apps/partial-app/.eslintrc.cjs');
+    expect(result.stderr).toContain('...dataDriftRules');
+    expect(result.stderr).not.toContain('...utilsDriftRules');
   });
 
   it('(c) fails when the eslintrc has no no-restricted-syntax rule at all', () => {
@@ -179,9 +229,19 @@ describe('check-eslint-drift-wiring — synthetic tree (failure modes)', () => {
     writeAppEslintrc(
       'ok-app-2',
       `const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+       const { rules: schemasDriftRules } = require('../../shared/eslint-rules/no-redeclare-schemas-exports.cjs');
+       const { rules: componentsDriftRules } = require('../../shared/eslint-rules/no-redeclare-components-exports.cjs');
+       const { rules: sessionStateDriftRules } = require('../../shared/eslint-rules/no-redeclare-session-state-exports.cjs');
+       const { rules: dataDriftRules } = require('../../shared/eslint-rules/no-redeclare-data-exports.cjs');
        module.exports = {
          rules: {
-           'no-restricted-syntax': ['error', ...utilsDriftRules],
+           'no-restricted-syntax': ['error',
+             ...utilsDriftRules,
+             ...schemasDriftRules,
+             ...componentsDriftRules,
+             ...sessionStateDriftRules,
+             ...dataDriftRules,
+           ],
          },
        };`,
     );

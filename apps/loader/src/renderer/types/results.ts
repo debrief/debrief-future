@@ -21,8 +21,11 @@ export type LoaderErrorCode =
 
 /**
  * Result of a successful load operation.
+ *
+ * Loader-local shape distinct from `@debrief/session-state`'s `LoadResult`.
+ * Kept separate to avoid the drift-guard redeclaration; see spec #214.
  */
-export interface LoadResult {
+export interface LoaderLoadResult {
   /** Target plot ID */
   plotId: string;
 

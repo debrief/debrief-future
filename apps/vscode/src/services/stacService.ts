@@ -17,24 +17,10 @@ import type {
   PlatformRecord,
 } from '../types/stac';
 
-/**
- * Associated file from STAC item sources or results folder.
- * Matches the interface from shared/components for compatibility.
- */
-export interface AssociatedFile {
-  /** Display name */
-  name: string;
-  /** Path relative to STAC item */
-  path: string;
-  /** Source or result */
-  category: 'source' | 'result';
-  /** Parsed from multi-suffix convention (e.g., '2d', 'table') */
-  viewerType?: string;
-  /** File format (e.g., 'json', 'geojson', 'csv') */
-  format?: string;
-  /** File modification time (epoch ms) for chronological ordering */
-  mtime?: number;
-}
+// AssociatedFile is canonically defined by `@debrief/components`; re-export
+// rather than redeclare (see spec #214 drift guard).
+export type { AssociatedFile } from '@debrief/components';
+import type { AssociatedFile } from '@debrief/components';
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
