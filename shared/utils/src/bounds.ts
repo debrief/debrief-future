@@ -21,7 +21,7 @@ export type { Bounds };
  * subtyping — so no call site needs an `as`-cast.
  */
 type BoundsInputFeature = {
-  geometry: { type: string; coordinates: unknown } | null | undefined;
+  geometry?: { type: string; coordinates: unknown } | null | undefined;
 };
 
 /**
