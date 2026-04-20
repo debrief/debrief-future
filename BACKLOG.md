@@ -130,7 +130,7 @@ Large features broken down into multiple backlog items.
 
 | ID | Title | Description | Status | Items |
 |----|-------|-------------|--------|-------|
-| 024 | [Storyboarding Briefings](docs/ideas/017-storyboarding-briefings.md) | Add storyboarding capability for mission/exercise briefings | proposed | — |
+| 024 | [Storyboarding Briefings](specs/202-storyboarding/spec.md) | Add storyboarding capability for mission/exercise briefings | specified | — |
 | E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | ~~#062~~, #063, #064, #065, #066, ~~#067~~, #068 |
 | ~~E02~~ | ~~PROV Logging Implementation~~ | ~~[Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md)~~ | ~~complete~~ | ~~#070, #071, #072, #073, #074, #075, #076~~ |
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | ~~#078~~, #079, ~~#080~~, #081, #082, #084 |
