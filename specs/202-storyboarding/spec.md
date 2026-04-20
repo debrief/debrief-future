@@ -691,7 +691,60 @@ map; no modal navigation is required beyond inline prompts.
 
 ## Success Criteria *(mandatory)*
 
-> _Pending — measurable, technology-agnostic._
+Each criterion is expressed in user- or behaviour-facing terms that can be
+verified without knowing implementation details.
+
+### Measurable Outcomes
+
+- **SC-001 — Fast capture loop.** From the moment the analyst triggers
+  capture to the moment the new Scene appears in the panel list, the
+  median end-to-end time is **under 1.5 seconds** (including thumbnail
+  production) on the reference test plot.
+- **SC-002 — Smooth playback.** When advancing between Scenes, the visible
+  map transition completes within **`transition_duration_ms` + 150 ms**
+  tolerance; the time slider lands on the target timestamp at the end of
+  the transition with no perceptible overshoot.
+- **SC-003 — Lossless round-trip.** A Storyboard with at least one Scene
+  that is saved, the plot closed, and the plot re-opened shows **zero
+  differences** in any persisted attribute (including nested `viewport`,
+  `history`, and the ordering of `visible_feature_ids`).
+- **SC-004 — Integrity on failure.** When thumbnail production fails on
+  **any** capture, duplicate, or update-to-current attempt, **no partial
+  Scene** is persisted and the plot's dirty state is unchanged by the
+  failed op — measured across 100% of induced-failure test runs.
+- **SC-005 — No silent overwrites.** **100%** of attempts to create a
+  Scene at an already-used timestamp (via capture or copy-to-other-
+  storyboard) present the Replace / Offset / Cancel prompt; none are
+  silently accepted or silently rejected.
+- **SC-006 — Reliable missing-data guard.** **100%** of Scenes whose
+  `visible_feature_ids` do not fully resolve in the current plot — or
+  whose `timestamp` falls outside the plot's time range — activate the
+  hard-block prompt on attempted step or edit; none slip through.
+- **SC-007 — Analyst can build a briefing quickly.** A trained analyst
+  can produce a **10-Scene** Storyboard (capture, rename, optional short
+  description on each) in **under 10 minutes** median on the reference
+  test plot.
+- **SC-008 — End-to-end briefing delivery.** A prepared Storyboard of at
+  least 5 Scenes can be walked forward and backward from first to last
+  Scene using **only the on-screen transport or scoped arrow keys** —
+  with no extra clicks, no detours through menus, and no observable
+  desync between the map, time slider, and panel selection.
+- **SC-009 — Multi-storyboard switch is instant.** Changing the active
+  Storyboard via the header dropdown updates the Scene list and the
+  on-map Scene rectangles **within the same user interaction** — no
+  visible stale state persists after the dropdown closes.
+- **SC-010 — Stale detection is accurate.** On plot open, **100%** of
+  Scenes whose underlying visible-feature set has changed are flagged
+  as stale, and **0%** of Scenes whose visible-feature set is unchanged
+  are falsely flagged.
+- **SC-011 — Full provenance coverage.** **100%** of persisted
+  Storyboards and Scenes carry complete `created_by`, `created_at`,
+  `last_modified_by`, `last_modified_at`, and at least one `history[]`
+  entry; **100%** of mutations are mirrored into the Analysis Log Panel.
+- **SC-012 — Offline end-to-end.** The full capture → edit → playback →
+  save → reopen cycle completes successfully with **no network access**
+  (Article I), verified by running the reference test with networking
+  disabled.
 
 ## Assumptions
 
