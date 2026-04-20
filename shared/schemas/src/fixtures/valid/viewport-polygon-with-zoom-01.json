@@ -1,0 +1,9 @@
+{
+  "coordinates": [
+    { "longitude": -2.5, "latitude": 52.5 },
+    { "longitude": 2.5, "latitude": 52.5 },
+    { "longitude": 2.5, "latitude": 50.5 },
+    { "longitude": -2.5, "latitude": 50.5 }
+  ],
+  "zoom": 10.5
+}

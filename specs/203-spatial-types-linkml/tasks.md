@@ -46,13 +46,13 @@
 
 **Checkpoint**: `task verify` may fail (expected — runtime still uses the duplicates). Schema tests from Phase 5 must later pass against these artefacts.
 
-- [ ] T001 Patch `ViewportPolygon` to add optional `zoom: float` attribute per `contracts/linkml-diff.md` §Change 1 `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T002 Patch `TimeFilter` to use `range: integer` nullable attributes per `contracts/linkml-diff.md` §Change 2 (reverses current `TimeInstant`-based shape; `TimeInstant` remains used by `TimeRange`) `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T003 [P] Add golden fixture exercising optional `zoom` on `ViewportPolygon` `shared/schemas/fixtures/viewport-polygon-with-zoom.json`
-- [ ] T004 [P] Update existing `ViewportPolygon` fixture to use object-form coordinates (remove any tuple remnants) `shared/schemas/fixtures/viewport-polygon.json`
-- [ ] T005 [P] Update existing `TimeFilter` fixture to use nullable epoch-integer shape `shared/schemas/fixtures/time-filter.json`
-- [ ] T006 Regenerate Pydantic, TypeScript, and JSON Schema artefacts by running `pnpm --filter @debrief/schemas build` — commit the regenerated files under `shared/schemas/src/generated/`
-- [ ] T007 Verify regeneration produced expected shapes: `Coordinate` unchanged, `ViewportPolygon.zoom?: number` present, `TimeFilter.start?/end?: number` (optional integers) — inspect `shared/schemas/src/generated/typescript/types.ts`
+- [x] T001 Patch `ViewportPolygon` to add optional `zoom: float` attribute per `contracts/linkml-diff.md` §Change 1 `shared/schemas/src/linkml/session-state.yaml`
+- [x] T002 Patch `TimeFilter` to use `range: integer` nullable attributes per `contracts/linkml-diff.md` §Change 2 (reverses current `TimeInstant`-based shape; `TimeInstant` remains used by `TimeRange`) `shared/schemas/src/linkml/session-state.yaml`
+- [x] T003 [P] Add golden fixture exercising optional `zoom` on `ViewportPolygon` `shared/schemas/src/fixtures/valid/viewport-polygon-with-zoom-01.json`
+- [x] T004 [P] Add `ViewportPolygon` fixture using object-form coordinates `shared/schemas/src/fixtures/valid/viewport-polygon-valid-01.json`
+- [x] T005 [P] Add `TimeFilter` fixtures using nullable epoch-integer shape `shared/schemas/src/fixtures/valid/time-filter-valid-01.json`, `time-filter-unbounded-start-01.json`, `time-filter-empty-01.json`
+- [x] T006 Regenerate Pydantic, TypeScript, and JSON Schema artefacts by running `uv run python scripts/generate.py --target all` (with PYTHONUTF8=1) — regenerated files committed under `shared/schemas/src/generated/`
+- [x] T007 Verified regeneration produced expected shapes: `Coordinate` unchanged, `ViewportPolygon.zoom?: number` present, `TimeFilter.start?/end?: number` (optional integers) — evidence in `evidence/schema-diff.md`
 
 **Parallel example (after T002 merges)**:
 ```
