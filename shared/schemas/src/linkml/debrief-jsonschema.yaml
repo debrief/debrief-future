@@ -26,3 +26,4 @@ imports:
   - system-record
   - stac-extension
   - tool-result
+  - storyboard

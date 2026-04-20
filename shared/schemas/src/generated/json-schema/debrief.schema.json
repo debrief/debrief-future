@@ -374,7 +374,9 @@
         "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON",
-        "SYSTEM_RECORD"
+        "SYSTEM_RECORD",
+        "STORYBOARD",
+        "STORYBOARD_SCENE"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -883,6 +885,13 @@
         "activity_id": {
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
+        },
+        "agent": {
+          "description": "Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "disabled": {
           "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
@@ -2231,6 +2240,140 @@
       "title": "ResultTypePath",
       "type": "object"
     },
+    "SceneFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature representing a Scene child entity",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Polygon covering the map viewport bounds at capture time. Antimeridian-crossing viewports produce a best-effort Polygon in MVP (module logs a warning; does not throw)."
+        },
+        "id": {
+          "description": "Stable identifier (equal to properties.id). ULID.",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/SceneProperties",
+          "description": "Scene properties"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "SceneFeature",
+      "type": "object"
+    },
+    "SceneProperties": {
+      "additionalProperties": false,
+      "description": "Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard \u2014 viewport, timestamp, and per-feature visibility.",
+      "properties": {
+        "description": {
+          "description": "Markdown per-scene narrative",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feature_set_hash": {
+          "description": "SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.",
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "id": {
+          "description": "ULID (26 chars, Crockford base-32). Immutable after create.",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "STORYBOARD_SCENE",
+          "description": "Feature kind discriminator (pinned to STORYBOARD_SCENE)"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "storyboard_id": {
+          "description": "Foreign key to parent Storyboard.properties.id (ULID).",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "thumbnail_asset_ref": {
+          "description": "STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers.",
+          "type": "string"
+        },
+        "time_range": {
+          "description": "Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timestamp": {
+          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "title": {
+          "description": "Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure.",
+          "type": "string"
+        },
+        "transition_duration_ms": {
+          "description": "Playback transition duration in milliseconds. Default 500.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "viewport": {
+          "$ref": "#/$defs/Viewport",
+          "description": "Map viewport camera state at capture time"
+        },
+        "visible_feature_ids": {
+          "description": "Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "storyboard_id",
+        "title",
+        "viewport",
+        "timestamp",
+        "visible_feature_ids",
+        "feature_set_hash",
+        "thumbnail_asset_ref",
+        "transition_duration_ms"
+      ],
+      "title": "SceneProperties",
+      "type": "object"
+    },
     "SegmentMetadata": {
       "additionalProperties": false,
       "description": "Per-segment metadata for compound tracks. Each segment corresponds to one LineString within a MultiLineString geometry. segments[i] describes geometry.coordinates[i].",
@@ -2812,6 +2955,97 @@
         "store_id"
       ],
       "title": "StacItemSummary",
+      "type": "object"
+    },
+    "StoryboardFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature representing a Storyboard parent entity",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Polygon hull covering the union of child Scene viewport bounds. Recomputed whenever the Scene set changes."
+        },
+        "id": {
+          "description": "Stable identifier (equal to properties.id). ULID.",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/StoryboardProperties",
+          "description": "Storyboard properties"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "StoryboardFeature",
+      "type": "object"
+    },
+    "StoryboardProperties": {
+      "additionalProperties": false,
+      "description": "Properties class for a Storyboard parent Feature. A Storyboard is a named, ordered collection of Scenes attached to a single plot.",
+      "properties": {
+        "description": {
+          "description": "Markdown narrative description",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "ULID (26 chars, Crockford base-32). Immutable after create.",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "STORYBOARD",
+          "description": "Feature kind discriminator (pinned to STORYBOARD)"
+        },
+        "name": {
+          "description": "Display title. Non-empty. Unique within plot FeatureCollection.",
+          "type": "string"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "schema_version": {
+          "description": "Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "name",
+        "schema_version"
+      ],
+      "title": "StoryboardProperties",
       "type": "object"
     },
     "SystemRecordProperties": {
@@ -3806,6 +4040,38 @@
       ],
       "title": "VesselDomainEnum",
       "type": "string"
+    },
+    "Viewport": {
+      "additionalProperties": false,
+      "description": "Camera state sub-record inside a Scene. Captures the map viewport at capture time.",
+      "properties": {
+        "bearing": {
+          "description": "Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports).",
+          "maximum": 0,
+          "minimum": 0,
+          "type": "number"
+        },
+        "center": {
+          "description": "[longitude, latitude] in degrees",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "zoom": {
+          "description": "Leaflet-compatible zoom level",
+          "type": "number"
+        }
+      },
+      "required": [
+        "center",
+        "zoom",
+        "bearing"
+      ],
+      "title": "Viewport",
+      "type": "object"
     },
     "WasGeneratedBy": {
       "additionalProperties": false,

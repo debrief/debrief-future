@@ -31,6 +31,10 @@ export enum FeatureKindEnum {
     MULTI_POLYGON = "MULTI_POLYGON",
     /** Plot-level system record (snapshot chain, branches) */
     SYSTEM_RECORD = "SYSTEM_RECORD",
+    /** Storyboard parent feature (panel-only entity, Polygon hull over child Scene viewports) */
+    STORYBOARD = "STORYBOARD",
+    /** Storyboard Scene feature (Polygon viewport bounds, captured moment in a Storyboard) */
+    STORYBOARD_SCENE = "STORYBOARD_SCENE",
 };
 /**
 * Type of track feature
@@ -68,7 +72,7 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-
+    
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
@@ -1093,6 +1097,8 @@ export interface LogEntry {
     disabled?: boolean,
     /** Free-text analyst annotation explaining the reasoning for this operation. */
     rationale?: string,
+    /** Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records. */
+    agent?: string,
 }
 
 
@@ -2009,6 +2015,97 @@ export interface DatasetEntry {
     /** Named data series for multi-line/multi-series charts. Corresponds to DatasetEnvelope.series (DataSeries[]). Absent when data_points is populated.
  */
     series?: DatasetSeries[],
+}
+
+
+/**
+ * Camera state sub-record inside a Scene. Captures the map viewport at capture time.
+ */
+export interface Viewport {
+    /** [longitude, latitude] in degrees */
+    center: number[],
+    /** Leaflet-compatible zoom level */
+    zoom: number,
+    /** Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports). */
+    bearing: number,
+}
+
+
+/**
+ * Properties class for a Storyboard parent Feature. A Storyboard is a named, ordered collection of Scenes attached to a single plot.
+ */
+export interface StoryboardProperties extends BaseFeatureProperties {
+    /** Feature kind discriminator (pinned to STORYBOARD) */
+    kind: string,
+    /** ULID (26 chars, Crockford base-32). Immutable after create. */
+    id: string,
+    /** Display title. Non-empty. Unique within plot FeatureCollection. */
+    name: string,
+    /** Markdown narrative description */
+    description?: string,
+    /** Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations. */
+    schema_version: number,
+}
+
+
+/**
+ * Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard — viewport, timestamp, and per-feature visibility.
+ */
+export interface SceneProperties extends BaseFeatureProperties {
+    /** Feature kind discriminator (pinned to STORYBOARD_SCENE) */
+    kind: string,
+    /** ULID (26 chars, Crockford base-32). Immutable after create. */
+    id: string,
+    /** Foreign key to parent Storyboard.properties.id (ULID). */
+    storyboard_id: string,
+    /** Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure. */
+    title: string,
+    /** Markdown per-scene narrative */
+    description?: string,
+    /** Map viewport camera state at capture time */
+    viewport: Viewport,
+    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard. */
+    timestamp: string,
+    /** Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1. */
+    time_range?: string,
+    /** Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective. */
+    visible_feature_ids: string[],
+    /** SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids. */
+    feature_set_hash: string,
+    /** STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers. */
+    thumbnail_asset_ref: string,
+    /** Playback transition duration in milliseconds. Default 500. */
+    transition_duration_ms: number,
+}
+
+
+/**
+ * GeoJSON Feature representing a Storyboard parent entity
+ */
+export interface StoryboardFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Stable identifier (equal to properties.id). ULID. */
+    id: string,
+    /** Polygon hull covering the union of child Scene viewport bounds. Recomputed whenever the Scene set changes. */
+    geometry: GeoJSONPolygon,
+    /** Storyboard properties */
+    properties: StoryboardProperties,
+}
+
+
+/**
+ * GeoJSON Feature representing a Scene child entity
+ */
+export interface SceneFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Stable identifier (equal to properties.id). ULID. */
+    id: string,
+    /** Polygon covering the map viewport bounds at capture time. Antimeridian-crossing viewports produce a best-effort Polygon in MVP (module logs a warning; does not throw). */
+    geometry: GeoJSONPolygon,
+    /** Scene properties */
+    properties: SceneProperties,
 }
 
 

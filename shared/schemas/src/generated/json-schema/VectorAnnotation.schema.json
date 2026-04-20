@@ -46,7 +46,9 @@
         "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON",
-        "SYSTEM_RECORD"
+        "SYSTEM_RECORD",
+        "STORYBOARD",
+        "STORYBOARD_SCENE"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -188,6 +190,13 @@
         "activity_id": {
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
+        },
+        "agent": {
+          "description": "Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "disabled": {
           "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",

@@ -353,7 +353,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       shared-zustand:
         specifier: ^2.1.0
-        version: 2.1.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1))
+        version: 2.1.0(zustand@5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1))
       vscrui:
         specifier: ^0.1.0
         version: 0.1.0(@types/react@18.3.27)(react@18.3.1)
@@ -426,10 +426,10 @@ importers:
         version: 3.25.76
       zundo:
         specifier: ^2.0.0
-        version: 2.3.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1))
+        version: 2.3.0(zustand@5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1))
       zustand:
         specifier: ^5.0.0
-        version: 5.0.10(@types/react@18.3.27)(react@18.3.1)
+        version: 5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1)
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17
@@ -500,6 +500,9 @@ importers:
       golden-layout:
         specifier: ^2.6.0
         version: 2.6.0
+      immer:
+        specifier: ^10.1.3
+        version: 10.2.0
       leaflet:
         specifier: ^1.9.0
         version: 1.9.4
@@ -509,6 +512,9 @@ importers:
       react-leaflet:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      ulid:
+        specifier: ^3.0.2
+        version: 3.0.2
       vega:
         specifier: ^5.30.0
         version: 5.33.1
@@ -4483,6 +4489,9 @@ packages:
 
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
+
+  immer@10.2.0:
+    resolution: {integrity: sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -11397,6 +11406,8 @@ snapshots:
 
   immediate@3.0.6: {}
 
+  immer@10.2.0: {}
+
   import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
@@ -13332,9 +13343,9 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shared-zustand@2.1.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1)):
+  shared-zustand@2.1.0(zustand@5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1)):
     dependencies:
-      zustand: 5.0.10(@types/react@18.3.27)(react@18.3.1)
+      zustand: 5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1)
 
   sharp@0.33.5:
     dependencies:
@@ -14750,13 +14761,14 @@ snapshots:
 
   zod@4.3.6: {}
 
-  zundo@2.3.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1)):
+  zundo@2.3.0(zustand@5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1)):
     dependencies:
-      zustand: 5.0.10(@types/react@18.3.27)(react@18.3.1)
+      zustand: 5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1)
 
-  zustand@5.0.10(@types/react@18.3.27)(react@18.3.1):
+  zustand@5.0.10(@types/react@18.3.27)(immer@10.2.0)(react@18.3.1):
     optionalDependencies:
       '@types/react': 18.3.27
+      immer: 10.2.0
       react: 18.3.1
 
   zwitch@2.0.4: {}
