@@ -108,6 +108,7 @@ tasks:
     cmds:
       - uv run ruff check .
       - pnpm lint
+      - node scripts/check-eslint-drift-wiring.cjs
 
   lint:fix:
     desc: "Auto-fix code style issues"
