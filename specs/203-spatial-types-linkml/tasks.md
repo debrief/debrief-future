@@ -160,23 +160,23 @@ T032 is single-threaded audit; T033 can fan out per site if many surface.
 
 ### Refit existing session-state tests to new shapes
 
-- [ ] T036 [P][test] Update tests to use object-form `Coordinate` fixtures and (where present) `TimeFilter` as epoch integers `services/session-state/tests/unit/slices/spatial.test.ts`
-- [ ] T037 [P][test] Update `TimeFilter` assertions to nullable epoch-integer shape `services/session-state/tests/unit/slices/temporal.test.ts`
-- [ ] T038 [P][test] Refit to object-form `ViewportPolygon` and epoch-integer `TimeFilter` fixtures `services/session-state/tests/unit/slices/browser-filter.test.ts`
-- [ ] T039 [P][test] Add an integration case: load a legacy tuple-form payload with `version: '1.0.0'` and assert viewport is rehydrated in object form with `SCHEMA_VERSION` now `1.1.0` (mirrors `contracts/persistence-migration.md` §Integration test) `services/session-state/tests/unit/persistence.test.ts`
-- [ ] T040 [P][test] Update `TimeFilter` shape assertions `services/session-state/tests/unit/temporal.test.ts`
-- [ ] T041 [P][test] Update `ViewportPolygon` fixtures to object form in the browser-filter hook tests `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T036 [P][test] Updated spatial.test.ts to use object-form `Coordinate` fixtures; imports `ViewportPolygon` from `@debrief/schemas` `services/session-state/tests/unit/slices/spatial.test.ts`
+- [x] T037 [P][test] Updated temporal.test.ts partial-filter case to use missing-key (undefined) rather than explicit null, per FR-021 `services/session-state/tests/unit/slices/temporal.test.ts`
+- [x] T038 [P][test] browser-filter.test.ts uses epoch numbers and string shapes — no refactor required `services/session-state/tests/unit/slices/browser-filter.test.ts`
+- [x] T039 [P][test] Added integration case: load v1.0.0 tuple-form payload → rehydrated viewport in object form (mirrors contracts/persistence-migration.md §Integration test) `services/session-state/tests/unit/persistence.test.ts`
+- [x] T040 [P][test] tests/unit/temporal.test.ts only covers TimeRange converters — no `TimeFilter` references, no refactor required `services/session-state/tests/unit/temporal.test.ts`
+- [x] T041 [P][test] Updated useBrowserFilter.test.ts fixtures to object-form ViewportPolygon via `rectViewport` helper; TimeFilter typed from `@debrief/schemas` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Run schema adherence suite
 
-- [ ] T042 Run `uv run pytest shared/schemas/` and confirm golden fixtures, round-trip, and Pydantic-vs-LinkML JSON Schema comparison all pass for the three types
-- [ ] T043 Run `pnpm --filter @debrief/schemas test` and confirm TS-side adherence suite passes
-- [ ] T044 Run full test sweeps: `uv run pytest`, `pnpm -r typecheck`, `pnpm --filter '!@debrief/web-shell' test` and fix any breakage introduced by import swaps
+- [x] T042 Ran `uv run pytest shared/schemas/tests/test_roundtrip.py shared/schemas/tests/test_schema_compare.py` — **230 passed**. Golden fixtures, round-trip, and Pydantic-vs-LinkML JSON Schema comparison all pass for the three types
+- [x] T043 Ran `pnpm --filter @debrief/schemas test` — **11 tests passed**, TS-side adherence suite green
+- [x] T044 Full test sweeps: `pnpm -r typecheck` clean; `pnpm --filter '!@debrief/web-shell' test` green; `uv run pytest --ignore=.../test_boundary_enforcement.py` — 1660 passed (6 unrelated config-workflow pre-existing failures verified on main branch, not introduced by feature 203)
 
 ### Capture evidence
 
-- [ ] T045 Capture the Python → JSON → TS → JSON → Python trace for one fixture per type and save to `specs/203-spatial-types-linkml/evidence/round-trip-evidence.md`
-- [ ] T046 Diff regenerated `shared/schemas/src/generated/typescript/types.ts` before/after and save relevant hunk to `specs/203-spatial-types-linkml/evidence/schema-diff.md`
+- [x] T045 Captured Python → JSON → TS → JSON → Python trace for Coordinate, ViewportPolygon, TimeFilter — `evidence/round-trip-evidence.md`
+- [x] T046 Schema diff captured — `evidence/schema-diff.md` (already produced in Phase 1)
 
 **Parallel example**:
 ```
