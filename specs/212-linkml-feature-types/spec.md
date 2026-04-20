@@ -111,7 +111,16 @@ A schema author editing LinkML adds or modifies the boundary-feature class witho
 
 ### Measurable Outcomes
 
-<!-- TODO: fill in -->
+- **SC-001**: A monorepo-wide search for `\binterface\s+(SafeFeature|SafeFeatureCollection|SafeGeometry|GeoJSONFeature|GeoJSONFeatureCollection)\b`, scoped to `apps/`, `services/`, and `shared/` while excluding `shared/schemas/src/generated/` and `shared/schemas/src/linkml/`, returns zero matches.
+- **SC-002**: A monorepo-wide search for imports of `SafeFeature`, `SafeFeatureCollection`, `SafeGeometry`, or `GeoJSONFeature` from `@debrief/utils` returns zero matches. (The symbols either no longer exist at that import path, or have been renamed / superseded by the generated equivalents exported from `@debrief/schemas`.)
+- **SC-003**: Exactly one LinkML class in `shared/schemas/src/linkml/` represents the loose-parse-boundary GeoJSON feature shape. A schema-diff check (listing every class whose name contains `Feature` and whose `geometry` attribute is nullable or whose `id` attribute accepts both string and integer) returns at most one class for that boundary shape.
+- **SC-004**: The full repository CI gate (`task verify` — lint + type-check + unit tests + Playwright E2E) passes on the change with zero new errors and zero new warnings compared to the pre-change baseline.
+- **SC-005**: Schema-adherence tests pass: (a) golden fixtures for a feature with nullable geometry + numeric id validate against the boundary-feature LinkML class; (b) round-trip Python → JSON → TypeScript → JSON → Python preserves all feature fields for the boundary shape; (c) LinkML-generated JSON Schema for the boundary class matches Pydantic-generated JSON Schema for the corresponding Pydantic model.
+- **SC-006**: Approximately 50 lines of hand-written type declarations are deleted from `shared/utils/src/types.ts` (5 interfaces plus their JSDoc comments) and approximately 10 lines from `services/session-state/src/types/results.ts` (1 interface plus comments). No equivalent hand-written declaration is reintroduced elsewhere in the tree.
+- **SC-007**: The number of `as`-cast tokens added by the migration in consumer files (outside the deleted types themselves and outside LinkML schema source) is zero — or every new `as` token is at a data-entry boundary identified in the PR description.
+- **SC-008**: A manual smoke test confirms behaviour parity on three user-facing workflows: (a) open a sample plot in the VS Code extension — map auto-zooms to feature extent as before; (b) import a REP file via the loader or VS Code command — feature count and layer composition match the pre-change result; (c) run a calc tool (e.g. `range_bearing` or `track_stats`) on a selection — result layer(s) render identically.
+- **SC-009**: The generated TypeScript output for the boundary-feature type carries a documentation comment stating the usage rule: parse-boundary only, narrow to `DebriefFeature` past the boundary. Verified by reading the generated `types.ts` output.
+- **SC-010**: Backlog item #204 ("Add RawGeoJSONFeature to LinkML; eliminate hand-typed duplicates") is closed as subsumed by this work. BACKLOG.md is updated in the same PR that completes this spec, marking #204 as `complete` with a reference to this spec. No separate work remains outstanding against #204 after the merge.
 
 ## Assumptions
 
