@@ -15,8 +15,24 @@
  * `ordering.ts` — they stay sync.
  */
 
-import { produce, type Draft } from "immer";
+import {
+  produce,
+  setAutoFreeze,
+  setUseStrictShallowCopy,
+  type Draft,
+} from "immer";
 import { ulid as generateUlid } from "ulid";
+
+// Performance tuning for very large plot FeatureCollections (FR-TEST-024
+// targets p95 < 10 ms at 100k positions):
+//   - autoFreeze off: structural sharing is the goal; freezing every
+//     emitted Feature roughly doubles the cost on large plots.
+//     Consumers treat returned plots as immutable by convention.
+//   - useStrictShallowCopy off: drafts skip the slow path that copies
+//     non-enumerable properties + symbols; our Features are plain JSON
+//     objects so the loose path is safe.
+setAutoFreeze(false);
+setUseStrictShallowCopy(false);
 
 import type {
   GeoJSONPolygon,
@@ -213,6 +229,53 @@ function recomputeStoryboardGeometry(
   sb.geometry = hullPolygon(scenePolys);
 }
 
+/**
+ * Fast-path "shallow-spread" plot copy that bypasses immer for ops which
+ * only append a new Feature and recompute the parent Storyboard's hull.
+ *
+ * Trade-off: immer would auto-wrap every Feature into a draft proxy, which
+ * is O(n) in `plot.features.length` and dominates p95 latency at 100k+
+ * positions (FR-TEST-024). When we know the op is purely additive, we can
+ * avoid that overhead entirely while preserving structural sharing
+ * (FR-MODULE-022) — every untouched Feature in `plot.features` is the same
+ * reference in the returned plot.
+ */
+function appendFeatureAndRecomputeHull(
+  plot: Plot,
+  newFeature: PlotFeature,
+  storyboardId: string,
+): Plot {
+  const sbIdx = plot.features.findIndex(
+    (f) => isStoryboardFeature(f) && f.properties.id === storyboardId,
+  );
+  if (sbIdx === -1) {
+    // Storyboard absent (orphan-create path) — append unconditionally.
+    return {
+      ...plot,
+      features: [...plot.features, newFeature],
+    };
+  }
+  // Compute the new hull including the appended Feature
+  const scenePolys: GeoJSONPolygon[] = [];
+  for (const f of plot.features) {
+    if (isSceneFeature(f) && f.properties.storyboard_id === storyboardId) {
+      const geom = f.geometry as GeoJSONPolygon | undefined;
+      if (geom?.type === "Polygon") scenePolys.push(geom);
+    }
+  }
+  if (isSceneFeature(newFeature)) {
+    const geom = newFeature.geometry as GeoJSONPolygon | undefined;
+    if (geom?.type === "Polygon") scenePolys.push(geom);
+  }
+  const newHull = hullPolygon(scenePolys);
+  const oldSb = plot.features[sbIdx] as unknown as StoryboardFeature;
+  const newSb: StoryboardFeature = { ...oldSb, geometry: newHull };
+  const newFeatures = plot.features.slice();
+  newFeatures[sbIdx] = newSb as unknown as PlotFeature;
+  newFeatures.push(newFeature);
+  return { ...plot, features: newFeatures };
+}
+
 // ---------------------------------------------------------------------------
 // Storyboard CRUD
 // ---------------------------------------------------------------------------
@@ -266,9 +329,10 @@ export async function createStoryboard(
     geometry: makeBoundingPolygon(0, 0, 0, 0),
     properties: props,
   };
-  const nextPlot = produce(plot, (draft) => {
-    draft.features.push(feature as unknown as Draft<PlotFeature>);
-  });
+  const nextPlot: Plot = {
+    ...plot,
+    features: [...plot.features, feature as unknown as PlotFeature],
+  };
   return { plot: nextPlot, storyboard: feature };
 }
 
@@ -474,10 +538,11 @@ export async function createScene(
     geometry: viewportToPolygon(input.viewport),
     properties: props,
   };
-  const nextPlot = produce(plot, (draft) => {
-    draft.features.push(sceneFeature as unknown as Draft<PlotFeature>);
-    recomputeStoryboardGeometry(draft, input.storyboardId);
-  });
+  const nextPlot = appendFeatureAndRecomputeHull(
+    plot,
+    sceneFeature as unknown as PlotFeature,
+    input.storyboardId,
+  );
   return { plot: nextPlot, scene: sceneFeature };
 }
 
@@ -550,38 +615,44 @@ export async function updateScene(
     activityId,
     rationale: input.rationale,
   });
-  const nextPlot = produce(plot, (draft) => {
-    const sc = draft.features[idx] as unknown as SceneFeature;
-    if (patch.title !== undefined) sc.properties.title = patch.title;
-    if (patch.description !== undefined) {
-      sc.properties.description = patch.description;
-    }
-    if (patch.viewport !== undefined) {
-      sc.properties.viewport = patch.viewport;
-      sc.geometry = viewportToPolygon(patch.viewport);
-    }
-    if (patch.timestamp !== undefined) {
-      sc.properties.timestamp = patch.timestamp;
-    }
-    if (canonical !== undefined) {
-      sc.properties.visible_feature_ids = canonical;
-      sc.properties.feature_set_hash = newHash as string;
-    }
-    if (patch.thumbnailAssetRef !== undefined) {
-      sc.properties.thumbnail_asset_ref = patch.thumbnailAssetRef;
-    }
-    if (patch.transitionDurationMs !== undefined) {
-      sc.properties.transition_duration_ms = patch.transitionDurationMs;
-    }
-    appendProvenance(sc.properties, logEntry);
-    if (patch.viewport !== undefined) {
-      recomputeStoryboardGeometry(draft, sc.properties.storyboard_id);
-    }
-  });
-  return {
-    plot: nextPlot,
-    scene: nextPlot.features[idx] as unknown as SceneFeature,
+  // Fast path: shallow-copy the target Scene + Storyboard (if hull changed)
+  // and reuse every other Feature reference. This bypasses immer's per-
+  // Feature draft proxy creation, which dominates p95 at 100k+ positions
+  // (FR-TEST-024).
+  const nextScene: SceneFeature = {
+    ...existing,
+    properties: {
+      ...existing.properties,
+      ...(patch.title !== undefined && { title: patch.title }),
+      ...(patch.description !== undefined && { description: patch.description }),
+      ...(patch.viewport !== undefined && { viewport: patch.viewport }),
+      ...(patch.timestamp !== undefined && { timestamp: patch.timestamp }),
+      ...(canonical !== undefined && {
+        visible_feature_ids: canonical,
+        feature_set_hash: newHash as string,
+      }),
+      ...(patch.thumbnailAssetRef !== undefined && {
+        thumbnail_asset_ref: patch.thumbnailAssetRef,
+      }),
+      ...(patch.transitionDurationMs !== undefined && {
+        transition_duration_ms: patch.transitionDurationMs,
+      }),
+      provenance: [...(existing.properties.provenance ?? []), logEntry],
+    },
+    ...(patch.viewport !== undefined && {
+      geometry: viewportToPolygon(patch.viewport),
+    }),
   };
+  const newFeatures = plot.features.slice();
+  newFeatures[idx] = nextScene as unknown as PlotFeature;
+  let nextPlot: Plot = { ...plot, features: newFeatures };
+  if (patch.viewport !== undefined) {
+    // Recompute hull only if viewport changed
+    nextPlot = produce(nextPlot, (draft) => {
+      recomputeStoryboardGeometry(draft, nextScene.properties.storyboard_id);
+    });
+  }
+  return { plot: nextPlot, scene: nextScene };
 }
 
 export interface DeleteSceneInput {
@@ -695,10 +766,11 @@ export async function duplicateScene(
     geometry: source.geometry,
     properties: props,
   };
-  const nextPlot = produce(plot, (draft) => {
-    draft.features.push(duplicated as unknown as Draft<PlotFeature>);
-    recomputeStoryboardGeometry(draft, source.properties.storyboard_id);
-  });
+  const nextPlot = appendFeatureAndRecomputeHull(
+    plot,
+    duplicated as unknown as PlotFeature,
+    source.properties.storyboard_id,
+  );
   return { plot: nextPlot, scene: duplicated };
 }
 
@@ -787,10 +859,11 @@ export async function copySceneToOtherStoryboard(
     geometry: source.geometry,
     properties: props,
   };
-  const nextPlot = produce(plot, (draft) => {
-    draft.features.push(copied as unknown as Draft<PlotFeature>);
-    recomputeStoryboardGeometry(draft, input.destinationStoryboardId);
-  });
+  const nextPlot = appendFeatureAndRecomputeHull(
+    plot,
+    copied as unknown as PlotFeature,
+    input.destinationStoryboardId,
+  );
   return { plot: nextPlot, scene: copied };
 }
 
