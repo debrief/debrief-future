@@ -593,9 +593,101 @@ tests defined in CLAUDE.md:
 3. **Schema comparison** — Pydantic-generated JSON Schema matches
    LinkML-generated JSON Schema field-for-field.
 
-## User Interface Flow *(optional — UI feature)*
+## User Interface Flow *(UI feature)*
 
-> _Pending — panel, capture shortcut, dropdown, playback transport, quick-picks._
+### Decision Analysis
+
+- **Primary Goal**: Build a replayable, narrated walk-through of a recorded
+  exercise — a named sequence of captured moments that a stakeholder
+  audience can be guided through in order, step by step.
+- **Key Decisions**:
+  1. **When to capture.** The analyst decides which combinations of map
+     framing, plot-time, and visible-feature selection represent a "moment
+     worth showing" and triggers capture at that moment.
+  2. **How to annotate.** For each captured Scene, the analyst decides
+     whether to rename it from its default DTG title and whether to write
+     a markdown description that a briefing audience would read.
+  3. **How to structure the narrative.** The analyst decides which Scenes
+     belong together (same Storyboard), when to split a narrative into
+     multiple Storyboards on one plot (e.g. commander's view vs. ASW
+     evidence), and when to copy Scenes between Storyboards.
+  4. **Whether a stale Scene needs attention.** When the panel flags a
+     Scene's thumbnail as stale, the analyst decides whether to refresh
+     (re-run the thumbnail pipeline) or leave it.
+  5. **How to respond to missing-data hard-blocks.** If a referenced
+     feature is gone or a timestamp is out of range, the analyst decides
+     whether to edit the affected Scene (e.g. update-to-current) or
+     remove it.
+- **Decision Inputs** (what the UI shows to support each decision):
+  - **Map + time slider + feature toggles** — the live state that capture
+    freezes into a Scene.
+  - **Panel Scene list** — ordered thumbnails with titles and DTG stamps;
+    shows what has already been captured and where the new capture would
+    slot in.
+  - **Storyboard dropdown** — which Storyboard the next capture or edit
+    will target.
+  - **Stale indicator** — per-Scene flag showing whether the thumbnail
+    still reflects the underlying plot.
+  - **On-map Scene rectangles** — faint polygons showing each Scene's
+    framing for the active Storyboard, giving spatial context for where
+    in the narrative the analyst is.
+  - **Hard-block prompt** — when a Scene cannot be stepped onto, the
+    prompt names the specific missing features or time-range issue.
+
+### Screen Progression
+
+The table covers the critical "first-time capture → edit → preview
+playback" happy path. Every step is observable in the panel or on the
+map; no modal navigation is required beyond inline prompts.
+
+| Step | Screen / State | User Action | Result |
+|------|----------------|-------------|--------|
+| 1 | Plot open, Storyboard panel hidden, no Storyboards yet | Press `Ctrl/Cmd+Alt+C` while focused on the Map Viewer | Inline quick-pick appears prompting for a Storyboard name |
+| 2 | Quick-pick for new Storyboard name | Type a name and confirm | Storyboard created; first Scene captured from current viewport + time + visibility; thumbnail produced by #174 |
+| 3 | Panel auto-opens, showing the new Storyboard in the header dropdown and its single Scene with DTG-default title | Click the Scene title to rename, optionally add a markdown description | Title / description persisted; `last_modified_*` bumped; Analysis Log entry appended |
+| 4 | Panel showing a Storyboard with 2+ Scenes | Press the Forward button or scoped `Right` arrow | Map animates via `flyTo` to the next Scene's viewport; time slider tweens to its timestamp over `transition_duration_ms` |
+| 5 | Mid-playback, sitting on Scene N | Drag the time slider | Scrub is constrained to `[Scene[N].timestamp, Scene[N+1].timestamp]`; locked beyond the last Scene's timestamp |
+| 6 | Panel showing all captured Scenes; on-map rectangles visible for the active Storyboard | Click an on-map Scene rectangle | Panel selection jumps to that Scene and the map animates to its viewport using the same transport |
+| 7 | A Scene the analyst wants to refine | Choose `update-to-current`, `duplicate`, or `copy-to-other-storyboard` from the Scene's overflow menu | Corresponding edit op runs atomically; provenance + history + Analysis Log all updated |
+
+### UI States
+
+- **Empty State (no Storyboards on plot).** Panel shows: *"No storyboards
+  yet. Press Ctrl/Cmd+Alt+C on the map, or click Capture, to create your
+  first scene."* The Storyboard dropdown is disabled; the capture button
+  is primary.
+- **Empty State (active Storyboard has no Scenes).** Panel shows the
+  Storyboard name in the header dropdown and a secondary message: *"No
+  scenes yet. Frame the map and capture."* Transport buttons and scoped
+  arrow keys are disabled.
+- **Loading State (capture in flight).** Capture button shows a spinner;
+  keyboard shortcut is temporarily ignored; the panel shows an inline
+  pending row with a placeholder thumbnail until the #174 pipeline
+  returns. The plot is not marked dirty until the Scene is actually
+  persisted.
+- **Loading State (playback transition).** Forward / backward buttons
+  are disabled during the `flyTo` + time-slider tween; scrub is locked
+  until the transition completes.
+- **Error State (thumbnail pipeline failure).** Error toast: *"Capture
+  failed — could not produce thumbnail. Scene not saved."* No row is
+  added to the Scene list; the panel remains in its pre-capture state.
+- **Error State (missing-data hard-block).** Modal prompt naming the
+  missing feature IDs or out-of-range timestamp, offering two actions:
+  *"Edit scene"* (opens the Scene for `update-to-current` / description
+  edit) and *"Delete scene"* (soft-delete with toast-undo).
+- **Error State (duplicate timestamp on capture).** Inline prompt:
+  *"A scene already exists at this timestamp. Replace / Offset (+1 s) /
+  Cancel."* No write occurs until the prompt is resolved.
+- **Stale State (per-Scene).** Scene row carries a small "stale" badge
+  with a tooltip naming which `visible_feature_ids` no longer resolve.
+  Row exposes a **Refresh thumbnail** action.
+- **Success State (capture).** New Scene row appears in timestamp order
+  with its thumbnail, the DTG-default title pre-selected for inline
+  rename, a "Scene N of M" counter updates, and a brief toast confirms
+  persistence. The Analysis Log Panel gains a corresponding entry.
+- **Success State (playback step).** Map is centred on the target
+  Scene's viewport, time slider is on its timestamp, the panel row is
+  highlighted, and the transport counter updates to reflect position.
 
 ## Success Criteria *(mandatory)*
 
