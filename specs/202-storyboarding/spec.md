@@ -11,7 +11,249 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-> _Pending — to be drafted next._
+User stories are ordered by priority. Each is independently testable: a later
+story can be developed and validated against fixture data even if the earlier
+stories are not yet complete — though in practice **US1 (Capture) is the
+critical path** because it is how the data model is exercised end-to-end.
+
+### User Story 1 — Capture a scene from the current map state (Priority: P1)
+
+An analyst reviewing a recorded exercise reaches a moment of interest — the
+map viewport is framed, the time slider is on the right instant, and a
+chosen set of tracks is toggled visible. They press a capture shortcut and
+the current state is frozen as a named **Scene** inside a **Storyboard**
+attached to the plot. The first capture on a plot also creates the
+Storyboard itself; subsequent captures append.
+
+**Why this priority**: Capture is the foundation. Without it, no
+Storyboards or Scenes exist and no other story can run. It is also the
+sole writer of the schema entities, so it exercises the full round-trip
+path end-to-end.
+
+**Independent Test**: With a plot open in the Map Viewer, press the capture
+shortcut on a plot that has no Storyboard yet. Confirm: (a) the panel
+prompts for a Storyboard name, (b) a Scene Feature with the expected
+viewport / timestamp / visibility / thumbnail is persisted into the plot
+FeatureCollection, (c) the plot is marked dirty, (d) re-opening the plot
+restores the Scene unchanged (schema round-trip).
+
+**Acceptance Scenarios**:
+
+1. **Given** a plot open in the Map Viewer with no Storyboards, **When** the
+   analyst triggers the capture shortcut, **Then** the panel prompts for a
+   Storyboard name, and on confirmation persists one Storyboard Feature plus
+   one Scene Feature whose viewport, timestamp, and `visible_feature_ids`
+   match the current map state.
+2. **Given** a plot with an active Storyboard, **When** the analyst captures
+   again at a new timestamp, **Then** a new Scene is appended and ordered by
+   `timestamp` (no explicit order field).
+3. **Given** the #174 thumbnail pipeline returns an error, **When** capture
+   is triggered, **Then** no Scene is persisted, an error toast is shown,
+   and the plot is not marked dirty.
+4. **Given** a capture at a timestamp that already has a Scene in the active
+   Storyboard, **When** the analyst confirms capture, **Then** they are
+   prompted **Replace / Offset (+1 s) / Cancel** and no write occurs until
+   the prompt is resolved.
+5. **Given** a successful capture, **When** the panel re-reads the plot,
+   **Then** the default Scene title is the DTG of the captured timestamp
+   (`DDHHmmZ MMM YY`, fallback ISO-8601) and is inline-editable.
+
+---
+
+### User Story 2 — Step through a storyboard to deliver a briefing (Priority: P2)
+
+With Scenes captured, the analyst wants to walk a stakeholder through the
+exercise in order. They open the Storyboard panel, pick a board from the
+header dropdown, and step forward and backward through its Scenes using
+on-screen transport buttons or scoped arrow keys. The map animates between
+Scenes and the time slider moves with them; between Scenes the analyst can
+scrub within the current segment.
+
+**Why this priority**: This is the stated purpose of the feature —
+"guided walkthroughs of recorded exercises." It delivers the end-user
+value on top of P1.
+
+**Independent Test**: Load a plot with a fixture Storyboard of at least
+three Scenes. Confirm: (a) forward button and scoped Right-arrow advance to
+the next Scene, (b) the map performs an animated `flyTo` and the time
+slider tweens to the Scene's `timestamp`, (c) the time slider is scrubbable
+only within `[current_scene.t, next_scene.t]` and is locked beyond the
+last Scene, (d) Scene viewport rectangles render on the map only for the
+active Storyboard.
+
+**Acceptance Scenarios**:
+
+1. **Given** an active Storyboard with multiple Scenes, **When** the analyst
+   presses Forward (button or scoped Right arrow), **Then** the map
+   animates to the next Scene's `viewport` and the time slider tweens to
+   its `timestamp` over `transition_duration_ms`.
+2. **Given** playback is sitting on Scene N, **When** the analyst scrubs the
+   time slider, **Then** scrubbing is constrained to
+   `[Scene[N].timestamp, Scene[N+1].timestamp]`; at the last Scene, scrub
+   beyond `timestamp` is disabled.
+3. **Given** the active Storyboard is selected, **When** the map renders,
+   **Then** each Scene's viewport Polygon shows as a faint rectangle on the
+   map, and clicking a rectangle selects that Scene in the panel and
+   animates to it. Rectangles for non-active Storyboards are hidden.
+4. **Given** a Scene references `visible_feature_ids` that are not present
+   in the plot or a `timestamp` outside the plot's time range, **When** the
+   analyst tries to step onto that Scene, **Then** playback is **hard-blocked**
+   with a prompt to edit or remove the Scene; no partial animation occurs.
+
+---
+
+### User Story 3 — Refine a captured storyboard (edit suite) (Priority: P3)
+
+After an initial capture pass, the analyst polishes the Storyboard: renames
+Scenes, writes markdown descriptions, deletes mistakes (with an undo
+window), re-snapshots a Scene to the current map state, inserts a Scene at
+an intermediate timestamp, duplicates a Scene to a new timestamp, and
+copies Scenes to another Storyboard on the same plot.
+
+**Why this priority**: Refinement makes captured Storyboards presentation-
+ready. It sits above the capture+playback loop because the loop is already
+useful without it, but it is what turns a raw capture into a polished
+briefing.
+
+**Independent Test**: Starting from a fixture Storyboard, exercise each
+edit op (rename, describe, delete+undo, update-to-current, duplicate,
+insert-middle, copy-to-other-storyboard) and confirm: (a) the mutation
+persists in the plot FeatureCollection, (b) provenance fields are updated
+and a `HistoryEntry` is appended, (c) an entry appears in the Analysis Log
+Panel (#176) with the Scene thumbnail.
+
+**Acceptance Scenarios**:
+
+1. **Given** a Scene, **When** the analyst renames it or edits its markdown
+   description, **Then** the change is persisted, `last_modified_{by,at}`
+   are updated, and a `HistoryEntry` (`rename` or `describe`) is appended.
+2. **Given** a Scene, **When** the analyst deletes it, **Then** a toast
+   offers undo for the remainder of the session; accepting undo restores
+   the Scene exactly; dismissing the toast or ending the session finalises
+   the delete.
+3. **Given** a Scene, **When** the analyst triggers `update-to-current`,
+   **Then** `viewport`, `timestamp`, `visible_feature_ids`,
+   `feature_set_hash`, and `thumbnail_asset_ref` are all re-snapshotted
+   from the current map state as a single atomic write.
+4. **Given** a Scene, **When** the analyst triggers `duplicate`, **Then**
+   they are prompted for a new timestamp (default: source + 1 s); on
+   confirm a new Scene with a fresh `id` is persisted at that timestamp.
+5. **Given** a Scene, **When** the analyst triggers
+   `copy-to-other-storyboard` and selects a destination from the dropdown,
+   **Then** a new Scene is created on the destination Storyboard with a
+   fresh `id`, a new `storyboard_id`, and a **deep-copied** thumbnail
+   asset (source and destination do not share the asset).
+6. **Given** an edit op is performed, **When** the Analysis Log Panel is
+   opened, **Then** the operation appears with its Scene thumbnail
+   attached.
+
+---
+
+### User Story 4 — Maintain multiple storyboards per plot (Priority: P4)
+
+A plot can support several narratives — e.g. "commander's view",
+"ASW evidence", "training debrief." The analyst creates, renames, deletes,
+and switches between Storyboards from the panel header dropdown. The
+"active" Storyboard is an ephemeral UI selection (defaults to
+most-recently-modified on plot open) and is not stored on disk.
+
+**Why this priority**: Independent but layered on top of US1–US3. A user
+could deliver a useful briefing with a single Storyboard; multi-Storyboard
+support adds organisational flexibility.
+
+**Independent Test**: With two Storyboards on a plot, switch between them
+via the header dropdown and confirm: (a) the Scene list updates to the
+selected Storyboard, (b) Scene viewport rectangles on the map update to
+only those of the active Storyboard, (c) the selection is not persisted
+across plot close/open — the most-recently-modified Storyboard is chosen
+on re-open.
+
+**Acceptance Scenarios**:
+
+1. **Given** a plot with no Storyboards, **When** the analyst creates a
+   new Storyboard from the panel overflow menu, **Then** it appears in the
+   dropdown and becomes the active selection.
+2. **Given** a plot with two or more Storyboards, **When** the analyst
+   changes the dropdown selection, **Then** the Scene list, the playback
+   transport, and the on-map Scene rectangles all update to the new
+   active Storyboard within the same interaction.
+3. **Given** a plot is re-opened, **When** the panel initialises, **Then**
+   the active Storyboard defaults to the one with the most recent
+   `last_modified_at`.
+4. **Given** a Storyboard, **When** the analyst deletes it from the overflow
+   menu, **Then** it is removed from the dropdown, all its Scenes and their
+   thumbnail assets are deleted, and an Analysis Log entry records the
+   cascade.
+
+---
+
+### User Story 5 — Detect and refresh stale Scene thumbnails (Priority: P5)
+
+Between capture and briefing, the underlying plot features (tracks, points,
+annotations) may change. The panel flags Scenes whose rendered thumbnail
+no longer matches the current visible-feature set so the analyst can
+decide whether to refresh or leave them.
+
+**Why this priority**: Data-integrity guardrail rather than a new
+interaction. Valuable for long-lived Storyboards, but a briefing can still
+be delivered (with stale thumbnails) without it.
+
+**Independent Test**: Load a fixture Storyboard, then mutate the underlying
+plot so that at least one Scene's `visible_feature_ids` no longer fully
+resolve. Reopen the plot and confirm: (a) affected Scenes are flagged as
+stale in the panel, (b) a per-Scene "Refresh thumbnail" action regenerates
+the thumbnail via the #174 pipeline and clears the flag, (c) the
+`feature_set_hash` is recomputed and persisted.
+
+**Acceptance Scenarios**:
+
+1. **Given** a Scene whose `feature_set_hash` no longer matches a
+   recomputation over its currently-resolvable `visible_feature_ids`,
+   **When** the plot is opened, **Then** the Scene is marked **stale** in
+   the panel with a visible indicator.
+2. **Given** a stale Scene, **When** the analyst triggers the per-Scene
+   refresh action, **Then** the thumbnail is re-captured via the #174
+   pipeline, `feature_set_hash` and `last_modified_{by,at}` are updated,
+   a `refresh-thumbnail` entry is appended to `history`, and the stale
+   flag is cleared.
+
+---
+
+### Edge Cases
+
+- **Thumbnail capture fails during a capture, duplicate, or update-to-current
+  op.** No partial Scene is written; capture/duplicate/update aborts with
+  an error toast; the plot is not marked dirty by the failed op.
+- **Duplicate timestamp within a Storyboard.** On capture or
+  copy-to-other-storyboard, the analyst is prompted **Replace / Offset
+  (+1 s) / Cancel**; no write occurs until the prompt is resolved.
+- **Missing referenced features at plot open.** Any Scene referencing a
+  `visible_feature_ids` entry that no longer exists hard-blocks playback
+  and editing of that Scene until the analyst edits or removes it. MVP
+  applies this hard-block in all contexts (no "production mode" relaxation).
+- **Timestamp outside plot time range.** Same hard-block as missing features.
+- **Feature ID churn on re-import.** Re-imports that change stable feature
+  IDs surface as the missing-features hard-block; scenes are not silently
+  "fixed."
+- **Antimeridian-crossing viewport.** Viewports spanning ±180° longitude
+  emit a warning and store a best-effort Polygon in MVP; proper
+  MultiPolygon splitting is deferred.
+- **Bearing ≠ 0 at capture time.** Not reachable via the Leaflet renderer,
+  but the schema rejects any attempt to persist a non-zero bearing in
+  schema version 1.
+- **Non-null `time_range` at capture time.** Schema rejects non-null
+  `time_range` in schema version 1 (reserved slot).
+- **Session-scoped undo window.** Toast-undo for Scene deletion is
+  available only within the current VS Code session; closing and reopening
+  the plot finalises all pending deletes.
+- **Cross-Storyboard timestamp collisions on copy.** When copying a Scene
+  to a destination Storyboard that already has a Scene at the same
+  timestamp, the same Replace / Offset / Cancel prompt applies.
+- **Very large Storyboards.** Soft target of ≤ ~50 Scenes per Storyboard
+  is documented to the analyst but not enforced — no hard cap in MVP.
+- **Deleting a Storyboard with Scenes.** Cascades to all child Scenes and
+  their thumbnail assets; surfaced via a single Analysis Log entry
+  summarising the cascade.
 
 ## Requirements *(mandatory)*
 
