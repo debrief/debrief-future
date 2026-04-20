@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ParameterChip } from '../ParameterChip';
+import { LOG_PANEL_STRINGS } from '../strings';
 import type { ParamChipData } from '../types';
 
 function chip(overrides: Partial<ParamChipData> = {}): ParamChipData {
@@ -15,7 +16,7 @@ function chip(overrides: Partial<ParamChipData> = {}): ParamChipData {
     name: 'speed',
     value: 30,
     paramType: 'number',
-    isDefault: false,
+    isNonDefault: true,
     ...overrides,
   };
 }
@@ -60,15 +61,15 @@ describe('ParameterChip', () => {
     expect(el.textContent).toContain('linear');
   });
 
-  it('shows non-default marker when isDefault is false', () => {
-    render(<ParameterChip chip={chip({ isDefault: false })} />);
-    const marker = screen.getByLabelText('non-default value');
+  it('shows non-default marker when isNonDefault is true', () => {
+    render(<ParameterChip chip={chip({ isNonDefault: true })} />);
+    const marker = screen.getByLabelText(LOG_PANEL_STRINGS.chipNonDefaultTooltip);
     expect(marker).toBeDefined();
   });
 
-  it('hides non-default marker when isDefault is true', () => {
-    render(<ParameterChip chip={chip({ isDefault: true })} />);
-    const marker = screen.queryByLabelText('non-default value');
+  it('hides non-default marker when isNonDefault is false', () => {
+    render(<ParameterChip chip={chip({ isNonDefault: false })} />);
+    const marker = screen.queryByLabelText(LOG_PANEL_STRINGS.chipNonDefaultTooltip);
     expect(marker).toBeNull();
   });
 

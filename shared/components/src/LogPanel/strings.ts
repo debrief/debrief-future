@@ -113,7 +113,14 @@ export const LOG_PANEL_STRINGS = {
   // Parameter chips (Feature: 176)
   chipNonDefaultTooltip: 'Non-default value',
 
+  // Track badges (Feature: 176)
+  trackBadgeDeletedSuffix: 'deleted',
+
   // Rich card (Feature: 176)
   rationaleTooltip: (rationale: string) => rationale,
   durationMs: (ms: number) => `${ms}ms`,
+  noParametersLabel: 'No parameters',
+  manualCheckpointLabel: 'Manual checkpoint',
+  paramOverflowLabel: (count: number) => `+${count} more`,
+  cardAriaLabel: (step: number, toolName: string) => `Step ${step}: ${toolName}`,
 } as const;
