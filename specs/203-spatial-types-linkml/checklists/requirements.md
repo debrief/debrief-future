@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — 3 markers present at FR-003 (`zoom` placement), FR-004 (TimeFilter shape conflict), FR-018 (persisted state migration strategy); all are legitimate design decisions with multiple viable options
+- [x] No [NEEDS CLARIFICATION] markers remain — all 3 resolved in `research.md` (R-001, R-002, R-003) and the spec has been updated accordingly
 - [x] Requirements are testable and unambiguous — each FR names the file/package and action; each SC has a verifiable outcome
 - [x] Success criteria are measurable — grep counts, test-suite pass/fail, evidence screenshots, line-count bounds
 - [x] Success criteria are technology-agnostic where possible — SCs are expressed as outcomes (types consolidated, tests pass, smoke tests pass) not as implementation steps; unavoidable technology references (LinkML, Pydantic, TS) are intrinsic to the refactor's scope

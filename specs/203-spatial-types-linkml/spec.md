@@ -103,8 +103,8 @@ A user loading a sample plot in the VS Code extension or the web-shell app sees 
 
 - **FR-001**: `@debrief/schemas` MUST be the single source of truth for the types `Coordinate`, `ViewportPolygon`, and `TimeFilter`. After this feature lands, no hand-authored TypeScript file in the repository may declare a type or interface named `Coordinate`, `ViewportPolygon`, or `TimeFilter`.
 - **FR-002**: The canonical `Coordinate` shape MUST be the object form `{ longitude: number, latitude: number }` with the existing LinkML bounds (`longitude` in `[-180, 180]`, `latitude` in `[-90, 90]`). This is already present in `shared/schemas/src/linkml/session-state.yaml` and MUST be preserved.
-- **FR-003**: The canonical `ViewportPolygon` MUST carry its 4-corner cardinality constraint (exactly 4 `Coordinate` objects in clockwise `[NW, NE, SE, SW]` order) in the LinkML source. [NEEDS CLARIFICATION: `zoom` field placement — option A: add `zoom: float` (optional) to `ViewportPolygon`; option B: define a sibling class `ViewState { viewport: ViewportPolygon, zoom: float }` and use it wherever zoom is needed; option C: keep `zoom` out of the schema entirely and handle it as a separate session-state field alongside the viewport.]
-- **FR-004**: The canonical `TimeFilter` MUST resolve the existing schema-vs-runtime conflict so that there is a single definition used by both. [NEEDS CLARIFICATION: TimeFilter shape — option A: change the LinkML `TimeFilter` to use `range: integer` (nullable epoch milliseconds), reversing the current `TimeInstant`-based definition to match Review Decision 5C; option B: change runtime to adopt `TimeInstant` objects, reversing Review Decision 5C; option C: keep both and formally define a "serialisation form" (TimeInstant) vs "runtime form" (epoch) with explicit converters.]
+- **FR-003**: The canonical `ViewportPolygon` MUST carry its 4-corner cardinality constraint (exactly 4 `Coordinate` objects in clockwise `[NW, NE, SE, SW]` order) in the LinkML source. An optional `zoom: float` attribute MUST be added to `ViewportPolygon` to match the runtime's existing usage (see research R-001); pre-existing fixtures without `zoom` remain valid.
+- **FR-004**: The canonical `TimeFilter` MUST be defined in LinkML with two optional attributes, `start` and `end`, each of `range: integer` representing nullable epoch milliseconds (null/missing means unbounded on that side). This change reverses the current `TimeInstant`-based schema definition and aligns with Review Decision 5C per research R-002. `TimeInstant` remains canonical for `TimeRange` (out of scope for this feature).
 
 **Code generation & regeneration**
 
@@ -133,7 +133,7 @@ A user loading a sample plot in the VS Code extension or the web-shell app sees 
 
 **State persistence**
 
-- **FR-018**: Persisted session state containing tuple-form coordinates MUST be handled on rehydration. The default approach is a one-time migration that reads tuple-form state and converts it to object form before hydrating the store. [NEEDS CLARIFICATION: migration strategy — option A: silent in-place migration that converts tuple→object on load; option B: bump the persistence schema version and refuse to rehydrate prior versions with a user-facing "session state must be reset" message; option C: defer — assume persisted state is empty in practice because the feature has not shipped widely.]
+- **FR-018**: Persisted session state containing tuple-form coordinates MUST be handled on rehydration via a silent in-place migration that detects tuple-shaped coordinates and converts them to object form before hydration (research R-003). The persistence schema version MUST be bumped so mid-migration state is detectable; the migration branch is annotated as removable after all production sessions have migrated.
 
 **Smoke test coverage**
 
@@ -142,8 +142,8 @@ A user loading a sample plot in the VS Code extension or the web-shell app sees 
 ### Key Entities
 
 - **Coordinate**: A geographic point. Canonical shape: `{ longitude: number, latitude: number }`. Constraints: `longitude ∈ [-180, 180]`, `latitude ∈ [-90, 90]`. Single authoritative definition in LinkML at `shared/schemas/src/linkml/session-state.yaml`.
-- **ViewportPolygon**: A geographic area as a 4-corner polygon supporting rotated views. Canonical shape: `{ coordinates: Coordinate[], zoom?: number }` (exact `zoom` placement subject to clarification in FR-003). Cardinality: exactly 4 coordinates in clockwise `[NW, NE, SE, SW]` order.
-- **TimeFilter**: Constraints on the visible time window. Canonical shape subject to clarification in FR-004. Semantics: `null`/missing start or end means the filter is unbounded on that side.
+- **ViewportPolygon**: A geographic area as a 4-corner polygon supporting rotated views. Canonical shape: `{ coordinates: Coordinate[], zoom?: number }` — `zoom` is an optional attribute on the polygon itself (research R-001). Cardinality: exactly 4 coordinates in clockwise `[NW, NE, SE, SW]` order.
+- **TimeFilter**: Constraints on the visible time window. Canonical shape: `{ start?: integer | null, end?: integer | null }` — both fields are optional/nullable epoch milliseconds (research R-002). Semantics: `null`/missing start or end means the filter is unbounded on that side.
 - **GeoJSON Coordinate Tuple** (boundary type, not stored): `[longitude, latitude]`. Appears only in code that reads, writes, or passes through GeoJSON geometry or Leaflet tuple inputs. Created via `toGeoJSONCoord`, consumed via `fromGeoJSONCoord`. Never used in application state.
 
 ## Success Criteria *(mandatory)*
