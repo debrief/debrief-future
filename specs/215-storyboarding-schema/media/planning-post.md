@@ -1,51 +1,42 @@
 ---
 layout: future-post
-title: "Planning: Storyboarding — Schema + CRUD Core"
+title: "Planning: Storyboarding — the headless foundation"
 date: 2026-04-20
 track: [momentum]
 author: Ian
 reading_time: 4
 tags: [tracer-bullet, storyboarding, schema, linkml]
-excerpt: "The unglamorous first slice of Storyboarding — schema and headless CRUD, no UI, so three sibling specs can build in parallel."
+excerpt: "Spec 215 lays the schema and CRUD groundwork for Storyboarding. No UI yet — just the invariants that every later slice will lean on."
 ---
 
-## What We're Building
+Storyboarding is one of the more ambitious pieces of the plan — an analyst capturing a narrated walk-through of a plot, then replaying it as a briefing. The epic (#024) splits into four specs, and I'm starting with the one that has nothing to show on screen: the schema and the CRUD core. Everything else — capture in #216, the panel and playback in #217, the edit suite in #218 — is going to lean on the shapes and invariants defined here.
 
-Storyboarding is how an analyst takes a plot and walks a reader through it: a sequence of captured Scenes, each one a viewport, a timestamp, a visible-feature set, and a thumbnail. It's one of the capabilities that makes the difference between "I have a map" and "I have a briefing". The parent epic (#024) covers the full thing — capture shortcut, panel, playback, edit suite.
+## What this slice actually ships
 
-This spec (#215) deliberately ships none of that. No capture button. No panel. No playback. What it does ship is the **headless schema and CRUD foundation** that the three sibling specs (#216 capture, #217 panel + playback, #218 edit suite) all build on top of: LinkML models for `Storyboard`, `Scene`, `Viewport`, and `HistoryEntry`; their generated Pydantic, JSON Schema, and TypeScript bindings; and a shared TypeScript CRUD module that enforces every invariant — ordering, duplicate-timestamp rejection, `feature_set_hash` computation, provenance append-only — at the module boundary, before any UI code runs.
+Two LinkML entities — `Storyboard` and `Scene` — both carried as plain GeoJSON Features inside the plot's existing FeatureCollection. A `Viewport` sub-record. Nine fixtures that exercise the Article II adherence gates, split between single-Feature round-trip fixtures and fuller FeatureCollection shapes. And a headless TypeScript CRUD module at `shared/components/src/storyboard/` that enforces every invariant the downstream UI specs would otherwise have to re-implement in three places.
 
-It's the unglamorous slice. And it's the one that unblocks everything else.
+No capture shortcut. No panel. No playback. If that sounds thin, it's because the value here is that three follow-up specs can now proceed in parallel against a schema that round-trips cleanly.
 
-## How It Fits
+## Decisions that moved during review
 
-Storyboards and Scenes are carried as standard GeoJSON Features inside the plot's existing FeatureCollection — no new files, no new STAC API surface. That's what keeps them flowing through the save/dirty-state path VS Code already owns, and it's why this slice can stay small: we're adding types and guarantees, not plumbing.
+A few design choices flipped between the first draft and the current one, and they're worth recording because they're the kind of thing that's easy to get wrong.
 
-The CRUD module lives at `shared/components/storyboard/`, following the precedent set by the filter-engine module from #126. That's a narrow departure from the usual thick-Python-services pattern — justified because storyboard data is pure GeoJSON round-trip with no domain algorithmics, and all three consumers are TypeScript webview surfaces. A Python service in front would be a passthrough. The Constitution Check in the plan records this explicitly.
+**Discriminator pattern.** The first draft introduced a `properties["debrief:type"]` key to mark Storyboard and Scene Features. That's wrong for in-plot Features: the `debrief:` prefix is reserved for STAC `item.properties`. In-plot Features have always used the inherited `kind` enum — `TRACK`, `POINT`, `CIRCLE`, and so on — and switching conventions mid-project would split type-narrowing across two fields. So `FeatureKindEnum` gets two new values, `STORYBOARD` and `STORYBOARD_SCENE`, and the generated TypeScript unions narrow the same way every other Feature type already does.
 
-Once this slice lands, specs #216, #217, and #218 can build against a stable, schema-adherent data layer in parallel. Any one of them can ship first.
+**Single-surface provenance.** The earlier shape proposed a dedicated `history[]` array on each Storyboard and Scene, plus `created_by`, `last_modified_by`, and `last_modified_at` fields. That's two parallel audit surfaces — the existing `BaseFeatureProperties.provenance: LogEntry[]` slot was already doing the job for every other Feature type, and the Analysis Log (#176) already knew how to read it. The cleaner move was to drop the proposed `HistoryEntry` entirely, append one `LogEntry` to `provenance[]` on every mutation, and add a single optional `agent` slot to `LogEntry` for the human actor. Derived fields (`created_at`, `last_modified_at`) come from `provenance[0]` and `provenance[last]` at read time. One audit surface, zero duplicated bookkeeping, and the Analysis Log picks it up for free.
 
-## Key Decisions
+**Async-first CRUD.** `feature_set_hash` is a SHA-256 over the canonicalised `visible_feature_ids`, and the only cross-platform path to SHA-256 is Web Crypto's `subtle.digest` — which is async by specification. Rather than make only the hash-touching ops async and leave the rest sync (a trap for any caller who learns `createScene` is async but `deleteScene` is not), every mutation op on the public API returns a `Promise`. Pure queries — `listScenesOrdered`, `detectMissingDataForScene`, `validatePlot` — stay synchronous.
 
-Eight technical decisions drove the research phase. A few of the interesting ones:
+## Structural sharing, and why immer earns its place
 
-- **LinkML module organisation**: all four entities in one `storyboard.yaml`, imported from `debrief.yaml`. Matches the existing pattern (`stac-extension.yaml`, `session-state.yaml`).
-- **Reserved-slot encoding**: `time_range` must be null and `viewport.bearing` must be 0 in schema v1. Encoded with LinkML structural constraints (`equals_number: 0`, `value_presence: ABSENT`) *and* a Pydantic `@field_validator` — redundant by design, because Article II says the schema is the contract and the generated models are the proof it holds.
-- **Cross-reference validation in two layers**: LinkML validates shape (ULID regex); the TS module validates reference resolution per FeatureCollection. LinkML can't validate across entities in a collection, so the module boundary is where orphan Scenes get caught.
-- **`feature_set_hash` algorithm**: SHA-256 over the UTF-8 encoding of `JSON.stringify(sortedIds)`, full 64-char hex. Available in both Node and browser, no dependency, order-insensitive.
-- **Atomicity via immutable staging**: compound ops (duplicate, copy-to-other-storyboard, cascade delete) build a new FeatureCollection in a local variable; if anything throws, we discard it and rethrow. Never mutate inputs in place. Matches the React/Zustand idiom the downstream specs will use.
-- **Error vocabulary**: nine typed subclasses of `StoryboardError`, each with a stable string `code` that survives minification. `DuplicateTimestamp` carries the conflicting Scene's ID so callers can surface a Replace / Offset / Cancel prompt.
-- **Migration hook**: `runPlotOpenMigrations(plot, registry)` is wired now as a no-op at v1, so the first real migration (v2) won't touch the load path.
-- **DTG formatter**: `DDHHmmZ MMM YY` in UTC, lives in the module itself so #216 and #218 share one implementation.
+The CRUD module uses `immer.produce(…)` on every mutation. That gives two properties that matter downstream. First, transactional semantics: if a recipe throws mid-op, the draft is discarded and the caller's input is byte-identical post-call, which is what satisfies the atomicity criterion for compound ops like `copySceneToOtherStoryboard` and cascading deletes. Second, reference equality on unmodified Features across input and output FeatureCollections — a testable invariant, and the property that downstream Zustand selectors in #217 will rely on for memoisation. Hand-rolling `structuredClone` on a 100k-position FeatureCollection measured over 50 ms in preliminary benching; that's a non-starter for the perf target.
 
-All nine `HistoryEntry.op` values — `create`, `rename`, `describe`, `delete`, `restore`, `update-to-current`, `duplicate`, `copy-in`, `insert-middle`, `refresh-thumbnail` — are frozen by this spec. Downstream specs use these; they don't extend them.
+## Article II gate lands in-slice
 
-## What We'd Love Feedback On
+There's a temptation, when you're building a schema layer whose only consumers are other specs, to defer the expensive adherence tests. I'm not doing that. The Py→JSON→TS→JSON→Py round-trip harness ships as part of this spec — pytest spawns a Node subprocess that parses and re-serialises each valid single-Feature fixture through the generated TypeScript models, pipes JSON back, and Pydantic re-validates. If the generators drift, this catches it at the schema layer, not three specs downstream when a panel renders garbage.
 
-Three genuine open questions where I'd value input from people who've done this work for real:
+Alongside that: a Vitest benchmark with a concrete target — p95 under 10 ms at 100k positions for `createScene`, `updateScene`, and `copySceneToOtherStoryboard` on the CI runner. Perf claims without a benchmark are just hopes.
 
-- **DTG format**: I've gone with `DDHHmmZ MMM YY` (e.g. `041500Z APR 26`). Is that the format field analysts actually expect, or is there a regional / doctrinal variant I should be matching instead?
-- **`HistoryEntry.op` vocabulary**: the ten values above are what I've extracted from the downstream specs' operation surface. Is anything missing that a briefing workflow would want in the audit trail — retitle-without-rename, thumbnail-only-refresh-during-playback, something else?
-- **`feature_set_hash` as staleness signal**: SHA-256 over sorted `visible_feature_ids` tells us *which features were visible at capture time*, not *what those features looked like then*. If an underlying track moves, the hash doesn't change. Is that the right boundary for a "Scene is stale" prompt, or does the staleness detector also need to hash feature contents?
+## What's next
 
-No UI to show this week. Next week's slice is #216 — the capture shortcut and the first-capture quick-pick — and that one has screenshots.
+Once this lands, #216, #217, and #218 are unblocked and can be worked in parallel. The capture shortcut slots into the CRUD surface as a single `createScene` call. The panel and playback consume `listScenesOrdered` and `detectMissingDataForScene`. The edit suite wires rename, describe, duplicate, and copy-across-Storyboards. None of those three specs needs to reinvent a single invariant — which is the whole point of landing this slice first.

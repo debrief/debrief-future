@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://debrief.info/schemas/storyboard/v1/storyboard.schema.json",
   "title": "Storyboard + Scene (v1) — reference excerpt",
-  "description": "Reference JSON Schema excerpt for review during spec stage. The authoritative artefact is generated from shared/schemas/src/linkml/storyboard.yaml at build time; this file is kept in sync as a contract check.",
+  "description": "Reference JSON Schema excerpt for review during spec stage. The authoritative artefact is generated from shared/schemas/src/linkml/storyboard.yaml at build time; this file is kept in sync as a contract check. Updated 2026-04-20: discriminator moved to inherited `kind` enum; HistoryEntry dropped in favour of inherited `provenance: LogEntry[]`.",
   "type": "object",
   "definitions": {
     "Ulid": {
@@ -17,22 +17,53 @@
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },
-    "HistoryEntry": {
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "WasGeneratedBy": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["timestamp", "actor", "op", "summary"],
+      "description": "Provenance envelope from shared/schemas/src/linkml/log-entry.yaml. Reproduced here for cross-reference only; the authoritative schema lives in log-entry.yaml.",
+      "required": ["tool", "tool_version", "parameters"],
       "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "tool_version": { "type": "string", "minLength": 1 },
+        "parameters": {
+          "type": "object",
+          "required": ["op"],
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "create", "rename", "describe", "delete", "restore",
+                "update-to-current", "duplicate", "copy-in",
+                "insert-middle", "refresh-thumbnail"
+              ]
+            },
+            "summary": { "type": "string", "maxLength": 140 }
+          }
+        }
+      }
+    },
+    "LogEntry": {
+      "type": "object",
+      "description": "Reference to the shared LogEntry shape. Storyboard CRUD ops append one entry per mutation with was_generated_by.tool = 'storyboard-crud' and was_generated_by.parameters.op set to the relevant op value. The human actor is carried in the new optional `agent` slot added by #215.",
+      "required": ["activity_id", "timestamp", "was_generated_by", "execution_duration"],
+      "properties": {
+        "activity_id": { "$ref": "#/definitions/Uuid" },
         "timestamp": { "$ref": "#/definitions/IsoInstant" },
-        "actor": { "type": "string", "minLength": 1 },
-        "op": {
-          "type": "string",
-          "enum": [
-            "create", "rename", "describe", "delete", "restore",
-            "update-to-current", "duplicate", "copy-in",
-            "insert-middle", "refresh-thumbnail"
-          ]
+        "agent": { "type": "string", "minLength": 1 },
+        "was_generated_by": { "$ref": "#/definitions/WasGeneratedBy" },
+        "used": {
+          "type": "array",
+          "items": { "type": "string" }
         },
-        "summary": { "type": "string", "minLength": 1, "maxLength": 140 }
+        "generated": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "execution_duration": { "type": "string", "pattern": "^PT.*$" },
+        "rationale": { "type": "string" }
       }
     },
     "Viewport": {
@@ -72,25 +103,26 @@
     },
     "StoryboardProperties": {
       "type": "object",
+      "description": "Extends BaseFeatureProperties — inherits `kind`, `id`, `tags`, `provenance` slots. Validated via the generated all-of composition; reproduced flat here for readability.",
       "additionalProperties": false,
       "required": [
-        "debrief:type", "id", "name", "schema_version",
-        "created_by", "created_at", "last_modified_by", "last_modified_at",
-        "history"
+        "kind", "id", "name", "schema_version", "provenance"
       ],
       "properties": {
-        "debrief:type": { "const": "storyboard" },
+        "kind": { "const": "STORYBOARD" },
         "id": { "$ref": "#/definitions/Ulid" },
         "name": { "type": "string", "minLength": 1 },
         "description": { "type": "string" },
         "schema_version": { "type": "integer", "minimum": 1 },
-        "created_by": { "type": "string", "minLength": 1 },
-        "created_at": { "$ref": "#/definitions/IsoInstant" },
-        "last_modified_by": { "type": "string", "minLength": 1 },
-        "last_modified_at": { "$ref": "#/definitions/IsoInstant" },
-        "history": {
+        "tags": {
           "type": "array",
-          "items": { "$ref": "#/definitions/HistoryEntry" }
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/LogEntry" },
+          "minItems": 1,
+          "description": "Append-only. First entry's timestamp is `created_at`; last entry's is `last_modified_at`."
         }
       }
     },
@@ -111,16 +143,16 @@
     },
     "SceneProperties": {
       "type": "object",
+      "description": "Extends BaseFeatureProperties.",
       "additionalProperties": false,
       "required": [
-        "debrief:type", "id", "storyboard_id", "title", "viewport",
+        "kind", "id", "storyboard_id", "title", "viewport",
         "timestamp", "visible_feature_ids", "feature_set_hash",
         "thumbnail_asset_ref", "transition_duration_ms",
-        "created_by", "created_at", "last_modified_by", "last_modified_at",
-        "history"
+        "provenance"
       ],
       "properties": {
-        "debrief:type": { "const": "storyboard_scene" },
+        "kind": { "const": "STORYBOARD_SCENE" },
         "id": { "$ref": "#/definitions/Ulid" },
         "storyboard_id": { "$ref": "#/definitions/Ulid" },
         "title": { "type": "string", "minLength": 1 },
@@ -136,13 +168,15 @@
         "feature_set_hash": { "$ref": "#/definitions/Sha256Hex" },
         "thumbnail_asset_ref": { "type": "string", "minLength": 1 },
         "transition_duration_ms": { "type": "integer", "minimum": 0 },
-        "created_by": { "type": "string", "minLength": 1 },
-        "created_at": { "$ref": "#/definitions/IsoInstant" },
-        "last_modified_by": { "type": "string", "minLength": 1 },
-        "last_modified_at": { "$ref": "#/definitions/IsoInstant" },
-        "history": {
+        "tags": {
           "type": "array",
-          "items": { "$ref": "#/definitions/HistoryEntry" }
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/LogEntry" },
+          "minItems": 1,
+          "description": "Append-only. First entry's timestamp is `created_at`; last entry's is `last_modified_at`."
         }
       }
     },

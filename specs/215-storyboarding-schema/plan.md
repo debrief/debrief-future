@@ -5,120 +5,115 @@
 
 ## Summary
 
-Deliver the schema-first, UI-free foundation for the Storyboarding epic
-(#024). This slice ships:
+Ship the **headless foundation** for the Storyboarding epic (#024) across
+three workstreams:
 
-1. **LinkML master schema** — `Storyboard`, `Scene`, `Viewport`,
-   `HistoryEntry` added to `shared/schemas/src/linkml/` and plumbed into
-   `debrief.yaml`. Three generated artefacts follow automatically:
-   Pydantic models, JSON Schema, and TypeScript types.
-2. **Golden fixtures + Article II adherence tests** — seven required
-   cases under `shared/schemas/src/fixtures/{valid,invalid}/`, wired
-   into the existing `test_roundtrip.py` / `test_schema_compare.py` /
-   `test_validation.py` harnesses.
+1. **LinkML schema delta** — extend `FeatureKindEnum` with `STORYBOARD` and
+   `STORYBOARD_SCENE`; add `storyboard.yaml` module defining
+   `StoryboardProperties`, `SceneProperties`, and the `Viewport` sub-record,
+   both property classes inheriting from `BaseFeatureProperties` (which
+   already carries `provenance: LogEntry[]`); add one optional `agent:
+   string` slot to `LogEntry` so the human actor per CRUD op is carried in
+   the existing provenance surface (no new `HistoryEntry` type).
+2. **Generated bindings** — Pydantic, JSON Schema, and TypeScript types
+   flow through the existing generators; nine golden fixtures (three
+   valid, four invalid, plus two single-Feature fixtures dedicated to the
+   Py↔TS round-trip harness) exercise all three Article II adherence gates.
 3. **Headless TypeScript CRUD module** at
-   `shared/components/src/storyboard/` — pure GeoJSON-Feature-in,
-   GeoJSON-Feature-out. Enforces every invariant (ordering, duplicate-
-   timestamp rejection, `feature_set_hash` recomputation, provenance
-   append-only, deep-copy thumbnail on cross-storyboard copy, plot-open
-   migration hook) at the module boundary, with a typed error
-   vocabulary. No React, no VS Code API, no Leaflet on the core path.
+   `shared/components/src/storyboard/`, re-exported from
+   `@debrief/components`. Every mutation op returns a `Promise` (Web
+   Crypto `subtle.digest` is async; the API is async-first for
+   consistency). Pure queries remain sync. Structural sharing via
+   `immer.produce(…)`. `sha256Hex` is lifted into
+   `shared/components/src/utils/hash.ts` for reuse with the nl-cql2 module.
 
-Downstream sibling specs (#216 capture, #217 panel + playback, #218
-edit suite) consume this module as their backing data layer. Shipping
-it in isolation unblocks all three in parallel and lands the Article II
-gates every later PR depends on.
+Downstream specs #216 (capture), #217 (panel + playback), and #218 (edit
+suite) import this module. No UI, no VS Code command, no panel ships in
+this slice.
 
 ## Technical Context
 
 **Language/Version**: Python 3.11 (Pydantic models, fixture validation,
-schema-adherence tests), TypeScript 5.x strict (headless CRUD module +
-vitest unit tests), LinkML ≥ 1.7.0 (schema source).
-**Primary Dependencies**: LinkML (`gen-pydantic`, `gen-json-schema`,
-`gen-typescript` — existing pipeline), Pydantic v2, `ulid` (TS; ULID
-generation; MIT, already in use for #175), `jsonschema` (Python fixture
-validation, already used in `test_validation.py`). No React, no VS
-Code, no Leaflet on the core path (FR-MODULE-018).
-**Storage**: Storyboards and Scenes are **GeoJSON Features inside the
-existing plot `FeatureCollection`** — no new files, no STAC API
-surface. Thumbnails continue to live as STAC assets, referenced by
-`thumbnail_asset_ref` (populated by #216 via the #174 capture
-pipeline).
-**Testing**: `pytest` for schema adherence (golden fixtures, round-
-trip, structural compare, validation). `vitest` for the TS CRUD
-module's unit and property-based tests. Playwright E2E is **N/A**
-(no UI surface).
-**Target Platform**: Schema artefacts consumed by every service and
-frontend. TS module targets Node 18+ (test harness) and the browser
-(future #217/#218 webview) — both via the existing `@debrief/components`
-build.
-**Project Type**: Schema module + headless TypeScript library inside
-the existing monorepo. No new package boundaries.
-**Performance Goals**: `listScenesOrdered` MUST be O(n log n) over
-Scene count; typical plot carries ≤ 50 Scenes so sub-millisecond. All
-other CRUD operations O(n) at worst over Scenes-in-plot.
-**Constraints**: Offline-only (Article I). Strict-mode TS (no `any` —
-Article XV). Pure functions throughout `detectMissingDataForScene`
-(Article III provenance — no input mutation). Every mutation MUST
-append exactly one `HistoryEntry` (SC-003, FR-MODULE-012, FR-
-MODULE-020).
-**Scale/Scope**: Typical plot: 1–3 Storyboards, ≤ 50 Scenes each.
-Stress fixture: 10 Storyboards × 200 Scenes to exercise ordering and
-hash recomputation. No pagination needed.
+schema-comparison test); TypeScript 5.x (shared/components, strict mode).
+
+**Primary Dependencies**:
+- LinkML ≥ 1.7.0 (`gen-pydantic`, `gen-json-schema`, `gen-typescript`)
+- Pydantic v2 (Python-side validation)
+- `immer` **(NEW)** pinned at `^10.1.3` — structural-sharing immutability;
+  added to `shared/components/package.json`. Justification in
+  Complexity Tracking.
+- `ulid` **(NEW)** pinned at `^3.0.2` — Node-friendly ULID generator;
+  added to `shared/components/package.json`.
+- Web Crypto (`crypto.subtle.digest`) — browser & Node 20+ built-in,
+  no new dep (same primitive the nl-cql2 `hash.ts` module already uses).
+- Vitest 1.x (unit + perf benchmarks) — already in the monorepo.
+- pytest ≥ 8 — already in the monorepo; extended to spawn Node subprocess
+  for cross-language round-trip harness.
+
+**Storage**: Storyboards and Scenes round-trip as plain GeoJSON Features
+inside the existing plot FeatureCollection. No new STAC collections.
+Thumbnail binaries live under the plot's existing STAC Item assets (via
+#174 helpers consumed in #216); this spec does not touch the STAC layer.
+
+**Testing**:
+- `shared/schemas/tests/test_roundtrip.py` — fixture-prefix-matched
+  Python↔Python round-trip over Pydantic models.
+- `shared/schemas/tests/test_validation.py` — invalid-fixture negative
+  cases.
+- `shared/schemas/tests/test_schema_compare.py` — Pydantic-generated
+  JSON Schema equals LinkML-generated JSON Schema.
+- `shared/schemas/tests/test_crosslang_roundtrip.py` **(NEW)** — pytest
+  spawns a Node subprocess that parses + re-serialises each valid
+  single-Feature fixture through the generated TypeScript models and
+  pipes JSON back; pytest re-validates the round-tripped JSON against
+  Pydantic. Article II SC-001 gate.
+- `shared/components/src/storyboard/__tests__/*.test.ts` — unit tests
+  per module (crud, ordering, missing-data, migration, provenance, dtg).
+- `shared/components/src/storyboard/__tests__/perf.bench.ts` **(NEW)** —
+  Vitest bench covering `createScene`, `updateScene`,
+  `copySceneToOtherStoryboard` at 100/1k/10k/100k position-report fan-
+  out. Target: p95 < 10 ms at 100 k positions on the CI runner.
+
+**Target Platform**: Node 20+ (tests, CLI tooling); evergreen browsers
+with Web Crypto `subtle.digest` (every host that runs the VS Code
+webview or the web-shell qualifies). No network at runtime — Article I.
+
+**Project Type**: Single (monorepo; no new app). Code lands in existing
+packages (`shared/schemas`, `shared/components`).
+
+**Performance Goals**: `createScene`, `updateScene`, and
+`copySceneToOtherStoryboard` have **p95 < 10 ms at 100 k positions** on
+the CI runner (FR-TEST-024). All query functions are O(n) scans over
+the plot FeatureCollection.
+
+**Constraints**:
+- Offline — no network in any CRUD path (Article I).
+- No UI framework imports in `shared/components/src/storyboard/index.ts`
+  or its transitive dependency graph (Article IV).
+- Zero `any` and zero `unknown` on the public API (Article XV).
+- `provenance[]` append-only; never mutate existing entries (FR-MODULE-020).
+
+**Scale/Scope**:
+- Expected: a single plot rarely carries > 5 Storyboards × 50 Scenes =
+  250 Feature rows of storyboard-related data.
+- Benchmark bound: 100 k total *position reports* (i.e. plot size), with
+  up to 5 Storyboards × 50 Scenes each, validated by the perf bench.
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| Article | Requirement | Status | Notes |
-|---------|-------------|--------|-------|
-| I. Defence-Grade Reliability | Offline by default | PASS | Module is pure in-memory FeatureCollection mutation. No network. |
-| I.3 No silent failures | Explicit success/failure | PASS | Typed error vocabulary (see contracts); every invalid op throws a named error *before* mutation. |
-| I.4 Reproducibility | Deterministic output | PASS | `feature_set_hash` is a deterministic hash of sorted `visible_feature_ids`. ULID generation is the only non-determinism and is isolated behind an injectable clock/id source for tests. |
-| II. Schema Integrity | LinkML single source of truth | PASS | All four entities defined in `shared/schemas/src/linkml/storyboard.yaml`. Pydantic + JSON Schema + TS types generated via existing pipeline. |
-| II.2 Schema tests mandatory | Adherence tests before merge | PASS | Seven golden fixtures, round-trip via `test_roundtrip.py`, structural compare via `test_schema_compare.py`. See SC-001/002/003. |
-| II.3 Schema versioning | Version bump + migration path | PASS | `schema_version: 1` + plot-open migration hook (FR-MODULE-019) wired as a no-op for v1, ready for later versions. |
-| III. Data Sovereignty | Provenance always | PASS | Every mutation appends a `HistoryEntry` with `timestamp`, `actor`, `op`, `summary`. History is append-only (FR-MODULE-020). |
-| III.3 Audit trail immutable | No history mutation | PASS | Module API has no "edit history" operation. Tests assert history never shrinks. |
-| IV. Architectural Boundaries | Services never touch UI | **Justified departure** | See Article IV exception below and Complexity Tracking. |
-| V. Extensibility | Fail-safe loading | PASS | Module throws typed errors at boundary; consumer decides UI surfacing. No global state, no singleton. |
-| VI. Testing | Unit tests mandatory | PASS | Every public op has positive + negative tests; atomicity tests via injected mid-op failure (SC-005). |
-| VII. Test-Driven AI | Tests define "done" | PASS | Acceptance scenarios in spec §3 map directly to contract-test names. |
-| VIII. Documentation | Specs before code | PASS | This plan + spec.md + forthcoming data-model.md / contracts / quickstart precede code. |
-| IX. Dependencies | Minimal, vetted | PASS | Adds no new runtime deps on core path; `ulid` already in use for #175. |
-| X. Security | No secrets | PASS | No credentials, no network. |
-| XI. I18N | Strings externalisable | PASS | Error messages use stable machine codes (e.g. `DuplicateTimestamp`). Human-readable strings live in the consuming UI layers (#217/#218), not in the core. |
-| XIII. Contribution Standards | CI MUST pass | PASS | Schema tests, vitest, pytest all wired into existing CI (`task verify`). |
-| XV. Strict Type Safety | No `any` | PASS | TS `strict: true` already enforced monorepo-wide. `unknown` → typed-boundary pattern at the GeoJSON entry points (parse → typed `StoryboardFeature` / `SceneFeature`). |
-
-**Article IV — "Services never touch UI" exception (narrow, justified):**
-
-The Storyboarding CRUD core lives in `shared/components/` (a TypeScript
-package), not in `services/` (Python). This is a deliberate narrow
-departure from the usual "thick Python services" pattern, justified
-because:
-
-1. Storyboard data is **pure GeoJSON-Feature round-trip** — no domain
-   algorithmics, no geospatial computation, no file-format translation.
-   There is no "analysis" layer that Python would add value to.
-2. The data lives **inside the plot's existing FeatureCollection**, so
-   it follows the same save/dirty-state path that VS Code already
-   owns. Forcing a Python hop would add round-trip cost for zero logic.
-3. The module is **UI-framework-agnostic**: pure functions on plain
-   FeatureCollection objects, no React, no Leaflet, no VS Code API on
-   the core path (FR-MODULE-018, SC-008). React bindings, if any,
-   live in a sibling sub-module (`react/`) on the edge of the
-   package — not on the core path.
-4. Downstream specs #216–#218 consume the core module directly; a
-   Python service in front of it would be a passthrough.
-
-This departure is recorded in Complexity Tracking (below) and matches
-the precedent set by the existing `shared/components/src/filter-engine/`
-(#126) — a pure TS module for CQL2 filtering, also with no Python
-service in front.
-
-**Gate result**: PASS — one narrow, justified departure (Article IV)
-recorded in Complexity Tracking.
+| Article | Decision | Status |
+|---------|----------|--------|
+| **I. Offline by default** | Pure in-memory FeatureCollection ops. SHA-256 via platform-native Web Crypto; ULID from `ulid` (no network). `deepCopyThumbnail` is taken as a caller-provided function (the module never performs I/O itself). | ✅ Pass |
+| **II. Schema integrity** | LinkML is single source of truth. Three adherence gates wired: golden fixtures (nine), Pydantic↔LinkML JSON-Schema equality, cross-language Py↔TS round-trip (landing in this slice per FR-TEST-023). | ✅ Pass |
+| **III. Provenance always** | One `LogEntry` appended to the inherited `BaseFeatureProperties.provenance[]` on every mutation; append-only invariant tested; `detectMissingDataForScene` pure (verified by deep-equal on inputs before/after). Single provenance surface — no parallel `history[]`. | ✅ Pass |
+| **IV. Services never touch UI** | Core module is headless TypeScript in `shared/components/src/storyboard/`. The core path has zero `react`, `vscode`, `leaflet`, `@debrief/components` visual imports. Narrow departure from "Python services" pattern — justification in Complexity Tracking. | ⚠ Narrow departure (documented) |
+| **V. Extensibility boundaries** | `MigrationFn`-based registry at plot-open; `runPlotOpenMigrations` is a typed seam that future schema versions register against without touching the load path. | ✅ Pass |
+| **VI. Tests required** | Positive + negative test per invariant (SC-003). Atomicity test via injected mid-op failure (SC-005). Cross-language round-trip (FR-TEST-023). Perf bench (FR-TEST-024). | ✅ Pass |
+| **VII. Specs before code** | This plan + spec + research + data-model + contracts + quickstart precede any implementation. | ✅ Pass |
+| **IX. Dependency hygiene** | Two new runtime deps: `immer ^10.1.3` and `ulid ^3.0.2`. Both replace hand-rolled, error-prone in-house equivalents (structural clone + ID generation). Justified in Complexity Tracking. No new build-time tooling. | ✅ Pass |
+| **XV. Strict type safety** | Public API: zero `any`, zero `unknown` on returns. Typed error classes (`StoryboardError` subclasses) with stable string codes. Match on `err.code`, not `instanceof`. | ✅ Pass |
 
 ## Project Structure
 
@@ -126,18 +121,15 @@ recorded in Complexity Tracking.
 
 ```text
 specs/215-storyboarding-schema/
-├── plan.md              # This file (/speckit.plan output)
+├── plan.md              # This file
+├── spec.md              # Feature spec (updated 2026-04-20 w/ clarifications)
 ├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output (entity + state shapes)
-├── quickstart.md        # Phase 1 output (consumer guide for #216–#218)
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
 ├── contracts/
-│   ├── crud-module-api.md   # TypeScript public API surface + error vocabulary
-│   └── storyboard.schema.json  # JSON Schema contract excerpt (for review)
-├── checklists/
-│   └── requirements.md  # Already exists — quality gate
-└── media/
-    ├── planning-post.md
-    └── linkedin-planning.md
+│   ├── storyboard.schema.json   # Reference JSON-Schema excerpt
+│   └── crud-module-api.md       # Public TS API contract
+└── tasks.md             # Phase 2 output (NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
@@ -145,70 +137,80 @@ specs/215-storyboarding-schema/
 ```text
 shared/schemas/
 ├── src/linkml/
-│   ├── storyboard.yaml              # NEW: Storyboard, Scene, Viewport, HistoryEntry
-│   └── debrief.yaml                 # MODIFIED: adds `imports: - storyboard`
+│   ├── common.yaml                  ← EDIT: +STORYBOARD, +STORYBOARD_SCENE in FeatureKindEnum
+│   ├── log-entry.yaml               ← EDIT: +optional `agent: string` slot
+│   ├── storyboard.yaml              ← NEW: StoryboardProperties, SceneProperties, Viewport
+│   └── debrief.yaml                 ← EDIT: imports += storyboard
 ├── src/fixtures/
 │   ├── valid/
-│   │   ├── storyboard-minimal.json             # NEW
-│   │   ├── storyboard-full-featured.json       # NEW
-│   │   └── storyboard-scene-minimal.json       # NEW
+│   │   ├── storyboard-single-minimal.json           ← NEW (single-Feature; round-trip)
+│   │   ├── storyboard-scene-single-minimal.json     ← NEW (single-Feature; round-trip)
+│   │   ├── storyboard-full-featured.json            ← NEW (FeatureCollection; Story+Scenes)
+│   │   └── storyboard-scene-minimal.json            ← NEW (FeatureCollection; one Scene)
 │   └── invalid/
-│       ├── storyboard-scene-duplicate-timestamp.json   # NEW
-│       ├── storyboard-scene-non-null-time-range.json   # NEW
-│       ├── storyboard-scene-bearing-nonzero.json       # NEW
-│       └── storyboard-scene-orphan.json                # NEW
+│       ├── storyboard-scene-duplicate-timestamp.json
+│       ├── storyboard-scene-non-null-time-range.json
+│       ├── storyboard-scene-bearing-nonzero.json
+│       └── storyboard-scene-orphan.json
 └── tests/
-    ├── test_roundtrip.py            # MODIFIED: register storyboard + scene entities
-    ├── test_schema_compare.py       # MODIFIED: compare storyboard.yaml outputs
-    └── test_validation.py           # MODIFIED: exercise new invalid fixtures
+    ├── test_roundtrip.py               ← EDIT: +entity entries (order scene before story)
+    ├── test_schema_compare.py          ← EDIT: +storyboard module
+    ├── test_validation.py              ← EDIT: +invalid cases
+    └── test_crosslang_roundtrip.py     ← NEW: Py→JSON→TS→JSON→Py via Node subprocess
 
 shared/components/
-├── src/storyboard/                  # NEW headless package path
-│   ├── index.ts                     # Public API re-exports
-│   ├── types.ts                     # Branded-type helpers + error classes
-│   ├── crud.ts                      # create/update/delete/duplicate/copy
-│   ├── ordering.ts                  # listScenesOrdered + timestamp invariants
-│   ├── hash.ts                      # feature_set_hash (deterministic)
-│   ├── history.ts                   # HistoryEntry append helper
-│   ├── missing-data.ts              # detectMissingDataForScene (pure)
-│   ├── migration.ts                 # plot-open migration hook (v1 no-op)
-│   ├── dtg.ts                       # DTG formatter (DDHHmmZ MMM YY)
-│   └── __tests__/
-│       ├── crud.test.ts
-│       ├── ordering.test.ts
-│       ├── hash.test.ts
-│       ├── history.test.ts
-│       ├── missing-data.test.ts
-│       ├── atomicity.test.ts        # mid-op failure injection (SC-005)
-│       └── migration.test.ts
-└── src/index.ts                     # MODIFIED: re-export storyboard public API
+├── package.json                         ← EDIT: +immer ^10.1.3, +ulid ^3.0.2
+└── src/
+    ├── utils/
+    │   └── hash.ts                      ← NEW: lifted from nl-cql2/hash.ts
+    ├── nl-cql2/
+    │   └── hash.ts                      ← EDIT: re-export from ../utils/hash.ts
+    └── storyboard/                      ← NEW module
+        ├── index.ts                     ← public re-exports
+        ├── types.ts                     ← branded types + error classes
+        ├── crud.ts                      ← createStoryboard, createScene, updateScene, …
+        ├── ordering.ts                  ← listScenesOrdered, timestamp conflict detection
+        ├── missing-data.ts              ← detectMissingDataForScene (pure)
+        ├── migration.ts                 ← runPlotOpenMigrations, V1_MIGRATIONS
+        ├── provenance.ts                ← appendLogEntry helper (Article III)
+        ├── dtg.ts                       ← formatDtg
+        ├── validate.ts                  ← validatePlot (invariant scanner)
+        └── __tests__/
+            ├── crud.test.ts
+            ├── ordering.test.ts
+            ├── missing-data.test.ts
+            ├── migration.test.ts
+            ├── provenance.test.ts
+            ├── validate.test.ts
+            ├── dtg.test.ts
+            └── perf.bench.ts            ← Vitest bench: p95 < 10ms @ 100k positions
 ```
 
-**Structure Decision**: Two existing workspaces touched, no new ones:
-`shared/schemas/` gains a new LinkML module + fixtures; `shared/
-components/` gains a new pure-TS sub-module following the established
-`filter-engine/` precedent. No Python service is added (see Article IV
-exception). No VS Code, web-shell, or extension code is modified by
-this spec — those arrive in #216–#218.
+**Structure Decision**: Single-project monorepo extension. All code
+lands in existing `shared/schemas/` and `shared/components/` workspaces;
+no new package is introduced. The `storyboard/` folder is a sibling of
+existing headless modules like `nl-cql2/` and `filter-engine/`,
+following the same import-discipline rules (no UI-framework imports on
+the core path).
 
 ## Media Components
 
-None — schema + headless-module feature. No visual components, no
-Storybook stories. Downstream sibling specs (#217, #218) will supply
-Storybook coverage for their visual surfaces (Scene list, panel
-transport, on-map Scene rectangles, etc.).
+None — backend/infrastructure feature. No visual components, no
+Storybook stories.
 
 ## Storybook E2E Testing
 
-None — no interactive UI components in this slice.
+None — no interactive UI components.
 
 ## VS Code Webview E2E Testing
 
-None — no extension workflow changes in this slice. The CRUD module is
-consumed by the webview in #217, where webview E2E coverage will land.
+None — no extension workflow changes. Sibling specs #216–#218 land
+those changes.
 
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|-----------|--------------------------------------|
-| Core CRUD module in TypeScript under `shared/components/`, not a Python service under `services/` (narrow Article IV departure) | Storyboard data is pure GeoJSON-Feature round-trip with no domain algorithms; lives inside the plot's existing FeatureCollection that VS Code already owns the save path for; has no dependencies on geospatial computation or file-format translation. Consumers (#216–#218) are all TS webview surfaces. | A Python service in front would be a passthrough — it would serialise/deserialise GeoJSON features on both sides, add IPC latency, and gain no analytical value. Precedent: `shared/components/src/filter-engine/` (#126) is also a pure TS module with no Python service, for the same reasons. |
+|-----------|------------|--------------------------------------|
+| **Narrow Article IV departure**: ship the CRUD logic as a shared TypeScript module rather than a Python service. | Storyboard/Scene operations are pure GeoJSON-Feature round-trip with no domain calculation — the hot path is called from webviews during capture/playback, where a Python-service round-trip would add 50–200 ms of RPC overhead for zero domain-logic benefit. Matches the precedent set by the filter-engine (#126) and nl-cql2 (#190) modules. | Python service + MCP tool rejected: adds network + IPC latency on every Scene CRUD and every playback step for no calculation. The VS Code extension would still need a TS adapter, duplicating the logic surface. |
+| **Runtime dep: `immer ^10.1.3`** | Structural-sharing immutability over FeatureCollections is a performance and correctness requirement (FR-MODULE-022). A hand-rolled deep-clone at every mutation would both violate the perf target (FR-TEST-024) and introduce subtle bugs where shared references leak back into the input. immer is the de-facto library (10M+ weekly downloads), peer-dep-free, and already battle-tested in the React ecosystem. | Hand-rolled `structuredClone` or recursive spread rejected: cloning the entire FeatureCollection on every CRUD op blows the p95 < 10 ms target at 100k positions; spread leaves nested Features aliased. |
+| **Runtime dep: `ulid ^3.0.2`** | Spec requires ULID IDs (FR-SCHEMA). Node does not ship a ULID generator. `ulid` is a 2 KB zero-dep package. | `crypto.randomUUID()` rejected: ULIDs are lexicographically sortable by creation time, which several spec invariants (ordering, log ordering, round-trip stability) lean on; UUIDv4 is not. |

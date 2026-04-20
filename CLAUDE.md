@@ -230,4 +230,3 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 ## Recent Changes
 - 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,
 - 199-code-quality-cleanup: Added TypeScript 5.x (existing monorepo — no new languages, no Python edits) + pnpm workspace, `@debrief/components` (LogPanel), `knip` (introduced via `pnpm dlx`), existing ESLint / pyright / ruff toolchain (unchanged)
-- 201-knip-loader-config: Added TypeScript 5.x (for the loader source the config references); configuration itself is JSON (no runtime language); YAML (Taskfile + CI workflow). + `knip` — **newly added**, pinned to a specific 5.x version in root `devDependencies`. Justification recorded below in Constitution Check Article IX. No other new dependencies.

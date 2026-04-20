@@ -4,6 +4,16 @@
 **Status**: Language-neutral contract. Drives implementation + test
 names in `shared/components/src/storyboard/`.
 
+**Updated 2026-04-20** following post-plan review. Key deltas:
+- **Mutation ops are async** (`Promise<{plot, …}>`) — Web Crypto's
+  `subtle.digest` is async. Pure queries remain synchronous.
+- **Structural sharing via `immer.produce`** — unmodified Features are
+  reference-equal across input and output FeatureCollections.
+- **Provenance** flows through the inherited
+  `BaseFeatureProperties.provenance: LogEntry[]` slot, not a
+  `HistoryEntry` array. Per-op encoding lives in `data-model.md §4`.
+- **`computeFeatureSetHash` is async** with canonicalisation built in.
+
 All signatures are TypeScript strict-mode. No function returns `any`.
 All functions are **pure**: they never mutate their inputs — they
 return a new `FeatureCollection` (or, for queries, a plain value) and
@@ -21,7 +31,7 @@ import type {
   StoryboardProperties,
   SceneProperties,
   Viewport,
-  HistoryEntry,
+  LogEntry,
 } from "@debrief/schemas";
 
 import type { FeatureCollection } from "geojson";
@@ -38,15 +48,16 @@ that are not Storyboards or Scenes pass through unchanged.
 export interface CreateStoryboardInput {
   name: string;
   description?: string;
-  actor: string;         // populates created_by / last_modified_by
+  actor: string;         // populates LogEntry.agent on the create entry
   now?: string;          // injectable clock (ISO-8601); defaults to new Date().toISOString()
   idOverride?: string;   // injectable ULID for deterministic tests
+  activityIdOverride?: string;  // injectable UUID for deterministic tests
 }
 
-export function createStoryboard(
+export async function createStoryboard(
   plot: Plot,
   input: CreateStoryboardInput,
-): { plot: Plot; storyboard: StoryboardFeature };
+): Promise<{ plot: Plot; storyboard: StoryboardFeature }>;
 
 export interface RenameStoryboardInput {
   storyboardId: string;
@@ -55,15 +66,15 @@ export interface RenameStoryboardInput {
   now?: string;
 }
 
-export function renameStoryboard(
+export async function renameStoryboard(
   plot: Plot,
   input: RenameStoryboardInput,
-): { plot: Plot; storyboard: StoryboardFeature };
+): Promise<{ plot: Plot; storyboard: StoryboardFeature }>;
 
-export function deleteStoryboard(
+export async function deleteStoryboard(
   plot: Plot,
   input: { storyboardId: string; actor: string; now?: string },
-): { plot: Plot; removedSceneIds: string[] };  // cascades — Scenes removed atomically
+): Promise<{ plot: Plot; removedSceneIds: string[] }>;  // cascades — Scenes removed atomically
 ```
 
 **Errors**:
@@ -82,18 +93,19 @@ export interface CreateSceneInput {
   description?: string;
   viewport: Viewport;                   // bearing MUST be 0 in v1
   timestamp: string;                    // ISO-8601 instant
-  visibleFeatureIds: string[];
+  visibleFeatureIds: string[];          // canonicalised (trim/dedupe/sort) before hashing
   thumbnailAssetRef: string;
   transitionDurationMs?: number;        // default 500
   actor: string;
   now?: string;
   idOverride?: string;
+  activityIdOverride?: string;
 }
 
-export function createScene(
+export async function createScene(
   plot: Plot,
   input: CreateSceneInput,
-): { plot: Plot; scene: SceneFeature };
+): Promise<{ plot: Plot; scene: SceneFeature }>;
 
 export interface UpdateScenePatch {
   title?: string;
@@ -105,7 +117,7 @@ export interface UpdateScenePatch {
   transitionDurationMs?: number;
 }
 
-export function updateScene(
+export async function updateScene(
   plot: Plot,
   input: {
     sceneId: string;
@@ -113,14 +125,14 @@ export function updateScene(
     actor: string;
     now?: string;
   },
-): { plot: Plot; scene: SceneFeature };
+): Promise<{ plot: Plot; scene: SceneFeature }>;
 
-export function deleteScene(
+export async function deleteScene(
   plot: Plot,
   input: { sceneId: string; actor: string; now?: string },
-): { plot: Plot };
+): Promise<{ plot: Plot }>;
 
-export function duplicateScene(
+export async function duplicateScene(
   plot: Plot,
   input: {
     sceneId: string;
@@ -129,7 +141,7 @@ export function duplicateScene(
     now?: string;
     idOverride?: string;
   },
-): { plot: Plot; scene: SceneFeature };
+): Promise<{ plot: Plot; scene: SceneFeature }>;
 
 export interface CopySceneToOtherStoryboardInput {
   sceneId: string;
@@ -141,7 +153,7 @@ export interface CopySceneToOtherStoryboardInput {
   idOverride?: string;
 }
 
-export function copySceneToOtherStoryboard(
+export async function copySceneToOtherStoryboard(
   plot: Plot,
   input: CopySceneToOtherStoryboardInput,
 ): Promise<{ plot: Plot; scene: SceneFeature }>;
@@ -156,13 +168,17 @@ export function copySceneToOtherStoryboard(
 - `OrphanScene` — validator detects the `storyboard_id` is missing
   (should be impossible via these APIs but guarded).
 - `ReservedSlotViolation` — non-null `time_range` or non-zero
-  `bearing` submitted.
+  `bearing` submitted; empty string in `visibleFeatureIds` after trim.
 - `ThumbnailDeepCopyFailed` — `deepCopyThumbnail` rejects; whole op
-  rolled back (no partial write).
+  rolled back (no partial write, input byte-identical post-call).
 
 ---
 
-## 4. Queries
+## 4. Queries (synchronous)
+
+All query functions are **pure** and **synchronous**. They perform no
+crypto, no I/O, and no mutation. Deep-equality of inputs before and
+after any query call is a tested invariant (SC-006).
 
 ```ts
 export function listScenesOrdered(
@@ -199,7 +215,11 @@ export function detectMissingDataForScene(
 
 export interface StaleReadResult {
   scene: SceneFeature;
-  stale: boolean;   // true if recomputed hash ≠ stored hash
+  storedHash: string;                   // scene.properties.feature_set_hash
+  canonicalVisibleIds: string[];        // trim/dedupe/sort applied
+  // Consumer awaits computeFeatureSetHash(canonicalVisibleIds) if it
+  // wants to detect staleness. Kept sync to avoid forcing async on
+  // every read. See research.md R11.
 }
 
 export function readSceneWithStaleness(
@@ -208,24 +228,53 @@ export function readSceneWithStaleness(
 ): StaleReadResult;
 ```
 
+### Derived read-only accessors (from inherited `provenance[]`)
+
+```ts
+export function getCreatedAt(
+  feature: StoryboardFeature | SceneFeature,
+): string;  // = provenance[0].timestamp
+
+export function getLastModifiedAt(
+  feature: StoryboardFeature | SceneFeature,
+): string;  // = provenance[provenance.length - 1].timestamp
+
+export function getCreatedBy(
+  feature: StoryboardFeature | SceneFeature,
+): string | null;  // = provenance[0].agent ?? null
+
+export function getLastModifiedBy(
+  feature: StoryboardFeature | SceneFeature,
+): string | null;  // = provenance[last].agent ?? null
+```
+
 ---
 
 ## 5. Invariant helpers
 
 ```ts
-export function computeFeatureSetHash(
+export async function computeFeatureSetHash(
   visibleFeatureIds: string[],
-): string;  // SHA-256 hex, lowercase
+): Promise<string>;
+// Canonicalises (trim, reject empty → ReservedSlotViolation, dedupe,
+// sort lexicographically), then SHA-256 hex (lowercase, 64 chars).
+// Async because Web Crypto's subtle.digest is async.
+
+export function canonicaliseVisibleFeatureIds(
+  visibleFeatureIds: string[],
+): string[];
+// Sync helper exposed for consumers that want to inspect the canonical
+// list without awaiting the hash (e.g. readSceneWithStaleness).
 
 export function validatePlot(plot: Plot): void;
 // Throws the first invariant violation encountered:
 //   OrphanScene | DuplicateTimestamp | DuplicateStoryboardName | ReservedSlotViolation
-// Side-effect-free. Intended for host-side save-time validation.
+// Side-effect-free. Synchronous. Intended for host-side save-time validation.
 ```
 
 ---
 
-## 6. Migration hook
+## 6. Migration hook (synchronous)
 
 ```ts
 export type MigrationFn = (plot: Plot) => Plot;
@@ -239,19 +288,53 @@ export const V1_MIGRATIONS: ReadonlyMap<number, MigrationFn>;
 // Pre-built registry shipping with #215. v1 entry is a no-op passthrough.
 ```
 
+Synchronous because v1 is a no-op. Future versions that require async
+work (e.g. re-hashing legacy feature sets) will introduce an async
+sibling `runPlotOpenMigrationsAsync`; the sync path stays for v1.
+
 ---
 
-## 7. DTG formatter
+## 7. DTG formatter (synchronous)
 
 ```ts
 export function formatDtg(isoInstant: string): string;
-// Returns "DDHHmmZ MMM YY" (e.g. "041500Z APR 26"); on parse failure
+// Returns "DDHHmmZ MMM YY" (e.g. "201500Z APR 26"); on parse failure
 // returns the input verbatim.
 ```
 
 ---
 
-## 8. Error vocabulary
+## 8. Provenance encoding helper (internal shape, exposed for tests)
+
+```ts
+export interface StoryboardCrudLogEntryInput {
+  op:
+    | "create" | "rename" | "describe" | "delete" | "restore"
+    | "update-to-current" | "duplicate" | "copy-in"
+    | "insert-middle" | "refresh-thumbnail";
+  actor: string;
+  now: string;
+  summary: string;
+  used: string[];       // source Feature ids (empty for "create")
+  generated: string[];  // output Feature id(s)
+  activityId: string;   // UUID v4 (or override for tests)
+  rationale?: string;
+}
+
+export function buildStoryboardCrudLogEntry(
+  input: StoryboardCrudLogEntryInput,
+): LogEntry;
+// Pure. Populates was_generated_by.tool = "storyboard-crud",
+// was_generated_by.tool_version = "1.0.0",
+// was_generated_by.parameters.op = input.op,
+// agent = input.actor,
+// execution_duration = "PT0S".
+// Used internally by every mutation op and exposed for test assertions.
+```
+
+---
+
+## 9. Error vocabulary
 
 ```ts
 export abstract class StoryboardError extends Error {
@@ -285,7 +368,7 @@ Consumer code MUST match on `err.code`, not on `instanceof`
 
 ---
 
-## 9. Non-API guarantees
+## 10. Non-API guarantees
 
 - **No global state.** Module has no singletons, no module-level
   caches, no side channels.
@@ -301,4 +384,15 @@ Consumer code MUST match on `err.code`, not on `instanceof`
   on return types.
 - **Browser + Node compatible.** Every function runs unchanged in both
   environments; SHA-256 uses the platform-native crypto primitive via
-  a thin shim (`node:crypto` in Node, `crypto.subtle` in browser).
+  the shared `shared/components/src/utils/hash.ts` module (which in
+  turn delegates to `globalThis.crypto.subtle.digest` — present in
+  Node 20+ and every evergreen browser).
+- **Structural sharing.** Every mutation is an `immer.produce(plot, …)`
+  recipe; unmodified Features are reference-equal across input and
+  output FeatureCollections (FR-MODULE-022, tested invariant).
+- **Atomicity.** If any step inside a mutation throws, the input plot
+  is byte-identical to its pre-call state (immer's produce discards
+  the draft). Tested under injected mid-op failure (SC-005).
+- **Append-only provenance.** Public ops never mutate or remove
+  existing `LogEntry` records in `provenance[]` (FR-MODULE-020, tested
+  invariant).
