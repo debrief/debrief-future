@@ -2,12 +2,24 @@
 
 **Feature Branch**: `202-storyboarding`
 **Created**: 2026-04-20
-**Status**: Draft (schema section only — other sections pending)
+**Status**: Draft — ready for quality-checklist validation
 **Input**: Backlog epic #024 — [Storyboarding Briefings](../../docs/ideas/017-storyboarding-briefings.md)
 
-> **Note**: This spec is being built up section by section. Only the **Key Entities**
-> section below is authoritative at this point. All other sections are stubs and
-> will be filled in subsequent passes.
+## Summary
+
+Introduce a **Storyboard** concept attached to a plot: a named, ordered
+sequence of **Scenes** that each capture the analyst's map viewport,
+plot-timestamp, and per-feature visibility at the moment of capture,
+together with a thumbnail. A Storyboard panel in the Map Viewer provides
+capture, editing, and forward/backward preview playback so an analyst can
+build a guided walk-through of a recorded exercise for briefings and
+training. Storyboards and Scenes are first-class GeoJSON Features that
+round-trip through the existing plot-edit path and are validated by
+LinkML-generated schemas; no STAC API changes are required.
+
+A **dedicated distraction-free briefing renderer** is explicitly deferred
+to a follow-up spec — MVP ships preview-only playback inside the VS Code
+panel.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -748,15 +760,96 @@ verified without knowing implementation details.
 
 ## Assumptions
 
-> _Pending — will capture Spec-Author Defaults from the idea doc (DTG format,
-> transition defaults, toast-undo scope, ID scheme, etc.)._
+Reasonable defaults adopted from the idea doc's *Spec-Author Defaults*.
+Each is a deliberate choice, not an open question — listed here so later
+phases can see exactly what was assumed.
+
+- **DTG format**: `DDHHmmZ MMM YY` (ZULU); falls back to ISO-8601 when DTG
+  cannot be formatted.
+- **Default `transition_duration_ms`**: `500`.
+- **Transition easing**: `ease-in-out` for both the `flyTo` and the
+  time-slider tween.
+- **Toast-undo window**: session-scoped only; closing the plot or the
+  VS Code window finalises pending deletes.
+- **Duplicate-scene default timestamp offset**: source `timestamp` + 1
+  second.
+- **Scene and Storyboard IDs**: ULID.
+- **Zoom precision**: float (Leaflet-native).
+- **Thumbnail dimensions**: inherited from the #174 pipeline's existing
+  conventions — not re-specified here.
+- **Cross-Storyboard drag-reorder**: not supported in MVP; reordering is
+  only via editing a Scene's `timestamp`, via `update-to-current`, or via
+  `copy-to-other-storyboard` + delete.
+- **Active-Storyboard persistence**: the active selection is not written
+  to disk; on plot re-open it defaults to the Storyboard with the most
+  recent `last_modified_at`.
+- **Hard-block severity**: the missing-data hard-block applies uniformly
+  across edit and playback contexts in MVP; a "production mode" relaxation
+  is explicitly out of scope (see below).
+- **Article IV departure (narrow)**: storyboard CRUD lives in a shared
+  TypeScript module under `shared/components/storyboard/` — not in a
+  Python service. This is a deliberate exception to the thick-services
+  pattern because the data is pure GeoJSON-Feature round-trip with no
+  domain logic; the STAC layer sees only generic features. Documented
+  here so the Constitution Check in `plan.md` can carry the full
+  justification.
 
 ## Dependencies
 
-> _Pending — #174 (thumbnails), #176 (Analysis Log Panel), LinkML pipeline,
-> stable feature IDs._
+External features and systems this spec assumes are present. Items marked
+**hard** block implementation; items marked **soft** can be worked around.
+
+- **#174 Thumbnail capture pipeline** (hard) — synchronous capture of the
+  map panel as a PNG STAC asset. Used both at Scene creation time and by
+  the per-Scene *Refresh thumbnail* action. Capture aborts when this
+  pipeline errors.
+- **#176 Analysis Log Panel** (hard) — destination for every Storyboard
+  and Scene mutation entry. If #176 is not available at implementation
+  time, mutation logging is nonetheless required by FR-034 and must be
+  held behind a feature flag until #176 lands — but shipping without a
+  visible log destination is not acceptable.
+- **LinkML generation pipeline** under `shared/schemas/` (hard) —
+  required to generate Pydantic, JSON Schema, and TypeScript bindings
+  from the Storyboard and Scene LinkML sources.
+- **Stable feature IDs across sessions** (hard) — Scenes reference plot
+  features by stable ID only. The plot-edit path must preserve IDs
+  across save/reload and across re-imports; ID churn is surfaced via the
+  missing-data hard-block rather than papered over.
+- **VS Code Map Viewer** (hard) — the host for the capture shortcut
+  (`Ctrl/Cmd+Alt+C`, scoped via `when`-clause), the on-map Scene
+  rectangles, and the `flyTo` + time-slider tween transport.
+- **Plot save/dirty-state mechanism** (hard) — edits to Storyboards and
+  Scenes mark the plot dirty and require the analyst's explicit save
+  before becoming durable.
+- **Command Palette / view-menu integration** (soft) — used to open the
+  panel before the first capture; a fallback "panel visibility" toggle
+  elsewhere in the UI is acceptable if the palette path is unavailable.
 
 ## Out of Scope
 
-> _Pending — dedicated briefing renderer, animated time-range scenes,
-> antimeridian MultiPolygon handling, sharing/collaboration, video export._
+Explicitly excluded from MVP; listed here so downstream phases do not
+accidentally pull them in.
+
+**Deferred to a follow-up spec**:
+
+- **Dedicated briefing renderer.** The distraction-free playback surface
+  (web-shell route, Electron briefing app, or exported static bundle) is
+  deferred. MVP ships preview-only playback inside the VS Code panel.
+- **Animated time-range Scenes.** The schema reserves `time_range`
+  (required `null` in v1), but MVP captures single instants only; a
+  future iteration will render smooth animation across a captured time
+  window.
+- **Antimeridian MultiPolygon handling.** Viewports that cross ±180°
+  longitude emit a warning and store a best-effort Polygon in MVP;
+  proper MultiPolygon splitting is deferred.
+
+**Phase 2 (explicit non-goals)**:
+
+- Mini-app export packaging with embedded data and snapshot background
+  images.
+- Storyboard sharing and real-time collaboration.
+- Video export of a Storyboard.
+- Production-mode relaxation of the missing-data hard-block (MVP blocks
+  everywhere; a less strict mode may be considered later).
+- Cross-Storyboard drag-reorder and any ordering mechanism other than
+  `timestamp`.
