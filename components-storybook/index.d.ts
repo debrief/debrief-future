@@ -39,7 +39,7 @@ export { useIsMobile } from './hooks/useIsMobile';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 export type { DebriefFeature, DebriefFeatureCollection, SchemaAnnotationFeature, TrackFeature, ReferenceLocation, Bounds } from './utils/types';
 export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, isExpandableFeature, } from './utils/types';
-export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from '@debrief/utils';
 export { calculateTimeExtent, parseDuration, findIntervalPositions, } from './utils/time';
 export { resolvePositionStyle, computeAllPositionStyles, assertNever, InvalidPointShapeError, } from '@debrief/utils';
 export type { PointShape, ResolvedPositionStyle } from '@debrief/utils';
