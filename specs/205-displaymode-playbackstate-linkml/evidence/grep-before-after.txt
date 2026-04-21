@@ -42,3 +42,28 @@ $ grep -nE 'as never' services/session-state/src/persistence/load.ts
 
 241:            state.setPlaybackState(message.state === 'playing' ? 'playing' : 'paused');
 
+
+## AFTER (Phase 6, branch 205-displaymode-playbackstate-linkml at task T071)
+
+### 1. Hand-typed DisplayMode / PlaybackState declarations (SC-001)
+
+$ grep -rnE '^(export\s+)?type\s+(DisplayMode|PlaybackState)\b' apps/ shared/ services/ --include='*.ts' --include='*.tsx' | grep -v shared/schemas/src/generated/ | grep -v /dist/
+
+(empty = SC-001 pass)
+
+### 2. Legacy-vocabulary translator ternaries (SC-002)
+
+$ grep -rnE "=== 'snailTrail'|=== 'normal' \?|'trail' : 'normal'|'snailTrail' : 'normal'" apps/ shared/ --include='*.ts' --include='*.tsx'
+
+(empty = SC-002 pass)
+
+### 3. as-never casts at load.ts (SC-012)
+
+$ grep -nE 'as never' services/session-state/src/persistence/load.ts
+
+180:    // the previous `as never` was an inherited bypass. The Zustand setter
+(only match is a comment referencing the historical cast — no actual 'as never' code)
+
+### 4. Silent-narrow translator at timeRangeView.ts:241 (review 3A)
+
+(empty = FR-022a pass)

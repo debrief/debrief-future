@@ -1,0 +1,39 @@
+# Guard-script transcripts (Feature 205 / FR-031 + FR-032 / SC-013 + SC-016)
+
+**Generated**: 2026-04-21T20:48:40Z
+**Git SHA**: 1a74e103
+
+## 1. check-no-hand-typed-temporal-enums.sh (clean pass)
+
+```
+✅ No hand-typed DisplayMode/PlaybackState or legacy translators found (regression guard passed)
+```
+
+## 2. check-adr-refs.sh (clean pass)
+
+```
+✅ All LinkML ADR references resolve (regression guard passed)
+```
+
+## 3. Simulated failure — check-no-hand-typed-temporal-enums.sh
+
+Temporarily introduce a hand-typed declaration to confirm the guard catches it:
+
+```
+Simulated violation added: shared/components/src/_test_205_sim/sim.ts
+Running guard script (expected: exit 1, violation listed)...
+❌ DisplayMode/PlaybackState regression guard failed!
+
+The following declarations or translators violate the schema-rooted
+enum contract established by Feature 205. Use `DisplayMode` /
+`PlaybackState` imported from `@debrief/schemas` (template-literal
+types derived from the generated `DisplayModeEnum` / `PlaybackStateEnum`).
+
+Hand-typed declarations:
+shared/components/src/_test_205_sim/sim.ts:1:export type DisplayMode = 'normal' | 'snailTrail';
+
+Exit code: 1
+Cleaning up simulated violation...
+Re-running guard script on clean tree:
+✅ No hand-typed DisplayMode/PlaybackState or legacy translators found (regression guard passed)
+```

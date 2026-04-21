@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0 -- C:\git\debrief-future\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\git\debrief-future\shared\schemas
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.0.0
+collecting ... collected 1 item
+
+shared\schemas\tests\test_regen_idempotent.py::test_generate_is_idempotent PASSED [100%]
+
+============================= 1 passed in 13.06s ==============================
