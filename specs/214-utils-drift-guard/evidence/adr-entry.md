@@ -1,0 +1,17 @@
+### ADR-020: Drift-prevention guards as ESLint rules — generalised factory, wired meta-check, and grandfathered shell scripts (2026-04-20)
+
+**Context.** Backlog item #214 followed #200's `calculateBounds` consolidation. The SC-001 guarantee from #200 ("exactly one match per symbol, all inside `shared/utils/`") is a point-in-time assertion — without a guard, any future PR could reintroduce a local `bounds.ts` without friction. The scope expanded during `/speckit.review` to cover every `@debrief/*` package (`@debrief/utils`, `@debrief/schemas`, `@debrief/components`, `@debrief/session-state`, `@debrief/data`), add a wiring-forgotten meta-check, and wire in the pre-existing but unwired `scripts/check-no-geojson-feature.sh`.
+
+**Decision.** Drift-prevention guards in this monorepo are implemented as parameterised ESLint `no-restricted-syntax` entry generators, wired via spreads in each `apps/*/.eslintrc.cjs`. A single `shared/eslint-rules/drift-rule-factory.cjs` accepts `(packageName, indexPath)` and parses the package's TypeScript barrel (including transitive `export *` walks within the package's own `src/`) to produce the selector entries. Five thin caller modules — one per `@debrief/*` package — invoke the factory and expose `{ rules }`. A plain-Node meta-check script (`scripts/check-eslint-drift-wiring.cjs`, invoked from `task lint`) asserts every `apps/*/.eslintrc.cjs` spreads every caller module; identity comparison ensures the guarantee is structural, not lexical.
+
+The pre-existing `scripts/check-no-geojson-feature.sh` is grandfathered — wired into `task lint` as-is, not rewritten. Its `shared/` + `services/` coverage is strictly broader than the ESLint rules' `apps/*` scope, so it complements rather than duplicates them. A later spec may migrate its logic into the drift-rule factory; that migration is not scheduled.
+
+**Consequences.**
+- ✅ Future drift-prevention guards SHOULD be ESLint rules (same pattern); unwired guard scripts are anti-precedent (the grandfathered exception is `check-no-geojson-feature.sh`, now wired).
+- ✅ Adding coverage for a sixth `@debrief/*` package is a three-line caller module + one line in `scripts/check-eslint-drift-wiring.cjs`'s `CALLER_MODULES` array + one require + spread per `apps/*/.eslintrc.cjs`.
+- ✅ Adding a new export to any `@debrief/*` index barrel automatically extends the guard with zero rule-module edits (FR-010 / SC-004 / SC-011).
+- ✅ Adding a new `apps/*` sibling with a `.eslintrc.cjs` is automatically enforced by the meta-check; no edit to the check script is required (FR-017).
+- ❌ Pre-existing name-collisions surfaced by the new guard (11 lines across `apps/vscode/src/types/`, `apps/vscode/src/webview/`, `services/session-state/src/types/results.ts`, and `shared/schemas/src/generated/typescript/types.ts`) are suppressed with explicit `// eslint-disable-next-line no-restricted-syntax -- … #214 scope-adjacent` annotations or `// canonical` tags. Follow-up specs will consolidate or rename each.
+- ❌ ESLint's `no-restricted-syntax` uses one severity per rule array; to set the drift rules at `'error'` we also elevated the pre-existing `snakeCaseRules` / `TSAsExpression Record | unknown` entries to `'error'`. Twenty pre-existing ADR-010/ADR-011 violations were suppressed inline with `-- pre-existing ADR-010/011, unrelated to #214` notes rather than fixed, since that cleanup is out of scope.
+
+**Originating issue:** Backlog item #214 (follow-up to #200). Spec: `specs/214-utils-drift-guard/`.

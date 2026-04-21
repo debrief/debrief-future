@@ -82,7 +82,7 @@ describe('Persistence', () => {
 
     it('should include schema version', () => {
       const persistent = extractPersistentState(store);
-      expect(persistent.schemaVersion).toBe('1.0.0');
+      expect(persistent.schemaVersion).toBe('1.1.0');
     });
 
     it('should include savedAt timestamp', () => {
@@ -101,7 +101,7 @@ describe('Persistence', () => {
     it('should include version header', () => {
       const json = serializeState(store);
       const parsed = JSON.parse(json);
-      expect(parsed.version).toBe('1.0.0');
+      expect(parsed.version).toBe('1.1.0');
     });
 
     it('should include savedAt', () => {
@@ -143,7 +143,7 @@ describe('Persistence', () => {
   describe('SCHEMA_VERSIONS', () => {
     it('should expose schema versions', () => {
       expect(SCHEMA_VERSIONS).toBeDefined();
-      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.0.0');
+      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.1.0');
       expect(SCHEMA_VERSIONS.MIN_SUPPORTED).toBe('1.0.0');
     });
   });
@@ -188,5 +188,66 @@ describe('Persistence round-trip', () => {
     expect(store2.getState().rotation).toBe(90);
     expect(store2.getState().selection.featureIds).toEqual(['f1']);
     expect(store2.getState().displayMode).toBe('snailTrail');
+  });
+});
+
+describe('Persistence loadSession — legacy tuple-form viewport (feature 203)', () => {
+  it('rehydrates version 1.0.0 tuple-form coordinates into canonical object form', async () => {
+    const { writeFile, readFile } = await import('fs/promises');
+    const legacyFile = {
+      version: '1.0.0',
+      savedAt: '2026-01-01T00:00:00.000Z',
+      temporal: {
+        currentTime: null,
+        timeRange: null,
+        timeFilter: null,
+        stepSize: { value: 1, unit: 'minute' },
+        playbackRate: 1,
+        playbackState: 'stopped',
+        displayMode: 'normal',
+      },
+      spatial: {
+        viewport: {
+          coordinates: [
+            [-1, 52], // NW (tuple form — legacy)
+            [1, 52], // NE
+            [1, 51], // SE
+            [-1, 51], // SW
+          ],
+          zoom: 10,
+        },
+        rotation: 0,
+        drawingMode: null,
+        drawingPaletteIndex: 0,
+      },
+      features: {
+        featureCollectionUri: null,
+        selection: { featureIds: [], primary: undefined, timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' } },
+        hiddenFeatureIds: [],
+      },
+    };
+
+    // The mock in the outer describe replaces fs/promises. Replace the readFile
+    // mock to return our legacy payload.
+    (readFile as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      JSON.stringify(legacyFile),
+    );
+    // writeFile is mocked as a no-op already; suppress unused binding warning.
+    void writeFile;
+
+    const store = createSessionStore();
+    const { loadSession } = await import('../../src/persistence/index.js');
+    const result = await loadSession(store, '/fake/legacy.debrief.json');
+
+    expect(result.success).toBe(true);
+    const rehydrated = store.getState().viewport;
+    expect(rehydrated).not.toBeNull();
+    expect(rehydrated!.coordinates).toEqual([
+      { longitude: -1, latitude: 52 },
+      { longitude: 1, latitude: 52 },
+      { longitude: 1, latitude: 51 },
+      { longitude: -1, latitude: 51 },
+    ]);
+    expect(rehydrated!.zoom).toBe(10);
   });
 });

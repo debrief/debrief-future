@@ -1,3 +1,9 @@
+const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+const { rules: schemasDriftRules } = require('../../shared/eslint-rules/no-redeclare-schemas-exports.cjs');
+const { rules: componentsDriftRules } = require('../../shared/eslint-rules/no-redeclare-components-exports.cjs');
+const { rules: sessionStateDriftRules } = require('../../shared/eslint-rules/no-redeclare-session-state-exports.cjs');
+const { rules: dataDriftRules } = require('../../shared/eslint-rules/no-redeclare-data-exports.cjs');
+
 module.exports = {
   root: true,
   env: {
@@ -38,7 +44,7 @@ module.exports = {
       },
     ],
     'no-restricted-syntax': [
-      'warn',
+      'error',
       {
         selector: "TSAsExpression[typeAnnotation.typeName.name='Record']",
         message:
@@ -49,6 +55,11 @@ module.exports = {
         message:
           'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
       },
+      ...utilsDriftRules,
+      ...schemasDriftRules,
+      ...componentsDriftRules,
+      ...sessionStateDriftRules,
+      ...dataDriftRules,
     ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },

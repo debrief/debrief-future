@@ -27,6 +27,8 @@ from debrief_schemas import (
     PolygonProperties,
     RectangleAnnotation,
     ReferenceLocation,
+    SceneFeature,
+    StoryboardFeature,
     SystemState,
     TextAnnotation,
     TrackFeature,
@@ -51,6 +53,13 @@ ROUNDTRIP_ENTITY_MAP = {
     "text-annotation": TextAnnotation,
     "vector-annotation": VectorAnnotation,
     "poly-annotation": PolyAnnotation,
+    # Storyboarding types (#215). Scene MUST be listed before Storyboard because
+    # get_entity_type matches by filename prefix, and "storyboard-scene-" starts
+    # with "storyboard-" — registering Storyboard first would mis-classify Scene
+    # fixtures. The "-single-" suffix limits the round-trip to single-Feature
+    # fixtures (FeatureCollection fixtures are exercised by the CRUD tests).
+    "storyboard-scene-single": SceneFeature,
+    "storyboard-single": StoryboardFeature,
     # Styling types
     "point-properties": PointProperties,
     "line-properties": LineProperties,

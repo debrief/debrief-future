@@ -14,6 +14,7 @@ import type {
 /**
  * Selection requirement — re-exported directly from schema (no extension needed).
  */
+// eslint-disable-next-line no-restricted-syntax -- deliberate local alias of @debrief/schemas.SelectionRequirement (adapter layer); follow-up to migrate callers off this re-export, #214 scope-adjacent
 export type SelectionRequirement = SchemaSelectionRequirement;
 
 /**
@@ -21,6 +22,7 @@ export type SelectionRequirement = SchemaSelectionRequirement;
  * Uses view-layer field names (valueType, defaultValue) adapted from
  * the schema's snake_case conventions (type, default_value).
  */
+// eslint-disable-next-line no-restricted-syntax -- camelCase VS Code-local adapter over @debrief/schemas.ToolParameter (snake_case); follow-up to consolidate, #214 scope-adjacent
 export interface ToolParameter {
   /** Parameter identifier */
   name: string;
@@ -42,6 +44,7 @@ export interface ToolParameter {
  * Tool definition — extends schema's Tool with VS Code-specific fields.
  * Base fields (id, name, description, version, requirements) come from schema.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local Tool extends @debrief/schemas.Tool with camelCase helpers; follow-up to consolidate with @debrief/components.Tool, #214 scope-adjacent
 export interface Tool extends SchemaTool {
   /** Minimum total features across all kinds (for multi-kind tools) */
   minFeatures?: number;
@@ -57,6 +60,7 @@ export type ToolSelection = Map<string, number>;
 /**
  * Result of checking a tool against a selection.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local MatchResult uses the local `Tool` extension; follow-up to consolidate with @debrief/components.MatchResult, #214 scope-adjacent
 export interface MatchResult {
   /** The tool being checked */
   tool: Tool;
@@ -69,6 +73,7 @@ export interface MatchResult {
 /**
  * Create an empty selection.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local createSelection returns the local `ToolSelection` Map; distinct signature from @debrief/session-state.createSelection. Follow-up to rename or consolidate, #214 scope-adjacent
 export function createSelection(): ToolSelection {
   return new Map();
 }
@@ -76,6 +81,7 @@ export function createSelection(): ToolSelection {
 /**
  * Create a selection from a record of kind → count.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local createSelectionFromCounts mirrors @debrief/components.createSelectionFromCounts; follow-up to consolidate, #214 scope-adjacent
 export function createSelectionFromCounts(counts: Record<string, number>): ToolSelection {
   return new Map(Object.entries(counts));
 }
@@ -105,6 +111,7 @@ function checkRequirements(requirements: SelectionRequirement[], selection: Tool
 /**
  * Get the reason why a tool is inactive for a selection.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local getInactiveReason mirrors @debrief/components.getInactiveReason but uses the local `Tool`; follow-up to consolidate, #214 scope-adjacent
 export function getInactiveReason(tool: Tool, selection: ToolSelection): string {
   if (!tool.requirements || tool.requirements.length === 0) {
     return '';
@@ -126,6 +133,7 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
 /**
  * Get all inactive reasons for a tool.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local getAllInactiveReasons mirrors @debrief/components.getAllInactiveReasons; follow-up to consolidate, #214 scope-adjacent
 export function getAllInactiveReasons(tool: Tool, selection: ToolSelection): string[] {
   const reason = getInactiveReason(tool, selection);
   return reason ? [reason] : [];
@@ -135,6 +143,7 @@ export function getAllInactiveReasons(tool: Tool, selection: ToolSelection): str
  * Tool matching service.
  * Matches tools to feature selections based on requirements.
  */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local ToolMatchService mirrors @debrief/components.ToolMatchService with the local `Tool` extension; follow-up to consolidate, #214 scope-adjacent
 export class ToolMatchService {
   private tools: Tool[];
 

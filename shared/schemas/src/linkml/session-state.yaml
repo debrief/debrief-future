@@ -97,14 +97,16 @@ classes:
           # start.epoch <= end.epoch
 
   TimeFilter:
-    description: Constraints on the visible time window
+    description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
     attributes:
       start:
-        description: Filter start (null = unbounded)
-        range: TimeInstant
+        description: Filter start as epoch milliseconds (null/missing = unbounded on the start)
+        range: integer
+        required: false
       end:
-        description: Filter end (null = unbounded)
-        range: TimeInstant
+        description: Filter end as epoch milliseconds (null/missing = unbounded on the end)
+        range: integer
+        required: false
 
   TimeStep:
     description: Step size for discrete time navigation (FR-008)
@@ -145,6 +147,10 @@ classes:
         required: true
         minimum_cardinality: 4
         maximum_cardinality: 4
+      zoom:
+        description: Map zoom level for restoring the view (optional)
+        range: float
+        required: false
 
   LevelDefinition:
     description: >-

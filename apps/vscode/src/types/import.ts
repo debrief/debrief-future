@@ -86,10 +86,5 @@ export interface ParseWarning {
   code: string;
 }
 
-export interface GeoJSONFeatureCollection {
-  type: 'FeatureCollection';
-  features: SafeFeature[];
-}
-
 // Re-exported alias so existing importers can continue to use GeoJSONFeature
 export type { SafeFeature as GeoJSONFeature } from '@debrief/utils';

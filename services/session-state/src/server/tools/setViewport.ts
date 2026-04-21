@@ -1,14 +1,19 @@
 /**
  * MCP tool: session.setViewport
  * Feature: 024-document-session-state
+ * Updated: 203-spatial-types-linkml (object-form Coordinate + canonical types).
  */
 
 import type { SessionStoreApi } from '../../store/index.js';
-import type { ViewportPolygon, Coordinate } from '../../types/index.js';
-import { calculateViewportCenter } from '../../types/index.js';
+import type { ViewportPolygon, Coordinate } from '@debrief/schemas';
+import { calculateViewportCenter } from '@debrief/utils';
 
 export interface SetViewportInput {
-  coordinates: [Coordinate, Coordinate, Coordinate, Coordinate];
+  /**
+   * Four corners in clockwise order [NW, NE, SE, SW], each in the canonical
+   * object form `{ longitude, latitude }`.
+   */
+  coordinates: Coordinate[];
   rotation?: number;
 }
 
@@ -24,7 +29,7 @@ export interface SetViewportOutput {
  */
 export function setViewport(
   store: SessionStoreApi,
-  input: SetViewportInput
+  input: SetViewportInput,
 ): SetViewportOutput {
   try {
     const viewport: ViewportPolygon = {
