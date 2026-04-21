@@ -148,7 +148,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -258,7 +258,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature

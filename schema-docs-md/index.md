@@ -66,6 +66,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 
 | Class | Description |
 | --- | --- |
+| [Any](classes/Any.md) | Permissive wildcard class used for free-form JSON object ranges (e |
 | [BaseFeatureProperties](classes/BaseFeatureProperties.md) | Abstract base for all GeoJSON feature properties classes |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[CircleAnnotationProperties](classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[LineAnnotationProperties](classes/LineAnnotationProperties.md) | Properties for a LineAnnotation |
@@ -95,8 +96,6 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [FeaturesSlice](classes/FeaturesSlice.md) | Feature selection and visibility state |
 | [FileProvEntry](classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |
 | [GeoJSONEmptyPoint](classes/GeoJSONEmptyPoint.md) | GeoJSON Point geometry with empty coordinates (for non-spatial features) |
-| [GeoJSONFeature](classes/GeoJSONFeature.md) | GeoJSON Feature representation used for tool result layers |
-| [GeoJSONGeometry](classes/GeoJSONGeometry.md) | GeoJSON geometry object (type + coordinates pair) |
 | [GeoJSONLineString](classes/GeoJSONLineString.md) | GeoJSON LineString geometry |
 | [GeoJSONMultiLineString](classes/GeoJSONMultiLineString.md) | GeoJSON MultiLineString geometry for compound tracks |
 | [GeoJSONMultiPoint](classes/GeoJSONMultiPoint.md) | GeoJSON MultiPoint geometry for reference point sets |
@@ -124,6 +123,8 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [PositionStyle](classes/PositionStyle.md) | Default styling configuration for track positions |
 | [PositionStyleOverride](classes/PositionStyleOverride.md) | Per-position style override |
 | [PropertiesProvenanceEntry](classes/PropertiesProvenanceEntry.md) | Single entry in item |
+| [RawGeoJSONFeature](classes/RawGeoJSONFeature.md) | Parse-boundary GeoJSON Feature (RFC 7946 §3 |
+| [RawGeoJSONFeatureCollection](classes/RawGeoJSONFeatureCollection.md) | Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3 |
 | [RectangleAnnotation](classes/RectangleAnnotation.md) | GeoJSON Feature for rectangle annotations |
 | [ReferenceLocation](classes/ReferenceLocation.md) | GeoJSON Feature for fixed reference points or reference point sets |
 | [ResultsSlice](classes/ResultsSlice.md) | Accumulated tool result layers and last-execution record for undo support |
@@ -223,7 +224,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [feature_tags](slots/feature_tags.md) | Union of all feature-level tags from the plot's GeoJSON features |
 | [featureCollectionUri](slots/featureCollectionUri.md) | Reference to external feature collection (FR-016) |
 | [featureIds](slots/featureIds.md) | Selected feature paths |
-| [features](slots/features.md) | Feature-related state |
+| [features](slots/features.md) | The collection's features, in document order |
 | [fields](slots/fields.md) | Non-empty list of field names touched in this commit |
 | [fill](slots/fill.md) | Whether to fill the shape |
 | [fill_color](slots/fill_color.md) | Fill color (CSS color string) |

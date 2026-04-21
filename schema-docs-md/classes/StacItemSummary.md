@@ -157,7 +157,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -222,6 +222,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     required: false
     multivalued: true
@@ -322,7 +324,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -399,6 +401,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     required: false
     multivalued: true

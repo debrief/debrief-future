@@ -141,8 +141,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -171,7 +171,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -195,7 +195,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: GeoJSONPolygon
@@ -218,6 +218,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: CircleAnnotationProperties
@@ -264,8 +265,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -296,7 +297,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -323,7 +324,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: GeoJSONPolygon
@@ -348,6 +349,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: CircleAnnotationProperties

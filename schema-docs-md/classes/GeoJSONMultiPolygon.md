@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONMultiPolygon](https://debrief.info/schemas/class/GeoJ
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [MultiPolygonFeature](../classes/MultiPolygonFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
+| [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiPolygon](../classes/GeoJSONMultiPolygon.md) |
 
 
 
@@ -122,8 +123,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -187,8 +188,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature

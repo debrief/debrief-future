@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONMultiLineString](https://debrief.info/schemas/class/G
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [TrackFeature](../classes/TrackFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) |
+| [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONMultiLineString](../classes/GeoJSONMultiLineString.md) |
 
 
 
@@ -122,8 +123,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -187,8 +188,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature

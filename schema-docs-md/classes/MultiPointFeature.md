@@ -142,8 +142,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -172,7 +172,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -196,7 +196,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: GeoJSONMultiPoint
@@ -219,6 +219,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: MultiPointFeatureProperties
@@ -234,6 +235,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     multivalued: true
     minimum_cardinality: 4
@@ -278,8 +281,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -310,7 +313,7 @@ attributes:
     - PlatformRecord
     - PlotSummary
     - StacItemSummary
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardProperties
     - SceneProperties
     - StoryboardFeature
@@ -337,7 +340,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: GeoJSONMultiPoint
@@ -362,6 +365,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: MultiPointFeatureProperties
@@ -379,6 +383,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     multivalued: true
     minimum_cardinality: 4

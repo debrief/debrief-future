@@ -49,6 +49,7 @@ URI: [debrief:class/GeoJSONEmptyPoint](https://debrief.info/schemas/class/GeoJSO
 | used by | used in | type | used |
 | ---  | --- | --- | --- |
 | [SystemState](../classes/SystemState.md) | [geometry](../slots/geometry.md) | range | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) |
+| [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONEmptyPoint](../classes/GeoJSONEmptyPoint.md) |
 
 
 
@@ -122,8 +123,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -188,8 +189,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature

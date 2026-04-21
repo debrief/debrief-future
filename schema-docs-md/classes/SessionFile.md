@@ -178,6 +178,7 @@ attributes:
     description: Features state
     from_schema: https://debrief.info/schemas/session-state
     domain_of:
+    - RawGeoJSONFeatureCollection
     - SessionState
     - SessionFile
     range: FeaturesSlice
@@ -256,6 +257,7 @@ attributes:
     alias: features
     owner: SessionFile
     domain_of:
+    - RawGeoJSONFeatureCollection
     - SessionState
     - SessionFile
     range: FeaturesSlice

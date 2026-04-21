@@ -168,8 +168,8 @@ attributes:
     name: features
     description: Feature-related state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     domain_of:
+    - RawGeoJSONFeatureCollection
     - SessionState
     - SessionFile
     range: FeaturesSlice
@@ -236,10 +236,10 @@ attributes:
     name: features
     description: Feature-related state
     from_schema: https://debrief.info/schemas/session-state
-    rank: 1000
     alias: features
     owner: SessionState
     domain_of:
+    - RawGeoJSONFeatureCollection
     - SessionState
     - SessionFile
     range: FeaturesSlice

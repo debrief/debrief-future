@@ -39,8 +39,8 @@ URI: [debrief:class/ResultsSlice](https://debrief.info/schemas/class/ResultsSlic
     
         
         
-        ResultsSlice --> "1..*" GeoJSONFeature : result_layers
-        click GeoJSONFeature href "../../classes/GeoJSONFeature/"
+        ResultsSlice --> "1..*" RawGeoJSONFeature : result_layers
+        click RawGeoJSONFeature href "../../classes/RawGeoJSONFeature/"
     
 
         
@@ -57,7 +57,7 @@ URI: [debrief:class/ResultsSlice](https://debrief.info/schemas/class/ResultsSlic
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [result_layers](../slots/result_layers.md) | 1..* <br/> [GeoJSONFeature](../classes/GeoJSONFeature.md) | Accumulated tool result features | direct |
+| [result_layers](../slots/result_layers.md) | 1..* <br/> [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | Accumulated tool result features | direct |
 | [last_tool_execution](../slots/last_tool_execution.md) | 0..1 <br/> [LastToolExecution](../classes/LastToolExecution.md) | Last tool execution record for single-step undo | direct |
 
 
@@ -119,7 +119,7 @@ attributes:
     rank: 1000
     domain_of:
     - ResultsSlice
-    range: GeoJSONFeature
+    range: RawGeoJSONFeature
     required: true
     multivalued: true
     inlined: true
@@ -157,7 +157,7 @@ attributes:
     owner: ResultsSlice
     domain_of:
     - ResultsSlice
-    range: GeoJSONFeature
+    range: RawGeoJSONFeature
     required: true
     multivalued: true
     inlined: true

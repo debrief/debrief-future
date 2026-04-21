@@ -207,6 +207,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     multivalued: true
   zoom:
@@ -336,6 +338,8 @@ attributes:
     - MultiPolygonFeature
     - PlotSummary
     - StacItemSummary
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     range: float
     multivalued: true
   zoom:

@@ -51,6 +51,7 @@ URI: [debrief:class/GeoJSONPoint](https://debrief.info/schemas/class/GeoJSONPoin
 | [ReferenceLocation](../classes/ReferenceLocation.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 | [NarrativeEntry](../classes/NarrativeEntry.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 | [TextAnnotation](../classes/TextAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
+| [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md) | [geometry](../slots/geometry.md) | any_of[range] | [GeoJSONPoint](../classes/GeoJSONPoint.md) |
 
 
 
@@ -125,8 +126,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature
@@ -194,8 +195,8 @@ attributes:
     - PolyAnnotation
     - ToolParameter
     - FileProvEntry
-    - GeoJSONGeometry
-    - GeoJSONFeature
+    - RawGeoJSONFeature
+    - RawGeoJSONFeatureCollection
     - DatasetAxisMetadata
     - DatasetEntry
     - StoryboardFeature

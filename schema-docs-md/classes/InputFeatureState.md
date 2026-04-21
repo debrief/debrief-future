@@ -133,7 +133,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: string
@@ -160,6 +160,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: string
@@ -214,7 +215,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
-    - GeoJSONFeature
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: string
@@ -243,6 +244,7 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - RawGeoJSONFeature
     - StoryboardFeature
     - SceneFeature
     range: string

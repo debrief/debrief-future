@@ -3,7 +3,7 @@
 
 
 
-_Current state of time playback_
+_Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md._
 
 
 
@@ -52,7 +52,8 @@ URI: [debrief:enum/PlaybackStateEnum](https://debrief.info/schemas/enum/Playback
 <details>
 ```yaml
 name: PlaybackStateEnum
-description: Current state of time playback
+description: Current state of time playback. Component consumers treat `stopped` as
+  equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
 from_schema: https://debrief.info/schemas/debrief
 rank: 1000
 permissible_values:

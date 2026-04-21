@@ -17,8 +17,8 @@ Alias: asset
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SnapshotRef](../classes/SnapshotRef.md) | Reference to a snapshot file |  no  |
 | [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
+| [SnapshotRef](../classes/SnapshotRef.md) | Reference to a snapshot file |  no  |
 
 
 

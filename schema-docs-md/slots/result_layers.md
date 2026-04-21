@@ -31,7 +31,7 @@ Alias: result_layers
 
 ## Properties
 
-* Range: [GeoJSONFeature](../classes/GeoJSONFeature.md)
+* Range: [RawGeoJSONFeature](../classes/RawGeoJSONFeature.md)
 
 * Multivalued: True
 
@@ -77,7 +77,7 @@ alias: result_layers
 owner: ResultsSlice
 domain_of:
 - ResultsSlice
-range: GeoJSONFeature
+range: RawGeoJSONFeature
 required: true
 multivalued: true
 inlined: true

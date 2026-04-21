@@ -17,8 +17,8 @@ Alias: tool
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
 | [WasGeneratedBy](../classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |  no  |
+| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
 
 
 

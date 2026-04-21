@@ -3,7 +3,7 @@
 
 
 
-_Track visualization display mode_
+_Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time._
 
 
 
@@ -13,8 +13,8 @@ URI: [debrief:enum/DisplayModeEnum](https://debrief.info/schemas/enum/DisplayMod
 
 | Value | Meaning | Description |
 | --- | --- | --- |
-| normal | None | Standard track display |
-| snailTrail | None | Trail showing recent positions |
+| full | None | Render the entire track regardless of current time |
+| trail | None | Render a snail-trail from track start up to current time |
 
 
 
@@ -51,16 +51,17 @@ URI: [debrief:enum/DisplayModeEnum](https://debrief.info/schemas/enum/DisplayMod
 <details>
 ```yaml
 name: DisplayModeEnum
-description: Track visualization display mode
+description: Track visualization display mode. `full` renders the entire track regardless
+  of current time; `trail` renders a snail-trail from track start up to current time.
 from_schema: https://debrief.info/schemas/debrief
 rank: 1000
 permissible_values:
-  normal:
-    text: normal
-    description: Standard track display
-  snailTrail:
-    text: snailTrail
-    description: Trail showing recent positions
+  full:
+    text: full
+    description: Render the entire track regardless of current time
+  trail:
+    text: trail
+    description: Render a snail-trail from track start up to current time
 
 ```
 </details>
