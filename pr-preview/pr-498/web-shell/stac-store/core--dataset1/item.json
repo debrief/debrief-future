@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--dataset1",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Dataset1",
+    "datetime": "2016-10-10T12:00:00+00:00",
+    "description": "Saxon Warrior: Dataset1 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Carney.",
+    "start_datetime": "2016-10-10T12:00:00+00:00",
+    "end_datetime": "2016-10-10T19:37:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "DATA_ONE",
+        "name": "HMS Carney",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_type": "queen-elizabeth",
+        "vessel_role": "carrier"
+      }
+    ],
+    "debrief:tags": [
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "radar-detection",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Dataset1 (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/Dataset1.rep",
+      "title": "Dataset1.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Dataset1": {
+      "href": "./assets/Dataset1.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Dataset1.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/Dataset1.rep",
+        "load_timestamp": "2026-04-13T23:12:31.277302Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
