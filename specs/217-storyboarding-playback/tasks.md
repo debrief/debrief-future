@@ -162,7 +162,7 @@ T170 → T171 → T172   (package.json — same file, serial)
 
 ### 3.3 StoryboardPlaybackService — transport state machine (tests first)
 
-- [ ] T320 [test] Unit tests for `StoryboardPlaybackService` — state machine core (`apps/vscode/src/services/__tests__/storyboardPlayback.test.ts`):
+- [x] T320 [test] Unit tests for `StoryboardPlaybackService` — state machine core (`apps/vscode/tests/unit/storyboardPlayback.test.ts` — flat VS Code test layout):
   - `onPlotOpened` runs `validatePlot`; on throw, `plotValid = false`, single `showErrorMessage`, all subsequent forward/backward/goToScene are no-ops (design-fix 2)
   - `onPlotOpened` seeds `activeStoryboardId` from `getMostRecentlyModifiedStoryboard(plot)` (R7)
   - `onPlotOpened` calls `timeRangeView.setScrubbableRange(start, end)` for the Scene window
@@ -184,11 +184,11 @@ T170 → T171 → T172   (package.json — same file, serial)
   - `onPlotFeaturesChanged` recomputes `sceneOrder`; if active Storyboard was deleted, falls back via `getMostRecentlyModifiedStoryboard`; if none remain, `activeStoryboardId = null`, clear context
   - `dispose` calls `setScrubbableRange(null, null)` for every plot with an active override (test-fix 4)
 
-- [ ] T321 Implement `StoryboardPlaybackService` class skeleton — constructor accepts `{ sessionManager, mapPanel, panelView, timeRangeView, storyboardModule, modalPromptPort, visibilityPort, transitionController }`; per-plot `Map<documentUri, TransportState>`; `onSnapshotChange` event emitter; `getSnapshot(documentUri)` projection `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T322 Implement lifecycle methods — `onPlotOpened` (validatePlot gate + seed active + setScrubbableRange + set `debrief.storyboardActive` context); `onPlotClosed` (restore scrubbable range + clear context + remove entry); `onPlotFeaturesChanged` (recompute sceneOrder + fallback via getMostRecentlyModifiedStoryboard) `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T323 Implement transport methods — `forward`, `backward`, `goToScene`; each runs in-flight guard → boundary guard → hard-block check (ISO conversion) → `executeTransition` `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T324 Implement `executeTransition(documentUri, targetIndex, direction)` — sets `transitionId`; calls `mapPanel.flyToViewport(viewport, durationMs)`; starts RAF tween writing `session.setCurrentTime(lerp)` over `durationMs`; calls `timeRangeView.setScrubbableRange(sceneN.t, sceneN+1.t)`; wires three clear triggers (`onFlyToComplete`, `onDidChangeVisibility`, `durationMs+250ms` timer); idempotent — first trigger wins `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T325 Implement hard-block flow — `promptHardBlock(scene, classification, direction, documentUri)` calls `modalPromptPort.showInformationMessage({ modal: true }, jumpPastLabel, openForEditingLabel)`; route to `resolveHardBlockByJumpingPast` / `resolveHardBlockByOpeningForEditing` (showInformationMessage inline — no separate command registration) `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T321 Implement `StoryboardPlaybackService` class skeleton — constructor accepts `{ sessionManager, mapPanel, panelView, timeRangeView, modalPromptPort, visibilityPort }`; per-plot `Map<documentUri, TransportState>`; `onSnapshotChange` event emitter; `getSnapshot(documentUri)` projection `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T322 Implement lifecycle methods — `onPlotOpened` (validatePlot gate + seed active + setScrubbableRange + set `debrief.storyboardActive` context); `onPlotClosed` (restore scrubbable range + clear context + remove entry); `onPlotFeaturesChanged` (recompute sceneOrder + fallback via getMostRecentlyModifiedStoryboard) `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T323 Implement transport methods — `forward`, `backward`, `goToScene`; each runs in-flight guard → boundary guard → hard-block check (ISO conversion) → `executeTransition` `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T324 Implement `executeTransition(documentUri, targetIndex, direction)` — sets `transitionId`; calls `mapPanel.flyToViewport(viewport, durationMs)`; snaps `session.setCurrentTime` to the target instant (time-controller tween in the webview); calls `timeRangeView.setScrubbableRange(sceneN.t, sceneN+1.t)`; wires three clear triggers (`onFlyToComplete`, `onDidChangeVisibility`, `durationMs+250ms` timer); idempotent — first trigger wins `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T325 Implement hard-block flow — `promptHardBlock(scene, classification, direction, documentUri)` calls `modalPromptPort.showInformationMessage({ modal: true }, jumpPastLabel, openForEditingLabel)`; route to `resolveHardBlockByJumpingPast` / `resolveHardBlockByOpeningForEditing` (showInformationMessage inline — no separate command registration) `apps/vscode/src/services/storyboardPlayback.ts`
 
 ### 3.4 Command handlers + package.json (US1 subset)
 
