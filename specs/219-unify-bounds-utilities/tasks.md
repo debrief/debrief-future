@@ -41,12 +41,12 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 **Goal**: Prepare `@debrief/utils` to host the five migrated helpers. Add the type-only dep on `@debrief/schemas`, confirm no package-cycle is created, and create evidence directories.
 
-- [ ] T001 Add `"@debrief/schemas": "workspace:*"` to the `dependencies` block of `shared/utils/package.json` (per research R-003 — enables the `ViewportPolygon` type import). File: `shared/utils/package.json`
-- [ ] T002 Run `pnpm install` at repo root to refresh the workspace lockfile after T001. No file edit — but captures output for T006.
-- [ ] T003 [P] Create evidence directory stub `specs/219-unify-bounds-utilities/evidence/.gitkeep` so subsequent evidence tasks have a target path. File: `specs/219-unify-bounds-utilities/evidence/.gitkeep`
-- [ ] T004 [P] Confirm `shared/components/package.json` already declares `"@debrief/utils": "workspace:*"` in `dependencies` (not just `peerDependencies` / transitive). If missing, add it — barrel re-export of `@debrief/utils` symbols requires an explicit dep. File: `shared/components/package.json`
-- [ ] T005 [P] Verify `shared/utils/src/index.ts` currently has a clean barrel shape that can absorb 5 new re-exports without reorganisation. Read-only inspection; no edit. File: `shared/utils/src/index.ts`
-- [ ] T006 Generate dep-cycle check evidence: run `pnpm why @debrief/utils` from `shared/schemas/` and confirm no reverse edge exists; capture output in `specs/219-unify-bounds-utilities/evidence/dep-graph-check.md`. File: `specs/219-unify-bounds-utilities/evidence/dep-graph-check.md`
+- [x] T001 Add `"@debrief/schemas": "workspace:*"` to the `dependencies` block of `shared/utils/package.json` (per research R-003 — enables the `ViewportPolygon` type import). File: `shared/utils/package.json`
+- [x] T002 Run `pnpm install` at repo root to refresh the workspace lockfile after T001. No file edit — but captures output for T006.
+- [x] T003 [P] Create evidence directory stub `specs/219-unify-bounds-utilities/evidence/.gitkeep` so subsequent evidence tasks have a target path. File: `specs/219-unify-bounds-utilities/evidence/.gitkeep`
+- [x] T004 [P] Confirm `shared/components/package.json` already declares `"@debrief/utils": "workspace:*"` in `dependencies` (not just `peerDependencies` / transitive). If missing, add it — barrel re-export of `@debrief/utils` symbols requires an explicit dep. File: `shared/components/package.json`
+- [x] T005 [P] Verify `shared/utils/src/index.ts` currently has a clean barrel shape that can absorb 5 new re-exports without reorganisation. Read-only inspection; no edit. File: `shared/utils/src/index.ts`
+- [x] T006 Generate dep-cycle check evidence: run `pnpm why @debrief/utils` from `shared/schemas/` and confirm no reverse edge exists; capture output in `specs/219-unify-bounds-utilities/evidence/dep-graph-check.md`. File: `specs/219-unify-bounds-utilities/evidence/dep-graph-check.md`
 
 **Parallel within Phase 1**: `[T003, T004, T005]` can run concurrently after T002. T006 depends on T001–T002 (dep must be installed).
 
@@ -56,12 +56,12 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 **Goal**: Land the type-system plumbing every user story depends on — the extended `BoundsInputFeature` shape, the new `isValidBboxTuple` narrowing helper, and the `ViewportPolygon` type import. These are **internal** changes (module-private) that prepare the unified module for the five migrated helpers without yet changing any external behaviour.
 
-- [ ] T007 [test] Write failing test asserting `isValidBboxTuple([NaN, 0, 10, 10])` returns `false`, `isValidBboxTuple([0, 0, 10, 10])` returns `true`, `isValidBboxTuple([1, 2, 3])` returns `false` (length check), `isValidBboxTuple('not-an-array')` returns `false`, and `isValidBboxTuple(null)` returns `false`. This test MUST fail at T007 (helper not yet implemented). File: `shared/utils/tests/bounds.test.ts`
-- [ ] T008 Extend `BoundsInputFeature` in `shared/utils/src/bounds.ts` to include `bbox?: Bounds | null | undefined`. Confirm the top-of-file JSDoc explains *why* (R-004: lets fast-path read `feature.bbox` without an `as`-cast). File: `shared/utils/src/bounds.ts`
-- [ ] T009 Implement the private `isValidBboxTuple(value: unknown): value is Bounds` narrowing helper in `shared/utils/src/bounds.ts`. Per R-002: returns `true` iff `Array.isArray(value) && value.length >= 4 && [0,1,2,3].every(i => Number.isFinite(value[i]))`. No `as`, no `any`. File: `shared/utils/src/bounds.ts`
-- [ ] T010 Re-run T007 tests — MUST now pass. No file edit; this is a verification task against T009.
-- [ ] T011 Add `import type { ViewportPolygon } from '@debrief/schemas';` near the top of `shared/utils/src/bounds.ts` (used later in Phase 3 by `viewportToBounds`). Confirm `tsc --noEmit` on `shared/utils/` still succeeds. File: `shared/utils/src/bounds.ts`
-- [ ] T012 Add the top-of-file module doc comment block per FR-017: name the three supported external feature-type families (`DebriefFeature`, `SafeFeature`, `GeoJSONFeature`) and state that the input type is a structural minimum so the module remains decoupled from the LinkML `DebriefFeature` schema. File: `shared/utils/src/bounds.ts`
+- [x] T007 [test] Write failing test asserting `isValidBboxTuple([NaN, 0, 10, 10])` returns `false`, `isValidBboxTuple([0, 0, 10, 10])` returns `true`, `isValidBboxTuple([1, 2, 3])` returns `false` (length check), `isValidBboxTuple('not-an-array')` returns `false`, and `isValidBboxTuple(null)` returns `false`. This test MUST fail at T007 (helper not yet implemented). File: `shared/utils/tests/bounds.test.ts`
+- [x] T008 Extend `BoundsInputFeature` in `shared/utils/src/bounds.ts` to include `bbox?: Bounds | null | undefined`. Confirm the top-of-file JSDoc explains *why* (R-004: lets fast-path read `feature.bbox` without an `as`-cast). File: `shared/utils/src/bounds.ts`
+- [x] T009 Implement the private `isValidBboxTuple(value: unknown): value is Bounds` narrowing helper in `shared/utils/src/bounds.ts`. Per R-002: returns `true` iff `Array.isArray(value) && value.length >= 4 && [0,1,2,3].every(i => Number.isFinite(value[i]))`. No `as`, no `any`. File: `shared/utils/src/bounds.ts`
+- [x] T010 Re-run T007 tests — MUST now pass. No file edit; this is a verification task against T009.
+- [x] T011 Add `import type { ViewportPolygon } from '@debrief/schemas';` near the top of `shared/utils/src/bounds.ts` (used later in Phase 3 by `viewportToBounds`). Confirm `tsc --noEmit` on `shared/utils/` still succeeds. File: `shared/utils/src/bounds.ts`
+- [x] T012 Add the top-of-file module doc comment block per FR-017: name the three supported external feature-type families (`DebriefFeature`, `SafeFeature`, `GeoJSONFeature`) and state that the input type is a structural minimum so the module remains decoupled from the LinkML `DebriefFeature` schema. File: `shared/utils/src/bounds.ts`
 
 **Parallel within Phase 2**: None — each task either edits `shared/utils/src/bounds.ts` directly or gates on a prior edit there.
 
@@ -75,39 +75,39 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 ### Tests (migrate + new type-level)
 
-- [ ] T013 [test] Copy the `viewportToBounds` / `bboxOverlapsViewport` / `filterBySpatialExtent` describe blocks verbatim from `shared/components/src/utils/bounds.test.ts` into `shared/utils/tests/bounds.test.ts`; update imports to `../src/bounds.js` or equivalent. Per research R-005 — verbatim copy, zero rewriting. File: `shared/utils/tests/bounds.test.ts`
-- [ ] T014 [test] Copy the `calculateBounds` / `expandBounds` / `isPointInBounds` describe blocks from `shared/components/src/utils/__tests__/utils.test.ts` into `shared/utils/tests/bounds.test.ts`. Drop any assertions that duplicate coverage already present in `shared/utils/tests/bounds.test.ts` (e.g. plain `calculateBounds` Point/LineString tests already present there). Document per R-005: "T013/T014 drop N duplicates" in task comments. File: `shared/utils/tests/bounds.test.ts`
-- [ ] T015 [test] Tests migrated in T013/T014 MUST fail at this point (the helpers they exercise do not yet exist on `@debrief/utils`). This is the RED phase. Verification task — no file edit.
+- [x] T013 [test] Copy the `viewportToBounds` / `bboxOverlapsViewport` / `filterBySpatialExtent` describe blocks verbatim from `shared/components/src/utils/bounds.test.ts` into `shared/utils/tests/bounds.test.ts`; update imports to `../src/bounds.js` or equivalent. Per research R-005 — verbatim copy, zero rewriting. File: `shared/utils/tests/bounds.test.ts`
+- [x] T014 [test] Copy the `calculateBounds` / `expandBounds` / `isPointInBounds` describe blocks from `shared/components/src/utils/__tests__/utils.test.ts` into `shared/utils/tests/bounds.test.ts`. Drop any assertions that duplicate coverage already present in `shared/utils/tests/bounds.test.ts` (e.g. plain `calculateBounds` Point/LineString tests already present there). Document per R-005: "T013/T014 drop N duplicates" in task comments. File: `shared/utils/tests/bounds.test.ts`
+- [x] T015 [test] Tests migrated in T013/T014 MUST fail at this point (the helpers they exercise do not yet exist on `@debrief/utils`). This is the RED phase. Verification task — no file edit.
 
 ### Migrate helpers
 
-- [ ] T016 Port `expandBounds(bounds, paddingPercent = 0.1)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve the signature and body byte-for-byte (FR-002 / EB-1/EB-2/EB-3). Export from the module. File: `shared/utils/src/bounds.ts`
-- [ ] T017 Port `isPointInBounds(lon, lat, bounds)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve signature and body byte-for-byte (FR-003 / PIB-1..3). File: `shared/utils/src/bounds.ts`
-- [ ] T018 Port `bboxOverlapsViewport(itemBbox, viewportBbox)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`, preserving antimeridian-handling logic byte-for-byte (FR-004 / BOV-1..6). File: `shared/utils/src/bounds.ts`
-- [ ] T019 Port `viewportToBounds(viewport: ViewportPolygon)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve object-form `{ longitude, latitude }` coordinate handling and the `Math.min(...lons)` spread pattern (FR-005 / VTB-1..4). File: `shared/utils/src/bounds.ts`
-- [ ] T020 Port `filterBySpatialExtent<T extends { bbox: Bounds | null }>(items, viewportBbox)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`, preserving the generic constraint exactly (FR-006 / FBSE-1..3). File: `shared/utils/src/bounds.ts`
-- [ ] T021 Add the five new exports (`expandBounds`, `isPointInBounds`, `bboxOverlapsViewport`, `viewportToBounds`, `filterBySpatialExtent`) to the `shared/utils/src/index.ts` barrel. File: `shared/utils/src/index.ts`
-- [ ] T022 Re-run the test suite: all tests migrated in T013/T014 MUST pass (GREEN phase). No file edit.
+- [x] T016 Port `expandBounds(bounds, paddingPercent = 0.1)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve the signature and body byte-for-byte (FR-002 / EB-1/EB-2/EB-3). Export from the module. File: `shared/utils/src/bounds.ts`
+- [x] T017 Port `isPointInBounds(lon, lat, bounds)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve signature and body byte-for-byte (FR-003 / PIB-1..3). File: `shared/utils/src/bounds.ts`
+- [x] T018 Port `bboxOverlapsViewport(itemBbox, viewportBbox)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`, preserving antimeridian-handling logic byte-for-byte (FR-004 / BOV-1..6). File: `shared/utils/src/bounds.ts`
+- [x] T019 Port `viewportToBounds(viewport: ViewportPolygon)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`. Preserve object-form `{ longitude, latitude }` coordinate handling and the `Math.min(...lons)` spread pattern (FR-005 / VTB-1..4). File: `shared/utils/src/bounds.ts`
+- [x] T020 Port `filterBySpatialExtent<T extends { bbox: Bounds | null }>(items, viewportBbox)` from `shared/components/src/utils/bounds.ts` into `shared/utils/src/bounds.ts`, preserving the generic constraint exactly (FR-006 / FBSE-1..3). File: `shared/utils/src/bounds.ts`
+- [x] T021 Add the five new exports (`expandBounds`, `isPointInBounds`, `bboxOverlapsViewport`, `viewportToBounds`, `filterBySpatialExtent`) to the `shared/utils/src/index.ts` barrel. File: `shared/utils/src/index.ts`
+- [x] T022 Re-run the test suite: all tests migrated in T013/T014 MUST pass (GREEN phase). No file edit.
 
 ### Migrate consumers
 
-- [ ] T023 [P] Update `shared/components/src/MapView/MapView.tsx` — change `import { calculateBounds, expandBounds } from '../utils/bounds'` (or similar) to `import { calculateBounds, expandBounds } from '@debrief/utils'`. Where `calculateBounds` is passed a `DebriefFeatureCollection`, unwrap to `.features` at the call site (contract CB-7 caveat). File: `shared/components/src/MapView/MapView.tsx`
-- [ ] T024 [P] Update `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx` — change the `expandBounds` import to `from '@debrief/utils'`. File: `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
-- [ ] T025 [P] Update `shared/components/src/StacBrowser/useBrowserFilter.ts` — change the `viewportToBounds` / `bboxOverlapsViewport` imports to `from '@debrief/utils'`. File: `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T026 Update the `shared/components/src/index.ts` barrel: replace the `from './utils/bounds'` re-exports (`calculateBounds`, `bboxOverlapsViewport`, `filterBySpatialExtent`, `viewportToBounds`) with `from '@debrief/utils'` re-exports. Do NOT re-export `expandBounds` or `isPointInBounds` — per contract §"Barrel re-export". File: `shared/components/src/index.ts`
+- [x] T023 [P] Update `shared/components/src/MapView/MapView.tsx` — change `import { calculateBounds, expandBounds } from '../utils/bounds'` (or similar) to `import { calculateBounds, expandBounds } from '@debrief/utils'`. Where `calculateBounds` is passed a `DebriefFeatureCollection`, unwrap to `.features` at the call site (contract CB-7 caveat). File: `shared/components/src/MapView/MapView.tsx`
+- [x] T024 [P] Update `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx` — change the `expandBounds` import to `from '@debrief/utils'`. File: `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
+- [x] T025 [P] Update `shared/components/src/StacBrowser/useBrowserFilter.ts` — change the `viewportToBounds` / `bboxOverlapsViewport` imports to `from '@debrief/utils'`. File: `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T026 Update the `shared/components/src/index.ts` barrel: replace the `from './utils/bounds'` re-exports (`calculateBounds`, `bboxOverlapsViewport`, `filterBySpatialExtent`, `viewportToBounds`) with `from '@debrief/utils'` re-exports. Do NOT re-export `expandBounds` or `isPointInBounds` — per contract §"Barrel re-export". File: `shared/components/src/index.ts`
 
 ### Delete duplicate
 
-- [ ] T027 Delete `shared/components/src/utils/bounds.ts` (215 LOC, 6 helpers all now hosted on `@debrief/utils`). File: `shared/components/src/utils/bounds.ts` — DELETED
-- [ ] T028 Delete `shared/components/src/utils/bounds.test.ts` (its assertions absorbed by T013). File: `shared/components/src/utils/bounds.test.ts` — DELETED
-- [ ] T029 Edit `shared/components/src/utils/__tests__/utils.test.ts`: remove the `calculateBounds` / `expandBounds` / `isPointInBounds` describe blocks (absorbed by T014). Leave any unrelated assertions in the file intact. File: `shared/components/src/utils/__tests__/utils.test.ts`
+- [x] T027 Delete `shared/components/src/utils/bounds.ts` (215 LOC, 6 helpers all now hosted on `@debrief/utils`). File: `shared/components/src/utils/bounds.ts` — DELETED
+- [x] T028 Delete `shared/components/src/utils/bounds.test.ts` (its assertions absorbed by T013). File: `shared/components/src/utils/bounds.test.ts` — DELETED
+- [x] T029 Edit `shared/components/src/utils/__tests__/utils.test.ts`: remove the `calculateBounds` / `expandBounds` / `isPointInBounds` describe blocks (absorbed by T014). Leave any unrelated assertions in the file intact. File: `shared/components/src/utils/__tests__/utils.test.ts`
 
 ### Verification
 
-- [ ] T030 Run `pnpm --filter @debrief/components test` — all tests pass without reference to the deleted `bounds.ts`. No file edit.
-- [ ] T031 Run `pnpm --filter @debrief/utils test` — all tests pass including the newly-migrated blocks. No file edit.
-- [ ] T032 Run repo-wide grep `grep -rn "from '.*/utils/bounds'" shared/ apps/ services/` and confirm zero matches outside `shared/utils/` itself (FR-015). No file edit — verification.
-- [ ] T033 Run `task verify` (lint + typecheck + unit + E2E) and confirm green (FR-020 / FR-021 regression gate — MapView fit-to-selection and StacBrowser spatial filter continue producing identical output).
+- [x] T030 Run `pnpm --filter @debrief/components test` — all tests pass without reference to the deleted `bounds.ts`. No file edit.
+- [x] T031 Run `pnpm --filter @debrief/utils test` — all tests pass including the newly-migrated blocks. No file edit.
+- [x] T032 Run repo-wide grep `grep -rn "from '.*/utils/bounds'" shared/ apps/ services/` and confirm zero matches outside `shared/utils/` itself (FR-015). No file edit — verification.
+- [x] T033 Run `task verify` (lint + typecheck + unit + E2E) and confirm green (FR-020 / FR-021 regression gate — MapView fit-to-selection and StacBrowser spatial filter continue producing identical output).
 
 **Parallel within Phase 3**: `[T023, T024, T025]` — three consumer updates edit disjoint files. All other tasks are sequential (they share `shared/utils/src/bounds.ts` or gate on prior green tests).
 
@@ -121,19 +121,19 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 ### Tests first (RED)
 
-- [ ] T034 [test] Add a new `describe('calculateBounds — pre-computed bbox fast-path', ...)` block to `shared/utils/tests/bounds.test.ts` covering (per contract CB-4 / CB-5): (a) valid `bbox = [0, 0, 5, 5]` with inconsistent `geometry.coordinates = [[-100, -100]]` → result is `[0, 0, 5, 5]` (fast-path taken); (b) mixed array — some features with valid bbox, some without — correct merged extent; (c) `bbox = [NaN, 0, 10, 10]` → fall back to coordinate walk (no throw); (d) `bbox = [1, 2, 3]` (length < 4) → fall back; (e) `bbox = null` → fall back; (f) `bbox = undefined` → fall back. Tests MUST fail at this point. File: `shared/utils/tests/bounds.test.ts`
-- [ ] T035 [test] Confirm the common-path regression test (no `bbox` anywhere in the input) still passes — this guards FR-010 / CB-6. No file edit — verification that the previously-green tests from Phase 3 T031 remain green.
+- [x] T034 [test] Add a new `describe('calculateBounds — pre-computed bbox fast-path', ...)` block to `shared/utils/tests/bounds.test.ts` covering (per contract CB-4 / CB-5): (a) valid `bbox = [0, 0, 5, 5]` with inconsistent `geometry.coordinates = [[-100, -100]]` → result is `[0, 0, 5, 5]` (fast-path taken); (b) mixed array — some features with valid bbox, some without — correct merged extent; (c) `bbox = [NaN, 0, 10, 10]` → fall back to coordinate walk (no throw); (d) `bbox = [1, 2, 3]` (length < 4) → fall back; (e) `bbox = null` → fall back; (f) `bbox = undefined` → fall back. Tests MUST fail at this point. File: `shared/utils/tests/bounds.test.ts`
+- [x] T035 [test] Confirm the common-path regression test (no `bbox` anywhere in the input) still passes — this guards FR-010 / CB-6. No file edit — verification that the previously-green tests from Phase 3 T031 remain green.
 
 ### Implement fast-path
 
-- [ ] T036 Modify the `calculateBounds` body in `shared/utils/src/bounds.ts`: inside the `for (const feature of features)` loop, after the `null`-geometry guard, add a branch: `if (feature.bbox !== undefined && feature.bbox !== null && isValidBboxTuple(feature.bbox)) { /* merge bbox into accumulator, then continue */ }`. The branch uses ONLY typed field access — no `as`, no `any`, leverages the extended `BoundsInputFeature` shape from T008. Per R-004. File: `shared/utils/src/bounds.ts`
-- [ ] T037 Run T034 tests — MUST now pass (GREEN). No file edit.
-- [ ] T038 Run the complete `pnpm --filter @debrief/utils test` suite — all tests (existing + migrated in Phase 3 + new fast-path in T034) pass. No file edit.
+- [x] T036 Modify the `calculateBounds` body in `shared/utils/src/bounds.ts`: inside the `for (const feature of features)` loop, after the `null`-geometry guard, add a branch: `if (feature.bbox !== undefined && feature.bbox !== null && isValidBboxTuple(feature.bbox)) { /* merge bbox into accumulator, then continue */ }`. The branch uses ONLY typed field access — no `as`, no `any`, leverages the extended `BoundsInputFeature` shape from T008. Per R-004. File: `shared/utils/src/bounds.ts`
+- [x] T037 Run T034 tests — MUST now pass (GREEN). No file edit.
+- [x] T038 Run the complete `pnpm --filter @debrief/utils test` suite — all tests (existing + migrated in Phase 3 + new fast-path in T034) pass. No file edit.
 
 ### Consumer verification (no code changes expected)
 
-- [ ] T039 Run `task verify` — MapView `fitToSelection` on a `DebriefFeatureCollection` whose features carry pre-computed `bbox` produces identical visual output as before (FR-020 regression guard). No file edit.
-- [ ] T040 Run `pnpm --filter @debrief/utils lint` — specifically confirm zero new `any` / `as` occurrences in `shared/utils/src/bounds.ts` (Article XV compliance). No file edit — verification.
+- [x] T039 Run `task verify` — MapView `fitToSelection` on a `DebriefFeatureCollection` whose features carry pre-computed `bbox` produces identical visual output as before (FR-020 regression guard). No file edit.
+- [x] T040 Run `pnpm --filter @debrief/utils lint` — specifically confirm zero new `any` / `as` occurrences in `shared/utils/src/bounds.ts` (Article XV compliance). No file edit — verification.
 
 **Parallel within Phase 4**: None — all tasks serialise on edits to `shared/utils/src/bounds.ts` or on its tests.
 
@@ -147,17 +147,17 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 ### Compile-time type tests
 
-- [ ] T041 [test] Create `shared/utils/tests/bounds.types.test-d.ts` with `expectTypeOf` assertions (using `vitest`'s built-in `expectTypeOf` or `vite-plugin-typescript-test-files` equivalent — mirror whatever convention is in use elsewhere in `shared/utils/tests/`; if none exists, use plain `// @ts-expect-error` / satisfies-pattern assertions). Cover: (a) `DebriefFeature[]` assigns to `calculateBounds` parameter; (b) `SafeFeature[]` assigns; (c) `GeoJSONFeature[]` assigns; (d) `BoundsInputFeature[]` assigns; (e) a FeatureCollection-like `{ features: DebriefFeature[] }` does NOT assign (contract CB-7 caveat — callers unwrap). File: `shared/utils/tests/bounds.types.test-d.ts`
-- [ ] T042 Run `pnpm --filter @debrief/utils typecheck` — T041's file compiles without errors. Verification — no file edit.
+- [x] T041 [test] Create `shared/utils/tests/bounds.types.test-d.ts` with `expectTypeOf` assertions (using `vitest`'s built-in `expectTypeOf` or `vite-plugin-typescript-test-files` equivalent — mirror whatever convention is in use elsewhere in `shared/utils/tests/`; if none exists, use plain `// @ts-expect-error` / satisfies-pattern assertions). Cover: (a) `DebriefFeature[]` assigns to `calculateBounds` parameter; (b) `SafeFeature[]` assigns; (c) `GeoJSONFeature[]` assigns; (d) `BoundsInputFeature[]` assigns; (e) a FeatureCollection-like `{ features: DebriefFeature[] }` does NOT assign (contract CB-7 caveat — callers unwrap). File: `shared/utils/tests/bounds.types.test-d.ts`
+- [x] T042 Run `pnpm --filter @debrief/utils typecheck` — T041's file compiles without errors. Verification — no file edit.
 
 ### Documentation
 
-- [ ] T043 Confirm the module doc block written in T012 still correctly lists the three supported families and explains the structural-minimum rationale (per FR-017). Amend if Phase 4's fast-path edits displaced any text. File: `shared/utils/src/bounds.ts`
-- [ ] T044 [P] Verify that `shared/utils/src/bounds.ts` does NOT re-export `DebriefFeature`, `SafeFeature`, `GeoJSONFeature`, or `ViewportPolygon` (FR-018 guard). Verification task — run `grep -E 'export (type )?(DebriefFeature|SafeFeature|GeoJSONFeature|ViewportPolygon)' shared/utils/src/bounds.ts` and confirm zero matches. File: `shared/utils/src/bounds.ts`
+- [x] T043 Confirm the module doc block written in T012 still correctly lists the three supported families and explains the structural-minimum rationale (per FR-017). Amend if Phase 4's fast-path edits displaced any text. File: `shared/utils/src/bounds.ts`
+- [x] T044 [P] Verify that `shared/utils/src/bounds.ts` does NOT re-export `DebriefFeature`, `SafeFeature`, `GeoJSONFeature`, or `ViewportPolygon` (FR-018 guard). Verification task — run `grep -E 'export (type )?(DebriefFeature|SafeFeature|GeoJSONFeature|ViewportPolygon)' shared/utils/src/bounds.ts` and confirm zero matches. File: `shared/utils/src/bounds.ts`
 
 ### Consumer type-check (no code changes expected)
 
-- [ ] T045 Run `pnpm -r typecheck` — confirms that `MapView`, `LeafletToolbar`, `useBrowserFilter`, and every downstream consumer of `@debrief/components` barrel still type-checks without the introduction of `as` or `any` at consumer call sites (FR-016 / SC-006 regression guard). No file edit.
+- [x] T045 Run `pnpm -r typecheck` — confirms that `MapView`, `LeafletToolbar`, `useBrowserFilter`, and every downstream consumer of `@debrief/components` barrel still type-checks without the introduction of `as` or `any` at consumer call sites (FR-016 / SC-006 regression guard). No file edit.
 
 **Parallel within Phase 5**: `[T044]` is a verification-only task and runs concurrently with T043's edit of the same file (serialise against T043 if T043 actually edits; otherwise `[T043, T044]` can share the phase).
 
@@ -169,19 +169,19 @@ This is a **Library/SDK + Schema-adjacent** feature (code-refactor touching Link
 
 ### Evidence Collection
 
-- [ ] T046 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) in `specs/219-unify-bounds-utilities/evidence/test-summary.md`. YAML front matter MUST include: `feature: 219-unify-bounds-utilities`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body MUST include: vitest pass counts for `shared/utils/tests/bounds.test.ts` + `shared/utils/tests/bounds.types.test-d.ts`, count of migrated-verbatim vs. net-new assertions (per R-005 ledger), and key scenarios verified (SC-001 through SC-007). File: `specs/219-unify-bounds-utilities/evidence/test-summary.md`
-- [ ] T047 Create usage demonstration in `specs/219-unify-bounds-utilities/evidence/usage-example.md` showing: (a) minimal `calculateBounds` import + call on `DebriefFeature[]`, (b) same call on `SafeFeature[]`, (c) same call on `GeoJSONFeature[]`, (d) fast-path example (features carrying `bbox`) side-by-side with slow-path (no `bbox`). Each example shows expected output comment. File: `specs/219-unify-bounds-utilities/evidence/usage-example.md`
-- [ ] T048 [P] Capture before/after file-diff evidence in `specs/219-unify-bounds-utilities/evidence/before-after.md`: (a) before/after `shared/utils/src/bounds.ts` public surface (4 → 9 exports), (b) deleted `shared/components/src/utils/bounds.ts` summary (LOC, function count), (c) `shared/components/src/index.ts` barrel diff proving zero consumer-visible rename. File: `specs/219-unify-bounds-utilities/evidence/before-after.md`
-- [ ] T049 [P] Capture consolidation metrics in `specs/219-unify-bounds-utilities/evidence/consolidation-metrics.md`: output of `grep -rn "export function calculateBounds\|export const calculateBounds" shared/ apps/ services/` (SC-002, expect 1 match), output of `grep -rn "from '.*/utils/bounds'" shared/ apps/ services/` (SC-001/FR-015, expect 0 matches outside `shared/utils/`), and consumer-churn count (SC-006, expect 0 external-consumer import changes). File: `specs/219-unify-bounds-utilities/evidence/consolidation-metrics.md`
+- [x] T046 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) in `specs/219-unify-bounds-utilities/evidence/test-summary.md`. YAML front matter MUST include: `feature: 219-unify-bounds-utilities`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body MUST include: vitest pass counts for `shared/utils/tests/bounds.test.ts` + `shared/utils/tests/bounds.types.test-d.ts`, count of migrated-verbatim vs. net-new assertions (per R-005 ledger), and key scenarios verified (SC-001 through SC-007). File: `specs/219-unify-bounds-utilities/evidence/test-summary.md`
+- [x] T047 Create usage demonstration in `specs/219-unify-bounds-utilities/evidence/usage-example.md` showing: (a) minimal `calculateBounds` import + call on `DebriefFeature[]`, (b) same call on `SafeFeature[]`, (c) same call on `GeoJSONFeature[]`, (d) fast-path example (features carrying `bbox`) side-by-side with slow-path (no `bbox`). Each example shows expected output comment. File: `specs/219-unify-bounds-utilities/evidence/usage-example.md`
+- [x] T048 [P] Capture before/after file-diff evidence in `specs/219-unify-bounds-utilities/evidence/before-after.md`: (a) before/after `shared/utils/src/bounds.ts` public surface (4 → 9 exports), (b) deleted `shared/components/src/utils/bounds.ts` summary (LOC, function count), (c) `shared/components/src/index.ts` barrel diff proving zero consumer-visible rename. File: `specs/219-unify-bounds-utilities/evidence/before-after.md`
+- [x] T049 [P] Capture consolidation metrics in `specs/219-unify-bounds-utilities/evidence/consolidation-metrics.md`: output of `grep -rn "export function calculateBounds\|export const calculateBounds" shared/ apps/ services/` (SC-002, expect 1 match), output of `grep -rn "from '.*/utils/bounds'" shared/ apps/ services/` (SC-001/FR-015, expect 0 matches outside `shared/utils/`), and consumer-churn count (SC-006, expect 0 external-consumer import changes). File: `specs/219-unify-bounds-utilities/evidence/consolidation-metrics.md`
 
 ### Media Content
 
-- [ ] T050 Spawn Content Specialist via Task tool (agent definition at `.claude/agents/media/content.md`) to create the shipped blog post at `specs/219-unify-bounds-utilities/media/shipped-post.md`. Provide context: feature name + goal, what was built (9 helpers consolidated, fast-path absorbed, 215 LOC deleted, zero consumer churn), lessons learned (structural subtyping as the workaround for three-family reconciliation; fast-path is strictly additive), what's next (backlog items #212 LinkML-generated SafeFeature/GeoJSONFeature and #214 drift-prevention remain independent). File: `specs/219-unify-bounds-utilities/media/shipped-post.md`
-- [ ] T051 [P] Create LinkedIn shipped summary at `specs/219-unify-bounds-utilities/media/linkedin-shipped.md` — 150–200 words, strong hook (not "we consolidated bounds utilities"), link placeholder `{{BLOG_POST_URL}}`, 2–3 tags max. File: `specs/219-unify-bounds-utilities/media/linkedin-shipped.md`
+- [x] T050 Spawn Content Specialist via Task tool (agent definition at `.claude/agents/media/content.md`) to create the shipped blog post at `specs/219-unify-bounds-utilities/media/shipped-post.md`. Provide context: feature name + goal, what was built (9 helpers consolidated, fast-path absorbed, 215 LOC deleted, zero consumer churn), lessons learned (structural subtyping as the workaround for three-family reconciliation; fast-path is strictly additive), what's next (backlog items #212 LinkML-generated SafeFeature/GeoJSONFeature and #214 drift-prevention remain independent). File: `specs/219-unify-bounds-utilities/media/shipped-post.md`
+- [x] T051 [P] Create LinkedIn shipped summary at `specs/219-unify-bounds-utilities/media/linkedin-shipped.md` — 150–200 words, strong hook (not "we consolidated bounds utilities"), link placeholder `{{BLOG_POST_URL}}`, 2–3 tags max. File: `specs/219-unify-bounds-utilities/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T052 Create PR and publish blog: run `/speckit.pr`. This task MUST run last. It depends on all Phase 1–6 evidence, media, and code tasks being complete; creates the feature PR in `debrief-future` and publishes `shipped-post.md` to `debrief.github.io`.
+- [x] T052 Create PR and publish blog: run `/speckit.pr`. This task MUST run last. It depends on all Phase 1–6 evidence, media, and code tasks being complete; creates the feature PR in `debrief-future` and publishes `shipped-post.md` to `debrief.github.io`.
 
 **Parallel within Phase 6**: `[T048, T049]` can run concurrently after T046/T047 (both edit new files). `[T050, T051]` can run concurrently after evidence is collected. T052 MUST run last.
 

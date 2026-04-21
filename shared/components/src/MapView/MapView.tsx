@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-le
 import L from 'leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
 import type { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
-import { calculateBounds, expandBounds } from '../utils/bounds';
+import { calculateBounds, expandBounds } from '@debrief/utils';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
 import { extractTemporalData } from './temporal-utils';
