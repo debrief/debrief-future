@@ -22,8 +22,9 @@ from debrief_schemas.validation import (
 
 # Import generated Storyboard/Scene models for negative-case validation (#215).
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
-from debrief_schemas import SceneFeature  # noqa: E402  (path-dependent import)
 from pydantic import ValidationError  # noqa: E402
+
+from debrief_schemas import SceneFeature  # noqa: E402  (path-dependent import)
 
 INVALID_FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures" / "invalid"
 
