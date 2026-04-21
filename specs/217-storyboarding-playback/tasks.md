@@ -113,9 +113,9 @@
 
 ### 2.8 VS Code command + keybinding contributions (skeleton)
 
-- [ ] T170 Add command contributions to `contributes.commands[]`: `debrief.storyboard.forward`, `.backward`, `.clickScene`, `.jumpPast`, `.editScene`, `.create`, `.rename`, `.delete`, `.openPanel` (latter reveals existing panel) `apps/vscode/package.json`
-- [ ] T171 Add `menus.commandPalette` filter — hide `.clickScene`, `.jumpPast`, `.editScene` via `when: "false"`; gate `.forward`, `.backward` by `debrief.storyboardActive` `apps/vscode/package.json`
-- [ ] T172 Add scoped keybinding contributions — `Left` / `Right` for `.backward` / `.forward` with `when: "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"` `apps/vscode/package.json`
+- [x] T170 Add command contributions to `contributes.commands[]`: `debrief.storyboard.forward`, `.backward`, `.clickScene`, `.jumpPast`, `.editScene`, `.create`, `.rename`, `.delete`, `.openPanel` (latter reveals existing panel) `apps/vscode/package.json`
+- [x] T171 Add `menus.commandPalette` filter — hide `.clickScene`, `.jumpPast`, `.editScene` via `when: "false"`; gate `.forward`, `.backward` by `debrief.storyboardActive` `apps/vscode/package.json`
+- [x] T172 Add scoped keybinding contributions — `Left` / `Right` for `.backward` / `.forward` with `when: "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"` `apps/vscode/package.json`
 
 ### Parallel execution examples (Phase 2)
 
