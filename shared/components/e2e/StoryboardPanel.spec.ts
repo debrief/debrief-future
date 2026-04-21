@@ -7,6 +7,8 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
 const STORY_BASE = '/iframe.html?id=panels-storyboardpanel';
 
@@ -14,7 +16,13 @@ const storyUrl = (variant: string): string => `${STORY_BASE}--${variant}`;
 const withTheme = (url: string, theme: 'light' | 'dark' | 'vscode'): string =>
   `${url}&globals=theme:${theme}`;
 
-const EVIDENCE_DIR = 'specs/216-storyboarding-capture/evidence/screenshots';
+// Evidence dir resolved relative to this test file, so screenshots always
+// land in `specs/216-.../evidence/screenshots/` regardless of the cwd from
+// which Playwright is invoked.
+const EVIDENCE_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../specs/216-storyboarding-capture/evidence/screenshots',
+);
 
 test.describe('StoryboardPanel — Empty', () => {
   for (const theme of ['light', 'dark', 'vscode'] as const) {

@@ -1,8 +1,8 @@
 ---
 feature: "216-storyboarding-capture"
-captured_at: "2026-04-21T17:30:00Z"
-git_sha: "338f06b"
-tests_passed: 55
+captured_at: "2026-04-21T18:05:00Z"
+git_sha: "8b5a391"
+tests_passed: 71
 tests_failed: 0
 tests_skipped: 6
 coverage_pct: null
@@ -14,8 +14,8 @@ coverage_pct: null
 
 | Metric | Value |
 |--------|-------|
-| Total Tests | 61 |
-| Passed | 55 |
+| Total Tests | 77 |
+| Passed | 71 |
 | Failed | 0 |
 | Skipped | 6 (webview E2E — blocker #143) |
 | Coverage | Not measured — delegated to #215 for core rules |
@@ -107,10 +107,27 @@ coverage_pct: null
 | each row renders thumbnail, DTG label, and timestamp secondary line | Pass |
 | scene row has accessible aria-label and role=listitem | Pass |
 
-### E2E suites (deferred)
+### `shared/components/e2e/StoryboardPanel.spec.ts` — Storybook E2E (16 tests, all pass)
 
-- `tests/e2e/test-storyboard-capture.spec.ts` — 6 workflows, skipped pending Blocker #143 (openvscode-server webview iframe accessibility).
-- `shared/components/e2e/StoryboardPanel.spec.ts` — Storybook Playwright specs covering 4 stories × 3 theme variants + accessibility; requires Storybook server.
+Run against the built static Storybook (`shared/components/storybook-static/`) served on `localhost:6006` under the `CLAUDE_CODE=1` Playwright profile (bundled Chromium via `@sparticuz/chromium`). Covers 5 stories × 3 theme variants (13 rendering tests) + accessibility asserts.
+
+| Test | Status |
+|------|--------|
+| Empty → renders empty-state copy in light / dark / vscode themes | 3 × Pass |
+| EmptyStoryboard → renders empty-Storyboard copy in all themes | 3 × Pass |
+| WithOneScene → renders one scene row with role=listitem + aria-label in all themes | 3 × Pass |
+| WithThreeScenes → renders three scene rows + "3 scenes" count in all themes | 3 × Pass |
+| Capturing → prepends pending row above persisted scenes in all themes | 3 × Pass |
+| Capture button has aria-label="Capture scene" | 1 × Pass |
+
+Screenshots captured for evidence under `evidence/screenshots/`:
+- `panel-empty.png` (light theme)
+- `panel-three-scenes-light.png` / `-dark.png` / `-vscode.png`
+- `capture-in-flight.png` (light theme)
+
+### VS Code webview E2E (deferred)
+
+- `tests/e2e/test-storyboard-capture.spec.ts` — 6 workflows, `.skip()` pending Blocker #143 (openvscode-server webview iframe accessibility). Each workflow maps 1:1 to a unit test in `captureScene.test.ts` so regression risk is covered.
 
 ## Key Scenarios Verified
 
@@ -149,7 +166,7 @@ coverage_pct: null
 ## Running the tests
 
 ```sh
-# Command handler + view provider + thumbnail service
+# Command handler + view provider + thumbnail service + MapPanel API + actor
 pnpm --filter debrief-vscode exec vitest run \
   tests/unit/captureScene.test.ts \
   tests/unit/storyboardPanelView.test.ts \
@@ -157,7 +174,13 @@ pnpm --filter debrief-vscode exec vitest run \
   tests/unit/mapPanel-setFeatures.test.ts \
   tests/unit/sessionManager-actor.test.ts
 
-# Presentational panel component
+# Presentational panel component (vitest + @testing-library/react)
 pnpm --filter @debrief/components exec vitest run \
   src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx
+
+# Storybook Playwright E2E (bundled Chromium, Claude Code profile)
+pnpm --filter @debrief/components build-storybook
+python3 -m http.server 6006 --directory shared/components/storybook-static &
+cd shared/components && CLAUDE_CODE=1 pnpm exec playwright test \
+  --config=playwright.config.ts e2e/StoryboardPanel.spec.ts
 ```
