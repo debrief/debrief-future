@@ -29,6 +29,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as os from 'os';
 import {
   createSessionStore,
   startServer,
@@ -41,6 +42,31 @@ import {
 import type { Express } from 'express';
 import type { Plot } from '../types/plot';
 import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
+
+/**
+ * Fallback actor written to provenance when `os.userInfo()` throws (e.g. in
+ * sandboxed code-server environments where `/etc/passwd` is not readable).
+ */
+export const ACTOR_FALLBACK = 'vscode-user';
+
+/**
+ * Resolve the current OS username, falling back to `ACTOR_FALLBACK` on any
+ * error. Extracted so tests can spy on the fallback path (T211).
+ */
+export function resolveActor(
+  userInfo: () => { username: string } = os.userInfo,
+): string {
+  try {
+    const info = userInfo();
+    const name = info.username;
+    if (typeof name === 'string' && name.trim().length > 0) {
+      return name;
+    }
+    return ACTOR_FALLBACK;
+  } catch {
+    return ACTOR_FALLBACK;
+  }
+}
 
 /**
  * Data needed to initialize a session with defaults derived from plot data.
@@ -88,6 +114,13 @@ export class SessionManager implements vscode.Disposable {
 
   /** MCP server port (defaults to 3001, configurable via settings) */
   private mcpPort: number = 3001;
+
+  /**
+   * Cached OS username (falls back to `ACTOR_FALLBACK` if `os.userInfo` throws).
+   * Used by Feature 216 capture to stamp provenance on newly-created Scene /
+   * Storyboard Features.
+   */
+  public readonly actor: string = resolveActor();
 
   /**
    * Create a new session for a document.
