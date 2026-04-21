@@ -41,6 +41,7 @@ import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@de
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
 
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local MapPanel is the extension host wrapper; name collides with @debrief/components.MapPanel (React component). Follow-up to rename the host class, #214 scope-adjacent
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
   public static readonly viewType = 'debrief.mapPanel';

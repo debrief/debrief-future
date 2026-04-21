@@ -12,7 +12,7 @@
  * type has discriminated type literal, id as string | number, and inline
  * geometry with coordinates for runtime use.
  */
-export interface GeoJSONFeature {
+export interface GeoJSONFeature { // canonical — session-state-local runtime shape distinct from @debrief/schemas.GeoJSONFeature; follow-up to unify, #214 scope-adjacent
   type: 'Feature';
   id?: string | number;
   geometry: { type: string; coordinates: unknown };

@@ -137,9 +137,10 @@ export interface ReferenceLocationViewModel {
 }
 
 /**
- * The current selection state
+ * The current selection state (map-local; distinct from @debrief/components.Selection
+ * which is `Map<string, number>`).
  */
-export interface Selection {
+export interface MapSelection {
   /** Selected track IDs */
   trackIds: string[];
 
@@ -184,7 +185,7 @@ export interface MapViewState {
   timeRange: PlotTimeRange;
 
   /** Active selection */
-  selection: Selection;
+  selection: MapSelection;
 
   /** Layer visibility states by ID */
   layerVisibility: Record<string, boolean>;
@@ -214,9 +215,9 @@ export interface RecentPlot {
 }
 
 /**
- * Create an empty selection
+ * Create an empty map selection (see MapSelection).
  */
-export function createEmptySelection(): Selection {
+export function createEmptyMapSelection(): MapSelection {
   return {
     trackIds: [],
     locationIds: [],

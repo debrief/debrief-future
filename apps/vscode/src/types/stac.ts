@@ -63,6 +63,7 @@ export interface Catalog {
  * (stacService, stacTreeProvider, catalogOverviewPanel) depend on camelCase
  * field access. Rename would require coordinated update across all consumers.
  */
+// eslint-disable-next-line no-restricted-syntax -- deliberate camelCase adapter over @debrief/schemas.StacItemSummary; follow-up to unify, #214 scope-adjacent
 export interface StacItemSummary {
   /** STAC Item ID */
   id: string;

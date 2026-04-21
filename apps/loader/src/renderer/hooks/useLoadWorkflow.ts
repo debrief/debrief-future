@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SourceFile, LoadResult } from '../types';
+import type { SourceFile, LoaderLoadResult } from '../types';
 import type { PlotInfo, StacStoreInfo } from '../types/store';
 
 interface LoadOptions {
@@ -24,7 +24,7 @@ interface LoadOptions {
 }
 
 interface UseLoadWorkflowResult {
-  executeLoad: (options: LoadOptions) => Promise<LoadResult>;
+  executeLoad: (options: LoadOptions) => Promise<LoaderLoadResult>;
 }
 
 /**
@@ -38,7 +38,7 @@ export function useLoadWorkflow(): UseLoadWorkflowResult {
   const { t } = useTranslation();
 
   const executeLoad = useCallback(
-    async (options: LoadOptions): Promise<LoadResult> => {
+    async (options: LoadOptions): Promise<LoaderLoadResult> => {
       const { sourceFile, store, mode, newPlotName, newPlotDescription, existingPlotId, plots, onProgress } =
         options;
 

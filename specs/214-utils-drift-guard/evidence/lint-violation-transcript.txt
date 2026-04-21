@@ -1,0 +1,61 @@
+# Drift-guard violation transcripts — spec #214, all 5 @debrief/* packages
+#
+# Captured post-implementation on git SHA 1f0222c. Each section below
+# temporarily introduces an original redeclaration under apps/*, runs the
+# drift-guard lint, captures the failure, and removes the file to restore
+# the clean baseline.
+
+
+═══════════════════════════════════════════════════════════════
+=== utils drift: apps/vscode/src/utils/drift-demo-bounds.ts (calculateBounds)
+═══════════════════════════════════════════════════════════════
++ cat > apps/vscode/src/utils/drift-demo-bounds.ts
+export function calculateBounds(): number[] { return [0, 0, 0, 0]; }
++ pnpm --filter debrief-vscode lint
+---
+  1:8  error  'calculateBounds' is exported by '@debrief/components'. Do not redeclare it under apps/*. Replace this declaration with: import { calculateBounds } from '@debrief/components';  no-restricted-syntax
+
+═══════════════════════════════════════════════════════════════
+=== utils drift: apps/web-shell/src/lib-drift-demo.ts (mergeBounds)
+═══════════════════════════════════════════════════════════════
++ cat > apps/web-shell/src/lib-drift-demo.ts
+export function mergeBounds(): number[] { return [0, 0, 0, 0]; }
++ pnpm --filter @debrief/web-shell lint
+---
+  1:8  error  'mergeBounds' is exported by '@debrief/utils'. Do not redeclare it under apps/*. Replace this declaration with: import { mergeBounds } from '@debrief/utils';  no-restricted-syntax
+
+═══════════════════════════════════════════════════════════════
+=== schemas drift: apps/vscode/src/drift-demo-platform.ts (PlatformRecord)
+═══════════════════════════════════════════════════════════════
++ cat > apps/vscode/src/drift-demo-platform.ts
+export interface PlatformRecord { id: string; }
++ pnpm --filter debrief-vscode lint
+---
+  1:8  error  'PlatformRecord' is exported by '@debrief/schemas'. Do not redeclare it under apps/*. Replace this declaration with: import { PlatformRecord } from '@debrief/schemas';  no-restricted-syntax
+
+═══════════════════════════════════════════════════════════════
+=== components drift: apps/vscode/src/drift-demo-stac-browser.ts (StacBrowser)
+═══════════════════════════════════════════════════════════════
++ cat > apps/vscode/src/drift-demo-stac-browser.ts
+export const StacBrowser = (): null => null;
++ pnpm --filter debrief-vscode lint
+---
+  1:14  error  'StacBrowser' is exported by '@debrief/components'. Do not redeclare it under apps/*. Replace this declaration with: import { StacBrowser } from '@debrief/components';  no-restricted-syntax
+
+═══════════════════════════════════════════════════════════════
+=== session-state drift (TRANSITIVE WALKER): apps/vscode/src/drift-demo-session.ts (getSessionStore)
+═══════════════════════════════════════════════════════════════
++ cat > apps/vscode/src/drift-demo-session.ts
+export function getSessionStore(): null { return null; }
++ pnpm --filter debrief-vscode lint
+---
+  1:8  error  'getSessionStore' is exported by '@debrief/session-state'. Do not redeclare it under apps/*. Replace this declaration with: import { getSessionStore } from '@debrief/session-state';  no-restricted-syntax
+
+═══════════════════════════════════════════════════════════════
+=== data drift: apps/vscode/src/drift-demo-loadRegistry.ts (loadRegistry)
+═══════════════════════════════════════════════════════════════
++ cat > apps/vscode/src/drift-demo-loadRegistry.ts
+export function loadRegistry(): null { return null; }
++ pnpm --filter debrief-vscode lint
+---
+  1:8  error  'loadRegistry' is exported by '@debrief/data'. Do not redeclare it under apps/*. Replace this declaration with: import { loadRegistry } from '@debrief/data';  no-restricted-syntax
