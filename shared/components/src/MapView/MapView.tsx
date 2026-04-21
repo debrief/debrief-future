@@ -12,6 +12,8 @@ import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { SensorBearingLayer } from './SensorBearingLayer';
 import { LeafletToolbar } from './LeafletToolbar';
 import type { DrawingMode } from './LeafletToolbar';
+import { SceneRectangleLayer } from './SceneRectangleLayer';
+import type { SceneRectangleLayerProps } from './SceneRectangleLayer';
 import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
@@ -106,6 +108,57 @@ export interface MapViewProps {
 
   /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
   onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
+
+  // ── NEW for #217 ─────────────────────────────────────────────────
+
+  /**
+   * Animated viewport target. When set, the MapView animates to this
+   * viewport's centre + zoom via Leaflet `L.Map.flyTo`. `null` means
+   * "no pending animation" (the typical idle state).
+   *
+   * Each time this prop transitions to a new `token`, the MapView
+   * kicks off a new animation. The caller is responsible for generating
+   * a fresh token per transition.
+   */
+  flyToTarget?: FlyToTarget | null;
+
+  /** Fires when an in-flight flyTo animation completes (Leaflet `moveend`). */
+  onFlyToComplete?: (token: number) => void;
+
+  /**
+   * The Scene Features to render as faint rectangles on the map. When
+   * provided, a `SceneRectangleLayer` is rendered inside the `MapContainer`.
+   */
+  sceneRectangles?: SceneRectangleLayerProps;
+
+  /** Fires when a Scene rectangle is clicked. Convenience re-export of
+   *  `SceneRectangleLayerProps.onSceneRectangleClick`. */
+  onSceneRectangleClick?: (sceneId: string) => void;
+
+  /**
+   * Predicate invoked for each feature before it is rendered in the
+   * base GeoJSON layer. Return `false` to exclude the feature. Defaults
+   * to excluding `STORYBOARD` and `STORYBOARD_SCENE` features (which
+   * are either invisible or rendered by the dedicated
+   * `SceneRectangleLayer`). See `map-view-flyto.md` §5 / FR-PLAY-015.
+   */
+  shouldRenderInBaseLayer?: (feature: GeoJSON.Feature) => boolean;
+}
+
+/**
+ * Animated viewport target for the {@link MapView.flyToTarget} prop.
+ */
+export interface FlyToTarget {
+  /** Monotonically-increasing identifier — each new transition gets a
+   *  new token; repeated values are idempotent. */
+  readonly token: number;
+
+  /** Centre + zoom. Typically resolved from a Scene's `viewport`. */
+  readonly center: readonly [number, number];  // [lat, lon]
+  readonly zoom: number;
+
+  /** Animation duration in ms. `0` means "jump without animation". */
+  readonly durationMs: number;
 }
 
 // Component to handle map events, auto-fit, and programmatic viewport control
@@ -114,6 +167,8 @@ function MapController({
   autoFitBounds,
   viewport,
   fitBoundsTrigger,
+  flyToTarget,
+  onFlyToComplete,
   onZoomChange,
   onBoundsChange,
   onBackgroundClick,
@@ -122,6 +177,8 @@ function MapController({
   autoFitBounds: boolean;
   viewport?: { center: [number, number]; zoom: number };
   fitBoundsTrigger?: number;
+  flyToTarget?: FlyToTarget | null;
+  onFlyToComplete?: (token: number) => void;
   onZoomChange?: (zoom: number) => void;
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
@@ -164,6 +221,34 @@ function MapController({
       map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
     }
   }, [map, fitBoundsTrigger, bounds]);
+
+  // Handle animated flyTo (#217 FR-PLAY-004). Fires on token change so
+  // repeated-value tokens are idempotent but fresh tokens trigger a new
+  // animation, superseding any in-flight flight.
+  useEffect(() => {
+    if (!flyToTarget) return;
+    const token = flyToTarget.token;
+    if (flyToTarget.durationMs === 0) {
+      // Jump without animation. Fire completion synchronously so the
+      // caller's transport state machine is not blocked on moveend.
+      map.setView(flyToTarget.center as [number, number], flyToTarget.zoom, { animate: false });
+      onFlyToComplete?.(token);
+      return;
+    }
+    map.flyTo(flyToTarget.center as [number, number], flyToTarget.zoom, {
+      duration: flyToTarget.durationMs / 1000,
+      easeLinearity: 0.25,
+    });
+    const handler = (): void => {
+      map.off('moveend', handler);
+      onFlyToComplete?.(token);
+    };
+    map.on('moveend', handler);
+    return () => {
+      map.off('moveend', handler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flyToTarget?.token]);
 
   // Handle map events
   useMapEvents({
@@ -229,7 +314,24 @@ export function MapView({
   drawingMode,
   onDrawingModeChange,
   onShapeCreated,
+  flyToTarget,
+  onFlyToComplete,
+  sceneRectangles,
+  onSceneRectangleClick,
+  shouldRenderInBaseLayer,
 }: MapViewProps) {
+  // Base-layer filter — defaults to excluding Storyboard parent + Scene
+  // features so they are never rendered in the main GeoJSON layer.
+  // Scene features are rendered separately via `SceneRectangleLayer`,
+  // and Storyboard parents are never rendered (FR-PLAY-015).
+  const baseLayerFilter = useMemo(() => {
+    if (shouldRenderInBaseLayer) return shouldRenderInBaseLayer;
+    return (feature: GeoJSON.Feature): boolean => {
+      const kind = (feature.properties as Record<string, unknown> | null | undefined)?.kind;
+      return kind !== 'STORYBOARD' && kind !== 'STORYBOARD_SCENE';
+    };
+  }, [shouldRenderInBaseLayer]);
+
   // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
     const arr = Array.isArray(features) ? features : features.features;
@@ -238,9 +340,12 @@ export function MapView({
       if (!f.geometry) return false;
       const coords = f.geometry.coordinates;
       if (Array.isArray(coords) && coords.length === 0) return false;
+      // Apply the base-layer filter (excludes STORYBOARD / STORYBOARD_SCENE
+      // by default — see FR-PLAY-015).
+      if (!baseLayerFilter(f as unknown as GeoJSON.Feature)) return false;
       return true;
     });
-  }, [features]);
+  }, [features, baseLayerFilter]);
 
   // Separate temporal tracks from static features when temporal rendering is active
   const { temporalFeatures, staticFeatures } = useMemo(() => {
@@ -533,10 +638,22 @@ export function MapView({
           autoFitBounds={autoFitBounds}
           viewport={viewport}
           fitBoundsTrigger={fitBoundsTrigger}
+          flyToTarget={flyToTarget}
+          onFlyToComplete={onFlyToComplete}
           onZoomChange={onZoomChange}
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
         />
+
+        {sceneRectangles && (
+          <SceneRectangleLayer
+            {...sceneRectangles}
+            onSceneRectangleClick={(sceneId) => {
+              sceneRectangles.onSceneRectangleClick(sceneId);
+              onSceneRectangleClick?.(sceneId);
+            }}
+          />
+        )}
 
         {staticFeatures.length > 0 && (
           <GeoJSON

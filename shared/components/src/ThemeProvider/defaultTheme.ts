@@ -28,6 +28,10 @@ export const lightThemeTokens: ThemeTokens = {
 
   selectionBg: 'rgba(0, 102, 204, 0.1)',
   selectionBorder: '#0066cc',
+
+  // Storyboard scene rectangles (Feature 217)
+  sceneRectangleStroke: '#3b82f6',  // blue-500
+  sceneRectangleFill: '#93c5fd',    // blue-300
 };
 
 /**
@@ -58,6 +62,10 @@ export const darkThemeTokens: ThemeTokens = {
 
   selectionBg: 'rgba(77, 166, 255, 0.15)',
   selectionBorder: '#4da6ff',
+
+  // Storyboard scene rectangles (Feature 217)
+  sceneRectangleStroke: '#60a5fa',  // blue-400
+  sceneRectangleFill: '#1e40af',    // blue-800
 };
 
 /**
@@ -66,6 +74,11 @@ export const darkThemeTokens: ThemeTokens = {
 export const vsCodeThemeTokens: ThemeTokens = {
   ...darkThemeTokens,
   // These will be overridden by CSS custom properties from VS Code
+
+  // Storyboard scene rectangles (Feature 217) — route through VS Code
+  // theme variables so the colours track the user's editor palette.
+  sceneRectangleStroke: 'var(--vscode-focusBorder)',
+  sceneRectangleFill: 'var(--vscode-selection-background)',
 };
 
 /**
