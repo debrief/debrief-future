@@ -334,9 +334,12 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
-// Storyboard panel — presentational React component (Feature: 216-storyboarding-capture)
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback)
 export { StoryboardPanel, SceneRow, SceneList } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
 } from './panels/StoryboardPanel';

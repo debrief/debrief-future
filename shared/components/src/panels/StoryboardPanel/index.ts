@@ -1,5 +1,5 @@
 /**
- * Public barrel for the Storyboard panel (Feature 216).
+ * Public barrel for the Storyboard panel (Features 216 + 217).
  */
 
 export { StoryboardPanel } from './StoryboardPanel';
@@ -8,4 +8,7 @@ export { SceneList } from './SceneList';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
 } from './types';

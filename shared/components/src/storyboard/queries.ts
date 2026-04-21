@@ -51,6 +51,43 @@ export function getActiveStoryboardDefault(
   return best;
 }
 
+/**
+ * Return the plot's most-recently-modified Storyboard — the one whose
+ * last provenance entry has the latest timestamp. Ties are broken by
+ * `storyboard.properties.id` ascending (ULIDs sort lexicographically by
+ * generation time, so this is a deterministic fallback consistent with
+ * creation order within the same millisecond).
+ *
+ * Null if the plot contains no Storyboards or any candidate Storyboard
+ * has an empty `provenance[]` (which would be a schema-invalid state
+ * caught by #215's `validatePlot`).
+ *
+ * Used by #217's playback service to seed the active Storyboard on
+ * plot-open (research R7 / FR-PLAY-002).
+ */
+export function getMostRecentlyModifiedStoryboard(
+  plot: Plot,
+): StoryboardFeature | null {
+  let best: StoryboardFeature | null = null;
+  let bestTs: string | null = null;
+  for (const f of plot.features) {
+    if (!isStoryboardFeature(f)) continue;
+    const entries = f.properties.provenance ?? [];
+    const last = entries[entries.length - 1];
+    if (!last) continue;
+    const ts = last.timestamp;
+    if (
+      bestTs === null ||
+      ts > bestTs ||
+      (ts === bestTs && f.properties.id < best!.properties.id)
+    ) {
+      best = f;
+      bestTs = ts;
+    }
+  }
+  return best;
+}
+
 export interface StaleReadResult {
   scene: SceneFeature;
   storedHash: string;
