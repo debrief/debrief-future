@@ -67,30 +67,30 @@
 
 ### 2.1 #215 query addition (Fix B / R7)
 
-- [ ] T101 [test] Add unit tests for new `getMostRecentlyModifiedStoryboard` query — empty plot → null, single Storyboard, multiple Storyboards with distinct `provenance[last].timestamp`, tie-break on equal timestamps → ULID ascending `shared/components/src/storyboard/__tests__/queries.test.ts`
-- [ ] T102 Implement `getMostRecentlyModifiedStoryboard(plot: Plot): StoryboardFeature | null` — scans `provenance[last].timestamp` per Storyboard; ties broken by `storyboard.properties.id` ascending `shared/components/src/storyboard/queries.ts`
-- [ ] T103 [P] Re-export `getMostRecentlyModifiedStoryboard` from the package entrypoint `shared/components/src/storyboard/index.ts`
+- [x] T101 [test] Add unit tests for new `getMostRecentlyModifiedStoryboard` query — empty plot → null, single Storyboard, multiple Storyboards with distinct `provenance[last].timestamp`, tie-break on equal timestamps → ULID ascending `shared/components/src/storyboard/__tests__/queries.test.ts`
+- [x] T102 Implement `getMostRecentlyModifiedStoryboard(plot: Plot): StoryboardFeature | null` — scans `provenance[last].timestamp` per Storyboard; ties broken by `storyboard.properties.id` ascending `shared/components/src/storyboard/queries.ts`
+- [x] T103 [P] Re-export `getMostRecentlyModifiedStoryboard` from the package entrypoint `shared/components/src/storyboard/index.ts`
 
 ### 2.2 Shared extension helper (design-fix 4)
 
-- [ ] T110 [P][test] Add unit tests for `plotFromFeatures(features: DebriefFeature[]): StoryboardPlot` — wraps a feature array as a throwaway `FeatureCollection`; identity on empty; preserves references (no deep copy) `apps/vscode/src/services/__tests__/plotFromFeatures.test.ts`
-- [ ] T111 Implement `plotFromFeatures` helper — returns `{ type: 'FeatureCollection', features }`; the single source of truth for the boundary between `DebriefFeature[]` and #215's `Plot` type `apps/vscode/src/services/plotFromFeatures.ts`
+- [x] T110 [P][test] Add unit tests for `plotFromFeatures(features: DebriefFeature[]): StoryboardPlot` — wraps a feature array as a throwaway `FeatureCollection`; identity on empty; preserves references (no deep copy). Test committed to `apps/vscode/tests/unit/plotFromFeatures.test.ts` (the VS Code package uses flat `tests/unit/` layout, not colocated `__tests__/`).
+- [x] T111 Implement `plotFromFeatures` helper — returns `{ type: 'FeatureCollection', features }`; the single source of truth for the boundary between `DebriefFeature[]` and #215's `Plot` type `apps/vscode/src/services/plotFromFeatures.ts`
 
 ### 2.3 View-model type extensions (design-fix 3)
 
-- [ ] T120 Extend `StoryboardPanelProps` with **optional+defaulted** fields: `storyboards?: readonly StoryboardOptionViewModel[]`, `activeStoryboardId?: string | null`, `currentSceneId?: string | null`, `transport?: TransportViewModel`, `onActiveStoryboardChange?`, `onCreateStoryboard?`, `onRenameStoryboard?`, `onDeleteStoryboard?`, `onTransportForward?`, `onTransportBackward?`. `SceneRowViewModel` stays at `ok` / `pending` only (no `blocked` variant — design-fix 1). `shared/components/src/panels/StoryboardPanel/types.ts`
-- [ ] T121 [P] Define new view-model types `StoryboardOptionViewModel` (storyboardId, name, sceneCount, lastModifiedIso), `TransportViewModel` (canGoBackward, canGoForward, sceneNumber, sceneTotal, transitionInFlight), `MissingDataReason` (discriminated union) in `shared/components/src/panels/StoryboardPanel/types.ts`
-- [ ] T122 [P] Confirm existing `StoryboardPanel.test.tsx` still compiles (design-fix 3 check — every optional+defaulted field must be usable without explicit value) `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
+- [x] T120 Extend `StoryboardPanelProps` with **optional+defaulted** fields: `storyboards?: readonly StoryboardOptionViewModel[]`, `activeStoryboardId?: string | null`, `currentSceneId?: string | null`, `transport?: TransportViewModel`, `onActiveStoryboardChange?`, `onCreateStoryboard?`, `onRenameStoryboard?`, `onDeleteStoryboard?`, `onTransportForward?`, `onTransportBackward?`. `SceneRowViewModel` stays at `ok` / `pending` only (no `blocked` variant — design-fix 1). `shared/components/src/panels/StoryboardPanel/types.ts`
+- [x] T121 [P] Define new view-model types `StoryboardOptionViewModel` (storyboardId, name, sceneCount, lastModifiedIso), `TransportViewModel` (canGoBackward, canGoForward, sceneNumber, sceneTotal, transitionInFlight), `MissingDataReason` (discriminated union) in `shared/components/src/panels/StoryboardPanel/types.ts`
+- [x] T122 [P] Confirm existing `StoryboardPanel.test.tsx` still compiles — all 8 #216 tests still pass with the new optional fields added. `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
 
 ### 2.4 MapPanel API extensions (arch-fix 2 + contracts/map-view-flyto.md)
 
-- [ ] T130 [test] Unit tests for MapPanel additions — `flyToViewport` returns fresh monotonic token, posts `flyTo` webview message with correct args; `flyToViewport(..., 0)` posts `animate: false` equivalent; `setSceneRectangles(null, ...)` posts a clear message; `onFlyToComplete` fires with correct token; `onSceneRectangleClick` fires with sceneId; `onFeaturesChanged` fires on every `setFeatures` call `apps/vscode/src/webview/__tests__/mapPanel.test.ts`
-- [ ] T131 Implement `MapPanel.flyToViewport(viewport, durationMs): number` — allocates fresh token, posts `flyTo` webview message with `{ token, center, zoom, durationMs }` `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T132 Implement `MapPanel.setSceneRectangles(scenes, activeStoryboardId, currentSceneId)` — posts `setSceneRectangles` webview message; serialises Scene features to `{ sceneId, viewport, timestamp }` view-model (no geometry duplication; webview uses `scene.geometry.coordinates`, see T142) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T133 Implement `MapPanel.onSceneRectangleClick: vscode.Event<string>` — forwards inbound `sceneRectangleClicked` webview message; uses `vscode.EventEmitter<string>` following the existing pattern `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T134 Implement `MapPanel.onFlyToComplete: vscode.Event<number>` — forwards inbound `flyToComplete` webview message `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T135 Implement `MapPanel.onFeaturesChanged: vscode.Event<DebriefFeature[]>` — fired from `setFeatures` after the internal feature-list mutation and the `loadPlot` repost; mirrors the `logPanelView` `_onFeaturesChanged` pattern (`apps/vscode/src/views/logPanelView.ts:123`) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T136 Extend `MapPanelMessage` + `MapPanelToExtensionMessage` discriminated unions with the new variants (`flyTo`, `setSceneRectangles`, `flyToComplete`, `sceneRectangleClicked`) `apps/vscode/src/webview/messages.ts`
+- [x] T130 [test] Unit tests for MapPanel additions — `flyToViewport` returns fresh monotonic token, posts `flyTo` webview message with correct args; `flyToViewport(..., 0)` posts `animate: false` equivalent; `setSceneRectangles(null, ...)` posts a clear message; `onFlyToComplete` fires with correct token; `onSceneRectangleClick` fires with sceneId; `onFeaturesChanged` fires on every `setFeatures` call. Test committed to `apps/vscode/tests/unit/mapPanel-storyboardPlayback.test.ts` (flat VS Code convention).
+- [x] T131 Implement `MapPanel.flyToViewport(viewport, durationMs): number` — allocates fresh token, posts `flyTo` webview message with `{ token, center, zoom, durationMs }` `apps/vscode/src/webview/mapPanel.ts`
+- [x] T132 Implement `MapPanel.setSceneRectangles(scenes, activeStoryboardId, currentSceneId)` — posts `setSceneRectangles` webview message; serialises Scene features to `{ sceneId, viewport, timestamp, polygon }` snapshot.
+- [x] T133 Implement `MapPanel.onSceneRectangleClick: vscode.Event<string>` — forwards inbound `sceneRectangleClicked` webview message via `vscode.EventEmitter<string>`.
+- [x] T134 Implement `MapPanel.onFlyToComplete: vscode.Event<number>` — forwards inbound `flyToComplete` webview message.
+- [x] T135 Implement `MapPanel.onFeaturesChanged: vscode.Event<DebriefFeature[]>` — fired from `setFeatures` on every call, even when `currentPlot` is null.
+- [x] T136 Extend `ExtensionToWebviewMessage` + `WebviewToExtensionMessage` discriminated unions with the new variants (`flyTo`, `setSceneRectangles`, `flyToComplete`, `sceneRectangleClicked`) + the new `SceneRectangleSnapshot` interface. `apps/vscode/src/webview/messages.ts`
 
 ### 2.5 MapView extensions (shared/components)
 
@@ -108,8 +108,8 @@
 
 ### 2.7 Webview message types (panel-side)
 
-- [ ] T160 Extend `StoryboardPanelMessage` (webview → extension) discriminated union with `active-storyboard-changed`, `transport-forward-clicked`, `transport-backward-clicked`, `create-storyboard-requested`, `rename-storyboard-requested`, `delete-storyboard-requested` `apps/vscode/src/types/storyboardPanelMessages.ts`
-- [ ] T161 Extend `ExtensionToStoryboardPanelMessage` (extension → webview) with `snapshot` variant (full `StoryboardPlaybackSnapshot` projection); keep `scenes` + `captureInFlight` + `theme` for #216 backward compatibility `apps/vscode/src/types/storyboardPanelMessages.ts`
+- [x] T160 Extend `StoryboardPanelMessage` (webview → extension) discriminated union with `active-storyboard-changed`, `transport-forward-clicked`, `transport-backward-clicked`, `create-storyboard-requested`, `rename-storyboard-requested`, `delete-storyboard-requested` `apps/vscode/src/types/storyboardPanelMessages.ts`
+- [x] T161 Extend `ExtensionToStoryboardPanelMessage` (extension → webview) with `snapshot` variant (full `StoryboardPlaybackSnapshot` projection); keep `scenes` + `captureInFlight` + `theme` for #216 backward compatibility `apps/vscode/src/types/storyboardPanelMessages.ts`
 
 ### 2.8 VS Code command + keybinding contributions (skeleton)
 
