@@ -395,9 +395,7 @@ class TestStoryboardSchemaGeneration:
             .get("feature_set_hash", {})
         )
         pattern = hash_prop.get("pattern", "")
-        assert pattern == "^[0-9a-f]{64}$", (
-            f"feature_set_hash pattern mismatch: {pattern!r}"
-        )
+        assert pattern == "^[0-9a-f]{64}$", f"feature_set_hash pattern mismatch: {pattern!r}"
 
     def test_viewport_bearing_reserved_to_zero(self) -> None:
         """Viewport.bearing MUST be 0 (v1 reserved slot)."""
@@ -452,16 +450,14 @@ class TestStoryboardSchemaGeneration:
         pydantic_sc_props = set(SceneFeature.model_json_schema()["properties"].keys())
         linkml_sc_props = set(defs.get("SceneFeature", {}).get("properties", {}).keys())
         assert pydantic_sc_props == linkml_sc_props, (
-            f"SceneFeature field drift: Pydantic {pydantic_sc_props} "
-            f"vs LinkML {linkml_sc_props}"
+            f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
         )
 
         # Viewport
         pydantic_vp_props = set(Viewport.model_json_schema()["properties"].keys())
         linkml_vp_props = set(defs.get("Viewport", {}).get("properties", {}).keys())
         assert pydantic_vp_props == linkml_vp_props, (
-            f"Viewport field drift: Pydantic {pydantic_vp_props} "
-            f"vs LinkML {linkml_vp_props}"
+            f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
         )
 
 

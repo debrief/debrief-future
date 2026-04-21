@@ -39,9 +39,7 @@ class TestCrossLangRoundTrip:
     """Py → JSON → TS → JSON → Py round-trip harness."""
 
     @pytest.mark.parametrize("fixture_name,model_cls", CROSSLANG_FIXTURES)
-    def test_crosslang_roundtrip_preserves_data(
-        self, fixture_name: str, model_cls: type
-    ) -> None:
+    def test_crosslang_roundtrip_preserves_data(self, fixture_name: str, model_cls: type) -> None:
         fixture_path = FIXTURES_DIR / fixture_name
         assert fixture_path.exists(), f"Fixture not found: {fixture_path}"
 
@@ -76,9 +74,7 @@ class TestCrossLangRoundTrip:
         )
 
     @pytest.mark.parametrize("fixture_name,_", CROSSLANG_FIXTURES)
-    def test_fixture_parses_unchanged_via_ts(
-        self, fixture_name: str, _: type
-    ) -> None:
+    def test_fixture_parses_unchanged_via_ts(self, fixture_name: str, _: type) -> None:
         """Extra assertion: the raw bytes emitted by the Node helper must be
         parseable by ``json.loads`` (i.e. the helper produced valid JSON)."""
         fixture_path = FIXTURES_DIR / fixture_name

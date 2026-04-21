@@ -584,8 +584,9 @@ class TestStoryboardingNegativeFixtures:
         for scene in scene_features:
             SceneFeature(**scene)  # Each parses individually
         # Both share the same timestamp
-        assert scene_features[0]["properties"]["timestamp"] == (
-            scene_features[1]["properties"]["timestamp"]
+        assert (
+            scene_features[0]["properties"]["timestamp"]
+            == (scene_features[1]["properties"]["timestamp"])
         )
 
     def test_rejects_orphan_scene_detected_by_module_layer(self) -> None:
@@ -602,4 +603,3 @@ class TestStoryboardingNegativeFixtures:
             f["properties"]["id"] for f in features if f["properties"]["kind"] == "STORYBOARD"
         }
         assert parsed.properties.storyboard_id not in other_ids
-
