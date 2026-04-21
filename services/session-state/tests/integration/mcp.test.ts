@@ -108,11 +108,11 @@ describe('MCP Integration', () => {
 
   describe('POST /mcp - session.setViewport', () => {
     it('should set viewport', async () => {
-      const coordinates: [[number, number], [number, number], [number, number], [number, number]] = [
-        [-5, 55],
-        [5, 55],
-        [5, 50],
-        [-5, 50],
+      const coordinates = [
+        { longitude: -5, latitude: 55 },
+        { longitude: 5, latitude: 55 },
+        { longitude: 5, latitude: 50 },
+        { longitude: -5, latitude: 50 },
       ];
 
       const response = await request(app)
@@ -122,15 +122,15 @@ describe('MCP Integration', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.viewport.coordinates).toEqual(coordinates);
-      expect(response.body.center).toEqual([0, 52.5]);
+      expect(response.body.center).toEqual({ longitude: 0, latitude: 52.5 });
     });
 
     it('should reject invalid coordinates', async () => {
-      const coordinates: [[number, number], [number, number], [number, number], [number, number]] = [
-        [-200, 55], // Invalid longitude
-        [5, 55],
-        [5, 50],
-        [-5, 50],
+      const coordinates = [
+        { longitude: -200, latitude: 55 }, // Invalid longitude
+        { longitude: 5, latitude: 55 },
+        { longitude: 5, latitude: 50 },
+        { longitude: -5, latitude: 50 },
       ];
 
       const response = await request(app)

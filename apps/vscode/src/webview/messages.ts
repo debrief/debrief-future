@@ -418,6 +418,7 @@ export interface ResultsCloseTabMessage {
 // ============================================================================
 
 /** All messages from extension to webview */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local ExtensionToWebviewMessage is the superset used by the extension host; @debrief/components exports a narrower shape for the webview. Follow-up to reconcile, #214 scope-adjacent
 export type ExtensionToWebviewMessage =
   | LoadPlotMessage
   | SetSelectionMessage

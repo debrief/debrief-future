@@ -23,7 +23,7 @@ import type { LatLngBoundsExpression, LeafletMouseEvent } from 'leaflet';
 
 import type { StacBrowserProps } from './types';
 import type { StacBrowserItem } from '../filter-engine/types';
-import type { ViewportPolygon } from '../utils/spatial-types';
+import type { ViewportPolygon, TimeFilter } from '@debrief/schemas';
 import type { TemporalFilter } from '../TimelineView/types';
 import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
@@ -675,7 +675,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
   const [viewport, setViewport] = useState<ViewportPolygon | null>(null);
   const [spatialFilterActive, setSpatialFilterActive] = useState(false);
-  const [timeFilter, setTimeFilter] = useState<{ start: number | null; end: number | null } | null>(null);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter | null>(null);
   const [temporalFilterActive, setTemporalFilterActive] = useState(false);
   const [timelineResetKey, setTimelineResetKey] = useState(0);
 
@@ -716,10 +716,10 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
       const [west, south, east, north] = bounds;
       setViewport({
         coordinates: [
-          [west, north],   // NW
-          [east, north],   // NE
-          [east, south],   // SE
-          [west, south],   // SW
+          { longitude: west, latitude: north },   // NW
+          { longitude: east, latitude: north },   // NE
+          { longitude: east, latitude: south },   // SE
+          { longitude: west, latitude: south },   // SW
         ],
       });
     }

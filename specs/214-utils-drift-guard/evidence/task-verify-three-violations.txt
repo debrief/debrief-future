@@ -1,0 +1,41 @@
+# Three-violations verification transcript — spec #214 / T107
+
+Demonstrates all three guard components firing simultaneously.
+Captured on git SHA 1f0222c by briefly introducing three faults, running
+each guard, then reverting. Nothing is committed.
+
+=== Drift rule (US1/US5) — apps/vscode/src/utils/bounds.ts ===
++ pnpm --filter debrief-vscode lint
+---
+  1:8  error  'calculateBounds' is exported by '@debrief/components'. Do not redeclare it under apps/*. Replace this declaration with: import { calculateBounds } from '@debrief/components';  no-restricted-syntax
+
+=== Wiring meta-check (US4) — apps/loader/.eslintrc.cjs missing spread ===
++ node scripts/check-eslint-drift-wiring.cjs
+---
+
+❌ ESLint drift-rule wiring check failed.
+
+The following apps/*/.eslintrc.cjs files are missing one or more drift-rule spreads:
+
+  apps/loader/.eslintrc.cjs
+    Missing: ...componentsDriftRules        (expected from shared/eslint-rules/no-redeclare-components-exports.cjs)
+
+Fix: add the missing require(...) lines and ensure each ...<pkg>DriftRules is spread
+into the 'no-restricted-syntax' rule array. See shared/eslint-rules/ for caller modules
+(or specs/214-utils-drift-guard/contracts/rule-contract.md §3 for the exact diff shape).
+
+=== GeoJSONFeature script (US6) — shared/components/src/bad-geojson.ts ===
++ bash scripts/check-no-geojson-feature.sh
+---
+❌ GeoJSONFeature regression guard failed!
+
+The following files define a local GeoJSONFeature interface.
+Use SafeFeature from @debrief/utils or schema types from @debrief/schemas instead.
+
+shared/components/src/bad-geojson.ts:1:export interface GeoJSONFeature { foo: string; }
+
+=== After cleanup — sanity re-run ===
++ node scripts/check-eslint-drift-wiring.cjs
+✓ check-eslint-drift-wiring: all 5 drift-rule spread(s) are present in every apps/*/.eslintrc.cjs.
++ bash scripts/check-no-geojson-feature.sh
+✅ No local GeoJSONFeature definitions found (regression guard passed)

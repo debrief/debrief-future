@@ -409,6 +409,9 @@ importers:
 
   services/session-state:
     dependencies:
+      '@debrief/schemas':
+        specifier: workspace:*
+        version: link:../../shared/schemas
       '@debrief/utils':
         specifier: workspace:*
         version: link:../../shared/utils

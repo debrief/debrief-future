@@ -1968,7 +1968,7 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary']} })
-    zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'Viewport']} })
+    zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
     center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
                        'CircleAnnotationProperties',
                        'Viewport']} })
@@ -4186,12 +4186,12 @@ class TimeRange(ConfiguredBaseModel):
 
 class TimeFilter(ConfiguredBaseModel):
     """
-    Constraints on the visible time window
+    Constraints on the visible time window (epoch milliseconds; null = unbounded)
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    start: Optional[TimeInstant] = Field(default=None, description="""Filter start (null = unbounded)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: Optional[TimeInstant] = Field(default=None, description="""Filter end (null = unbounded)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    start: Optional[int] = Field(default=None, description="""Filter start as epoch milliseconds (null/missing = unbounded on the start)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    end: Optional[int] = Field(default=None, description="""Filter end as epoch milliseconds (null/missing = unbounded on the end)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
 
 
 class TimeStep(ConfiguredBaseModel):
@@ -4228,6 +4228,7 @@ class ViewportPolygon(ConfiguredBaseModel):
                        'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'ViewportPolygon']} })
+    zoom: Optional[float] = Field(default=None, description="""Map zoom level for restoring the view (optional)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
 
 
 class LevelDefinition(ConfiguredBaseModel):
@@ -4730,7 +4731,7 @@ class Viewport(ConfiguredBaseModel):
     center: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
                        'CircleAnnotationProperties',
                        'Viewport']} })
-    zoom: float = Field(default=..., description="""Leaflet-compatible zoom level""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'Viewport']} })
+    zoom: float = Field(default=..., description="""Leaflet-compatible zoom level""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
     bearing: float = Field(default=..., description="""Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports).""", ge=0, le=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact',
                        'TUASolution',
                        'VectorAnnotationProperties',

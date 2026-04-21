@@ -238,6 +238,7 @@ export class ResultsPanelService {
       if (feature === null || typeof feature !== 'object') {continue;}
       const props = (feature as { properties?: unknown }).properties;
       if (props === null || props === undefined || typeof props !== 'object') {continue;}
+      // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
       const propsMap = props as Record<string, unknown>;
 
       const ds = propsMap['__datasets'];
@@ -552,6 +553,7 @@ export class ResultsPanelService {
   }
 
   private _toSnapshot(tab: ResultTab): ResultsTabSnapshot {
+    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
     const envelopeAsRecord = tab.envelope as unknown as Record<string, unknown>;
     const snapshot: ResultsTabSnapshot = {
       id: tab.id,

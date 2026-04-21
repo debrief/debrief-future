@@ -584,6 +584,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         itemPath: message.itemPath,
         updatedProperties: result.updatedProperties,
         overrides: result.overrides,
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-010, unrelated to #214
         activityId: result.activityId,
       });
     } catch (err) {

@@ -17,24 +17,10 @@ import type {
   PlatformRecord,
 } from '../types/stac';
 
-/**
- * Associated file from STAC item sources or results folder.
- * Matches the interface from shared/components for compatibility.
- */
-export interface AssociatedFile {
-  /** Display name */
-  name: string;
-  /** Path relative to STAC item */
-  path: string;
-  /** Source or result */
-  category: 'source' | 'result';
-  /** Parsed from multi-suffix convention (e.g., '2d', 'table') */
-  viewerType?: string;
-  /** File format (e.g., 'json', 'geojson', 'csv') */
-  format?: string;
-  /** File modification time (epoch ms) for chronological ordering */
-  mtime?: number;
-}
+// AssociatedFile is canonically defined by `@debrief/components`; re-export
+// rather than redeclare (see spec #214 drift guard).
+export type { AssociatedFile } from '@debrief/components';
+import type { AssociatedFile } from '@debrief/components';
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
@@ -108,6 +94,7 @@ export interface UpdateItemMetadataInput {
 export interface UpdateItemMetadataResult {
   updatedProperties: Record<string, unknown>;
   overrides: string[];
+  // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-010, unrelated to #214
   activityId: string;
 }
 
@@ -1170,6 +1157,7 @@ export class StacService {
     // Feature 193 / backlog #191: respect analyst overrides and become
     // idempotent. Skip any field listed in item.properties["debrief:overrides"],
     // and skip the write entirely when no derived value actually changed.
+    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
     const overridesRaw = (item.properties as Record<string, unknown>)['debrief:overrides'];
     const overrides = new Set<string>(
       Array.isArray(overridesRaw)
@@ -1183,6 +1171,7 @@ export class StacService {
       end_datetime: latest,
     };
 
+    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
     const props = item.properties as unknown as Record<string, unknown>;
     let changed = false;
     for (const [field, value] of Object.entries(proposed)) {
@@ -1265,6 +1254,7 @@ export class StacService {
     const fingerprint = fs.statSync(fullItemPath).mtimeMs;
 
     // Step 3: merge patch into properties.
+    // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
     const props = item.properties as Record<string, unknown>;
     for (const [k, v] of Object.entries(patch)) {
       props[k] = v;
@@ -1365,6 +1355,7 @@ export class StacService {
     return {
       updatedProperties: props,
       overrides: mergedOverrides,
+      // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-010, unrelated to #214
       activityId,
     };
   }

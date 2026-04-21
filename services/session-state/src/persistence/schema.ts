@@ -17,7 +17,7 @@ export interface SessionFileHeader {
 /**
  * Schema version history (for compatibility reference).
  */
-export const SCHEMA_VERSION_HISTORY = ['1.0.0'] as const;
+export const SCHEMA_VERSION_HISTORY = ['1.0.0', '1.1.0'] as const;
 
 /**
  * Schema versions and their compatibility.
@@ -70,7 +70,11 @@ export function isFutureVersion(version: string): boolean {
 
 /**
  * Migrate session data from an older version to current.
- * Currently a no-op as we only have v1.0.0.
+ *
+ * Viewport-shape migration (tuple-form coordinates → object form, introduced by
+ * feature 203) is handled inline by `coerceViewport` inside `applySessionState`,
+ * not here — see `persistence/load.ts`. This function only records the version
+ * transitions so that the "every past version is acknowledged" discipline holds.
  */
 export function migrateSession(
   data: Record<string, unknown>,
@@ -80,8 +84,14 @@ export function migrateSession(
     return data;
   }
 
-  // Future migrations would be added here
-  // e.g., if (fromVersion === '1.0.0') { migrateFrom1_0_0(data) }
+  // REMOVABLE: added for feature 203 (spatial types consolidation, 2026-04-20).
+  // Once all production session files have been saved with viewport in object
+  // form (version >= 1.1.0), this branch can be deleted.
+  if (fromVersion === '1.0.0') {
+    // Viewport migration is handled inline by coerceViewport in
+    // applySessionState — no data mutation required here.
+    return data;
+  }
 
   return data;
 }

@@ -1690,13 +1690,13 @@ export interface TimeRange {
 
 
 /**
- * Constraints on the visible time window
+ * Constraints on the visible time window (epoch milliseconds; null = unbounded)
  */
 export interface TimeFilter {
-    /** Filter start (null = unbounded) */
-    start?: TimeInstant,
-    /** Filter end (null = unbounded) */
-    end?: TimeInstant,
+    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
+    start?: number,
+    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
+    end?: number,
 }
 
 
@@ -1728,6 +1728,8 @@ export interface Coordinate {
 export interface ViewportPolygon {
     /** Four corners in clockwise order [NW, NE, SE, SW] */
     coordinates: Coordinate[],
+    /** Map zoom level for restoring the view (optional) */
+    zoom?: number,
 }
 
 
@@ -1826,7 +1828,7 @@ export interface GeoJSONGeometry {
  * GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
 
  */
-export interface GeoJSONFeature {
+export interface GeoJSONFeature { // canonical — LinkML-generated schema type
     /** GeoJSON object type — always "Feature" */
     type: string,
     /** Optional feature identifier (string or numeric, stored as string) */

@@ -3,11 +3,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import type { LoadResult } from '../types/results';
+import type { LoaderLoadResult } from '../types/results';
 import './SuccessView.css';
 
 interface SuccessViewProps {
-  result: LoadResult;
+  result: LoaderLoadResult;
 }
 
 export function SuccessView({ result }: SuccessViewProps) {

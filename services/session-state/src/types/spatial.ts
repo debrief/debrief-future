@@ -1,65 +1,28 @@
 /**
  * Spatial state types for session state management.
  * Feature: 024-document-session-state
+ * Updated: 203-spatial-types-linkml (Coordinate/ViewportPolygon consolidated
+ * into @debrief/schemas; validators + centre moved to @debrief/utils).
  */
 
-/**
- * A geographic coordinate [longitude, latitude].
- *
- * Schema equivalent: @debrief/schemas#Coordinate
- * Not migrated: generated Coordinate is { longitude: number, latitude: number }
- * (an object) while this type is a tuple [number, number] matching GeoJSON
- * coordinate conventions used throughout leaflet/GeoJSON consumers.
- */
-export type Coordinate = [number, number];
+import type { ViewportPolygon, Coordinate } from '@debrief/schemas';
 
-/**
- * Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013).
- * Coordinates are in clockwise order: [NW, NE, SE, SW].
- *
- * Schema equivalent: @debrief/schemas#ViewportPolygon
- * Not migrated: generated ViewportPolygon uses Coordinate[] (object array) and
- * lacks the zoom field. This type uses a fixed-length tuple of [number, number]
- * tuples and retains zoom for view restoration.
- */
-export interface ViewportPolygon {
-  coordinates: [Coordinate, Coordinate, Coordinate, Coordinate];
-  /** Map zoom level for restoring the view */
-  zoom?: number;
-}
-
-/**
- * Validate that coordinates are within valid geographic bounds.
- * Longitude: [-180, 180], Latitude: [-90, 90]
- */
-export function validateCoordinate(coord: Coordinate): boolean {
-  const [lon, lat] = coord;
-  return lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90;
-}
-
-/**
- * Validate all coordinates in a viewport polygon.
- */
-export function validateViewportPolygon(viewport: ViewportPolygon): boolean {
-  return viewport.coordinates.every(validateCoordinate);
-}
-
-/**
- * Calculate the center point of a viewport polygon.
- */
-export function calculateViewportCenter(viewport: ViewportPolygon): Coordinate {
-  const [nw, ne, se, sw] = viewport.coordinates;
-  const lon = (nw[0] + ne[0] + se[0] + sw[0]) / 4;
-  const lat = (nw[1] + ne[1] + se[1] + sw[1]) / 4;
-  return [lon, lat];
-}
+// Re-export canonical types for convenience of internal consumers that
+// already import from services/session-state/types.
+export type { Coordinate, ViewportPolygon };
+export {
+  validateCoordinate,
+  validateViewportPolygon,
+  calculateViewportCenter,
+} from '@debrief/utils';
 
 /**
  * Spatial state slice (FR-012 through FR-015).
  *
  * Schema equivalent: @debrief/schemas#SpatialSlice
  * Not migrated: generated SpatialSlice lacks drawingMode and drawingPaletteIndex
- * (ephemeral UI-only fields), and uses the object-based Coordinate/ViewportPolygon.
+ * (ephemeral UI-only fields). The viewport field uses the canonical
+ * object-form ViewportPolygon.
  */
 export interface SpatialSlice {
   /** Visible map area as 4-corner polygon (FR-012) */
