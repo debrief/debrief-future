@@ -266,7 +266,7 @@ This is a **Schema Change** feature (LinkML enum vocabulary rename + TypeScript 
 
 ### PR creation
 
-- [ ] T081 Create PR and publish blog: run `/speckit.pr`. This task MUST be the final task. It (a) creates the feature PR in `debrief-future` attaching all evidence from `specs/205-displaymode-playbackstate-linkml/evidence/`; (b) publishes `media/shipped-post.md` to `debrief.github.io` via a cross-repo PR; (c) returns both PR URLs for review.
+- [x] T081 Create PR and publish blog: run `/speckit.pr`. This task MUST be the final task. It (a) creates the feature PR in `debrief-future` attaching all evidence from `specs/205-displaymode-playbackstate-linkml/evidence/`; (b) publishes `media/shipped-post.md` to `debrief.github.io` via a cross-repo PR; (c) returns both PR URLs for review.
 
 **Task T081 must run last. All preceding tasks (T001–T080) must be complete before this runs.**
 
