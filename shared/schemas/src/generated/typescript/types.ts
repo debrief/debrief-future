@@ -1668,14 +1668,14 @@ export interface StacItemSummary {
 
 
 /**
- * Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — payloads arriving with geometry==null are coerced to GeoJSONEmptyPoint at the service-code ingress boundary (services/io, services/stac), not made nullable here.
+ * Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — callers handling possibly-null geometry payloads (e.g. NarrativeEntry features) either narrow at the parse boundary or defer to the domain-specific feature class that allows the looser shape (see ADR-021 for the ingress-coercion deferral).
  */
 export interface RawGeoJSONFeature {
     /** GeoJSON object type — always "Feature". */
     type: "Feature",
     /** Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion. */
     id?: string | number,
-    /** GeoJSON geometry — discriminated union over the seven existing geometry classes in geojson.yaml. Discrimination is driven by designates_type on each class's type slot, making Pydantic validation O(1) per feature. */
+    /** GeoJSON geometry — any_of union over the seven existing geometry classes in geojson.yaml (GeoJSONPoint, GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONPolygon, GeoJSONMultiPoint, GeoJSONMultiLineString, GeoJSONMultiPolygon). Pydantic validates via try-each-alternative; observed cost is ~25µs per feature (10 000 features in ~250ms). */
     geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,
     /** Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 §3.2. */
     properties?: Record<string, unknown> | null,

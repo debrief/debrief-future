@@ -483,59 +483,50 @@ def generate_typescript() -> bool:
             "export interface GeoJSONFeature { // canonical — LinkML-generated schema type",
         )
 
-        # Post-process (#204): RawGeoJSONFeature/RawGeoJSONFeatureCollection
-        # need several fixes because gen-typescript doesn't emit literal
-        # types, any_of unions, or free-form record types correctly.
-        _raw_geojson_feature_block_old = (
-            "export interface RawGeoJSONFeature {\n"
-            "    /** GeoJSON object type — always \"Feature\". */\n"
-            "    type: string,\n"
-            "    /** Optional feature identifier. "
-            "RFC 7946 permits either a string or an integer; "
-            "both are retained without coercion. */\n"
-            "    id?: string,\n"
-            "    /** GeoJSON geometry — discriminated union over the seven existing "
-            "geometry classes in geojson.yaml. Discrimination is driven by "
-            "designates_type on each class's type slot, making Pydantic validation "
-            "O(1) per feature. */\n"
-            "    geometry: string,\n"
-            "    /** Free-form properties dictionary. Consumers narrow to a domain "
-            "properties class (TrackProperties, ReferenceLocationProperties, etc.) "
-            "after validating the kind discriminator. May be absent or null per "
-            "RFC 7946 §3.2. */\n"
-            "    properties?: Any,\n"
-        )
-        _raw_geojson_feature_block_new = (
-            "export interface RawGeoJSONFeature {\n"
-            "    /** GeoJSON object type — always \"Feature\". */\n"
-            "    type: \"Feature\",\n"
-            "    /** Optional feature identifier. "
-            "RFC 7946 permits either a string or an integer; "
-            "both are retained without coercion. */\n"
-            "    id?: string | number,\n"
-            "    /** GeoJSON geometry — discriminated union over the seven existing "
-            "geometry classes in geojson.yaml. Discrimination is driven by "
-            "designates_type on each class's type slot, making Pydantic validation "
-            "O(1) per feature. */\n"
-            "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
-            "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
-            "GeoJSONMultiPolygon,\n"
-            "    /** Free-form properties dictionary. Consumers narrow to a domain "
-            "properties class (TrackProperties, ReferenceLocationProperties, etc.) "
-            "after validating the kind discriminator. May be absent or null per "
-            "RFC 7946 §3.2. */\n"
-            "    properties?: Record<string, unknown> | null,\n"
-        )
-        if _raw_geojson_feature_block_old in content:
-            content = content.replace(
-                _raw_geojson_feature_block_old, _raw_geojson_feature_block_new
-            )
-        else:
+        # Post-process (#204): RawGeoJSONFeature needs four narrowing fixes
+        # because gen-typescript doesn't emit literal types, any_of unions,
+        # or free-form record types for the relevant slots. The fixes are
+        # applied line-by-line on three specific fields inside the
+        # `export interface RawGeoJSONFeature { … }` block so that changes
+        # to the LinkML description text do not break the post-processor.
+        raw_feature_start = content.find("export interface RawGeoJSONFeature {\n")
+        if raw_feature_start == -1:
             raise RuntimeError(
-                "generate.py: RawGeoJSONFeature post-processor source block "
-                "did not match the gen-typescript output. gen-typescript "
-                "emitted a different shape — update generate.py to match."
+                "generate.py: gen-typescript did not emit "
+                "`export interface RawGeoJSONFeature`."
             )
+        raw_feature_end = content.index("}\n", raw_feature_start) + 2
+        raw_feature_block = content[raw_feature_start:raw_feature_end]
+        # 1) discriminated type literal
+        new_block = raw_feature_block.replace(
+            '    type: string,\n', '    type: "Feature",\n', 1
+        )
+        # 2) id union
+        new_block = new_block.replace(
+            '    id?: string,\n', '    id?: string | number,\n', 1
+        )
+        # 3) geometry union
+        new_block = new_block.replace(
+            '    geometry: string,\n',
+            '    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | '
+            'GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | '
+            'GeoJSONMultiPolygon,\n',
+            1,
+        )
+        # 4) free-form properties
+        new_block = new_block.replace(
+            '    properties?: Any,\n',
+            '    properties?: Record<string, unknown> | null,\n',
+            1,
+        )
+        if new_block == raw_feature_block:
+            raise RuntimeError(
+                "generate.py: RawGeoJSONFeature post-processor had no "
+                "effect — gen-typescript output no longer contains the "
+                "expected `type: string` / `id?: string` / `geometry: string` / "
+                "`properties?: Any` tokens. Update generate.py."
+            )
+        content = content[:raw_feature_start] + new_block + content[raw_feature_end:]
 
         # RawGeoJSONFeatureCollection.type — literal narrowing.
         content = content.replace(
