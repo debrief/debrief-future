@@ -17,8 +17,8 @@ Alias: dash_array
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
 | [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
+| [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
 
 
 
