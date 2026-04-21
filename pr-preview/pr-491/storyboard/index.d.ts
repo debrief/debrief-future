@@ -5,7 +5,7 @@
  * core path. Consumers (downstream specs #216 / #217 / #218) import from
  * `@debrief/components` and treat the module as a pure data-layer helper.
  */
-export type { Plot, SceneFeature, StoryboardFeature, Ulid, StoryboardId, SceneId, } from './types';
+export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, Ulid, StoryboardId, SceneId, } from './types';
 export { isStoryboardFeature, isSceneFeature, asUlid, asStoryboardId, asSceneId, } from './types';
 export { StoryboardError, DuplicateTimestampError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, } from './errors';
 export type { StoryboardErrorCode } from './errors';
@@ -15,7 +15,7 @@ export { listScenesOrdered } from './ordering';
 export { getStoryboard, getScene, getActiveStoryboardDefault, readSceneWithStaleness, } from './queries';
 export type { StaleReadResult } from './queries';
 export { detectMissingDataForScene } from './missing-data';
-export type { MissingDataClassification, PlotTimeRange, } from './missing-data';
+export type { MissingDataClassification, PlotTimeRange as StoryboardPlotTimeRange, } from './missing-data';
 export { canonicaliseVisibleFeatureIds, computeFeatureSetHash, } from './hash';
 export { validatePlot } from './validate';
 export { runPlotOpenMigrations, V1_MIGRATIONS } from './migration';
