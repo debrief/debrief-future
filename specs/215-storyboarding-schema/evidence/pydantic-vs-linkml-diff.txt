@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.0.2, pluggy-1.6.0 -- /home/user/debrief-future/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/user/debrief-future/shared/schemas
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.0.0
+collecting ... collected 7 items
+
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_storyboard_properties_exist PASSED [ 14%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_scene_properties_exist PASSED [ 28%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_viewport_properties_exist PASSED [ 42%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_scene_feature_set_hash_pattern PASSED [ 57%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_viewport_bearing_reserved_to_zero PASSED [ 71%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_scene_ulid_pattern PASSED [ 85%]
+shared/schemas/tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_storyboard_pydantic_vs_linkml_schema PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_schema_compare.py::TestStoryboardSchemaGeneration::test_storyboard_pydantic_vs_linkml_schema
+  /home/user/debrief-future/shared/schemas/src/generated/python/debrief_schemas/__init__.py:4495: UserWarning: Field name "schema" in "SessionFile" shadows an attribute in parent "ConfiguredBaseModel"
+    class SessionFile(ConfiguredBaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 7 passed, 1 warning in 0.42s =========================

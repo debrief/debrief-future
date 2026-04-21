@@ -1,0 +1,30 @@
+# task-verify equivalent transcript — spec #214
+
+Since `task` is not installed in this cloud environment, the following
+runs the three CI-equivalent steps manually — matching CLAUDE.md's 'Before
+Pushing' fallback sequence — on git SHA 1f0222c.
+
+=== Step 1 — Lint ===
++ pnpm lint (then wiring-check, then geojson-check — equivalent to task lint)
+apps/vscode prelint: Done
+apps/vscode lint$ eslint src --ext ts
+apps/vscode lint: Done
++ node scripts/check-eslint-drift-wiring.cjs
+✓ check-eslint-drift-wiring: all 5 drift-rule spread(s) are present in every apps/*/.eslintrc.cjs.
++ bash scripts/check-no-geojson-feature.sh
+✅ No local GeoJSONFeature definitions found (regression guard passed)
+
+=== Step 2 — eslint-rules Vitest (relevant subset) ===
++ pnpm --filter @debrief/utils test -- tests/eslint-rules
+ ✓ tests/eslint-rules/no-redeclare-utils-exports.test.ts  (12 tests) 127ms
+ ✓ tests/eslint-rules/no-redeclare-schemas-exports.test.ts  (2 tests) 177ms
+ ✓ tests/eslint-rules/drift-rule-factory.test.ts  (24 tests) 247ms
+ ✓ tests/eslint-rules/no-redeclare-components-exports.test.ts  (2 tests) 268ms
+ ✓ tests/eslint-rules/no-redeclare-session-state-exports.test.ts  (3 tests) 246ms
+ ✓ tests/eslint-rules/check-eslint-drift-wiring.test.ts  (7 tests) 3863ms
+
+ Test Files  7 passed (7)
+      Tests  52 passed (52)
+   Start at  23:21:56
+   Duration  5.78s (transform 623ms, setup 2ms, collect 16.70s, tests 4.97s, environment 1ms, prepare 3.52s)
+

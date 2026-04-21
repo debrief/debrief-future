@@ -464,6 +464,15 @@ def generate_typescript() -> bool:
                 )
                 content = content[:idx] + fixed_block + content[brace_idx:]
 
+        # Post-process (#214): tag the generated `GeoJSONFeature` interface
+        # with `// canonical` so the `scripts/check-no-geojson-feature.sh`
+        # regression guard (wired into `task lint`) doesn't flag the
+        # schema's own declaration.
+        content = content.replace(
+            "export interface GeoJSONFeature {",
+            "export interface GeoJSONFeature { // canonical — LinkML-generated schema type",
+        )
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 

@@ -330,3 +330,6 @@ export type {
   BrowserSelectionProviderProps,
   PropertiesSidePanelProps,
 } from './StacBrowser';
+
+// Storyboard CRUD module (Feature: 215-storyboarding-schema)
+export * from './storyboard';

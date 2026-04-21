@@ -1,11 +1,12 @@
 /**
  * Unit tests for spatial state slice.
  * Feature: 024-document-session-state
+ * Updated: 203-spatial-types-linkml (object-form Coordinate, canonical ViewportPolygon).
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createSessionStore, type SessionStoreApi } from '../../../src/store/index.js';
-import type { ViewportPolygon } from '../../../src/types/index.js';
+import type { ViewportPolygon } from '@debrief/schemas';
 
 describe('Spatial Slice', () => {
   let store: SessionStoreApi;
@@ -28,10 +29,10 @@ describe('Spatial Slice', () => {
     it('should set valid viewport', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-5, 55],   // NW
-          [5, 55],    // NE
-          [5, 50],    // SE
-          [-5, 50],   // SW
+          { longitude: -5, latitude: 55 }, // NW
+          { longitude: 5, latitude: 55 }, // NE
+          { longitude: 5, latitude: 50 }, // SE
+          { longitude: -5, latitude: 50 }, // SW
         ],
       };
       store.getState().setViewport(viewport);
@@ -40,7 +41,12 @@ describe('Spatial Slice', () => {
 
     it('should allow null viewport', () => {
       const viewport: ViewportPolygon = {
-        coordinates: [[-5, 55], [5, 55], [5, 50], [-5, 50]],
+        coordinates: [
+          { longitude: -5, latitude: 55 },
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
+        ],
       };
       store.getState().setViewport(viewport);
       store.getState().setViewport(null);
@@ -50,10 +56,10 @@ describe('Spatial Slice', () => {
     it('should reject viewport with invalid longitude > 180', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [181, 55],  // Invalid longitude
-          [5, 55],
-          [5, 50],
-          [-5, 50],
+          { longitude: 181, latitude: 55 }, // Invalid longitude
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
         ],
       };
       expect(() => store.getState().setViewport(viewport)).toThrow();
@@ -62,10 +68,10 @@ describe('Spatial Slice', () => {
     it('should reject viewport with invalid longitude < -180', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-181, 55], // Invalid longitude
-          [5, 55],
-          [5, 50],
-          [-5, 50],
+          { longitude: -181, latitude: 55 }, // Invalid longitude
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
         ],
       };
       expect(() => store.getState().setViewport(viewport)).toThrow();
@@ -74,10 +80,10 @@ describe('Spatial Slice', () => {
     it('should reject viewport with invalid latitude > 90', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-5, 91],   // Invalid latitude
-          [5, 55],
-          [5, 50],
-          [-5, 50],
+          { longitude: -5, latitude: 91 }, // Invalid latitude
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
         ],
       };
       expect(() => store.getState().setViewport(viewport)).toThrow();
@@ -86,10 +92,10 @@ describe('Spatial Slice', () => {
     it('should reject viewport with invalid latitude < -90', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-5, -91],  // Invalid latitude
-          [5, 55],
-          [5, 50],
-          [-5, 50],
+          { longitude: -5, latitude: -91 }, // Invalid latitude
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
         ],
       };
       expect(() => store.getState().setViewport(viewport)).toThrow();
@@ -98,10 +104,10 @@ describe('Spatial Slice', () => {
     it('should accept viewport at boundary values', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-180, 90],   // Max boundaries
-          [180, 90],
-          [180, -90],
-          [-180, -90],
+          { longitude: -180, latitude: 90 }, // Max boundaries
+          { longitude: 180, latitude: 90 },
+          { longitude: 180, latitude: -90 },
+          { longitude: -180, latitude: -90 },
         ],
       };
       store.getState().setViewport(viewport);
@@ -139,29 +145,29 @@ describe('Spatial Slice', () => {
     it('should calculate center of viewport', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [-10, 60],  // NW
-          [10, 60],   // NE
-          [10, 40],   // SE
-          [-10, 40],  // SW
+          { longitude: -10, latitude: 60 }, // NW
+          { longitude: 10, latitude: 60 }, // NE
+          { longitude: 10, latitude: 40 }, // SE
+          { longitude: -10, latitude: 40 }, // SW
         ],
       };
       store.getState().setViewport(viewport);
       const center = store.getState().getCenter();
-      expect(center).toEqual([0, 50]);
+      expect(center).toEqual({ longitude: 0, latitude: 50 });
     });
 
     it('should calculate center of asymmetric viewport', () => {
       const viewport: ViewportPolygon = {
         coordinates: [
-          [0, 10],   // NW
-          [20, 10],  // NE
-          [20, 0],   // SE
-          [0, 0],    // SW
+          { longitude: 0, latitude: 10 }, // NW
+          { longitude: 20, latitude: 10 }, // NE
+          { longitude: 20, latitude: 0 }, // SE
+          { longitude: 0, latitude: 0 }, // SW
         ],
       };
       store.getState().setViewport(viewport);
       const center = store.getState().getCenter();
-      expect(center).toEqual([10, 5]);
+      expect(center).toEqual({ longitude: 10, latitude: 5 });
     });
   });
 

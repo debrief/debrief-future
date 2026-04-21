@@ -2,6 +2,8 @@
 # Regression guard: prevent reintroduction of local GeoJSONFeature interface definitions.
 # Use SafeFeature from @debrief/utils or schema types from @debrief/schemas instead.
 #
+# Wired into task lint by spec 214-utils-drift-guard.
+#
 # Usage: bash scripts/check-no-geojson-feature.sh
 # Exit code 0 = clean, 1 = violations found
 

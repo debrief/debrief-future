@@ -4,7 +4,7 @@
 
 import type { StacStoreInfo, PlotInfo } from './store';
 import type { NewPlotForm } from './forms';
-import type { LoadResult, LoaderError } from './results';
+import type { LoaderLoadResult, LoaderError } from './results';
 
 /**
  * Represents the file being loaded.
@@ -71,5 +71,5 @@ export interface LoaderState {
   error: LoaderError | null;
 
   /** Result details (if step = 'complete') */
-  result: LoadResult | null;
+  result: LoaderLoadResult | null;
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './bounds';
 import type { Bounds } from './types';
-import type { ViewportPolygon } from './spatial-types';
+import type { ViewportPolygon } from '@debrief/schemas';
 
 // ============================================================================
 // T030: viewportToBounds — convert ViewportPolygon to Bounds
@@ -10,42 +10,72 @@ import type { ViewportPolygon } from './spatial-types';
 describe('viewportToBounds', () => {
   it('converts a non-rotated viewport to bounds', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[-10, 55], [5, 55], [5, 45], [-10, 45]],
+      coordinates: [
+        { longitude: -10, latitude: 55 },
+        { longitude: 5, latitude: 55 },
+        { longitude: 5, latitude: 45 },
+        { longitude: -10, latitude: 45 },
+      ],
     };
     expect(viewportToBounds(viewport)).toEqual([-10, 45, 5, 55]);
   });
 
   it('handles a rotated viewport by computing enclosing AABB', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[0, 10], [10, 0], [0, -10], [-10, 0]],
+      coordinates: [
+        { longitude: 0, latitude: 10 },
+        { longitude: 10, latitude: 0 },
+        { longitude: 0, latitude: -10 },
+        { longitude: -10, latitude: 0 },
+      ],
     };
     expect(viewportToBounds(viewport)).toEqual([-10, -10, 10, 10]);
   });
 
   it('returns null for degenerate polygon (all same point)', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[5, 5], [5, 5], [5, 5], [5, 5]],
+      coordinates: [
+        { longitude: 5, latitude: 5 },
+        { longitude: 5, latitude: 5 },
+        { longitude: 5, latitude: 5 },
+        { longitude: 5, latitude: 5 },
+      ],
     };
     expect(viewportToBounds(viewport)).toBeNull();
   });
 
   it('returns null for degenerate polygon (zero-width line)', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[5, 0], [5, 10], [5, 10], [5, 0]],
+      coordinates: [
+        { longitude: 5, latitude: 0 },
+        { longitude: 5, latitude: 10 },
+        { longitude: 5, latitude: 10 },
+        { longitude: 5, latitude: 0 },
+      ],
     };
     expect(viewportToBounds(viewport)).toBeNull();
   });
 
   it('returns null for degenerate polygon (zero-height line)', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[0, 5], [10, 5], [10, 5], [0, 5]],
+      coordinates: [
+        { longitude: 0, latitude: 5 },
+        { longitude: 10, latitude: 5 },
+        { longitude: 10, latitude: 5 },
+        { longitude: 0, latitude: 5 },
+      ],
     };
     expect(viewportToBounds(viewport)).toBeNull();
   });
 
   it('preserves precision for small viewports', () => {
     const viewport: ViewportPolygon = {
-      coordinates: [[-0.001, 51.501], [0.001, 51.501], [0.001, 51.499], [-0.001, 51.499]],
+      coordinates: [
+        { longitude: -0.001, latitude: 51.501 },
+        { longitude: 0.001, latitude: 51.501 },
+        { longitude: 0.001, latitude: 51.499 },
+        { longitude: -0.001, latitude: 51.499 },
+      ],
     };
     const bounds = viewportToBounds(viewport);
     expect(bounds).not.toBeNull();
@@ -53,6 +83,26 @@ describe('viewportToBounds', () => {
     expect(bounds![1]).toBeCloseTo(51.499, 5);
     expect(bounds![2]).toBeCloseTo(0.001, 5);
     expect(bounds![3]).toBeCloseTo(51.501, 5);
+  });
+
+  it('computes correct bounds from object-form coordinates (FR-022 regression)', () => {
+    // New case after feature 203: explicitly verify object-field access rather
+    // than tuple indexing.
+    const viewport: ViewportPolygon = {
+      coordinates: [
+        { longitude: 151.2, latitude: -33.8 }, // NW (Sydney area)
+        { longitude: 151.3, latitude: -33.8 }, // NE
+        { longitude: 151.3, latitude: -33.9 }, // SE
+        { longitude: 151.2, latitude: -33.9 }, // SW
+      ],
+    };
+    const bounds = viewportToBounds(viewport);
+    expect(bounds).not.toBeNull();
+    // minLon = 151.2, minLat = -33.9, maxLon = 151.3, maxLat = -33.8
+    expect(bounds![0]).toBeCloseTo(151.2, 5);
+    expect(bounds![1]).toBeCloseTo(-33.9, 5);
+    expect(bounds![2]).toBeCloseTo(151.3, 5);
+    expect(bounds![3]).toBeCloseTo(-33.8, 5);
   });
 });
 

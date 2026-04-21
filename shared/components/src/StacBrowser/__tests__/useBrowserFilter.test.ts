@@ -1,6 +1,8 @@
 /**
  * useBrowserFilter hook tests.
- * Feature: 132-three-view-sync (T051-T052, T059-T061, T067-T069, T074-T076, T080)
+ * Feature: 132-three-view-sync (T051-T052, T059-T061, T067-T069, T074-T076, T080).
+ * Updated: 203-spatial-types-linkml (object-form ViewportPolygon; TimeFilter
+ * from @debrief/schemas).
  *
  * Tests all three filter axes individually and in combination.
  */
@@ -9,7 +11,24 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useBrowserFilter } from '../useBrowserFilter';
 import type { StacBrowserItem } from '../../filter-engine/types';
-import type { ViewportPolygon } from '../../utils/spatial-types';
+import type { ViewportPolygon, TimeFilter } from '@debrief/schemas';
+
+/** Helper: build a 4-corner viewport polygon from west/south/east/north. */
+function rectViewport(
+  west: number,
+  south: number,
+  east: number,
+  north: number,
+): ViewportPolygon {
+  return {
+    coordinates: [
+      { longitude: west, latitude: north }, // NW
+      { longitude: east, latitude: north }, // NE
+      { longitude: east, latitude: south }, // SE
+      { longitude: west, latitude: south }, // SW
+    ],
+  };
+}
 
 // ─── Test fixtures ───────────────────────────────────────────────────────────
 
@@ -81,7 +100,7 @@ function defaultArgs() {
     metadataFilteredIds: null as ReadonlySet<string> | null,
     viewport: null as ViewportPolygon | null,
     spatialFilterActive: false,
-    timeFilter: null as { start: number | null; end: number | null } | null,
+    timeFilter: null as TimeFilter | null,
     temporalFilterActive: false,
     clearAllFilters,
   };
@@ -120,9 +139,7 @@ describe('useBrowserFilter — metadata axis (US1)', () => {
 // ─── US2: Spatial filtering ─────────────────────────────────────────────────
 
 describe('useBrowserFilter — spatial axis (US2)', () => {
-  const northAtlanticViewport: ViewportPolygon = {
-    coordinates: [[-25, 65], [0, 65], [0, 45], [-25, 45]],
-  };
+  const northAtlanticViewport: ViewportPolygon = rectViewport(-25, 45, 0, 65);
 
   it('T059: filters to exercises overlapping viewport', () => {
     const args = defaultArgs();
@@ -146,9 +163,7 @@ describe('useBrowserFilter — spatial axis (US2)', () => {
 
   it('T061: degenerate viewport (zero-area) treated as no spatial filter', () => {
     const args = defaultArgs();
-    args.viewport = {
-      coordinates: [[0, 0], [0, 0], [0, 0], [0, 0]],
-    };
+    args.viewport = rectViewport(0, 0, 0, 0);
     args.spatialFilterActive = true;
     const { result } = renderHook(() => useBrowserFilter(args));
     // All items should pass (degenerate viewport → no filter)
@@ -167,7 +182,7 @@ describe('useBrowserFilter — spatial axis (US2)', () => {
 // ─── US3: Temporal filtering ────────────────────────────────────────────────
 
 describe('useBrowserFilter — temporal axis (US3)', () => {
-  const janFeb2024 = {
+  const janFeb2024: TimeFilter = {
     start: new Date('2024-01-01T00:00:00Z').getTime(),
     end: new Date('2024-02-28T00:00:00Z').getTime(),
   };
@@ -217,10 +232,8 @@ describe('useBrowserFilter — temporal axis (US3)', () => {
 // ─── US4: Combined multi-axis filtering ─────────────────────────────────────
 
 describe('useBrowserFilter — combined 3-axis (US4)', () => {
-  const northAtlanticViewport: ViewportPolygon = {
-    coordinates: [[-25, 65], [0, 65], [0, 45], [-25, 45]],
-  };
-  const janFeb2024 = {
+  const northAtlanticViewport: ViewportPolygon = rectViewport(-25, 45, 0, 65);
+  const janFeb2024: TimeFilter = {
     start: new Date('2024-01-01T00:00:00Z').getTime(),
     end: new Date('2024-02-28T00:00:00Z').getTime(),
   };
@@ -281,9 +294,7 @@ describe('useBrowserFilter — combined 3-axis (US4)', () => {
   it('T074: all three filters, different dataset (combo 5)', () => {
     const args = defaultArgs();
     args.metadataFilteredIds = new Set(['ex-3', 'ex-4', 'ex-5']);
-    const pacificViewport: ViewportPolygon = {
-      coordinates: [[130, 45], [170, 45], [170, 15], [130, 15]],
-    };
+    const pacificViewport: ViewportPolygon = rectViewport(130, 15, 170, 45);
     args.viewport = pacificViewport;
     args.spatialFilterActive = true;
     args.timeFilter = {
@@ -302,9 +313,7 @@ describe('useBrowserFilter — combined 3-axis (US4)', () => {
   it('T075: removing one axis broadens result set', () => {
     const args3 = defaultArgs();
     args3.metadataFilteredIds = new Set(['ex-1', 'ex-2', 'ex-3']);
-    args3.viewport = {
-      coordinates: [[-25, 65], [0, 65], [0, 45], [-25, 45]],
-    };
+    args3.viewport = rectViewport(-25, 45, 0, 65);
     args3.spatialFilterActive = true;
     args3.timeFilter = {
       start: new Date('2024-01-01T00:00:00Z').getTime(),

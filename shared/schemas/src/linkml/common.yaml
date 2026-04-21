@@ -50,6 +50,10 @@ enums:
         description: Multi-polygon tool result (MultiPolygon geometry)
       SYSTEM_RECORD:
         description: Plot-level system record (snapshot chain, branches)
+      STORYBOARD:
+        description: Storyboard parent feature (panel-only entity, Polygon hull over child Scene viewports)
+      STORYBOARD_SCENE:
+        description: Storyboard Scene feature (Polygon viewport bounds, captured moment in a Storyboard)
 
   TrackTypeEnum:
     description: Type of track feature
