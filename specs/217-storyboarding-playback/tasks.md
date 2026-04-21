@@ -103,8 +103,8 @@
 
 ### 2.6 TimeRangeView scrubbable-range override (arch-fix 1 / R2)
 
-- [ ] T150 [test] Unit tests for `TimeRangeViewProvider.setScrubbableRange(start, end)` — posting `updateTimeExtent` overrides `start`/`end` but leaves `dataStart`/`dataEnd` at `state.timeRange`; `setScrubbableRange(null, null)` restores; override survives session-state `timeRange` updates (new extent still applies override); cleared on plot switch `apps/vscode/src/views/__tests__/timeRangeView.test.ts`
-- [ ] T151 Implement `TimeRangeViewProvider.setScrubbableRange(start: number | null, end: number | null): void` — stores `scrubbableOverride: { start, end }` field; repost `updateTimeExtent` with `start`/`end` replaced while `dataStart`/`dataEnd` stay from `state.timeRange`; called by `StoryboardPlaybackService` on each transport step / dropdown switch / deactivation `apps/vscode/src/views/timeRangeView.ts`
+- [x] T150 [test] Unit tests for `TimeRangeViewProvider.setScrubbableRange(start, end)` — posting `updateTimeExtent` overrides `start`/`end` but leaves `dataStart`/`dataEnd` at `state.timeRange`; `setScrubbableRange(null, null)` restores; override survives session-state `timeRange` updates (new extent still applies override); cleared on plot switch `apps/vscode/src/views/__tests__/timeRangeView.test.ts`
+- [x] T151 Implement `TimeRangeViewProvider.setScrubbableRange(start: number | null, end: number | null): void` — stores `scrubbableOverride: { start, end }` field; repost `updateTimeExtent` with `start`/`end` replaced while `dataStart`/`dataEnd` stay from `state.timeRange`; called by `StoryboardPlaybackService` on each transport step / dropdown switch / deactivation `apps/vscode/src/views/timeRangeView.ts`
 
 ### 2.7 Webview message types (panel-side)
 
