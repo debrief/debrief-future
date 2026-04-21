@@ -6,9 +6,8 @@
  * These tests fail at `tsc --noEmit` time if the `BoundsInputFeature`
  * structural minimum is ever narrowed in a way that breaks the contract.
  *
- * Test (e) also confirms that a FeatureCollection-shaped object does NOT
- * assign directly to the parameter — callers must unwrap to `.features[]`
- * first (contract CB-7 caveat).
+ * Tests (e) and (f) confirm that FeatureCollection-shaped objects assign
+ * directly — no `.features[]` unwrap required at the call site (FR-001).
  */
 
 import { expectTypeOf } from 'vitest';
@@ -27,6 +26,12 @@ interface GeoJSONFeature {
   properties: Record<string, unknown> | null;
 }
 
+// Minimal FeatureCollection structural shape for the plain-GeoJSON test (f).
+interface GeoJSONFeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJSONFeature[];
+}
+
 // (a) DebriefFeature[] assigns to calculateBounds parameter
 const debriefFeatures: DebriefFeature[] = [];
 expectTypeOf(calculateBounds).toBeCallableWith(debriefFeatures);
@@ -43,6 +48,10 @@ expectTypeOf(calculateBounds).toBeCallableWith(geoJsonFeatures);
 const minimalFeatures = [{ geometry: { type: 'Point', coordinates: [0, 0] } }];
 expectTypeOf(calculateBounds).toBeCallableWith(minimalFeatures);
 
-// (e) DebriefFeatureCollection does NOT assign directly — callers must unwrap.
-// @ts-expect-error — FeatureCollection is not assignable to ReadonlyArray<BoundsInputFeature>
-calculateBounds({} as DebriefFeatureCollection);
+// (e) DebriefFeatureCollection assigns directly — auto-unwrapped inside calculateBounds (FR-001)
+const debriefFeatureCollection = {} as DebriefFeatureCollection;
+expectTypeOf(calculateBounds).toBeCallableWith(debriefFeatureCollection);
+
+// (f) Plain GeoJSON FeatureCollection also assigns directly
+const geoJsonFeatureCollection: GeoJSONFeatureCollection = { type: 'FeatureCollection', features: [] };
+expectTypeOf(calculateBounds).toBeCallableWith(geoJsonFeatureCollection);

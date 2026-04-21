@@ -366,7 +366,18 @@ describe('calculateBounds', () => {
       ],
     };
 
-    it('calculates bounds for a feature collection (unwrapped)', () => {
+    it('calculates bounds for a feature collection object directly (FR-001)', () => {
+      // Pass the collection object — no .features unwrap required (FR-001)
+      const fc: BoundsTestFeatureCollection = mockFeatureCollection;
+      const bounds = calculateBounds(fc);
+      expect(bounds).not.toBeNull();
+      expect(bounds![0]).toBe(-5.0); // minLon
+      expect(bounds![1]).toBe(50.0); // minLat
+      expect(bounds![2]).toBe(-3.0); // maxLon
+      expect(bounds![3]).toBe(52.0); // maxLat
+    });
+
+    it('calculates bounds for a feature collection (unwrapped array also works)', () => {
       const bounds = calculateBounds(mockFeatureCollection.features);
       expect(bounds).not.toBeNull();
       expect(bounds![0]).toBe(-5.0); // minLon

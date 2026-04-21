@@ -139,14 +139,19 @@ if (viewportBbox !== null) {
 
 ## Troubleshooting
 
-### "Type `DebriefFeatureCollection` is not assignable to `ReadonlyArray<BoundsInputFeature>`"
+### "Type `DebriefFeatureCollection` is not assignable to parameter of type `BoundsInput`"
 
-You're passing a FeatureCollection where an array is expected. Unwrap:
+This error means you have an older build of `@debrief/utils`. Since FR-001,
+`calculateBounds` accepts both `DebriefFeatureCollection` and plain feature
+arrays directly — no `.features` unwrap required. Rebuild:
 
-```diff
--const bounds = calculateBounds(featureCollection);
-+const bounds = calculateBounds(featureCollection.features);
+```bash
+pnpm --filter @debrief/utils build
 ```
+
+If the error persists after rebuilding, confirm you're importing from
+`@debrief/utils` (not a stale local copy of the deleted
+`shared/components/src/utils/bounds.ts`).
 
 ### "Module not found: `shared/components/src/utils/bounds`"
 

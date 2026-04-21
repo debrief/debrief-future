@@ -9,11 +9,12 @@
  *
  * The input type for `calculateBounds` (and the other array-accepting helpers)
  * is a structural minimum (`BoundsInputFeature`) that is satisfied without
- * casts by all three external feature-type families used across the monorepo:
+ * casts by all four input shapes used across the monorepo:
  *
- *   - `DebriefFeature` — LinkML-generated; from `@debrief/schemas`
- *   - `SafeFeature`    — hand-written; `geometry: SafeGeometry | null`; from `@debrief/utils/types`
- *   - `GeoJSONFeature` — raw JSON parse; from `@debrief/utils/types`
+ *   - `DebriefFeature[]`           — LinkML-generated; from `@debrief/schemas`
+ *   - `SafeFeature[]`              — hand-written; `geometry: SafeGeometry | null`; from `@debrief/utils/types`
+ *   - `GeoJSONFeature[]`           — raw JSON parse; from `@debrief/utils/types`
+ *   - `DebriefFeatureCollection`   — collection object; auto-unwrapped to `.features[]` inside `calculateBounds`
  *
  * This module does **not** re-export any of the above types — each caller
  * imports its preferred family from its canonical location and passes it in.
@@ -51,6 +52,20 @@ type BoundsInputFeature = {
   geometry?: { type: string; coordinates: unknown } | null | undefined;
   bbox?: readonly number[] | null | undefined;
 };
+
+/**
+ * Accepted input shapes for `calculateBounds` (FR-001).
+ *
+ * - A plain array (or readonly array) of features — the common case.
+ * - A FeatureCollection-shaped object with a `features` array — so callers
+ *   holding a `DebriefFeatureCollection` or a raw GeoJSON `FeatureCollection`
+ *   can pass it directly without unwrapping to `.features[]` first.
+ *
+ * `calculateBounds` auto-unwraps the collection form at the top of its body.
+ */
+type BoundsInput =
+  | ReadonlyArray<BoundsInputFeature>
+  | { features: ReadonlyArray<BoundsInputFeature> };
 
 /**
  * The union of coordinate-array shapes the utility can process, produced by
@@ -155,23 +170,33 @@ function detectDepth(raw: unknown): 1 | 2 | 3 | 4 | null {
   return null;
 }
 
+function isFeatureCollectionInput(
+  v: BoundsInput,
+): v is { features: ReadonlyArray<BoundsInputFeature> } {
+  return !Array.isArray(v);
+}
+
 /**
- * Calculate bounds from an array of GeoJSON-like features.
+ * Calculate bounds from an array of GeoJSON-like features or a FeatureCollection.
  *
- * Accepts any of the three supported feature-type families without casts:
- * `DebriefFeature[]`, `SafeFeature[]`, `GeoJSONFeature[]`, and the
- * structural-minimum `BoundsInputFeature[]`.
+ * Accepts any of the four supported input shapes without casts:
+ * `DebriefFeature[]`, `SafeFeature[]`, `GeoJSONFeature[]`, and
+ * `DebriefFeatureCollection` / plain GeoJSON `FeatureCollection` objects.
+ * FeatureCollection-shaped inputs are auto-unwrapped to their `.features` array
+ * at the top of the function body (FR-001).
  *
  * When a feature carries a valid pre-computed `feature.bbox`, the fast-path
  * uses it directly and skips the per-coordinate walk for that feature, keeping
  * map-fit latency O(n features) for STAC-style collections.
  *
- * @param features Array of features with a structural `geometry` field.
+ * @param input Array of features, or a FeatureCollection-shaped object.
  * @returns Bounds [minLon, minLat, maxLon, maxLat] or null if no valid coordinates.
  */
 export function calculateBounds(
-  features: ReadonlyArray<BoundsInputFeature>
+  input: BoundsInput
 ): Bounds | null {
+  const features = isFeatureCollectionInput(input) ? input.features : input;
+
   let minLon = Infinity;
   let minLat = Infinity;
   let maxLon = -Infinity;
