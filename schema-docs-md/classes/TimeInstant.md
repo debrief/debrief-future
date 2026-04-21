@@ -50,8 +50,6 @@ URI: [debrief:class/TimeInstant](https://debrief.info/schemas/class/TimeInstant)
 | ---  | --- | --- | --- |
 | [TimeRange](../classes/TimeRange.md) | [start](../slots/start.md) | range | [TimeInstant](../classes/TimeInstant.md) |
 | [TimeRange](../classes/TimeRange.md) | [end](../slots/end.md) | range | [TimeInstant](../classes/TimeInstant.md) |
-| [TimeFilter](../classes/TimeFilter.md) | [start](../slots/start.md) | range | [TimeInstant](../classes/TimeInstant.md) |
-| [TimeFilter](../classes/TimeFilter.md) | [end](../slots/end.md) | range | [TimeInstant](../classes/TimeInstant.md) |
 | [FeatureSelection](../classes/FeatureSelection.md) | [timestamp](../slots/timestamp.md) | range | [TimeInstant](../classes/TimeInstant.md) |
 | [TemporalSlice](../classes/TemporalSlice.md) | [currentTime](../slots/currentTime.md) | range | [TimeInstant](../classes/TimeInstant.md) |
 

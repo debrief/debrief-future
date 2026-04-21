@@ -3,7 +3,7 @@
 # Class: TimeFilter 
 
 
-_Constraints on the visible time window_
+_Constraints on the visible time window (epoch milliseconds; null = unbounded)_
 
 
 
@@ -22,25 +22,7 @@ URI: [debrief:class/TimeFilter](https://debrief.info/schemas/class/TimeFilter)
     click TimeFilter href "../../classes/TimeFilter/"
       TimeFilter : end
         
-          
-    
-        
-        
-        TimeFilter --> "0..1" TimeInstant : end
-        click TimeInstant href "../../classes/TimeInstant/"
-    
-
-        
       TimeFilter : start
-        
-          
-    
-        
-        
-        TimeFilter --> "0..1" TimeInstant : start
-        click TimeInstant href "../../classes/TimeInstant/"
-    
-
         
       
 ```
@@ -55,8 +37,8 @@ URI: [debrief:class/TimeFilter](https://debrief.info/schemas/class/TimeFilter)
 
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
-| [start](../slots/start.md) | 0..1 <br/> [TimeInstant](../classes/TimeInstant.md) | Filter start (null = unbounded) | direct |
-| [end](../slots/end.md) | 0..1 <br/> [TimeInstant](../classes/TimeInstant.md) | Filter end (null = unbounded) | direct |
+| [start](../slots/start.md) | 0..1 <br/> [Integer](../types/Integer.md) | Filter start as epoch milliseconds (null/missing = unbounded on the start) | direct |
+| [end](../slots/end.md) | 0..1 <br/> [Integer](../types/Integer.md) | Filter end as epoch milliseconds (null/missing = unbounded on the end) | direct |
 
 
 
@@ -111,27 +93,31 @@ URI: [debrief:class/TimeFilter](https://debrief.info/schemas/class/TimeFilter)
 <details>
 ```yaml
 name: TimeFilter
-description: Constraints on the visible time window
+description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
 from_schema: https://debrief.info/schemas/debrief
 attributes:
   start:
     name: start
-    description: Filter start (null = unbounded)
+    description: Filter start as epoch milliseconds (null/missing = unbounded on the
+      start)
     from_schema: https://debrief.info/schemas/session-state
     domain_of:
     - PlotTimeExtent
     - TimeRange
     - TimeFilter
-    range: TimeInstant
+    range: integer
+    required: false
   end:
     name: end
-    description: Filter end (null = unbounded)
+    description: Filter end as epoch milliseconds (null/missing = unbounded on the
+      end)
     from_schema: https://debrief.info/schemas/session-state
     domain_of:
     - PlotTimeExtent
     - TimeRange
     - TimeFilter
-    range: TimeInstant
+    range: integer
+    required: false
 
 ```
 </details>
@@ -141,12 +127,13 @@ attributes:
 <details>
 ```yaml
 name: TimeFilter
-description: Constraints on the visible time window
+description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
 from_schema: https://debrief.info/schemas/debrief
 attributes:
   start:
     name: start
-    description: Filter start (null = unbounded)
+    description: Filter start as epoch milliseconds (null/missing = unbounded on the
+      start)
     from_schema: https://debrief.info/schemas/session-state
     alias: start
     owner: TimeFilter
@@ -154,10 +141,12 @@ attributes:
     - PlotTimeExtent
     - TimeRange
     - TimeFilter
-    range: TimeInstant
+    range: integer
+    required: false
   end:
     name: end
-    description: Filter end (null = unbounded)
+    description: Filter end as epoch milliseconds (null/missing = unbounded on the
+      end)
     from_schema: https://debrief.info/schemas/session-state
     alias: end
     owner: TimeFilter
@@ -165,7 +154,8 @@ attributes:
     - PlotTimeExtent
     - TimeRange
     - TimeFilter
-    range: TimeInstant
+    range: integer
+    required: false
 
 ```
 </details>

@@ -3,11 +3,6 @@
 # Slot: zoom 
 
 
-_Map zoom level - for spatial state_
-
-
-
-
 
 URI: [debrief:slot/zoom](https://debrief.info/schemas/slot/zoom)
 Alias: zoom
@@ -23,6 +18,7 @@ Alias: zoom
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |  no  |
+| [ViewportPolygon](../classes/ViewportPolygon.md) | Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-01... |  no  |
 
 
 
@@ -31,7 +27,7 @@ Alias: zoom
 
 ## Properties
 
-* Range: [Float](../types/Float.md)
+* Range: [String](../types/String.md)
 
 
 
@@ -40,13 +36,6 @@ Alias: zoom
 
 
 
-
-
-
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
 
 
 
@@ -66,14 +55,11 @@ Alias: zoom
 <details>
 ```yaml
 name: zoom
-description: Map zoom level - for spatial state
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
 alias: zoom
-owner: SystemStateProperties
 domain_of:
 - SystemStateProperties
-range: float
+- ViewportPolygon
+range: string
 
 ```
 </details>

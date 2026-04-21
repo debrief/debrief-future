@@ -142,7 +142,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [SystemStateProperties](classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |
 | [TemporalSlice](classes/TemporalSlice.md) | Time-related state including navigation, playback, and filtering |
 | [TextAnnotation](classes/TextAnnotation.md) | GeoJSON Feature for text annotations at a position |
-| [TimeFilter](classes/TimeFilter.md) | Constraints on the visible time window |
+| [TimeFilter](classes/TimeFilter.md) | Constraints on the visible time window (epoch milliseconds; null = unbounded) |
 | [TimeInstant](classes/TimeInstant.md) | A point in time with dual representations (FR-032, FR-033) |
 | [TimeRange](classes/TimeRange.md) | A temporal interval with inclusive start and end |
 | [TimestampedPosition](classes/TimestampedPosition.md) | Temporal and kinematic metadata for a single track position |

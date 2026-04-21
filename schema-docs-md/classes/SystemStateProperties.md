@@ -214,6 +214,7 @@ attributes:
     rank: 1000
     domain_of:
     - SystemStateProperties
+    - ViewportPolygon
     range: float
   center:
     name: center
@@ -340,6 +341,7 @@ attributes:
     owner: SystemStateProperties
     domain_of:
     - SystemStateProperties
+    - ViewportPolygon
     range: float
   center:
     name: center
