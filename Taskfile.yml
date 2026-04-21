@@ -53,7 +53,7 @@ tasks:
 
   test:
     desc: "Run all tests (Python + TypeScript + Playwright E2E)"
-    deps: [install]
+    deps: [install, build]
     cmds:
       - uv run pytest
       - pnpm --filter '!@debrief/web-shell' test

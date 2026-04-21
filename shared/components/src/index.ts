@@ -100,7 +100,7 @@ export {
 } from './utils/types';
 
 // Utilities
-export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from '@debrief/utils';
 export {
   calculateTimeExtent,
   parseDuration,

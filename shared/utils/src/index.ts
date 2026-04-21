@@ -20,6 +20,11 @@ export {
   mergeBounds,
   boundsToLeaflet,
   isValidBounds,
+  expandBounds,
+  isPointInBounds,
+  bboxOverlapsViewport,
+  viewportToBounds,
+  filterBySpatialExtent,
 } from './bounds.js';
 
 // Spatial converters (feature 203)

@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { Bounds } from '../../utils/types';
-import { expandBounds } from '../../utils/bounds';
+import { expandBounds } from '@debrief/utils';
 import './LeafletToolbar.css';
 
 /** Drawing mode values matching session-state DrawingMode type */
