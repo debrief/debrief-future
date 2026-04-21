@@ -20,27 +20,6 @@ export type { PositionStyle, PositionStyleOverride };
 export type PointShape = `${PointShapeEnum}`;
 
 /**
- * GeoJSON Feature type
- */
-export interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: {
-    type: string;
-    coordinates: number[] | number[][] | number[][][];
-  };
-  properties: Record<string, unknown> | null;
-}
-
-/**
- * GeoJSON FeatureCollection
- */
-export interface GeoJSONFeatureCollection {
-  type: 'FeatureCollection';
-  features: GeoJSONFeature[];
-}
-
-/**
  * Bounds type: [minLon, minLat, maxLon, maxLat]
  */
 export type Bounds = [number, number, number, number];

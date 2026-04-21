@@ -1,0 +1,1 @@
+{ "type": "Feature", "id": "geom-point", "geometry": { "type": "Point", "coordinates": [12.3, 45.6] }, "properties": {} }

@@ -6,7 +6,8 @@
 
 import type { DebriefFeature } from '@debrief/schemas';
 import { OutputKindEnum } from '@debrief/schemas';
-import type { GeoJSONFeature, MCPToolDefinition } from '@debrief/utils';
+import type { MCPToolDefinition } from '@debrief/utils';
+import type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
 
 type Position = number[];
 

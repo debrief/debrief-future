@@ -35,7 +35,8 @@ import {
   type LogService,
   type DrawingMode,
 } from '@debrief/session-state';
-import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
+import { DuplicateImportError } from '../types/import';
+import type { SafeFeature } from '@debrief/utils';
 import {
   calculateBounds,
   mergeBounds,
@@ -1205,7 +1206,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.flatMap((f: GeoJSONFeature) => {
+      const safeFeatures = parseResult.features.flatMap((f: SafeFeature) => {
         if (!f.geometry) { return []; }
         return [{
           type: 'Feature' as const,

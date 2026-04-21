@@ -79,11 +79,21 @@ def generate_pydantic() -> bool:
         # eliminate Any from generated code. These are infrastructure classes,
         # not domain models — object is sufficient for their serialisation needs.
         content = content.replace("dict[str, Any]", "dict[str, object]")
-        # Remove the Any import if it's no longer used
-        content = content.replace(
-            "from typing import (\n    Any,\n",
-            "from typing import (\n",
-        )
+        # Post-process: LinkML emits `Optional[Any]` for `range: Any` slots
+        # (RawGeoJSONFeature.properties). Replace with `Optional[dict[str, object]]`
+        # to stay Article-XV-compliant (no authored `Any` in generated code).
+        content = content.replace("Optional[Any]", "Optional[dict[str, object]]")
+        # Remove the Any import if it's no longer used. We search for any
+        # remaining `Any`-as-a-typing-token occurrences (word boundary, not
+        # preceded by lowercase letters to avoid matching "Any" inside other
+        # identifiers).
+        import re as _re
+
+        if not _re.search(r"(?<![A-Za-z_])Any(?![A-Za-z_])", content):
+            content = content.replace(
+                "from typing import (\n    Any,\n",
+                "from typing import (\n",
+            )
 
         # Post-process: Fix GeoJSON coordinate types. LinkML generates flat
         # list[float] for all coordinate arrays, but GeoJSON requires nested
@@ -471,6 +481,70 @@ def generate_typescript() -> bool:
         content = content.replace(
             "export interface GeoJSONFeature {",
             "export interface GeoJSONFeature { // canonical — LinkML-generated schema type",
+        )
+
+        # Post-process (#204): RawGeoJSONFeature needs four narrowing fixes
+        # because gen-typescript doesn't emit literal types, any_of unions,
+        # or free-form record types for the relevant slots. The fixes are
+        # applied line-by-line on three specific fields inside the
+        # `export interface RawGeoJSONFeature { … }` block so that changes
+        # to the LinkML description text do not break the post-processor.
+        raw_feature_start = content.find("export interface RawGeoJSONFeature {\n")
+        if raw_feature_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface RawGeoJSONFeature`."
+            )
+        raw_feature_end = content.index("}\n", raw_feature_start) + 2
+        raw_feature_block = content[raw_feature_start:raw_feature_end]
+        # 1) discriminated type literal
+        new_block = raw_feature_block.replace("    type: string,\n", '    type: "Feature",\n', 1)
+        # 2) id union
+        new_block = new_block.replace("    id?: string,\n", "    id?: string | number,\n", 1)
+        # 3) geometry union
+        new_block = new_block.replace(
+            "    geometry: string,\n",
+            "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+            "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
+            "GeoJSONMultiPolygon,\n",
+            1,
+        )
+        # 4) free-form properties
+        new_block = new_block.replace(
+            "    properties?: Any,\n",
+            "    properties?: Record<string, unknown> | null,\n",
+            1,
+        )
+        if new_block == raw_feature_block:
+            raise RuntimeError(
+                "generate.py: RawGeoJSONFeature post-processor had no "
+                "effect — gen-typescript output no longer contains the "
+                "expected `type: string` / `id?: string` / `geometry: string` / "
+                "`properties?: Any` tokens. Update generate.py."
+            )
+        content = content[:raw_feature_start] + new_block + content[raw_feature_end:]
+
+        # RawGeoJSONFeatureCollection.type — literal narrowing.
+        content = content.replace(
+            "export interface RawGeoJSONFeatureCollection {\n"
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
+            "    type: string,",
+            "export interface RawGeoJSONFeatureCollection {\n"
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
+            '    type: "FeatureCollection",',
+        )
+
+        # Drop the empty `export interface Any {}` stub — it's the LinkML
+        # wildcard class that the post-processor has already mapped to
+        # `Record<string, unknown>` at the usage site. Leaving it in the
+        # output would ship an exported `Any` symbol that other packages
+        # could accidentally import, defeating Article XV.
+        import re as _re_any
+
+        content = _re_any.sub(
+            r"/\*\*\s*\n\s*\*[^*]*LinkML idiom[^*]*"
+            r"\*/\s*\nexport interface Any \{\s*\n\}\s*\n\s*\n",
+            "",
+            content,
         )
 
         # Prepend DO NOT EDIT header

@@ -9,11 +9,25 @@ import {
   boundsToLeaflet,
   isValidBounds,
 } from '../src/bounds.js';
-import type { GeoJSONFeature } from '../src/types.js';
+
+// Local structural fixture shape. calculateBounds accepts any
+// `{ geometry?: { type: string; coordinates: unknown } | null | undefined }`
+// input; this alias keeps the happy-path tests readable without depending on
+// either the deleted @debrief/utils GeoJSONFeature interface or the
+// strictly-typed @debrief/schemas RawGeoJSONFeature (whose geometry union
+// would force per-test narrowing).
+interface BoundsTestFeature {
+  type: 'Feature';
+  geometry: {
+    type: string;
+    coordinates: number[] | number[][] | number[][][];
+  };
+  properties: Record<string, unknown> | null;
+}
 
 describe('calculateBounds', () => {
   it('should calculate bounds for a single Point feature', () => {
-    const features: GeoJSONFeature[] = [
+    const features: BoundsTestFeature[] = [
       {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [10, 20] },
@@ -26,7 +40,7 @@ describe('calculateBounds', () => {
   });
 
   it('should calculate bounds for a LineString feature', () => {
-    const features: GeoJSONFeature[] = [
+    const features: BoundsTestFeature[] = [
       {
         type: 'Feature',
         geometry: {
@@ -46,7 +60,7 @@ describe('calculateBounds', () => {
   });
 
   it('should calculate bounds for multiple features', () => {
-    const features: GeoJSONFeature[] = [
+    const features: BoundsTestFeature[] = [
       {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [-10, -20] },
@@ -75,7 +89,7 @@ describe('calculateBounds', () => {
   });
 
   it('should handle Polygon geometry', () => {
-    const features: GeoJSONFeature[] = [
+    const features: BoundsTestFeature[] = [
       {
         type: 'Feature',
         geometry: {

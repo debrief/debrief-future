@@ -588,3 +588,158 @@ The pre-existing `scripts/check-no-geojson-feature.sh` is grandfathered — wire
 - ❌ ESLint's `no-restricted-syntax` uses one severity per rule array; to set the drift rules at `'error'` we also elevated the pre-existing `snakeCaseRules` / `TSAsExpression Record | unknown` entries to `'error'`. Twenty pre-existing ADR-010/ADR-011 violations were suppressed inline with `-- pre-existing ADR-010/011, unrelated to #214` notes rather than fixed, since that cleanup is out of scope.
 
 **Originating issue:** Backlog item #214 (follow-up to #200). Spec: `specs/214-utils-drift-guard/`.
+
+---
+
+### ADR-021: Unify parse-boundary GeoJSON Feature types into schema-rooted `RawGeoJSONFeature` (2026-04-21)
+
+**Context.**
+Backlog item #204 surfaced three drifted parse-boundary types for
+"some GeoJSON Feature, not yet narrowed to a Debrief variant":
+
+1. `interface GeoJSONFeature` in `shared/utils/src/types.ts`
+   (`id?: string`, typed-array coordinates, `properties: Record<string, unknown> | null`).
+2. `interface GeoJSONFeature` in `services/session-state/src/types/results.ts`
+   (`id?: string | number`, `coordinates: unknown`, similar properties shape).
+3. `GeoJSONFeature: TypeAlias = dict[str, Any]` (and the matching
+   `GeoJSONFeatureCollection` alias) in
+   `services/stac/src/debrief_stac/types.py` — an Article XV violation.
+
+No LinkML class described this shape, so every new parse-boundary
+consumer (~ 22 TypeScript files + 3 Python files across `apps/vscode`,
+`apps/loader`, `apps/web-shell`, `shared/components`, `services/*`)
+reached for one of the three drifted copies or invented a fourth local
+one. A `SafeFeature as GeoJSONFeature` alias in
+`apps/vscode/src/types/import.ts` quietly papered over the divergence
+inside the VS Code extension.
+
+**Decision.**
+Introduce two schema-rooted classes in a new LinkML submodule
+`shared/schemas/src/linkml/raw-geojson.yaml`:
+
+- `RawGeoJSONFeature` — discriminated `type = "Feature"`, optional
+  `id: string | integer`, required `geometry` as an `any_of` union
+  over the seven existing geometry classes in `geojson.yaml`, optional
+  free-form `properties`, optional `bbox`.
+- `RawGeoJSONFeatureCollection` — discriminated
+  `type = "FeatureCollection"`, `features: RawGeoJSONFeature[]`,
+  optional `bbox`.
+
+Supporting infrastructure:
+- An in-module `Any` class (`class_uri: linkml:Any`) wraps the LinkML
+  idiom for free-form JSON object ranges. The generator post-processor
+  maps this to `Optional[dict[str, object]]` in Pydantic and
+  `Record<string, unknown> | null` in TypeScript — schema-sourced, NOT
+  authored `any`, so Article XV is upheld.
+- The pre-existing under-specified `GeoJSONFeature` +
+  `GeoJSONGeometry` classes in `session-state.yaml` are deleted;
+  `ResultsSlice.result_layers` now ranges over `RawGeoJSONFeature`.
+- The schema-adherence fixture set is extended with 12 valid and 5
+  invalid fixtures under `shared/schemas/fixtures/raw-geojson/`; a new
+  `test_raw_geojson_fixtures.py` exercises round-trip + a 10 000-feature
+  Pydantic validation micro-bench (budget ≤ 500 ms; observed ~250 ms).
+
+Migration:
+- The two hand-typed TypeScript interfaces are deleted.
+- Every consumer imports the new name — directly from `@debrief/schemas`
+  where ergonomic, or via an in-package re-export (e.g.
+  `services/session-state/src/types/results.ts` re-exports
+  `RawGeoJSONFeature as GeoJSONFeature`) where minimising ripple matters.
+- The `SafeFeature as GeoJSONFeature` alias in `apps/vscode` is deleted;
+  the three VS Code call sites (importRep.ts, ioService.ts, mapPanel.ts)
+  now import `SafeFeature` directly — that was always the actual type.
+- The grandfathered `scripts/check-no-geojson-feature.sh` regression
+  guard (wired into `task lint` by ADR-020 / spec #214) is tightened:
+  the `shared/utils/src/types.ts` exclusion is removed (the interface
+  there is deleted by #204) and the diagnostic message now points
+  readers at `RawGeoJSONFeature` instead of `SafeFeature`.
+
+**Alternatives considered:**
+
+- **Add `RawGeoJSONFeature` alongside the existing thin
+  `GeoJSONFeature` class** — rejected. Keeping two near-identical
+  "loose Feature" LinkML classes replicates the exact drift this ADR
+  exists to eliminate.
+- **Make `RawGeoJSONFeature.geometry` nullable** — rejected. Would
+  propagate the nullable type through every consumer, forcing
+  defensive `if (!f.geometry)` branches everywhere. Reintroduces the
+  silent-drop pattern of `mapPanel.ts:1199` at every new site.
+- **Add `designates_type: true` to each geometry class's `type` slot
+  (review decision 13A)** — proposed by the review phase to make the
+  `any_of` a discriminated union with O(1) Pydantic dispatch.
+  Evaluated and **deferred**: `gen-pydantic` 1.9.6 emits
+  `Literal["GeoJSONPoint"]` (the class name) instead of
+  `Literal["Point"]` (the `equals_string` value), breaking every real
+  GeoJSON payload. Without the annotation, Pydantic's un-discriminated
+  union validation costs ~250 ms for 10 000 features on the CI runner
+  — comfortably under the 500 ms budget — so the optimisation is not
+  required to meet the spec's perf criterion. Revisit when
+  `gen-pydantic` honours `equals_string` alongside `designates_type`.
+- **Apply the null-geometry → GeoJSONEmptyPoint coercion at the two
+  ingress sites (review decision 5-alt) and delete `mapPanel.ts:1199`
+  silent-drop guard (review 14A)** — evaluated and **deferred**. The
+  coercion conflicts with the existing `NarrativeEntry` schema, which
+  legitimately accepts `geometry == null` and rejects a Point with
+  empty coordinates (its geometry range is `GeoJSONPoint` with
+  `minimum_cardinality: 2`). Applying the coercion globally at the
+  REP-parse or STAC-load boundary regresses three narrative-related
+  tests (`test_import_dpf_files`, `test_import_mixed_formats`,
+  `test_add_features_null_geometry`). The `_coerce_null_geometry`
+  shim is retained in `services/io/src/debrief_io/parser.py` as an
+  opt-in utility with unit tests, but is not applied automatically.
+  The `mapPanel.ts:1199` guard therefore stays as belt-and-braces;
+  removing it requires first widening `NarrativeEntry` to accept
+  `GeoJSONEmptyPoint`, which is out of scope for #204. Tracked as a
+  follow-up.
+- **Refactor `services/stac/src/debrief_stac/types.py` aliases from
+  `dict[str, Any]` to `dict[str, object]`** — evaluated and
+  **deferred**. The narrower alias produced ten pyright errors in
+  `features.py` that would each require a cast or narrowing shim.
+  That refactor is not essential to the consolidation goal. A type
+  hygiene note has been added in-file pointing at this ADR.
+
+**Consequences:**
+
+- ✅ Exactly zero hand-written `interface GeoJSONFeature` or
+  `interface GeoJSONFeatureCollection` declarations exist anywhere
+  under `apps/`, `shared/`, or `services/` (grep-verified; the
+  `scripts/check-no-geojson-feature.sh` guard now enforces this
+  indefinitely).
+- ✅ A developer reaching for a "loose GeoJSON Feature type" at a
+  parse boundary has exactly one schema-rooted target:
+  `import type { RawGeoJSONFeature } from '@debrief/schemas'`. The
+  generated TypeScript declaration carries a schema-sourced
+  parse-boundary docstring that directs the reader to narrow to
+  `DebriefFeature` via the existing type guards in `unions.ts`.
+- ✅ `@debrief/schemas` now models the RFC 7946 §3.2 loose-Feature
+  shape precisely — discriminated `"Feature"` literal,
+  `string | number` id, 7-class geometry union, free-form properties,
+  optional bbox. Contrib extensions and future features inherit the
+  shape without rediscovering it.
+- ✅ 1081 Python tests + 618 session-state tests + 254 utils tests +
+  1682 components tests pass unchanged; the migration is structural,
+  not behavioural.
+- ❌ The two review-phase optimisations (`designates_type: true` for
+  discriminated-union perf; ingress `_coerce_null_geometry` for
+  silent-drop elimination) are recorded as explicit deferrals above
+  — both blocked by generator / schema constraints outside #204's
+  control. Either can be revisited independently.
+- ❌ `services/stac/src/debrief_stac/types.py` still uses
+  `dict[str, Any]` for `GeoJSONFeature` / `GeoJSONFeatureCollection`.
+  This is a documented narrowing-refactor out of scope for #204.
+
+**Scope-adjacent decisions locked in by this ADR:**
+
+- The `camelCase` vs `snake_case` drift flagged in
+  `services/session-state/src/types/results.ts` is NOT resolved here
+  — that is a separate consolidation tracked by backlog #206.
+- The `SafeFeature` / `SafeGeometry` / `SafeFeatureCollection` family
+  in `@debrief/utils` is left untouched — a different "permissive
+  boundary" type family used at MCP/service call sites, with its own
+  established usage.
+- Contrib-side extensions (`contrib/`) and any consumers outside the
+  monorepo SHOULD migrate to `RawGeoJSONFeature` on their next touch;
+  this ADR does not mandate a deadline.
+
+**Originating issue:** Backlog item #204 (Tech Debt). Spec:
+`specs/204-rawgeojsonfeature-linkml/`.

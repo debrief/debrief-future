@@ -1,0 +1,1 @@
+{ "type": "Feature", "id": "geom-empty-point", "geometry": { "type": "Point", "coordinates": [] }, "properties": { "kind": "SYSTEM" } }
