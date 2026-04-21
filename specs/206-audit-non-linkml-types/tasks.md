@@ -129,13 +129,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] For every `cross-domain-hand-typed` and `drift-candidate` finding, attempt to fold into an existing backlog item first (#203 spatial types, #204 RawGeoJSONFeature, #205 DisplayMode/PlaybackState, or another open E11 child). Update the `recommendedAction` cell to `Fold into #NNN — <short rationale>` `docs/type-audit-2026.md`
-- [ ] T032 [US2] Determine the next available backlog ID in `BACKLOG.md` by scanning existing rows (current max + 1) `BACKLOG.md`
-- [ ] T033 [US2] For each remaining actionable finding that does not fit an existing item, append a new row to `BACKLOG.md` using the project's existing table format — category `Infrastructure`, status `approved` if scope is clear else `needs-interview`, link to the audit report anchor as the rationale source `BACKLOG.md`
-- [ ] T034 [US2] (Optional, if any new item's scope warrants it) Create idea documents under `docs/ideas/` following the pattern of `docs/ideas/203-*.md`, `204-*.md`, `205-*.md` `docs/ideas/`
-- [ ] T035 [US2] Update every actionable finding's `recommendedAction` cell in the report to `Open #NNN — <title>` (for newly opened items) or `Fold into #NNN` (for existing) so every row has a non-empty link target `docs/type-audit-2026.md`
-- [ ] T036 [US2] Fill the report's "Newly opened backlog items" summary sub-list with each new ID + one-line title + link to `BACKLOG.md` `docs/type-audit-2026.md`
-- [ ] T037 [US2] Self-check against spec SC-002: filter the Findings table to `cross-domain-hand-typed` + `drift-candidate` rows and confirm zero rows have an empty `backlogItemRef` `docs/type-audit-2026.md`
+- [x] T031 [US2] For every `cross-domain-hand-typed` and `drift-candidate` finding, attempt to fold into an existing backlog item first (#203 spatial types, #204 RawGeoJSONFeature, #205 DisplayMode/PlaybackState, or another open E11 child). Update the `recommendedAction` cell to `Fold into #NNN — <short rationale>` `docs/type-audit-2026.md`
+- [x] T032 [US2] Determine the next available backlog ID in `BACKLOG.md` by scanning existing rows (current max + 1) `BACKLOG.md`
+- [x] T033 [US2] For each remaining actionable finding that does not fit an existing item, append a new row to `BACKLOG.md` using the project's existing table format — category `Infrastructure`, status `approved` if scope is clear else `needs-interview`, link to the audit report anchor as the rationale source `BACKLOG.md`
+- [x] T034 [US2] (Optional, if any new item's scope warrants it) Create idea documents under `docs/ideas/` following the pattern of `docs/ideas/203-*.md`, `204-*.md`, `205-*.md` `docs/ideas/`
+- [x] T035 [US2] Update every actionable finding's `recommendedAction` cell in the report to `Open #NNN — <title>` (for newly opened items) or `Fold into #NNN` (for existing) so every row has a non-empty link target `docs/type-audit-2026.md`
+- [x] T036 [US2] Fill the report's "Newly opened backlog items" summary sub-list with each new ID + one-line title + link to `BACKLOG.md` `docs/type-audit-2026.md`
+- [x] T037 [US2] Self-check against spec SC-002: filter the Findings table to `cross-domain-hand-typed` + `drift-candidate` rows and confirm zero rows have an empty `backlogItemRef` `docs/type-audit-2026.md`
 
 **Checkpoint**: Every actionable finding has a backlog home. The Summary section's counts match the number of new items committed to `BACKLOG.md`.
 

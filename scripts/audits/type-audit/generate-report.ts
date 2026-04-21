@@ -141,15 +141,15 @@ interface BacklogEntry {
  */
 const BACKLOG_TABLE: Record<string, BacklogEntry> = {
   'mcp-transport': {
-    id: 224,
+    id: 222,
     title: '[E11] Promote MCP transport envelopes (request / response / content item / tool definition / param schema) to LinkML',
-    url: 'BACKLOG.md#mcp-transport',
+    url: 'BACKLOG.md#222',
     isNew: true,
   },
   'stac-handtypes': {
-    id: 225,
+    id: 223,
     title: '[E11] Promote STAC catalog hand-types (StacItem / StacCatalog / StacCollection) to LinkML — replace hand-authored aliases in apps/vscode/src/types/stac.ts + apps/web-shell/src/mocks/stacService.ts',
-    url: 'BACKLOG.md#stac-handtypes',
+    url: 'BACKLOG.md#223',
     isNew: true,
   },
   'geojson-handtypes': {
@@ -159,34 +159,28 @@ const BACKLOG_TABLE: Record<string, BacklogEntry> = {
     isNew: false,
   },
   'session-state-wire': {
-    id: 226,
+    id: 224,
     title: '[E11] Promote session-state wire shapes (StateSnapshot / FeatureProvenance / ModifiedFeature / InputFeatureState / BranchPointLocation / CreateSnapshotOptions) to LinkML',
-    url: 'BACKLOG.md#session-state-wire',
+    url: 'BACKLOG.md#224',
     isNew: true,
   },
   'ipc-envelopes': {
-    id: 227,
+    id: 225,
     title: '[E11] Promote loader↔main IPC envelopes (CreatePlotResponse / AddFeaturesResponse / ListPlotsResponse / OpenPlotArgs / ParseResult) to LinkML — wire shapes shared between Electron main/renderer and VS Code extension',
-    url: 'BACKLOG.md#ipc-envelopes',
-    isNew: true,
-  },
-  'tool-result-envelope': {
-    id: 228,
-    title: '[E11] Promote tool-result envelope (ToolResultEnvelope / CalcResult / ToolContext) to LinkML — currently hand-authored in TS and consumed by debrief-calc on the Python side',
-    url: 'BACKLOG.md#tool-result-envelope',
+    url: 'BACKLOG.md#225',
     isNew: true,
   },
   // Drift rollups
   'drift-real': {
-    id: 229,
+    id: 226,
     title: '[E11] Resolve real drift clusters surfaced by the type-audit — same-name different-shape declarations that indicate unintended semantic divergence (excludes Storybook Story / React Props per-file conventions)',
-    url: 'BACKLOG.md#drift-real',
+    url: 'BACKLOG.md#226',
     isNew: true,
   },
   'drift-convention': {
-    id: 230,
+    id: 227,
     title: '[E11] Storybook / React component local-convention drift rollup — Story (38 sites) and Props (14 sites) re-declarations are per-file conventions rather than semantic drift; treat as no-action but document in a rollup so future audits can ignore them',
-    url: 'BACKLOG.md#drift-convention',
+    url: 'BACKLOG.md#227',
     isNew: true,
   },
 };
@@ -197,7 +191,8 @@ function recommendAction(finding: Finding, driftClusters: DriftCluster[]): { act
       return { action: 'No action — already schema-rooted via `@debrief/schemas` import.', backlogItemRef: null };
     case 'boundary-loose':
       return {
-        action: `Confirm boundary use is intentional; if the shape is knowable, promote to LinkML (feeds #${BACKLOG_TABLE['tool-result-envelope'].id} for envelope shapes).`,
+        action:
+          'Confirm boundary use is intentional; if the shape is knowable, promote to LinkML in a future E11 phase (no current backlog home).',
         backlogItemRef: null,
       };
     case 'single-domain':
@@ -227,10 +222,23 @@ function recommendAction(finding: Finding, driftClusters: DriftCluster[]): { act
           backlogItemRef: `#${item.id}`,
         };
       }
-      // Check if this drift cluster's members include any existing E11 child's scope.
-      // For now, route all real drift to #229 (the audit's general drift rollup).
+      // If the drift cluster matches a known cross-domain theme, route to that
+      // theme's item rather than the generic drift rollup — both concerns share
+      // the same fix (schema promotion).
+      for (const { re, theme } of CROSS_DOMAIN_NAME_PATTERNS) {
+        if (re.test(name)) {
+          const item = BACKLOG_TABLE[theme];
+          if (item) {
+            const verb = item.isNew ? 'Open' : 'Fold into';
+            return {
+              action: `${verb} #${item.id} — drift cluster "${name}" aligns with this E11 phase (schema promotion resolves the drift).`,
+              backlogItemRef: `#${item.id}`,
+            };
+          }
+        }
+      }
+      // Otherwise route to the generic drift rollup.
       const item = BACKLOG_TABLE['drift-real'];
-      // Find which cluster this record is in to reference sibling members.
       const cluster = driftClusters.find((c) => c.memberIds.includes(finding.record.id));
       const siblings = cluster
         ? cluster.memberIds.filter((id) => id !== finding.record.id).length
