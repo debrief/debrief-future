@@ -228,5 +228,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 206-audit-non-linkml-types: Type-declaration audit landed — `docs/type-audit-2026.md` enumerates 885 in-scope TS declarations across 317 files, classifies each into one of five E11 buckets, and opens #222–#227 for the follow-up schema-promotion work. Scanner + generator committed at `scripts/audits/type-audit/` (TypeScript compiler API + vitest fixture tests). Root devDeps added: `typescript`, `vitest`, `ajv`, `@types/node`.
 - 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,
 - 199-code-quality-cleanup: Added TypeScript 5.x (existing monorepo — no new languages, no Python edits) + pnpm workspace, `@debrief/components` (LogPanel), `knip` (introduced via `pnpm dlx`), existing ESLint / pyright / ruff toolchain (unchanged)

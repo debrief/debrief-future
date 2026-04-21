@@ -167,26 +167,26 @@
 
 ### Cross-cutting cleanup
 
-- [ ] T045 Run `task verify` (lint + typecheck + test) and fix any regressions introduced by adding `typescript` / `vitest` / `ajv` to root devDeps
-- [ ] T046 [P] Verify no production source files were modified — `git diff --stat origin/main...HEAD` should only touch `docs/`, `BACKLOG.md`, `scripts/audits/type-audit/`, `package.json`, `pnpm-lock.yaml`, and `specs/206-audit-non-linkml-types/` (spec SC-005)
-- [ ] T047 Update `CLAUDE.md` "Recent Changes" section with a 206 entry (previous auto-update was a no-op) `CLAUDE.md`
+- [x] T045 Run `task verify` (lint + typecheck + test) and fix any regressions introduced by adding `typescript` / `vitest` / `ajv` to root devDeps
+- [x] T046 [P] Verify no production source files were modified — `git diff --stat origin/main...HEAD` should only touch `docs/`, `BACKLOG.md`, `scripts/audits/type-audit/`, `package.json`, `pnpm-lock.yaml`, and `specs/206-audit-non-linkml-types/` (spec SC-005)
+- [x] T047 Update `CLAUDE.md` "Recent Changes" section with a 206 entry (previous auto-update was a no-op) `CLAUDE.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T048 Create evidence directory `specs/206-audit-non-linkml-types/evidence/`
-- [ ] T049 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: 206-audit-non-linkml-types`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers scanner unit tests + contract validation `specs/206-audit-non-linkml-types/evidence/test-summary.md`
-- [ ] T050 [P] Record usage example — a narrated walk-through of running the scanner, validating with ajv, and assigning a classification to one sample record `specs/206-audit-non-linkml-types/evidence/usage-example.md`
-- [ ] T051 [P] Capture terminal transcript of a full-repo scanner run with stderr one-line summary `specs/206-audit-non-linkml-types/evidence/scanner-run.txt`
-- [ ] T052 [P] Capture a trimmed (~10 records) redacted excerpt of the intermediate scanner JSON `specs/206-audit-non-linkml-types/evidence/scan-output.sample.json`
-- [ ] T053 [P] Capture ajv validation output against `contracts/scan-output.schema.json` `specs/206-audit-non-linkml-types/evidence/ajv-validation.txt`
-- [ ] T054 [P] Capture `git diff BACKLOG.md` showing newly opened items (or a "no new items" note if none were opened) `specs/206-audit-non-linkml-types/evidence/backlog-diff.txt`
-- [ ] T055 [P] Write a short note referencing the committed report as the primary deliverable `specs/206-audit-non-linkml-types/evidence/report-link.md`
-- [ ] T056 Execute the re-run sanity check from spec SC-004: on a fresh worktree at the same SHA, re-run the scanner + ajv validate; document that the JSON output is byte-identical (determinism test already enforces this, but a live re-run is the evidence) `specs/206-audit-non-linkml-types/evidence/rerun-methodology.md`
+- [x] T048 Create evidence directory `specs/206-audit-non-linkml-types/evidence/`
+- [x] T049 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: 206-audit-non-linkml-types`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers scanner unit tests + contract validation `specs/206-audit-non-linkml-types/evidence/test-summary.md`
+- [x] T050 [P] Record usage example — a narrated walk-through of running the scanner, validating with ajv, and assigning a classification to one sample record `specs/206-audit-non-linkml-types/evidence/usage-example.md`
+- [x] T051 [P] Capture terminal transcript of a full-repo scanner run with stderr one-line summary `specs/206-audit-non-linkml-types/evidence/scanner-run.txt`
+- [x] T052 [P] Capture a trimmed (~10 records) redacted excerpt of the intermediate scanner JSON `specs/206-audit-non-linkml-types/evidence/scan-output.sample.json`
+- [x] T053 [P] Capture ajv validation output against `contracts/scan-output.schema.json` `specs/206-audit-non-linkml-types/evidence/ajv-validation.txt`
+- [x] T054 [P] Capture `git diff BACKLOG.md` showing newly opened items (or a "no new items" note if none were opened) `specs/206-audit-non-linkml-types/evidence/backlog-diff.txt`
+- [x] T055 [P] Write a short note referencing the committed report as the primary deliverable `specs/206-audit-non-linkml-types/evidence/report-link.md`
+- [x] T056 Execute the re-run sanity check from spec SC-004: on a fresh worktree at the same SHA, re-run the scanner + ajv validate; document that the JSON output is byte-identical (determinism test already enforces this, but a live re-run is the evidence) `specs/206-audit-non-linkml-types/evidence/rerun-methodology.md`
 
 ### Media Content
 
-- [ ] T057 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — include What We Built (surprising findings, counts per bucket, anything notable), Lessons Learned (any classification call that was hard), What's Next (the E11 phase list the audit unlocked) `specs/206-audit-non-linkml-types/media/shipped-post.md`
-- [ ] T058 [P] Create LinkedIn shipped summary (150–200 words, hook opening referencing a concrete number from the findings, link placeholder to full post) `specs/206-audit-non-linkml-types/media/linkedin-shipped.md`
+- [x] T057 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — include What We Built (surprising findings, counts per bucket, anything notable), Lessons Learned (any classification call that was hard), What's Next (the E11 phase list the audit unlocked) `specs/206-audit-non-linkml-types/media/shipped-post.md`
+- [x] T058 [P] Create LinkedIn shipped summary (150–200 words, hook opening referencing a concrete number from the findings, link placeholder to full post) `specs/206-audit-non-linkml-types/media/linkedin-shipped.md`
 
 ### PR Creation
 

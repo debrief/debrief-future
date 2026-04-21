@@ -1,0 +1,40 @@
+$ time pnpm tsx scripts/audits/type-audit/scan.ts \
+    --roots apps shared services \
+    --exclude "shared/schemas/src/generated/**" \
+    --exclude "**/__tests__/**" \
+    --exclude "**/__fixtures__/**" \
+    --exclude "**/*.test.ts" \
+    --exclude "**/*.spec.ts" \
+    --exclude "**/node_modules/**" \
+    --exclude "**/dist/**" \
+    --out tmp/type-audit.json
+
+Scanned 317 files, emitted 885 records, 25 drift clusters [schema-rooted-candidate=260 boundary-candidate=5 drift-shortlist=106 none=514]
+Wrote tmp/type-audit.json
+
+real    0m4.195s
+user    0m0.015s
+sys     0m0.016s
+
+# Bucket breakdown after classifier applied:
+#   schema-rooted               260
+#   boundary-loose                5
+#   single-domain               486
+#   cross-domain-hand-typed      28
+#   drift-candidate             106
+#                               ---
+#                               885 total
+
+# Drift cluster breakdown (25 total):
+#   Local-convention (no-action): Story (38 members), Props (14 members)
+#   Domain-specific (routed to existing E11 children or new #222-#225):
+#     StacItem (3), StacCatalog (2), Plot (2), MatchResult (2), ParseResult (2)
+#   Residual drift (routed to #226):
+#     DebriefConfig, ExtensionMessage, ExtensionToWebviewMessage, FilterState,
+#     IncomingMessage, PlotTimeRange, PointMetadataEntry, Position,
+#     PropertiesCommitMessage, ResultTab, SetCurrentTimeMessage,
+#     StateSnapshot, StylePropertyDescriptor, TimeControllerState,
+#     ToolParameter, WebviewMessage, WebviewReadyMessage, WizardStep
+
+# Captured at commit 01166d6e on branch 206-audit-non-linkml-types
+# Host: Windows 11 (scanner is cross-platform; CI runs on Linux)

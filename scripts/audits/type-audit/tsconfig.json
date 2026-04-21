@@ -15,5 +15,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["scan.ts", "__tests__/**/*.ts"]
+  "include": ["scan.ts", "generate-report.ts", "__tests__/*.ts"],
+  "exclude": ["__tests__/fixtures/**"]
 }

@@ -2,7 +2,7 @@
 feature: 206-audit-non-linkml-types
 epic: E11
 captured_at: 2026-04-21
-git_sha: 22db5ed49467e1d6dccbe4d723f838df0305ee65
+git_sha: 01166d6e8ef72ed5cf25c339f0d9fa7dfc2b15b1
 scanner_version: v1
 ---
 
@@ -1094,4 +1094,4 @@ phases should re-verify during schema-promotion work.
 
 | Date | Commit | Outcome |
 |------|--------|---------|
-| 2026-04-21 | `22db5ed4` | Initial audit — 885 declarations, 25 drift clusters. |
+| 2026-04-21 | `01166d6e` | Initial audit — 885 declarations, 25 drift clusters. |

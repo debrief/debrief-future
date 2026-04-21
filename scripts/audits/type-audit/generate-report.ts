@@ -216,36 +216,41 @@ function recommendAction(finding: Finding, driftClusters: DriftCluster[]): { act
     case 'drift-candidate': {
       const name = finding.record.declarationName;
       if (LOCAL_CONVENTION_DRIFT_NAMES.has(name)) {
-        const item = BACKLOG_TABLE['drift-convention'];
-        return {
-          action: `Fold into #${item.id} — ${name} is a well-understood per-file convention (not semantic drift).`,
-          backlogItemRef: `#${item.id}`,
-        };
+        const conventionItem = BACKLOG_TABLE['drift-convention'];
+        if (conventionItem) {
+          return {
+            action: `Fold into #${conventionItem.id} — ${name} is a well-understood per-file convention (not semantic drift).`,
+            backlogItemRef: `#${conventionItem.id}`,
+          };
+        }
       }
       // If the drift cluster matches a known cross-domain theme, route to that
       // theme's item rather than the generic drift rollup — both concerns share
       // the same fix (schema promotion).
       for (const { re, theme } of CROSS_DOMAIN_NAME_PATTERNS) {
         if (re.test(name)) {
-          const item = BACKLOG_TABLE[theme];
-          if (item) {
-            const verb = item.isNew ? 'Open' : 'Fold into';
+          const themeItem = BACKLOG_TABLE[theme];
+          if (themeItem) {
+            const verb = themeItem.isNew ? 'Open' : 'Fold into';
             return {
-              action: `${verb} #${item.id} — drift cluster "${name}" aligns with this E11 phase (schema promotion resolves the drift).`,
-              backlogItemRef: `#${item.id}`,
+              action: `${verb} #${themeItem.id} — drift cluster "${name}" aligns with this E11 phase (schema promotion resolves the drift).`,
+              backlogItemRef: `#${themeItem.id}`,
             };
           }
         }
       }
       // Otherwise route to the generic drift rollup.
-      const item = BACKLOG_TABLE['drift-real'];
+      const realItem = BACKLOG_TABLE['drift-real'];
+      if (!realItem) {
+        return { action: 'Open new item — drift candidate.', backlogItemRef: null };
+      }
       const cluster = driftClusters.find((c) => c.memberIds.includes(finding.record.id));
       const siblings = cluster
         ? cluster.memberIds.filter((id) => id !== finding.record.id).length
         : 0;
       return {
-        action: `Open #${item.id} — drift cluster "${name}" (${siblings + 1} members).`,
-        backlogItemRef: `#${item.id}`,
+        action: `Open #${realItem.id} — drift cluster "${name}" (${siblings + 1} members).`,
+        backlogItemRef: `#${realItem.id}`,
       };
     }
   }
@@ -421,7 +426,7 @@ pnpm tsx scripts/audits/type-audit/generate-report.ts \\
 
 - Per-file convention drift (Storybook \`Story\`, React component \`Props\`) is
   mechanically flagged by R1 but folded into a single rollup backlog item
-  (#${BACKLOG_TABLE['drift-convention'].id}) rather than treated as semantic
+  (#${BACKLOG_TABLE['drift-convention']?.id ?? '?'}) rather than treated as semantic
   drift. Future audits should keep the mechanical rule honest and only suppress
   at the backlog-linkage level.
 - R3 cross-domain detection is **name-based, not shape-based**. A type that

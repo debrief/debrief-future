@@ -236,11 +236,13 @@ function isBoundaryLooseType(typeNode: ts.TypeNode): boolean {
     const name = typeNode.typeName;
     const nameText = ts.isIdentifier(name) ? name.text : name.getText();
     if (nameText === 'Record' && typeNode.typeArguments && typeNode.typeArguments.length === 2) {
-      const [keyArg, valueArg] = typeNode.typeArguments;
+      const keyArg = typeNode.typeArguments[0];
+      const valueArg = typeNode.typeArguments[1];
+      if (!keyArg || !valueArg) return false;
       const keyIsString =
         keyArg.kind === ts.SyntaxKind.StringKeyword ||
         (ts.isLiteralTypeNode(keyArg) && keyArg.literal.kind === ts.SyntaxKind.StringLiteral);
-      if (keyIsString && valueArg && isBoundaryLooseType(valueArg)) return true;
+      if (keyIsString && isBoundaryLooseType(valueArg)) return true;
     }
   }
   return false;
@@ -490,25 +492,28 @@ function parseArgs(argv: string[]): CliArgs {
   while (i < argv.length) {
     const a = argv[i];
     if (a === '--roots') {
-      // Consume subsequent non-flag args as roots.
       i += 1;
-      while (i < argv.length && !argv[i].startsWith('--')) {
-        roots.push(argv[i]);
+      while (i < argv.length) {
+        const next = argv[i];
+        if (next === undefined || next.startsWith('--')) break;
+        roots.push(next);
         i += 1;
       }
       continue;
     }
     if (a === '--exclude') {
-      if (i + 1 < argv.length) {
-        excludes.push(argv[i + 1]);
+      const value = argv[i + 1];
+      if (value !== undefined) {
+        excludes.push(value);
         i += 2;
         continue;
       }
       throw new Error('--exclude requires a value');
     }
     if (a === '--out') {
-      if (i + 1 < argv.length) {
-        out = argv[i + 1];
+      const value = argv[i + 1];
+      if (value !== undefined) {
+        out = value;
         i += 2;
         continue;
       }
