@@ -1047,7 +1047,48 @@ number → declaration name so re-runs produce diff-friendly output.
 
 ## 4. Python cross-domain appendix
 
-_Populated in Phase 5 — see §4 in the final committed report._
+Per spec FR-012 — hand-authored Python types whose instances appear to cross
+the Python ↔ TypeScript boundary are surfaced here as signals, without being
+classified against the five TS buckets.
+
+Methodology: `grep -r "class.*BaseModel" services/ shared/ --include="*.py"`
+at the audit SHA, then inspect each class for evidence of cross-domain use
+(MCP JSON-RPC emission, STAC asset persistence, session-state serialisation,
+IPC response shape).
+
+| File | Declaration | Kind | Cross-domain evidence | Suggested follow-up |
+|------|-------------|------|-----------------------|---------------------|
+| `services/calc/debrief_calc/models.py` | `ToolResult` | BaseModel | Returned from MCP tool calls (`debrief-calc` service) — serialised to JSON and consumed by TS `MCPToolResponse` | Fold into #222 — the LinkML source becomes the single root for both Python and TS. |
+| `services/calc/debrief_calc/models.py` | `ToolParameter` | BaseModel | Same as ToolResult — MCP tool definitions serialise these | Fold into #222. |
+| `services/calc/debrief_calc/models.py` | `ToolError` | BaseModel | MCP error-response envelope | Fold into #222. |
+| `services/calc/debrief_calc/models.py` | `Tool` | BaseModel | MCP tool-definition envelope (name, schema, description) | Fold into #222. |
+| `services/calc/debrief_calc/models.py` | `Provenance` | BaseModel | Written to STAC asset metadata + session-state FeatureProvenance — name-matches the TS `FeatureProvenance` but structural overlap not verified here | Fold into #224 (session-state) and #223 (STAC) — confirm shape alignment during those phases. |
+| `services/calc/debrief_calc/models.py` | `ModifiedFeature` | BaseModel | Name collision with TS `ModifiedFeature` in `services/session-state/src/log/types.ts` — likely meant to be the same wire shape | Fold into #224. |
+| `services/calc/debrief_calc/models.py` | `PropertyDelta` | BaseModel | Feature-state change shape, serialised across MCP | Fold into #224. |
+| `services/calc/debrief_calc/models.py` | `CreatedAsset` | BaseModel | STAC asset creation response | Fold into #223. |
+| `services/calc/debrief_calc/models.py` | `SourceRef` | BaseModel | Feature provenance reference | Fold into #224. |
+| `services/calc/debrief_calc/models.py` | `SelectionContext` | BaseModel | MCP tool-context payload (selected features) | Fold into #222. |
+| `services/calc/debrief_calc/models.py` | `ContextType` | StrEnum | Used by `SelectionContext` — consumed on the TS side for menu labelling | Fold into #222 (promote to LinkML enum). |
+| `services/io/src/debrief_io/models.py` | `ParseResult` | BaseModel | File-parse response — name collides with TS `ParseResult` drift cluster (`apps/loader/src/renderer/types/results.ts` + `apps/vscode/src/types/import.ts`) | Fold into #225. |
+| `services/io/src/debrief_io/models.py` | `ParseWarning` | BaseModel | Attached to ParseResult payload | Fold into #225. |
+| `services/io/src/debrief_io/models.py` | `ImportResult` | BaseModel | Multi-file import envelope — serialised over IPC to the loader renderer and the VS Code extension host | Fold into #225. |
+| `services/io/src/debrief_io/models.py` | `ImportWarning` / `ImportFileError` | BaseModel | Attached to ImportResult | Fold into #225. |
+| `services/io/src/debrief_io/models.py` | `HandlerInfo` | BaseModel | File-handler registry returned over IPC | Fold into #225. |
+| `services/session-state-py/src/debrief_session/types.py` | `SessionState` | BaseModel | Top-level session-state persisted shape — mirrors TS `StateSnapshot` | Fold into #224. |
+| `services/session-state-py/src/debrief_session/types.py` | `SpatialSlice` / `FeaturesSlice` / `DocumentSlice` | BaseModel | Session-state slice shapes — serialised across MCP and to disk | Fold into #224. |
+| `services/stac/src/debrief_stac/models.py` | `PlotMetadata` | BaseModel | STAC Item metadata shape persisted to `item.json` and read by the TS loader | Fold into #223. |
+| `services/stac/src/debrief_stac/models.py` | `PlotSummary` | BaseModel | STAC list-plots response — consumed by TS `ListPlotsResponse` | Fold into #223 + #225. |
+| `services/stac/src/debrief_stac/models.py` | `CollectionExtent` / `CollectionSummaries` / `TemporalExtent` | BaseModel | STAC collection metadata — persisted + returned over MCP | Fold into #223. |
+| `services/stac/src/debrief_stac/models.py` | `AssetProvenance` | BaseModel | STAC asset metadata — mirrors calc `Provenance` | Fold into #223 + #224. |
+| `services/config/src/debrief_config/models.py` | `Config` | BaseModel | Name collision with TS `DebriefConfig` drift cluster (`apps/loader/src/main/ipc/config.ts` + `apps/vscode/src/services/configService.ts`) — the Python `Config` is the shared authoritative shape | Fold into #226 (residual drift) — the Python side is the win candidate. |
+| `services/config/src/debrief_config/models.py` | `StoreRegistration` | BaseModel | Store-registration row of the config bundle | Fold into #226. |
+
+**Caveat**: this appendix is a name-based sweep, not a structural analysis.
+A Pydantic class whose instances never cross the boundary (pure intra-Python
+convenience) is not distinguishable from one that does without reading each
+call site. The entries above were manually verified against MCP tool
+registration, STAC persistence, and session-state IPC paths; follow-up
+phases should re-verify during schema-promotion work.
 
 ## 5. Re-run log / changelog
 

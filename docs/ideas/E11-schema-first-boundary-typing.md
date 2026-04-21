@@ -16,18 +16,37 @@ Per the architectural principle:
 ## Proposed Solution
 Multi-phase rollout, one boundary at a time. Each phase is its own backlog item under this epic, landing as an independent PR. Acceptance for the epic is: zero `no-restricted-syntax` warnings in production code; all parse points either use a LinkML-generated type + generated-guard or a Zod/equivalent validator for single-domain shapes.
 
-### Phase inventory (initial — may grow from #206 audit)
+### Phase inventory
 
-| Phase | Target | Approach |
-|-------|--------|----------|
-| Phase 1 | Tool-result envelope + `__datasets` sidecar | Promote to LinkML. Generate TS types; add a parse-time guard (`isToolResult`) and a narrowing helper. Replace every `Record<string, unknown>` cast with a guarded call. |
-| Phase 2 | NL → CQL2 LLM response shape | Promote to LinkML (the canonical CQL2-JSON subset the LLM is prompted to produce). Generate TS; replace cast chains in `parseResponse.ts` with a schema-derived validator. |
-| Phase 3 | Enum-bundle / taxonomy JSON | The build script that produces `enum-bundle.json` exports a matching schema (LinkML if the bundle crosses to Python; otherwise a Zod schema kept alongside the build script). Filter-engine consumes typed output. |
-| Phase 4 | E2E test harness | Tighten harness types to use the same schema-derived types as production; replace hand-constructed payloads with builder helpers that produce schema-valid fakes. |
-| Phase 5 | localStorage | Each persisted key gets a Zod (or equivalent TS-only) schema co-located with its write path. Reads use `schema.parse()` — a failed parse means "missing or corrupt, fall back to default." |
+The audit (#206) landed on 2026-04-21 with the report at
+[docs/type-audit-2026.md](../type-audit-2026.md). It enumerated 885 in-scope
+named TypeScript declarations across 317 files and classified each into one
+of five buckets (schema-rooted / boundary-loose / single-domain / cross-domain
+hand-typed / drift-candidate). 134 rows were actionable (28 cross-domain
+hand-typed + 106 drift-candidate) and each resolves to a backlog item.
+The phase list below combines the original five-boundary inventory with the
+audit-opened items.
 
-### Inputs from #206
-The type-audit report produced by #206 will likely add phases to this list (or expand an existing phase's scope). Each additional target gets its own backlog item under this epic.
+| Phase | Target | Item | Approach |
+|-------|--------|------|----------|
+| Phase 1 | Tool-result envelope + `__datasets` sidecar | _(no current item — future)_ | Promote to LinkML. Generate TS types; add a parse-time guard (`isToolResult`) and a narrowing helper. Replace every `Record<string, unknown>` cast with a guarded call. |
+| Phase 2 | NL → CQL2 LLM response shape | _(no current item — future)_ | Promote to LinkML (the canonical CQL2-JSON subset the LLM is prompted to produce). Generate TS; replace cast chains in `parseResponse.ts` with a schema-derived validator. |
+| Phase 3 | Enum-bundle / taxonomy JSON | _(no current item — future)_ | The build script that produces `enum-bundle.json` exports a matching schema (LinkML if the bundle crosses to Python; otherwise a Zod schema kept alongside the build script). Filter-engine consumes typed output. |
+| Phase 4 | E2E test harness | _(no current item — future)_ | Tighten harness types to use the same schema-derived types as production; replace hand-constructed payloads with builder helpers that produce schema-valid fakes. |
+| Phase 5 | localStorage | _(no current item — future)_ | Each persisted key gets a Zod (or equivalent TS-only) schema co-located with its write path. Reads use `schema.parse()` — a failed parse means "missing or corrupt, fall back to default." |
+| Phase 6 | Spatial types | #203 | Coordinate / Position hand-types promoted to LinkML. |
+| Phase 7 | GeoJSON hand-types (RawGeoJSONFeature etc.) | #204 | Includes the `GeoJsonFeature` / `GeoJsonFeatureCollection` duplicates in `services/session-state/src/log/types.ts` surfaced by the audit. |
+| Phase 8 | DisplayMode / PlaybackState | ~~#205~~ (complete) | ✓ Shipped 2026-04-21. |
+| Phase 9 | MCP transport envelopes (MCP\*, ToolResult, ToolDefinition, ToolParameterMeta, ToolsUpdateMessage etc.) | #222 | 16 hand-typed sites. Includes the MCP / Tool drift clusters (`MatchResult`, `ParseResult`, `Plot`, `ToolParameter`). |
+| Phase 10 | STAC catalog hand-types (StacItem / StacCatalog / StacCollection) | #223 | 5 sites + drift clusters for `StacItem` (3 members), `StacCatalog` (2), `Plot` (2). |
+| Phase 11 | Session-state wire shapes (StateSnapshot / FeatureProvenance / ModifiedFeature / InputFeatureState / BranchPointLocation / CreateSnapshotOptions) | #224 | Persisted and MCP-served. Includes the `StateSnapshot` (2 members) drift cluster. |
+| Phase 12 | Loader↔main IPC envelopes (CreatePlotResponse / AddFeaturesResponse / ListPlotsResponse / OpenPlotArgs / ParseResult) | #225 | Electron main↔renderer + VS Code shared shapes. Includes the `ParseResult` drift cluster. |
+| Phase 13 | Residual drift (DebriefConfig, ExtensionMessage, FilterState, etc.) | #226 | 14 drift clusters that don't map to a domain-specific phase above. |
+| Phase 14 | Storybook / React local-convention drift rollup (Story, Props) | #227 | No action expected — the rule fires mechanically but the findings are per-file conventions. |
+
+See the audit report's [§1 Summary](../type-audit-2026.md#1-summary) for the
+per-bucket counts and [§3 Findings](../type-audit-2026.md#3-findings) for the
+per-site list.
 
 ## Success Criteria
 - Zero `no-restricted-syntax` ESLint warnings in production code
@@ -39,7 +58,19 @@ The type-audit report produced by #206 will likely add phases to this list (or e
 Proposed
 
 ## Items
-To be allocated on phase kick-off. First phase targets (tool-result + NL→CQL2) will be added as individual backlog entries once spec work starts.
+
+- [#203](../../BACKLOG.md) — Spatial types (Coordinate / Position) → LinkML
+- [#204](../../BACKLOG.md) — RawGeoJSONFeature → LinkML (GeoJSON hand-types)
+- ~~#205~~ — DisplayMode / PlaybackState → LinkML (**complete 2026-04-21**)
+- [#206](../../BACKLOG.md) — Audit non-LinkML type declarations (**complete** — this report)
+- [#222](../../BACKLOG.md) — Promote MCP transport envelopes to LinkML
+- [#223](../../BACKLOG.md) — Promote STAC catalog hand-types to LinkML
+- [#224](../../BACKLOG.md) — Promote session-state wire shapes to LinkML
+- [#225](../../BACKLOG.md) — Promote loader↔main IPC envelopes to LinkML
+- [#226](../../BACKLOG.md) — Resolve residual drift clusters
+- [#227](../../BACKLOG.md) — Storybook / React local-convention drift rollup (no-action documentation)
+
+The primary deliverable of #206 is [docs/type-audit-2026.md](../type-audit-2026.md).
 
 ## Parallelisation
 Phases 1 and 2 both edit LinkML — coordinate with #203, #204, #205 per their Parallelisation notes.

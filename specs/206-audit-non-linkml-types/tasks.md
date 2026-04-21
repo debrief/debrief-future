@@ -149,13 +149,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Author the Methodology section: list the exact in-scope paths (`apps/`, `shared/`, `services/`), the exclusion patterns (verbatim globs), the rule for distinguishing generated vs. authored code (path-based — `shared/schemas/src/generated/`), and the rule applied for each of the five classification buckets (spec FR-009) `docs/type-audit-2026.md`
-- [ ] T039 [US3] In the Methodology section, embed the exact re-run command (copy from `quickstart.md` §1) so the report is self-contained `docs/type-audit-2026.md`
-- [ ] T040 [US3] Add a "Known methodology gaps / caveats" subsection listing any generated output discovered outside `shared/schemas/src/generated/` (per spec edge-case bullet) or any classification judgement that felt borderline and deserves a second look `docs/type-audit-2026.md`
-- [ ] T041 [P] [US3] Populate the Python cross-domain appendix: sweep `services/` and `shared/` Python packages for hand-authored types whose instances appear to cross the Python ↔ TS boundary (e.g. Pydantic `BaseModel` subclasses consumed by MCP tool results). If none found, include an explicit "No candidates found" line — the section is not optional (spec FR-012) `docs/type-audit-2026.md`
-- [ ] T042 [US3] Update `docs/ideas/E11-schema-first-boundary-typing.md` — add a bullet under `## Items` linking to `docs/type-audit-2026.md`, and append any new phases surfaced by the audit to `## Phase inventory` (spec FR-010 / SC-003) `docs/ideas/E11-schema-first-boundary-typing.md`
-- [ ] T043 [US3] Confirm the report's intro paragraph back-links to `docs/ideas/E11-schema-first-boundary-typing.md` (T025 scaffolded the link — verify it survived editing) `docs/type-audit-2026.md`
-- [ ] T044 [US3] Add a "Re-run log / changelog" section at the bottom of the report with a first entry: `2026-MM-DD — Initial audit (git_sha: ...)` — future re-runs append rows here without rewriting the body `docs/type-audit-2026.md`
+- [x] T038 [US3] Author the Methodology section: list the exact in-scope paths (`apps/`, `shared/`, `services/`), the exclusion patterns (verbatim globs), the rule for distinguishing generated vs. authored code (path-based — `shared/schemas/src/generated/`), and the rule applied for each of the five classification buckets (spec FR-009) `docs/type-audit-2026.md`
+- [x] T039 [US3] In the Methodology section, embed the exact re-run command (copy from `quickstart.md` §1) so the report is self-contained `docs/type-audit-2026.md`
+- [x] T040 [US3] Add a "Known methodology gaps / caveats" subsection listing any generated output discovered outside `shared/schemas/src/generated/` (per spec edge-case bullet) or any classification judgement that felt borderline and deserves a second look `docs/type-audit-2026.md`
+- [x] T041 [P] [US3] Populate the Python cross-domain appendix: sweep `services/` and `shared/` Python packages for hand-authored types whose instances appear to cross the Python ↔ TS boundary (e.g. Pydantic `BaseModel` subclasses consumed by MCP tool results). If none found, include an explicit "No candidates found" line — the section is not optional (spec FR-012) `docs/type-audit-2026.md`
+- [x] T042 [US3] Update `docs/ideas/E11-schema-first-boundary-typing.md` — add a bullet under `## Items` linking to `docs/type-audit-2026.md`, and append any new phases surfaced by the audit to `## Phase inventory` (spec FR-010 / SC-003) `docs/ideas/E11-schema-first-boundary-typing.md`
+- [x] T043 [US3] Confirm the report's intro paragraph back-links to `docs/ideas/E11-schema-first-boundary-typing.md` (T025 scaffolded the link — verify it survived editing) `docs/type-audit-2026.md`
+- [x] T044 [US3] Add a "Re-run log / changelog" section at the bottom of the report with a first entry: `2026-MM-DD — Initial audit (git_sha: ...)` — future re-runs append rows here without rewriting the body `docs/type-audit-2026.md`
 
 **Checkpoint**: All three user stories are independently testable. Report and epic cross-link bidirectionally. Methodology is complete enough to support re-runs.
 
