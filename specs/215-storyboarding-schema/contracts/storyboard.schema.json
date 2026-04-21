@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/storyboard/v1/storyboard.schema.json",
+  "title": "Storyboard + Scene (v1) — reference excerpt",
+  "description": "Reference JSON Schema excerpt for review during spec stage. The authoritative artefact is generated from shared/schemas/src/linkml/storyboard.yaml at build time; this file is kept in sync as a contract check. Updated 2026-04-20: discriminator moved to inherited `kind` enum; HistoryEntry dropped in favour of inherited `provenance: LogEntry[]`.",
+  "type": "object",
+  "definitions": {
+    "Ulid": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "IsoInstant": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Sha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "WasGeneratedBy": {
+      "type": "object",
+      "description": "Provenance envelope from shared/schemas/src/linkml/log-entry.yaml. Reproduced here for cross-reference only; the authoritative schema lives in log-entry.yaml.",
+      "required": ["tool", "tool_version", "parameters"],
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "tool_version": { "type": "string", "minLength": 1 },
+        "parameters": {
+          "type": "object",
+          "required": ["op"],
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "create", "rename", "describe", "delete", "restore",
+                "update-to-current", "duplicate", "copy-in",
+                "insert-middle", "refresh-thumbnail"
+              ]
+            },
+            "summary": { "type": "string", "maxLength": 140 }
+          }
+        }
+      }
+    },
+    "LogEntry": {
+      "type": "object",
+      "description": "Reference to the shared LogEntry shape. Storyboard CRUD ops append one entry per mutation with was_generated_by.tool = 'storyboard-crud' and was_generated_by.parameters.op set to the relevant op value. The human actor is carried in the new optional `agent` slot added by #215.",
+      "required": ["activity_id", "timestamp", "was_generated_by", "execution_duration"],
+      "properties": {
+        "activity_id": { "$ref": "#/definitions/Uuid" },
+        "timestamp": { "$ref": "#/definitions/IsoInstant" },
+        "agent": { "type": "string", "minLength": 1 },
+        "was_generated_by": { "$ref": "#/definitions/WasGeneratedBy" },
+        "used": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "generated": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "execution_duration": { "type": "string", "pattern": "^PT.*$" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "Viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["center", "zoom", "bearing"],
+      "properties": {
+        "center": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "zoom": { "type": "number" },
+        "bearing": { "type": "number", "const": 0 }
+      }
+    },
+    "Polygon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "Polygon" },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    },
+    "StoryboardProperties": {
+      "type": "object",
+      "description": "Extends BaseFeatureProperties — inherits `kind`, `id`, `tags`, `provenance` slots. Validated via the generated all-of composition; reproduced flat here for readability.",
+      "additionalProperties": false,
+      "required": [
+        "kind", "id", "name", "schema_version", "provenance"
+      ],
+      "properties": {
+        "kind": { "const": "STORYBOARD" },
+        "id": { "$ref": "#/definitions/Ulid" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "schema_version": { "type": "integer", "minimum": 1 },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/LogEntry" },
+          "minItems": 1,
+          "description": "Append-only. First entry's timestamp is `created_at`; last entry's is `last_modified_at`."
+        }
+      }
+    },
+    "StoryboardFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "geometry", "properties"],
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "$ref": "#/definitions/Ulid" },
+        "geometry": { "$ref": "#/definitions/Polygon" },
+        "properties": { "$ref": "#/definitions/StoryboardProperties" }
+      }
+    },
+    "SceneTimeRange": {
+      "type": "null",
+      "description": "Reserved in schema v1 — MUST be null."
+    },
+    "SceneProperties": {
+      "type": "object",
+      "description": "Extends BaseFeatureProperties.",
+      "additionalProperties": false,
+      "required": [
+        "kind", "id", "storyboard_id", "title", "viewport",
+        "timestamp", "visible_feature_ids", "feature_set_hash",
+        "thumbnail_asset_ref", "transition_duration_ms",
+        "provenance"
+      ],
+      "properties": {
+        "kind": { "const": "STORYBOARD_SCENE" },
+        "id": { "$ref": "#/definitions/Ulid" },
+        "storyboard_id": { "$ref": "#/definitions/Ulid" },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "viewport": { "$ref": "#/definitions/Viewport" },
+        "timestamp": { "$ref": "#/definitions/IsoInstant" },
+        "time_range": { "$ref": "#/definitions/SceneTimeRange" },
+        "visible_feature_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "feature_set_hash": { "$ref": "#/definitions/Sha256Hex" },
+        "thumbnail_asset_ref": { "type": "string", "minLength": 1 },
+        "transition_duration_ms": { "type": "integer", "minimum": 0 },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/LogEntry" },
+          "minItems": 1,
+          "description": "Append-only. First entry's timestamp is `created_at`; last entry's is `last_modified_at`."
+        }
+      }
+    },
+    "SceneFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "geometry", "properties"],
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "$ref": "#/definitions/Ulid" },
+        "geometry": { "$ref": "#/definitions/Polygon" },
+        "properties": { "$ref": "#/definitions/SceneProperties" }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/StoryboardFeature" },
+    { "$ref": "#/definitions/SceneFeature" }
+  ]
+}

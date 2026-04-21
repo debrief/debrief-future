@@ -23,6 +23,38 @@ in isolation is valuable because it unblocks every follow-up spec in
 parallel and lands the Article II schema adherence tests that every later
 PR will depend on.
 
+## Clarifications
+
+### Session 2026-04-20 (post-plan review)
+
+- **Q**: Should Storyboard and Scene Features use `properties["debrief:type"]`
+  as the discriminator, or the existing in-plot `kind` pattern?
+  **A**: Use `kind: STORYBOARD` and `kind: STORYBOARD_SCENE`, extending
+  `FeatureKindEnum`. The `debrief:` prefix is reserved for STAC
+  `item.properties` (per #125); in-plot Features use the canonical
+  `BaseFeatureProperties.kind` discriminator. FR-SCHEMA-003 updated
+  accordingly.
+- **Q**: Should Storyboards/Scenes carry their own `history[]` + author/
+  timestamp fields, or use the existing inherited `provenance: LogEntry[]`
+  slot on `BaseFeatureProperties`?
+  **A**: Use the inherited `provenance: LogEntry[]` slot (Article III
+  single-surface provenance). Drop the proposed `HistoryEntry`,
+  `created_by`, `last_modified_by`, `last_modified_at` fields. The Analysis
+  Log (#176) already reads `LogEntry`, so this unifies consumers.
+  `LogEntry` gains an optional `agent` slot to carry the human actor;
+  the 10 storyboard CRUD ops are encoded via `WasGeneratedBy.tool =
+  "storyboard-crud"` + `WasGeneratedBy.parameters.op`.
+- **Q**: Is the CRUD module allowed to be asynchronous?
+  **A**: Yes — Web Crypto's `subtle.digest` is async, so any op that
+  (re)computes `feature_set_hash` MUST return a `Promise`. All
+  mutation ops become async for a consistent API; pure queries stay
+  sync.
+- **Q**: What is the concrete scope boundary with Py→JSON→TS→JSON→Py
+  round-trip testing, perf benchmarking, and hash canonicalisation?
+  **A**: All three are in scope for #215 (moved from "deferred" into
+  the core slice). The cross-language round-trip harness is an Article
+  II gate that has to land with the schema, not after.
+
 ## User Scenarios & Testing *(mandatory)*
 
 This spec's "users" are the **downstream specs and their developers** —
@@ -164,9 +196,24 @@ FRs appear here; those live in #216–#218.
   TypeScript bindings from those LinkML sources via the existing
   generation pipeline.
 - **FR-SCHEMA-003**: Storyboard and Scene instances MUST be standard
-  GeoJSON Features (`type: "Feature"`) carrying a
-  `properties.debrief:type` discriminator of `"storyboard"` or
-  `"storyboard_scene"` respectively.
+  GeoJSON Features (`type: "Feature"`) carrying the inherited
+  `properties.kind` discriminator from `BaseFeatureProperties`, with
+  values `STORYBOARD` and `STORYBOARD_SCENE` respectively. Both values
+  MUST be added to `FeatureKindEnum` in `common.yaml`. *(Updated per
+  2026-04-20 clarification: the previous `properties["debrief:type"]`
+  encoding was withdrawn to match the established in-plot pattern.)*
+- **FR-SCHEMA-003a**: Storyboard and Scene property classes MUST
+  inherit from `BaseFeatureProperties`, picking up the existing
+  `provenance: LogEntry[]` append-only slot. Every CRUD mutation MUST
+  append exactly one `LogEntry` to `provenance[]` with
+  `was_generated_by.tool = "storyboard-crud"` and
+  `was_generated_by.parameters.op` set to the relevant op value
+  (`create`, `rename`, `describe`, `delete`, `restore`,
+  `update-to-current`, `duplicate`, `copy-in`, `insert-middle`,
+  `refresh-thumbnail`). The human actor is carried by a new optional
+  `agent: string` slot on `LogEntry`. No separate `history[]`,
+  `created_by`, `last_modified_by`, or `last_modified_at` fields are
+  defined.
 - **FR-SCHEMA-004**: The schema MUST reject any Scene with a non-null
   `time_range` in schema version 1 (reserved slot).
 - **FR-SCHEMA-005**: The schema MUST reject any Scene with
@@ -196,8 +243,13 @@ FRs appear here; those live in #216–#218.
   (plotFeatures)`, and `detectMissingDataForScene(scene, plotFeatures,
   plotTimeRange)`.
 - **FR-MODULE-012**: On every successful CRUD mutation the module MUST
-  update `last_modified_by`, `last_modified_at`, and append exactly one
-  `HistoryEntry` with a correct `op` value.
+  append exactly one `LogEntry` to the target Feature's inherited
+  `provenance[]` slot, with `was_generated_by.tool =
+  "storyboard-crud"`, `was_generated_by.parameters.op` set to the
+  relevant op value, and `agent` set to the caller-supplied actor
+  string. "Created-by / last-modified-by / last-modified-at" are
+  derived at read time from the first/last `provenance` entry; they
+  are NOT stored as separate slots.
 - **FR-MODULE-013**: `listScenesOrdered` MUST return Scenes sorted by
   `timestamp` ascending; no explicit `order` field is consulted or
   written.
@@ -210,8 +262,11 @@ FRs appear here; those live in #216–#218.
   from the source's. If the deep copy fails, the op MUST roll back
   atomically (no partial write).
 - **FR-MODULE-016**: The module MUST compute `feature_set_hash` as a
-  deterministic hash of the sorted `visible_feature_ids` on every
-  create/update that touches `visible_feature_ids`.
+  deterministic hash of the **canonicalised** `visible_feature_ids`
+  (trim whitespace on each ID, reject empty strings, dedupe, sort
+  lexicographically) on every create/update that touches
+  `visible_feature_ids`. SHA-256 hex, lowercase, 64 chars. The hash
+  function is async (Web Crypto `subtle.digest`).
 - **FR-MODULE-017**: `detectMissingDataForScene` MUST be pure — it MUST
   NOT mutate the Scene, the plot features, or the plot time range — and
   MUST return one of `ok`, `missing-features` (with the list of
@@ -224,9 +279,28 @@ FRs appear here; those live in #216–#218.
   keyed on `schema_version`; the v1 hook is a no-op but MUST be wired
   so later versions can register migrations without touching the load
   path.
-- **FR-MODULE-020**: `history[]` arrays MUST be treated as append-only
-  by the module — existing entries are never mutated or removed by any
-  public operation.
+- **FR-MODULE-020**: `provenance[]` arrays MUST be treated as
+  append-only by the module — existing entries are never mutated or
+  removed by any public operation.
+- **FR-MODULE-021**: Every mutation op MUST return a `Promise` (Web
+  Crypto is async; the API is async-first for consistency). Pure
+  queries (`listScenesOrdered`, `get*`, `detectMissingDataForScene`,
+  `validatePlot`, `runPlotOpenMigrations`) remain synchronous.
+- **FR-MODULE-022**: The module MUST use `immer.produce(…)` for
+  structural sharing on every mutation; unmodified Features MUST be
+  reference-equal across input and output FeatureCollections (tested
+  invariant).
+- **FR-TEST-023**: The spec MUST land a Python → JSON → TypeScript →
+  JSON → Python round-trip harness covering at least the two valid
+  single-Feature fixtures (Article II SC-001 gate). Implementation
+  via pytest invoking a Node subprocess that parses + re-serialises
+  through the generated TypeScript models.
+- **FR-TEST-024**: The spec MUST land a Vitest performance benchmark
+  (`shared/components/src/storyboard/__tests__/perf.bench.ts`)
+  measuring `createScene`, `updateScene`, and
+  `copySceneToOtherStoryboard` p95 latency on synthetic plots of
+  100, 1 000, 10 000, and 100 000 total position reports. Target:
+  **p95 < 10 ms at 100k positions** on the CI runner.
 
 ### Key Entities *(schema-first; authoritative)*
 
@@ -252,21 +326,19 @@ plot. A plot can carry multiple Storyboards; none are "active" on disk
 - `type`: `"Feature"`
 - `geometry`: `Polygon` — computed hull covering the union of child
   Scene viewport bounds. Recomputed whenever the Scene set changes.
-- `properties.debrief:type`: `"storyboard"` (discriminator)
+- `properties.kind`: `STORYBOARD` (inherited discriminator)
 
 **Attributes** (all on `properties`):
 
 | Attribute | Type | Required | Notes |
 |-----------|------|----------|-------|
+| `kind` | `STORYBOARD` | yes | Inherited from `BaseFeatureProperties`. |
 | `id` | ULID string | yes | Stable identifier; survives renames and re-imports. |
 | `name` | string | yes | Display title (unique within a plot). |
 | `description` | markdown string | no | Rendered in the panel; also available to downstream briefing renderers. |
 | `schema_version` | integer | yes | Migration vector. Starts at `1`. |
-| `created_by` | actor string | yes | Provenance — Article III. |
-| `created_at` | ISO-8601 instant | yes | Provenance. |
-| `last_modified_by` | actor string | yes | Provenance. |
-| `last_modified_at` | ISO-8601 instant | yes | Provenance. |
-| `history` | array of `HistoryEntry` | yes | Append-only mutation log. |
+| `tags` | string[] | no | Inherited from `BaseFeatureProperties`. |
+| `provenance` | `LogEntry[]` | yes | Inherited from `BaseFeatureProperties`. Append-only. Each CRUD op appends one entry; first entry's timestamp is `created_at`, last entry's is `last_modified_at`, `agent` field identifies the actor. |
 
 **Invariants**:
 - `name` is unique within the owning plot's FeatureCollection.
@@ -287,12 +359,13 @@ plus a thumbnail.
 **GeoJSON shape**:
 - `type`: `"Feature"`
 - `geometry`: `Polygon` — the map viewport bounds at capture time.
-- `properties.debrief:type`: `"storyboard_scene"` (discriminator)
+- `properties.kind`: `STORYBOARD_SCENE` (inherited discriminator)
 
 **Attributes** (all on `properties`):
 
 | Attribute | Type | Required | Notes |
 |-----------|------|----------|-------|
+| `kind` | `STORYBOARD_SCENE` | yes | Inherited from `BaseFeatureProperties`. |
 | `id` | ULID string | yes | Stable identifier. |
 | `storyboard_id` | ULID string | yes | Foreign key → `Storyboard.id`. |
 | `title` | string | yes | Defaults to DTG of `timestamp` in `DDHHmmZ MMM YY`; falls back to ISO-8601. |
@@ -300,15 +373,12 @@ plus a thumbnail.
 | `viewport` | `Viewport` sub-record | yes | Camera state. |
 | `timestamp` | ISO-8601 instant | yes | Drives Scene ordering. |
 | `time_range` | `{start, end}` or `null` | no | **Reserved** — MUST be `null` in v1. |
-| `visible_feature_ids` | array of stable feature IDs | yes | IDs visible at capture. Order-insensitive. |
-| `feature_set_hash` | string | yes | Hash of sorted `visible_feature_ids`. |
+| `visible_feature_ids` | array of stable feature IDs | yes | IDs visible at capture. Canonicalised (trim, dedupe, sort) before hashing. |
+| `feature_set_hash` | string | yes | SHA-256 hex of canonicalised `visible_feature_ids`. |
 | `thumbnail_asset_ref` | STAC asset reference | yes | Populated by #216 at capture time via #174. |
 | `transition_duration_ms` | integer | yes | Playback override. Default `500`. |
-| `created_by` | actor string | yes | Provenance. |
-| `created_at` | ISO-8601 instant | yes | Provenance. |
-| `last_modified_by` | actor string | yes | Provenance. |
-| `last_modified_at` | ISO-8601 instant | yes | Provenance. |
-| `history` | array of `HistoryEntry` | yes | Append-only. |
+| `tags` | string[] | no | Inherited from `BaseFeatureProperties`. |
+| `provenance` | `LogEntry[]` | yes | Inherited from `BaseFeatureProperties`. Append-only. CRUD ops append one entry per mutation; first = created, last = last-modified. |
 
 **Invariants**:
 - `timestamp` unique within a Storyboard.
@@ -329,14 +399,24 @@ plus a thumbnail.
 | `zoom` | float | yes | Leaflet-compatible. |
 | `bearing` | float | yes | MUST be `0` in v1. |
 
-#### Sub-Entity — HistoryEntry
+#### Provenance encoding — how CRUD ops map to `LogEntry`
 
-| Attribute | Type | Required | Notes |
-|-----------|------|----------|-------|
-| `timestamp` | ISO-8601 instant | yes | |
-| `actor` | string | yes | |
-| `op` | enum | yes | `create`, `rename`, `describe`, `delete`, `restore`, `update-to-current`, `duplicate`, `copy-in`, `insert-middle`, `refresh-thumbnail` |
-| `summary` | short string | yes | One-liner for the Analysis Log (#176). |
+The inherited `provenance: LogEntry[]` slot carries one `LogEntry` per
+CRUD mutation. Encoding:
+
+| `LogEntry` field | Value for storyboard CRUD ops |
+|------------------|--------------------------------|
+| `activity_id` | fresh UUID v4 for each op |
+| `timestamp` | ISO-8601 instant when the op ran |
+| `agent` (NEW optional slot) | Actor string (e.g. `"alice"`) |
+| `was_generated_by.tool` | `"storyboard-crud"` |
+| `was_generated_by.tool_version` | `"1.0.0"` (semver of this spec) |
+| `was_generated_by.parameters.op` | one of: `create`, `rename`, `describe`, `delete`, `restore`, `update-to-current`, `duplicate`, `copy-in`, `insert-middle`, `refresh-thumbnail` |
+| `was_generated_by.parameters.summary` | one-liner for the Analysis Log (#176) |
+| `used` | source feature IDs (empty for `create`; source scene for `duplicate`/`copy-in`) |
+| `generated` | output feature IDs (the Storyboard or Scene id) |
+| `execution_duration` | `PT0S` (CRUD is effectively instantaneous) |
+| `rationale` | free-text analyst annotation (optional) |
 
 ---
 
