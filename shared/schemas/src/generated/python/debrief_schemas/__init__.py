@@ -106,7 +106,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': 'C:\\git\\debrief-future\\shared\\schemas\\src\\linkml\\debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
@@ -727,7 +727,7 @@ class FileProvDirectionEnum(str, Enum):
 
 class PlaybackStateEnum(str, Enum):
     """
-    Current state of time playback
+    Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-NN in docs/project_notes/decisions.md.
     """
     stopped = "stopped"
     """
@@ -745,15 +745,15 @@ class PlaybackStateEnum(str, Enum):
 
 class DisplayModeEnum(str, Enum):
     """
-    Track visualization display mode
+    Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
     """
-    normal = "normal"
+    full = "full"
     """
-    Standard track display
+    Render the entire track regardless of current time
     """
-    snailTrail = "snailTrail"
+    trail = "trail"
     """
-    Trail showing recent positions
+    Render a snail-trail from track start up to current time
     """
 
 

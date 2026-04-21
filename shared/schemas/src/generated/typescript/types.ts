@@ -388,7 +388,7 @@ export enum FileProvDirectionEnum {
     target = "target",
 };
 /**
-* Current state of time playback
+* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-NN in docs/project_notes/decisions.md.
 */
 export enum PlaybackStateEnum {
     
@@ -400,15 +400,29 @@ export enum PlaybackStateEnum {
     paused = "paused",
 };
 /**
-* Track visualization display mode
+* Template-literal derivation of the permissible playback states from
+* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
+* so TypeScript rejects an unknown state at compile time (Feature 205 /
+* FR-007).
+*/
+export type PlaybackState = `${PlaybackStateEnum}`;
+/**
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
 */
 export enum DisplayModeEnum {
     
-    /** Standard track display */
-    normal = "normal",
-    /** Trail showing recent positions */
-    snailTrail = "snailTrail",
+    /** Render the entire track regardless of current time */
+    full = "full",
+    /** Render a snail-trail from track start up to current time */
+    trail = "trail",
 };
+/**
+* Template-literal derivation of the permissible display modes from
+* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
+* TypeScript rejects an unknown mode at compile time (Feature 205 /
+* FR-007).
+*/
+export type DisplayMode = `${DisplayModeEnum}`;
 /**
 * Units for time step navigation
 */
@@ -1804,9 +1818,9 @@ export interface TemporalSlice {
     /** Playback speed multiplier 0.1-100x (FR-009) */
     playbackRate: number,
     /** Current playback state - ephemeral (FR-010) */
-    playbackState: string,
+    playbackState: PlaybackState,
     /** Track visualization mode (FR-011) */
-    displayMode: string,
+    displayMode: DisplayMode,
 }
 
 

@@ -54,9 +54,9 @@ class TestSchemaStructure:
         schema = json.loads(schema_file.read_text())
 
         assert "$schema" in schema, "Schema should have $schema field"
-        assert "type" in schema or "properties" in schema, (
-            "Schema should have type or properties field"
-        )
+        assert (
+            "type" in schema or "properties" in schema
+        ), "Schema should have type or properties field"
 
 
 class TestEnumConsistency:
@@ -70,9 +70,9 @@ class TestEnumConsistency:
         enum_values = track_type_def.get("enum", [])
 
         expected = ["OWNSHIP", "CONTACT", "REFERENCE", "SOLUTION"]
-        assert set(enum_values) == set(expected), (
-            f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
 
     def test_location_type_enum_values(self) -> None:
         """LocationTypeEnum should have consistent values."""
@@ -82,9 +82,9 @@ class TestEnumConsistency:
         enum_values = location_type_def.get("enum", [])
 
         expected = ["WAYPOINT", "EXERCISE_AREA", "DANGER_AREA", "ANCHORAGE", "PORT", "REFERENCE"]
-        assert set(enum_values) == set(expected), (
-            f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
 
     def test_segment_type_enum_values(self) -> None:
         """SegmentTypeEnum should have consistent values."""
@@ -94,9 +94,9 @@ class TestEnumConsistency:
         enum_values = segment_type_def.get("enum", [])
 
         expected = ["TRACK", "ABSOLUTE_TMA", "RELATIVE_TMA", "DYNAMIC_INFILL"]
-        assert set(enum_values) == set(expected), (
-            f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
 
     def test_feature_kind_enum_values(self) -> None:
         """FeatureKindEnum should include all feature type discriminators."""
@@ -123,9 +123,9 @@ class TestEnumConsistency:
             "STORYBOARD",
             "STORYBOARD_SCENE",
         ]
-        assert set(enum_values) == set(expected), (
-            f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
 
     def test_array_centre_mode_enum_values(self) -> None:
         """ArrayCentreModeEnum should have consistent values."""
@@ -135,9 +135,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["PLAIN", "WORM", "MEASURED"]
-        assert set(enum_values) == set(expected), (
-            f"ArrayCentreModeEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"ArrayCentreModeEnum values mismatch: {enum_values} vs {expected}"
 
     def test_line_style_enum_values(self) -> None:
         """LineStyleEnum should have consistent values."""
@@ -147,9 +147,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["SOLID", "DASHED", "DOT", "DASH_DOT"]
-        assert set(enum_values) == set(expected), (
-            f"LineStyleEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"LineStyleEnum values mismatch: {enum_values} vs {expected}"
 
     def test_label_location_enum_values(self) -> None:
         """LabelLocationEnum should have consistent values."""
@@ -159,9 +159,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["LEFT", "CENTER", "RIGHT"]
-        assert set(enum_values) == set(expected), (
-            f"LabelLocationEnum values mismatch: {enum_values} vs {expected}"
-        )
+        assert set(enum_values) == set(
+            expected
+        ), f"LabelLocationEnum values mismatch: {enum_values} vs {expected}"
 
     def test_line_label_position_enum_values(self) -> None:
         """LineLabelPositionEnum should have consistent values."""
@@ -171,8 +171,110 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["START", "MIDDLE", "END"]
-        assert set(enum_values) == set(expected), (
-            f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(
+            expected
+        ), f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+
+
+class TestFeature205EnumParity:
+    """LinkML ↔ Pydantic parity for Feature 205 enums (FR-008 / SC-005).
+
+    PlaybackStateEnum / DisplayModeEnum are emitted by gen-pydantic and
+    gen-typescript but NOT by gen-json-schema, because the JSON Schema
+    generator runs against `debrief-jsonschema.yaml` which deliberately
+    excludes the `session-state` module to sidestep a gen-json-schema
+    bug with multivalued-class ranges (see the file's header comment).
+    The parity contract therefore covers the two generators that
+    actually emit these enums — Pydantic and TypeScript (via the
+    generated `types.ts`).
+    """
+
+    def _load_linkml_enum(self, enum_name: str) -> set[str]:
+        import yaml  # noqa: PLC0415
+
+        linkml_file = Path(__file__).parent.parent / "src" / "linkml" / "session-state.yaml"
+        data = yaml.safe_load(linkml_file.read_text())
+        perms = data.get("enums", {}).get(enum_name, {}).get("permissible_values", {}) or {}
+        return set(perms.keys())
+
+    def _load_pydantic_enum(self, enum_name: str) -> set[str]:
+        import sys  # noqa: PLC0415
+
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
+        import debrief_schemas  # noqa: PLC0415
+
+        cls = getattr(debrief_schemas, enum_name)
+        return set(cls._member_map_.keys())
+
+    def _load_typescript_enum(self, enum_name: str) -> set[str]:
+        import re  # noqa: PLC0415
+
+        ts_file = Path(__file__).parent.parent / "src" / "generated" / "typescript" / "types.ts"
+        content = ts_file.read_text(encoding="utf-8")
+        # Match: `export enum <EnumName> { ... members ... }`
+        # Members: `    name = "value",`
+        pattern = re.compile(
+            rf"export enum {re.escape(enum_name)} \{{([^}}]*)\}}",
+            re.DOTALL,
+        )
+        match = pattern.search(content)
+        if not match:
+            return set()
+        members = re.findall(r'(\w+)\s*=\s*"[^"]*"', match.group(1))
+        return set(members)
+
+    def test_playback_state_enum_canonical_values(self) -> None:
+        """PlaybackStateEnum has canonical values stopped|playing|paused (FR-005 / SC-005)."""
+        assert self._load_linkml_enum("PlaybackStateEnum") == {
+            "stopped",
+            "playing",
+            "paused",
+        }
+
+    def test_display_mode_enum_canonical_values(self) -> None:
+        """DisplayModeEnum has canonical values full|trail (FR-002 / SC-003)."""
+        assert self._load_linkml_enum("DisplayModeEnum") == {"full", "trail"}
+
+    def test_display_mode_enum_has_no_legacy_values(self) -> None:
+        """Legacy 'normal'/'snailTrail' values MUST NOT appear in DisplayModeEnum (SC-003)."""
+        linkml_vals = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        legacy = {"normal", "snailTrail"}
+        for name, vals in [
+            ("LinkML", linkml_vals),
+            ("Pydantic", pydantic_vals),
+            ("TypeScript", typescript_vals),
+        ]:
+            leaked = vals & legacy
+            assert not leaked, (
+                f"DisplayModeEnum still carries legacy values in {name}: {leaked}. "
+                "These must be removed per Feature 205 / FR-002."
+            )
+
+    def test_playback_state_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("PlaybackStateEnum")
+        pydantic_vals = self._load_pydantic_enum("PlaybackStateEnum")
+        typescript_vals = self._load_typescript_enum("PlaybackStateEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"PlaybackStateEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
+        )
+
+    def test_display_mode_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"DisplayModeEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
         )
 
 
@@ -267,9 +369,9 @@ class TestSensorSchemaStructure:
             assert "array" in origin_type, "origin type should include 'array'"
         else:
             assert origin_type == "array", "origin should be array"
-        assert origin_prop.get("items", {}).get("type") == "number", (
-            "origin items should be numbers"
-        )
+        assert (
+            origin_prop.get("items", {}).get("type") == "number"
+        ), "origin items should be numbers"
 
     def test_measured_position_location_schema(self) -> None:
         """MeasuredArrayPosition.location should be array of exactly 2 floats."""
@@ -282,9 +384,9 @@ class TestSensorSchemaStructure:
             assert "array" in location_type, "location type should include 'array'"
         else:
             assert location_type == "array", "location should be array"
-        assert location_prop.get("items", {}).get("type") == "number", (
-            "location items should be numbers"
-        )
+        assert (
+            location_prop.get("items", {}).get("type") == "number"
+        ), "location items should be numbers"
 
 
 class TestRequiredFields:
@@ -309,12 +411,12 @@ class TestRequiredFields:
         assert len(any_of) >= 2, "geometry should have anyOf with at least 2 options"
 
         refs = [opt.get("$ref", "") for opt in any_of]
-        assert any("GeoJSONLineString" in r for r in refs), (
-            "geometry anyOf should include GeoJSONLineString"
-        )
-        assert any("GeoJSONMultiLineString" in r for r in refs), (
-            "geometry anyOf should include GeoJSONMultiLineString"
-        )
+        assert any(
+            "GeoJSONLineString" in r for r in refs
+        ), "geometry anyOf should include GeoJSONLineString"
+        assert any(
+            "GeoJSONMultiLineString" in r for r in refs
+        ), "geometry anyOf should include GeoJSONMultiLineString"
 
     def test_track_properties_has_compound_fields(self) -> None:
         """TrackProperties should have segments, sensors, tuas fields."""
@@ -449,16 +551,16 @@ class TestStoryboardSchemaGeneration:
         # Scene
         pydantic_sc_props = set(SceneFeature.model_json_schema()["properties"].keys())
         linkml_sc_props = set(defs.get("SceneFeature", {}).get("properties", {}).keys())
-        assert pydantic_sc_props == linkml_sc_props, (
-            f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
-        )
+        assert (
+            pydantic_sc_props == linkml_sc_props
+        ), f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
 
         # Viewport
         pydantic_vp_props = set(Viewport.model_json_schema()["properties"].keys())
         linkml_vp_props = set(defs.get("Viewport", {}).get("properties", {}).keys())
-        assert pydantic_vp_props == linkml_vp_props, (
-            f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
-        )
+        assert (
+            pydantic_vp_props == linkml_vp_props
+        ), f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
 
 
 if __name__ == "__main__":
