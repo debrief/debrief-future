@@ -1,9 +1,12 @@
 /**
- * Storyboard panel — minimal (Scene list only) for Feature 216.
+ * Storyboard panel — Scene list (#216) + transport row (#217).
  *
- * #217 will extend with transport controls + multi-Storyboard dropdown.
- * #218 will extend with edit affordances. This spec ships a presentational
- * Scene list only — a confirmation surface for the capture flow.
+ * #218 will extend with edit affordances. Current surface:
+ *   - Static header with the active Storyboard name + Capture button.
+ *   - SceneList with optional `currentSceneId`-driven highlight (#217).
+ *   - Optional TransportRow below the SceneList when `transport` is
+ *     provided (design-fix 3 — #217 leaves #216 behaviour unchanged when
+ *     the new optional props are omitted).
  *
  * No VS Code imports; theming flows through the existing `ThemeProvider`
  * tokens so the panel works unmodified in Storybook.
@@ -11,6 +14,7 @@
 
 import React from 'react';
 import { SceneList } from './SceneList';
+import { TransportRow } from './TransportRow';
 import type { StoryboardPanelProps } from './types';
 
 const EMPTY_STATE_COPY =
@@ -25,6 +29,10 @@ export function StoryboardPanel({
   captureInFlight,
   onCaptureClick,
   onSceneRowClick,
+  currentSceneId,
+  transport,
+  onTransportForward,
+  onTransportBackward,
 }: StoryboardPanelProps): React.ReactElement {
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
@@ -125,9 +133,18 @@ export function StoryboardPanel({
           <SceneList
             scenes={scenes}
             captureInFlight={captureInFlight}
+            currentSceneId={currentSceneId ?? null}
             onSceneRowClick={onSceneRowClick}
           />
         </div>
+      )}
+
+      {transport && (
+        <TransportRow
+          transport={transport}
+          onForwardClick={onTransportForward ?? ((): void => undefined)}
+          onBackwardClick={onTransportBackward ?? ((): void => undefined)}
+        />
       )}
     </div>
   );

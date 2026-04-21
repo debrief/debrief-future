@@ -10,6 +10,8 @@ import type { SceneRowViewModel } from './types';
 export interface SceneListProps {
   readonly scenes: readonly SceneRowViewModel[];
   readonly captureInFlight: boolean;
+  /** ID of the current transport scene — that row gets `data-active="true"`. */
+  readonly currentSceneId?: string | null;
   onSceneRowClick(sceneId: string): void;
 }
 
@@ -25,6 +27,7 @@ const PENDING_SCENE: SceneRowViewModel = {
 export function SceneList({
   scenes,
   captureInFlight,
+  currentSceneId,
   onSceneRowClick,
 }: SceneListProps): React.ReactElement {
   return (
@@ -41,6 +44,7 @@ export function SceneList({
         <SceneRow
           key={scene.sceneId}
           scene={scene}
+          active={currentSceneId === scene.sceneId}
           onClick={onSceneRowClick}
         />
       ))}

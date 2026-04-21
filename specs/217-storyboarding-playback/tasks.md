@@ -156,9 +156,9 @@ T170 → T171 → T172   (package.json — same file, serial)
 
 ### 3.2 Integrate TransportRow into StoryboardPanel
 
-- [ ] T310 [test] Extend existing `StoryboardPanel.test.tsx` — TransportRow renders when `transport` prop provided; TransportRow hidden when `transport` undefined (design-fix 3); current-scene highlight applied to matching row via `currentSceneId` prop; `[data-active="true"]` attribute present on current row `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
-- [ ] T311 Update `StoryboardPanel.tsx` to render `<TransportRow>` below the Scene list when `transport` prop is provided; apply `data-active="true"` to the Scene row matching `currentSceneId` (used by E2E + CSS highlight); retain #216 empty-state paths unchanged `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T312 [P] Add `Transport` and `HardBlockModal` stories to Storybook — Transport story shows 3-Scene panel with transport enabled; HardBlockModal story shows missing-features variant with labels populated `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T310 [test] Extend existing `StoryboardPanel.test.tsx` — TransportRow renders when `transport` prop provided; TransportRow hidden when `transport` undefined (design-fix 3); current-scene highlight applied to matching row via `currentSceneId` prop; `[data-active="true"]` attribute present on current row `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
+- [x] T311 Update `StoryboardPanel.tsx` to render `<TransportRow>` below the Scene list when `transport` prop is provided; apply `data-active="true"` to the Scene row matching `currentSceneId` (used by E2E + CSS highlight); retain #216 empty-state paths unchanged `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [x] T312 [P] Add `Transport` and `HardBlockModal` stories to Storybook — Transport story shows 3-Scene panel with transport enabled; HardBlockModal story shows missing-features variant with labels populated `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
 ### 3.3 StoryboardPlaybackService — transport state machine (tests first)
 

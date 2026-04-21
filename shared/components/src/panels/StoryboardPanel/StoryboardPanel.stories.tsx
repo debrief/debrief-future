@@ -8,7 +8,12 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { StoryboardPanel } from './StoryboardPanel';
-import type { SceneRowViewModel } from './types';
+import { HardBlockModal } from './HardBlockModal';
+import type {
+  SceneRowViewModel,
+  TransportViewModel,
+  MissingDataReason,
+} from './types';
 
 function makeSceneRow(
   sceneId: string,
@@ -105,4 +110,48 @@ export const Capturing: Story = {
     onCaptureClick: () => undefined,
     onSceneRowClick: () => undefined,
   },
+};
+
+// ─── #217 stories ─────────────────────────────────────────────────────
+
+const TRANSPORT_AT_1: TransportViewModel = {
+  canGoBackward: false,
+  canGoForward: true,
+  sceneNumber: 1,
+  sceneTotal: 3,
+  transitionInFlight: false,
+};
+
+export const Transport: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    currentSceneId: 'scene-1',
+    transport: TRANSPORT_AT_1,
+    onTransportForward: () => undefined,
+    onTransportBackward: () => undefined,
+  },
+};
+
+const HARD_BLOCK_REASON: MissingDataReason = {
+  kind: 'missing-features',
+  missingFeatureIds: ['track-nimitz', 'annotation-bearing-lock'],
+};
+
+export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
+  name: 'HardBlockModal (missing features)',
+  render: () => (
+    <HardBlockModal
+      sceneTitle="201435Z APR 26 — Surface contact"
+      reason={HARD_BLOCK_REASON}
+      jumpPastLabel="Jump past this scene"
+      openForEditingLabel="Open for editing"
+      onJumpPast={() => undefined}
+      onOpenForEditing={() => undefined}
+      onDismiss={() => undefined}
+    />
+  ),
 };
