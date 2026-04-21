@@ -151,7 +151,7 @@ def generate_pydantic() -> bool:
         # Prepend DO NOT EDIT header
         content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
 
-        output_file.write_text(content)
+        output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
@@ -318,7 +318,7 @@ def generate_jsonschema() -> bool:
         _strip_type_from_anyof(full_schema)
         _fix_geojson_coordinates(full_schema)
 
-        output_file.write_text(json.dumps(full_schema, indent=2))
+        output_file.write_text(json.dumps(full_schema, indent=2), encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
         entity_types = [
             # Core types
@@ -356,7 +356,9 @@ def generate_jsonschema() -> bool:
                     "$defs": {k: v for k, v in all_defs.items() if k in reachable},
                 }
                 entity_file = JSONSCHEMA_OUT / f"{entity}.schema.json"
-                entity_file.write_text(json.dumps(entity_schema, indent=2))
+                entity_file.write_text(
+                    json.dumps(entity_schema, indent=2), encoding="utf-8", newline="\n"
+                )
                 print(f"  [OK] Generated: {entity_file}")
 
         return True
@@ -474,6 +476,67 @@ def generate_typescript() -> bool:
                 )
                 content = content[:idx] + fixed_block + content[brace_idx:]
 
+        # Post-process (Feature 205 / FR-007): narrow `playbackState: string` /
+        # `displayMode: string` on `TemporalSlice` to the template-literal
+        # unions `PlaybackState` / `DisplayMode` derived from
+        # PlaybackStateEnum / DisplayModeEnum. gen-typescript emits `string`
+        # for enum-ranged attributes (see the Feature 201 / FR-014 PointShape
+        # precedent above); without this narrowing, callers cannot catch
+        # `{ playbackState: 'palying' }` or `{ displayMode: 'snailTrail' }`
+        # at compile time.
+        _playback_state_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible playback states from\n"
+            "* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice\n"
+            "* so TypeScript rejects an unknown state at compile time (Feature 205 /\n"
+            "* FR-007).\n"
+            "*/\n"
+            "export type PlaybackState = `${PlaybackStateEnum}`;\n"
+        )
+        _display_mode_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible display modes from\n"
+            "* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so\n"
+            "* TypeScript rejects an unknown mode at compile time (Feature 205 /\n"
+            "* FR-007).\n"
+            "*/\n"
+            "export type DisplayMode = `${DisplayModeEnum}`;\n"
+        )
+        _playback_state_sentinel = "export enum PlaybackStateEnum {"
+        _display_mode_sentinel = "export enum DisplayModeEnum {"
+
+        if _playback_state_sentinel in content and "export type PlaybackState" not in content:
+            enum_start = content.index(_playback_state_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _playback_state_decl + content[enum_end + len("};\n") :]
+
+        if _display_mode_sentinel in content and "export type DisplayMode" not in content:
+            enum_start = content.index(_display_mode_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _display_mode_decl + content[enum_end + len("};\n") :]
+
+        # Narrow the two TemporalSlice fields from string → template-literal type.
+        _temporal_slice_start = content.find("export interface TemporalSlice {\n")
+        if _temporal_slice_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface TemporalSlice`."
+            )
+        _temporal_slice_end = content.index("}\n", _temporal_slice_start) + 2
+        _temporal_slice_block = content[_temporal_slice_start:_temporal_slice_end]
+        _new_block = _temporal_slice_block.replace(
+            "    playbackState: string,\n", "    playbackState: PlaybackState,\n", 1
+        ).replace("    displayMode: string,\n", "    displayMode: DisplayMode,\n", 1)
+        if _new_block == _temporal_slice_block:
+            raise RuntimeError(
+                "generate.py: TemporalSlice enum-slot post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`playbackState: string` / `displayMode: string` tokens. Update "
+                "generate.py (Feature 205)."
+            )
+        content = content[:_temporal_slice_start] + _new_block + content[_temporal_slice_end:]
+
         # Post-process (#214): tag the generated `GeoJSONFeature` interface
         # with `// canonical` so the `scripts/check-no-geojson-feature.sh`
         # regression guard (wired into `task lint`) doesn't flag the
@@ -550,12 +613,16 @@ def generate_typescript() -> bool:
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 
-        output_file.write_text(content)
+        output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
 
         # Create index.ts that re-exports everything
         index_file = TYPESCRIPT_OUT / "index.ts"
-        index_file.write_text('export * from "./types.js";\nexport * from "./unions.js";\n')
+        index_file.write_text(
+            'export * from "./types.js";\nexport * from "./unions.js";\n',
+            encoding="utf-8",
+            newline="\n",
+        )
         print(f"  [OK] Generated: {index_file}")
         return True
     except subprocess.CalledProcessError as e:

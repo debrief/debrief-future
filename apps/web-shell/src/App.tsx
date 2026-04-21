@@ -63,15 +63,10 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
-import {
-  getSessionStore,
-  resetSessionStore,
-  type DisplayMode as StoreDisplayMode,
-} from '@debrief/session-state';
+import { getSessionStore, resetSessionStore } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
-import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
@@ -92,12 +87,6 @@ function featureProps(f: { properties: unknown }): { [key: string]: unknown } {
 type StyleObj = { [key: string]: unknown };
 type OverridesObj = { [key: string]: StyleObj };
 
-// Map between session-state DisplayMode ('normal'|'snailTrail') and
-// components DisplayMode ('full'|'trail') — the two enums diverged historically.
-const toComponentMode = (m: StoreDisplayMode): ComponentDisplayMode =>
-  m === 'snailTrail' ? 'trail' : 'full';
-const toStoreMode = (m: string): StoreDisplayMode =>
-  m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
@@ -1075,7 +1064,7 @@ export default function App() {
         playback.pause();
         break;
       case 'temporal:displayMode':
-        store.getState().setDisplayMode(toStoreMode(message.payload.mode));
+        store.getState().setDisplayMode(message.payload.mode);
         break;
       case 'tool:run':
         handleRunTool(message.payload.toolId, message.payload.params);
@@ -1289,7 +1278,7 @@ export default function App() {
       currentTime: playback.currentTime,
       playbackState: playback.playbackState,
       playbackSpeed: playback.speed,
-      displayMode: toComponentMode(state.displayMode),
+      displayMode: state.displayMode,
       timeUiState: timeExtent ? 'ready' : 'empty',
       tools,
       toolMatches,
@@ -1305,7 +1294,7 @@ export default function App() {
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
       currentTime: playback.currentTime,
-      displayMode: toComponentMode(state.displayMode),
+      displayMode: state.displayMode,
       drawingMode,
       onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,

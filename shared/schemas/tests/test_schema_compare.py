@@ -176,6 +176,108 @@ class TestEnumConsistency:
         )
 
 
+class TestFeature205EnumParity:
+    """LinkML ↔ Pydantic parity for Feature 205 enums (FR-008 / SC-005).
+
+    PlaybackStateEnum / DisplayModeEnum are emitted by gen-pydantic and
+    gen-typescript but NOT by gen-json-schema, because the JSON Schema
+    generator runs against `debrief-jsonschema.yaml` which deliberately
+    excludes the `session-state` module to sidestep a gen-json-schema
+    bug with multivalued-class ranges (see the file's header comment).
+    The parity contract therefore covers the two generators that
+    actually emit these enums — Pydantic and TypeScript (via the
+    generated `types.ts`).
+    """
+
+    def _load_linkml_enum(self, enum_name: str) -> set[str]:
+        import yaml  # noqa: PLC0415
+
+        linkml_file = Path(__file__).parent.parent / "src" / "linkml" / "session-state.yaml"
+        data = yaml.safe_load(linkml_file.read_text())
+        perms = data.get("enums", {}).get(enum_name, {}).get("permissible_values", {}) or {}
+        return set(perms.keys())
+
+    def _load_pydantic_enum(self, enum_name: str) -> set[str]:
+        import sys  # noqa: PLC0415
+
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
+        import debrief_schemas  # noqa: PLC0415
+
+        cls = getattr(debrief_schemas, enum_name)
+        return set(cls._member_map_.keys())
+
+    def _load_typescript_enum(self, enum_name: str) -> set[str]:
+        import re  # noqa: PLC0415
+
+        ts_file = Path(__file__).parent.parent / "src" / "generated" / "typescript" / "types.ts"
+        content = ts_file.read_text(encoding="utf-8")
+        # Match: `export enum <EnumName> { ... members ... }`
+        # Members: `    name = "value",`
+        pattern = re.compile(
+            rf"export enum {re.escape(enum_name)} \{{([^}}]*)\}}",
+            re.DOTALL,
+        )
+        match = pattern.search(content)
+        if not match:
+            return set()
+        members = re.findall(r'(\w+)\s*=\s*"[^"]*"', match.group(1))
+        return set(members)
+
+    def test_playback_state_enum_canonical_values(self) -> None:
+        """PlaybackStateEnum has canonical values stopped|playing|paused (FR-005 / SC-005)."""
+        assert self._load_linkml_enum("PlaybackStateEnum") == {
+            "stopped",
+            "playing",
+            "paused",
+        }
+
+    def test_display_mode_enum_canonical_values(self) -> None:
+        """DisplayModeEnum has canonical values full|trail (FR-002 / SC-003)."""
+        assert self._load_linkml_enum("DisplayModeEnum") == {"full", "trail"}
+
+    def test_display_mode_enum_has_no_legacy_values(self) -> None:
+        """Legacy 'normal'/'snailTrail' values MUST NOT appear in DisplayModeEnum (SC-003)."""
+        linkml_vals = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        legacy = {"normal", "snailTrail"}
+        for name, vals in [
+            ("LinkML", linkml_vals),
+            ("Pydantic", pydantic_vals),
+            ("TypeScript", typescript_vals),
+        ]:
+            leaked = vals & legacy
+            assert not leaked, (
+                f"DisplayModeEnum still carries legacy values in {name}: {leaked}. "
+                "These must be removed per Feature 205 / FR-002."
+            )
+
+    def test_playback_state_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("PlaybackStateEnum")
+        pydantic_vals = self._load_pydantic_enum("PlaybackStateEnum")
+        typescript_vals = self._load_typescript_enum("PlaybackStateEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"PlaybackStateEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
+        )
+
+    def test_display_mode_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"DisplayModeEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
+        )
+
+
 class TestSensorSchemaStructure:
     """Test that SensorData and SensorContact definitions are correct in JSON Schema."""
 

@@ -45,6 +45,12 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
 
   // State
   const [currentTime, setCurrentTimeState] = useState(defaultInitialTime);
+  // Feature 205 / FR-024: the hook's internal state is initialised to 'paused'
+  // and only ever written as 'playing' or 'paused' — 'stopped' is not reachable
+  // from the hook's own setters. The public PlaybackState surface accepts all
+  // three canonical values (stopped|playing|paused) to match the schema;
+  // per the stopped ≡ paused rendering rule (see ADR), any inbound 'stopped'
+  // is rendered identically to 'paused'. See docs/project_notes/decisions.md.
   const [playbackState, setPlaybackStateInternal] = useState<PlaybackState>('paused');
   const [speed, setSpeedState] = useState<PlaybackSpeed>(initialSpeed);
 

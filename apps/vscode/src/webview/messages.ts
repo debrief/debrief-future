@@ -8,7 +8,7 @@
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { SafeFeatureCollection } from '@debrief/utils';
-import type { PlatformRecord } from '@debrief/schemas';
+import type { DisplayMode, PlatformRecord } from '@debrief/schemas';
 export type { PlatformRecord };
 
 // ============================================================================
@@ -123,7 +123,7 @@ export interface SetCurrentTimeMessage {
 export interface SetDisplayModeMessage {
   type: 'setDisplayMode';
   /** 'full' = entire track + highlight marker; 'trail' = snail-trail to current time */
-  displayMode: 'full' | 'trail';
+  displayMode: DisplayMode;
 }
 
 /** Set hidden feature IDs (Feature: 048) */

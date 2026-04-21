@@ -17,6 +17,7 @@ import {
   type SessionStoreWithUndo,
   type TemporalSlice,
 } from '@debrief/session-state';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { SessionManager } from '../services/sessionManager';
 
 // Message types from webview to extension
@@ -27,12 +28,12 @@ interface TimeChangeMessage {
 
 interface PlaybackStateChangeMessage {
   type: 'playbackStateChange';
-  state: 'playing' | 'paused';
+  state: PlaybackState;
 }
 
 interface DisplayModeChangeMessage {
   type: 'displayModeChange';
-  mode: 'full' | 'trail';
+  mode: DisplayMode;
 }
 
 interface WebviewReadyMessage {
@@ -61,8 +62,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
 
   // Event callbacks (legacy - kept for backward compatibility)
   private _onTimeChangeCallback?: (time: number) => void;
-  private _onPlaybackStateChangeCallback?: (state: 'playing' | 'paused') => void;
-  private _onDisplayModeChangeCallback?: (mode: 'full' | 'trail') => void;
+  private _onPlaybackStateChangeCallback?: (state: PlaybackState) => void;
+  private _onDisplayModeChangeCallback?: (mode: DisplayMode) => void;
 
   constructor(extensionUri: vscode.Uri, sessionManager?: SessionManager) {
     this._extensionUri = extensionUri;
@@ -238,7 +239,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           // Update session state if available
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setPlaybackState(message.state === 'playing' ? 'playing' : 'paused');
+            state.setPlaybackState(message.state);
           }
           // Legacy callback
           if (this._onPlaybackStateChangeCallback) {
@@ -250,7 +251,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           // Update session state if available
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setDisplayMode(message.mode === 'trail' ? 'snailTrail' : 'normal');
+            state.setDisplayMode(message.mode);
           }
           // Legacy callback
           if (this._onDisplayModeChangeCallback) {
@@ -319,14 +320,14 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   /**
    * Register callback for playback state changes
    */
-  public onPlaybackStateChange(callback: (state: 'playing' | 'paused') => void): void {
+  public onPlaybackStateChange(callback: (state: PlaybackState) => void): void {
     this._onPlaybackStateChangeCallback = callback;
   }
 
   /**
    * Register callback for display mode changes
    */
-  public onDisplayModeChange(callback: (mode: 'full' | 'trail') => void): void {
+  public onDisplayModeChange(callback: (mode: DisplayMode) => void): void {
     this._onDisplayModeChangeCallback = callback;
   }
 

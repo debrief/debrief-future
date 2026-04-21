@@ -40,8 +40,8 @@ describe('Temporal Slice', () => {
       expect(store.getState().playbackState).toBe('stopped');
     });
 
-    it('should have displayMode of normal by default', () => {
-      expect(store.getState().displayMode).toBe('normal');
+    it('should have displayMode of full by default', () => {
+      expect(store.getState().displayMode).toBe('full');
     });
   });
 
@@ -135,15 +135,15 @@ describe('Temporal Slice', () => {
   });
 
   describe('setDisplayMode (FR-011)', () => {
-    it('should set display mode to snailTrail', () => {
-      store.getState().setDisplayMode('snailTrail');
-      expect(store.getState().displayMode).toBe('snailTrail');
+    it('should set display mode to trail', () => {
+      store.getState().setDisplayMode('trail');
+      expect(store.getState().displayMode).toBe('trail');
     });
 
-    it('should set display mode to normal', () => {
-      store.getState().setDisplayMode('snailTrail');
-      store.getState().setDisplayMode('normal');
-      expect(store.getState().displayMode).toBe('normal');
+    it('should set display mode to full', () => {
+      store.getState().setDisplayMode('trail');
+      store.getState().setDisplayMode('full');
+      expect(store.getState().displayMode).toBe('full');
     });
   });
 

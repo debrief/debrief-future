@@ -719,13 +719,10 @@ export class MapPanel {
           time: initialState.currentTime,
         });
       }
-      {
-        const webviewMode = initialState.displayMode === 'snailTrail' ? 'trail' : 'full';
-        this.postMessage({
-          type: 'setDisplayMode',
-          displayMode: webviewMode,
-        });
-      }
+      this.postMessage({
+        type: 'setDisplayMode',
+        displayMode: initialState.displayMode,
+      });
 
       // Subscribe to temporal (time + displayMode) changes (Feature: 039)
       this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
@@ -736,10 +733,9 @@ export class MapPanel {
           });
         }
         // Forward display mode to map webview
-        const webviewMode = temporal.displayMode === 'snailTrail' ? 'trail' : 'full';
         this.postMessage({
           type: 'setDisplayMode',
-          displayMode: webviewMode,
+          displayMode: temporal.displayMode,
         });
       });
 
@@ -905,10 +901,9 @@ export class MapPanel {
               time: state.currentTime,
             });
           }
-          const webviewMode = state.displayMode === 'snailTrail' ? 'trail' : 'full';
           this.postMessage({
             type: 'setDisplayMode',
-            displayMode: webviewMode,
+            displayMode: state.displayMode,
           });
         }
         break;

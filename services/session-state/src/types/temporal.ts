@@ -99,15 +99,13 @@ export interface TimeStep {
 }
 
 /**
- * Current state of time playback (FR-010).
- * Ephemeral - not persisted or tracked in undo history.
+ * Canonical playback / display-mode vocabularies for the temporal slice
+ * (Feature 205). Sourced from @debrief/schemas — the LinkML-generated
+ * enum is the single source of truth across Python + TypeScript.
+ * See ADR-NN in docs/project_notes/decisions.md.
  */
-export type PlaybackState = 'stopped' | 'playing' | 'paused';
-
-/**
- * Track visualization display mode (FR-011).
- */
-export type DisplayMode = 'normal' | 'snailTrail';
+import type { PlaybackState, DisplayMode } from '@debrief/schemas';
+export type { PlaybackState, DisplayMode };
 
 /**
  * Temporal state slice (FR-005 through FR-011).
@@ -115,9 +113,8 @@ export type DisplayMode = 'normal' | 'snailTrail';
  *
  * Schema equivalent: @debrief/schemas#TemporalSlice
  * Not migrated: generated TemporalSlice uses TimeInstant objects for
- * currentTime/timeRange/timeFilter, and string literals for playbackState/
- * displayMode. This type uses epoch numbers (Review Decision 5C) and
- * discriminated union literals for type safety.
+ * currentTime/timeRange/timeFilter. This type uses epoch numbers
+ * (Review Decision 5C) for hot-path state updates.
  */
 export interface TemporalSlice {
   /** Current playback/display time as epoch milliseconds (FR-005) */
@@ -146,7 +143,7 @@ export const DEFAULT_TEMPORAL_SLICE: TemporalSlice = {
   stepSize: { value: 1, unit: 'minute' },
   playbackRate: 1.0,
   playbackState: 'stopped',
-  displayMode: 'normal',
+  displayMode: 'full',
 };
 
 /**

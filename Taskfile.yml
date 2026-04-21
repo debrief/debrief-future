@@ -110,6 +110,8 @@ tasks:
       - pnpm lint
       - node scripts/check-eslint-drift-wiring.cjs
       - bash scripts/check-no-geojson-feature.sh
+      - bash scripts/check-no-hand-typed-temporal-enums.sh
+      - bash scripts/check-adr-refs.sh
 
   lint:fix:
     desc: "Auto-fix code style issues"

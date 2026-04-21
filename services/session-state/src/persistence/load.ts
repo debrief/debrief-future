@@ -5,9 +5,30 @@
 
 import { readFile } from 'fs/promises';
 import type { ViewportPolygon as SchemaViewportPolygon } from '@debrief/schemas';
+import {
+  DisplayModeEnum,
+  PlaybackStateEnum,
+  type DisplayMode,
+  type PlaybackState,
+} from '@debrief/schemas';
 import type { SessionStoreApi } from '../store/index.js';
 import type { SessionState } from '../types/index.js';
+import type { TimeStep } from '../types/temporal.js';
 import { isVersionCompatible, isFutureVersion, migrateSession } from './schema.js';
+
+// Load-boundary membership check (Feature 205 / FR-023a — Article I.3).
+// Returns a typed narrowing if the value is a permissible enum member, or
+// null otherwise. The caller short-circuits `loadSession` with the canonical
+// `LoadResult` shape when null is returned (R2-1A — no throw, no custom
+// error class; conforms to the existing module contract).
+function validateEnumMember<T extends string>(
+  value: unknown,
+  permissible: readonly T[]
+): T | null {
+  return typeof value === 'string' && (permissible as readonly string[]).includes(value)
+    ? (value as T)
+    : null;
+}
 
 /**
  * Load result.
@@ -63,13 +84,16 @@ export async function loadSession(
       data.version
     ) as unknown as SessionFile;
 
-    // Apply state to store
-    const result = applySessionState(store, migratedData, path);
+    // Apply state to store (may short-circuit with a validation error)
+    const applyResult = applySessionState(store, migratedData, path);
+    if (!applyResult.success) {
+      return applyResult;
+    }
 
     return {
       success: true,
       version: data.version,
-      state: result,
+      state: applyResult.state,
     };
   } catch (err) {
     return {
@@ -81,13 +105,51 @@ export async function loadSession(
 
 /**
  * Apply loaded session state to the store.
+ *
+ * Returns a narrowed result: `{ success: true, state }` on success, or
+ * `{ success: false, error }` when a load-boundary validation fails
+ * (Feature 205 / FR-023a). No throws — matches the module's
+ * LoadResult-return convention (R2-1A).
  */
 function applySessionState(
   store: SessionStoreApi,
   data: SessionFile,
   path: string
-): SessionState {
+): { success: true; state: SessionState } | { success: false; error: string } {
   const { temporal, spatial, features } = data;
+
+  // Load-boundary enum validation (Feature 205 / FR-023a — Article I.3).
+  // Validate BEFORE mutating the store so a reject leaves state untouched.
+  let displayMode: DisplayMode | undefined;
+  if (temporal.displayMode !== undefined) {
+    displayMode = validateEnumMember<DisplayMode>(
+      temporal.displayMode,
+      Object.values(DisplayModeEnum) as DisplayMode[]
+    ) ?? undefined;
+    if (displayMode === undefined) {
+      return {
+        success: false,
+        error:
+          `Invalid temporal.displayMode: ${JSON.stringify(temporal.displayMode)}. ` +
+          `Expected one of ${Object.values(DisplayModeEnum).join(', ')}.`,
+      };
+    }
+  }
+  let playbackState: PlaybackState | undefined;
+  if (temporal.playbackState !== undefined) {
+    playbackState = validateEnumMember<PlaybackState>(
+      temporal.playbackState,
+      Object.values(PlaybackStateEnum) as PlaybackState[]
+    ) ?? undefined;
+    if (playbackState === undefined) {
+      return {
+        success: false,
+        error:
+          `Invalid temporal.playbackState: ${JSON.stringify(temporal.playbackState)}. ` +
+          `Expected one of ${Object.values(PlaybackStateEnum).join(', ')}.`,
+      };
+    }
+  }
 
   // Reset store and apply loaded state
   store.getState().reset();
@@ -114,13 +176,19 @@ function applySessionState(
     store.getState().setTimeFilter({ start, end });
   }
   if (temporal.stepSize) {
-    store.getState().setStepSize(temporal.stepSize as never);
+    // Feature 205 / FR-023b: stepSize is a TimeStep object, not an enum;
+    // the previous `as never` was an inherited bypass. The Zustand setter
+    // accepts TimeStep directly.
+    store.getState().setStepSize(temporal.stepSize as TimeStep);
   }
   if (typeof temporal.playbackRate === 'number') {
     store.getState().setPlaybackRate(temporal.playbackRate);
   }
-  if (temporal.displayMode) {
-    store.getState().setDisplayMode(temporal.displayMode as never);
+  if (displayMode !== undefined) {
+    store.getState().setDisplayMode(displayMode);
+  }
+  if (playbackState !== undefined) {
+    store.getState().setPlaybackState(playbackState);
   }
 
   // Apply spatial state.
@@ -152,34 +220,37 @@ function applySessionState(
   // Return current state
   const state = store.getState();
   return {
-    temporal: {
-      currentTime: state.currentTime,
-      timeRange: state.timeRange,
-      timeFilter: state.timeFilter,
-      stepSize: state.stepSize,
-      playbackRate: state.playbackRate,
-      playbackState: state.playbackState,
-      displayMode: state.displayMode,
-    },
-    spatial: {
-      viewport: state.viewport,
-      rotation: state.rotation,
-      drawingMode: state.drawingMode,
-      drawingPaletteIndex: state.drawingPaletteIndex ?? 0,
-    },
-    features: {
-      featureCollectionUri: state.featureCollectionUri,
-      selection: state.selection,
-      hiddenFeatureIds: state.hiddenFeatureIds,
-      styleVersion: state.styleVersion ?? 0,
-    },
-    document: {
-      dirty: state.dirty,
-      savePath: state.savePath,
-    },
-    results: {
-      resultLayers: state.resultLayers ?? [],
-      lastToolExecution: state.lastToolExecution ?? null,
+    success: true,
+    state: {
+      temporal: {
+        currentTime: state.currentTime,
+        timeRange: state.timeRange,
+        timeFilter: state.timeFilter,
+        stepSize: state.stepSize,
+        playbackRate: state.playbackRate,
+        playbackState: state.playbackState,
+        displayMode: state.displayMode,
+      },
+      spatial: {
+        viewport: state.viewport,
+        rotation: state.rotation,
+        drawingMode: state.drawingMode,
+        drawingPaletteIndex: state.drawingPaletteIndex ?? 0,
+      },
+      features: {
+        featureCollectionUri: state.featureCollectionUri,
+        selection: state.selection,
+        hiddenFeatureIds: state.hiddenFeatureIds,
+        styleVersion: state.styleVersion ?? 0,
+      },
+      document: {
+        dirty: state.dirty,
+        savePath: state.savePath,
+      },
+      results: {
+        resultLayers: state.resultLayers ?? [],
+        lastToolExecution: state.lastToolExecution ?? null,
+      },
     },
   };
 }

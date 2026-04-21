@@ -140,15 +140,15 @@ test.describe('Undo/Redo Split (073)', () => {
 
     const initial = await getStoreState(page);
     const savedUri = initial.featureCollectionUri;
-    expect(initial.displayMode).toBe('normal');
+    expect(initial.displayMode).toBe('full');
 
     // Change display mode (UI-state — should be undoable)
     await page.evaluate(() => {
-      window.__sessionStore.getState().setDisplayMode('snailTrail');
+      window.__sessionStore.getState().setDisplayMode('trail');
     });
 
     const afterMode = await getStoreState(page);
-    expect(afterMode.displayMode).toBe('snailTrail');
+    expect(afterMode.displayMode).toBe('trail');
     expect(afterMode.canUndo).toBe(true);
 
     // Also change featureCollectionUri (data — should NOT be undoable)
@@ -163,7 +163,7 @@ test.describe('Undo/Redo Split (073)', () => {
     await page.keyboard.press('Control+z');
 
     const afterUndo = await getStoreState(page);
-    expect(afterUndo.displayMode).toBe('normal');
+    expect(afterUndo.displayMode).toBe('full');
     expect(afterUndo.featureCollectionUri).toBe('stac://new-data');
   });
 });

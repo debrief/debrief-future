@@ -35,12 +35,12 @@ describe('Persistence', () => {
   describe('extractPersistentState', () => {
     it('should extract temporal state', () => {
       store.getState().setPlaybackRate(2.0);
-      store.getState().setDisplayMode('snailTrail');
+      store.getState().setDisplayMode('trail');
 
       const persistent = extractPersistentState(store);
 
       expect(persistent.temporal.playbackRate).toBe(2.0);
-      expect(persistent.temporal.displayMode).toBe('snailTrail');
+      expect(persistent.temporal.displayMode).toBe('trail');
     });
 
     it('should extract spatial state', () => {
@@ -157,7 +157,7 @@ describe('Persistence round-trip', () => {
     store1.getState().setPlaybackRate(2.5);
     store1.getState().setRotation(90);
     store1.getState().setSelection(['f1'], 'f1');
-    store1.getState().setDisplayMode('snailTrail');
+    store1.getState().setDisplayMode('trail');
 
     // Serialize
     const json = serializeState(store1);
@@ -187,7 +187,7 @@ describe('Persistence round-trip', () => {
     expect(store2.getState().playbackRate).toBe(2.5);
     expect(store2.getState().rotation).toBe(90);
     expect(store2.getState().selection.featureIds).toEqual(['f1']);
-    expect(store2.getState().displayMode).toBe('snailTrail');
+    expect(store2.getState().displayMode).toBe('trail');
   });
 });
 
@@ -204,7 +204,7 @@ describe('Persistence loadSession — legacy tuple-form viewport (feature 203)',
         stepSize: { value: 1, unit: 'minute' },
         playbackRate: 1,
         playbackState: 'stopped',
-        displayMode: 'normal',
+        displayMode: 'full',
       },
       spatial: {
         viewport: {
@@ -249,5 +249,82 @@ describe('Persistence loadSession — legacy tuple-form viewport (feature 203)',
       { longitude: -1, latitude: 51 },
     ]);
     expect(rehydrated!.zoom).toBe(10);
+  });
+});
+
+describe('loadSession — temporal enum validation (Feature 205 / FR-023a)', () => {
+  /**
+   * Load-boundary validation for DisplayMode and PlaybackState: legacy,
+   * unknown, or typo values MUST be rejected with a typed error, returning
+   * `LoadResult { success: false, error: ... }` — no throw (R2-1A,
+   * R2-3A). The tests assert on `result.success` + `result.error` shape
+   * only, never `rejects.toThrow`.
+   */
+  function buildValidSessionPayload(overrides: {
+    displayMode?: unknown;
+    playbackState?: unknown;
+  } = {}): Record<string, unknown> {
+    return {
+      version: '1.1.0',
+      savedAt: '2026-04-21T00:00:00.000Z',
+      temporal: {
+        currentTime: null,
+        timeRange: null,
+        timeFilter: null,
+        stepSize: { value: 1, unit: 'minute' },
+        playbackRate: 1,
+        playbackState: overrides.playbackState ?? 'stopped',
+        displayMode: overrides.displayMode ?? 'full',
+      },
+      spatial: {
+        viewport: null,
+        rotation: 0,
+        drawingMode: null,
+        drawingPaletteIndex: 0,
+      },
+      features: {
+        featureCollectionUri: null,
+        selection: { featureIds: [], primary: undefined, timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' } },
+        hiddenFeatureIds: [],
+      },
+    };
+  }
+
+  async function runLoad(payload: Record<string, unknown>) {
+    const { readFile } = await import('fs/promises');
+    (readFile as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      JSON.stringify(payload),
+    );
+    const store = createSessionStore();
+    const { loadSession } = await import('../../src/persistence/index.js');
+    return loadSession(store, '/fake/session.debrief.json');
+  }
+
+  it('returns LoadResult {success:false} for legacy displayMode "snailTrail"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ displayMode: 'snailTrail' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.displayMode.*snailTrail/);
+  });
+
+  it('returns LoadResult {success:false} for legacy displayMode "normal"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ displayMode: 'normal' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.displayMode.*normal/);
+  });
+
+  it('returns LoadResult {success:false} for typo playbackState "palying"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ playbackState: 'palying' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.playbackState.*palying/);
+  });
+
+  it('returns LoadResult {success:true} for every canonical permissible value', async () => {
+    for (const playbackState of ['stopped', 'playing', 'paused'] as const) {
+      for (const displayMode of ['full', 'trail'] as const) {
+        const result = await runLoad(buildValidSessionPayload({ playbackState, displayMode }));
+        expect(result.success, `playback=${playbackState} display=${displayMode}`).toBe(true);
+        expect(result.error).toBeUndefined();
+      }
+    }
   });
 });

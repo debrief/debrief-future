@@ -6,6 +6,7 @@
  */
 
 import type { DebriefFeature } from '../utils/types';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
 import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
@@ -90,12 +91,12 @@ export interface ActivityPanelProps {
   timeExtent?: [number, number] | null;
   /** Current time position */
   currentTime?: number;
-  /** Current playback state */
-  playbackState?: 'playing' | 'paused';
+  /** Current playback state — widened to the canonical three-state vocabulary in Feature 205 */
+  playbackState?: PlaybackState;
   /** Playback speed multiplier */
   playbackSpeed?: 1 | 2 | 4 | 8 | 16 | 32 | 64;
   /** Track display mode */
-  displayMode?: 'full' | 'trail';
+  displayMode?: DisplayMode;
   /** UI state for time controller */
   timeUiState?: 'empty' | 'loading' | 'ready';
 

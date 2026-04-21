@@ -71,6 +71,7 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
       "WebSearch",
+<<<<<<< Updated upstream
       "Bash(claude:*)",
       "Bash(scoop install:*)",
       "Bash(pushd:*)",
@@ -90,6 +91,9 @@
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell dev:*)",
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell generate-thumbnails:*)",
       "Bash(STAC_STORE_PATH=* npx tsx apps/web-shell/scripts/capture-single.ts:*)"
+=======
+      "Bash(dir \"%USERPROFILE%\\\\Pictures\\\\Screenshots\\\\*.png\" /O-D)"
+>>>>>>> Stashed changes
     ]
   }
 }
