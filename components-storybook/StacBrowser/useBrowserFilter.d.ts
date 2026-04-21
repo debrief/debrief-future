@@ -1,5 +1,5 @@
 import { StacBrowserItem } from '../filter-engine/types';
-import { ViewportPolygon, TimeFilter } from '../utils/spatial-types';
+import { ViewportPolygon, TimeFilter } from '../../../schemas/src/generated/typescript/index.ts';
 import { BrowserFilterResult } from './types';
 
 interface UseBrowserFilterArgs {
