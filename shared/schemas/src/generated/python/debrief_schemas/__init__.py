@@ -103,7 +103,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/Users/ian/git/worktrees/193-properties-panel/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': 'C:\\git\\debrief-future\\shared\\schemas\\src\\linkml\\debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
@@ -1904,7 +1904,7 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'MultiPolygonFeature',
                        'PlotSummary',
                        'StacItemSummary']} })
-    zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon']} })
     center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
     selected_ids: Optional[list[str]] = Field(default=[], description="""Array of selected feature IDs - for selection state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
@@ -3947,12 +3947,12 @@ class TimeRange(ConfiguredBaseModel):
 
 class TimeFilter(ConfiguredBaseModel):
     """
-    Constraints on the visible time window
+    Constraints on the visible time window (epoch milliseconds; null = unbounded)
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    start: Optional[TimeInstant] = Field(default=None, description="""Filter start (null = unbounded)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
-    end: Optional[TimeInstant] = Field(default=None, description="""Filter end (null = unbounded)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    start: Optional[int] = Field(default=None, description="""Filter start as epoch milliseconds (null/missing = unbounded on the start)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
+    end: Optional[int] = Field(default=None, description="""Filter end as epoch milliseconds (null/missing = unbounded on the end)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotTimeExtent', 'TimeRange', 'TimeFilter']} })
 
 
 class TimeStep(ConfiguredBaseModel):
@@ -3989,6 +3989,7 @@ class ViewportPolygon(ConfiguredBaseModel):
                        'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'ViewportPolygon']} })
+    zoom: Optional[float] = Field(default=None, description="""Map zoom level for restoring the view (optional)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon']} })
 
 
 class LevelDefinition(ConfiguredBaseModel):

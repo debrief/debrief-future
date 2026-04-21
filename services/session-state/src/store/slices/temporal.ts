@@ -5,11 +5,11 @@
  */
 
 import type { StateCreator } from 'zustand';
+import type { TimeFilter } from '@debrief/schemas';
 import type {
   TemporalSlice,
   TemporalActions,
   TimeRange,
-  TimeFilter,
   TimeStep,
   PlaybackState,
   DisplayMode,

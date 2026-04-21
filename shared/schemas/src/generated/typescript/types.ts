@@ -68,7 +68,7 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-
+    
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
@@ -1684,13 +1684,13 @@ export interface TimeRange {
 
 
 /**
- * Constraints on the visible time window
+ * Constraints on the visible time window (epoch milliseconds; null = unbounded)
  */
 export interface TimeFilter {
-    /** Filter start (null = unbounded) */
-    start?: TimeInstant,
-    /** Filter end (null = unbounded) */
-    end?: TimeInstant,
+    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
+    start?: number,
+    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
+    end?: number,
 }
 
 
@@ -1722,6 +1722,8 @@ export interface Coordinate {
 export interface ViewportPolygon {
     /** Four corners in clockwise order [NW, NE, SE, SW] */
     coordinates: Coordinate[],
+    /** Map zoom level for restoring the view (optional) */
+    zoom?: number,
 }
 
 

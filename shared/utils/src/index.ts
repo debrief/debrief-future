@@ -22,6 +22,19 @@ export {
   isValidBounds,
 } from './bounds.js';
 
+// Spatial converters (feature 203)
+export {
+  toGeoJSONCoord,
+  fromGeoJSONCoord,
+} from './spatial-converters.js';
+
+// Spatial validators + viewport centre (feature 203)
+export {
+  validateCoordinate,
+  validateViewportPolygon,
+  calculateViewportCenter,
+} from './spatial-validators.js';
+
 // Temporal utilities
 export {
   findNearestPointIndex,

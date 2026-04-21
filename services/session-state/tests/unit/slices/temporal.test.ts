@@ -73,10 +73,13 @@ describe('Temporal Slice', () => {
       expect(store.getState().timeFilter).toEqual(filter);
     });
 
-    it('should allow partial filter with null start', () => {
-      const filter = { start: null, end: 1706090000000 };
+    it('should allow partial filter with missing start (unbounded)', () => {
+      // Canonical TimeFilter (feature 203): missing/undefined means unbounded.
+      // FR-021 requires consumers to use `!= null` checks that accept both
+      // legacy null and canonical undefined.
+      const filter = { end: 1706090000000 };
       store.getState().setTimeFilter(filter);
-      expect(store.getState().timeFilter?.start).toBeNull();
+      expect(store.getState().timeFilter?.start == null).toBe(true);
       expect(store.getState().timeFilter?.end).not.toBeNull();
     });
   });

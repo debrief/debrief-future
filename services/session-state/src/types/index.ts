@@ -21,8 +21,12 @@ import type { BrowserFilterSlice, BrowserFilterActions } from './browser-filter.
 
 /**
  * Schema version for persistence compatibility (FR-026).
+ *
+ * Bumped to 1.1.0 by feature 203 (spatial types consolidation): ViewportPolygon
+ * coordinates switch from tuple form `[lon, lat]` to object form
+ * `{ longitude, latitude }`, handled inline at load time by `coerceViewport`.
  */
-export const SCHEMA_VERSION = '1.0.0';
+export const SCHEMA_VERSION = '1.1.0';
 
 /**
  * Complete session state combining all slices (FR-001, FR-002).

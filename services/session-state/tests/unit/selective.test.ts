@@ -59,7 +59,12 @@ describe('Selective Subscriptions (SC-006)', () => {
 
       // Change only viewport
       const viewport: ViewportPolygon = {
-        coordinates: [[-5, 55], [5, 55], [5, 50], [-5, 50]],
+        coordinates: [
+          { longitude: -5, latitude: 55 },
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
+        ],
       };
       store.getState().setViewport(viewport);
 
@@ -155,7 +160,12 @@ describe('Selective Subscriptions (SC-006)', () => {
       );
 
       const viewport: ViewportPolygon = {
-        coordinates: [[-5, 55], [5, 55], [5, 50], [-5, 50]],
+        coordinates: [
+          { longitude: -5, latitude: 55 },
+          { longitude: 5, latitude: 55 },
+          { longitude: 5, latitude: 50 },
+          { longitude: -5, latitude: 50 },
+        ],
       };
       store.getState().setViewport(viewport);
 

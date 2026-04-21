@@ -36,7 +36,12 @@ import {
   type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
-import { calculateBounds, mergeBounds, boundsToLeaflet } from '@debrief/utils';
+import {
+  calculateBounds,
+  mergeBounds,
+  boundsToLeaflet,
+  fromGeoJSONCoord,
+} from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
 import type { TrackProperties } from '@debrief/schemas';
@@ -641,10 +646,11 @@ export class MapPanel {
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
         const zoom = spatial.viewport?.zoom;
         if (spatial.viewport !== null && zoom !== undefined) {
-          // Calculate center from coordinates: [NW, NE, SE, SW] in [lng, lat] order
+          // Calculate center from coordinates: [NW, NE, SE, SW] in object form
+          // { longitude, latitude } after feature 203.
           const coords = spatial.viewport.coordinates;
-          const centerLng = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4;
-          const centerLat = (coords[0][1] + coords[1][1] + coords[2][1] + coords[3][1]) / 4;
+          const centerLng = (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) / 4;
+          const centerLat = (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
           const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
 
           // Only send if actually different from last sent
@@ -756,9 +762,11 @@ export class MapPanel {
     // Debounce viewport updates to session state
     this.viewportUpdateTimeout = setTimeout(() => {
       if (this.activeSession && viewport.bounds) {
-        // bounds is [NW, NE, SE, SW] in [lng, lat] order - matches ViewportPolygon format
+        // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
+        // feature 203 consolidated ViewportPolygon on the canonical
+        // object form, so convert at this boundary via fromGeoJSONCoord.
         const newViewport = {
-          coordinates: viewport.bounds,
+          coordinates: viewport.bounds.map(fromGeoJSONCoord),
           zoom: viewport.zoom,
         };
         // Only update if viewport actually changed (avoid feedback loop)
