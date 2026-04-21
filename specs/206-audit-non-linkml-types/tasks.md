@@ -190,7 +190,7 @@
 
 ### PR Creation
 
-- [ ] T059 Create PR and publish blog: run `/speckit.pr`
+- [x] T059 Create PR and publish blog: run `/speckit.pr`
 
 **Task T059 must run last. It depends on T045 through T058 being complete — CI must be green, evidence must be captured, and both blog posts must be drafted before the PR opens.**
 
