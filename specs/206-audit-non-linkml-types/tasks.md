@@ -74,25 +74,25 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementing the scanner.
 
-- [ ] T007 [P] [test] Fixture unit test — scanner enumerates the expected number of records from the fixtures folder and produces stable-sorted output `scripts/audits/type-audit/__tests__/scan.enumerate.test.ts`
-- [ ] T008 [P] [test] Fixture unit test — auto-tag rules: `schema-rooted-candidate` fires on files importing `@debrief/schemas`, `boundary-candidate` fires on aliases bottoming out in `unknown` / `Record<string, unknown>` `scripts/audits/type-audit/__tests__/scan.autotag.test.ts`
-- [ ] T009 [P] [test] Fixture unit test — `driftClusters` groups same-name-different-shape declarations and excludes same-name-same-shape duplicates `scripts/audits/type-audit/__tests__/scan.drift.test.ts`
-- [ ] T010 [P] [test] Contract test — scanner output validates against `specs/206-audit-non-linkml-types/contracts/scan-output.schema.json` via ajv `scripts/audits/type-audit/__tests__/scan.contract.test.ts`
-- [ ] T011 [P] [test] Determinism test — running the scanner twice on the same fixtures produces byte-identical JSON (stable sort order, stable SHA-1 shape hashes) `scripts/audits/type-audit/__tests__/scan.determinism.test.ts`
+- [x] T007 [P] [test] Fixture unit test — scanner enumerates the expected number of records from the fixtures folder and produces stable-sorted output `scripts/audits/type-audit/__tests__/scan.enumerate.test.ts`
+- [x] T008 [P] [test] Fixture unit test — auto-tag rules: `schema-rooted-candidate` fires on files importing `@debrief/schemas`, `boundary-candidate` fires on aliases bottoming out in `unknown` / `Record<string, unknown>` `scripts/audits/type-audit/__tests__/scan.autotag.test.ts`
+- [x] T009 [P] [test] Fixture unit test — `driftClusters` groups same-name-different-shape declarations and excludes same-name-same-shape duplicates `scripts/audits/type-audit/__tests__/scan.drift.test.ts`
+- [x] T010 [P] [test] Contract test — scanner output validates against `specs/206-audit-non-linkml-types/contracts/scan-output.schema.json` via ajv `scripts/audits/type-audit/__tests__/scan.contract.test.ts`
+- [x] T011 [P] [test] Determinism test — running the scanner twice on the same fixtures produces byte-identical JSON (stable sort order, stable SHA-1 shape hashes) `scripts/audits/type-audit/__tests__/scan.determinism.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T012 Implement AST traversal — walk each `.ts` / `.tsx` file and emit one record per top-level `InterfaceDeclaration`, `TypeAliasDeclaration`, `EnumDeclaration` (spec FR-001, data-model §1) `scripts/audits/type-audit/scan.ts`
-- [ ] T013 Implement exclusion rules — skip paths matching `shared/schemas/src/generated/**`, `**/__tests__/**`, `**/__fixtures__/**`, `**/*.test.ts`, `**/*.spec.ts`, `**/node_modules/**`, `**/dist/**` (spec FR-002, FR-003) `scripts/audits/type-audit/scan.ts`
-- [ ] T014 Compute stable `id` (`${packageName}:${relativeFilePath}:${declarationName}`) + `shapeHash` (SHA-1 of normalised AST print) per record `scripts/audits/type-audit/scan.ts`
-- [ ] T015 Collect import specifiers per file and attach to each record's `imports` array `scripts/audits/type-audit/scan.ts`
-- [ ] T016 Implement auto-tagging: set `autoTag` to `schema-rooted-candidate` / `boundary-candidate` / `drift-shortlist` / `none` per research.md R2, R4, R6 `scripts/audits/type-audit/scan.ts`
-- [ ] T017 Implement drift-cluster post-pass — group records by `declarationName`, emit a cluster when membership size ≥ 2 and distinct `shapeHash` count ≥ 2 `scripts/audits/type-audit/scan.ts`
-- [ ] T018 Emit the top-level wrapper — `scannerVersion` = `"v1"`, `capturedAt` (ISO-8601), `gitSha` (from `git rev-parse HEAD`), `scannedPaths`, `excludedPaths`, `records`, `driftClusters` (data-model §6, contract: `scan-output.schema.json`) `scripts/audits/type-audit/scan.ts`
-- [ ] T019 Add CLI flag parsing (`--roots`, `--exclude`, `--out`) matching the invocation documented in `quickstart.md` `scripts/audits/type-audit/scan.ts`
-- [ ] T020 Print a one-line stderr summary on completion (`Scanned N files, emitted M records, K drift clusters`) — confirms the scanner ran without forcing stdout noise `scripts/audits/type-audit/scan.ts`
-- [ ] T021 Wire up `vitest` configuration for the scanner tests (minimal — Node environment, no DOM, no Playwright) `scripts/audits/type-audit/vitest.config.ts`
-- [ ] T022 Run the scanner once against the full repo and verify it completes in under 30 seconds (plan.md Performance Goal); record timing in a commit message or throwaway log — this is a developer smoke-test, not an evidence task
+- [x] T012 Implement AST traversal — walk each `.ts` / `.tsx` file and emit one record per top-level `InterfaceDeclaration`, `TypeAliasDeclaration`, `EnumDeclaration` (spec FR-001, data-model §1) `scripts/audits/type-audit/scan.ts`
+- [x] T013 Implement exclusion rules — skip paths matching `shared/schemas/src/generated/**`, `**/__tests__/**`, `**/__fixtures__/**`, `**/*.test.ts`, `**/*.spec.ts`, `**/node_modules/**`, `**/dist/**` (spec FR-002, FR-003) `scripts/audits/type-audit/scan.ts`
+- [x] T014 Compute stable `id` (`${packageName}:${relativeFilePath}:${declarationName}`) + `shapeHash` (SHA-1 of normalised AST print) per record `scripts/audits/type-audit/scan.ts`
+- [x] T015 Collect import specifiers per file and attach to each record's `imports` array `scripts/audits/type-audit/scan.ts`
+- [x] T016 Implement auto-tagging: set `autoTag` to `schema-rooted-candidate` / `boundary-candidate` / `drift-shortlist` / `none` per research.md R2, R4, R6 `scripts/audits/type-audit/scan.ts`
+- [x] T017 Implement drift-cluster post-pass — group records by `declarationName`, emit a cluster when membership size ≥ 2 and distinct `shapeHash` count ≥ 2 `scripts/audits/type-audit/scan.ts`
+- [x] T018 Emit the top-level wrapper — `scannerVersion` = `"v1"`, `capturedAt` (ISO-8601), `gitSha` (from `git rev-parse HEAD`), `scannedPaths`, `excludedPaths`, `records`, `driftClusters` (data-model §6, contract: `scan-output.schema.json`) `scripts/audits/type-audit/scan.ts`
+- [x] T019 Add CLI flag parsing (`--roots`, `--exclude`, `--out`) matching the invocation documented in `quickstart.md` `scripts/audits/type-audit/scan.ts`
+- [x] T020 Print a one-line stderr summary on completion (`Scanned N files, emitted M records, K drift clusters`) — confirms the scanner ran without forcing stdout noise `scripts/audits/type-audit/scan.ts`
+- [x] T021 Wire up `vitest` configuration for the scanner tests (minimal — Node environment, no DOM, no Playwright) `scripts/audits/type-audit/vitest.config.ts`
+- [x] T022 Run the scanner once against the full repo and verify it completes in under 30 seconds (plan.md Performance Goal); record timing in a commit message or throwaway log — this is a developer smoke-test, not an evidence task
 
 **Parallel opportunity**: T007–T011 (all tests in different files) can be drafted simultaneously. T013–T017 mutate `scan.ts` and must be done sequentially in that file (unless split into modules).
 
