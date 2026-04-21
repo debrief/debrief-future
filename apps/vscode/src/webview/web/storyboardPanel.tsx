@@ -1,5 +1,5 @@
 /**
- * Webview entrypoint for the Storyboard panel (Feature 216).
+ * Webview entrypoint for the Storyboard panel (Features 216 + 217).
  *
  * Mounts the presentational `<StoryboardPanel/>` from `@debrief/components`
  * and wires its event handlers to VS Code's `postMessage` channel.
@@ -8,7 +8,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { StoryboardPanel, ThemeProvider } from '@debrief/components';
-import type { SceneRowViewModel, Theme } from '@debrief/components';
+import type {
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  Theme,
+} from '@debrief/components';
 
 interface AcquiredVsCodeApi {
   postMessage(message: unknown): void;
@@ -33,13 +38,31 @@ interface ThemeMessage {
   theme: 'light' | 'dark' | 'vscode';
 }
 
-type ExtensionMessage = ScenesMessage | CaptureInFlightMessage | ThemeMessage;
+interface SnapshotMessage {
+  type: 'snapshot';
+  storyboards: readonly StoryboardOptionViewModel[];
+  scenes: readonly SceneRowViewModel[];
+  activeStoryboardId: string | null;
+  activeStoryboardName: string | null;
+  currentSceneId: string | null;
+  transport: TransportViewModel;
+}
+
+type ExtensionMessage =
+  | ScenesMessage
+  | CaptureInFlightMessage
+  | ThemeMessage
+  | SnapshotMessage;
 
 const vscode = acquireVsCodeApi();
 
 function StoryboardPanelApp(): React.ReactElement {
-  const [scenes, setScenes] = useState<SceneRowViewModel[]>([]);
+  const [scenes, setScenes] = useState<readonly SceneRowViewModel[]>([]);
   const [activeStoryboardName, setActiveStoryboardName] = useState<string | null>(null);
+  const [activeStoryboardId, setActiveStoryboardId] = useState<string | null>(null);
+  const [storyboards, setStoryboards] = useState<readonly StoryboardOptionViewModel[]>([]);
+  const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
+  const [transport, setTransport] = useState<TransportViewModel | undefined>(undefined);
   const [captureInFlight, setCaptureInFlight] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'vscode'>('vscode');
 
@@ -51,6 +74,15 @@ function StoryboardPanelApp(): React.ReactElement {
         case 'scenes':
           setScenes(msg.scenes);
           setActiveStoryboardName(msg.activeStoryboardName);
+          setActiveStoryboardId(msg.activeStoryboardId);
+          break;
+        case 'snapshot':
+          setScenes(msg.scenes);
+          setStoryboards(msg.storyboards);
+          setActiveStoryboardName(msg.activeStoryboardName);
+          setActiveStoryboardId(msg.activeStoryboardId);
+          setCurrentSceneId(msg.currentSceneId);
+          setTransport(msg.transport);
           break;
         case 'captureInFlight':
           setCaptureInFlight(msg.inFlight);
@@ -73,6 +105,14 @@ function StoryboardPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'scene-row-clicked', sceneId });
   }, []);
 
+  const onTransportForward = useCallback(() => {
+    vscode.postMessage({ type: 'transport-forward-clicked' });
+  }, []);
+
+  const onTransportBackward = useCallback(() => {
+    vscode.postMessage({ type: 'transport-backward-clicked' });
+  }, []);
+
   const themeConfig: Theme = { variant: theme };
 
   return (
@@ -83,6 +123,12 @@ function StoryboardPanelApp(): React.ReactElement {
         captureInFlight={captureInFlight}
         onCaptureClick={onCaptureClick}
         onSceneRowClick={onSceneRowClick}
+        storyboards={storyboards.length > 0 ? storyboards : undefined}
+        activeStoryboardId={activeStoryboardId}
+        currentSceneId={currentSceneId}
+        transport={transport}
+        onTransportForward={onTransportForward}
+        onTransportBackward={onTransportBackward}
       />
     </ThemeProvider>
   );
