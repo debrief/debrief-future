@@ -15,6 +15,7 @@
 import React from 'react';
 import { SceneList } from './SceneList';
 import { TransportRow } from './TransportRow';
+import { StoryboardHeader } from './StoryboardHeader';
 import type { StoryboardPanelProps } from './types';
 
 const EMPTY_STATE_COPY =
@@ -29,8 +30,14 @@ export function StoryboardPanel({
   captureInFlight,
   onCaptureClick,
   onSceneRowClick,
+  storyboards,
+  activeStoryboardId,
   currentSceneId,
   transport,
+  onActiveStoryboardChange,
+  onCreateStoryboard,
+  onRenameStoryboard,
+  onDeleteStoryboard,
   onTransportForward,
   onTransportBackward,
 }: StoryboardPanelProps): React.ReactElement {
@@ -39,6 +46,7 @@ export function StoryboardPanel({
   const isEmptyStoryboard =
     activeStoryboardName !== null && scenes.length === 0 && !captureInFlight;
   const sceneCount = scenes.length;
+  const hasStoryboards = storyboards !== undefined && storyboards.length > 0;
 
   return (
     <div
@@ -92,6 +100,17 @@ export function StoryboardPanel({
           Capture
         </button>
       </header>
+
+      {hasStoryboards && onActiveStoryboardChange && (
+        <StoryboardHeader
+          storyboards={storyboards!}
+          activeStoryboardId={activeStoryboardId ?? null}
+          onActiveStoryboardChange={onActiveStoryboardChange}
+          onCreateStoryboard={onCreateStoryboard}
+          onRenameStoryboard={onRenameStoryboard}
+          onDeleteStoryboard={onDeleteStoryboard}
+        />
+      )}
 
       {isEmptyNoStoryboard ? (
         <div

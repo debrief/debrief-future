@@ -8,7 +8,11 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { StoryboardPanel } from '../StoryboardPanel';
-import type { SceneRowViewModel, TransportViewModel } from '../types';
+import type {
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+} from '../types';
 
 function row(overrides: Partial<SceneRowViewModel> & { sceneId: string }): SceneRowViewModel {
   return {
@@ -281,5 +285,82 @@ describe('StoryboardPanel', () => {
     );
     fireEvent.click(screen.getByTestId('transport-backward'));
     expect(onTransportBackward).toHaveBeenCalledTimes(1);
+  });
+
+  // ── #217 StoryboardHeader integration (Phase 4.2 / T410) ──────────
+
+  function sbOption(
+    storyboardId: string,
+    name = storyboardId.toUpperCase(),
+    sceneCount = 1,
+  ): StoryboardOptionViewModel {
+    return {
+      storyboardId,
+      name,
+      sceneCount,
+      lastModifiedIso: '2026-04-20T14:00:00.000Z',
+    };
+  }
+
+  it('does NOT render StoryboardHeader when storyboards prop is undefined', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-header')).toBeNull();
+  });
+
+  it('does NOT render StoryboardHeader when storyboards prop is empty', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[]}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-header')).toBeNull();
+  });
+
+  it('renders StoryboardHeader above the Scene list when storyboards non-empty', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[sbOption('sb-a', 'Alpha'), sbOption('sb-b', 'Bravo')]}
+        activeStoryboardId="sb-a"
+        onActiveStoryboardChange={() => undefined}
+      />,
+    );
+    expect(screen.getByTestId('storyboard-header')).toBeTruthy();
+  });
+
+  it('header dropdown change fires onActiveStoryboardChange with storyboardId', () => {
+    const onActiveStoryboardChange = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[sbOption('sb-a', 'Alpha'), sbOption('sb-b', 'Bravo')]}
+        activeStoryboardId="sb-a"
+        onActiveStoryboardChange={onActiveStoryboardChange}
+      />,
+    );
+    const select = screen.getByTestId('storyboard-header-select') as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: 'sb-b' } });
+    expect(onActiveStoryboardChange).toHaveBeenCalledWith('sb-b');
   });
 });
