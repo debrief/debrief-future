@@ -19,6 +19,7 @@ import { PropertiesForm } from '../PropertiesPanel';
 import type { FieldKey, FieldValue } from '../PropertiesPanel';
 import type { DebriefFeature } from '../utils/types';
 import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import { getFeatureLabel } from '../utils/labels';
 import type { DisplayItem } from '../FeatureList/flattenFeatures';
 import type { ActivityPanelProps } from './types';
@@ -238,7 +239,9 @@ export function ActivityPanel({
   );
 
   const handlePlaybackStateChange = useCallback(
-    (state: 'playing' | 'paused') => {
+    // Accepts the full three-state PlaybackState vocabulary (Feature 205);
+    // 'stopped' is treated identically to 'paused' (stopped ≡ paused rule).
+    (state: PlaybackState) => {
       if (state === 'playing') {
         onMessage?.({ type: 'temporal:play', payload: { rate: 1 } });
       } else {
@@ -249,7 +252,7 @@ export function ActivityPanel({
   );
 
   const handleDisplayModeChange = useCallback(
-    (mode: 'full' | 'trail') => {
+    (mode: DisplayMode) => {
       onMessage?.({ type: 'temporal:displayMode', payload: { mode } });
     },
     [onMessage]

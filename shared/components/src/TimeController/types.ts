@@ -2,19 +2,15 @@
  * Type definitions for the TimeController component.
  */
 
-import type { DisplayMode, TimeExtent } from '../utils/types';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
+import type { TimeExtent } from '../utils/types';
 
-export type { DisplayMode };
+export type { DisplayMode, PlaybackState };
 
 /**
  * Playback speed multiplier options.
  */
 export type PlaybackSpeed = 1 | 2 | 4 | 8 | 16 | 32 | 64;
-
-/**
- * Playback state.
- */
-export type PlaybackState = 'playing' | 'paused';
 
 /**
  * UI state for the time controller.

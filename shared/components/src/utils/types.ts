@@ -72,12 +72,9 @@ export {
   isAnnotationFeature,
 } from '@debrief/schemas';
 
-/**
- * Track display mode.
- * - 'full': Show entire track regardless of time position
- * - 'trail': Show track history from start up to current time position
- */
-export type DisplayMode = 'full' | 'trail';
+// DisplayMode moved to @debrief/schemas (Feature 205). Re-exported from the
+// shared/schemas barrel for package-level ergonomics.
+export type { DisplayMode } from '@debrief/schemas';
 
 // Bounds type — canonical definition in @debrief/utils (T08)
 export type { Bounds } from '@debrief/utils';

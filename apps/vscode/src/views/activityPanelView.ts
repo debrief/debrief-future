@@ -20,6 +20,7 @@ import {
   type TemporalSlice,
   type FeatureSelection,
 } from '@debrief/session-state';
+import type { DisplayMode } from '@debrief/schemas';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
@@ -46,7 +47,7 @@ interface TemporalPauseMessage {
 
 interface TemporalDisplayModeMessage {
   type: 'temporal:displayMode';
-  payload: { mode: 'full' | 'trail' };
+  payload: { mode: DisplayMode };
 }
 
 interface ToolRunMessage {
@@ -207,7 +208,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             startTime: state.timeRange.start,
             endTime: state.timeRange.end,
             currentTime: state.currentTime,
-            displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
+            displayMode: state.displayMode,
           },
         });
       }
@@ -249,7 +250,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         startTime: temporal.timeRange.start,
         endTime: temporal.timeRange.end,
         currentTime: temporal.currentTime,
-        displayMode: temporal.displayMode === 'snailTrail' ? 'trail' : 'full',
+        displayMode: temporal.displayMode,
       },
     });
   }
@@ -431,7 +432,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
                   startTime: state.timeRange.start,
                   endTime: state.timeRange.end,
                   currentTime: state.currentTime,
-                  displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
+                  displayMode: state.displayMode,
                 },
               });
             }
@@ -464,7 +465,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         case 'temporal:displayMode':
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setDisplayMode(message.payload.mode === 'trail' ? 'snailTrail' : 'normal');
+            state.setDisplayMode(message.payload.mode);
           }
           void vscode.commands.executeCommand('debrief.setDisplayMode', {
             mode: message.payload.mode,
