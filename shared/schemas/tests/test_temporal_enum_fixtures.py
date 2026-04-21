@@ -52,9 +52,9 @@ def test_invalid_fixture_fails(fixture_path: Path) -> None:
 def test_valid_fixtures_cover_every_permissible_value() -> None:
     """FR-008: one valid fixture per permissible value (5 total — 3 playback states + 2 display modes)."""
     fixtures = _valid_fixtures()
-    assert (
-        len(fixtures) >= 5
-    ), f"Expected ≥5 valid fixtures (one per permissible value), found {len(fixtures)}"
+    assert len(fixtures) >= 5, (
+        f"Expected ≥5 valid fixtures (one per permissible value), found {len(fixtures)}"
+    )
 
     seen_playback_states: set[str] = set()
     seen_display_modes: set[str] = set()

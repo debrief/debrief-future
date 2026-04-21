@@ -54,9 +54,9 @@ class TestSchemaStructure:
         schema = json.loads(schema_file.read_text())
 
         assert "$schema" in schema, "Schema should have $schema field"
-        assert (
-            "type" in schema or "properties" in schema
-        ), "Schema should have type or properties field"
+        assert "type" in schema or "properties" in schema, (
+            "Schema should have type or properties field"
+        )
 
 
 class TestEnumConsistency:
@@ -70,9 +70,9 @@ class TestEnumConsistency:
         enum_values = track_type_def.get("enum", [])
 
         expected = ["OWNSHIP", "CONTACT", "REFERENCE", "SOLUTION"]
-        assert set(enum_values) == set(
-            expected
-        ), f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_location_type_enum_values(self) -> None:
         """LocationTypeEnum should have consistent values."""
@@ -82,9 +82,9 @@ class TestEnumConsistency:
         enum_values = location_type_def.get("enum", [])
 
         expected = ["WAYPOINT", "EXERCISE_AREA", "DANGER_AREA", "ANCHORAGE", "PORT", "REFERENCE"]
-        assert set(enum_values) == set(
-            expected
-        ), f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_segment_type_enum_values(self) -> None:
         """SegmentTypeEnum should have consistent values."""
@@ -94,9 +94,9 @@ class TestEnumConsistency:
         enum_values = segment_type_def.get("enum", [])
 
         expected = ["TRACK", "ABSOLUTE_TMA", "RELATIVE_TMA", "DYNAMIC_INFILL"]
-        assert set(enum_values) == set(
-            expected
-        ), f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_feature_kind_enum_values(self) -> None:
         """FeatureKindEnum should include all feature type discriminators."""
@@ -123,9 +123,9 @@ class TestEnumConsistency:
             "STORYBOARD",
             "STORYBOARD_SCENE",
         ]
-        assert set(enum_values) == set(
-            expected
-        ), f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_array_centre_mode_enum_values(self) -> None:
         """ArrayCentreModeEnum should have consistent values."""
@@ -135,9 +135,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["PLAIN", "WORM", "MEASURED"]
-        assert set(enum_values) == set(
-            expected
-        ), f"ArrayCentreModeEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"ArrayCentreModeEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_line_style_enum_values(self) -> None:
         """LineStyleEnum should have consistent values."""
@@ -147,9 +147,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["SOLID", "DASHED", "DOT", "DASH_DOT"]
-        assert set(enum_values) == set(
-            expected
-        ), f"LineStyleEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"LineStyleEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_label_location_enum_values(self) -> None:
         """LabelLocationEnum should have consistent values."""
@@ -159,9 +159,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["LEFT", "CENTER", "RIGHT"]
-        assert set(enum_values) == set(
-            expected
-        ), f"LabelLocationEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"LabelLocationEnum values mismatch: {enum_values} vs {expected}"
+        )
 
     def test_line_label_position_enum_values(self) -> None:
         """LineLabelPositionEnum should have consistent values."""
@@ -171,9 +171,9 @@ class TestEnumConsistency:
         enum_values = enum_def.get("enum", [])
 
         expected = ["START", "MIDDLE", "END"]
-        assert set(enum_values) == set(
-            expected
-        ), f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+        assert set(enum_values) == set(expected), (
+            f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+        )
 
 
 class TestFeature205EnumParity:
@@ -369,9 +369,9 @@ class TestSensorSchemaStructure:
             assert "array" in origin_type, "origin type should include 'array'"
         else:
             assert origin_type == "array", "origin should be array"
-        assert (
-            origin_prop.get("items", {}).get("type") == "number"
-        ), "origin items should be numbers"
+        assert origin_prop.get("items", {}).get("type") == "number", (
+            "origin items should be numbers"
+        )
 
     def test_measured_position_location_schema(self) -> None:
         """MeasuredArrayPosition.location should be array of exactly 2 floats."""
@@ -384,9 +384,9 @@ class TestSensorSchemaStructure:
             assert "array" in location_type, "location type should include 'array'"
         else:
             assert location_type == "array", "location should be array"
-        assert (
-            location_prop.get("items", {}).get("type") == "number"
-        ), "location items should be numbers"
+        assert location_prop.get("items", {}).get("type") == "number", (
+            "location items should be numbers"
+        )
 
 
 class TestRequiredFields:
@@ -411,12 +411,12 @@ class TestRequiredFields:
         assert len(any_of) >= 2, "geometry should have anyOf with at least 2 options"
 
         refs = [opt.get("$ref", "") for opt in any_of]
-        assert any(
-            "GeoJSONLineString" in r for r in refs
-        ), "geometry anyOf should include GeoJSONLineString"
-        assert any(
-            "GeoJSONMultiLineString" in r for r in refs
-        ), "geometry anyOf should include GeoJSONMultiLineString"
+        assert any("GeoJSONLineString" in r for r in refs), (
+            "geometry anyOf should include GeoJSONLineString"
+        )
+        assert any("GeoJSONMultiLineString" in r for r in refs), (
+            "geometry anyOf should include GeoJSONMultiLineString"
+        )
 
     def test_track_properties_has_compound_fields(self) -> None:
         """TrackProperties should have segments, sensors, tuas fields."""
@@ -551,16 +551,16 @@ class TestStoryboardSchemaGeneration:
         # Scene
         pydantic_sc_props = set(SceneFeature.model_json_schema()["properties"].keys())
         linkml_sc_props = set(defs.get("SceneFeature", {}).get("properties", {}).keys())
-        assert (
-            pydantic_sc_props == linkml_sc_props
-        ), f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
+        assert pydantic_sc_props == linkml_sc_props, (
+            f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
+        )
 
         # Viewport
         pydantic_vp_props = set(Viewport.model_json_schema()["properties"].keys())
         linkml_vp_props = set(defs.get("Viewport", {}).get("properties", {}).keys())
-        assert (
-            pydantic_vp_props == linkml_vp_props
-        ), f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
+        assert pydantic_vp_props == linkml_vp_props, (
+            f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
+        )
 
 
 if __name__ == "__main__":
