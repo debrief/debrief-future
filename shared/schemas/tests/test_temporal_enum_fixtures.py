@@ -38,8 +38,10 @@ def test_valid_fixture_passes(fixture_path: Path) -> None:
     data = json.loads(fixture_path.read_text())
     instance = TemporalSlice.model_validate(data)
     assert instance is not None
-    assert instance.playbackState in PlaybackStateEnum
-    assert instance.displayMode in DisplayModeEnum
+    # Note: use `.value in {...}` rather than `x in Enum` — on Python 3.11
+    # the latter raises TypeError for a str operand (only 3.12+ supports it).
+    assert instance.playbackState in {e.value for e in PlaybackStateEnum}
+    assert instance.displayMode in {e.value for e in DisplayModeEnum}
 
 
 @pytest.mark.parametrize("fixture_path", _invalid_fixtures())
