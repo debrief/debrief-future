@@ -28,10 +28,11 @@ This is a **Schema Change** feature (per the Quality Rubric). Required evidence:
 |----------|-------------|---------------|
 | `evidence/test-summary.md` | Full CI pass/fail counts from `task verify`, with YAML front matter (feature, captured_at, git_sha, tests_passed/failed/skipped, coverage_pct) | After all tests pass |
 | `evidence/usage-example.md` | Minimal TS + Python code snippet showing import + consumption of `RawGeoJSONFeature` | After Phase 4 complete |
-| `evidence/round-trip-evidence.md` | 3-fixture round-trip table (Python validate → dump → TS parse → stringify → Python validate); byte-identical column | After T020 green |
+| `evidence/round-trip-evidence.md` | 3-fixture round-trip table (Python validate → dump → TS parse → stringify → Python validate); byte-identical column | After T018 green |
 | `evidence/grep-before-after.txt` | `rg -nw "interface GeoJSONFeature" shared/ services/ apps/` on main vs on PR branch; shows zero hits on PR branch (SC-001, SC-002) | After Phase 4 complete |
-| `evidence/perf-bench.txt` | Output of `uv run pytest shared/schemas/tests/test_designates_type_perf.py -v`; must show wall-clock < 500 ms for 10 000-feature validation (review 13A) | After T019 green |
-| `evidence/null-geometry-e2e-trace.zip` | Playwright trace from `test-null-geometry-no-drop.spec.ts` showing null-geometry feature surviving import (review 10A) | After T055 green |
+| `evidence/perf-bench.txt` | Output of `uv run pytest shared/schemas/tests/test_designates_type_perf.py -v`; must show wall-clock < 500 ms for 10 000-feature validation (review 13A) | After T021 green |
+| `evidence/null-geometry-e2e-trace.zip` | Playwright trace from `test-null-geometry-no-drop.spec.ts` showing null-geometry feature surviving import (review 10A) | After T061 green |
+| `evidence/guard-script-transcripts.txt` | `scripts/check-no-geojson-feature.sh` pass + simulated-fail transcripts (review US3 guard rails) | After T065 green |
 | `evidence/ci-pipeline.txt` | `task verify` full output on the final commit | Before PR creation |
 
 ### Media Content
@@ -47,7 +48,7 @@ This is a **Schema Change** feature (per the Quality Rubric). Required evidence:
 
 | Action | Description | Created When |
 |--------|-------------|--------------|
-| Feature PR | PR in debrief-future with all evidence attached | Final task (T067) |
+| Feature PR | PR in debrief-future with all evidence attached | Final task (T076) |
 | Blog PR | PR in debrief.github.io with shipped-post | Triggered by `/speckit.pr` |
 
 ---
@@ -76,11 +77,11 @@ This is a **Schema Change** feature (per the Quality Rubric). Required evidence:
 - [ ] T005 Add `designates_type: true` to the `type` slot of each of the 7 geometry classes (`GeoJSONPoint`, `GeoJSONEmptyPoint`, `GeoJSONLineString`, `GeoJSONPolygon`, `GeoJSONMultiPoint`, `GeoJSONMultiLineString`, `GeoJSONMultiPolygon`) in `shared/schemas/src/linkml/geojson.yaml` — review 13A. Annotation is additive; payload acceptance is unchanged.
 - [ ] T006 Create new LinkML submodule `shared/schemas/src/linkml/raw-geojson.yaml` with `RawGeoJSONFeature` + `RawGeoJSONFeatureCollection` classes. `RawGeoJSONFeature.geometry` is an `any_of` union over the 7 geometry classes (review 11A). Include description blocks that render as parse-boundary docstrings (FR-008).
 - [ ] T007 Add `raw-geojson` to the `imports:` list in `shared/schemas/src/linkml/debrief.yaml` (alphabetically before `session-state` per contracts/linkml-classes.md §2)
-- [ ] T008 Delete the thin `GeoJSONFeature` class (lines 270-286) and `GeoJSONGeometry` class (lines 262-268) from `shared/schemas/src/linkml/session-state.yaml`; update `ResultsSlice.result_layers.range` from `GeoJSONFeature` to `RawGeoJSONFeature` — FR-007
+- [ ] T008 Delete the thin `GeoJSONFeature` and `GeoJSONGeometry` classes from `shared/schemas/src/linkml/session-state.yaml`; update `ResultsSlice.result_layers.range` from `GeoJSONFeature` to `RawGeoJSONFeature` — FR-007. Locate the classes via `rg '^\s+GeoJSONFeature:|^\s+GeoJSONGeometry:' shared/schemas/src/linkml/session-state.yaml` (line numbers shifted after #203 merged into main).
 
 ### Generator post-processor
 
-- [ ] T009 Add two string-replacement entries to `generate_typescript()` in `shared/schemas/scripts/generate.py`: (1) `RawGeoJSONFeature.id` → `id?: string | number`; (2) `RawGeoJSONFeature.properties` → `properties?: Record<string, unknown> | null`. Plus a defensive third entry that expands a single-alternative `geometry: GeoJSONPoint` into the full 7-class union if `gen-typescript` collapses the union. See contracts/linkml-classes.md §5.
+- [ ] T009 Add two string-replacement entries to `generate_typescript()` in `shared/schemas/scripts/generate.py`: (1) `RawGeoJSONFeature.id` → `id?: string | number`; (2) `RawGeoJSONFeature.properties` → `properties?: Record<string, unknown> | null`. Plus a defensive third entry that expands a single-alternative `geometry: GeoJSONPoint` into the full 7-class union if `gen-typescript` collapses the union. **Note**: `generate.py` was modified by #215 after this plan was authored; re-read the current `generate_typescript()` structure before inserting — the existing post-processor entries may have moved. See contracts/linkml-classes.md §5.
 
 ### Regenerate derived artefacts
 
@@ -131,7 +132,7 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 
 ### Python ingress — services/stac + services/io (review 5-alt, 14A)
 
-- [ ] T023 [US2] Delete `GeoJSONFeature: TypeAlias = dict[str, Any]` and `GeoJSONFeatureCollection: TypeAlias = dict[str, Any]` from `services/stac/src/debrief_stac/types.py`; Article XV fix (FR-FR-SC-003).
+- [ ] T023 [US2] Delete `GeoJSONFeature: TypeAlias = dict[str, Any]` and `GeoJSONFeatureCollection: TypeAlias = dict[str, Any]` from `services/stac/src/debrief_stac/types.py`; Article XV fix.
 - [ ] T024 [US2] Add `_coerce_null_geometry(feature: dict) -> dict` shim to `services/io/src/debrief_io/parser.py` per quickstart.md §2b; apply it to every feature immediately before `RawGeoJSONFeatureCollection.model_validate(...)`. Import `RawGeoJSONFeatureCollection` from `debrief_schemas`.
 - [ ] T025 [US2] Add the same `_coerce_null_geometry` shim to `services/stac/src/debrief_stac/features.py` ingress; import `RawGeoJSONFeatureCollection` from `debrief_schemas`.
 - [ ] T026 [US2] Update `services/stac/tests/fixtures.py` imports to source from `debrief_schemas`.
@@ -185,19 +186,20 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 - [ ] T053 [P][US2] Update `apps/web-shell/src/tools/track/analysis/rangeBearing.ts` import source
 - [ ] T054 [P][US2] Update `apps/web-shell/src/tools/track/analysis/trackStats.ts` import source
 
-### Typecheck gate
+### Typecheck + drift-rule gate
 
 - [ ] T055 [US2] Run `pnpm -r typecheck` — every TypeScript workspace compiles cleanly. Zero `as any` or `@ts-expect-error` introductions at migration sites — SC-003.
 - [ ] T056 [US2] Run `uv run pyright` — Python strict typecheck green.
+- [ ] T057 [US2] Run `pnpm lint` — confirm the five `shared/eslint-rules/no-redeclare-*-exports.cjs` drift rules (landed with #214) do not flag the new `RawGeoJSONFeature` re-exports. In particular the `services/session-state/src/types/results.ts` re-export `RawGeoJSONFeature as GeoJSONFeature` must not trip `no-redeclare-session-state-exports.cjs`. If flagged, switch to importing `RawGeoJSONFeature` directly at the call sites instead of re-exporting under the old name.
 
 ### VS Code Webview E2E — null-geometry no-drop (review 10A)
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Full details: `docs/project_notes/playwright-installation-research.md`.
 
-- [ ] T057 [US2][test] Create E2E fixture REP file at `tests/e2e/fixtures/null-geometry.rep` — 2 tracks, one with a null-geometry row.
-- [ ] T058 [US2][test] Create Playwright spec `tests/e2e/test-null-geometry-no-drop.spec.ts` — open the fixture via the VS Code command palette, assert the layer count matches the fixture's feature count (no drop), assert one layer renders with `geometry.type === "Point"` and `coordinates.length === 0`.
-- [ ] T059 [US2][test] Add any new page-object selectors needed for the null-geometry assertion under `tests/e2e/models/`.
-- [ ] T060 [US2][test] Run webview E2E: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-null-geometry-no-drop`. Capture the trace bundle as evidence.
+- [ ] T058 [US2][test] Create E2E fixture REP file at `tests/e2e/fixtures/null-geometry.rep` — 2 tracks, one with a null-geometry row.
+- [ ] T059 [US2][test] Create Playwright spec `tests/e2e/test-null-geometry-no-drop.spec.ts` — open the fixture via the VS Code command palette, assert the layer count matches the fixture's feature count (no drop), assert one layer renders with `geometry.type === "Point"` and `coordinates.length === 0`.
+- [ ] T060 [US2][test] Add any new page-object selectors needed for the null-geometry assertion under `tests/e2e/models/`.
+- [ ] T061 [US2][test] Run webview E2E: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-null-geometry-no-drop`. Capture the trace bundle as evidence.
 
 **Checkpoint**: Consumer migration complete, `task verify` green, the silent-drop guard is dead, the null-geometry E2E passes. US3 guard rails can follow.
 
@@ -205,20 +207,27 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 
 ## Phase 5: User Story 3 — Guard rails prevent reintroduction (Priority: P3)
 
-**Goal**: A future contributor who reaches for "just a loose GeoJSON Feature type" is redirected by (a) a prominent parse-boundary docstring on the generated `RawGeoJSONFeature` type, and (b) an ADR entry in `docs/project_notes/decisions.md` that the memory-aware review protocol surfaces.
+**Goal**: A future contributor who reaches for "just a loose GeoJSON Feature type" is redirected by three layers — (a) an active lint-stage regression guard (`scripts/check-no-geojson-feature.sh`, which landed on main with #214), (b) a prominent parse-boundary docstring on the generated `RawGeoJSONFeature` type, and (c) an ADR entry in `docs/project_notes/decisions.md` that the memory-aware review protocol surfaces.
 
-**Independent Test**: Inspect `shared/schemas/src/generated/typescript/types.ts` — the `RawGeoJSONFeature` declaration is preceded by a non-empty docstring naming it as a parse-boundary type and pointing to `DebriefFeature` narrowing (FR-008, SC-010). Inspect `docs/project_notes/decisions.md` — an ADR entry exists with today's date, naming the three deleted duplicates, the two new classes, the `designates_type` relaxation, and the 14A validation-boundary rule.
+**Scope note — #214 already delivered a partial guard rail**: the regression script `scripts/check-no-geojson-feature.sh`, wired into `task lint` by spec #214, fails CI if any file under `apps/`, `shared/`, or `services/` re-introduces `interface GeoJSONFeature`. It currently carries one exclusion (`grep -v "shared/utils/src/types.ts"`) because that file IS the canonical hand-typed interface today. #204 deletes that interface (T030); the exclusion then becomes dead weight and should be removed to tighten the guard. The error-message text also points readers at `SafeFeature` — post-#204 it should point at `RawGeoJSONFeature` (the new canonical parse-boundary name). This turns the spec's optional follow-up guard into a shipped guard.
+
+**Independent Test**: (1) `bash scripts/check-no-geojson-feature.sh` exits 0 with the tightened version (no exclusion); (2) a developer who adds `interface GeoJSONFeature` to any file under `apps/`, `shared/`, or `services/` sees the guard fail locally and in CI with the updated message pointing at `RawGeoJSONFeature`; (3) inspect `shared/schemas/src/generated/typescript/types.ts` — the `RawGeoJSONFeature` declaration is preceded by a non-empty docstring (FR-008, SC-010); (4) inspect `docs/project_notes/decisions.md` — the new ADR entry is present.
 
 ### Docstring propagation
 
-- [ ] T061 [US3] Verify the `RawGeoJSONFeature` LinkML `description:` block in `shared/schemas/src/linkml/raw-geojson.yaml` (authored in T006) explicitly (a) names it as a parse-boundary type, (b) directs the reader to narrow to `DebriefFeature` past the boundary, (c) references the existing `isDebriefFeature` / `isTrackFeature` type guards in `@debrief/schemas/unions.ts`. If the description is insufficient, edit and re-run `make generate`.
-- [ ] T062 [US3] Inspect generated artefacts to confirm the docstring propagates: `shared/schemas/src/generated/typescript/types.ts` and `shared/schemas/src/generated/python/debrief_schemas/__init__.py` both carry the parse-boundary docstring on `RawGeoJSONFeature`. SC-010.
+- [ ] T062 [US3] Verify the `RawGeoJSONFeature` LinkML `description:` block in `shared/schemas/src/linkml/raw-geojson.yaml` (authored in T006) explicitly (a) names it as a parse-boundary type, (b) directs the reader to narrow to `DebriefFeature` past the boundary, (c) references the existing `isDebriefFeature` / `isTrackFeature` type guards in `@debrief/schemas/unions.ts`. If the description is insufficient, edit and re-run `make generate`.
+- [ ] T063 [US3] Inspect generated artefacts to confirm the docstring propagates: `shared/schemas/src/generated/typescript/types.ts` and `shared/schemas/src/generated/python/debrief_schemas/__init__.py` both carry the parse-boundary docstring on `RawGeoJSONFeature`. SC-010.
+
+### Tighten the #214 regression guard `scripts/check-no-geojson-feature.sh`
+
+- [ ] T064 [US3] Edit `scripts/check-no-geojson-feature.sh`: (1) remove the `| grep -v "shared/utils/src/types.ts"` exclusion line — after T030 that file no longer defines `GeoJSONFeature`, so the exclusion is dead weight and keeping it would let a future regression in that file slip past the guard; (2) update the diagnostic message from "Use SafeFeature from @debrief/utils or schema types from @debrief/schemas instead" to "Use `RawGeoJSONFeature` from `@debrief/schemas` (parse-boundary) or narrow via existing `DebriefFeature` type guards" — points readers at the new canonical name.
+- [ ] T065 [US3][test] Verify the tightened guard: (a) run `bash scripts/check-no-geojson-feature.sh` on the final commit and expect exit 0; (b) negative-case check — temporarily add `interface GeoJSONFeature { type: "Feature" }` to a throwaway file, re-run the guard, confirm it fails with the updated diagnostic message pointing at `RawGeoJSONFeature`, then revert the file. Capture both transcripts as evidence (feeds the shipped-post's "guard rails in action" beat).
 
 ### ADR entry
 
-- [ ] T063 [US3] Append a dated ADR entry to `docs/project_notes/decisions.md` with the next free ADR number. Required content: (a) names the three deleted hand-typed duplicates (`shared/utils` interface, `services/session-state` interface, `services/stac` `dict[str, Any]` alias); (b) names the two new classes (`RawGeoJSONFeature`, `RawGeoJSONFeatureCollection`); (c) explicitly documents the narrow relaxation of the spec's Out-of-Scope list for the `designates_type: true` additive annotation on `geojson.yaml` geometry classes (review 13A); (d) records the 14A one-validation-per-ingress-boundary rule so future reviewers can point to it; (e) links to `specs/204-rawgeojsonfeature-linkml/spec.md`. FR-019, SC-007.
+- [ ] T066 [US3] Append a dated ADR entry to `docs/project_notes/decisions.md` with the next free ADR number. Required content: (a) names the three deleted hand-typed duplicates (`shared/utils` interface, `services/session-state` interface, `services/stac` `dict[str, Any]` alias); (b) names the two new classes (`RawGeoJSONFeature`, `RawGeoJSONFeatureCollection`); (c) explicitly documents the narrow relaxation of the spec's Out-of-Scope list for the `designates_type: true` additive annotation on `geojson.yaml` geometry classes (review 13A); (d) records the 14A one-validation-per-ingress-boundary rule so future reviewers can point to it; (e) notes the #214 guard-script tightening (T064) so the interaction between #204 and #214 is discoverable; (f) links to `specs/204-rawgeojsonfeature-linkml/spec.md`. FR-019, SC-007.
 
-**Checkpoint**: All three user stories complete. Guard rails in place. Ready for evidence capture + PR.
+**Checkpoint**: All three user stories complete. Three-layer guard rails in place (active lint guard + schema-sourced docstring + ADR). Ready for evidence capture + PR.
 
 ---
 
@@ -228,27 +237,28 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 
 ### Final verification
 
-- [ ] T064 Run `task verify` on the final commit — full CI parity. Capture stdout/stderr to `specs/204-rawgeojsonfeature-linkml/evidence/ci-pipeline.txt`. Zero failures attributable to the migration — SC-005.
+- [ ] T067 Run `task verify` on the final commit — full CI parity. Capture stdout/stderr to `specs/204-rawgeojsonfeature-linkml/evidence/ci-pipeline.txt`. Zero failures attributable to the migration — SC-005.
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T065 Capture test summary using template `.specify/templates/evidence/test-summary-template.md` in `specs/204-rawgeojsonfeature-linkml/evidence/test-summary.md`. YAML front matter MUST include `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body describes: extended schema-adherence coverage (7 + 5 + 5 fixtures), null-geometry coercion unit tests, null-geometry Playwright E2E, session-state behaviour-unchanged sweep, 10 000-feature perf bench result.
-- [ ] T066 Create usage demonstration in `specs/204-rawgeojsonfeature-linkml/evidence/usage-example.md` — minimal code snippets (Python + TypeScript) showing `import` + consumption of `RawGeoJSONFeature`, covering the three id-shape variants (string, integer, absent) and the null-properties case.
-- [ ] T067 [P] Create round-trip proof in `specs/204-rawgeojsonfeature-linkml/evidence/round-trip-evidence.md` — table of the 3 canonical fixtures with the column sequence [Python validate → dump | TS parse → stringify | Python re-validate | byte-identical? ✓] showing all ✓ (SC-008). Embed the `test_roundtrip.py` output inline.
-- [ ] T068 [P] Capture grep-before-after evidence in `specs/204-rawgeojsonfeature-linkml/evidence/grep-before-after.txt` — run `rg -nw "interface GeoJSONFeature" shared/ services/ apps/` and `rg -nw "GeoJSONFeature: TypeAlias" services/` twice: once on `main`, once on the PR branch. PR-branch output MUST be empty (SC-001, SC-002).
-- [ ] T069 [P] Capture perf-bench output in `specs/204-rawgeojsonfeature-linkml/evidence/perf-bench.txt` — `uv run pytest shared/schemas/tests/test_designates_type_perf.py -v -s` with the wall-clock line visible. Must show ≤ 500 ms (review 13A).
-- [ ] T070 [P] Copy the Playwright trace bundle (from T060) to `specs/204-rawgeojsonfeature-linkml/evidence/null-geometry-e2e-trace.zip` so reviewers can replay the no-drop assertion.
+- [ ] T068 Capture test summary using template `.specify/templates/evidence/test-summary-template.md` in `specs/204-rawgeojsonfeature-linkml/evidence/test-summary.md`. YAML front matter MUST include `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body describes: extended schema-adherence coverage (7 + 5 + 5 fixtures), null-geometry coercion unit tests, null-geometry Playwright E2E, session-state behaviour-unchanged sweep, 10 000-feature perf bench result, guard-script tightening.
+- [ ] T069 Create usage demonstration in `specs/204-rawgeojsonfeature-linkml/evidence/usage-example.md` — minimal code snippets (Python + TypeScript) showing `import` + consumption of `RawGeoJSONFeature`, covering the three id-shape variants (string, integer, absent) and the null-properties case.
+- [ ] T070 [P] Create round-trip proof in `specs/204-rawgeojsonfeature-linkml/evidence/round-trip-evidence.md` — table of the 3 canonical fixtures with the column sequence [Python validate → dump | TS parse → stringify | Python re-validate | byte-identical? ✓] showing all ✓ (SC-008). Embed the `test_roundtrip.py` output inline.
+- [ ] T071 [P] Capture grep-before-after evidence in `specs/204-rawgeojsonfeature-linkml/evidence/grep-before-after.txt` — run `rg -nw "interface GeoJSONFeature" shared/ services/ apps/` and `rg -nw "GeoJSONFeature: TypeAlias" services/` twice: once on `main`, once on the PR branch. PR-branch output MUST be empty (SC-001, SC-002).
+- [ ] T072 [P] Capture perf-bench output in `specs/204-rawgeojsonfeature-linkml/evidence/perf-bench.txt` — `uv run pytest shared/schemas/tests/test_designates_type_perf.py -v -s` with the wall-clock line visible. Must show ≤ 500 ms (review 13A).
+- [ ] T073 [P] Copy the Playwright trace bundle (from T061) to `specs/204-rawgeojsonfeature-linkml/evidence/null-geometry-e2e-trace.zip` so reviewers can replay the no-drop assertion.
+- [ ] T074 [P] Copy the guard-script transcripts (from T065) to `specs/204-rawgeojsonfeature-linkml/evidence/guard-script-transcripts.txt` — shows both the pass and simulated-fail cases.
 
 ### Media Content
 
-- [ ] T071 Create shipped blog post at `specs/204-rawgeojsonfeature-linkml/media/shipped-post.md`. Spawn the Content Specialist via the Task tool (subagent_type `general-purpose`, reading `.claude/agents/media/content.md`) and supply: feature name, goal from spec.md, key accomplishments (3 constitutional articles addressed, perf number, E2E coverage), screenshots not applicable (Schema Change feature), lessons learned (review phase surfaced Article I.3 silent-drop that the spec missed). Follow the Shipped Post template.
-- [ ] T072 [P] Create LinkedIn shipped summary at `specs/204-rawgeojsonfeature-linkml/media/linkedin-shipped.md` — 150-200 words, strong hook (before/after grep numbers), link to shipped-post.md.
+- [ ] T075 Create shipped blog post at `specs/204-rawgeojsonfeature-linkml/media/shipped-post.md`. Spawn the Content Specialist via the Task tool (subagent_type `general-purpose`, reading `.claude/agents/media/content.md`) and supply: feature name, goal from spec.md, key accomplishments (3 constitutional articles addressed, perf number, E2E coverage, guard-script tightening), screenshots not applicable (Schema Change feature), lessons learned (review phase surfaced Article I.3 silent-drop that the spec missed; #214 had already shipped a partial guard that this feature tightens). Follow the Shipped Post template.
+- [ ] T076 [P] Create LinkedIn shipped summary at `specs/204-rawgeojsonfeature-linkml/media/linkedin-shipped.md` — 150-200 words, strong hook (before/after grep numbers), link to shipped-post.md.
 
 ### PR Creation
 
-- [ ] T073 Create PR and publish blog: run `/speckit.pr`
+- [ ] T077 Create PR and publish blog: run `/speckit.pr`
 
-**Task T073 must run last. It depends on ALL tasks T001-T072 being complete: evidence directory populated, shipped + LinkedIn drafts ready, `task verify` green on the tip commit. `/speckit.pr` creates the feature PR in debrief-future and a cross-repo PR to debrief.github.io with the shipped post.**
+**Task T077 must run last. It depends on ALL tasks T001-T076 being complete: evidence directory populated, shipped + LinkedIn drafts ready, `task verify` green on the tip commit. `/speckit.pr` promotes draft PR #492 to ready, attaches evidence, and opens the cross-repo PR to debrief.github.io with the shipped post.**
 
 ---
 
@@ -260,16 +270,16 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 - **Phase 2 (Foundational)** — blocks Phases 3, 4, 5. Every user story depends on the schema source and generated artefacts being coherent.
 - **Phase 3 (US1, P1)** — depends on Phase 2. Delivers the canonical type + all adherence tests + the perf bench.
 - **Phase 4 (US2, P2)** — depends on Phase 3 (the new type must exist before consumers can migrate to it).
-- **Phase 5 (US3, P3)** — depends on Phase 2 for the docstring propagation, and on Phase 4 completing so the ADR can name what was deleted.
+- **Phase 5 (US3, P3)** — depends on Phase 2 for the docstring propagation, and on Phase 4 completing so the ADR can name what was deleted and the guard-script tightening (T064) can reference the now-deleted `shared/utils/src/types.ts` interface.
 - **Phase 6 (Polish)** — depends on Phase 5. Evidence captures final state; PR task must run last.
 
 ### Within-phase task ordering
 
 - **Phase 2**: T005 + T006 + T007 + T008 (schema edits) must complete before T009 (generate.py edit) before T010 (regen) before T011-T013 (artefact verification). Fixture directories T002/T003 can happen in parallel with schema edits.
 - **Phase 3**: Fixtures T014-T016 can run in parallel; test-harness edits T017-T021 can start once fixtures exist; T022 (final pytest run) waits on all of them.
-- **Phase 4**: Python ingress (T023-T029) is independent of TypeScript migration (T030+). Within TypeScript, the shared/utils deletion (T030-T033) must precede consumer-file updates (T034+) because those consumers import from `@debrief/utils`. The session-state sweep T036 waits on T034-T035. Component files T038-T042 can run in parallel once T037 is done. apps/vscode file edits T044-T047 are mostly parallel; T044 is the intentional silent-drop removal and should land as a single atomic edit. E2E tests T057-T060 wait on all consumer migration.
-- **Phase 5**: T061 → T062 (docstring flow); T063 (ADR) can run in parallel with docstring verification.
-- **Phase 6**: T064 must pass before evidence collection T065-T070 begins. Media tasks T071-T072 can run in parallel. T073 waits on everything.
+- **Phase 4**: Python ingress (T023-T029) is independent of TypeScript migration (T030+). Within TypeScript, the shared/utils deletion (T030-T033) must precede consumer-file updates (T034+) because those consumers import from `@debrief/utils`. The session-state sweep T036 waits on T034-T035. Component files T038-T042 can run in parallel once T037 is done. apps/vscode file edits T044-T047 are mostly parallel; T044 is the intentional silent-drop removal and should land as a single atomic edit. Typecheck + drift gate T055-T057 wait on all consumer migration. E2E tests T058-T061 wait on T055-T057.
+- **Phase 5**: T062 → T063 (docstring flow) can run in parallel with T064 (guard edit) → T065 (guard verify); T066 (ADR) is last because it cites both T064 and the deletions in Phase 4.
+- **Phase 6**: T067 must pass before evidence collection T068-T074 begins. Media tasks T075-T076 can run in parallel. T077 waits on everything.
 
 ### Parallel opportunities
 
@@ -285,8 +295,9 @@ Covers the 5 feature-level valid + 7 per-geometry valid + 5 invalid fixtures spe
 | Phase 4 apps/vscode file updates | T045, T046, T047 | 3 independent files, post-T044 |
 | Phase 4 apps/loader IPC | T049, T050 | 2 sibling files |
 | Phase 4 apps/web-shell tools | T051, T052, T053, T054 | 4 sibling files, zero interdependencies |
-| Phase 6 evidence capture | T067, T068, T069, T070 | 4 different output files, each reads a different source |
-| Phase 6 media | T072 (parallel with T071) | LinkedIn summary is independent of the blog post draft |
+| Phase 5 docstring vs guard | T062-T063 alongside T064-T065 | Docstring verification touches generated artefacts only; guard edit touches `scripts/check-no-geojson-feature.sh` only |
+| Phase 6 evidence capture | T070, T071, T072, T073, T074 | 5 different output files, each reads a different source |
+| Phase 6 media | T076 (parallel with T075) | LinkedIn summary is independent of the blog post draft |
 
 ---
 
@@ -299,9 +310,9 @@ Although this work ships as one atomic PR, the phases provide natural commit bou
 1. **Commits 1-4** (Phase 2 Foundational): schema source edits + generator post-processor + regenerated artefacts. A single logical unit. `task verify` green on the generated artefacts alone proves the schema side.
 2. **Commits 5-6** (Phase 3): fixtures + extended schema adherence tests + perf bench. The green pytest run here is the contract that the new type IS the authoritative one before consumers touch it.
 3. **Commits 7-11** (Phase 4): consumer migration in dependency order — Python ingress first (services land the coercion shim), then shared/utils/types cleanup, then shared/components, then apps/vscode (including the silent-drop removal commit — flagged explicitly so reviewers see the Article I.3 resolution), then apps/loader + apps/web-shell, finally the E2E spec + Playwright trace.
-4. **Commit 12** (Phase 5): ADR + docstring propagation check.
+4. **Commit 12** (Phase 5): docstring check + guard-script tightening + ADR.
 5. **Commit 13** (Phase 6): evidence + media drafts.
-6. **PR creation** (T073): opens the feature PR and the cross-repo blog PR.
+6. **PR promotion** (T077): promotes draft PR #492 to ready, attaches evidence, opens the cross-repo blog PR.
 
 ### Risk-mitigation ordering
 
@@ -309,11 +320,12 @@ Although this work ships as one atomic PR, the phases provide natural commit bou
 - **Generator post-processor before regen**: T009 before T010. If regen runs without the new string-replacements, the TS output loses `id?: string | number` and `properties?: Record<string, unknown> | null`, which cascades into compile errors across every consumer.
 - **Fixture creation before test-harness extensions**: T014-T016 before T017-T021. A pytest run that can't find the fixture files fails fast with the wrong kind of error.
 - **`designates_type` before perf bench**: T005 is in Phase 2, T021 is in Phase 3. If T021 runs without T005 having landed, the 10 000-feature validation costs ~3 s and the bench reports a false regression.
+- **Guard-script tightening after `shared/utils` interface deletion**: T064 must land AFTER T030. Tightening the guard (removing the `shared/utils/src/types.ts` exclusion) before the interface is deleted would make the guard fail on the existing interface and break CI mid-PR.
 
 ### Parallel-team strategy
 
 - **One-developer execution** (expected): work phases in order, parallelising the [P] batches within each phase. Total effort ~1-2 days.
-- **Two-developer execution** (optional): after Phase 2 is green, Developer A takes Phase 3 + the Python ingress half of Phase 4 (T023-T029); Developer B takes the TypeScript consumer half of Phase 4 (T030-T054). They meet at T055-T060 (typecheck + E2E).
+- **Two-developer execution** (optional): after Phase 2 is green, Developer A takes Phase 3 + the Python ingress half of Phase 4 (T023-T029); Developer B takes the TypeScript consumer half of Phase 4 (T030-T054). They meet at T055-T061 (typecheck + drift-rule + E2E).
 
 ### Rollback plan
 
@@ -324,7 +336,7 @@ If the migration uncovers a blocking issue (e.g., a generator-emitted Pydantic u
 ## Notes
 
 - Every [P] task in the same phase operates on a different file; they can be launched concurrently via the Task tool or handled as a parallel batch in a single session.
-- Evidence artefacts are the contract between this feature and the reviewer; T065-T070 are non-optional.
-- The PR task T073 runs `/speckit.pr`, which creates both the feature PR in `debrief-future` and a blog-post PR in `debrief.github.io`. Both URLs are reported back.
+- Evidence artefacts are the contract between this feature and the reviewer; T068-T074 are non-optional.
+- The PR task T077 runs `/speckit.pr`, which promotes the existing draft PR (#492) to ready, attaches evidence, and creates the blog-post PR in `debrief.github.io`. Both URLs are reported back.
 - Avoid `--no-verify`: if a pre-commit hook fails, investigate — the hook set runs ruff/eslint/typecheck inline.
 - The single-PR constraint (SC-009) means rebasing or splitting mid-stream is not an option; keep commits linear.
