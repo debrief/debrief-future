@@ -17,8 +17,8 @@ Alias: start
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TimeRange](../classes/TimeRange.md) | A temporal interval with inclusive start and end |  no  |
 | [PlotTimeExtent](../classes/PlotTimeExtent.md) | Temporal extent of a plot expressed as ISO 8601 strings |  no  |
+| [TimeRange](../classes/TimeRange.md) | A temporal interval with inclusive start and end |  no  |
 | [TimeFilter](../classes/TimeFilter.md) | Constraints on the visible time window (epoch milliseconds; null = unbounded) |  no  |
 
 
