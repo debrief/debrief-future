@@ -1,0 +1,133 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--gapstesttrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.8919782,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1585009
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.8919782,
+    5.1585009,
+    30.9332722,
+    5.1943915
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Gapstesttrack",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Saxon Warrior: Gapstesttrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Roosevelt.",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "MAYO",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "harbour-ops",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "prosecution",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "GapsTestTrack (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/GapsTestTrack.dpf",
+      "title": "GapsTestTrack.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-GapsTestTrack": {
+      "href": "./assets/GapsTestTrack.dpf",
+      "type": "application/octet-stream",
+      "title": "GapsTestTrack.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/GapsTestTrack.dpf",
+        "load_timestamp": "2026-04-13T23:12:31.861993Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
