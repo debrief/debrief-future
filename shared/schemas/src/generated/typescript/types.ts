@@ -1668,6 +1668,36 @@ export interface StacItemSummary {
 
 
 /**
+ * Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — payloads arriving with geometry==null are coerced to GeoJSONEmptyPoint at the service-code ingress boundary (services/io, services/stac), not made nullable here.
+ */
+export interface RawGeoJSONFeature {
+    /** GeoJSON object type — always "Feature". */
+    type: "Feature",
+    /** Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion. */
+    id?: string | number,
+    /** GeoJSON geometry — discriminated union over the seven existing geometry classes in geojson.yaml. Discrimination is driven by designates_type on each class's type slot, making Pydantic validation O(1) per feature. */
+    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,
+    /** Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 §3.2. */
+    properties?: Record<string, unknown> | null,
+    /** Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6). */
+    bbox?: number[],
+}
+
+
+/**
+ * Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3.3). Used by STAC item payloads and tool-result layers before narrowing.
+ */
+export interface RawGeoJSONFeatureCollection {
+    /** GeoJSON object type — always "FeatureCollection". */
+    type: "FeatureCollection",
+    /** The collection's features, in document order. */
+    features: RawGeoJSONFeature[],
+    /** Optional bounding box, shaped as in RawGeoJSONFeature.bbox. */
+    bbox?: number[],
+}
+
+
+/**
  * A point in time with dual representations (FR-032, FR-033)
  */
 export interface TimeInstant {
@@ -1816,29 +1846,6 @@ export interface DocumentSlice {
 
 
 /**
- * GeoJSON geometry object (type + coordinates pair)
- */
-export interface GeoJSONGeometry {
-    /** GeoJSON geometry type (e.g., Point, LineString, Polygon) */
-    type: string,
-}
-
-
-/**
- * GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
-
- */
-export interface GeoJSONFeature { // canonical — LinkML-generated schema type
-    /** GeoJSON object type — always "Feature" */
-    type: string,
-    /** Optional feature identifier (string or numeric, stored as string) */
-    id?: string,
-    /** GeoJSON geometry object */
-    geometry: GeoJSONGeometry,
-}
-
-
-/**
  * Record of the last tool execution, enabling single-step undo. Feature 110-tool-level-undo-gap.
 
  */
@@ -1858,7 +1865,7 @@ export interface LastToolExecution {
  */
 export interface ResultsSlice {
     /** Accumulated tool result features */
-    result_layers: GeoJSONFeature[],
+    result_layers: RawGeoJSONFeature[],
     /** Last tool execution record for single-step undo */
     last_tool_execution?: LastToolExecution,
 }

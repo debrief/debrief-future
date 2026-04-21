@@ -11,6 +11,7 @@ from datetime import (
 from decimal import Decimal
 from enum import Enum
 from typing import (
+    Any,
     ClassVar,
     Literal,
     Optional,
@@ -94,6 +95,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                  'log-entry',
                  'system-record',
                  'stac-extension',
+                 'raw-geojson',
                  'session-state',
                  'tool-result',
                  'storyboard'],
@@ -1035,8 +1037,8 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1079,8 +1081,8 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1123,8 +1125,8 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1167,8 +1169,8 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1211,8 +1213,8 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1255,8 +1257,8 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1299,8 +1301,8 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1680,8 +1682,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1703,7 +1705,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -1723,7 +1725,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: TrackProperties = Field(default=..., description="""Track metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1739,6 +1741,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1746,7 +1749,9 @@ class TrackFeature(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
 
 
 class PointMetadataEntry(ConfiguredBaseModel):
@@ -1873,8 +1878,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -1896,7 +1901,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -1915,7 +1920,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: ReferenceLocationProperties = Field(default=..., description="""Reference metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1931,6 +1936,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -1967,7 +1973,9 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
     zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'ViewportPolygon', 'Viewport']} })
     center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties',
                        'CircleAnnotationProperties',
@@ -2005,8 +2013,8 @@ class SystemState(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2028,7 +2036,7 @@ class SystemState(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2046,7 +2054,7 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: SystemStateProperties = Field(default=..., description="""State-specific properties""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2062,6 +2070,7 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -2172,8 +2181,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2195,7 +2204,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2213,7 +2222,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: MultiPointFeatureProperties = Field(default=..., description="""Feature properties and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2229,6 +2238,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2236,7 +2246,9 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
 
 
 class MultiPolygonFeatureProperties(BaseFeatureProperties):
@@ -2332,8 +2344,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2355,7 +2367,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2373,7 +2385,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: MultiPolygonFeatureProperties = Field(default=..., description="""Feature properties and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2389,6 +2401,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2396,7 +2409,9 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
 
 
 class LogEntry(ConfiguredBaseModel):
@@ -2479,7 +2494,7 @@ class InputFeatureState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature'],
          'notes': ['Typed as string in LinkML but serialized as a JSON object in '
@@ -2499,6 +2514,7 @@ class InputFeatureState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature'],
          'notes': ['Typed as string in LinkML but serialized as a JSON object in '
@@ -2610,8 +2626,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2633,7 +2649,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2651,7 +2667,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: NarrativeEntryProperties = Field(default=..., description="""Narrative metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2667,6 +2683,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -2768,8 +2785,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2791,7 +2808,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2809,7 +2826,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: CircleAnnotationProperties = Field(default=..., description="""Circle metadata including center and radius for reconstruction""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2825,6 +2842,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -2922,8 +2940,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -2945,7 +2963,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -2963,7 +2981,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: RectangleAnnotationProperties = Field(default=..., description="""Rectangle metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2979,6 +2997,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -3076,8 +3095,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3099,7 +3118,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -3117,7 +3136,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: LineAnnotationProperties = Field(default=..., description="""Line metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -3133,6 +3152,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -3219,8 +3239,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3242,7 +3262,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -3260,7 +3280,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: TextAnnotationProperties = Field(default=..., description="""Text metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -3276,6 +3296,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -3379,8 +3400,8 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3402,7 +3423,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -3420,7 +3441,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: VectorAnnotationProperties = Field(default=..., description="""Vector metadata including origin, range, and bearing for reconstruction""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -3436,6 +3457,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -3535,8 +3557,8 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3558,7 +3580,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -3576,7 +3598,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: PolyAnnotationProperties = Field(default=..., description="""Polygon metadata including vertex count and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -3592,6 +3614,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -3646,7 +3669,7 @@ class Tool(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -3712,8 +3735,8 @@ class ToolParameter(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3835,8 +3858,8 @@ class FileProvEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -3875,7 +3898,7 @@ class PlatformRecord(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -4073,7 +4096,7 @@ class PlotSummary(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -4091,7 +4114,9 @@ class PlotSummary(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
     time_extent: Optional[PlotTimeExtent] = Field(default=None, description="""Temporal extent of the plot (start/end ISO 8601 strings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
     track_count: Optional[int] = Field(default=None, description="""Number of tracks in this plot""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
     location_count: Optional[int] = Field(default=None, description="""Number of reference locations in this plot""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary']} })
@@ -4120,7 +4145,7 @@ class StacItemSummary(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -4138,7 +4163,9 @@ class StacItemSummary(ConfiguredBaseModel):
                        'MultiPointFeature',
                        'MultiPolygonFeature',
                        'PlotSummary',
-                       'StacItemSummary']} })
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
     start_datetime: Optional[str] = Field(default=None, description="""Range start datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
     end_datetime: Optional[str] = Field(default=None, description="""Range end datetime (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacItemSummary']} })
     platforms: Optional[list[PlatformRecord]] = Field(default=[], description="""Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
@@ -4147,6 +4174,156 @@ class StacItemSummary(ConfiguredBaseModel):
                        'StacExtensionProperties',
                        'StacItemSummary']} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Feature-level tags from debrief:feature_tags""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties', 'StacItemSummary']} })
+
+
+class RawGeoJSONFeature(ConfiguredBaseModel):
+    """
+    Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — payloads arriving with geometry==null are coerced to GeoJSONEmptyPoint at the service-code ingress boundary (services/io, services/stac), not made nullable here.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/raw-geojson'})
+
+    type: Literal["Feature"] = Field(default=..., description="""GeoJSON object type — always \"Feature\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature'],
+         'equals_string': 'Feature'} })
+    id: Optional[Union[int, str]] = Field(default=None, description="""Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion.""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'string'}, {'range': 'integer'}],
+         'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool',
+                       'PlatformRecord',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'StoryboardProperties',
+                       'SceneProperties',
+                       'StoryboardFeature',
+                       'SceneFeature']} })
+    geometry: Union[GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONMultiLineString, GeoJSONMultiPoint, GeoJSONMultiPolygon, GeoJSONPoint, GeoJSONPolygon] = Field(default=..., description="""GeoJSON geometry — discriminated union over the seven existing geometry classes in geojson.yaml. Discrimination is driven by designates_type on each class's type slot, making Pydantic validation O(1) per feature.""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONPoint'},
+                    {'range': 'GeoJSONEmptyPoint'},
+                    {'range': 'GeoJSONLineString'},
+                    {'range': 'GeoJSONPolygon'},
+                    {'range': 'GeoJSONMultiPoint'},
+                    {'range': 'GeoJSONMultiLineString'},
+                    {'range': 'GeoJSONMultiPolygon'}],
+         'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'RawGeoJSONFeature',
+                       'StoryboardFeature',
+                       'SceneFeature']} })
+    properties: Optional[dict[str, object]] = Field(default=None, description="""Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 §3.2.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'RawGeoJSONFeature',
+                       'StoryboardFeature',
+                       'SceneFeature']} })
+    bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
+
+
+class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
+    """
+    Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3.3). Used by STAC item payloads and tool-result layers before narrowing.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/raw-geojson'})
+
+    type: Literal["FeatureCollection"] = Field(default=..., description="""GeoJSON object type — always \"FeatureCollection\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature'],
+         'equals_string': 'FeatureCollection'} })
+    features: list[RawGeoJSONFeature] = Field(default=..., description="""The collection's features, in document order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
+    bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box, shaped as in RawGeoJSONFeature.bbox.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'SystemStateProperties',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'PlotSummary',
+                       'StacItemSummary',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection']} })
 
 
 class TimeInstant(ConfiguredBaseModel):
@@ -4321,114 +4498,6 @@ class DocumentSlice(ConfiguredBaseModel):
     savePath: Optional[str] = Field(default=None, description="""Last save location""", json_schema_extra = { "linkml_meta": {'domain_of': ['DocumentSlice']} })
 
 
-class GeoJSONGeometry(ConfiguredBaseModel):
-    """
-    GeoJSON geometry object (type + coordinates pair)
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    type: str = Field(default=..., description="""GeoJSON geometry type (e.g., Point, LineString, Polygon)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon',
-                       'GeoJSONMultiPoint',
-                       'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'TrackFeature',
-                       'ReferenceLocation',
-                       'SystemState',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'NarrativeEntry',
-                       'CircleAnnotation',
-                       'RectangleAnnotation',
-                       'LineAnnotation',
-                       'TextAnnotation',
-                       'VectorAnnotation',
-                       'PolyAnnotation',
-                       'ToolParameter',
-                       'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
-                       'DatasetAxisMetadata',
-                       'DatasetEntry',
-                       'StoryboardFeature',
-                       'SceneFeature']} })
-
-
-class GeoJSONFeature(ConfiguredBaseModel):
-    """
-    GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
-
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
-
-    type: str = Field(default=..., description="""GeoJSON object type — always \"Feature\"""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon',
-                       'GeoJSONMultiPoint',
-                       'GeoJSONMultiLineString',
-                       'GeoJSONMultiPolygon',
-                       'TrackFeature',
-                       'ReferenceLocation',
-                       'SystemState',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'NarrativeEntry',
-                       'CircleAnnotation',
-                       'RectangleAnnotation',
-                       'LineAnnotation',
-                       'TextAnnotation',
-                       'VectorAnnotation',
-                       'PolyAnnotation',
-                       'ToolParameter',
-                       'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
-                       'DatasetAxisMetadata',
-                       'DatasetEntry',
-                       'StoryboardFeature',
-                       'SceneFeature']} })
-    id: Optional[str] = Field(default=None, description="""Optional feature identifier (string or numeric, stored as string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'ReferenceLocation',
-                       'SystemState',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'NarrativeEntry',
-                       'CircleAnnotation',
-                       'RectangleAnnotation',
-                       'LineAnnotation',
-                       'TextAnnotation',
-                       'VectorAnnotation',
-                       'PolyAnnotation',
-                       'Tool',
-                       'PlatformRecord',
-                       'PlotSummary',
-                       'StacItemSummary',
-                       'GeoJSONFeature',
-                       'StoryboardProperties',
-                       'SceneProperties',
-                       'StoryboardFeature',
-                       'SceneFeature']} })
-    geometry: GeoJSONGeometry = Field(default=..., description="""GeoJSON geometry object""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
-                       'ReferenceLocation',
-                       'SystemState',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'InputFeatureState',
-                       'NarrativeEntry',
-                       'CircleAnnotation',
-                       'RectangleAnnotation',
-                       'LineAnnotation',
-                       'TextAnnotation',
-                       'VectorAnnotation',
-                       'PolyAnnotation',
-                       'GeoJSONFeature',
-                       'StoryboardFeature',
-                       'SceneFeature']} })
-
-
 class LastToolExecution(ConfiguredBaseModel):
     """
     Record of the last tool execution, enabling single-step undo. Feature 110-tool-level-undo-gap.
@@ -4448,7 +4517,7 @@ class ResultsSlice(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    result_layers: list[GeoJSONFeature] = Field(default=..., description="""Accumulated tool result features""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResultsSlice']} })
+    result_layers: list[RawGeoJSONFeature] = Field(default=..., description="""Accumulated tool result features""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResultsSlice']} })
     last_tool_execution: Optional[LastToolExecution] = Field(default=None, description="""Last tool execution record for single-step undo""", json_schema_extra = { "linkml_meta": {'domain_of': ['ResultsSlice']} })
 
 
@@ -4476,7 +4545,7 @@ class SessionState(ConfiguredBaseModel):
     schemaVersion: str = Field(default=..., description="""Schema version for persistence compatibility (FR-026)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
     temporal: TemporalSlice = Field(default=..., description="""Time-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     spatial: SpatialSlice = Field(default=..., description="""Geographic view state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
+    features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
     document: DocumentSlice = Field(default=..., description="""Editor state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
 
     @field_validator('schemaVersion')
@@ -4504,7 +4573,7 @@ class SessionFile(ConfiguredBaseModel):
     savedAt: str = Field(default=..., description="""When the session was saved (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
     temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
+    features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
 
     @field_validator('version')
     def pattern_version(cls, v):
@@ -4621,8 +4690,8 @@ class DatasetAxisMetadata(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -4705,8 +4774,8 @@ class DatasetEntry(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -4778,7 +4847,7 @@ class StoryboardProperties(BaseFeatureProperties):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -4864,7 +4933,7 @@ class SceneProperties(BaseFeatureProperties):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -4968,8 +5037,8 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -4991,7 +5060,7 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -5009,7 +5078,7 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: StoryboardProperties = Field(default=..., description="""Storyboard properties""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -5025,6 +5094,7 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -5056,8 +5126,8 @@ class SceneFeature(ConfiguredBaseModel):
                        'PolyAnnotation',
                        'ToolParameter',
                        'FileProvEntry',
-                       'GeoJSONGeometry',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
@@ -5079,7 +5149,7 @@ class SceneFeature(ConfiguredBaseModel):
                        'PlatformRecord',
                        'PlotSummary',
                        'StacItemSummary',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardProperties',
                        'SceneProperties',
                        'StoryboardFeature',
@@ -5097,7 +5167,7 @@ class SceneFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
-                       'GeoJSONFeature',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
     properties: SceneProperties = Field(default=..., description="""Scene properties""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -5113,6 +5183,7 @@ class SceneFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
 
@@ -5185,6 +5256,8 @@ StacExtensionProperties.model_rebuild()
 PlotTimeExtent.model_rebuild()
 PlotSummary.model_rebuild()
 StacItemSummary.model_rebuild()
+RawGeoJSONFeature.model_rebuild()
+RawGeoJSONFeatureCollection.model_rebuild()
 TimeInstant.model_rebuild()
 TimeRange.model_rebuild()
 TimeFilter.model_rebuild()
@@ -5197,8 +5270,6 @@ TemporalSlice.model_rebuild()
 SpatialSlice.model_rebuild()
 FeaturesSlice.model_rebuild()
 DocumentSlice.model_rebuild()
-GeoJSONGeometry.model_rebuild()
-GeoJSONFeature.model_rebuild()
 LastToolExecution.model_rebuild()
 ResultsSlice.model_rebuild()
 BrowserFilterSlice.model_rebuild()

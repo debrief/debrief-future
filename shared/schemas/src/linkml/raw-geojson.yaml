@@ -1,0 +1,111 @@
+id: https://debrief.info/schemas/raw-geojson
+name: raw-geojson
+title: Debrief Raw GeoJSON Boundary Types
+description: >-
+  Parse-boundary GeoJSON classes used before narrowing to a Debrief domain
+  feature (TrackFeature, ReferenceLocation, SystemState, etc.). These
+  classes model the permissive shape allowed by RFC 7946 §3 and replace
+  the hand-typed duplicates previously in shared/utils and
+  services/session-state.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - geojson
+
+classes:
+  Any:
+    class_uri: linkml:Any
+    description: >-
+      Permissive wildcard class used for free-form JSON object ranges
+      (e.g., RawGeoJSONFeature.properties). Maps to dict[str, object] in
+      Pydantic and Record<string, unknown> in TypeScript after generator
+      post-processing. This is the LinkML idiom for RFC 7946 §3.2
+      free-form properties and is NOT a violation of Article XV — see
+      docs/project_notes/decisions.md (RawGeoJSONFeature ADR).
+
+  RawGeoJSONFeature:
+    description: >-
+      Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this
+      to a domain feature (TrackFeature, ReferenceLocation, SystemState,
+      MultiPointFeature, MultiPolygonFeature) after validating the
+      properties.kind discriminator. Narrowing is done via the existing
+      isDebriefFeature / isTrackFeature / isReferenceLocation type guards
+      in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions
+      (Python). Note: geometry is REQUIRED — payloads arriving with
+      geometry==null are coerced to GeoJSONEmptyPoint at the service-code
+      ingress boundary (services/io, services/stac), not made nullable
+      here.
+    attributes:
+      type:
+        description: GeoJSON object type — always "Feature".
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: >-
+          Optional feature identifier. RFC 7946 permits either a string or
+          an integer; both are retained without coercion.
+        required: false
+        any_of:
+          - range: string
+          - range: integer
+      geometry:
+        description: >-
+          GeoJSON geometry — discriminated union over the seven existing
+          geometry classes in geojson.yaml. Discrimination is driven by
+          designates_type on each class's type slot, making Pydantic
+          validation O(1) per feature.
+        required: true
+        any_of:
+          - range: GeoJSONPoint
+          - range: GeoJSONEmptyPoint
+          - range: GeoJSONLineString
+          - range: GeoJSONPolygon
+          - range: GeoJSONMultiPoint
+          - range: GeoJSONMultiLineString
+          - range: GeoJSONMultiPolygon
+      properties:
+        description: >-
+          Free-form properties dictionary. Consumers narrow to a domain
+          properties class (TrackProperties, ReferenceLocationProperties,
+          etc.) after validating the kind discriminator. May be absent or
+          null per RFC 7946 §3.2.
+        range: Any
+        required: false
+      bbox:
+        description: >-
+          Optional bounding box. Either [minLon, minLat, maxLon, maxLat]
+          (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt]
+          (length 6).
+        range: float
+        multivalued: true
+        required: false
+
+  RawGeoJSONFeatureCollection:
+    description: >-
+      Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3.3). Used by
+      STAC item payloads and tool-result layers before narrowing.
+    attributes:
+      type:
+        description: GeoJSON object type — always "FeatureCollection".
+        range: string
+        required: true
+        equals_string: "FeatureCollection"
+      features:
+        description: The collection's features, in document order.
+        range: RawGeoJSONFeature
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      bbox:
+        description: Optional bounding box, shaped as in RawGeoJSONFeature.bbox.
+        range: float
+        multivalued: true
+        required: false
