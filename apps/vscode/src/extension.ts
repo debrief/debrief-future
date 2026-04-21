@@ -769,15 +769,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // module when a plot is first opened.
   let mapPanelEventsWired = false;
   const wireMapPanelEvents = (): void => {
-    if (mapPanelEventsWired || !mapPanel) return;
+    if (mapPanelEventsWired || !mapPanel) {return;}
     mapPanelEventsWired = true;
     mapPanel.onFeaturesChanged(() => {
       const uri = sessionManager.getActiveDocumentUri();
-      if (uri) storyboardPlaybackService.onPlotFeaturesChanged(uri);
+      if (uri) {storyboardPlaybackService.onPlotFeaturesChanged(uri);}
     });
     mapPanel.onSceneRectangleClick((sceneId) => {
       const uri = sessionManager.getActiveDocumentUri();
-      if (uri) void storyboardPlaybackService.goToScene(uri, sceneId);
+      if (uri) {void storyboardPlaybackService.goToScene(uri, sceneId);}
     });
   };
   // Poll on session-change — by then MapPanel should exist.

@@ -59,14 +59,14 @@ export function validateStoryboardName(
   ignoreId?: string,
 ): string | null {
   const trimmed = candidate.trim();
-  if (trimmed === '') return 'Name cannot be empty';
+  if (trimmed === '') {return 'Name cannot be empty';}
   if (trimmed.length > MAX_NAME_LENGTH) {
     return `Name is too long (max ${MAX_NAME_LENGTH} characters)`;
   }
   const collision = existing.find(
     (sb) => sb.storyboardId !== ignoreId && sb.name === trimmed,
   );
-  if (collision) return 'A Storyboard with this name already exists';
+  if (collision) {return 'A Storyboard with this name already exists';}
   return null;
 }
 
@@ -78,7 +78,7 @@ export function registerStoryboardManagementCommands(
   const disposables: vscode.Disposable[] = [
     vscode.commands.registerCommand('debrief.storyboard.create', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri) return;
+      if (!documentUri) {return;}
       const snapshot = service.getSnapshot(documentUri);
       const name = await vscode.window.showInputBox({
         prompt: 'Name for the new Storyboard',
@@ -86,44 +86,44 @@ export function registerStoryboardManagementCommands(
         validateInput: (value): string | null =>
           validateStoryboardName(value, snapshot.storyboards, undefined),
       });
-      if (typeof name !== 'string') return;
+      if (typeof name !== 'string') {return;}
       const trimmed = name.trim();
-      if (trimmed === '') return;
+      if (trimmed === '') {return;}
       await service.createStoryboard(documentUri, trimmed);
     }),
 
     vscode.commands.registerCommand('debrief.storyboard.rename', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri) return;
+      if (!documentUri) {return;}
       const snapshot = service.getSnapshot(documentUri);
       const activeId = snapshot.activeStoryboardId;
-      if (activeId === null) return;
+      if (activeId === null) {return;}
       const current = snapshot.storyboards.find(
         (sb) => sb.storyboardId === activeId,
       );
-      if (!current) return;
+      if (!current) {return;}
       const newName = await vscode.window.showInputBox({
         prompt: 'Rename Storyboard',
         value: current.name,
         validateInput: (value): string | null =>
           validateStoryboardName(value, snapshot.storyboards, activeId),
       });
-      if (typeof newName !== 'string') return;
+      if (typeof newName !== 'string') {return;}
       const trimmed = newName.trim();
-      if (trimmed === '' || trimmed === current.name) return;
+      if (trimmed === '' || trimmed === current.name) {return;}
       await service.renameStoryboard(documentUri, activeId, trimmed);
     }),
 
     vscode.commands.registerCommand('debrief.storyboard.delete', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri) return;
+      if (!documentUri) {return;}
       const snapshot = service.getSnapshot(documentUri);
       const activeId = snapshot.activeStoryboardId;
-      if (activeId === null) return;
+      if (activeId === null) {return;}
       const active = snapshot.storyboards.find(
         (sb) => sb.storyboardId === activeId,
       );
-      if (!active) return;
+      if (!active) {return;}
       const sceneCount = snapshot.scenes.length;
 
       if (sceneCount > 0) {
@@ -134,7 +134,7 @@ export function registerStoryboardManagementCommands(
           { modal: true },
           'Delete',
         );
-        if (choice !== 'Delete') return;
+        if (choice !== 'Delete') {return;}
       }
 
       await service.deleteStoryboard(documentUri, activeId);
@@ -143,7 +143,7 @@ export function registerStoryboardManagementCommands(
 
   const composite = {
     dispose(): void {
-      for (const d of disposables) d.dispose();
+      for (const d of disposables) {d.dispose();}
     },
   };
   context.subscriptions.push(composite);

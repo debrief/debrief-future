@@ -283,7 +283,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
    */
   public setScrubbableRange(start: number | null, end: number | null): void {
     if (start === null || end === null) {
-      if (this._scrubbableOverride === null) return;
+      if (this._scrubbableOverride === null) {return;}
       this._scrubbableOverride = null;
     } else {
       this._scrubbableOverride = { start, end };

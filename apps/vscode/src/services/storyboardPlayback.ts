@@ -39,7 +39,7 @@ import type {
   DebriefFeature,
 } from '@debrief/components';
 import type { SessionStoreApi } from '@debrief/session-state';
-import { plotFromFeatures } from './plotFromFeatures';
+import { plotFromFeatures, featuresFromPlot } from './plotFromFeatures';
 
 // ── Ports (injectable for tests) ─────────────────────────────────────
 
@@ -206,7 +206,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     // in-flight transition (R8 secondary trigger).
     this.rootDisposables.push(
       this.visibilityPort.onDidChangeVisibility((visible) => {
-        if (visible) return;
+        if (visible) {return;}
         for (const state of this.states.values()) {
           if (state.transitionId !== null) {
             this.clearTransition(state);
@@ -219,10 +219,10 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     this.rootDisposables.push(
       this.mapPanel.onFlyToComplete((token) => {
         const documentUri = this.flyToTokenToDocumentUri.get(token);
-        if (documentUri === undefined) return;
+        if (documentUri === undefined) {return;}
         const state = this.states.get(documentUri);
-        if (!state) return;
-        if (state.transitionId !== token) return;
+        if (!state) {return;}
+        if (state.transitionId !== token) {return;}
         this.clearTransition(state);
       }),
     );
@@ -272,13 +272,13 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
   public onPlotClosed(documentUri: string): void {
     const state = this.states.get(documentUri);
-    if (!state) return;
+    if (!state) {return;}
     this.clearTransition(state);
     if (state.scrubbableOverrideInstalled) {
       this.timeRangeView.setScrubbableRange(null, null);
       state.scrubbableOverrideInstalled = false;
     }
-    for (const d of state.disposables) d.dispose();
+    for (const d of state.disposables) {d.dispose();}
     this.states.delete(documentUri);
     this.setContextFn('debrief.storyboardActive', false);
     this.mapPanel.setSceneRectangles(null, null, null);
@@ -286,8 +286,8 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
   public onPlotFeaturesChanged(documentUri: string): void {
     const state = this.states.get(documentUri);
-    if (!state) return;
-    if (!state.plotValid) return;
+    if (!state) {return;}
+    if (!state.plotValid) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
 
     // Check whether the active Storyboard still exists.
@@ -327,27 +327,27 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
   public async forward(documentUri: string): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return;
-    if (state.currentSceneIndex >= state.sceneOrder.length - 1) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
+    if (state.currentSceneIndex >= state.sceneOrder.length - 1) {return;}
     await this.stepTo(state, state.currentSceneIndex + 1, 'forward');
   }
 
   public async backward(documentUri: string): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return;
-    if (state.currentSceneIndex <= 0) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
+    if (state.currentSceneIndex <= 0) {return;}
     await this.stepTo(state, state.currentSceneIndex - 1, 'backward');
   }
 
   public async goToScene(documentUri: string, sceneId: string): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
     const index = state.sceneOrder.indexOf(sceneId);
-    if (index < 0) return;
-    if (index === state.currentSceneIndex) return;
+    if (index < 0) {return;}
+    if (index === state.currentSceneIndex) {return;}
     const direction: 'forward' | 'backward' =
       index > state.currentSceneIndex ? 'forward' : 'backward';
     await this.stepTo(state, index, direction);
@@ -358,8 +358,8 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     storyboardId: string | null,
   ): void {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.activeStoryboardId === storyboardId) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.activeStoryboardId === storyboardId) {return;}
     state.activeStoryboardId = storyboardId;
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     this.recomputeSceneOrder(state, plot);
@@ -377,8 +377,8 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     description?: string,
   ): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return; // R9 guard
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;} // R9 guard
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     try {
       const result = await crudCreateStoryboard(plot, {
@@ -391,7 +391,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       // source of truth). The subsequent onFeaturesChanged recomputes
       // the panel / rectangles; we also update activeStoryboardId
       // here so the new Storyboard becomes the selected one.
-      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(featuresFromPlot(result.plot));
       state.activeStoryboardId = result.storyboard.properties.id;
       this.recomputeSceneOrder(state, result.plot);
       this.applyScrubbableRange(state, result.plot);
@@ -409,8 +409,8 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     newName: string,
   ): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     try {
       const result = await crudRenameStoryboard(plot, {
@@ -419,7 +419,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(featuresFromPlot(result.plot));
       this.emitSnapshot(state, result.plot);
     } catch (err) {
       this.showErrorMessage(err instanceof Error ? err.message : String(err));
@@ -431,8 +431,8 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     storyboardId: string,
   ): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
-    if (state.transitionId !== null) return;
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     try {
       const result = await crudDeleteStoryboard(plot, {
@@ -440,7 +440,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(featuresFromPlot(result.plot));
       if (state.activeStoryboardId === storyboardId) {
         const fallback = getMostRecentlyModifiedStoryboard(result.plot);
         state.activeStoryboardId = fallback?.properties.id ?? null;
@@ -463,11 +463,11 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     direction: 'forward' | 'backward',
   ): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) return;
+    if (!state || !state.plotValid) {return;}
     const idx = state.sceneOrder.indexOf(blockedSceneId);
-    if (idx < 0) return;
+    if (idx < 0) {return;}
     const target = direction === 'forward' ? idx + 1 : idx - 1;
-    if (target < 0 || target >= state.sceneOrder.length) return;
+    if (target < 0 || target >= state.sceneOrder.length) {return;}
     await this.stepTo(state, target, direction, /* skipHardBlockCheck */ true);
   }
 
@@ -476,10 +476,10 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     blockedSceneId: string,
   ): void {
     const state = this.states.get(documentUri);
-    if (!state) return;
+    if (!state) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     const scene = getScene(plot, blockedSceneId);
-    if (!scene) return;
+    if (!scene) {return;}
     // Surface a read-only info toast. No transport change.
     void vscode.window.showInformationMessage(
       messages.editSceneStub(scene.properties.title, scene.properties.timestamp),
@@ -489,7 +489,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
   // ── Disposal ─────────────────────────────────────────────────────
 
   public dispose(): void {
-    if (this.disposed) return;
+    if (this.disposed) {return;}
     this.disposed = true;
     for (const state of this.states.values()) {
       this.clearTransition(state);
@@ -497,10 +497,10 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         this.timeRangeView.setScrubbableRange(null, null);
         state.scrubbableOverrideInstalled = false;
       }
-      for (const d of state.disposables) d.dispose();
+      for (const d of state.disposables) {d.dispose();}
     }
     this.states.clear();
-    for (const d of this.rootDisposables) d.dispose();
+    for (const d of this.rootDisposables) {d.dispose();}
     this.rootDisposables.length = 0;
     this._onSnapshotChange.dispose();
     this.setContextFn('debrief.storyboardActive', false);
@@ -515,10 +515,10 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     skipHardBlockCheck = false,
   ): Promise<void> {
     const targetSceneId = state.sceneOrder[targetIndex];
-    if (targetSceneId === undefined) return;
+    if (targetSceneId === undefined) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     const targetScene = getScene(plot, targetSceneId);
-    if (!targetScene) return;
+    if (!targetScene) {return;}
 
     if (!skipHardBlockCheck) {
       const classification = this.classifyScene(targetScene, plot);
@@ -669,7 +669,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       return;
     }
     const currentScene = getScene(plot, currentSceneId);
-    if (!currentScene) return;
+    if (!currentScene) {return;}
     const nextSceneId = state.sceneOrder[state.currentSceneIndex + 1];
     const currentEpoch = new Date(currentScene.properties.timestamp).getTime();
     let endEpoch = currentEpoch;
@@ -679,7 +679,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         endEpoch = new Date(nextScene.properties.timestamp).getTime();
       }
     }
-    if (Number.isNaN(currentEpoch)) return;
+    if (Number.isNaN(currentEpoch)) {return;}
     this.timeRangeView.setScrubbableRange(currentEpoch, endEpoch);
     state.scrubbableOverrideInstalled = true;
   }
@@ -715,7 +715,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const storyboards: StoryboardOptionViewModel[] = [];
     let activeStoryboardName: string | null = null;
     for (const f of plot.features) {
-      if (!isStoryboardFeature(f)) continue;
+      if (!isStoryboardFeature(f)) {continue;}
       const sbFeature = f as StoryboardFeature;
       const sceneCount = plot.features.filter(
         (candidate) =>
@@ -738,7 +738,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const scenes: SceneRowViewModel[] = [];
     for (const sceneId of state.sceneOrder) {
       const sceneFeature = getScene(plot, sceneId);
-      if (!sceneFeature) continue;
+      if (!sceneFeature) {continue;}
       scenes.push({
         sceneId: sceneFeature.properties.id,
         title: sceneFeature.properties.title,
@@ -805,7 +805,7 @@ export function missingDataReasonFromClassification(
   plotStartIso: string,
   plotEndIso: string,
 ): MissingDataReason | null {
-  if (classification.kind === 'ok') return null;
+  if (classification.kind === 'ok') {return null;}
   if (classification.kind === 'missing-features') {
     return {
       kind: 'missing-features',

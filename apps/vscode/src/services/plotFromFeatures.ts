@@ -28,3 +28,18 @@ export function plotFromFeatures(
     features: features as unknown as StoryboardPlotFeature[],
   };
 }
+
+/**
+ * Inverse of `plotFromFeatures` — unwraps a `StoryboardPlot.features`
+ * array (returned from #215's async CRUD) back into the VS Code
+ * extension's `DebriefFeature[]` view. Same ADR-019 boundary.
+ *
+ * Used by `StoryboardPlaybackService`'s create / rename / delete
+ * methods to push #215's result.plot.features back into `MapPanel`.
+ */
+export function featuresFromPlot(
+  plot: StoryboardPlot,
+): readonly DebriefFeature[] {
+  // eslint-disable-next-line no-restricted-syntax -- StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
+  return plot.features as unknown as readonly DebriefFeature[];
+}

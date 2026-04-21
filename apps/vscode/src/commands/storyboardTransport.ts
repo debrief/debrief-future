@@ -48,19 +48,19 @@ export function registerStoryboardTransportCommands(
   const disposables: vscode.Disposable[] = [
     vscode.commands.registerCommand('debrief.storyboard.forward', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri) return;
+      if (!documentUri) {return;}
       await service.forward(documentUri);
     }),
 
     vscode.commands.registerCommand('debrief.storyboard.backward', async () => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri) return;
+      if (!documentUri) {return;}
       await service.backward(documentUri);
     }),
 
     vscode.commands.registerCommand('debrief.storyboard.clickScene', async (sceneId: unknown) => {
       const documentUri = sessionManager.getActiveDocumentUri();
-      if (!documentUri || typeof sceneId !== 'string') return;
+      if (!documentUri || typeof sceneId !== 'string') {return;}
       await service.goToScene(documentUri, sceneId);
     }),
 
@@ -68,8 +68,8 @@ export function registerStoryboardTransportCommands(
       'debrief.storyboard.jumpPast',
       async (payload: unknown) => {
         const documentUri = sessionManager.getActiveDocumentUri();
-        if (!documentUri) return;
-        if (!isJumpPastPayload(payload)) return;
+        if (!documentUri) {return;}
+        if (!isJumpPastPayload(payload)) {return;}
         await service.resolveHardBlockByJumpingPast(
           documentUri,
           payload.blockedSceneId,
@@ -81,7 +81,7 @@ export function registerStoryboardTransportCommands(
 
   const composite = {
     dispose(): void {
-      for (const d of disposables) d.dispose();
+      for (const d of disposables) {d.dispose();}
     },
   };
   context.subscriptions.push(composite);
@@ -94,9 +94,9 @@ interface JumpPastPayload {
 }
 
 function isJumpPastPayload(value: unknown): value is JumpPastPayload {
-  if (value === null || typeof value !== 'object') return false;
+  if (value === null || typeof value !== 'object') {return false;}
   const v = value as { blockedSceneId?: unknown; direction?: unknown };
-  if (typeof v.blockedSceneId !== 'string') return false;
-  if (v.direction !== 'forward' && v.direction !== 'backward') return false;
+  if (typeof v.blockedSceneId !== 'string') {return false;}
+  if (v.direction !== 'forward' && v.direction !== 'backward') {return false;}
   return true;
 }

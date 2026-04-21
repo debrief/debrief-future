@@ -137,7 +137,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private resolveThumbnailHrefForActiveItem(sceneId: string): string {
-    if (!this.view) return '';
+    if (!this.view) {return '';}
     const stacItemPath = this.getStacItemDirectory();
     return this.resolveThumbnailHref(this.view.webview, stacItemPath, sceneId);
   }
