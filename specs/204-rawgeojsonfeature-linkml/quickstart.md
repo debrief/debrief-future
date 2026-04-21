@@ -113,10 +113,67 @@ Replace the aliased export with a direct one:
 (`features.py`, `tests/fixtures.py`) directly. Keep the aliases only if
 they would cause the diff to blow up beyond a reviewable size.
 
-### 2b. `services/stac/src/debrief_stac/features.py` + `tests/fixtures.py`
+### 2b. Ingress null-geometry coercion (review 5-alt)
 
-Update imports to source from `debrief_schemas` directly (or keep the
-package-internal alias — see 2a).
+Two and only two sites validate a `RawGeoJSONFeatureCollection` at runtime
+— `services/io/src/debrief_io/parser.py` (REP import) and
+`services/stac/src/debrief_stac/features.py` (STAC catalog load). Both MUST
+apply this coercion shim **before** handing the payload to Pydantic:
+
+```python
+from debrief_schemas import RawGeoJSONFeature
+
+def _coerce_null_geometry(feature: dict) -> dict:
+    """Review 5-alt — null or missing geometry becomes GeoJSONEmptyPoint.
+
+    The RawGeoJSONFeature.geometry slot is required; this shim preserves
+    features that would otherwise be dropped (Article I.3 — no silent
+    failures) by mapping them to a renderable empty-point geometry.
+    """
+    geom = feature.get("geometry")
+    if geom is None:
+        feature = {**feature, "geometry": {"type": "Point", "coordinates": []}}
+    return feature
+
+# Usage at ingress:
+features = [_coerce_null_geometry(f) for f in raw["features"]]
+RawGeoJSONFeatureCollection.model_validate({"type": "FeatureCollection", "features": features})
+```
+
+Both ingress sites MUST carry a Python unit test that asserts a
+null-geometry input produces a feature with
+`geometry.type == "Point"` and `len(geometry.coordinates) == 0`. Target
+file: `services/io/tests/test_parser_null_geometry.py` and a matching
+assertion in `services/stac/tests/`.
+
+### 2c. `services/stac/src/debrief_stac/features.py` + `services/io/src/debrief_io/parser.py` + `services/stac/tests/fixtures.py`
+
+Update imports to source from `debrief_schemas` directly. Apply the 2b
+coercion at the ingress site immediately before the `model_validate` call.
+
+### 2d. `apps/vscode/src/webview/mapPanel.ts` — silent-drop guard removal (review 14A)
+
+Past the ingress boundary `geometry` is guaranteed non-null — the guard at
+`mapPanel.ts:1199` is now dead code. Delete it:
+
+```diff
+-const safeFeatures = parseResult.features.flatMap((f: GeoJSONFeature) => {
+-  if (!f.geometry) { return []; }
+-  return [{
++const safeFeatures = parseResult.features.map((f: RawGeoJSONFeature) => ({
+     type: 'Feature' as const,
+     geometry: {
+       type: f.geometry.type,
+       …
+     }
+-  }];
+-});
++}));
+```
+
+The Playwright spec `tests/e2e/test-null-geometry-no-drop.spec.ts`
+(review 10A) asserts that deleting the guard does not regress Article I.3
+— the null-geometry feature in the test fixture survives to the map panel.
 
 ## 3. Regenerate + verify
 
@@ -169,20 +226,31 @@ data-model, contracts, quickstart).
 
 Number the ADR by finding the next free number in `decisions.md`.
 
-## 5. Acceptance checks (from spec.md)
+## 5. Acceptance checks (from spec.md + review decisions)
 
 Before opening the PR, verify each success criterion:
 
 - [ ] **SC-001** — `rg -nw "interface GeoJSONFeature" shared/ services/ apps/` returns no hits.
 - [ ] **SC-002** — `rg -nw "GeoJSONFeature: TypeAlias" services/` returns no hits.
 - [ ] **SC-003** — `git diff main -- shared/ services/ apps/ | grep -E "^\+.*\b(any|Any)\b"` shows no new hits.
-- [ ] **SC-004** — `rg -n "RawGeoJSONFeature|RawGeoJSONGeometry|RawGeoJSONFeatureCollection" shared/schemas/src/generated/` returns matches in Pydantic, TypeScript, JSON Schema.
+- [ ] **SC-004** — `rg -n "RawGeoJSONFeature|RawGeoJSONFeatureCollection" shared/schemas/src/generated/` returns matches in Pydantic, TypeScript, JSON Schema (no `RawGeoJSONGeometry` — that class is not created; review 11A).
 - [ ] **SC-005** — `task verify` green.
-- [ ] **SC-006** — fixture files in `shared/schemas/fixtures/raw-geojson/{valid,invalid}/` exist and are exercised.
-- [ ] **SC-007** — single PR contains schema + regen + consumer migration.
+- [ ] **SC-006** — fixture files exist and are exercised:
+  - `shared/schemas/fixtures/raw-geojson/valid/feature-*.json`, `collection-*.json` (5 files)
+  - `shared/schemas/fixtures/raw-geojson/valid/geometry/*.json` (7 files — one per geometry class; review 11A)
+  - `shared/schemas/fixtures/raw-geojson/invalid/*.json` (5 files — 4 feature-level + 1 `unknown-geometry-type.json`; review 11A)
+- [ ] **SC-007** — single PR contains schema + regen + consumer migration + ingress coercion.
 - [ ] **SC-008** — round-trip test passes on 3 canonical fixtures.
 - [ ] **SC-009** — reviewers confirm atomic PR (no partial merges).
-- [ ] **SC-010** — ADR entry present in `docs/project_notes/decisions.md`.
+- [ ] **SC-010** — ADR entry present in `docs/project_notes/decisions.md` (names deleted duplicates, new classes, `designates_type` relaxation, 14A validation-boundary rule).
+
+Review-decision acceptance checks:
+
+- [ ] **Review 10A** — `services/io/tests/test_parser_null_geometry.py` and `tests/e2e/test-null-geometry-no-drop.spec.ts` both pass. Each asserts a null-geometry feature becomes a `GeoJSONEmptyPoint` with no drop.
+- [ ] **Review 11A** — the 7 `valid/geometry/*` fixtures pass Pydantic validation; `invalid/unknown-geometry-type.json` fails.
+- [ ] **Review 12A** — `pnpm --filter @debrief/session-state test` green (imports-only change, no behavioural delta); `ENTITY_MAP` in `shared/schemas/tests/test_golden.py` has one entry per new class.
+- [ ] **Review 13A** — `uv run pytest shared/schemas/tests/test_designates_type_perf.py` passes (10 000-feature collection validates ≤ 500 ms); each of the 7 geometry classes in `geojson.yaml` carries `designates_type: true` on its `type` slot.
+- [ ] **Review 14A** — `apps/vscode/src/webview/mapPanel.ts` no longer contains `if (!f.geometry) return []`; validation of `RawGeoJSONFeatureCollection` happens only in `services/io/parser.py` and `services/stac/features.py`.
 
 ## 6. Common pitfalls
 

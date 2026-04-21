@@ -30,32 +30,18 @@ default_range: string
 
 imports:
   - linkml:types
+  - geojson            # for the 7 geometry classes used in the any_of union
 
 classes:
-  RawGeoJSONGeometry:
-    description: >-
-      Minimum-contract GeoJSON geometry (RFC 7946 §3.1). Narrow geometry
-      classes (GeoJSONPoint, GeoJSONLineString, …) in geojson.yaml refine
-      this at the domain boundary.
-    attributes:
-      type:
-        description: GeoJSON geometry type discriminator (Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection).
-        range: string
-        required: true
-      coordinates:
-        description: >-
-          Coordinate payload. Shape depends on the geometry type; domain
-          narrow classes in geojson.yaml enforce the nested arity. Not
-          required so GeometryCollection can be represented.
-        range: Any
-        required: false
-
   RawGeoJSONFeature:
     description: >-
       Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Callers narrow this
       to a domain feature (TrackFeature, ReferenceLocation, SystemState,
       MultiPointFeature, MultiPolygonFeature) after validating the
-      properties.kind discriminator.
+      properties.kind discriminator. Note: geometry is REQUIRED — payloads
+      arriving with geometry==null are coerced to GeoJSONEmptyPoint at the
+      service-code ingress boundary (services/io, services/stac), not
+      made nullable here.
     attributes:
       type:
         description: GeoJSON object type — always "Feature".
@@ -71,9 +57,20 @@ classes:
           - range: string
           - range: integer
       geometry:
-        description: GeoJSON geometry (narrowed by domain classes downstream).
-        range: RawGeoJSONGeometry
+        description: >-
+          GeoJSON geometry — discriminated union over the seven existing
+          geometry classes in geojson.yaml. Discrimination is driven by
+          `designates_type: true` on each class's `type` slot, making
+          Pydantic validation O(1) per feature.
         required: true
+        any_of:
+          - range: GeoJSONPoint
+          - range: GeoJSONEmptyPoint
+          - range: GeoJSONLineString
+          - range: GeoJSONPolygon
+          - range: GeoJSONMultiPoint
+          - range: GeoJSONMultiLineString
+          - range: GeoJSONMultiPolygon
       properties:
         description: >-
           Free-form properties dictionary. Callers narrow to a domain
@@ -155,22 +152,97 @@ Delete the existing `GeoJSONFeature` and `GeoJSONGeometry` classes
 (Exact line numbers may drift during implementation — the contract is
 structural, not line-numbered.)
 
+## 3.5 Edit: `shared/schemas/src/linkml/geojson.yaml` (review 13A)
+
+Add `designates_type: true` to the `type` slot of each of the seven
+geometry classes. This is a purely additive annotation — payload
+acceptance is unchanged — that enables Pydantic discriminated-union
+dispatch for `RawGeoJSONFeature.geometry` (and incidentally improves
+validation speed for existing `TrackFeature`/`ReferenceLocation` unions).
+
+```diff
+  GeoJSONPoint:
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "Point"
++       designates_type: true
+      coordinates: { … }
+
+  GeoJSONEmptyPoint:
+    attributes:
+      type:
+        … equals_string: "Point" …
++       designates_type: true
+      coordinates: { maximum_cardinality: 0, … }
+
+  GeoJSONLineString:
+    attributes:
+      type:
+        … equals_string: "LineString" …
++       designates_type: true
+
+  GeoJSONPolygon:
+    attributes:
+      type:
+        … equals_string: "Polygon" …
++       designates_type: true
+
+  GeoJSONMultiPoint:
+    attributes:
+      type:
+        … equals_string: "MultiPoint" …
++       designates_type: true
+
+  GeoJSONMultiLineString:
+    attributes:
+      type:
+        … equals_string: "MultiLineString" …
++       designates_type: true
+
+  GeoJSONMultiPolygon:
+    attributes:
+      type:
+        … equals_string: "MultiPolygon" …
++       designates_type: true
+```
+
+**Scope note**: The original spec Out-of-Scope list excluded changes to
+`geojson.yaml`. The review narrowly relaxes that exclusion — adding
+`designates_type: true` is a one-line, payload-neutral annotation
+required to meet the 10 000-feature ≤ 500 ms performance budget. The ADR
+entry documents this relaxation explicitly.
+
 ## 4. Expected generator outputs
 
 ### 4.1 Pydantic (`shared/schemas/src/generated/python/debrief_schemas/__init__.py`)
 
 ```python
-class RawGeoJSONGeometry(ConfiguredBaseModel):
-    """Minimum-contract GeoJSON geometry (RFC 7946 §3.1). …"""
-    type: str = Field(..., description="GeoJSON geometry type discriminator …")
-    coordinates: Optional[Any] = Field(None, description="Coordinate payload. …")
+# Existing geometry classes (geojson.yaml) — no new RawGeoJSONGeometry class.
+# After the 13A edit each of these has type: Literal["Point"|"LineString"|…]
+# because of designates_type: true on the type slot.
+
+RawGeometryUnion = Annotated[
+    Union[
+        GeoJSONPoint,
+        GeoJSONEmptyPoint,
+        GeoJSONLineString,
+        GeoJSONPolygon,
+        GeoJSONMultiPoint,
+        GeoJSONMultiLineString,
+        GeoJSONMultiPolygon,
+    ],
+    Field(discriminator="type"),
+]
 
 
 class RawGeoJSONFeature(ConfiguredBaseModel):
     """Parse-boundary GeoJSON Feature (RFC 7946 §3.2). …"""
     type: Literal["Feature"] = Field(..., description="GeoJSON object type — always \"Feature\".")
     id: Optional[Union[str, int]] = Field(None, description="Optional feature identifier. …")
-    geometry: RawGeoJSONGeometry = Field(..., description="GeoJSON geometry …")
+    geometry: RawGeometryUnion = Field(..., description="GeoJSON geometry …")
     properties: Optional[Any] = Field(None, description="Free-form properties dictionary. …")
     bbox: Optional[List[float]] = Field(None, description="Optional bounding box. …")
 
@@ -182,6 +254,13 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
     bbox: Optional[List[float]] = Field(None, description="Optional bounding box …")
 ```
 
+**Generator-specific note**: `gen-pydantic` renders `any_of` plus the
+per-class `designates_type: true` as the `Annotated[Union[...], Field(discriminator="type")]`
+shape shown above. The exact emitted syntax may vary slightly (e.g.,
+`RootModel`-based wrappers); the contract is that Pydantic performs
+O(1) discriminator dispatch, not O(n) try-each-alternative. The
+`test_designates_type_perf.py` micro-bench verifies the ≤ 500 ms budget.
+
 **Note on `Any`** — LinkML's `range: Any` generates `typing.Any` in
 Pydantic. This is schema-sourced, not hand-authored, and maps to
 `Record<string, unknown>` (not `any`) in the TypeScript post-processor.
@@ -192,13 +271,19 @@ Article XV's prohibition is on *authored* `Any` — see research §2.
 After the generator post-processor runs:
 
 ```ts
-/** Minimum-contract GeoJSON geometry (RFC 7946 §3.1). … */
-export interface RawGeoJSONGeometry {
-    /** GeoJSON geometry type discriminator … */
-    type: string,
-    /** Coordinate payload. … */
-    coordinates?: unknown,
-}
+/**
+ * Parse-boundary GeoJSON geometry — union of the seven existing
+ * geometry classes in geojson.yaml. TypeScript narrows via the `type`
+ * discriminator; consumers should `switch (geometry.type)`.
+ */
+export type RawGeometryUnion =
+  | GeoJSONPoint
+  | GeoJSONEmptyPoint
+  | GeoJSONLineString
+  | GeoJSONPolygon
+  | GeoJSONMultiPoint
+  | GeoJSONMultiLineString
+  | GeoJSONMultiPolygon;
 
 /** Parse-boundary GeoJSON Feature (RFC 7946 §3.2). … */
 export interface RawGeoJSONFeature {
@@ -207,7 +292,7 @@ export interface RawGeoJSONFeature {
     /** Optional feature identifier. … */
     id?: string | number,
     /** GeoJSON geometry … */
-    geometry: RawGeoJSONGeometry,
+    geometry: RawGeometryUnion,
     /** Free-form properties dictionary. … */
     properties?: Record<string, unknown> | null,
     /** Optional bounding box. … */
@@ -229,24 +314,23 @@ export interface RawGeoJSONFeatureCollection {
 
 ```json
 {
-  "RawGeoJSONGeometry": {
-    "additionalProperties": false,
-    "description": "Minimum-contract GeoJSON geometry …",
-    "properties": {
-      "type": { "type": "string" },
-      "coordinates": {}
-    },
-    "required": ["type"],
-    "title": "RawGeoJSONGeometry",
-    "type": "object"
-  },
   "RawGeoJSONFeature": {
     "additionalProperties": false,
     "description": "Parse-boundary GeoJSON Feature …",
     "properties": {
       "type": { "const": "Feature", "type": "string" },
       "id": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
-      "geometry": { "$ref": "#/$defs/RawGeoJSONGeometry" },
+      "geometry": {
+        "oneOf": [
+          { "$ref": "#/$defs/GeoJSONPoint" },
+          { "$ref": "#/$defs/GeoJSONEmptyPoint" },
+          { "$ref": "#/$defs/GeoJSONLineString" },
+          { "$ref": "#/$defs/GeoJSONPolygon" },
+          { "$ref": "#/$defs/GeoJSONMultiPoint" },
+          { "$ref": "#/$defs/GeoJSONMultiLineString" },
+          { "$ref": "#/$defs/GeoJSONMultiPolygon" }
+        ]
+      },
       "properties": {},
       "bbox": { "items": { "type": "number" }, "type": "array" }
     },
@@ -281,7 +365,9 @@ export interface RawGeoJSONFeatureCollection {
 
 ## 5. Generator post-processing additions (`shared/schemas/scripts/generate.py`)
 
-Two new string-replacement entries in `generate_typescript()`:
+Two new string-replacement entries in `generate_typescript()` —
+`RawGeoJSONGeometry.coordinates` is no longer a concern because that class
+no longer exists; the geometry union renders natively via `gen-typescript`.
 
 ```python
 # RawGeoJSONFeature.id — any_of[string, integer] — gen-typescript falls back
@@ -294,16 +380,20 @@ content = content.replace(
     "both are retained without coercion. */\n    id?: string | number,",
 )
 
-# RawGeoJSONFeature.properties + RawGeoJSONGeometry.coordinates — LinkML
-# `range: Any` emits `properties?: string` / `coordinates?: string`.
-# Replace with `Record<string, unknown> | null` / `unknown`.
+# RawGeoJSONFeature.properties — LinkML `range: Any` emits
+# `properties?: string`. Replace with `Record<string, unknown> | null`.
 content = content.replace(
     "    properties?: string,",
     "    properties?: Record<string, unknown> | null,",
 )
+
+# RawGeoJSONFeature.geometry — gen-typescript may render any_of as the first
+# alternative only (`geometry: GeoJSONPoint`). Expand to the full union.
+# If gen-typescript already emits a union, this replace is a no-op.
 content = content.replace(
-    "    coordinates?: string,",
-    "    coordinates?: unknown,",
+    "    geometry: GeoJSONPoint,",
+    "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+    "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,",
 )
 ```
 
@@ -393,13 +483,72 @@ plain JSON file round-tripped through Pydantic and JSON Schema.
 { "type": "Feature", "id": true, "geometry": { "type": "Point", "coordinates": [0, 0] } }
 ```
 
+### `valid/geometry/point.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-point", "geometry": { "type": "Point", "coordinates": [12.3, 45.6] }, "properties": {} }
+```
+
+### `valid/geometry/empty-point.json` (review 5-alt coercion target, 11A fixture)
+
+```json
+{ "type": "Feature", "id": "geom-empty-point", "geometry": { "type": "Point", "coordinates": [] }, "properties": { "kind": "SYSTEM" } }
+```
+
+### `valid/geometry/linestring.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-linestring", "geometry": { "type": "LineString", "coordinates": [[0, 0], [1, 1], [2, 2]] }, "properties": {} }
+```
+
+### `valid/geometry/polygon.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-polygon", "geometry": { "type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]] }, "properties": {} }
+```
+
+### `valid/geometry/multipoint.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-multipoint", "geometry": { "type": "MultiPoint", "coordinates": [[0, 0], [1, 1], [2, 2]] }, "properties": {} }
+```
+
+### `valid/geometry/multilinestring.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-multilinestring", "geometry": { "type": "MultiLineString", "coordinates": [[[0, 0], [1, 1]], [[2, 2], [3, 3]]] }, "properties": {} }
+```
+
+### `valid/geometry/multipolygon.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "geom-multipolygon", "geometry": { "type": "MultiPolygon", "coordinates": [[[[0, 0], [1, 0], [1, 1], [0, 0]]], [[[2, 2], [3, 2], [3, 3], [2, 2]]]] }, "properties": {} }
+```
+
+### `invalid/unknown-geometry-type.json` (review 11A)
+
+```json
+{ "type": "Feature", "id": "unknown", "geometry": { "type": "GeometryCollection", "geometries": [] }, "properties": {} }
+```
+
+Must fail the `any_of`-over-seven-classes match — `GeometryCollection` is
+an RFC 7946 geometry kind Debrief does not consume. A second assertion in
+the same test file asserts that `{ "type": "NotAGeometry" }` also fails.
+
 ## 7. Test contracts
 
 ### 7.1 Golden-fixture test (`test_golden.py`)
 
-- Every file under `valid/` → `RawGeoJSONFeature.model_validate_json(...)` or
+- `ENTITY_MAP` in `test_golden.py` gains an entry for each new class
+  (`RawGeoJSONFeature` → `debrief_schemas.RawGeoJSONFeature`,
+  `RawGeoJSONFeatureCollection` → `debrief_schemas.RawGeoJSONFeatureCollection`).
+  This is an explicit task in `tasks.md` (review 12A) — the edit is easy to
+  forget otherwise.
+- Every file under `valid/` (including `valid/geometry/*`) →
+  `RawGeoJSONFeature.model_validate_json(...)` or
   `RawGeoJSONFeatureCollection.model_validate_json(...)` must succeed.
-- Every file under `invalid/` → must raise `pydantic.ValidationError`.
+- Every file under `invalid/` (including `invalid/unknown-geometry-type.json`)
+  → must raise `pydantic.ValidationError`.
 
 ### 7.2 Round-trip test (`test_roundtrip.py`)
 
@@ -414,13 +563,28 @@ plain JSON file round-tripped through Pydantic and JSON Schema.
 
 ### 7.3 Schema-compare test (`test_schema_compare.py`)
 
-- For each of `RawGeoJSONGeometry`, `RawGeoJSONFeature`,
-  `RawGeoJSONFeatureCollection`: assert that the LinkML-generated JSON
-  Schema entry is deep-equal (modulo ordering) to Pydantic's
-  `.model_json_schema()` output.
+- For each of `RawGeoJSONFeature` and `RawGeoJSONFeatureCollection`:
+  assert that the LinkML-generated JSON Schema entry is deep-equal (modulo
+  ordering) to Pydantic's `.model_json_schema()` output.
 
 ### 7.4 TS typecheck (existing `Makefile` target)
 
 - `pnpm exec tsc --noEmit` on a fixture file that imports
-  `RawGeoJSONFeature` and asserts the presence of `id?: string | number`
-  and `properties?: Record<string, unknown> | null`.
+  `RawGeoJSONFeature` and asserts the presence of `id?: string | number`,
+  `properties?: Record<string, unknown> | null`, and
+  `geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon`.
+
+### 7.5 Performance micro-bench (`test_designates_type_perf.py` — review 13A)
+
+- Construct a 10 000-feature `RawGeoJSONFeatureCollection` by sampling
+  (with replacement) from the `valid/geometry/*` fixture pool.
+- `time.perf_counter()` around
+  `RawGeoJSONFeatureCollection.model_validate(collection_dict)`.
+- Assert elapsed wall-clock ≤ **500 ms** on the CI runner.
+- Budget rationale: extrapolates to ≤ 2.5 s for the realistic 50 000-feature
+  ceiling (`BULK_RED_TRACKS.rep`), acceptable as a once-per-file ingress
+  cost. Without `designates_type: true` the same input costs ~3 s at 10 000
+  features — the micro-bench is the regression guard.
+- If the test fails, the regression is almost always a missing
+  `designates_type: true` on one of the seven geometry classes, or a
+  `gen-pydantic` output that did not pick up the discriminator-union idiom.

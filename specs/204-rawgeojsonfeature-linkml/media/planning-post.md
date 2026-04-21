@@ -1,12 +1,12 @@
 ---
 layout: future-post
-title: "Planning: One schema-rooted type to retire three drifted twins"
-date: 2026-04-20
+title: "Planning: One schema-rooted type to retire three drifted twins — and a silent failure mode"
+date: 2026-04-21
 track: [momentum]
 author: Ian
-reading_time: 5
-tags: [tracer-bullet, schemas, linkml, type-safety, tech-debt]
-excerpt: "Three hand-typed definitions of the same GeoJSON Feature concept, each slightly different, each drifting. We're collapsing them into one generated type."
+reading_time: 6
+tags: [tracer-bullet, schemas, linkml, type-safety, tech-debt, reliability]
+excerpt: "Three hand-typed definitions of the same GeoJSON Feature concept, each slightly different, each drifting. Fix one silent-drop guard that was eating features past the parse boundary. One atomic PR."
 ---
 
 ## What Happens When Your Schema Has a Twin?
@@ -25,9 +25,39 @@ Every individual step was reasonable. The sum is Article II (Schema Integrity) d
 
 ## What We're Doing
 
-Adding one LinkML submodule with three classes — `RawGeoJSONGeometry`, `RawGeoJSONFeature`, `RawGeoJSONFeatureCollection` — then regenerating Pydantic, TypeScript and JSON Schema from the updated source. The two hand-typed interfaces in `shared/utils/src/types.ts` and `services/session-state/src/types/results.ts` get deleted. So does the paired hand-typed `GeoJSONFeatureCollection`. The `services/stac` `dict[str, Any]` gets replaced with the generated Pydantic `RawGeoJSONFeature`. The existing, under-specified `GeoJSONFeature` LinkML stub in `session-state.yaml` is folded into the new class — paralleling two near-identical "loose Feature" classes would have replicated the exact drift we're paying down.
+Adding one LinkML submodule with two classes — `RawGeoJSONFeature` and `RawGeoJSONFeatureCollection`. The `geometry` slot is an `any_of` discriminated union over the seven geometry classes (`GeoJSONPoint`, `GeoJSONEmptyPoint`, `GeoJSONLineString`, …) that already exist in `geojson.yaml`; no third "loose geometry" class is introduced, because we already know the geometry kinds at the boundary. Then we regenerate Pydantic, TypeScript and JSON Schema from source. The two hand-typed interfaces in `shared/utils/src/types.ts` and `services/session-state/src/types/results.ts` get deleted. So does the paired hand-typed `GeoJSONFeatureCollection`. The `services/stac` `dict[str, Any]` gets replaced with the generated Pydantic `RawGeoJSONFeature`. The existing, under-specified `GeoJSONFeature` LinkML stub in `session-state.yaml` is folded into the new class — paralleling two near-identical "loose Feature" classes would have replicated the exact drift we're paying down.
 
-Roughly 24 TypeScript files and 3 Python files flip their imports. No runtime behaviour changes. No wire-format changes. No persistence changes. The whole thing ships as one atomic PR so reviewers see the schema edit, the regeneration diff, and the consumer migration together in a single pass.
+Roughly 22 TypeScript files and 3 Python files flip their imports. The whole thing ships as one atomic PR so reviewers see the schema edit, the regeneration diff, and the consumer migration together in a single pass.
+
+## The Silent Failure We Found While Planning
+
+While the spec review was walking through consumers, one line at `apps/vscode/src/webview/mapPanel.ts:1199` caught the reviewer's eye:
+
+```ts
+if (!f.geometry) { return []; }
+```
+
+A guard that looks like defensive programming, but is in fact silently dropping any feature whose `geometry` is null. No log, no warning, no user-visible error — just a feature that vanishes between import and display. That is a straight-line violation of Article I.3 of the project constitution: *operations MUST succeed fully or fail explicitly. Users MUST always know the state of their data.*
+
+The fix falls naturally out of the schema consolidation. `RawGeoJSONFeature.geometry` is required — not nullable. The two ingress sites (`services/io` REP importer and `services/stac` catalog loader) coerce any null-geometry payload into a `GeoJSONEmptyPoint` (`{"type": "Point", "coordinates": []}`) before validation. Past that boundary, consumers trust the static type and the guard goes away. The Playwright regression test — import a fixture containing a null-geometry row, assert that no layer is dropped and the row surfaces as an empty-point geometry — pins the contract down.
+
+This is the unglamorous half of "schema integrity." A drifted type lets a silent-drop guard look reasonable for years. A single, schema-rooted, required-geometry type makes the guard obviously wrong the moment you look at it.
+
+## The Small Performance Budget We're Spending
+
+Discriminated unions of seven classes are free in TypeScript (`switch` on `type` is O(1)) but not in Pydantic. Without a discriminator, Pydantic tries each alternative against each feature — ~6× slower than it needs to be. A 10 000-feature file validates in ~3 s instead of ~500 ms. Bad enough to feel on a realistic 50 000-feature import.
+
+The fix is one additive YAML annotation — `designates_type: true` on each of the seven geometry classes' `type` slot — that tells Pydantic to discriminate on `type`. Payload acceptance is unchanged. The 10 000-feature micro-benchmark under `shared/schemas/tests/test_designates_type_perf.py` enforces the ≤ 500 ms budget so the gain doesn't silently regress.
+
+## Why This Is Constitutional, Not Cosmetic
+
+Article II (Schema Integrity) says the LinkML master schema is the single source of truth and derived types must be generated from it. Three hand-typed duplicates of a concept that *should* come from the schema is a direct violation — it's been tolerated, but it's still a violation.
+
+Article XV (Strict Type Safety) forbids `any` in generated output and penalises structural drift. A `dict[str, Any]` annotation on a parse-boundary payload is the Python cousin of the TypeScript `any` we already refuse to tolerate.
+
+Article I.3 (No silent failures) is the bonus we caught along the way: the silent-drop guard at the map panel disappears, replaced by an explicit conversion at the ingress boundary that we can point to, test, and trust.
+
+Three articles of the constitution. The payoff is not a new capability — it is the removal of three independent excuses to add a fourth duplicate, a fourth silent guard, or a fourth `Any` six months from now.
 
 ## Why This Is Constitutional, Not Cosmetic
 

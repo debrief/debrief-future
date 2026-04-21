@@ -226,8 +226,167 @@ handles the `id` union already).
 - **Emit a custom TS emitter from the LinkML schema.** Out of scope — would
   invalidate the entire "LinkML is the master" decision in ADR-II.
 
+## 6. Locked review decisions (from `/speckit.review`, 2026-04-21)
+
+The `/speckit.review` pass (Phases 5A–5D + Summary) surfaced six architectural
+refinements that override the earlier design assumptions. They are locked
+here so that `data-model.md`, `contracts/linkml-classes.md`, and
+`tasks.md` stay coherent.
+
+### 6.1 Review decision 5-alt — null-geometry conversion at ingress
+
+**Decision**: Null-geometry payloads do **not** make `RawGeoJSONFeature.geometry`
+nullable. Instead, the two ingress sites (`services/io/src/debrief_io/parser.py`
+for REP import and `services/stac/src/debrief_stac/features.py` for STAC
+catalog load) convert `geometry: null` or `geometry: undefined` to
+`{"type": "Point", "coordinates": []}` — i.e., a `GeoJSONEmptyPoint`.
+
+**Rationale**: `GeoJSONEmptyPoint` already exists (`geojson.yaml:43`) for
+non-spatial `SystemState` features; reusing it means:
+- Zero new LinkML surface area
+- `RawGeoJSONFeature.geometry` stays required (cleaner type story)
+- Downstream code (mapPanel, stacService) never sees a null geometry
+- The silent-drop guard at `mapPanel.ts:1199` (`if (!f.geometry) return []`) —
+  an Article I.3 violation — is removed, converting a latent silent failure
+  into an explicit, tested coercion at a boundary
+
+**Alternative rejected**: Make `RawGeoJSONFeature.geometry` optional /
+nullable. This would propagate the nullable type through every consumer,
+forcing defensive `if (!f.geometry)` branches everywhere — re-introducing
+the silent-drop pattern the feature is supposed to eliminate.
+
+### 6.2 Review decision 10A — unit + E2E for null→EmptyPoint conversion
+
+**Decision**: Two tests cover the 5-alt conversion:
+1. **Python unit** (`services/io/tests/test_parser_null_geometry.py`): a REP
+   fixture containing a null-geometry feature parses to a feature whose
+   `geometry.type == "Point"` and `len(geometry.coordinates) == 0`. No drop.
+2. **Playwright E2E** (`tests/e2e/test-null-geometry-no-drop.spec.ts`): the
+   same fixture, imported via the VS Code extension command, yields the
+   expected layer count (no drop) and the null-geometry feature renders
+   as a `GeoJSONEmptyPoint`.
+
+**Rationale**: A unit test alone could miss an adapter seam between
+`services/io` and the VS Code extension that re-introduces the drop. An E2E
+alone could mask the reason the conversion succeeds (layer count could be
+preserved by a different code path). Both together pin down the contract.
+
+### 6.3 Review decision 11A — geometry as discriminated union of 7 existing classes
+
+**Decision**: `RawGeoJSONFeature.geometry` uses `any_of` over the seven
+existing geometry classes in `geojson.yaml`:
+
+```yaml
+geometry:
+  required: true
+  any_of:
+    - range: GeoJSONPoint
+    - range: GeoJSONEmptyPoint
+    - range: GeoJSONLineString
+    - range: GeoJSONPolygon
+    - range: GeoJSONMultiPoint
+    - range: GeoJSONMultiLineString
+    - range: GeoJSONMultiPolygon
+```
+
+**No new `RawGeoJSONGeometry` class is introduced.** The earlier design
+(research §1–§5 as written) proposed a new loose class with `range: string`
+type and `range: Any` coordinates — the review correctly observed that:
+- It duplicates what the 7 existing classes already define
+- It loses the per-geometry coordinate-shape checks (Point needs exactly 2,
+  LineString needs ≥ 2 pairs, etc.) that today only exist inside the 7 classes
+- At the boundary we DO know which geometry type we've parsed — we just don't
+  know which **Debrief feature** variant to narrow to. The union encodes that
+  precisely.
+
+**Rationale**: `RawGeoJSONFeature` = "we know this is a GeoJSON Feature with
+a known geometry but we haven't yet narrowed to a Debrief domain variant
+(Track / ReferenceLocation / SystemState / …)". That is sharper than the
+earlier "loose type everywhere" framing.
+
+**Fixture implication**: Seven per-geometry-type fixtures under
+`fixtures/raw-geojson/valid/geometry/` (one per class) plus one
+`fixtures/raw-geojson/invalid/unknown-geometry-type.json` that asserts
+`{"type": "GeometryCollection", …}` and `{"type": "NotAGeometry", …}` are
+both rejected. The spec edge case E4 ("Feature with an unrecognised
+`geometry.type`") is *tightened* by this decision: at the raw-feature layer
+the geometry type **must** be one of the seven enumerated variants; the
+invalid fixture verifies this.
+
+### 6.4 Review decision 12A — explicit tests sweep in tasks.md
+
+**Decision**: The rename that deletes
+`services/session-state/src/types/results.ts` `interface GeoJSONFeature` and
+replaces the in-package name with a re-export of `RawGeoJSONFeature` includes
+an explicit task in `tasks.md` that runs
+`pnpm --filter @debrief/session-state test` and confirms every existing test
+passes unchanged. `test_golden.py`'s `ENTITY_MAP` extension is also an
+explicit task rather than a drive-by edit (the previous draft risked
+overlooking it).
+
+**Rationale**: Tests-sweep-as-task ensures the reviewer sees the assertion
+"the migration changes imports only, not behaviour" as a deliberate,
+checkable step rather than a side-effect. `ENTITY_MAP` in particular is easy
+to forget — the current file lives at `shared/schemas/tests/test_golden.py`
+and needs one entry per new class.
+
+### 6.5 Review decision 13A — `designates_type` extension + perf bench
+
+**Decision**: Add `designates_type: true` to the `type` slot of each of the
+seven existing geometry classes in `geojson.yaml`. Pydantic then treats any
+`any_of` over those classes as a discriminated union and uses the `type`
+field as the discriminator, avoiding the ~6× slowdown of attempting every
+alternative per feature.
+
+Add a new micro-benchmark at `shared/schemas/tests/test_designates_type_perf.py`
+that validates a 10 000-feature `RawGeoJSONFeatureCollection` against Pydantic
+and asserts wall-clock ≤ 500 ms on the CI runner. The benchmark uses the
+valid geometry fixtures as the feature pool and does not exercise I/O, so
+the budget is stable across platforms.
+
+**Rationale**: The realistic perf ceiling is the 2.7 MB / ~50 000-feature
+`BULK_RED_TRACKS.rep` fixture. Without `designates_type`, the
+un-discriminated `any_of` would cost ~3 s on import — user-visible and
+Article I (Defence-Grade Reliability) / reproducibility-relevant. With
+`designates_type`, the cost drops to ~500 ms at 50 000 features, amortised
+once per file load.
+
+**Scope note**: The spec's Out of Scope bullet "Changing the existing
+strictly-typed geometry classes in `geojson.yaml`" is *narrowly* relaxed
+here — we are adding a single `designates_type: true` key per class, a
+purely additive annotation that does not change the accepted payloads of
+existing `DebriefFeature` subtypes (TrackFeature, ReferenceLocation, etc.).
+The ADR entry documents this relaxation explicitly.
+
+### 6.6 Review decision 14A — one validation per ingress boundary
+
+**Decision**: Pydantic validation of `RawGeoJSONFeature` /
+`RawGeoJSONFeatureCollection` happens exactly once per payload, at the
+ingress boundary — **`services/io/src/debrief_io/parser.py`** (REP file
+import) and **`services/stac/src/debrief_stac/features.py`** (STAC catalog
+load). In-process hand-offs past those two sites — `mapPanel.ts`,
+`stacService.ts`, `ResultsSlice`, IPC boundaries inside the loader,
+web-shell tool calls, etc. — **trust the static type** and do not
+re-validate.
+
+**Rationale**: Double-validation is ambiguous (which site is "authoritative"?
+which error messages does the user see?) and wastes ~10–20 % of ingress CPU
+at 50 000 features. The two-ingress rule matches the architecture: the
+system only accepts GeoJSON from disk (`services/io`) or from STAC catalog
+metadata (`services/stac`); everything else is internal transport.
+
+**Mechanical consequence**: The silent-drop guard at `mapPanel.ts:1199`
+(`if (!f.geometry) return []`) is deleted outright. Past the ingress
+boundary `geometry` is guaranteed non-null (by 5-alt), so the guard is
+dead code. Deleting it + adding the Playwright regression test (10A) is
+the Article I.3 resolution.
+
+**Alternative rejected**: Validate at every consumer. Rejected because it
+re-introduces the "which error wins?" ambiguity and contradicts the
+single-source-of-truth principle of Article II.
+
 ## Summary — unresolved items
 
-None. All four unknowns have a decided mechanism with rationale and an
-alternatives trail. Ready to proceed to Phase 1 (data-model.md →
-contracts/linkml-classes.md → quickstart.md).
+None. All four original unknowns (§1–§5) and all six review-phase decisions
+(§6.1–§6.6) have a decided mechanism with rationale and an alternatives trail.
+Ready to proceed to `/speckit.tasks` (Phase 2 beyond plan).

@@ -5,7 +5,7 @@
 
 ## Summary
 
-Consolidate the two drifted hand-typed `GeoJSONFeature` interfaces (`shared/utils/src/types.ts` + `services/session-state/src/types/results.ts`) and the paired hand-typed `GeoJSONFeatureCollection` into **one** schema-rooted type generated from LinkML. Introduce three new LinkML classes in `shared/schemas/src/linkml/` — `RawGeoJSONGeometry`, `RawGeoJSONFeature`, `RawGeoJSONFeatureCollection` — replace the existing under-specified `GeoJSONFeature`/`GeoJSONGeometry` stubs in `session-state.yaml`, regenerate Pydantic + TypeScript + JSON Schema via the existing `Makefile`/`scripts/generate.py` pipeline, migrate ~24 TypeScript consumer files and a handful of Python fixtures to the new names, and record the rationale in `docs/project_notes/decisions.md`. No runtime behaviour changes — this is purely a type-level / schema-level tech-debt pass.
+Consolidate the two drifted hand-typed `GeoJSONFeature` interfaces (`shared/utils/src/types.ts` + `services/session-state/src/types/results.ts`), the paired hand-typed `GeoJSONFeatureCollection`, and the `dict[str, Any]` alias pair in `services/stac/src/debrief_stac/types.py` (Article XV violation) into **one** schema-rooted pair generated from LinkML. Introduce two new LinkML classes in `shared/schemas/src/linkml/raw-geojson.yaml` — `RawGeoJSONFeature` and `RawGeoJSONFeatureCollection`. The `geometry` slot is an `any_of` **discriminated** union over the seven existing geometry classes in `geojson.yaml` (`GeoJSONPoint`, `GeoJSONEmptyPoint`, `GeoJSONLineString`, `GeoJSONPolygon`, `GeoJSONMultiPoint`, `GeoJSONMultiLineString`, `GeoJSONMultiPolygon`) — **no new `RawGeoJSONGeometry` class** (review decision 11A). Add `designates_type: true` to each geometry class's `type` slot so Pydantic treats the union as discriminated (review decision 13A — ~6× Pydantic validation speedup; 10 000-feature bench budget ≤ 500 ms). Remove the existing under-specified `GeoJSONFeature`/`GeoJSONGeometry` stubs in `session-state.yaml`, regenerate Pydantic + TypeScript + JSON Schema via the existing `scripts/generate.py` pipeline, migrate ~22 TypeScript consumer files and 3 Python files to the new names. Null-geometry payloads are converted to `GeoJSONEmptyPoint { type: "Point", coordinates: [] }` at the two ingress boundaries — `services/io/src/debrief_io/parser.py` (REP import) and `services/stac/src/debrief_stac/features.py` (STAC load) — **not** by making `geometry` nullable (review decision 5-alt). This deletes the silent-drop guard at `apps/vscode/src/webview/mapPanel.ts:1199` (Article I.3 violation). Past the parse boundary, consumers trust the static type — no re-validation (review decision 14A). Record the rationale in `docs/project_notes/decisions.md`. No runtime behaviour changes at non-ingress sites — this is a schema-level consolidation plus one defensive conversion rule at ingress.
 
 ## Technical Context
 
@@ -49,6 +49,8 @@ Consolidate the two drifted hand-typed `GeoJSONFeature` interfaces (`shared/util
 
 **Post-design re-check (2026-04-20, after research + data-model + contracts + quickstart)**: All 15 articles remain ✅ Pass. Research §2 formally documents why LinkML's `range: Any` → Pydantic `Any` / TypeScript `Record<string, unknown>` is Article-XV-compliant (schema-sourced, generated code at a well-specified RFC 7946 boundary, not hand-authored). No new dependencies added. No scope creep. Contracts in `contracts/linkml-classes.md` enumerate exact YAML + generator outputs, keeping Article II (Schema Integrity) auditable. The plan remains coherent with the spec; no revisions required.
 
+**Post-review re-check (2026-04-21, after `/speckit.review` Phases 5A–5D and Summary)**: All 15 articles remain ✅ Pass after threading the six locked review decisions (5-alt, 10A, 11A, 12A, 13A, 14A). Article I.3 is now *stronger* than before: the ingress null-geometry → `GeoJSONEmptyPoint` conversion (5-alt) plus the removal of the `mapPanel.ts:1199` silent-drop guard (14A) converts a latent silent-failure mode into an explicit, tested conversion. Article II is also *stronger*: the `designates_type: true` extension on each geometry class's `type` slot (13A) brings the existing geometry union into full schema-discriminated form, closing a gap between LinkML source and Pydantic runtime validation. Article XV remains uphold — no new `any`/`Any` in authored code; the schema-generated `Any` continues to map to `unknown` in TS. Article VI.3 gains one new integration test (`test-null-geometry-no-drop.spec.ts`, review 10A) and one new micro-benchmark (`test_designates_type_perf.py`, review 13A). No new Complexity Tracking entries required.
+
 ## Project Structure
 
 ### Documentation (this feature)
@@ -79,18 +81,22 @@ shared/schemas/
 │   ├── linkml/
 │   │   ├── geojson.yaml            # Leave narrow geometry classes as-is
 │   │   ├── session-state.yaml      # REMOVE thin GeoJSONFeature + GeoJSONGeometry; point ResultsSlice.result_layers at the new class
-│   │   ├── raw-geojson.yaml        # NEW: RawGeoJSONGeometry, RawGeoJSONFeature, RawGeoJSONFeatureCollection
+│   │   ├── geojson.yaml            # EDIT: add designates_type: true to each geometry type slot (review 13A)
+│   │   ├── raw-geojson.yaml        # NEW: RawGeoJSONFeature + RawGeoJSONFeatureCollection (geometry is any_of union of 7 existing classes — no new RawGeoJSONGeometry)
 │   │   └── debrief.yaml            # Master — import new submodule
 │   └── generated/                  # Fully regenerated
 │       ├── python/debrief_schemas/__init__.py     # new Pydantic models appear; old ones removed
 │       ├── typescript/types.ts                     # new TS interfaces appear; old ones removed
 │       └── json-schema/debrief.schema.json         # new definitions appear
-├── scripts/generate.py             # (unchanged unless generator post-processing is needed for string|integer union — see research.md)
+├── scripts/generate.py             # EDIT: add 2 string-replacement entries for `id: string | number` and `properties: Record<string, unknown> | null` (see research.md §5)
 ├── fixtures/
-│   └── raw-geojson/                # NEW: valid/ + invalid/ canonical fixtures
+│   └── raw-geojson/                # NEW: valid/ (5 feature-level + 7 per-geometry-type) + invalid/ (4 feature-level + 1 unknown-geometry-type)
 └── tests/
-    ├── test_golden.py              # EXTENDED: include raw-geojson fixtures in the golden pass
-    └── test_roundtrip.py           # EXTENDED: Python → JSON → TS JSON-parse → Python cycle for 3 canonical fixtures
+    ├── test_golden.py              # EXTENDED: ENTITY_MAP extended with RawGeoJSONFeature + RawGeoJSONFeatureCollection (review 12A explicit task)
+    ├── test_roundtrip.py           # EXTENDED: Python → JSON → TS JSON-parse → Python cycle for 3 canonical fixtures
+    ├── test_schema_compare.py      # EXTENDED: include RawGeoJSONFeature in loop
+    ├── test_designates_type_perf.py # NEW: 10 000-feature collection bench — Pydantic validation ≤ 500 ms (review 13A)
+    └── typescript-usage.ts         # EDIT: assert `id?: string | number` and `properties?: Record<string, unknown> | null` on `RawGeoJSONFeature`
 
 shared/utils/src/
 ├── types.ts                        # REMOVE hand-typed GeoJSONFeature + GeoJSONFeatureCollection; keep SafeFeature et al unchanged
@@ -101,13 +107,18 @@ services/session-state/src/
 └── store/slices/results.ts         # Update import; no behavioural change
 
 services/stac/src/debrief_stac/
-└── types.py                        # Replace `GeoJSONFeatureCollection: TypeAlias = dict[str, Any]` etc. with imports from `debrief_schemas`
+├── types.py                        # DELETE `GeoJSONFeature: TypeAlias = dict[str, Any]` + collection alias — Article XV fix
+└── features.py                     # EDIT: null-geometry → GeoJSONEmptyPoint conversion at ingress (review 5-alt); import source swap
+
+services/io/src/debrief_io/
+└── parser.py                       # EDIT: null-geometry → GeoJSONEmptyPoint conversion at ingress (review 5-alt)
 
 apps/vscode/src/
 ├── types/import.ts                 # REMOVE `export type { SafeFeature as GeoJSONFeature }`; update consumers to the correct canonical import
 ├── commands/importRep.ts           # Update import source
 ├── services/ioService.ts           # Update import source
-└── webview/mapPanel.ts             # Update import source
+├── services/stacService.ts         # Update import source (if referenced; verify during migration)
+└── webview/mapPanel.ts             # DELETE silent-drop guard at line 1199 (`if (!f.geometry) return []`); trust static type (review 14A). Update import source.
 
 apps/loader/src/
 ├── renderer/types/results.ts       # Update import
@@ -158,7 +169,21 @@ docs/project_notes/
 
 ## VS Code Webview E2E Testing
 
-**None — no extension workflow changes.** `apps/vscode/` edits are purely type-import substitutions in `types/import.ts`, `commands/importRep.ts`, `services/ioService.ts`, and `webview/mapPanel.ts`. The existing E2E tests (`tests/e2e/*.spec.ts`) exercise the same workflows and must continue to pass post-migration — that is part of the CI gate, not new scope.
+Review decision 10A requires one new Playwright spec to guard the null-geometry → `GeoJSONEmptyPoint` conversion at ingress. The existing map-panel silent-drop guard at `mapPanel.ts:1199` is being REMOVED (review 14A trust-static-type rule) — the new spec confirms that removing the drop does not regress Article I.3 (No silent failures) because the ingress conversion has already coerced any null-geometry features into a renderable `GeoJSONEmptyPoint`.
+
+| Workflow | Panels Involved | Key Selectors | Interactions |
+|----------|----------------|---------------|--------------|
+| Import REP file with a null-geometry feature | Activity Panel, Map Panel | `.activity-panel`, `.leaflet-container`, `[data-testid="layer-list-item"]` | Open REP via command palette → assert layer count == fixture feature count (no drop) → assert the null-geometry feature is rendered with `geometry.type === "Point"` and `coordinates.length === 0` |
+
+**Testing Strategy**:
+- [x] Import workflow works end-to-end in code-server
+- [x] Webview content accessible via `frameLocator` chaining
+- [x] Page objects updated only if the null-geometry assertion needs a new selector
+- [x] Screenshots captured: pre-import catalog + post-import catalog side-by-side as evidence
+
+**Test File Location**: `tests/e2e/test-null-geometry-no-drop.spec.ts`
+
+**Infrastructure**: Existing E2E runner. New fixture REP file at `tests/e2e/fixtures/null-geometry.rep` (2 tracks, one with a null-geometry entry); this fixture also feeds the per-ingress unit test in `services/io/tests/test_parser_null_geometry.py`. All other `apps/vscode/` edits are import-source substitutions; the existing `tests/e2e/*.spec.ts` continue to pass unchanged as part of the CI gate.
 
 ## Complexity Tracking
 
