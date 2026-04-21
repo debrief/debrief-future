@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--jumps",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.873711111111113,
+          4.921111111111111
+        ],
+        [
+          30,
+          4.921111111111111
+        ],
+        [
+          30,
+          5
+        ],
+        [
+          29.873711111111113,
+          5
+        ],
+        [
+          29.873711111111113,
+          4.921111111111111
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.873711111111113,
+    4.921111111111111,
+    30,
+    5
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Jumps",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Saxon Warrior: Jumps — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Evertsen.",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "HMS Evertsen",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "missile-firing",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "jumps (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/jumps.rep",
+      "title": "jumps.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-jumps": {
+      "href": "./assets/jumps.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "jumps.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/jumps.rep",
+        "load_timestamp": "2026-04-13T23:12:32.690371Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
