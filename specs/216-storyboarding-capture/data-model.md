@@ -33,8 +33,8 @@ the handler never hand-rolls any of those.
 | `storyboard_id` | `activeStoryboard.properties.id` | Either the Storyboard created by the first-capture path, or the one returned by `getActiveStoryboardDefault(plot)`. |
 | `title` | `formatDtg(timestamp)` | #215's DTG formatter; fallback to ISO-8601 string per #215 R8. Handler passes `undefined` to let #215 apply the default. |
 | `description` | `""` | Empty on capture; #218 edit suite populates later. |
-| `viewport.center` | `calculateViewportCenter(sessionState.spatial.viewport)` | `@debrief/utils` helper — centroid of the 4-corner polygon. |
-| `viewport.zoom` | `inferZoomFromPolygon(sessionState.spatial.viewport)` | **NEW** `@debrief/utils` helper — Web Mercator diagonal-span → Leaflet zoom. |
+| `viewport.center` | `calculateViewportCenter(sessionState.spatial.viewport)` | `@debrief/utils` helper (shipped by #203) — centroid of the 4-corner polygon. |
+| `viewport.zoom` | `sessionState.spatial.viewport.zoom` | Authoritative slot on `ViewportPolygon`, populated by `MapPanel` at `apps/vscode/src/webview/mapPanel.ts:770`. Read directly; no helper needed. |
 | `viewport.bearing` | `0` | Reserved slot in v1; enforced by #215. |
 | `timestamp` | `new Date(sessionState.temporal.currentTime).toISOString()` | Converts epoch-ms to ISO-8601 instant at command entry. Rejected with toast if `currentTime` is `null` or outside `temporal.timeRange`. |
 | `time_range` | `null` | Reserved slot in v1; enforced by #215. |
@@ -88,12 +88,18 @@ passed from the keybinding / toolbar button:
 
 ```ts
 interface CaptureCommandContext {
-  readonly mapPanel: MapPanel;             // live reference — used for
-                                           // thumbnail request and post-capture
-                                           // plot swap
-  readonly sessionStore: SessionStoreApi;  // read-only snapshot source
-  readonly sessionManager: SessionManager; // actor + markDirty
-  readonly stacItemPath: string;           // absolute path for thumbnail write
+  readonly mapPanel: MapPanel;             // live reference — features snapshot
+                                           // (getCurrentFeatures()),
+                                           // thumbnail request,
+                                           // post-capture setFeatures()
+  readonly sessionStore: SessionStoreApi;  // read-only snapshot source for
+                                           // spatial/temporal/features slices
+                                           // + markDirty at end of happy path
+  readonly stacItemPath: string;           // absolute path for thumbnail write;
+                                           // derived from mapPanel.getCurrentPlot().itemPath
+                                           // + the active store root
+  readonly actor: string;                  // cached os.userInfo().username
+                                           // with "vscode-user" fallback
   readonly trigger:                        // for telemetry + logging only
     | { source: "keybinding" }
     | { source: "panelButton" }
@@ -101,38 +107,40 @@ interface CaptureCommandContext {
 }
 
 type CaptureResult =
-  | { status: "captured";             scene: SceneFeature; }
-  | { status: "cancelled";             reason: CancelReason; }
-  | { status: "rejected";              reason: RejectReason; error?: Error; };
-
-type CancelReason =
-  | "user-dismissed-name-prompt"
-  | "user-dismissed-duplicate-prompt"
-  | "capture-in-flight";
-
-type RejectReason =
-  | "map-not-focused"
-  | "no-plot-open"
-  | "viewport-unavailable"
-  | "currenttime-unavailable"
-  | "currenttime-out-of-range"
-  | "thumbnail-failed"
-  | "duplicate-name-unrecoverable"    // 5 consecutive offset retries exhausted
-  | "duplicate-offset-limit-exceeded"
-  | "unexpected";                      // surfaced as error toast; logs to
-                                       // output channel
+  | { status: "captured"; scene: SceneFeature }
+  | {
+      status: "cancelled";
+      reason: "name-prompt" | "duplicate-prompt" | "in-flight";
+    }
+  | {
+      status: "rejected";
+      reason:
+        | "viewport-unavailable"
+        | "currenttime-unavailable"
+        | "currenttime-out-of-range"
+        | "thumbnail-failed"
+        | "duplicate-offset-limit-exceeded"
+        | "unexpected";
+      error?: Error;                        // attached on "unexpected"
+    };
 ```
+
+(Removed `map-not-focused` and `no-plot-open` — both are unreachable
+under the compound `when: "debrief.mapFocused && debrief.plotOpen"`
+guard on the keybinding and the panel-button menu contribution. A
+single runtime assertion at command entry handles the
+unreachable-invariant case; we don't codify unreachable states in
+the return type.)
 
 Every branch of the command's control flow terminates in exactly one
 of these variants, and each variant maps to one of:
 
 - A success toast + panel focus (`captured`).
-- A silent return (`cancelled: user-dismissed-*`) — no toast,
-  because the user made the decision.
-- A status-bar hint (`cancelled: capture-in-flight`).
-- A non-modal error toast (`rejected: *`), with
-  `viewport-unavailable` / `currenttime-*` / `thumbnail-failed`
-  getting the user-facing messages specified in spec.md §UI States.
+- A silent return (`cancelled: name-prompt | duplicate-prompt`) —
+  no toast, because the user made the decision.
+- A status-bar hint (`cancelled: in-flight`).
+- A non-modal error toast (`rejected: *`), with user-facing
+  messages per spec.md §UI States.
 
 This type is the basis for the unit-test matrix: one test case per
 variant, asserting the right branch is reached and no side-effects

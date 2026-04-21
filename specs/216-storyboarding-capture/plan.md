@@ -19,20 +19,34 @@ infrastructure:
    (`scene-{ulid}.png` under the STAC Item dir + a `scene-thumbnail-{id}`
    asset entry) instead of #174's plot-level `thumbnail.png`.
 3. **Session-state store** (`@debrief/session-state`) — single source of
-   truth for `viewport: ViewportPolygon`, `currentTime: epoch-ms`, and
-   `hiddenFeatureIds`. Capture reads a consistent snapshot from
-   `session.getState()`; no round-trip to the webview is needed.
+   truth for `viewport: ViewportPolygon` (already carries its own
+   `zoom` slot, populated by MapPanel on every pan/zoom),
+   `currentTime: epoch-ms`, and `hiddenFeatureIds`. Capture reads a
+   consistent snapshot from `session.getState()`; no round-trip to
+   the webview is needed.
 
-New artefacts this slice adds: **one command handler** (`captureScene.ts`),
-**one keybinding contribution** (`ctrl/cmd+alt+c` with
-`when: "debrief.mapFocused"`), **one WebviewViewProvider** for the minimal
-Storyboard panel (Scene list + thumbnails + DTG titles — playback /
-editing belong to #217 and #218), **one per-Scene thumbnail service**, and
-a small **MapPanel mutator** to swap the plot FeatureCollection when CRUD
-returns a new one. Duplicate-timestamp collisions resolve through a modal
-`showInformationMessage` with Replace / Offset (+1 s) / Cancel buttons;
-first-capture Storyboard naming uses `showQuickPick` with inline
-collision validation.
+New artefacts this slice adds: **one command handler**
+(`captureScene.ts`), **one keybinding contribution**
+(`ctrl/cmd+alt+c` with `when: "debrief.mapFocused"`), **one
+WebviewViewProvider** for the minimal Storyboard panel (Scene list +
+thumbnails + DTG titles — playback / editing belong to #217 and
+#218), **one per-Scene thumbnail service**, and a small **MapPanel
+feature-setter** (`setFeatures(features: DebriefFeature[])`) to push
+the CRUD-returned features back into the webview. Duplicate-
+timestamp collisions resolve through a modal
+`showInformationMessage` with Replace / Offset (+1 s) / Cancel
+buttons; first-capture Storyboard naming uses `showInputBox` with
+`validateInput` for inline collision feedback.
+
+**Plot-type convention**: the VS Code extension's `Plot` type is a
+STAC-Item metadata record (`apps/vscode/src/types/plot.ts`), not a
+GeoJSON FeatureCollection. #215's CRUD module operates on a
+FeatureCollection — so capture wraps `MapPanel.currentFeatures`
+(the sibling private field holding `DebriefFeature[]`) into a
+throwaway `FeatureCollection` at the CRUD boundary, receives a new
+FeatureCollection back, and pushes the resulting features into
+`MapPanel.setFeatures(...)`. STAC-Item metadata (`currentPlot`) is
+only read to derive the thumbnail write path (`itemPath`).
 
 The extension path is entirely JavaScript runtime; no new Python code.
 
@@ -53,9 +67,12 @@ runtime dependencies**):
 - `@debrief/session-state` — `SessionStoreApi.getState()`,
   `selectors.hiddenFeatureIds`, `markDirty()`. Source of truth for
   `viewport`, `currentTime`, and hidden-feature set.
-- `@debrief/utils` — `calculateViewportCenter(viewport: ViewportPolygon):
-  Coordinate` for the 4-corner → `[lon, lat]` conversion into
-  `SceneProperties.viewport.center`.
+- `@debrief/utils` — `calculateViewportCenter(viewport:
+  ViewportPolygon): Coordinate` (shipped by #203) for the 4-corner
+  → `[lon, lat]` conversion into `SceneProperties.viewport.center`.
+  `ViewportPolygon.zoom` is already an authoritative slot populated
+  by MapPanel (at `apps/vscode/src/webview/mapPanel.ts:770`); capture
+  reads it directly. **No new zoom-inference helper needed.**
 - `@debrief/schemas` — generated `SceneFeature`, `StoryboardFeature`,
   `Viewport`, `ViewportPolygon`, `Coordinate` types.
 - VS Code Extension API ^1.85.0 — `window.showQuickPick`,
@@ -218,7 +235,7 @@ apps/vscode/
     ├── views/
     │   └── storyboardPanelView.ts           ← NEW: WebviewViewProvider; mirrors logPanelView.ts
     ├── webview/
-    │   ├── mapPanel.ts                      ← EDIT: add `appendFeatures(features: DebriefFeature[])` for CRUD-returned plot swap
+    │   ├── mapPanel.ts                      ← EDIT: add `setFeatures(features: DebriefFeature[])` to push CRUD-returned FeatureCollection back into the webview; read `currentFeatures` externally (or expose a getter) for capture's FC construction
     │   └── web/
     │       └── storyboardPanel.tsx          ← NEW: React webview entrypoint — renders <StoryboardPanel/> from @debrief/components
     └── types/

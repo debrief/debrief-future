@@ -56,10 +56,10 @@ export async function captureScene(
 ): Promise<CaptureResult>;
 
 interface CaptureCommandContext {
-  readonly mapPanel: MapPanel;
-  readonly sessionStore: SessionStoreApi;
-  readonly sessionManager: SessionManager;
-  readonly stacItemPath: string;
+  readonly mapPanel: MapPanel;              // getCurrentFeatures() + setFeatures() + requestThumbnailCapture()
+  readonly sessionStore: SessionStoreApi;   // getState() snapshot + markDirty()
+  readonly stacItemPath: string;            // absolute path for thumbnail write
+  readonly actor: string;                   // OS username, or "vscode-user" fallback
   readonly trigger:
     | { source: "keybinding" }
     | { source: "panelButton" }
@@ -83,47 +83,53 @@ Numbered steps; each maps to at least one unit test.
 3. **Read snapshot**:
    ```ts
    const state       = sessionStore.getState();
-   const viewport    = state.spatial.viewport;
+   const viewport    = state.spatial.viewport;        // ViewportPolygon | null (includes .zoom)
    const currentTime = state.temporal.currentTime;
    const timeRange   = state.temporal.timeRange;
    const hiddenIds   = new Set(state.features.hiddenFeatureIds);
-   const plot        = mapPanel.currentPlot;          // FeatureCollection
+   const features    = mapPanel.getCurrentFeatures();  // DebriefFeature[]  (sibling to currentPlot)
+   // Runtime assertion: when-clause guards guarantee features.length > 0 + viewport is set,
+   // but we re-check viewport below for belt-and-braces. No-plot-open and map-not-focused are
+   // unreachable invariants — asserted, not returned as rejection variants.
    ```
 4. **Validate snapshot** (rejects early, before any thumbnail call):
    - `viewport === null`          → `rejected: "viewport-unavailable"`
    - `currentTime === null`       → `rejected: "currenttime-unavailable"`
-   - `currentTime < timeRange.start || currentTime > timeRange.end`
+   - `timeRange !== null && (currentTime < timeRange.start || currentTime > timeRange.end)`
                                   → `rejected: "currenttime-out-of-range"` (SC-004)
-   - `plot === null`              → `rejected: "no-plot-open"` (should be unreachable due to `when`-clause)
 5. **Derive Scene inputs**:
    ```ts
    const timestampIso   = new Date(currentTime).toISOString();
    const center         = calculateViewportCenter(viewport);
-   const zoom           = inferZoomFromPolygon(viewport);
-   const visibleIds     = plot.features
+   const zoom           = viewport.zoom;                       // authoritative slot
+   const visibleIds     = features
      .filter((f) => f.properties?.id && !hiddenIds.has(f.properties.id))
      .map((f) => f.properties.id);
+   // Build a throwaway FeatureCollection for #215's CRUD boundary.
+   // #215 expects a FC; the VS Code "Plot" type is STAC metadata, not a FC.
+   const fc: FeatureCollection = { type: "FeatureCollection", features };
    ```
 6. **Resolve active Storyboard** (or trigger first-capture prompt):
    ```ts
    let activeStoryboardId: string;
-   const existing = getActiveStoryboardDefault(plot);
+   const existing = getActiveStoryboardDefault(fc);
    if (existing !== null) {
      activeStoryboardId = existing.properties.id;
    } else {
-     const name = await promptForStoryboardName(plot);  // showInputBox
+     const name = await promptForStoryboardName(fc);  // showInputBox
      if (name === undefined) {
-       return { status: "cancelled", reason: "user-dismissed-name-prompt" };
+       return { status: "cancelled", reason: "name-prompt" };
      }
-     const { plot: plot1, storyboard } = await createStoryboard(plot, {
-       name, actor: sessionManager.actor,
+     const { plot: fc1, storyboard } = await createStoryboard(fc, {
+       name, actor: context.actor,
      });
-     mapPanel.swapPlot(plot1);
+     mapPanel.setFeatures(fc1.features);   // push the new FC's features back
      activeStoryboardId = storyboard.properties.id;
    }
    ```
-   After `createStoryboard` returns, MapPanel holds the new plot; the
-   rest of the flow uses `mapPanel.currentPlot`.
+   After `createStoryboard` returns, MapPanel holds the new features;
+   the rest of the flow calls `createScene` on the latest
+   FeatureCollection re-wrapped from `mapPanel.getCurrentFeatures()`.
 7. **Capture thumbnail**:
    ```ts
    const thumbnails = await mapPanel.requestThumbnailCapture(5000);
@@ -151,20 +157,24 @@ Numbered steps; each maps to at least one unit test.
      const assetKey = await sceneThumbnailService.writeSceneThumbnail(
        context.stacItemPath, sceneId, thumbnails.largePngBase64, thumbnails.smallPngBase64,
      );
-     const { plot: nextPlot, scene } = await createScene(
-       mapPanel.currentPlot,
+     const fcLatest: FeatureCollection = {
+       type: "FeatureCollection",
+       features: mapPanel.getCurrentFeatures(),
+     };
+     const { plot: fcNext, scene } = await createScene(
+       fcLatest,
        {
          storyboardId: activeStoryboardId,
          viewport: { center, zoom, bearing: 0 },
          timestamp: timestampIso,
          visibleFeatureIds: visibleIds,
          thumbnailAssetRef: assetKey,
-         actor: sessionManager.actor,
+         actor: context.actor,
          idOverride: sceneId,
        },
      );
-     mapPanel.swapPlot(nextPlot);
-     sessionManager.markDirty(plot.id);
+     mapPanel.setFeatures(fcNext.features);
+     sessionStore.getState().markDirty();              // session-store method, no args
      await commands.executeCommand("debrief.storyboardPanel.focus");
      return { status: "captured", scene };
    } catch (err) {
@@ -261,6 +271,7 @@ with mocked `MapPanel`, `SessionStoreApi`, `SessionManager`,
 | `duplicate Storyboard name blocks prompt confirm button` | FR-CAP-004 (via `validateInput` returning a string) |
 | `second shortcut press while in-flight is silently ignored` | Single-flight edge case |
 | `markDirty called exactly once on happy path, never on failure paths` | SC-002 structural guarantee |
+| `createScene failure after PNG write leaves dirty flag untouched + no panel update` | Cross-component atomicity (review Finding #3 — composes thumbnail-write success with CRUD failure; orphan PNG acceptable, dirty-flag correctness not) |
 | `commands.executeCommand('debrief.storyboardPanel.focus') fires on success` | FR-CAP-013 |
 | `success posts captureInFlight:false on panel` | UI State consistency |
 

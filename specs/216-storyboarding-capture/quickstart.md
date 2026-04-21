@@ -50,7 +50,7 @@ apps/vscode/
     ├── views/
     │   └── storyboardPanelView.ts            ← NEW
     ├── webview/
-    │   ├── mapPanel.ts                       ← EDIT: +swapPlot(plot) mutator
+    │   ├── mapPanel.ts                       ← EDIT: +setFeatures(features) mutator; expose getCurrentFeatures() (already internal)
     │   └── web/storyboardPanel.tsx           ← NEW: React webview entry
     └── types/
         └── storyboardPanelMessages.ts        ← NEW: discriminated unions
@@ -66,8 +66,7 @@ shared/components/
     │   └── __tests__/StoryboardPanel.test.tsx ← 8 cases
     └── index.ts                              ← EDIT: export StoryboardPanel
 
-shared/utils/                                  ← EDIT: +inferZoomFromPolygon
-└── src/viewport.ts                           ← NEW helper + test
+shared/utils/                                  ← (no edit — ViewportPolygon.zoom already authoritative; calculateViewportCenter shipped by #203)
 
 tests/e2e/
 └── test-storyboard-capture.spec.ts           ← NEW: 6 E2E workflows through code-server
@@ -84,8 +83,13 @@ shared/components/e2e/
 
 ```
 User: click a plot in the STAC browser
-State: plot loaded into MapPanel.currentPlot
-       session-state populated (spatial.viewport, temporal.currentTime, temporal.timeRange)
+State: MapPanel.currentPlot = STAC-Item metadata record
+       MapPanel.currentFeatures = DebriefFeature[]  (the plot's features)
+       session-state populated:
+         spatial.viewport      = ViewportPolygon { coordinates: [...], zoom: 10 }
+         temporal.currentTime  = epoch-ms
+         temporal.timeRange    = { start, end }
+         features.hiddenFeatureIds = []
        debrief.plotOpen context key = true
        Storyboard panel view visible in sidebar (empty state — "No Storyboards yet.")
 ```
@@ -104,13 +108,15 @@ State: sessionStore.getState() holds the live snapshot
 The keybinding fires `debrief.captureScene` only because
 `debrief.mapFocused && debrief.plotOpen`. Inside the handler:
 
-- **Read snapshot** — `viewport`, `currentTime`, `hiddenIds` from
-  session-state; `plot` from MapPanel.
+- **Read snapshot** — `viewport` (includes `zoom`), `currentTime`,
+  `hiddenIds` from `sessionStore.getState()`; `features` from
+  `mapPanel.getCurrentFeatures()`; construct a throwaway
+  `FeatureCollection` at the #215 boundary.
 - **Validate** — any null or out-of-range → reject with error
   toast, no further work.
-- **Resolve active Storyboard** — `getActiveStoryboardDefault(plot)`
+- **Resolve active Storyboard** — `getActiveStoryboardDefault(fc)`
   returns `null` because no Storyboards exist yet → trigger the
-  first-capture quick-pick.
+  first-capture prompt.
 
 ### 4. Name the Storyboard
 
@@ -143,29 +149,35 @@ const { assetKey } = await sceneThumbnailService.writeSceneThumbnail(
 );
 // PNGs + item.json.assets now durable on disk
 
-const { plot: plot1, storyboard } = await createStoryboard(plot, {
-  name: "MARSTRIKE 26 — Day 1",
-  actor: sessionManager.actor,
-});
-mapPanel.swapPlot(plot1);
+// Wrap features into a throwaway FeatureCollection for #215's CRUD API.
+const fc: FeatureCollection = {
+  type: "FeatureCollection",
+  features: mapPanel.getCurrentFeatures(),
+};
 
-const { plot: plot2, scene } = await createScene(plot1, {
+const { plot: fc1, storyboard } = await createStoryboard(fc, {
+  name: "MARSTRIKE 26 — Day 1",
+  actor: context.actor,
+});
+mapPanel.setFeatures(fc1.features);
+
+const { plot: fc2, scene } = await createScene(fc1, {
   storyboardId: storyboard.properties.id,
   viewport: {
     center: calculateViewportCenter(viewport),
-    zoom:   inferZoomFromPolygon(viewport),
+    zoom:   viewport.zoom,       // authoritative slot (populated by MapPanel)
     bearing: 0,
   },
   timestamp: new Date(currentTime).toISOString(),
-  visibleFeatureIds: plot1.features
+  visibleFeatureIds: fc1.features
     .filter((f) => f.properties?.id && !hiddenIds.has(f.properties.id))
     .map((f) => f.properties.id),
   thumbnailAssetRef: assetKey,
-  actor: sessionManager.actor,
+  actor: context.actor,
   idOverride: sceneId,        // ensures Scene.id matches the PNG filename
 });
-mapPanel.swapPlot(plot2);
-sessionManager.markDirty(plot.id);
+mapPanel.setFeatures(fc2.features);
+sessionStore.getState().markDirty();          // session-store method, no args
 await commands.executeCommand("debrief.storyboardPanel.focus");
 ```
 
@@ -299,16 +311,18 @@ these commands. The mapping is in
 
 ## Things to verify at implementation time
 
-- **`SessionManager.markDirty(plotId)` actually exists** with that
-  signature. If the method name / signature differs, update
-  `captureScene.ts` step 9 and re-run the "markDirty fires exactly
-  once on happy path" unit test.
-- **`MapPanel.swapPlot(plot)` / `MapPanel.appendFeatures(features)`
-  is the right API** for pushing the CRUD-returned plot into the
-  webview. Today `MapPanel.currentPlot` is mutated in some places
-  and re-posted in others; the implementation should pick one
-  pattern and reuse it consistently (contract calls it
-  `swapPlot`).
+- **`activeSession.getState().markDirty()` is the single dirty-flag
+  API** — no arguments. Dirty middleware at
+  `services/session-state/src/store/middleware/dirty.ts` already
+  wires it into the VS Code tab-dirty indicator. Do NOT add a new
+  `markDirty(plotId)` variant; the session is already
+  per-active-plot.
+- **`MapPanel.setFeatures(features: DebriefFeature[])` is a new
+  method** added in this spec — it replaces the full feature list
+  in the webview (not an append). The paired
+  `MapPanel.getCurrentFeatures(): DebriefFeature[]` exposes the
+  already-existing private `currentFeatures` field (currently only
+  readable internally).
 - **`os.userInfo().username` is stable in code-server deployments
   the team uses**. If it throws in the containerised preview, the
   fallback to `"vscode-user"` kicks in and unit tests should cover

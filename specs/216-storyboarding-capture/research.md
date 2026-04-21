@@ -75,23 +75,26 @@ the extension in `MapPanel.currentPlot`) and excluding anything whose
 to #215's `createScene`, which canonicalises (trim / dedupe / sort)
 and hashes it.
 
-The `viewport` is a `ViewportPolygon` (GeoJSON Polygon of 4 corners).
-Scene Properties expect `viewport: { center: [lon, lat]; zoom; bearing: 0 }`
-instead, so the capture handler projects:
+The `viewport` is a `ViewportPolygon` — a 4-corner polygon **plus
+an authoritative `zoom: number` slot** (defined in
+`session-state.yaml` and generated into
+`@debrief/schemas`). `MapPanel` already writes the live zoom level
+into this slot on every Leaflet `moveend`
+(`apps/vscode/src/webview/mapPanel.ts:770`). Scene Properties
+require `viewport: { center: [lon, lat]; zoom; bearing: 0 }` — so
+the capture handler projects:
 
 ```ts
 const sceneViewport = {
-  center: calculateViewportCenter(viewport),  // @debrief/utils helper
-  zoom:   inferZoomFromPolygon(viewport),     // #215 CRUD input helper; bearing=0 in v1
+  center: calculateViewportCenter(viewport),  // @debrief/utils (shipped by #203)
+  zoom:   viewport.zoom,                       // already populated by MapPanel
   bearing: 0,
 };
 ```
 
-`inferZoomFromPolygon` does not exist yet. **Decision: add it as a
-pure helper in `@debrief/utils/src/viewport.ts`**. It converts the
-diagonal span of the polygon into an approximate Leaflet zoom level
-using the standard Web Mercator formula. This helper is independently
-useful to #217 (viewport tween) and #218 (update-to-current).
+No new zoom-inference helper is needed. (An earlier draft of this
+spec proposed `inferZoomFromPolygon` in `@debrief/utils`; it was
+dead work because the zoom was already authoritative.)
 
 ### Rationale
 
@@ -567,23 +570,26 @@ capture resets the guard; a successful capture resets the guard.
 
 ### R6c — Plot dirty-flag mechanism
 
-The existing `SessionManager.markDirty(plotId)` (or equivalent —
-will confirm at implementation time) is the single entry point for
-marking a plot as having unsaved changes. Every existing plot
-mutation (add feature, change color, delete selection) goes through
-it. Capture calls `markDirty` **after** the FeatureCollection has
-been swapped into `MapPanel.currentPlot` with the new Storyboard +
-Scene, and **after** the per-Scene thumbnail PNG has been written
-(so that save-close-reopen restores a consistent plot — the Scene
-reference and the thumbnail file agree).
+The session store's `markDirty()` method — signature
+`activeSession.getState().markDirty(): void` (no arguments; the
+dirty flag is per-active-session, not per-plot-id) — is the single
+entry point for marking a plot as having unsaved changes. The
+store's dirty middleware already wires `markDirty()` calls to the
+VS Code dirty indicator via
+`services/session-state/src/store/middleware/dirty.ts`. Capture
+calls `markDirty` **after** features have been pushed into
+`MapPanel.setFeatures(...)` with the new Storyboard + Scene, and
+**after** the per-Scene thumbnail PNG has been written (so that
+save-close-reopen restores a consistent plot — the Scene reference
+and the thumbnail file agree).
 
-If #215's CRUD returns the same plot reference (no-op — impossible
-in practice but defensively checked), `markDirty` is still called
-because capture conceptually always produces a write.
+If #215's CRUD returns the same features reference (no-op —
+impossible in practice but defensively checked), `markDirty` is
+still called because capture conceptually always produces a write.
 
-**Decision**: one `markDirty(plotId)` call at the end of the happy
-path, immediately before the panel-focus command. No dirty-flag
-changes on any failure path (SC-002).
+**Decision**: one `activeSession.getState().markDirty()` call at
+the end of the happy path, immediately before the panel-focus
+command. No dirty-flag changes on any failure path (SC-002).
 
 ### Rationale
 
