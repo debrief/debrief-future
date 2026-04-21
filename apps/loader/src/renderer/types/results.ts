@@ -2,7 +2,10 @@
  * Operation result types.
  */
 
-import type { GeoJSONFeature } from '@debrief/utils';
+// #204: GeoJSONFeature is now the schema-generated RawGeoJSONFeature from
+// `@debrief/schemas`. Re-exported under the legacy name so existing main/
+// IPC modules can keep their import specifier.
+import type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
 
 export type { GeoJSONFeature };
 

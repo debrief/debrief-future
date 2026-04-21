@@ -265,32 +265,6 @@ classes:
         description: Last save location
         range: string
 
-  GeoJSONGeometry:
-    description: GeoJSON geometry object (type + coordinates pair)
-    attributes:
-      type:
-        description: GeoJSON geometry type (e.g., Point, LineString, Polygon)
-        range: string
-        required: true
-
-  GeoJSONFeature:
-    description: >
-      GeoJSON Feature representation used for tool result layers.
-      Feature 109-unify-result-layer-lifecycle.
-    attributes:
-      type:
-        description: GeoJSON object type — always "Feature"
-        range: string
-        required: true
-      id:
-        description: Optional feature identifier (string or numeric, stored as string)
-        range: string
-        required: false
-      geometry:
-        description: GeoJSON geometry object
-        range: GeoJSONGeometry
-        required: true
-
   LastToolExecution:
     description: >
       Record of the last tool execution, enabling single-step undo.
@@ -318,7 +292,7 @@ classes:
     attributes:
       result_layers:
         description: Accumulated tool result features
-        range: GeoJSONFeature
+        range: RawGeoJSONFeature
         multivalued: true
         required: true
         inlined_as_list: true

@@ -19,6 +19,28 @@ if TYPE_CHECKING:
     from debrief_io.types import FilePath
 
 
+def _coerce_null_geometry(feature: dict[str, object]) -> dict[str, object]:
+    """Convert null/missing geometry to a GeoJSONEmptyPoint — utility shim.
+
+    Per review decision 5-alt for spec #204, the intent was to run this at
+    the ingress boundary so consumers never observe a null geometry. That
+    conversion turned out to conflict with the existing NarrativeEntry
+    schema (which legitimately accepts ``geometry == null`` and rejects
+    an empty-coordinate Point). The shim is retained as a utility for
+    callers that opt-in to the conversion, but is NOT applied automatically
+    by ``parse()`` / ``parse_rep()``. The ADR for #204 records the
+    deferral.
+
+    Idempotent. Non-dict inputs pass through unchanged so downstream
+    validators can surface a meaningful error.
+    """
+    if not isinstance(feature, dict):
+        return feature
+    if feature.get("geometry") is None:
+        feature["geometry"] = {"type": "Point", "coordinates": []}
+    return feature
+
+
 def _read_file(path: Path) -> tuple[str, str]:
     """Read file with encoding detection.
 

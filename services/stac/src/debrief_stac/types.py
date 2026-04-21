@@ -21,6 +21,12 @@ STACAsset: TypeAlias = dict[str, Any]
 STACLink: TypeAlias = dict[str, str]
 
 # GeoJSON types
+# #204 / Article XV note: These aliases remain `dict[str, Any]` pending a
+# full refactor of debrief_stac.features. The stricter schema-rooted shape
+# (`RawGeoJSONFeature` Pydantic model, or `dict[str, object]` with explicit
+# narrowing) would require replacing every `fc["features"]` access with
+# a cast — a non-trivial change outside #204's consolidation scope. The
+# ADR records this deferral explicitly; see docs/project_notes/decisions.md.
 GeoJSONFeature: TypeAlias = dict[str, Any]
 GeoJSONFeatureCollection: TypeAlias = dict[str, Any]
 BoundingBox: TypeAlias = tuple[float, float, float, float]  # [minLon, minLat, maxLon, maxLat]

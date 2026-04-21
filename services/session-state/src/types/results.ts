@@ -1,23 +1,18 @@
 /**
  * Results state types for session state management.
- * Feature: 109-unify-result-layer-lifecycle, 110-tool-level-undo-gap
+ * Feature: 109-unify-result-layer-lifecycle, 110-tool-level-undo-gap,
+ * 204-rawgeojsonfeature-linkml (GeoJSONFeature unified to schema-rooted
+ * RawGeoJSONFeature from @debrief/schemas).
  */
 
-/**
- * GeoJSON Feature representation for result layers.
- *
- * Schema equivalent: @debrief/schemas#GeoJSONFeature
- * Not migrated: generated GeoJSONFeature uses type: string and id?: string
- * with a GeoJSONGeometry sub-object (type: string, no coordinates). This
- * type has discriminated type literal, id as string | number, and inline
- * geometry with coordinates for runtime use.
- */
-export interface GeoJSONFeature { // canonical — session-state-local runtime shape distinct from @debrief/schemas.GeoJSONFeature; follow-up to unify, #214 scope-adjacent
-  type: 'Feature';
-  id?: string | number;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown> | null;
-}
+// #204: The previously hand-typed `GeoJSONFeature` interface in this file
+// is superseded by the schema-generated `RawGeoJSONFeature` from
+// `@debrief/schemas`. Re-exported here under the original in-package name
+// so existing importers (e.g. store/slices/results.ts, loader IPC, web-shell
+// tools) continue to compile without ripple changes. Follow-up cleanup to
+// rename the in-package API boundary tracked separately.
+export type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
+import type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
 
 /**
  * Record of the last tool execution, enabling single-step undo (#110).

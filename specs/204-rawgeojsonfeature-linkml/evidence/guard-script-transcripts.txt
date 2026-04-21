@@ -1,0 +1,42 @@
+# Guard-script transcripts — #204 / ADR-021
+
+## Pass case (clean tree)
+
+$ bash scripts/check-no-geojson-feature.sh
+✅ No local GeoJSONFeature definitions found (regression guard passed)
+$ echo "Exit: $?"
+Exit: 0
+
+## Fail case (simulated regression)
+
+$ cat > shared/utils/src/_test_regression.ts <<'TS'
+interface GeoJSONFeature {
+  type: "Feature";
+}
+TS
+$ bash scripts/check-no-geojson-feature.sh
+❌ GeoJSONFeature regression guard failed!
+
+The following files define a local GeoJSONFeature interface.
+Use `RawGeoJSONFeature` from `@debrief/schemas` (parse-boundary) or
+narrow via existing `DebriefFeature` type guards (isDebriefFeature,
+isTrackFeature, isReferenceLocation) in @debrief/schemas/unions.
+
+shared/utils/src/_test_regression.ts:1:interface GeoJSONFeature {
+$ echo "Exit: $?"
+Exit: 1
+$ rm shared/utils/src/_test_regression.ts
+
+## Tightening summary
+
+Before #204 (baseline guard shipped by #214):
+- Diagnostic message pointed at `SafeFeature` from `@debrief/utils`.
+- Excluded `shared/utils/src/types.ts` from the search because that file
+  carried the original canonical `interface GeoJSONFeature` declaration.
+
+After #204:
+- Diagnostic message points at `RawGeoJSONFeature` from `@debrief/schemas`
+  (the new canonical parse-boundary name).
+- The `shared/utils/src/types.ts` exclusion is removed — the interface
+  there is deleted by #204, so the exclusion is dead weight and keeping
+  it would let a future regression inside that file slip past the guard.

@@ -1,5 +1,17 @@
 {
   "$defs": {
+    "Any": {
+      "additionalProperties": true,
+      "description": "Permissive wildcard class used for free-form JSON object ranges (e.g., RawGeoJSONFeature.properties). Maps to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript after generator post-processing. This is the LinkML idiom for RFC 7946 \u00a73.2 free-form properties and is NOT a violation of Article XV \u2014 see docs/project_notes/decisions.md (RawGeoJSONFeature ADR).",
+      "title": "Any",
+      "type": [
+        "null",
+        "boolean",
+        "object",
+        "number",
+        "string"
+      ]
+    },
     "ArrayCentreModeEnum": {
       "description": "Array centre calculation mode for towed array sensors",
       "enum": [
@@ -1976,6 +1988,118 @@
         "source"
       ],
       "title": "PropertiesProvenanceEntry",
+      "type": "object"
+    },
+    "RawGeoJSONFeature": {
+      "additionalProperties": false,
+      "description": "Parse-boundary GeoJSON Feature (RFC 7946 \u00a73.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED \u2014 callers handling possibly-null geometry payloads (e.g. NarrativeEntry features) either narrow at the parse boundary or defer to the domain-specific feature class that allows the looser shape (see ADR-021 for the ingress-coercion deferral).",
+      "properties": {
+        "bbox": {
+          "description": "Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6).",
+          "items": {
+            "type": "number"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "geometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoJSONPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONEmptyPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONLineString"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONPolygon"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiLineString"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiPolygon"
+            }
+          ],
+          "description": "GeoJSON geometry \u2014 any_of union over the seven existing geometry classes in geojson.yaml (GeoJSONPoint, GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONPolygon, GeoJSONMultiPoint, GeoJSONMultiLineString, GeoJSONMultiPolygon). Pydantic validates via try-each-alternative; observed cost is ~25\u00b5s per feature (10 000 features in ~250ms)."
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion."
+        },
+        "properties": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 \u00a73.2."
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON object type \u2014 always \"Feature\".",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "geometry"
+      ],
+      "title": "RawGeoJSONFeature",
+      "type": "object"
+    },
+    "RawGeoJSONFeatureCollection": {
+      "additionalProperties": false,
+      "description": "Parse-boundary GeoJSON FeatureCollection (RFC 7946 \u00a73.3). Used by STAC item payloads and tool-result layers before narrowing.",
+      "properties": {
+        "bbox": {
+          "description": "Optional bounding box, shaped as in RawGeoJSONFeature.bbox.",
+          "items": {
+            "type": "number"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "features": {
+          "description": "The collection's features, in document order.",
+          "items": {
+            "$ref": "#/$defs/RawGeoJSONFeature"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "FeatureCollection",
+          "description": "GeoJSON object type \u2014 always \"FeatureCollection\".",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "features"
+      ],
+      "title": "RawGeoJSONFeatureCollection",
       "type": "object"
     },
     "RectangleAnnotation": {
