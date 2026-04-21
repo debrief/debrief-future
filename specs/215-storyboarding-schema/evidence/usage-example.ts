@@ -15,7 +15,7 @@ import {
   listScenesOrdered,
   readSceneWithStaleness,
   updateScene,
-  type Plot,
+  type StoryboardPlot as Plot,
 } from "../../../shared/components/src/storyboard";
 
 async function main(): Promise<void> {

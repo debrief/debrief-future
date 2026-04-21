@@ -9,8 +9,14 @@
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+// Note: `Plot` and `PlotTimeRange` are deliberately re-exported under
+// `StoryboardPlot` / `StoryboardPlotTimeRange` names to avoid a collision
+// with the unrelated `Plot` type in `apps/vscode/src/types/plot.ts` (which
+// represents a STAC-item record, not a FeatureCollection). The
+// `no-redeclare-schemas-exports` lint rule introduced in #214 would
+// otherwise trip on every consumer that imported the VS Code `Plot`.
 export type {
-  Plot,
+  Plot as StoryboardPlot,
   SceneFeature,
   StoryboardFeature,
   Ulid,
@@ -85,7 +91,7 @@ export type { StaleReadResult } from "./queries";
 export { detectMissingDataForScene } from "./missing-data";
 export type {
   MissingDataClassification,
-  PlotTimeRange,
+  PlotTimeRange as StoryboardPlotTimeRange,
 } from "./missing-data";
 
 // ---------------------------------------------------------------------------
