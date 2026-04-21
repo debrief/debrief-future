@@ -13,24 +13,12 @@
 import { expectTypeOf } from 'vitest';
 import { calculateBounds } from '../src/bounds.js';
 import type { SafeFeature } from '../src/types.js';
-import type { DebriefFeature, DebriefFeatureCollection } from '@debrief/schemas';
-
-// GeoJSON-like structural fixture for the raw-parse boundary use case.
-// Mirrors `RawGeoJSONFeature` without importing from its canonical location
-// to demonstrate the structural-subtyping contract is satisfied by any
-// compatible shape.
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string | number;
-  geometry: { type: string; coordinates: unknown } | null;
-  properties: Record<string, unknown> | null;
-}
-
-// Minimal FeatureCollection structural shape for the plain-GeoJSON test (f).
-interface GeoJSONFeatureCollection {
-  type: 'FeatureCollection';
-  features: GeoJSONFeature[];
-}
+import type {
+  DebriefFeature,
+  DebriefFeatureCollection,
+  RawGeoJSONFeature,
+  RawGeoJSONFeatureCollection,
+} from '@debrief/schemas';
 
 // (a) DebriefFeature[] assigns to calculateBounds parameter
 const debriefFeatures: DebriefFeature[] = [];
@@ -40,9 +28,9 @@ expectTypeOf(calculateBounds).toBeCallableWith(debriefFeatures);
 const safeFeatures: SafeFeature[] = [];
 expectTypeOf(calculateBounds).toBeCallableWith(safeFeatures);
 
-// (c) GeoJSONFeature[] assigns via structural-minimum narrowing gate
-const geoJsonFeatures: GeoJSONFeature[] = [];
-expectTypeOf(calculateBounds).toBeCallableWith(geoJsonFeatures);
+// (c) RawGeoJSONFeature[] assigns — parse-boundary feature family (FR-016)
+const rawFeatures: RawGeoJSONFeature[] = [];
+expectTypeOf(calculateBounds).toBeCallableWith(rawFeatures);
 
 // (d) BoundsInputFeature-shaped literal array assigns (structural minimum)
 const minimalFeatures = [{ geometry: { type: 'Point', coordinates: [0, 0] } }];
@@ -52,6 +40,6 @@ expectTypeOf(calculateBounds).toBeCallableWith(minimalFeatures);
 const debriefFeatureCollection = {} as DebriefFeatureCollection;
 expectTypeOf(calculateBounds).toBeCallableWith(debriefFeatureCollection);
 
-// (f) Plain GeoJSON FeatureCollection also assigns directly
-const geoJsonFeatureCollection: GeoJSONFeatureCollection = { type: 'FeatureCollection', features: [] };
-expectTypeOf(calculateBounds).toBeCallableWith(geoJsonFeatureCollection);
+// (f) RawGeoJSONFeatureCollection also assigns directly (FR-001)
+const rawFeatureCollection: RawGeoJSONFeatureCollection = { type: 'FeatureCollection', features: [] };
+expectTypeOf(calculateBounds).toBeCallableWith(rawFeatureCollection);
