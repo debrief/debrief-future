@@ -237,6 +237,12 @@
         "title": "Open Catalog Overview",
         "category": "Debrief",
         "icon": "$(map)"
+      },
+      {
+        "command": "debrief.captureScene",
+        "title": "Capture Scene to Storyboard",
+        "category": "Debrief",
+        "icon": "$(device-camera)"
       }
     ],
     "keybindings": [
@@ -308,6 +314,12 @@
         "key": "delete",
         "mac": "delete",
         "when": "focusedView == 'debrief.activityPanel' && debrief.hasSelection"
+      },
+      {
+        "command": "debrief.captureScene",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c",
+        "when": "debrief.mapFocused && debrief.plotOpen"
       }
     ],
     "viewsContainers": {
@@ -337,6 +349,13 @@
           "id": "debrief.activityPanel",
           "name": "Activity",
           "type": "webview"
+        },
+        {
+          "id": "debrief.storyboardPanel",
+          "name": "Storyboard",
+          "type": "webview",
+          "when": "debrief.plotOpen",
+          "icon": "$(device-camera-video)"
         }
       ],
       "debrief-log": [
@@ -397,6 +416,11 @@
         {
           "command": "debrief.toggleInactiveTools",
           "when": "view == debrief.activityPanel && debrief.calcAvailable",
+          "group": "navigation"
+        },
+        {
+          "command": "debrief.captureScene",
+          "when": "view == debrief.storyboardPanel && debrief.mapFocused && debrief.plotOpen",
           "group": "navigation"
         }
       ],
@@ -480,6 +504,10 @@
         {
           "command": "debrief.deleteSelection",
           "when": "debrief.plotOpen && debrief.hasSelection"
+        },
+        {
+          "command": "debrief.captureScene",
+          "when": "debrief.plotOpen"
         }
       ]
     },
