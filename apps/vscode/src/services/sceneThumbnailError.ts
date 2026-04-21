@@ -19,7 +19,7 @@ export type SceneThumbnailErrorCode =
 
 export class SceneThumbnailError extends Error {
   public readonly code: SceneThumbnailErrorCode;
-  public readonly cause?: unknown;
+  public override readonly cause?: unknown;
 
   constructor(
     code: SceneThumbnailErrorCode,

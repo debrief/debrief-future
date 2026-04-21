@@ -22,8 +22,8 @@ import {
   type StoryboardPlot,
   type SceneFeature,
   type CreateSceneInput,
-  type PlotFeature,
 } from '@debrief/components';
+type StoryboardPlotFeature = StoryboardPlot['features'][number];
 import { calculateViewportCenter } from '@debrief/utils';
 import type {
   SessionStoreApi,
@@ -129,7 +129,8 @@ export interface CaptureInFlightSink {
 function packagePlot(features: DebriefFeature[]): StoryboardPlot {
   return {
     type: 'FeatureCollection',
-    features: features as unknown as PlotFeature[],
+    // eslint-disable-next-line no-restricted-syntax -- #216: DebriefFeature ↔ StoryboardPlotFeature boundary; both are GeoJSON Features, schemas intentionally keep the typings separate (see ADR-019).
+    features: features as unknown as StoryboardPlotFeature[],
   };
 }
 
@@ -194,13 +195,14 @@ async function captureSceneInner(
   const centerObj = calculateViewportCenter(viewport);
   const center: [number, number] = [centerObj.longitude, centerObj.latitude];
   const zoom = viewport.zoom;
-  const visibleIds = features
-    .filter(
-      (f) =>
-        typeof f.properties?.id === 'string' &&
-        !hiddenIds.has(f.properties.id as string),
-    )
-    .map((f) => String(f.properties!.id));
+  const visibleIds: string[] = [];
+  for (const f of features) {
+    const props = f.properties as { id?: string | number | null } | null;
+    const rawId = props?.id;
+    if (typeof rawId !== 'string' || rawId.length === 0) {continue;}
+    if (hiddenIds.has(rawId)) {continue;}
+    visibleIds.push(rawId);
+  }
 
   // Step 6 — resolve active Storyboard (first-capture prompt if none)
   let activeStoryboardId: string;
@@ -222,6 +224,7 @@ async function captureSceneInner(
       currentPlot = result.plot;
       activeStoryboardId = result.storyboard.properties.id;
       mapPanel.setFeatures(
+        // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
         currentPlot.features as unknown as DebriefFeature[],
       );
     } catch (err) {
@@ -283,9 +286,10 @@ async function captureSceneInner(
     const fcLatest = packagePlot(mapPanel.getCurrentFeatures());
     const result = await createScene(fcLatest, sceneInput);
     mapPanel.setFeatures(
+      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       result.plot.features as unknown as DebriefFeature[],
     );
-    const withUndo = sessionStore.getState() as SessionStoreWithUndo;
+    const withUndo = sessionStore.getState();
     withUndo.markDirty();
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
@@ -316,7 +320,7 @@ async function handleDuplicateTimestamp(
     );
     return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
   }
-  const conflict = await findExistingConflict(mapPanel, inputs);
+  const conflict = findExistingConflict(mapPanel, inputs);
   const choice = await deps.showInformationMessage(
     `A scene already exists at ${formatDtg(inputs.timestamp)}.`,
     { modal: true },
@@ -339,13 +343,18 @@ async function handleDuplicateTimestamp(
   return { status: 'cancelled', reason: 'duplicate-prompt' };
 }
 
-async function findExistingConflict(
+function findExistingConflict(
   mapPanel: MapPanel,
   inputs: CreateSceneInput,
-): Promise<string | null> {
+): string | null {
   const plot = packagePlot(mapPanel.getCurrentFeatures());
   for (const f of plot.features) {
-    const props = f.properties as { kind?: string; storyboard_id?: string; timestamp?: string; id?: string } | null;
+    const props = f.properties as {
+      kind?: string;
+      storyboard_id?: string;
+      timestamp?: string;
+      id?: string;
+    } | null;
     if (
       props !== null &&
       props.kind === 'STORYBOARD_SCENE' &&
@@ -376,6 +385,7 @@ async function performReplace(
       now: deps.now(),
     });
     context.mapPanel.setFeatures(
+      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       afterDelete.plot.features as unknown as DebriefFeature[],
     );
   } catch (err) {
@@ -400,9 +410,10 @@ async function retryCreateScene(
     const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
     const result = await createScene(fcLatest, inputs);
     context.mapPanel.setFeatures(
+      // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       result.plot.features as unknown as DebriefFeature[],
     );
-    const withUndo = context.sessionStore.getState() as SessionStoreWithUndo;
+    const withUndo = context.sessionStore.getState();
     withUndo.markDirty();
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
@@ -437,7 +448,7 @@ async function promptForStoryboardName(
     ignoreFocusOut: true,
     validateInput: (value) => {
       const trimmed = value.trim();
-      if (trimmed === '') return 'Name cannot be empty';
+      if (trimmed === '') {return 'Name cannot be empty';}
       if (existingNames.has(trimmed)) {
         return `A Storyboard named "${trimmed}" already exists on this plot`;
       }

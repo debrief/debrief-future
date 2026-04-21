@@ -17,8 +17,13 @@ import { TimeRangeViewProvider } from './views/timeRangeView';
 import { ActivityPanelViewProvider } from './views/activityPanelView';
 import { LogPanelViewProvider } from './views/logPanelView';
 import { ResultsPanelViewProvider } from './views/resultsPanelView';
+import { StoryboardPanelViewProvider } from './views/storyboardPanelView';
 import { ResultsPanelService } from './services/resultsPanelService';
 import { MapPanel } from './webview/mapPanel';
+import {
+  captureScene,
+  type CaptureCommandContext,
+} from './commands/captureScene';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
@@ -134,6 +139,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
   logPanelProvider.setCalcService(calcService);
+
+  // Storyboard panel (Feature: 216 — capture)
+  const storyboardPanelProvider = new StoryboardPanelViewProvider(
+    context.extensionUri,
+    sessionManager,
+  );
+  storyboardPanelProvider.setMapPanelResolver(() => mapPanel);
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
@@ -446,6 +458,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       'debrief.resultsPanel',
       resultsPanelProvider,
       { webviewOptions: { retainContextWhenHidden: true } },
+    ),
+    vscode.window.registerWebviewViewProvider(
+      'debrief.storyboardPanel',
+      storyboardPanelProvider,
     )
   );
 
@@ -633,6 +649,44 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     resultsPanelService
   );
   context.subscriptions.push(...commands);
+
+  // Feature 216 — register the capture-scene command. We construct the
+  // CaptureCommandContext at invoke time so every capture sees the current
+  // mapPanel / active session / actor — no stale closures.
+  context.subscriptions.push(
+    vscode.commands.registerCommand('debrief.captureScene', async () => {
+      const panel = mapPanel;
+      const session = sessionManager.getActiveSession();
+      if (!panel || !session) {
+        void vscode.window.showErrorMessage(
+          'Capture failed — no plot is currently open.',
+        );
+        return;
+      }
+      const store = panel.getCurrentStore();
+      const plot = panel.getCurrentPlot();
+      if (!store?.path || !plot?.itemPath) {
+        void vscode.window.showErrorMessage(
+          'Capture failed — plot is missing STAC item metadata.',
+        );
+        return;
+      }
+      const path = await import('path');
+      const stacItemPath = path.dirname(path.join(store.path, plot.itemPath));
+      const ctx: CaptureCommandContext = {
+        mapPanel: panel,
+        sessionStore: session,
+        stacItemPath,
+        actor: sessionManager.actor,
+        trigger: { source: 'programmatic' },
+      };
+      await captureScene(ctx, {
+        setCaptureInFlight: (inFlight: boolean) =>
+          storyboardPanelProvider.setCaptureInFlight(inFlight),
+      });
+      storyboardPanelProvider.refresh();
+    }),
+  );
 
   // Set initial context
   await vscode.commands.executeCommand('setContext', 'debrief.plotOpen', false);
