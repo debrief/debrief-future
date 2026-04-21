@@ -7,7 +7,15 @@
 
 import type { CatalogOverviewItem, PlatformRecord } from '../filter-engine/types';
 export type { PlatformRecord };
-import type { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
+// #204: GeoJSONFeature / GeoJSONFeatureCollection have been consolidated
+// into the schema-generated RawGeoJSONFeature / RawGeoJSONFeatureCollection.
+// Re-exported here under the legacy in-package names so existing importers
+// inside ExerciseListView (utils, stories, tests, fixtures) can continue to
+// use the original names without a ripple.
+import type {
+  RawGeoJSONFeature as GeoJSONFeature,
+  RawGeoJSONFeatureCollection as GeoJSONFeatureCollection,
+} from '@debrief/schemas';
 export type { GeoJSONFeature, GeoJSONFeatureCollection };
 
 /** Exercise data for list view display. Extends CatalogOverviewItem with STAC extension metadata. */

@@ -86,5 +86,7 @@ export interface ParseWarning {
   code: string;
 }
 
-// Re-exported alias so existing importers can continue to use GeoJSONFeature
-export type { SafeFeature as GeoJSONFeature } from '@debrief/utils';
+// #204: The legacy `GeoJSONFeature as SafeFeature` alias has been removed.
+// Consumers inside apps/vscode now import the shape appropriate to their
+// use site: `SafeFeature` for MCP/service-call boundaries, or
+// `RawGeoJSONFeature` from `@debrief/schemas` for the parse-boundary shape.

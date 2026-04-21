@@ -13,7 +13,8 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
-import type { ParseResult, ParseWarning, GeoJSONFeature } from '../types/import';
+import type { ParseResult, ParseWarning } from '../types/import';
+import type { SafeFeature } from '@debrief/utils';
 import { RepParseError } from '../types/import';
 
 export class IoService {
@@ -86,8 +87,8 @@ export class IoService {
     try {
       const result = await this.callDebriefIo(filePath);
 
-      const rawFeatures = result.features as GeoJSONFeature[] | undefined;
-      const features: GeoJSONFeature[] = rawFeatures ?? [];
+      const rawFeatures = result.features as SafeFeature[] | undefined;
+      const features: SafeFeature[] = rawFeatures ?? [];
 
       const rawWarnings = result.warnings as Array<Record<string, unknown>> | undefined;
       const warnings: ParseWarning[] = (rawWarnings ?? []).map((w) => ({

@@ -1,0 +1,64 @@
+# CI pipeline output — #204 final commit
+# Captured at: 2026-04-21 (git_sha: 8c46bb9)
+
+## Ruff (Python lint)
+
+$ uv run ruff check .
+warning: The following rules have been removed and ignoring them has no effect:
+    - ANN101
+    - ANN102
+
+All checks passed!
+
+## PNPM lint (TypeScript + shell guard)
+
+$ pnpm lint
+... (all workspaces)
+apps/web-shell lint: Done
+apps/vscode lint: Done
+[scripts/check-no-geojson-feature.sh grandfathered guard passes — zero violations]
+
+## Pyright (Python type check)
+
+$ uv run pyright
+0 errors, 0 warnings, 0 informations
+
+## PNPM typecheck (all 11 workspaces)
+
+$ pnpm -r typecheck
+apps/spec-navigator typecheck: Done
+shared/config-ts typecheck: Done
+shared/data typecheck: Done
+shared/schemas typecheck: Done
+shared/utils typecheck: Done
+services/session-state typecheck: Done
+apps/loader typecheck: Done
+shared/components typecheck: Done
+apps/nl-demo typecheck: no typecheck configured for nl-demo
+apps/web-shell typecheck: Done
+
+## Python tests (unit + integration, excluding external-fixture test_features)
+
+$ uv run pytest shared/schemas/tests/ services/io/tests/ --ignore=services/stac/tests/test_features.py
+============ 1232 passed, 7 skipped, 1 xfailed, 1 warning in 9.61s =============
+
+$ cd services/stac && uv run --project $(realpath ..) pytest tests/
+================== 167 passed, 7 skipped, 1 warning in 3.43s ===================
+
+## TypeScript unit tests
+
+$ pnpm --filter @debrief/session-state test
+Test Files  35 passed (35)
+     Tests  618 passed (618)
+
+$ pnpm --filter @debrief/utils test
+Test Files  18 passed (18)
+     Tests  254 passed (254)
+
+$ pnpm --filter @debrief/components test
+Test Files  121 passed | 4 skipped (125)
+     Tests  1682 passed | 4 skipped (1686)
+
+## Grand total
+
+3573 passed, 15 skipped, 1 xfailed across Python + TypeScript

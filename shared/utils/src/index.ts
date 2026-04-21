@@ -51,8 +51,6 @@ export {
 
 // Types
 export type {
-  GeoJSONFeature,
-  GeoJSONFeatureCollection,
   Bounds,
   SafeGeometry,
   SafeFeature,

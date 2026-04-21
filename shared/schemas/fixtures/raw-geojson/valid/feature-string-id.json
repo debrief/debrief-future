@@ -1,0 +1,6 @@
+{
+  "type": "Feature",
+  "id": "track-001",
+  "geometry": { "type": "Point", "coordinates": [0.0, 0.0] },
+  "properties": {}
+}

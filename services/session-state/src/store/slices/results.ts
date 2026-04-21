@@ -9,8 +9,8 @@ import type {
   ResultsActions,
   LastToolExecution,
   SessionStore,
-  GeoJSONFeature,
 } from '../../types/index.js';
+import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { DEFAULT_RESULTS_SLICE } from '../../types/index.js';
 
 export type ResultsSliceWithActions = ResultsSlice & ResultsActions;
@@ -26,7 +26,7 @@ export const createResultsSlice: StateCreator<
 > = (set, get) => ({
   ...DEFAULT_RESULTS_SLICE,
 
-  addResultLayers: (features: GeoJSONFeature[]) => {
+  addResultLayers: (features: RawGeoJSONFeature[]) => {
     set({ resultLayers: [...get().resultLayers, ...features] });
   },
 
