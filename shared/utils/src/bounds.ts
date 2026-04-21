@@ -15,8 +15,8 @@ export type { Bounds };
  *
  * Private to this module — it is **not** exported from `@debrief/utils`. Keeping
  * it private avoids committing to a third public feature type alongside
- * `GeoJSONFeature` and `SafeFeature`. Every in-tree feature type
- * (`GeoJSONFeature`, `SafeFeature`, `DebriefFeature` and its variants) is
+ * `RawGeoJSONFeature` and `SafeFeature`. Every in-tree feature type
+ * (`RawGeoJSONFeature`, `SafeFeature`, `DebriefFeature` and its variants) is
  * assignable to `ReadonlyArray<BoundsInputFeature>` via TypeScript's structural
  * subtyping — so no call site needs an `as`-cast.
  */

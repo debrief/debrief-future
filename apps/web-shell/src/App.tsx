@@ -69,7 +69,7 @@ import {
   type DisplayMode as StoreDisplayMode,
 } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
-import type { GeoJSONFeature } from '@debrief/utils';
+import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
@@ -976,7 +976,7 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+      store.getState().addResultLayers(allResultLayers as RawGeoJSONFeature[]);
 
       // Record last tool execution for single-step undo (#110)
       const resultIds = allResultLayers.map((layer, i) =>

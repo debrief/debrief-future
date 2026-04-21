@@ -22,6 +22,17 @@ from debrief_stac.types import (
 
 logger = logging.getLogger(__name__)
 
+# Null-geometry coercion note (#204 review 5-alt):
+# The companion shim in services/io/debrief_io/parser.py converts null
+# geometry to GeoJSONEmptyPoint at the REP-import boundary. We do NOT
+# repeat that coercion here because the STAC catalog legitimately accepts
+# null-geometry NarrativeEntry features (geometry is optional per schema)
+# and coercing them to {type:"Point", coordinates:[]} would violate the
+# NarrativeEntry schema's GeoJSONPoint range. Downstream consumers that
+# need a non-null geometry (e.g., mapPanel) either narrow via the
+# NarrativeEntry discriminator or apply the coercion at their own
+# ingress boundary.
+
 
 def add_features(
     catalog_path: CatalogPath,
