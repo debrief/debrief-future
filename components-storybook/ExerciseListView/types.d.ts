@@ -1,5 +1,5 @@
 import { CatalogOverviewItem, PlatformRecord } from '../filter-engine/types';
-import { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
+import { RawGeoJSONFeature as GeoJSONFeature, RawGeoJSONFeatureCollection as GeoJSONFeatureCollection } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { PlatformRecord };
 export type { GeoJSONFeature, GeoJSONFeatureCollection };
