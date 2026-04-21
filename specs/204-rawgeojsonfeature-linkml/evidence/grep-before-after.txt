@@ -1,0 +1,20 @@
+# Grep evidence — #204
+## SC-001 + SC-002 verification
+
+Command:
+  $ rg -nE "^(export\s+)?interface\s+GeoJSONFeature(Collection)?\b" shared/ services/ apps/
+
+### On main (pre-#204, example output):
+  shared/utils/src/types.ts:25:export interface GeoJSONFeature {
+  shared/utils/src/types.ts:38:export interface GeoJSONFeatureCollection {
+  services/session-state/src/types/results.ts:15:export interface GeoJSONFeature { // canonical — session-state-local runtime shape distinct from @debrief/schemas.GeoJSONFeature; follow-up to unify, #214 scope-adjacent
+
+### On PR branch (HEAD = 8c46bb9):
+(zero hits — SC-001 verified)
+
+## SC-002 for GeoJSONFeatureCollection
+(zero hits — SC-002 verified)
+
+## Python Any-alias (Article XV driver)
+services/stac/src/debrief_stac/types.py:30:GeoJSONFeature: TypeAlias = dict[str, Any]
+(see services/stac/src/debrief_stac/types.py — Any alias retained with ADR-021 deferral note; refactor tracked out of scope)
