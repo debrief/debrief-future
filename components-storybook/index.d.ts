@@ -114,4 +114,6 @@ export type { FieldSpec, FieldDerivationState, PropertiesFormField, PropertiesFo
 export { BrowserSelectionContext, BrowserSelectionProvider, useBrowserSelection, PropertiesSidePanel, } from './StacBrowser';
 export type { BrowserSelection, BrowserSelectionProviderProps, PropertiesSidePanelProps, } from './StacBrowser';
 export * from './storyboard';
+export { StoryboardPanel, SceneRow, SceneList } from './panels/StoryboardPanel';
+export type { StoryboardPanelProps, SceneRowViewModel, } from './panels/StoryboardPanel';
 //# sourceMappingURL=index.d.ts.map
