@@ -247,3 +247,6 @@ apps/web-shell/test-results/
 
 # Vite temp files
 vite.config.ts.timestamp-*
+
+# Type-audit scanner intermediate output (regenerated per run)
+tmp/

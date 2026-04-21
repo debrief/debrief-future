@@ -108,14 +108,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Run the scanner against the full repo and save the intermediate JSON to a local throwaway path (e.g. `tmp/type-audit.json`) — `.gitignore` the `tmp/` folder if not already ignored `tmp/type-audit.json`
-- [ ] T024 [US1] Validate `tmp/type-audit.json` against `contracts/scan-output.schema.json` with ajv-cli; abort if validation fails (spec SC-001 depends on trusting the scanner's output) `tmp/type-audit.json`
-- [ ] T025 [US1] Create the report scaffold with YAML front matter (`feature`, `epic`, `captured_at`, `git_sha`, `scanner_version`), an intro paragraph that back-links to `docs/ideas/E11-schema-first-boundary-typing.md`, and the six required section headings from data-model §6 `docs/type-audit-2026.md`
-- [ ] T026 [US1] Populate the Findings table — one row per record, sorted classification → package → file path. For each row, confirm or override the scanner's `autoTag` and assign one of the five final classifications (`schema-rooted`, `boundary-loose`, `single-domain`, `cross-domain-hand-typed`, `drift-candidate`). Author a one-line `summary` per row. Leave `recommendedAction` cells for Phase 4 where they need backlog IDs `docs/type-audit-2026.md`
-- [ ] T027 [P] [US1] For every `single-domain` row, author the `justification` column (spec data-model §3 validation rule) `docs/type-audit-2026.md`
-- [ ] T028 [P] [US1] Resolve every entry in `driftClusters` — each cluster becomes at least one `drift-candidate` finding, cross-referencing the sibling declarations `docs/type-audit-2026.md`
-- [ ] T029 [US1] Fill the Summary section with per-bucket counts (derive from the populated Findings table) — leave the "Newly opened backlog items" sub-list for Phase 4 `docs/type-audit-2026.md`
-- [ ] T030 [US1] Spot-check: pick 10 random TS declarations from in-scope paths and verify each appears in the Findings table (SC-001). Record the sample IDs in a commit message, not the report `docs/type-audit-2026.md`
+- [x] T023 [US1] Run the scanner against the full repo and save the intermediate JSON to a local throwaway path (e.g. `tmp/type-audit.json`) — `.gitignore` the `tmp/` folder if not already ignored `tmp/type-audit.json`
+- [x] T024 [US1] Validate `tmp/type-audit.json` against `contracts/scan-output.schema.json` with ajv-cli; abort if validation fails (spec SC-001 depends on trusting the scanner's output) `tmp/type-audit.json`
+- [x] T025 [US1] Create the report scaffold with YAML front matter (`feature`, `epic`, `captured_at`, `git_sha`, `scanner_version`), an intro paragraph that back-links to `docs/ideas/E11-schema-first-boundary-typing.md`, and the six required section headings from data-model §6 `docs/type-audit-2026.md`
+- [x] T026 [US1] Populate the Findings table — one row per record, sorted classification → package → file path. For each row, confirm or override the scanner's `autoTag` and assign one of the five final classifications (`schema-rooted`, `boundary-loose`, `single-domain`, `cross-domain-hand-typed`, `drift-candidate`). Author a one-line `summary` per row. Leave `recommendedAction` cells for Phase 4 where they need backlog IDs `docs/type-audit-2026.md`
+- [x] T027 [P] [US1] For every `single-domain` row, author the `justification` column (spec data-model §3 validation rule) `docs/type-audit-2026.md`
+- [x] T028 [P] [US1] Resolve every entry in `driftClusters` — each cluster becomes at least one `drift-candidate` finding, cross-referencing the sibling declarations `docs/type-audit-2026.md`
+- [x] T029 [US1] Fill the Summary section with per-bucket counts (derive from the populated Findings table) — leave the "Newly opened backlog items" sub-list for Phase 4 `docs/type-audit-2026.md`
+- [x] T030 [US1] Spot-check: pick 10 random TS declarations from in-scope paths and verify each appears in the Findings table (SC-001). Record the sample IDs in a commit message, not the report `docs/type-audit-2026.md`
 
 **Checkpoint**: The report's Findings table is complete and internally consistent; every record is classified. Phase 4 can fill in backlog linkage.
 
