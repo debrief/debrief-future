@@ -45,6 +45,11 @@ import { plotFromFeatures } from './plotFromFeatures';
 
 export interface PlaybackMapPanel {
   getCurrentFeatures(): DebriefFeature[];
+  /** Push a new feature set back into the MapPanel after a #215 CRUD op
+   *  (Feature 217 Phase 4). The subsequent `onFeaturesChanged` fires the
+   *  normal recompute path; the service also re-seeds its own state
+   *  directly from the `result.plot` to avoid racing the event loop. */
+  setFeatures(features: readonly DebriefFeature[]): void;
   flyToViewport(viewport: SceneFeature['properties']['viewport'], durationMs: number): number;
   setSceneRectangles(
     scenes: ReadonlyArray<SceneFeature> | null,
@@ -382,12 +387,16 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      // In production the extension host pushes result.plot.features back
-      // into MapPanel; that push triggers onPlotFeaturesChanged which
-      // recomputes sceneOrder. Here we also update activeStoryboardId so
-      // the new storyboard becomes the selected one.
+      // Push the new feature set back into MapPanel (the canonical
+      // source of truth). The subsequent onFeaturesChanged recomputes
+      // the panel / rectangles; we also update activeStoryboardId
+      // here so the new Storyboard becomes the selected one.
+      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
       state.activeStoryboardId = result.storyboard.properties.id;
       this.recomputeSceneOrder(state, result.plot);
+      this.applyScrubbableRange(state, result.plot);
+      this.updateStoryboardActiveContext(state);
+      this.pushSceneRectangles(state, result.plot);
       this.emitSnapshot(state, result.plot);
     } catch (err) {
       this.showErrorMessage(err instanceof Error ? err.message : String(err));
@@ -404,13 +413,14 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (state.transitionId !== null) return;
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     try {
-      await crudRenameStoryboard(plot, {
+      const result = await crudRenameStoryboard(plot, {
         storyboardId,
         newName,
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      this.emitSnapshot(state, plot);
+      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
+      this.emitSnapshot(state, result.plot);
     } catch (err) {
       this.showErrorMessage(err instanceof Error ? err.message : String(err));
     }
@@ -425,18 +435,21 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (state.transitionId !== null) return;
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
     try {
-      await crudDeleteStoryboard(plot, {
+      const result = await crudDeleteStoryboard(plot, {
         storyboardId,
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
+      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
       if (state.activeStoryboardId === storyboardId) {
-        const fallback = getMostRecentlyModifiedStoryboard(plot);
+        const fallback = getMostRecentlyModifiedStoryboard(result.plot);
         state.activeStoryboardId = fallback?.properties.id ?? null;
       }
-      this.recomputeSceneOrder(state, plot);
+      this.recomputeSceneOrder(state, result.plot);
+      this.applyScrubbableRange(state, result.plot);
       this.updateStoryboardActiveContext(state);
-      this.emitSnapshot(state, plot);
+      this.pushSceneRectangles(state, result.plot);
+      this.emitSnapshot(state, result.plot);
     } catch (err) {
       this.showErrorMessage(err instanceof Error ? err.message : String(err));
     }

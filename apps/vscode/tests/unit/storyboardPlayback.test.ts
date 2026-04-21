@@ -114,6 +114,7 @@ interface Harness {
   setSceneRectanglesSpy: ReturnType<typeof vi.fn>;
   flyToViewportSpy: ReturnType<typeof vi.fn>;
   setScrubbableRangeSpy: ReturnType<typeof vi.fn>;
+  setFeaturesSpy: ReturnType<typeof vi.fn>;
   applySnapshotSpy: ReturnType<typeof vi.fn>;
   showInformationMessageSpy: ReturnType<typeof vi.fn>;
   showErrorMessageSpy: ReturnType<typeof vi.fn>;
@@ -144,6 +145,12 @@ function makeHarness(options: {
 
   const setSceneRectanglesSpy = vi.fn();
   const setScrubbableRangeSpy = vi.fn();
+  const setFeaturesSpy = vi.fn((next: readonly DebriefFeature[]) => {
+    // Test convenience: route setFeatures back through the same
+    // features buffer that getCurrentFeatures returns, so that after a
+    // CRUD op pushes the new feature set, subsequent reads see it.
+    features = [...next];
+  });
   const applySnapshotSpy = vi.fn();
   const setCurrentTimeSpy = vi.fn();
 
@@ -154,6 +161,7 @@ function makeHarness(options: {
 
   const mapPanel: PlaybackMapPanel = {
     getCurrentFeatures: () => features.slice(),
+    setFeatures: setFeaturesSpy,
     flyToViewport: flyToViewportSpy,
     setSceneRectangles: setSceneRectanglesSpy,
     onFlyToComplete: onFlyToCompleteEmitter.event,
@@ -230,6 +238,7 @@ function makeHarness(options: {
     setSceneRectanglesSpy,
     flyToViewportSpy,
     setScrubbableRangeSpy,
+    setFeaturesSpy,
     applySnapshotSpy,
     showInformationMessageSpy,
     showErrorMessageSpy,
@@ -560,9 +569,11 @@ describe('StoryboardPlaybackService — CRUD-during-flight guard (R9)', () => {
       scene('s1', 'sb-A', '2026-04-20T14:00:00Z'),
       scene('s2', 'sb-A', '2026-04-20T14:05:00Z'),
     ] as unknown as DebriefFeature[];
-    const h = makeHarness({ features });
+    // Permissive timeRange so forward() transitions instead of hard-blocking.
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
     h.service.onPlotOpened(DOC);
     await h.service.forward(DOC);
+    expect(h.service.getSnapshot(DOC).transport.transitionInFlight).toBe(true);
 
     const before = h.service.getSnapshot(DOC).storyboards.length;
     await h.service.createStoryboard(DOC, 'NewName');
@@ -575,9 +586,10 @@ describe('StoryboardPlaybackService — CRUD-during-flight guard (R9)', () => {
       scene('s1', 'sb-A', '2026-04-20T14:00:00Z'),
       scene('s2', 'sb-A', '2026-04-20T14:05:00Z'),
     ] as unknown as DebriefFeature[];
-    const h = makeHarness({ features });
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
     h.service.onPlotOpened(DOC);
     await h.service.forward(DOC);
+    expect(h.service.getSnapshot(DOC).transport.transitionInFlight).toBe(true);
     const before = h.service.getSnapshot(DOC).storyboards[0]!.name;
     await h.service.renameStoryboard(DOC, 'sb-A', 'Renamed');
     expect(h.service.getSnapshot(DOC).storyboards[0]!.name).toBe(before);
@@ -590,9 +602,10 @@ describe('StoryboardPlaybackService — CRUD-during-flight guard (R9)', () => {
       scene('s1', 'sb-A', '2026-04-20T14:00:00Z'),
       scene('s2', 'sb-A', '2026-04-20T14:05:00Z'),
     ] as unknown as DebriefFeature[];
-    const h = makeHarness({ features });
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
     h.service.onPlotOpened(DOC);
     await h.service.forward(DOC);
+    expect(h.service.getSnapshot(DOC).transport.transitionInFlight).toBe(true);
     const before = h.service.getSnapshot(DOC).storyboards.length;
     await h.service.deleteStoryboard(DOC, 'sb-B');
     expect(h.service.getSnapshot(DOC).storyboards.length).toBe(before);
@@ -617,5 +630,272 @@ describe('StoryboardPlaybackService — dispose', () => {
       (call) => call[0] === null && call[1] === null,
     );
     expect(nullCalls.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ─── Phase 4 / US2 — multi-Storyboard management (T420) ────────────────
+
+describe('StoryboardPlaybackService — setActiveStoryboard (T421)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('switches synchronously — snapshot updates before any await (SC-003)', () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T14:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T14:00:00Z'),
+      scene('scene-A1', 'sb-A', '2026-04-20T14:05:00Z'),
+      scene('scene-A2', 'sb-A', '2026-04-20T14:10:00Z'),
+      scene('scene-B1', 'sb-B', '2026-04-21T14:05:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    // sb-B is most recent → active
+    expect(h.service.getSnapshot(DOC).activeStoryboardId).toBe('sb-B');
+
+    h.service.setActiveStoryboard(DOC, 'sb-A');
+    // Synchronous — no await. Snapshot reflects new active id.
+    const snap = h.service.getSnapshot(DOC);
+    expect(snap.activeStoryboardId).toBe('sb-A');
+    expect(snap.currentSceneId).toBe('scene-A1'); // index reset to 0
+    expect(snap.scenes).toHaveLength(2);
+  });
+
+  it('recomputes sceneOrder + sets currentSceneIndex=0 on switch', () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T14:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T14:00:00Z'),
+      scene('a1', 'sb-A', '2026-04-20T14:05:00Z'),
+      scene('a2', 'sb-A', '2026-04-20T14:10:00Z'),
+      scene('b1', 'sb-B', '2026-04-21T14:05:00Z'),
+      scene('b2', 'sb-B', '2026-04-21T14:10:00Z'),
+      scene('b3', 'sb-B', '2026-04-21T14:15:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC); // sb-B active (3 scenes)
+    expect(h.service.getSnapshot(DOC).scenes).toHaveLength(3);
+
+    h.service.setActiveStoryboard(DOC, 'sb-A');
+    const snap = h.service.getSnapshot(DOC);
+    expect(snap.activeStoryboardId).toBe('sb-A');
+    expect(snap.scenes).toHaveLength(2);
+    expect(snap.transport.sceneNumber).toBe(1);
+  });
+
+  it('calls setScrubbableRange for the new Storyboard window on switch', () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T14:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T14:00:00Z'),
+      scene('a1', 'sb-A', '2026-04-20T14:05:00Z'),
+      scene('a2', 'sb-A', '2026-04-20T14:10:00Z'),
+      scene('b1', 'sb-B', '2026-04-21T14:05:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.setScrubbableRangeSpy.mockClear();
+    h.service.setActiveStoryboard(DOC, 'sb-A');
+    expect(h.setScrubbableRangeSpy).toHaveBeenCalled();
+    const [start, end] = h.setScrubbableRangeSpy.mock.calls[0]!;
+    expect(start).toBe(new Date('2026-04-20T14:05:00Z').getTime());
+    expect(end).toBe(new Date('2026-04-20T14:10:00Z').getTime());
+  });
+
+  it('setSceneRectangles is called with the new active Storyboard on switch', () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T14:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T14:00:00Z'),
+      scene('a1', 'sb-A', '2026-04-20T14:05:00Z'),
+      scene('b1', 'sb-B', '2026-04-21T14:05:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.setSceneRectanglesSpy.mockClear();
+    h.service.setActiveStoryboard(DOC, 'sb-A');
+    expect(h.setSceneRectanglesSpy).toHaveBeenCalled();
+    const lastCall =
+      h.setSceneRectanglesSpy.mock.calls[h.setSceneRectanglesSpy.mock.calls.length - 1]!;
+    expect(lastCall[1]).toBe('sb-A');
+  });
+});
+
+describe('StoryboardPlaybackService — createStoryboard (T422)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('delegates to #215 CRUD and pushes new features back via setFeatures', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.setFeaturesSpy.mockClear();
+
+    await h.service.createStoryboard(DOC, 'New Storyboard');
+
+    expect(h.setFeaturesSpy).toHaveBeenCalledTimes(1);
+    // The new Storyboard should appear in the snapshot.
+    const snap = h.service.getSnapshot(DOC);
+    const names = snap.storyboards.map((s) => s.name);
+    expect(names).toContain('New Storyboard');
+  });
+
+  it('sets the new Storyboard as active after create', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+
+    await h.service.createStoryboard(DOC, 'Freshly-made');
+
+    const snap = h.service.getSnapshot(DOC);
+    expect(snap.activeStoryboardName).toBe('Freshly-made');
+    // New Storyboard has no Scenes yet.
+    expect(snap.scenes).toHaveLength(0);
+  });
+
+  it('surfaces DuplicateStoryboardName via showErrorMessage (no state mutation)', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    const before = h.service.getSnapshot(DOC).storyboards.length;
+    h.setFeaturesSpy.mockClear();
+
+    await h.service.createStoryboard(DOC, 'Alpha'); // duplicate
+
+    expect(h.showErrorMessageSpy).toHaveBeenCalledTimes(1);
+    expect(h.setFeaturesSpy).not.toHaveBeenCalled();
+    expect(h.service.getSnapshot(DOC).storyboards.length).toBe(before);
+  });
+
+  it('rejects during in-flight transition (R9)', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('s1', 'sb-A', '2026-04-20T14:00:00Z'),
+      scene('s2', 'sb-A', '2026-04-20T14:05:00Z'),
+    ] as unknown as DebriefFeature[];
+    // Permissive timeRange so forward() transitions instead of hard-blocking.
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    await h.service.forward(DOC); // in-flight
+    expect(h.service.getSnapshot(DOC).transport.transitionInFlight).toBe(true);
+
+    h.setFeaturesSpy.mockClear();
+    await h.service.createStoryboard(DOC, 'Rejected');
+    expect(h.setFeaturesSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('StoryboardPlaybackService — renameStoryboard (T423)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('delegates to #215 CRUD and pushes new features back', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.setFeaturesSpy.mockClear();
+
+    await h.service.renameStoryboard(DOC, 'sb-A', 'Renamed');
+
+    expect(h.setFeaturesSpy).toHaveBeenCalledTimes(1);
+    expect(h.service.getSnapshot(DOC).storyboards[0]!.name).toBe('Renamed');
+  });
+
+  it('surfaces UnknownStoryboard via showErrorMessage (no state mutation)', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.setFeaturesSpy.mockClear();
+
+    await h.service.renameStoryboard(DOC, 'sb-DOES-NOT-EXIST', 'NewName');
+
+    expect(h.showErrorMessageSpy).toHaveBeenCalledTimes(1);
+    expect(h.setFeaturesSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('StoryboardPlaybackService — deleteStoryboard (T424)', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('delegates to cascading #215 CRUD and pushes new features back', async () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T10:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T10:00:00Z'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+      scene('b1', 'sb-B', '2026-04-21T14:00:00Z'),
+      scene('b2', 'sb-B', '2026-04-21T14:05:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC); // sb-B active
+    h.setFeaturesSpy.mockClear();
+
+    await h.service.deleteStoryboard(DOC, 'sb-B');
+
+    expect(h.setFeaturesSpy).toHaveBeenCalledTimes(1);
+    const snap = h.service.getSnapshot(DOC);
+    expect(snap.storyboards.map((s) => s.storyboardId)).toEqual(['sb-A']);
+  });
+
+  it('re-seeds active via getMostRecentlyModifiedStoryboard when active was deleted', async () => {
+    const features = [
+      sb('sb-A', 'Alpha', '2026-04-20T10:00:00Z'),
+      sb('sb-B', 'Bravo', '2026-04-21T10:00:00Z'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+      scene('b1', 'sb-B', '2026-04-21T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC); // sb-B active
+
+    await h.service.deleteStoryboard(DOC, 'sb-B');
+
+    expect(h.service.getSnapshot(DOC).activeStoryboardId).toBe('sb-A');
+  });
+
+  it('clears storyboardActive context and scrubbable override when no Storyboards remain', async () => {
+    const features = [
+      sb('sb-A', 'Alpha'),
+      scene('a1', 'sb-A', '2026-04-20T14:00:00Z'),
+    ] as unknown as DebriefFeature[];
+    const h = makeHarness({ features, timeRange: { start: 0, end: 10e12 } });
+    h.service.onPlotOpened(DOC);
+    h.executeSetContextSpy.mockClear();
+    h.setScrubbableRangeSpy.mockClear();
+
+    await h.service.deleteStoryboard(DOC, 'sb-A');
+
+    expect(h.executeSetContextSpy).toHaveBeenCalledWith(
+      'debrief.storyboardActive',
+      false,
+    );
+    // Scrubbable override cleared (start/end both null).
+    const nullCalls = h.setScrubbableRangeSpy.mock.calls.filter(
+      (call) => call[0] === null && call[1] === null,
+    );
+    expect(nullCalls.length).toBeGreaterThanOrEqual(1);
+    expect(h.service.getSnapshot(DOC).activeStoryboardId).toBeNull();
   });
 });

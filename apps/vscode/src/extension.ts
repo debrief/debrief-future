@@ -175,6 +175,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Mini-adapter so the service sees only the surface it needs from MapPanel.
   const playbackMapPanel: PlaybackMapPanel = {
     getCurrentFeatures: (): DebriefFeature[] => mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => mapPanel?.setFeatures?.([...features]),
     flyToViewport: (viewport, durationMs): number =>
       mapPanel?.flyToViewport?.(viewport, durationMs) ?? -1,
     setSceneRectangles: (scenes, activeId, currentId): void =>
