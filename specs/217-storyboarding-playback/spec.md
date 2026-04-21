@@ -161,8 +161,11 @@ Storyboard is chosen on re-open.
 - **FR-PLAY-002**: The active Storyboard selection MUST be ephemeral
   (not persisted to disk). On plot open, System MUST default the
   active selection to the Storyboard with the most recent
-  `last_modified_at` (via #215's `getActiveStoryboardDefault`); if no
-  Storyboards exist, the panel MUST show an empty state.
+  `last_modified_at` (via `getMostRecentlyModifiedStoryboard` — a
+  new pure query added to #215's queries module by this slice; the
+  existing `getActiveStoryboardDefault` returns "first by name
+  ascending" and is NOT the correct helper); if no Storyboards
+  exist, the panel MUST show an empty state.
 - **FR-PLAY-003**: Changing the dropdown selection MUST update the
   Scene list, the playback transport state, and the on-map Scene
   rectangles within the same user interaction (no visible stale state
@@ -393,9 +396,11 @@ and #218 (edit suite).
 
 ## Dependencies
 
-- **#215 (Schema + CRUD core)** (hard) — Scene ordering,
-  `getActiveStoryboardDefault`, cascading `deleteStoryboard`,
-  `detectMissingDataForScene`.
+- **#215 (Schema + CRUD core)** (hard) — Scene ordering, cascading
+  `deleteStoryboard`, `detectMissingDataForScene`, `validatePlot`.
+  This slice also adds a new `getMostRecentlyModifiedStoryboard`
+  query to #215's queries module (for FR-PLAY-002's default active
+  selection — see plan.md R7).
 - **#216 (Capture)** (hard in practice) — without capture, no Scenes
   exist to play back. Playback can still be tested against fixture
   data without #216 present.
