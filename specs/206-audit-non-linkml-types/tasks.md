@@ -53,12 +53,12 @@
 
 **Purpose**: Create the scanner's folder skeleton and make `typescript` available to the scanner at repo-root level.
 
-- [ ] T001 Create scanner folder structure with a README explaining purpose, CLI flags, and invocation `scripts/audits/type-audit/README.md`
-- [ ] T002 [P] Add a minimal `tsconfig.json` for the scanner that targets Node 20 + ESM and enables `strict: true` `scripts/audits/type-audit/tsconfig.json`
-- [ ] T003 Add `typescript` (^5.x) to the repo-root `devDependencies` so the scanner does not need to piggy-back on a workspace install `package.json`
-- [ ] T004 [P] Add `vitest` + `ajv` to the repo-root `devDependencies` for scanner unit tests and schema-contract validation `package.json`
-- [ ] T005 [P] Create fixtures directory with ~10 hand-crafted `.ts` files covering each of: exported interface, non-exported interface, type alias, enum, alias bottoming out in `Record<string, unknown>`, drift pair (same name different shape across two files), schema-rooted re-export, and an excluded test-local declaration `scripts/audits/type-audit/__tests__/fixtures/`
-- [ ] T006 Run `pnpm install` at the repo root to materialise the new devDependencies `package.json`
+- [x] T001 Create scanner folder structure with a README explaining purpose, CLI flags, and invocation `scripts/audits/type-audit/README.md`
+- [x] T002 [P] Add a minimal `tsconfig.json` for the scanner that targets Node 20 + ESM and enables `strict: true` `scripts/audits/type-audit/tsconfig.json`
+- [x] T003 Add `typescript` (^5.x) to the repo-root `devDependencies` so the scanner does not need to piggy-back on a workspace install `package.json`
+- [x] T004 [P] Add `vitest` + `ajv` to the repo-root `devDependencies` for scanner unit tests and schema-contract validation `package.json`
+- [x] T005 [P] Create fixtures directory with ~10 hand-crafted `.ts` files covering each of: exported interface, non-exported interface, type alias, enum, alias bottoming out in `Record<string, unknown>`, drift pair (same name different shape across two files), schema-rooted re-export, and an excluded test-local declaration `scripts/audits/type-audit/__tests__/fixtures/`
+- [x] T006 Run `pnpm install` at the repo root to materialise the new devDependencies `package.json`
 
 **Checkpoint**: Scanner folder exists, TypeScript compiler available at root, fixtures in place. Phase 2 can begin.
 
