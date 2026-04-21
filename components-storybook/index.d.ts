@@ -113,4 +113,5 @@ export { PropertiesForm, ArrayWidget, BboxWidget, DateTimeWidget, PlatformArrayW
 export type { FieldSpec, FieldDerivationState, PropertiesFormField, PropertiesFormProps, } from './PropertiesPanel';
 export { BrowserSelectionContext, BrowserSelectionProvider, useBrowserSelection, PropertiesSidePanel, } from './StacBrowser';
 export type { BrowserSelection, BrowserSelectionProviderProps, PropertiesSidePanelProps, } from './StacBrowser';
+export * from './storyboard';
 //# sourceMappingURL=index.d.ts.map
