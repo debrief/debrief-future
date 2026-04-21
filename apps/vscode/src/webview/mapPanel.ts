@@ -558,6 +558,41 @@ export class MapPanel {
   }
 
   /**
+   * Get a defensive shallow copy of the current in-memory feature list.
+   *
+   * Used by capture (#216) to wrap features into a throwaway FeatureCollection
+   * at the #215 CRUD boundary without giving callers a live handle to the
+   * private field.
+   */
+  public getCurrentFeatures(): DebriefFeature[] {
+    return this.currentFeatures.slice();
+  }
+
+  /**
+   * Replace the in-memory feature list and re-post a loadPlot-style update
+   * so `<mapView>` rerenders. Preserves `currentPlot` (STAC metadata) intact.
+   *
+   * Used by capture (#216) to push the #215 CRUD-returned FeatureCollection
+   * features back into the webview after a Storyboard / Scene create.
+   */
+  public setFeatures(features: DebriefFeature[]): void {
+    this.currentFeatures = features.slice();
+    if (this.currentPlot === null) {
+      return;
+    }
+    this.postMessage({
+      type: 'loadPlot',
+      plot: {
+        id: this.currentPlot.id,
+        title: this.currentPlot.title,
+        features: this.currentFeatures,
+        bbox: this.currentPlot.bbox,
+        timeExtent: this.currentPlot.timeExtent,
+      },
+    });
+  }
+
+  /**
    * Get the feature kind for a feature ID (Feature: 038).
    *
    * Looks up the 'kind' property of features from the current plot data

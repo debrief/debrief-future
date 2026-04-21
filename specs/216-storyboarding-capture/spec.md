@@ -2,7 +2,7 @@
 
 **Feature Branch**: `216-storyboarding-capture`
 **Created**: 2026-04-20
-**Status**: Draft — ready for quality-checklist validation
+**Status**: Complete (2026-04-21)
 **Parent Epic**: #024 Storyboarding Briefings — [idea doc](../../docs/ideas/017-storyboarding-briefings.md)
 **Sibling Specs**: #215 (schema + CRUD core), #216 (this), #217 (panel + playback), #218 (edit suite + housekeeping)
 **Input**: Second of four sibling specs splitting epic #024. This slice delivers the capture flow — the first user-visible slice.
