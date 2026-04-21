@@ -9,6 +9,8 @@ export { TransportRow } from './TransportRow';
 export type { TransportRowProps } from './TransportRow';
 export { HardBlockModal } from './HardBlockModal';
 export type { HardBlockModalProps } from './HardBlockModal';
+export { StoryboardHeader } from './StoryboardHeader';
+export type { StoryboardHeaderProps } from './StoryboardHeader';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,

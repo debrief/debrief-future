@@ -342,11 +342,21 @@ export type {
 export * from './storyboard';
 
 // Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback)
-export { StoryboardPanel, SceneRow, SceneList } from './panels/StoryboardPanel';
+export {
+  StoryboardPanel,
+  SceneRow,
+  SceneList,
+  TransportRow,
+  HardBlockModal,
+  StoryboardHeader,
+} from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
   StoryboardOptionViewModel,
   TransportViewModel,
   MissingDataReason,
+  TransportRowProps,
+  HardBlockModalProps,
+  StoryboardHeaderProps,
 } from './panels/StoryboardPanel';
