@@ -492,31 +492,26 @@ def generate_typescript() -> bool:
         raw_feature_start = content.find("export interface RawGeoJSONFeature {\n")
         if raw_feature_start == -1:
             raise RuntimeError(
-                "generate.py: gen-typescript did not emit "
-                "`export interface RawGeoJSONFeature`."
+                "generate.py: gen-typescript did not emit `export interface RawGeoJSONFeature`."
             )
         raw_feature_end = content.index("}\n", raw_feature_start) + 2
         raw_feature_block = content[raw_feature_start:raw_feature_end]
         # 1) discriminated type literal
-        new_block = raw_feature_block.replace(
-            '    type: string,\n', '    type: "Feature",\n', 1
-        )
+        new_block = raw_feature_block.replace("    type: string,\n", '    type: "Feature",\n', 1)
         # 2) id union
-        new_block = new_block.replace(
-            '    id?: string,\n', '    id?: string | number,\n', 1
-        )
+        new_block = new_block.replace("    id?: string,\n", "    id?: string | number,\n", 1)
         # 3) geometry union
         new_block = new_block.replace(
-            '    geometry: string,\n',
-            '    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | '
-            'GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | '
-            'GeoJSONMultiPolygon,\n',
+            "    geometry: string,\n",
+            "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+            "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
+            "GeoJSONMultiPolygon,\n",
             1,
         )
         # 4) free-form properties
         new_block = new_block.replace(
-            '    properties?: Any,\n',
-            '    properties?: Record<string, unknown> | null,\n',
+            "    properties?: Any,\n",
+            "    properties?: Record<string, unknown> | null,\n",
             1,
         )
         if new_block == raw_feature_block:
@@ -531,11 +526,11 @@ def generate_typescript() -> bool:
         # RawGeoJSONFeatureCollection.type — literal narrowing.
         content = content.replace(
             "export interface RawGeoJSONFeatureCollection {\n"
-            "    /** GeoJSON object type — always \"FeatureCollection\". */\n"
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
             "    type: string,",
             "export interface RawGeoJSONFeatureCollection {\n"
-            "    /** GeoJSON object type — always \"FeatureCollection\". */\n"
-            "    type: \"FeatureCollection\",",
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
+            '    type: "FeatureCollection",',
         )
 
         # Drop the empty `export interface Any {}` stub — it's the LinkML

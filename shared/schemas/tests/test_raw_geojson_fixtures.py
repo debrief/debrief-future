@@ -146,10 +146,9 @@ class TestPerformance:
         RawGeoJSONFeatureCollection.model_validate(collection)
         elapsed = time.perf_counter() - start
 
-        print(f"\nValidated {self.N} features in {elapsed*1000:.1f} ms")
+        print(f"\nValidated {self.N} features in {elapsed * 1000:.1f} ms")
         assert elapsed < self.BUDGET_SECONDS, (
-            f"10 000-feature validation took {elapsed:.2f}s, exceeds "
-            f"{self.BUDGET_SECONDS}s budget"
+            f"10 000-feature validation took {elapsed:.2f}s, exceeds {self.BUDGET_SECONDS}s budget"
         )
 
 

@@ -61,9 +61,7 @@ class TestCoerceNullGeometry:
             ("MultiPoint", [[0, 0], [1, 1]]),
         ],
     )
-    def test_various_valid_geometries_preserved(
-        self, geom_type: str, coords: list
-    ) -> None:
+    def test_various_valid_geometries_preserved(self, geom_type: str, coords: list) -> None:
         feature: dict[str, object] = {
             "type": "Feature",
             "geometry": {"type": geom_type, "coordinates": coords},
