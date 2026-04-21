@@ -127,6 +127,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: MultiPoint
@@ -190,6 +192,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: MultiPoint

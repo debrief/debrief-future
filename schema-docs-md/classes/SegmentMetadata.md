@@ -224,6 +224,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
   style:
     name: style
     description: Per-segment line styling override
@@ -404,6 +405,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
   style:
     name: style

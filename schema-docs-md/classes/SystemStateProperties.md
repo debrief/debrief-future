@@ -164,6 +164,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: SYSTEM
@@ -215,6 +217,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - ViewportPolygon
+    - Viewport
     range: float
   center:
     name: center
@@ -224,6 +227,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - CircleAnnotationProperties
+    - Viewport
     range: float
     multivalued: true
   selected_ids:
@@ -281,6 +285,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: SYSTEM
@@ -342,6 +348,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - ViewportPolygon
+    - Viewport
     range: float
   center:
     name: center
@@ -353,6 +360,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - CircleAnnotationProperties
+    - Viewport
     range: float
     multivalued: true
   selected_ids:

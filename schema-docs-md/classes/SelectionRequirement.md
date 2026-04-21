@@ -135,6 +135,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: true
   segment_type:
@@ -207,6 +209,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: true
   segment_type:

@@ -169,6 +169,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: POLY
@@ -276,6 +278,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: POLY

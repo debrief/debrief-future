@@ -158,6 +158,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   title:
@@ -168,6 +172,7 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - DatasetEntry
+    - SceneProperties
     range: string
     required: true
   datetime:
@@ -318,6 +323,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   title:
@@ -330,6 +339,7 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - DatasetEntry
+    - SceneProperties
     range: string
     required: true
   datetime:

@@ -145,6 +145,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: Feature
@@ -170,6 +172,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     required: true
   geometry:
     name: geometry
@@ -190,6 +196,8 @@ attributes:
     - VectorAnnotation
     - PolyAnnotation
     - GeoJSONFeature
+    - StoryboardFeature
+    - SceneFeature
     range: GeoJSONPoint
   properties:
     name: properties
@@ -209,6 +217,8 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StoryboardFeature
+    - SceneFeature
     range: NarrativeEntryProperties
     required: true
 
@@ -257,6 +267,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: Feature
@@ -284,6 +296,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   geometry:
@@ -307,6 +323,8 @@ attributes:
     - VectorAnnotation
     - PolyAnnotation
     - GeoJSONFeature
+    - StoryboardFeature
+    - SceneFeature
     range: GeoJSONPoint
   properties:
     name: properties
@@ -328,6 +346,8 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StoryboardFeature
+    - SceneFeature
     range: NarrativeEntryProperties
     required: true
 

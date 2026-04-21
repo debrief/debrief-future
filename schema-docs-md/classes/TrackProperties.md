@@ -286,6 +286,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: TRACK
@@ -539,6 +541,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: TRACK

@@ -126,6 +126,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: MultiLineString
@@ -189,6 +191,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: MultiLineString

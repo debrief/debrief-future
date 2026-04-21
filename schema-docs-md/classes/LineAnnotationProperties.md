@@ -163,6 +163,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: LINE
@@ -252,6 +254,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: LINE

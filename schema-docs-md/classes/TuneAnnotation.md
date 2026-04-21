@@ -112,6 +112,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   parameter:
@@ -165,6 +166,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   parameter:

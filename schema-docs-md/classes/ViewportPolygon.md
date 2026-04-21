@@ -122,6 +122,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - ViewportPolygon
+    - Viewport
     range: float
     required: false
 
@@ -166,6 +167,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - ViewportPolygon
+    - Viewport
     range: float
     required: false
 

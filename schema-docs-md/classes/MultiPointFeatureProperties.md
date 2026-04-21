@@ -169,6 +169,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: MULTI_POINT
@@ -238,6 +240,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
 
 ```
 </details>
@@ -273,6 +277,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: MULTI_POINT
@@ -354,6 +360,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
   tags:
     name: tags

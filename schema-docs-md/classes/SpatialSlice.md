@@ -113,6 +113,7 @@ attributes:
     rank: 1000
     domain_of:
     - SpatialSlice
+    - SceneProperties
     range: ViewportPolygon
   rotation:
     name: rotation
@@ -146,6 +147,7 @@ attributes:
     owner: SpatialSlice
     domain_of:
     - SpatialSlice
+    - SceneProperties
     range: ViewportPolygon
   rotation:
     name: rotation

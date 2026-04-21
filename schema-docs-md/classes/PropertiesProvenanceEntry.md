@@ -139,6 +139,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: string
     required: true
   tool:
@@ -239,6 +240,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: string
     required: true
   tool:

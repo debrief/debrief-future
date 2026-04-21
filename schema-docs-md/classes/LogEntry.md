@@ -22,6 +22,8 @@ URI: [debrief:class/LogEntry](https://debrief.info/schemas/class/LogEntry)
     click LogEntry href "../../classes/LogEntry/"
       LogEntry : activity_id
         
+      LogEntry : agent
+        
       LogEntry : disabled
         
       LogEntry : execution_duration
@@ -93,6 +95,7 @@ URI: [debrief:class/LogEntry](https://debrief.info/schemas/class/LogEntry)
 | [input_state](../slots/input_state.md) | * <br/> [InputFeatureState](../classes/InputFeatureState.md) | Pre-operation feature states for coordinate-mutating tools | direct |
 | [disabled](../slots/disabled.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this entry is skipped during replay | direct |
 | [rationale](../slots/rationale.md) | 0..1 <br/> [String](../types/String.md) | Free-text analyst annotation explaining the reasoning for this operation | direct |
+| [agent](../slots/agent.md) | 0..1 <br/> [String](../types/String.md) | Human actor (e | direct |
 
 
 
@@ -115,6 +118,8 @@ URI: [debrief:class/LogEntry](https://debrief.info/schemas/class/LogEntry)
 | [TextAnnotationProperties](../classes/TextAnnotationProperties.md) | [provenance](../slots/provenance.md) | range | [LogEntry](../classes/LogEntry.md) |
 | [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md) | [provenance](../slots/provenance.md) | range | [LogEntry](../classes/LogEntry.md) |
 | [PolyAnnotationProperties](../classes/PolyAnnotationProperties.md) | [provenance](../slots/provenance.md) | range | [LogEntry](../classes/LogEntry.md) |
+| [StoryboardProperties](../classes/StoryboardProperties.md) | [provenance](../slots/provenance.md) | range | [LogEntry](../classes/LogEntry.md) |
+| [SceneProperties](../classes/SceneProperties.md) | [provenance](../slots/provenance.md) | range | [LogEntry](../classes/LogEntry.md) |
 
 
 
@@ -187,6 +192,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   was_generated_by:
@@ -284,6 +290,17 @@ attributes:
     - LogEntry
     range: string
     required: false
+  agent:
+    name: agent
+    description: 'Human actor (e.g. analyst username) who triggered the operation.
+      Added by #215 for Storyboarding CRUD provenance; optional and useful to any
+      tool emitting LogEntry records.'
+    from_schema: https://debrief.info/schemas/log-entry
+    rank: 1000
+    domain_of:
+    - LogEntry
+    range: string
+    required: false
 
 ```
 </details>
@@ -325,6 +342,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   was_generated_by:
@@ -435,6 +453,19 @@ attributes:
     from_schema: https://debrief.info/schemas/log-entry
     rank: 1000
     alias: rationale
+    owner: LogEntry
+    domain_of:
+    - LogEntry
+    range: string
+    required: false
+  agent:
+    name: agent
+    description: 'Human actor (e.g. analyst username) who triggered the operation.
+      Added by #215 for Storyboarding CRUD provenance; optional and useful to any
+      tool emitting LogEntry records.'
+    from_schema: https://debrief.info/schemas/log-entry
+    rank: 1000
+    alias: agent
     owner: LogEntry
     domain_of:
     - LogEntry

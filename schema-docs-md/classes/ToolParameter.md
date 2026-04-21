@@ -127,6 +127,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   type:
@@ -159,6 +160,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   description:
@@ -172,6 +175,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: true
   required:
@@ -234,6 +239,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   type:
@@ -268,6 +274,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   description:
@@ -283,6 +291,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: true
   required:

@@ -51,6 +51,8 @@ URI: [debrief:class/GeoJSONPolygon](https://debrief.info/schemas/class/GeoJSONPo
 | [CircleAnnotation](../classes/CircleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [RectangleAnnotation](../classes/RectangleAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 | [PolyAnnotation](../classes/PolyAnnotation.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
+| [StoryboardFeature](../classes/StoryboardFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
+| [SceneFeature](../classes/SceneFeature.md) | [geometry](../slots/geometry.md) | range | [GeoJSONPolygon](../classes/GeoJSONPolygon.md) |
 
 
 
@@ -128,6 +130,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: Polygon
@@ -191,6 +195,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
     equals_string: Polygon

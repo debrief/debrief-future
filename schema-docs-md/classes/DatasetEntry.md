@@ -162,6 +162,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   title:
@@ -172,6 +174,7 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - DatasetEntry
+    - SceneProperties
     range: string
     required: true
   metadata:
@@ -263,6 +266,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   title:
@@ -275,6 +280,7 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - DatasetEntry
+    - SceneProperties
     range: string
     required: true
   metadata:

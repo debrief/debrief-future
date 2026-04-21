@@ -196,6 +196,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: POINT
@@ -214,6 +216,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     required: true
   location_type:
     name: location_type
@@ -236,6 +239,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
   symbol:
     name: symbol
     description: Map symbol identifier
@@ -334,6 +339,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: POINT
@@ -354,6 +361,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   location_type:
@@ -381,6 +389,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
   symbol:
     name: symbol

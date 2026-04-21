@@ -127,6 +127,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   data_points:
@@ -179,6 +180,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   data_points:

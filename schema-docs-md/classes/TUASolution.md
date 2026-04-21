@@ -182,6 +182,7 @@ attributes:
     - SensorContact
     - TUASolution
     - VectorAnnotationProperties
+    - Viewport
     range: float
     minimum_value: 0
     maximum_value: 360
@@ -331,6 +332,7 @@ attributes:
     - SensorContact
     - TUASolution
     - VectorAnnotationProperties
+    - Viewport
     range: float
     minimum_value: 0
     maximum_value: 360

@@ -172,6 +172,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: VECTOR
@@ -206,6 +208,7 @@ attributes:
     - SensorContact
     - TUASolution
     - VectorAnnotationProperties
+    - Viewport
     range: float
     required: true
     minimum_value: 0
@@ -296,6 +299,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: VECTOR
@@ -336,6 +341,7 @@ attributes:
     - SensorContact
     - TUASolution
     - VectorAnnotationProperties
+    - Viewport
     range: float
     required: true
     minimum_value: 0

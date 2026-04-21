@@ -124,6 +124,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     required: true
   host_track_name:
     name: host_track_name
@@ -175,6 +176,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   host_track_name:

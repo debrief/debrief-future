@@ -26,6 +26,8 @@ URI: [debrief:enum/FeatureKindEnum](https://debrief.info/schemas/enum/FeatureKin
 | MULTI_POINT | None | Multi-point tool result (MultiPoint geometry) |
 | MULTI_POLYGON | None | Multi-polygon tool result (MultiPolygon geometry) |
 | SYSTEM_RECORD | None | Plot-level system record (snapshot chain, branches) |
+| STORYBOARD | None | Storyboard parent feature (panel-only entity, Polygon hull over child Scene v... |
+| STORYBOARD_SCENE | None | Storyboard Scene feature (Polygon viewport bounds, captured moment in a Story... |
 
 
 
@@ -105,6 +107,14 @@ permissible_values:
   SYSTEM_RECORD:
     text: SYSTEM_RECORD
     description: Plot-level system record (snapshot chain, branches)
+  STORYBOARD:
+    text: STORYBOARD
+    description: Storyboard parent feature (panel-only entity, Polygon hull over child
+      Scene viewports)
+  STORYBOARD_SCENE:
+    text: STORYBOARD_SCENE
+    description: Storyboard Scene feature (Polygon viewport bounds, captured moment
+      in a Storyboard)
 
 ```
 </details>

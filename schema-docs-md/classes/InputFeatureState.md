@@ -134,6 +134,8 @@ attributes:
     - VectorAnnotation
     - PolyAnnotation
     - GeoJSONFeature
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   properties:
@@ -158,6 +160,8 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: false
 
@@ -211,6 +215,8 @@ attributes:
     - VectorAnnotation
     - PolyAnnotation
     - GeoJSONFeature
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   properties:
@@ -237,6 +243,8 @@ attributes:
     - TextAnnotation
     - VectorAnnotation
     - PolyAnnotation
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: false
 

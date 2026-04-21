@@ -140,6 +140,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: TimeInstant
     required: true
 
@@ -192,6 +193,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: TimeInstant
     required: true
 

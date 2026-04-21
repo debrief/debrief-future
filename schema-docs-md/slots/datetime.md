@@ -51,6 +51,7 @@ Alias: datetime
 | [BranchRecord](../classes/BranchRecord.md) | [branched_at](../slots/branched_at.md) | range | [datetime](../slots/datetime.md) |
 | [BranchOrigin](../classes/BranchOrigin.md) | [branched_at](../slots/branched_at.md) | range | [datetime](../slots/datetime.md) |
 | [FileProvEntry](../classes/FileProvEntry.md) | [timestamp](../slots/timestamp.md) | range | [datetime](../slots/datetime.md) |
+| [SceneProperties](../classes/SceneProperties.md) | [timestamp](../slots/timestamp.md) | range | [datetime](../slots/datetime.md) |
 
 
 

@@ -44,6 +44,10 @@ URI: [debrief:class/BaseFeatureProperties](https://debrief.info/schemas/class/Ba
         click VectorAnnotationProperties href "../../classes/VectorAnnotationProperties/"
       BaseFeatureProperties <|-- PolyAnnotationProperties
         click PolyAnnotationProperties href "../../classes/PolyAnnotationProperties/"
+      BaseFeatureProperties <|-- StoryboardProperties
+        click StoryboardProperties href "../../classes/StoryboardProperties/"
+      BaseFeatureProperties <|-- SceneProperties
+        click SceneProperties href "../../classes/SceneProperties/"
       
       BaseFeatureProperties : kind
         
@@ -89,6 +93,8 @@ URI: [debrief:class/BaseFeatureProperties](https://debrief.info/schemas/class/Ba
     * [TextAnnotationProperties](../classes/TextAnnotationProperties.md)
     * [VectorAnnotationProperties](../classes/VectorAnnotationProperties.md)
     * [PolyAnnotationProperties](../classes/PolyAnnotationProperties.md)
+    * [StoryboardProperties](../classes/StoryboardProperties.md)
+    * [SceneProperties](../classes/SceneProperties.md)
 
 
 
@@ -172,6 +178,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
   tags:
@@ -236,6 +244,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
   tags:

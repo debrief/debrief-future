@@ -75,6 +75,8 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[PolyAnnotationProperties](classes/PolyAnnotationProperties.md) | Properties for a PolyAnnotation |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[RectangleAnnotationProperties](classes/RectangleAnnotationProperties.md) | Properties for a RectangleAnnotation |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ReferenceLocationProperties](classes/ReferenceLocationProperties.md) | Properties for a ReferenceLocation |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SceneProperties](classes/SceneProperties.md) | Properties class for a Scene child Feature |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[StoryboardProperties](classes/StoryboardProperties.md) | Properties class for a Storyboard parent Feature |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TextAnnotationProperties](classes/TextAnnotationProperties.md) | Properties for a TextAnnotation |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TrackProperties](classes/TrackProperties.md) | Properties for a TrackFeature |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VectorAnnotationProperties](classes/VectorAnnotationProperties.md) | Properties for a VectorAnnotation |
@@ -126,6 +128,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [ReferenceLocation](classes/ReferenceLocation.md) | GeoJSON Feature for fixed reference points or reference point sets |
 | [ResultsSlice](classes/ResultsSlice.md) | Accumulated tool result layers and last-execution record for undo support |
 | [ResultTypePath](classes/ResultTypePath.md) | Slash-delimited hierarchical type path |
+| [SceneFeature](classes/SceneFeature.md) | GeoJSON Feature representing a Scene child entity |
 | [SegmentMetadata](classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |
 | [SelectionRequirement](classes/SelectionRequirement.md) | A constraint specifying which feature kinds a tool accepts, with minimum and ... |
 | [SensorContact](classes/SensorContact.md) | Single sensor measurement record |
@@ -137,6 +140,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [SpatialSlice](classes/SpatialSlice.md) | Geographic view state for the map display |
 | [StacExtensionProperties](classes/StacExtensionProperties.md) | Extension properties added to STAC item |
 | [StacItemSummary](classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |
+| [StoryboardFeature](classes/StoryboardFeature.md) | GeoJSON Feature representing a Storyboard parent entity |
 | [SystemRecordProperties](classes/SystemRecordProperties.md) | Properties for the non-spatial system record feature |
 | [SystemState](classes/SystemState.md) | GeoJSON Feature for storing non-spatial system state |
 | [SystemStateProperties](classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |
@@ -156,6 +160,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [TUASolution](classes/TUASolution.md) | Single Target Uncertainty Area estimate |
 | [TuneAnnotation](classes/TuneAnnotation.md) | Records a parameter modification (appended, not replacing original) |
 | [VectorAnnotation](classes/VectorAnnotation.md) | GeoJSON Feature for vector annotations |
+| [Viewport](classes/Viewport.md) | Camera state sub-record inside a Scene |
 | [ViewportPolygon](classes/ViewportPolygon.md) | Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-01... |
 | [WasGeneratedBy](classes/WasGeneratedBy.md) | Identifies the tool and its parameters for a specific invocation |
 
@@ -169,6 +174,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [activity_id](slots/activity_id.md) | Unique operation identifier (UUID v4) |
 | [addressingMode](slots/addressingMode.md) | How addresses at this level are interpreted |
 | [after_leg](slots/after_leg.md) | Name of following TMA leg (DYNAMIC_INFILL) |
+| [agent](slots/agent.md) | Human actor (e |
 | [ambiguous_bearing](slots/ambiguous_bearing.md) | Ambiguous bearing (second solution) in degrees |
 | [array_centre_mode](slots/array_centre_mode.md) | How bearing line origin is calculated relative to host platform |
 | [asset](slots/asset.md) | Relative path to snapshot GeoJSON file |
@@ -213,6 +219,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [epoch](slots/epoch.md) | Milliseconds since Unix epoch |
 | [execution_duration](slots/execution_duration.md) | Wall-clock execution time in ISO 8601 duration format (e |
 | [feature_id](slots/feature_id.md) | ID of the feature whose pre-operation state is captured |
+| [feature_set_hash](slots/feature_set_hash.md) | SHA-256 hex (lowercase, 64 chars) of JSON |
 | [feature_tags](slots/feature_tags.md) | Union of all feature-level tags from the plot's GeoJSON features |
 | [featureCollectionUri](slots/featureCollectionUri.md) | Reference to external feature collection (FR-016) |
 | [featureIds](slots/featureIds.md) | Selected feature paths |
@@ -307,6 +314,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [rotation](slots/rotation.md) | Map rotation in degrees 0-360 (FR-013) |
 | [savedAt](slots/savedAt.md) | When the session was saved (ISO 8601) |
 | [savePath](slots/savePath.md) | Last save location |
+| [schema_version](slots/schema_version.md) | Schema version |
 | [schemaVersion](slots/schemaVersion.md) | Schema version for persistence compatibility (FR-026) |
 | [segment_type](slots/segment_type.md) | Segment type discriminator |
 | [segments](slots/segments.md) | Per-segment metadata for compound tracks |
@@ -336,6 +344,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [state_type](slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection) |
 | [stepSize](slots/stepSize.md) | Step size for discrete navigation (FR-008) |
 | [store_id](slots/store_id.md) | Parent store identifier (needed for URI construction) |
+| [storyboard_id](slots/storyboard_id.md) | Foreign key to parent Storyboard |
 | [stroke](slots/stroke.md) | Whether to draw outline |
 | [style](slots/style.md) | Per-segment line styling override |
 | [symbol](slots/symbol.md) | Shape to use for position symbols |
@@ -345,8 +354,10 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [temporal](slots/temporal.md) | Time-related state |
 | [temporal_filter_active](slots/temporal_filter_active.md) | Whether the timeline range is used as a temporal filter |
 | [text](slots/text.md) | Narrative text content |
+| [thumbnail_asset_ref](slots/thumbnail_asset_ref.md) | STAC asset key (path + name within the plot's STAC item) |
 | [time](slots/time.md) | Position timestamp (ISO8601) |
 | [time_extent](slots/time_extent.md) | Temporal extent of the plot (start/end ISO 8601 strings) |
+| [time_range](slots/time_range.md) | Reserved slot for v2 animated time-range Scenes |
 | [timeFilter](slots/timeFilter.md) | Optional visible time window constraint (FR-007) |
 | [timeRange](slots/timeRange.md) | Full temporal extent of loaded data (FR-006) |
 | [timestamp](slots/timestamp.md) | When the operation occurred (ISO 8601 with timezone) |
@@ -357,6 +368,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [track_count](slots/track_count.md) | Number of tracks in this plot |
 | [track_id](slots/track_id.md) | Associated track identifier (optional) |
 | [track_type](slots/track_type.md) | Type of track |
+| [transition_duration_ms](slots/transition_duration_ms.md) | Playback transition duration in milliseconds |
 | [tuas](slots/tuas.md) | Embedded Target Uncertainty Area data associated with this track |
 | [tunable](slots/tunable.md) | Whether this parameter can be modified during replay |
 | [tune](slots/tune.md) | Parameter tuning record |
@@ -374,6 +386,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [vessel_type](slots/vessel_type.md) | Vessel type override (leaf of classification path, e |
 | [viewport](slots/viewport.md) | Visible map area as 4-corner polygon (FR-012) |
 | [visible](slots/visible.md) | Contact visibility |
+| [visible_feature_ids](slots/visible_feature_ids.md) | Stable feature IDs visible at capture |
 | [was_generated_by](slots/was_generated_by.md) | Tool identity and parameters for this invocation |
 | [weight](slots/weight.md) | Stroke width in pixels |
 | [worm_in_hole](slots/worm_in_hole.md) | Display mode flag |

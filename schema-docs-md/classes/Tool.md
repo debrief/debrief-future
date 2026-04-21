@@ -133,6 +133,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   name:
@@ -151,6 +155,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   description:
@@ -165,6 +170,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: false
   version:
@@ -231,6 +238,10 @@ attributes:
     - PlotSummary
     - StacItemSummary
     - GeoJSONFeature
+    - StoryboardProperties
+    - SceneProperties
+    - StoryboardFeature
+    - SceneFeature
     range: string
     required: true
   name:
@@ -251,6 +262,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   description:
@@ -267,6 +279,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
     required: false
   version:

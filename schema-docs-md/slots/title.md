@@ -18,8 +18,9 @@ Alias: title
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [PlotSummary](../classes/PlotSummary.md) | Projection of a STAC Item for UI consumption (e |  no  |
-| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
 | [DatasetEntry](../classes/DatasetEntry.md) | Standard envelope for all tool result datasets, matching the runtime DatasetE... |  no  |
+| [SceneProperties](../classes/SceneProperties.md) | Properties class for a Scene child Feature |  no  |
+| [StacItemSummary](../classes/StacItemSummary.md) | Minimal STAC Item projection for browser tree display and metadata filtering |  no  |
 
 
 
@@ -61,6 +62,7 @@ domain_of:
 - PlotSummary
 - StacItemSummary
 - DatasetEntry
+- SceneProperties
 range: string
 
 ```

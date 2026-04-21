@@ -166,6 +166,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: FileProvEventTypeEnum
     required: true
   timestamp:
@@ -178,6 +180,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   asset:
@@ -264,6 +267,8 @@ attributes:
     - GeoJSONFeature
     - DatasetAxisMetadata
     - DatasetEntry
+    - StoryboardFeature
+    - SceneFeature
     range: FileProvEventTypeEnum
     required: true
   timestamp:
@@ -278,6 +283,7 @@ attributes:
     - FileProvEntry
     - PropertiesProvenanceEntry
     - FeatureSelection
+    - SceneProperties
     range: datetime
     required: true
   asset:

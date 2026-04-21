@@ -117,6 +117,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   addressingMode:
@@ -139,6 +140,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
 
 ```
@@ -170,6 +173,7 @@ attributes:
     - PlatformRecord
     - LevelDefinition
     - DatasetSeries
+    - StoryboardProperties
     range: string
     required: true
   addressingMode:
@@ -196,6 +200,8 @@ attributes:
     - Tool
     - ToolParameter
     - LevelDefinition
+    - StoryboardProperties
+    - SceneProperties
     range: string
 
 ```

@@ -169,6 +169,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: CIRCLE
@@ -179,6 +181,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - CircleAnnotationProperties
+    - Viewport
     range: float
     required: true
     multivalued: true
@@ -280,6 +283,8 @@ attributes:
     - PolyAnnotationProperties
     - SelectionRequirement
     - SystemRecordProperties
+    - StoryboardProperties
+    - SceneProperties
     range: FeatureKindEnum
     required: true
     equals_string: CIRCLE
@@ -292,6 +297,7 @@ attributes:
     domain_of:
     - SystemStateProperties
     - CircleAnnotationProperties
+    - Viewport
     range: float
     required: true
     multivalued: true
