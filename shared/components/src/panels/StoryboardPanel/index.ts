@@ -5,6 +5,10 @@
 export { StoryboardPanel } from './StoryboardPanel';
 export { SceneRow } from './SceneRow';
 export { SceneList } from './SceneList';
+export { TransportRow } from './TransportRow';
+export type { TransportRowProps } from './TransportRow';
+export { HardBlockModal } from './HardBlockModal';
+export type { HardBlockModalProps } from './HardBlockModal';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
