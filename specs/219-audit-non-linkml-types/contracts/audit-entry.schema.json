@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.dev/schemas/219-audit-non-linkml-types/audit-entry.schema.json",
+  "title": "Type-audit inventory entry",
+  "description": "Single entry in specs/219-audit-non-linkml-types/evidence/inventory-*.json. Two variants: RawInventoryEntry (enumerator output) and ClassifiedInventoryEntry (after curation).",
+  "$defs": {
+    "Kind": {
+      "type": "string",
+      "enum": ["interface", "type", "enum"]
+    },
+    "SignalKind": {
+      "type": "string",
+      "enum": [
+        "imports-from-schemas",
+        "eslint-disable-no-restricted-syntax",
+        "name-collides-with-schema-type",
+        "name-collides-with-other-declarations",
+        "in-services-directory",
+        "single-file-use"
+      ]
+    },
+    "Classification": {
+      "type": "string",
+      "enum": [
+        "schema-rooted",
+        "boundary-loose",
+        "single-domain-convenience",
+        "must-promote",
+        "drift-candidate"
+      ]
+    },
+    "Signal": {
+      "type": "object",
+      "required": ["kind", "detail"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "$ref": "#/$defs/SignalKind" },
+        "detail": { "type": "string", "maxLength": 400 }
+      }
+    },
+    "RawInventoryEntry": {
+      "type": "object",
+      "required": ["id", "name", "filePath", "line", "kind", "isExported", "signals"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$",
+          "description": "SHA-1 of '<filePath>:<line>:<name>'"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$",
+          "description": "Valid TypeScript identifier"
+        },
+        "filePath": {
+          "type": "string",
+          "pattern": "^(apps|shared|services)/",
+          "description": "Repo-relative path with forward slashes"
+        },
+        "line": { "type": "integer", "minimum": 1 },
+        "kind": { "$ref": "#/$defs/Kind" },
+        "isExported": { "type": "boolean" },
+        "signals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Signal" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ClassifiedInventoryEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "filePath",
+        "line",
+        "kind",
+        "isExported",
+        "signals",
+        "classification",
+        "justification",
+        "followUpLink",
+        "driftCohort",
+        "reviewer",
+        "overrodeSignal"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/RawInventoryEntry/properties/id" },
+        "name": { "$ref": "#/$defs/RawInventoryEntry/properties/name" },
+        "filePath": { "$ref": "#/$defs/RawInventoryEntry/properties/filePath" },
+        "line": { "$ref": "#/$defs/RawInventoryEntry/properties/line" },
+        "kind": { "$ref": "#/$defs/Kind" },
+        "isExported": { "type": "boolean" },
+        "signals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Signal" }
+        },
+        "classification": { "$ref": "#/$defs/Classification" },
+        "justification": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "followUpLink": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "driftCohort": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            },
+            { "type": "null" }
+          ]
+        },
+        "reviewer": {
+          "type": "string",
+          "pattern": "^@?[A-Za-z0-9-]+$",
+          "description": "GitHub handle (with or without leading @)"
+        },
+        "overrodeSignal": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "description": "followUpLink required for must-promote / drift-candidate",
+          "if": {
+            "properties": {
+              "classification": { "enum": ["must-promote", "drift-candidate"] }
+            }
+          },
+          "then": {
+            "properties": {
+              "followUpLink": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "description": "driftCohort required iff classification == drift-candidate",
+          "if": {
+            "properties": {
+              "classification": { "const": "drift-candidate" }
+            }
+          },
+          "then": {
+            "properties": {
+              "driftCohort": { "type": "string" }
+            }
+          },
+          "else": {
+            "properties": {
+              "driftCohort": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "AuditReport": {
+      "type": "object",
+      "required": [
+        "featureSpec",
+        "gitSha",
+        "publishedAt",
+        "enumeratorVersion",
+        "totalDeclarations",
+        "counts",
+        "phaseImpact"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "featureSpec": { "type": "string" },
+        "gitSha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "enumeratorVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "totalDeclarations": { "type": "integer", "minimum": 0 },
+        "counts": {
+          "type": "object",
+          "required": [
+            "schema-rooted",
+            "boundary-loose",
+            "single-domain-convenience",
+            "must-promote",
+            "drift-candidate"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "schema-rooted": { "type": "integer", "minimum": 0 },
+            "boundary-loose": { "type": "integer", "minimum": 0 },
+            "single-domain-convenience": { "type": "integer", "minimum": 0 },
+            "must-promote": { "type": "integer", "minimum": 0 },
+            "drift-candidate": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "phaseImpact": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["phase", "status", "relatedEntryIds"],
+            "additionalProperties": false,
+            "properties": {
+              "phase": { "type": "string" },
+              "status": {
+                "type": "string",
+                "enum": ["existing", "expanded", "new"]
+              },
+              "relatedEntryIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40}$"
+                }
+              },
+              "notes": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "null" }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "DriftCohort": {
+      "type": "object",
+      "required": [
+        "cohortId",
+        "displayName",
+        "memberEntryIds",
+        "shapeSummary",
+        "followUpLink"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "cohortId": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "displayName": { "type": "string", "minLength": 1 },
+        "memberEntryIds": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$"
+          },
+          "uniqueItems": true
+        },
+        "shapeSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "followUpLink": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/RawInventoryEntry" },
+    { "$ref": "#/$defs/ClassifiedInventoryEntry" },
+    { "$ref": "#/$defs/AuditReport" },
+    { "$ref": "#/$defs/DriftCohort" }
+  ]
+}

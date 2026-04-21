@@ -183,6 +183,7 @@ Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x (strict), React 18.x (static SPA at `apps/spec-navigator/`) + Vite 5.x, `react-markdown` + `remark-gfm` + `rehype-slug` + `rehype-autolink-headings` + `rehype-highlight` + `highlight.js` (artefact rendering), `zod ^3.22.0` (GitHub REST boundary + payload validation), `@playwright/test` + `@axe-core/playwright` (E2E + a11y); no backend, no new Python modules (191-spec-navigator)
 - TypeScript 5.x (for the loader source the config references); configuration itself is JSON (no runtime language); YAML (Taskfile + CI workflow). + `knip` — **newly added**, pinned to a specific 5.x version in root `devDependencies`. Justification recorded below in Constitution Check Article IX. No other new dependencies. (201-knip-loader-config)
 - Storyboards and Scenes are **GeoJSON Features inside the (215-storyboarding-schema)
+- TypeScript 5.x (audit script + analysis of TS source). No Python changes. + Bundled `typescript` compiler API (already in the monorepo) for AST traversal. No new runtime or dev dependencies. (219-audit-non-linkml-types)
 
 ## Before Pushing
 
@@ -228,5 +229,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 219-audit-non-linkml-types: Added TypeScript 5.x (audit script + analysis of TS source). No Python changes. + Bundled `typescript` compiler API (already in the monorepo) for AST traversal. No new runtime or dev dependencies.
 - 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,
 - 199-code-quality-cleanup: Added TypeScript 5.x (existing monorepo — no new languages, no Python edits) + pnpm workspace, `@debrief/components` (LogPanel), `knip` (introduced via `pnpm dlx`), existing ESLint / pyright / ruff toolchain (unchanged)
