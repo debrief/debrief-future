@@ -77,6 +77,13 @@ classes:
         description: Free-text analyst annotation explaining the reasoning for this operation.
         range: string
         required: false
+      agent:
+        description: >-
+          Human actor (e.g. analyst username) who triggered the operation.
+          Added by #215 for Storyboarding CRUD provenance; optional and
+          useful to any tool emitting LogEntry records.
+        range: string
+        required: false
 
   WasGeneratedBy:
     description: >-

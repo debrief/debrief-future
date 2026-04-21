@@ -26,6 +26,7 @@ imports:
   - stac-extension
   - session-state
   - tool-result
+  - storyboard
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:
