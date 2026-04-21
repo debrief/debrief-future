@@ -192,9 +192,9 @@ T170 → T171 → T172   (package.json — same file, serial)
 
 ### 3.4 Command handlers + package.json (US1 subset)
 
-- [ ] T330 [test] Unit tests for US1 command handlers — forward/backward/clickScene/jumpPast dispatch to service with `documentUri = sessionManager.getActiveDocumentUri()`; return early when `documentUri === null` `apps/vscode/src/commands/__tests__/storyboardCommands.test.ts`
-- [ ] T331 Implement `registerStoryboardTransportCommands(context, service, sessionManager)` — registers `debrief.storyboard.forward`, `.backward`, `.clickScene`, `.jumpPast` `apps/vscode/src/commands/storyboardTransport.ts`
-- [ ] T332 [P] Note: `debrief.storyboard.editScene` is NOT registered as a command for this slice — the "Open for editing" modal action calls `showInformationMessage` inline from the service. This task is a documentation marker only (no code change) — confirm `resolveHardBlockByOpeningForEditing` surfaces a read-only `showInformationMessage` with Scene title + DTG `apps/vscode/src/services/storyboardPlayback.ts`
+- [x] T330 [test] Unit tests for US1 command handlers — forward/backward/clickScene/jumpPast dispatch to service with `documentUri = sessionManager.getActiveDocumentUri()`; return early when `documentUri === null` `apps/vscode/tests/unit/storyboardCommands.test.ts` (flat VS Code layout)
+- [x] T331 Implement `registerStoryboardTransportCommands(context, service, sessionManager)` — registers `debrief.storyboard.forward`, `.backward`, `.clickScene`, `.jumpPast` `apps/vscode/src/commands/storyboardTransport.ts`
+- [x] T332 [P] Documentation marker — `debrief.storyboard.editScene` is NOT registered as a command for this slice. `StoryboardPlaybackService.resolveHardBlockByOpeningForEditing` surfaces a read-only `vscode.window.showInformationMessage` with scene title + timestamp; routed from the hard-block modal's *Open for editing* action. Full editor surface arrives in #218. `apps/vscode/src/services/storyboardPlayback.ts`
 
 ### 3.5 Extension host wiring (US1)
 
