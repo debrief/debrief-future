@@ -36,6 +36,7 @@ import { ToolMatchAdapter } from './services/toolMatchAdapter';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
+import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
 import {
   StoryboardPlaybackService,
   type ModalPromptPort,
@@ -216,6 +217,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     formatDtg,
   });
   context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
+
+  // #217 Phase 4 — the panel needs the service reference so it can
+  // call setActiveStoryboard synchronously on dropdown-change messages.
+  storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
@@ -724,6 +729,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // backward, clickScene, jumpPast). Must run AFTER the service is
   // constructed and BEFORE any user interaction can reach the commands.
   registerStoryboardTransportCommands(
+    context,
+    storyboardPlaybackService,
+    sessionManager,
+  );
+
+  // Feature 217 Phase 4 — register management commands (create,
+  // rename, delete). These drive the overflow-menu flow from the
+  // Storyboard panel.
+  registerStoryboardManagementCommands(
     context,
     storyboardPlaybackService,
     sessionManager,

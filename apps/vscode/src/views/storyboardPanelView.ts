@@ -21,7 +21,7 @@ import {
 import type { SceneRowViewModel } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
-import type { StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
+import type { StoryboardPlaybackService, StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
 import { plotFromFeatures } from '../services/plotFromFeatures';
 import type {
   StoryboardPanelMessage,
@@ -38,6 +38,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   private pendingMessages: ExtensionToStoryboardPanelMessage[] = [];
   private sessionChangeDisposable: vscode.Disposable | undefined;
   private getMapPanel: () => MapPanel | undefined = () => undefined;
+  private playbackService: StoryboardPlaybackService | undefined;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -50,6 +51,15 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
 
   public setMapPanelResolver(fn: () => MapPanel | undefined): void {
     this.getMapPanel = fn;
+  }
+
+  /**
+   * #217 Phase 4: Provide the playback service so the panel can forward
+   * synchronous state changes (dropdown selection) without going through
+   * the command palette.
+   */
+  public setPlaybackService(service: StoryboardPlaybackService): void {
+    this.playbackService = service;
   }
 
   public resolveWebviewView(
@@ -219,13 +229,23 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       case 'transport-backward-clicked':
         void vscode.commands.executeCommand('debrief.storyboard.backward');
         break;
-      case 'active-storyboard-changed':
+      case 'active-storyboard-changed': {
+        // Direct state change — NOT a palette command. The service
+        // updates per-plot state synchronously and emits a snapshot.
+        const uri = this.sessionManager.getActiveDocumentUri();
+        if (uri && this.playbackService) {
+          this.playbackService.setActiveStoryboard(uri, message.storyboardId);
+        }
+        break;
+      }
       case 'create-storyboard-requested':
+        void vscode.commands.executeCommand('debrief.storyboard.create');
+        break;
       case 'rename-storyboard-requested':
+        void vscode.commands.executeCommand('debrief.storyboard.rename');
+        break;
       case 'delete-storyboard-requested':
-        // US2 wiring — not implemented in this slice (P3 US1 only).
-        // Forward via commands once #217 Phase 4 lands; for now log.
-        console.warn('[StoryboardPanel] US2 message received but not yet handled:', message.type);
+        void vscode.commands.executeCommand('debrief.storyboard.delete');
         break;
       case 'log':
         if (message.level === 'error') {

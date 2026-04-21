@@ -391,7 +391,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       // source of truth). The subsequent onFeaturesChanged recomputes
       // the panel / rectangles; we also update activeStoryboardId
       // here so the new Storyboard becomes the selected one.
-      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
       state.activeStoryboardId = result.storyboard.properties.id;
       this.recomputeSceneOrder(state, result.plot);
       this.applyScrubbableRange(state, result.plot);
@@ -419,7 +419,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
       this.emitSnapshot(state, result.plot);
     } catch (err) {
       this.showErrorMessage(err instanceof Error ? err.message : String(err));
@@ -440,7 +440,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         actor: 'vscode-user',
         now: new Date().toISOString(),
       });
-      this.mapPanel.setFeatures(result.plot.features as readonly DebriefFeature[]);
+      this.mapPanel.setFeatures(result.plot.features as unknown as readonly DebriefFeature[]);
       if (state.activeStoryboardId === storyboardId) {
         const fallback = getMostRecentlyModifiedStoryboard(result.plot);
         state.activeStoryboardId = fallback?.properties.id ?? null;

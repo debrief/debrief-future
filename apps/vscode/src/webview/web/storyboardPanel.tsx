@@ -113,6 +113,22 @@ function StoryboardPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'transport-backward-clicked' });
   }, []);
 
+  const onActiveStoryboardChange = useCallback((storyboardId: string) => {
+    vscode.postMessage({ type: 'active-storyboard-changed', storyboardId });
+  }, []);
+
+  const onCreateStoryboard = useCallback(() => {
+    vscode.postMessage({ type: 'create-storyboard-requested' });
+  }, []);
+
+  const onRenameStoryboard = useCallback(() => {
+    vscode.postMessage({ type: 'rename-storyboard-requested' });
+  }, []);
+
+  const onDeleteStoryboard = useCallback(() => {
+    vscode.postMessage({ type: 'delete-storyboard-requested' });
+  }, []);
+
   const themeConfig: Theme = { variant: theme };
 
   return (
@@ -129,6 +145,10 @@ function StoryboardPanelApp(): React.ReactElement {
         transport={transport}
         onTransportForward={onTransportForward}
         onTransportBackward={onTransportBackward}
+        onActiveStoryboardChange={onActiveStoryboardChange}
+        onCreateStoryboard={onCreateStoryboard}
+        onRenameStoryboard={onRenameStoryboard}
+        onDeleteStoryboard={onDeleteStoryboard}
       />
     </ThemeProvider>
   );
