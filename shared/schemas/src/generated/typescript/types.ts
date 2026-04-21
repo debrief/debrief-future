@@ -388,7 +388,7 @@ export enum FileProvDirectionEnum {
     target = "target",
 };
 /**
-* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-NN in docs/project_notes/decisions.md.
+* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
 */
 export enum PlaybackStateEnum {
     

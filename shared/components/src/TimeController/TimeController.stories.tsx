@@ -13,6 +13,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState, useCallback } from 'react';
 import { TimeController } from './TimeController';
+import { PlaybackControls } from './PlaybackControls';
 import type { TimeControllerProps, DisplayMode, PlaybackState } from './types';
 import type { TimeExtent } from '../utils/types';
 import { ThemeProvider } from '../ThemeProvider';
@@ -532,6 +533,41 @@ export const TimeScrubberOnly: Story = {
     docs: {
       description: {
         story: 'Sub-components like TimeScrubber, PlaybackControls, and SpeedSelector can be imported individually for custom layouts.',
+      },
+    },
+  },
+};
+
+/**
+ * Feature 205 / FR-025: visual regression guard for the stopped ≡ paused
+ * rendering rule. The PlaybackState vocabulary widened from two states
+ * ('playing' | 'paused') to three ('stopped' | 'playing' | 'paused') when
+ * session-state and component-side enums were consolidated into LinkML.
+ * The `stopped` state is rendered identically to `paused` — same play
+ * glyph, same aria-label="Play", same enabled onClick — so existing
+ * `'playing' ?  : 'paused'` branches work unchanged.
+ *
+ * Stopped and Paused should be visually indistinguishable below; Playing
+ * differs (pause glyph + "Pause" aria-label).
+ */
+export const PlaybackStateStoppedEquivPaused: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 24, padding: 16 }}>
+      {(['stopped', 'paused', 'playing'] as const).map((state) => (
+        <div key={state} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 12, color: '#808080' }}>playbackState = &quot;{state}&quot;</div>
+          <PlaybackControls playbackState={state} onToggle={() => undefined} />
+        </div>
+      ))}
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Regression guard for Feature 205 FR-023 / FR-025 — `stopped` renders identically to `paused`. ' +
+          'If this story visually diverges between the first two buttons, revisit the `stopped ≡ paused` rule ' +
+          'documented in ADR-NN (`docs/project_notes/decisions.md`).',
       },
     },
   },

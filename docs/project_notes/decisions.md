@@ -743,3 +743,110 @@ Migration:
 
 **Originating issue:** Backlog item #204 (Tech Debt). Spec:
 `specs/204-rawgeojsonfeature-linkml/`.
+
+### ADR-022: Schema-Rooted DisplayMode and PlaybackState — 2026-04-21
+
+**Context.** Two enum-style types were defined twice in TypeScript with drifted
+vocabularies: `DisplayMode` as `'full' | 'trail'` (components) vs `'normal' |
+'snailTrail'` (session-state); `PlaybackState` as `'playing' | 'paused'`
+(components) vs `'stopped' | 'playing' | 'paused'` (session-state). Seven-plus
+translation ternaries bridged the two vocabularies at host↔webview and
+session-state↔component boundaries, plus one disguised silent-narrowing
+translator at `apps/vscode/src/views/timeRangeView.ts:241` that silently
+collapsed `'stopped'` → `'paused'` in session-state. `persistence/load.ts`
+contained two `as never` bypass casts (lines 117, 123) that silently accepted
+any persisted value. LinkML already had enum definitions generating to
+Pydantic and TypeScript — `PlaybackStateEnum` with three canonical values;
+`DisplayModeEnum` with the legacy `normal|snailTrail` strings — but
+`gen-typescript` emitted `TemporalSlice.playbackState` / `.displayMode` as
+`string`, defeating narrowing at the read point. See spec in
+`specs/205-displaymode-playbackstate-linkml/spec.md`.
+
+**Decision.**
+
+1. Rename `DisplayModeEnum` permissible values from `normal|snailTrail` to
+   `full|trail` (aligning LinkML with the visible UI button labels).
+2. Keep `PlaybackStateEnum` as `stopped|playing|paused` (already canonical).
+3. Extend `shared/schemas/scripts/generate.py` with a template-literal
+   post-processor for both enums, matching the Feature 201 / FR-014
+   `PointShape` precedent; the post-processor also narrows
+   `TemporalSlice.playbackState` / `.displayMode` from `string` to the
+   derived template-literal types.
+4. Delete four hand-typed declarations:
+   - `shared/components/src/utils/types.ts:80` (`DisplayMode`)
+   - `shared/components/src/TimeController/types.ts:17` (`PlaybackState`)
+   - `services/session-state/src/types/temporal.ts:105` (`PlaybackState`)
+   - `services/session-state/src/types/temporal.ts:110` (`DisplayMode`)
+5. Delete all translator ternaries and helpers (8 sites across 4 files in
+   `apps/vscode/` and `apps/web-shell/`); both sides now speak the canonical
+   vocabulary. Delete the silent-narrowing PlaybackState translator at
+   `apps/vscode/src/views/timeRangeView.ts:241` (Article I.3 closure — no
+   more silent `'stopped'` → `'paused'` collapse).
+6. Retype 5 IPC message shapes and 4 callback/method-type declarations
+   across `activityPanelView.ts`, `timeRangeView.ts`, and
+   `webview/messages.ts` using the schema-rooted `PlaybackState` /
+   `DisplayMode` types.
+7. Add runtime validation at `services/session-state/src/persistence/load.ts`
+   that rejects legacy `'normal'` / `'snailTrail'` values (and any other
+   out-of-spec value) with a typed error, returning the existing
+   `LoadResult { success: false, error }` shape — no new error class, no
+   throw, preserving the module's caller contract. Replace the two
+   `as never` casts at lines 117 and 123 with typed setter calls (Article
+   XV closure for these two sites; other `as`-style coercions in the same
+   file remain out of scope).
+8. **Component-side rendering rule — `stopped ≡ paused`.** The component
+   layer has historically only known `'playing'` and `'paused'`. After
+   this feature widens the component-side `PlaybackState` surface to the
+   full three-state vocabulary, the `stopped` state MUST render
+   identically to `paused`:
+   - `PlaybackControls` shows the play glyph (VS Code icon
+     `debug-start`) with `aria-label="Play"` and `title="Play (Space)"`.
+   - The play/pause button is **enabled** (so the user can resume).
+   - The pause branch is not taken — `isPlaying = playbackState === 'playing'`
+     naturally treats `'stopped'` and `'paused'` identically.
+   - The `useTimePlayback` animation tick stays inactive (the condition
+     `playbackState !== 'playing'` already short-circuits on `'stopped'`),
+     so the playhead does not advance.
+   - The LinkML schema description for `PlaybackStateEnum` cites this
+     ADR for the rendering rule rather than describing UI elements
+     directly (Article IV — schema sits beneath services and should not
+     name play/pause buttons).
+9. Adopt the LinkML-description cross-reference convention
+   `See ADR-NN in docs/project_notes/decisions.md` for schema ↔ ADR links,
+   validated at lint time by `scripts/check-adr-refs.sh` (the two-digit
+   placeholder in the source YAML is the template token; it is replaced
+   with the real three-digit ADR number — `ADR-022` — at feature
+   implementation time).
+10. Add `scripts/check-no-hand-typed-temporal-enums.sh` (following the
+    `check-no-geojson-feature.sh` / `#204`/`#214` precedent) to prevent
+    reintroduction of hand-typed `type DisplayMode` / `type PlaybackState`
+    declarations and legacy-vocabulary translators.
+
+**Consequences.**
+
+- Single schema-rooted vocabulary end to end; no translation logic to
+  maintain. `pnpm -r typecheck` passes on a clean tree.
+- `DEFAULT_TEMPORAL_SLICE.displayMode` changes from `'normal'` to `'full'`
+  — no semantic change (both described "Standard track display" / "full
+  track"). Three session-state test assertion sites are migrated in step
+  (review 8A).
+- Articles I (Defence-Grade Reliability — I.3 silent-failure closure for
+  the two uncovered translators), II (Schema Integrity), IV
+  (Architectural Boundaries — schema no longer names UI elements), and
+  XV (Strict Type Safety — removed the two `as never` bypasses) are all
+  strengthened. Article VIII (Documentation) gains a machine-validated
+  schema ↔ ADR cross-reference convention.
+- No installed base affected (Article XIV pre-release freedom; verified
+  no JSON fixtures carry the legacy values).
+- CI adds a ~20–30 s regen-idempotency pytest
+  (`test_regen_idempotent.py`) that runs per-PR and sandboxes the regen
+  in `tmp_path` — local `uv run pytest` NEVER mutates the working-tree
+  generated artefacts (R2-4A).
+- The `PlaybackControls.test.tsx` unit test fixes the `stopped ≡ paused`
+  rendering rule as a red-on-regress pin. A visual story
+  (`TimeController.stories.tsx` → `PlaybackStateStoppedEquivPaused`)
+  displays the three states side-by-side so a reviewer can see at a
+  glance that the first two are indistinguishable.
+
+**Originating issue:** Backlog item #205 (Tech Debt). Spec:
+`specs/205-displaymode-playbackstate-linkml/`.
