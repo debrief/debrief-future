@@ -31,7 +31,7 @@ This command bridges the gap between backlog prioritization and the speckit work
 Extract the backlog item ID from `$ARGUMENTS`:
 
 - Accept formats: `007`, `7`, `#007`, `#7`, `ID 007`
-- Normalize to numeric (e.g., `007` → `7`)
+- Normalize to a 3-digit zero-padded string (e.g., `7` → `007`, `#12` → `012`) so it matches BACKLOG.md IDs and feature-branch/spec-dir prefixes
 - ERROR if no ID provided: "Please provide a backlog item ID, e.g., `/speckit.start 007`"
 
 ### Step 1a: Check for Stale Worktrees (Cleanup)
