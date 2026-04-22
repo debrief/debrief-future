@@ -39,12 +39,13 @@ import type {
 // extension does not pull the runtime ESM bundle.
 import type {
   TimelineEntry,
+  TimelineEntryKind,
   LogParameterValue,
   OperationCategory,
   ParameterSchemaEntry,
   ViewMode,
 } from '@debrief/components';
-import { VALID_VIEW_MODES } from '@debrief/components';
+import { VALID_VIEW_MODES, resolveToolCategory } from '@debrief/components';
 
 // Webview ↔ Extension message types are imported from `../webview/logPanelMessages`
 // (shared with the webview side to enforce a single contract).
@@ -68,26 +69,44 @@ function classifyOperation(toolId: string): OperationCategory {
 }
 
 /**
- * Convert a LogEntry from the log service to a display-oriented TimelineEntry.
+ * Classify a timeline entry's semantic kind. Feature: 208-timeline-entry-kind.
+ *
+ * Interim decision table (extended when the PROV-side signal lands):
+ *   - resolveToolCategory(toolName).category === 'snapshot' → 'snapshot'
+ *   - otherwise                                              → 'tool'
+ *
+ * `'tune'` is reserved in the contract but not emitted here; it lands when a
+ * future PROV-side signal is available.
  */
-function toTimelineEntry(entry: LogEntry): TimelineEntry {
+function classifyKind(toolName: string): TimelineEntryKind {
+  return resolveToolCategory(toolName).category === 'snapshot' ? 'snapshot' : 'tool';
+}
+
+/**
+ * Convert a LogEntry from the log service to a display-oriented TimelineEntry.
+ *
+ * Exported for unit testing. Feature: 208-timeline-entry-kind (T020).
+ */
+export function toTimelineEntry(entry: LogEntry): TimelineEntry {
+  const toolName = entry.was_generated_by.tool;
   return {
     activity_id: entry.activity_id,
     timestamp: entry.timestamp,
-    toolName: entry.was_generated_by.tool,
+    toolName,
     tool_version: entry.was_generated_by.tool_version,
     parameters: entry.was_generated_by.parameters as { [k: string]: LogParameterValue },
     usedFeatureIds: entry.used,
     generatedFeatureIds: entry.generated,
     execution_duration: entry.execution_duration,
     generated_result_id: entry.generated_result_id ?? null,
-    operationCategory: classifyOperation(entry.was_generated_by.tool),
+    operationCategory: classifyOperation(toolName),
     deleted: entry.deleted === true,
     disabled: entry.disabled === true,
     rationale: entry.rationale ?? null,
     tuneAnnotation: entry.tune
       ? { parameter: entry.tune.parameter, previous_value: entry.tune.previous_value, new_value: entry.tune.new_value }
       : null,
+    kind: classifyKind(toolName),
   };
 }
 

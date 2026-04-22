@@ -110,8 +110,14 @@ export function LogEntry({
   const showParams = viewMode !== 'compact';
   const showDetails = viewMode === 'detailed';
 
-  // Snapshot entries ("Manual checkpoint") — detect via tool category per Decision 2A.
-  const isSnapshot = resolveToolCategory(entry.toolName).category === 'snapshot';
+  // Snapshot entries ("Manual checkpoint") — detect via the `kind` discriminator.
+  // Feature 208 replaces feature 176 Decision 2A's ToolCategory-equality check.
+  // The `entry.kind === undefined` clause preserves legacy behaviour for test
+  // fixtures that construct a TimelineEntry without the host populator.
+  const isSnapshot =
+    entry.kind === 'snapshot' ||
+    (entry.kind === undefined &&
+      resolveToolCategory(entry.toolName).category === 'snapshot');
 
   const ariaLabel =
     stepIndex != null

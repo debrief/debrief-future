@@ -63,6 +63,40 @@ export type ViewMode = 'timeline' | 'by-feature' | 'compact' | 'detailed';
 export const VALID_VIEW_MODES: readonly ViewMode[] = ['timeline', 'by-feature', 'compact', 'detailed'] as const;
 
 /**
+ * Semantic classification of a timeline entry, independent of its visual
+ * category. Feature: 208-timeline-entry-kind.
+ *
+ * - 'snapshot': a distinguished moment in the session (today sourced from the
+ *   `ToolCategory === 'snapshot'` signal; in future also from a manual snapshot
+ *   button and other PROV-side signals).
+ * - 'tool':     an ordinary tool invocation.
+ * - 'tune':     reserved for future analytical-adjustment / tune-marker
+ *   entries. No populator emits `'tune'` in feature 208 — it lands with a
+ *   future PROV-side signal.
+ */
+export type TimelineEntryKind = 'snapshot' | 'tool' | 'tune';
+
+/**
+ * All values of TimelineEntryKind, for runtime enumeration (tests, fixtures,
+ * documentation). Feature: 208-timeline-entry-kind.
+ */
+export const TIMELINE_ENTRY_KINDS: readonly TimelineEntryKind[] = [
+  'snapshot',
+  'tool',
+  'tune',
+] as const;
+
+/**
+ * Exhaustiveness guard. Call at the default branch of a switch/if-chain that
+ * enumerates TimelineEntryKind values. Adding a new kind without handling it
+ * surfaces as a type-check failure at this site.
+ * Feature: 208-timeline-entry-kind.
+ */
+export function assertNeverKind(value: never): never {
+  throw new Error(`Unhandled TimelineEntryKind: ${String(value)}`);
+}
+
+/**
  * Display-oriented timeline entry derived from LogEntry.
  *
  * T023: TimelineEntry is a UI projection, not a schema type. It carries
@@ -86,6 +120,14 @@ export interface TimelineEntry {
   tuneAnnotation?: { parameter: string; previous_value: unknown; new_value: unknown } | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   input_state?: InputFeatureState[] | null;
+  /**
+   * Semantic classification of this entry, independent of its visual category.
+   * Populated by the VS Code host on every emitted entry. Optional because
+   * test fixtures may bypass the host populator; consumers MUST fall back to
+   * legacy detection (`resolveToolCategory`) when `kind` is absent.
+   * Feature: 208-timeline-entry-kind.
+   */
+  kind?: TimelineEntryKind;
 }
 
 /**

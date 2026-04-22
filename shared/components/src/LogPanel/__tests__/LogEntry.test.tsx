@@ -168,3 +168,96 @@ describe('LogEntry — card anatomy', () => {
     expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ activity_id: 'a1' }));
   });
 });
+
+// Feature 208: kind-discriminator driven snapshot detection (T021).
+describe('LogEntry — kind discriminator (feature 208)', () => {
+  it('renders snapshot presentation when kind === "snapshot" (regardless of toolName)', () => {
+    // toolName is explicitly non-snapshot in the category map, proving the
+    // decision is driven by `kind`, not by `resolveToolCategory`.
+    render(
+      <LogEntry
+        entry={entry({ toolName: 'bearing-between-tracks', kind: 'snapshot' })}
+        featureNames={featureNames}
+        viewMode="timeline"
+        isSelected={false}
+      />
+    );
+    expect(screen.getByTestId('manual-checkpoint-placeholder')).toBeTruthy();
+  });
+
+  it('renders tool presentation when kind === "tool" (regardless of toolName)', () => {
+    // toolName is a known snapshot tool; kind overrides to tool.
+    render(
+      <LogEntry
+        entry={entry({ toolName: 'export-png', kind: 'tool' })}
+        featureNames={featureNames}
+        viewMode="timeline"
+        isSelected={false}
+      />
+    );
+    expect(screen.queryByTestId('manual-checkpoint-placeholder')).toBeNull();
+  });
+
+  it('falls back to legacy category check when kind is absent and toolName is a snapshot tool', () => {
+    const rest: TimelineEntry = { ...entry({ toolName: 'export-png' }) };
+    delete rest.kind;
+    render(
+      <LogEntry
+        entry={rest as TimelineEntry}
+        featureNames={featureNames}
+        viewMode="timeline"
+        isSelected={false}
+      />
+    );
+    expect(screen.getByTestId('manual-checkpoint-placeholder')).toBeTruthy();
+  });
+
+  it('falls back to tool rendering when kind is absent and toolName is non-snapshot', () => {
+    const rest: TimelineEntry = { ...entry({ toolName: 'bearing-between-tracks' }) };
+    delete rest.kind;
+    render(
+      <LogEntry
+        entry={rest as TimelineEntry}
+        featureNames={featureNames}
+        viewMode="timeline"
+        isSelected={false}
+      />
+    );
+    expect(screen.queryByTestId('manual-checkpoint-placeholder')).toBeNull();
+  });
+
+  // T031: "future 'tune' compatibility" — reserved-value tolerance.
+  describe("future 'tune' compatibility (T031)", () => {
+    it('renders tool-row presentation for kind === "tune" without throwing', () => {
+      expect(() => {
+        render(
+          <LogEntry
+            entry={entry({ toolName: 'bearing-between-tracks', kind: 'tune' })}
+            featureNames={featureNames}
+            viewMode="timeline"
+            isSelected={false}
+          />
+        );
+      }).not.toThrow();
+      expect(screen.queryByTestId('manual-checkpoint-placeholder')).toBeNull();
+    });
+  });
+
+  it('treats an unknown kind value as tool-row (fallback rendering)', () => {
+    // Cast forces an invalid runtime value the type system would normally
+    // reject. Confirms graceful fallback per FR-007.
+    const invalidEntry = entry({ toolName: 'bearing-between-tracks' });
+    (invalidEntry as unknown as { kind: string }).kind = 'annotation';
+    expect(() => {
+      render(
+        <LogEntry
+          entry={invalidEntry}
+          featureNames={featureNames}
+          viewMode="timeline"
+          isSelected={false}
+        />
+      );
+    }).not.toThrow();
+    expect(screen.queryByTestId('manual-checkpoint-placeholder')).toBeNull();
+  });
+});
