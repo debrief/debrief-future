@@ -579,6 +579,11 @@ const allCategoriesEntries: TimelineEntry[] = [
     operationCategory: 'calculation',
   },
   {
+    // Snapshot demo: post-feature-208, snapshot rendering is driven by the
+    // PROV-side `kind` discriminator, not by the tool's visual ToolCategory.
+    // The story retains its manual-checkpoint-placeholder appearance because
+    // `kind: 'snapshot'` is set explicitly — previously it appeared only
+    // because export-png happens to share the 'snapshot' visual category.
     activity_id: 'cat-snapshot',
     timestamp: '2026-04-19T09:04:00Z',
     toolName: 'export-png',
@@ -589,6 +594,7 @@ const allCategoriesEntries: TimelineEntry[] = [
     execution_duration: 'PT0.4S',
     generated_result_id: null,
     operationCategory: 'export',
+    kind: 'snapshot',
   },
   {
     activity_id: 'cat-unknown',
@@ -653,6 +659,8 @@ export const AllChipTypes: Story = {
 
 const edgeCaseEntries: TimelineEntry[] = [
   {
+    // Snapshot demo: kind-driven (feature 208). See analogous comment on
+    // `cat-snapshot` in allCategoriesEntries.
     activity_id: 'edge-snapshot',
     timestamp: '2026-04-19T11:00:00Z',
     toolName: 'export-png',
@@ -663,6 +671,7 @@ const edgeCaseEntries: TimelineEntry[] = [
     execution_duration: 'PT0.3S',
     generated_result_id: null,
     operationCategory: 'export',
+    kind: 'snapshot',
   },
   {
     activity_id: 'edge-noparams',

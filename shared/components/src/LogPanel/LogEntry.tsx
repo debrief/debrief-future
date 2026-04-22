@@ -21,7 +21,6 @@ import { ParameterChip } from './ParameterChip';
 import { TrackBadge } from './TrackBadge';
 import { CardFlip } from './CardFlip';
 import { EditFace } from './EditFace';
-import { resolveToolCategory } from './toolCategories';
 import './LogPanel.css';
 import './ParameterEditor.css';
 import './CardFlip.css';
@@ -110,8 +109,12 @@ export function LogEntry({
   const showParams = viewMode !== 'compact';
   const showDetails = viewMode === 'detailed';
 
-  // Snapshot entries ("Manual checkpoint") — detect via tool category per Decision 2A.
-  const isSnapshot = resolveToolCategory(entry.toolName).category === 'snapshot';
+  // Snapshot entries ("Manual checkpoint") — detect via the PROV-side `kind`
+  // discriminator, not via visual `ToolCategory`. Feature 208 replaces the
+  // feature 176 Decision 2A ToolCategory-equality check here; entry semantics
+  // now flow from `LogEntry.activity_type` on the LinkML schema, not from
+  // inferring meaning from the tool's visual category.
+  const isSnapshot = entry.kind === 'snapshot';
 
   const ariaLabel =
     stepIndex != null
