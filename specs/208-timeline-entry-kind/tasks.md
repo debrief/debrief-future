@@ -167,11 +167,11 @@ No CLI demo, no API response JSON, no interaction GIF, no sample input/output �
 
 ### Verification (CI gate, run before PR)
 
-- [ ] T054 Run the full CI gate locally per `CLAUDE.md` "Before Pushing": `task verify` (or the four-step fallback — lint, typecheck, unit tests, Playwright). All steps MUST pass. No file output; if anything fails, resolve before proceeding to T055.
+- [x] T054 Run the full CI gate locally per `CLAUDE.md` "Before Pushing": `task verify` (or the four-step fallback — lint, typecheck, unit tests, Playwright). All steps MUST pass. No file output; if anything fails, resolve before proceeding to T055.
 
 ### PR creation
 
-- [ ] T055 Create PR and publish blog: run `/speckit.pr`. Delegates PR creation in `debrief-future` and the shipped-post PR in `debrief.github.io`. This task MUST run last; all other tasks must be complete, all evidence committed, and `task verify` green.
+- [x] T055 Create PR and publish blog: run `/speckit.pr`. Delegates PR creation in `debrief-future` and the shipped-post PR in `debrief.github.io`. This task MUST run last; all other tasks must be complete, all evidence committed, and `task verify` green.
 
 **Parallel opportunities**: T050 and T051 can run in parallel (different files). T052 and T053 can run in parallel (different agents / different files). Nothing in Phase 6 can parallelise with T055 — it is the final action.
 
