@@ -1,0 +1,12 @@
+### Full-repo scan validation (tmp/type-audit.json) ###
+  Result: VALID
+  Records: 885
+  Drift clusters: 25
+  Scanner version: v1
+  Captured at: 2026-04-21T23:19:07.763Z
+  Git SHA: 01166d6e8ef72ed5cf25c339f0d9fa7dfc2b15b1
+
+### Sample subset validation (evidence/scan-output.sample.json) ###
+  Note: the committed sample has a human-annotation `note` field stripped for validation; the committed fields conform to the contract.
+  Result: VALID
+  Records in sample: 10

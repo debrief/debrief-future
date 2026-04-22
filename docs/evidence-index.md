@@ -22,3 +22,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 200-bounds-consolidation | 10 | md, txt | 2026-04-20 | current | [#482](https://github.com/debrief/debrief-future/pull/482) |
 | 203-spatial-types-linkml | 5 | md | 2026-04-21 | current | [#490](https://github.com/debrief/debrief-future/pull/490) |
 | 219-unify-bounds-utilities | 5 | md | 2026-04-21 | current | [#497](https://github.com/debrief/debrief-future/pull/497) |
+| 206-audit-non-linkml-types | 8 | md, txt, json | 2026-04-22 | current | [#504](https://github.com/debrief/debrief-future/pull/504) |

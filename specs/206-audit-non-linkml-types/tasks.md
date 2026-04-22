@@ -53,12 +53,12 @@
 
 **Purpose**: Create the scanner's folder skeleton and make `typescript` available to the scanner at repo-root level.
 
-- [ ] T001 Create scanner folder structure with a README explaining purpose, CLI flags, and invocation `scripts/audits/type-audit/README.md`
-- [ ] T002 [P] Add a minimal `tsconfig.json` for the scanner that targets Node 20 + ESM and enables `strict: true` `scripts/audits/type-audit/tsconfig.json`
-- [ ] T003 Add `typescript` (^5.x) to the repo-root `devDependencies` so the scanner does not need to piggy-back on a workspace install `package.json`
-- [ ] T004 [P] Add `vitest` + `ajv` to the repo-root `devDependencies` for scanner unit tests and schema-contract validation `package.json`
-- [ ] T005 [P] Create fixtures directory with ~10 hand-crafted `.ts` files covering each of: exported interface, non-exported interface, type alias, enum, alias bottoming out in `Record<string, unknown>`, drift pair (same name different shape across two files), schema-rooted re-export, and an excluded test-local declaration `scripts/audits/type-audit/__tests__/fixtures/`
-- [ ] T006 Run `pnpm install` at the repo root to materialise the new devDependencies `package.json`
+- [x] T001 Create scanner folder structure with a README explaining purpose, CLI flags, and invocation `scripts/audits/type-audit/README.md`
+- [x] T002 [P] Add a minimal `tsconfig.json` for the scanner that targets Node 20 + ESM and enables `strict: true` `scripts/audits/type-audit/tsconfig.json`
+- [x] T003 Add `typescript` (^5.x) to the repo-root `devDependencies` so the scanner does not need to piggy-back on a workspace install `package.json`
+- [x] T004 [P] Add `vitest` + `ajv` to the repo-root `devDependencies` for scanner unit tests and schema-contract validation `package.json`
+- [x] T005 [P] Create fixtures directory with ~10 hand-crafted `.ts` files covering each of: exported interface, non-exported interface, type alias, enum, alias bottoming out in `Record<string, unknown>`, drift pair (same name different shape across two files), schema-rooted re-export, and an excluded test-local declaration `scripts/audits/type-audit/__tests__/fixtures/`
+- [x] T006 Run `pnpm install` at the repo root to materialise the new devDependencies `package.json`
 
 **Checkpoint**: Scanner folder exists, TypeScript compiler available at root, fixtures in place. Phase 2 can begin.
 
@@ -74,25 +74,25 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementing the scanner.
 
-- [ ] T007 [P] [test] Fixture unit test — scanner enumerates the expected number of records from the fixtures folder and produces stable-sorted output `scripts/audits/type-audit/__tests__/scan.enumerate.test.ts`
-- [ ] T008 [P] [test] Fixture unit test — auto-tag rules: `schema-rooted-candidate` fires on files importing `@debrief/schemas`, `boundary-candidate` fires on aliases bottoming out in `unknown` / `Record<string, unknown>` `scripts/audits/type-audit/__tests__/scan.autotag.test.ts`
-- [ ] T009 [P] [test] Fixture unit test — `driftClusters` groups same-name-different-shape declarations and excludes same-name-same-shape duplicates `scripts/audits/type-audit/__tests__/scan.drift.test.ts`
-- [ ] T010 [P] [test] Contract test — scanner output validates against `specs/206-audit-non-linkml-types/contracts/scan-output.schema.json` via ajv `scripts/audits/type-audit/__tests__/scan.contract.test.ts`
-- [ ] T011 [P] [test] Determinism test — running the scanner twice on the same fixtures produces byte-identical JSON (stable sort order, stable SHA-1 shape hashes) `scripts/audits/type-audit/__tests__/scan.determinism.test.ts`
+- [x] T007 [P] [test] Fixture unit test — scanner enumerates the expected number of records from the fixtures folder and produces stable-sorted output `scripts/audits/type-audit/__tests__/scan.enumerate.test.ts`
+- [x] T008 [P] [test] Fixture unit test — auto-tag rules: `schema-rooted-candidate` fires on files importing `@debrief/schemas`, `boundary-candidate` fires on aliases bottoming out in `unknown` / `Record<string, unknown>` `scripts/audits/type-audit/__tests__/scan.autotag.test.ts`
+- [x] T009 [P] [test] Fixture unit test — `driftClusters` groups same-name-different-shape declarations and excludes same-name-same-shape duplicates `scripts/audits/type-audit/__tests__/scan.drift.test.ts`
+- [x] T010 [P] [test] Contract test — scanner output validates against `specs/206-audit-non-linkml-types/contracts/scan-output.schema.json` via ajv `scripts/audits/type-audit/__tests__/scan.contract.test.ts`
+- [x] T011 [P] [test] Determinism test — running the scanner twice on the same fixtures produces byte-identical JSON (stable sort order, stable SHA-1 shape hashes) `scripts/audits/type-audit/__tests__/scan.determinism.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T012 Implement AST traversal — walk each `.ts` / `.tsx` file and emit one record per top-level `InterfaceDeclaration`, `TypeAliasDeclaration`, `EnumDeclaration` (spec FR-001, data-model §1) `scripts/audits/type-audit/scan.ts`
-- [ ] T013 Implement exclusion rules — skip paths matching `shared/schemas/src/generated/**`, `**/__tests__/**`, `**/__fixtures__/**`, `**/*.test.ts`, `**/*.spec.ts`, `**/node_modules/**`, `**/dist/**` (spec FR-002, FR-003) `scripts/audits/type-audit/scan.ts`
-- [ ] T014 Compute stable `id` (`${packageName}:${relativeFilePath}:${declarationName}`) + `shapeHash` (SHA-1 of normalised AST print) per record `scripts/audits/type-audit/scan.ts`
-- [ ] T015 Collect import specifiers per file and attach to each record's `imports` array `scripts/audits/type-audit/scan.ts`
-- [ ] T016 Implement auto-tagging: set `autoTag` to `schema-rooted-candidate` / `boundary-candidate` / `drift-shortlist` / `none` per research.md R2, R4, R6 `scripts/audits/type-audit/scan.ts`
-- [ ] T017 Implement drift-cluster post-pass — group records by `declarationName`, emit a cluster when membership size ≥ 2 and distinct `shapeHash` count ≥ 2 `scripts/audits/type-audit/scan.ts`
-- [ ] T018 Emit the top-level wrapper — `scannerVersion` = `"v1"`, `capturedAt` (ISO-8601), `gitSha` (from `git rev-parse HEAD`), `scannedPaths`, `excludedPaths`, `records`, `driftClusters` (data-model §6, contract: `scan-output.schema.json`) `scripts/audits/type-audit/scan.ts`
-- [ ] T019 Add CLI flag parsing (`--roots`, `--exclude`, `--out`) matching the invocation documented in `quickstart.md` `scripts/audits/type-audit/scan.ts`
-- [ ] T020 Print a one-line stderr summary on completion (`Scanned N files, emitted M records, K drift clusters`) — confirms the scanner ran without forcing stdout noise `scripts/audits/type-audit/scan.ts`
-- [ ] T021 Wire up `vitest` configuration for the scanner tests (minimal — Node environment, no DOM, no Playwright) `scripts/audits/type-audit/vitest.config.ts`
-- [ ] T022 Run the scanner once against the full repo and verify it completes in under 30 seconds (plan.md Performance Goal); record timing in a commit message or throwaway log — this is a developer smoke-test, not an evidence task
+- [x] T012 Implement AST traversal — walk each `.ts` / `.tsx` file and emit one record per top-level `InterfaceDeclaration`, `TypeAliasDeclaration`, `EnumDeclaration` (spec FR-001, data-model §1) `scripts/audits/type-audit/scan.ts`
+- [x] T013 Implement exclusion rules — skip paths matching `shared/schemas/src/generated/**`, `**/__tests__/**`, `**/__fixtures__/**`, `**/*.test.ts`, `**/*.spec.ts`, `**/node_modules/**`, `**/dist/**` (spec FR-002, FR-003) `scripts/audits/type-audit/scan.ts`
+- [x] T014 Compute stable `id` (`${packageName}:${relativeFilePath}:${declarationName}`) + `shapeHash` (SHA-1 of normalised AST print) per record `scripts/audits/type-audit/scan.ts`
+- [x] T015 Collect import specifiers per file and attach to each record's `imports` array `scripts/audits/type-audit/scan.ts`
+- [x] T016 Implement auto-tagging: set `autoTag` to `schema-rooted-candidate` / `boundary-candidate` / `drift-shortlist` / `none` per research.md R2, R4, R6 `scripts/audits/type-audit/scan.ts`
+- [x] T017 Implement drift-cluster post-pass — group records by `declarationName`, emit a cluster when membership size ≥ 2 and distinct `shapeHash` count ≥ 2 `scripts/audits/type-audit/scan.ts`
+- [x] T018 Emit the top-level wrapper — `scannerVersion` = `"v1"`, `capturedAt` (ISO-8601), `gitSha` (from `git rev-parse HEAD`), `scannedPaths`, `excludedPaths`, `records`, `driftClusters` (data-model §6, contract: `scan-output.schema.json`) `scripts/audits/type-audit/scan.ts`
+- [x] T019 Add CLI flag parsing (`--roots`, `--exclude`, `--out`) matching the invocation documented in `quickstart.md` `scripts/audits/type-audit/scan.ts`
+- [x] T020 Print a one-line stderr summary on completion (`Scanned N files, emitted M records, K drift clusters`) — confirms the scanner ran without forcing stdout noise `scripts/audits/type-audit/scan.ts`
+- [x] T021 Wire up `vitest` configuration for the scanner tests (minimal — Node environment, no DOM, no Playwright) `scripts/audits/type-audit/vitest.config.ts`
+- [x] T022 Run the scanner once against the full repo and verify it completes in under 30 seconds (plan.md Performance Goal); record timing in a commit message or throwaway log — this is a developer smoke-test, not an evidence task
 
 **Parallel opportunity**: T007–T011 (all tests in different files) can be drafted simultaneously. T013–T017 mutate `scan.ts` and must be done sequentially in that file (unless split into modules).
 
@@ -108,14 +108,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Run the scanner against the full repo and save the intermediate JSON to a local throwaway path (e.g. `tmp/type-audit.json`) — `.gitignore` the `tmp/` folder if not already ignored `tmp/type-audit.json`
-- [ ] T024 [US1] Validate `tmp/type-audit.json` against `contracts/scan-output.schema.json` with ajv-cli; abort if validation fails (spec SC-001 depends on trusting the scanner's output) `tmp/type-audit.json`
-- [ ] T025 [US1] Create the report scaffold with YAML front matter (`feature`, `epic`, `captured_at`, `git_sha`, `scanner_version`), an intro paragraph that back-links to `docs/ideas/E11-schema-first-boundary-typing.md`, and the six required section headings from data-model §6 `docs/type-audit-2026.md`
-- [ ] T026 [US1] Populate the Findings table — one row per record, sorted classification → package → file path. For each row, confirm or override the scanner's `autoTag` and assign one of the five final classifications (`schema-rooted`, `boundary-loose`, `single-domain`, `cross-domain-hand-typed`, `drift-candidate`). Author a one-line `summary` per row. Leave `recommendedAction` cells for Phase 4 where they need backlog IDs `docs/type-audit-2026.md`
-- [ ] T027 [P] [US1] For every `single-domain` row, author the `justification` column (spec data-model §3 validation rule) `docs/type-audit-2026.md`
-- [ ] T028 [P] [US1] Resolve every entry in `driftClusters` — each cluster becomes at least one `drift-candidate` finding, cross-referencing the sibling declarations `docs/type-audit-2026.md`
-- [ ] T029 [US1] Fill the Summary section with per-bucket counts (derive from the populated Findings table) — leave the "Newly opened backlog items" sub-list for Phase 4 `docs/type-audit-2026.md`
-- [ ] T030 [US1] Spot-check: pick 10 random TS declarations from in-scope paths and verify each appears in the Findings table (SC-001). Record the sample IDs in a commit message, not the report `docs/type-audit-2026.md`
+- [x] T023 [US1] Run the scanner against the full repo and save the intermediate JSON to a local throwaway path (e.g. `tmp/type-audit.json`) — `.gitignore` the `tmp/` folder if not already ignored `tmp/type-audit.json`
+- [x] T024 [US1] Validate `tmp/type-audit.json` against `contracts/scan-output.schema.json` with ajv-cli; abort if validation fails (spec SC-001 depends on trusting the scanner's output) `tmp/type-audit.json`
+- [x] T025 [US1] Create the report scaffold with YAML front matter (`feature`, `epic`, `captured_at`, `git_sha`, `scanner_version`), an intro paragraph that back-links to `docs/ideas/E11-schema-first-boundary-typing.md`, and the six required section headings from data-model §6 `docs/type-audit-2026.md`
+- [x] T026 [US1] Populate the Findings table — one row per record, sorted classification → package → file path. For each row, confirm or override the scanner's `autoTag` and assign one of the five final classifications (`schema-rooted`, `boundary-loose`, `single-domain`, `cross-domain-hand-typed`, `drift-candidate`). Author a one-line `summary` per row. Leave `recommendedAction` cells for Phase 4 where they need backlog IDs `docs/type-audit-2026.md`
+- [x] T027 [P] [US1] For every `single-domain` row, author the `justification` column (spec data-model §3 validation rule) `docs/type-audit-2026.md`
+- [x] T028 [P] [US1] Resolve every entry in `driftClusters` — each cluster becomes at least one `drift-candidate` finding, cross-referencing the sibling declarations `docs/type-audit-2026.md`
+- [x] T029 [US1] Fill the Summary section with per-bucket counts (derive from the populated Findings table) — leave the "Newly opened backlog items" sub-list for Phase 4 `docs/type-audit-2026.md`
+- [x] T030 [US1] Spot-check: pick 10 random TS declarations from in-scope paths and verify each appears in the Findings table (SC-001). Record the sample IDs in a commit message, not the report `docs/type-audit-2026.md`
 
 **Checkpoint**: The report's Findings table is complete and internally consistent; every record is classified. Phase 4 can fill in backlog linkage.
 
@@ -129,13 +129,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] For every `cross-domain-hand-typed` and `drift-candidate` finding, attempt to fold into an existing backlog item first (#203 spatial types, #204 RawGeoJSONFeature, #205 DisplayMode/PlaybackState, or another open E11 child). Update the `recommendedAction` cell to `Fold into #NNN — <short rationale>` `docs/type-audit-2026.md`
-- [ ] T032 [US2] Determine the next available backlog ID in `BACKLOG.md` by scanning existing rows (current max + 1) `BACKLOG.md`
-- [ ] T033 [US2] For each remaining actionable finding that does not fit an existing item, append a new row to `BACKLOG.md` using the project's existing table format — category `Infrastructure`, status `approved` if scope is clear else `needs-interview`, link to the audit report anchor as the rationale source `BACKLOG.md`
-- [ ] T034 [US2] (Optional, if any new item's scope warrants it) Create idea documents under `docs/ideas/` following the pattern of `docs/ideas/203-*.md`, `204-*.md`, `205-*.md` `docs/ideas/`
-- [ ] T035 [US2] Update every actionable finding's `recommendedAction` cell in the report to `Open #NNN — <title>` (for newly opened items) or `Fold into #NNN` (for existing) so every row has a non-empty link target `docs/type-audit-2026.md`
-- [ ] T036 [US2] Fill the report's "Newly opened backlog items" summary sub-list with each new ID + one-line title + link to `BACKLOG.md` `docs/type-audit-2026.md`
-- [ ] T037 [US2] Self-check against spec SC-002: filter the Findings table to `cross-domain-hand-typed` + `drift-candidate` rows and confirm zero rows have an empty `backlogItemRef` `docs/type-audit-2026.md`
+- [x] T031 [US2] For every `cross-domain-hand-typed` and `drift-candidate` finding, attempt to fold into an existing backlog item first (#203 spatial types, #204 RawGeoJSONFeature, #205 DisplayMode/PlaybackState, or another open E11 child). Update the `recommendedAction` cell to `Fold into #NNN — <short rationale>` `docs/type-audit-2026.md`
+- [x] T032 [US2] Determine the next available backlog ID in `BACKLOG.md` by scanning existing rows (current max + 1) `BACKLOG.md`
+- [x] T033 [US2] For each remaining actionable finding that does not fit an existing item, append a new row to `BACKLOG.md` using the project's existing table format — category `Infrastructure`, status `approved` if scope is clear else `needs-interview`, link to the audit report anchor as the rationale source `BACKLOG.md`
+- [x] T034 [US2] (Optional, if any new item's scope warrants it) Create idea documents under `docs/ideas/` following the pattern of `docs/ideas/203-*.md`, `204-*.md`, `205-*.md` `docs/ideas/`
+- [x] T035 [US2] Update every actionable finding's `recommendedAction` cell in the report to `Open #NNN — <title>` (for newly opened items) or `Fold into #NNN` (for existing) so every row has a non-empty link target `docs/type-audit-2026.md`
+- [x] T036 [US2] Fill the report's "Newly opened backlog items" summary sub-list with each new ID + one-line title + link to `BACKLOG.md` `docs/type-audit-2026.md`
+- [x] T037 [US2] Self-check against spec SC-002: filter the Findings table to `cross-domain-hand-typed` + `drift-candidate` rows and confirm zero rows have an empty `backlogItemRef` `docs/type-audit-2026.md`
 
 **Checkpoint**: Every actionable finding has a backlog home. The Summary section's counts match the number of new items committed to `BACKLOG.md`.
 
@@ -149,13 +149,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Author the Methodology section: list the exact in-scope paths (`apps/`, `shared/`, `services/`), the exclusion patterns (verbatim globs), the rule for distinguishing generated vs. authored code (path-based — `shared/schemas/src/generated/`), and the rule applied for each of the five classification buckets (spec FR-009) `docs/type-audit-2026.md`
-- [ ] T039 [US3] In the Methodology section, embed the exact re-run command (copy from `quickstart.md` §1) so the report is self-contained `docs/type-audit-2026.md`
-- [ ] T040 [US3] Add a "Known methodology gaps / caveats" subsection listing any generated output discovered outside `shared/schemas/src/generated/` (per spec edge-case bullet) or any classification judgement that felt borderline and deserves a second look `docs/type-audit-2026.md`
-- [ ] T041 [P] [US3] Populate the Python cross-domain appendix: sweep `services/` and `shared/` Python packages for hand-authored types whose instances appear to cross the Python ↔ TS boundary (e.g. Pydantic `BaseModel` subclasses consumed by MCP tool results). If none found, include an explicit "No candidates found" line — the section is not optional (spec FR-012) `docs/type-audit-2026.md`
-- [ ] T042 [US3] Update `docs/ideas/E11-schema-first-boundary-typing.md` — add a bullet under `## Items` linking to `docs/type-audit-2026.md`, and append any new phases surfaced by the audit to `## Phase inventory` (spec FR-010 / SC-003) `docs/ideas/E11-schema-first-boundary-typing.md`
-- [ ] T043 [US3] Confirm the report's intro paragraph back-links to `docs/ideas/E11-schema-first-boundary-typing.md` (T025 scaffolded the link — verify it survived editing) `docs/type-audit-2026.md`
-- [ ] T044 [US3] Add a "Re-run log / changelog" section at the bottom of the report with a first entry: `2026-MM-DD — Initial audit (git_sha: ...)` — future re-runs append rows here without rewriting the body `docs/type-audit-2026.md`
+- [x] T038 [US3] Author the Methodology section: list the exact in-scope paths (`apps/`, `shared/`, `services/`), the exclusion patterns (verbatim globs), the rule for distinguishing generated vs. authored code (path-based — `shared/schemas/src/generated/`), and the rule applied for each of the five classification buckets (spec FR-009) `docs/type-audit-2026.md`
+- [x] T039 [US3] In the Methodology section, embed the exact re-run command (copy from `quickstart.md` §1) so the report is self-contained `docs/type-audit-2026.md`
+- [x] T040 [US3] Add a "Known methodology gaps / caveats" subsection listing any generated output discovered outside `shared/schemas/src/generated/` (per spec edge-case bullet) or any classification judgement that felt borderline and deserves a second look `docs/type-audit-2026.md`
+- [x] T041 [P] [US3] Populate the Python cross-domain appendix: sweep `services/` and `shared/` Python packages for hand-authored types whose instances appear to cross the Python ↔ TS boundary (e.g. Pydantic `BaseModel` subclasses consumed by MCP tool results). If none found, include an explicit "No candidates found" line — the section is not optional (spec FR-012) `docs/type-audit-2026.md`
+- [x] T042 [US3] Update `docs/ideas/E11-schema-first-boundary-typing.md` — add a bullet under `## Items` linking to `docs/type-audit-2026.md`, and append any new phases surfaced by the audit to `## Phase inventory` (spec FR-010 / SC-003) `docs/ideas/E11-schema-first-boundary-typing.md`
+- [x] T043 [US3] Confirm the report's intro paragraph back-links to `docs/ideas/E11-schema-first-boundary-typing.md` (T025 scaffolded the link — verify it survived editing) `docs/type-audit-2026.md`
+- [x] T044 [US3] Add a "Re-run log / changelog" section at the bottom of the report with a first entry: `2026-MM-DD — Initial audit (git_sha: ...)` — future re-runs append rows here without rewriting the body `docs/type-audit-2026.md`
 
 **Checkpoint**: All three user stories are independently testable. Report and epic cross-link bidirectionally. Methodology is complete enough to support re-runs.
 
@@ -167,30 +167,30 @@
 
 ### Cross-cutting cleanup
 
-- [ ] T045 Run `task verify` (lint + typecheck + test) and fix any regressions introduced by adding `typescript` / `vitest` / `ajv` to root devDeps
-- [ ] T046 [P] Verify no production source files were modified — `git diff --stat origin/main...HEAD` should only touch `docs/`, `BACKLOG.md`, `scripts/audits/type-audit/`, `package.json`, `pnpm-lock.yaml`, and `specs/206-audit-non-linkml-types/` (spec SC-005)
-- [ ] T047 Update `CLAUDE.md` "Recent Changes" section with a 206 entry (previous auto-update was a no-op) `CLAUDE.md`
+- [x] T045 Run `task verify` (lint + typecheck + test) and fix any regressions introduced by adding `typescript` / `vitest` / `ajv` to root devDeps
+- [x] T046 [P] Verify no production source files were modified — `git diff --stat origin/main...HEAD` should only touch `docs/`, `BACKLOG.md`, `scripts/audits/type-audit/`, `package.json`, `pnpm-lock.yaml`, and `specs/206-audit-non-linkml-types/` (spec SC-005)
+- [x] T047 Update `CLAUDE.md` "Recent Changes" section with a 206 entry (previous auto-update was a no-op) `CLAUDE.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T048 Create evidence directory `specs/206-audit-non-linkml-types/evidence/`
-- [ ] T049 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: 206-audit-non-linkml-types`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers scanner unit tests + contract validation `specs/206-audit-non-linkml-types/evidence/test-summary.md`
-- [ ] T050 [P] Record usage example — a narrated walk-through of running the scanner, validating with ajv, and assigning a classification to one sample record `specs/206-audit-non-linkml-types/evidence/usage-example.md`
-- [ ] T051 [P] Capture terminal transcript of a full-repo scanner run with stderr one-line summary `specs/206-audit-non-linkml-types/evidence/scanner-run.txt`
-- [ ] T052 [P] Capture a trimmed (~10 records) redacted excerpt of the intermediate scanner JSON `specs/206-audit-non-linkml-types/evidence/scan-output.sample.json`
-- [ ] T053 [P] Capture ajv validation output against `contracts/scan-output.schema.json` `specs/206-audit-non-linkml-types/evidence/ajv-validation.txt`
-- [ ] T054 [P] Capture `git diff BACKLOG.md` showing newly opened items (or a "no new items" note if none were opened) `specs/206-audit-non-linkml-types/evidence/backlog-diff.txt`
-- [ ] T055 [P] Write a short note referencing the committed report as the primary deliverable `specs/206-audit-non-linkml-types/evidence/report-link.md`
-- [ ] T056 Execute the re-run sanity check from spec SC-004: on a fresh worktree at the same SHA, re-run the scanner + ajv validate; document that the JSON output is byte-identical (determinism test already enforces this, but a live re-run is the evidence) `specs/206-audit-non-linkml-types/evidence/rerun-methodology.md`
+- [x] T048 Create evidence directory `specs/206-audit-non-linkml-types/evidence/`
+- [x] T049 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` — YAML front matter with `feature: 206-audit-non-linkml-types`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body covers scanner unit tests + contract validation `specs/206-audit-non-linkml-types/evidence/test-summary.md`
+- [x] T050 [P] Record usage example — a narrated walk-through of running the scanner, validating with ajv, and assigning a classification to one sample record `specs/206-audit-non-linkml-types/evidence/usage-example.md`
+- [x] T051 [P] Capture terminal transcript of a full-repo scanner run with stderr one-line summary `specs/206-audit-non-linkml-types/evidence/scanner-run.txt`
+- [x] T052 [P] Capture a trimmed (~10 records) redacted excerpt of the intermediate scanner JSON `specs/206-audit-non-linkml-types/evidence/scan-output.sample.json`
+- [x] T053 [P] Capture ajv validation output against `contracts/scan-output.schema.json` `specs/206-audit-non-linkml-types/evidence/ajv-validation.txt`
+- [x] T054 [P] Capture `git diff BACKLOG.md` showing newly opened items (or a "no new items" note if none were opened) `specs/206-audit-non-linkml-types/evidence/backlog-diff.txt`
+- [x] T055 [P] Write a short note referencing the committed report as the primary deliverable `specs/206-audit-non-linkml-types/evidence/report-link.md`
+- [x] T056 Execute the re-run sanity check from spec SC-004: on a fresh worktree at the same SHA, re-run the scanner + ajv validate; document that the JSON output is byte-identical (determinism test already enforces this, but a live re-run is the evidence) `specs/206-audit-non-linkml-types/evidence/rerun-methodology.md`
 
 ### Media Content
 
-- [ ] T057 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — include What We Built (surprising findings, counts per bucket, anything notable), Lessons Learned (any classification call that was hard), What's Next (the E11 phase list the audit unlocked) `specs/206-audit-non-linkml-types/media/shipped-post.md`
-- [ ] T058 [P] Create LinkedIn shipped summary (150–200 words, hook opening referencing a concrete number from the findings, link placeholder to full post) `specs/206-audit-non-linkml-types/media/linkedin-shipped.md`
+- [x] T057 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — include What We Built (surprising findings, counts per bucket, anything notable), Lessons Learned (any classification call that was hard), What's Next (the E11 phase list the audit unlocked) `specs/206-audit-non-linkml-types/media/shipped-post.md`
+- [x] T058 [P] Create LinkedIn shipped summary (150–200 words, hook opening referencing a concrete number from the findings, link placeholder to full post) `specs/206-audit-non-linkml-types/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T059 Create PR and publish blog: run `/speckit.pr`
+- [x] T059 Create PR and publish blog: run `/speckit.pr`
 
 **Task T059 must run last. It depends on T045 through T058 being complete — CI must be green, evidence must be captured, and both blog posts must be drafted before the PR opens.**
 
