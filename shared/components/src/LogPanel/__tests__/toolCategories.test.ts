@@ -1,8 +1,8 @@
 /**
  * Unit tests for the manifest-fed `resolveToolCategory` resolver.
  *
- * Feature: 207 (replaces the static TOOL_ID_TO_CATEGORY shim with a
- * manifest-fed lookup; shim preserved as a transitional fallback).
+ * Feature: 207 Commit B — the interim `TOOL_ID_TO_CATEGORY` shim has
+ * been removed; resolution is exclusively via the passed-in manifest map.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -13,7 +13,7 @@ import {
 } from '../toolCategories';
 import type { ToolCategoryMap } from '../types';
 
-describe('resolveToolCategory — manifest-fed path (feature 207)', () => {
+describe('resolveToolCategory — manifest-fed resolution (feature 207)', () => {
   it('uses the manifest category when tool declared one', () => {
     const map: ToolCategoryMap = { 'my-tool': 'calc' };
     const config = resolveToolCategory('my-tool', map);
@@ -48,38 +48,25 @@ describe('resolveToolCategory — manifest-fed path (feature 207)', () => {
   );
 });
 
-describe('resolveToolCategory — legacy shim fallback (feature 207 transitional)', () => {
-  it('consults TOOL_ID_TO_CATEGORY when no manifest is supplied', () => {
-    // Pre-#207 callers (Storybook stories, unit tests not yet threaded with
-    // a manifest) still get the correct colour for the 16 hand-listed tools.
-    expect(resolveToolCategory('import-rep')).toBe(TOOL_CATEGORY_CONFIGS.import);
-    expect(resolveToolCategory('change-track-color')).toBe(
-      TOOL_CATEGORY_CONFIGS.style,
+describe('resolveToolCategory — unloaded manifest state (feature 207 R4)', () => {
+  it('returns UNKNOWN for every tool when no manifest is supplied', () => {
+    // Pre-manifest-delivery render path: the webview calls resolveToolCategory
+    // with no map until the `tools:manifest` message arrives. Every card
+    // must render grey until then — no flashing of incorrect (non-grey) colours.
+    expect(resolveToolCategory('import-rep')).toBe(UNKNOWN_CATEGORY_CONFIG);
+    expect(resolveToolCategory('change-track-color')).toBe(UNKNOWN_CATEGORY_CONFIG);
+    expect(resolveToolCategory('some-brand-new-tool')).toBe(UNKNOWN_CATEGORY_CONFIG);
+  });
+
+  it('UNKNOWN and undefined-manifest are observationally identical', () => {
+    // Intentional — callers relying on the legacy shim must now pass
+    // a manifest map. The Commit B migration updated every first-party
+    // tool to declare `category` at its registration site, so no
+    // production caller needs the shim behaviour.
+    expect(resolveToolCategory('import-rep')).toEqual(UNKNOWN_CATEGORY_CONFIG);
+    expect(resolveToolCategory('import-rep', {})).toEqual(UNKNOWN_CATEGORY_CONFIG);
+    expect(resolveToolCategory('import-rep', { 'other': 'calc' })).toEqual(
+      UNKNOWN_CATEGORY_CONFIG,
     );
-    expect(resolveToolCategory('move-track')).toBe(TOOL_CATEGORY_CONFIGS.calc);
-    expect(resolveToolCategory('time-filter')).toBe(TOOL_CATEGORY_CONFIGS.filter);
-    expect(resolveToolCategory('export-png')).toBe(TOOL_CATEGORY_CONFIGS.snapshot);
-  });
-
-  it('returns UNKNOWN when no manifest + tool not in shim', () => {
-    expect(resolveToolCategory('some-new-tool')).toBe(UNKNOWN_CATEGORY_CONFIG);
-  });
-});
-
-describe('resolveToolCategory — manifest precedence over shim', () => {
-  it('uses manifest when defined even if the shim has a different answer', () => {
-    // 'import-rep' is `import` in the shim. A manifest that re-categorises
-    // it (e.g. to style) should win — the manifest is the source of truth.
-    const map: ToolCategoryMap = { 'import-rep': 'style' };
-    expect(resolveToolCategory('import-rep', map)).toBe(
-      TOOL_CATEGORY_CONFIGS.style,
-    );
-  });
-
-  it('does NOT fall back to the shim when manifest is empty', () => {
-    // Key difference from legacy behaviour: an empty map is "no tool
-    // declared a category", not "ask the shim".
-    const map: ToolCategoryMap = {};
-    expect(resolveToolCategory('import-rep', map)).toBe(UNKNOWN_CATEGORY_CONFIG);
   });
 });

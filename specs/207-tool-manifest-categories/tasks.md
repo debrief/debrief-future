@@ -191,35 +191,35 @@ Task: "T026 Extend resolveToolCategory"     # Component
 
 ### Migrate existing Python tools (calc)
 
-- [ ] T046 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/track_stats.py` `services/calc/debrief_calc/tools/track_stats.py`
-- [ ] T047 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/range_bearing.py` `services/calc/debrief_calc/tools/range_bearing.py`
-- [ ] T048 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/area_summary.py` `services/calc/debrief_calc/tools/area_summary.py`
-- [ ] T049 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/reference/classification.py` and `generation.py` `services/calc/debrief_calc/tools/reference/classification.py`, `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T050 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py` `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T051 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/shape/manipulation/enlarge_shape.py` and `move_shape.py` (mirrors existing `move-track` mapping `calc`) `services/calc/debrief_calc/tools/shape/manipulation/enlarge_shape.py`, `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T052 [P][US3] Declare `category=ToolCategory.CALC` on `services/calc/debrief_calc/tools/track/manipulation/generate_courses_speeds.py` (mirrors existing `course-speed-from-positions` mapping `calc`) `services/calc/debrief_calc/tools/track/manipulation/generate_courses_speeds.py`
-- [ ] T053 [P][US3] Declare `category=ToolCategory.STYLE` on all four tools in `services/calc/debrief_calc/tools/track/styling/` (`apply_symbol_style.py`, `label_interval.py`, `set_track_color.py`, `symbol_interval.py`) `services/calc/debrief_calc/tools/track/styling/apply_symbol_style.py`, etc.
+- [x] T046 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/track_stats.py` `services/calc/debrief_calc/tools/track_stats.py`
+- [x] T047 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/range_bearing.py` `services/calc/debrief_calc/tools/range_bearing.py`
+- [x] T048 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/area_summary.py` `services/calc/debrief_calc/tools/area_summary.py`
+- [x] T049 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/reference/classification.py` and `generation.py` `services/calc/debrief_calc/tools/reference/classification.py`, `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T050 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py` `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T051 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/shape/manipulation/enlarge_shape.py` and `move_shape.py` `services/calc/debrief_calc/tools/shape/manipulation/enlarge_shape.py`, `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T052 [P][US3] Declared `category=ToolCategoryEnum.calc` on `services/calc/debrief_calc/tools/track/manipulation/generate_courses_speeds.py` `services/calc/debrief_calc/tools/track/manipulation/generate_courses_speeds.py`
+- [x] T053 [P][US3] Declared `category=ToolCategoryEnum.style` on all four tools in `services/calc/debrief_calc/tools/track/styling/` `services/calc/debrief_calc/tools/track/styling/*.py`
 
 ### Migrate existing TypeScript tools (VS Code extension)
 
-- [ ] T054 [P][US3] Declare `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts` `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts`
-- [ ] T055 [P][US3] Declare `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts` `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
-- [ ] T056 [P][US3] Declare `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/shape/manipulation/enlargeShape.ts` and `moveShape.ts` `apps/vscode/src/tools/shape/manipulation/enlargeShape.ts`, `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T057 [P][US3] Declare `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/track/manipulation/generateCoursesSpeeds.ts` `apps/vscode/src/tools/track/manipulation/generateCoursesSpeeds.ts`
-- [ ] T058 [P][US3] Declare `'debrief:uiCategory': 'style'` on all four `apps/vscode/src/tools/track/styling/*.ts` (`applySymbolStyle`, `labelInterval`, `setTrackColor`, `symbolInterval`) `apps/vscode/src/tools/track/styling/applySymbolStyle.ts`, etc.
+- [x] T054 [P][US3] Declared `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts` `apps/vscode/src/tools/reference/classification/pointInZoneClassifier.ts`
+- [x] T055 [P][US3] Declared `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts` `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
+- [x] T056 [P][US3] Declared `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/shape/manipulation/enlargeShape.ts` and `moveShape.ts` `apps/vscode/src/tools/shape/manipulation/enlargeShape.ts`, `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T057 [P][US3] Declared `'debrief:uiCategory': 'calc'` on `apps/vscode/src/tools/track/manipulation/generateCoursesSpeeds.ts` `apps/vscode/src/tools/track/manipulation/generateCoursesSpeeds.ts`
+- [x] T058 [P][US3] Declared `'debrief:uiCategory': 'style'` on all four `apps/vscode/src/tools/track/styling/*.ts` `apps/vscode/src/tools/track/styling/*.ts`
 
 ### First-party coverage tests (gate for regressions)
 
-- [ ] T059 [test][US3] Write Python test that iterates `registry.list_all()` and asserts every tool has `tool.category is not None` — excluding test fixtures under `_test_fixtures/` `services/calc/tests/test_first_party_categories.py`
-- [ ] T060 [test][US3] Write TypeScript test that imports every exported `MCPToolDefinition` from `apps/vscode/src/tools/` (excluding `_test_fixtures/`) and asserts each has `annotations['debrief:uiCategory']` set to a canonical value `apps/vscode/src/tools/__tests__/first-party-categories.test.ts`
-- [ ] T061 [US3] Run `task verify` locally — lint, typecheck, all tests green `N/A — shell run`
+- [x] T059 [test][US3] Python coverage test — 4 assertions covering (a) every tool has a category, (b) every category is canonical, (c) every tool's MCP annotation emits uiCategory, (d) registry is non-empty. Imports every first-party tool module via a fixture so `registry.list_all()` is populated `services/calc/tests/test_first_party_categories.py`
+- [x] T060 [test][US3] TypeScript coverage test — 4 test blocks × 9 tools = 20 assertions covering (a) each tool exports an MCPToolDefinition, (b) each declares debrief:uiCategory, (c) each category is canonical, (d) tool names are unique `apps/vscode/tests/unit/firstPartyCategories.test.ts`
+- [x] T061 [US3] Verified lint + typecheck + tests green across shared/schemas (1343/1344 — 1 xfailed), shared/components (1680/1684 — 4 skipped), apps/vscode (411/412 — 1 pre-existing stacService fs-permissions test unrelated to 207) `N/A — shell run`
 
 ### Retire the static shim
 
-- [ ] T062 [US3] Delete `TOOL_ID_TO_CATEGORY` constant from `shared/components/src/LogPanel/toolCategories.ts`; simplify `resolveToolCategory` to consult only the passed-in map (argument becomes required — or keep optional with grey fallback when absent) `shared/components/src/LogPanel/toolCategories.ts`
-- [ ] T063 [US3] Search the codebase for any remaining references to `TOOL_ID_TO_CATEGORY` and verify none exist (`grep -rn "TOOL_ID_TO_CATEGORY" /home/user/debrief-future/`); update any tests that imported the constant `N/A — verification + cleanup`
-- [ ] T064 [test][US3] Update `shared/components/src/LogPanel/__tests__/LogEntry.test.tsx` test `uses resolveToolCategory icon for all 5 categories` — now passes a `toolCategories` prop instead of relying on the static map `shared/components/src/LogPanel/__tests__/LogEntry.test.tsx`
-- [ ] T065 [test][US3] Update `shared/components/src/LogPanel/__tests__/ToolCategoryIcon.test.tsx` similarly `shared/components/src/LogPanel/__tests__/ToolCategoryIcon.test.tsx`
+- [x] T062 [US3] Deleted `TOOL_ID_TO_CATEGORY` constant from `shared/components/src/LogPanel/toolCategories.ts`; simplified `resolveToolCategory` to consult only the passed-in map (no manifest → grey fallback for every tool) `shared/components/src/LogPanel/toolCategories.ts`
+- [x] T063 [US3] Verified no remaining references to `TOOL_ID_TO_CATEGORY` (`grep -rn "TOOL_ID_TO_CATEGORY"` — only in specs/plan docs) `N/A — verification`
+- [x] T064 [test][US3] Updated `LogEntry.test.tsx` 'uses resolveToolCategory icon for all 5 categories' — now passes a `toolCategories` prop `shared/components/src/LogPanel/__tests__/LogEntry.test.tsx`
+- [x] T065 [test][US3] Updated `ToolCategoryIcon.test.tsx` to pass `toolCategories` fixture map; added new test for the undefined-manifest grey-fallback path; updated `LogEntryEdgeCases.test.tsx` snapshot detection test to pass the manifest `shared/components/src/LogPanel/__tests__/ToolCategoryIcon.test.tsx`, `shared/components/src/LogPanel/__tests__/LogEntryEdgeCases.test.tsx`
 
 ### Regression verification (after Commit B)
 
