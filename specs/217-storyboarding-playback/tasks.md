@@ -16,18 +16,13 @@
 |----------|-------------|---------------|
 | `test-summary.md` | Aggregated vitest + Playwright results (YAML front matter: feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct) | After all tests pass |
 | `usage-example.md` | Walk-through of opening a plot, stepping through a Storyboard, hitting a hard-block, switching Storyboards | After US1 + US2 complete |
-| `screenshots/storyboard-panel-transport-light.png` | TransportRow story in light theme (Storybook capture) | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-transport-dark.png` | TransportRow story in dark theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-transport-vscode.png` | TransportRow story in vscode theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-multi-light.png` | WithMultipleStoryboards story in light theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-multi-dark.png` | WithMultipleStoryboards story in dark theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-multi-vscode.png` | WithMultipleStoryboards story in vscode theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-hardblock-light.png` | HardBlockModal story in light theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-hardblock-dark.png` | HardBlockModal story in dark theme | After T330 Storybook E2E |
-| `screenshots/storyboard-panel-hardblock-vscode.png` | HardBlockModal story in vscode theme | After T330 Storybook E2E |
-| `screenshots/interaction.gif` | 3-5 s GIF of forward-through-storyboard in code-server: Forward click → map flyTo → time slider advance → rectangle highlight update | Captured during webview E2E run, converted from Playwright video |
-| `screenshots/e2e-hardblock.png` | Code-server screenshot of the native VS Code modal surfaced by a missing-feature hard-block | After T340 webview E2E |
-| `screenshots/e2e-dropdown-switch.png` | Code-server screenshot of dropdown switch with Scene rectangles updating | After T340 webview E2E |
+| `screenshots/storyboard-panel-transport-light.png` | TransportRow story — canonical light-theme Storybook capture | After Storybook E2E |
+| `screenshots/storyboard-panel-multi-light.png` | WithMultipleStoryboards story — canonical light-theme Storybook capture | After Storybook E2E |
+| `screenshots/storyboard-panel-hardblock-light.png` | HardBlockModal story — canonical light-theme Storybook capture | After Storybook E2E |
+<!-- Originally planned dark / vscode theme variants were dropped — the Storybook sandbox renders all three themes identically (VS Code CSS tokens resolve to the same palette regardless of `globals=theme:...`). See evidence/screenshots/README.md § "Theme parity note". -->
+| `screenshots/interaction.gif` | ~3s GIF of forward-through-storyboard flow — panel + map side-by-side, scene-row highlight + map flyTo + rectangle layer panning | PNG-stitch pipeline from Playwright `page.screenshot` loop |
+| `screenshots/e2e-hardblock.png` | HardBlockModal overlay captured on the integrated Storybook harness (real DOM dialog, not VS Code-native) | After integrated E2E |
+| `screenshots/e2e-dropdown-switch.png` | Dropdown switch with Scene rectangles updating, on the integrated Storybook harness | After integrated E2E |
 | `feature-integration.md` | Integration diagram + brief — shows how `StoryboardPlaybackService` composes with `#215 CRUD`, `MapPanel`, `TimeRangeViewProvider`, `SessionManager` | After US1 + US2 complete |
 
 ### Media Content

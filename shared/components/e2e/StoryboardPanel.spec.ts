@@ -120,64 +120,60 @@ test.describe('StoryboardPanel — accessibility', () => {
 
 // ─── #217 — Transport / MultipleStoryboards / HardBlockModal ─────────
 
+// Three stories × three themes were originally captured, but the panel's
+// VS Code CSS tokens resolve identically in the Storybook sandbox, so the
+// dark / vscode variants produced byte-identical PNGs. Kept one light
+// capture per story as the canonical evidence; the theme-parity
+// behaviour is noted in evidence/screenshots/README.md.
+
 test.describe('StoryboardPanel — Transport (#217)', () => {
-  for (const theme of ['light', 'dark', 'vscode'] as const) {
-    test(`renders TransportRow in ${theme} theme`, async ({ page }) => {
-      await page.goto(withTheme(storyUrl('transport'), theme));
-      await page.waitForSelector('[data-testid="storyboard-panel"]');
-      // Transport row present with Forward / Backward buttons + counter
-      await expect(
-        page.locator('[data-testid="transport-forward"]'),
-      ).toBeVisible();
-      await expect(
-        page.locator('[data-testid="transport-backward"]'),
-      ).toBeVisible();
-      // Currently at Scene 1 of 3 — Backward disabled, Forward enabled
-      await expect(
-        page.locator('[data-testid="transport-backward"]'),
-      ).toBeDisabled();
-      await expect(
-        page.locator('[data-testid="transport-forward"]'),
-      ).toBeEnabled();
-      await page.screenshot({
-        path: `${EVIDENCE_DIR_217}/storyboard-panel-transport-${theme}.png`,
-      });
+  test('renders TransportRow with canonical light-theme capture', async ({ page }) => {
+    await page.goto(withTheme(storyUrl('transport'), 'light'));
+    await page.waitForSelector('[data-testid="storyboard-panel"]');
+    await expect(
+      page.locator('[data-testid="transport-forward"]'),
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-testid="transport-backward"]'),
+    ).toBeVisible();
+    // Currently at Scene 1 of 3 — Backward disabled, Forward enabled
+    await expect(
+      page.locator('[data-testid="transport-backward"]'),
+    ).toBeDisabled();
+    await expect(
+      page.locator('[data-testid="transport-forward"]'),
+    ).toBeEnabled();
+    await page.screenshot({
+      path: `${EVIDENCE_DIR_217}/storyboard-panel-transport-light.png`,
     });
-  }
+  });
 });
 
 test.describe('StoryboardPanel — WithMultipleStoryboards (#217)', () => {
-  for (const theme of ['light', 'dark', 'vscode'] as const) {
-    test(`renders header dropdown with 3 Storyboards in ${theme} theme`, async ({ page }) => {
-      await page.goto(withTheme(storyUrl('with-multiple-storyboards'), theme));
-      await page.waitForSelector('[data-testid="storyboard-panel"]');
-      // Dropdown present + populated
-      const dropdown = page.locator('[data-testid="storyboard-header-select"]');
-      await expect(dropdown).toBeVisible();
-      // Overflow trigger present
-      await expect(
-        page.locator('[data-testid="storyboard-header-overflow"]'),
-      ).toBeVisible();
-      await page.screenshot({
-        path: `${EVIDENCE_DIR_217}/storyboard-panel-multi-${theme}.png`,
-      });
+  test('renders header dropdown with 3 Storyboards (canonical light capture)', async ({ page }) => {
+    await page.goto(withTheme(storyUrl('with-multiple-storyboards'), 'light'));
+    await page.waitForSelector('[data-testid="storyboard-panel"]');
+    const dropdown = page.locator('[data-testid="storyboard-header-select"]');
+    await expect(dropdown).toBeVisible();
+    await expect(
+      page.locator('[data-testid="storyboard-header-overflow"]'),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `${EVIDENCE_DIR_217}/storyboard-panel-multi-light.png`,
     });
-  }
+  });
 });
 
 test.describe('StoryboardPanel — HardBlockModal (#217)', () => {
-  for (const theme of ['light', 'dark', 'vscode'] as const) {
-    test(`renders HardBlockModal in ${theme} theme`, async ({ page }) => {
-      await page.goto(withTheme(storyUrl('hard-block-modal-story'), theme));
-      // The presentational modal renders as a role="dialog" element
-      await page.waitForSelector('[role="dialog"]');
-      await expect(page.locator('[role="dialog"]')).toHaveAttribute(
-        'aria-modal',
-        'true',
-      );
-      await page.screenshot({
-        path: `${EVIDENCE_DIR_217}/storyboard-panel-hardblock-${theme}.png`,
-      });
+  test('renders HardBlockModal (canonical light capture)', async ({ page }) => {
+    await page.goto(withTheme(storyUrl('hard-block-modal-story'), 'light'));
+    await page.waitForSelector('[role="dialog"]');
+    await expect(page.locator('[role="dialog"]')).toHaveAttribute(
+      'aria-modal',
+      'true',
+    );
+    await page.screenshot({
+      path: `${EVIDENCE_DIR_217}/storyboard-panel-hardblock-light.png`,
     });
-  }
+  });
 });

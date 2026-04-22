@@ -114,16 +114,17 @@ test.describe('StoryboardPlayback — interaction recording', () => {
     // Let tiles settle at the initial viewport before the first click.
     await page.waitForTimeout(INITIAL_TILE_SETTLE_MS);
 
-    // Frame grabber — runs in parallel with the interactions. We capture
-    // PNGs only of the right-hand map region (avoiding the panel, which
-    // is mostly static) to keep individual frames small. A timer loop
-    // keeps firing until we cancel it after the last interaction.
+    // Frame grabber — runs in parallel with the interactions. Captures
+    // the FULL harness region: panel on the left (with TransportRow +
+    // scene rows + dropdown) AND map on the right. That way the viewer
+    // sees the current-row highlight shift in lock-step with the map
+    // flyTo.
     let grabbing = true;
     const grabLoop = (async (): Promise<void> => {
       while (grabbing) {
         const path = `${framesDir}/frame-${String(frameIdx).padStart(4, '0')}.png`;
         try {
-          await page.screenshot({ path, clip: { x: 380, y: 0, width: 900, height: 480 } });
+          await page.screenshot({ path, clip: { x: 0, y: 0, width: 1280, height: 480 } });
         } catch {
           // Page may be closing; ignore and exit loop.
           break;

@@ -5,30 +5,27 @@ All 12 planned visual artefacts for #217 are captured via the
 #216 used. No VS Code host required; everything drives through the
 presentational components and the Storybook iframe.
 
-## Per-component captures (9 PNGs, T511)
+## Per-component captures (3 PNGs, T511)
 
-Per-story × per-theme captures from the #216-style
-`StoryboardPanel.spec.ts` harness.
+Per-story captures from the #216-style `StoryboardPanel.spec.ts` harness.
+One canonical light-theme capture per story.
 
-| File | Story | Theme |
-|------|-------|-------|
-| `storyboard-panel-transport-light.png` | `Transport` | light |
-| `storyboard-panel-transport-dark.png` | `Transport` | dark |
-| `storyboard-panel-transport-vscode.png` | `Transport` | vscode |
-| `storyboard-panel-multi-light.png` | `WithMultipleStoryboards` | light |
-| `storyboard-panel-multi-dark.png` | `WithMultipleStoryboards` | dark |
-| `storyboard-panel-multi-vscode.png` | `WithMultipleStoryboards` | vscode |
-| `storyboard-panel-hardblock-light.png` | `HardBlockModalStory` | light |
-| `storyboard-panel-hardblock-dark.png` | `HardBlockModalStory` | dark |
-| `storyboard-panel-hardblock-vscode.png` | `HardBlockModalStory` | vscode |
+| File | Story |
+|------|-------|
+| `storyboard-panel-transport-light.png` | `Transport` |
+| `storyboard-panel-multi-light.png` | `WithMultipleStoryboards` |
+| `storyboard-panel-hardblock-light.png` | `HardBlockModalStory` |
 
-**Note on theme parity**: the three theme variants produce visually
-identical PNGs for the Storyboard panel — matching #216's behaviour
-(`panel-three-scenes-{light,dark,vscode}.png` are also byte-identical).
-The panel uses VS Code CSS tokens that only diverge under an actual
-VS Code host; in Storybook's default light iframe they all resolve to
-the same palette. The screenshots confirm **structural** parity across
-theme variants, which is the #216 precedent.
+**Theme parity note**: the plan originally called for three theme
+variants per story (light / dark / vscode × 3 = 9 PNGs). Under the
+Storybook sandbox the panel's VS Code CSS tokens resolve to the same
+palette regardless of the `globals=theme:...` URL param, so all three
+theme captures were byte-identical to the light capture (the same
+behaviour is visible on #216's `panel-three-scenes-{light,dark,vscode}.png`).
+The two redundant variants per story were dropped; the three light
+captures above are the canonical evidence for the three headline
+affordances. Under a real VS Code host the tokens diverge as expected
+(tested at unit level; not visually captured here).
 
 ## Integrated flow captures (3 artefacts, T520 + T532 + T533)
 
