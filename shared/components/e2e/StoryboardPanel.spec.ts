@@ -24,6 +24,12 @@ const EVIDENCE_DIR = resolve(
   '../../../specs/216-storyboarding-capture/evidence/screenshots',
 );
 
+// #217 evidence dir — shares the Storybook E2E harness with #216's stories.
+const EVIDENCE_DIR_217 = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../specs/217-storyboarding-playback/evidence/screenshots',
+);
+
 test.describe('StoryboardPanel — Empty', () => {
   for (const theme of ['light', 'dark', 'vscode'] as const) {
     test(`renders empty-state copy in ${theme} theme`, async ({ page }) => {
@@ -110,4 +116,68 @@ test.describe('StoryboardPanel — accessibility', () => {
     const button = page.locator('[data-testid="capture-button"]');
     await expect(button).toHaveAttribute('aria-label', 'Capture scene');
   });
+});
+
+// ─── #217 — Transport / MultipleStoryboards / HardBlockModal ─────────
+
+test.describe('StoryboardPanel — Transport (#217)', () => {
+  for (const theme of ['light', 'dark', 'vscode'] as const) {
+    test(`renders TransportRow in ${theme} theme`, async ({ page }) => {
+      await page.goto(withTheme(storyUrl('transport'), theme));
+      await page.waitForSelector('[data-testid="storyboard-panel"]');
+      // Transport row present with Forward / Backward buttons + counter
+      await expect(
+        page.locator('[data-testid="transport-forward"]'),
+      ).toBeVisible();
+      await expect(
+        page.locator('[data-testid="transport-backward"]'),
+      ).toBeVisible();
+      // Currently at Scene 1 of 3 — Backward disabled, Forward enabled
+      await expect(
+        page.locator('[data-testid="transport-backward"]'),
+      ).toBeDisabled();
+      await expect(
+        page.locator('[data-testid="transport-forward"]'),
+      ).toBeEnabled();
+      await page.screenshot({
+        path: `${EVIDENCE_DIR_217}/storyboard-panel-transport-${theme}.png`,
+      });
+    });
+  }
+});
+
+test.describe('StoryboardPanel — WithMultipleStoryboards (#217)', () => {
+  for (const theme of ['light', 'dark', 'vscode'] as const) {
+    test(`renders header dropdown with 3 Storyboards in ${theme} theme`, async ({ page }) => {
+      await page.goto(withTheme(storyUrl('with-multiple-storyboards'), theme));
+      await page.waitForSelector('[data-testid="storyboard-panel"]');
+      // Dropdown present + populated
+      const dropdown = page.locator('[data-testid="storyboard-header-select"]');
+      await expect(dropdown).toBeVisible();
+      // Overflow trigger present
+      await expect(
+        page.locator('[data-testid="storyboard-header-overflow"]'),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `${EVIDENCE_DIR_217}/storyboard-panel-multi-${theme}.png`,
+      });
+    });
+  }
+});
+
+test.describe('StoryboardPanel — HardBlockModal (#217)', () => {
+  for (const theme of ['light', 'dark', 'vscode'] as const) {
+    test(`renders HardBlockModal in ${theme} theme`, async ({ page }) => {
+      await page.goto(withTheme(storyUrl('hard-block-modal-story'), theme));
+      // The presentational modal renders as a role="dialog" element
+      await page.waitForSelector('[role="dialog"]');
+      await expect(page.locator('[role="dialog"]')).toHaveAttribute(
+        'aria-modal',
+        'true',
+      );
+      await page.screenshot({
+        path: `${EVIDENCE_DIR_217}/storyboard-panel-hardblock-${theme}.png`,
+      });
+    });
+  }
 });
