@@ -5,6 +5,9 @@
 
 // LogEntry types (PROV-aligned, mirrors Phase 0 LinkML schema)
 // Field names use snake_case to match the wire format (ADR-010).
+import type { ActivityType } from '@debrief/schemas';
+export type { ActivityType };
+
 export interface ParameterValue {
   value: unknown;
   default: boolean;
@@ -47,6 +50,11 @@ export interface LogEntry {
   rationale?: string | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   input_state?: InputFeatureState[] | null;
+  /**
+   * Semantic kind of this provenance record. Mirror of
+   * `LogEntry.activity_type` in the LinkML schema. Feature: 208-timeline-entry-kind.
+   */
+  activity_type?: ActivityType | null;
 }
 
 // Expanded ToolResult fields (Phase 0 contract)

@@ -64,15 +64,15 @@ export const VALID_VIEW_MODES: readonly ViewMode[] = ['timeline', 'by-feature', 
 
 /**
  * Semantic classification of a timeline entry, independent of its visual
- * category. Feature: 208-timeline-entry-kind.
+ * category. Projected from the PROV-side `LogEntry.activity_type` field on
+ * the LinkML schema (source of truth). Feature: 208-timeline-entry-kind.
  *
- * - 'snapshot': a distinguished moment in the session (today sourced from the
- *   `ToolCategory === 'snapshot'` signal; in future also from a manual snapshot
- *   button and other PROV-side signals).
+ * - 'snapshot': a distinguished moment in the session (manual checkpoint,
+ *   future: manual snapshot button, rationale markers).
  * - 'tool':     an ordinary tool invocation.
- * - 'tune':     reserved for future analytical-adjustment / tune-marker
- *   entries. No populator emits `'tune'` in feature 208 — it lands with a
- *   future PROV-side signal.
+ * - 'tune':     reserved for future standalone tune-action entries. No
+ *   populator emits `'tune'` in feature 208 — it lands when a producer
+ *   sets `activity_type: 'tune'` on the record.
  */
 export type TimelineEntryKind = 'snapshot' | 'tool' | 'tune';
 
@@ -122,9 +122,10 @@ export interface TimelineEntry {
   input_state?: InputFeatureState[] | null;
   /**
    * Semantic classification of this entry, independent of its visual category.
-   * Populated by the VS Code host on every emitted entry. Optional because
-   * test fixtures may bypass the host populator; consumers MUST fall back to
-   * legacy detection (`resolveToolCategory`) when `kind` is absent.
+   * Populated by the VS Code host on every emitted entry from the PROV-side
+   * `LogEntry.activity_type` signal. Optional only because Storybook fixtures
+   * and legacy mocks may omit it; consumers treat `undefined` the same as
+   * `'tool'` — there is no secondary tool-name fallback.
    * Feature: 208-timeline-entry-kind.
    */
   kind?: TimelineEntryKind;
