@@ -8,14 +8,12 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Blocked by issue #143 (webview iframe selector instability in openvscode-server).
-// Converted from `skip` to `fixme` so CI flags it as a known-pending suite
-// rather than silently dropping the whole describe block. Feature 176 decision 9A.
-test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
+test.describe('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,
   }) => {
+    test.fixme(true, 'pending #509 — LogPanel webview iframe not discoverable after openPlotViaStacTree (failure mode 1)');
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const logFrame = await codeServerPage.getLogPanelFrame();
 
@@ -29,6 +27,7 @@ test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
   });
 
   test('running a tool creates a log entry', async ({ codeServerPage }) => {
+    test.fixme(true, 'pending #509 — .leaflet-interactive features never render in map webview (failure mode 2)');
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     // Select a track and run a tool to create a log entry
@@ -47,6 +46,7 @@ test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
   test('log entries are shown most recent first', async ({
     codeServerPage,
   }) => {
+    test.fixme(true, 'pending #509 — .leaflet-interactive features never render in map webview (failure mode 2)');
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     // Run tools to create multiple entries
