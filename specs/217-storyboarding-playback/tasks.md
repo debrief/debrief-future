@@ -320,41 +320,41 @@ T440 (extension.ts)
 
 ### 5.1 Pre-PR CI gates
 
-- [ ] T501 Run `task verify` (or fallback: `uv run ruff check . && pnpm lint && uv run pyright && pnpm -r typecheck && uv run pytest && pnpm --filter '!@debrief/web-shell' test`) — every step MUST pass before opening the PR (CLAUDE.md "Before Pushing")
-- [ ] T502 Run web-shell Playwright suite — `cd apps/web-shell && node run-playwright.mjs && cd ../..` (bundled Chromium via `@sparticuz/chromium`)
-- [ ] T503 Run VS Code webview E2E — `pnpm --filter @debrief/vscode-extension build && cd tests/e2e && pnpm exec playwright test test-storyboard-playback.spec.ts` — all nine T350–T354 + T450–T454 scenarios pass
+- [x] T501 Run `task verify` (or fallback: `uv run ruff check . && pnpm lint && uv run pyright && pnpm -r typecheck && uv run pytest && pnpm --filter '!@debrief/web-shell' test`) — every step MUST pass before opening the PR (CLAUDE.md "Before Pushing")
+- [x] T502 Run web-shell Playwright suite — `cd apps/web-shell && node run-playwright.mjs && cd ../..` (bundled Chromium via `@sparticuz/chromium`)
+- [x] T503 Run VS Code webview E2E — `pnpm --filter @debrief/vscode-extension build && cd tests/e2e && pnpm exec playwright test test-storyboard-playback.spec.ts` — all nine T350–T354 + T450–T454 scenarios pass
 
 ### 5.2 Storybook E2E (theme capture)
 
-- [ ] T510 [test] Storybook E2E — verify 3 stories × 3 theme variants × basic render + accessibility assertions `shared/components/e2e/StoryboardPanel.spec.ts` (extend existing file from #216)
-- [ ] T511 [P] Run the Storybook build + E2E run (`pnpm --filter @debrief/components storybook:build && node apps/web-shell/run-playwright.mjs`); archive the nine PNGs into the evidence directory `specs/217-storyboarding-playback/evidence/screenshots/`
+- [x] T510 [test] Storybook E2E — verify 3 stories × 3 theme variants × basic render + accessibility assertions `shared/components/e2e/StoryboardPanel.spec.ts` (extend existing file from #216)
+- [x] T511 [P] Run the Storybook build + E2E run (`pnpm --filter @debrief/components storybook:build && node apps/web-shell/run-playwright.mjs`); archive the nine PNGs into the evidence directory `specs/217-storyboarding-playback/evidence/screenshots/`
 
 ### 5.3 Interaction GIF capture
 
-- [ ] T520 Record interaction GIF via Playwright — enable `recordVideo` in the webview E2E config for T350 (forward-through-storyboard); convert the WebM to ≤ 2MB / ≤ 5s GIF using `ffmpeg` with `scale=800:-1`; save to `specs/217-storyboarding-playback/evidence/screenshots/interaction.gif`
+- [x] T520 Record interaction GIF via Playwright — enable `recordVideo` in the webview E2E config for T350 (forward-through-storyboard); convert the WebM to ≤ 2MB / ≤ 5s GIF using `ffmpeg` with `scale=800:-1`; save to `specs/217-storyboarding-playback/evidence/screenshots/interaction.gif`
 
 ### 5.4 Evidence collection
 
-- [ ] T530 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct) — include counts for vitest unit tests + Playwright E2E + Storybook E2E `specs/217-storyboarding-playback/evidence/test-summary.md`
-- [ ] T531 Create usage demonstration — walk-through of: open plot, open Storyboard panel, Forward through 3 Scenes, scrub within a segment, switch Storyboard via dropdown, hit a hard-block, jump past. Include screenshots at key steps `specs/217-storyboarding-playback/evidence/usage-example.md`
-- [ ] T532 [P] Capture E2E screenshot — native VS Code hard-block modal in code-server (output from T354) `specs/217-storyboarding-playback/evidence/screenshots/e2e-hardblock.png`
-- [ ] T533 [P] Capture E2E screenshot — dropdown switch with Scene rectangles updating (output from T450) `specs/217-storyboarding-playback/evidence/screenshots/e2e-dropdown-switch.png`
-- [ ] T534 [P] Produce integration diagram + brief — Mermaid sequence diagram showing `StoryboardPanel` click → `storyboardPanelView` postMessage → `vscode.commands.executeCommand('debrief.storyboard.forward')` → `StoryboardPlaybackService.forward` → `#215 detectMissingDataForScene` → `MapPanel.flyToViewport` → `TimeRangeViewProvider.setScrubbableRange`; narrative explaining each hop `specs/217-storyboarding-playback/evidence/feature-integration.md`
+- [x] T530 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter (feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct) — include counts for vitest unit tests + Playwright E2E + Storybook E2E `specs/217-storyboarding-playback/evidence/test-summary.md`
+- [x] T531 Create usage demonstration — walk-through of: open plot, open Storyboard panel, Forward through 3 Scenes, scrub within a segment, switch Storyboard via dropdown, hit a hard-block, jump past. Include screenshots at key steps `specs/217-storyboarding-playback/evidence/usage-example.md`
+- [x] T532 [P] Capture E2E screenshot — native VS Code hard-block modal in code-server (output from T354) `specs/217-storyboarding-playback/evidence/screenshots/e2e-hardblock.png`
+- [x] T533 [P] Capture E2E screenshot — dropdown switch with Scene rectangles updating (output from T450) `specs/217-storyboarding-playback/evidence/screenshots/e2e-dropdown-switch.png`
+- [x] T534 [P] Produce integration diagram + brief — Mermaid sequence diagram showing `StoryboardPanel` click → `storyboardPanelView` postMessage → `vscode.commands.executeCommand('debrief.storyboard.forward')` → `StoryboardPlaybackService.forward` → `#215 detectMissingDataForScene` → `MapPanel.flyToViewport` → `TimeRangeViewProvider.setScrubbableRange`; narrative explaining each hop `specs/217-storyboarding-playback/evidence/feature-integration.md`
 
 ### 5.5 Media content (shipped post + LinkedIn)
 
-- [ ] T540 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — sections: What We Built (delivery flow landed), Screenshots (embedded from T511 + T520 + T532 + T533), By the Numbers (metrics from T530's YAML front matter), Lessons Learned (R2 discovery about `timeFilter` vs `timeExtent`; the three-trigger transition-clear; the design-fix-1 "don't pre-compute row state" decision), What's Next (#218 edit suite) — front matter per agent spec: `layout: future-post`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `excerpt` under 150 chars `specs/217-storyboarding-playback/media/shipped-post.md`
-- [ ] T541 [P] Create LinkedIn shipped summary (150–200 words) — strong hook (analyst walking into a briefing), one concrete implementation insight (three-trigger transition-clear or the `timeFilter` trap), link placeholder `{{POST_URL}}`, tags `#FutureDebrief #MaritimeAnalysis #OpenSource` `specs/217-storyboarding-playback/media/linkedin-shipped.md`
+- [x] T540 Create shipped blog post using the Content Specialist agent (`.claude/agents/media/content.md`) — sections: What We Built (delivery flow landed), Screenshots (embedded from T511 + T520 + T532 + T533), By the Numbers (metrics from T530's YAML front matter), Lessons Learned (R2 discovery about `timeFilter` vs `timeExtent`; the three-trigger transition-clear; the design-fix-1 "don't pre-compute row state" decision), What's Next (#218 edit suite) — front matter per agent spec: `layout: future-post`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `excerpt` under 150 chars `specs/217-storyboarding-playback/media/shipped-post.md`
+- [x] T541 [P] Create LinkedIn shipped summary (150–200 words) — strong hook (analyst walking into a briefing), one concrete implementation insight (three-trigger transition-clear or the `timeFilter` trap), link placeholder `{{POST_URL}}`, tags `#FutureDebrief #MaritimeAnalysis #OpenSource` `specs/217-storyboarding-playback/media/linkedin-shipped.md`
 
 ### 5.6 Documentation hygiene
 
-- [ ] T550 Update `CHANGELOG.md` — add the #217 entry under "Unreleased" describing the Storyboard panel + playback transport landing (brief — links to the PR) `CHANGELOG.md`
-- [ ] T551 [P] Log in `docs/project_notes/issues.md` with ticket #217 URL and evidence-dir reference `docs/project_notes/issues.md`
-- [ ] T552 [P] Log the R2 research finding (`timeFilter` vs `timeExtent` — the scrubber doesn't consume `timeFilter`) in `docs/project_notes/bugs.md` so a future PR doesn't repeat the mistake `docs/project_notes/bugs.md`
+- [x] T550 Update `CHANGELOG.md` — add the #217 entry under "Unreleased" describing the Storyboard panel + playback transport landing (brief — links to the PR) `CHANGELOG.md`
+- [x] T551 [P] Log in `docs/project_notes/issues.md` with ticket #217 URL and evidence-dir reference `docs/project_notes/issues.md`
+- [x] T552 [P] Log the R2 research finding (`timeFilter` vs `timeExtent` — the scrubber doesn't consume `timeFilter`) in `docs/project_notes/bugs.md` so a future PR doesn't repeat the mistake `docs/project_notes/bugs.md`
 
 ### 5.7 PR creation
 
-- [ ] T560 Create PR and publish blog: run `/speckit.pr`
+- [x] T560 Create PR and publish blog: run `/speckit.pr`
 
 **Task T560 must run last. It depends on T501–T552 being complete.** It will:
 - Open the feature PR in `debrief/debrief-future` with the generated description + evidence links
