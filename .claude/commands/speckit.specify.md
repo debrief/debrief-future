@@ -40,14 +40,17 @@ Given that feature description, do this:
 
    The script assigns the next available 3-digit feature number by globally scanning local branches, remote branches, and `specs/` directories for the highest existing `NNN-*` entry (regex `^[0-9]{3}-`), then incrementing. Claude does **not** pre-compute the number.
 
-   Run the script once, passing only the short-name and feature description:
+   **Exception — backlog-driven sessions**: If the feature description starts with a `[backlog-id:NNN]` tag (e.g. it was handed off from `/speckit.start 210`), extract `NNN` and pass it as `--number NNN` to the script. Strip the tag from the description before using it. This preserves the `BACKLOG.md` ID → spec-dir prefix invariant (`| 210 | ... | [desc](specs/210-short-name/spec.md) | ...`), which would otherwise break because the script's auto-numbering is `highest+1`, not the backlog ID.
 
-   - Bash example: `.specify/scripts/bash/create-new-feature.sh --json --short-name "user-auth" "Add user authentication"`
+   Run the script once, passing only the short-name and feature description (plus `--number` only if the exception applies):
+
+   - Bash example (standalone): `.specify/scripts/bash/create-new-feature.sh --json --short-name "user-auth" "Add user authentication"`
+   - Bash example (from `/speckit.start 210`): `.specify/scripts/bash/create-new-feature.sh --json --number 210 --short-name "user-auth" "Add user authentication"`
    - PowerShell example: `.specify/scripts/bash/create-new-feature.sh --json -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
    - Run the script exactly once per feature.
-   - Do **not** pass `--number`; let the script compute it. Feature numbers are **global** (shared across all short-names) and zero-padded to 3 digits (e.g. `207-user-auth`), never reset per short-name.
+   - Do **not** pass `--number` **unless** the description arrived with a `[backlog-id:NNN]` tag (see exception above). For standalone use, let the script compute the number — feature numbers are **global** (shared across all short-names) and zero-padded to 3 digits (e.g. `207-user-auth`), never reset per short-name.
    - The JSON is provided in the terminal as output — always refer to it to get the actual content you're looking for.
    - The JSON output contains `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`, and (in worktree mode) `WORKTREE_PATH`.
    - For single quotes in args like "I'm Groot", use escape syntax: e.g. `'I'\''m Groot'` (or double-quote if possible: `"I'm Groot"`).
