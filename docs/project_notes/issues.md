@@ -16,6 +16,12 @@ Each entry should include:
 
 <!-- Add new entries below this line -->
 
+### 2026-04-21 - #217: Storyboarding — Panel + Playback (E024 3/4)
+- **Status**: Completed (implementation merged)
+- **Description**: Multi-Storyboard dropdown, TransportRow (Prev/Next + scoped Left/Right-arrow keybindings), Leaflet `flyTo` animation, scrub-window lock via `TimeRangeViewProvider.setScrubbableRange`, on-map `SceneRectangleLayer` overlay for the active Storyboard, missing-data hard-block modal with `Jump Past` chain-walker. `StoryboardPlaybackService` on the extension host; three-trigger (moveend / visibility-false / safety-timer) transition-clear invariant with idempotent-by-token clear handler. ~154 unit tests across 11 suites; 23 commits; zero new runtime dependencies.
+- **URL**: https://github.com/debrief/debrief-future/tree/main/specs/217-storyboarding-playback
+- **Evidence**: [`specs/217-storyboarding-playback/evidence/`](../../specs/217-storyboarding-playback/evidence/)
+
 ### 2026-04-21 - #216: Storyboarding — Capture (E024 2/4)
 - **Status**: Completed (implementation merged)
 - **Description**: Ctrl/Cmd+Alt+C capture flow in the Map Viewer. First-capture inline quick-pick for Storyboard name; synchronous #174 thumbnail write via new per-Scene `sceneThumbnailService`; DTG-default Scene title via #215's `formatDtg`; duplicate-timestamp Replace/Offset/Cancel modal with 5-retry safety cap; minimal Storyboard panel auto-focuses to confirm persistence. 55 unit tests across 6 suites; webview E2E stubbed pending Blocker #143.
