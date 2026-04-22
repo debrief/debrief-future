@@ -60,9 +60,9 @@ Per the Quality Rubric, this is an **Infrastructure** feature: "Configuration sa
 
 **Purpose**: Confirm the runtime environment has what Playwright needs before touching the test file. Per research.md R6, the cloud runner already discovers the file — but the Chromium binary and code-server preview must be provisioned in the current sandbox.
 
-- [ ] T001 Provision bundled Chromium for the sandbox: run `bash tests/e2e/scripts/ensure-chromium.sh` and verify `tests/e2e/.chromium-path` is written `tests/e2e/.chromium-path`
-- [ ] T002 [P] Confirm the sibling suite `test-analysis-tool.spec.ts` still passes on `main` — establishes the "helpers work" baseline (research.md R2). Run `CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-analysis-tool.spec.ts` and record pass status `tests/e2e/test-analysis-tool.spec.ts`
-- [ ] T003 [P] Confirm Playwright currently reports `test-log-panel.spec.ts` as **3 pending (fixme)** in a discovery-only run — proves R6 discovery path and gives a before-picture for evidence `tests/e2e/test-log-panel.spec.ts`
+- [x] T001 Provision bundled Chromium for the sandbox: run `bash tests/e2e/scripts/ensure-chromium.sh` and verify `tests/e2e/.chromium-path` is written `tests/e2e/.chromium-path`
+- [x] T002 [P] Confirm the sibling suite `test-analysis-tool.spec.ts` still passes on `main` — establishes the "helpers work" baseline (research.md R2). Run `CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-analysis-tool.spec.ts` and record pass status `tests/e2e/test-analysis-tool.spec.ts`
+- [x] T003 [P] Confirm Playwright currently reports `test-log-panel.spec.ts` as **3 pending (fixme)** in a discovery-only run — proves R6 discovery path and gives a before-picture for evidence `tests/e2e/test-log-panel.spec.ts`
 
 **Checkpoint**: Chromium resolved, sibling baseline green, current `fixme` state captured. Ready to reactivate.
 
@@ -84,13 +84,13 @@ Per the Quality Rubric, this is an **Infrastructure** feature: "Configuration sa
 
 ### Reactivation Edit
 
-- [ ] T010 [US1] Delete the three-line stale-blocker comment (lines 11–13) and remove `.fixme` + trailing `// blocked:` comment from the `test.describe` call (line 14) — transforms `test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)` into `test.describe('Log Panel', () => {`. No other edit `tests/e2e/test-log-panel.spec.ts`
+- [x] T010 [US1] Delete the three-line stale-blocker comment (lines 11–13) and remove `.fixme` + trailing `// blocked:` comment from the `test.describe` call (line 14) — transforms `test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)` into `test.describe('Log Panel', () => {`. No other edit `tests/e2e/test-log-panel.spec.ts`
 
 ### First Live Run
 
-- [ ] T011 [US1] Run the reactivated file once against the current preview: `CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-log-panel.spec.ts`. Capture raw stdout for evidence. If it fails, STOP — do not fall back to `fixme`; invoke the FR-005 / research R7 escape hatch (open new issue) `tests/e2e/test-log-panel.spec.ts`
-- [ ] T012 [P] [US1] Save the passing terminal transcript to the evidence directory `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
-- [ ] T013 [P] [US1] Save the one-file reactivation diff for the audit trail: `git diff main...HEAD -- tests/e2e/test-log-panel.spec.ts > specs/210-unskip-log-panel-e2e/evidence/diff.patch` `specs/210-unskip-log-panel-e2e/evidence/diff.patch`
+- [x] T011 [US1] Run the reactivated file once against the current preview: `CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-log-panel.spec.ts`. Capture raw stdout for evidence. If it fails, STOP — do not fall back to `fixme`; invoke the FR-005 / research R7 escape hatch (open new issue) `tests/e2e/test-log-panel.spec.ts`
+- [x] T012 [P] [US1] Save the passing terminal transcript to the evidence directory `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
+- [x] T013 [P] [US1] Save the one-file reactivation diff for the audit trail: `git diff main...HEAD -- tests/e2e/test-log-panel.spec.ts > specs/210-unskip-log-panel-e2e/evidence/diff.patch` `specs/210-unskip-log-panel-e2e/evidence/diff.patch`
 
 **Checkpoint**: US1 complete — suite is active, a single green run is recorded, SC-002 satisfied.
 
@@ -104,8 +104,8 @@ Per the Quality Rubric, this is an **Infrastructure** feature: "Configuration sa
 
 ### Hygiene Check
 
-- [ ] T020 [US2] Run the SC-001 grep and confirm zero matches: `grep -nE "\.fixme|\.skip\b|#143" tests/e2e/test-log-panel.spec.ts` — exit code must be 1 (no match). If any match remains (e.g. a stray comment survived T010), return to Phase 3 and strip it `tests/e2e/test-log-panel.spec.ts`
-- [ ] T021 [P] [US2] Confirm `grep -nE "\.fixme|\.skip\b|#143" tests/e2e/test-log-panel.spec.ts` command + its zero-match output is captured in `evidence/playwright-run.txt` (append at the top or bottom) so the hygiene proof lives alongside the run transcript `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
+- [x] T020 [US2] Run the SC-001 grep and confirm zero matches: `grep -nE "\.fixme|\.skip\b|#143" tests/e2e/test-log-panel.spec.ts` — exit code must be 1 (no match). If any match remains (e.g. a stray comment survived T010), return to Phase 3 and strip it `tests/e2e/test-log-panel.spec.ts`
+- [x] T021 [P] [US2] Confirm `grep -nE "\.fixme|\.skip\b|#143" tests/e2e/test-log-panel.spec.ts` command + its zero-match output is captured in `evidence/playwright-run.txt` (append at the top or bottom) so the hygiene proof lives alongside the run transcript `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
 
 **Checkpoint**: US2 complete — no stale markers survive. SC-001 satisfied.
 
@@ -119,8 +119,8 @@ Per the Quality Rubric, this is an **Infrastructure** feature: "Configuration sa
 
 ### Three-Run Stability Loop
 
-- [ ] T030 [US3] Run the suite three consecutive times against the same preview, aborting on the first failure. Capture a concatenated transcript (all three run outputs labelled `=== Run N ===`). Command: `for i in 1 2 3; do echo "=== Run $i ==="; CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-log-panel.spec.ts || exit 1; done 2>&1 | tee specs/210-unskip-log-panel-e2e/evidence/stability-run.txt` `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
-- [ ] T031 [US3] Verify the captured transcript shows exactly 9 passed / 0 skipped / 0 failed across the three runs. If any run fails or flakes (one pass + one fail + one pass), stop — invoke FR-005 (new blocker issue); do not mark SC-003 met `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
+- [x] T030 [US3] Run the suite three consecutive times against the same preview, aborting on the first failure. Capture a concatenated transcript (all three run outputs labelled `=== Run N ===`). Command: `for i in 1 2 3; do echo "=== Run $i ==="; CLAUDE_CODE=1 pnpm --filter '@debrief/e2e' test test-log-panel.spec.ts || exit 1; done 2>&1 | tee specs/210-unskip-log-panel-e2e/evidence/stability-run.txt` `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
+- [x] T031 [US3] Verify the captured transcript shows exactly 9 passed / 0 skipped / 0 failed across the three runs. If any run fails or flakes (one pass + one fail + one pass), stop — invoke FR-005 (new blocker issue); do not mark SC-003 met `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
 
 **Checkpoint**: US3 complete — stability proven. SC-002 + SC-003 both satisfied.
 
@@ -132,24 +132,24 @@ Per the Quality Rubric, this is an **Infrastructure** feature: "Configuration sa
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T040 Create the evidence test-summary using the project template: copy `.specify/templates/evidence/test-summary-template.md` to `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`, fill YAML front matter (`feature: "210-unskip-log-panel-e2e"`, `captured_at`, `git_sha`, `tests_passed: 3`, `tests_failed: 0`, `tests_skipped: 0`, `coverage_pct: null`), and write the body: counts, key scenarios verified (one bullet per test in the file), environment note (cloud sandbox / Heroku / local), and a cross-link to `playwright-run.txt` + `stability-run.txt` `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`
-- [ ] T041 [P] Write the usage-example evidence — reviewer-facing "how to run the reactivated suite" demo based on `quickstart.md` §"How to run the suite" (just the cloud path + expected-output block) `specs/210-unskip-log-panel-e2e/evidence/usage-example.md`
-- [ ] T042 [P] Verify `evidence/playwright-run.txt` exists (from T012) and contains the "3 passed / 0 failed" line plus the SC-001 grep output appended by T021 `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
-- [ ] T043 [P] Verify `evidence/stability-run.txt` exists (from T030) and shows 9/9 green across three runs `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
-- [ ] T044 [P] Verify `evidence/diff.patch` exists (from T013) and contains only the `test.describe.fixme` → `test.describe` edit plus the deleted blocker comment — no other hunks `specs/210-unskip-log-panel-e2e/evidence/diff.patch`
+- [x] T040 Create the evidence test-summary using the project template: copy `.specify/templates/evidence/test-summary-template.md` to `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`, fill YAML front matter (`feature: "210-unskip-log-panel-e2e"`, `captured_at`, `git_sha`, `tests_passed: 3`, `tests_failed: 0`, `tests_skipped: 0`, `coverage_pct: null`), and write the body: counts, key scenarios verified (one bullet per test in the file), environment note (cloud sandbox / Heroku / local), and a cross-link to `playwright-run.txt` + `stability-run.txt` `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`
+- [x] T041 [P] Write the usage-example evidence — reviewer-facing "how to run the reactivated suite" demo based on `quickstart.md` §"How to run the suite" (just the cloud path + expected-output block) `specs/210-unskip-log-panel-e2e/evidence/usage-example.md`
+- [x] T042 [P] Verify `evidence/playwright-run.txt` exists (from T012) and contains the "3 passed / 0 failed" line plus the SC-001 grep output appended by T021 `specs/210-unskip-log-panel-e2e/evidence/playwright-run.txt`
+- [x] T043 [P] Verify `evidence/stability-run.txt` exists (from T030) and shows 9/9 green across three runs `specs/210-unskip-log-panel-e2e/evidence/stability-run.txt`
+- [x] T044 [P] Verify `evidence/diff.patch` exists (from T013) and contains only the `test.describe.fixme` → `test.describe` edit plus the deleted blocker comment — no other hunks `specs/210-unskip-log-panel-e2e/evidence/diff.patch`
 
 ### Acceptance Self-Check
 
-- [ ] T045 Run the pre-PR self-check block from `quickstart.md` §"Acceptance self-check before opening PR": SC-001 grep, NFR-001 file-path filter, FR-006 file-exists, FR-007 backlog-strikethrough grep, plus `task verify`. All five must print ✅. Any FAIL means return to the relevant phase before creating the PR `specs/210-unskip-log-panel-e2e/`
+- [x] T045 Run the pre-PR self-check block from `quickstart.md` §"Acceptance self-check before opening PR": SC-001 grep, NFR-001 file-path filter, FR-006 file-exists, FR-007 backlog-strikethrough grep, plus `task verify`. All five must print ✅. Any FAIL means return to the relevant phase before creating the PR `specs/210-unskip-log-panel-e2e/`
 
 ### Backlog Closure
 
-- [ ] T046 Update `BACKLOG.md` row `#210`: wrap every cell in strikethrough `~~…~~`, replace the feature-description cell with a strikethrough link to `specs/210-unskip-log-panel-e2e/spec.md`, change the status cell from `proposed` to `complete`. Mirror the formatting pattern of rows `~~215~~`, `~~216~~`, `~~206~~` `BACKLOG.md`
+- [x] T046 Update `BACKLOG.md` row `#210`: wrap every cell in strikethrough `~~…~~`, replace the feature-description cell with a strikethrough link to `specs/210-unskip-log-panel-e2e/spec.md`, change the status cell from `proposed` to `complete`. Mirror the formatting pattern of rows `~~215~~`, `~~216~~`, `~~206~~` `BACKLOG.md`
 
 ### Media Content
 
-- [ ] T047 Create the shipped blog post via the Content Specialist agent (`.claude/agents/media/content.md`). Provide the agent with: feature name, goal, evidence artefacts captured (test-summary + both transcripts + diff), lessons learned (especially R5 log-panel focus-command nit noted in research.md and the "loud failures over silent skips" narrative carried over from `planning-post.md`), and the three What's-Next candidates from the planning post. Required sections per the template: What We Built, Screenshots (N/A — mark "see transcripts"), Lessons Learned, What's Next `specs/210-unskip-log-panel-e2e/media/shipped-post.md`
-- [ ] T048 [P] Create the shipped LinkedIn summary via the same Content Specialist spawn — 150-200 words, hook opening, link-placeholder for the published blog URL `specs/210-unskip-log-panel-e2e/media/linkedin-shipped.md`
+- [x] T047 Create the shipped blog post via the Content Specialist agent (`.claude/agents/media/content.md`). Provide the agent with: feature name, goal, evidence artefacts captured (test-summary + both transcripts + diff), lessons learned (especially R5 log-panel focus-command nit noted in research.md and the "loud failures over silent skips" narrative carried over from `planning-post.md`), and the three What's-Next candidates from the planning post. Required sections per the template: What We Built, Screenshots (N/A — mark "see transcripts"), Lessons Learned, What's Next `specs/210-unskip-log-panel-e2e/media/shipped-post.md`
+- [x] T048 [P] Create the shipped LinkedIn summary via the same Content Specialist spawn — 150-200 words, hook opening, link-placeholder for the published blog URL `specs/210-unskip-log-panel-e2e/media/linkedin-shipped.md`
 
 ### PR Creation
 

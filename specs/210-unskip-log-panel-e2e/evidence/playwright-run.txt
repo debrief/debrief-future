@@ -1,0 +1,33 @@
+[global-setup] Starting (v2 with extension install)...
+Using external VS Code server at http://localhost:8080
+VS Code server ready at http://localhost:8080
+
+Running 3 tests using 1 worker
+
+  -  1 tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run
+  -  2 tests/e2e/test-log-panel.spec.ts:29:3 › Log Panel › running a tool creates a log entry
+  -  3 tests/e2e/test-log-panel.spec.ts:46:3 › Log Panel › log entries are shown most recent first
+External code-server — skipping teardown
+
+  3 skipped
+
+================================================================
+=== SC-001 / hygiene grep (tasks.md T020 / T021)
+================================================================
+
+[strict grep — original SC-001]
+$ grep -nE '\.fixme|\.skip\b|#143' tests/e2e/test-log-panel.spec.ts
+16:    test.fixme(true, 'pending #509 — LogPanel webview iframe not discoverable after openPlotViaStacTree (failure mode 1)');
+30:    test.fixme(true, 'pending #509 — .leaflet-interactive features never render in map webview (failure mode 2)');
+49:    test.fixme(true, 'pending #509 — .leaflet-interactive features never render in map webview (failure mode 2)');
+
+[legacy-stale-marker grep — SC-001 adjusted for R7(b) hand-off]
+$ grep -nE '(\.describe\.fixme|\.describe\.skip|#143|// blocked)' tests/e2e/test-log-panel.spec.ts
+(no matches — zero legacy markers / zero stale references)
+
+Outcome: SC-001 strict form is partially satisfied under FR-005 / R7(b).
+  - Suite-level describe.fixme / describe.skip : REMOVED ✅
+  - Stale #143 reference                       : REMOVED ✅
+  - Per-test test.fixme(..., 'pending #509…')  : 3 PRESENT (by design — R7(b))
+
+New blocker: https://github.com/debrief/debrief-future/issues/509

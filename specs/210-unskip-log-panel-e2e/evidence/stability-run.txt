@@ -1,0 +1,56 @@
+Stability Run (US3 / SC-003) — DEFERRED
+=======================================
+
+Feature: 210-unskip-log-panel-e2e
+Date: 2026-04-22
+Branch: claude/speckit-specify-210-uRbqr
+
+SC-003 requires: "3 consecutive back-to-back runs × 3 passing tests = 9/9 green."
+
+Status: NOT ATTEMPTED — escape hatch FR-005 / research R7(b) active.
+
+Rationale
+---------
+The first run (T011 / playwright-run.txt) reported:
+  - Test 1 (empty state):       FAIL — LogPanel webview iframe not
+                                discoverable after openPlotViaStacTree.
+  - Test 2 (tool creates entry): FAIL — `.leaflet-interactive` features
+                                never render in map webview.
+  - Test 3 (multi-entry order):  FAIL — same failure mode as Test 2.
+
+Per spec.md FR-005:
+  "If any of the three tests cannot be made to pass within this
+  feature, the implementer MUST NOT land the change by re-applying
+  `fixme` [onto #143] — instead they MUST open a new blocker issue,
+  document the specific failure mode, and reference the new issue."
+
+Per research.md R7(b):
+  "land a `test.fixme` on the individual failing test(s) — not the
+  whole `describe` — referencing the new issue, not #143."
+
+Both obligations have been satisfied:
+  - New blocker filed: https://github.com/debrief/debrief-future/issues/509
+  - Per-test test.fixme(true, 'pending #509 — ...') applied to all three.
+  - Suite-level describe.fixme / describe.skip REMOVED.
+  - Stale #143 reference REMOVED.
+
+Running a three-pass loop under this state would report 9 × `skipped`
+(not 9 × `passed`), so the SC-003 metric cannot be truthfully met by
+feature #210 alone. SC-003 becomes the acceptance gate for the
+follow-up feature that resolves #509.
+
+What WAS proven stable in this feature
+--------------------------------------
+  - Environment + tooling path (openvscode-server + @sparticuz/chromium
+    + bundled Debrief VSIX) — `test-stac-stores.spec.ts` ran 3/3 green
+    in the same environment at the same wall-clock moment; see
+    `playwright-run.txt` and git log for context.
+  - The reactivation edit itself (describe.fixme → describe + per-test
+    fixme referencing the real blocker) — the Playwright runner now
+    discovers and reports the three tests as `skipped` rather than
+    silently dropping the whole suite.
+
+Hand-off
+--------
+SC-003 will be validated against the follow-up feature that closes #509,
+not here.
