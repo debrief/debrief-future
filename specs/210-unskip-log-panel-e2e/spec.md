@@ -1,6 +1,6 @@
 # Feature Specification: Un-skip Webview Log-Panel E2E Suite
 
-**Feature Branch**: `221-unskip-log-panel-e2e`
+**Feature Branch**: `210-unskip-log-panel-e2e`
 **Created**: 2026-04-22
 **Status**: Draft
 **Input**: User description: "Un-skip webview log-panel E2E suite — `tests/e2e/test-log-panel.spec.ts` is currently `test.describe.fixme(...)` pending issue #143 (webview iframe selector instability in code-server). Once #143 resolves, convert back to active tests; these cover the real integration path (code-server → LogPanel webview iframe → VS Code message bus) that Storybook cannot exercise. (requires #143, #176)"
@@ -81,7 +81,7 @@ As a developer running the Playwright suite locally or in a cloud sandbox, when 
 - **FR-003**: All three tests MUST pass against the same preview environments used by the sibling suites `test-analysis-tool.spec.ts` and `test-capture-log-evidence.spec.ts` (code-server local, Heroku review app).
 - **FR-004**: The full E2E test invocation that runs in CI (per `CLAUDE.md` "Before Pushing" step 4) MUST succeed on the branch with the three log-panel tests active and passing.
 - **FR-005**: If any of the three tests cannot be made to pass within this feature, the implementer MUST NOT land the change by re-applying `fixme` — instead they MUST open a new blocker issue, document the specific failure mode, and reference the **new** issue (not `#143`). The backlog item is "un-skip and verify", not "un-skip at any cost".
-- **FR-006**: Evidence of passing runs MUST be captured under `specs/221-unskip-log-panel-e2e/evidence/` per the project evidence-capture convention (test summary template with `git_sha` + `captured_at` front matter), showing at minimum one full pass of `test-log-panel.spec.ts`.
+- **FR-006**: Evidence of passing runs MUST be captured under `specs/210-unskip-log-panel-e2e/evidence/` per the project evidence-capture convention (test summary template with `git_sha` + `captured_at` front matter), showing at minimum one full pass of `test-log-panel.spec.ts`.
 - **FR-007**: The backlog entry for item `210` MUST be marked `complete` on merge (struck-through in `BACKLOG.md`), with a link to the spec directory, consistent with the repository's backlog-closure pattern.
 
 ### Non-Functional Requirements
@@ -92,7 +92,7 @@ As a developer running the Playwright suite locally or in a cloud sandbox, when 
 ### Key Entities
 
 - **`tests/e2e/test-log-panel.spec.ts`**: The sole file modified by this feature. Currently contains one `test.describe.fixme(...)` block wrapping three tests (empty state, single tool entry, multiple entries ordered most-recent-first). Target state: `test.describe(...)` (active) with the stale `#143` comment removed.
-- **Evidence artefact**: New test-summary document under `specs/221-unskip-log-panel-e2e/evidence/` capturing the passing run(s) per `.specify/templates/evidence/test-summary-template.md`.
+- **Evidence artefact**: New test-summary document under `specs/210-unskip-log-panel-e2e/evidence/` capturing the passing run(s) per `.specify/templates/evidence/test-summary-template.md`.
 - **Backlog entry `210`**: Row in `BACKLOG.md` to be struck through and linked to this spec on merge.
 
 ## Success Criteria *(mandatory)*

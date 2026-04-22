@@ -1,7 +1,7 @@
 # Phase 0 Research: Un-skip Webview Log-Panel E2E Suite
 
-**Feature**: 221-unskip-log-panel-e2e
-**Branch**: `221-unskip-log-panel-e2e` (dev branch: `claude/speckit-specify-210-uRbqr`)
+**Feature**: 210-unskip-log-panel-e2e
+**Branch**: `210-unskip-log-panel-e2e` (dev branch: `claude/speckit-specify-210-uRbqr`)
 **Date**: 2026-04-22
 
 ## Purpose

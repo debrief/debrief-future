@@ -1,7 +1,7 @@
 # Implementation Plan: Un-skip Webview Log-Panel E2E Suite
 
-**Branch**: `221-unskip-log-panel-e2e` | **Date**: 2026-04-22 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/221-unskip-log-panel-e2e/spec.md`
+**Branch**: `210-unskip-log-panel-e2e` | **Date**: 2026-04-22 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/210-unskip-log-panel-e2e/spec.md`
 
 ## Summary
 
@@ -44,7 +44,7 @@ Reactivate the three tests in `tests/e2e/test-log-panel.spec.ts`, which are curr
 ### Documentation (this feature)
 
 ```text
-specs/221-unskip-log-panel-e2e/
+specs/210-unskip-log-panel-e2e/
 ├── spec.md                 # Feature specification (already committed)
 ├── plan.md                 # This file
 ├── research.md             # Phase 0 output — reactivation-readiness evidence
@@ -81,7 +81,7 @@ tests/e2e/
 # apps/vscode/src/webview/** (log-panel webview entry)
 ```
 
-**Structure Decision**: Single-file change inside the existing `tests/e2e/` Playwright test root. No new source directories. Evidence and media co-locate under `specs/221-unskip-log-panel-e2e/` per repo convention.
+**Structure Decision**: Single-file change inside the existing `tests/e2e/` Playwright test root. No new source directories. Evidence and media co-locate under `specs/210-unskip-log-panel-e2e/` per repo convention.
 
 ## Media Components
 

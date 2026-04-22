@@ -91,11 +91,11 @@ All three runs must report 3/3 pass. Any flake — one pass + one fail + one pas
 1. Capture the failure — screenshot, error log, Playwright trace.
 2. Open a new issue describing the specific failure mode (e.g. "Log-panel webview frame not discoverable in CI — selector X not found within Y ms").
 3. Either (a) leave the reactivated tests failing in the PR (loud CI failure is a valid signal) and hand the fix to a separate feature, **or** (b) land a `test.fixme` on the individual failing test(s) — not the whole `describe` — referencing the **new** issue, not `#143`.
-4. Update `specs/221-unskip-log-panel-e2e/evidence/test-summary.md` to document the partial success and the hand-off.
+4. Update `specs/210-unskip-log-panel-e2e/evidence/test-summary.md` to document the partial success and the hand-off.
 
 ## Evidence deliverable (FR-006)
 
-One file: `specs/221-unskip-log-panel-e2e/evidence/test-summary.md`, following `.specify/templates/evidence/test-summary-template.md`. Minimum content:
+One file: `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`, following `.specify/templates/evidence/test-summary-template.md`. Minimum content:
 
 - YAML front matter with `git_sha` and `captured_at`.
 - One Playwright terminal output block showing 3 passed / 0 skipped / 0 failed.
@@ -108,7 +108,7 @@ On merge, in `BACKLOG.md`:
 
 - Find the row with `| 210 | Tech Debt | Un-skip webview log-panel E2E suite — …`.
 - Wrap every cell in `~~…~~` strikethrough.
-- Replace the feature-description cell with a strikethrough link to `specs/221-unskip-log-panel-e2e/spec.md`, matching the pattern used by rows `~~215~~`, `~~216~~`, `~~206~~`.
+- Replace the feature-description cell with a strikethrough link to `specs/210-unskip-log-panel-e2e/spec.md`, matching the pattern used by rows `~~215~~`, `~~216~~`, `~~206~~`.
 - Change status cell from `proposed` to `complete`.
 
 ## Acceptance self-check before opening PR
@@ -125,7 +125,7 @@ git diff --name-only main...HEAD -- 'shared/components/src/LogPanel/**' \
   | grep . && echo "FAIL" || echo "✅ NFR-001"
 
 # FR-006: evidence artefact exists
-test -f specs/221-unskip-log-panel-e2e/evidence/test-summary.md && echo "✅ FR-006" || echo "FAIL"
+test -f specs/210-unskip-log-panel-e2e/evidence/test-summary.md && echo "✅ FR-006" || echo "FAIL"
 
 # FR-007: backlog updated
 grep -E "^\| ~~210~~" BACKLOG.md && echo "✅ FR-007" || echo "FAIL"
