@@ -1,0 +1,133 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--mid-flow",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.8737112,
+          4.9211105
+        ],
+        [
+          30,
+          4.9211105
+        ],
+        [
+          30,
+          5
+        ],
+        [
+          29.8737112,
+          5
+        ],
+        [
+          29.8737112,
+          4.9211105
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.8737112,
+    4.9211105,
+    30,
+    5
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Mid Flow",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Saxon Warrior: Mid Flow — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Ramage.",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "FS Ramage",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "mine-clearance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "visual-sighting",
+      "zig-zag"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "mid_flow (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/mid_flow.dpf",
+      "title": "mid_flow.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-mid_flow": {
+      "href": "./assets/mid_flow.dpf",
+      "type": "application/octet-stream",
+      "title": "mid_flow.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/mid_flow.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.060997Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
