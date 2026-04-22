@@ -85,9 +85,9 @@
 
 ### TypeScript — MCP annotation type + adapter boundary
 
-- [ ] T016 Add optional `'debrief:uiCategory'?: ToolCategory` field to the `annotations` shape in `shared/utils/src/mcp-types.ts` (import `ToolCategory` from `@debrief/schemas`) `shared/utils/src/mcp-types.ts`
-- [ ] T017 [test] Write adapter tests: `mcpAdapter` extracts `'debrief:uiCategory': 'style'` → `{ category: 'style' }`; missing key → `{ category: null }`; invalid string → `{ category: null }` + `console.warn` called once `shared/components/src/ToolMatch/__tests__/mcpAdapter.test.ts`
-- [ ] T018 Extend `adaptMCPToolsForMatching` (and the legacy-fallback path in `calcService`) to parse `debrief:uiCategory` through a whitelist of the five canonical values; coerce non-matching to `null` with a dev-visible `console.warn` — T017 goes red → green `shared/components/src/ToolMatch/mcpAdapter.ts`, `apps/vscode/src/services/calcService.ts`
+- [x] T016 Add optional `'debrief:uiCategory'?: ToolCategoryEnum` field to the `annotations` shape in `shared/utils/src/mcp-types.ts` `shared/utils/src/mcp-types.ts`
+- [x] T017 [test] Write adapter tests: `fromMCPTool` extracts `'debrief:uiCategory': 'style'` → `{ category: 'style' }`; missing key → `{ category: undefined }`; invalid string → `{ category: undefined }` + `console.warn` called once (all 5 canonical values + 4 edge cases = 10 new tests) `shared/components/src/ToolMatch/__tests__/mcpAdapter.test.ts`
+- [x] T018 Extend `fromMCPTool` (the single canonical adapter used by both VS Code extension and web-shell) to parse `debrief:uiCategory` via new `parseToolUICategory` boundary helper — coerces non-canonical strings to `undefined` with a dev-visible `console.warn` naming the tool and offending value `shared/components/src/ToolMatch/mcpAdapter.ts`
 
 ### Webview message + extension host delivery
 

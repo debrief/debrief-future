@@ -5,6 +5,8 @@
  * and TypeScript frontends. Consolidated from apps/vscode and @debrief/components.
  */
 
+import type { ToolCategoryEnum } from '@debrief/schemas';
+
 /**
  * Debrief-specific annotations on MCP content items.
  */
@@ -85,5 +87,15 @@ export interface MCPToolDefinition {
     'debrief:category': string;
     'debrief:version': string;
     'debrief:outputKind': string;
+    /**
+     * Visual category for Log Panel icon rendering (feature 207). One of
+     * the five canonical ToolCategoryEnum values. Absent when the tool did
+     * not declare a category — Log Panel then renders neutral grey.
+     *
+     * This is additive to `debrief:category` (hierarchical path). The two
+     * serve different consumers (tool-match vs Log Panel visuals) and
+     * may disagree without issue.
+     */
+    'debrief:uiCategory'?: ToolCategoryEnum;
   };
 }
