@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-filter",
+  "name": "Test Filter Tool",
+  "description": "Sample filter tool",
+  "category": "filter"
+}

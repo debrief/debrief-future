@@ -4,6 +4,10 @@
   "additionalProperties": false,
   "description": "An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.",
   "properties": {
+    "category": {
+      "$ref": "#/$defs/ToolCategoryEnum",
+      "description": "Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey \"Other\" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md \u00a7R5). Feature 207."
+    },
     "description": {
       "description": "Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.",
       "type": [
@@ -89,6 +93,18 @@
       ],
       "title": "SelectionRequirement",
       "type": "object"
+    },
+    "ToolCategoryEnum": {
+      "description": "Visual category for Log Panel icon rendering. Declared by the tool at registration; consumed by frontends to colour tool-icon glyphs. See docs/log-panel-ux-srd.md \u00a75.\nThis enum defines only the declarable values. The neutral-grey \"unknown\" state shown by the Log Panel when a tool has no declared category is NOT a value of this enum \u2014 it is a rendering-layer fallback produced when the attribute is null or absent.",
+      "enum": [
+        "import",
+        "style",
+        "calc",
+        "filter",
+        "snapshot"
+      ],
+      "title": "ToolCategoryEnum",
+      "type": "string"
     }
   }
 }

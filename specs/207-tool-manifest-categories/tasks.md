@@ -51,10 +51,10 @@
 
 **Purpose**: Create the evidence scaffold and confirm the branch + feature directory are ready. No new packages, no new lint configs — all toolchain is already established.
 
-- [ ] T001 Create evidence directory `specs/207-tool-manifest-categories/evidence/`
-- [ ] T002 [P] Create evidence screenshots directory `specs/207-tool-manifest-categories/evidence/screenshots/`
-- [ ] T003 [P] Confirm working on branch `207-tool-manifest-categories` (run `git branch --show-current`; fail if not) `N/A — shell check`
-- [ ] T004 [P] Confirm CLAUDE.md `Recent Changes` reflects this feature (already updated by `/speckit.plan`) `CLAUDE.md`
+- [x] T001 Create evidence directory `specs/207-tool-manifest-categories/evidence/`
+- [x] T002 [P] Create evidence screenshots directory `specs/207-tool-manifest-categories/evidence/screenshots/`
+- [x] T003 [P] Confirm working on branch `207-tool-manifest-categories` (run `git branch --show-current`; fail if not) `N/A — shell check`
+- [x] T004 [P] Confirm CLAUDE.md `Recent Changes` reflects this feature (already updated by `/speckit.plan`) `CLAUDE.md`
 
 **Checkpoint**: Evidence scaffold exists, branch is correct. Proceed to Foundation.
 
@@ -68,12 +68,12 @@
 
 ### Schema (LinkML source of truth)
 
-- [ ] T005 [test] Write golden fixtures for `ToolCategoryEnum` — valid (`import`, `style`, `calc`, `filter`, `snapshot`, null, absent) and invalid (`geometry`, `calcs`, empty string) `shared/schemas/fixtures/tool/category-fixtures.json`
-- [ ] T006 [test] Write schema-adherence test asserting `ToolCategoryEnum` accepts only the five canonical values + null `shared/schemas/tests/test_tool_category_enum.py`
-- [ ] T007 Add `ToolCategoryEnum` (five `permissible_values`) and `Tool.category` attribute (optional, range `ToolCategoryEnum`) to `shared/schemas/src/linkml/tool.yaml` — T005/T006 tests must go from red → green `shared/schemas/src/linkml/tool.yaml`
-- [ ] T008 [P][test] Write round-trip evidence test: Python Pydantic → JSON → TypeScript type-guard → JSON → Pydantic preserves category value for each of the five values + null `shared/schemas/tests/test_tool_category_round_trip.py`
-- [ ] T009 Regenerate all derived artefacts (`uv run python -m debrief_schemas.generate` or the project's `task schemas`) so `debrief_schemas.ToolCategory` and `@debrief/schemas` literal union exist `shared/schemas/src/debrief_schemas/tool.py`, `shared/schemas/src/ts/tool.ts`, `shared/schemas/src/json-schema/tool.schema.json`
-- [ ] T010 [test] Verify generated Python `ToolCategory` is a `StrEnum` with exactly five members; verify generated TypeScript produces a literal union type (run `pnpm --filter @debrief/schemas typecheck` and `uv run pytest shared/schemas/tests`) `N/A — verification only`
+- [x] T005 [test] Write golden fixtures for `ToolCategoryEnum` — valid (`import`, `style`, `calc`, `filter`, `snapshot`, null, absent) and invalid (`geometry`, `calcs`, empty string) `shared/schemas/fixtures/tool/{valid,invalid}/*.json`
+- [x] T006 [test] Write schema-adherence test asserting `ToolCategoryEnum` accepts only the five canonical values + null `shared/schemas/tests/test_tool_category_fixtures.py`
+- [x] T007 Add `ToolCategoryEnum` (five `permissible_values`) and `Tool.category` attribute (optional, range `ToolCategoryEnum`) to `shared/schemas/src/linkml/tool.yaml` — T005/T006 tests must go from red → green `shared/schemas/src/linkml/tool.yaml`
+- [x] T008 [P][test] Write round-trip evidence test: Python Pydantic → JSON → JSON-Schema validation → Pydantic preserves category value for each of the five values + null `shared/schemas/tests/test_tool_category_round_trip.py`
+- [x] T009 Regenerate all derived artefacts (`make generate`) so `debrief_schemas.ToolCategoryEnum` and TS `ToolCategoryEnum` exist `shared/schemas/src/generated/python/debrief_schemas/__init__.py`, `shared/schemas/src/generated/typescript/types.ts`, `shared/schemas/src/generated/json-schema/Tool.schema.json`
+- [x] T010 [test] Verify generated Python `ToolCategoryEnum` is a `str, Enum` with exactly five members (one per canonical value); TypeScript compiles clean (`pnpm exec tsc --noEmit --project src/generated/typescript/tsconfig.json`) `N/A — verification only`
 
 ### Python service — tool model + registry
 
