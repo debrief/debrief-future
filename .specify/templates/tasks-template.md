@@ -183,15 +183,20 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T0XX [P] [US1] Add interaction tests for user flows
 - [ ] T0XX [US1] Run e2e tests: `pnpm --filter @debrief/components test:e2e [Component]`
 
-### VS Code Webview E2E Tests for User Story 1 (REQUIRED for extension workflows) 🖥️
+### Web-Shell E2E Tests for User Story 1 (REQUIRED for extension workflows) 🖥️
 
-> **NOTE**: Include this section when the user story involves VS Code extension workflows (opening files, running commands, interacting with webview panels).
-> See plan.md "VS Code Webview E2E Testing" section for which workflows need tests.
+> **NOTE**: Include this section when the user story involves a full extension workflow (opening a plot, running a tool, interacting with multiple panels) rather than a single isolated component. The web-shell (`apps/web-shell/`) is a standalone React app that hosts the same shared components as the VS Code extension (MapView, FilterBar, FeatureList, drawing tools, LogPanel, PropertiesPanel, etc.); driving it with Playwright is the supported path for full-workflow tests and blog/PR screenshots.
+>
+> See plan.md "Web-Shell E2E Testing" section for which workflows need tests.
 > Full architecture guide: `docs/e2e-testing-guide.md`
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The web-shell runner at `apps/web-shell/run-playwright.mjs` extracts the bundled `@sparticuz/chromium` binary and configures Playwright to use it. Full details: `docs/project_notes/playwright-installation-research.md`
+>
+> **Do NOT use the `tests/e2e/` + `xvfb-run` + openvscode-server path.** It was explored in #142 but is unreliable and is not the source of record for screenshots. Reach for it only if a test genuinely requires the real VS Code chrome (command palette, sidebar host); otherwise use web-shell.
 
-- [ ] T0XX [P] [US1] Update page objects in `tests/e2e/models/` with new selectors
-- [ ] T0XX [P] [US1] Create Playwright test `tests/e2e/test-[workflow].spec.ts`
-- [ ] T0XX [US1] Run webview e2e tests: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-[workflow]`
+- [ ] T0XX [P] [US1] Update page objects in `apps/web-shell/playwright/pages/` with new selectors (reuse `AnalysisPage` / `CatalogPage` where possible)
+- [ ] T0XX [P] [US1] Create Playwright test `apps/web-shell/playwright/tests/[workflow].spec.ts` (model on `properties-screenshots.spec.ts` or `drawing.spec.ts`)
+- [ ] T0XX [US1] Run web-shell e2e tests: `cd apps/web-shell && node run-playwright.mjs [workflow]` (or `pnpm --filter @debrief/web-shell test [workflow]` locally)
 
 ### Implementation for User Story 1
 
@@ -299,14 +304,17 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] VS Code theme: `screenshots/component-vscode.png`
 ```
 
-### VS Code Webview E2E Evidence Collection (REQUIRED for extension workflows) 🖥️
+### Web-Shell E2E Evidence Collection (REQUIRED for extension workflows) 🖥️
 
-> **Purpose**: Capture workflow evidence from VS Code webview tests
+> **Purpose**: Capture workflow screenshots and GIFs from Playwright tests driving the web-shell. This is the supported path for blog/PR screenshots of extension workflows — the openvscode-server / `xvfb-run` route is not in use.
+>
 > Full guide: `docs/e2e-testing-guide.md`
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — `apps/web-shell/run-playwright.mjs` auto-provisions the bundled `@sparticuz/chromium` binary. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] TXXX Run webview e2e suite: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts`
-- [ ] TXXX [P] Capture workflow screenshots to tests/e2e/evidence/
-- [ ] TXXX Document webview e2e results in evidence/webview-e2e-summary.md
+- [ ] TXXX Run web-shell e2e suite: `cd apps/web-shell && node run-playwright.mjs`
+- [ ] TXXX [P] Capture workflow screenshots directly into `specs/[feature]/evidence/screenshots/` from the spec file (see `apps/web-shell/playwright/tests/properties-screenshots.spec.ts` for the pattern — it writes PNGs + an interaction GIF into the feature's evidence dir)
+- [ ] TXXX Document web-shell e2e results in evidence/webview-e2e-summary.md
 
 **Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
 

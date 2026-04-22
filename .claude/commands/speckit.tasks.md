@@ -145,7 +145,8 @@ Based on the feature type detected from spec.md and plan.md:
 | **API/Service** | Sample request + response JSON | `sample-request.json`, `sample-response.json` |
 | **Library/SDK** | Code examples with results | `usage-example.py`, `output.txt` |
 | **Data Processing** | Before/after samples | `input-sample.*`, `output-sample.*` |
-| **UI Component** | 3 theme screenshots (light/dark/vscode) + interaction GIF showing key user flow | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **UI Component** | 3 theme screenshots (light/dark/vscode) + interaction GIF showing key user flow (via Storybook E2E) | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **VS Code Extension Workflow** | Workflow screenshots + interaction GIF captured by Playwright driving the **web-shell** (`apps/web-shell/playwright/tests/`, run via `node apps/web-shell/run-playwright.mjs`). The web-shell hosts the same shared components as the extension, so its screenshots are the source of record for blog/PR media. Do **not** route screenshots through openvscode-server / `xvfb-run` — that path is unreliable. | `screenshots/workflow-*.png`, `screenshots/interaction.gif`, `webview-e2e-summary.md` |
 | **Parser/Converter** | Input/output file pairs side-by-side | `sample-input.rep`, `parsed-output.json` |
 | **Schema Change** | Round-trip proof (Python -> JSON -> TypeScript -> JSON) | `round-trip-evidence.md` |
 | **Integration** | End-to-end flow demo + sequence diagram | `integration-flow.md`, `sequence.mermaid` |
