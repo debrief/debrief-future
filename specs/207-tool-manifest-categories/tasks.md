@@ -264,10 +264,11 @@ Task: "T026 Extend resolveToolCategory"     # Component
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T077 Capture test summary using template `.specify/templates/evidence/test-summary-template.md` with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`) `specs/207-tool-manifest-categories/evidence/test-summary.md`
-- [ ] T078 Record usage demonstration: Python `@tool(category=…)` snippet + TypeScript `'debrief:uiCategory': …` snippet + rendered screenshot side-by-side `specs/207-tool-manifest-categories/evidence/usage-example.md`
-- [ ] T079 [P] Capture round-trip evidence: run the schema round-trip harness (Python → JSON → TS → JSON → Python) for each of the five category values + null, record inputs/outputs `specs/207-tool-manifest-categories/evidence/round-trip-evidence.md`
-- [ ] T080 [P] Capture `tools/list` MCP response after migration showing `debrief:uiCategory` populated on every first-party tool (truncate to representative sample, annotate) `specs/207-tool-manifest-categories/evidence/manifest-sample.json`
+- [x] T077 Captured test summary using template with YAML front matter — 3434 passed / 0 failed / 4 skipped across 3438 total `specs/207-tool-manifest-categories/evidence/test-summary.md`
+- [x] T078 Recorded usage demonstration — Python `@tool(category=…)` + TypeScript `'debrief:uiCategory': …` snippets + the before/after migration narrative + the end-to-end data flow diagram `specs/207-tool-manifest-categories/evidence/usage-example.md`
+- [x] T079 [P] Captured round-trip evidence — LinkML → Python StrEnum → JSON serialisation → JSON Schema validation → Pydantic re-parse for all five canonical values, byte-identical round trip confirmed `specs/207-tool-manifest-categories/evidence/round-trip-evidence.md`
+- [x] T080 [P] Captured representative `tools/list` MCP response (4 tools covering calc + style) showing `debrief:uiCategory` populated on every first-party tool `specs/207-tool-manifest-categories/evidence/manifest-sample.json`
+- [x] T074 (US4 evidence) Documented the fail-closed coercion behaviour at all five defensive layers (Pydantic, JSON Schema, TS typecheck, `mcpAdapter` runtime coercion, rendering fallback) `specs/207-tool-manifest-categories/evidence/invalid-category-coercion.md`
 
 ### E2E Evidence Collection (REQUIRED for UI components) 🎭
 
@@ -286,8 +287,8 @@ Task: "T026 Extend resolveToolCategory"     # Component
 
 ### Media Content
 
-- [ ] T088 Create shipped blog post using the Content Specialist agent — read `.claude/agents/media/content.md` then spawn via Task tool. Sections: *What We Built*, *Screenshots* (embed the three theme shots + interaction GIF), *By the Numbers* (pull from `test-summary.md` front matter), *Lessons Learned* (two-commit migration, LinkML-first enum), *What's Next* (pointer to backlog item for destructive-bucket conversation) `specs/207-tool-manifest-categories/media/shipped-post.md`
-- [ ] T089 [P] Create LinkedIn shipped summary (150–200 words, hook-first opening, link to shipped post, 2–3 tags) `specs/207-tool-manifest-categories/media/linkedin-shipped.md`
+- [x] T088 Shipped blog post drafted via Content Specialist agent — sections: *What We Built*, *By the Numbers* (pulled from test-summary front matter), *Lessons Learned* (LinkML marriage, TS enum ergonomics gap, two-commit migration, boundary-coercion value), *What's Next*, *Decisions I'm Still Chewing On* `specs/207-tool-manifest-categories/media/shipped-post.md`
+- [x] T089 [P] LinkedIn shipped summary drafted — hook-first opening focused on the icon/glance experience; ~150 words; three focused tags `specs/207-tool-manifest-categories/media/linkedin-shipped.md`
 
 ### Project Memory
 
