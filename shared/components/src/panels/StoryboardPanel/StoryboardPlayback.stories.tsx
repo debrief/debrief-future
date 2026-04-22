@@ -318,6 +318,8 @@ function StoryboardPlaybackHarness(): React.ReactElement {
         <MapView
           features={emptyFc}
           selectedIds={new Set()}
+          initialCenter={[51.3, -1.5]}
+          initialZoom={7}
           flyToTarget={flyToTarget}
           onFlyToComplete={onFlyToComplete}
           sceneRectangles={{

@@ -21,7 +21,14 @@ const EVIDENCE_DIR_217 = resolve(
 );
 
 const FLYTO_DURATION_MS = 600;
-const FLYTO_SETTLE_MS = FLYTO_DURATION_MS + 400;
+// Give Leaflet's tile layer time to download + render after each flyTo
+// lands on a new viewport — otherwise the recording captures blank tiles
+// during the post-transition frame.
+const FLYTO_SETTLE_MS = FLYTO_DURATION_MS + 2000;
+// Initial tile-load settle after the harness renders, before any
+// interaction starts. Longer than FLYTO_SETTLE_MS because the first
+// paint of the base tile layer from a cold cache is the slowest step.
+const INITIAL_TILE_SETTLE_MS = 2500;
 
 test.describe('StoryboardPlayback — integrated flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -33,8 +40,8 @@ test.describe('StoryboardPlayback — integrated flow', () => {
     // Wait for the Leaflet tiles layer to paint so screenshots show the
     // basemap, not a white void.
     await page.waitForSelector('.leaflet-tile-loaded, .leaflet-container');
-    // Small extra settle for fonts + tile fade-in.
-    await page.waitForTimeout(600);
+    // Let tiles download + render before any interaction begins.
+    await page.waitForTimeout(INITIAL_TILE_SETTLE_MS);
   });
 
   test('dropdown switch refreshes Scene rectangles', async ({ page }) => {
@@ -82,51 +89,73 @@ test.describe('StoryboardPlayback — integrated flow', () => {
 // interaction artefact — GIF is a convenience format.
 
 test.describe('StoryboardPlayback — interaction recording', () => {
-  test('records forward-through-storyboard flow', async ({ page, browser }, testInfo) => {
-    // Fresh context per recording so the .webm is scoped to this test only.
-    const context = await browser.newContext({
-      viewport: { width: 1280, height: 720 },
-      recordVideo: {
-        dir: testInfo.outputDir,
-        size: { width: 1280, height: 720 },
-      },
-    });
-    const recPage = await context.newPage();
-    await recPage.goto(STORY_URL);
-    await recPage.waitForSelector(
+  // Playwright's recordVideo (WebM, compositor-level) doesn't capture
+  // Leaflet tile-layer rasters reliably on Chromium. Screenshots do.
+  // So we drive the interaction and grab a PNG frame every ~120ms over
+  // the entire flow, then stitch them into a GIF via ffmpeg.
+  //
+  // The result is a true representation of what the analyst sees —
+  // tiles, rectangles, panel state, and the scene-row highlight
+  // transitioning in lock-step with the map flyTo animation.
+
+  test('frames forward-through-storyboard flow', async ({
+    page,
+  }, testInfo) => {
+    const framesDir = testInfo.outputDir;
+    const FRAME_INTERVAL_MS = 120;
+    let frameIdx = 0;
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto(STORY_URL);
+    await page.waitForSelector(
       '[data-testid="storyboard-playback-harness"]',
     );
-    await recPage.waitForSelector('.leaflet-tile-loaded, .leaflet-container');
-    await recPage.waitForTimeout(800);
+    await page.waitForSelector('.leaflet-tile-loaded, .leaflet-container');
+    // Let tiles settle at the initial viewport before the first click.
+    await page.waitForTimeout(INITIAL_TILE_SETTLE_MS);
 
-    // Forward twice → each step animates the map (flyTo) and advances the
-    // counter. Wait out each transition so the recording captures the full
-    // animation, not just the final frame.
-    await recPage.locator('[data-testid="transport-forward"]').click();
-    await recPage.waitForTimeout(FLYTO_SETTLE_MS);
+    // Frame grabber — runs in parallel with the interactions. We capture
+    // PNGs only of the right-hand map region (avoiding the panel, which
+    // is mostly static) to keep individual frames small. A timer loop
+    // keeps firing until we cancel it after the last interaction.
+    let grabbing = true;
+    const grabLoop = (async (): Promise<void> => {
+      while (grabbing) {
+        const path = `${framesDir}/frame-${String(frameIdx).padStart(4, '0')}.png`;
+        try {
+          await page.screenshot({ path, clip: { x: 380, y: 0, width: 900, height: 480 } });
+        } catch {
+          // Page may be closing; ignore and exit loop.
+          break;
+        }
+        frameIdx += 1;
+        await page.waitForTimeout(FRAME_INTERVAL_MS);
+      }
+    })();
 
-    // Back once then forward again — exercises Backward too.
-    await recPage.locator('[data-testid="transport-backward"]').click();
-    await recPage.waitForTimeout(FLYTO_SETTLE_MS);
-    await recPage.locator('[data-testid="transport-forward"]').click();
-    await recPage.waitForTimeout(FLYTO_SETTLE_MS);
+    // Drive the interaction — Forward, Backward, Forward. Same pattern
+    // as the WebM recording.
+    await page.locator('[data-testid="transport-forward"]').click();
+    await page.waitForTimeout(FLYTO_SETTLE_MS);
 
-    // Final assertion so the recording captures a known-good terminal state.
-    const counter = recPage.locator('[data-testid="transport-counter"]');
+    await page.locator('[data-testid="transport-backward"]').click();
+    await page.waitForTimeout(FLYTO_SETTLE_MS);
+
+    await page.locator('[data-testid="transport-forward"]').click();
+    await page.waitForTimeout(FLYTO_SETTLE_MS);
+
+    grabbing = false;
+    await grabLoop;
+
+    const counter = page.locator('[data-testid="transport-counter"]');
     await expect(counter).toContainText('2 of 3');
 
-    // Close the page first so the video is finalised on disk.
-    const videoObj = recPage.video();
-    await recPage.close();
-    await context.close();
-    if (videoObj) {
-      const webmPath = await videoObj.path();
-      // Expose the recorded path so the companion convert script can find it.
-      testInfo.attachments.push({
-        name: 'interaction-webm',
-        path: webmPath,
-        contentType: 'video/webm',
-      });
-    }
+    // Emit the frames directory as an attachment so the post-run ffmpeg
+    // script knows where to find them.
+    testInfo.attachments.push({
+      name: 'interaction-frames-dir',
+      path: framesDir,
+      contentType: 'text/plain',
+    });
   });
 });
