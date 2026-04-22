@@ -100,13 +100,20 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Verify bundles: self-contained, < 500KB, renders in isolation
      - Record bundle details in evidence/
    - **Media content**: Create blog posts and LinkedIn summaries using Content Specialist agent
-   - **E2E test tasks**: Playwright tests for Storybook stories (when plan.md has "Storybook E2E Testing" entries):
-     - Create test file in `shared/components/e2e/` using pattern from `.specify/templates/e2e-test-template.ts`
-     - Use Storybook story URL: `/iframe.html?id=category-component--variant`
-     - Test all theme variants using URL globals parameter: `&globals=theme:light|dark|vscode`
-     - Add `data-testid` attributes to components for reliable selection
-     - Capture screenshots for evidence: `await page.screenshot({ path: 'specs/[feature]/evidence/screenshots/...' })`
-     - Run tests: `pnpm --filter @debrief/components test:e2e [testfile]`
+   - **E2E test tasks** — pick the path that matches the feature:
+     - **Storybook E2E** (isolated components, when plan.md has "Storybook E2E Testing" entries):
+       - Create test file in `shared/components/e2e/` using pattern from `.specify/templates/e2e-test-template.ts`
+       - Use Storybook story URL: `/iframe.html?id=category-component--variant`
+       - Test all theme variants using URL globals parameter: `&globals=theme:light|dark|vscode`
+       - Add `data-testid` attributes to components for reliable selection
+       - Capture screenshots for evidence: `await page.screenshot({ path: 'specs/[feature]/evidence/screenshots/...' })`
+       - Run tests: `pnpm --filter @debrief/components test:e2e [testfile]`
+     - **Web-shell E2E** (full extension workflows and blog/PR screenshots, when plan.md has "Web-Shell E2E Testing" entries):
+       - Create test file in `apps/web-shell/playwright/tests/[workflow].spec.ts` — model on `properties-screenshots.spec.ts` (multi-theme + interaction GIF) or `drawing.spec.ts` (workflow interaction).
+       - Reuse page objects in `apps/web-shell/playwright/pages/` (`AnalysisPage`, `CatalogPage`); extend with new selectors rather than duplicating.
+       - Write screenshots/GIFs directly into `specs/[feature]/evidence/screenshots/` from the spec file — this is the source of record for blog/PR media.
+       - Run tests: `cd apps/web-shell && node run-playwright.mjs [workflow]` (cloud) or `pnpm --filter @debrief/web-shell test [workflow]` (local).
+       - **Do NOT** reach for the openvscode-server / `xvfb-run --config tests/e2e/playwright.config.ts` path to capture screenshots — it was explored in #142 and is unreliable; use it only if a test genuinely requires the real VS Code chrome (command palette, sidebar host).
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright tests because you think browsers can't be installed. Standard browser CDN downloads are blocked (403), but `@sparticuz/chromium` bundles a Linux Chromium binary via npm and works fully. The project's `playwright.config.ts` auto-detects the environment and uses the bundled binary when `CLAUDE_CODE=1` is set. Run via `node apps/web-shell/run-playwright.mjs` to extract and configure the bundled browser. Full details: `docs/project_notes/playwright-installation-research.md`
 
