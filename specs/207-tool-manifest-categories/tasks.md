@@ -77,11 +77,11 @@
 
 ### Python service — tool model + registry
 
-- [ ] T011 [test] Write test: `Tool(category=ToolCategory.CALC, …)` constructs successfully; `Tool(category="geometry", …)` raises `ValidationError` `services/calc/tests/test_models.py`
-- [ ] T012 [test] Write test: `Tool.to_mcp_tool()` emits `annotations["debrief:uiCategory"] == "calc"` when `category=ToolCategory.CALC`, and omits the key entirely when `category is None` `services/calc/tests/test_models_mcp.py`
-- [ ] T013 Add `category: ToolCategory | None = None` field to the Pydantic `Tool` class in `services/calc/debrief_calc/models.py`; extend `to_mcp_tool()` to emit `debrief:uiCategory` when set (see `contracts/mcp-annotations.md`) — T011/T012 go red → green `services/calc/debrief_calc/models.py`
-- [ ] T014 Extend the `@tool(…)` decorator in `services/calc/debrief_calc/registry.py` to accept `category: ToolCategory | None = None` and forward it to the `Tool` constructor `services/calc/debrief_calc/registry.py`
-- [ ] T015 [test] Write decorator test: `@tool(name=…, category=ToolCategory.FILTER, …)` registers a `Tool` whose `category` is `ToolCategory.FILTER` `services/calc/tests/test_registry.py`
+- [x] T011 [test] Write test: `Tool(category=ToolCategoryEnum.calc, …)` constructs successfully; `Tool(category="geometry", …)` raises `ValidationError` `services/calc/tests/test_models.py`
+- [x] T012 [test] Write test: `Tool.to_mcp_tool()` emits `annotations["debrief:uiCategory"] == "calc"` when `category=ToolCategoryEnum.calc`, and omits the key entirely when `category is None` `services/calc/tests/test_models_mcp.py`
+- [x] T013 Add `category: ToolCategoryEnum | None = None` field to the Pydantic `Tool` class in `services/calc/debrief_calc/models.py`; extend `to_mcp_tool()` to emit `debrief:uiCategory` when set (see `contracts/mcp-annotations.md`) — T011/T012 go red → green `services/calc/debrief_calc/models.py`
+- [x] T014 Extend the `@tool(…)` decorator in `services/calc/debrief_calc/registry.py` to accept `category: ToolCategoryEnum | None = None` and forward it to the `Tool` constructor `services/calc/debrief_calc/registry.py`
+- [x] T015 [test] Write decorator test: `@tool(name=…, category=ToolCategoryEnum.filter, …)` registers a `Tool` whose `category` is `"filter"` `services/calc/tests/test_registry.py`
 
 ### TypeScript — MCP annotation type + adapter boundary
 
