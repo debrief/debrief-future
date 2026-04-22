@@ -37,6 +37,8 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 207: manifest-fed icon resolution
+  ToolCategoryMap,
 } from './types';
 export { DEFAULT_FILTER_STATE, VALID_VIEW_MODES } from './types';
 export { ParameterEditor } from './ParameterEditor';

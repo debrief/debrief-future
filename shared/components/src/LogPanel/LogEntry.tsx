@@ -32,6 +32,7 @@ export function LogEntry({
   featureNames,
   viewMode,
   isSelected,
+  toolCategories,
   onClick,
   // onTuneClick is kept in props for API compat but not used by rich card layout
   onRestoreClick,
@@ -111,7 +112,7 @@ export function LogEntry({
   const showDetails = viewMode === 'detailed';
 
   // Snapshot entries ("Manual checkpoint") — detect via tool category per Decision 2A.
-  const isSnapshot = resolveToolCategory(entry.toolName).category === 'snapshot';
+  const isSnapshot = resolveToolCategory(entry.toolName, toolCategories).category === 'snapshot';
 
   const ariaLabel =
     stepIndex != null
@@ -142,7 +143,7 @@ export function LogEntry({
         {stepIndex != null && (
           <span className="log-panel__entry-step">{stepIndex}</span>
         )}
-        <ToolCategoryIcon toolName={entry.toolName} size={18} />
+        <ToolCategoryIcon toolName={entry.toolName} toolCategories={toolCategories} size={18} />
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {entry.rationale && (
           <span

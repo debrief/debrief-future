@@ -1,23 +1,25 @@
 /**
- * Static tool category configuration map.
+ * Tool category configuration + resolver.
  *
- * Maps tool IDs to visual categories for icon rendering.
- * Future: replaced by tool manifest lookup.
- *
- * Feature: 176-log-panel-ux
+ * Feature: 176-log-panel-ux (introduced the five-bucket visual taxonomy).
+ * Feature: 207 (replaces the static `TOOL_ID_TO_CATEGORY` shim with a
+ *               manifest-fed resolver; shim kept here as a transitional
+ *               fallback for callers that do not yet pass a manifest map,
+ *               scheduled for removal in Commit B once all first-party
+ *               tools declare `category` via the LinkML schema).
  */
 
-import type { ToolCategory, ToolCategoryConfig } from './types';
+import type { ToolCategory, ToolCategoryConfig, ToolCategoryMap } from './types';
 
 /**
  * Visual config for each tool category.
  */
 export const TOOL_CATEGORY_CONFIGS: Record<ToolCategory, ToolCategoryConfig> = {
-  import: { category: 'import', background: '#dbeafe', glyph: '\u2B07', label: 'Import' },
-  style: { category: 'style', background: '#ede9fe', glyph: '\uD83C\uDFA8', label: 'Style' },
-  calc: { category: 'calc', background: '#dcfce7', glyph: '\u223F', label: 'Calculation' },
-  filter: { category: 'filter', background: '#fff7ed', glyph: '\u29D6', label: 'Filter' },
-  snapshot: { category: 'snapshot', background: '#fef9c3', glyph: '\uD83D\uDCF7', label: 'Snapshot' },
+  import: { category: 'import', background: '#dbeafe', glyph: '⬇', label: 'Import' },
+  style: { category: 'style', background: '#ede9fe', glyph: '🎨', label: 'Style' },
+  calc: { category: 'calc', background: '#dcfce7', glyph: '∿', label: 'Calculation' },
+  filter: { category: 'filter', background: '#fff7ed', glyph: '⧖', label: 'Filter' },
+  snapshot: { category: 'snapshot', background: '#fef9c3', glyph: '📷', label: 'Snapshot' },
 };
 
 /**
@@ -31,7 +33,13 @@ export const UNKNOWN_CATEGORY_CONFIG: ToolCategoryConfig = {
 };
 
 /**
- * Static mapping of known tool IDs to categories.
+ * Transitional static mapping of known tool IDs to categories.
+ *
+ * Consulted only when the caller does NOT supply a manifest map. This
+ * preserves the pre-#207 behaviour for Storybook stories and any legacy
+ * consumer that has not been threaded with `toolCategories` yet. Feature
+ * 207 Commit B deletes this constant and switches `resolveToolCategory`
+ * to consult the manifest-only path.
  */
 const TOOL_ID_TO_CATEGORY: Record<string, ToolCategory> = {
   // Import tools
@@ -59,9 +67,30 @@ const TOOL_ID_TO_CATEGORY: Record<string, ToolCategory> = {
 
 /**
  * Resolve the tool category for a given tool name.
- * Returns the ToolCategoryConfig if known, or the fallback config.
+ *
+ * Resolution precedence (feature 207):
+ *   1. If a manifest map is supplied and the tool has a canonical declared
+ *      category in it → use that.
+ *   2. If a manifest map is supplied but the tool is absent from it, or
+ *      declared `null`, or declared a non-canonical value (which should not
+ *      happen after the `mcpAdapter` boundary coerces) → unknown (grey).
+ *   3. If NO manifest map is supplied (legacy callers / Storybook without
+ *      fixtures) → consult the transitional static `TOOL_ID_TO_CATEGORY`
+ *      shim. Removed in Commit B.
+ *   4. Otherwise → unknown (grey).
  */
-export function resolveToolCategory(toolName: string): ToolCategoryConfig {
+export function resolveToolCategory(
+  toolName: string,
+  toolCategories?: ToolCategoryMap,
+): ToolCategoryConfig {
+  if (toolCategories !== undefined) {
+    const declared = toolCategories[toolName];
+    if (declared && declared in TOOL_CATEGORY_CONFIGS) {
+      return TOOL_CATEGORY_CONFIGS[declared as ToolCategory];
+    }
+    return UNKNOWN_CATEGORY_CONFIG;
+  }
+  // Legacy path — transitional static shim.
   const category = TOOL_ID_TO_CATEGORY[toolName];
   if (category) {
     return TOOL_CATEGORY_CONFIGS[category];

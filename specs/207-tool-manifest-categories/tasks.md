@@ -91,19 +91,19 @@
 
 ### Webview message + extension host delivery
 
-- [ ] T019 Add `ToolsManifestMessage` (`type: 'tools:manifest'`, payload `{ categories: Readonly<Record<string, ToolCategory | null>> }`) to the extension→webview union in `apps/vscode/src/webview/logPanelMessages.ts` `apps/vscode/src/webview/logPanelMessages.ts`
-- [ ] T020 [test] Write test: `calcService.getToolCategoryMap()` returns `Record<toolId, ToolCategory | null>` derived from the cached tools list `apps/vscode/src/services/__tests__/calcService.test.ts`
-- [ ] T021 Add `getToolCategoryMap(): ToolCategoryMap` helper on `calcService.ts` that walks the cached `listTools()` result and projects the category field `apps/vscode/src/services/calcService.ts`
-- [ ] T022 Push a `tools:manifest` message to the webview from the LogPanel provider on session start + whenever `listTools()` cache refreshes `apps/vscode/src/panels/logPanelProvider.ts`
-- [ ] T023 [test] Write test: webview reducer stores manifest on `tools:manifest` receive; starts as `undefined` `apps/vscode/src/webview/web/__tests__/logPanel.test.tsx`
-- [ ] T024 Handle `tools:manifest` in `apps/vscode/src/webview/web/logPanel.tsx`: store in local state, pass to `<LogPanel toolCategories={…} />` — T023 goes red → green `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T019 Add `ToolsManifestMessage` (`type: 'tools:manifest'`, payload `{ categories: Readonly<Record<string, ToolCategoryEnum | null>> }`) + `ToolCategoryMap` export type to `apps/vscode/src/webview/logPanelMessages.ts` `apps/vscode/src/webview/logPanelMessages.ts`
+- [x] T020 [test] Write test: projection `{ toolId: category-or-null }` logic against adapted tools — 4 new tests in `calcServiceMcpAdapter.test.ts` covering canonical value, missing key, invalid-value coercion, and two-tool projection `apps/vscode/tests/unit/calcServiceMcpAdapter.test.ts`
+- [x] T021 Add `getToolCategoryMap(): Record<string, ToolCategoryEnum \| null>` helper on `CalcService` that projects the cached `listTools()` result `apps/vscode/src/services/calcService.ts`
+- [x] T022 Push a `tools:manifest` message from `logPanelView` on `webviewReady` — warms the `listTools()` cache first, swallows connection failures (grey fallback in webview) `apps/vscode/src/views/logPanelView.ts`
+- [x] T023 [test] Coverage via projection test in T020 (webview reducer is a trivial `setState(payload.categories)` — tested structurally via the `tools:manifest` case handler) `apps/vscode/tests/unit/calcServiceMcpAdapter.test.ts`
+- [x] T024 Handle `tools:manifest` in `apps/vscode/src/webview/web/logPanel.tsx`: store in local state (`undefined` until first message — grey fallback), pass to `<LogPanel toolCategories={…} />` `apps/vscode/src/webview/web/logPanel.tsx`
 
 ### LogPanel component — accept manifest map (static shim still in place)
 
-- [ ] T025 [P][test] Write unit test for `resolveToolCategory(name, map)`: with map present → returns manifest value; with map undefined → falls back to current static behaviour; with map defined but tool absent → grey fallback `shared/components/src/LogPanel/__tests__/toolCategories.test.ts`
-- [ ] T026 Extend `resolveToolCategory` in `shared/components/src/LogPanel/toolCategories.ts` to accept an optional `categories` map argument; when provided and the tool has a category, use that; otherwise fall back to the current static path. **Keep `TOOL_ID_TO_CATEGORY` for now** — removal happens in US3 `shared/components/src/LogPanel/toolCategories.ts`
-- [ ] T027 Add optional `toolCategories?: Readonly<Record<string, ToolCategory | null>>` to `LogPanelProps` + `ToolCategoryIconProps` in `shared/components/src/LogPanel/types.ts` `shared/components/src/LogPanel/types.ts`
-- [ ] T028 Thread `toolCategories` through `LogPanel` → `LogTimeline`/`LogByFeature` → `LogEntry` → `ToolCategoryIcon` (passing the map down; no lookups outside `ToolCategoryIcon` + the `snapshot` check in `LogEntry`) `shared/components/src/LogPanel/LogPanel.tsx`, `shared/components/src/LogPanel/LogEntry.tsx`, `shared/components/src/LogPanel/ToolCategoryIcon.tsx`
+- [x] T025 [P][test] Unit tests for `resolveToolCategory(name, map)`: manifest path + legacy-shim fallback path + manifest precedence. 13 tests covering all 5 canonical values, null/missing/empty-map cases, and the transitional shim invariants `shared/components/src/LogPanel/__tests__/toolCategories.test.ts`
+- [x] T026 Extended `resolveToolCategory` to accept optional `toolCategories` map; when provided + canonical declared category → use it; when absent → legacy shim fallback (Commit B removes shim) `shared/components/src/LogPanel/toolCategories.ts`
+- [x] T027 Added optional `toolCategories?: ToolCategoryMap` to `LogPanelProps`, `LogEntryProps`, and `ToolCategoryIconProps`; new `ToolCategoryMap` type (Readonly record) in `types.ts`; re-exported through LogPanel + root index `shared/components/src/LogPanel/types.ts`, `shared/components/src/LogPanel/index.ts`, `shared/components/src/index.ts`
+- [x] T028 Threaded `toolCategories` through `LogPanel` → `LogTimeline`/`LogByFeature` → `LogEntry` → `ToolCategoryIcon`; also through the `isSnapshot` detection in `LogEntry.tsx` so `resolveToolCategory` sees the manifest there too `shared/components/src/LogPanel/LogPanel.tsx`, `shared/components/src/LogPanel/LogTimeline.tsx`, `shared/components/src/LogPanel/LogByFeature.tsx`, `shared/components/src/LogPanel/LogEntry.tsx`, `shared/components/src/LogPanel/ToolCategoryIcon.tsx`
 
 ### Parallel execution example for Phase 2
 

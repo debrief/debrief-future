@@ -26,6 +26,7 @@ import type {
 import type {
   ExtensionMessage,
   ReplayProgressPayload,
+  ToolCategoryMap,
 } from '../logPanelMessages';
 import { postWebviewMessage } from '../logPanelMessages';
 
@@ -68,6 +69,14 @@ function LogPanelApp(): React.ReactElement {
   // Phase 6: Replay state
   const [replayProgress, setReplayProgress] = useState<ReplayProgressPayload | null>(null);
 
+  // Feature 207: tool-manifest map for icon category resolution.
+  // `undefined` = not yet received (render with grey fallback); once a
+  // `tools:manifest` message arrives this becomes a live map and the
+  // Log Panel re-renders with correct colours.
+  const [toolCategories, setToolCategories] = useState<ToolCategoryMap | undefined>(
+    undefined,
+  );
+
   // Listen for messages from extension
   useEffect(() => {
     const handleMessage = (event: MessageEvent<ExtensionMessage>) => {
@@ -99,6 +108,11 @@ function LogPanelApp(): React.ReactElement {
 
         case 'mode:init':
           setViewMode(msg.payload.viewMode as ViewMode);
+          break;
+
+        // Feature 207: tool-manifest push (icon categories)
+        case 'tools:manifest':
+          setToolCategories(msg.payload.categories);
           break;
 
         // Phase 6: replay messages
@@ -329,6 +343,7 @@ function LogPanelApp(): React.ReactElement {
       plotName={plotName}
       actionResultMessage={actionResultMessage}
       replayProgress={replayProgress}
+      toolCategories={toolCategories}
       onMessage={handleMessage}
       onViewModeChange={handleViewModeChange}
       onFilterStateChange={setFilterState}

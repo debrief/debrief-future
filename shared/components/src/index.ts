@@ -253,6 +253,8 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 207: manifest-fed icon resolution
+  ToolCategoryMap,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,
