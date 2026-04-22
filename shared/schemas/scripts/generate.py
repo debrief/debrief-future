@@ -537,6 +537,35 @@ def generate_typescript() -> bool:
             )
         content = content[:_temporal_slice_start] + _new_block + content[_temporal_slice_end:]
 
+        # Post-process (#208): narrow LogEntry.activity_type from string → ActivityType.
+        # gen-typescript doesn't wire enum ranges into interface field types; the
+        # ActivityType enum declaration is emitted separately but the slot range
+        # collapses to `string`. We rewrite the single occurrence inside the
+        # LogEntry interface block.
+        _log_entry_start = content.find("export interface LogEntry {\n")
+        if _log_entry_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface LogEntry`."
+            )
+        _log_entry_end = content.index("}\n", _log_entry_start) + 2
+        _log_entry_block = content[_log_entry_start:_log_entry_end]
+        _new_log_entry_block = _log_entry_block.replace(
+            "    activity_type?: string,\n",
+            "    activity_type?: ActivityType,\n",
+            1,
+        )
+        if _new_log_entry_block == _log_entry_block:
+            raise RuntimeError(
+                "generate.py: LogEntry.activity_type post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`activity_type?: string` token. Update generate.py (Feature 208)."
+            )
+        content = (
+            content[:_log_entry_start]
+            + _new_log_entry_block
+            + content[_log_entry_end:]
+        )
+
         # Post-process (#214): tag the generated `GeoJSONFeature` interface
         # with `// canonical` so the `scripts/check-no-geojson-feature.sh`
         # regression guard (wired into `task lint`) doesn't flag the
