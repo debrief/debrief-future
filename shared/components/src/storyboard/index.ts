@@ -81,6 +81,7 @@ export {
   getStoryboard,
   getScene,
   getActiveStoryboardDefault,
+  getMostRecentlyModifiedStoryboard,
   readSceneWithStaleness,
 } from "./queries";
 export type { StaleReadResult } from "./queries";

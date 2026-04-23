@@ -8,7 +8,13 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { StoryboardPanel } from './StoryboardPanel';
-import type { SceneRowViewModel } from './types';
+import { HardBlockModal } from './HardBlockModal';
+import type {
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
+} from './types';
 
 function makeSceneRow(
   sceneId: string,
@@ -105,4 +111,105 @@ export const Capturing: Story = {
     onCaptureClick: () => undefined,
     onSceneRowClick: () => undefined,
   },
+};
+
+// ─── #217 stories ─────────────────────────────────────────────────────
+
+const TRANSPORT_AT_1: TransportViewModel = {
+  canGoBackward: false,
+  canGoForward: true,
+  sceneNumber: 1,
+  sceneTotal: 3,
+  transitionInFlight: false,
+};
+
+export const Transport: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    currentSceneId: 'scene-1',
+    transport: TRANSPORT_AT_1,
+    onTransportForward: () => undefined,
+    onTransportBackward: () => undefined,
+  },
+};
+
+const HARD_BLOCK_REASON: MissingDataReason = {
+  kind: 'missing-features',
+  missingFeatureIds: ['track-nimitz', 'annotation-bearing-lock'],
+};
+
+const MULTI_STORYBOARDS: readonly StoryboardOptionViewModel[] = [
+  {
+    storyboardId: 'sb-commander',
+    name: "Commander's view",
+    sceneCount: 5,
+    lastModifiedIso: '2026-04-20T15:00:00.000Z',
+  },
+  {
+    storyboardId: 'sb-asw',
+    name: 'ASW evidence',
+    sceneCount: 3,
+    lastModifiedIso: '2026-04-20T14:30:00.000Z',
+  },
+  {
+    storyboardId: 'sb-training',
+    name: 'Training debrief',
+    sceneCount: 2,
+    lastModifiedIso: '2026-04-20T14:00:00.000Z',
+  },
+];
+
+const FIVE_SCENES: SceneRowViewModel[] = [
+  makeSceneRow('scene-1', '2026-04-20T14:00:00.000Z', 'Exercise start'),
+  makeSceneRow('scene-2', '2026-04-20T14:10:00.000Z', 'First contact'),
+  makeSceneRow('scene-3', '2026-04-20T14:20:00.000Z', 'Bearing fix'),
+  makeSceneRow('scene-4', '2026-04-20T14:30:00.000Z', 'CPA estimate'),
+  makeSceneRow('scene-5', '2026-04-20T14:45:00.000Z', 'Disengagement'),
+];
+
+const TRANSPORT_MULTI: TransportViewModel = {
+  canGoBackward: true,
+  canGoForward: true,
+  sceneNumber: 2,
+  sceneTotal: 5,
+  transitionInFlight: false,
+};
+
+export const WithMultipleStoryboards: Story = {
+  args: {
+    scenes: FIVE_SCENES,
+    activeStoryboardName: "Commander's view",
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    storyboards: MULTI_STORYBOARDS,
+    activeStoryboardId: 'sb-commander',
+    currentSceneId: 'scene-2',
+    transport: TRANSPORT_MULTI,
+    onActiveStoryboardChange: () => undefined,
+    onCreateStoryboard: () => undefined,
+    onRenameStoryboard: () => undefined,
+    onDeleteStoryboard: () => undefined,
+    onTransportForward: () => undefined,
+    onTransportBackward: () => undefined,
+  },
+};
+
+export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
+  name: 'HardBlockModal (missing features)',
+  render: () => (
+    <HardBlockModal
+      sceneTitle="201435Z APR 26 — Surface contact"
+      reason={HARD_BLOCK_REASON}
+      jumpPastLabel="Jump past this scene"
+      openForEditingLabel="Open for editing"
+      onJumpPast={() => undefined}
+      onOpenForEditing={() => undefined}
+      onDismiss={() => undefined}
+    />
+  ),
 };

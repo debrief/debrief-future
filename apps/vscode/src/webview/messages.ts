@@ -8,7 +8,7 @@
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { SafeFeatureCollection } from '@debrief/utils';
-import type { DisplayMode, PlatformRecord } from '@debrief/schemas';
+import type { DisplayMode, PlatformRecord, Viewport } from '@debrief/schemas';
 export type { PlatformRecord };
 
 // ============================================================================
@@ -167,6 +167,56 @@ export interface RequestTrackDetailsResponse extends ResponseMessage {
     endTime: string;
     duration: string;
   };
+}
+
+// ============================================================================
+// Storyboard Playback Messages (#217)
+// ============================================================================
+
+/**
+ * Kick off an animated flyTo on the map (extension → webview).
+ * `durationMs === 0` means "jump without animation" (setView with animate:false).
+ * The token correlates to the `flyToComplete` response so the extension can
+ * distinguish the animation it kicked off from any intervening ones.
+ */
+export interface FlyToMessage {
+  type: 'flyTo';
+  token: number;
+  center: readonly [number, number];  // [lat, lng]
+  zoom: number;
+  durationMs: number;
+}
+
+/** Scene snapshot sent for rectangle rendering. */
+export interface SceneRectangleSnapshot {
+  readonly sceneId: string;
+  readonly viewport: Viewport;
+  readonly timestamp: string;
+  /** GeoJSON Polygon coordinates — outer ring + optional holes. */
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+
+/**
+ * Push the active Storyboard's Scene rectangles to the webview
+ * (extension → webview). Passing `scenes: null` clears the overlay.
+ */
+export interface SetSceneRectanglesMessage {
+  type: 'setSceneRectangles';
+  scenes: readonly SceneRectangleSnapshot[] | null;
+  activeStoryboardId: string | null;
+  currentSceneId: string | null;
+}
+
+/** A flyTo animation has ended (webview → extension). */
+export interface FlyToCompleteMessage {
+  type: 'flyToComplete';
+  token: number;
+}
+
+/** User clicked a Scene rectangle (webview → extension). */
+export interface SceneRectangleClickedMessage {
+  type: 'sceneRectangleClicked';
+  sceneId: string;
 }
 
 // ============================================================================
@@ -445,7 +495,10 @@ export type ExtensionToWebviewMessage =
   // Results panel (#178)
   | ResultsSetTabsMessage
   | ResultsSetVisibilityMessage
-  | ResultsSetLoadingMessage;
+  | ResultsSetLoadingMessage
+  // Storyboard playback (#217)
+  | FlyToMessage
+  | SetSceneRectanglesMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -470,7 +523,10 @@ export type WebviewToExtensionMessage =
   | ResultsSaveMessage
   | ResultsSaveAsMessage
   | ResultsRetryMessage
-  | ResultsCloseTabMessage;
+  | ResultsCloseTabMessage
+  // Storyboard playback (#217)
+  | FlyToCompleteMessage
+  | SceneRectangleClickedMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)

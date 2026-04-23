@@ -18,11 +18,11 @@ import {
   type StoryboardPlot,
   type SceneFeature,
 } from '@debrief/components';
-type StoryboardPlotFeature = StoryboardPlot['features'][number];
 import type { SceneRowViewModel } from '@debrief/components';
-import type { SessionStoreApi } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
+import type { StoryboardPlaybackService, StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
+import { plotFromFeatures } from '../services/plotFromFeatures';
 import type {
   StoryboardPanelMessage,
   ExtensionToStoryboardPanelMessage,
@@ -38,6 +38,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   private pendingMessages: ExtensionToStoryboardPanelMessage[] = [];
   private sessionChangeDisposable: vscode.Disposable | undefined;
   private getMapPanel: () => MapPanel | undefined = () => undefined;
+  private playbackService: StoryboardPlaybackService | undefined;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -50,6 +51,15 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
 
   public setMapPanelResolver(fn: () => MapPanel | undefined): void {
     this.getMapPanel = fn;
+  }
+
+  /**
+   * #217 Phase 4: Provide the playback service so the panel can forward
+   * synchronous state changes (dropdown selection) without going through
+   * the command palette.
+   */
+  public setPlaybackService(service: StoryboardPlaybackService): void {
+    this.playbackService = service;
   }
 
   public resolveWebviewView(
@@ -82,11 +92,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   public refresh(): void {
     if (!this.view) {return;}
     const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
-    const plot: StoryboardPlot = {
-      type: 'FeatureCollection',
-      // eslint-disable-next-line no-restricted-syntax -- #216: DebriefFeature ↔ StoryboardPlotFeature boundary — both are GeoJSON Features (see ADR-019).
-      features: plotFeatures as unknown as StoryboardPlotFeature[],
-    };
+    const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
     const activeStoryboard = getActiveStoryboardDefault(plot);
     const activeId = activeStoryboard?.properties.id ?? null;
     const activeName = activeStoryboard?.properties.name ?? null;
@@ -101,6 +107,39 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       activeStoryboardName: activeName,
       activeStoryboardId: activeId,
     });
+  }
+
+  /**
+   * Apply a full playback snapshot (#217). Called by the
+   * StoryboardPlaybackService on every transport step / lifecycle event /
+   * CRUD op. The service already enriches the view-models; we pass them
+   * straight through.
+   */
+  public applySnapshot(snapshot: StoryboardPlaybackSnapshot): void {
+    // Thumbnails may not be resolvable by the service (it doesn't know
+    // about webview URIs). Enrich each row with a webview-safe thumbnail
+    // href derived from the STAC item directory.
+    const enrichedScenes = snapshot.scenes.map((row) => ({
+      ...row,
+      thumbnailHref: row.thumbnailHref === ''
+        ? this.resolveThumbnailHrefForActiveItem(row.sceneId)
+        : row.thumbnailHref,
+    }));
+    this.post({
+      type: 'snapshot',
+      storyboards: snapshot.storyboards,
+      scenes: enrichedScenes,
+      activeStoryboardId: snapshot.activeStoryboardId,
+      activeStoryboardName: snapshot.activeStoryboardName,
+      currentSceneId: snapshot.currentSceneId,
+      transport: snapshot.transport,
+    });
+  }
+
+  private resolveThumbnailHrefForActiveItem(sceneId: string): string {
+    if (!this.view) {return '';}
+    const stacItemPath = this.getStacItemDirectory();
+    return this.resolveThumbnailHref(this.view.webview, stacItemPath, sceneId);
   }
 
   public setCaptureInFlight(inFlight: boolean): void {
@@ -174,8 +213,39 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         void vscode.commands.executeCommand('debrief.captureScene');
         break;
       case 'scene-row-clicked':
-        // #216 logs only. #217 will replace with flyTo behaviour.
-        void this.getSession(); // no-op read, keeps the dep graph honest
+        // #217: scene-row-clicked now drives transport (goToScene via
+        // the debrief.storyboard.clickScene command). The service runs
+        // the hard-block check inside goToScene — if the target Scene
+        // is missing features or out of range, the native VS Code modal
+        // surfaces. Rows themselves carry no pre-computed `blocked`
+        // state (design-fix 1).
+        void vscode.commands.executeCommand('debrief.storyboard.clickScene', message.sceneId);
+        break;
+      case 'transport-forward-clicked':
+        // Delegating to the VS Code command keeps the panel button click
+        // and the scoped Right-arrow key on the same code path.
+        void vscode.commands.executeCommand('debrief.storyboard.forward');
+        break;
+      case 'transport-backward-clicked':
+        void vscode.commands.executeCommand('debrief.storyboard.backward');
+        break;
+      case 'active-storyboard-changed': {
+        // Direct state change — NOT a palette command. The service
+        // updates per-plot state synchronously and emits a snapshot.
+        const uri = this.sessionManager.getActiveDocumentUri();
+        if (uri && this.playbackService) {
+          this.playbackService.setActiveStoryboard(uri, message.storyboardId);
+        }
+        break;
+      }
+      case 'create-storyboard-requested':
+        void vscode.commands.executeCommand('debrief.storyboard.create');
+        break;
+      case 'rename-storyboard-requested':
+        void vscode.commands.executeCommand('debrief.storyboard.rename');
+        break;
+      case 'delete-storyboard-requested':
+        void vscode.commands.executeCommand('debrief.storyboard.delete');
         break;
       case 'log':
         if (message.level === 'error') {
@@ -186,10 +256,6 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         // debug-level logs are intentionally dropped in production builds.
         break;
     }
-  }
-
-  private getSession(): SessionStoreApi | null {
-    return this.sessionManager.getActiveSession();
   }
 
   private post(message: ExtensionToStoryboardPanelMessage): void {
