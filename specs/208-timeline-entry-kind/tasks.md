@@ -50,7 +50,7 @@ This feature is a **Schema Change** (per the Quality Rubric) with a **Library/SD
 
 **Purpose**: Prepare directories and confirm the worktree is configured for the feature.
 
-- [ ] T001 Create evidence directory structure `specs/208-timeline-entry-kind/evidence/screenshots/`
+- [x] T001 Create evidence directory structure `specs/208-timeline-entry-kind/evidence/screenshots/`
 - [ ] T002 [P] Confirm worktree branch is `208-timeline-entry-kind` and CI baseline (`task verify`) passes on the untouched branch before changes begin — this is the pre-migration baseline for SC-003 regression comparisons.
 
 **Checkpoint**: Empty evidence directory exists; pre-change CI is green, establishing the regression baseline.
@@ -65,26 +65,26 @@ This feature is a **Schema Change** (per the Quality Rubric) with a **Library/SD
 
 ### Schema layer (LinkML) — maps to research.md R1
 
-- [ ] T003 Add `ActivityType` enum + optional `activity_type` slot to `LogEntry` class in `shared/schemas/src/linkml/log-entry.yaml` per data-model.md §1
-- [ ] T004 Regenerate Pydantic models — produces updated `shared/schemas/src/generated/pydantic/` (run via existing `gen-pydantic` workflow)
-- [ ] T005 [P] Regenerate TypeScript types — produces updated `shared/schemas/src/generated/typescript/types.ts` (run via existing `gen-typescript` workflow)
-- [ ] T006 [P] Regenerate JSON Schema — produces updated `shared/schemas/src/generated/json-schema/` (run via existing `gen-json-schema` workflow)
-- [ ] T007 [P] [test] Add LinkML golden fixtures for `activity_type` in `shared/schemas/fixtures/` — three fixtures: (a) valid with `activity_type: 'snapshot'`, (b) valid with field absent, (c) invalid with `activity_type: 'invalid'` (must fail validation). File path examples: `shared/schemas/fixtures/log-entry-with-activity-type.json`, `shared/schemas/fixtures/log-entry-no-activity-type.json`, `shared/schemas/fixtures/log-entry-invalid-activity-type.json`
-- [ ] T008 [test] Verify LinkML adherence tests (round-trip + structural comparison) pass with new field and fixtures — run existing schema adherence suite; no new test file, but add fixture references to `shared/schemas/tests/` if required
+- [x] T003 Add `ActivityType` enum + optional `activity_type` slot to `LogEntry` class in `shared/schemas/src/linkml/log-entry.yaml` per data-model.md §1
+- [x] T004 Regenerate Pydantic models — produces updated `shared/schemas/src/generated/pydantic/` (run via existing `gen-pydantic` workflow)
+- [x] T005 [P] Regenerate TypeScript types — produces updated `shared/schemas/src/generated/typescript/types.ts` (run via existing `gen-typescript` workflow)
+- [x] T006 [P] Regenerate JSON Schema — produces updated `shared/schemas/src/generated/json-schema/` (run via existing `gen-json-schema` workflow)
+- [x] T007 [P] [test] Add LinkML golden fixtures for `activity_type` in `shared/schemas/fixtures/` — three fixtures: (a) valid with `activity_type: 'snapshot'`, (b) valid with field absent, (c) invalid with `activity_type: 'invalid'` (must fail validation). File path examples: `shared/schemas/fixtures/log-entry-with-activity-type.json`, `shared/schemas/fixtures/log-entry-no-activity-type.json`, `shared/schemas/fixtures/log-entry-invalid-activity-type.json`
+- [x] T008 [test] Verify LinkML adherence tests (round-trip + structural comparison) pass with new field and fixtures — run existing schema adherence suite; no new test file, but add fixture references to `shared/schemas/tests/` if required
 
 ### UI projection type (TypeScript) — maps to data-model.md §3
 
-- [ ] T009 Add `TimelineEntryKind` union export + optional `kind?: TimelineEntryKind` field on the `TimelineEntry` interface in `shared/components/src/LogPanel/types.ts` per data-model.md §3
+- [x] T009 Add `TimelineEntryKind` union export + optional `kind?: TimelineEntryKind` field on the `TimelineEntry` interface in `shared/components/src/LogPanel/types.ts` per data-model.md §3
 
 ### Host projection (TypeScript) — maps to data-model.md §4 and research.md R1
 
-- [ ] T010 Add `kindFromActivityType` helper and wire `kind` field in `toTimelineEntry` function in `apps/vscode/src/views/logPanelView.ts` per data-model.md §4. Implementation must match `contracts/timeline-entry-kind.ts` reference shape.
-- [ ] T011 [test] Add projection fallback unit test in `apps/vscode/src/views/__tests__/logPanelView.test.ts` (create file if absent). Covers FR-006: LogEntry without `activity_type` projects to `kind: 'tool'`; with `activity_type: 'snapshot'` projects to `kind: 'snapshot'`; never throws.
-- [ ] T012 [P] [test] Add projection totality unit test in `apps/vscode/src/views/__tests__/logPanelView.test.ts` covering SC-002: every sample-catalogue LogEntry yields a defined `kind`.
+- [x] T010 Add `kindFromActivityType` helper and wire `kind` field in `toTimelineEntry` function in `apps/vscode/src/views/logPanelView.ts` per data-model.md §4. Implementation must match `contracts/timeline-entry-kind.ts` reference shape.
+- [x] T011 [test] Add projection fallback unit test in `apps/vscode/src/views/__tests__/logPanelView.test.ts` (create file if absent). Covers FR-006: LogEntry without `activity_type` projects to `kind: 'tool'`; with `activity_type: 'snapshot'` projects to `kind: 'snapshot'`; never throws.
+- [x] T012 [P] [test] Add projection totality unit test in `apps/vscode/src/views/__tests__/logPanelView.test.ts` covering SC-002: every sample-catalogue LogEntry yields a defined `kind`.
 
 ### Import the generated schema type into the host
 
-- [ ] T013 Import `ActivityType` from the regenerated schema package into `apps/vscode/src/views/logPanelView.ts` and use it as the argument type of `kindFromActivityType` (no inline string literals).
+- [x] T013 Import `ActivityType` from the regenerated schema package into `apps/vscode/src/views/logPanelView.ts` and use it as the argument type of `kindFromActivityType` (no inline string literals).
 
 **Checkpoint**: `task verify` passes. `TimelineEntry.kind` exists and is populated on every projected entry, but no consumer reads it yet — observable behaviour unchanged. This is commit-2 from R6.
 
@@ -98,17 +98,17 @@ This feature is a **Schema Change** (per the Quality Rubric) with a **Library/SD
 
 ### Capture before-state evidence (must happen BEFORE the code edit)
 
-- [ ] T014 [US1] Capture pre-migration Storybook screenshot of an export-tool entry (rendering with the incorrect "manual checkpoint" placeholder) to `specs/208-timeline-entry-kind/evidence/screenshots/export-tool-before.png`. This is the "before" half of the evidence pair demonstrating the latent-bug fix per research.md R2. Must run before T015.
+- [x] T014 [US1] Capture pre-migration Storybook screenshot of an export-tool entry (rendering with the incorrect "manual checkpoint" placeholder) to `specs/208-timeline-entry-kind/evidence/screenshots/export-tool-before.png`. This is the "before" half of the evidence pair demonstrating the latent-bug fix per research.md R2. Must run before T015.
 
 ### Consumer migration
 
-- [ ] T015 [US1] Replace the visual-category check on line 114 of `shared/components/src/LogPanel/LogEntry.tsx`: change `const isSnapshot = resolveToolCategory(entry.toolName).category === 'snapshot'` to `const isSnapshot = entry.kind === 'snapshot'` per data-model.md §5. Do NOT remove the `resolveToolCategory` import — it is still used for icon/colour rendering per FR-008.
-- [ ] T016 [US1] [test] Add/update unit test in `shared/components/src/LogPanel/__tests__/LogEntry.test.tsx` — assert that `isSnapshot` branch is driven by `entry.kind`, not by `entry.toolName` category (pass a fixture with `kind: 'snapshot'` but `toolName: 'calculate-range'`; pass a fixture with `kind: 'tool'` but `toolName: 'export-png'`).
+- [x] T015 [US1] Replace the visual-category check on line 114 of `shared/components/src/LogPanel/LogEntry.tsx`: change `const isSnapshot = resolveToolCategory(entry.toolName).category === 'snapshot'` to `const isSnapshot = entry.kind === 'snapshot'` per data-model.md §5. Do NOT remove the `resolveToolCategory` import — it is still used for icon/colour rendering per FR-008.
+- [x] T016 [US1] [test] Add/update unit test in `shared/components/src/LogPanel/__tests__/LogEntry.test.tsx` — assert that `isSnapshot` branch is driven by `entry.kind`, not by `entry.toolName` category (pass a fixture with `kind: 'snapshot'` but `toolName: 'calculate-range'`; pass a fixture with `kind: 'tool'` but `toolName: 'export-png'`).
 
 ### Rebaseline Storybook
 
-- [ ] T017 [US1] Update LogPanel Storybook story fixtures (if any) that asserted the old "manual checkpoint placeholder for export tools" behaviour — set `kind: 'snapshot'` explicitly on fixtures that *should* render the manual-checkpoint placeholder; leave export-tool fixtures with `kind` absent (fallback `'tool'`). Files likely affected: `shared/components/src/LogPanel/LogPanel.stories.tsx`, `shared/components/src/LogPanel/LogEntry.stories.tsx` (if present).
-- [ ] T018 [US1] Re-run affected Storybook snapshot tests and rebaseline where the new output matches the data-model.md §5 intended behaviour. Review each rebaselined story against research.md R2 to confirm the change is *intended* (export-tool → normal chips) and not an unintended regression. Reviewer note goes into the commit message.
+- [x] T017 [US1] Update LogPanel Storybook story fixtures (if any) that asserted the old "manual checkpoint placeholder for export tools" behaviour — set `kind: 'snapshot'` explicitly on fixtures that *should* render the manual-checkpoint placeholder; leave export-tool fixtures with `kind` absent (fallback `'tool'`). Files likely affected: `shared/components/src/LogPanel/LogPanel.stories.tsx`, `shared/components/src/LogPanel/LogEntry.stories.tsx` (if present).
+- [x] T018 [US1] Re-run affected Storybook snapshot tests and rebaseline where the new output matches the data-model.md §5 intended behaviour. Review each rebaselined story against research.md R2 to confirm the change is *intended* (export-tool → normal chips) and not an unintended regression. Reviewer note goes into the commit message.
 
 ### Capture after-state evidence
 
@@ -142,13 +142,13 @@ This feature is a **Schema Change** (per the Quality Rubric) with a **Library/SD
 
 ### Drift test — asserts SC-001 (no residual semantic gates) and SC-005 (no tool-name heuristics)
 
-- [ ] T023 [US3] [test] Add semantic-gate drift test in `shared/components/src/LogPanel/__tests__/semantic-gate-drift.test.ts` (new file). Reads `LogEntry.tsx` source at runtime (`fs.readFileSync`), asserts it does NOT contain the literal `resolveToolCategory(entry.toolName).category === 'snapshot'` pattern nor any equivalent `category === 'snapshot'` regex against a `ToolCategory` expression. Directly covers SC-001.
-- [ ] T024 [US3] [P] [test] Add projection-purity drift test in `apps/vscode/src/views/__tests__/projection-purity.test.ts` (new file). Reads `logPanelView.ts` source, locates the `kindFromActivityType` function, and asserts its body does not contain known tool-ID string literals (`'manual-checkpoint'`, `'export-png'`, `'export-csv'`, `'export-geojson'`, etc.). Directly covers SC-005.
+- [x] T023 [US3] [test] Add semantic-gate drift test in `shared/components/src/LogPanel/__tests__/semantic-gate-drift.test.ts` (new file). Reads `LogEntry.tsx` source at runtime (`fs.readFileSync`), asserts it does NOT contain the literal `resolveToolCategory(entry.toolName).category === 'snapshot'` pattern nor any equivalent `category === 'snapshot'` regex against a `ToolCategory` expression. Directly covers SC-001.
+- [x] T024 [US3] [P] [test] Add projection-purity drift test in `apps/vscode/src/views/__tests__/projection-purity.test.ts` (new file). Reads `logPanelView.ts` source, locates the `kindFromActivityType` function, and asserts its body does not contain known tool-ID string literals (`'manual-checkpoint'`, `'export-png'`, `'export-csv'`, `'export-geojson'`, etc.). Directly covers SC-005.
 
 ### Capture grep-based evidence
 
-- [ ] T025 [US3] Capture semantic-gate grep evidence to `specs/208-timeline-entry-kind/evidence/semantic-gate-grep.txt` — a terminal transcript of `rg "category === 'snapshot'"` across the worktree, annotated to show each remaining hit is inside a *rendering* path (icon/colour), not a semantic gate. Human reviewer cross-check against SC-001.
-- [ ] T026 [US3] [P] Capture projection-purity grep evidence to `specs/208-timeline-entry-kind/evidence/projection-purity-check.txt` — a transcript of `rg "'(manual-checkpoint|export-png|export-csv|export-geojson)'" apps/vscode/src/views/logPanelView.ts` showing zero hits in the kind-resolution path.
+- [x] T025 [US3] Capture semantic-gate grep evidence to `specs/208-timeline-entry-kind/evidence/semantic-gate-grep.txt` — a terminal transcript of `rg "category === 'snapshot'"` across the worktree, annotated to show each remaining hit is inside a *rendering* path (icon/colour), not a semantic gate. Human reviewer cross-check against SC-001.
+- [x] T026 [US3] [P] Capture projection-purity grep evidence to `specs/208-timeline-entry-kind/evidence/projection-purity-check.txt` — a transcript of `rg "'(manual-checkpoint|export-png|export-csv|export-geojson)'" apps/vscode/src/views/logPanelView.ts` showing zero hits in the kind-resolution path.
 
 **Checkpoint**: US3 delivered. Drift tests guard against future regressions of SC-001 and SC-005.
 
@@ -160,27 +160,27 @@ This feature is a **Schema Change** (per the Quality Rubric) with a **Library/SD
 
 ### Documentation
 
-- [ ] T027 [P] Add a short ADR-style entry to `docs/project_notes/decisions.md` noting the semantic separation between `LogEntry.activity_type` (PROV, semantic) and `ToolCategory` (UI, visual). One paragraph; links back to this spec.
-- [ ] T028 [P] Log this feature in `docs/project_notes/issues.md` with the PR URL (added once PR is created — staged here as a placeholder).
+- [x] T027 [P] Add a short ADR-style entry to `docs/project_notes/decisions.md` noting the semantic separation between `LogEntry.activity_type` (PROV, semantic) and `ToolCategory` (UI, visual). One paragraph; links back to this spec.
+- [x] T028 [P] Log this feature in `docs/project_notes/issues.md` with the PR URL (added once PR is created — staged here as a placeholder).
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T029 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` in `specs/208-timeline-entry-kind/evidence/test-summary.md`. YAML front matter MUST include `feature: 208-timeline-entry-kind`, `captured_at` (ISO 8601), `git_sha` (current branch HEAD), `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body MUST describe the key verified scenarios: (a) LinkML adherence pass with new field + fixtures, (b) projection fallback to `'tool'` for absent `activity_type`, (c) projection emits `'snapshot'` for `activity_type: 'snapshot'`, (d) LogEntry.tsx renders manual-checkpoint placeholder only when `kind === 'snapshot'`, (e) exhaustiveness canary compiles, (f) semantic-gate + projection-purity drift tests pass.
-- [ ] T030 Create usage demonstration in `specs/208-timeline-entry-kind/evidence/usage-example.md`. Include: TypeScript snippet showing `entry.kind === 'snapshot'` gate, Python snippet showing `LogEntry(..., activity_type=ActivityType.snapshot)`, the old (wrong) visual-category pattern as a counter-example, and a one-sentence explanation of when to use each.
-- [ ] T031 [P] Create schema round-trip proof in `specs/208-timeline-entry-kind/evidence/round-trip-evidence.md` per Quality Rubric for Schema Change features. Show a Python `LogEntry` instance with `activity_type: 'snapshot'` → serialised JSON → deserialised in TypeScript via the regenerated types → re-serialised JSON → deserialised back to Python. Assert byte-level JSON equality after normalisation.
+- [x] T029 Capture test summary using the template at `.specify/templates/evidence/test-summary-template.md` in `specs/208-timeline-entry-kind/evidence/test-summary.md`. YAML front matter MUST include `feature: 208-timeline-entry-kind`, `captured_at` (ISO 8601), `git_sha` (current branch HEAD), `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body MUST describe the key verified scenarios: (a) LinkML adherence pass with new field + fixtures, (b) projection fallback to `'tool'` for absent `activity_type`, (c) projection emits `'snapshot'` for `activity_type: 'snapshot'`, (d) LogEntry.tsx renders manual-checkpoint placeholder only when `kind === 'snapshot'`, (e) exhaustiveness canary compiles, (f) semantic-gate + projection-purity drift tests pass.
+- [x] T030 Create usage demonstration in `specs/208-timeline-entry-kind/evidence/usage-example.md`. Include: TypeScript snippet showing `entry.kind === 'snapshot'` gate, Python snippet showing `LogEntry(..., activity_type=ActivityType.snapshot)`, the old (wrong) visual-category pattern as a counter-example, and a one-sentence explanation of when to use each.
+- [x] T031 [P] Create schema round-trip proof in `specs/208-timeline-entry-kind/evidence/round-trip-evidence.md` per Quality Rubric for Schema Change features. Show a Python `LogEntry` instance with `activity_type: 'snapshot'` → serialised JSON → deserialised in TypeScript via the regenerated types → re-serialised JSON → deserialised back to Python. Assert byte-level JSON equality after normalisation.
 - [ ] T032 [P] Verify all three theme-variant viewings of the rebaselined Storybook stories (light / dark / vscode) render consistently — capture any additional screenshots that reveal per-theme regressions, to `specs/208-timeline-entry-kind/evidence/screenshots/`. (Likely no action needed if theme variants are unaffected; recorded here for completeness.)
 
 ### CI Verification (REQUIRED before PR)
 
-- [ ] T033 Run `task verify` from worktree root — confirms lint + typecheck + unit tests all green. Re-run if any prior step changed code.
+- [x] T033 Run `task verify` from worktree root — confirms lint + typecheck + unit tests all green. Re-run if any prior step changed code.
 - [ ] T034 Run Playwright E2E suites: `cd apps/web-shell && node run-playwright.mjs` — confirms LogPanel-adjacent web-shell flows pass against the rebaselined behaviour. (The code-server LogPanel E2E suite at `tests/e2e/test-log-panel.spec.ts` is currently `test.describe.fixme(...)` per backlog #210; not in scope for this feature.)
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 ### Media Content
 
-- [ ] T035 Spawn the Content Specialist agent (`.claude/agents/media/content.md`) via Task tool with `subagent_type: "content-specialist"` to draft the shipped blog post at `specs/208-timeline-entry-kind/media/shipped-post.md`. Provide: the evidence summary, the latent-bug fix narrative from research.md R2, a short "Lessons Learned" on visual-vs-semantic separation, and a "What's Next" pointer to the three downstream features (snapshot button / tune marker / manual rationale). Track: `credibility`. Include a reference to the planning post from `media/planning-post.md`.
-- [ ] T036 [P] Spawn Content Specialist to draft the LinkedIn shipped summary at `specs/208-timeline-entry-kind/media/linkedin-shipped.md`. 150–200 words; hook on the latent-bug-fix angle; link placeholder to the shipped post.
+- [x] T035 Spawn the Content Specialist agent (`.claude/agents/media/content.md`) via Task tool with `subagent_type: "content-specialist"` to draft the shipped blog post at `specs/208-timeline-entry-kind/media/shipped-post.md`. Provide: the evidence summary, the latent-bug fix narrative from research.md R2, a short "Lessons Learned" on visual-vs-semantic separation, and a "What's Next" pointer to the three downstream features (snapshot button / tune marker / manual rationale). Track: `credibility`. Include a reference to the planning post from `media/planning-post.md`.
+- [x] T036 [P] Spawn Content Specialist to draft the LinkedIn shipped summary at `specs/208-timeline-entry-kind/media/linkedin-shipped.md`. 150–200 words; hook on the latent-bug-fix angle; link placeholder to the shipped post.
 
 ### PR Creation (FINAL TASK — must run last)
 
