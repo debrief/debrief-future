@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.github.io/schemas/206/type-declaration-record.schema.json",
+  "title": "TypeDeclarationRecord",
+  "description": "One record emitted by scripts/audits/type-audit/scan.ts per named TypeScript declaration discovered in in-scope source. The intermediate JSON file is a list of these records; the reviewer consumes it to author docs/type-audit-2026.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "packageName",
+    "filePath",
+    "lineNumber",
+    "declarationName",
+    "kind",
+    "isExported",
+    "shapeHash",
+    "rhsSummary",
+    "imports",
+    "autoTag"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable identifier: ${packageName}:${relativeFilePath}:${declarationName}",
+      "pattern": "^[^:]*:[^:]+:[^:]+$"
+    },
+    "packageName": {
+      "type": "string",
+      "description": "pnpm workspace name (e.g. @debrief/components). Empty string if outside a workspace."
+    },
+    "filePath": {
+      "type": "string",
+      "description": "Repo-relative path, forward-slash normalised"
+    },
+    "lineNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "declarationName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["interface", "type", "enum"]
+    },
+    "isExported": {
+      "type": "boolean"
+    },
+    "shapeHash": {
+      "type": "string",
+      "description": "SHA-1 hex of the AST printed form of the declaration",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "rhsSummary": {
+      "type": ["string", "null"],
+      "description": "For type aliases, truncated textual summary of the RHS (max 160 chars). Null for interface/enum.",
+      "maxLength": 160
+    },
+    "imports": {
+      "type": "array",
+      "description": "Module specifiers imported by the containing file",
+      "items": { "type": "string" }
+    },
+    "autoTag": {
+      "type": "string",
+      "enum": [
+        "schema-rooted-candidate",
+        "boundary-candidate",
+        "drift-shortlist",
+        "none"
+      ]
+    }
+  }
+}

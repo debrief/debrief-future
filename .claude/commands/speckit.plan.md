@@ -37,18 +37,17 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 1: Update agent context by running the agent script
    - Re-evaluate Constitution Check post-design
 
-4. **Media content - Planning Post**: After design artifacts are complete, create a planning announcement:
+4. **Cache opening context**: After design artifacts are complete, capture the opener for the eventual feature post:
    - Read the Content Specialist agent definition from `.claude/agents/media/content.md`
    - Use the Task tool with `subagent_type: "general-purpose"` to spawn the Content Specialist
    - Provide the specialist with:
      - Feature name and goal from spec.md
      - Key technical decisions from research.md
      - Architecture overview from plan.md
-   - Request a "Planning Post" following the template in the agent definition
-   - Save the draft post to `FEATURE_DIR/media/planning-post.md`
-   - Generate a LinkedIn summary and save to `FEATURE_DIR/media/linkedin-planning.md`
+   - Request the cached opener — three prose sections (`## What We're Building`, `## How It Fits`, `## Key Decisions`), no front matter, matching the contract in the agent definition
+   - Save to `FEATURE_DIR/evidence/opening-context.md` (create the `evidence/` directory if missing)
 
-5. **Stop and report**: Command ends after planning. Report branch, IMPL_PLAN path, generated artifacts, and media content drafts.
+5. **Stop and report**: Command ends after planning. Report branch, IMPL_PLAN path, generated artifacts, and the cached opener path.
 
 ## Phases
 
@@ -102,7 +101,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 **Prerequisites:** Phase 1 complete (design artifacts exist)
 
-**Purpose**: Identify Storybook stories to bundle for blog post demos. This enables interactive component demos in shipped posts.
+**Purpose**: Identify Storybook stories to bundle for blog post demos. This enables interactive component demos in feature posts.
 
 1. **Scan for Storybook stories** related to the feature:
    - Check for `.stories.tsx` files in the feature scope
@@ -132,14 +131,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 **Output**: plan.md with Media Components section populated (or marked as N/A)
 
-### Phase 2: Media Content Creation
+### Phase 2: Opening Context Capture
 
 **Prerequisites:** Phase 1 complete (design artifacts exist)
 
-1. **Create media directory**: `mkdir -p FEATURE_DIR/media/`
+1. **Create evidence directory**: `mkdir -p FEATURE_DIR/evidence/`
 
 2. **Spawn Content Specialist** via Task tool:
-   - Read `.claude/agents/media/content.md` for agent definition
+   - Read `.claude/agents/media/content.md` for agent definition (Cached Opening Context section)
    - Provide context:
      ```text
      Feature: [name from spec.md]
@@ -148,17 +147,14 @@ You **MUST** consider the user input before proceeding (if not empty).
      Architecture: [summary from plan.md]
      Audience: DSTL scientists, potential contributors, defence maritime analysis community
      ```
-   - Request: "Write a Planning Post announcing this feature"
+   - Request: "Write the cached opener — three prose sections: What We're Building, How It Fits, Key Decisions. Prose only, no front matter, no feedback solicitation."
 
-3. **Generate planning post**: Save to `FEATURE_DIR/media/planning-post.md`
-   - Must follow the Planning Post template from content.md
-   - Include sections: What We're Building, How It Fits, Key Decisions, What We'd Love Feedback On
+3. **Write cached opener**: Save to `FEATURE_DIR/evidence/opening-context.md`
+   - Three sections with `##` headings: `## What We're Building`, `## How It Fits`, `## Key Decisions`
+   - No YAML front matter
+   - Use the template at `.specify/templates/evidence/opening-context-template.md` as the structural reference
 
-4. **Generate LinkedIn summary**: Save to `FEATURE_DIR/media/linkedin-planning.md`
-   - 150-200 words, strong hook, link placeholder
-   - Follow LinkedIn template from content.md
-
-**Output**: media/planning-post.md, media/linkedin-planning.md
+**Output**: evidence/opening-context.md
 
 ## Key rules
 

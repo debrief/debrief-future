@@ -1,0 +1,255 @@
+{
+  "scannerVersion": "v1",
+  "capturedAt": "2026-04-21T23:19:07.763Z",
+  "gitSha": "01166d6e8ef72ed5cf25c339f0d9fa7dfc2b15b1",
+  "scannedPaths": [
+    "apps",
+    "shared",
+    "services"
+  ],
+  "excludedPaths": [
+    "shared/schemas/src/generated/**",
+    "**/__tests__/**",
+    "**/__fixtures__/**",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  "note": "Redacted sample — 10 records selected for evidence; the full output at this SHA contains 885 records. Select-by-autoTag: 3 schema-rooted-candidate + 3 boundary-candidate + 3 drift-shortlist + 1 none.",
+  "records": [
+    {
+      "id": "@debrief/components:shared/components/src/ActivityPanel/ActivityPanel.tsx:PaneSectionProps",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/ActivityPanel/ActivityPanel.tsx",
+      "lineNumber": 78,
+      "declarationName": "PaneSectionProps",
+      "kind": "interface",
+      "isExported": false,
+      "shapeHash": "3a81ddc068d3ee40ac538b5edf35996edded9923",
+      "rhsSummary": null,
+      "imports": [
+        "../FeatureList",
+        "../FeatureList/flattenFeatures",
+        "../FormatMenu",
+        "../GeometryDialog",
+        "../LayersToolbar",
+        "../PropertiesPanel",
+        "../TimeController",
+        "../ToolsPanel",
+        "../utils/labels",
+        "../utils/types",
+        "./ActivityPanel.css",
+        "./types",
+        "@debrief/schemas",
+        "react",
+        "vscrui"
+      ],
+      "autoTag": "schema-rooted-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/ActivityPanel/ActivityPanel.tsx:ResizeHandleProps",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/ActivityPanel/ActivityPanel.tsx",
+      "lineNumber": 121,
+      "declarationName": "ResizeHandleProps",
+      "kind": "interface",
+      "isExported": false,
+      "shapeHash": "9993dfbab7bfd8f6adfada59517c181569411b4b",
+      "rhsSummary": null,
+      "imports": [
+        "../FeatureList",
+        "../FeatureList/flattenFeatures",
+        "../FormatMenu",
+        "../GeometryDialog",
+        "../LayersToolbar",
+        "../PropertiesPanel",
+        "../TimeController",
+        "../ToolsPanel",
+        "../utils/labels",
+        "../utils/types",
+        "./ActivityPanel.css",
+        "./types",
+        "@debrief/schemas",
+        "react",
+        "vscrui"
+      ],
+      "autoTag": "schema-rooted-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/ActivityPanel/ActivityPanel.tsx:SectionErrorBoundaryProps",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/ActivityPanel/ActivityPanel.tsx",
+      "lineNumber": 34,
+      "declarationName": "SectionErrorBoundaryProps",
+      "kind": "interface",
+      "isExported": false,
+      "shapeHash": "b3b31a5354db391af699e33b80196d2ea965e4de",
+      "rhsSummary": null,
+      "imports": [
+        "../FeatureList",
+        "../FeatureList/flattenFeatures",
+        "../FormatMenu",
+        "../GeometryDialog",
+        "../LayersToolbar",
+        "../PropertiesPanel",
+        "../TimeController",
+        "../ToolsPanel",
+        "../utils/labels",
+        "../utils/types",
+        "./ActivityPanel.css",
+        "./types",
+        "@debrief/schemas",
+        "react",
+        "vscrui"
+      ],
+      "autoTag": "schema-rooted-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/nl-cql2/types.ts:Cql2Json",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/nl-cql2/types.ts",
+      "lineNumber": 17,
+      "declarationName": "Cql2Json",
+      "kind": "type",
+      "isExported": true,
+      "shapeHash": "a3d5129bbb4b0faac2c1e3734b7740e7536e8f2a",
+      "rhsSummary": "Record<string, unknown>",
+      "imports": [
+        "../FilterBar/types",
+        "../filter-engine"
+      ],
+      "autoTag": "boundary-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/PropertiesPanel/messageTypes.ts:FieldValue",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/PropertiesPanel/messageTypes.ts",
+      "lineNumber": 8,
+      "declarationName": "FieldValue",
+      "kind": "type",
+      "isExported": true,
+      "shapeHash": "631413ce41c87cffaa82fb7f5929be1cd8c525a5",
+      "rhsSummary": "unknown",
+      "imports": [],
+      "autoTag": "boundary-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/PropertiesPanel/schemaResolver.ts:UnknownRecord",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/PropertiesPanel/schemaResolver.ts",
+      "lineNumber": 13,
+      "declarationName": "UnknownRecord",
+      "kind": "type",
+      "isExported": false,
+      "shapeHash": "aef25ed8317d7bad902f02e5b7e1276d0365f283",
+      "rhsSummary": "Record<string, unknown>",
+      "imports": [
+        "./types"
+      ],
+      "autoTag": "boundary-candidate"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/ActivityPanel/ActivityPanel.stories.tsx:Story",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/ActivityPanel/ActivityPanel.stories.tsx",
+      "lineNumber": 143,
+      "declarationName": "Story",
+      "kind": "type",
+      "isExported": false,
+      "shapeHash": "3c4517e88c51fcf8e56559218dbda7d4416c014e",
+      "rhsSummary": "StoryObj<typeof ActivityPanel>",
+      "imports": [
+        "../ThemeProvider",
+        "./ActivityPanel",
+        "./types",
+        "@storybook/react",
+        "react"
+      ],
+      "autoTag": "drift-shortlist"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/ChartRenderer/ChartRenderer.stories.tsx:Story",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/ChartRenderer/ChartRenderer.stories.tsx",
+      "lineNumber": 20,
+      "declarationName": "Story",
+      "kind": "type",
+      "isExported": false,
+      "shapeHash": "67b2a66c12304ec0907184049ee646fa4784e6d5",
+      "rhsSummary": "StoryObj<typeof ChartRenderer>",
+      "imports": [
+        "./ChartRenderer",
+        "./fixtures/empty-dataset.json",
+        "./fixtures/range-bearing-series.json",
+        "./fixtures/zone-histogram.json",
+        "./transformer",
+        "./types",
+        "@storybook/react",
+        "react"
+      ],
+      "autoTag": "drift-shortlist"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/colour-engine/ColourDimensionSelector.stories.tsx:Story",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/colour-engine/ColourDimensionSelector.stories.tsx",
+      "lineNumber": 48,
+      "declarationName": "Story",
+      "kind": "type",
+      "isExported": false,
+      "shapeHash": "431a70be6df04c325648b5b7bcba8a9a6f4b7659",
+      "rhsSummary": "StoryObj<typeof ColourDimensionSelector>",
+      "imports": [
+        "../ThemeProvider",
+        "./ColourDimensionSelector",
+        "./registry",
+        "./types",
+        "@storybook/react",
+        "react"
+      ],
+      "autoTag": "drift-shortlist"
+    },
+    {
+      "id": "@debrief/components:shared/components/src/CascadingMenu/CascadingMenu.tsx:CascadingMenuItem",
+      "packageName": "@debrief/components",
+      "filePath": "shared/components/src/CascadingMenu/CascadingMenu.tsx",
+      "lineNumber": 4,
+      "declarationName": "CascadingMenuItem",
+      "kind": "interface",
+      "isExported": true,
+      "shapeHash": "4523a1e93df7d7e74748d32790cae9e6b4604764",
+      "rhsSummary": null,
+      "imports": [
+        "./CascadingMenu.css",
+        "react"
+      ],
+      "autoTag": "none"
+    }
+  ],
+  "driftClusters": [
+    {
+      "declarationName": "DebriefConfig",
+      "memberIds": [
+        "debrief-loader:apps/loader/src/main/ipc/config.ts:DebriefConfig",
+        "debrief-vscode:apps/vscode/src/services/configService.ts:DebriefConfig"
+      ]
+    },
+    {
+      "declarationName": "ExtensionMessage",
+      "memberIds": [
+        "debrief-vscode:apps/vscode/src/webview/logPanelMessages.ts:ExtensionMessage",
+        "debrief-vscode:apps/vscode/src/webview/web/activityPanel.tsx:ExtensionMessage",
+        "debrief-vscode:apps/vscode/src/webview/web/storyboardPanel.tsx:ExtensionMessage",
+        "debrief-vscode:apps/vscode/src/webview/web/timeController.tsx:ExtensionMessage"
+      ]
+    },
+    {
+      "declarationName": "ExtensionToWebviewMessage",
+      "memberIds": [
+        "@debrief/components:shared/components/src/LogPanel/types.ts:ExtensionToWebviewMessage",
+        "debrief-vscode:apps/vscode/src/webview/messages.ts:ExtensionToWebviewMessage"
+      ]
+    }
+  ]
+}

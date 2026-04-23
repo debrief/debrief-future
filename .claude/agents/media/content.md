@@ -1,6 +1,6 @@
 ---
 name: content-specialist
-description: Writes blog posts and LinkedIn content for Future Debrief. Use when creating planning or shipped posts, or social media summaries.
+description: Writes feature blog posts for Future Debrief. Use when capturing opening context during /speckit.plan or writing the final feature post during /speckit.pr.
 ---
 
 # Content Specialist
@@ -61,53 +61,19 @@ Show what readers could do that they can't today. Use sparingly until Tracks 1 a
 - End when the content ends — no summary or wrap-up
 - No "In conclusion" or "To summarise"
 
-## Blog Post Types
+## Blog Post Type
 
-### Planning Posts (Monday)
+One post per feature, published at ship time. Opening framing is captured during planning (see Cached Opening Context below) and stitched into the final article.
 
-Purpose: Announce what we're building next, invite feedback before implementation.
+### Feature Post
 
-Structure:
-```markdown
----
-layout: future-post
-title: "Planning: [Feature Name]"
-date: YYYY-MM-DD
-track: [momentum]
-author: Ian
-reading_time: N
-tags: [tracer-bullet, relevant-component]
-excerpt: "One-line summary of what we're planning to build"
----
-
-## What We're Building
-
-[1-2 paragraphs: the capability, why it matters]
-
-## How It Fits
-
-[1 paragraph: connection to overall architecture/vision]
-
-## Key Decisions
-
-[Bullet list of choices we're facing or have made]
-
-## What We'd Love Feedback On
-
-[Specific questions for readers]
-
-→ [Join the discussion](link to GitHub Discussion)
-```
-
-### Shipped Posts (Friday)
-
-Purpose: Show what we built, share learnings, celebrate progress.
+Purpose: Show what we built — including *why* it was worth building — and share learnings.
 
 Structure:
 ```markdown
 ---
 layout: future-post
-title: "Shipped: [Feature Name]"
+title: "Building [Feature Name]"
 date: YYYY-MM-DD
 track: [credibility]
 author: Ian
@@ -116,9 +82,17 @@ tags: [tracer-bullet, relevant-component]
 excerpt: "One-line summary of what we delivered"
 ---
 
-## What We Built
+## What We're Building
 
-[1-2 paragraphs: the capability delivered]
+[1-2 paragraphs from cached opening context: the capability, why it matters]
+
+## How It Fits
+
+[1 paragraph from cached opening context: connection to architecture/vision]
+
+## Key Decisions
+
+[From cached opening context: choices made and their trade-offs]
 
 ## Screenshots
 
@@ -139,6 +113,20 @@ excerpt: "One-line summary of what we delivered"
 → [See the code](link to PR or spec)
 → [Try it yourself](if applicable)
 ```
+
+The first three sections (*What We're Building*, *How It Fits*, *Key Decisions*) come verbatim from `specs/[feature]/evidence/opening-context.md` — the cached opener written during `/speckit.plan`. Read that file and prepend its contents; do not rewrite them. Sections 4 onwards are written fresh at ship time from evidence.
+
+### Cached Opening Context
+
+During `/speckit.plan`, the Content Specialist writes a cached opener to `specs/[feature]/evidence/opening-context.md`. This file contains prose — no front matter — for the three sections that frame the feature:
+
+1. `## What We're Building` — 1–2 paragraphs: the capability and why it matters.
+2. `## How It Fits` — 1 paragraph: how this connects to the overall architecture and vision.
+3. `## Key Decisions` — bullet list or short paragraphs: choices made and their trade-offs.
+
+When writing the Feature Post at ship time, open `evidence/opening-context.md` and copy those three sections verbatim into the post above *Screenshots*. Do not paraphrase; the planning-time framing is the article's opening.
+
+If `opening-context.md` is missing (e.g., for features that pre-date this workflow), generate the three sections from `spec.md`, `plan.md`, and `research.md` and note their absence when reporting back.
 
 ### Evidence-Driven Content
 
@@ -179,7 +167,7 @@ All Future Debrief posts use `future-post` layout with these fields:
 | Field | Required | Description |
 |-------|----------|-------------|
 | `layout` | Yes | Always `future-post` |
-| `title` | Yes | Post title, include type prefix (Planning:/Shipped:) |
+| `title` | Yes | Post title, prefixed with `Building ` (e.g., `Building Filter Bar`) |
 | `date` | Yes | YYYY-MM-DD format |
 | `track` | Yes | Array of track values: `momentum`, `credibility`, `ambition` |
 | `author` | Yes | Always `Ian` (capitalized) |
@@ -198,40 +186,9 @@ Posts must include one or more track values from:
 | `ambition` | Painting the future, roadmap items, vision pieces |
 
 **Examples:**
-- Planning post: `track: [momentum]`
-- Shipped post: `track: [credibility]`
+- Feature post: `track: [credibility]`
 - Major milestone with roadmap implications: `track: [credibility, ambition]`
 - Progress update showing ongoing work: `track: [momentum]`
-
-## LinkedIn Summaries
-
-- 150-200 words maximum
-- Hook in first line — something genuinely interesting, not hype
-- One concrete detail or insight
-- Link to full post
-- 2-3 relevant tags maximum, no hashtag spam
-
-**Avoid these openings:**
-- "I'm excited to announce..."
-- "Big news!"
-- "We're thrilled to share..."
-- Hype emoji (rocket ships, etc.)
-
-**Better openings:**
-- Start with the interesting thing itself
-- A question the work answers
-- A problem that got solved
-
-Template:
-```
-[The interesting thing — what happened or what's now possible]
-
-[2-3 sentences of context — why it matters]
-
-[Link to read more]
-
-#FutureDebrief #MaritimeAnalysis #OpenSource
-```
 
 ## Feedback Mechanism
 
@@ -280,11 +237,13 @@ Before marking a post complete:
 
 - [ ] Front matter has all required fields
 - [ ] `layout: future-post` (not `post` or `future-default`)
+- [ ] `title` prefixed with `Building ` (e.g., `Building Filter Bar`)
 - [ ] `track` is array with valid values (momentum, credibility, ambition)
 - [ ] `author: Ian` (capitalized)
 - [ ] `reading_time` calculated and included
 - [ ] `excerpt` under 150 characters
 - [ ] Tags are lowercase and hyphenated
 - [ ] Headings use `##` (not `#`)
+- [ ] First three sections copied verbatim from `evidence/opening-context.md`
 - [ ] Links to code/PRs included where relevant
 - [ ] Ends with substance (no generic calls to action)
