@@ -7,6 +7,21 @@ export declare function getScene(plot: Plot, sceneId: string): SceneFeature | nu
  * Null if the plot contains no Storyboards.
  */
 export declare function getActiveStoryboardDefault(plot: Plot): StoryboardFeature | null;
+/**
+ * Return the plot's most-recently-modified Storyboard — the one whose
+ * last provenance entry has the latest timestamp. Ties are broken by
+ * `storyboard.properties.id` ascending (ULIDs sort lexicographically by
+ * generation time, so this is a deterministic fallback consistent with
+ * creation order within the same millisecond).
+ *
+ * Null if the plot contains no Storyboards or any candidate Storyboard
+ * has an empty `provenance[]` (which would be a schema-invalid state
+ * caught by #215's `validatePlot`).
+ *
+ * Used by #217's playback service to seed the active Storyboard on
+ * plot-open (research R7 / FR-PLAY-002).
+ */
+export declare function getMostRecentlyModifiedStoryboard(plot: Plot): StoryboardFeature | null;
 export interface StaleReadResult {
     scene: SceneFeature;
     storedHash: string;
