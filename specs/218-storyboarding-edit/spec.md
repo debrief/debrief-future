@@ -13,10 +13,14 @@ This spec delivers the **edit suite** on top of the playback panel from
 #217: inline Scene rename, markdown description, session-scoped soft-
 delete with toast-undo, `update-to-current`, `duplicate` (with
 prompted timestamp), and `copy-to-other-storyboard` (deep-copied
-thumbnail asset). It also delivers two **housekeeping** capabilities:
-stale-thumbnail detection + per-Scene refresh, and the wiring into the
-**Analysis Log Panel (#176)** so every Storyboard or Scene mutation
-leaves an auditable trail with the Scene's thumbnail attached.
+thumbnail asset). It also delivers four **housekeeping** capabilities:
+stale-thumbnail detection + per-Scene refresh, a **bulk "Refresh all
+stale"** action, periodic **orphan-asset garbage collection** on plot
+close, and the wiring into the **Analysis Log Panel (#176)** so every
+Storyboard or Scene mutation leaves an auditable trail with the
+Scene's thumbnail attached. The Log Panel additionally **collapses
+consecutive same-op cards** inside a short window so a polish-heavy
+session stays legible.
 
 After this slice merges, the full MVP scope of the epic is in place:
 capture (#216), brief (#217), polish (#218). The dedicated distraction-
@@ -168,6 +172,27 @@ recorded.
   and the panel transitions out of the empty state.
 - **Markdown description length.** No hard cap is introduced here;
   the panel scrolls if the description grows long.
+- **Orphan thumbnail at plot close.** The `gcOrphanAssets` pass
+  (FR-EDIT-024) unlinks PNGs with no referring Scene; if the pass
+  itself fails (disk error), a warning is logged to the output
+  channel and the orphan survives until the next plot close — no
+  user-facing toast, no blocking of plot-close.
+- **Bulk "Refresh all stale" with some #174 failures.** Per-Scene
+  failures surface in the Log Panel (individual `refresh-thumbnail`
+  cards with error details); the rollup card shows `{ succeeded,
+  failed }` tallies; the action completes (does not abort on first
+  failure) so analysts can address remaining stale Scenes in a
+  single pass.
+- **Rapid-fire edits collapsed too aggressively.** The
+  LogPanel collapse (FR-EDIT-026) kicks in at ≥ 3 consecutive
+  same-op entries within 120 s. A user who wants full granularity
+  toggles `debrief.logPanel.collapseConsecutiveSameOp` off; the
+  audit trail at the `LogEntry`/provenance level is always complete.
+- **External delete of the Storyboard while undo toast is visible.**
+  `undoDeleteScene` surfaces a specific red toast ("Cannot restore —
+  storyboard was deleted") and clears the buffer entry; the
+  provenance chain at the `LogEntry` level stays intact (the
+  original `delete` entry is not reversed).
 
 ## Requirements *(mandatory)*
 
@@ -277,11 +302,39 @@ recorded.
 
 - **FR-EDIT-022**: All edit operations MUST flow through #215's
   module API. This spec MUST NOT introduce direct writes to
-  Storyboard or Scene Features.
+  Storyboard or Scene Features. **Exception (additive)**: this
+  slice ships a `restoreScene` helper and a `checkSceneTimestamp`
+  wrapper **inside #215's module** (`shared/components/src/storyboard/
+  crud.ts`), maintaining the single-mutation-boundary invariant.
 - **FR-EDIT-023**: This spec's UI surface MUST live inside the
   panel established by #217 (Scene row overflow menus, inline edit
   affordances, edit form) and MUST NOT introduce a separate
   window or view.
+
+#### Housekeeping additions (per review fold-in 2026-04-23)
+
+- **FR-EDIT-024**: On plot close, System MUST invoke
+  `sceneThumbnailService.gcOrphanAssets(plot)` which scans
+  `item.json` asset entries against live Scene `thumbnail_asset_ref`
+  values and unlinks any PNG whose Scene has been removed. Reclaimed
+  asset hrefs MUST be returned for telemetry.
+- **FR-EDIT-025**: System MUST expose a **bulk "Refresh all stale
+  thumbnails"** action at the Storyboard level (panel header
+  overflow menu). The action iterates every Scene flagged stale on
+  the active Storyboard, invokes `#174.captureThumbnail` per Scene,
+  emits one `refresh-thumbnail` log card per Scene, and emits a
+  single `refresh-all-stale` rollup card on completion carrying
+  `{ succeeded, failed }` tallies. The action is a no-op (with an
+  info toast) when no Scenes are flagged stale on the active
+  Storyboard.
+- **FR-EDIT-026**: The Analysis Log Panel (#176) MUST support
+  **consecutive-same-op collapse** for `debrief.storyboardEdit`
+  entries: when ≥ 3 consecutive entries with identical `op` +
+  `actor` fall within a 120-second window, they MUST render as a
+  single collapsed card showing the count + an expand action that
+  reveals the individual cards. The behaviour MUST be gated on a
+  new VS Code setting `debrief.logPanel.collapseConsecutiveSameOp`
+  (default **true**) so power users can opt out.
 
 ### Key Entities
 
@@ -422,6 +475,27 @@ No new Features are introduced and no new sub-entities are added.
 - **SC-010 — Offline.** The full edit suite (including refresh-
   thumbnail via #174) succeeds end-to-end with no network access
   (Article I).
+- **SC-011 — Orphan-asset reclamation.** After a session with N
+  delete ops and M `update-to-current` ops, the `gcOrphanAssets`
+  pass on plot close MUST unlink **100%** of orphan PNGs (asset
+  entries in `item.json` with no referring Scene) and MUST leave
+  **100%** of live thumbnails untouched (FR-EDIT-024).
+- **SC-012 — Bulk refresh integrity.** `refreshAllStaleThumbnails`
+  MUST invoke #174 exactly once per stale Scene, MUST emit exactly
+  one `refresh-thumbnail` card per successful refresh, and MUST
+  emit exactly one `refresh-all-stale` rollup card per invocation.
+  Per-Scene failures do NOT abort the run (FR-EDIT-025).
+- **SC-013 — Log collapse fidelity.** With
+  `debrief.logPanel.collapseConsecutiveSameOp = true`, ≥ 3
+  consecutive same-op+same-actor `debrief.storyboardEdit` entries
+  within a 120 s window MUST render as a single collapsed card.
+  With the setting off, the same entries MUST render individually.
+  In both states, `getTimeline` output MUST be byte-identical —
+  the collapse is rendering-only (FR-EDIT-026).
+- **SC-014 — Stale-pass perf budget.** `onPlotOpened` stale
+  detection MUST complete within **50 ms** at the spec scale bound
+  (5 Storyboards × 50 Scenes = 250 hash recomputations) on the
+  reference CI runner. Regressions MUST fail CI (review 4A).
 
 ## Assumptions
 
