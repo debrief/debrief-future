@@ -12,7 +12,7 @@ export type { StoryboardErrorCode } from './errors';
 export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, } from './crud';
 export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, } from './crud';
 export { listScenesOrdered } from './ordering';
-export { getStoryboard, getScene, getActiveStoryboardDefault, readSceneWithStaleness, } from './queries';
+export { getStoryboard, getScene, getActiveStoryboardDefault, getMostRecentlyModifiedStoryboard, readSceneWithStaleness, } from './queries';
 export type { StaleReadResult } from './queries';
 export { detectMissingDataForScene } from './missing-data';
 export type { MissingDataClassification, PlotTimeRange as StoryboardPlotTimeRange, } from './missing-data';

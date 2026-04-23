@@ -4,7 +4,9 @@ import { SceneRowViewModel } from './types';
 export interface SceneListProps {
     readonly scenes: readonly SceneRowViewModel[];
     readonly captureInFlight: boolean;
+    /** ID of the current transport scene — that row gets `data-active="true"`. */
+    readonly currentSceneId?: string | null;
     onSceneRowClick(sceneId: string): void;
 }
-export declare function SceneList({ scenes, captureInFlight, onSceneRowClick, }: SceneListProps): React.ReactElement;
+export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, }: SceneListProps): React.ReactElement;
 //# sourceMappingURL=SceneList.d.ts.map

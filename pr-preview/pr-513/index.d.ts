@@ -13,7 +13,9 @@ export { computeDuration, formatDuration, formatDateRange, formatRelativeTime, s
 export { StacFileTree } from './StacFileTree';
 export type { StacFileTreeProps, FilesystemAdapter, DirectoryEntry, FileStat, TreeNodeData, NodeType, } from './StacFileTree';
 export { MapView } from './MapView';
-export type { MapViewProps } from './MapView';
+export type { MapViewProps, FlyToTarget } from './MapView';
+export { SceneRectangleLayer, geoJsonPolygonToLeafletCoords, computeFillOpacity, computeOverlapRanks, } from './MapView/SceneRectangleLayer';
+export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';
 export { Timeline } from './Timeline';
 export type { TimelineProps } from './Timeline';
 export { TimeController, useTimePlayback } from './TimeController';
@@ -114,6 +116,6 @@ export type { FieldSpec, FieldDerivationState, PropertiesFormField, PropertiesFo
 export { BrowserSelectionContext, BrowserSelectionProvider, useBrowserSelection, PropertiesSidePanel, } from './StacBrowser';
 export type { BrowserSelection, BrowserSelectionProviderProps, PropertiesSidePanelProps, } from './StacBrowser';
 export * from './storyboard';
-export { StoryboardPanel, SceneRow, SceneList } from './panels/StoryboardPanel';
-export type { StoryboardPanelProps, SceneRowViewModel, } from './panels/StoryboardPanel';
+export { StoryboardPanel, SceneRow, SceneList, TransportRow, HardBlockModal, StoryboardHeader, } from './panels/StoryboardPanel';
+export type { StoryboardPanelProps, SceneRowViewModel, StoryboardOptionViewModel, TransportViewModel, MissingDataReason, TransportRowProps, HardBlockModalProps, StoryboardHeaderProps, } from './panels/StoryboardPanel';
 //# sourceMappingURL=index.d.ts.map

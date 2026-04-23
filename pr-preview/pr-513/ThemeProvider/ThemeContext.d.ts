@@ -34,6 +34,8 @@ export interface ThemeTokens {
     borderColorFocus: string;
     selectionBg: string;
     selectionBorder: string;
+    sceneRectangleStroke: string;
+    sceneRectangleFill: string;
 }
 /**
  * Context value provided by ThemeProvider
