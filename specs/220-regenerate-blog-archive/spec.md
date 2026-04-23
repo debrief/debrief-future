@@ -43,7 +43,7 @@ For each epic identified by its charter spec (`NNN-epic-*`) or `[Ex]` prefix sca
 
 ### User Story 3 — Composite posts cluster related standalone specs (Priority: P3)
 
-For standalone (non-epic) shipped specs that ship within a 14-day window AND share ≥1 tag/topic, produce one composite post at `specs/[earliest-spec]/media/composite-post.md`. Members of a composite are excluded from per-spec generation.
+For standalone (non-epic) shipped specs that ship within a 5-day window AND share ≥1 tag/topic, produce one composite post at `specs/[earliest-spec]/media/composite-post.md`. Members of a composite are excluded from per-spec generation.
 
 **Why this priority**: Raises quality for loose thematic clusters without imposing the epic framework retroactively.
 
@@ -51,8 +51,8 @@ For standalone (non-epic) shipped specs that ship within a 14-day window AND sha
 
 **Acceptance Scenarios**:
 
-1. **Given** two specs shipped 5 days apart sharing the tag `filter-engine`, **When** the generator runs, **Then** a composite is produced at the earliest spec's media folder.
-2. **Given** two specs shipped 30 days apart (outside the window), **When** the generator runs, **Then** they each get their own `unified-post.md`; no composite.
+1. **Given** two specs shipped 3 days apart sharing the tag `filter-engine`, **When** the generator runs, **Then** a composite is produced at the earliest spec's media folder.
+2. **Given** two specs shipped 10 days apart (outside the window), **When** the generator runs, **Then** they each get their own `unified-post.md`; no composite (flag as "near miss" in Unresolved Groupings for author review).
 3. **Given** two specs shipped close in time but with zero tag overlap, **When** the generator runs, **Then** no composite is produced.
 
 ---
@@ -78,7 +78,7 @@ Generate a single `ARCHIVE-REBUILD.md` at the repo root containing: a table of e
 
 - **FR-001**: The generator MUST classify each shipped spec as one of: `unified` (standalone), `epic-member` (absorbed into rollup), `composite-member` (absorbed into composite), or `skipped` (in-flight, no `shipped-post.md`).
 - **FR-002**: Epic membership MUST be determined charter-first (member table in `NNN-epic-*/spec.md`), falling back to `[Ex]` prefix scan of spec titles/inputs; mismatches MUST be flagged, not silently resolved.
-- **FR-003**: Composite membership MUST require BOTH a 14-day ship-date proximity AND ≥1 tag/topic overlap; thresholds configurable in the script but defaults are binding.
+- **FR-003**: Composite membership MUST require BOTH a 5-day ship-date proximity AND ≥1 tag/topic overlap; thresholds configurable in the script but defaults are binding. Pairs that fall just outside the window (5 < Δdays ≤ 10) with tag overlap MUST be listed as "near misses" under Unresolved Groupings so the author can promote them manually.
 - **FR-004**: Each generated post MUST use the `Building [Feature Name]` title pattern (standalone/composite) or a descriptive charter-derived title (epic rollup).
 - **FR-005**: Each generated post MUST be dated to the feature's original ship date (from `shipped-post.md` front matter or PR merge date); no in-flight specs are dated to today (they are skipped).
 - **FR-006**: The first three sections of every generated post MUST be copied verbatim from `evidence/opening-context.md` where present; when absent, synthesised from `spec.md`/`plan.md`/`research.md` and the fallback noted in the index.
@@ -124,7 +124,7 @@ Generate a single `ARCHIVE-REBUILD.md` at the repo root containing: a table of e
 
 These are captured from the interview but may need revisiting at `/speckit.specify` time:
 
-- **Composite threshold tuning**: 14-day window and ≥1 shared tag are defaults. If the first dry run produces too many/few composites, these thresholds may need adjustment before final generation.
+- **Composite threshold tuning**: 5-day window and ≥1 shared tag are defaults (tightened from an initial 14-day proposal — related non-epic specs historically land within a couple of days, rarely beyond a week). A 5–10 day "near miss" band surfaces borderline pairs in the index rather than auto-grouping or silently dropping them. If the first dry run produces too many/few composites, these thresholds may need adjustment before final generation.
 - **Merge-PR description retrieval**: For the "everything" source feed, accessing merged PR descriptions requires GitHub API access during the run. If the script runs in an environment without `gh`, the generator must degrade gracefully (use `shipped-post.md` as the PR-description proxy).
 - **Charter auto-detection**: The script identifies charter specs by directory name pattern (`NNN-epic-*`). If any charter exists without that naming (legacy), it will be missed and its members generated as standalones. An index-time flag lets the author intervene.
 
@@ -150,6 +150,6 @@ Decisions captured during the scoping interview (2026-04-23):
 | Q12 | One-shot script, deleted in same PR |
 | Q13 | Nothing deleted on `debrief-future`; website team handles wipe |
 | Q14 | Single `ARCHIVE-REBUILD.md` at repo root combining index + runbook |
-| Q15 | Composite detection: time window AND tag overlap (AND-gated) |
+| Q15 | Composite detection: time window AND tag overlap (AND-gated); 5-day window default, 5–10 day "near miss" surfaced in index |
 | Q16 | Composite post location: `specs/[earliest-spec]/media/composite-post.md` |
 | Q17 | No LinkedIn generation anywhere (silent drop) |
