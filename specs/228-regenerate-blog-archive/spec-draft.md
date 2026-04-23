@@ -1,6 +1,6 @@
 # Feature Specification: Regenerate Blog Archive from Specs
 
-**Feature Branch**: `220-regenerate-blog-archive`
+**Feature Branch**: `228-regenerate-blog-archive`
 **Created**: 2026-04-23
 **Status**: Draft (pre-`/speckit.specify` — captures interview answers for the combine-articles workstream follow-up)
 **Input**: User description: "Regenerate the Future Debrief blog archive: one unified 'Building [Feature]' post per shipped spec, epic rollups replacing per-spec posts for multi-spec arcs, composites grouping temporally- and thematically-related standalone specs. Produces an index for the `debrief.github.io` dev, who wipes and republishes `future` posts from scratch."
