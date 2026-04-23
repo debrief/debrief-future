@@ -495,7 +495,7 @@ Always end with a clear summary:
 ├─────────────────────────────────────────────────┤
 │  PR: https://github.com/debrief/debrief.github.io/pull/XX
 │  Branch: future-debrief/2026-01-16-feature-name │
-│  Content: Blog post - "Shipped: Feature Name"   │
+│  Content: Blog post - "Building Feature Name"   │
 ├─────────────────────────────────────────────────┤
 │  Next Steps:                                    │
 │  1. Review PR at link above                     │
