@@ -2,13 +2,6 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import type { Plugin } from 'vite';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
-
-// ESM-compatible __dirname shim — Node 22.6+ runs this file via native
-// TS stripping as ESM, where `__dirname` is not defined. This keeps the
-// config working across Node 20 (CommonJS-native), Node 22.6+ (native TS
-// stripping), and all tsx / ts-node variants.
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Vite plugin to handle .geojson files as JSON.
