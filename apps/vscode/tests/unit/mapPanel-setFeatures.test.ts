@@ -21,6 +21,7 @@ interface MapPanelInternals {
   currentFeatures: DebriefFeature[];
   currentPlot: Plot | null;
   postMessage: (msg: unknown) => void;
+  _onFeaturesChanged: { fire: (features: DebriefFeature[]) => void };
 }
 
 function makeFeature(id: string): DebriefFeature {
@@ -56,6 +57,7 @@ function makePanel(plot: Plot | null, features: DebriefFeature[]): {
   internals.currentFeatures = features;
   const postMessage = vi.fn();
   internals.postMessage = postMessage;
+  internals._onFeaturesChanged = { fire: vi.fn() };
   return { panel, postMessage };
 }
 

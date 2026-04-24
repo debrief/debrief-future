@@ -144,7 +144,13 @@ Proceed with specification? (The handoff button below will continue)
 
 When the user confirms (clicks the handoff button), the description will be passed to `/speckit.specify`.
 
-**Important**: The description from BACKLOG.md becomes the feature description for speckit.specify.
+**Important**: The description from BACKLOG.md becomes the feature description for speckit.specify. **Prefix it with `[backlog-id:{ID}]`** so that `/speckit.specify` preserves the backlog ID as the feature number (by passing `--number {ID}` to `create-new-feature.sh`). Without this prefix the script would auto-assign `highest+1`, breaking the BACKLOG.md → `specs/NNN-short-name/spec.md` link invariant.
+
+Example handoff payload for item `210`:
+
+```
+[backlog-id:210] Implement user authentication with OAuth2
+```
 
 ### Step 6: Post-Specification Update (CRITICAL)
 

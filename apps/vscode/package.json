@@ -243,6 +243,46 @@
         "title": "Capture Scene to Storyboard",
         "category": "Debrief",
         "icon": "$(device-camera)"
+      },
+      {
+        "command": "debrief.storyboard.forward",
+        "title": "Storyboard: Forward",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.backward",
+        "title": "Storyboard: Backward",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.clickScene",
+        "title": "Storyboard: Select Scene",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.jumpPast",
+        "title": "Storyboard: Jump Past Blocked Scene",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.create",
+        "title": "Storyboard: Create New Storyboard",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.rename",
+        "title": "Storyboard: Rename Storyboard",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.delete",
+        "title": "Storyboard: Delete Storyboard",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.openPanel",
+        "title": "Storyboard: Show Panel",
+        "category": "Debrief"
       }
     ],
     "keybindings": [
@@ -320,6 +360,16 @@
         "key": "ctrl+alt+c",
         "mac": "cmd+alt+c",
         "when": "debrief.mapFocused && debrief.plotOpen"
+      },
+      {
+        "command": "debrief.storyboard.forward",
+        "key": "right",
+        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"
+      },
+      {
+        "command": "debrief.storyboard.backward",
+        "key": "left",
+        "when": "debrief.storyboardActive && (debrief.mapFocused || focusedView == 'debrief.storyboardPanel')"
       }
     ],
     "viewsContainers": {
@@ -508,6 +558,22 @@
         {
           "command": "debrief.captureScene",
           "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.storyboard.clickScene",
+          "when": "false"
+        },
+        {
+          "command": "debrief.storyboard.jumpPast",
+          "when": "false"
+        },
+        {
+          "command": "debrief.storyboard.forward",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.backward",
+          "when": "debrief.storyboardActive"
         }
       ]
     },

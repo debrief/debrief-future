@@ -35,6 +35,19 @@ import { SessionManager } from './services/sessionManager';
 import { ToolMatchAdapter } from './services/toolMatchAdapter';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
+import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
+import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import {
+  StoryboardPlaybackService,
+  type ModalPromptPort,
+  type VisibilityPort,
+  type PlaybackMapPanel,
+  type PlaybackSessionManager,
+  type PlaybackPanelView,
+  type PlaybackTimeRangeView,
+} from './services/storyboardPlayback';
+import { formatDtg } from '@debrief/components';
+import type { DebriefFeature } from '@debrief/components';
 
 let mapPanel: MapPanel | undefined;
 
@@ -140,12 +153,74 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
   logPanelProvider.setCalcService(calcService);
 
-  // Storyboard panel (Feature: 216 — capture)
+  // Storyboard panel (Features: 216 capture + 217 playback)
   const storyboardPanelProvider = new StoryboardPanelViewProvider(
     context.extensionUri,
     sessionManager,
   );
   storyboardPanelProvider.setMapPanelResolver(() => mapPanel);
+
+  // Storyboard playback service (#217) — owns transport state per plot.
+  // Constructed lazily after the panel + time-range providers exist so
+  // the service can wire the ports it needs. `modalPromptPort` uses
+  // vscode.window.showInformationMessage with the modal flag. The
+  // visibility port is keyed to the Storyboard panel's onDidChangeVisibility.
+  const visibilityEmitter = new vscode.EventEmitter<boolean>();
+  const visibilityPort: VisibilityPort = {
+    onDidChangeVisibility: visibilityEmitter.event,
+  };
+  const modalPromptPort: ModalPromptPort = {
+    showInformationMessage: (message, options, ...items): Thenable<string | undefined> =>
+      vscode.window.showInformationMessage(message, options, ...items),
+  };
+  // Mini-adapter so the service sees only the surface it needs from MapPanel.
+  const playbackMapPanel: PlaybackMapPanel = {
+    getCurrentFeatures: (): DebriefFeature[] => mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => mapPanel?.setFeatures?.([...features]),
+    flyToViewport: (viewport, durationMs): number =>
+      mapPanel?.flyToViewport?.(viewport, durationMs) ?? -1,
+    setSceneRectangles: (scenes, activeId, currentId): void =>
+      mapPanel?.setSceneRectangles?.(scenes, activeId, currentId),
+    onFlyToComplete: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onFlyToComplete(listener)
+        : { dispose: (): void => undefined },
+    onSceneRectangleClick: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onSceneRectangleClick(listener)
+        : { dispose: (): void => undefined },
+    onFeaturesChanged: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onFeaturesChanged(listener)
+        : { dispose: (): void => undefined },
+  };
+  const playbackSessionManager: PlaybackSessionManager = {
+    getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    getSession: (uri): SessionStoreApi | undefined => sessionManager.getSession(uri),
+    getActiveSession: (): SessionStoreApi | null => sessionManager.getActiveSession(),
+    onActiveSessionChange: sessionManager.onActiveSessionChange,
+  };
+  const playbackPanelView: PlaybackPanelView = {
+    applySnapshot: (snap): void => storyboardPanelProvider.applySnapshot(snap),
+  };
+  const playbackTimeRangeView: PlaybackTimeRangeView = {
+    setScrubbableRange: (start, end): void =>
+      timeRangeProvider.setScrubbableRange(start, end),
+  };
+  const storyboardPlaybackService = new StoryboardPlaybackService({
+    sessionManager: playbackSessionManager,
+    mapPanel: playbackMapPanel,
+    panelView: playbackPanelView,
+    timeRangeView: playbackTimeRangeView,
+    modalPromptPort,
+    visibilityPort,
+    formatDtg,
+  });
+  context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
+
+  // #217 Phase 4 — the panel needs the service reference so it can
+  // call setActiveStoryboard synchronously on dropdown-change messages.
+  storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
@@ -649,6 +724,66 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     resultsPanelService
   );
   context.subscriptions.push(...commands);
+
+  // Feature 217 — register storyboard transport commands (forward,
+  // backward, clickScene, jumpPast). Must run AFTER the service is
+  // constructed and BEFORE any user interaction can reach the commands.
+  registerStoryboardTransportCommands(
+    context,
+    storyboardPlaybackService,
+    sessionManager,
+  );
+
+  // Feature 217 Phase 4 — register management commands (create,
+  // rename, delete). These drive the overflow-menu flow from the
+  // Storyboard panel.
+  registerStoryboardManagementCommands(
+    context,
+    storyboardPlaybackService,
+    sessionManager,
+  );
+
+  // Subscribe the Storyboard panel provider to the service's snapshot
+  // stream so every transport step / CRUD op / lifecycle transition
+  // refreshes the panel view.
+  context.subscriptions.push(
+    storyboardPlaybackService.onSnapshotChange((snap) => {
+      storyboardPanelProvider.applySnapshot(snap);
+    }),
+  );
+
+  // Feature 217 — wire the service's lifecycle + transport surface.
+  // Plot open: run validatePlot + seed active + install scrub override.
+  // Plot close / switch: restore scrub + drop state.
+  context.subscriptions.push(
+    sessionManager.onActiveSessionChange((session) => {
+      const activeUri = sessionManager.getActiveDocumentUri();
+      if (session && activeUri) {
+        storyboardPlaybackService.onPlotOpened(activeUri);
+      }
+    }),
+  );
+
+  // Feature 217 — subscribe the service to map-panel event streams.
+  // These are set up lazily because mapPanel is mutated by the commands
+  // module when a plot is first opened.
+  let mapPanelEventsWired = false;
+  const wireMapPanelEvents = (): void => {
+    if (mapPanelEventsWired || !mapPanel) {return;}
+    mapPanelEventsWired = true;
+    mapPanel.onFeaturesChanged(() => {
+      const uri = sessionManager.getActiveDocumentUri();
+      if (uri) {storyboardPlaybackService.onPlotFeaturesChanged(uri);}
+    });
+    mapPanel.onSceneRectangleClick((sceneId) => {
+      const uri = sessionManager.getActiveDocumentUri();
+      if (uri) {void storyboardPlaybackService.goToScene(uri, sceneId);}
+    });
+  };
+  // Poll on session-change — by then MapPanel should exist.
+  context.subscriptions.push(
+    sessionManager.onActiveSessionChange(() => wireMapPanelEvents()),
+  );
 
   // Feature 216 — register the capture-scene command. We construct the
   // CaptureCommandContext at invoke time so every capture sees the current

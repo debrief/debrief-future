@@ -213,7 +213,7 @@ describe('StoryboardPanelViewProvider', () => {
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith('debrief.captureScene');
   });
 
-  it('scene-row-clicked is a no-op in #216 and does not execute any command', () => {
+  it('scene-row-clicked dispatches debrief.storyboard.clickScene (#217 — behaviour changed from #216 no-op)', () => {
     const sessionManager = makeSessionManager();
     const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
     provider.setMapPanelResolver(() => makeMapPanelStub([]));
@@ -222,7 +222,10 @@ describe('StoryboardPanelViewProvider', () => {
     messageHandler?.({ type: 'ready' });
     (vscode.commands.executeCommand as ReturnType<typeof vi.fn>).mockClear();
     messageHandler?.({ type: 'scene-row-clicked', sceneId: 'sc-1' });
-    expect(vscode.commands.executeCommand).not.toHaveBeenCalled();
+    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+      'debrief.storyboard.clickScene',
+      'sc-1',
+    );
   });
 
   it('setCaptureInFlight posts the captureInFlight message', async () => {
