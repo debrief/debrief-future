@@ -1,0 +1,18 @@
+INFO: regenerate: repo=/Users/ian/git/debrief-future dry_run=False skip_gh=True
+INFO: discovered 157 spec directories
+INFO: parsed 12 epics from BACKLOG.md
+WARNING: composite cluster comp-052-053-069-077-087-097-098 has 7 members — consider tightening tags
+WARNING: composite cluster comp-185-186-187-188-189-190 has 6 members — consider tightening tags
+INFO: atomic: promoting 75 files
+Archive Rebuild Summary — 2026-04-24T17:50:24Z
+  Scanned:              157 spec directories
+  Shipped (eligible):   131
+  Unified posts:        56
+  Epic rollups:         3  (E02, E05, E08)
+  Composite posts:      15  (46 member specs)
+  Epic members:         29
+  Skipped (in-flight):  26
+  Unresolved groupings: 43
+  Run duration:         0.9s
+  GitHub API:           gh version 2.60.0 (2024-10-24)
+Index written: /Users/ian/git/debrief-future/ARCHIVE-REBUILD.md
