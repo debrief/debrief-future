@@ -37,6 +37,35 @@ The feature properties include `source_tool` and `source_features` fields for pr
 
 When we shipped the styling schemas back in January, PointProperties already said "for Point and MultiPoint geometries" and PolygonProperties said "for Polygon and MultiPolygon geometries." The styling classes were ready. The geometry classes weren't.
 
+Now they are. The LinkML master schema includes GeoJSONMultiPoint and GeoJSONMultiPolygon geometry classes, along with four supporting schema classes (two Properties, two Features) and two new FeatureKindEnum values: MULTI_POINT and MULTI_POLYGON. All generated artifacts -- Pydantic models, JSON Schema, TypeScript interfaces -- regenerated cleanly. Zero new dependencies. Zero changes to existing classes.
+
+A rendezvous planner that finds candidate meeting points between two tracks can now return a proper MultiPoint feature:
+
+```json
+{
+  "type": "Feature",
+  "id": "mp-rendezvous-002",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [[-3.5, 51.0], [-3.6, 51.1]]
+  },
+  "properties": {
+    "kind": "MULTI_POINT",
+    "label": "Rendezvous Candidates",
+    "style": {
+      "shape": "triangle",
+      "radius": 8,
+      "fill_color": "#00FF00",
+      "fill_opacity": 0.6
+    },
+    "source_tool": "rendezvous-planner",
+    "source_features": ["track-alpha", "track-bravo"]
+  }
+}
+```
+
+That feature validates against the schema, carries its own styling, records which tool created it and from what inputs, and flows through the full pipeline into a STAC catalog. A coverage analyser returning exclusion zones -- including polygons with interior holes for safe passage corridors -- works the same way with MultiPolygon and PolygonProperties.
+
 ## By the Numbers
 
 10 golden fixtures created: 6 valid (including edge cases like a single-point MultiPoint and polygons with interior rings), 4 invalid (missing style, wrong kind discriminator). The test suite went from 135 to 146 passing tests, zero regressions. TypeScript compilation clean.

@@ -32,6 +32,32 @@ tags:
 - [075-branching](specs/075-branching) — 2026-02-10
 - [076-replay-tune](specs/076-replay-tune) — 2026-02-11
 
+## Member Features
+
+### 071-log-recording-service — 2026-02-09
+
+## What We Built
+
+### 072-log-panel — 2026-02-09
+
+## What We Built
+
+### 073-undo-redo-split — 2026-02-09
+
+## What We Built
+
+### 074-snapshots — 2026-02-09
+
+## What We Built
+
+### 075-branching — 2026-02-10
+
+## What We Built
+
+### 076-replay-tune — 2026-02-11
+
+## What We Built
+
 ## What Shipped
 
 Across 6 shipped member specs, the E02 epic covers PROV Logging Implementation. See the member list for individual ship dates and detail.

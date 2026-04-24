@@ -32,6 +32,22 @@ The work also sets up siblings in the pipeline — features #204 and #205 circle
 
 `Coordinate`, `ViewportPolygon`, and `TimeFilter` are now defined in exactly one place: the LinkML schema at `shared/schemas/src/linkml/session-state.yaml`. The two hand-authored TypeScript duplicates — one in `shared/components`, one in `services/session-state` — are gone. Every consumer imports from `@debrief/schemas` and gets the generated object form.
 
+`@debrief/utils` gains two small converter helpers for the GeoJSON / Leaflet boundary:
+
+```typescript
+import { toGeoJSONCoord, fromGeoJSONCoord } from '@debrief/utils';
+
+toGeoJSONCoord({ longitude: -0.1276, latitude: 51.5074 });
+// => [-0.1276, 51.5074]   (RFC 7946, longitude first)
+
+fromGeoJSONCoord([-0.1276, 51.5074]);
+// => { longitude: -0.1276, latitude: 51.5074 }
+```
+
+Tuples still exist — GeoJSON and Leaflet expect them — but only at the wire edge. The object form `{ longitude, latitude }` is canonical everywhere else. The validators (`validateCoordinate`, `validateViewportPolygon`, `calculateViewportCenter`) moved to `@debrief/utils` alongside the converters so both the component library and session-state can reach them without a cross-workspace build dependency.
+
+Persisted session state migrates silently. A new `coerceViewport` helper in `applySessionState` detects legacy tuple-shaped viewports on rehydration and converts them to object form before they reach `setViewport`. The persistence `SCHEMA_VERSION` bumps from `'1.0.0'` to `'1.1.0'` so operators can tell which files have been through the migration.
+
 ## By the Numbers
 
 | | |

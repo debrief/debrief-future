@@ -39,27 +39,35 @@ The payoff: adding a new extension field in LinkML surfaces a new input on the n
 
 A schema-driven Properties Panel that edits STAC item metadata from two surfaces. When a plot is open, a 4th section appears in the ActivityPanel alongside TimeController, Tools, and Layers. When no plot is open and the analyst is triaging the catalog, a Properties area stacks under `ThumbnailPreview` in `StacBrowser`. Same form, same field set, same service path.
 
+The form is generated from the LinkML-derived JSON Schema for the STAC item type. `PropertiesForm` in `shared/components/src/PropertiesPanel/` walks the schema and maps each property to either a `ParameterEditor` widget (scalars, enums) or one of four new sibling widgets: `ArrayWidget` for chip lists, `DateTimeWidget` for ISO-8601, `BboxWidget` for the four-quad, `PlatformArrayWidget` for platform records. Add a field in LinkML, run `make generate`, and a new input appears on the next build — confirmed by the round-trip test in `test_properties_panel_roundtrip.py`.
+
+Writes go through a single gatekeeper: `stacService.updateItemMetadata`. Read, record mtime, merge patch into `item.properties`, append a provenance entry, re-stat to detect concurrent edits, atomic temp+rename onto `item.json`. No session-state staging, no parallel write path, no last-write-wins. The same method serves the ActivityPanel and the StacBrowser — the "which surface is editing?" question never becomes a "which writer wins?" question because there is only one writer.
+
+Auto-derivation is now override-aware. `stacService.updateTemporalMetadata` reads `item.properties["debrief:overrides"]` and skips any field listed there. Edit `start_datetime` once, and subsequent derivation passes leave it alone. The Properties form renders those fields with an "override" chip so the analyst can see why derivation isn't running for them.
+
+The provenance log is bounded. The active array on `item.properties["debrief:provenance_log"]` caps at 500 entries; the 501st commit rotates the oldest entry into a sibling `provenance_log_archive.jsonl` in the same item directory. Append-only JSONL, atomic rotation. Reads stay O(cap); the full audit trail is preserved on disk (Article III.3).
+
 ## Screenshots
 
 The `PropertiesForm` rendering the metadata for a catalog item, captured from the web-shell preview against three VS Code theme variants. Two fields carry chips: `datetime` is `auto-derived` (computed from the plot's feature timestamps), `start_datetime` is `override` (the analyst overrode it once, so subsequent derivation passes skip it).
 
 **Dark theme**
 
-![PropertiesForm in the dark theme — Title, Datetime with "auto-derived" chip, Start datetime with "override" chip, a chip-list of tags, Platforms](../evidence/screenshots/properties-form-dark.png)
+![PropertiesForm in the dark theme — Title, Datetime with "auto-derived" chip, Start datetime with "override" chip, a chip-list of tags, Platforms](/assets/images/future-debrief/193-properties-panel/properties-form-dark.png)
 
 **Light theme**
 
-![PropertiesForm in the light theme — same layout, light background](../evidence/screenshots/properties-form-light.png)
+![PropertiesForm in the light theme — same layout, light background](/assets/images/future-debrief/193-properties-panel/properties-form-light.png)
 
 **VS Code sidebar theme**
 
-![PropertiesForm in the VS Code sidebar theme — neutral dark palette matching the editor chrome](../evidence/screenshots/properties-form-vscode.png)
+![PropertiesForm in the VS Code sidebar theme — neutral dark palette matching the editor chrome](/assets/images/future-debrief/193-properties-panel/properties-form-vscode.png)
 
 **Validation error**
 
 The panel rejects schema-invalid input inline — no disk write, no provenance entry. Here an invalid ISO-8601 datetime surfaces an inline error next to the field (the original value stays on disk until a valid commit):
 
-![PropertiesForm showing an inline validation error under the Datetime field — "Must be a valid ISO-8601 datetime (e.g. 2025-01-01T12:00:00Z)"](../evidence/screenshots/properties-form-validation-error.png)
+![PropertiesForm showing an inline validation error under the Datetime field — "Must be a valid ISO-8601 datetime (e.g. 2025-01-01T12:00:00Z)"](/assets/images/future-debrief/193-properties-panel/properties-form-validation-error.png)
 
 A short webm recording of the edit flow (add a tag → blur → chip appears) is checked in alongside the stills at `evidence/screenshots/interaction.webm`.
 

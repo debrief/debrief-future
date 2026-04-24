@@ -37,6 +37,12 @@ Everything downstream depends on these schema structures. Save-time resolution (
 
 The STAC metadata format has changed. Where exercises previously stored nationalities and vessel classes as flat, disconnected lists, they now carry a `debrief:platforms` array of structured `PlatformRecord` entries. Each record binds a platform's identity fields — nationality, vessel class, domain, vessel type, vessel role — together as a unit.
 
+The consequence is that "which exercises involved British submarines?" can now be expressed as a compound predicate: `nationality = "GB" AND domain = "subsurface"`. Before this change, you could filter on either property but not join them, because the data model stored `["GB", "FR"]` and `["subsurface/submarine/ssn/trafalgar", "surface/warship/frigate/type23"]` in separate lists with no pairing.
+
+We also added six optional override fields to `TrackProperties`: `display_name`, `nationality`, `vessel_class`, `vessel_type`, `vessel_role`, and `domain`. These are analyst-set values that take precedence over registry-derived defaults. When absent — which is almost always, for registered platforms — downstream consumers resolve from the registry at runtime. When present, the analyst's value wins. The field exists in the schema; using it is a deliberate act.
+
+All 100 exercise fixtures have been regenerated in the new format. The old flat fields (`debrief:vessel_classes`, `debrief:nationalities`, `debrief:track_names`) are gone — not deprecated, removed.
+
 ## By the Numbers
 
 | | |

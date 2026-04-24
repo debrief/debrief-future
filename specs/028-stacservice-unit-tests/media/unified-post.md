@@ -30,6 +30,10 @@ The Constitution (Article VI) requires unit tests for all services. This makes t
 
 Last week a bug slipped through. `loadPlotData()` returned an incomplete object when no GeoJSON asset existed - the code path nobody thought to test. The fix was five lines. The real problem was that our existing tests duplicated the service's categorization logic instead of calling the actual methods. When the real implementation drifted, the tests kept passing.
 
+We added 64 unit tests that invoke actual `StacService` methods with mocked file system operations. The tests cover all 10 public methods - from `validateStorePath()` through `loadPlotData()` to `saveTrackColors()`.
+
+Coverage hit 97% on stacService.ts. More importantly, the specific bug case is now tested: when there's no GeoJSON asset, `loadPlotData()` returns `{ tracks: [], locations: [], otherFeatures: [] }`, not undefined.
+
 ## Lessons Learned
 
 The original test file (`stacService.shapes.test.ts`) tested feature categorization by reimplementing the logic in test code. That's a trap - when you duplicate logic in tests, you're not testing the actual implementation. You're testing your understanding of what the implementation should do.

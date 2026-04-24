@@ -40,22 +40,22 @@ The wire format is the interop story worth telling. Every submission is a single
 
 ## Screenshots
 
-![Landing view — artefact tree on the left, primary spec rendered on the right](./evidence/screenshots/landing.png)
+![Landing view — artefact tree on the left, primary spec rendered on the right](/assets/images/future-debrief/191-spec-navigator/landing.png)
 *Landing view. Tree grouped by kind (spec / plan / tasks / research / contracts / evidence), primary spec rendered by default.*
 
-![Interaction GIF — selecting a passage, adding a comment, opening the drawer](./evidence/interaction.gif)
+![Interaction GIF — selecting a passage, adding a comment, opening the drawer](/assets/images/future-debrief/191-spec-navigator/interaction.gif)
 *Select a passage, the "Add comment" chip floats in under the selection, the composer pre-populates with the quoted snippet.*
 
-![Drawer open showing three drafted comments grouped by target](./evidence/screenshots/drawer-open.png)
+![Drawer open showing three drafted comments grouped by target](/assets/images/future-debrief/191-spec-navigator/drawer-open.png)
 *The drawer. Drafts grouped by target, editable in place, persisted in `localStorage`.*
 
-![Stale-head modal warning that the PR was force-pushed between load and submit](./evidence/screenshots/stale-head-modal.png)
+![Stale-head modal warning that the PR was force-pushed between load and submit](/assets/images/future-debrief/191-spec-navigator/stale-head-modal.png)
 *Stale-head modal. The reviewer chose explicitly whether to submit against a commit they didn't read.*
 
-![Settings panel with PAT entry and on-screen scope documentation](./evidence/screenshots/settings-panel.png)
+![Settings panel with PAT entry and on-screen scope documentation](/assets/images/future-debrief/191-spec-navigator/settings-panel.png)
 *Settings. Required scope documented inline; Clear credential is one click.*
 
-![Navigator on a mobile viewport, two-pane collapsed to single column](./evidence/screenshots/mobile.png)
+![Navigator on a mobile viewport, two-pane collapsed to single column](/assets/images/future-debrief/191-spec-navigator/mobile.png)
 *Mobile — the whole flow works on a phone, including selection-level comments.*
 
 ## By the Numbers

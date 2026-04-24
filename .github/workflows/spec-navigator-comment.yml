@@ -1,0 +1,100 @@
+name: Spec Navigator Comment
+
+# Posts (or updates) a sticky PR comment pointing reviewers at the
+# production Spec Navigator keyed to this PR, whenever the PR touches
+# anything under specs/. Code-only PRs are silent.
+#
+# The Spec Navigator is a static SPA at
+#   https://debrief.github.io/debrief-future/spec-navigator/
+# that reads ?pr=<number> at runtime and fetches the PR's spec content
+# from GitHub via the API — no per-branch build required.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'specs/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Identify changed spec directory
+        id: specdir
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            const specDirs = new Set();
+            for (const f of files) {
+              const m = f.filename.match(/^specs\/([^/]+)\//);
+              if (m) specDirs.add(m[1]);
+            }
+            const dirs = [...specDirs].sort();
+            core.setOutput('dirs', JSON.stringify(dirs));
+            core.setOutput('count', String(dirs.length));
+
+      - name: Post or update Spec Navigator comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const headSha = context.payload.pull_request.head.sha;
+            const headRef = context.payload.pull_request.head.ref;
+            const dirs = JSON.parse(`${{ steps.specdir.outputs.dirs }}`);
+
+            const marker = '<!-- spec-navigator-comment -->';
+            const navUrl = `https://debrief.github.io/debrief-future/spec-navigator/?pr=${prNumber}`;
+
+            const specLinks = dirs.map((d) => {
+              const treeUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${headRef}/specs/${d}`;
+              return `- [\`specs/${d}/\`](${treeUrl})`;
+            }).join('\n');
+
+            const body = [
+              marker,
+              '## 📋 Spec Navigator',
+              '',
+              `Review this PR's specs interactively:`,
+              '',
+              `👉 **[Open in Spec Navigator](${navUrl})**`,
+              '',
+              dirs.length > 0 ? '**Raw spec directories changed in this PR**:' : '',
+              dirs.length > 0 ? specLinks : '',
+              '',
+              `<sub>Updated for ${headSha.substring(0, 7)} — the navigator reads spec content live from GitHub, so no rebuild is needed.</sub>`,
+            ].filter((line) => line !== '').join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated comment ${existing.id}`);
+            } else {
+              const { data: created } = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+              core.info(`Created comment ${created.id}`);
+            }

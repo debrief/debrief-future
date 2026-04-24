@@ -32,6 +32,8 @@ The fourth bug is unrelated. The selection callback that feeds feature IDs to th
 
 Fixed four regressions in the VS Code extension: time slider showing wrong positions, location markers appearing at incorrect times, trail mode rendering in the future instead of the past, and analysis tools not appearing in the palette.
 
+All four bugs appeared after we refactored the map component to use shared React components.
+
 ## The Detective Work
 
 Three of the bugs had the same signature — anything involving temporal queries returned wrong results. The time slider would move, but the position shown was from a different point in the track. Trail mode would draw future positions instead of historical ones.

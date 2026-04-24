@@ -32,6 +32,8 @@ This is a spec-only deliverable following the #049 tool documentation model: a m
 
 Spec #055 defines the `position-range-bearing` tool — a language-neutral specification for computing the range and bearing from a selected position on one track to the nearest matching position on another track. The spec lives at `shared/tools/track/measurement/position-range-bearing.1.0.md` and follows the same nine-section structure introduced in #049: Metadata, MCP interface, Inputs, Outputs, Algorithm, Edge Cases, Examples, Registration, and Changelog.
 
+This brings the track/measurement family to 20 tools. The output is a range in nautical miles (Haversine formula) and a bearing in degrees true (forward-azimuth), both computed against the temporally nearest position on the reference track.
+
 ## How It Works
 
 The algorithm has three steps:

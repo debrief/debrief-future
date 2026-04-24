@@ -34,6 +34,10 @@ This builds on the existing plot view webview. Same Leaflet map, same interactio
 
 The catalog overview panel turns a STAC directory into a navigable spatial-temporal index. Double-click a catalog node in the STAC Stores tree view, and VS Code opens a read-only panel showing two synchronized views: a Leaflet map with bounding box rectangles for every item, and an SVG timeline with horizontal bars representing temporal spans.
 
+The component lives in `shared/components/` as a reusable React element, tested in Storybook with 11 stories covering nominal cases and edge conditions (empty catalogs, missing bbox, missing temporal metadata). The panel integrates into VS Code as a `WebviewPanel`, using the same message-passing pattern as the existing plot view.
+
+Double-clicking an item on either the map or timeline opens that item in the full plot view—no separate navigation step needed.
+
 ## How It Works
 
 The architecture keeps concerns separated: the React component handles all rendering and layout logic, receiving catalog data as props. The VS Code extension provides a thin wrapper that manages the panel lifecycle, retrieves item metadata via `stacService.listItems()`, and bridges the webview's double-click messages back to the "open plot" flow.

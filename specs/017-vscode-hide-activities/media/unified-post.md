@@ -31,6 +31,8 @@ The implementation touches only the extension activation — no changes to core 
 
 The Debrief VS Code extension now automatically hides non-essential activity bar items when it activates. Instead of seeing Explorer, Search, Source Control, Debug, Extensions, and Testing, analysts see just two activities: **Explorer** (for browsing STAC stores) and **Debrief** (for analysis tools).
 
+Five distractions removed. Zero functionality lost. The hidden activities still work if you need them — right-click the activity bar to restore any of them.
+
 ## How It Works
 
 On first activation, the extension modifies VS Code's `workbench.activity.pinnedViewlets2` setting to hide:
