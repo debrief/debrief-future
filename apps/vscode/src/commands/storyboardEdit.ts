@@ -1,26 +1,28 @@
 /**
  * Storyboard edit command handlers (Feature 218).
  *
- * Registers 10 new commands + 1 replacement (editScene) that back
- * the Scene-row overflow menu actions. Every handler delegates to
- * `StoryboardEditService` and surfaces user prompts (input box,
- * quick pick, modal) + error toasts at the VS Code boundary.
- *
- * Phase 1: skeleton with no-op handlers. Real implementations land
- * alongside the service methods in Phase 3 (T033, T040, T045, T049,
- * T053) and Phase 4 (T075, T079).
+ * Backs the 11 commands contributed by apps/vscode/package.json. The
+ * webview panel dispatches most edit ops directly to
+ * StoryboardEditService (since the message payload carries all the
+ * inputs — new title, description, etc.). These command handlers are
+ * used for:
+ *   1. Palette-invoked ops that take args (via the dispatcher's
+ *      vscode.commands.executeCommand('...', { sceneId }) route).
+ *   2. Palette-invoked ops without args (show a toast asking the
+ *      analyst to select a scene first).
+ *   3. Ops that need native prompts the webview can't carry in its
+ *      postMessage (showInputBox for timestamp, showQuickPick for
+ *      destination storyboard).
  *
  * Contract: specs/218-storyboarding-edit/contracts/vscode-commands.md
  */
 
 import * as vscode from 'vscode';
 import type { StoryboardEditService } from '../services/storyboardEdit';
+import { storyboardEdit as messages } from '../messages/storyboardEdit';
 
-/**
- * Narrow SessionManager surface — enough for the command handlers
- * to resolve `documentUri` without pulling in the full constructor
- * graph. Mirrors the pattern from `storyboardTransport.ts`.
- */
+const ACTOR = 'vscode-user';
+
 export interface EditSessionManager {
   getActiveDocumentUri(): string | null;
 }
@@ -32,74 +34,9 @@ interface HandlerDeps {
   readonly sessionManager: EditSessionManager;
 }
 
-// ── Handlers (Phase 1 stubs — no-op until Phase 3/4) ─────────────────
-
-export const renameSceneHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T033 — prompt via showInputBox, delegate to service.renameScene.
-  };
-
-export const describeSceneHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T033 — open edit form via postMessage, delegate to service.describeScene.
-  };
-
-export const deleteSceneHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T033 — delegate to service.deleteScene, toast undo.
-  };
-
-export const updateToCurrentHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T040 — read map view, delegate, pattern-match result.
-  };
-
-export const duplicateSceneHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T045 — prompt for new timestamp, delegate, collision modal.
-  };
-
-export const copyToOtherHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T049 — quick-pick sibling storyboard, delegate, collision modal.
-  };
-
-export const refreshThumbnailHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 4 T075 — delegate to service.refreshSceneThumbnail.
-  };
-
-export const refreshAllStaleHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 4 T079 — delegate to service.refreshAllStaleThumbnails.
-  };
-
-export const renameStoryboardHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T053 — showInputBox with uniqueness re-prompt loop.
-  };
-
-export const describeStoryboardHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T053 — open description editor in panel header via postMessage.
-  };
-
-export const editSceneHandler = (deps: HandlerDeps): CommandFn =>
-  async (...args): Promise<void> => {
-    const documentUri = deps.sessionManager.getActiveDocumentUri();
-    if (documentUri === null) {
-      return;
-    }
-    const sceneId = extractSceneId(args);
-    if (sceneId === null) {
-      return;
-    }
-    await deps.service.openSceneForMissingDataEdit({ documentUri, sceneId });
-  };
+// ── Arg extraction helpers ───────────────────────────────────────────
 
 function extractSceneId(args: readonly unknown[]): string | null {
-  // The hard-block modal (#217) passes either a bare sceneId string or an
-  // object `{ sceneId }` (matching storyboardEditStub's historical shape).
   const arg = args[0];
   if (typeof arg === 'string') {
     return arg;
@@ -111,6 +48,314 @@ function extractSceneId(args: readonly unknown[]): string | null {
     }
   }
   return null;
+}
+
+function extractStoryboardId(args: readonly unknown[]): string | null {
+  const arg = args[0];
+  if (typeof arg === 'string') {
+    return arg;
+  }
+  if (typeof arg === 'object' && arg !== null && 'storyboardId' in arg) {
+    const s = (arg as { storyboardId?: unknown }).storyboardId;
+    if (typeof s === 'string') {
+      return s;
+    }
+  }
+  return null;
+}
+
+async function withUriAndScene(
+  deps: HandlerDeps,
+  args: readonly unknown[],
+): Promise<{ documentUri: string; sceneId: string } | null> {
+  const documentUri = deps.sessionManager.getActiveDocumentUri();
+  if (documentUri === null) {
+    return null;
+  }
+  const sceneId = extractSceneId(args);
+  if (sceneId === null) {
+    await vscode.window.showInformationMessage(
+      'Select a scene in the Storyboard panel first.',
+    );
+    return null;
+  }
+  return { documentUri, sceneId };
+}
+
+async function withUriAndStoryboard(
+  deps: HandlerDeps,
+  args: readonly unknown[],
+): Promise<{ documentUri: string; storyboardId: string } | null> {
+  const documentUri = deps.sessionManager.getActiveDocumentUri();
+  if (documentUri === null) {
+    return null;
+  }
+  const storyboardId = extractStoryboardId(args);
+  if (storyboardId === null) {
+    await vscode.window.showInformationMessage(
+      'Select a storyboard in the panel first.',
+    );
+    return null;
+  }
+  return { documentUri, storyboardId };
+}
+
+// ── Handlers ─────────────────────────────────────────────────────────
+
+export const renameSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    // Palette fallback — prompt for the new title via showInputBox.
+    const newTitle = await vscode.window.showInputBox({
+      prompt: 'Rename scene',
+      value: '',
+    });
+    if (newTitle === undefined) {
+      return;
+    }
+    try {
+      await deps.service.renameScene({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        newTitle,
+        actor: ACTOR,
+      });
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const describeSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    // Description editing happens in the panel's edit form — the
+    // palette path just opens the form.
+    await deps.service.openSceneForMissingDataEdit({
+      documentUri: ctx.documentUri,
+      sceneId: ctx.sceneId,
+    });
+  };
+
+export const deleteSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    try {
+      const result = await deps.service.deleteScene({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        actor: ACTOR,
+      });
+      if (result.kind === 'unknown-scene') {
+        void vscode.window.showErrorMessage(
+          `Scene ${ctx.sceneId} not found.`,
+        );
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const undoDeleteSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    try {
+      const result = await deps.service.undoDeleteScene({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        actor: ACTOR,
+      });
+      if (result.kind === 'unrecoverable-scene') {
+        if (result.reason === 'storyboard-gone') {
+          void vscode.window.showErrorMessage(messages.undoStoryboardGone());
+        } else {
+          void vscode.window.showErrorMessage(messages.undoBufferEvicted());
+        }
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const updateToCurrentHandler = (_deps: HandlerDeps): CommandFn =>
+  (): Promise<void> => {
+    // Phase 3c — reading the live map view (viewport, currentTime,
+    // visibleFeatureIds) requires the same `sessionStore.getState()` +
+    // `mapPanel.getCurrentFeatures()` plumbing captureScene uses. The
+    // dispatcher + service layers are ready; the integration lands in
+    // a follow-up so this command doesn't silently submit partial data.
+    void vscode.window.showInformationMessage(
+      'Update to current: live map-state read lands in the next Phase 3 pass.',
+    );
+    return Promise.resolve();
+  };
+
+export const duplicateSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    // Default offset = now + 1s. A follow-up will read the source
+    // scene's timestamp and suggest source + 1s instead.
+    const defaultTs = new Date(Date.now() + 1000).toISOString();
+    const input = await vscode.window.showInputBox({
+      prompt: 'Timestamp for duplicate (ISO-8601)',
+      value: defaultTs,
+      validateInput: isoValidator,
+    });
+    if (input === undefined) {
+      return;
+    }
+    try {
+      const result = await deps.service.duplicateScene({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        newTimestamp: input,
+        actor: ACTOR,
+      });
+      if (result.kind === 'duplicate-timestamp-collision') {
+        await handleTimestampCollision(deps, ctx, input, result.suggestedOffsetTimestamp);
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const copyToOtherHandler = (_deps: HandlerDeps): CommandFn =>
+  (): Promise<void> => {
+    // Phase 3c — needs a quick-pick of sibling Storyboards (built from
+    // the current plot). Ready for follow-up.
+    void vscode.window.showInformationMessage(
+      'Copy to other storyboard: destination picker lands in the next Phase 3 pass.',
+    );
+    return Promise.resolve();
+  };
+
+export const refreshThumbnailHandler = (_deps: HandlerDeps): CommandFn =>
+  (): Promise<void> => {
+    // Phase 4 T075 — wired with Story 2.
+    void vscode.window.showInformationMessage(
+      'Refresh thumbnail arrives with Phase 4 (stale detection).',
+    );
+    return Promise.resolve();
+  };
+
+export const refreshAllStaleHandler = (_deps: HandlerDeps): CommandFn =>
+  (): Promise<void> => {
+    // Phase 4 T079 — wired with Story 2.
+    void vscode.window.showInformationMessage(
+      'Refresh all stale arrives with Phase 4 (stale detection).',
+    );
+    return Promise.resolve();
+  };
+
+export const renameStoryboardHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndStoryboard(deps, args);
+    if (!ctx) {
+      return;
+    }
+    const newName = await vscode.window.showInputBox({
+      prompt: 'Rename storyboard',
+      validateInput: (v): string | null =>
+        v.trim() === '' ? 'Name cannot be empty' : null,
+    });
+    if (newName === undefined) {
+      return;
+    }
+    try {
+      const result = await deps.service.renameStoryboard({
+        documentUri: ctx.documentUri,
+        storyboardId: ctx.storyboardId,
+        newName,
+        actor: ACTOR,
+      });
+      if (result.kind === 'name-conflict') {
+        void vscode.window.showErrorMessage(
+          messages.storyboardNameConflict(newName),
+        );
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const describeStoryboardHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndStoryboard(deps, args);
+    if (!ctx) {
+      return;
+    }
+    const description = await vscode.window.showInputBox({
+      prompt: 'Edit storyboard description (markdown)',
+    });
+    if (description === undefined) {
+      return;
+    }
+    try {
+      await deps.service.describeStoryboard({
+        documentUri: ctx.documentUri,
+        storyboardId: ctx.storyboardId,
+        description: description === '' ? null : description,
+        actor: ACTOR,
+      });
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
+  };
+
+export const editSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    await deps.service.openSceneForMissingDataEdit({
+      documentUri: ctx.documentUri,
+      sceneId: ctx.sceneId,
+    });
+  };
+
+// ── Shared prompts ──────────────────────────────────────────────────
+
+function isoValidator(value: string): string | null {
+  return Number.isNaN(Date.parse(value))
+    ? 'Timestamp must be ISO-8601 (e.g. 2026-04-20T10:00:00Z)'
+    : null;
+}
+
+async function handleTimestampCollision(
+  deps: HandlerDeps,
+  ctx: { documentUri: string; sceneId: string },
+  attempted: string,
+  suggestedOffsetTimestamp: string,
+): Promise<void> {
+  const pick = await vscode.window.showInformationMessage(
+    messages.duplicateTimestampConflict(attempted),
+    { modal: true },
+    'Offset (+1 s)',
+    'Cancel',
+  );
+  if (pick === 'Offset (+1 s)') {
+    await deps.service.duplicateScene({
+      documentUri: ctx.documentUri,
+      sceneId: ctx.sceneId,
+      newTimestamp: suggestedOffsetTimestamp,
+      actor: ACTOR,
+    });
+  }
 }
 
 // ── Registration ────────────────────────────────────────────────────
@@ -141,10 +386,11 @@ export function registerStoryboardEditCommands(
   const disposables = COMMAND_SPECS.map(({ id, factory }) =>
     vscode.commands.registerCommand(id, factory(deps)),
   );
-
   const composite: vscode.Disposable = {
     dispose(): void {
-      for (const d of disposables) {d.dispose();}
+      for (const d of disposables) {
+        d.dispose();
+      }
     },
   };
   context.subscriptions.push(composite);
