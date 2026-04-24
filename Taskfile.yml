@@ -112,6 +112,7 @@ tasks:
       - bash scripts/check-no-geojson-feature.sh
       - bash scripts/check-no-hand-typed-temporal-enums.sh
       - bash scripts/check-adr-refs.sh
+      - bash scripts/check-log-panel-skip-guard.sh
 
   lint:fix:
     desc: "Auto-fix code style issues"
