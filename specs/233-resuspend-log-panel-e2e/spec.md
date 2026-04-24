@@ -71,6 +71,7 @@ As a future developer who encounters another test suite wedged on webview flakin
 - **FR-002**: The mute comment (`#233 — Re-suspended pending #142. ...`) MUST be removed from the test file in the same commit.
 - **FR-003**: Before un-suspending, #142 MUST be merged to main and the log-panel suite MUST pass three consecutive CI runs on a feature branch that rebases on top of that merge.
 - **FR-004**: The backlog entry for 233 MUST be struck-through and marked `complete` in `BACKLOG.md` in the same commit that removes `.fixme`.
+- **FR-005**: The skip-guard script that #210 introduced at `scripts/check-log-panel-skip-guard.sh` (invoked from `Taskfile.yml` → `lint`) MUST be restored when the suite is un-muted. The script asserts no `test.skip` / `test.fixme` / `test.describe.skip` / `test.describe.fixme` appears in `tests/e2e/test-log-panel.spec.ts`. It was removed by #534 (alongside this spec's creation) because it blocked the narrow mute; its purpose — preventing silent future skips — remains valid once the suite is stable again. Restoring means: re-create the bash script (see commit history for the original), re-add the `bash scripts/check-log-panel-skip-guard.sh` line to `Taskfile.yml`'s `lint` task, and confirm `task lint` passes with the `.fixme`-free test file.
 
 ### Un-Suspend Recipe
 
@@ -84,17 +85,24 @@ git pull origin main
 #      `test.describe.fixme('Log Panel', ...)` → `test.describe('Log Panel', ...)`
 #    Also delete the multi-line comment block above it referring to #233.
 
-# 3. Run locally first (cloud-friendly runner):
-node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel
+# 3. Restore the skip-guard that #534 removed.
+#    Re-create scripts/check-log-panel-skip-guard.sh — the original lives at
+#    git show 5385f6e8:scripts/check-log-panel-skip-guard.sh (pre-#534 HEAD).
+#    Re-add `bash scripts/check-log-panel-skip-guard.sh` to Taskfile.yml
+#    under the `lint:` task, right after `check-adr-refs.sh`.
 
-# 4. Verify: expect 5 passed, 0 failed, 0 skipped. If any fails, STOP —
+# 4. Run locally first (cloud-friendly runner):
+node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel
+task lint  # confirm skip-guard passes against the fixme-free file
+
+# 5. Verify: expect 5 passed, 0 failed, 0 skipped. If any fails, STOP —
 #    triage the specific failure; #142 may be incomplete.
 
-# 5. Push and open a PR. Ensure CI runs the VS Code E2E job against
+# 6. Push and open a PR. Ensure CI runs the VS Code E2E job against
 #    this branch three times (via "re-run jobs" button on the run page)
 #    to confirm stability.
 
-# 6. When all three runs are green, mark 233 complete in BACKLOG.md
+# 7. When all three runs are green, mark 233 complete in BACKLOG.md
 #    (strike-through the row) and merge.
 ```
 
