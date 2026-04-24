@@ -224,10 +224,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // call setActiveStoryboard synchronously on dropdown-change messages.
   storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
 
-  // #218 — Storyboard edit orchestration service. Phase 1 registers
-  // the service + commands; real behaviour is wired in Phase 2/3 tasks.
+  // #218 — Storyboard edit orchestration service. Phase 3 wires the
+  // panel view as the edit sink so inbound messages (scene-edit-form-
+  // open, scene-undo-toast-shown) flow back to the webview. The
+  // remaining ports (mapPanel, sessionManager, thumbnailService,
+  // logService) are wired via setters below.
   const storyboardEditService = new StoryboardEditService();
   context.subscriptions.push(storyboardEditService.activate());
+  storyboardPanelProvider.setEditService(storyboardEditService);
   registerStoryboardEditCommands(context, {
     service: storyboardEditService,
     sessionManager: {
