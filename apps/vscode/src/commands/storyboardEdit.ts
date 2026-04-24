@@ -27,11 +27,53 @@ export interface EditSessionManager {
   getActiveDocumentUri(): string | null;
 }
 
+/**
+ * Live map-state snapshot for `updateSceneToCurrent`. Returned by the
+ * `readCurrentMapView` port, built from `mapPanel` viewport + session
+ * store state at the moment the user clicks.
+ *
+ * `viewport.center` is a mutable `number[]` — matches the shape
+ * `Viewport` declares in `@debrief/schemas`; the service forwards it
+ * straight to #215's `updateScene` without re-typing.
+ */
+export interface CurrentMapView {
+  readonly viewport: {
+    readonly center: number[];
+    readonly zoom: number;
+    readonly bearing: number;
+  };
+  readonly timestamp: string;
+  readonly visibleFeatureIds: readonly string[];
+}
+
+/** Sibling storyboard for the copy-to-other quick-pick. */
+export interface SiblingStoryboard {
+  readonly id: string;
+  readonly name: string;
+  readonly sceneCount: number;
+}
+
 type CommandFn = (...args: readonly unknown[]) => Promise<void> | void;
 
-interface HandlerDeps {
+export interface HandlerDeps {
   readonly service: StoryboardEditService;
   readonly sessionManager: EditSessionManager;
+  /** Optional: read the live map view for `updateSceneToCurrent`. Null
+   *  return means the map hasn't reported state yet (viewport unset /
+   *  time slider uninitialised). */
+  readonly readCurrentMapView?: () => CurrentMapView | null;
+  /** Optional: list sibling storyboards (excluding the source) for the
+   *  copy-to-other quick-pick. */
+  readonly listSiblingStoryboards?: (
+    documentUri: string,
+    sourceStoryboardId: string,
+  ) => readonly SiblingStoryboard[];
+  /** Optional: resolve a Scene's source storyboard id (used by
+   *  copy-to-other to exclude the source from the quick-pick). */
+  readonly resolveSceneStoryboard?: (
+    documentUri: string,
+    sceneId: string,
+  ) => string | null;
 }
 
 // ── Arg extraction helpers ───────────────────────────────────────────
@@ -188,17 +230,55 @@ export const undoDeleteSceneHandler = (deps: HandlerDeps): CommandFn =>
     }
   };
 
-export const updateToCurrentHandler = (_deps: HandlerDeps): CommandFn =>
-  (): Promise<void> => {
-    // Phase 3c — reading the live map view (viewport, currentTime,
-    // visibleFeatureIds) requires the same `sessionStore.getState()` +
-    // `mapPanel.getCurrentFeatures()` plumbing captureScene uses. The
-    // dispatcher + service layers are ready; the integration lands in
-    // a follow-up so this command doesn't silently submit partial data.
-    void vscode.window.showInformationMessage(
-      'Update to current: live map-state read lands in the next Phase 3 pass.',
-    );
-    return Promise.resolve();
+export const updateToCurrentHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    if (!deps.readCurrentMapView) {
+      void vscode.window.showErrorMessage(
+        'Update failed — map-state port not wired. Reopen the plot.',
+      );
+      return;
+    }
+    const view = deps.readCurrentMapView();
+    if (view === null) {
+      void vscode.window.showErrorMessage(
+        'Update failed — map has not reported a viewport or time yet. Pan / zoom, set the time slider, and retry.',
+      );
+      return;
+    }
+    try {
+      const result = await deps.service.updateSceneToCurrent({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        currentView: view,
+        actor: ACTOR,
+      });
+      if (result.kind === 'thumbnail-failed') {
+        void vscode.window.showErrorMessage(
+          messages.updateToCurrentThumbnailFailed(),
+        );
+      } else if (result.kind === 'duplicate-timestamp-collision') {
+        const pick = await vscode.window.showInformationMessage(
+          messages.duplicateTimestampConflict(view.timestamp),
+          { modal: true },
+          'Offset (+1 s)',
+          'Cancel',
+        );
+        if (pick === 'Offset (+1 s)') {
+          await deps.service.updateSceneToCurrent({
+            documentUri: ctx.documentUri,
+            sceneId: ctx.sceneId,
+            currentView: { ...view, timestamp: result.suggestedOffsetTimestamp },
+            actor: ACTOR,
+          });
+        }
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
   };
 
 export const duplicateSceneHandler = (deps: HandlerDeps): CommandFn =>
@@ -233,14 +313,89 @@ export const duplicateSceneHandler = (deps: HandlerDeps): CommandFn =>
     }
   };
 
-export const copyToOtherHandler = (_deps: HandlerDeps): CommandFn =>
-  (): Promise<void> => {
-    // Phase 3c — needs a quick-pick of sibling Storyboards (built from
-    // the current plot). Ready for follow-up.
-    void vscode.window.showInformationMessage(
-      'Copy to other storyboard: destination picker lands in the next Phase 3 pass.',
+export const copyToOtherHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    if (!deps.listSiblingStoryboards || !deps.resolveSceneStoryboard) {
+      void vscode.window.showErrorMessage(
+        'Copy failed — sibling-storyboards port not wired.',
+      );
+      return;
+    }
+    const sourceStoryboardId = deps.resolveSceneStoryboard(
+      ctx.documentUri,
+      ctx.sceneId,
     );
-    return Promise.resolve();
+    if (sourceStoryboardId === null) {
+      void vscode.window.showErrorMessage(
+        `Scene ${ctx.sceneId} not found.`,
+      );
+      return;
+    }
+    const siblings = deps.listSiblingStoryboards(
+      ctx.documentUri,
+      sourceStoryboardId,
+    );
+    if (siblings.length === 0) {
+      void vscode.window.showInformationMessage(
+        'No other storyboards on this plot — create one first.',
+      );
+      return;
+    }
+    const pick = await vscode.window.showQuickPick(
+      siblings.map((sb) => ({
+        label: sb.name,
+        description: `${sb.sceneCount} scene${sb.sceneCount === 1 ? '' : 's'}`,
+        id: sb.id,
+      })),
+      { placeHolder: 'Destination storyboard' },
+    );
+    if (!pick) {
+      return;
+    }
+    // Default to "now" + 1s — the destination may have a colliding
+    // timestamp; we handle that reactively.
+    const tsInput = await vscode.window.showInputBox({
+      prompt: 'Timestamp on destination storyboard (ISO-8601)',
+      value: new Date(Date.now() + 1000).toISOString(),
+      validateInput: isoValidator,
+    });
+    if (tsInput === undefined) {
+      return;
+    }
+    try {
+      const result = await deps.service.copySceneToOtherStoryboard({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        destinationStoryboardId: pick.id,
+        newTimestamp: tsInput,
+        actor: ACTOR,
+      });
+      if (result.kind === 'deep-copy-failed') {
+        void vscode.window.showErrorMessage(messages.deepCopyFailed());
+      } else if (result.kind === 'duplicate-timestamp-collision') {
+        const choice = await vscode.window.showInformationMessage(
+          messages.duplicateTimestampConflict(tsInput),
+          { modal: true },
+          'Offset (+1 s)',
+          'Cancel',
+        );
+        if (choice === 'Offset (+1 s)') {
+          await deps.service.copySceneToOtherStoryboard({
+            documentUri: ctx.documentUri,
+            sceneId: ctx.sceneId,
+            destinationStoryboardId: pick.id,
+            newTimestamp: result.suggestedOffsetTimestamp,
+            actor: ACTOR,
+          });
+        }
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
   };
 
 export const refreshThumbnailHandler = (_deps: HandlerDeps): CommandFn =>

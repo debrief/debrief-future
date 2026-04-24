@@ -49,6 +49,7 @@ import {
   type PlaybackTimeRangeView,
 } from './services/storyboardPlayback';
 import { formatDtg } from '@debrief/components';
+import { calculateViewportCenter } from '@debrief/utils';
 import type { DebriefFeature } from '@debrief/components';
 
 let mapPanel: MapPanel | undefined;
@@ -236,6 +237,95 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     service: storyboardEditService,
     sessionManager: {
       getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    },
+    readCurrentMapView: (): {
+      viewport: { center: number[]; zoom: number; bearing: number };
+      timestamp: string;
+      visibleFeatureIds: readonly string[];
+    } | null => {
+      const panel = mapPanel;
+      if (!panel) {return null;}
+      const docUri = sessionManager.getActiveDocumentUri();
+      if (docUri === null) {return null;}
+      const session = sessionManager.getSession(docUri);
+      const state = session?.getState();
+      const viewport = state?.viewport ?? null;
+      const currentTime = state?.currentTime ?? null;
+      if (!viewport || viewport.zoom === undefined || currentTime === null) {
+        return null;
+      }
+      const centerObj = calculateViewportCenter(viewport);
+      const features = panel.getCurrentFeatures();
+      const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
+      const visibleFeatureIds: string[] = [];
+      for (const f of features) {
+        const props = f.properties as { id?: string | null } | null;
+        const id = props?.id;
+        if (typeof id !== 'string' || id.length === 0) {continue;}
+        if (hiddenIds.has(id)) {continue;}
+        visibleFeatureIds.push(id);
+      }
+      return {
+        viewport: {
+          center: [centerObj.longitude, centerObj.latitude],
+          zoom: viewport.zoom,
+          bearing: 0,
+        },
+        timestamp: new Date(currentTime).toISOString(),
+        visibleFeatureIds,
+      };
+    },
+    listSiblingStoryboards: (
+      _documentUri: string,
+      sourceStoryboardId: string,
+    ): readonly { id: string; name: string; sceneCount: number }[] => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      const sceneCountById = new Map<string, number>();
+      for (const f of features) {
+        const props = f.properties as { kind?: string; storyboard_id?: string } | null;
+        if (props?.kind === 'STORYBOARD_SCENE' && typeof props.storyboard_id === 'string') {
+          sceneCountById.set(
+            props.storyboard_id,
+            (sceneCountById.get(props.storyboard_id) ?? 0) + 1,
+          );
+        }
+      }
+      const result: { id: string; name: string; sceneCount: number }[] = [];
+      for (const f of features) {
+        const props = f.properties as { kind?: string; id?: string; name?: string } | null;
+        if (
+          props?.kind === 'STORYBOARD' &&
+          typeof props.id === 'string' &&
+          typeof props.name === 'string' &&
+          props.id !== sourceStoryboardId
+        ) {
+          result.push({
+            id: props.id,
+            name: props.name,
+            sceneCount: sceneCountById.get(props.id) ?? 0,
+          });
+        }
+      }
+      return result;
+    },
+    resolveSceneStoryboard: (
+      _documentUri: string,
+      sceneId: string,
+    ): string | null => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      for (const f of features) {
+        const props = f.properties as
+          | { kind?: string; id?: string; storyboard_id?: string }
+          | null;
+        if (
+          props?.kind === 'STORYBOARD_SCENE' &&
+          props.id === sceneId &&
+          typeof props.storyboard_id === 'string'
+        ) {
+          return props.storyboard_id;
+        }
+      }
+      return null;
     },
   });
 
