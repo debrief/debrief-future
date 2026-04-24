@@ -115,7 +115,7 @@ Every `![alt](path)` reference in every generated post (unified, rollup, composi
 
 **Why this priority**: Without this, 100 % of images in the published archive 404. This is a single-location fix (one helper applied at stitch time) but the blast radius is total.
 
-**Independent Test**: `grep -rE '!\[.*\]\((\./|\.\./)' specs/*/media/{unified,epic-rollup,composite}-post.md` must return zero matches after the re-run.
+**Independent Test**: `grep -rE '!\[.*\]\((\./|\.\./)' specs/*/media/unified-post.md specs/*/media/epic-rollup.md specs/*/media/composite-post.md` must return zero matches after the re-run.
 
 **Acceptance Scenarios**:
 
@@ -144,8 +144,10 @@ Every `![alt](path)` reference in every generated post (unified, rollup, composi
 
 - **Image file does not exist on disk** despite a reference in `shipped-post.md`: the generator must not fail; record the broken reference in `ARCHIVE-REBUILD.md` under **Broken Image References** alongside the source spec, and rewrite the path anyway (the maintainer will chase down the missing asset).
 - **Path contains query string or fragment** (e.g. `foo.png?raw=true`): strip everything after the first `?` or `#` before deriving the basename; preserve the suffix on the rewritten path.
-- **Image referenced via HTML `<img>` tag** instead of Markdown `![]()`: out of scope for this pass — log a warning with spec slug + line number. None are known to exist in the current archive; this is guardrail only.
-- **Image path uses `../../` to climb outside the spec**: out of scope (no such case in the current archive). If encountered, log a warning and leave path untouched; maintainer to fix manually.
+- **Image referenced via HTML `<img>` tag** instead of Markdown `![]()`: harvested by a sibling `_HTML_IMG_RE` regex (see FR-010) and routed through the same path rewriter. Alt text taken from `alt="..."` when present, empty otherwise.
+- **Image path uses `../../` (or deeper) to climb outside the spec** (see FR-011): `rewrite_image_path` strips every leading `./`, `../`, or `evidence/` segment before taking the basename, so multi-level climbs resolve identically to single-level ones. No warning needed.
+- **Symlinked evidence directories** (see FR-012): orphan scanner dedupes by resolved path (`Path.resolve()`) so a symlink into another spec's screenshots directory never double-counts.
+- **Malformed markdown image reference** (unclosed paren, line-wrapped alt text, or otherwise not matched by `_IMAGE_RE`): counted at harvest time and surfaced in a new `## Malformed Image References` section of `ARCHIVE-REBUILD.md` (see FR-013) so no `![` occurrence is silently dropped.
 - **Same image referenced twice in one source body**: preserve both references in the generated post (no deduplication; ordering signals).
 
 ---
@@ -163,6 +165,10 @@ Every `![alt](path)` reference in every generated post (unified, rollup, composi
 - **FR-007**: `ARCHIVE-REBUILD.md` MUST gain a new **Broken Image References** section listing any `![alt](path)` where the referenced file does not exist on disk, with source spec and full source-relative path. (Generator MUST NOT fail on broken references.)
 - **FR-008**: The generator MUST continue to honour #228 FR-007 (no existing-file overwrites) and #228 FR-011 (atomic all-or-nothing promotion).
 - **FR-009**: The generator and its tests MUST be deleted again in the same PR that commits the regenerated outputs, matching #228 FR-009.
+- **FR-010**: The harvester MUST match HTML `<img>` tags via a sibling regex `_HTML_IMG_RE` and emit `ImageReference` records identical in shape to the markdown path. Alt text comes from the `alt="..."` attribute when present; empty otherwise. Rewritten paths follow the same rule as FR-004.
+- **FR-011**: `rewrite_image_path` MUST strip every leading `./`, `../`, or `evidence/` segment (repeated application, not one-level) before taking the basename, so paths such as `../../evidence/foo.png` and `evidence/screenshots/foo.png` resolve to the same Jekyll URL.
+- **FR-012**: The orphan scanner MUST dedupe candidate files by their resolved filesystem path (`Path.resolve()`) so that symlinked evidence directories do not contribute duplicate entries.
+- **FR-013**: The harvester MUST count `![` occurrences in each source body and compare against the number of matches produced by `_IMAGE_RE` + `_HTML_IMG_RE`. When counts diverge, each unmatched occurrence MUST be surfaced in a new `## Malformed Image References` section of `ARCHIVE-REBUILD.md` with spec key + line number. The generator MUST NOT fail on malformed input.
 
 ### Non-Functional Requirements
 
@@ -174,22 +180,24 @@ Every `![alt](path)` reference in every generated post (unified, rollup, composi
 
 ### Key Entities
 
-- **ImageReference** — new dataclass: `(alt: str, source_path: str, rewritten_path: str, source_spec_key: str, line_number: int)`. Emitted by the image harvester; consumed by the path rewriter and the broken-reference checker.
-- **OrphanImage** — new dataclass: `(spec_key: str, filename: str, relative_path: Path)`. Populated by FR-006; serialised into the new **Orphan Screenshots** section.
-- **BrokenImageReference** — new dataclass: `(spec_key: str, source_path: str, alt: str)`. Populated by FR-007; serialised into the new **Broken Image References** section.
+- **ImageReference** — new dataclass: `(alt: str, source_path: str, rewritten_path: str, source_spec_key: str, line_number: int, kind: Literal["markdown", "html"])`. Emitted by the image harvester (both markdown `![]()` and HTML `<img>` forms, per FR-010); consumed by the path rewriter and the broken-reference checker. The `line_number` field supports the malformed-reference pass (FR-013) and any future HTML-warning diagnostics.
+- **OrphanImage** — new dataclass: `(spec_key: str, filename: str, relative_path: Path, resolved_path: Path)`. Populated by FR-006 with symlink dedup via the `resolved_path` key (FR-012); serialised into the new **Orphan Screenshots** section.
+- **BrokenImageReference** — new dataclass: `(spec_key: str, source_path: str, alt: str)`. Populated by FR-007; serialised into the new **Broken Image References** section. Source paths are resolved against the shipped-post's own directory (`shipped_post_path.parent`) before the existence check.
+- **MalformedImageReference** — new dataclass: `(spec_key: str, line_number: int, snippet: str)`. Populated by FR-013 when `![` occurrences in a source body exceed the regex match count; serialised into the new **Malformed Image References** section.
 
 ---
 
 ## Success Criteria *(mandatory)*
 
-- **SC-001**: After re-run, the total count of `![…](…)` references in generated posts is ≥ 56 (matches source total of 57 minus zero tolerance for intentional drops).
-- **SC-002**: Zero occurrences of source-relative image paths (matching `!\[[^]]*\]\((\./|\.\./|evidence/)`) in `specs/*/media/{unified,epic-rollup,composite}-post.md`.
+- **SC-001**: For every well-formed markdown `![alt](path)` or HTML `<img src="path">` reference in a source `shipped-post.md`, the set of `(alt, basename(path))` pairs in the generated post(s) that absorb that spec is a superset of the source set (zero silent drops). Baseline at 2026-04-24: 64 markdown refs + 0 HTML refs in source; re-measured at implementation time.
+- **SC-002**: Zero occurrences of source-relative image paths (matching `!\[[^]]*\]\((\./|\.\./|evidence/)`) in `specs/*/media/unified-post.md`, `specs/*/media/epic-rollup.md`, or `specs/*/media/composite-post.md` (three separate globs — no brace expansion, which misses the rollup filename).
 - **SC-003**: `specs/185-cql2-array-filter/media/composite-post.md` contains ≥ 16 image references (from members 186+189+190).
 - **SC-004**: `specs/125-stac-extension-mock-data/media/epic-rollup.md` contains the 3 images from member `174-thumbnail-capture`.
-- **SC-005**: `ARCHIVE-REBUILD.md` contains an **Orphan Screenshots** section listing 19 images across specs 085, 118, 142.
+- **SC-005**: `ARCHIVE-REBUILD.md` contains three new sections — **Orphan Screenshots** (listing 19 images across specs 085, 118, 142 at current baseline), **Broken Image References**, and **Malformed Image References** — each always present even when empty (empty-body placeholder paragraph).
 - **SC-006**: `scripts/regenerate-blog-archive.py` and `tests/regenerate_blog_archive/` do not exist in the merged commit (honours FR-009).
 - **SC-007**: All existing #228 acceptance criteria (SC-001 through SC-006 of #228) still pass — no regression to classification, ship-date resolution, or atomic-writer behaviour.
-- **SC-008**: Review-sized PR: ≤ 2 500 changed lines of prose output + ≤ 300 changed lines of Python (patches only; the script body itself is a revert-and-delete cycle that nets to zero).
+- **SC-008**: Review-sized PR: ≤ 2 800 changed lines of prose output + ≤ 400 changed lines of Python (patches only; the script body itself is a revert-and-delete cycle that nets to zero). Bumped from original 2 500 / 300 to absorb FR-010..FR-013 and the full rollup + composite test matrix.
+- **SC-009**: For every `![alt](/assets/images/future-debrief/<slug>/<basename>)` reference surviving in any generated post, either the corresponding source asset exists on disk at `specs/<slug>/evidence/.../<basename>` **or** the reference appears as a row in the **Broken Image References** section of `ARCHIVE-REBUILD.md` (i.e. every surviving reference is either resolvable or explicitly annotated — no dangling image reference without a surface).
 
 ---
 
@@ -298,16 +306,20 @@ Paths rewritten to Jekyll convention regardless — maintainer must locate the m
 
 ```bash
 uv run python scripts/regenerate-blog-archive.py --force  # overwrites the existing generated posts
-# verify success criteria
-grep -cE '!\[.*\]\(' specs/*/media/{unified,epic-rollup,composite}-post.md | awk -F: '{s+=$2} END {print "total:", s}'  # expect ≥ 56
-grep -rE '!\[[^]]*\]\((\./|\.\./|evidence/)' specs/*/media/ | wc -l  # expect 0
-grep -c 'Orphan Screenshots' ARCHIVE-REBUILD.md  # expect 1
+# verify success criteria — three separate globs (brace expansion misses epic-rollup.md)
+grep -cE '!\[.*\]\(' specs/*/media/unified-post.md specs/*/media/epic-rollup.md specs/*/media/composite-post.md \
+  | awk -F: '{s+=$2} END {print "total:", s}'  # expect ≥ baseline
+grep -rE '!\[[^]]*\]\((\./|\.\./|evidence/)' \
+  specs/*/media/unified-post.md specs/*/media/epic-rollup.md specs/*/media/composite-post.md | wc -l  # expect 0
+grep -c 'Orphan Screenshots' ARCHIVE-REBUILD.md   # expect 1
+grep -c 'Broken Image References' ARCHIVE-REBUILD.md   # expect 1
+grep -c 'Malformed Image References' ARCHIVE-REBUILD.md  # expect 1
 # full gates
 task verify
 # delete
 git rm scripts/regenerate-blog-archive.py
 git rm -r tests/regenerate_blog_archive/
-git commit -m "feat(229): delete revived generator per FR-009"
+git commit -m "feat(230): delete revived generator per FR-009"
 ```
 
 ### PR shape
@@ -334,9 +346,9 @@ Update the **Runbook** section of `ARCHIVE-REBUILD.md` to call out:
 
 - **Republishing to `debrief.github.io`.** This spec regenerates `specs/*/media/*.md` and `ARCHIVE-REBUILD.md` only. The website maintainer still runs the runbook manually.
 - **Re-writing the generator's architecture.** Surgical patches only; dataclasses, atomic writer, and classifier are unchanged.
-- **Back-filling missing screenshots.** If a source post references a broken path, we surface it and move on — we do not regenerate the image.
-- **HTML `<img>` tags.** Warn-only; no rewrite.
-- **Fixing the orphan images themselves.** The maintainer decides whether to embed; we only surface.
+- **Back-filling missing screenshots.** If a source post references a broken path, we surface it in **Broken Image References** and move on — we do not regenerate the image.
+- **Fixing the orphan images themselves.** The maintainer decides whether to embed; we only surface the inventory.
+- **Modifying source `shipped-post.md` files.** Paths in source posts remain source-relative; only generated posts carry the rewritten Jekyll absolute paths.
 
 ---
 
@@ -353,6 +365,11 @@ Update the **Runbook** section of `ARCHIVE-REBUILD.md` to call out:
 None identified. All defect counts are measured from the committed output of PR #518 on the same day as this spec. Re-running the audit before implementation is cheap and recommended:
 
 ```bash
-# Sanity: should print "Source imgs: 57 | Generated imgs: 23 | Lost: 34"
-# (see the audit script that produced these numbers in the spec background)
+# Sanity audit at 2026-04-24: source 64 markdown refs, generated 25, lost 39.
+# Re-measure at implementation time — brace expansion in the original audit
+# command hides epic-rollup.md matches (actual filename is epic-rollup.md, not
+# epic-rollup-post.md). Use three explicit globs per SC-002.
+grep -cE '!\[.*\]\(' specs/*/media/shipped-post.md | awk -F: '{s+=$2} END {print "source:", s}'
+grep -cE '!\[.*\]\(' specs/*/media/unified-post.md specs/*/media/epic-rollup.md specs/*/media/composite-post.md \
+  | awk -F: '{s+=$2} END {print "generated:", s}'
 ```
