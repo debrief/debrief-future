@@ -33,6 +33,16 @@ vscrui sits at the shared component layer of our architecture. It doesn't replac
 
 Building multiple VS Code extensions for Debrief, we kept facing the same problem: how to maintain visual consistency while respecting VS Code's theming system. Microsoft's webview UI toolkit was deprecated, and we needed an explicit standard before more webviews went different directions.
 
+We standardized on [vscrui](https://github.com/vscode-webview/ui-toolkit), a mature React component library maintained by the community. Then we documented the decision in `shared/components/vscrui.md`:
+
+- **Component catalog**: 15 components across five categories (inputs, buttons, form controls, layout containers, and progress indicators) with guidance for when to use each
+- **Installation and bundling**: Step-by-step guidance for bundling vscrui locally — critical because our platform works entirely offline, with no CDN access
+- **Usage patterns**: Concrete React examples showing how webviews structure components with consistent theming across light and dark modes
+- **Scope and constraints**: Clear boundaries on what vscrui provides (accessibility, VS Code theme integration) versus what needs custom implementation (layout logic, domain-specific interactions)
+- **Extension process**: How to propose new components when the standard library doesn't cover a capability, including the criteria we'll use to evaluate additions
+
+We added a cross-reference in `ARCHITECTURE.md` so new contributors see this standard immediately when designing webviews.
+
 ## Lessons Learned
 
 We built three webviews before formalizing a component standard. Each solved the same problems slightly differently — inconsistent but not broken. It taught us that explicit architectural decisions should be documented before they become patterns.

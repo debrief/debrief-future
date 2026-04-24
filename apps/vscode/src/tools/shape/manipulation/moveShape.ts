@@ -48,6 +48,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:category': 'shape/manipulation',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'mutation/shape/translated',
+    'debrief:uiCategory': 'calc',
   },
 };
 

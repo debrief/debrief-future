@@ -32,6 +32,10 @@ This builds on two pieces we shipped recently: REP file loading (#021) and the p
 
 One of the most common workflows in Debrief is loading tactical data. Feature 043 extends that workflow with a new capability: users can now create a new STAC plot directly from REP files without leaving the file browser.
 
+Right-click on a `.rep` file (or multiple files), select "Add to new plot in [store-name]", enter a plot name, and Debrief handles the rest: parsing the files, extracting temporal and spatial metadata, creating a new STAC item, and populating it with the exercise data. All in one action.
+
+The implementation supports single or multiple REP files, validates all of them before committing anything to disk (fail-fast parsing), preserves the original files as STAC assets for provenance, and opens the resulting plot in the map panel so you can start analyzing immediately.
+
 ## Screenshots
 
 **Right-click context menu** — The new "Add to new plot in [Store Name]" option appears alongside existing load commands.

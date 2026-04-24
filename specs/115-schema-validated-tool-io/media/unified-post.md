@@ -37,6 +37,16 @@ This is a direct consequence of our schema-first architecture. We already genera
 
 The planning post for this feature started with a concrete bug: `apply-symbol-style` wrote marker data to `style.point.shape`, the renderer read from `default_position_style.symbol`, and nothing in the pipeline complained. Features made it all the way to the frontend, and symbols just silently didn't appear.
 
+The fix to that specific bug was a one-liner. The real problem was structural: GeoJSON features flowed through four services as plain `dict[str, Any]` in Python and `Record<string, unknown>` in TypeScript. Every service touched the same data. Nothing verified it matched a shared contract.
+
+We now have five validation checkpoints — `parser_output`, `tool_input`, `tool_output`, `catalog_write`, `catalog_read` — each enforcing the Pydantic model for the feature's `kind`. The same `validate_feature()` function handles all of them. A field mismatch that would previously have reached a user now fails at the boundary where it originates, naming the field and the boundary:
+
+```python
+# SchemaValidationError at tool_output: Feature 'ref-002' (POINT)
+#   - properties.name: Field required
+#   - properties.display_name: Extra inputs are not permitted
+```
+
 ## What Changed
 
 **Shared validation infrastructure.** A `FEATURE_MODEL_MAP` in `debrief_schemas` dispatches each of the 12 feature kinds to its Pydantic model class. `validate_feature()` and `validate_features()` sit on top of that map, raising `SchemaValidationError` with structured detail. All services import from one place.

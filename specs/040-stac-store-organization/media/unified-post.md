@@ -37,6 +37,10 @@ More importantly, storing everything in one place — source files, STAC metadat
 
 The Python debrief-stac service stores plots as STAC Items with GeoJSON payloads, and we've long assumed items should live in their own folders. But legacy stores created before this decision existed stored everything flat in a single catalog directory.
 
+We built a migration function that converts those flat stores to the canonical per-item structure: each item gets its own folder containing `item.json`, associated GeoJSON data, and an `assets/` subfolder for source files. The function is idempotent—safe to run twice without corruption—and we've exposed it via JSON-RPC CLI so the Electron loader app can invoke it directly.
+
+Eight migration tests cover typical and edge cases: empty stores, items without assets, mixed valid/invalid JSON. All pass. The VS Code extension test data is already migrated.
+
 ## How It Works
 
 The interesting part is what *didn't* need to change. Our TypeScript `stacService` resolves asset paths relative to the item location. When we move an item folder from the flat catalog into its own subtree, those relative hrefs move with it—no rewriting needed.

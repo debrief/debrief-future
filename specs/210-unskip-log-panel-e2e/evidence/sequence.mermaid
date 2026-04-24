@@ -1,0 +1,63 @@
+%% Sequence diagram — LogPanel E2E integration path under spec 210.
+%%
+%% Shows the runtime chain each of the 5 scenarios traverses from Playwright
+%% assertion call-site back to the LogPanel DOM rendered inside the VS Code
+%% webview iframe. The blue arrows are plain HTTP / DOM navigation; the red
+%% arrow is the VS Code ↔ webview postMessage boundary that the web-shell
+%% and Storybook paths CANNOT exercise — the justification for this suite's
+%% existence.
+
+sequenceDiagram
+    autonumber
+    participant Test as Playwright Runner<br/>(test-log-panel.spec.ts)
+    participant Fixture as Fixture<br/>(tests/e2e/fixtures/base.ts)
+    participant Page as CodeServerPage<br/>(tests/e2e/models/code-server-page.ts)
+    participant Browser as Chromium<br/>(@sparticuz/chromium)
+    participant CS as openvscode-server
+    participant Ext as VS Code extension host<br/>(debrief-vscode)
+    participant WV as LogPanel webview iframe<br/>(vscode-webview://&lt;guid&gt;/)
+    participant DOM as LogPanel DOM<br/>(@debrief/components)
+
+    Test->>Fixture: request codeServerPage fixture
+    Fixture->>Browser: launch
+    Fixture->>CS: navigate to CODE_SERVER_URL
+    CS->>Ext: activate debrief-vscode on view focus
+    Fixture-->>Test: resolved CodeServerPage
+
+    Test->>Page: openPlotViaStacTree('Exercise Alpha')
+    Page->>CS: DOM-click STAC tree node
+    CS->>Ext: command: openPlot
+    Ext->>CS: spawn LogPanel webview
+    CS->>WV: load vscode-webview://&lt;guid&gt;/index.html
+
+    Test->>Page: getLogPanelFrame()
+    Page->>WV: findWebviewFrameByContent('[data-testid="log-panel"]', 15s)
+    WV-->>Page: FrameLocator
+    Page-->>Test: FrameLocator
+
+    alt Scenario A — empty state
+        Test->>WV: locator('[data-testid="log-panel-empty-no-entries"]').toBeVisible()
+        WV->>DOM: render LogPanel with entries=[]
+        DOM-->>Test: assertion passes
+    else Scenario B / C — entry creation & ordering
+        Test->>Page: executeCommand('Debrief: Range Bearing')
+        Page->>Ext: command palette → tool
+        rect rgb(255, 230, 230)
+          Ext-->>WV: postMessage({ entries: [...] })
+          Note right of Ext: VS Code ↔ webview boundary<br/>(the gap web-shell/Storybook cannot cover)
+        end
+        WV->>DOM: re-render LogPanel with entries
+        Test->>WV: locator('.log-panel__entry').first().waitFor()
+        DOM-->>Test: assertion passes
+    else Scenario D / E — select & deselect
+        Test->>WV: firstEntry.click()
+        WV->>DOM: LogEntry onClick
+        DOM->>DOM: selection state toggled
+        DOM->>DOM: className includes 'log-panel__entry--selected'
+        Test->>WV: expect(firstEntry).toHaveClass(/selected/)
+        DOM-->>Test: assertion passes
+        Test->>WV: firstEntry.click() (second time)
+        DOM-->>DOM: selection cleared
+        Test->>WV: expect(firstEntry).not.toHaveClass(/selected/)
+        DOM-->>Test: assertion passes
+    end

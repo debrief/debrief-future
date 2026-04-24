@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolCategoryEnum
 from debrief_calc.registry import tool
 
 # Default color for points outside all zones
@@ -57,6 +57,7 @@ def _get_zone_color(zone_info: dict[str, Any]) -> str:
     output_kind="reference/classified_points",
     context_type=ContextType.MULTI,
     parameters=[],
+    category=ToolCategoryEnum.calc,
 )
 def point_in_zone_classifier(
     context: SelectionContext, params: dict[str, Any]
