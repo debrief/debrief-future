@@ -378,9 +378,9 @@ Task: "Run test_atomic_writer.py"
 
 ### Cleanup (FR-009 — delete the one-shot)
 
-- [ ] T120 Delete the generator script `git rm scripts/regenerate-blog-archive.py`
-- [ ] T121 [P] Delete the test package `git rm -r tests/regenerate_blog_archive/`
-- [ ] T122 Verify nothing in the repo still imports or references the deleted paths: `grep -rn "regenerate-blog-archive\|regenerate_blog_archive" . --include="*.py" --include="*.md" --include="*.toml" --exclude-dir=.git` — only references should be in `specs/228-regenerate-blog-archive/` and `ARCHIVE-REBUILD.md` `(run command)`
+- [x] T120 Delete the generator script `git rm scripts/regenerate-blog-archive.py`
+- [x] T121 [P] Delete the test package `git rm -r tests/regenerate_blog_archive/`
+- [x] T122 Verify nothing in the repo still imports or references the deleted paths: `grep -rn "regenerate-blog-archive\|regenerate_blog_archive" . --include="*.py" --include="*.md" --include="*.toml" --exclude-dir=.git` — only references should be in `specs/228-regenerate-blog-archive/` and `ARCHIVE-REBUILD.md` `(run command)`
 
 ### Pre-push verification
 
