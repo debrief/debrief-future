@@ -39,6 +39,7 @@ import { registerStoryboardTransportCommands } from './commands/storyboardTransp
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
 import { StoryboardEditService } from './services/storyboardEdit';
+import { plotFromFeatures } from './services/plotFromFeatures';
 import {
   StoryboardPlaybackService,
   type ModalPromptPort,
@@ -867,6 +868,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       const activeUri = sessionManager.getActiveDocumentUri();
       if (session && activeUri) {
         storyboardPlaybackService.onPlotOpened(activeUri);
+        // #218 T070 — kick off the stale-detection pass (early-returns
+        // on zero-storyboard plots per review 11A).
+        void storyboardEditService.onPlotOpened(
+          activeUri,
+          plotFromFeatures(mapPanel?.getCurrentFeatures() ?? []),
+        );
       }
     }),
   );

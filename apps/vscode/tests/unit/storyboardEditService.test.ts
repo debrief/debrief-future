@@ -625,6 +625,273 @@ describe('StoryboardEditService — missing-data routing', () => {
   });
 });
 
+describe('StoryboardEditService — stale detection pass (Phase 4)', () => {
+  let mapPanel: InMemoryMapPanel;
+  let logService: ReturnType<typeof makeLogService>;
+  let sink: ReturnType<typeof makePanelSink>;
+  let service: StoryboardEditService;
+  let fixture: Awaited<ReturnType<typeof seedFixture>>;
+
+  beforeEach(async () => {
+    mapPanel = new InMemoryMapPanel();
+    logService = makeLogService();
+    sink = makePanelSink();
+    fixture = await seedFixture(mapPanel);
+    service = makeService(mapPanel, { logService, panelSink: sink });
+  });
+
+  it('onPlotOpened: all scenes fresh → stale=false + unresolved=[]', async () => {
+    const plot = plotFromFeatures(mapPanel.getCurrentFeatures());
+    // Add a track feature so the Scene's visibleFeatureIds resolve.
+    const withTrack = {
+      ...plot,
+      features: [
+        ...plot.features,
+        {
+          type: 'Feature',
+          id: 'track-1',
+          properties: { id: 'track-1', kind: 'TRACK' },
+          geometry: { type: 'Point', coordinates: [0, 0] },
+        } as unknown as DebriefFeature,
+      ],
+    };
+    mapPanel.replaceAll(featuresFromPlot(withTrack));
+
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    const f1 = service.getStaleFlag(DOC, fixture.sceneId);
+    const f2 = service.getStaleFlag(DOC, fixture.secondSceneId);
+    expect(f1?.stale).toBe(false);
+    expect(f1?.unresolvedFeatureIds).toEqual([]);
+    expect(f2?.stale).toBe(false);
+    expect(f2?.unresolvedFeatureIds).toEqual([]);
+    // Inbound postMessage fired once with all two flags.
+    const staleMsgs = sink.messages.filter(
+      (m) => m.type === 'scene-stale-flags-updated',
+    );
+    expect(staleMsgs).toHaveLength(1);
+    if (staleMsgs[0]?.type === 'scene-stale-flags-updated') {
+      expect(staleMsgs[0].flags.length).toBe(2);
+    }
+  });
+
+  it('onPlotOpened: Scene with missing feature ids → stale=true + unresolved populated', async () => {
+    // Fixture has Scenes referencing "track-1" but no TRACK feature exists.
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+    const f = service.getStaleFlag(DOC, fixture.sceneId);
+    expect(f?.stale).toBe(true);
+    expect(f?.unresolvedFeatureIds).toEqual(['track-1']);
+  });
+
+  it('onPlotOpened: zero-storyboard plot early-returns (review 11A — no iteration cost)', async () => {
+    const empty = { type: 'FeatureCollection' as const, features: [] };
+    await service.onPlotOpened(DOC, empty as unknown as StoryboardPlot);
+    expect(service.getStaleFlag(DOC, fixture.sceneId)).toBeNull();
+    const staleMsgs = sink.messages.filter(
+      (m) => m.type === 'scene-stale-flags-updated',
+    );
+    expect(staleMsgs).toHaveLength(0);
+  });
+
+  it('deleteScene drops the stale cache entry for the removed Scene (T071)', async () => {
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+    expect(service.getStaleFlag(DOC, fixture.sceneId)).not.toBeNull();
+    await service.deleteScene({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(service.getStaleFlag(DOC, fixture.sceneId)).toBeNull();
+  });
+
+  it('undoDeleteScene re-inserts the stale cache entry (T071)', async () => {
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+    await service.deleteScene({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(service.getStaleFlag(DOC, fixture.sceneId)).toBeNull();
+    const result = await service.undoDeleteScene({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(result.kind).toBe('ok');
+    expect(service.getStaleFlag(DOC, fixture.sceneId)).not.toBeNull();
+  });
+});
+
+describe('StoryboardEditService — refreshSceneThumbnail (Phase 4)', () => {
+  let mapPanel: InMemoryMapPanel;
+  let logService: ReturnType<typeof makeLogService>;
+  let fixture: Awaited<ReturnType<typeof seedFixture>>;
+
+  beforeEach(async () => {
+    mapPanel = new InMemoryMapPanel();
+    logService = makeLogService();
+    fixture = await seedFixture(mapPanel);
+  });
+
+  it('success: thumbnail captured, scene updated, log entry emitted, stale flag clears (FR-EDIT-018)', async () => {
+    const capture = vi.fn(async () => ({
+      assetKey: 'scene-thumbnail-01JSC00000000000000000000A-refreshed',
+    }));
+    const service = makeService(mapPanel, {
+      logService,
+      thumbnailService: { captureThumbnail: capture },
+    });
+    // Seed the stale cache with stale=true to assert it clears.
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+    expect(service.getStaleFlag(DOC, fixture.sceneId)?.stale).toBe(true);
+
+    const result = await service.refreshSceneThumbnail({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(result.kind).toBe('ok');
+    if (result.kind !== 'ok') throw new Error();
+    expect(result.scene.properties.thumbnail_asset_ref).toBe(
+      'scene-thumbnail-01JSC00000000000000000000A-refreshed',
+    );
+    expect(capture).toHaveBeenCalledTimes(1);
+    expect(logService.calls.some((c) => c.op === 'refresh-thumbnail')).toBe(true);
+  });
+
+  it('failure: plot byte-identical, stale flag persists (SC-005)', async () => {
+    const plotBefore = JSON.stringify(plotFromFeatures(mapPanel.getCurrentFeatures()));
+    const capture = vi.fn(async () => {
+      throw new Error('simulated #174 failure');
+    });
+    const service = makeService(mapPanel, {
+      logService,
+      thumbnailService: { captureThumbnail: capture },
+    });
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    const result = await service.refreshSceneThumbnail({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(result.kind).toBe('thumbnail-failed');
+    const plotAfter = JSON.stringify(plotFromFeatures(mapPanel.getCurrentFeatures()));
+    expect(plotAfter).toBe(plotBefore);
+    expect(logService.calls).toHaveLength(0);
+    expect(service.getStaleFlag(DOC, fixture.sceneId)?.stale).toBe(true);
+  });
+
+  it('thumbnail-failed when service port is not wired', async () => {
+    const service = makeService(mapPanel, { logService });
+    const result = await service.refreshSceneThumbnail({
+      documentUri: DOC,
+      sceneId: fixture.sceneId,
+      actor: ALICE,
+    });
+    expect(result.kind).toBe('thumbnail-failed');
+  });
+});
+
+describe('StoryboardEditService — refreshAllStaleThumbnails (Phase 4, FR-EDIT-025)', () => {
+  let mapPanel: InMemoryMapPanel;
+  let logService: ReturnType<typeof makeLogService>;
+  let fixture: Awaited<ReturnType<typeof seedFixture>>;
+
+  beforeEach(async () => {
+    mapPanel = new InMemoryMapPanel();
+    logService = makeLogService();
+    fixture = await seedFixture(mapPanel);
+  });
+
+  it('SC-012: iterates every stale Scene, invokes #174 once per, emits one card per refresh + one rollup', async () => {
+    const capture = vi.fn(async (input: { sceneId: string }) => ({
+      assetKey: `scene-thumbnail-${input.sceneId}-refreshed`,
+    }));
+    const service = makeService(mapPanel, {
+      logService,
+      thumbnailService: { captureThumbnail: capture },
+    });
+    // Both fixture scenes are stale (no track-1 in plot).
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    const result = await service.refreshAllStaleThumbnails({
+      documentUri: DOC,
+      storyboardId: fixture.storyboardId,
+      actor: ALICE,
+    });
+    expect(result.succeeded).toHaveLength(2);
+    expect(result.failed).toHaveLength(0);
+    expect(capture).toHaveBeenCalledTimes(2);
+    // 2 refresh-thumbnail cards + 1 rollup = 3 log entries.
+    const perScene = logService.calls.filter((c) => c.op === 'refresh-thumbnail');
+    const rollups = logService.calls.filter((c) => c.op === 'refresh-all-stale');
+    expect(perScene).toHaveLength(2);
+    expect(rollups).toHaveLength(1);
+  });
+
+  it('continues on per-Scene failure, surfaces {succeeded, failed} tally', async () => {
+    let n = 0;
+    const capture = vi.fn(async (input: { sceneId: string }) => {
+      n += 1;
+      if (n === 1) {
+        throw new Error('first refresh failed');
+      }
+      return { assetKey: `scene-thumbnail-${input.sceneId}-refreshed` };
+    });
+    const service = makeService(mapPanel, {
+      logService,
+      thumbnailService: { captureThumbnail: capture },
+    });
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    const result = await service.refreshAllStaleThumbnails({
+      documentUri: DOC,
+      storyboardId: fixture.storyboardId,
+      actor: ALICE,
+    });
+    expect(result.succeeded).toHaveLength(1);
+    expect(result.failed).toHaveLength(1);
+    expect(capture).toHaveBeenCalledTimes(2);
+    // Still emits exactly one rollup.
+    expect(
+      logService.calls.filter((c) => c.op === 'refresh-all-stale'),
+    ).toHaveLength(1);
+  });
+
+  it('no stale scenes → empty succeeded/failed + one rollup card', async () => {
+    // Add the track-1 feature so scenes are no longer stale.
+    const plot = plotFromFeatures(mapPanel.getCurrentFeatures());
+    mapPanel.replaceAll(
+      featuresFromPlot({
+        ...plot,
+        features: [
+          ...plot.features,
+          {
+            type: 'Feature',
+            id: 'track-1',
+            properties: { id: 'track-1', kind: 'TRACK' },
+            geometry: { type: 'Point', coordinates: [0, 0] },
+          } as unknown as DebriefFeature,
+        ],
+      }),
+    );
+    const service = makeService(mapPanel, { logService });
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    const result = await service.refreshAllStaleThumbnails({
+      documentUri: DOC,
+      storyboardId: fixture.storyboardId,
+      actor: ALICE,
+    });
+    expect(result.succeeded).toEqual([]);
+    expect(result.failed).toEqual([]);
+    expect(
+      logService.calls.filter((c) => c.op === 'refresh-all-stale'),
+    ).toHaveLength(1);
+  });
+});
+
 describe('StoryboardEditService — sanity: unknown scene guards', () => {
   it('renameScene throws UnknownSceneError for missing scene', async () => {
     const mapPanel = new InMemoryMapPanel();

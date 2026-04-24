@@ -8,6 +8,7 @@
 import React from 'react';
 import { SceneRow } from './SceneRow';
 import { SceneEditForm } from './SceneEditForm';
+import { StaleBadge } from './StaleBadge';
 import type { SceneEditViewModel, SceneRowViewModel } from './types';
 
 export interface SceneListProps {
@@ -77,6 +78,15 @@ export function SceneList({
               active={currentSceneId === scene.sceneId}
               onClick={onSceneRowClick}
             />
+            {editVm?.stale && (
+              <StaleBadge
+                sceneId={scene.sceneId}
+                unresolvedFeatureIds={editVm.unresolvedFeatureIds}
+                onRefreshThumbnail={(): void =>
+                  onSceneRefreshThumbnailClicked?.(scene.sceneId)
+                }
+              />
+            )}
             {editVm?.editFormOpen && (
               <SceneEditForm
                 sceneId={scene.sceneId}

@@ -13,12 +13,16 @@
 import * as vscode from 'vscode';
 import {
   checkSceneTimestamp,
+  computeFeatureSetHash,
   copySceneToOtherStoryboard as crudCopyScene,
   deleteScene as crudDeleteScene,
   describeStoryboard as crudDescribeStoryboard,
   duplicateScene as crudDuplicateScene,
   getScene,
   getStoryboard,
+  isSceneFeature,
+  isStoryboardFeature,
+  readSceneWithStaleness,
   renameStoryboard as crudRenameStoryboard,
   restoreScene as crudRestoreScene,
   updateScene as crudUpdateScene,
@@ -37,11 +41,6 @@ import type {
   SceneUndoToastDescriptor,
 } from '../types/storyboardPanelMessages';
 import { plotFromFeatures, featuresFromPlot } from './plotFromFeatures';
-
-const notImplemented = <T>(method: string, phase: string): Promise<T> =>
-  Promise.reject(
-    new Error(`StoryboardEditService.${method}: not implemented (${phase})`),
-  );
 
 // ── View-model + transient-state types (data-model.md §1, §2, §5) ────
 
@@ -364,9 +363,59 @@ export class StoryboardEditService implements vscode.Disposable {
 
   // ── Lifecycle ──────────────────────────────────────────────────────
 
-  onPlotOpened(_documentUri: string, _initialPlot: StoryboardPlot): Promise<void> {
-    // Phase 4 T069 — stale-detection pass.
-    return Promise.resolve();
+  /**
+   * On plot open, run the stale-detection pass over every Scene and
+   * populate the per-plot `StaleFlagCache`. Review 11A: early-return
+   * when the plot has zero Storyboards — non-storyboard plots pay
+   * zero Scene-iteration cost.
+   *
+   * Pass composes #215's `readSceneWithStaleness` with
+   * `computeFeatureSetHash` (review 5A) — no direct reads of
+   * `scene.properties.feature_set_hash`.
+   */
+  async onPlotOpened(documentUri: string, initialPlot: StoryboardPlot): Promise<void> {
+    if (!plotHasAnyStoryboard(initialPlot)) {
+      this.staleCache.delete(documentUri);
+      return;
+    }
+    const resolvable = collectResolvableFeatureIds(initialPlot);
+    const sceneIds: string[] = [];
+    for (const f of initialPlot.features) {
+      if (isSceneFeature(f)) {
+        sceneIds.push(f.properties.id);
+      }
+    }
+    const flags = new Map<string, StaleFlag>();
+    const now = new Date().toISOString();
+    for (const sceneId of sceneIds) {
+      const read = readSceneWithStaleness(initialPlot, sceneId);
+      if (!read) {continue;}
+      const recomputed = await computeFeatureSetHash(read.canonicalVisibleIds);
+      const unresolved = read.canonicalVisibleIds.filter(
+        (id) => !resolvable.has(id),
+      );
+      const hashMismatch = recomputed !== read.storedHash;
+      const stale = hashMismatch || unresolved.length > 0;
+      flags.set(sceneId, {
+        sceneId,
+        stale,
+        unresolvedFeatureIds: unresolved,
+        computedAt: now,
+      });
+    }
+    this.staleCache.set(documentUri, flags);
+    this.postToPanel({
+      type: 'scene-stale-flags-updated',
+      flags: Array.from(flags.values()).map((f) => ({
+        sceneId: f.sceneId,
+        stale: f.stale,
+        unresolvedFeatureIds: f.unresolvedFeatureIds,
+      })),
+    });
+    this._onDidChangeStaleFlags.fire({
+      documentUri,
+      sceneIds: Array.from(flags.keys()),
+    });
   }
 
   async onPlotClosed(documentUri: string, finalPlot: StoryboardPlot): Promise<void> {
@@ -582,6 +631,8 @@ export class StoryboardEditService implements vscode.Disposable {
       type: 'scene-undo-toast-shown',
       toast: toastOf(deleted, existing.properties.title),
     });
+    // T071 — drop the stale cache entry; the Scene no longer exists.
+    this.dropStaleFlag(input.documentUri, input.sceneId);
 
     const logEntryActivityId = await this.emitLogEntry(
       input.documentUri,
@@ -639,6 +690,12 @@ export class StoryboardEditService implements vscode.Disposable {
     queue.splice(idx, 1);
     this._onDidChangeUndoQueue.fire({ documentUri: input.documentUri });
     this.postToPanel({ type: 'scene-undo-toast-shown', toast: null });
+    // T071 — re-insert the restored Scene's stale flag.
+    await this.recomputeStaleFlagFor(
+      input.documentUri,
+      nextPlot,
+      scene.properties.id,
+    );
 
     const logEntryActivityId = await this.emitLogEntry(
       input.documentUri,
@@ -715,6 +772,13 @@ export class StoryboardEditService implements vscode.Disposable {
       now,
     });
     this.writePlot(input.documentUri, nextPlot);
+    // T071 — update-to-current re-snapshots everything; the flag
+    // normalises to { stale: false, unresolvedFeatureIds: [] }.
+    await this.recomputeStaleFlagFor(
+      input.documentUri,
+      nextPlot,
+      scene.properties.id,
+    );
 
     const logEntryActivityId = await this.emitLogEntry(
       input.documentUri,
@@ -747,6 +811,12 @@ export class StoryboardEditService implements vscode.Disposable {
         now,
       });
       this.writePlot(input.documentUri, nextPlot);
+      // T071 — insert a stale flag for the duplicated Scene.
+      await this.recomputeStaleFlagFor(
+        input.documentUri,
+        nextPlot,
+        scene.properties.id,
+      );
       const logEntryActivityId = await this.emitLogEntry(
         input.documentUri,
         'duplicate',
@@ -797,6 +867,12 @@ export class StoryboardEditService implements vscode.Disposable {
         now,
       });
       this.writePlot(input.documentUri, nextPlot);
+      // T071 — insert a stale flag for the new destination Scene.
+      await this.recomputeStaleFlagFor(
+        input.documentUri,
+        nextPlot,
+        scene.properties.id,
+      );
 
       // Review 3A — two log cards sharing a freshly-minted pairActivityId.
       const pairActivityId = mintUuid();
@@ -840,14 +916,124 @@ export class StoryboardEditService implements vscode.Disposable {
     }
   }
 
-  // ── Refresh thumbnail (Phase 4 — stubbed for now) ──────────────────
+  // ── Refresh thumbnail (FR-EDIT-018/019, SC-005) ────────────────────
 
-  refreshSceneThumbnail(_input: EditRefreshThumbnailInput): Promise<RefreshThumbnailResult> {
-    return notImplemented('refreshSceneThumbnail', 'Phase 4 T074');
+  async refreshSceneThumbnail(
+    input: EditRefreshThumbnailInput,
+  ): Promise<RefreshThumbnailResult> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getScene(plot, input.sceneId);
+    if (!existing) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+    const capture = this.thumbnailService?.captureThumbnail;
+    const ctx = this.sessionManager?.resolveStoreContext(input.documentUri) ?? null;
+    if (!capture || !ctx) {
+      return {
+        kind: 'thumbnail-failed',
+        error: new Error(
+          'Refresh failed — thumbnail service or STAC context not wired.',
+        ),
+      };
+    }
+    let newAssetRef: string;
+    try {
+      const captured = await capture({
+        stacItemPath: ctx.itemPath,
+        sceneId: input.sceneId,
+      });
+      newAssetRef = captured.assetKey;
+    } catch (err) {
+      // SC-005 — plot is byte-identical; stale flag persists.
+      return { kind: 'thumbnail-failed', error: coerceError(err) };
+    }
+    const now = new Date().toISOString();
+    const { plot: nextPlot, scene } = await crudUpdateScene(plot, {
+      sceneId: input.sceneId,
+      patch: {
+        thumbnailAssetRef: newAssetRef,
+        // Re-canonicalise the current visible ids so #215 recomputes
+        // the hash (hash drift from non-id sources clears).
+        visibleFeatureIds: [...existing.properties.visible_feature_ids],
+      },
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    await this.recomputeStaleFlagFor(
+      input.documentUri,
+      nextPlot,
+      input.sceneId,
+    );
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'refresh-thumbnail',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `refresh thumbnail`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
   }
 
-  refreshAllStaleThumbnails(_input: EditRefreshAllStaleInput): Promise<RefreshAllStaleResult> {
-    return notImplemented('refreshAllStaleThumbnails', 'Phase 4 T078');
+  /**
+   * Bulk refresh every stale-flagged Scene on the active Storyboard
+   * (FR-EDIT-025). Iterates sequentially, emits one per-Scene log
+   * card, then one rollup card. Does not abort on per-Scene failures.
+   */
+  async refreshAllStaleThumbnails(
+    input: EditRefreshAllStaleInput,
+  ): Promise<RefreshAllStaleResult> {
+    const plot = this.readPlot(input.documentUri);
+    // Find stale Scenes on the target Storyboard.
+    const bucket = this.staleCache.get(input.documentUri);
+    const staleSceneIds: string[] = [];
+    if (bucket) {
+      for (const f of plot.features) {
+        if (!isSceneFeature(f)) {continue;}
+        if (f.properties.storyboard_id !== input.storyboardId) {continue;}
+        const flag = bucket.get(f.properties.id);
+        if (flag?.stale) {
+          staleSceneIds.push(f.properties.id);
+        }
+      }
+    }
+    const succeeded: string[] = [];
+    const failed: { readonly sceneId: string; readonly error: Error }[] = [];
+    for (const sceneId of staleSceneIds) {
+      try {
+        const r = await this.refreshSceneThumbnail({
+          documentUri: input.documentUri,
+          sceneId,
+          actor: input.actor,
+        });
+        if (r.kind === 'ok') {
+          succeeded.push(sceneId);
+        } else {
+          failed.push({ sceneId, error: r.error });
+        }
+      } catch (err) {
+        failed.push({ sceneId, error: coerceError(err) });
+      }
+    }
+    // Rollup card — even when no stale scenes (informative zero-row).
+    const now = new Date().toISOString();
+    const summary = `refresh-all-stale: ${succeeded.length} succeeded, ${failed.length} failed`;
+    await this.emitLogEntry(
+      input.documentUri,
+      'refresh-all-stale',
+      input.storyboardId,
+      null,
+      null,
+      input.actor,
+      summary,
+      now,
+      '',
+    );
+    return { succeeded, failed };
   }
 
   // ── Storyboard-level edits ─────────────────────────────────────────
@@ -938,6 +1124,63 @@ export class StoryboardEditService implements vscode.Disposable {
     return this.undoBuffer.get(documentUri) ?? [];
   }
 
+  // ── Stale-cache invalidation helpers (T071) ────────────────────────
+
+  /**
+   * Recompute and store the stale flag for one Scene (reuses the same
+   * pass as `onPlotOpened`). Fires `scene-stale-flags-updated` with
+   * only the affected sceneId for minimal webview churn.
+   */
+  private async recomputeStaleFlagFor(
+    documentUri: string,
+    plot: StoryboardPlot,
+    sceneId: string,
+  ): Promise<void> {
+    const read = readSceneWithStaleness(plot, sceneId);
+    if (!read) {
+      this.dropStaleFlag(documentUri, sceneId);
+      return;
+    }
+    const resolvable = collectResolvableFeatureIds(plot);
+    const recomputed = await computeFeatureSetHash(read.canonicalVisibleIds);
+    const unresolved = read.canonicalVisibleIds.filter((id) => !resolvable.has(id));
+    const flag: StaleFlag = {
+      sceneId,
+      stale: recomputed !== read.storedHash || unresolved.length > 0,
+      unresolvedFeatureIds: unresolved,
+      computedAt: new Date().toISOString(),
+    };
+    let bucket = this.staleCache.get(documentUri);
+    if (!bucket) {
+      bucket = new Map();
+      this.staleCache.set(documentUri, bucket);
+    }
+    bucket.set(sceneId, flag);
+    this.postToPanel({
+      type: 'scene-stale-flags-updated',
+      flags: [
+        {
+          sceneId,
+          stale: flag.stale,
+          unresolvedFeatureIds: flag.unresolvedFeatureIds,
+        },
+      ],
+    });
+    this._onDidChangeStaleFlags.fire({
+      documentUri,
+      sceneIds: [sceneId],
+    });
+  }
+
+  /** Drop the cache entry for a deleted Scene. */
+  private dropStaleFlag(documentUri: string, sceneId: string): void {
+    const bucket = this.staleCache.get(documentUri);
+    if (!bucket) {return;}
+    if (bucket.delete(sceneId)) {
+      this._onDidChangeStaleFlags.fire({ documentUri, sceneIds: [sceneId] });
+    }
+  }
+
   // ── Internals ──────────────────────────────────────────────────────
 
   private postToPanel(message: ExtensionToStoryboardPanelMessage): void {
@@ -970,6 +1213,36 @@ function toastOf(deleted: DeletedScene, title: string): SceneUndoToastDescriptor
     deletedAt: deleted.deletedAt,
     canUndo: true,
   };
+}
+
+function plotHasAnyStoryboard(plot: StoryboardPlot): boolean {
+  for (const f of plot.features) {
+    if (isStoryboardFeature(f)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Collect IDs of plot features that can RESOLVE a scene's
+ * `visible_feature_ids` entry. Excludes Storyboard and Scene features
+ * (those carry their own provenance / structure, never the underlying
+ * plot data a Scene references). Uses `properties.id` as the canonical
+ * id (matches #216/#217 capture behaviour — Scene's visibleFeatureIds
+ * come from `props.id` on each iterated feature).
+ */
+function collectResolvableFeatureIds(plot: StoryboardPlot): Set<string> {
+  const set = new Set<string>();
+  for (const f of plot.features) {
+    if (isStoryboardFeature(f) || isSceneFeature(f)) {continue;}
+    const props = (f as { properties?: { id?: unknown } | null }).properties;
+    const id = props?.id;
+    if (typeof id === 'string' && id.length > 0) {
+      set.add(id);
+    }
+  }
+  return set;
 }
 
 function offsetTimestampBy1s(iso: string): string {

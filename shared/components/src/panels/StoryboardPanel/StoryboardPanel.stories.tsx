@@ -278,6 +278,26 @@ export const WithUndoToast: Story = {
   },
 };
 
+export const WithStaleBadge: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        stale: true,
+        unresolvedFeatureIds: ['track-alpha', 'track-bravo'],
+      },
+    },
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};
+
 export const WithMissingDataRemediation: Story = {
   args: {
     scenes: SCENES_THREE,

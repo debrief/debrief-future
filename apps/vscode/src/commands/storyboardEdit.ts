@@ -398,22 +398,55 @@ export const copyToOtherHandler = (deps: HandlerDeps): CommandFn =>
     }
   };
 
-export const refreshThumbnailHandler = (_deps: HandlerDeps): CommandFn =>
-  (): Promise<void> => {
-    // Phase 4 T075 — wired with Story 2.
-    void vscode.window.showInformationMessage(
-      'Refresh thumbnail arrives with Phase 4 (stale detection).',
-    );
-    return Promise.resolve();
+export const refreshThumbnailHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndScene(deps, args);
+    if (!ctx) {
+      return;
+    }
+    try {
+      const result = await deps.service.refreshSceneThumbnail({
+        documentUri: ctx.documentUri,
+        sceneId: ctx.sceneId,
+        actor: ACTOR,
+      });
+      if (result.kind === 'thumbnail-failed') {
+        void vscode.window.showErrorMessage(messages.refreshThumbnailFailed());
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
   };
 
-export const refreshAllStaleHandler = (_deps: HandlerDeps): CommandFn =>
-  (): Promise<void> => {
-    // Phase 4 T079 — wired with Story 2.
-    void vscode.window.showInformationMessage(
-      'Refresh all stale arrives with Phase 4 (stale detection).',
-    );
-    return Promise.resolve();
+export const refreshAllStaleHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const ctx = await withUriAndStoryboard(deps, args);
+    if (!ctx) {
+      return;
+    }
+    try {
+      const result = await deps.service.refreshAllStaleThumbnails({
+        documentUri: ctx.documentUri,
+        storyboardId: ctx.storyboardId,
+        actor: ACTOR,
+      });
+      if (result.succeeded.length === 0 && result.failed.length === 0) {
+        void vscode.window.showInformationMessage(messages.refreshAllStaleNone());
+      } else if (result.failed.length === 0) {
+        void vscode.window.showInformationMessage(
+          messages.refreshAllStaleSuccess(result.succeeded.length),
+        );
+      } else {
+        void vscode.window.showWarningMessage(
+          messages.refreshAllStalePartial(
+            result.succeeded.length,
+            result.failed.length,
+          ),
+        );
+      }
+    } catch (err) {
+      void vscode.window.showErrorMessage(messages.unexpectedError(err));
+    }
   };
 
 export const renameStoryboardHandler = (deps: HandlerDeps): CommandFn =>
