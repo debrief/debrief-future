@@ -68,12 +68,24 @@ import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
+import {
+  StoryboardEditHarness,
+  parseHarnessQueryString,
+} from './StoryboardEditHarness';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
 /** Bridge: cast Feature[] to DebriefFeature[] (structural overlap). */
 function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
   return features as DebriefFeature[];
+}
+
+/**
+ * Wrapper that reads URL params and mounts the harness view (#230 US4).
+ */
+function StoryboardEditHarnessMount(): JSX.Element {
+  const initial = parseHarnessQueryString(window.location.search);
+  return <StoryboardEditHarness initial={initial} />;
 }
 
 /** Extract indexable properties from a feature safely. */
@@ -163,6 +175,16 @@ function getMimeType(filePath: string): string {
  * Main application component.
  */
 export default function App() {
+  // #230 US4 — top-level branch: when `?storyboard-edit-harness` is
+  // present, mount the harness view instead of the standard shell so
+  // Playwright can drive the polish loop without VS Code.
+  if (
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('storyboard-edit-harness')
+  ) {
+    return <StoryboardEditHarnessMount />;
+  }
+
   // Session-state store (reactive via useSyncExternalStore)
   const state = useSessionStore();
   const store = getSessionStore();
