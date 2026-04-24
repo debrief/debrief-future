@@ -260,10 +260,14 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 208: TimelineEntry kind discriminator
+  TimelineEntryKind,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,
   VALID_VIEW_MODES,
+  TIMELINE_ENTRY_KINDS,
+  assertNeverKind,
 } from './LogPanel';
 export type {
   FilterState as LogFilterState,

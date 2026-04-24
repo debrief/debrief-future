@@ -43,9 +43,14 @@ function entry(overrides: Partial<TimelineEntry> = {}): TimelineEntry {
 
 describe('LogEntry edge cases', () => {
   it('renders "Manual checkpoint" placeholder and omits duration for snapshot entries', () => {
+    // Feature 208: snapshot rendering is gated on `entry.kind === 'snapshot'`
+    // (PROV-side signal), not on `ToolCategory(toolName) === 'snapshot'`. The
+    // fixture keeps `toolName: 'export-png'` to document that the gate is
+    // independent of the tool — any entry explicitly flagged `kind: 'snapshot'`
+    // renders this way, including an export-that-is-also-a-checkpoint.
     const { container } = render(
       <LogEntry
-        entry={entry({ toolName: 'export-png' })}
+        entry={entry({ toolName: 'export-png', kind: 'snapshot' })}
         featureNames={{}}
         viewMode="timeline"
         isSelected={false}

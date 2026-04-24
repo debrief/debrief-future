@@ -16,6 +16,22 @@ default_range: string
 imports:
   - linkml:types
 
+enums:
+  ActivityType:
+    description: >-
+      Semantic discriminator for provenance records. Consumers use this field
+      to choose rendering or handling behaviour independently of visual
+      tool-category grouping. Introduced by feature 208 so future entry types
+      (manual checkpoint, standalone tune, manual rationale) can be
+      distinguished without overloading tool-category.
+    permissible_values:
+      snapshot:
+        description: Manual checkpoint entry.
+      tool:
+        description: Regular tool invocation. Default for records without an explicit activity_type.
+      tune:
+        description: Reserved for future standalone tune-action entries.
+
 classes:
   LogEntry:
     description: >-
@@ -83,6 +99,16 @@ classes:
           Added by #215 for Storyboarding CRUD provenance; optional and
           useful to any tool emitting LogEntry records.
         range: string
+        required: false
+      activity_type:
+        description: >-
+          Semantic kind of this provenance record. Optional; absent records
+          are treated as `tool` by consumers. Introduced by feature 208 so
+          future entry types (manual checkpoint, standalone tune, manual
+          rationale) can be distinguished without overloading visual
+          tool-category. See `shared/components/src/LogPanel/types.ts`
+          `TimelineEntryKind` for the UI-side mirror.
+        range: ActivityType
         required: false
 
   WasGeneratedBy:

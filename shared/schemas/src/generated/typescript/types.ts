@@ -324,6 +324,18 @@ export enum LineLabelPositionEnum {
     END = "END",
 };
 /**
+* Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.
+*/
+export enum ActivityType {
+    
+    /** Manual checkpoint entry. */
+    snapshot = "snapshot",
+    /** Regular tool invocation. Default for records without an explicit activity_type. */
+    tool = "tool",
+    /** Reserved for future standalone tune-action entries. */
+    tune = "tune",
+};
+/**
 * Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
 */
 export enum OutputKindEnum {
@@ -1113,6 +1125,8 @@ export interface LogEntry {
     rationale?: string,
     /** Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records. */
     agent?: string,
+    /** Semantic kind of this provenance record. Optional; absent records are treated as `tool` by consumers. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts` `TimelineEntryKind` for the UI-side mirror. */
+    activity_type?: ActivityType,
 }
 
 
