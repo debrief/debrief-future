@@ -23,6 +23,7 @@ export interface SceneEditFormProps {
     readonly onDelete: () => void;
     readonly onRefreshThumbnail: () => void;
     readonly onCancel: () => void;
+    /** Optional markdown renderer; defaults to plain text in a <pre>. */
     readonly renderMarkdown?: (markdown: string) => ReactNode;
 }
 export declare const SceneEditForm: React.FC<SceneEditFormProps>;
