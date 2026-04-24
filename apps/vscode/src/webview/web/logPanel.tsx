@@ -21,12 +21,12 @@ import type {
   LogFilterState,
   LogPanelMessage,
   ParameterSchemaEntry,
+  ToolCategoryMap,
 } from '@debrief/components';
 // Shared message contract — single source of truth for both extension and webview.
 import type {
   ExtensionMessage,
   ReplayProgressPayload,
-  ToolCategoryMap,
 } from '../logPanelMessages';
 import { postWebviewMessage } from '../logPanelMessages';
 
