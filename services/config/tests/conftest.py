@@ -10,18 +10,23 @@ import pytest
 def isolated_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Isolate config to a temp directory for all tests.
 
-    Uses XDG_CONFIG_HOME environment variable which platformdirs respects.
+    Sets XDG_CONFIG_HOME (Linux) and monkeypatches `user_config_path`
+    (macOS — `platformdirs` uses ~/Library/Application Support regardless
+    of XDG, so per-test isolation requires a direct patch to avoid leaking
+    test registrations into the real user config file).
     """
     config_base = tmp_path / "config"
     config_base.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("XDG_CONFIG_HOME", str(config_base))
 
-    # Force reimport of paths module to pick up new env var
-    import importlib
+    def _fake_user_config_path(*, appname: str, ensure_exists: bool = False) -> Path:  # noqa: ARG001
+        target = config_base / appname
+        if ensure_exists:
+            target.mkdir(parents=True, exist_ok=True)
+        return target
 
     import debrief_config.paths
-
-    importlib.reload(debrief_config.paths)
+    monkeypatch.setattr(debrief_config.paths, "user_config_path", _fake_user_config_path)
 
     return config_base / "debrief"
 
