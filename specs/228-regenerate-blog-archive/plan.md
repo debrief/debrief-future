@@ -49,6 +49,8 @@ Build a one-shot Python script that walks every shipped spec under `specs/`, cla
 
 **Post-design re-check (2026-04-23)**: After Phase 1 design artifacts were produced (`research.md`, `data-model.md`, `contracts/cli.md`, `quickstart.md`), every applicable article still passes. The research.md R1 decision (promote `BACKLOG.md` to primary charter source instead of `NNN-epic-*` directories) preserves the spec's **intent** that mismatches be surfaced, not silently reconciled. No new dependencies were introduced by the design phase. No new complexity surfaced.
 
+**Review-phase patch (2026-04-24, companion to research.md R7 widening)**: The shipped-post locator recognises the legacy date-stamped naming (`media/YYYY-MM-DD-shipped-*.md`) in addition to the canonical `media/shipped-post.md`. Tie-break on multiple legacy files in one directory: latest ISO date in the filename wins. Rationale: covers early specs (`000-schemas`, `001-debrief-stac`, `002-debrief-io`) that predate the naming convention. Without this, those three specs would silently fall through to `skipped` despite having public shipped posts — violating Article I.3 (no silent failures).
+
 ## Project Structure
 
 ### Documentation (this feature)

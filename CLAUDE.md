@@ -184,6 +184,7 @@ Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x (for the loader source the config references); configuration itself is JSON (no runtime language); YAML (Taskfile + CI workflow). + `knip` — **newly added**, pinned to a specific 5.x version in root `devDependencies`. Justification recorded below in Constitution Check Article IX. No other new dependencies. (201-knip-loader-config)
 - Storyboards and Scenes are **GeoJSON Features inside the (215-storyboarding-schema)
 - Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case). (228-regenerate-blog-archive)
+- Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`, (229-blog-archive-screenshot-fix-impl)
 
 ## Before Pushing
 
@@ -229,6 +230,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 229-blog-archive-screenshot-fix-impl: Added Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`,
 - 228-regenerate-blog-archive: Added Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case).
 - 206-audit-non-linkml-types: Type-declaration audit landed — `docs/type-audit-2026.md` enumerates 885 in-scope TS declarations across 317 files, classifies each into one of five E11 buckets, and opens #222–#227 for the follow-up schema-promotion work. Scanner + generator committed at `scripts/audits/type-audit/` (TypeScript compiler API + vitest fixture tests). Root devDeps added: `typescript`, `vitest`, `ajv`, `@types/node`.
-- 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,
