@@ -6,6 +6,7 @@ import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState } from './types';
 import type { PlatformRecord } from '@debrief/schemas';
+import type { LLMClient, LiveOutcome, EnumBundle } from '../nl-cql2';
 
 // --- Mock Data ---
 
@@ -564,6 +565,139 @@ export const WithSavedFilters: Story = {
     docs: {
       description: {
         story: 'FilterBar with saved filters integration. Use Save to persist and Historic Filters to restore.',
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// #191 T052 — NL mode with a deterministic stub client
+// ---------------------------------------------------------------------------
+
+const NL_STUB_ENUMS: EnumBundle = {
+  vessel_class_tree: {},
+  nationalities: ['GB', 'FR', 'DE'],
+  exercise_names: [],
+  tags: ['alpha', 'beta'],
+  feature_tags: [],
+  _meta: {
+    canonicalisation: 'storybook-stub',
+    exercise_parse_rule: 'storybook-stub',
+    generated_from_catalog: 'storybook-stub',
+    generated_from_registry: 'storybook-stub',
+    tool: 'storybook-stub',
+  },
+};
+
+/**
+ * Canned outcome map keyed by lowercased phrase substring. Any phrase
+ * matching `auth-failure` / `rate-limit` / `provider-error` / `timeout` /
+ * `malformed` / `not-configured` / `ceiling-reached` returns the matching
+ * failure outcome — exercising the banner matrix. Everything else produces
+ * a success with nationality chips derived from the phrase.
+ */
+const STUB_CANNED: Array<[string, LiveOutcome]> = [
+  ['auth-failure', { kind: 'auth-failure', providerStatus: 401, durationMs: 42 }],
+  ['rate-limit', { kind: 'rate-limit', providerStatus: 429, retryAfterSeconds: 30, durationMs: 42 }],
+  ['provider-error', { kind: 'provider-error', providerStatus: 502, durationMs: 42 }],
+  ['timeout', { kind: 'timeout', durationMs: 12000 }],
+  ['malformed', { kind: 'malformed-response', reason: 'non-json', durationMs: 42, responseBytes: 128 }],
+  ['not-configured', { kind: 'not-configured', reason: 'no-key', durationMs: 0 }],
+  ['ceiling-reached', { kind: 'ceiling-reached', ceiling: 50, durationMs: 0 }],
+];
+
+function stubSuccessForPhrase(phrase: string): LiveOutcome {
+  const lower = phrase.toLowerCase();
+  const lozenges: Array<{ filterType: string; value: string }> = [];
+  if (/\buk|british|royal navy\b/.test(lower)) {
+    lozenges.push({ filterType: 'nationality', value: 'GB' });
+  }
+  if (/french|france/.test(lower)) {
+    lozenges.push({ filterType: 'nationality', value: 'FR' });
+  }
+  if (/german|germany|bundes/.test(lower)) {
+    lozenges.push({ filterType: 'nationality', value: 'DE' });
+  }
+  if (lozenges.length === 0) {
+    lozenges.push({ filterType: 'title', value: phrase });
+  }
+  const rawResponse = JSON.stringify({ cql2: {}, lozenges, unrecognised_terms: [] });
+  return {
+    kind: 'success',
+    rawResponse,
+    durationMs: 42,
+    responseBytes: rawResponse.length,
+    model: 'claude-haiku-4-5-20251001',
+  };
+}
+
+function createStubClient(opts: { latencyMs?: number } = {}): LLMClient {
+  let aborted = false;
+  return {
+    async generate(prompt: string): Promise<LiveOutcome> {
+      aborted = false;
+      // Extract the phrase from the prompt suffix (`Phrase: …`).
+      const match = prompt.match(/Phrase:\s*(.*)$/m);
+      const phrase = match?.[1] ?? prompt;
+      const lower = phrase.toLowerCase();
+
+      // Simulate latency so supersession-style interactions are observable.
+      const delay = opts.latencyMs ?? 200;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      if (aborted) {
+        return { kind: 'transport-error', reason: 'cancelled', durationMs: delay };
+      }
+
+      for (const [key, outcome] of STUB_CANNED) {
+        if (lower.includes(key)) return outcome;
+      }
+      return stubSuccessForPhrase(phrase);
+    },
+    abort() {
+      aborted = true;
+    },
+  };
+}
+
+function NlModeWrapper(): React.ReactElement {
+  const [filteredCount, setFilteredCount] = useState(MOCK_ITEMS.length);
+  const handleFiltered = useCallback((filtered: StacBrowserItem[]) => {
+    setFilteredCount(filtered.length);
+  }, []);
+
+  // Fresh stub client per render so the story re-initialises cleanly.
+  const [client] = useState(() => createStubClient({ latencyMs: 300 }));
+
+  return (
+    <div>
+      <FilterBar
+        items={MOCK_ITEMS}
+        taxonomy={MOCK_TAXONOMY}
+        onFilteredItems={handleFiltered}
+        llmClient={client}
+        nlEnums={NL_STUB_ENUMS}
+        liveModeLabel="Live · Anthropic · claude-haiku-4-5-20251001 (stub)"
+      />
+      <div style={{ padding: '8px 12px', fontSize: '12px', color: 'var(--vscode-descriptionForeground, #666)' }}>
+        <div>Showing {filteredCount} of {MOCK_ITEMS.length} exercises</div>
+        <div style={{ marginTop: 4, opacity: 0.7 }}>
+          Try: &ldquo;UK submarines&rdquo;, &ldquo;French frigates&rdquo;,
+          &ldquo;auth-failure&rdquo;, &ldquo;timeout&rdquo;, &ldquo;rate-limit&rdquo;,
+          &ldquo;malformed&rdquo;, &ldquo;ceiling-reached&rdquo;.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const NlModeWithStubClient: Story = {
+  name: 'NL Mode — with stub client',
+  render: () => <NlModeWrapper />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'FilterBar in #191 NL mode driven by a deterministic stub LLM client. Typing a recognised phrase applies chips; typing one of the 7 failure keywords renders the matching banner. Used by the E2E suite for theme + interaction screenshots.',
       },
     },
   },

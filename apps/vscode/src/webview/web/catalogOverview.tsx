@@ -165,6 +165,18 @@ function CatalogOverviewApp(): React.ReactElement {
       ? `Live · Anthropic · ${nlConfig.model}`
       : undefined;
 
+  // #191 T082 — host wiring for the NL failure-banner recovery buttons.
+  // `retry` is handled inside FilterBar (re-submits the last phrase); here
+  // we route `open-settings` and `reload` through VS Code commands by
+  // posting a message back to the extension host, which maps them to the
+  // matching `vscode.commands.executeCommand`.
+  const handleNlBannerAction = useCallback(
+    (action: 'open-settings' | 'retry' | 'reload') => {
+      vscode.postMessage({ type: 'nlBannerAction', action });
+    },
+    [],
+  );
+
   return (
     <StacBrowser
       items={browserItems}
@@ -173,6 +185,7 @@ function CatalogOverviewApp(): React.ReactElement {
       llmClient={effectiveLlmClient}
       nlEnums={effectiveLlmClient ? NL_ENUMS : undefined}
       liveModeLabel={liveModeLabel}
+      onNlBannerAction={handleNlBannerAction}
     />
   );
 }

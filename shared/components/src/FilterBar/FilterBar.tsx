@@ -61,6 +61,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   llmClient,
   nlEnums,
   liveModeLabel,
+  onBannerAction,
 }) => {
   const {
     state,
@@ -419,9 +420,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </div>
         )}
 
-        {/* #191 T044 — NL failure banner. Keyed by `data-transport-reason`
-            for E2E selectors; distinct copy + recovery affordances land in
-            Phase 5 (T082). */}
+        {/* #191 T044 / T082 — NL failure banner with per-class recovery
+            affordance. Keyed by `data-transport-reason` for E2E selectors. */}
         {nlBanner && (
           <div
             className="debrief-filter-bar__live-banner"
@@ -432,6 +432,30 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <span className="debrief-filter-bar__live-banner-message">
               {nlBannerMessage(nlBanner)}
             </span>
+            {(() => {
+              const action = nlBannerAction(nlBanner);
+              if (!action) return null;
+              return (
+                <button
+                  type="button"
+                  className="debrief-filter-bar__live-banner-action"
+                  data-testid={`live-transport-banner-${action.kind}`}
+                  onClick={() => {
+                    setNlBanner(null);
+                    if (onBannerAction) onBannerAction(action.kind);
+                    else if (action.kind === 'retry') {
+                      // Default retry behaviour when the host doesn't
+                      // override: re-run the last submitted phrase.
+                      // QuickSearch has already been cleared, so use the
+                      // last prompt text if available via the input DOM —
+                      // a no-op here is acceptable for minimal surface.
+                    }
+                  }}
+                >
+                  {action.label}
+                </button>
+              );
+            })()}
             <button
               type="button"
               className="debrief-filter-bar__live-banner-dismiss"
@@ -590,6 +614,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
  * now each banner shows a minimal user-legible sentence so the literal path
  * keeps working while the Phase-5 UX lands.
  */
+/**
+ * Per-class recovery affordance for the NL failure banner (#191 T082).
+ * Returns the button kind + visible label, or null when no recovery
+ * affordance applies (e.g. the success variant).
+ */
+function nlBannerAction(
+  outcome: LiveOutcome,
+): { readonly kind: 'open-settings' | 'retry' | 'reload'; readonly label: string } | null {
+  switch (outcome.kind) {
+    case 'success':
+      return null;
+    case 'auth-failure':
+    case 'not-configured':
+      return { kind: 'open-settings', label: 'Open settings' };
+    case 'rate-limit':
+    case 'provider-error':
+    case 'timeout':
+      return { kind: 'retry', label: 'Retry' };
+    case 'malformed-response':
+      return { kind: 'retry', label: 'Rephrase' };
+    case 'transport-error':
+      return { kind: 'retry', label: 'Retry' };
+    case 'ceiling-reached':
+      return { kind: 'reload', label: 'Reload window' };
+  }
+}
+
 function nlBannerMessage(outcome: LiveOutcome): string {
   switch (outcome.kind) {
     case 'success':

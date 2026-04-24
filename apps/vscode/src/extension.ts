@@ -39,6 +39,7 @@ import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
+import { registerNlSearchCommands } from './commands/nlSearchCommands';
 import { StoryboardEditService } from './services/storyboardEdit';
 import { plotFromFeatures } from './services/plotFromFeatures';
 import {
@@ -773,6 +774,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     // Register activity bar restore command
     context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
+
+    // #191 T062 — NL search set/clear API key commands.
+    for (const cmd of registerNlSearchCommands(context)) {
+      context.subscriptions.push(cmd);
+    }
   } catch (err) {
     console.error('[Debrief] ActivityBarService failed:', err);
     outputChannel.appendLine(`[startup] ActivityBarService failed: ${err instanceof Error ? err.message : String(err)}`);

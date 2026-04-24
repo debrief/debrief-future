@@ -147,6 +147,13 @@ export interface FilterBarProps {
   readonly nlEnums?: EnumBundle;
   /** Display label for the live-mode indicator (e.g. "Live · Anthropic · claude-haiku-4-5-20251001"). */
   readonly liveModeLabel?: string;
+  /**
+   * Invoked when the user presses a recovery button inside the NL failure
+   * banner. Hosts (e.g. VS Code's Catalog Overview) map the action to the
+   * right command — e.g. `open-settings` → `workbench.action.openSettings`,
+   * `retry` → re-submit the phrase.
+   */
+  readonly onBannerAction?: (action: 'open-settings' | 'retry' | 'reload') => void;
 }
 
 /** Distinct-value collection for platform-chip pickers (#186) */

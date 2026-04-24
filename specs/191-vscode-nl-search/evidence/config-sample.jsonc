@@ -1,0 +1,25 @@
+// Sample VS Code `settings.json` snippet for enabling the #191 NL search
+// feature in the Catalog Overview panel. Paste the `debrief.nlSearch.*`
+// stanza into User or Workspace settings — the API key is NOT a setting;
+// provide it via the "Debrief: NL Search — Set Anthropic API Key" command
+// (the key lives in SecretStorage only, never in workspace files).
+{
+  // Opt-in toggle — default `false`. Leave off to keep today's literal
+  // QuickSearch behaviour (no network calls).
+  "debrief.nlSearch.enabled": true,
+
+  // Anthropic model ID. Change only if you have access to a different
+  // variant.
+  "debrief.nlSearch.model": "claude-haiku-4-5-20251001",
+
+  // Per-session call ceiling — prevents runaway spend. Resets on VS Code
+  // reload.
+  "debrief.nlSearch.callCeiling": 50,
+
+  // Per-call wall-clock timeout in milliseconds.
+  "debrief.nlSearch.timeoutMs": 12000,
+
+  // Defensive cap on provider response size (bytes). Responses exceeding
+  // this budget are treated as a `malformed-response` outcome.
+  "debrief.nlSearch.maxResponseBytes": 262144
+}

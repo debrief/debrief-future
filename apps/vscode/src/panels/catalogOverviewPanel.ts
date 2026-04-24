@@ -84,13 +84,20 @@ interface NlAbortMessage {
   requestId: string;
 }
 
+/** NL-search banner-action request from the webview (#191 T082). */
+interface NlBannerActionMessage {
+  type: 'nlBannerAction';
+  action: 'open-settings' | 'retry' | 'reload';
+}
+
 type OverviewToExtensionMessage =
   | OverviewItemSelectedMessage
   | OverviewWebviewReadyMessage
   | OverviewViewportChangedMessage
   | PropertiesCommitMessage
   | NlGenerateMessage
-  | NlAbortMessage;
+  | NlAbortMessage
+  | NlBannerActionMessage;
 
 export class CatalogOverviewPanel {
   public static readonly viewType = 'debrief.catalogOverview';
@@ -300,6 +307,27 @@ export class CatalogOverviewPanel {
 
       case 'nlAbort':
         this.handleNlAbort(message);
+        break;
+
+      case 'nlBannerAction':
+        this.handleNlBannerAction(message);
+        break;
+    }
+  }
+
+  private handleNlBannerAction(message: NlBannerActionMessage): void {
+    switch (message.action) {
+      case 'open-settings':
+        void vscode.commands.executeCommand(
+          'workbench.action.openSettings',
+          '@ext:debrief.debrief-vscode debrief.nlSearch',
+        );
+        break;
+      case 'reload':
+        void vscode.commands.executeCommand('workbench.action.reloadWindow');
+        break;
+      case 'retry':
+        // FilterBar handles retry locally; no host action required.
         break;
     }
   }

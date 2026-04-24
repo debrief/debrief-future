@@ -628,6 +628,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   llmClient,
   nlEnums,
   liveModeLabel,
+  onNlBannerAction,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<GoldenLayout | null>(null);
@@ -933,6 +934,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             llmClient={llmClient}
             nlEnums={nlEnums}
             liveModeLabel={liveModeLabel}
+            onBannerAction={onNlBannerAction}
           />
         </div>
         {activeFilterCount > 0 && (
