@@ -1084,6 +1084,72 @@ def rewrite_image_path(path: str, source_spec_slug: str) -> str:
     return f"/assets/images/future-debrief/{source_spec_slug}/{basename}{suffix}"
 
 
+def scan_orphans(
+    spec: SpecRecord,
+    referenced_basenames: set[str],
+    seen_resolved: set[Path],
+    *,
+    repo_root: Path,
+) -> list[OrphanImage]:
+    """Walk the spec's evidence directory for image assets not referenced
+    by its shipped-post. Dedupes via `Path.resolve()` (FR-012)."""
+    candidates: list[Path] = []
+    screenshots_dir = spec.path / "evidence" / "screenshots"
+    evidence_top = spec.path / "evidence"
+    if screenshots_dir.is_dir():
+        for pat in ("*.png", "*.gif", "*.jpg", "*.jpeg"):
+            candidates.extend(screenshots_dir.rglob(pat))
+    if evidence_top.is_dir():
+        for pat in ("*.png", "*.gif"):
+            candidates.extend(evidence_top.glob(pat))
+    out: list[OrphanImage] = []
+    for p in candidates:
+        resolved = p.resolve()
+        if resolved in seen_resolved:
+            continue
+        seen_resolved.add(resolved)
+        if p.name in referenced_basenames:
+            continue
+        try:
+            rel = p.relative_to(repo_root)
+        except ValueError:
+            rel = p
+        out.append(OrphanImage(
+            spec_key=spec.key,
+            filename=p.name,
+            relative_path=rel,
+            resolved_path=resolved,
+        ))
+    return out
+
+
+def rewrite_image_paths_in_body(body: str, source_spec_slug: str) -> str:
+    """Rewrite every `![alt](path)` and `<img src="path">` occurrence in
+    `body` to use the Jekyll absolute path. Used by `stitch_unified_post`
+    to apply FR-004 to unified posts (rollup + composite stitchers emit
+    rewritten paths directly via `harvest_image_refs`)."""
+    def _md_sub(m: re.Match[str]) -> str:
+        alt = m.group("alt")
+        path = m.group("path")
+        rewritten = rewrite_image_path(path, source_spec_slug)
+        return f"![{alt}]({rewritten})"
+
+    def _html_sub(m: re.Match[str]) -> str:
+        original = m.group(0)
+        path = m.group("path")
+        rewritten = rewrite_image_path(path, source_spec_slug)
+        # Replace the src="..." portion with the rewritten path
+        return original.replace(
+            m.group("q") + path + m.group("q"),
+            m.group("q") + rewritten + m.group("q"),
+            1,
+        )
+
+    body = _IMAGE_RE.sub(_md_sub, body)
+    body = _HTML_IMG_RE.sub(_html_sub, body)
+    return body
+
+
 def harvest_image_refs(
     body: str,
     source_spec: SpecRecord,
@@ -1157,6 +1223,8 @@ def stitch_unified_post(
     title = _building_title(spec.front_matter.title)
     shipped_body = extract_shipped_body(spec.shipped_post_path)
     merged = _merge_opener_with_shipped_body(opener, shipped_body)
+    # Spec 231 FR-004: rewrite source-relative image paths to Jekyll absolute.
+    merged = rewrite_image_paths_in_body(merged, spec.key)
     fm = _format_front_matter(
         title=title,
         date=ship_date,
@@ -1837,6 +1905,43 @@ def assert_coverage_invariant(
 # ---------------------------------------------------------------------------
 
 
+def audit_image_references(
+    *,
+    index: ArchiveIndex,
+    specs: list[SpecRecord],
+    repo_root: Path,
+) -> None:
+    """Populate index.orphans / broken_refs / malformed_refs for spec 231.
+
+    Iterates every spec: harvests refs from its shipped-post (if present),
+    records malformed + broken references, then scans evidence/ for orphan
+    images. Dedup across the whole run via `Path.resolve()` (FR-012).
+    """
+    seen_resolved: set[Path] = set()
+    for spec in specs:
+        referenced_basenames: set[str] = set()
+        if spec.shipped_post_path is not None:
+            body = extract_shipped_body(spec.shipped_post_path)
+            refs, malformed = harvest_image_refs(body, spec)
+            index.malformed_refs.extend(malformed)
+            shipped_dir = spec.shipped_post_path.parent
+            for r in refs:
+                clean = r.source_path.split("?")[0].split("#")[0]
+                referenced_basenames.add(Path(clean).name)
+                if r.source_path.startswith(("http://", "https://", "data:", "/")):
+                    continue
+                resolved = (shipped_dir / clean).resolve()
+                if not resolved.is_file():
+                    index.broken_refs.append(BrokenImageReference(
+                        spec_key=spec.key,
+                        source_path=r.source_path,
+                        alt=r.alt,
+                    ))
+        index.orphans.extend(scan_orphans(
+            spec, referenced_basenames, seen_resolved, repo_root=repo_root,
+        ))
+
+
 def serialise_archive_index(index: ArchiveIndex, *, args: CliArgs) -> str:
     lines: list[str] = []
     lines.append("# Archive Rebuild")
@@ -1920,6 +2025,85 @@ def serialise_archive_index(index: ArchiveIndex, *, args: CliArgs) -> str:
                     lines.append(f"  {detail_line}")
                 lines.append("")
 
+    # Spec 231: orphan / broken / malformed image audit surfaces.
+    # Sorted at serialisation boundary for byte-identical reproducibility
+    # (NFR-005 / Issue 3A).
+    lines.append("## Orphan Screenshots")
+    lines.append("")
+    if not index.orphans:
+        lines.append("_No orphan screenshots detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "Screenshot files present on disk but not referenced by any source "
+            "`shipped-post.md`. Maintainer may hand-embed into the generated "
+            "posts at publication time."
+        )
+        lines.append("")
+        lines.append("| Spec | File | Generated Post |")
+        lines.append("|------|------|----------------|")
+        for orphan in sorted(
+            index.orphans, key=lambda o: (o.spec_key, o.filename),
+        ):
+            target_post = _find_target_post_for_spec_key(
+                orphan.spec_key, index,
+            )
+            target = target_post or "-"
+            lines.append(
+                f"| {orphan.spec_key} | `{orphan.relative_path}` | {target} |"
+            )
+        lines.append("")
+
+    lines.append("## Broken Image References")
+    lines.append("")
+    if not index.broken_refs:
+        lines.append("_No broken references detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "Image references whose source path does not resolve to an "
+            "existing file on disk. The rewritten Jekyll path is still "
+            "emitted in the generated post — maintainer must locate the "
+            "missing asset."
+        )
+        lines.append("")
+        lines.append("| Spec | Source Path | Alt |")
+        lines.append("|------|-------------|-----|")
+        for ref in sorted(
+            index.broken_refs, key=lambda r: (r.spec_key, r.source_path),
+        ):
+            alt_safe = ref.alt.replace("|", "\\|").replace("`", "\\`")
+            path_safe = ref.source_path.replace("|", "\\|")
+            lines.append(
+                f"| {ref.spec_key} | `{path_safe}` | {alt_safe or '-'} |"
+            )
+        lines.append("")
+
+    lines.append("## Malformed Image References")
+    lines.append("")
+    if not index.malformed_refs:
+        lines.append("_No malformed references detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "`![` occurrences in source shipped-posts that did not parse "
+            "as a valid markdown image reference. Maintainer may inspect "
+            "the source line and repair the reference."
+        )
+        lines.append("")
+        lines.append("| Spec | Line | Snippet |")
+        lines.append("|------|-----:|---------|")
+        for m in sorted(
+            index.malformed_refs, key=lambda x: (x.spec_key, x.line_number),
+        ):
+            snippet_safe = (
+                m.snippet.replace("|", "\\|").replace("`", "\\`")
+            )
+            lines.append(
+                f"| {m.spec_key} | {m.line_number} | {snippet_safe} |"
+            )
+        lines.append("")
+
     lines.append("## Runbook")
     lines.append("")
     lines.append(
@@ -1943,6 +2127,22 @@ def serialise_archive_index(index: ArchiveIndex, *, args: CliArgs) -> str:
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _find_target_post_for_spec_key(
+    spec_key: str,
+    index: ArchiveIndex,
+) -> str | None:
+    """Return the generated-post path (as `Classification`-resolved) for the
+    given spec key, or None if the spec did not classify into any post."""
+    for c in index.classifications:
+        if c.spec.key != spec_key:
+            continue
+        post = _find_post_for_classification(c, index.generated_posts)
+        if post is None:
+            return None
+        return f"`specs/{post.destination.parent.parent.name}/media/{post.destination.name}`"
+    return None
 
 
 def _find_post_for_classification(
@@ -2184,6 +2384,8 @@ def main(argv: list[str] | None = None) -> int:
             index.skipped_specs = [
                 c.spec for c in classifications if c.category == "skipped"
             ]
+            # Spec 231: image audit — orphan, broken, malformed surfaces.
+            audit_image_references(index=index, specs=specs, repo_root=args.repo_root)
             for post in posts:
                 writer.stage(post.destination, post.body)
 
