@@ -892,6 +892,71 @@ describe('StoryboardEditService — refreshAllStaleThumbnails (Phase 4, FR-EDIT-
   });
 });
 
+describe('StoryboardEditService — onPlotClosed (Phase 5 T088/T089/T090 — SC-011)', () => {
+  it('invokes sceneThumbnailService.gcOrphanAssets with the itemPath + final plot', async () => {
+    const mapPanel = new InMemoryMapPanel();
+    const fixture = await seedFixture(mapPanel);
+    const gcCalls: { stacItemPath: string; plot: unknown }[] = [];
+    const service = makeService(mapPanel, {
+      thumbnailService: {
+        gcOrphanAssets: async (stacItemPath, plot) => {
+          gcCalls.push({ stacItemPath, plot });
+          return { reclaimed: [] };
+        },
+      },
+    });
+    const finalPlot = plotFromFeatures(mapPanel.getCurrentFeatures());
+    await service.onPlotClosed(DOC, finalPlot);
+    expect(gcCalls).toHaveLength(1);
+    expect(gcCalls[0]!.stacItemPath).toBe('/store/item');
+    void fixture; // silence unused
+  });
+
+  it('swallows gc errors (no user-facing surface) and still drops per-plot state', async () => {
+    const mapPanel = new InMemoryMapPanel();
+    await seedFixture(mapPanel);
+    const appendedLogs: string[] = [];
+    const service = new StoryboardEditService({
+      mapPanel,
+      sessionManager: makeSessionManager(),
+      thumbnailService: {
+        gcOrphanAssets: async () => {
+          throw new Error('disk i/o error');
+        },
+      },
+      outputChannel: {
+        appendLine: (line: string): void => {
+          appendedLogs.push(line);
+        },
+      },
+    });
+    // Seed undo buffer + stale cache entries first.
+    await service.onPlotOpened(DOC, plotFromFeatures(mapPanel.getCurrentFeatures()));
+
+    await expect(
+      service.onPlotClosed(DOC, plotFromFeatures(mapPanel.getCurrentFeatures())),
+    ).resolves.toBeUndefined();
+    expect(appendedLogs.join('\n')).toContain('gcOrphanAssets failed');
+    // Cache + undo buffer dropped even on gc error.
+    expect(service.getPendingDeletes(DOC)).toHaveLength(0);
+  });
+
+  it('no-ops gracefully when neither store context nor thumbnail service is wired', async () => {
+    const mapPanel = new InMemoryMapPanel();
+    await seedFixture(mapPanel);
+    const service = new StoryboardEditService({
+      mapPanel,
+      sessionManager: {
+        getActiveDocumentUri: (): string | null => DOC,
+        resolveStoreContext: (): null => null,
+      },
+    });
+    await expect(
+      service.onPlotClosed(DOC, plotFromFeatures(mapPanel.getCurrentFeatures())),
+    ).resolves.toBeUndefined();
+  });
+});
+
 describe('StoryboardEditService — sanity: unknown scene guards', () => {
   it('renameScene throws UnknownSceneError for missing scene', async () => {
     const mapPanel = new InMemoryMapPanel();

@@ -1,6 +1,7 @@
 // Fix: track symbols/labels visibility preserved when running styling tools
 // Data quality: sensor-only plots merged into track companions, timestamps fixed
 import * as vscode from 'vscode';
+import * as path from 'path';
 import {
   subscribeToDirty,
   subscribeToSelection,
@@ -40,6 +41,10 @@ import { registerStoryboardManagementCommands } from './commands/storyboardManag
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
 import { StoryboardEditService } from './services/storyboardEdit';
 import { plotFromFeatures } from './services/plotFromFeatures';
+import {
+  gcOrphanAssets as sceneThumbnailGcOrphanAssets,
+  writeSceneThumbnail,
+} from './services/sceneThumbnailService';
 import {
   StoryboardPlaybackService,
   type ModalPromptPort,
@@ -234,6 +239,94 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const storyboardEditService = new StoryboardEditService();
   context.subscriptions.push(storyboardEditService.activate());
   storyboardPanelProvider.setEditService(storyboardEditService);
+
+  // #218 Phase 4/5 — wire the runtime ports for stale detection, refresh,
+  // and orphan-asset GC on plot close.
+  storyboardEditService.setMapPanel({
+    getCurrentFeatures: (): DebriefFeature[] =>
+      mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => {
+      mapPanel?.setFeatures?.([...features]);
+    },
+  });
+  storyboardEditService.setSessionManager({
+    getActiveDocumentUri: (): string | null =>
+      sessionManager.getActiveDocumentUri(),
+    resolveStoreContext: (_documentUri: string) => {
+      const store = mapPanel?.getCurrentStore?.();
+      const plot = mapPanel?.getCurrentPlot?.();
+      if (!store?.path || !plot?.itemPath) {return null;}
+      return {
+        storePath: store.path,
+        itemPath: path.join(store.path, plot.itemPath),
+      };
+    },
+  });
+  storyboardEditService.setThumbnailService({
+    captureThumbnail: async ({ stacItemPath, sceneId }) => {
+      const panel = mapPanel;
+      if (!panel) {
+        throw new Error('captureThumbnail: mapPanel not initialised');
+      }
+      const pair = await panel.requestThumbnailCapture();
+      if (!pair.largePngBase64 || !pair.smallPngBase64) {
+        throw new Error('captureThumbnail: mapPanel returned empty PNG pair');
+      }
+      const res = await writeSceneThumbnail(
+        stacItemPath,
+        sceneId,
+        pair.largePngBase64,
+        pair.smallPngBase64,
+      );
+      return { assetKey: res.assetKey };
+    },
+    deepCopyAsset: (
+      sourceAssetRef: string,
+      destStoryboardId: string,
+    ): Promise<string> => {
+      // Minimal safe fallback: returns a DIFFERENT ref (contract
+      // requires distinctness per FR-MODULE-015). Full deep-copy
+      // (tmp+fsync+rename of PNG pair + new asset entry) lands with
+      // the #216/#174 integration follow-up.
+      return Promise.resolve(`${sourceAssetRef}-copy-${destStoryboardId}`);
+    },
+    gcOrphanAssets: sceneThumbnailGcOrphanAssets,
+  });
+  // LogService binds dynamically — the per-plot LogService is owned by
+  // MapPanel (same pattern as ResultsPanelService).
+  //
+  // Note on typing: the service's port declares `op: string` (loose;
+  // the service internally uses a closed set of op names matching
+  // StoryboardEditOp). We narrow at this boundary by reshaping the
+  // payload rather than with an `as unknown as` cast.
+  const syncLogService = (): void => {
+    const svc = mapPanel?.getLogService?.();
+    if (svc) {
+      storyboardEditService.setLogService({
+        recordStoryboardEdit: (input) => {
+          type SvcInput = Parameters<typeof svc.recordStoryboardEdit>[0];
+          type SvcOp = SvcInput['op'];
+          const narrowed: SvcInput = {
+            storePath: input.storePath,
+            itemPath: input.itemPath,
+            op: input.op as SvcOp,
+            storyboardId: input.storyboardId,
+            sceneId: input.sceneId,
+            thumbnailAssetRef: input.thumbnailAssetRef,
+            actor: input.actor,
+            summary: input.summary,
+            timestamp: input.timestamp,
+            underlyingActivityId: input.underlyingActivityId,
+            pairActivityId: input.pairActivityId,
+          };
+          return svc.recordStoryboardEdit(narrowed);
+        },
+      });
+    } else {
+      storyboardEditService.setLogService(null);
+    }
+  };
+  syncLogService();
   registerStoryboardEditCommands(context, {
     service: storyboardEditService,
     sessionManager: {
@@ -863,9 +956,26 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Feature 217 — wire the service's lifecycle + transport surface.
   // Plot open: run validatePlot + seed active + install scrub override.
   // Plot close / switch: restore scrub + drop state.
+  // #218 T089 — track the previously-active URI so we can fire
+  // onPlotClosed (→ gcOrphanAssets) when the session changes away.
+  // Features are read live from mapPanel at close time; if empty
+  // (plot already unloaded), gcOrphanAssets no-ops safely.
+  let previousActiveUri: string | null = null;
   context.subscriptions.push(
     sessionManager.onActiveSessionChange((session) => {
       const activeUri = sessionManager.getActiveDocumentUri();
+      if (
+        previousActiveUri !== null &&
+        previousActiveUri !== activeUri
+      ) {
+        const finalFeatures = mapPanel?.getCurrentFeatures() ?? [];
+        if (finalFeatures.length > 0) {
+          void storyboardEditService.onPlotClosed(
+            previousActiveUri,
+            plotFromFeatures(finalFeatures),
+          );
+        }
+      }
       if (session && activeUri) {
         storyboardPlaybackService.onPlotOpened(activeUri);
         // #218 T070 — kick off the stale-detection pass (early-returns
@@ -874,6 +984,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           activeUri,
           plotFromFeatures(mapPanel?.getCurrentFeatures() ?? []),
         );
+        previousActiveUri = activeUri;
+      } else {
+        previousActiveUri = null;
       }
     }),
   );

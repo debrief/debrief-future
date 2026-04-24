@@ -252,6 +252,7 @@ export function buildStoryboardEditLogEntry(
   });
   const parameters: Record<string, ParameterValue> = {
     op: param(input.op),
+    actor: param(input.actor),
     storyboardId: param(input.storyboardId),
     sceneId: param(input.sceneId),
     thumbnailAssetRef: param(input.thumbnailAssetRef),
