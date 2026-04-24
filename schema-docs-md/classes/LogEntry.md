@@ -22,6 +22,17 @@ URI: [debrief:class/LogEntry](https://debrief.info/schemas/class/LogEntry)
     click LogEntry href "../../classes/LogEntry/"
       LogEntry : activity_id
         
+      LogEntry : activity_type
+        
+          
+    
+        
+        
+        LogEntry --> "0..1" ActivityType : activity_type
+        click ActivityType href "../../enums/ActivityType/"
+    
+
+        
       LogEntry : agent
         
       LogEntry : disabled
@@ -96,6 +107,7 @@ URI: [debrief:class/LogEntry](https://debrief.info/schemas/class/LogEntry)
 | [disabled](../slots/disabled.md) | 0..1 <br/> [Boolean](../types/Boolean.md) | Whether this entry is skipped during replay | direct |
 | [rationale](../slots/rationale.md) | 0..1 <br/> [String](../types/String.md) | Free-text analyst annotation explaining the reasoning for this operation | direct |
 | [agent](../slots/agent.md) | 0..1 <br/> [String](../types/String.md) | Human actor (e | direct |
+| [activity_type](../slots/activity_type.md) | 0..1 <br/> [ActivityType](../enums/ActivityType.md) | Semantic kind of this provenance record | direct |
 
 
 
@@ -301,6 +313,19 @@ attributes:
     - LogEntry
     range: string
     required: false
+  activity_type:
+    name: activity_type
+    description: Semantic kind of this provenance record. Optional; absent records
+      are treated as `tool` by consumers. Introduced by feature 208 so future entry
+      types (manual checkpoint, standalone tune, manual rationale) can be distinguished
+      without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts`
+      `TimelineEntryKind` for the UI-side mirror.
+    from_schema: https://debrief.info/schemas/log-entry
+    rank: 1000
+    domain_of:
+    - LogEntry
+    range: ActivityType
+    required: false
 
 ```
 </details>
@@ -470,6 +495,21 @@ attributes:
     domain_of:
     - LogEntry
     range: string
+    required: false
+  activity_type:
+    name: activity_type
+    description: Semantic kind of this provenance record. Optional; absent records
+      are treated as `tool` by consumers. Introduced by feature 208 so future entry
+      types (manual checkpoint, standalone tune, manual rationale) can be distinguished
+      without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts`
+      `TimelineEntryKind` for the UI-side mirror.
+    from_schema: https://debrief.info/schemas/log-entry
+    rank: 1000
+    alias: activity_type
+    owner: LogEntry
+    domain_of:
+    - LogEntry
+    range: ActivityType
     required: false
 
 ```

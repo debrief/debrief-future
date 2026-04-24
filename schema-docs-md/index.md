@@ -173,6 +173,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | --- | --- |
 | [$schema](slots/$schema.md) | JSON Schema URI |
 | [activity_id](slots/activity_id.md) | Unique operation identifier (UUID v4) |
+| [activity_type](slots/activity_type.md) | Semantic kind of this provenance record |
 | [addressingMode](slots/addressingMode.md) | How addresses at this level are interpreted |
 | [after_leg](slots/after_leg.md) | Name of following TMA leg (DYNAMIC_INFILL) |
 | [agent](slots/agent.md) | Human actor (e |
@@ -402,6 +403,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 
 | Enumeration | Description |
 | --- | --- |
+| [ActivityType](enums/ActivityType.md) | Semantic discriminator for provenance records |
 | [AddressingMode](enums/AddressingMode.md) | How addresses in a selection path level are interpreted (Feature 053) |
 | [ArrayCentreModeEnum](enums/ArrayCentreModeEnum.md) | Array centre calculation mode for towed array sensors |
 | [CardinalDirectionEnum](enums/CardinalDirectionEnum.md) | Eight-point compass directions |
