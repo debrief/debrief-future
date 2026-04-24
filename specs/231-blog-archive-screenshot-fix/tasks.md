@@ -124,18 +124,18 @@
 
 ### Re-run & verify
 
-- [ ] T028 Re-measure source baseline before re-run: `grep -cE '!\[.*\]\(' specs/*/media/shipped-post.md | awk -F: '{s+=$2} END {print "source:", s}'` — expect ≥ 64 (baseline at 2026-04-24). Record the number for SC-001 comparison. `specs/*/media/shipped-post.md`
-- [ ] T029 Run `uv run python scripts/regenerate-blog-archive.py --force` and capture stdout + run-log output for `evidence/cli-demo.txt` (T035). Expect ≤ 60 s elapsed (NFR-001). `ARCHIVE-REBUILD.md`
-- [ ] T030 Verify SC-001 / SC-002 / SC-003 / SC-004 / SC-005 via three-explicit-globs grep bundle from research R8: count generated refs ≥ baseline, zero source-relative paths, 185 composite ≥ 16 refs, 125 rollup has 3 thumbnail refs, three new index sections present. **Use three separate globs; brace expansion silently misses `epic-rollup.md`.** `specs/*/media/ ARCHIVE-REBUILD.md`
-- [ ] T031 Verify NFR-005 reproducibility: re-run `uv run python scripts/regenerate-blog-archive.py --force` a second time; assert `git diff --name-only specs/*/media/ ARCHIVE-REBUILD.md | wc -l` is `0` (byte-identical). `specs/*/media/ ARCHIVE-REBUILD.md`
-- [ ] T032 Run `task verify` (lint + typecheck + pytest + Playwright E2E). All gates green before delete. Commit as `feat(231): re-run generator with screenshot fix` (includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md`). `specs/231-blog-archive-screenshot-fix/evidence/`
+- [x] T028 Re-measure source baseline before re-run: `grep -cE '!\[.*\]\(' specs/*/media/shipped-post.md | awk -F: '{s+=$2} END {print "source:", s}'` — expect ≥ 64 (baseline at 2026-04-24). Record the number for SC-001 comparison. `specs/*/media/shipped-post.md`
+- [x] T029 Run `uv run python scripts/regenerate-blog-archive.py --force` and capture stdout + run-log output for `evidence/cli-demo.txt` (T035). Expect ≤ 60 s elapsed (NFR-001). `ARCHIVE-REBUILD.md`
+- [x] T030 Verify SC-001 / SC-002 / SC-003 / SC-004 / SC-005 via three-explicit-globs grep bundle from research R8: count generated refs ≥ baseline, zero source-relative paths, 185 composite ≥ 16 refs, 125 rollup has 3 thumbnail refs, three new index sections present. **Use three separate globs; brace expansion silently misses `epic-rollup.md`.** `specs/*/media/ ARCHIVE-REBUILD.md`
+- [x] T031 Verify NFR-005 reproducibility: re-run `uv run python scripts/regenerate-blog-archive.py --force` a second time; assert `git diff --name-only specs/*/media/ ARCHIVE-REBUILD.md | wc -l` is `0` (byte-identical). `specs/*/media/ ARCHIVE-REBUILD.md`
+- [x] T032 Run `task verify` (lint + typecheck + pytest + Playwright E2E). All gates green before delete. Commit as `feat(231): re-run generator with screenshot fix` (includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md`). `specs/231-blog-archive-screenshot-fix/evidence/`
+- [x] T033 Capture test results using `.specify/templates/evidence/test-summary-template.md` in `specs/231-blog-archive-screenshot-fix/evidence/test-summary.md`.
+- [x] T034 [P] Create usage demonstration in `specs/231-blog-archive-screenshot-fix/evidence/usage-example.md`.
+- [x] T035 [P] Capture generator terminal session in `specs/231-blog-archive-screenshot-fix/evidence/cli-demo.txt`.
+- [x] T036 [P] Capture before/after sample in `specs/231-blog-archive-screenshot-fix/evidence/before-after-sample.md`.
 
 ### Evidence collection
 
-- [ ] T033 Capture test results using `.specify/templates/evidence/test-summary-template.md` in `specs/231-blog-archive-screenshot-fix/evidence/test-summary.md`. YAML front matter must include `feature: 231`, `captured_at` (ISO timestamp), `git_sha` (branch HEAD), `tests_passed` (expect ~93: 54 baseline + 39 new), `tests_failed: 0`, `tests_skipped: 0`, `coverage_pct` (≥ 77 % per NFR-004). Body: test counts per file, key scenarios verified (SC-001 through SC-009 mapping). `specs/231-blog-archive-screenshot-fix/evidence/test-summary.md`
-- [ ] T034 [P] Create usage demonstration in `specs/231-blog-archive-screenshot-fix/evidence/usage-example.md` — walk reader through the full revive → patch → re-run → delete cycle with commands and expected outputs. Show how a reviewer reproduces the fix locally from a fresh checkout of `main`. `specs/231-blog-archive-screenshot-fix/evidence/usage-example.md`
-- [ ] T035 [P] Capture generator terminal session in `specs/231-blog-archive-screenshot-fix/evidence/cli-demo.txt` (from T029 output). Show the summary block with post counts + run log + elapsed time. `specs/231-blog-archive-screenshot-fix/evidence/cli-demo.txt`
-- [ ] T036 [P] Capture before/after sample in `specs/231-blog-archive-screenshot-fix/evidence/before-after-sample.md`. Two excerpts: (a) `specs/185-cql2-array-filter/media/composite-post.md` before (pre-patch commit) showing 0 images vs after showing ≥ 16 images under three `#### Screenshots` blocks; (b) `specs/176-log-panel-ux/media/unified-post.md` before (3 refs with `./evidence/` paths) vs after (4 refs with Jekyll `/assets/images/future-debrief/...` paths). Use `git show HEAD~N:specs/...` for the before side. `specs/231-blog-archive-screenshot-fix/evidence/before-after-sample.md`
 
 ### Delete the generator (FR-009)
 
