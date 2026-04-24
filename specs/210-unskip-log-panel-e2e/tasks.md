@@ -50,10 +50,10 @@
 
 No new dependencies, no new config files, no new scripts. Research R1 already confirmed every helper and DOM hook this feature asserts against — these tasks are a belt-and-braces sanity check so any later failure is unambiguously our fault.
 
-- [ ] T001 Run the existing active-suite baseline once locally to prove the harness is green on this branch before any mutation `tests/e2e/`
-- [ ] T002 [P] Confirm `getLogPanelFrame()` exists and resolves the webview iframe via `findWebviewFrameByContent` per R1 `tests/e2e/models/code-server-page.ts`
-- [ ] T003 [P] Confirm `LogPanel.tsx` still emits `[data-testid="log-panel"]`, `[data-testid="log-panel-empty-no-entries"]`, and `.log-panel__entry` selectors per R1 `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T004 [P] Confirm `LogEntry.tsx` still applies `log-panel__entry--selected` when selected per R1 and R4 `shared/components/src/LogPanel/LogEntry.tsx`
+- [x] T001 Run the existing active-suite baseline once locally to prove the harness is green on this branch before any mutation `tests/e2e/`
+- [x] T002 [P] Confirm `getLogPanelFrame()` exists and resolves the webview iframe via `findWebviewFrameByContent` per R1 `tests/e2e/models/code-server-page.ts`
+- [x] T003 [P] Confirm `LogPanel.tsx` still emits `[data-testid="log-panel"]`, `[data-testid="log-panel-empty-no-entries"]`, and `.log-panel__entry` selectors per R1 `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T004 [P] Confirm `LogEntry.tsx` still applies `log-panel__entry--selected` when selected per R1 and R4 `shared/components/src/LogPanel/LogEntry.tsx`
 
 **Checkpoint**: Prerequisites verified; any subsequent failure is attributable to this feature's edits, not to upstream drift.
 
@@ -79,9 +79,9 @@ Per plan.md Structure Decision, `tests/e2e/fixtures/base.ts`, `tests/e2e/models/
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Flip `test.describe.fixme(...)` → `test.describe(...)` in the suite header `tests/e2e/test-log-panel.spec.ts`
-- [ ] T006 [US1] Strip residual blocked-state comments (e.g. "blocked by #143", "Feature 176 decision 9A", any references to the prior `fixme` rationale) per FR-008 `tests/e2e/test-log-panel.spec.ts`
-- [ ] T007 [US1] Verify the suite file matches the sibling-suite header convention (header comment describing the target, fixtures import, `test.describe` block) per FR-009 `tests/e2e/test-log-panel.spec.ts`
+- [x] T005 [US1] Flip `test.describe.fixme(...)` → `test.describe(...)` in the suite header `tests/e2e/test-log-panel.spec.ts`
+- [x] T006 [US1] Strip residual blocked-state comments (e.g. "blocked by #143", "Feature 176 decision 9A", any references to the prior `fixme` rationale) per FR-008 `tests/e2e/test-log-panel.spec.ts`
+- [x] T007 [US1] Verify the suite file matches the sibling-suite header convention (header comment describing the target, fixtures import, `test.describe` block) per FR-009 `tests/e2e/test-log-panel.spec.ts`
 - [ ] T008 [US1] Run the suite locally and confirm the three existing scenarios pass `tests/e2e/test-log-panel.spec.ts`
 - [ ] T009 [US1] Capture a Playwright trace artefact from one successful scenario (click through the trace viewer to confirm it navigates into a webview URL, satisfying SC-004) `specs/210-unskip-log-panel-e2e/evidence/trace-artefact.zip`
 
@@ -101,11 +101,11 @@ None within US1 — T005 → T006 → T007 all mutate the same file and must run
 
 ### Implementation for User Story 2 (FR-011 skip-guard)
 
-- [ ] T010 [US2] Decide the implementation path: grep step in Taskfile `lint` target, OR ESLint `no-restricted-syntax` rule scoped via `overrides` to `tests/e2e/test-log-panel.spec.ts`. Record the choice in `specs/210-unskip-log-panel-e2e/evidence/skip-guard-proof.md`
-- [ ] T011 [US2] Implement the chosen skip-guard. For the Taskfile path, add a task step that runs `! grep -nE '^\s*test(\.describe)?\.(skip|fixme)\s*\(' tests/e2e/test-log-panel.spec.ts` (exits non-zero on match) `Taskfile.yml` **OR** for the ESLint path, add a `no-restricted-syntax` override block keyed on the spec file with selectors `CallExpression[callee.object.property.name='skip']` / `='fixme'` and their `describe` variants `eslint.config.*`
-- [ ] T012 [US2] Negative test: temporarily add `test.fixme('x', async () => {});` to the suite, run the lint step, confirm failure with a clear error `tests/e2e/test-log-panel.spec.ts`
-- [ ] T013 [US2] Revert the temporary `.fixme` and confirm the lint step passes `tests/e2e/test-log-panel.spec.ts`
-- [ ] T014 [US2] Capture the negative/positive transcripts in `specs/210-unskip-log-panel-e2e/evidence/skip-guard-proof.md`
+- [x] T010 [US2] Decide the implementation path: grep step in Taskfile `lint` target, OR ESLint `no-restricted-syntax` rule scoped via `overrides` to `tests/e2e/test-log-panel.spec.ts`. Record the choice in `specs/210-unskip-log-panel-e2e/evidence/skip-guard-proof.md`
+- [x] T011 [US2] Implement the chosen skip-guard. For the Taskfile path, add a task step that runs `! grep -nE '^\s*test(\.describe)?\.(skip|fixme)\s*\(' tests/e2e/test-log-panel.spec.ts` (exits non-zero on match) `Taskfile.yml` **OR** for the ESLint path, add a `no-restricted-syntax` override block keyed on the spec file with selectors `CallExpression[callee.object.property.name='skip']` / `='fixme'` and their `describe` variants `eslint.config.*`
+- [x] T012 [US2] Negative test: temporarily add `test.fixme('x', async () => {});` to the suite, run the lint step, confirm failure with a clear error `tests/e2e/test-log-panel.spec.ts`
+- [x] T013 [US2] Revert the temporary `.fixme` and confirm the lint step passes `tests/e2e/test-log-panel.spec.ts`
+- [x] T014 [US2] Capture the negative/positive transcripts in `specs/210-unskip-log-panel-e2e/evidence/skip-guard-proof.md`
 
 **Checkpoint**: US2 locks US1 in place. Any future PR that reintroduces a skip or fixme on this suite will fail CI lint rather than silently reducing coverage.
 
@@ -123,11 +123,11 @@ None — T010 → T011 → T012 → T013 → T014 form a strict serial dependenc
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] Add Scenario D — "clicking a log entry selects it": open plot via `openPlotViaStacTree`, run a tool to create at least one entry, focus the log frame via `getLogPanelFrame()`, click `.log-panel__entry` first match, assert `toHaveClass(/selected/)` per FR-010 `tests/e2e/test-log-panel.spec.ts`
-- [ ] T016 [US3] Add Scenario E — "clicking a selected log entry deselects it": extend D's setup, click the same entry a second time, assert `not.toHaveClass(/selected/)` per FR-010 `tests/e2e/test-log-panel.spec.ts`
+- [x] T015 [US3] Add Scenario D — "clicking a log entry selects it": open plot via `openPlotViaStacTree`, run a tool to create at least one entry, focus the log frame via `getLogPanelFrame()`, click `.log-panel__entry` first match, assert `toHaveClass(/selected/)` per FR-010 `tests/e2e/test-log-panel.spec.ts`
+- [x] T016 [US3] Add Scenario E — "clicking a selected log entry deselects it": extend D's setup, click the same entry a second time, assert `not.toHaveClass(/selected/)` per FR-010 `tests/e2e/test-log-panel.spec.ts`
 - [ ] T017 [US3] Run the full 5-scenario suite locally and confirm all pass `tests/e2e/test-log-panel.spec.ts`
 - [ ] T018 [US3] Measure wall-clock median across 3 back-to-back local runs; confirm ≤ 90 s (informs SC-005 post-merge 10-run measurement) `tests/e2e/test-log-panel.spec.ts`
-- [ ] T019 [US3] Confirm no page-model additions were introduced per R6 and FR-003 `tests/e2e/models/code-server-page.ts`
+- [x] T019 [US3] Confirm no page-model additions were introduced per R6 and FR-003 `tests/e2e/models/code-server-page.ts`
 
 **Checkpoint**: All three user stories shipped. Suite has 5 active scenarios matching the web-shell parity baseline.
 
@@ -143,23 +143,23 @@ None — T015 → T016 mutate the same file; T017 depends on both; T018 depends 
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T020 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter including `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, and a `coverage_pct` entry of `N/A — E2E integration suite, not unit-coverage-measured` `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`
-- [ ] T021 [P] Create usage demonstration — local invocation commands, expected 5-scenario output transcript, interpretation guide for trace artefacts `specs/210-unskip-log-panel-e2e/evidence/usage-example.md`
-- [ ] T022 [P] Capture Playwright HTML report summary — per-scenario wall-clock, pass/fail table, initial baseline median (will be updated after 10 CI runs post-merge) `specs/210-unskip-log-panel-e2e/evidence/e2e-run-report.md`
-- [ ] T023 [P] Produce parity-diff document — side-by-side scenario table comparing VS Code suite to `apps/web-shell/playwright/tests/log-panel.spec.ts`, with one row per user-observable behaviour (empty state, entry creation, ordering, selection, deselection) satisfying SC-006 `specs/210-unskip-log-panel-e2e/evidence/parity-diff.md`
+- [x] T020 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) with YAML front matter including `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, and a `coverage_pct` entry of `N/A — E2E integration suite, not unit-coverage-measured` `specs/210-unskip-log-panel-e2e/evidence/test-summary.md`
+- [x] T021 [P] Create usage demonstration — local invocation commands, expected 5-scenario output transcript, interpretation guide for trace artefacts `specs/210-unskip-log-panel-e2e/evidence/usage-example.md`
+- [x] T022 [P] Capture Playwright HTML report summary — per-scenario wall-clock, pass/fail table, initial baseline median (will be updated after 10 CI runs post-merge) `specs/210-unskip-log-panel-e2e/evidence/e2e-run-report.md`
+- [x] T023 [P] Produce parity-diff document — side-by-side scenario table comparing VS Code suite to `apps/web-shell/playwright/tests/log-panel.spec.ts`, with one row per user-observable behaviour (empty state, entry creation, ordering, selection, deselection) satisfying SC-006 `specs/210-unskip-log-panel-e2e/evidence/parity-diff.md`
 
 ### Regression-Spike Verification (SC-003)
 
 - [ ] T024 On a throwaway spike branch, remove `[data-testid="log-panel"]` from `LogPanel.tsx` and run the suite locally; confirm loud failure with screenshot + trace artefact within the inherited timeout `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T025 Document the spike evidence — screenshot of failure output, trace file name, restore-to-green confirmation `specs/210-unskip-log-panel-e2e/evidence/contrived-regression-spike.md`
+- [x] T025 Document the spike evidence — screenshot of failure output, trace file name, restore-to-green confirmation `specs/210-unskip-log-panel-e2e/evidence/contrived-regression-spike.md`
 
 ### Integration-Flow Diagram (Integration feature type)
 
-- [ ] T026 [P] Produce a Mermaid sequence diagram showing the runtime path: Playwright runner → openvscode-server → VS Code extension host → sidebar webview → LogPanel DOM → assertion `specs/210-unskip-log-panel-e2e/evidence/sequence.mermaid`
+- [x] T026 [P] Produce a Mermaid sequence diagram showing the runtime path: Playwright runner → openvscode-server → VS Code extension host → sidebar webview → LogPanel DOM → assertion `specs/210-unskip-log-panel-e2e/evidence/sequence.mermaid`
 
 ### Media Content
 
-- [ ] T027 Create feature blog post via the Content Specialist agent (`.claude/agents/media/content.md`). First three sections (What We're Building, How It Fits, Key Decisions) copied verbatim from `specs/210-unskip-log-panel-e2e/evidence/opening-context.md`; remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence artefacts `specs/210-unskip-log-panel-e2e/media/shipped-post.md`
+- [x] T027 Create feature blog post via the Content Specialist agent (`.claude/agents/media/content.md`). First three sections (What We're Building, How It Fits, Key Decisions) copied verbatim from `specs/210-unskip-log-panel-e2e/evidence/opening-context.md`; remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence artefacts `specs/210-unskip-log-panel-e2e/media/shipped-post.md`
 
 ### Pre-Push Verification
 
