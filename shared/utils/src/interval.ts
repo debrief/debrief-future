@@ -6,14 +6,25 @@
  */
 
 import { parseDuration } from './duration.js';
+import { InvalidPointShapeError } from './errors.js';
+import { PointShapeEnum } from '@debrief/schemas';
 import type {
+  PointShape,
   PositionStyle,
   PositionStyleOverride,
   ResolvedPositionStyle,
 } from './types.js';
 
 // Re-export types for convenience
-export type { PositionStyle, PositionStyleOverride, ResolvedPositionStyle };
+export type { PointShape, PositionStyle, PositionStyleOverride, ResolvedPositionStyle };
+
+/**
+ * Cached at module load so the resolver's per-call guard (FR-015) does a
+ * constant-time Set lookup instead of building an array every invocation.
+ */
+const VALID_POINT_SHAPES: ReadonlySet<string> = new Set<string>(
+  Object.values(PointShapeEnum)
+);
 
 /**
  * Find position indices that match a time interval.
@@ -36,6 +47,14 @@ export function findIntervalPositions(
 
   if (timestamps.length === 0 || intervalMs <= 0) {
     return result;
+  }
+
+  // Always include the first and last positions so short tracks never lose
+  // their endpoints to interval-rounding gaps (the components-side resolver
+  // historically guaranteed this — FR-008 requires behaviour preservation).
+  result.add(0);
+  if (timestamps.length > 1) {
+    result.add(timestamps.length - 1);
   }
 
   const startTime = timestamps[0]!;
@@ -122,7 +141,7 @@ export function resolvePositionStyle(
   let showSymbol = defaultStyle.show_symbol;
   let symbol = defaultStyle.symbol;
   let showLabel = defaultStyle.show_label;
-  let label: string | null = null;
+  let labelText: string | null = null;
 
   // 2. Apply interval rules (intervals enable, they don't disable)
   if (symbolIntervalPositions.has(index)) {
@@ -132,33 +151,43 @@ export function resolvePositionStyle(
     showLabel = true;
   }
 
-  // 3. Apply explicit override (highest priority)
+  // 3. Apply explicit override (highest priority).
+  //    Treat `null` as "no override — use cascaded default" per FR-013 so
+  //    that e.g. `{ show_symbol: null }` preserves the default instead of
+  //    toggling the flag off.
   if (override) {
-    if (override.show_symbol !== undefined) {
+    if (override.show_symbol !== undefined && override.show_symbol !== null) {
       showSymbol = override.show_symbol;
     }
-    if (override.symbol !== undefined) {
+    if (override.symbol !== undefined && override.symbol !== null) {
+      if (!VALID_POINT_SHAPES.has(override.symbol)) {
+        throw new InvalidPointShapeError(override.symbol, [
+          ...VALID_POINT_SHAPES,
+        ]);
+      }
       symbol = override.symbol;
     }
-    if (override.show_label !== undefined) {
+    if (override.show_label !== undefined && override.show_label !== null) {
       showLabel = override.show_label;
     }
-    if (override.label !== undefined) {
-      label = override.label;
+    if (override.label !== undefined && override.label !== null) {
+      labelText = override.label;
     }
   }
 
   // 4. Default label text to formatted timestamp
-  if (showLabel && label === null) {
-    label = formatTimestampForLabel(positionTime);
+  if (showLabel && labelText === null) {
+    labelText = formatTimestampForLabel(positionTime);
   }
 
   return {
     showSymbol,
-    // T020: schema PositionStyle.symbol is `string`; cast to the renderer union
-    symbol: symbol as ResolvedPositionStyle['symbol'],
+    // schema PositionStyle.symbol is currently `string`; the guard above
+    // ensures override-sourced values are real PointShapes, and the schema
+    // fixtures + LinkML constraints ensure default-style values are too.
+    symbol: symbol as PointShape,
     showLabel,
-    label,
+    labelText,
   };
 }
 
@@ -197,7 +226,11 @@ export function computeAllPositionStyles(
   defaultStyle: PositionStyle,
   symbolInterval: string | null | undefined,
   labelInterval: string | null | undefined,
-  overrides: (PositionStyleOverride | null)[] | null | undefined
+  overrides:
+    | (PositionStyleOverride | null)[]
+    | Record<string, PositionStyleOverride>
+    | null
+    | undefined
 ): ResolvedPositionStyle[] {
   // Parse timestamps to epoch ms for interval calculations
   const timestamps = positions.map((p) => new Date(p.time).getTime());
@@ -214,9 +247,18 @@ export function computeAllPositionStyles(
     ? findIntervalPositions(timestamps, labelIntervalMs)
     : new Set<number>();
 
+  // session-state persists sparse overrides as an index-keyed object for a
+  // compact on-disk shape; schema-typed data uses the array form. Accept
+  // either and normalise per position.
+  const isArrayOverrides = Array.isArray(overrides);
+
   // Resolve style for each position
   return positions.map((pos, i) => {
-    const override = overrides && overrides[i] ? overrides[i] : null;
+    const override = isArrayOverrides
+      ? (overrides[i] ?? null)
+      : ((overrides as Record<string, PositionStyleOverride> | null | undefined)?.[
+          String(i)
+        ] ?? null);
     return resolvePositionStyle(
       i,
       defaultStyle,

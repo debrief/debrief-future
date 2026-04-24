@@ -1,0 +1,23 @@
+# Wiring-check failure transcript — spec #214
+
+Synthetic apps/tutorial-sandbox/.eslintrc.cjs added with no drift-rule spreads.
+
++ node scripts/check-eslint-drift-wiring.cjs
+---
+
+❌ ESLint drift-rule wiring check failed.
+
+The following apps/*/.eslintrc.cjs files are missing one or more drift-rule spreads:
+
+  apps/tutorial-sandbox/.eslintrc.cjs
+    Missing: ...utilsDriftRules        (expected from shared/eslint-rules/no-redeclare-utils-exports.cjs)
+    Missing: ...schemasDriftRules        (expected from shared/eslint-rules/no-redeclare-schemas-exports.cjs)
+    Missing: ...componentsDriftRules        (expected from shared/eslint-rules/no-redeclare-components-exports.cjs)
+    Missing: ...sessionStateDriftRules        (expected from shared/eslint-rules/no-redeclare-session-state-exports.cjs)
+    Missing: ...dataDriftRules        (expected from shared/eslint-rules/no-redeclare-data-exports.cjs)
+
+Fix: add the missing require(...) lines and ensure each ...<pkg>DriftRules is spread
+into the 'no-restricted-syntax' rule array. See shared/eslint-rules/ for caller modules
+(or specs/214-utils-drift-guard/contracts/rule-contract.md §3 for the exact diff shape).
+---
+exit=1

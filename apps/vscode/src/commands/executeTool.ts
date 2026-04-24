@@ -238,6 +238,7 @@ export function createExecuteToolCommand(
     for (const feature of allResultFeatures) {
       const props = feature?.properties;
       if (props !== null && typeof props === 'object') {
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
         const propsMap = props as Record<string, unknown>;
         const hasDatasets =
           Array.isArray(propsMap['__datasets']) &&

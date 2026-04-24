@@ -35,12 +35,12 @@ describe('Persistence', () => {
   describe('extractPersistentState', () => {
     it('should extract temporal state', () => {
       store.getState().setPlaybackRate(2.0);
-      store.getState().setDisplayMode('snailTrail');
+      store.getState().setDisplayMode('trail');
 
       const persistent = extractPersistentState(store);
 
       expect(persistent.temporal.playbackRate).toBe(2.0);
-      expect(persistent.temporal.displayMode).toBe('snailTrail');
+      expect(persistent.temporal.displayMode).toBe('trail');
     });
 
     it('should extract spatial state', () => {
@@ -82,7 +82,7 @@ describe('Persistence', () => {
 
     it('should include schema version', () => {
       const persistent = extractPersistentState(store);
-      expect(persistent.schemaVersion).toBe('1.0.0');
+      expect(persistent.schemaVersion).toBe('1.1.0');
     });
 
     it('should include savedAt timestamp', () => {
@@ -101,7 +101,7 @@ describe('Persistence', () => {
     it('should include version header', () => {
       const json = serializeState(store);
       const parsed = JSON.parse(json);
-      expect(parsed.version).toBe('1.0.0');
+      expect(parsed.version).toBe('1.1.0');
     });
 
     it('should include savedAt', () => {
@@ -143,7 +143,7 @@ describe('Persistence', () => {
   describe('SCHEMA_VERSIONS', () => {
     it('should expose schema versions', () => {
       expect(SCHEMA_VERSIONS).toBeDefined();
-      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.0.0');
+      expect(SCHEMA_VERSIONS.CURRENT).toBe('1.1.0');
       expect(SCHEMA_VERSIONS.MIN_SUPPORTED).toBe('1.0.0');
     });
   });
@@ -157,7 +157,7 @@ describe('Persistence round-trip', () => {
     store1.getState().setPlaybackRate(2.5);
     store1.getState().setRotation(90);
     store1.getState().setSelection(['f1'], 'f1');
-    store1.getState().setDisplayMode('snailTrail');
+    store1.getState().setDisplayMode('trail');
 
     // Serialize
     const json = serializeState(store1);
@@ -187,6 +187,144 @@ describe('Persistence round-trip', () => {
     expect(store2.getState().playbackRate).toBe(2.5);
     expect(store2.getState().rotation).toBe(90);
     expect(store2.getState().selection.featureIds).toEqual(['f1']);
-    expect(store2.getState().displayMode).toBe('snailTrail');
+    expect(store2.getState().displayMode).toBe('trail');
+  });
+});
+
+describe('Persistence loadSession — legacy tuple-form viewport (feature 203)', () => {
+  it('rehydrates version 1.0.0 tuple-form coordinates into canonical object form', async () => {
+    const { writeFile, readFile } = await import('fs/promises');
+    const legacyFile = {
+      version: '1.0.0',
+      savedAt: '2026-01-01T00:00:00.000Z',
+      temporal: {
+        currentTime: null,
+        timeRange: null,
+        timeFilter: null,
+        stepSize: { value: 1, unit: 'minute' },
+        playbackRate: 1,
+        playbackState: 'stopped',
+        displayMode: 'full',
+      },
+      spatial: {
+        viewport: {
+          coordinates: [
+            [-1, 52], // NW (tuple form — legacy)
+            [1, 52], // NE
+            [1, 51], // SE
+            [-1, 51], // SW
+          ],
+          zoom: 10,
+        },
+        rotation: 0,
+        drawingMode: null,
+        drawingPaletteIndex: 0,
+      },
+      features: {
+        featureCollectionUri: null,
+        selection: { featureIds: [], primary: undefined, timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' } },
+        hiddenFeatureIds: [],
+      },
+    };
+
+    // The mock in the outer describe replaces fs/promises. Replace the readFile
+    // mock to return our legacy payload.
+    (readFile as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      JSON.stringify(legacyFile),
+    );
+    // writeFile is mocked as a no-op already; suppress unused binding warning.
+    void writeFile;
+
+    const store = createSessionStore();
+    const { loadSession } = await import('../../src/persistence/index.js');
+    const result = await loadSession(store, '/fake/legacy.debrief.json');
+
+    expect(result.success).toBe(true);
+    const rehydrated = store.getState().viewport;
+    expect(rehydrated).not.toBeNull();
+    expect(rehydrated!.coordinates).toEqual([
+      { longitude: -1, latitude: 52 },
+      { longitude: 1, latitude: 52 },
+      { longitude: 1, latitude: 51 },
+      { longitude: -1, latitude: 51 },
+    ]);
+    expect(rehydrated!.zoom).toBe(10);
+  });
+});
+
+describe('loadSession — temporal enum validation (Feature 205 / FR-023a)', () => {
+  /**
+   * Load-boundary validation for DisplayMode and PlaybackState: legacy,
+   * unknown, or typo values MUST be rejected with a typed error, returning
+   * `LoadResult { success: false, error: ... }` — no throw (R2-1A,
+   * R2-3A). The tests assert on `result.success` + `result.error` shape
+   * only, never `rejects.toThrow`.
+   */
+  function buildValidSessionPayload(overrides: {
+    displayMode?: unknown;
+    playbackState?: unknown;
+  } = {}): Record<string, unknown> {
+    return {
+      version: '1.1.0',
+      savedAt: '2026-04-21T00:00:00.000Z',
+      temporal: {
+        currentTime: null,
+        timeRange: null,
+        timeFilter: null,
+        stepSize: { value: 1, unit: 'minute' },
+        playbackRate: 1,
+        playbackState: overrides.playbackState ?? 'stopped',
+        displayMode: overrides.displayMode ?? 'full',
+      },
+      spatial: {
+        viewport: null,
+        rotation: 0,
+        drawingMode: null,
+        drawingPaletteIndex: 0,
+      },
+      features: {
+        featureCollectionUri: null,
+        selection: { featureIds: [], primary: undefined, timestamp: { epoch: 0, iso: '1970-01-01T00:00:00.000Z' } },
+        hiddenFeatureIds: [],
+      },
+    };
+  }
+
+  async function runLoad(payload: Record<string, unknown>) {
+    const { readFile } = await import('fs/promises');
+    (readFile as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      JSON.stringify(payload),
+    );
+    const store = createSessionStore();
+    const { loadSession } = await import('../../src/persistence/index.js');
+    return loadSession(store, '/fake/session.debrief.json');
+  }
+
+  it('returns LoadResult {success:false} for legacy displayMode "snailTrail"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ displayMode: 'snailTrail' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.displayMode.*snailTrail/);
+  });
+
+  it('returns LoadResult {success:false} for legacy displayMode "normal"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ displayMode: 'normal' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.displayMode.*normal/);
+  });
+
+  it('returns LoadResult {success:false} for typo playbackState "palying"', async () => {
+    const result = await runLoad(buildValidSessionPayload({ playbackState: 'palying' }));
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/Invalid temporal\.playbackState.*palying/);
+  });
+
+  it('returns LoadResult {success:true} for every canonical permissible value', async () => {
+    for (const playbackState of ['stopped', 'playing', 'paused'] as const) {
+      for (const displayMode of ['full', 'trail'] as const) {
+        const result = await runLoad(buildValidSessionPayload({ playbackState, displayMode }));
+        expect(result.success, `playback=${playbackState} display=${displayMode}`).toBe(true);
+        expect(result.error).toBeUndefined();
+      }
+    }
   });
 });

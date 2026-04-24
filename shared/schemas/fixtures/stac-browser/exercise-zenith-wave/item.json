@@ -44,8 +44,31 @@
     "datetime": null,
     "start_datetime": "2026-11-15T22:00:00Z",
     "end_datetime": "2026-11-16T01:23:33Z",
-    "debrief:vessel_classes": [
-      "surface/warship/patrol/river"
+    "debrief:platforms": [
+      {
+        "id": "USS-FRIDTJOF-NANSEN",
+        "name": "USS Fridtjof Nansen",
+        "nationality": "US",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "SPS-SACHSEN",
+        "name": "SPS Sachsen",
+        "nationality": "ES"
+      },
+      {
+        "id": "HNLMS-COLE",
+        "name": "HNLMS Cole",
+        "nationality": "NL"
+      },
+      {
+        "id": "USS-PORTLAND",
+        "name": "USS Portland",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "NGFS",
@@ -54,17 +77,6 @@
     ],
     "debrief:feature_tags": [
       "passive-search"
-    ],
-    "debrief:track_names": [
-      "USS Fridtjof Nansen",
-      "SPS Sachsen",
-      "HNLMS Cole",
-      "USS Portland"
-    ],
-    "debrief:nationalities": [
-      "US",
-      "ES",
-      "NL"
     ]
   },
   "links": [

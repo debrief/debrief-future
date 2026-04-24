@@ -42,8 +42,31 @@
     "title": "Exercise Single Point 002",
     "description": "Single Point 002 \u2014 Arctic exercise. 4 track(s), 3 nation(s). Single-point observation, no time range.",
     "datetime": "2021-12-06T09:00:00Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia"
+    "debrief:platforms": [
+      {
+        "id": "FS-MARGOTTINI",
+        "name": "FS Margottini",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_role": "ssn",
+        "vessel_type": "virginia"
+      },
+      {
+        "id": "HMS-CARNEY",
+        "name": "HMS Carney",
+        "nationality": "SE"
+      },
+      {
+        "id": "SPS-PROVENCE",
+        "name": "SPS Provence",
+        "nationality": "ES"
+      },
+      {
+        "id": "FS-SACHSEN",
+        "name": "FS Sachsen",
+        "nationality": "FR"
+      }
     ],
     "debrief:tags": [
       "surveillance",
@@ -57,17 +80,6 @@
       "sonar-contact",
       "intercept",
       "prosecution"
-    ],
-    "debrief:track_names": [
-      "FS Margottini",
-      "HMS Carney",
-      "SPS Provence",
-      "FS Sachsen"
-    ],
-    "debrief:nationalities": [
-      "FR",
-      "SE",
-      "ES"
     ]
   },
   "links": [

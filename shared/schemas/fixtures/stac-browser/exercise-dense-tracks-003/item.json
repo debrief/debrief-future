@@ -44,9 +44,40 @@
     "datetime": null,
     "start_datetime": "2024-06-28T20:00:00Z",
     "end_datetime": "2024-06-30T11:10:28Z",
-    "debrief:vessel_classes": [
-      "surface/warship/patrol/river",
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "USS-LABOON",
+        "name": "USS Laboon",
+        "nationality": "US",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "HMS-ROOSEVELT",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "USS-KENT",
+        "name": "USS Kent",
+        "nationality": "US"
+      },
+      {
+        "id": "HMS-NYKOPING",
+        "name": "HMS Nykoping",
+        "nationality": "GB"
+      },
+      {
+        "id": "USS-LANCASTER",
+        "name": "USS Lancaster",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "MCM",
@@ -57,17 +88,6 @@
     ],
     "debrief:feature_tags": [
       "prosecution"
-    ],
-    "debrief:track_names": [
-      "USS Laboon",
-      "HMS Roosevelt",
-      "USS Kent",
-      "HMS Nykoping",
-      "USS Lancaster"
-    ],
-    "debrief:nationalities": [
-      "US",
-      "GB"
     ]
   },
   "links": [

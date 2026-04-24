@@ -1,19 +1,21 @@
 # E2E Testing Guide
 
-How to write and run end-to-end tests for Debrief features that involve UI components. Covers both **Storybook component tests** (isolated React components) and **VS Code webview tests** (full extension running in code-server).
+How to write and run end-to-end tests for Debrief features that involve UI components. Covers **Storybook component tests** (isolated React components), **web-shell workflow tests** (full extension workflows via a standalone React host — the default path for extension E2E and blog/PR screenshots), and **VS Code webview tests** (full extension running in code-server — optional, for chrome-level concerns only).
 
-## 1. Two Kinds of E2E Test
+## 1. Three Kinds of E2E Test
 
 | Kind | What It Tests | Runs In | Test Location |
 |------|--------------|---------|---------------|
 | **Storybook E2E** | Individual React components via Storybook stories | Storybook dev server (`localhost:6006`) | `shared/components/e2e/` |
-| **VS Code Webview E2E** | Full extension: webviews, commands, sidebar panels | code-server (headless VS Code) | `tests/e2e/` |
+| **Web-Shell E2E** (default for extension workflows) | Full workflows using the same shared components as the VS Code extension, hosted in a standalone React app (MapView, FilterBar, FeatureList, drawing tools, LogPanel, PropertiesPanel, GoldenLayout, etc.) | `apps/web-shell` (Vite dev server) | `apps/web-shell/playwright/tests/` |
+| **VS Code Webview E2E** (optional, chrome-level only) | Tests that genuinely require real VS Code chrome (command palette, sidebar host, notification toasts) | code-server (headless VS Code) | `tests/e2e/` |
 
 **When to use which:**
 
 - Adding or modifying a **shared component** (map, timeline, chart, feature list) → Storybook E2E
-- Adding or modifying an **extension workflow** (open file → view tracks → run tool) → VS Code Webview E2E
-- Major features often need **both**: Storybook tests for component correctness, webview tests for integration
+- Adding or modifying an **extension workflow** (open file → view tracks → run tool → edit properties) → **Web-Shell E2E**. This is also the source of record for the screenshots and GIFs that land in `specs/[feature]/evidence/screenshots/` and later in blog posts.
+- Testing behaviour that depends on the real VS Code chrome (command palette invocation, sidebar host lifecycle, native notifications) → VS Code Webview E2E. For everything else prefer web-shell — the code-server path was explored in #142, is unreliable, and is not the source of blog/PR screenshots.
+- Major features often need **both** Storybook tests (component correctness) and Web-Shell tests (workflow integration + screenshots).
 
 ## 2. Storybook E2E Tests
 
@@ -66,7 +68,90 @@ pnpm --filter @debrief/components test:e2e MyComponent
 
 The `plan-template.md` and `tasks-template.md` already include Storybook E2E sections. When `/speckit.plan` identifies UI components, it populates the "Storybook E2E Testing" table. When `/speckit.tasks` generates task lists, it includes E2E test tasks alongside implementation tasks.
 
-## 3. VS Code Webview E2E Tests
+## 3. Web-Shell E2E Tests
+
+### Overview
+
+`apps/web-shell/` is a small Vite/React app that mounts the same shared components the VS Code extension uses — MapView, FilterBar, FeatureList, drawing tools, GoldenLayout panels, LogPanel, PropertiesPanel, TimeController. Playwright drives it in a regular browser page, which avoids every class of flake we hit when driving code-server (service-worker collisions, CSP hash invalidation, `resolveWebviewView` lifecycle bugs, etc.). This is the default path for full-workflow E2E tests and is the **source of record** for the screenshots and GIFs that land in `specs/[feature]/evidence/screenshots/` and later in blog posts.
+
+### Test Layout
+
+```
+apps/web-shell/
+  playwright/
+    playwright.config.ts          # config — uses bundled chromium when CLAUDE_CODE=1
+    global-setup.ts
+    pages/
+      AnalysisPage.ts             # panels, filters, tool runs, properties form
+      CatalogPage.ts              # STAC catalog browsing
+      index.ts
+    tests/
+      properties-screenshots.spec.ts   # multi-theme + interaction GIF (reference pattern)
+      drawing.spec.ts                  # workflow interaction pattern
+      plot-load.spec.ts                # load + render pattern
+      ...
+  run-playwright.mjs              # cloud runner: extracts @sparticuz/chromium then runs tests
+```
+
+### Creating a Test
+
+Model on `properties-screenshots.spec.ts` (screenshot + GIF capture) or `drawing.spec.ts` (workflow interaction). Write evidence directly into the feature's evidence folder:
+
+```typescript
+// apps/web-shell/playwright/tests/my-workflow.spec.ts
+import { test, expect } from '@playwright/test';
+import { mkdirSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const EVIDENCE_DIR = resolve(
+  __dirname,
+  '../../../../specs/NNN-my-feature/evidence/screenshots',
+);
+mkdirSync(EVIDENCE_DIR, { recursive: true });
+
+test('captures the key workflow', async ({ page }) => {
+  await page.goto('/');
+  // ... interact using page objects from apps/web-shell/playwright/pages/
+  await page.screenshot({ path: `${EVIDENCE_DIR}/workflow-default.png` });
+});
+```
+
+Reuse page objects in `apps/web-shell/playwright/pages/` rather than re-implementing selectors — extend them with new accessors where needed.
+
+### Theme Variants
+
+For multi-theme screenshots (`component-light.png`, `component-dark.png`, `component-vscode.png`), inject a small CSS override that sets the VS Code CSS variables on `:root`. See `properties-screenshots.spec.ts`'s `applyTheme()` helper for the canonical pattern.
+
+### Interaction GIFs
+
+Enable `recordVideo` in the test's context options, drive the workflow, then convert the resulting `.webm` to `.gif` (ffmpeg). `properties-screenshots.spec.ts` shows the full pattern including the move + rename step.
+
+### Running
+
+```bash
+# Cloud session (Claude Code) — uses bundled @sparticuz/chromium
+cd apps/web-shell && node run-playwright.mjs
+
+# Single test file
+cd apps/web-shell && node run-playwright.mjs my-workflow
+
+# Local dev (macOS/Windows) — requires system Chromium
+pnpm --filter @debrief/web-shell test
+pnpm --filter @debrief/web-shell test my-workflow
+
+# With Playwright UI
+pnpm --filter @debrief/web-shell test:ui
+```
+
+### Speckit Integration
+
+`plan-template.md` and `tasks-template.md` have a "Web-Shell E2E Testing" section. When `/speckit.plan` identifies an extension workflow, it populates that table. When `/speckit.tasks` generates tasks, it emits web-shell test + screenshot-capture tasks that write directly into the feature's evidence directory.
+
+## 4. VS Code Webview E2E Tests (optional — chrome-level only)
+
+> **Status**: Explored in #142 and documented below for reference. This path is **unreliable** and is **not** the source of record for screenshots or blog media — use web-shell (§3) for workflow E2E and screenshot capture. Reach for this path only when a test must exercise real VS Code chrome that the web-shell cannot simulate (command palette, sidebar host lifecycle, native notification toasts, VSIX install flows).
 
 ### The Problem
 
@@ -223,20 +308,25 @@ npx playwright test --config tests/e2e/playwright.config.ts --trace on
 | `.provenance-source` | Provenance lineage markers | US2: Tool Execution |
 | `.notification-toast-container` | VS Code notification toasts | US3: Error Feedback |
 
-## 4. CI Configuration
+## 5. CI Configuration
 
 ### Storybook E2E in CI
 
 Already integrated in `.github/workflows/ci.yml`. The Storybook dev server starts, Playwright runs against it, and results are reported.
 
-### VS Code Webview E2E in CI
+### Web-Shell E2E in CI
 
-Runs as a separate CI job (see `specs/005-e2e-workflow-tests/plan.md`, Decision 8):
+Runs as part of the main CI pipeline — see `CLAUDE.md` "Before Pushing" for the exact step:
 
-1. Build extension VSIX
-2. Start code-server with extension sideloaded
-3. Run `patch-webview.sh`
-4. Run Playwright tests with `xvfb-run`
+```sh
+cd apps/web-shell && node run-playwright.mjs
+```
+
+The runner extracts `@sparticuz/chromium` on first run, starts the Vite dev server via Playwright's `webServer` config, then runs the suite.
+
+### VS Code Webview E2E in CI (optional)
+
+Not currently wired into the main CI gate. Historical reference: `specs/005-e2e-workflow-tests/plan.md`, Decision 8 documented a separate CI job that built the extension VSIX, started code-server with it sideloaded, ran `patch-webview.sh`, and invoked Playwright via `xvfb-run`. If you re-enable this for chrome-level tests, follow that pattern.
 
 ### Chromium in Cloud Sessions
 
@@ -249,7 +339,7 @@ npm install @sparticuz/chromium
 
 Config requires `executablePath` pointing to the extracted binary and sandbox-disable flags. See `docs/project_notes/playwright-installation-research.md` for full details.
 
-## 5. Adding E2E Tests for a New Feature (Checklist)
+## 6. Adding E2E Tests for a New Feature (Checklist)
 
 ### For a Storybook component:
 
@@ -260,7 +350,17 @@ Config requires `executablePath` pointing to the extracted binary and sandbox-di
 5. Run `pnpm --filter @debrief/components test:e2e {Component}`
 6. Capture screenshots to `specs/{feature}/evidence/screenshots/`
 
-### For a VS Code extension workflow:
+### For an extension workflow (default — web-shell):
+
+1. Identify which panels and shared components are exercised (map, filter bar, feature list, drawing, properties, log, catalog, time controller, …)
+2. Reuse/extend page objects in `apps/web-shell/playwright/pages/` (`AnalysisPage`, `CatalogPage`); add new selectors there rather than duplicating
+3. Create `apps/web-shell/playwright/tests/{workflow}.spec.ts` — model on `properties-screenshots.spec.ts` (screenshots + interaction GIF) or `drawing.spec.ts` (workflow interaction)
+4. Write screenshots and GIFs **directly** into `specs/{feature}/evidence/screenshots/` from the spec file (see `properties-screenshots.spec.ts` for the canonical path-resolution pattern)
+5. Run with `cd apps/web-shell && node run-playwright.mjs {workflow}` (cloud) or `pnpm --filter @debrief/web-shell test {workflow}` (local)
+
+### For a chrome-level VS Code webview test (optional):
+
+Only when a test genuinely requires real VS Code chrome that web-shell cannot simulate.
 
 1. Identify which webview panels are involved (editor, sidebar, or both)
 2. Add DOM selectors to the **Selectors Reference** above
@@ -268,24 +368,51 @@ Config requires `executablePath` pointing to the extracted binary and sandbox-di
 4. Create test file in `tests/e2e/test-{workflow}.spec.ts`
 5. Use `frameLocator` chaining for webview content access
 6. Run with `xvfb-run` for headed mode (required for webview iframe creation)
-7. Capture screenshots to `tests/e2e/evidence/`
+7. Capture evidence to `tests/e2e/evidence/` — but do **not** rely on this path for blog/PR screenshots; produce those via web-shell instead.
 
 ### Speckit workflow:
 
-When using `/speckit.plan`, fill in both the "Storybook E2E Testing" section (for components) and the "VS Code Webview E2E Testing" section (for extension workflows). `/speckit.tasks` will generate the corresponding test tasks automatically.
+When using `/speckit.plan`, fill in:
+- **"Storybook E2E Testing"** for isolated component tests
+- **"Web-Shell E2E Testing"** for full extension workflows and any screenshots destined for evidence/blog
 
-## 6. Troubleshooting
+`/speckit.tasks` will generate the corresponding test tasks automatically, including screenshot-capture tasks that write into the feature's evidence directory.
+
+## 7. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `#active-frame` not created | Patches not applied | Run `bash tests/e2e/scripts/patch-webview.sh` |
-| Webview loads but content is blank | `resolveWebviewView` not called | Use `webview-injector.ts` helper |
-| `vscode-resource` URLs 404 | DNS unreachable in sandbox | Add route interception (see Section 3) |
-| Chromium won't launch | Standard download blocked | Use `@sparticuz/chromium` (see Section 4) |
-| Tests pass locally, fail in CI | Missing `xvfb-run` | Wrap command: `xvfb-run --auto-servernum npx playwright test ...` |
-| Wrong sidebar frame selected | Multiple webview hosts | Use frame-finding pattern (see Section 3) |
+| Chromium won't launch | Standard download blocked | Use `@sparticuz/chromium` via `apps/web-shell/run-playwright.mjs` (see §5) |
+| Web-shell test starts but page is empty | Vite dev server not ready | Check `playwright.config.ts` `webServer` block; increase `timeout` if cold-boot is slow |
+| Screenshot written to the wrong folder | Incorrect relative path from spec file | Match the pattern in `properties-screenshots.spec.ts` — resolve against `fileURLToPath(import.meta.url)` |
+| Theme override isn't applied | VS Code CSS variables not set on `:root` | Use the `applyTheme()` helper pattern from `properties-screenshots.spec.ts` |
+| **Chrome-level only:** `#active-frame` not created | Patches not applied | Run `bash tests/e2e/scripts/patch-webview.sh` |
+| **Chrome-level only:** Webview loads but content is blank | `resolveWebviewView` not called | Use `webview-injector.ts` helper |
+| **Chrome-level only:** `vscode-resource` URLs 404 | DNS unreachable in sandbox | Add route interception (see §4) |
+| **Chrome-level only:** Tests pass locally, fail in CI | Missing `xvfb-run` | Wrap command: `xvfb-run --auto-servernum npx playwright test ...` |
+| **Chrome-level only:** Wrong sidebar frame selected | Multiple webview hosts | Use frame-finding pattern (see §4) |
 
-## 7. File Reference
+## 8. File Reference
+
+### Web-Shell E2E (default path)
+
+| File | Purpose |
+|------|---------|
+| `apps/web-shell/playwright/playwright.config.ts` | Playwright config — uses bundled chromium when `CLAUDE_CODE=1` |
+| `apps/web-shell/playwright/global-setup.ts` | Starts the Vite dev server before tests |
+| `apps/web-shell/playwright/pages/AnalysisPage.ts` | Page object for panels, filters, tool runs, properties form |
+| `apps/web-shell/playwright/pages/CatalogPage.ts` | Page object for STAC catalog browsing |
+| `apps/web-shell/playwright/tests/*.spec.ts` | Web-shell workflow E2E tests |
+| `apps/web-shell/run-playwright.mjs` | Cloud runner: extracts `@sparticuz/chromium`, then runs tests |
+
+### Storybook E2E
+
+| File | Purpose |
+|------|---------|
+| `shared/components/playwright.config.ts` | Playwright config for Storybook tests |
+| `shared/components/e2e/*.spec.ts` | Storybook component E2E tests |
+
+### VS Code Webview E2E (optional — chrome-level only)
 
 | File | Purpose |
 |------|---------|
@@ -297,9 +424,13 @@ When using `/speckit.plan`, fill in both the "Storybook E2E Testing" section (fo
 | `tests/e2e/models/code-server-page.ts` | Page object for VS Code chrome |
 | `tests/e2e/models/debrief-webview.ts` | Page object for Debrief webview content |
 | `tests/e2e/fixtures/base.ts` | Custom Playwright fixtures |
-| `shared/components/playwright.config.ts` | Playwright config for Storybook tests |
-| `shared/components/e2e/*.spec.ts` | Storybook component E2E tests |
+
+### Speckit templates and research notes
+
+| File | Purpose |
+|------|---------|
 | `.specify/templates/plan-template.md` | Plan template with E2E sections |
 | `.specify/templates/tasks-template.md` | Tasks template with E2E task patterns |
-| `docs/project_notes/webview-e2e-research.md` | Original research notes (detailed) |
+| `.specify/templates/e2e-test-template.ts` | Storybook E2E boilerplate |
+| `docs/project_notes/webview-e2e-research.md` | Original research notes on the code-server path |
 | `docs/project_notes/playwright-installation-research.md` | Chromium installation research |

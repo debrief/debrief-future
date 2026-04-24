@@ -41,35 +41,41 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks With Narrative",
     "datetime": "1970-01-03T01:34:00+00:00",
-    "description": "Saxon Warrior: Sen Tracks With Narrative — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mahan, FGS Otto Sverdrup. 6 narrative entries. Multi-national participation: DE, FR.",
+    "description": "Saxon Warrior: Sen Tracks With Narrative — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Roosevelt, USS Visby. 6 narrative entries. Multi-national participation: GB, US.",
     "start_datetime": "1970-01-03T01:34:00+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/trafalgar",
-      "surface/warship/patrol/river"
+    "debrief:platforms": [
+      {
+        "id": "Frigate",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_type": "queen-elizabeth",
+        "vessel_role": "carrier"
+      },
+      {
+        "id": "New_SSK",
+        "name": "USS Visby",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssk/type212",
+        "domain": "subsurface",
+        "vessel_type": "type212",
+        "vessel_role": "ssk"
+      }
     ],
     "debrief:tags": [
       "ASW",
+      "MCM",
+      "NGFS",
       "certification",
-      "demo",
-      "escort",
-      "missile-firing",
-      "replenishment",
+      "harbour-ops",
       "training"
     ],
     "debrief:feature_tags": [
       "datum",
-      "sonar-contact",
-      "visual-sighting",
-      "zig-zag"
-    ],
-    "debrief:track_names": [
-      "FS Mahan",
-      "FGS Otto Sverdrup"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "FR"
+      "radar-detection",
+      "towed-array"
     ]
   },
   "links": [
@@ -93,7 +99,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
+      "href": "file:///tmp/debrief-regen-4x2tftum/sen_tracks_with_narrative.dpf",
       "title": "sen_tracks_with_narrative.dpf"
     }
   ],
@@ -114,8 +120,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/sen_tracks_with_narrative.dpf",
-        "load_timestamp": "2026-03-28T13:51:04.117114Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/sen_tracks_with_narrative.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.689270Z",
         "tool_version": "0.1.0"
       }
     },

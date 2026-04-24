@@ -70,6 +70,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:category': 'reference/generation',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'addition/reference/generated_points',
+    'debrief:uiCategory': 'calc',
   },
 };
 

@@ -297,4 +297,115 @@ describe('createLogService', () => {
       expect(wgb.tool).toBe('debrief.fileSave');
     });
   });
+
+  describe('recordStoryboardEdit (Feature: 218)', () => {
+    const baseInput = {
+      storePath: '/store',
+      itemPath: 'item.json',
+      storyboardId: 'sb-1',
+      sceneId: 'scene-a',
+      thumbnailAssetRef: 'scene-thumbnail-scene-a',
+      actor: 'alice',
+      summary: 'rename scene "Old" → "New"',
+      timestamp: '2026-04-24T12:00:00Z',
+      underlyingActivityId: 'underlying-1',
+      pairActivityId: null,
+    } as const;
+
+    it("produces a LogEntry tagged with the storyboard-edit sentinel", async () => {
+      const deps = createMockDeps({
+        loadGeoJson: vi.fn().mockResolvedValue({
+          features: [
+            { type: 'Feature', id: 'scene-a', properties: { provenance: [] } },
+          ],
+        }),
+      });
+      const service = createLogService(deps);
+      const result = await service.recordStoryboardEdit({ ...baseInput, op: 'rename' });
+
+      expect(result.activity_id).not.toBe('');
+      const call = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls[0];
+      const provArg = call![2] as Array<{ entry: Record<string, unknown> }>;
+      const wgb = provArg[0]!.entry.was_generated_by as Record<string, unknown>;
+      expect(wgb.tool).toBe('debrief.storyboardEdit');
+      const params = wgb.parameters as Record<string, { value: unknown }>;
+      expect(params.op?.value).toBe('rename');
+      expect(params.sceneId?.value).toBe('scene-a');
+      expect(params.storyboardId?.value).toBe('sb-1');
+      expect(params.underlyingActivityId?.value).toBe('underlying-1');
+      expect(params.pairActivityId?.value).toBeNull();
+    });
+
+    it('returns { activity_id: "" } (skipped) when loadGeoJson returns null (FR-EDIT-021)', async () => {
+      const deps = createMockDeps({
+        loadGeoJson: vi.fn().mockResolvedValue(null),
+      });
+      const service = createLogService(deps);
+      const result = await service.recordStoryboardEdit({ ...baseInput, op: 'rename' });
+      expect(result.activity_id).toBe('');
+      expect(deps.appendProvenance).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      'create', 'rename', 'describe', 'delete', 'restore', 'update-to-current',
+      'duplicate', 'copy-in', 'copy-out', 'refresh-thumbnail', 'refresh-all-stale',
+      'insert-middle',
+    ] as const)('parametrised: op=%s round-trips through the recorder', async (op) => {
+      const deps = createMockDeps({
+        loadGeoJson: vi.fn().mockResolvedValue({
+          features: [
+            { type: 'Feature', id: 'scene-a', properties: { provenance: [] } },
+          ],
+        }),
+      });
+      const service = createLogService(deps);
+      const result = await service.recordStoryboardEdit({ ...baseInput, op });
+      expect(result.activity_id).not.toBe('');
+      const call = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls[0];
+      const provArg = call![2] as Array<{ entry: Record<string, unknown> }>;
+      const params = (provArg[0]!.entry.was_generated_by as Record<string, unknown>).parameters as Record<string, { value: unknown }>;
+      expect(params.op?.value).toBe(op);
+    });
+
+    it('carries pairActivityId for paired copy-out / copy-in entries (review 3A)', async () => {
+      const deps = createMockDeps({
+        loadGeoJson: vi.fn().mockResolvedValue({
+          features: [
+            { type: 'Feature', id: 'scene-a', properties: { provenance: [] } },
+            { type: 'Feature', id: 'scene-b', properties: { provenance: [] } },
+          ],
+        }),
+      });
+      const service = createLogService(deps);
+      const PAIR = 'pair-uuid-123';
+      await service.recordStoryboardEdit({ ...baseInput, op: 'copy-out', pairActivityId: PAIR });
+      await service.recordStoryboardEdit({ ...baseInput, op: 'copy-in', sceneId: 'scene-b', pairActivityId: PAIR });
+      const calls = (deps.appendProvenance as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+      expect(calls).toHaveLength(2);
+      const getPair = (c: unknown[]): unknown => {
+        const arg = c[2] as Array<{ entry: Record<string, unknown> }>;
+        const wgb = arg[0]!.entry.was_generated_by as Record<string, unknown>;
+        const p = wgb.parameters as Record<string, { value: unknown }>;
+        return p.pairActivityId?.value;
+      };
+      expect(getPair(calls[0]!)).toBe(PAIR);
+      expect(getPair(calls[1]!)).toBe(PAIR);
+    });
+
+    it('propagates errors from appendProvenance to the caller', async () => {
+      const err = new Error('disk full');
+      const deps = createMockDeps({
+        appendProvenance: vi.fn().mockRejectedValue(err),
+        loadGeoJson: vi.fn().mockResolvedValue({
+          features: [
+            { type: 'Feature', id: 'scene-a', properties: { provenance: [] } },
+          ],
+        }),
+      });
+      const service = createLogService(deps);
+      await expect(
+        service.recordStoryboardEdit({ ...baseInput, op: 'rename' }),
+      ).rejects.toBe(err);
+    });
+  });
 });

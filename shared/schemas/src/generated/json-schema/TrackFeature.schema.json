@@ -50,6 +50,16 @@
   "title": "TrackFeature",
   "type": "object",
   "$defs": {
+    "ActivityType": {
+      "description": "Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.",
+      "enum": [
+        "snapshot",
+        "tool",
+        "tune"
+      ],
+      "title": "ActivityType",
+      "type": "string"
+    },
     "ArrayCentreModeEnum": {
       "description": "Array centre calculation mode for towed array sensors",
       "enum": [
@@ -75,7 +85,9 @@
         "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON",
-        "SYSTEM_RECORD"
+        "SYSTEM_RECORD",
+        "STORYBOARD",
+        "STORYBOARD_SCENE"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -279,6 +291,17 @@
         "activity_id": {
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
+        },
+        "activity_type": {
+          "$ref": "#/$defs/ActivityType",
+          "description": "Semantic kind of this provenance record. Optional; absent records are treated as `tool` by consumers. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts` `TimelineEntryKind` for the UI-side mirror."
+        },
+        "agent": {
+          "description": "Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "disabled": {
           "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
@@ -1085,6 +1108,17 @@
           "$ref": "#/$defs/PositionStyle",
           "description": "Default styling applied to all positions"
         },
+        "display_name": {
+          "description": "Human-readable platform display name override. When set, overrides the registry-derived name for this track.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "domain": {
+          "$ref": "#/$defs/VesselDomainEnum",
+          "description": "Vessel domain override. When set, overrides the registry-derived domain."
+        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -1098,6 +1132,14 @@
         "label_interval": {
           "description": "ISO 8601 duration for interval-based label display. Null means no interval-based labels.",
           "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nationality": {
+          "description": "ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality.",
+          "pattern": "^[A-Z]{2}$",
           "type": [
             "string",
             "null"
@@ -1209,6 +1251,30 @@
             "array",
             "null"
           ]
+        },
+        "vessel_class": {
+          "description": "Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path.",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_role": {
+          "description": "Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_type": {
+          "description": "Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1285,6 +1351,16 @@
       ],
       "title": "TuneAnnotation",
       "type": "object"
+    },
+    "VesselDomainEnum": {
+      "description": "Top-level vessel domain classification",
+      "enum": [
+        "surface",
+        "subsurface",
+        "unknown"
+      ],
+      "title": "VesselDomainEnum",
+      "type": "string"
     },
     "WasGeneratedBy": {
       "additionalProperties": false,

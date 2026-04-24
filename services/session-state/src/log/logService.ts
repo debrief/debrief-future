@@ -11,6 +11,7 @@ import type {
   LogEntry,
   LogService,
   RecordResult,
+  RecordStoryboardEditInput,
   TimelineOptions,
   ToolResultForLog,
   ExpandedToolResultFields,
@@ -26,6 +27,7 @@ import type {
 import { FILE_SAVE_TOOL_SENTINEL } from './types.js';
 import {
   buildLogEntry,
+  buildStoryboardEditLogEntry,
   extractActivityIdFromOutputFeatures,
   generateActivityId,
 } from './entryBuilder.js';
@@ -319,6 +321,78 @@ export function createLogService(deps: LogServiceDeps): LogService {
       deps.markDirty();
 
       return { activity_id };
+    },
+
+    /**
+     * Record a StoryboardEditEvent on the analysis log (Feature 218).
+     *
+     * Attaches the LogEntry to the affected Scene's provenance (for
+     * Scene-level ops) or the Storyboard's (for Storyboard-level ops),
+     * falling back to the first feature in the collection if neither
+     * carrier is available (e.g., after a cascade-delete removed both).
+     *
+     * Degraded path (FR-EDIT-021): returns `{ activity_id: '' }` without
+     * throwing when the plot cannot be loaded — the storyboard-edit is
+     * already durable in the Feature's `provenance[]` via #215.
+     */
+    async recordStoryboardEdit(
+      input: RecordStoryboardEditInput
+    ): Promise<{ activity_id: string }> {
+      const fc = await deps.loadGeoJson(input.storePath, input.itemPath);
+      if (!fc) {
+        // Not initialised for this plot — skip silently per FR-EDIT-021.
+        return { activity_id: '' };
+      }
+
+      const entry = buildStoryboardEditLogEntry(input);
+
+      // Attach to the affected Scene (if still present), else the
+      // Storyboard, else the first feature as a last-resort carrier
+      // (mirrors recordFileSaved's fallback).
+      const carrierIds: string[] = [];
+      for (const feature of fc.features) {
+        const props = feature.properties as Record<string, unknown> | null;
+        if (!props) continue;
+        const fid = feature.id ?? props['id'] ?? props['feature_id'];
+        if (fid === undefined || fid === null) continue;
+        const fidStr = String(fid);
+        if (input.sceneId !== null && fidStr === input.sceneId) {
+          carrierIds.push(fidStr);
+          break;
+        }
+        if (input.sceneId === null && fidStr === input.storyboardId) {
+          carrierIds.push(fidStr);
+          break;
+        }
+      }
+
+      if (carrierIds.length === 0) {
+        const first = fc.features[0];
+        if (first) {
+          const props = first.properties as Record<string, unknown> | null;
+          const fid = first.id ?? props?.['id'] ?? props?.['feature_id'];
+          if (fid !== undefined && fid !== null) {
+            carrierIds.push(String(fid));
+          }
+        }
+      }
+
+      if (carrierIds.length === 0) {
+        // Plot with no features — nothing to carry the entry on.
+        return { activity_id: '' };
+      }
+
+      const provenance: FeatureProvenance[] = carrierIds.map(
+        (feature_id) => ({
+          feature_id,
+          entry: entry as unknown as Record<string, unknown>,
+        })
+      );
+
+      await deps.appendProvenance(input.storePath, input.itemPath, provenance);
+      deps.markDirty();
+
+      return { activity_id: entry.activity_id };
     },
 
     async getTimeline(

@@ -6,7 +6,13 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 from debrief_calc.tools.sensor.detection.sensor_model import (
     DefaultSensorModel,
@@ -265,6 +271,7 @@ ZONE_STYLES: list[dict[str, Any]] = [
     input_kinds=["TRACK"],
     output_kind="addition/feature",
     context_type=ContextType.SINGLE,
+    category=ToolCategoryEnum.calc,
     parameters=[
         ToolParameter(
             name="interval",

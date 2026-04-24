@@ -9,7 +9,7 @@
  */
 
 import React, { useMemo } from 'react';
-import type { LogByFeatureProps } from './types';
+import type { LogPanelProps } from './types';
 import { LogEntry } from './LogEntry';
 import { groupEntriesByFeature } from './utils';
 
@@ -18,6 +18,7 @@ export function LogByFeature({
   featureNames,
   viewMode,
   selectedEntryId,
+  toolCategories,
   onEntryClick,
   onTuneClick,
   onRestoreClick,
@@ -34,7 +35,7 @@ export function LogByFeature({
   onRationaleChange,
   onRetrySchema,
   className,
-}: LogByFeatureProps): React.ReactElement {
+}: LogPanelProps): React.ReactElement {
   const groups = useMemo(
     () => groupEntriesByFeature(entries, featureNames),
     [entries, featureNames]
@@ -67,6 +68,7 @@ export function LogByFeature({
               featureNames={featureNames}
               viewMode={viewMode}
               isSelected={entry.activity_id === selectedEntryId}
+              toolCategories={toolCategories}
               onClick={onEntryClick}
               onTuneClick={onTuneClick}
               onRestoreClick={onRestoreClick}

@@ -1,5 +1,27 @@
 {
   "$defs": {
+    "ActivityType": {
+      "description": "Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.",
+      "enum": [
+        "snapshot",
+        "tool",
+        "tune"
+      ],
+      "title": "ActivityType",
+      "type": "string"
+    },
+    "Any": {
+      "additionalProperties": true,
+      "description": "Permissive wildcard class used for free-form JSON object ranges (e.g., RawGeoJSONFeature.properties). Maps to dict[str, object] in Pydantic and Record<string, unknown> in TypeScript after generator post-processing. This is the LinkML idiom for RFC 7946 \u00a73.2 free-form properties and is NOT a violation of Article XV \u2014 see docs/project_notes/decisions.md (RawGeoJSONFeature ADR).",
+      "title": "Any",
+      "type": [
+        "null",
+        "boolean",
+        "object",
+        "number",
+        "string"
+      ]
+    },
     "ArrayCentreModeEnum": {
       "description": "Array centre calculation mode for towed array sensors",
       "enum": [
@@ -374,7 +396,9 @@
         "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON",
-        "SYSTEM_RECORD"
+        "SYSTEM_RECORD",
+        "STORYBOARD",
+        "STORYBOARD_SCENE"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -883,6 +907,17 @@
         "activity_id": {
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
+        },
+        "activity_type": {
+          "$ref": "#/$defs/ActivityType",
+          "description": "Semantic kind of this provenance record. Optional; absent records are treated as `tool` by consumers. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts` `TimelineEntryKind` for the UI-side mirror."
+        },
+        "agent": {
+          "description": "Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "disabled": {
           "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
@@ -1417,6 +1452,64 @@
       "title": "ParameterValue",
       "type": "object"
     },
+    "PlatformRecord": {
+      "additionalProperties": false,
+      "description": "Fully-resolved metadata for a single platform within a STAC item. Produced by save-time resolution merging registry lookups with analyst overrides. Only id is required; all other fields may be absent for unregistered platforms.",
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/VesselDomainEnum",
+          "description": "Top-level vessel domain classification"
+        },
+        "id": {
+          "description": "Platform identifier (e.g., \"NELSON\"). Matches platform_id on TrackProperties.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable platform name (e.g., \"HMS Nelson\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nationality": {
+          "description": "ISO 3166-1 alpha-2 country code (e.g., GB, US)",
+          "pattern": "^[A-Z]{2}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_class": {
+          "description": "Full vessel classification path using slash-separated notation (e.g., surface/warship/frigate/type23).\n",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_role": {
+          "description": "Vessel role \u2014 parent of leaf in classification path (e.g., frigate)",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_type": {
+          "description": "Vessel type \u2014 leaf of classification path (e.g., type23)",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "PlatformRecord",
+      "type": "object"
+    },
     "PlotSummary": {
       "additionalProperties": false,
       "description": "Projection of a STAC Item for UI consumption (e.g., browser tree rows). Carries only the fields required for listing and opening a plot, derived from the STAC Item plus its debrief: extension properties. Replaces the Plot interface from apps/vscode/src/types/plot.ts as the canonical summary type.",
@@ -1864,6 +1957,165 @@
       "title": "PositionStyleOverride",
       "type": "object"
     },
+    "PropertiesProvenanceEntry": {
+      "additionalProperties": false,
+      "description": "Single entry in item.properties[\"debrief:provenance_log\"] recording one Properties Panel commit. Appended by stacService.updateItemMetadata (single writer \u2014 Article IV.2). Immutable once written (Article III.3); archive rotation preserves entries by moving to a sibling provenance_log_archive.jsonl \u2014 entries are never mutated or deleted in place.",
+      "properties": {
+        "activity_id": {
+          "description": "ULID generated by the service writer at commit time. Monotonic sort key for replay, undo, and LogPanel cross-referencing.\n",
+          "type": "string"
+        },
+        "fields": {
+          "description": "Non-empty list of field names touched in this commit. Sorted alphabetically for deterministic replay.\n",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "method": {
+          "description": "Versioned method identifier matching ^properties-panel@.+$, populated from the @debrief/components package.json version.\n",
+          "pattern": "^properties-panel@.+$",
+          "type": "string"
+        },
+        "source": {
+          "description": "Origin of the edit. MUST equal \"user\" \u2014 Properties Panel edits are human-initiated.\n",
+          "pattern": "^user$",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "ISO-8601 UTC timestamp set by the service at write time.",
+          "type": "string"
+        },
+        "tool": {
+          "description": "Sentinel identifying the Properties Panel as the writer. MUST equal \"debrief.propertiesPanel\".\n",
+          "pattern": "^debrief\\.propertiesPanel$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "activity_id",
+        "timestamp",
+        "tool",
+        "method",
+        "fields",
+        "source"
+      ],
+      "title": "PropertiesProvenanceEntry",
+      "type": "object"
+    },
+    "RawGeoJSONFeature": {
+      "additionalProperties": false,
+      "description": "Parse-boundary GeoJSON Feature (RFC 7946 \u00a73.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED \u2014 callers handling possibly-null geometry payloads (e.g. NarrativeEntry features) either narrow at the parse boundary or defer to the domain-specific feature class that allows the looser shape (see ADR-021 for the ingress-coercion deferral).",
+      "properties": {
+        "bbox": {
+          "description": "Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6).",
+          "items": {
+            "type": "number"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "geometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoJSONPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONEmptyPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONLineString"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONPolygon"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiLineString"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiPolygon"
+            }
+          ],
+          "description": "GeoJSON geometry \u2014 any_of union over the seven existing geometry classes in geojson.yaml (GeoJSONPoint, GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONPolygon, GeoJSONMultiPoint, GeoJSONMultiLineString, GeoJSONMultiPolygon). Pydantic validates via try-each-alternative; observed cost is ~25\u00b5s per feature (10 000 features in ~250ms)."
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion."
+        },
+        "properties": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 \u00a73.2."
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON object type \u2014 always \"Feature\".",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "geometry"
+      ],
+      "title": "RawGeoJSONFeature",
+      "type": "object"
+    },
+    "RawGeoJSONFeatureCollection": {
+      "additionalProperties": false,
+      "description": "Parse-boundary GeoJSON FeatureCollection (RFC 7946 \u00a73.3). Used by STAC item payloads and tool-result layers before narrowing.",
+      "properties": {
+        "bbox": {
+          "description": "Optional bounding box, shaped as in RawGeoJSONFeature.bbox.",
+          "items": {
+            "type": "number"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "features": {
+          "description": "The collection's features, in document order.",
+          "items": {
+            "$ref": "#/$defs/RawGeoJSONFeature"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "FeatureCollection",
+          "description": "GeoJSON object type \u2014 always \"FeatureCollection\".",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "features"
+      ],
+      "title": "RawGeoJSONFeatureCollection",
+      "type": "object"
+    },
     "RectangleAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).",
@@ -2124,6 +2376,140 @@
         "path"
       ],
       "title": "ResultTypePath",
+      "type": "object"
+    },
+    "SceneFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature representing a Scene child entity",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Polygon covering the map viewport bounds at capture time. Antimeridian-crossing viewports produce a best-effort Polygon in MVP (module logs a warning; does not throw)."
+        },
+        "id": {
+          "description": "Stable identifier (equal to properties.id). ULID.",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/SceneProperties",
+          "description": "Scene properties"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "SceneFeature",
+      "type": "object"
+    },
+    "SceneProperties": {
+      "additionalProperties": false,
+      "description": "Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard \u2014 viewport, timestamp, and per-feature visibility.",
+      "properties": {
+        "description": {
+          "description": "Markdown per-scene narrative",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feature_set_hash": {
+          "description": "SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.",
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "id": {
+          "description": "ULID (26 chars, Crockford base-32). Immutable after create.",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "STORYBOARD_SCENE",
+          "description": "Feature kind discriminator (pinned to STORYBOARD_SCENE)"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "storyboard_id": {
+          "description": "Foreign key to parent Storyboard.properties.id (ULID).",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "thumbnail_asset_ref": {
+          "description": "STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers.",
+          "type": "string"
+        },
+        "time_range": {
+          "description": "Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timestamp": {
+          "description": "ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "title": {
+          "description": "Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure.",
+          "type": "string"
+        },
+        "transition_duration_ms": {
+          "description": "Playback transition duration in milliseconds. Default 500.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "viewport": {
+          "$ref": "#/$defs/Viewport",
+          "description": "Map viewport camera state at capture time"
+        },
+        "visible_feature_ids": {
+          "description": "Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "storyboard_id",
+        "title",
+        "viewport",
+        "timestamp",
+        "visible_feature_ids",
+        "feature_set_hash",
+        "thumbnail_asset_ref",
+        "transition_duration_ms"
+      ],
+      "title": "SceneProperties",
       "type": "object"
     },
     "SegmentMetadata": {
@@ -2567,11 +2953,30 @@
             "null"
           ]
         },
-        "nationalities": {
-          "description": "Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.\n",
+        "overrides": {
+          "description": "Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.\n",
           "items": {
-            "pattern": "^[A-Z]{2}$",
             "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "platforms": {
+          "description": "Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.\n",
+          "items": {
+            "$ref": "#/$defs/PlatformRecord"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "provenance_log": {
+          "description": "Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 \u2014 audit trail immutable).\n",
+          "items": {
+            "$ref": "#/$defs/PropertiesProvenanceEntry"
           },
           "type": [
             "array",
@@ -2581,27 +2986,6 @@
         "tags": {
           "description": "Plot-level tags \u2014 free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.\n",
           "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "track_names": {
-          "description": "Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "vessel_classes": {
-          "description": "Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).\n",
-          "items": {
-            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
             "type": "string"
           },
           "type": [
@@ -2665,10 +3049,10 @@
           "description": "Path to item.json relative to store root",
           "type": "string"
         },
-        "nationalities": {
-          "description": "ISO 3166-1 alpha-2 nationality codes from debrief:nationalities\n",
+        "platforms": {
+          "description": "Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.\n",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/PlatformRecord"
           },
           "type": [
             "array",
@@ -2699,26 +3083,6 @@
         "title": {
           "description": "Item title",
           "type": "string"
-        },
-        "track_names": {
-          "description": "Track platform names from debrief:track_names",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "vessel_classes": {
-          "description": "Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
         }
       },
       "required": [
@@ -2729,6 +3093,97 @@
         "store_id"
       ],
       "title": "StacItemSummary",
+      "type": "object"
+    },
+    "StoryboardFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature representing a Storyboard parent entity",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Polygon hull covering the union of child Scene viewport bounds. Recomputed whenever the Scene set changes."
+        },
+        "id": {
+          "description": "Stable identifier (equal to properties.id). ULID.",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/StoryboardProperties",
+          "description": "Storyboard properties"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "StoryboardFeature",
+      "type": "object"
+    },
+    "StoryboardProperties": {
+      "additionalProperties": false,
+      "description": "Properties class for a Storyboard parent Feature. A Storyboard is a named, ordered collection of Scenes attached to a single plot.",
+      "properties": {
+        "description": {
+          "description": "Markdown narrative description",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "ULID (26 chars, Crockford base-32). Immutable after create.",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "STORYBOARD",
+          "description": "Feature kind discriminator (pinned to STORYBOARD)"
+        },
+        "name": {
+          "description": "Display title. Non-empty. Unique within plot FeatureCollection.",
+          "type": "string"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "schema_version": {
+          "description": "Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations.",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "name",
+        "schema_version"
+      ],
+      "title": "StoryboardProperties",
       "type": "object"
     },
     "SystemRecordProperties": {
@@ -3172,6 +3627,10 @@
       "additionalProperties": false,
       "description": "An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.",
       "properties": {
+        "category": {
+          "$ref": "#/$defs/ToolCategoryEnum",
+          "description": "Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey \"Other\" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md \u00a7R5). Feature 207."
+        },
         "description": {
           "description": "Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.",
           "type": [
@@ -3211,6 +3670,18 @@
       ],
       "title": "Tool",
       "type": "object"
+    },
+    "ToolCategoryEnum": {
+      "description": "Visual category for Log Panel icon rendering. Declared by the tool at registration; consumed by frontends to colour tool-icon glyphs. See docs/log-panel-ux-srd.md \u00a75.\nThis enum defines only the declarable values. The neutral-grey \"unknown\" state shown by the Log Panel when a tool has no declared category is NOT a value of this enum \u2014 it is a rendering-layer fallback produced when the attribute is null or absent.",
+      "enum": [
+        "import",
+        "style",
+        "calc",
+        "filter",
+        "snapshot"
+      ],
+      "title": "ToolCategoryEnum",
+      "type": "string"
     },
     "ToolParameter": {
       "additionalProperties": false,
@@ -3361,6 +3832,17 @@
           "$ref": "#/$defs/PositionStyle",
           "description": "Default styling applied to all positions"
         },
+        "display_name": {
+          "description": "Human-readable platform display name override. When set, overrides the registry-derived name for this track.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "domain": {
+          "$ref": "#/$defs/VesselDomainEnum",
+          "description": "Vessel domain override. When set, overrides the registry-derived domain."
+        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -3374,6 +3856,14 @@
         "label_interval": {
           "description": "ISO 8601 duration for interval-based label display. Null means no interval-based labels.",
           "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nationality": {
+          "description": "ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality.",
+          "pattern": "^[A-Z]{2}$",
           "type": [
             "string",
             "null"
@@ -3483,6 +3973,30 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "vessel_class": {
+          "description": "Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path.",
+          "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_role": {
+          "description": "Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vessel_type": {
+          "description": "Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type.",
+          "pattern": "^[a-z0-9-]+$",
+          "type": [
+            "string",
             "null"
           ]
         }
@@ -3680,6 +4194,38 @@
       ],
       "title": "VesselDomainEnum",
       "type": "string"
+    },
+    "Viewport": {
+      "additionalProperties": false,
+      "description": "Camera state sub-record inside a Scene. Captures the map viewport at capture time.",
+      "properties": {
+        "bearing": {
+          "description": "Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports).",
+          "maximum": 0,
+          "minimum": 0,
+          "type": "number"
+        },
+        "center": {
+          "description": "[longitude, latitude] in degrees",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "zoom": {
+          "description": "Leaflet-compatible zoom level",
+          "type": "number"
+        }
+      },
+      "required": [
+        "center",
+        "zoom",
+        "bearing"
+      ],
+      "title": "Viewport",
+      "type": "object"
     },
     "WasGeneratedBy": {
       "additionalProperties": false,

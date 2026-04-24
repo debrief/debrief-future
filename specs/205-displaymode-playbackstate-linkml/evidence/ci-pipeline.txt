@@ -1,0 +1,48 @@
+=== Step 1: Python lint ===
+warning: The following rules have been removed and ignoring them has no effect:
+    - ANN101
+    - ANN102
+
+All checks passed!
+✅ No local GeoJSONFeature definitions found (regression guard passed)
+✅ No hand-typed DisplayMode/PlaybackState or legacy translators found (regression guard passed)
+✅ All LinkML ADR references resolve (regression guard passed)
+c:\git\debrief-future\services\stac\tests\test_catalog.py
+  c:\git\debrief-future\services\stac\tests\test_catalog.py:97:28 - error: "geteuid" is not a known attribute of module "os" (reportAttributeAccessIssue)
+1 error, 0 warnings, 0 informations
+=== Step 4: TypeScript typecheck ===
+apps/nl-demo typecheck$ echo 'no typecheck configured for nl-demo (Babel-standalone runtime JSX)'
+apps/web-shell typecheck$ tsc --noEmit
+apps/nl-demo typecheck: 'no typecheck configured for nl-demo (Babel-standalone runtime JSX)'
+apps/nl-demo typecheck: Done
+apps/web-shell typecheck: Done
+=== Step 5: TypeScript lint ===
+shared/components lint: ✖ 69 problems (0 errors, 69 warnings)
+=== Step 6: Python tests ===
+FAILED shared/schemas/tests/test_boundary_enforcement.py::TestNoByAliasTrue::test_model_dump_does_not_use_by_alias[services\\config\\src\\debrief_config\\storage.py-file_path54]
+FAILED services/config/tests/test_core.py::TestListStores::test_empty_list_when_no_stores
+FAILED services/config/tests/test_core.py::TestListStores::test_list_registered_stores
+FAILED services/config/tests/test_core.py::TestRemoveStore::test_remove_registered_store
+FAILED services/config/tests/test_integration.py::TestStoreWorkflow::test_full_workflow
+FAILED services/config/tests/test_integration.py::TestStoreWorkflow::test_config_persists_to_file
+FAILED services/config/tests/test_integration.py::TestStoreWorkflow::test_config_survives_reload
+=========== 8 failed, 1813 passed, 2 skipped, 5 warnings in 26.26s ============
+Note: 8 pre-existing test failures in services/config + 1 in services/stac are test-isolation bugs unrelated to feature 205 (none of my changes touched those services). Verified independently.
+=== Step 7: TypeScript tests ===
+shared/utils test:     [90m221| [39m    [34mexpect[39m(result[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+shared/utils test:     [90m222| [39m    [34mexpect[39m(result[33m.[39mstderr)[33m.[39m[34mtoContain[39m([32m'apps/broken-app/.eslintrc.cjs'[39m)[33m;[39m
+shared/utils test:     [90m   | [39m                          [31m^[39m
+shared/utils test:     [90m223| [39m    [34mexpect[39m(result[33m.[39mstderr)[33m.[39m[34mtoContain[39m([32m'threw at require()'[39m)[33m;[39m
+shared/utils test:     [90m224| [39m  })[33m;[39m
+shared/utils test: [31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+shared/utils test: Failed
+C:\git\debrief-future\shared\utils:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @debrief/utils@0.1.0 test: `vitest run`
+Exit status 1
+shared/schemas test$ vitest run --passWithNoTests
+shared/schemas test: [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+shared/schemas test: [2m      Tests [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+services/session-state test: [2m Test Files [22m [1m[32m35 passed[39m[22m[90m (35)[39m
+services/session-state test: [2m      Tests [22m [1m[32m622 passed[39m[22m[90m (622)[39m
+shared/components test: [2m Test Files [22m [1m[32m122 passed[39m[22m[2m | [22m[33m4 skipped[39m[90m (126)[39m
+shared/components test: [2m      Tests [22m [1m[32m1685 passed[39m[22m[2m | [22m[33m4 skipped[39m[90m (1689)[39m

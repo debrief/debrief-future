@@ -47,6 +47,14 @@
     "./colour-engine": {
       "types": "./dist/colour-engine/index.d.ts",
       "import": "./dist/colour-engine/index.js"
+    },
+    "./PropertiesPanel/provenanceTypes": {
+      "types": "./src/PropertiesPanel/provenanceTypes.ts",
+      "import": "./src/PropertiesPanel/provenanceTypes.ts"
+    },
+    "./PropertiesPanel/autoDerivedFields": {
+      "types": "./src/PropertiesPanel/autoDerivedFields.ts",
+      "import": "./src/PropertiesPanel/autoDerivedFields.ts"
     }
   },
   "sideEffects": [
@@ -62,6 +70,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:bench": "vitest bench --run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:claude": "CLAUDE_CODE=1 playwright test",
@@ -91,7 +100,9 @@
     "vega-embed": "^6.26.0",
     "vega-lite": "^5.21.0",
     "vscrui": "^0.1.0",
-    "modern-screenshot": "^4.5.0"
+    "modern-screenshot": "^4.5.0",
+    "immer": "^10.1.3",
+    "ulid": "^3.0.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",

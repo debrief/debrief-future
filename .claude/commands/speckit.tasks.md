@@ -4,7 +4,7 @@ handoffs:
   - label: Implement Tasks
     agent: speckit.implement
     prompt: Execute the generated task plan
-    send: true
+    send: false
 ---
 
 ## User Input
@@ -23,19 +23,28 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 3. **Read spec.md** from FEATURE_DIR for user stories and acceptance criteria.
 
-4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
-   - Correct feature name from plan.md
-   - **Evidence Requirements section** (see Evidence Planning Rules below)
-   - Phase 1: Setup tasks (project initialization)
-   - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
-   - Phase 3+: One phase per user story (in priority order from spec.md)
-   - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection, media content, AND PR creation tasks)
+4. **Generate tasks.md incrementally** (REQUIRED — do NOT write the full file in one call). A single `Write` call producing the entire file can exceed the stream idle timeout on dense features. Instead:
+
+   **Step 4a — Write skeleton** (`Write` tool, one call):
+   Create `tasks.md` with ONLY:
+   - Title (feature name from plan.md)
+   - Evidence Requirements section (full content — see Evidence Planning Rules below)
+   - Phase headings as empty placeholders (e.g. `## Phase 1: Setup`, `## Phase 2: Foundation`, one heading per user story, `## Phase N: Polish & Cross-Cutting Concerns`)
+   - Empty `## Dependencies` heading
+   - Empty `## Implementation Strategy` heading
+
+   **Step 4b — Fill each phase** (`Edit` tool, one call per phase):
+   For each phase placeholder in turn, replace it with the fully populated section:
+   - Story goal, independent test criteria, tests (if requested), implementation tasks
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
-   - Dependencies section showing story completion order
-   - Parallel execution examples per story
-   - Implementation strategy section (incremental delivery)
+   - Parallel execution examples inside the phase
+
+   **Step 4c — Fill cross-cutting sections** (`Edit` tool, one call each):
+   - Replace empty `## Dependencies` with story completion order
+   - Replace empty `## Implementation Strategy` with incremental delivery notes
+
+   Use `.specify/templates/tasks-template.md` as the structural reference. The Polish phase MUST include evidence collection, media content, AND PR creation tasks (see Evidence Planning Rules).
 
 5. **Plan evidence artifacts**: Determine what evidence should be captured to demonstrate the feature works:
    - **Test evidence**: What test output/summary will prove correctness?
@@ -136,7 +145,8 @@ Based on the feature type detected from spec.md and plan.md:
 | **API/Service** | Sample request + response JSON | `sample-request.json`, `sample-response.json` |
 | **Library/SDK** | Code examples with results | `usage-example.py`, `output.txt` |
 | **Data Processing** | Before/after samples | `input-sample.*`, `output-sample.*` |
-| **UI Component** | 3 theme screenshots (light/dark/vscode) + interaction GIF showing key user flow | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **UI Component** | 3 theme screenshots (light/dark/vscode) + interaction GIF showing key user flow (via Storybook E2E) | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **VS Code Extension Workflow** | Workflow screenshots + interaction GIF captured by Playwright driving the **web-shell** (`apps/web-shell/playwright/tests/`, run via `node apps/web-shell/run-playwright.mjs`). The web-shell hosts the same shared components as the extension, so its screenshots are the source of record for blog/PR media. Do **not** route screenshots through openvscode-server / `xvfb-run` — that path is unreliable. | `screenshots/workflow-*.png`, `screenshots/interaction.gif`, `webview-e2e-summary.md` |
 | **Parser/Converter** | Input/output file pairs side-by-side | `sample-input.rep`, `parsed-output.json` |
 | **Schema Change** | Round-trip proof (Python -> JSON -> TypeScript -> JSON) | `round-trip-evidence.md` |
 | **Integration** | End-to-end flow demo + sequence diagram | `integration-flow.md`, `sequence.mermaid` |
@@ -164,24 +174,19 @@ For the Polish phase, ALWAYS generate these tasks:
    - [ ] TXXX [P] Capture [specific artifact] in specs/[feature]/evidence/[filename]
    ```
 
-4. **Shipped Post Task** (REQUIRED - for media announcement):
+4. **Feature Post Task** (REQUIRED - for media announcement):
    ```markdown
-   - [ ] TXXX Create shipped blog post in specs/[feature]/media/shipped-post.md
+   - [ ] TXXX Create feature blog post in specs/[feature]/media/shipped-post.md
    ```
-   Use Content Specialist agent (`.claude/agents/media/content.md`) to generate:
-   - Shipped Post following the template
-   - Include: What We Built, Screenshots (if applicable), Lessons Learned, What's Next
+   Use Content Specialist agent (`.claude/agents/media/content.md`) to generate the Feature Post:
+   - Title prefixed with `Building `
+   - First three sections (What We're Building, How It Fits, Key Decisions) copied verbatim from `specs/[feature]/evidence/opening-context.md` (cached during `/speckit.plan`)
+   - Remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence
 
-5. **LinkedIn Shipped Summary Task** (REQUIRED):
-   ```markdown
-   - [ ] TXXX [P] Create LinkedIn shipped summary in specs/[feature]/media/linkedin-shipped.md
-   ```
-   150-200 words, hook opening, link to full post
-
-6. **Playwright E2E Reminder** (include when generating E2E test tasks):
+5. **Playwright E2E Reminder** (include when generating E2E test tasks):
    > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-7. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
+6. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
    ```markdown
    - [ ] TXXX Run app in dev mode and verify startup
    - [ ] TXXX [P] Capture runtime screenshot of actual app window
@@ -192,7 +197,7 @@ For the Polish phase, ALWAYS generate these tasks:
    - UI renders correctly in real Electron window
    - Error handling works when dependencies are unavailable
 
-8. **PR Creation Task** (REQUIRED - must be final task):
+7. **PR Creation Task** (REQUIRED - must be final task):
    ```markdown
    - [ ] TXXX Create PR and publish blog: run /speckit.pr
    ```
@@ -243,10 +248,8 @@ For UI component features, always plan an interaction GIF task. The GIF should:
 
 | Artifact | Description | Created When |
 |----------|-------------|--------------|
-| media/planning-post.md | Blog post announcing the feature | During /speckit.plan |
-| media/linkedin-planning.md | LinkedIn summary for planning | During /speckit.plan |
-| media/shipped-post.md | Blog post celebrating completion | During Polish phase |
-| media/linkedin-shipped.md | LinkedIn summary for shipped | During Polish phase |
+| evidence/opening-context.md | Cached opener (What We're Building, How It Fits, Key Decisions) | During /speckit.plan |
+| media/shipped-post.md | Feature post combining cached opener + ship-time evidence | During Polish phase |
 
 ### PR Creation
 
@@ -258,16 +261,15 @@ For UI component features, always plan an interaction GIF task. The GIF should:
 
 ## Media Content Rules
 
-**Purpose**: Create blog posts and social content to announce planning and celebrate shipped features.
+**Purpose**: Cache opening context at plan time and write one feature post at ship time that combines the cached opener with delivery evidence.
 
 ### Media Agents
 
 Use the agents in `.claude/agents/media/` via the Task tool:
 
 1. **Content Specialist** (`.claude/agents/media/content.md`):
-   - Planning posts (announce what we're building)
-   - Shipped posts (celebrate what we built)
-   - LinkedIn summaries
+   - Cached opener during `/speckit.plan` (three prose sections, no front matter)
+   - Feature post during the Polish phase / `/speckit.pr`
    - Voice & tone guidelines
 
 2. **Technical Specialist** (`.claude/agents/media/technical.md`):
@@ -277,7 +279,7 @@ Use the agents in `.claude/agents/media/` via the Task tool:
 
 ### Spawning Media Agents
 
-To create media content, spawn a subagent via Task tool:
+To create the feature post, spawn a subagent via Task tool:
 
 ```text
 Task tool call:
@@ -287,9 +289,9 @@ Task tool call:
 
     [Include full content of .claude/agents/media/content.md]
 
-    Create a [Planning/Shipped] Post for:
+    Create a Feature Post for:
     - Feature: [name]
-    - Goal: [from spec.md]
+    - Cached opener (copy verbatim as first three sections): [contents of evidence/opening-context.md]
     - Key accomplishments: [from evidence/]
     - Lessons learned: [notable challenges/decisions]
 ```
@@ -310,14 +312,13 @@ After applying all rules, a generated Polish phase should look like:
 
 ### Media Content
 
-- [ ] T505 Create shipped blog post in specs/002-debrief-io/media/shipped-post.md
-- [ ] T506 [P] Create LinkedIn shipped summary in specs/002-debrief-io/media/linkedin-shipped.md
+- [ ] T505 Create feature blog post in specs/002-debrief-io/media/shipped-post.md (reads evidence/opening-context.md for the first three sections)
 
 ### PR Creation
 
-- [ ] T507 Create PR and publish blog: run /speckit.pr
+- [ ] T506 Create PR and publish blog: run /speckit.pr
 
-**Task T507 must run last. It depends on all evidence and media tasks being complete.**
+**Task T506 must run last. It depends on all evidence and media tasks being complete.**
 ```
 
 ## Complete Example: Polish Phase (Electron/Desktop App)
@@ -341,12 +342,11 @@ For Electron apps, include runtime verification:
 
 ### Media Content
 
-- [ ] T098 Create shipped blog post in specs/004-loader/media/shipped-post.md
-- [ ] T099 [P] Create LinkedIn shipped summary in specs/004-loader/media/linkedin-shipped.md
+- [ ] T098 Create feature blog post in specs/004-loader/media/shipped-post.md (reads evidence/opening-context.md for the first three sections)
 
 ### PR Creation
 
-- [ ] T100 Create PR and publish blog: run /speckit.pr
+- [ ] T099 Create PR and publish blog: run /speckit.pr
 
-**Task T100 must run last. Runtime verification ensures the app works beyond just component tests.**
+**Task T099 must run last. Runtime verification ensures the app works beyond just component tests.**
 ```

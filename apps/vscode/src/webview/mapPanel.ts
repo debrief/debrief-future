@@ -35,12 +35,20 @@ import {
   type LogService,
   type DrawingMode,
 } from '@debrief/session-state';
-import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
-import { calculateBounds, mergeBounds } from '../utils/bounds';
+import { DuplicateImportError } from '../types/import';
+import type { SafeFeature } from '@debrief/utils';
+import {
+  calculateBounds,
+  mergeBounds,
+  boundsToLeaflet,
+  fromGeoJSONCoord,
+} from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
-import type { TrackProperties } from '@debrief/schemas';
+import type { TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
+import type { SceneRectangleSnapshot } from './messages';
 
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local MapPanel is the extension host wrapper; name collides with @debrief/components.MapPanel (React component). Follow-up to rename the host class, #214 scope-adjacent
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
   public static readonly viewType = 'debrief.mapPanel';
@@ -73,6 +81,15 @@ export class MapPanel {
   private onExportPngCallback:
     | ((requestId: string) => Promise<void>)
     | undefined;
+
+  // Storyboard playback (#217) — events + token allocator
+  private readonly _onSceneRectangleClick = new vscode.EventEmitter<string>();
+  public readonly onSceneRectangleClick: vscode.Event<string> = this._onSceneRectangleClick.event;
+  private readonly _onFlyToComplete = new vscode.EventEmitter<number>();
+  public readonly onFlyToComplete: vscode.Event<number> = this._onFlyToComplete.event;
+  private readonly _onFeaturesChanged = new vscode.EventEmitter<DebriefFeature[]>();
+  public readonly onFeaturesChanged: vscode.Event<DebriefFeature[]> = this._onFeaturesChanged.event;
+  private flyToTokenCounter = 0;
 
   // Session manager integration (Feature: 029)
   private activeSession?: SessionStoreApi;
@@ -427,43 +444,11 @@ export class MapPanel {
       return;
     }
 
-    // Calculate bounds from selected features
-    let minLat = Infinity;
-    let maxLat = -Infinity;
-    let minLng = Infinity;
-    let maxLng = -Infinity;
-
-    for (const feature of selectedFeatures) {
-      const geom = feature.geometry as { type: string; coordinates: unknown };
-      const coords = geom.coordinates;
-      if (geom.type === 'LineString') {
-        for (const coord of coords as number[][]) {
-          const lng = coord[0];
-          const lat = coord[1];
-          if (typeof lng === 'number' && typeof lat === 'number') {
-            minLat = Math.min(minLat, lat);
-            maxLat = Math.max(maxLat, lat);
-            minLng = Math.min(minLng, lng);
-            maxLng = Math.max(maxLng, lng);
-          }
-        }
-      } else if (geom.type === 'Point') {
-        const coord = coords as number[];
-        if (coord.length >= 2) {
-          minLat = Math.min(minLat, coord[1]!);
-          maxLat = Math.max(maxLat, coord[1]!);
-          minLng = Math.min(minLng, coord[0]!);
-          maxLng = Math.max(maxLng, coord[0]!);
-        }
-      }
+    const bounds = calculateBounds(selectedFeatures);
+    if (bounds === null) {
+      return;
     }
-
-    if (minLat !== Infinity) {
-      this.fitBounds([
-        [minLat, minLng],
-        [maxLat, maxLng],
-      ]);
-    }
+    this.fitBounds(boundsToLeaflet(bounds));
   }
 
   /**
@@ -583,6 +568,112 @@ export class MapPanel {
   }
 
   /**
+   * Get a defensive shallow copy of the current in-memory feature list.
+   *
+   * Used by capture (#216) to wrap features into a throwaway FeatureCollection
+   * at the #215 CRUD boundary without giving callers a live handle to the
+   * private field.
+   */
+  public getCurrentFeatures(): DebriefFeature[] {
+    return this.currentFeatures.slice();
+  }
+
+  /**
+   * Replace the in-memory feature list and re-post a loadPlot-style update
+   * so `<mapView>` rerenders. Preserves `currentPlot` (STAC metadata) intact.
+   *
+   * Used by capture (#216) to push the #215 CRUD-returned FeatureCollection
+   * features back into the webview after a Storyboard / Scene create.
+   */
+  public setFeatures(features: DebriefFeature[]): void {
+    this.currentFeatures = features.slice();
+    if (this.currentPlot === null) {
+      // Still fire onFeaturesChanged — downstream consumers (e.g. the
+      // StoryboardPlaybackService) may care about feature-set transitions
+      // even before a plot title has been resolved.
+      this._onFeaturesChanged.fire(this.currentFeatures.slice());
+      return;
+    }
+    this.postMessage({
+      type: 'loadPlot',
+      plot: {
+        id: this.currentPlot.id,
+        title: this.currentPlot.title,
+        features: this.currentFeatures,
+        bbox: this.currentPlot.bbox,
+        timeExtent: this.currentPlot.timeExtent,
+      },
+    });
+    this._onFeaturesChanged.fire(this.currentFeatures.slice());
+  }
+
+  /**
+   * Kick off an animated flyTo on the map (#217).
+   * Returns a fresh monotonic token that the caller uses to correlate
+   * completion via `onFlyToComplete`. A `durationMs === 0` value is
+   * forwarded to the webview as a "jump" (`setView` with `animate:false`
+   * — see `contracts/map-view-flyto.md` §1).
+   */
+  public flyToViewport(viewport: Viewport, durationMs: number): number {
+    const token = ++this.flyToTokenCounter;
+    const centerLon = viewport.center[0];
+    const centerLat = viewport.center[1];
+    if (centerLon === undefined || centerLat === undefined) {
+      // Preserve the token but drop the message; completion fires
+      // synchronously so the caller's transition state clears cleanly.
+      queueMicrotask(() => this._onFlyToComplete.fire(token));
+      return token;
+    }
+    this.postMessage({
+      type: 'flyTo',
+      token,
+      center: [centerLat, centerLon],
+      zoom: viewport.zoom,
+      durationMs,
+    });
+    return token;
+  }
+
+  /**
+   * Push the active Storyboard's Scene rectangles to the webview (#217).
+   * Passing `scenes: null` clears the overlay. The webview-side
+   * SceneRectangleLayer reads `scene.geometry.coordinates` (the GeoJSON
+   * Polygon) for each rectangle — not `scene.properties.viewport.corners`
+   * (plan Fix D).
+   */
+  public setSceneRectangles(
+    scenes: ReadonlyArray<SceneFeature> | null,
+    activeStoryboardId: string | null,
+    currentSceneId: string | null,
+  ): void {
+    const snapshots: SceneRectangleSnapshot[] | null = scenes === null
+      ? null
+      : scenes.map((s) => {
+          const geom = s.geometry as
+            | { type: 'Polygon'; coordinates: number[][][] }
+            | undefined;
+          const polygon: readonly (readonly (readonly [number, number])[])[] =
+            geom && geom.type === 'Polygon' && Array.isArray(geom.coordinates)
+              ? geom.coordinates.map((ring) =>
+                  ring.map((pt) => [pt[0] as number, pt[1] as number] as const),
+                )
+              : [[]];
+          return {
+            sceneId: s.properties.id,
+            viewport: s.properties.viewport,
+            timestamp: s.properties.timestamp,
+            polygon,
+          };
+        });
+    this.postMessage({
+      type: 'setSceneRectangles',
+      scenes: snapshots,
+      activeStoryboardId,
+      currentSceneId,
+    });
+  }
+
+  /**
    * Get the feature kind for a feature ID (Feature: 038).
    *
    * Looks up the 'kind' property of features from the current plot data
@@ -672,10 +763,11 @@ export class MapPanel {
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
         const zoom = spatial.viewport?.zoom;
         if (spatial.viewport !== null && zoom !== undefined) {
-          // Calculate center from coordinates: [NW, NE, SE, SW] in [lng, lat] order
+          // Calculate center from coordinates: [NW, NE, SE, SW] in object form
+          // { longitude, latitude } after feature 203.
           const coords = spatial.viewport.coordinates;
-          const centerLng = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4;
-          const centerLat = (coords[0][1] + coords[1][1] + coords[2][1] + coords[3][1]) / 4;
+          const centerLng = (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) / 4;
+          const centerLat = (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
           const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
 
           // Only send if actually different from last sent
@@ -708,13 +800,10 @@ export class MapPanel {
           time: initialState.currentTime,
         });
       }
-      {
-        const webviewMode = initialState.displayMode === 'snailTrail' ? 'trail' : 'full';
-        this.postMessage({
-          type: 'setDisplayMode',
-          displayMode: webviewMode,
-        });
-      }
+      this.postMessage({
+        type: 'setDisplayMode',
+        displayMode: initialState.displayMode,
+      });
 
       // Subscribe to temporal (time + displayMode) changes (Feature: 039)
       this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
@@ -725,10 +814,9 @@ export class MapPanel {
           });
         }
         // Forward display mode to map webview
-        const webviewMode = temporal.displayMode === 'snailTrail' ? 'trail' : 'full';
         this.postMessage({
           type: 'setDisplayMode',
-          displayMode: webviewMode,
+          displayMode: temporal.displayMode,
         });
       });
 
@@ -787,9 +875,11 @@ export class MapPanel {
     // Debounce viewport updates to session state
     this.viewportUpdateTimeout = setTimeout(() => {
       if (this.activeSession && viewport.bounds) {
-        // bounds is [NW, NE, SE, SW] in [lng, lat] order - matches ViewportPolygon format
+        // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
+        // feature 203 consolidated ViewportPolygon on the canonical
+        // object form, so convert at this boundary via fromGeoJSONCoord.
         const newViewport = {
-          coordinates: viewport.bounds,
+          coordinates: viewport.bounds.map(fromGeoJSONCoord),
           zoom: viewport.zoom,
         };
         // Only update if viewport actually changed (avoid feedback loop)
@@ -819,6 +909,11 @@ export class MapPanel {
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
     }
+
+    // Clean up storyboard playback emitters (#217)
+    this._onSceneRectangleClick.dispose();
+    this._onFlyToComplete.dispose();
+    this._onFeaturesChanged.dispose();
 
     // Clean up resources
     this.panel.dispose();
@@ -892,10 +987,9 @@ export class MapPanel {
               time: state.currentTime,
             });
           }
-          const webviewMode = state.displayMode === 'snailTrail' ? 'trail' : 'full';
           this.postMessage({
             type: 'setDisplayMode',
-            displayMode: webviewMode,
+            displayMode: state.displayMode,
           });
         }
         break;
@@ -978,6 +1072,16 @@ export class MapPanel {
             smallPngBase64: message.smallPngBase64,
           });
         }
+        break;
+
+      case 'flyToComplete':
+        // Storyboard playback flyTo animation ended (#217)
+        this._onFlyToComplete.fire(message.token);
+        break;
+
+      case 'sceneRectangleClicked':
+        // Storyboard Scene rectangle clicked on the map (#217)
+        this._onSceneRectangleClick.fire(message.sceneId);
         break;
     }
   }
@@ -1228,7 +1332,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.flatMap((f: GeoJSONFeature) => {
+      const safeFeatures = parseResult.features.flatMap((f: SafeFeature) => {
         if (!f.geometry) { return []; }
         return [{
           type: 'Feature' as const,

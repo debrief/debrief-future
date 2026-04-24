@@ -44,7 +44,7 @@
     "datetime": null,
     "start_datetime": "2022-09-10T21:00:00Z",
     "end_datetime": "2022-09-11T10:21:03Z",
-    "debrief:vessel_classes": [],
+    "debrief:platforms": [],
     "debrief:tags": [
       "multi-national",
       "boarding",
@@ -55,9 +55,7 @@
       "zig-zag",
       "minefield",
       "intercept"
-    ],
-    "debrief:track_names": [],
-    "debrief:nationalities": []
+    ]
   },
   "links": [
     {

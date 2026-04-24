@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import type { LogTimelineProps } from './types';
+import type { LogPanelProps } from './types';
 import { LogEntry } from './LogEntry';
 
 export function LogTimeline({
@@ -15,6 +15,7 @@ export function LogTimeline({
   featureNames,
   viewMode,
   selectedEntryId,
+  toolCategories,
   onEntryClick,
   onTuneClick,
   onRestoreClick,
@@ -31,7 +32,7 @@ export function LogTimeline({
   onRationaleChange,
   onRetrySchema,
   className,
-}: LogTimelineProps): React.ReactElement {
+}: LogPanelProps): React.ReactElement {
   return (
     <div
       className={`log-panel__timeline ${className ?? ''}`}
@@ -46,6 +47,7 @@ export function LogTimeline({
           featureNames={featureNames}
           viewMode={viewMode}
           isSelected={entry.activity_id === selectedEntryId}
+          toolCategories={toolCategories}
           onClick={onEntryClick}
           onTuneClick={onTuneClick}
           onRestoreClick={onRestoreClick}

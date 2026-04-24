@@ -1,0 +1,149 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--offsettracks",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          60.2
+        ],
+        [
+          0.5,
+          60.2
+        ],
+        [
+          0.5,
+          60.7
+        ],
+        [
+          0,
+          60.7
+        ],
+        [
+          0,
+          60.2
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0,
+    60.2,
+    0.5,
+    60.7
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Offsettracks",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Saxon Warrior: Offsettracks — Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including FGS Mahan, HMS Andrea Doria, Contact Alpha. Multi-national participation: DE, GB.",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T13:00:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "SENSOR_2",
+        "name": "FGS Mahan",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_type": "arleigh-burke",
+        "vessel_role": "destroyer"
+      },
+      {
+        "id": "SENSOR_1",
+        "name": "HMS Andrea Doria",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_type": "river",
+        "vessel_role": "patrol"
+      },
+      {
+        "id": "SUBJECT",
+        "name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "force-protection",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "OffsetTracks (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/OffsetTracks.dpf",
+      "title": "OffsetTracks.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-OffsetTracks": {
+      "href": "./assets/OffsetTracks.dpf",
+      "type": "application/octet-stream",
+      "title": "OffsetTracks.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/OffsetTracks.dpf",
+        "load_timestamp": "2026-04-13T23:12:31.891990Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

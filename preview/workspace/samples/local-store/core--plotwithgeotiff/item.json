@@ -44,27 +44,35 @@
     "description": "Saxon Warrior: Plotwithgeotiff — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Collingwood, HMS Nelson. Multi-national participation: DE, GB.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
     "end_datetime": "1995-12-12T05:26:00+00:00",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45",
-      "surface/warship/frigate/type23"
+    "debrief:platforms": [
+      {
+        "id": "COLLINGWOOD",
+        "name": "HMS Collingwood",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer"
+      },
+      {
+        "id": "NELSON",
+        "name": "HMS Nelson",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/frigate/type23",
+        "domain": "surface",
+        "vessel_type": "type23",
+        "vessel_role": "frigate"
+      }
     ],
     "debrief:tags": [
-      "force-protection",
-      "surveillance",
+      "ASW",
+      "harbour-ops",
+      "replenishment",
       "training"
     ],
     "debrief:feature_tags": [
-      "torpedo-run",
-      "track-merge",
-      "visual-sighting"
-    ],
-    "debrief:track_names": [
-      "HMS Collingwood",
-      "HMS Nelson"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "GB"
+      "minefield",
+      "radar-detection"
     ]
   },
   "links": [
@@ -88,7 +96,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/PlotWithGeoTiff.dpf",
+      "href": "file:///tmp/debrief-regen-4x2tftum/PlotWithGeoTiff.dpf",
       "title": "PlotWithGeoTiff.dpf"
     }
   ],
@@ -109,8 +117,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/PlotWithGeoTiff.dpf",
-        "load_timestamp": "2026-03-28T13:50:57.957353Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/PlotWithGeoTiff.dpf",
+        "load_timestamp": "2026-04-13T23:12:32.485477Z",
         "tool_version": "0.1.0"
       }
     },

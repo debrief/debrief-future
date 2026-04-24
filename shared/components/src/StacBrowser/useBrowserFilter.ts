@@ -9,8 +9,8 @@
 
 import { useMemo, useRef } from 'react';
 import type { StacBrowserItem } from '../filter-engine/types';
-import type { ViewportPolygon, TimeFilter } from '../utils/spatial-types';
-import { viewportToBounds, bboxOverlapsViewport } from '../utils/bounds';
+import type { ViewportPolygon, TimeFilter } from '@debrief/schemas';
+import { viewportToBounds, bboxOverlapsViewport } from '@debrief/utils';
 import { itemOverlapsFilter } from '../utils/timeline-helpers';
 import type { TemporalFilter } from '../TimelineView/types';
 import type { BrowserFilterResult } from './types';
@@ -85,14 +85,15 @@ export function useBrowserFilter({
     // Defensive guard: degenerate viewport → treat as no spatial filter (Review Decision 7D)
     const effectiveSpatialActive = spatialFilterActive && viewportBounds !== null;
 
-    // Defensive guard: inverted timeFilter (start > end) → treat as no temporal filter (Review Decision 7D)
-    const effectiveTemporalActive = temporalFilterActive && timeFilter !== null &&
-      timeFilter.start !== null && timeFilter.end !== null &&
+    // Defensive guard: inverted timeFilter (start > end) → treat as no temporal filter (Review Decision 7D).
+    // Use `!= null` (loose) to accept both null (legacy) and undefined (canonical schema) — FR-021.
+    const effectiveTemporalActive = temporalFilterActive && timeFilter != null &&
+      timeFilter.start != null && timeFilter.end != null &&
       timeFilter.start <= timeFilter.end;
 
     // Build the temporal filter in TemporalFilter shape for itemOverlapsFilter
     const temporalFilterForHelper: TemporalFilter | null =
-      effectiveTemporalActive && timeFilter?.start !== null && timeFilter?.end !== null
+      effectiveTemporalActive && timeFilter?.start != null && timeFilter?.end != null
         ? { start: timeFilter.start, end: timeFilter.end }
         : null;
 
@@ -141,8 +142,8 @@ export function useBrowserFilter({
   // Preserves reference identity when content is unchanged to prevent cascading re-renders.
   const prevSpatialRef = useRef<readonly StacBrowserItem[] | null>(null);
   const spatialFilteredItems = useMemo(() => {
-    const isTemporalActive = temporalFilterActive && timeFilter !== null &&
-      timeFilter.start !== null && timeFilter.end !== null &&
+    const isTemporalActive = temporalFilterActive && timeFilter != null &&
+      timeFilter.start != null && timeFilter.end != null &&
       timeFilter.start <= timeFilter.end;
 
     const result = isTemporalActive

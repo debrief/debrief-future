@@ -5,6 +5,7 @@ import { ThemeProvider } from '../ThemeProvider';
 import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState, SavedFiltersCollection } from './types';
+import type { PlatformRecord } from '@debrief/schemas';
 
 // --- Mock Data (reused from FilterBar.stories) ---
 
@@ -17,12 +18,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -32,27 +31,31 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 const MOCK_ITEMS: StacBrowserItem[] = [
   makeItem('ex-001', {
     title: 'CASEX Alpha',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'blue-water'],
-    vesselClasses: ['surface/warship/frigate/type23'],
     author: 'CDR Smith',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T04:00:00Z',
   }),
   makeItem('ex-002', {
     title: 'CASEX Bravo',
-    nationalities: ['British'],
+    platforms: [
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['asw', 'shallow-water'],
-    vesselClasses: ['surface/warship/destroyer/type45'],
     author: 'CDR Jones',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-02T12:00:00Z',
   }),
   makeItem('ex-003', {
     title: 'GROUPEX Charlie',
-    nationalities: ['French', 'British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'asw'],
-    vesselClasses: ['surface/warship/frigate/type23', 'surface/warship/destroyer/type45'],
     author: 'CDR Smith',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-04T00:00:00Z',
@@ -99,7 +102,7 @@ const SAVED_COLLECTION: SavedFiltersCollection = {
       name: 'French Exercises',
       filterBarState: {
         items: [
-          { kind: 'lozenge', id: 's1-l1', filterType: 'nationality', value: 'French' },
+          { kind: 'lozenge', shape: 'simple', id: 's1-l1', filterType: 'nationality', value: 'French' },
         ],
       },
       cql2Json: { op: 'eq', args: [{ property: 'nationality' }, 'French'] },
@@ -111,8 +114,8 @@ const SAVED_COLLECTION: SavedFiltersCollection = {
       name: 'ASW Convoy',
       filterBarState: {
         items: [
-          { kind: 'lozenge', id: 's2-l1', filterType: 'tag', value: 'asw' },
-          { kind: 'lozenge', id: 's2-l2', filterType: 'tag', value: 'convoy' },
+          { kind: 'lozenge', shape: 'simple', id: 's2-l1', filterType: 'tag', value: 'asw' },
+          { kind: 'lozenge', shape: 'simple', id: 's2-l2', filterType: 'tag', value: 'convoy' },
         ],
       },
       cql2Json: { op: 'and', args: [] },
@@ -211,8 +214,8 @@ export const SaveFlow: Story = {
       taxonomy={MOCK_TAXONOMY}
       initialFilterState={{
         items: [
-          { kind: 'lozenge', id: 'demo-1', filterType: 'nationality', value: 'French' },
-          { kind: 'lozenge', id: 'demo-2', filterType: 'tag', value: 'convoy' },
+          { kind: 'lozenge', shape: 'simple', id: 'demo-1', filterType: 'nationality', value: 'French' },
+          { kind: 'lozenge', shape: 'simple', id: 'demo-2', filterType: 'tag', value: 'convoy' },
         ],
       }}
     />
@@ -221,6 +224,45 @@ export const SaveFlow: Story = {
     docs: {
       description: {
         story: 'Filter bar pre-populated with active filters. Click Save to name and persist the current configuration.',
+      },
+    },
+  },
+};
+
+// Platform chip round-trip (#186)
+export const PlatformChipRoundTrip: Story = {
+  name: 'Platform chip round-trip',
+  render: () => (
+    <SavedFiltersWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialFilterState={{
+        items: [
+          {
+            kind: 'lozenge',
+            shape: 'platform',
+            id: 'plat-saved-1',
+            filterType: 'platform',
+            attributes: { nationality: 'GB', vessel_role: 'frigate' },
+          },
+          {
+            kind: 'lozenge',
+            shape: 'simple',
+            id: 'saved-tag-1',
+            filterType: 'tag',
+            value: 'convoy',
+          },
+        ],
+      }}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Save a filter containing a platform chip, clear the bar, then restore — the chip ' +
+          'and its attributes should be identical. The CQL2 JSON emitted before save and after ' +
+          'restore is equal (#186, U32/U35).',
       },
     },
   },

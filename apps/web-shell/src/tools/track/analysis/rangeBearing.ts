@@ -5,10 +5,10 @@
  * so the calcService can auto-open it in the Results panel.
  */
 
-import type { MCPToolDefinition } from '../../../services/toolService';
 import type { TrackFeature } from '@debrief/schemas';
 import { OutputKindEnum } from '@debrief/schemas';
-import type { GeoJSONFeature } from '@debrief/utils';
+import type { MCPToolDefinition } from '@debrief/utils';
+import type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
 
 const EARTH_RADIUS_NM = 3440.065;
 

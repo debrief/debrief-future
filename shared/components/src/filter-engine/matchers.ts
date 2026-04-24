@@ -5,7 +5,8 @@
  * returning true if the item matches the predicate.
  */
 
-import type { DurationBucket, ModifiedBucket, FilterType, StacBrowserItem } from "./types";
+import type { PlatformRecord } from '@debrief/schemas';
+import type { ArrayFilterPredicate, CompoundPredicate, DurationBucket, ModifiedBucket, FilterType, PlatformField, StacBrowserItem } from "./types";
 import type { DescendantMap } from "./taxonomy";
 
 /** Duration bucket thresholds in milliseconds */
@@ -45,10 +46,11 @@ function matchVesselClass(
   value: string,
   descendantMap: DescendantMap,
 ): boolean {
-  if (!item.vesselClasses || item.vesselClasses.length === 0) return false;
+  const platforms = item.platforms ?? [];
+  if (platforms.length === 0) return false;
   const expandedPaths = descendantMap.get(value);
   if (!expandedPaths) return false;
-  return item.vesselClasses.some((vc) => expandedPaths.has(vc));
+  return platforms.some((p) => p.vessel_class && expandedPaths.has(p.vessel_class));
 }
 
 /** Match duration against a bucket */
@@ -127,14 +129,74 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
   title: (item, value) => matchTitle(item, value),
   filename: (item, value) => matchFilename(item, value),
   "plot-contents": (item, value) => matchPlotContents(item, value),
-  "track-name": (item, value) =>
-    arrayContainsCaseInsensitive(item.trackNames, value),
-  nationality: (item, value) =>
-    arrayContainsCaseInsensitive(item.nationalities, value),
+  "track-name": (item, value) => {
+    const lower = value.toLowerCase();
+    return (item.platforms ?? []).some((p) => p.name != null && p.name.toLowerCase() === lower);
+  },
+  nationality: (item, value) => {
+    const upper = value.toUpperCase();
+    return (item.platforms ?? []).some((p) => p.nationality != null && p.nationality.toUpperCase() === upper);
+  },
   collection: (item, value) => matchCollection(item, value),
+  // Platform chips are evaluated via array_filter, not via a flat string match.
+  // The Predicate channel is never populated with 'platform' by the FilterBar
+  // (the reducer emits ArrayFilterPredicate entries instead), so this matcher
+  // is a no-op guard for the enum completeness check.
+  platform: () => false,
 };
 
 /** Get the matcher function for a filter type */
 export function getMatcher(type: FilterType): MatcherFn {
   return MATCHERS[type];
+}
+
+/** Read a platform field value by field name */
+function getPlatformField(platform: PlatformRecord, field: PlatformField): string | undefined {
+  switch (field) {
+    case "id": return platform.id;
+    case "name": return platform.name;
+    case "nationality": return platform.nationality;
+    case "vessel_class": return platform.vessel_class;
+    case "vessel_type": return platform.vessel_type;
+    case "vessel_role": return platform.vessel_role;
+    case "domain": return platform.domain;
+  }
+}
+
+/** Evaluate a compound predicate against a single platform record */
+function evaluateCompound(
+  platform: PlatformRecord,
+  pred: CompoundPredicate,
+  descendantMap: DescendantMap,
+): boolean {
+  switch (pred.kind) {
+    case "comparison": {
+      const fieldValue = getPlatformField(platform, pred.field);
+      if (fieldValue == null) return false;
+      if (pred.field === "vessel_class") {
+        const expandedPaths = descendantMap.get(pred.value);
+        return expandedPaths != null && expandedPaths.has(fieldValue);
+      }
+      if (pred.field === "id") {
+        return fieldValue === pred.value;
+      }
+      return fieldValue.toLowerCase() === pred.value.toLowerCase();
+    }
+    case "and":
+      return pred.children.every((c) => evaluateCompound(platform, c, descendantMap));
+    case "or":
+      return pred.children.some((c) => evaluateCompound(platform, c, descendantMap));
+  }
+}
+
+/** Evaluate an array_filter predicate against a STAC item */
+export function matchArrayFilter(
+  item: StacBrowserItem,
+  af: ArrayFilterPredicate,
+  descendantMap: DescendantMap,
+): boolean {
+  const platforms = item.platforms ?? [];
+  if (platforms.length === 0) return af.negated === true;
+  const result = platforms.some((p) => evaluateCompound(p, af.predicate, descendantMap));
+  return af.negated ? !result : result;
 }

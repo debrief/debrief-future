@@ -16,6 +16,10 @@ eggs/
 .eggs/
 lib/
 lib64/
+# Re-include the JS helpers directory used by apps/nl-demo (the root rule
+# above is for Python venvs; this path is unambiguously source code).
+!apps/nl-demo/lib/
+!apps/nl-demo/lib/**
 parts/
 sdist/
 var/
@@ -243,3 +247,6 @@ apps/web-shell/test-results/
 
 # Vite temp files
 vite.config.ts.timestamp-*
+
+# Type-audit scanner intermediate output (regenerated per run)
+tmp/

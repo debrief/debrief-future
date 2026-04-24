@@ -522,3 +522,230 @@ export const CardFlipPrimitive: Story = {
     return <Wrapper />;
   },
 };
+
+// --- Feature 176: Rich card focused stories (T015) ---
+
+/**
+ * Displays one card per defined ToolCategory, plus the neutral-grey
+ * fallback, so reviewers can compare all icon styles at a glance.
+ */
+const allCategoriesEntries: TimelineEntry[] = [
+  {
+    activity_id: 'cat-import',
+    timestamp: '2026-04-19T09:00:00Z',
+    toolName: 'import-rep',
+    tool_version: '1.0.0',
+    parameters: { file: { value: 'alpha.rep', default: false } },
+    usedFeatureIds: [],
+    generatedFeatureIds: ['track-alpha'],
+    execution_duration: 'PT1.2S',
+    generated_result_id: null,
+    operationCategory: 'import',
+  },
+  {
+    activity_id: 'cat-style',
+    timestamp: '2026-04-19T09:01:00Z',
+    toolName: 'change-color',
+    tool_version: '1.0.0',
+    parameters: { color: { value: '#e11d48', default: false } },
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.1S',
+    generated_result_id: null,
+    operationCategory: 'property-edit',
+  },
+  {
+    activity_id: 'cat-calc',
+    timestamp: '2026-04-19T09:02:00Z',
+    toolName: 'bearing-between-tracks',
+    tool_version: '1.2.0',
+    parameters: { maxRange: { value: 5000, default: false } },
+    usedFeatureIds: ['track-alpha', 'track-bravo'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT2.3S',
+    generated_result_id: null,
+    operationCategory: 'calculation',
+  },
+  {
+    activity_id: 'cat-filter',
+    timestamp: '2026-04-19T09:03:00Z',
+    toolName: 'time-filter',
+    tool_version: '1.0.0',
+    parameters: { mode: { value: 'include', default: false } },
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.05S',
+    generated_result_id: null,
+    operationCategory: 'calculation',
+  },
+  {
+    // Snapshot demo: post-feature-208, snapshot rendering is driven by the
+    // PROV-side `kind` discriminator, not by the tool's visual ToolCategory.
+    // The story retains its manual-checkpoint-placeholder appearance because
+    // `kind: 'snapshot'` is set explicitly — previously it appeared only
+    // because export-png happens to share the 'snapshot' visual category.
+    activity_id: 'cat-snapshot',
+    timestamp: '2026-04-19T09:04:00Z',
+    toolName: 'export-png',
+    tool_version: '1.0.0',
+    parameters: {},
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.4S',
+    generated_result_id: null,
+    operationCategory: 'export',
+    kind: 'snapshot',
+  },
+  {
+    activity_id: 'cat-unknown',
+    timestamp: '2026-04-19T09:05:00Z',
+    toolName: 'custom-unknown-tool',
+    tool_version: '0.0.1',
+    parameters: { note: { value: 'fallback', default: false } },
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.2S',
+    generated_result_id: null,
+    operationCategory: 'calculation',
+  },
+];
+
+export const AllCategories: Story = {
+  name: 'Rich Card — All Categories',
+  render: () => (
+    <LogPanelInteractive
+      entries={allCategoriesEntries}
+      featureNames={sampleFeatureNames}
+      hasActiveSession={true}
+    />
+  ),
+};
+
+/**
+ * One entry carrying one parameter of every chip type + overflow indicator.
+ */
+const allChipTypesEntry: TimelineEntry = {
+  activity_id: 'chip-matrix',
+  timestamp: '2026-04-19T10:00:00Z',
+  toolName: 'bearing-between-tracks',
+  tool_version: '1.2.0',
+  parameters: {
+    colour: { value: '#00aa55', default: false },
+    speed: { value: 12, default: false },
+    mode: { value: 'auto', default: false },
+    visible: { value: true, default: false },
+    range: { value: '10-200', default: false },
+    plain: { value: 'HMS Alpha', default: true },
+    extra1: { value: 1, default: true },
+    extra2: { value: 2, default: true },
+  },
+  usedFeatureIds: ['track-alpha'],
+  generatedFeatureIds: [],
+  execution_duration: 'PT1.0S',
+  generated_result_id: null,
+  operationCategory: 'calculation',
+};
+
+export const AllChipTypes: Story = {
+  name: 'Rich Card — All Chip Types',
+  render: () => (
+    <LogPanelInteractive
+      entries={[allChipTypesEntry]}
+      featureNames={sampleFeatureNames}
+      hasActiveSession={true}
+    />
+  ),
+};
+
+const edgeCaseEntries: TimelineEntry[] = [
+  {
+    // Snapshot demo: kind-driven (feature 208). See analogous comment on
+    // `cat-snapshot` in allCategoriesEntries.
+    activity_id: 'edge-snapshot',
+    timestamp: '2026-04-19T11:00:00Z',
+    toolName: 'export-png',
+    tool_version: '1.0.0',
+    parameters: {},
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.3S',
+    generated_result_id: null,
+    operationCategory: 'export',
+    kind: 'snapshot',
+  },
+  {
+    activity_id: 'edge-noparams',
+    timestamp: '2026-04-19T11:01:00Z',
+    toolName: 'bearing-between-tracks',
+    tool_version: '1.2.0',
+    parameters: {},
+    usedFeatureIds: ['track-alpha', 'track-bravo'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT0.2S',
+    generated_result_id: null,
+    operationCategory: 'calculation',
+  },
+  {
+    activity_id: 'edge-missing-dur',
+    timestamp: '2026-04-19T11:02:00Z',
+    toolName: 'change-color',
+    tool_version: '1.0.0',
+    parameters: { color: { value: 'red', default: false } },
+    usedFeatureIds: ['track-alpha'],
+    generatedFeatureIds: [],
+    execution_duration: '',
+    generated_result_id: null,
+    operationCategory: 'property-edit',
+  },
+  {
+    activity_id: 'edge-multi-track',
+    timestamp: '2026-04-19T11:03:00Z',
+    toolName: 'bearing-between-tracks',
+    tool_version: '1.2.0',
+    parameters: { maxRange: { value: 5000, default: false } },
+    usedFeatureIds: ['track-alpha', 'track-bravo', 'track-charlie'],
+    generatedFeatureIds: [],
+    execution_duration: 'PT1.4S',
+    generated_result_id: null,
+    operationCategory: 'calculation',
+  },
+];
+
+export const EdgeCases: Story = {
+  name: 'Rich Card — Edge Cases',
+  render: () => (
+    <LogPanelInteractive
+      entries={edgeCaseEntries}
+      featureNames={sampleFeatureNames}
+      hasActiveSession={true}
+    />
+  ),
+};
+
+const disabledEntryVariant: TimelineEntry = {
+  activity_id: 'disabled-sample',
+  timestamp: '2026-04-19T12:00:00Z',
+  toolName: 'bearing-between-tracks',
+  tool_version: '1.2.0',
+  parameters: {
+    maxRange: { value: 5000, default: false },
+    units: { value: 'metres', default: true },
+  },
+  usedFeatureIds: ['track-alpha', 'track-bravo'],
+  generatedFeatureIds: [],
+  execution_duration: 'PT0.9S',
+  generated_result_id: null,
+  operationCategory: 'calculation',
+  disabled: true,
+};
+
+export const DisabledCard: Story = {
+  name: 'Rich Card — Disabled',
+  render: () => (
+    <LogPanelInteractive
+      entries={[disabledEntryVariant, ...sampleEntries.slice(1)]}
+      featureNames={sampleFeatureNames}
+      hasActiveSession={true}
+    />
+  ),
+};

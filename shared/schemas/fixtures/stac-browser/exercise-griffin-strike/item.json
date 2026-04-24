@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2026-12-21T10:00:00Z",
     "end_datetime": "2026-12-22T06:14:41Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/arleigh-burke",
-      "surface/warship/corvette/visby"
+    "debrief:platforms": [
+      {
+        "id": "USS-IRON-DUKE",
+        "name": "USS Iron Duke",
+        "nationality": "US",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      },
+      {
+        "id": "USS-ROALD-AMUNDSEN",
+        "name": "USS Roald Amundsen",
+        "nationality": "US",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_role": "corvette",
+        "vessel_type": "visby"
+      },
+      {
+        "id": "USS-DE-ZEVEN-PROVINCIEN",
+        "name": "USS De Zeven Provincien",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "surveillance"
@@ -54,14 +75,6 @@
     "debrief:feature_tags": [
       "visual-sighting",
       "sonar-contact"
-    ],
-    "debrief:track_names": [
-      "USS Iron Duke",
-      "USS Roald Amundsen",
-      "USS De Zeven Provincien"
-    ],
-    "debrief:nationalities": [
-      "US"
     ]
   },
   "links": [

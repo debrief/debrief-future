@@ -1,0 +1,135 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--turn-single-point",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.923572222222223,
+          5.1826388888888895
+        ],
+        [
+          30.923572222222223,
+          5.1826388888888895
+        ],
+        [
+          30.923572222222223,
+          5.1826388888888895
+        ],
+        [
+          30.923572222222223,
+          5.1826388888888895
+        ],
+        [
+          30.923572222222223,
+          5.1826388888888895
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.923572222222223,
+    5.1826388888888895,
+    30.923572222222223,
+    5.1826388888888895
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Turn Single Point",
+    "datetime": "2009-04-22T18:02:54.410000+00:00",
+    "description": "Saxon Warrior: Turn Single Point — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Laboon.",
+    "start_datetime": "2009-04-22T18:02:54.410000+00:00",
+    "end_datetime": "2009-04-22T18:02:54.410000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "MAYO",
+        "name": "USS Laboon",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "MCM",
+      "multi-national",
+      "replenishment",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "radar-detection",
+      "sonar-contact"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "turn_single_point (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/turn_single_point.rep",
+      "title": "turn_single_point.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-turn_single_point": {
+      "href": "./assets/turn_single_point.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "turn_single_point.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/turn_single_point.rep",
+        "load_timestamp": "2026-04-13T23:12:33.858438Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

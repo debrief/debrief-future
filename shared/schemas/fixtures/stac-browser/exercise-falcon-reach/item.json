@@ -44,8 +44,31 @@
     "datetime": null,
     "start_datetime": "2022-08-13T09:00:00Z",
     "end_datetime": "2022-08-13T13:52:06Z",
-    "debrief:vessel_classes": [
-      "surface/warship/patrol/river"
+    "debrief:platforms": [
+      {
+        "id": "HMS-DIAMOND",
+        "name": "HMS Diamond",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "FS-HELGE-INGSTAD",
+        "name": "FS Helge Ingstad",
+        "nationality": "FR"
+      },
+      {
+        "id": "HMS-BERGAMINI",
+        "name": "HMS Bergamini",
+        "nationality": "GB"
+      },
+      {
+        "id": "FS-FRIDTJOF-NANSEN",
+        "name": "FS Fridtjof Nansen",
+        "nationality": "FR"
+      }
     ],
     "debrief:tags": [
       "mine-clearance"
@@ -53,16 +76,6 @@
     "debrief:feature_tags": [
       "sonar-contact",
       "helicopter-ops"
-    ],
-    "debrief:track_names": [
-      "HMS Diamond",
-      "FS Helge Ingstad",
-      "HMS Bergamini",
-      "FS Fridtjof Nansen"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "FR"
     ]
   },
   "links": [

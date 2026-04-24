@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2021-02-16T06:00:00Z",
     "end_datetime": "2021-02-17T10:44:24Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/survey/echo",
-      "surface/auxiliary/supply/fort-victoria"
+    "debrief:platforms": [
+      {
+        "id": "HMS-LANCASTER",
+        "name": "HMS Lancaster",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      },
+      {
+        "id": "INS-BRETAGNE",
+        "name": "INS Bretagne",
+        "nationality": "IN",
+        "vessel_class": "surface/auxiliary/supply/fort-victoria",
+        "domain": "surface",
+        "vessel_role": "supply",
+        "vessel_type": "fort-victoria"
+      },
+      {
+        "id": "HMS-HARNOSAND",
+        "name": "HMS Harnosand",
+        "nationality": "SE"
+      }
     ],
     "debrief:tags": [
       "harbour-ops",
@@ -58,15 +79,6 @@
       "depth-charge",
       "torpedo-run",
       "track-merge"
-    ],
-    "debrief:track_names": [
-      "HMS Lancaster",
-      "INS Bretagne",
-      "HMS Harnosand"
-    ],
-    "debrief:nationalities": [
-      "SE",
-      "IN"
     ]
   },
   "links": [

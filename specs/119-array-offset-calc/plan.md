@@ -76,7 +76,7 @@ services/calc/tests/tools/sensor/
 
 shared/schemas/src/fixtures/valid/
 ├── track-feature-sensors-measured-01.json  # EXISTS: MEASURED mode fixture
-└── track-feature-array-offset-01.json      # NEW: Multi-mode test fixture with expected outputs
+└── array-offset-golden-01.json      # NEW: Multi-mode test fixture with expected outputs
 ```
 
 **Structure Decision**: This is a cross-cutting feature touching both `shared/components` (TypeScript rendering) and `services/calc` (Python calculation tools). No new top-level directories are needed. The array offset module is co-located with existing sensor utilities in both languages.

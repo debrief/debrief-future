@@ -44,10 +44,54 @@
     "datetime": null,
     "start_datetime": "2021-05-07T04:00:00Z",
     "end_datetime": "2021-05-07T08:49:14Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45",
-      "surface/warship/patrol/river",
-      "surface/warship/corvette/visby"
+    "debrief:platforms": [
+      {
+        "id": "HMCS-KENT",
+        "name": "HMCS Kent",
+        "nationality": "CA",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "HMCS-AQUITAINE",
+        "name": "HMCS Aquitaine",
+        "nationality": "CA",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_role": "patrol",
+        "vessel_type": "river"
+      },
+      {
+        "id": "HMCS-TROMP",
+        "name": "HMCS Tromp",
+        "nationality": "CA",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_role": "corvette",
+        "vessel_type": "visby"
+      },
+      {
+        "id": "HMCS-PORTLAND",
+        "name": "HMCS Portland",
+        "nationality": "CA"
+      },
+      {
+        "id": "HMCS-LANGUEDOC",
+        "name": "HMCS Languedoc",
+        "nationality": "CA"
+      },
+      {
+        "id": "HMCS-SUTHERLAND",
+        "name": "HMCS Sutherland",
+        "nationality": "CA"
+      },
+      {
+        "id": "HMCS-BRETAGNE",
+        "name": "HMCS Bretagne",
+        "nationality": "CA"
+      }
     ],
     "debrief:tags": [
       "gunnery"
@@ -56,18 +100,6 @@
       "passive-search",
       "zig-zag",
       "depth-charge"
-    ],
-    "debrief:track_names": [
-      "HMCS Kent",
-      "HMCS Aquitaine",
-      "HMCS Tromp",
-      "HMCS Portland",
-      "HMCS Languedoc",
-      "HMCS Sutherland",
-      "HMCS Bretagne"
-    ],
-    "debrief:nationalities": [
-      "CA"
     ]
   },
   "links": [

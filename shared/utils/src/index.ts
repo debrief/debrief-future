@@ -20,7 +20,25 @@ export {
   mergeBounds,
   boundsToLeaflet,
   isValidBounds,
+  expandBounds,
+  isPointInBounds,
+  bboxOverlapsViewport,
+  viewportToBounds,
+  filterBySpatialExtent,
 } from './bounds.js';
+
+// Spatial converters (feature 203)
+export {
+  toGeoJSONCoord,
+  fromGeoJSONCoord,
+} from './spatial-converters.js';
+
+// Spatial validators + viewport centre (feature 203)
+export {
+  validateCoordinate,
+  validateViewportPolygon,
+  calculateViewportCenter,
+} from './spatial-validators.js';
 
 // Temporal utilities
 export {
@@ -38,12 +56,11 @@ export {
 
 // Types
 export type {
-  GeoJSONFeature,
-  GeoJSONFeatureCollection,
   Bounds,
   SafeGeometry,
   SafeFeature,
   SafeFeatureCollection,
+  PointShape,
   PositionStyle,
   PositionStyleOverride,
   ResolvedPositionStyle,
@@ -52,6 +69,12 @@ export type {
   DataSeries,
   DatasetEnvelope,
 } from './types.js';
+
+// Exhaustiveness helper
+export { assertNever } from './assert.js';
+
+// Errors
+export { InvalidPointShapeError } from './errors.js';
 
 // CSV utilities
 export {

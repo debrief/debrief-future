@@ -40,22 +40,20 @@
   ],
   "properties": {
     "title": "Saxon Warrior: Analysis1 Areas",
-    "datetime": "2026-03-28T13:50:57.636617+00:00",
+    "datetime": "2026-04-13T23:12:29.920924+00:00",
     "description": "Saxon Warrior: Analysis1 Areas — Royal Navy training exercise in the English Channel / Western Approaches.",
-    "debrief:vessel_classes": [],
+    "debrief:platforms": [],
     "debrief:tags": [
-      "ASW",
-      "amphibious",
-      "demo",
+      "escort",
       "force-protection",
+      "gunnery",
+      "surveillance",
       "training"
     ],
     "debrief:feature_tags": [
-      "radar-detection",
-      "torpedo-run"
-    ],
-    "debrief:track_names": [],
-    "debrief:nationalities": []
+      "depth-charge",
+      "sprint-and-drift"
+    ]
   },
   "links": [
     {
@@ -78,7 +76,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/Demo-Analysis/Analysis1_Areas.rep",
+      "href": "file:///tmp/debrief-regen-4x2tftum/Analysis1_Areas.rep",
       "title": "Analysis1_Areas.rep"
     }
   ],
@@ -99,8 +97,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/Demo-Analysis/Analysis1_Areas.rep",
-        "load_timestamp": "2026-03-28T13:50:57.638291Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/Analysis1_Areas.rep",
+        "load_timestamp": "2026-04-13T23:12:29.922670Z",
         "tool_version": "0.1.0"
       }
     },

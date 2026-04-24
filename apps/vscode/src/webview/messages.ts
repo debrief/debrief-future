@@ -8,6 +8,8 @@
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { SafeFeatureCollection } from '@debrief/utils';
+import type { DisplayMode, PlatformRecord, Viewport } from '@debrief/schemas';
+export type { PlatformRecord };
 
 // ============================================================================
 // Base Types
@@ -121,7 +123,7 @@ export interface SetCurrentTimeMessage {
 export interface SetDisplayModeMessage {
   type: 'setDisplayMode';
   /** 'full' = entire track + highlight marker; 'trail' = snail-trail to current time */
-  displayMode: 'full' | 'trail';
+  displayMode: DisplayMode;
 }
 
 /** Set hidden feature IDs (Feature: 048) */
@@ -165,6 +167,56 @@ export interface RequestTrackDetailsResponse extends ResponseMessage {
     endTime: string;
     duration: string;
   };
+}
+
+// ============================================================================
+// Storyboard Playback Messages (#217)
+// ============================================================================
+
+/**
+ * Kick off an animated flyTo on the map (extension → webview).
+ * `durationMs === 0` means "jump without animation" (setView with animate:false).
+ * The token correlates to the `flyToComplete` response so the extension can
+ * distinguish the animation it kicked off from any intervening ones.
+ */
+export interface FlyToMessage {
+  type: 'flyTo';
+  token: number;
+  center: readonly [number, number];  // [lat, lng]
+  zoom: number;
+  durationMs: number;
+}
+
+/** Scene snapshot sent for rectangle rendering. */
+export interface SceneRectangleSnapshot {
+  readonly sceneId: string;
+  readonly viewport: Viewport;
+  readonly timestamp: string;
+  /** GeoJSON Polygon coordinates — outer ring + optional holes. */
+  readonly polygon: readonly (readonly (readonly [number, number])[])[];
+}
+
+/**
+ * Push the active Storyboard's Scene rectangles to the webview
+ * (extension → webview). Passing `scenes: null` clears the overlay.
+ */
+export interface SetSceneRectanglesMessage {
+  type: 'setSceneRectangles';
+  scenes: readonly SceneRectangleSnapshot[] | null;
+  activeStoryboardId: string | null;
+  currentSceneId: string | null;
+}
+
+/** A flyTo animation has ended (webview → extension). */
+export interface FlyToCompleteMessage {
+  type: 'flyToComplete';
+  token: number;
+}
+
+/** User clicked a Scene rectangle (webview → extension). */
+export interface SceneRectangleClickedMessage {
+  type: 'sceneRectangleClicked';
+  sceneId: string;
 }
 
 // ============================================================================
@@ -416,6 +468,7 @@ export interface ResultsCloseTabMessage {
 // ============================================================================
 
 /** All messages from extension to webview */
+// eslint-disable-next-line no-restricted-syntax -- VS Code-local ExtensionToWebviewMessage is the superset used by the extension host; @debrief/components exports a narrower shape for the webview. Follow-up to reconcile, #214 scope-adjacent
 export type ExtensionToWebviewMessage =
   | LoadPlotMessage
   | SetSelectionMessage
@@ -442,7 +495,10 @@ export type ExtensionToWebviewMessage =
   // Results panel (#178)
   | ResultsSetTabsMessage
   | ResultsSetVisibilityMessage
-  | ResultsSetLoadingMessage;
+  | ResultsSetLoadingMessage
+  // Storyboard playback (#217)
+  | FlyToMessage
+  | SetSceneRectanglesMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -467,7 +523,10 @@ export type WebviewToExtensionMessage =
   | ResultsSaveMessage
   | ResultsSaveAsMessage
   | ResultsRetryMessage
-  | ResultsCloseTabMessage;
+  | ResultsCloseTabMessage
+  // Storyboard playback (#217)
+  | FlyToCompleteMessage
+  | SceneRectangleClickedMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)
@@ -488,11 +547,9 @@ export interface ExerciseListItemMessage {
   readonly datetime: string | null;
   readonly startDatetime: string | null;
   readonly endDatetime: string | null;
-  readonly vesselClasses: readonly string[];
+  readonly platforms: readonly PlatformRecord[];
   readonly tags: readonly string[];
   readonly author: string | null;
-  readonly nationalities: readonly string[];
-  readonly trackNames: readonly string[];
   readonly trackDataHref: string | null;
 }
 

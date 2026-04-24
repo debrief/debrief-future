@@ -12,10 +12,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
+  SceneRectangleSnapshot,
 } from '../messages';
 
 // VS Code API type
@@ -68,6 +69,13 @@ function MapViewApp(): React.ReactElement {
   // Temporal state
   const [currentTime, setCurrentTime] = useState<number | undefined>();
   const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
+
+  // Storyboard playback (#217)
+  const [flyToTarget, setFlyToTarget] = useState<FlyToTarget | null>(null);
+  const [sceneRectanglesState, setSceneRectanglesState] = useState<
+    | { scenes: readonly SceneRectangleSnapshot[]; activeStoryboardId: string | null; currentSceneId: string | null }
+    | null
+  >(null);
 
   // Restore state on mount
   useEffect(() => {
@@ -157,6 +165,25 @@ function MapViewApp(): React.ReactElement {
         case 'setDrawingPaletteIndex':
           setPaletteIndex(msg.paletteIndex);
           break;
+        case 'flyTo':
+          setFlyToTarget({
+            token: msg.token,
+            center: msg.center,
+            zoom: msg.zoom,
+            durationMs: msg.durationMs,
+          });
+          break;
+        case 'setSceneRectangles':
+          if (msg.scenes === null) {
+            setSceneRectanglesState(null);
+          } else {
+            setSceneRectanglesState({
+              scenes: msg.scenes,
+              activeStoryboardId: msg.activeStoryboardId,
+              currentSceneId: msg.currentSceneId,
+            });
+          }
+          break;
         case 'requestThumbnailCapture':
           void (async () => {
             try {
@@ -241,6 +268,53 @@ function MapViewApp(): React.ReactElement {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // #217 — flyTo completion + scene-rectangle click
+  const handleFlyToComplete = useCallback((token: number) => {
+    vscode.postMessage({ type: 'flyToComplete', token });
+  }, []);
+
+  const handleSceneRectangleClick = useCallback((sceneId: string) => {
+    vscode.postMessage({ type: 'sceneRectangleClicked', sceneId });
+  }, []);
+
+  // Convert SceneRectangleSnapshot[] (transport-safe primitives) to the
+  // SceneFeature shape expected by SceneRectangleLayer. The layer only
+  // reads `geometry.coordinates` + `properties.timestamp` + `properties.id`
+  // + `properties.storyboard_id` + `properties.viewport`, so a partial
+  // synthesis is sufficient.
+  const sceneRectangleProps: SceneRectangleLayerProps | undefined = useMemo(() => {
+    if (!sceneRectanglesState) return undefined;
+    const syntheticScenes = sceneRectanglesState.scenes.map((snap) => ({
+      type: 'Feature' as const,
+      id: snap.sceneId,
+      geometry: {
+        type: 'Polygon' as const,
+        coordinates: snap.polygon.map((ring) => ring.map((pt) => [pt[0], pt[1]])) as unknown as number[][][],
+      },
+      properties: {
+        id: snap.sceneId,
+        kind: 'STORYBOARD_SCENE' as const,
+        storyboard_id: sceneRectanglesState.activeStoryboardId ?? '',
+        viewport: snap.viewport,
+        timestamp: snap.timestamp,
+        title: '',
+        visible_feature_ids: [] as string[],
+        feature_set_hash: '',
+        thumbnail_asset_ref: '',
+        transition_duration_ms: 500,
+        schema_version: 1,
+      },
+    }));
+    // Cast once at the boundary — the synthetic object is structurally
+    // sufficient for the layer's read pattern.
+    return {
+      scenes: syntheticScenes as unknown as SceneRectangleLayerProps['scenes'],
+      activeStoryboardId: sceneRectanglesState.activeStoryboardId,
+      currentSceneId: sceneRectanglesState.currentSceneId,
+      onSceneRectangleClick: handleSceneRectangleClick,
+    };
+  }, [sceneRectanglesState, handleSceneRectangleClick]);
 
   // Shape drawing callback — prompt for name, then convert Geoman output to schema-compliant features
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
@@ -349,6 +423,9 @@ function MapViewApp(): React.ReactElement {
       drawingMode={drawingMode}
       onDrawingModeChange={handleDrawingModeChange}
       onShapeCreated={handleShapeCreated}
+      flyToTarget={flyToTarget}
+      onFlyToComplete={handleFlyToComplete}
+      sceneRectangles={sceneRectangleProps}
       height="100vh"
     />
   );

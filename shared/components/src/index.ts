@@ -42,7 +42,14 @@ export type {
 } from './StacFileTree';
 
 export { MapView } from './MapView';
-export type { MapViewProps } from './MapView';
+export type { MapViewProps, FlyToTarget } from './MapView';
+export {
+  SceneRectangleLayer,
+  geoJsonPolygonToLeafletCoords,
+  computeFillOpacity,
+  computeOverlapRanks,
+} from './MapView/SceneRectangleLayer';
+export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';
 
 export { Timeline } from './Timeline';
 export type { TimelineProps } from './Timeline';
@@ -100,15 +107,19 @@ export {
 } from './utils/types';
 
 // Utilities
-export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from '@debrief/utils';
 export {
   calculateTimeExtent,
   parseDuration,
   findIntervalPositions,
+} from './utils/time';
+export {
   resolvePositionStyle,
   computeAllPositionStyles,
-} from './utils/time';
-export type { ResolvedPositionStyle } from './utils/time';
+  assertNever,
+  InvalidPointShapeError,
+} from '@debrief/utils';
+export type { PointShape, ResolvedPositionStyle } from '@debrief/utils';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
 
 // ToolMatch
@@ -222,8 +233,6 @@ export { LogPanel } from './LogPanel';
 export type {
   LogPanelProps,
   LogEntryProps,
-  LogTimelineProps,
-  LogByFeatureProps,
   LogFilterRowProps,
   LogActionBarProps,
   SnapshotBoundaryProps,
@@ -251,10 +260,16 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 207: manifest-fed icon resolution
+  ToolCategoryMap,
+  // Feature 208: TimelineEntry kind discriminator
+  TimelineEntryKind,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,
   VALID_VIEW_MODES,
+  TIMELINE_ENTRY_KINDS,
+  assertNeverKind,
 } from './LogPanel';
 export type {
   FilterState as LogFilterState,
@@ -289,3 +304,75 @@ export type {
   ColourDimensionSelectorProps,
   ColourLegendProps,
 } from './colour-engine';
+
+// PropertiesPanel (Feature: 193-properties-panel)
+export {
+  PROPERTIES_PANEL_TOOL_SENTINEL,
+  PROVENANCE_LOG_CAP,
+  PROVENANCE_LOG_ARCHIVE_FILENAME,
+  isValidPropertiesProvenanceEntry,
+} from './PropertiesPanel/provenanceTypes';
+export type { PropertiesProvenanceEntry } from './PropertiesPanel/provenanceTypes';
+export {
+  AUTO_DERIVED_FIELDS,
+  isAutoDerivedField,
+} from './PropertiesPanel/autoDerivedFields';
+export type { AutoDerivedField } from './PropertiesPanel/autoDerivedFields';
+export {
+  PropertiesForm,
+  ArrayWidget,
+  BboxWidget,
+  DateTimeWidget,
+  PlatformArrayWidget,
+  resolveFieldSpec,
+} from './PropertiesPanel';
+export type {
+  FieldSpec,
+  FieldDerivationState,
+  PropertiesFormField,
+  PropertiesFormProps,
+} from './PropertiesPanel';
+export {
+  BrowserSelectionContext,
+  BrowserSelectionProvider,
+  useBrowserSelection,
+  PropertiesSidePanel,
+} from './StacBrowser';
+export type {
+  BrowserSelection,
+  BrowserSelectionProviderProps,
+  PropertiesSidePanelProps,
+} from './StacBrowser';
+
+// Storyboard CRUD module (Feature: 215-storyboarding-schema)
+export * from './storyboard';
+
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit)
+export {
+  StoryboardPanel,
+  SceneRow,
+  SceneList,
+  TransportRow,
+  HardBlockModal,
+  StoryboardHeader,
+  SceneEditForm,
+  UndoToast,
+  StaleBadge,
+} from './panels/StoryboardPanel';
+export type {
+  StoryboardPanelProps,
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
+  TransportRowProps,
+  HardBlockModalProps,
+  StoryboardHeaderProps,
+  SceneEditFormProps,
+  SceneMissingData,
+  UndoToastProps,
+  UndoToastState,
+  StaleBadgeProps,
+  SceneEditViewModel,
+  StoryboardEditViewModel,
+} from './panels/StoryboardPanel';

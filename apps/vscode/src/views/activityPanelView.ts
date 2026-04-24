@@ -20,6 +20,7 @@ import {
   type TemporalSlice,
   type FeatureSelection,
 } from '@debrief/session-state';
+import type { DisplayMode } from '@debrief/schemas';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
@@ -27,6 +28,7 @@ import type { MatchResult } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import type { AssociatedFile, StacService } from '../services/stacService';
 import type { ResultsPanelService } from '../services/resultsPanelService';
+import { AUTO_DERIVED_FIELDS } from '@debrief/components/PropertiesPanel/autoDerivedFields';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -45,7 +47,7 @@ interface TemporalPauseMessage {
 
 interface TemporalDisplayModeMessage {
   type: 'temporal:displayMode';
-  payload: { mode: 'full' | 'trail' };
+  payload: { mode: DisplayMode };
 }
 
 interface ToolRunMessage {
@@ -81,6 +83,13 @@ interface FileActionMessage {
   };
 }
 
+interface PropertiesCommitMessage {
+  type: 'properties:commit';
+  storePath: string;
+  itemPath: string;
+  patch: Record<string, unknown>;
+}
+
 interface WebviewReadyMessage {
   type: 'webviewReady';
 }
@@ -96,6 +105,7 @@ type WebviewMessage =
   | LayerSelectMessage
   | LayerFormatMessage
   | FileActionMessage
+  | PropertiesCommitMessage
   | WebviewReadyMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
@@ -198,7 +208,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             startTime: state.timeRange.start,
             endTime: state.timeRange.end,
             currentTime: state.currentTime,
-            displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
+            displayMode: state.displayMode,
           },
         });
       }
@@ -240,7 +250,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         startTime: temporal.timeRange.start,
         endTime: temporal.timeRange.end,
         currentTime: temporal.currentTime,
-        displayMode: temporal.displayMode === 'snailTrail' ? 'trail' : 'full',
+        displayMode: temporal.displayMode,
       },
     });
   }
@@ -422,7 +432,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
                   startTime: state.timeRange.start,
                   endTime: state.timeRange.end,
                   currentTime: state.currentTime,
-                  displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
+                  displayMode: state.displayMode,
                 },
               });
             }
@@ -455,7 +465,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         case 'temporal:displayMode':
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setDisplayMode(message.payload.mode === 'trail' ? 'snailTrail' : 'normal');
+            state.setDisplayMode(message.payload.mode);
           }
           void vscode.commands.executeCommand('debrief.setDisplayMode', {
             mode: message.payload.mode,
@@ -521,8 +531,72 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             message.payload.action,
           );
           break;
+
+        case 'properties:commit':
+          // Feature: 193-properties-panel — direct-write item metadata
+          void this._handlePropertiesCommit(message);
+          break;
       }
     });
+  }
+
+  /**
+   * Handle a Properties Panel commit from the webview.
+   *
+   * Invokes stacService.updateItemMetadata (single-writer) and replies with
+   * a 'properties:committed' on success or 'properties:error' on failure.
+   */
+  private async _handlePropertiesCommit(
+    message: PropertiesCommitMessage,
+  ): Promise<void> {
+    if (!this._stacService) {
+      this._postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: 'ServiceUnavailable',
+        message: 'Properties write service not wired',
+      });
+      return;
+    }
+
+    try {
+      const pkgJson = vscode.extensions.getExtension('debrief.debrief-vscode')
+        ?.packageJSON as { version?: string } | undefined;
+      const packageVersion = pkgJson?.version ?? '0.0.0';
+      const fields = Object.keys(message.patch).sort();
+      // T077: only auto-derived fields go into debrief:overrides — non-derived
+      // fields are plain user values and don't need a skip-list entry.
+      const overrideFields = fields.filter((k) =>
+        AUTO_DERIVED_FIELDS.includes(k as (typeof AUTO_DERIVED_FIELDS)[number]),
+      );
+      const result = await this._stacService.updateItemMetadata({
+        storePath: message.storePath,
+        itemPath: message.itemPath,
+        patch: message.patch,
+        overrideFields,
+        provenance: {
+          tool: 'debrief.propertiesPanel',
+          fields,
+        },
+        packageVersion: String(packageVersion),
+      });
+      this._postMessage({
+        type: 'properties:committed',
+        itemPath: message.itemPath,
+        updatedProperties: result.updatedProperties,
+        overrides: result.overrides,
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-010, unrelated to #214
+        activityId: result.activityId,
+      });
+    } catch (err) {
+      const e = err as Error & { name?: string };
+      this._postMessage({
+        type: 'properties:error',
+        itemPath: message.itemPath,
+        errorName: e.name ?? 'Error',
+        message: e.message ?? 'Properties commit failed',
+      });
+    }
   }
 
   /**

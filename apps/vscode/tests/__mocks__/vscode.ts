@@ -5,6 +5,7 @@ export const window = {
   showInformationMessage: vi.fn(),
   showErrorMessage: vi.fn(),
   showWarningMessage: vi.fn(),
+  showInputBox: vi.fn(),
   showQuickPick: vi.fn(),
   showOpenDialog: vi.fn(),
   showSaveDialog: vi.fn(),

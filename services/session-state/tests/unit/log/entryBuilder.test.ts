@@ -8,7 +8,6 @@ import {
   msToIsoDuration,
   generateActivityId,
   extractActivityIdFromOutputFeatures,
-  extractParametersFromOutputFeatures,
 } from '../../../src/log/entryBuilder.js';
 import type { ToolResultForLog, ExpandedToolResultFields } from '../../../src/log/types.js';
 
@@ -244,58 +243,3 @@ describe('buildLogEntry', () => {
   });
 });
 
-describe('extractParametersFromOutputFeatures', () => {
-  it('extracts parameters matching activityId', () => {
-    const features: Array<Record<string, unknown>> = [{
-      type: 'Feature',
-      properties: {
-        provenance: [{
-          activity_id: 'act-1',
-          was_generated_by: {
-            tool: 'move-shape',
-            parameters: {
-              direction: { value: 90, default: false, tunable: true },
-            },
-          },
-        }],
-      },
-    }];
-    const params = extractParametersFromOutputFeatures(features, 'act-1');
-    expect(params).toBeDefined();
-    expect(params!.direction).toEqual({ value: 90, default: false, tunable: true });
-  });
-
-  it('returns undefined when no matching activityId', () => {
-    const features: Array<Record<string, unknown>> = [{
-      type: 'Feature',
-      properties: {
-        provenance: [{
-          activity_id: 'act-other',
-          was_generated_by: { tool: 'x', parameters: { a: { value: 1 } } },
-        }],
-      },
-    }];
-    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
-  });
-
-  it('returns undefined when no provenance', () => {
-    const features: Array<Record<string, unknown>> = [{
-      type: 'Feature',
-      properties: {},
-    }];
-    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
-  });
-
-  it('returns undefined when parameters are empty', () => {
-    const features: Array<Record<string, unknown>> = [{
-      type: 'Feature',
-      properties: {
-        provenance: [{
-          activity_id: 'act-1',
-          was_generated_by: { tool: 'x', parameters: {} },
-        }],
-      },
-    }];
-    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
-  });
-});

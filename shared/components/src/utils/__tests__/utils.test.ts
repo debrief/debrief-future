@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { calculateBounds, expandBounds, isPointInBounds } from '../bounds';
 import { calculateTimeExtent, parseTime, formatTime, formatDuration } from '../time';
 import { getFeatureLabel, getFeatureIcon, getFeatureColor, getFeatureDescription } from '../labels';
 import { isTrackFeature, isReferenceLocation } from '../types';
@@ -81,62 +80,6 @@ describe('types', () => {
 
     it('returns false for track features', () => {
       expect(isReferenceLocation(mockTrackFeature)).toBe(false);
-    });
-  });
-});
-
-describe('bounds', () => {
-  describe('calculateBounds', () => {
-    it('calculates bounds for a feature collection', () => {
-      const bounds = calculateBounds(mockFeatureCollection);
-      expect(bounds).not.toBeNull();
-      expect(bounds![0]).toBe(-5.0); // minLon
-      expect(bounds![1]).toBe(50.0); // minLat
-      expect(bounds![2]).toBe(-3.0); // maxLon
-      expect(bounds![3]).toBe(52.0); // maxLat
-    });
-
-    it('calculates bounds for an array of features', () => {
-      const bounds = calculateBounds([mockTrackFeature]);
-      expect(bounds).toEqual([-5.0, 50.0, -4.0, 51.0]);
-    });
-
-    it('returns null for empty collection', () => {
-      const bounds = calculateBounds({ type: 'FeatureCollection', features: [] });
-      expect(bounds).toBeNull();
-    });
-
-    it('uses feature bbox if available', () => {
-      const featureWithBbox: TrackFeature = {
-        ...mockTrackFeature,
-        bbox: [-10, 40, 0, 60],
-      };
-      const bounds = calculateBounds([featureWithBbox]);
-      expect(bounds).toEqual([-10, 40, 0, 60]);
-    });
-  });
-
-  describe('expandBounds', () => {
-    it('expands bounds by percentage', () => {
-      const bounds = expandBounds([-5, 50, -3, 52], 0.1);
-      expect(bounds[0]).toBeLessThan(-5);
-      expect(bounds[1]).toBeLessThan(50);
-      expect(bounds[2]).toBeGreaterThan(-3);
-      expect(bounds[3]).toBeGreaterThan(52);
-    });
-  });
-
-  describe('isPointInBounds', () => {
-    it('returns true for point inside bounds', () => {
-      expect(isPointInBounds(-4, 51, [-5, 50, -3, 52])).toBe(true);
-    });
-
-    it('returns false for point outside bounds', () => {
-      expect(isPointInBounds(-6, 51, [-5, 50, -3, 52])).toBe(false);
-    });
-
-    it('returns true for point on boundary', () => {
-      expect(isPointInBounds(-5, 50, [-5, 50, -3, 52])).toBe(true);
     });
   });
 });

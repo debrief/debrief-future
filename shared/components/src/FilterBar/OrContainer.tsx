@@ -3,11 +3,15 @@
  *
  * Uses @dnd-kit useDroppable to accept lozenge drops (but not OR containers).
  * Contains a mini (+) button for adding child filters.
+ *
+ * Extended in #186 to accept both simple and platform lozenge children through
+ * the widened LozengeItem union, and to surface the Platform option in the
+ * mini add-menu.
  */
 
 import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import type { LozengeItem } from './types';
+import type { LozengeItem, PlatformAttributes } from './types';
 import type { FilterType, VesselTaxonomyNode } from '../filter-engine';
 import { Lozenge } from './Lozenge';
 import { FILTER_TYPE_OPTIONS } from './constants';
@@ -21,9 +25,16 @@ export interface OrContainerProps {
   readonly onEditLozenge: (id: string) => void;
   readonly onRemoveLozenge: (id: string) => void;
   readonly onValueChange: (id: string, newValue: string) => void;
+  readonly onPlatformAttributesChange?: (id: string, attributes: PlatformAttributes) => void;
   readonly onEditClose: () => void;
   readonly onToggleNegate: (id: string) => void;
-  readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
+  readonly availableValues: Readonly<Record<Exclude<FilterType, 'platform'>, readonly string[]>>;
+  readonly platformAvailableValues?: Readonly<{
+    readonly nationality: readonly string[];
+    readonly domain: readonly string[];
+    readonly vessel_role: readonly string[];
+    readonly vessel_type: readonly string[];
+  }>;
   readonly taxonomy: readonly VesselTaxonomyNode[];
   readonly labelMap?: ReadonlyMap<string, string>;
   readonly taxonomyCounts?: ReadonlyMap<string, number>;
@@ -37,9 +48,11 @@ export const OrContainer: React.FC<OrContainerProps> = ({
   onEditLozenge,
   onRemoveLozenge,
   onValueChange,
+  onPlatformAttributesChange,
   onEditClose,
   onToggleNegate,
   availableValues,
+  platformAvailableValues,
   taxonomy,
   labelMap,
   taxonomyCounts,
@@ -69,9 +82,11 @@ export const OrContainer: React.FC<OrContainerProps> = ({
               onEdit={onEditLozenge}
               onRemove={onRemoveLozenge}
               onValueChange={onValueChange}
+              onPlatformAttributesChange={onPlatformAttributesChange}
               onEditClose={onEditClose}
               onToggleNegate={onToggleNegate}
               availableValues={availableValues}
+              platformAvailableValues={platformAvailableValues}
               taxonomy={taxonomy}
               labelMap={labelMap}
               taxonomyCounts={taxonomyCounts}

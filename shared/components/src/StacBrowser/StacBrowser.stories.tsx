@@ -10,6 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { StacBrowser } from './StacBrowser';
 import { ThemeProvider } from '../ThemeProvider';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine/types';
+import type { PlatformRecord } from '@debrief/schemas';
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -22,12 +23,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-01-01T00:00:00Z',
     endDatetime: '2025-01-15T00:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -40,11 +39,12 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     bbox: [-20, 50, -10, 60],
     startDatetime: '2025-01-01T00:00:00Z',
     endDatetime: '2025-01-15T00:00:00Z',
-    vesselClasses: ['surface/warship/frigate/type23'],
-    nationalities: ['British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'GB', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'CONTACT-ALPHA', name: 'Contact Alpha', domain: 'unknown' },
+    ] satisfies PlatformRecord[],
     tags: ['asw', 'blue-water'],
     author: 'CDR Smith',
-    trackNames: ['HMS Argyll', 'Contact Alpha'],
     collection: 'exercises-2025',
   }),
   makeItem('ex-002', {
@@ -52,11 +52,12 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     bbox: [10, 30, 30, 40],
     startDatetime: '2025-02-01T00:00:00Z',
     endDatetime: '2025-03-15T00:00:00Z',
-    vesselClasses: ['surface/warship/destroyer/type45'],
-    nationalities: ['French', 'British'],
+    platforms: [
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+      { id: 'AQUITAINE', name: 'FS Aquitaine', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['carrier-ops', 'blue-water'],
     author: 'CDR Jones',
-    trackNames: ['HMS Diamond', 'FS Aquitaine'],
     collection: 'exercises-2025',
   }),
   makeItem('ex-003', {
@@ -64,11 +65,11 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     bbox: [140, 20, 160, 40],
     startDatetime: '2025-03-01T00:00:00Z',
     endDatetime: '2025-04-01T00:00:00Z',
-    vesselClasses: ['submarine/nuclear/ssn'],
-    nationalities: ['Japanese'],
+    platforms: [
+      { id: 'SORYU', name: 'JS Soryu', nationality: 'JP', vessel_class: 'subsurface/submarine/ssn', vessel_role: 'ssn', domain: 'subsurface' },
+    ] satisfies PlatformRecord[],
     tags: ['asw'],
     author: 'CDR Tanaka',
-    trackNames: ['JS Soryu'],
     collection: 'training-2025',
   }),
   makeItem('ex-004', {
@@ -76,11 +77,11 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     bbox: [15, 54, 25, 60],
     startDatetime: '2025-01-15T00:00:00Z',
     endDatetime: '2025-02-15T00:00:00Z',
-    vesselClasses: ['surface/warship/frigate/type26'],
-    nationalities: ['German'],
+    platforms: [
+      { id: 'SACHSEN', name: 'FGS Sachsen', nationality: 'DE', vessel_class: 'surface/warship/frigate/type26', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['surface-action'],
     author: 'CDR Mueller',
-    trackNames: ['FGS Sachsen'],
     collection: 'exercises-2025',
   }),
   makeItem('ex-005', {
@@ -88,7 +89,9 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     bbox: null,
     startDatetime: '2025-01-10T00:00:00Z',
     endDatetime: '2025-01-20T00:00:00Z',
-    nationalities: ['British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'GB', vessel_class: 'surface/warship/frigate/type23', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['tabletop'],
     author: 'CDR Williams',
   }),
@@ -98,7 +101,9 @@ const MOCK_ITEMS: StacBrowserItem[] = [
     datetime: null,
     startDatetime: null,
     endDatetime: null,
-    nationalities: ['French'],
+    platforms: [
+      { id: 'AQUITAINE', name: 'FS Aquitaine', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['historical'],
   }),
 ];
@@ -196,8 +201,9 @@ export const ManyExercises: Story = {
         bbox: [-180 + (i * 7) % 360, -60 + (i * 3) % 120, -170 + (i * 7) % 360, -50 + (i * 3) % 120],
         startDatetime: new Date(2024, 0, 1 + i * 7).toISOString(),
         endDatetime: new Date(2024, 0, 8 + i * 7).toISOString(),
-        vesselClasses: i % 3 === 0 ? ['submarine/nuclear/ssn'] : ['surface/warship/frigate/type23'],
-        nationalities: ['British', 'French', 'German', 'Japanese'][i % 4] ? [['British', 'French', 'German', 'Japanese'][i % 4]!] : [],
+        platforms: i % 3 === 0
+          ? [{ id: `SC${String(i).padStart(2, '0')}`, name: `Submerged Contact ${String(i).padStart(2, '0')}`, vessel_class: 'subsurface/submarine/ssn', domain: 'subsurface' }] satisfies PlatformRecord[]
+          : [{ id: `FRG${String(i).padStart(2, '0')}`, nationality: ['GB', 'FR', 'DE', 'JP'][i % 4], vessel_class: 'surface/warship/frigate/type23', domain: 'surface' }] satisfies PlatformRecord[],
       }),
     ),
     taxonomy: MOCK_TAXONOMY,

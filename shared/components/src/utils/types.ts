@@ -72,8 +72,9 @@ export {
   isAnnotationFeature,
 } from '@debrief/schemas';
 
-// Re-export DisplayMode from TimeController for use by MapView temporal rendering
-export type { DisplayMode } from '../TimeController/types';
+// DisplayMode moved to @debrief/schemas (Feature 205). Re-exported from the
+// shared/schemas barrel for package-level ergonomics.
+export type { DisplayMode } from '@debrief/schemas';
 
 // Bounds type — canonical definition in @debrief/utils (T08)
 export type { Bounds } from '@debrief/utils';

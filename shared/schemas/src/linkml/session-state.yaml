@@ -22,7 +22,10 @@ imports:
 
 enums:
   PlaybackStateEnum:
-    description: Current state of time playback
+    description: >-
+      Current state of time playback. Component consumers treat
+      `stopped` as equivalent to `paused`. See ADR-022 in
+      docs/project_notes/decisions.md.
     permissible_values:
       stopped:
         description: Playback is stopped
@@ -32,12 +35,15 @@ enums:
         description: Playback is paused
 
   DisplayModeEnum:
-    description: Track visualization display mode
+    description: >-
+      Track visualization display mode. `full` renders the entire track
+      regardless of current time; `trail` renders a snail-trail from
+      track start up to current time.
     permissible_values:
-      normal:
-        description: Standard track display
-      snailTrail:
-        description: Trail showing recent positions
+      full:
+        description: Render the entire track regardless of current time
+      trail:
+        description: Render a snail-trail from track start up to current time
 
   TimeUnitEnum:
     description: Units for time step navigation
@@ -97,14 +103,16 @@ classes:
           # start.epoch <= end.epoch
 
   TimeFilter:
-    description: Constraints on the visible time window
+    description: Constraints on the visible time window (epoch milliseconds; null = unbounded)
     attributes:
       start:
-        description: Filter start (null = unbounded)
-        range: TimeInstant
+        description: Filter start as epoch milliseconds (null/missing = unbounded on the start)
+        range: integer
+        required: false
       end:
-        description: Filter end (null = unbounded)
-        range: TimeInstant
+        description: Filter end as epoch milliseconds (null/missing = unbounded on the end)
+        range: integer
+        required: false
 
   TimeStep:
     description: Step size for discrete time navigation (FR-008)
@@ -145,6 +153,10 @@ classes:
         required: true
         minimum_cardinality: 4
         maximum_cardinality: 4
+      zoom:
+        description: Map zoom level for restoring the view (optional)
+        range: float
+        required: false
 
   LevelDefinition:
     description: >-
@@ -259,32 +271,6 @@ classes:
         description: Last save location
         range: string
 
-  GeoJSONGeometry:
-    description: GeoJSON geometry object (type + coordinates pair)
-    attributes:
-      type:
-        description: GeoJSON geometry type (e.g., Point, LineString, Polygon)
-        range: string
-        required: true
-
-  GeoJSONFeature:
-    description: >
-      GeoJSON Feature representation used for tool result layers.
-      Feature 109-unify-result-layer-lifecycle.
-    attributes:
-      type:
-        description: GeoJSON object type — always "Feature"
-        range: string
-        required: true
-      id:
-        description: Optional feature identifier (string or numeric, stored as string)
-        range: string
-        required: false
-      geometry:
-        description: GeoJSON geometry object
-        range: GeoJSONGeometry
-        required: true
-
   LastToolExecution:
     description: >
       Record of the last tool execution, enabling single-step undo.
@@ -312,7 +298,7 @@ classes:
     attributes:
       result_layers:
         description: Accumulated tool result features
-        range: GeoJSONFeature
+        range: RawGeoJSONFeature
         multivalued: true
         required: true
         inlined_as_list: true

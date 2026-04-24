@@ -1,4 +1,9 @@
 const { rules: snakeCaseRules } = require('../../shared/eslint-rules/provenance-snake-case.cjs');
+const { rules: utilsDriftRules } = require('../../shared/eslint-rules/no-redeclare-utils-exports.cjs');
+const { rules: schemasDriftRules } = require('../../shared/eslint-rules/no-redeclare-schemas-exports.cjs');
+const { rules: componentsDriftRules } = require('../../shared/eslint-rules/no-redeclare-components-exports.cjs');
+const { rules: sessionStateDriftRules } = require('../../shared/eslint-rules/no-redeclare-session-state-exports.cjs');
+const { rules: dataDriftRules } = require('../../shared/eslint-rules/no-redeclare-data-exports.cjs');
 
 module.exports = {
   root: true,
@@ -43,7 +48,7 @@ module.exports = {
       },
     ],
     'no-restricted-syntax': [
-      'warn',
+      'error',
       {
         selector: "TSAsExpression[typeAnnotation.typeName.name='Record']",
         message:
@@ -55,6 +60,11 @@ module.exports = {
           'Do not cast to unknown — validate through a typed model instead (ADR-011, Constitution XV.7).',
       },
       ...snakeCaseRules,
+      ...utilsDriftRules,
+      ...schemasDriftRules,
+      ...componentsDriftRules,
+      ...sessionStateDriftRules,
+      ...dataDriftRules,
     ],
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/await-thenable': 'error',

@@ -4,12 +4,20 @@
  * Feature: 072-log-panel (E02, Phase 2)
  */
 
-// T022: Import ParameterValue, InputFeatureState from @debrief/schemas instead of defining locally.
-// Note: schema ParameterValue uses `value: string` (wire format) and InputFeatureState uses
-// snake_case `feature_id` (wire format). Consumers accessing `value` as `unknown`
-// will need to update to use the schema field names.
-import type { ParameterValue, InputFeatureState } from '@debrief/schemas';
+// Schema ParameterValue uses `value: string` (wire format); InputFeatureState uses
+// snake_case `feature_id` (wire format).
+import type { ParameterValue, InputFeatureState, ToolCategoryEnum } from '@debrief/schemas';
 export type { ParameterValue, InputFeatureState };
+
+/**
+ * Feature 207: runtime map of tool ID → visual category (or null when the
+ * tool declared no category / declared an invalid value). Consumed by
+ * `resolveToolCategory()` to paint each Log Panel card's icon.
+ *
+ * `undefined` at the prop level means "manifest not yet loaded" — every
+ * card renders the grey fallback until a map arrives.
+ */
+export type ToolCategoryMap = Readonly<Record<string, ToolCategoryEnum | null>>;
 
 /**
  * Operation category derived from tool ID.
@@ -28,9 +36,12 @@ export type ParamType = 'colour' | 'number' | 'boolean' | 'range' | 'enum';
 
 /**
  * Static config for a tool category's visual properties. Feature: 176-log-panel-ux
+ *
+ * `category` is nullable to accommodate the neutral-grey fallback for tools
+ * that have no manifest entry yet.
  */
 export interface ToolCategoryConfig {
-  readonly category: ToolCategory;
+  readonly category: ToolCategory | null;
   readonly background: string;
   readonly glyph: string;
   readonly label: string;
@@ -43,7 +54,7 @@ export interface ParamChipData {
   readonly name: string;
   readonly value: unknown;
   readonly paramType: ParamType | null;
-  readonly isDefault: boolean;
+  readonly isNonDefault: boolean;
   readonly unit?: string | null;
 }
 
@@ -60,6 +71,40 @@ export type ViewMode = 'timeline' | 'by-feature' | 'compact' | 'detailed';
  * Valid ViewMode values for runtime validation.
  */
 export const VALID_VIEW_MODES: readonly ViewMode[] = ['timeline', 'by-feature', 'compact', 'detailed'] as const;
+
+/**
+ * Semantic classification of a timeline entry, independent of its visual
+ * category. Projected from the PROV-side `LogEntry.activity_type` field on
+ * the LinkML schema (source of truth). Feature: 208-timeline-entry-kind.
+ *
+ * - 'snapshot': a distinguished moment in the session (manual checkpoint,
+ *   future: manual snapshot button, rationale markers).
+ * - 'tool':     an ordinary tool invocation.
+ * - 'tune':     reserved for future standalone tune-action entries. No
+ *   populator emits `'tune'` in feature 208 — it lands when a producer
+ *   sets `activity_type: 'tune'` on the record.
+ */
+export type TimelineEntryKind = 'snapshot' | 'tool' | 'tune';
+
+/**
+ * All values of TimelineEntryKind, for runtime enumeration (tests, fixtures,
+ * documentation). Feature: 208-timeline-entry-kind.
+ */
+export const TIMELINE_ENTRY_KINDS: readonly TimelineEntryKind[] = [
+  'snapshot',
+  'tool',
+  'tune',
+] as const;
+
+/**
+ * Exhaustiveness guard. Call at the default branch of a switch/if-chain that
+ * enumerates TimelineEntryKind values. Adding a new kind without handling it
+ * surfaces as a type-check failure at this site.
+ * Feature: 208-timeline-entry-kind.
+ */
+export function assertNeverKind(value: never): never {
+  throw new Error(`Unhandled TimelineEntryKind: ${String(value)}`);
+}
 
 /**
  * Display-oriented timeline entry derived from LogEntry.
@@ -85,6 +130,15 @@ export interface TimelineEntry {
   tuneAnnotation?: { parameter: string; previous_value: unknown; new_value: unknown } | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   input_state?: InputFeatureState[] | null;
+  /**
+   * Semantic classification of this entry, independent of its visual category.
+   * Populated by the VS Code host on every emitted entry from the PROV-side
+   * `LogEntry.activity_type` signal. Optional only because Storybook fixtures
+   * and legacy mocks may omit it; consumers treat `undefined` the same as
+   * `'tool'` — there is no secondary tool-name fallback.
+   * Feature: 208-timeline-entry-kind.
+   */
+  kind?: TimelineEntryKind;
 }
 
 /**
@@ -191,16 +245,31 @@ export type ExtensionToWebviewMessage =
 
 /**
  * Props for the LogPanel root component.
+ *
+ * As of feature 199 this is also the canonical prop type for the
+ * `LogTimeline` and `LogByFeature` view components — every field they
+ * consume is declared here as optional. The child-only fields are
+ * grouped at the bottom of this interface.
  */
 export interface LogPanelProps {
   entries: TimelineEntry[];
   featureNames: Record<string, string>;
   viewMode: ViewMode;
   selectedEntryId: string | null;
-  filterState: FilterState;
-  hasActiveSession: boolean;
-  plotName: string | null;
-  actionResultMessage: string | null;
+  /** LogPanel root only — the inner views (LogTimeline / LogByFeature) ignore this. */
+  filterState?: FilterState;
+  /** LogPanel root only. */
+  hasActiveSession?: boolean;
+  /** LogPanel root only. */
+  plotName?: string | null;
+  /** LogPanel root only. */
+  actionResultMessage?: string | null;
+  /**
+   * Feature 207: manifest-declared tool categories. When provided, card
+   * icons render using `toolCategories[entry.toolName]`; otherwise every
+   * icon falls back to neutral grey.
+   */
+  toolCategories?: ToolCategoryMap;
   onMessage?: (message: LogPanelMessage) => void;
   onViewModeChange?: (mode: ViewMode) => void;
   onFilterStateChange?: (state: FilterState) => void;
@@ -221,6 +290,30 @@ export interface LogPanelProps {
   /** Flip-card: update rationale text. Feature: 113 */
   onRationaleUpdate?: (activityId: string, rationale: string) => void;
   className?: string;
+
+  // --- Fields previously held by per-view child prop interfaces. ---
+  // Consolidated here per feature 199 (FR-004). All optional so no existing
+  // LogPanel call site needs to change.
+  onEntryClick?: (entry: TimelineEntry) => void;
+  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+  onRestoreClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: currently editing entry ID. Feature: 113 */
+  editingActivityId?: string | null;
+  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
+  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
+  /** Flip-card: whether the schema is loading. Feature: 113 */
+  schemaLoading?: boolean;
+  /** Flip-card: schema error message. Feature: 113 */
+  schemaError?: string | null;
+  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
+  rationaleRef?: React.Ref<HTMLTextAreaElement>;
+  /** Flip-card callbacks (pass-through). Feature: 113 */
+  onEditClick?: (entry: TimelineEntry) => void;
+  onDoneClick?: (entry: TimelineEntry) => void;
+  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
+  onDeleteClick?: (activityId: string) => void;
+  onRationaleChange?: (activityId: string, rationale: string) => void;
+  onRetrySchema?: (toolId: string) => void;
 }
 
 /**
@@ -231,6 +324,11 @@ export interface LogEntryProps {
   featureNames: Record<string, string>;
   viewMode: ViewMode;
   isSelected: boolean;
+  /**
+   * Feature 207: manifest-declared tool categories. Forwarded to
+   * `ToolCategoryIcon` for icon rendering.
+   */
+  toolCategories?: ToolCategoryMap;
   onClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
   onRestoreClick?: (entry: TimelineEntry) => void;
@@ -266,70 +364,6 @@ export interface LogEntryProps {
 }
 
 /**
- * Props for the LogTimeline component.
- */
-export interface LogTimelineProps {
-  entries: TimelineEntry[];
-  featureNames: Record<string, string>;
-  viewMode: ViewMode;
-  selectedEntryId: string | null;
-  onEntryClick?: (entry: TimelineEntry) => void;
-  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
-  onRestoreClick?: (entry: TimelineEntry) => void;
-  /** Flip-card: currently editing entry ID. Feature: 113 */
-  editingActivityId?: string | null;
-  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
-  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
-  /** Flip-card: whether the schema is loading. Feature: 113 */
-  schemaLoading?: boolean;
-  /** Flip-card: schema error message. Feature: 113 */
-  schemaError?: string | null;
-  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
-  rationaleRef?: React.Ref<HTMLTextAreaElement>;
-  /** Flip-card callbacks (pass-through). Feature: 113 */
-  onEditClick?: (entry: TimelineEntry) => void;
-  onDoneClick?: (entry: TimelineEntry) => void;
-  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
-  onDisableToggle?: (activityId: string, disabled: boolean) => void;
-  onDeleteClick?: (activityId: string) => void;
-  onRationaleChange?: (activityId: string, rationale: string) => void;
-  onRetrySchema?: (toolId: string) => void;
-  className?: string;
-}
-
-/**
- * Props for the LogByFeature component.
- */
-export interface LogByFeatureProps {
-  entries: TimelineEntry[];
-  featureNames: Record<string, string>;
-  viewMode: ViewMode;
-  selectedEntryId: string | null;
-  onEntryClick?: (entry: TimelineEntry) => void;
-  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
-  onRestoreClick?: (entry: TimelineEntry) => void;
-  /** Flip-card: currently editing entry ID. Feature: 113 */
-  editingActivityId?: string | null;
-  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
-  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
-  /** Flip-card: whether the schema is loading. Feature: 113 */
-  schemaLoading?: boolean;
-  /** Flip-card: schema error message. Feature: 113 */
-  schemaError?: string | null;
-  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
-  rationaleRef?: React.Ref<HTMLTextAreaElement>;
-  /** Flip-card callbacks (pass-through). Feature: 113 */
-  onEditClick?: (entry: TimelineEntry) => void;
-  onDoneClick?: (entry: TimelineEntry) => void;
-  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
-  onDisableToggle?: (activityId: string, disabled: boolean) => void;
-  onDeleteClick?: (activityId: string) => void;
-  onRationaleChange?: (activityId: string, rationale: string) => void;
-  onRetrySchema?: (toolId: string) => void;
-  className?: string;
-}
-
-/**
  * Props for the LogFilterRow component.
  */
 export interface LogFilterRowProps {
@@ -355,6 +389,11 @@ export interface LogActionBarProps {
  */
 export interface ToolCategoryIconProps {
   toolName: string;
+  /**
+   * Feature 207: manifest-declared tool categories. When provided, the icon
+   * uses `toolCategories[toolName]`; otherwise falls back to grey.
+   */
+  toolCategories?: ToolCategoryMap;
   size?: number;
   className?: string;
 }

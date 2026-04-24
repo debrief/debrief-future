@@ -1,0 +1,22 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "fx--alpha",
+  "geometry": null,
+  "bbox": [0.0, 0.0, 0.0, 0.0],
+  "properties": {
+    "title": "Saxon Warrior: Alpha",
+    "datetime": "2025-01-01T00:00:00+00:00",
+    "debrief:platforms": [
+      { "id": "NELSON", "name": "HMS Nelson", "nationality": "GB" },
+      { "id": "MASON", "name": "USS Mason", "nationality": "US" }
+    ],
+    "debrief:tags": ["training", "ASW", "Training "],
+    "debrief:feature_tags": ["radar-detection", "sonar-contact"]
+  },
+  "links": [],
+  "assets": {}
+}

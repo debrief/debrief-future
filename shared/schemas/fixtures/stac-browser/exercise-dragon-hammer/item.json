@@ -44,9 +44,25 @@
     "datetime": null,
     "start_datetime": "2021-08-13T03:00:00Z",
     "end_datetime": "2021-08-17T19:30:06Z",
-    "debrief:vessel_classes": [
-      "surface/auxiliary/supply/fort-victoria",
-      "surface/auxiliary/survey/echo"
+    "debrief:platforms": [
+      {
+        "id": "HMS-SACHSEN",
+        "name": "HMS Sachsen",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/supply/fort-victoria",
+        "domain": "surface",
+        "vessel_role": "supply",
+        "vessel_type": "fort-victoria"
+      },
+      {
+        "id": "HMS-KENT",
+        "name": "HMS Kent",
+        "nationality": "SE",
+        "vessel_class": "surface/auxiliary/survey/echo",
+        "domain": "surface",
+        "vessel_role": "survey",
+        "vessel_type": "echo"
+      }
     ],
     "debrief:tags": [
       "certification",
@@ -55,13 +71,6 @@
     "debrief:feature_tags": [
       "track-merge",
       "zig-zag"
-    ],
-    "debrief:track_names": [
-      "HMS Sachsen",
-      "HMS Kent"
-    ],
-    "debrief:nationalities": [
-      "SE"
     ]
   },
   "links": [

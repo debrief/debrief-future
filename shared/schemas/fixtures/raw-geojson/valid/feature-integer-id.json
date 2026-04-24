@@ -1,0 +1,6 @@
+{
+  "type": "Feature",
+  "id": 42,
+  "geometry": { "type": "LineString", "coordinates": [[0, 0], [1, 1]] },
+  "properties": { "sensor": "radar" }
+}

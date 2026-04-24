@@ -31,6 +31,7 @@ export function LogEntry({
   featureNames,
   viewMode,
   isSelected,
+  toolCategories,
   onClick,
   // onTuneClick is kept in props for API compat but not used by rich card layout
   onRestoreClick,
@@ -53,23 +54,24 @@ export function LogEntry({
   const affectedIds = getAffectedFeatureIds(entry);
   const features = affectedIds.map((id) => resolveFeatureDisplay(id, featureNames));
 
-  // Build parameter chips with inferred types
-  const chips: ParamChipData[] = useMemo(() => {
-    return Object.entries(entry.parameters)
-      .filter(([, param]) => !param.default)
-      .slice(0, 5)
-      .map(([key, param]) => {
-        // Find matching schema entry if available
-        const schemaEntry = schema?.find((s) => s.name === key) ?? null;
-        return {
-          name: key,
-          value: param.value,
-          paramType: inferParamType(key, param.value, schemaEntry),
-          isDefault: param.default === true,
-          unit: null,
-        };
-      });
+  // Build parameter chips with inferred types — show all params; mark non-defaults
+  const CHIP_CAP = 5;
+  const allChips: ParamChipData[] = useMemo(() => {
+    return Object.entries(entry.parameters).map(([key, param]) => {
+      // Find matching schema entry if available
+      const schemaEntry = schema?.find((s) => s.name === key) ?? null;
+      return {
+        name: key,
+        value: param.value,
+        paramType: inferParamType(key, param.value, schemaEntry),
+        isNonDefault: param.default !== true,
+        unit: null,
+      };
+    });
   }, [entry.parameters, schema]);
+
+  const chips = useMemo(() => allChips.slice(0, CHIP_CAP), [allChips]);
+  const overflowCount = Math.max(0, allChips.length - CHIP_CAP);
 
   const handleClick = () => {
     onClick?.(entry);
@@ -108,6 +110,20 @@ export function LogEntry({
   const showParams = viewMode !== 'compact';
   const showDetails = viewMode === 'detailed';
 
+  // Snapshot entries ("Manual checkpoint") — detect via the PROV-side `kind`
+  // discriminator (Feature 208), not via visual `ToolCategory`. Feature 208
+  // replaced the feature 176 Decision 2A ToolCategory-equality check; entry
+  // semantics now flow from `LogEntry.activity_type` on the LinkML schema,
+  // not from inferring meaning from the tool's visual category. The Log
+  // Panel icon itself still reads the manifest-declared visual category via
+  // `ToolCategoryIcon` below (Feature 207).
+  const isSnapshot = entry.kind === 'snapshot';
+
+  const ariaLabel =
+    stepIndex != null
+      ? LOG_PANEL_STRINGS.cardAriaLabel(stepIndex, entry.toolName)
+      : entry.toolName;
+
   // Front face — the read-only rich card
   const frontFace = (
     <div
@@ -117,6 +133,8 @@ export function LogEntry({
       data-activity-id={entry.activity_id}
       title={LOG_PANEL_STRINGS.toolVersionTooltip(entry.tool_version)}
       role="button"
+      aria-selected={isSelected}
+      aria-label={ariaLabel}
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -130,7 +148,7 @@ export function LogEntry({
         {stepIndex != null && (
           <span className="log-panel__entry-step">{stepIndex}</span>
         )}
-        <ToolCategoryIcon toolName={entry.toolName} size={18} />
+        <ToolCategoryIcon toolName={entry.toolName} toolCategories={toolCategories} size={18} />
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {entry.rationale && (
           <span
@@ -185,18 +203,40 @@ export function LogEntry({
         <span className="log-panel__entry-timestamp">
           {formatTimestamp(entry.timestamp)}
         </span>
-        <span className="log-panel__entry-duration">
-          {formatDuration(entry.execution_duration)}
-        </span>
+        {!isSnapshot && entry.execution_duration && (
+          <span className="log-panel__entry-duration">
+            {formatDuration(entry.execution_duration)}
+          </span>
+        )}
       </div>
 
       {/* Row 3: Parameter chips (hidden in compact mode) */}
-      {showParams && chips.length > 0 && (
-        <div className="log-panel__entry-chips" data-testid="param-chips">
-          {chips.map((chip) => (
-            <ParameterChip key={chip.name} chip={chip} />
-          ))}
-        </div>
+      {showParams && (
+        isSnapshot ? (
+          <div className="log-panel__entry-chips log-panel__entry-chips--empty" data-testid="manual-checkpoint-placeholder">
+            <em>{LOG_PANEL_STRINGS.manualCheckpointLabel}</em>
+          </div>
+        ) : chips.length === 0 ? (
+          <div className="log-panel__entry-chips log-panel__entry-chips--empty" data-testid="no-params-placeholder">
+            <em>{LOG_PANEL_STRINGS.noParametersLabel}</em>
+          </div>
+        ) : (
+          <div className="log-panel__entry-chips" data-testid="param-chips">
+            {chips.map((chip) => (
+              <ParameterChip key={chip.name} chip={chip} />
+            ))}
+            {overflowCount > 0 && (
+              <span
+                className="log-panel__chip log-panel__chip--overflow"
+                data-testid="param-chip-overflow"
+                aria-label={LOG_PANEL_STRINGS.paramOverflowLabel(overflowCount)}
+                title={LOG_PANEL_STRINGS.paramOverflowLabel(overflowCount)}
+              >
+                {LOG_PANEL_STRINGS.paramOverflowLabel(overflowCount)}
+              </span>
+            )}
+          </div>
+        )
       )}
 
       {/* Detailed mode: extended feature lists */}

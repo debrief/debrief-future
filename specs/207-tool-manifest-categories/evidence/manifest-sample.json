@@ -1,0 +1,201 @@
+[
+  {
+    "name": "apply-symbol-style",
+    "description": "Applies a symbol style to position markers on track features.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "description": "Marker shape (default: square)",
+              "type": "string",
+              "default": "square",
+              "x-debrief-param-type": "MarkerSymbol"
+            },
+            "radius": {
+              "description": "Marker radius in pixels",
+              "type": "number",
+              "default": 4
+            },
+            "fill_color": {
+              "description": "Fill color for markers (CSS color string)",
+              "type": "string"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled",
+      "debrief:uiCategory": "style"
+    }
+  },
+  {
+    "name": "generate-reference-points",
+    "description": "Generates a grid or scatter pattern of reference points within a selected polygon.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "pattern": {
+              "description": "Generation pattern",
+              "type": "string",
+              "x-debrief-param-type": "ReferencePointPattern"
+            },
+            "count": {
+              "description": "Number of reference points to generate",
+              "type": "number",
+              "enum": [
+                1,
+                2,
+                5,
+                10,
+                20,
+                50,
+                100,
+                200,
+                500,
+                1000,
+                2000,
+                5000,
+                10000
+              ],
+              "default": 20
+            },
+            "seed": {
+              "description": "Random seed (scatter only)",
+              "type": "number"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "RECTANGLE",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "POLY",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "kind": "CIRCLE",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "debrief:category": "reference",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "reference/generated_points",
+      "debrief:uiCategory": "calc"
+    }
+  },
+  {
+    "name": "range-bearing",
+    "description": "Calculate range and bearing time-series between two features (tracks, points, polygons)",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {},
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        },
+        {
+          "kind": "SHAPE",
+          "min": 1
+        }
+      ],
+      "debrief:category": "analysis",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "dataset/range_bearing_series",
+      "debrief:uiCategory": "calc"
+    }
+  },
+  {
+    "name": "set-track-color",
+    "description": "Sets the display color for track features. Modifies the line color property of each track's style.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "color": {
+              "description": "CSS color value to apply",
+              "type": "string",
+              "x-debrief-param-type": "NamedColor"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled",
+      "debrief:uiCategory": "style"
+    }
+  }
+]

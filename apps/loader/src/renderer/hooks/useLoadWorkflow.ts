@@ -4,8 +4,8 @@
 
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SourceFile, LoadResult } from '../types';
-import type { StacStoreInfo } from '../types/store';
+import type { SourceFile, LoaderLoadResult } from '../types';
+import type { PlotInfo, StacStoreInfo } from '../types/store';
 
 interface LoadOptions {
   sourceFile: SourceFile;
@@ -14,11 +14,17 @@ interface LoadOptions {
   newPlotName?: string;
   newPlotDescription?: string;
   existingPlotId?: string;
+  /**
+   * The list of plots already fetched from `usePlots`, used to resolve the
+   * display name for the `mode: 'existing'` branch. Required when
+   * `mode === 'existing'`; ignored otherwise.
+   */
+  plots?: ReadonlyArray<PlotInfo>;
   onProgress: (progress: number, message: string) => void;
 }
 
 interface UseLoadWorkflowResult {
-  executeLoad: (options: LoadOptions) => Promise<LoadResult>;
+  executeLoad: (options: LoadOptions) => Promise<LoaderLoadResult>;
 }
 
 /**
@@ -32,8 +38,8 @@ export function useLoadWorkflow(): UseLoadWorkflowResult {
   const { t } = useTranslation();
 
   const executeLoad = useCallback(
-    async (options: LoadOptions): Promise<LoadResult> => {
-      const { sourceFile, store, mode, newPlotName, newPlotDescription, existingPlotId, onProgress } =
+    async (options: LoadOptions): Promise<LoaderLoadResult> => {
+      const { sourceFile, store, mode, newPlotName, newPlotDescription, existingPlotId, plots, onProgress } =
         options;
 
       // Generate operation ID for cleanup tracking
@@ -69,8 +75,12 @@ export function useLoadWorkflow(): UseLoadWorkflowResult {
         if (!existingPlotId) {
           throw new Error('No plot selected');
         }
+        const selectedPlot = plots?.find((p) => p.id === existingPlotId);
+        if (!selectedPlot) {
+          throw new Error(`Plot ${existingPlotId} not found in supplied plot list`);
+        }
         plotId = existingPlotId;
-        plotName = existingPlotId; // TODO: Get actual name from plot list
+        plotName = selectedPlot.name;
       }
 
       onProgress(40, t('progress.creatingPlot'));

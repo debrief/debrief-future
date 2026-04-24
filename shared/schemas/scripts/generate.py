@@ -30,6 +30,11 @@ PYTHON_OUT = GENERATED_DIR / "python" / "debrief_schemas"
 JSONSCHEMA_OUT = GENERATED_DIR / "json-schema"
 TYPESCRIPT_OUT = GENERATED_DIR / "typescript"
 
+# Documentation output (uncommitted — lives under build/, consumed by MkDocs)
+BUILD_DIR = SCHEMAS_ROOT / "build"
+DOCS_MD_OUT = BUILD_DIR / "md"
+DOCS_TEMPLATES = SCHEMAS_ROOT / "docs-templates"
+
 
 def run_command(cmd: list[str], description: str) -> bool:
     """Run a command and return success status."""
@@ -74,11 +79,21 @@ def generate_pydantic() -> bool:
         # eliminate Any from generated code. These are infrastructure classes,
         # not domain models — object is sufficient for their serialisation needs.
         content = content.replace("dict[str, Any]", "dict[str, object]")
-        # Remove the Any import if it's no longer used
-        content = content.replace(
-            "from typing import (\n    Any,\n",
-            "from typing import (\n",
-        )
+        # Post-process: LinkML emits `Optional[Any]` for `range: Any` slots
+        # (RawGeoJSONFeature.properties). Replace with `Optional[dict[str, object]]`
+        # to stay Article-XV-compliant (no authored `Any` in generated code).
+        content = content.replace("Optional[Any]", "Optional[dict[str, object]]")
+        # Remove the Any import if it's no longer used. We search for any
+        # remaining `Any`-as-a-typing-token occurrences (word boundary, not
+        # preceded by lowercase letters to avoid matching "Any" inside other
+        # identifiers).
+        import re as _re
+
+        if not _re.search(r"(?<![A-Za-z_])Any(?![A-Za-z_])", content):
+            content = content.replace(
+                "from typing import (\n    Any,\n",
+                "from typing import (\n",
+            )
 
         # Post-process: Fix GeoJSON coordinate types. LinkML generates flat
         # list[float] for all coordinate arrays, but GeoJSON requires nested
@@ -136,7 +151,7 @@ def generate_pydantic() -> bool:
         # Prepend DO NOT EDIT header
         content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
 
-        output_file.write_text(content)
+        output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
@@ -303,7 +318,7 @@ def generate_jsonschema() -> bool:
         _strip_type_from_anyof(full_schema)
         _fix_geojson_coordinates(full_schema)
 
-        output_file.write_text(json.dumps(full_schema, indent=2))
+        output_file.write_text(json.dumps(full_schema, indent=2), encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
         entity_types = [
             # Core types
@@ -341,7 +356,9 @@ def generate_jsonschema() -> bool:
                     "$defs": {k: v for k, v in all_defs.items() if k in reachable},
                 }
                 entity_file = JSONSCHEMA_OUT / f"{entity}.schema.json"
-                entity_file.write_text(json.dumps(entity_schema, indent=2))
+                entity_file.write_text(
+                    json.dumps(entity_schema, indent=2), encoding="utf-8", newline="\n"
+                )
                 print(f"  [OK] Generated: {entity_file}")
 
         return True
@@ -421,15 +438,216 @@ def generate_typescript() -> bool:
                 )
                 content = content[:idx] + fixed_block + content[brace_idx:]
 
+        # Post-process (Feature 201 / FR-014): narrow `symbol: string` on the
+        # two enum-ranged attributes (`PositionStyle.symbol`,
+        # `PositionStyleOverride.symbol`) to the template-literal union
+        # `PointShape` derived from `PointShapeEnum`. gen-typescript emits
+        # `string` for enum-ranged attributes; without this narrowing,
+        # callers cannot catch `{ symbol: 'star' }` at compile time. The
+        # `PointShape` type is injected immediately after the PointShapeEnum
+        # declaration (same file, no cross-package import — avoids a build-
+        # order cycle with @debrief/utils which consumes PointShapeEnum).
+        _point_shape_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible point-marker shapes\n"
+            "* from PointShapeEnum. Narrows the `symbol` field on PositionStyle /\n"
+            "* PositionStyleOverride so TypeScript rejects an unknown shape at\n"
+            "* compile time (Feature 201 / FR-014).\n"
+            "*/\n"
+            "export type PointShape = `${PointShapeEnum}`;\n"
+        )
+        _point_shape_sentinel = "export enum PointShapeEnum {"
+        if _point_shape_sentinel in content and "export type PointShape" not in content:
+            # Find the closing brace that ends the PointShapeEnum declaration.
+            enum_start = content.index(_point_shape_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _point_shape_decl + content[enum_end + len("};\n") :]
+
+        _symbol_narrow_targets = ("PositionStyle", "PositionStyleOverride")
+        for iface_name in _symbol_narrow_targets:
+            old_sig = f"export interface {iface_name}"
+            if old_sig in content:
+                idx = content.index(old_sig)
+                brace_idx = content.index("}", idx)
+                block = content[idx:brace_idx]
+                fixed_block = block.replace("symbol: string,", "symbol: PointShape,").replace(
+                    "symbol?: string,", "symbol?: PointShape,"
+                )
+                content = content[:idx] + fixed_block + content[brace_idx:]
+
+        # Post-process (Feature 205 / FR-007): narrow `playbackState: string` /
+        # `displayMode: string` on `TemporalSlice` to the template-literal
+        # unions `PlaybackState` / `DisplayMode` derived from
+        # PlaybackStateEnum / DisplayModeEnum. gen-typescript emits `string`
+        # for enum-ranged attributes (see the Feature 201 / FR-014 PointShape
+        # precedent above); without this narrowing, callers cannot catch
+        # `{ playbackState: 'palying' }` or `{ displayMode: 'snailTrail' }`
+        # at compile time.
+        _playback_state_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible playback states from\n"
+            "* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice\n"
+            "* so TypeScript rejects an unknown state at compile time (Feature 205 /\n"
+            "* FR-007).\n"
+            "*/\n"
+            "export type PlaybackState = `${PlaybackStateEnum}`;\n"
+        )
+        _display_mode_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible display modes from\n"
+            "* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so\n"
+            "* TypeScript rejects an unknown mode at compile time (Feature 205 /\n"
+            "* FR-007).\n"
+            "*/\n"
+            "export type DisplayMode = `${DisplayModeEnum}`;\n"
+        )
+        _playback_state_sentinel = "export enum PlaybackStateEnum {"
+        _display_mode_sentinel = "export enum DisplayModeEnum {"
+
+        if _playback_state_sentinel in content and "export type PlaybackState" not in content:
+            enum_start = content.index(_playback_state_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _playback_state_decl + content[enum_end + len("};\n") :]
+
+        if _display_mode_sentinel in content and "export type DisplayMode" not in content:
+            enum_start = content.index(_display_mode_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _display_mode_decl + content[enum_end + len("};\n") :]
+
+        # Narrow the two TemporalSlice fields from string → template-literal type.
+        _temporal_slice_start = content.find("export interface TemporalSlice {\n")
+        if _temporal_slice_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface TemporalSlice`."
+            )
+        _temporal_slice_end = content.index("}\n", _temporal_slice_start) + 2
+        _temporal_slice_block = content[_temporal_slice_start:_temporal_slice_end]
+        _new_block = _temporal_slice_block.replace(
+            "    playbackState: string,\n", "    playbackState: PlaybackState,\n", 1
+        ).replace("    displayMode: string,\n", "    displayMode: DisplayMode,\n", 1)
+        if _new_block == _temporal_slice_block:
+            raise RuntimeError(
+                "generate.py: TemporalSlice enum-slot post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`playbackState: string` / `displayMode: string` tokens. Update "
+                "generate.py (Feature 205)."
+            )
+        content = content[:_temporal_slice_start] + _new_block + content[_temporal_slice_end:]
+
+        # Post-process (#208): narrow LogEntry.activity_type from string → ActivityType.
+        # gen-typescript doesn't wire enum ranges into interface field types; the
+        # ActivityType enum declaration is emitted separately but the slot range
+        # collapses to `string`. We rewrite the single occurrence inside the
+        # LogEntry interface block.
+        _log_entry_start = content.find("export interface LogEntry {\n")
+        if _log_entry_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface LogEntry`."
+            )
+        _log_entry_end = content.index("}\n", _log_entry_start) + 2
+        _log_entry_block = content[_log_entry_start:_log_entry_end]
+        _new_log_entry_block = _log_entry_block.replace(
+            "    activity_type?: string,\n",
+            "    activity_type?: ActivityType,\n",
+            1,
+        )
+        if _new_log_entry_block == _log_entry_block:
+            raise RuntimeError(
+                "generate.py: LogEntry.activity_type post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`activity_type?: string` token. Update generate.py (Feature 208)."
+            )
+        content = content[:_log_entry_start] + _new_log_entry_block + content[_log_entry_end:]
+
+        # Post-process (#214): tag the generated `GeoJSONFeature` interface
+        # with `// canonical` so the `scripts/check-no-geojson-feature.sh`
+        # regression guard (wired into `task lint`) doesn't flag the
+        # schema's own declaration.
+        content = content.replace(
+            "export interface GeoJSONFeature {",
+            "export interface GeoJSONFeature { // canonical — LinkML-generated schema type",
+        )
+
+        # Post-process (#204): RawGeoJSONFeature needs four narrowing fixes
+        # because gen-typescript doesn't emit literal types, any_of unions,
+        # or free-form record types for the relevant slots. The fixes are
+        # applied line-by-line on three specific fields inside the
+        # `export interface RawGeoJSONFeature { … }` block so that changes
+        # to the LinkML description text do not break the post-processor.
+        raw_feature_start = content.find("export interface RawGeoJSONFeature {\n")
+        if raw_feature_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface RawGeoJSONFeature`."
+            )
+        raw_feature_end = content.index("}\n", raw_feature_start) + 2
+        raw_feature_block = content[raw_feature_start:raw_feature_end]
+        # 1) discriminated type literal
+        new_block = raw_feature_block.replace("    type: string,\n", '    type: "Feature",\n', 1)
+        # 2) id union
+        new_block = new_block.replace("    id?: string,\n", "    id?: string | number,\n", 1)
+        # 3) geometry union
+        new_block = new_block.replace(
+            "    geometry: string,\n",
+            "    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | "
+            "GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | "
+            "GeoJSONMultiPolygon,\n",
+            1,
+        )
+        # 4) free-form properties
+        new_block = new_block.replace(
+            "    properties?: Any,\n",
+            "    properties?: Record<string, unknown> | null,\n",
+            1,
+        )
+        if new_block == raw_feature_block:
+            raise RuntimeError(
+                "generate.py: RawGeoJSONFeature post-processor had no "
+                "effect — gen-typescript output no longer contains the "
+                "expected `type: string` / `id?: string` / `geometry: string` / "
+                "`properties?: Any` tokens. Update generate.py."
+            )
+        content = content[:raw_feature_start] + new_block + content[raw_feature_end:]
+
+        # RawGeoJSONFeatureCollection.type — literal narrowing.
+        content = content.replace(
+            "export interface RawGeoJSONFeatureCollection {\n"
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
+            "    type: string,",
+            "export interface RawGeoJSONFeatureCollection {\n"
+            '    /** GeoJSON object type — always "FeatureCollection". */\n'
+            '    type: "FeatureCollection",',
+        )
+
+        # Drop the empty `export interface Any {}` stub — it's the LinkML
+        # wildcard class that the post-processor has already mapped to
+        # `Record<string, unknown>` at the usage site. Leaving it in the
+        # output would ship an exported `Any` symbol that other packages
+        # could accidentally import, defeating Article XV.
+        import re as _re_any
+
+        content = _re_any.sub(
+            r"/\*\*\s*\n\s*\*[^*]*LinkML idiom[^*]*"
+            r"\*/\s*\nexport interface Any \{\s*\n\}\s*\n\s*\n",
+            "",
+            content,
+        )
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 
-        output_file.write_text(content)
+        output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
 
         # Create index.ts that re-exports everything
         index_file = TYPESCRIPT_OUT / "index.ts"
-        index_file.write_text('export * from "./types.js";\nexport * from "./unions.js";\n')
+        index_file.write_text(
+            'export * from "./types.js";\nexport * from "./unions.js";\n',
+            encoding="utf-8",
+            newline="\n",
+        )
         print(f"  [OK] Generated: {index_file}")
         return True
     except subprocess.CalledProcessError as e:
@@ -437,6 +655,62 @@ def generate_typescript() -> bool:
         return False
     except FileNotFoundError:
         print("  [FAIL] gen-typescript not found. Install with: pip install linkml")
+        return False
+
+
+def generate_markdown_docs() -> bool:
+    """Generate Markdown documentation from the LinkML schema via `gen-doc`.
+
+    Output goes to ``build/md/`` for MkDocs to consume. Flag choices:
+
+    - ``--render-imports`` — essential; ``debrief.yaml`` is a pure import
+      aggregator, so without this flag no content is rendered.
+    - ``--subfolder-type-separation`` — groups outputs into
+      ``classes/``, ``slots/``, ``enums/``, ``types/`` subdirectories for
+      cleaner navigation in MkDocs.
+    - ``--hierarchical-class-view`` — index page shows classes indented by
+      inheritance, making the ~91-class tree readable at a glance.
+    - ``--include-top-level-diagram`` — index page shows a Mermaid ER diagram
+      of the whole schema; individual class pages get their own diagrams by
+      default.
+    """
+    if not MASTER_SCHEMA.exists():
+        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
+        return False
+
+    DOCS_MD_OUT.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "gen-doc",
+        "--render-imports",
+        "--subfolder-type-separation",
+        "--hierarchical-class-view",
+        # Intentionally NOT passing --include-top-level-diagram: when the
+        # diagram type is mermaid_class_diagram, linkml's index template calls
+        # gen.mermaid_diagram() which returns None (the class-diagram path is
+        # handled only in per-class jinja templates). Jinja stringifies that
+        # to "None", producing a broken Mermaid block on the index page.
+        # Per-class diagrams are unaffected — they render via the
+        # class_diagram.md.jinja2 include in our template override.
+        "--diagram-type",
+        "mermaid_class_diagram",
+        # Local template override adds a defensive fix for classes with
+        # postcondition-only rules (see docs-templates/class.md.jinja2).
+        "--template-directory",
+        str(DOCS_TEMPLATES),
+        "--directory",
+        str(DOCS_MD_OUT),
+        str(MASTER_SCHEMA),
+    ]
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print(f"  [OK] Generated Markdown docs: {DOCS_MD_OUT}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"  [FAIL] gen-doc failed: {e.stderr}")
+        return False
+    except FileNotFoundError:
+        print("  [FAIL] gen-doc not found. Install with: pip install linkml")
         return False
 
 
@@ -464,9 +738,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--target",
-        choices=["pydantic", "jsonschema", "typescript", "all"],
+        choices=["pydantic", "jsonschema", "typescript", "docs", "all"],
         default="all",
-        help="Which schema(s) to generate (default: all)",
+        help=(
+            "Which schema(s) to generate (default: all). "
+            "'docs' runs gen-doc only and is NOT included in 'all' — "
+            "it's a separate, heavier pipeline consumed by mkdocs."
+        ),
     )
     parser.add_argument(
         "--validate-fixtures",
@@ -494,6 +772,11 @@ def main() -> None:
     if args.target in ("typescript", "all"):
         print("Generating TypeScript interfaces...")
         if not generate_typescript():
+            success = False
+
+    if args.target == "docs":
+        print("Generating Markdown documentation...")
+        if not generate_markdown_docs():
             success = False
 
     if args.validate_fixtures and not validate_fixtures():

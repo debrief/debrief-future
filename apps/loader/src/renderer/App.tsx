@@ -5,7 +5,7 @@
 
 import { useEffect, useReducer, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { LoaderState, SourceFile, StacStoreInfo, PlotInfo, LoadResult, LoaderError } from './types';
+import type { LoaderState, SourceFile, StacStoreInfo, PlotInfo, LoaderLoadResult, LoaderError } from './types';
 import { StoreSelector } from './components/StoreSelector';
 import { PlotConfig } from './components/PlotConfig';
 import { ProgressView } from './components/ProgressView';
@@ -29,7 +29,7 @@ type LoaderAction =
   | { type: 'PREV_STEP' }
   | { type: 'START_PROCESSING' }
   | { type: 'SET_PROGRESS'; progress: number; message: string }
-  | { type: 'SET_COMPLETE'; result: LoadResult }
+  | { type: 'SET_COMPLETE'; result: LoaderLoadResult }
   | { type: 'SET_ERROR'; error: LoaderError }
   | { type: 'RESET' };
 
@@ -198,6 +198,7 @@ export function App() {
         newPlotName: state.newPlotForm.name,
         newPlotDescription: state.newPlotForm.description,
         existingPlotId: state.selectedPlot?.id,
+        plots: state.selectedPlot ? [state.selectedPlot] : undefined,
         onProgress: (progress, message) => {
           dispatch({ type: 'SET_PROGRESS', progress, message });
         },

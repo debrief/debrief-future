@@ -41,31 +41,38 @@
   "properties": {
     "title": "Saxon Warrior: Sen Tracks",
     "datetime": "1970-01-03T01:34:25+00:00",
-    "description": "Saxon Warrior: Sen Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FS Mason, FGS Ramage. Multi-national participation: DE, FR.",
+    "description": "Saxon Warrior: Sen Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FGS Laboon, HMS Westminster. Multi-national participation: DE, GB.",
     "start_datetime": "1970-01-03T01:34:25+00:00",
     "end_datetime": "1970-01-03T04:17:25+00:00",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/trafalgar",
-      "surface/warship/frigate/type23"
+    "debrief:platforms": [
+      {
+        "id": "Frigate",
+        "name": "FGS Laboon",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_type": "river",
+        "vessel_role": "patrol"
+      },
+      {
+        "id": "New_SSK",
+        "name": "HMS Westminster",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      }
     ],
     "debrief:tags": [
       "ASW",
-      "amphibious",
-      "boarding",
-      "training",
-      "transit"
+      "NGFS",
+      "escort",
+      "training"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "radar-detection"
-    ],
-    "debrief:track_names": [
-      "FS Mason",
-      "FGS Ramage"
-    ],
-    "debrief:nationalities": [
-      "DE",
-      "FR"
+      "radar-detection",
+      "track-merge"
     ]
   },
   "links": [
@@ -89,7 +96,7 @@
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/legacy-source-data/sen_tracks.rep",
+      "href": "file:///tmp/debrief-regen-4x2tftum/sen_tracks.rep",
       "title": "sen_tracks.rep"
     }
   ],
@@ -110,8 +117,8 @@
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/legacy-source-data/sen_tracks.rep",
-        "load_timestamp": "2026-03-28T13:51:04.087299Z",
+        "source_path": "/tmp/debrief-regen-4x2tftum/sen_tracks.rep",
+        "load_timestamp": "2026-04-13T23:12:33.674391Z",
         "tool_version": "0.1.0"
       }
     },

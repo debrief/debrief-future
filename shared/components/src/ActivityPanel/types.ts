@@ -6,8 +6,11 @@
  */
 
 import type { DebriefFeature } from '../utils/types';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
+import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+import type { PropertiesFormField } from '../PropertiesPanel/types';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -16,6 +19,7 @@ export interface ActivityPanelCollapseState {
   timeControllerCollapsed: boolean;
   toolsCollapsed: boolean;
   layersCollapsed: boolean;
+  propertiesCollapsed: boolean;
 }
 
 /**
@@ -25,6 +29,7 @@ export const DEFAULT_COLLAPSE_STATE: ActivityPanelCollapseState = {
   timeControllerCollapsed: false,
   toolsCollapsed: false,
   layersCollapsed: false,
+  propertiesCollapsed: false,
 };
 
 /**
@@ -74,7 +79,8 @@ export type ActivityPanelMessage =
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } }
   | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean; isPointOverride?: boolean; positionIndex?: number; childType?: string } }
-  | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } };
+  | { type: 'file:action'; payload: { file: AssociatedFile; action: 'open' | 'openWith' | 'reveal' | 'delete' } }
+  | PropertiesCommitMessage;
 
 /**
  * Props for the ActivityPanel component.
@@ -85,12 +91,12 @@ export interface ActivityPanelProps {
   timeExtent?: [number, number] | null;
   /** Current time position */
   currentTime?: number;
-  /** Current playback state */
-  playbackState?: 'playing' | 'paused';
+  /** Current playback state — widened to the canonical three-state vocabulary in Feature 205 */
+  playbackState?: PlaybackState;
   /** Playback speed multiplier */
   playbackSpeed?: 1 | 2 | 4 | 8 | 16 | 32 | 64;
   /** Track display mode */
-  displayMode?: 'full' | 'trail';
+  displayMode?: DisplayMode;
   /** UI state for time controller */
   timeUiState?: 'empty' | 'loading' | 'ready';
 
@@ -123,6 +129,20 @@ export interface ActivityPanelProps {
   collapseState?: ActivityPanelCollapseState;
   /** Callback when collapse state changes */
   onCollapseStateChange?: (state: ActivityPanelCollapseState) => void;
+
+  // Properties section (T042-T045)
+  /** Fields to render in the Properties section. Hydrated host-side from item.properties + JSON Schema. */
+  propertiesFields?: PropertiesFormField[];
+  /** True while the open plot's item.json / schema is still loading. */
+  propertiesLoading?: boolean;
+  /** True when the item.json is on a read-only filesystem. */
+  propertiesReadOnly?: boolean;
+  /** Last write error to surface as a banner above the Properties form. Cleared on next successful commit. */
+  propertiesWriteError?: string | null;
+  /** Absolute path to the STAC store root for the open plot — used when emitting commit messages. */
+  openItemStorePath?: string;
+  /** Relative path (from storePath) to the item.json for the open plot. */
+  openItemPath?: string;
 
   // Message callback for host communication
   /** Callback for messages sent to the host */

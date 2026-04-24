@@ -44,9 +44,30 @@
     "datetime": null,
     "start_datetime": "2024-12-06T20:00:00Z",
     "end_datetime": "2024-12-14T14:01:48Z",
-    "debrief:vessel_classes": [
-      "surface/warship/corvette/visby",
-      "surface/warship/destroyer/type45"
+    "debrief:platforms": [
+      {
+        "id": "USS-DE-RUYTER",
+        "name": "USS De Ruyter",
+        "nationality": "US",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_role": "corvette",
+        "vessel_type": "visby"
+      },
+      {
+        "id": "USS-FRIDTJOF-NANSEN",
+        "name": "USS Fridtjof Nansen",
+        "nationality": "US",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "type45"
+      },
+      {
+        "id": "USS-SACHSEN",
+        "name": "USS Sachsen",
+        "nationality": "US"
+      }
     ],
     "debrief:tags": [
       "certification",
@@ -57,14 +78,6 @@
       "track-merge",
       "zig-zag",
       "intercept"
-    ],
-    "debrief:track_names": [
-      "USS De Ruyter",
-      "USS Fridtjof Nansen",
-      "USS Sachsen"
-    ],
-    "debrief:nationalities": [
-      "US"
     ]
   },
   "links": [

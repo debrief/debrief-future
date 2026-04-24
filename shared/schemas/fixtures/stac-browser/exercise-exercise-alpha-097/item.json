@@ -44,8 +44,31 @@
     "datetime": null,
     "start_datetime": "2021-07-13T18:00:00Z",
     "end_datetime": "2021-07-28T05:45:13Z",
-    "debrief:vessel_classes": [
-      "surface/warship/frigate/type26"
+    "debrief:platforms": [
+      {
+        "id": "HNOMS-IRON-DUKE",
+        "name": "HNoMS Iron Duke",
+        "nationality": "NO",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type26"
+      },
+      {
+        "id": "HMS-LANCASTER",
+        "name": "HMS Lancaster",
+        "nationality": "SE"
+      },
+      {
+        "id": "HNOMS-LABOON",
+        "name": "HNoMS Laboon",
+        "nationality": "NO"
+      },
+      {
+        "id": "HMS-DEFENDER",
+        "name": "HMS Defender",
+        "nationality": "SE"
+      }
     ],
     "debrief:tags": [
       "SAR",
@@ -57,16 +80,6 @@
     "debrief:feature_tags": [
       "datum",
       "sonar-contact"
-    ],
-    "debrief:track_names": [
-      "HNoMS Iron Duke",
-      "HMS Lancaster",
-      "HNoMS Laboon",
-      "HMS Defender"
-    ],
-    "debrief:nationalities": [
-      "NO",
-      "SE"
     ]
   },
   "links": [

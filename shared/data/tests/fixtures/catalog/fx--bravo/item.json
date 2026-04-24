@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "fx--bravo",
+  "geometry": null,
+  "bbox": [0.0, 0.0, 0.0, 0.0],
+  "properties": {
+    "title": "Joint Warrior: Bravo",
+    "datetime": "2025-01-02T00:00:00+00:00",
+    "debrief:platforms": [
+      { "id": "COLLINGWOOD", "name": "HMS Collingwood", "nationality": "GB" }
+    ],
+    "debrief:tags": ["training", "MCM"],
+    "debrief:feature_tags": ["helicopter-ops", "radar-detection"]
+  },
+  "links": [],
+  "assets": {}
+}

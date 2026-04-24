@@ -15,6 +15,8 @@ import {
   TimestampedPosition,
   GeoJSONPoint,
   GeoJSONLineString,
+  RawGeoJSONFeature,
+  RawGeoJSONFeatureCollection,
 } from "../src/generated/typescript";
 
 // ============================================================================
@@ -126,5 +128,71 @@ console.log("\nReferenceLocation:");
 console.log(`  ID: ${referenceLocation.id}`);
 console.log(`  Name: ${referenceLocation.properties.name}`);
 console.log(`  Type: ${referenceLocation.properties.location_type}`);
+
+// ============================================================================
+// RawGeoJSONFeature Usage (#204) — parse-boundary type
+// ============================================================================
+
+// string id
+const rawStringId: RawGeoJSONFeature = {
+  type: "Feature",
+  id: "track-001",
+  geometry: { type: "Point", coordinates: [0.0, 0.0] },
+  properties: {},
+};
+
+// integer id
+const rawIntegerId: RawGeoJSONFeature = {
+  type: "Feature",
+  id: 42,
+  geometry: { type: "LineString", coordinates: [[0, 0], [1, 1]] },
+  properties: { sensor: "radar" },
+};
+
+// no id, null properties
+const rawNoId: RawGeoJSONFeature = {
+  type: "Feature",
+  geometry: { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] },
+  properties: null,
+};
+
+// DebriefFeature subtype is a valid RawGeoJSONFeature (acceptance scenario 3 / spec US1)
+// Note: TrackFeature requires LineString|MultiLineString geometry and structured
+// properties; the raw type is a valid supertype.
+const rawFromTrack: RawGeoJSONFeature = trackFeature as unknown as RawGeoJSONFeature;
+
+// Collection
+const rawCollection: RawGeoJSONFeatureCollection = {
+  type: "FeatureCollection",
+  features: [rawStringId, rawIntegerId, rawNoId, rawFromTrack],
+};
+
+// Exhaustive narrowing on the geometry discriminator
+function narrowGeometry(feature: RawGeoJSONFeature): string {
+  switch (feature.geometry.type) {
+    case "Point":
+      return "Point";
+    case "LineString":
+      return "LineString";
+    case "Polygon":
+      return "Polygon";
+    case "MultiPoint":
+      return "MultiPoint";
+    case "MultiLineString":
+      return "MultiLineString";
+    case "MultiPolygon":
+      return "MultiPolygon";
+    default: {
+      const _exhaustive: never = feature.geometry;
+      return _exhaustive;
+    }
+  }
+}
+
+console.log("\nRawGeoJSONFeature:");
+console.log(`  string-id: ${rawStringId.id}`);
+console.log(`  integer-id: ${rawIntegerId.id}`);
+console.log(`  collection size: ${rawCollection.features.length}`);
+console.log(`  narrowed geometry: ${narrowGeometry(rawStringId)}`);
 
 console.log("\n✓ All types compile and work correctly");

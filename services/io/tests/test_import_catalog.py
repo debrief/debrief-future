@@ -438,3 +438,182 @@ class TestGenerateReport:
         assert "Files succeeded: 9" in report
         assert "Files failed:    1" in report
         assert "Total tracks:     20" in report
+
+
+# --- REP content helpers for platform validation tests ---
+
+# A REP line for a registered platform (NELSON)
+_REP_REGISTERED = (
+    "951212 050000.000 NELSON   @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+    "951212 050100.000 NELSON   @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+)
+
+# A REP line for an unregistered platform (PHANTOM)
+_REP_UNREGISTERED = (
+    "951212 050000.000 PHANTOM  @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+    "951212 050100.000 PHANTOM  @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+)
+
+# Mixed: one registered, one unregistered
+_REP_MIXED = _REP_REGISTERED + _REP_UNREGISTERED
+
+
+class TestPlatformValidationIntegration:
+    """Integration tests for platform registry validation in the import pipeline."""
+
+    def test_registered_platforms_no_warnings(self, tmp_path: Path) -> None:
+        """Import REP file with registered platforms — no UNREGISTERED_PLATFORM warnings."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "boat1.rep").write_text((FIXTURES / "boat1.rep").read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded >= 1
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 0
+
+    def test_unregistered_platforms_produce_warnings(self, tmp_path: Path) -> None:
+        """Import REP file with unregistered platform — correct warning emitted, import succeeds."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "mixed.rep").write_text(_REP_MIXED)
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 1
+        assert result.files_failed == 0
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 1
+        assert "PHANTOM" in unreg_warns[0].message
+        assert unreg_warns[0].file == "mixed.rep"
+
+    def test_dpf_unregistered_platforms_produce_warnings(self, tmp_path: Path) -> None:
+        """Import DPF file with unregistered platform — correct warning emitted."""
+        source = tmp_path / "source"
+        source.mkdir()
+        # Read existing DPF and inject an unregistered track name
+        dpf_content = (FIXTURES / "sample.dpf").read_text()
+        dpf_content = dpf_content.replace('Name="COLLINGWOOD"', 'Name="GHOST_SHIP"', 1)
+        (source / "modified.dpf").write_text(dpf_content)
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 1
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert any("GHOST_SHIP" in w.message for w in unreg_warns)
+
+    def test_registry_unavailable_still_succeeds(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """When registry cannot be loaded, import succeeds with REGISTRY_UNAVAILABLE warning."""
+        import debrief_data
+
+        # Monkeypatch load_registry to raise FileNotFoundError
+        def _failing_load(*_args: object, **_kwargs: object) -> None:
+            raise FileNotFoundError("registry not found")
+
+        monkeypatch.setattr(debrief_data, "load_registry", _failing_load)
+
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "boat1.rep").write_text((FIXTURES / "boat1.rep").read_text())
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded >= 1
+        assert result.files_failed == 0
+        reg_warns = [w for w in result.warnings if w.code == "REGISTRY_UNAVAILABLE"]
+        assert len(reg_warns) == 1
+        # No UNREGISTERED_PLATFORM warnings when registry is unavailable
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 0
+
+    def test_all_unregistered_import_still_succeeds(self, tmp_path: Path) -> None:
+        """Import with only unregistered platforms still succeeds (US2)."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "unknown.rep").write_text(_REP_UNREGISTERED)
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 1
+        assert result.files_failed == 0
+        assert result.total_tracks >= 1
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 1
+
+    def test_deduplication_many_positions_one_warning(self, tmp_path: Path) -> None:
+        """File with many positions for one unregistered platform — exactly one warning (US3)."""
+        source = tmp_path / "source"
+        source.mkdir()
+        # Create 50 position records for one unregistered platform
+        lines = []
+        for i in range(50):
+            minute = f"{i:02d}"
+            lines.append(
+                f"951212 05{minute}00.000 CONTACT_X @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            )
+        (source / "many_positions.rep").write_text("".join(lines))
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 1
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 1
+        assert "CONTACT_X" in unreg_warns[0].message
+
+    def test_multiple_unregistered_one_warning_each(self, tmp_path: Path) -> None:
+        """File with 3 unregistered platforms — exactly 3 warnings (US3)."""
+        source = tmp_path / "source"
+        source.mkdir()
+        content = (
+            "951212 050000.000 ALPHA_X  @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            "951212 050100.000 ALPHA_X  @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+            "951212 050000.000 BRAVO_X  @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            "951212 050100.000 BRAVO_X  @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+            "951212 050000.000 CHARLIE_X @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            "951212 050100.000 CHARLIE_X @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+        )
+        (source / "multi.rep").write_text(content)
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 1
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 3
+
+    def test_batch_import_file_attribution(self, tmp_path: Path) -> None:
+        """Batch import with different unregistered platforms in different files (US4)."""
+        source = tmp_path / "source"
+        source.mkdir()
+
+        # File A: unregistered VESSEL_X
+        (source / "file_a.rep").write_text(
+            "951212 050000.000 VESSEL_X @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            "951212 050100.000 VESSEL_X @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+        )
+
+        # File B: unregistered VESSEL_Y
+        (source / "file_b.rep").write_text(
+            "951212 050000.000 VESSEL_Y @C   22 11 10.63 N 21 41 52.37 W 269.7   2.0      0\n"
+            "951212 050100.000 VESSEL_Y @C   22 11 10.58 N 21 42  2.98 W 269.7   2.0      0\n"
+        )
+
+        catalog = tmp_path / "catalog"
+        result = import_legacy_data(source, catalog)
+
+        assert result.files_succeeded == 2
+        unreg_warns = [w for w in result.warnings if w.code == "UNREGISTERED_PLATFORM"]
+        assert len(unreg_warns) == 2
+
+        warn_map = {w.message.split("'")[1]: w.file for w in unreg_warns}
+        assert warn_map["VESSEL_X"] == "file_a.rep"
+        assert warn_map["VESSEL_Y"] == "file_b.rep"

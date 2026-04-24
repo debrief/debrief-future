@@ -4,7 +4,11 @@
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    # Keep aligned with the project's `uv run ruff` version (and therefore
+    # CI's `uvx ruff format --check .` step) so the hook formats the same
+    # way CI does. Bumped 2026-04-21 — the 0.8.6 hook produced a style
+    # that newer ruff rejects.
+    rev: v0.14.11
     hooks:
       - id: ruff
         args: [--fix]

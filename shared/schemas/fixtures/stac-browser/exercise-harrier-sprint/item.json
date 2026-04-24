@@ -44,24 +44,37 @@
     "datetime": null,
     "start_datetime": "2022-07-02T18:00:00Z",
     "end_datetime": "2022-07-03T15:33:12Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/arleigh-burke"
+    "debrief:platforms": [
+      {
+        "id": "USS-HAMBURG",
+        "name": "USS Hamburg",
+        "nationality": "US",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      },
+      {
+        "id": "HNOMS-ROALD-AMUNDSEN",
+        "name": "HNoMS Roald Amundsen",
+        "nationality": "NO"
+      },
+      {
+        "id": "USS-NYKOPING",
+        "name": "USS Nykoping",
+        "nationality": "US"
+      },
+      {
+        "id": "HNOMS-CAIO-DUILIO",
+        "name": "HNoMS Caio Duilio",
+        "nationality": "NO"
+      }
     ],
     "debrief:tags": [
       "NGFS"
     ],
     "debrief:feature_tags": [
       "helicopter-ops"
-    ],
-    "debrief:track_names": [
-      "USS Hamburg",
-      "HNoMS Roald Amundsen",
-      "USS Nykoping",
-      "HNoMS Caio Duilio"
-    ],
-    "debrief:nationalities": [
-      "US",
-      "NO"
     ]
   },
   "links": [

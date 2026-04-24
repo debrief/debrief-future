@@ -38,6 +38,16 @@
   "title": "ReferenceLocation",
   "type": "object",
   "$defs": {
+    "ActivityType": {
+      "description": "Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.",
+      "enum": [
+        "snapshot",
+        "tool",
+        "tune"
+      ],
+      "title": "ActivityType",
+      "type": "string"
+    },
     "FeatureKindEnum": {
       "description": "Discriminator for GeoJSON feature types",
       "enum": [
@@ -53,7 +63,9 @@
         "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON",
-        "SYSTEM_RECORD"
+        "SYSTEM_RECORD",
+        "STORYBOARD",
+        "STORYBOARD_SCENE"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -159,6 +171,17 @@
         "activity_id": {
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
+        },
+        "activity_type": {
+          "$ref": "#/$defs/ActivityType",
+          "description": "Semantic kind of this provenance record. Optional; absent records are treated as `tool` by consumers. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts` `TimelineEntryKind` for the UI-side mirror."
+        },
+        "agent": {
+          "description": "Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "disabled": {
           "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",

@@ -26,6 +26,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
       vscode: path.resolve(__dirname, 'tests/__mocks__/vscode.ts'),
       '@debrief/components/ToolMatch': path.resolve(__dirname, '../../shared/components/src/ToolMatch/index.ts'),
+      '@debrief/components/PropertiesPanel/provenanceTypes': path.resolve(__dirname, '../../shared/components/src/PropertiesPanel/provenanceTypes.ts'),
+      '@debrief/components/PropertiesPanel/autoDerivedFields': path.resolve(__dirname, '../../shared/components/src/PropertiesPanel/autoDerivedFields.ts'),
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
     },

@@ -29,6 +29,7 @@
     "build:storybook": "storybook build"
   },
   "dependencies": {
+    "@debrief/schemas": "workspace:*",
     "@debrief/utils": "workspace:*",
     "i18next": "^23.7.0",
     "react": "^18.2.0",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.0",
     "@storybook/addon-a11y": "^8.4.0",
+    "@testing-library/react": "14.3.1",
     "@storybook/addon-actions": "^8.4.0",
     "@storybook/addon-controls": "^8.4.0",
     "@storybook/addon-essentials": "^8.4.0",

@@ -72,7 +72,7 @@ export function useTaxonomyMatchCounts(
       // (an item with multiple vessel classes in the same subtree counts once per ancestor)
       const countedPaths = new Set<string>();
 
-      for (const vesselClass of item.vesselClasses) {
+      for (const vesselClass of (item.platforms ?? []).map((p) => p.vessel_class).filter((v): v is string => v != null)) {
         // For each taxonomy path, check if this vessel class is a descendant
         for (const [taxonomyPath, descendants] of pathDescendantMap) {
           if (descendants.has(vesselClass) && !countedPaths.has(taxonomyPath)) {

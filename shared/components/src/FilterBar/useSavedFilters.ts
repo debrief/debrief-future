@@ -15,16 +15,29 @@ import type {
 import { SAVED_FILTERS_MAX, SAVED_FILTERS_NAME_MAX_LENGTH } from './constants';
 import { getFilterTypeLabel } from './constants';
 
+/** Render a single lozenge (simple or platform) as "Type: value" */
+function describeLozenge(item: FilterBarState['items'][number]): string {
+  if (item.kind !== 'lozenge') return '';
+  if (item.shape === 'platform') {
+    const pieces: string[] = [];
+    const attrs = item.attributes;
+    for (const key of ['nationality', 'domain', 'vessel_role', 'vessel_type', 'vessel_class'] as const) {
+      const v = attrs[key];
+      if (typeof v === 'string' && v !== '') pieces.push(v);
+    }
+    return `${getFilterTypeLabel('platform')}: ${pieces.join(' · ')}`;
+  }
+  return `${getFilterTypeLabel(item.filterType)}: ${item.value}`;
+}
+
 /** Generate a default name from active filter values */
 function generateDefaultName(filterBarState: FilterBarState): string {
   const parts: string[] = [];
   for (const item of filterBarState.items) {
     if (item.kind === 'lozenge') {
-      parts.push(`${getFilterTypeLabel(item.filterType)}: ${item.value}`);
+      parts.push(describeLozenge(item));
     } else if (item.kind === 'or-container') {
-      const children = item.children
-        .map((c) => `${getFilterTypeLabel(c.filterType)}: ${c.value}`)
-        .join(' | ');
+      const children = item.children.map(describeLozenge).join(' | ');
       if (children) parts.push(`(${children})`);
     }
   }

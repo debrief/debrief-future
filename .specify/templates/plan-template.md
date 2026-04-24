@@ -143,30 +143,33 @@ directories captured above]
 
 *If no e2e tests needed, write "None - no interactive UI components"*
 
-## VS Code Webview E2E Testing
+## Web-Shell E2E Testing
 
-*Identify extension workflows that require end-to-end testing through code-server. Skip if feature has no VS Code extension changes.*
+*Identify extension workflows that require end-to-end testing. Skip if the feature has no extension workflow changes. This is the path for any workflow-level screenshots destined for evidence/blog.*
 
-> **Reference**: `docs/e2e-testing-guide.md` — full guide to the webview E2E architecture, patches, and patterns.
+> **Reference**: `docs/e2e-testing-guide.md` §3 — web-shell architecture, page objects, screenshot/GIF patterns.
+>
+> The web-shell (`apps/web-shell/`) is a standalone React app hosting the same shared components as the VS Code extension. Driving it with Playwright is the supported path for full-workflow E2E and is the source of record for blog/PR screenshots. Do **not** route workflow tests through openvscode-server / `xvfb-run` — that path (#142) is unreliable and reserved for chrome-level concerns.
 
-| Workflow | Panels Involved | Key Selectors | Interactions |
-|----------|----------------|---------------|--------------|
-| [e.g., Open REP file] | Map Panel, Activity Panel | `.leaflet-container`, `.catalog-overview` | open file, verify tracks render |
+| Workflow | Panels/Components Involved | Key Selectors | Interactions |
+|----------|---------------------------|---------------|--------------|
+| [e.g., Open plot + filter tracks] | MapView, FilterBar, FeatureList | `.leaflet-container`, `[data-testid="filter-bar"]`, `[data-testid="feature-list"]` | load plot, apply filter, verify count |
 
 **Testing Strategy**:
-- [ ] Extension workflow works end-to-end in code-server
-- [ ] Webview content accessible via `frameLocator` chaining
-- [ ] Page objects updated for new selectors
-- [ ] Screenshots captured for evidence
+- [ ] Workflow runs end-to-end in the web-shell
+- [ ] Page objects in `apps/web-shell/playwright/pages/` extended for new selectors (reuse `AnalysisPage` / `CatalogPage` rather than duplicating)
+- [ ] Screenshots and/or interaction GIF written **directly** into `specs/[feature]/evidence/screenshots/` from the spec file (follow the path-resolution pattern in `apps/web-shell/playwright/tests/properties-screenshots.spec.ts`)
 
-**Test File Location**: `tests/e2e/test-{workflow}.spec.ts`
+**Test File Location**: `apps/web-shell/playwright/tests/{workflow}.spec.ts`
 
-**Infrastructure**:
-- Patches applied by `tests/e2e/scripts/patch-webview.sh`
-- Content injection via `tests/e2e/helpers/webview-injector.ts`
-- Headed Chromium required: `xvfb-run --auto-servernum npx playwright test ...`
+**Run Commands**:
+- Cloud: `cd apps/web-shell && node run-playwright.mjs {workflow}` (auto-provisions `@sparticuz/chromium`)
+- Local: `pnpm --filter @debrief/web-shell test {workflow}`
 
-*If no webview E2E tests needed, write "None - no extension workflow changes"*
+**Optional — chrome-level VS Code Webview tests**:
+Only for tests that genuinely require real VS Code chrome (command palette, sidebar host lifecycle, native notifications). See `docs/e2e-testing-guide.md` §4. Not the path for evidence/blog screenshots.
+
+*If no workflow E2E tests needed, write "None - no extension workflow changes"*
 
 ## Complexity Tracking
 

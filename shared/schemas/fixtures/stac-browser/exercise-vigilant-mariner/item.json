@@ -44,9 +44,35 @@
     "datetime": null,
     "start_datetime": "2023-10-04T10:00:00Z",
     "end_datetime": "2023-10-04T22:30:31Z",
-    "debrief:vessel_classes": [
-      "surface/warship/frigate/type23",
-      "surface/merchant/tanker/vlcc"
+    "debrief:platforms": [
+      {
+        "id": "FS-BERGAMINI",
+        "name": "FS Bergamini",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/frigate/type23",
+        "domain": "surface",
+        "vessel_role": "frigate",
+        "vessel_type": "type23"
+      },
+      {
+        "id": "HNLMS-DE-RUYTER",
+        "name": "HNLMS De Ruyter",
+        "nationality": "NL",
+        "vessel_class": "surface/merchant/tanker/vlcc",
+        "domain": "surface",
+        "vessel_role": "tanker",
+        "vessel_type": "vlcc"
+      },
+      {
+        "id": "FS-LABOON",
+        "name": "FS Laboon",
+        "nationality": "FR"
+      },
+      {
+        "id": "HNLMS-TROMP",
+        "name": "HNLMS Tromp",
+        "nationality": "NL"
+      }
     ],
     "debrief:tags": [
       "certification"
@@ -56,16 +82,6 @@
       "depth-charge",
       "passive-search",
       "minefield"
-    ],
-    "debrief:track_names": [
-      "FS Bergamini",
-      "HNLMS De Ruyter",
-      "FS Laboon",
-      "HNLMS Tromp"
-    ],
-    "debrief:nationalities": [
-      "FR",
-      "NL"
     ]
   },
   "links": [

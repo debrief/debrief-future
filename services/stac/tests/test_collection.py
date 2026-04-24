@@ -34,11 +34,9 @@ def _make_item(
     datetime: str = "2024-06-15T12:00:00Z",
     start_datetime: str | None = None,
     end_datetime: str | None = None,
-    vessel_classes: list[str] | None = None,
+    platforms: list[dict] | None = None,
     tags: list[str] | None = None,
     feature_tags: list[str] | None = None,
-    track_names: list[str] | None = None,
-    nationalities: list[str] | None = None,
 ) -> dict:
     """Helper to create a STAC Item dict for testing."""
     props: dict = {
@@ -49,16 +47,12 @@ def _make_item(
         props["start_datetime"] = start_datetime
     if end_datetime:
         props["end_datetime"] = end_datetime
-    if vessel_classes is not None:
-        props["debrief:vessel_classes"] = vessel_classes
+    if platforms is not None:
+        props["debrief:platforms"] = platforms
     if tags is not None:
         props["debrief:tags"] = tags
     if feature_tags is not None:
         props["debrief:feature_tags"] = feature_tags
-    if track_names is not None:
-        props["debrief:track_names"] = track_names
-    if nationalities is not None:
-        props["debrief:nationalities"] = nationalities
 
     return {
         "type": "Feature",
@@ -105,14 +99,24 @@ class TestExtractItemExtent:
 class TestExtractItemSummaries:
     """Tests for _extract_item_summaries helper."""
 
-    def test_extracts_extension_properties(self) -> None:
-        item = _make_item(
-            vessel_classes=["surface/warship/frigate"],
-            nationalities=["GB", "US"],
-        )
+    def test_extracts_platforms(self) -> None:
+        platforms = [
+            {
+                "id": "NELSON",
+                "name": "HMS Nelson",
+                "nationality": "GB",
+                "vessel_class": "surface/warship/frigate",
+            },
+            {
+                "id": "MASON",
+                "name": "USS Mason",
+                "nationality": "US",
+                "vessel_class": "surface/warship/destroyer",
+            },
+        ]
+        item = _make_item(platforms=platforms)
         result = _extract_item_summaries(item)
-        assert result["debrief:vessel_classes"] == ["surface/warship/frigate"]
-        assert result["debrief:nationalities"] == ["GB", "US"]
+        assert result["debrief:platforms"] == platforms
 
     def test_missing_properties_not_included(self) -> None:
         """T020: item missing debrief:* properties → contributes nothing."""
@@ -120,11 +124,19 @@ class TestExtractItemSummaries:
         result = _extract_item_summaries(item)
         assert len(result) == 0
 
-    def test_null_values_filtered(self) -> None:
+    def test_non_dict_platform_entries_filtered(self) -> None:
         item = _make_item()
-        item["properties"]["debrief:vessel_classes"] = ["frigate", None, "submarine"]
+        item["properties"]["debrief:platforms"] = [
+            {"id": "NELSON", "vessel_class": "frigate"},
+            "not-a-dict",
+            None,
+            {"id": "MASON", "vessel_class": "submarine"},
+        ]
         result = _extract_item_summaries(item)
-        assert result["debrief:vessel_classes"] == ["frigate", "submarine"]
+        assert result["debrief:platforms"] == [
+            {"id": "NELSON", "vessel_class": "frigate"},
+            {"id": "MASON", "vessel_class": "submarine"},
+        ]
 
 
 class TestMergeExtent:
@@ -166,19 +178,32 @@ class TestMergeExtent:
 class TestMergeSummaries:
     """Tests for _merge_summaries helper."""
 
-    def test_first_item_sets_summaries(self) -> None:
-        result = _merge_summaries(None, {"debrief:vessel_classes": ["frigate", "destroyer"]})
-        assert result["debrief:vessel_classes"] == ["destroyer", "frigate"]
+    def test_first_item_sets_platforms(self) -> None:
+        platforms = [
+            {"id": "NELSON", "vessel_class": "frigate"},
+            {"id": "MASON", "vessel_class": "destroyer"},
+        ]
+        result = _merge_summaries(None, {"debrief:platforms": platforms})
+        assert result["debrief:platforms"] == platforms
 
-    def test_merges_deduplicated(self) -> None:
-        existing = {"debrief:vessel_classes": ["destroyer", "frigate"]}
-        result = _merge_summaries(existing, {"debrief:vessel_classes": ["frigate", "submarine"]})
-        assert result["debrief:vessel_classes"] == ["destroyer", "frigate", "submarine"]
+    def test_merges_platforms_deduplicated_by_id(self) -> None:
+        existing_platforms = [{"id": "NELSON", "vessel_class": "frigate"}]
+        new_platforms = [
+            {"id": "NELSON", "vessel_class": "updated-frigate"},
+            {"id": "MASON", "vessel_class": "destroyer"},
+        ]
+        existing = {"debrief:platforms": existing_platforms}
+        result = _merge_summaries(existing, {"debrief:platforms": new_platforms})
+        # NELSON already seen — first record wins; MASON is new
+        assert len(result["debrief:platforms"]) == 2
+        nelson = next(p for p in result["debrief:platforms"] if p["id"] == "NELSON")
+        assert nelson["vessel_class"] == "frigate"  # first-seen wins
+        assert any(p["id"] == "MASON" for p in result["debrief:platforms"])
 
-    def test_sorted_alphabetically(self) -> None:
-        """T021: summaries arrays sorted alphabetically."""
-        result = _merge_summaries(None, {"debrief:nationalities": ["US", "GB", "FR"]})
-        assert result["debrief:nationalities"] == ["FR", "GB", "US"]
+    def test_sorted_tags_alphabetically(self) -> None:
+        """T021: tag summaries arrays sorted alphabetically."""
+        result = _merge_summaries(None, {"debrief:tags": ["training", "ASW", "SAR"]})
+        assert result["debrief:tags"] == ["ASW", "SAR", "training"]
 
 
 class TestCollectionPromotionUS1:
@@ -196,7 +221,7 @@ class TestCollectionPromotionUS1:
         assert catalog["license"] == "proprietary"
 
     def test_add_item_expands_summaries(self, tmp_path: Path) -> None:
-        """T016: Collection with items → add item with later date + new vessel class → summaries expand."""
+        """T016: Collection with items → add item with later date + new platform → summaries expand."""
         catalog_path = create_catalog(tmp_path / "catalog")
 
         # Create item 1 with features to set bbox and datetime
@@ -207,8 +232,9 @@ class TestCollectionPromotionUS1:
         )
         # Manually set extension properties on item
         item1 = read_plot(catalog_path, plot1)
-        item1["properties"]["debrief:vessel_classes"] = ["frigate"]
-        item1["properties"]["debrief:nationalities"] = ["GB"]
+        item1["properties"]["debrief:platforms"] = [
+            {"id": "NELSON", "name": "HMS Nelson", "nationality": "GB", "vessel_class": "frigate"}
+        ]
         item1["bbox"] = [-5.0, 49.0, 2.0, 58.5]
         with open(catalog_path / plot1 / "item.json", "w") as f:
             json.dump(item1, f, indent=2)
@@ -220,8 +246,9 @@ class TestCollectionPromotionUS1:
             plot_id="plot-2",
         )
         item2 = read_plot(catalog_path, plot2)
-        item2["properties"]["debrief:vessel_classes"] = ["submarine"]
-        item2["properties"]["debrief:nationalities"] = ["US"]
+        item2["properties"]["debrief:platforms"] = [
+            {"id": "MASON", "name": "USS Mason", "nationality": "US", "vessel_class": "submarine"}
+        ]
         item2["bbox"] = [-10.0, 48.0, 3.0, 60.0]
         with open(catalog_path / plot2 / "item.json", "w") as f:
             json.dump(item2, f, indent=2)
@@ -235,8 +262,8 @@ class TestCollectionPromotionUS1:
 
         catalog = open_catalog(catalog_path)
         assert catalog["type"] == "Collection"
-        assert catalog["summaries"]["debrief:vessel_classes"] == ["frigate", "submarine"]
-        assert catalog["summaries"]["debrief:nationalities"] == ["GB", "US"]
+        platform_ids = {p["id"] for p in catalog["summaries"]["debrief:platforms"]}
+        assert platform_ids == {"NELSON", "MASON"}
         assert catalog["extent"]["spatial"]["bbox"] == [[-10.0, 48.0, 3.0, 60.0]]
 
     def test_add_features_updates_collection_extent(self, tmp_path: Path) -> None:
@@ -309,22 +336,20 @@ class TestCollectionPromotionUS1:
         catalog = open_catalog(catalog_path)
         # Summaries should have empty arrays
         for key in [
-            "debrief:vessel_classes",
+            "debrief:platforms",
             "debrief:tags",
             "debrief:feature_tags",
-            "debrief:track_names",
-            "debrief:nationalities",
         ]:
             assert catalog["summaries"][key] == []
 
     def test_summaries_sorted_alphabetically(self, tmp_path: Path) -> None:
-        """T021: summaries arrays are sorted alphabetically."""
+        """T021: tag summaries arrays are sorted alphabetically."""
         catalog_path = create_catalog(tmp_path / "catalog")
         plot_id = create_plot(catalog_path, PlotMetadata(title="Plot"), plot_id="plot-1")
 
-        # Set extension properties in unsorted order
+        # Set tags in unsorted order
         item = read_plot(catalog_path, plot_id)
-        item["properties"]["debrief:nationalities"] = ["US", "GB", "FR"]
+        item["properties"]["debrief:tags"] = ["training", "ASW", "SAR"]
         with open(catalog_path / plot_id / "item.json", "w") as f:
             json.dump(item, f, indent=2)
 
@@ -335,7 +360,7 @@ class TestCollectionPromotionUS1:
         _save_catalog(catalog_path, catalog_data)
 
         catalog = open_catalog(catalog_path)
-        assert catalog["summaries"]["debrief:nationalities"] == ["FR", "GB", "US"]
+        assert catalog["summaries"]["debrief:tags"] == ["ASW", "SAR", "training"]
 
     def test_collection_validates_against_schema(self, tmp_path: Path) -> None:
         """T022: Collection output validates against collection-schema.json."""
@@ -603,17 +628,21 @@ class TestDeletionRebuildUS4:
         # Temporal range should now end at mid's date
         assert "2024-06-15" in catalog["extent"]["temporal"]["interval"][0][1]
 
-    def test_delete_item_removes_unique_vessel_class(self, tmp_path: Path) -> None:
-        """T045: delete item with unique vessel class → class removed from summaries."""
+    def test_delete_item_removes_unique_platform(self, tmp_path: Path) -> None:
+        """T045: delete item with unique platform → platform removed from summaries."""
         catalog_path = create_catalog(tmp_path / "catalog")
 
         create_plot(catalog_path, PlotMetadata(title="P1"), plot_id="p1")
         create_plot(catalog_path, PlotMetadata(title="P2"), plot_id="p2")
 
-        # Set extension properties
-        for pid, vc in [("p1", ["frigate"]), ("p2", ["submarine"])]:
+        # Set platforms on each item
+        platforms_by_plot = {
+            "p1": [{"id": "NELSON", "vessel_class": "frigate"}],
+            "p2": [{"id": "MASON", "vessel_class": "submarine"}],
+        }
+        for pid, platforms in platforms_by_plot.items():
             item = read_plot(catalog_path, pid)
-            item["properties"]["debrief:vessel_classes"] = vc
+            item["properties"]["debrief:platforms"] = platforms
             with open(catalog_path / pid / "item.json", "w") as f:
                 json.dump(item, f, indent=2)
 
@@ -624,8 +653,9 @@ class TestDeletionRebuildUS4:
         _save_catalog(catalog_path, catalog_data)
 
         catalog = open_catalog(catalog_path)
-        assert "frigate" in catalog["summaries"]["debrief:vessel_classes"]
-        assert "submarine" in catalog["summaries"]["debrief:vessel_classes"]
+        platform_ids = {p["id"] for p in catalog["summaries"]["debrief:platforms"]}
+        assert "NELSON" in platform_ids
+        assert "MASON" in platform_ids
 
         # Remove p2 link and rebuild
         catalog_data = open_catalog(catalog_path)
@@ -638,8 +668,9 @@ class TestDeletionRebuildUS4:
         _save_catalog(catalog_path, catalog_data)
 
         catalog = open_catalog(catalog_path)
-        assert "frigate" in catalog["summaries"]["debrief:vessel_classes"]
-        assert "submarine" not in catalog["summaries"]["debrief:vessel_classes"]
+        platform_ids_after = {p["id"] for p in catalog["summaries"]["debrief:platforms"]}
+        assert "NELSON" in platform_ids_after
+        assert "MASON" not in platform_ids_after
 
     def test_delete_all_items_clears_summaries(self, tmp_path: Path) -> None:
         """T046: delete all items → summaries empty."""
@@ -660,11 +691,9 @@ class TestDeletionRebuildUS4:
         assert catalog["type"] == "Collection"
         assert catalog["extent"]["temporal"]["interval"] == [[None, None]]
         for key in [
-            "debrief:vessel_classes",
+            "debrief:platforms",
             "debrief:tags",
             "debrief:feature_tags",
-            "debrief:track_names",
-            "debrief:nationalities",
         ]:
             assert catalog["summaries"][key] == []
 

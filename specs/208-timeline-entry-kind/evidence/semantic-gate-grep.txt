@@ -1,0 +1,35 @@
+# SC-001 semantic-gate grep evidence
+#
+# Captured: 2026-04-22T20:26:52Z
+# Branch:   208-timeline-entry-kind-v2
+# Commit:   6f1dccbd
+#
+# SC-001: Zero residual `ToolCategory === 'snapshot'` semantic gates remain
+# in LogPanel rendering code. Every remaining hit below is either:
+#   - test-file text that documents the anti-pattern (drift test itself), or
+#   - type-declaration / documentation, not an executable gate.
+
+## Query 1: Any `category === 'snapshot'` pattern across LogPanel sources
+$ rg "category === 'snapshot'" shared/components/src/LogPanel/
+shared/components/src/LogPanel/__tests__/semantic-gate-drift.test.ts:  it("does not contain the legacy `resolveToolCategory(...).category === 'snapshot'` gate", () => {
+shared/components/src/LogPanel/__tests__/semantic-gate-drift.test.ts:    // Any expression of shape `*.category === 'snapshot'` is the anti-pattern
+
+# Each hit above should belong to the semantic-gate-drift.test.ts file, which
+# contains the anti-pattern as a string inside its test assertions. No hits
+# in LogEntry.tsx, LogPanel.tsx, or other rendering files.
+
+## Query 2: Narrow to the primary LogPanel rendering file
+$ rg "category === 'snapshot'" shared/components/src/LogPanel/LogEntry.tsx
+(zero matches — SC-001 satisfied)
+
+## Query 3: Any residual use of resolveToolCategory for entry semantics in LogEntry.tsx
+$ rg "resolveToolCategory" shared/components/src/LogPanel/LogEntry.tsx
+(zero matches — resolveToolCategory no longer imported in LogEntry.tsx)
+
+## Verdict
+
+SC-001 satisfied. The only textual hits of `category === 'snapshot'` in
+LogPanel source are inside the semantic-gate drift test, which asserts the
+pattern is absent from rendering code. No gated legacy fallback remains
+(contrast: PR #508 kept a gated fallback at LogEntry.tsx:117-120; the
+schema-rooted approach deletes it and lets the populator always supply kind).

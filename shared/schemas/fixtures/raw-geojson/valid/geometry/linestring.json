@@ -1,0 +1,1 @@
+{ "type": "Feature", "id": "geom-linestring", "geometry": { "type": "LineString", "coordinates": [[0, 0], [1, 1], [2, 2]] }, "properties": {} }

@@ -1,6 +1,7 @@
 // Fix: track symbols/labels visibility preserved when running styling tools
 // Data quality: sensor-only plots merged into track companions, timestamps fixed
 import * as vscode from 'vscode';
+import * as path from 'path';
 import {
   subscribeToDirty,
   subscribeToSelection,
@@ -17,8 +18,13 @@ import { TimeRangeViewProvider } from './views/timeRangeView';
 import { ActivityPanelViewProvider } from './views/activityPanelView';
 import { LogPanelViewProvider } from './views/logPanelView';
 import { ResultsPanelViewProvider } from './views/resultsPanelView';
+import { StoryboardPanelViewProvider } from './views/storyboardPanelView';
 import { ResultsPanelService } from './services/resultsPanelService';
 import { MapPanel } from './webview/mapPanel';
+import {
+  captureScene,
+  type CaptureCommandContext,
+} from './commands/captureScene';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
@@ -30,6 +36,27 @@ import { SessionManager } from './services/sessionManager';
 import { ToolMatchAdapter } from './services/toolMatchAdapter';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
+import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
+import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import { registerStoryboardEditCommands } from './commands/storyboardEdit';
+import { StoryboardEditService } from './services/storyboardEdit';
+import { plotFromFeatures } from './services/plotFromFeatures';
+import {
+  gcOrphanAssets as sceneThumbnailGcOrphanAssets,
+  writeSceneThumbnail,
+} from './services/sceneThumbnailService';
+import {
+  StoryboardPlaybackService,
+  type ModalPromptPort,
+  type VisibilityPort,
+  type PlaybackMapPanel,
+  type PlaybackSessionManager,
+  type PlaybackPanelView,
+  type PlaybackTimeRangeView,
+} from './services/storyboardPlayback';
+import { formatDtg } from '@debrief/components';
+import { calculateViewportCenter } from '@debrief/utils';
+import type { DebriefFeature } from '@debrief/components';
 
 let mapPanel: MapPanel | undefined;
 
@@ -135,6 +162,267 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
   logPanelProvider.setCalcService(calcService);
 
+  // Storyboard panel (Features: 216 capture + 217 playback)
+  const storyboardPanelProvider = new StoryboardPanelViewProvider(
+    context.extensionUri,
+    sessionManager,
+  );
+  storyboardPanelProvider.setMapPanelResolver(() => mapPanel);
+
+  // Storyboard playback service (#217) — owns transport state per plot.
+  // Constructed lazily after the panel + time-range providers exist so
+  // the service can wire the ports it needs. `modalPromptPort` uses
+  // vscode.window.showInformationMessage with the modal flag. The
+  // visibility port is keyed to the Storyboard panel's onDidChangeVisibility.
+  const visibilityEmitter = new vscode.EventEmitter<boolean>();
+  const visibilityPort: VisibilityPort = {
+    onDidChangeVisibility: visibilityEmitter.event,
+  };
+  const modalPromptPort: ModalPromptPort = {
+    showInformationMessage: (message, options, ...items): Thenable<string | undefined> =>
+      vscode.window.showInformationMessage(message, options, ...items),
+  };
+  // Mini-adapter so the service sees only the surface it needs from MapPanel.
+  const playbackMapPanel: PlaybackMapPanel = {
+    getCurrentFeatures: (): DebriefFeature[] => mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => mapPanel?.setFeatures?.([...features]),
+    flyToViewport: (viewport, durationMs): number =>
+      mapPanel?.flyToViewport?.(viewport, durationMs) ?? -1,
+    setSceneRectangles: (scenes, activeId, currentId): void =>
+      mapPanel?.setSceneRectangles?.(scenes, activeId, currentId),
+    onFlyToComplete: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onFlyToComplete(listener)
+        : { dispose: (): void => undefined },
+    onSceneRectangleClick: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onSceneRectangleClick(listener)
+        : { dispose: (): void => undefined },
+    onFeaturesChanged: (listener): vscode.Disposable =>
+      mapPanel
+        ? mapPanel.onFeaturesChanged(listener)
+        : { dispose: (): void => undefined },
+  };
+  const playbackSessionManager: PlaybackSessionManager = {
+    getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    getSession: (uri): SessionStoreApi | undefined => sessionManager.getSession(uri),
+    getActiveSession: (): SessionStoreApi | null => sessionManager.getActiveSession(),
+    onActiveSessionChange: sessionManager.onActiveSessionChange,
+  };
+  const playbackPanelView: PlaybackPanelView = {
+    applySnapshot: (snap): void => storyboardPanelProvider.applySnapshot(snap),
+  };
+  const playbackTimeRangeView: PlaybackTimeRangeView = {
+    setScrubbableRange: (start, end): void =>
+      timeRangeProvider.setScrubbableRange(start, end),
+  };
+  const storyboardPlaybackService = new StoryboardPlaybackService({
+    sessionManager: playbackSessionManager,
+    mapPanel: playbackMapPanel,
+    panelView: playbackPanelView,
+    timeRangeView: playbackTimeRangeView,
+    modalPromptPort,
+    visibilityPort,
+    formatDtg,
+  });
+  context.subscriptions.push({ dispose: (): void => storyboardPlaybackService.dispose() });
+
+  // #217 Phase 4 — the panel needs the service reference so it can
+  // call setActiveStoryboard synchronously on dropdown-change messages.
+  storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
+
+  // #218 — Storyboard edit orchestration service. Phase 3 wires the
+  // panel view as the edit sink so inbound messages (scene-edit-form-
+  // open, scene-undo-toast-shown) flow back to the webview. The
+  // remaining ports (mapPanel, sessionManager, thumbnailService,
+  // logService) are wired via setters below.
+  const storyboardEditService = new StoryboardEditService();
+  context.subscriptions.push(storyboardEditService.activate());
+  storyboardPanelProvider.setEditService(storyboardEditService);
+
+  // #218 Phase 4/5 — wire the runtime ports for stale detection, refresh,
+  // and orphan-asset GC on plot close.
+  storyboardEditService.setMapPanel({
+    getCurrentFeatures: (): DebriefFeature[] =>
+      mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => {
+      mapPanel?.setFeatures?.([...features]);
+    },
+  });
+  storyboardEditService.setSessionManager({
+    getActiveDocumentUri: (): string | null =>
+      sessionManager.getActiveDocumentUri(),
+    resolveStoreContext: (_documentUri: string) => {
+      const store = mapPanel?.getCurrentStore?.();
+      const plot = mapPanel?.getCurrentPlot?.();
+      if (!store?.path || !plot?.itemPath) {return null;}
+      return {
+        storePath: store.path,
+        itemPath: path.join(store.path, plot.itemPath),
+      };
+    },
+  });
+  storyboardEditService.setThumbnailService({
+    captureThumbnail: async ({ stacItemPath, sceneId }) => {
+      const panel = mapPanel;
+      if (!panel) {
+        throw new Error('captureThumbnail: mapPanel not initialised');
+      }
+      const pair = await panel.requestThumbnailCapture();
+      if (!pair.largePngBase64 || !pair.smallPngBase64) {
+        throw new Error('captureThumbnail: mapPanel returned empty PNG pair');
+      }
+      const res = await writeSceneThumbnail(
+        stacItemPath,
+        sceneId,
+        pair.largePngBase64,
+        pair.smallPngBase64,
+      );
+      return { assetKey: res.assetKey };
+    },
+    deepCopyAsset: (
+      sourceAssetRef: string,
+      destStoryboardId: string,
+    ): Promise<string> => {
+      // Minimal safe fallback: returns a DIFFERENT ref (contract
+      // requires distinctness per FR-MODULE-015). Full deep-copy
+      // (tmp+fsync+rename of PNG pair + new asset entry) lands with
+      // the #216/#174 integration follow-up.
+      return Promise.resolve(`${sourceAssetRef}-copy-${destStoryboardId}`);
+    },
+    gcOrphanAssets: sceneThumbnailGcOrphanAssets,
+  });
+  // LogService binds dynamically — the per-plot LogService is owned by
+  // MapPanel (same pattern as ResultsPanelService).
+  //
+  // Note on typing: the service's port declares `op: string` (loose;
+  // the service internally uses a closed set of op names matching
+  // StoryboardEditOp). We narrow at this boundary by reshaping the
+  // payload rather than with an `as unknown as` cast.
+  const syncLogService = (): void => {
+    const svc = mapPanel?.getLogService?.();
+    if (svc) {
+      storyboardEditService.setLogService({
+        recordStoryboardEdit: (input) => {
+          type SvcInput = Parameters<typeof svc.recordStoryboardEdit>[0];
+          type SvcOp = SvcInput['op'];
+          const narrowed: SvcInput = {
+            storePath: input.storePath,
+            itemPath: input.itemPath,
+            op: input.op as SvcOp,
+            storyboardId: input.storyboardId,
+            sceneId: input.sceneId,
+            thumbnailAssetRef: input.thumbnailAssetRef,
+            actor: input.actor,
+            summary: input.summary,
+            timestamp: input.timestamp,
+            underlyingActivityId: input.underlyingActivityId,
+            pairActivityId: input.pairActivityId,
+          };
+          return svc.recordStoryboardEdit(narrowed);
+        },
+      });
+    } else {
+      storyboardEditService.setLogService(null);
+    }
+  };
+  syncLogService();
+  registerStoryboardEditCommands(context, {
+    service: storyboardEditService,
+    sessionManager: {
+      getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    },
+    readCurrentMapView: (): {
+      viewport: { center: number[]; zoom: number; bearing: number };
+      timestamp: string;
+      visibleFeatureIds: readonly string[];
+    } | null => {
+      const panel = mapPanel;
+      if (!panel) {return null;}
+      const docUri = sessionManager.getActiveDocumentUri();
+      if (docUri === null) {return null;}
+      const session = sessionManager.getSession(docUri);
+      const state = session?.getState();
+      const viewport = state?.viewport ?? null;
+      const currentTime = state?.currentTime ?? null;
+      if (!viewport || viewport.zoom === undefined || currentTime === null) {
+        return null;
+      }
+      const centerObj = calculateViewportCenter(viewport);
+      const features = panel.getCurrentFeatures();
+      const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
+      const visibleFeatureIds: string[] = [];
+      for (const f of features) {
+        const props = f.properties as { id?: string | null } | null;
+        const id = props?.id;
+        if (typeof id !== 'string' || id.length === 0) {continue;}
+        if (hiddenIds.has(id)) {continue;}
+        visibleFeatureIds.push(id);
+      }
+      return {
+        viewport: {
+          center: [centerObj.longitude, centerObj.latitude],
+          zoom: viewport.zoom,
+          bearing: 0,
+        },
+        timestamp: new Date(currentTime).toISOString(),
+        visibleFeatureIds,
+      };
+    },
+    listSiblingStoryboards: (
+      _documentUri: string,
+      sourceStoryboardId: string,
+    ): readonly { id: string; name: string; sceneCount: number }[] => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      const sceneCountById = new Map<string, number>();
+      for (const f of features) {
+        const props = f.properties as { kind?: string; storyboard_id?: string } | null;
+        if (props?.kind === 'STORYBOARD_SCENE' && typeof props.storyboard_id === 'string') {
+          sceneCountById.set(
+            props.storyboard_id,
+            (sceneCountById.get(props.storyboard_id) ?? 0) + 1,
+          );
+        }
+      }
+      const result: { id: string; name: string; sceneCount: number }[] = [];
+      for (const f of features) {
+        const props = f.properties as { kind?: string; id?: string; name?: string } | null;
+        if (
+          props?.kind === 'STORYBOARD' &&
+          typeof props.id === 'string' &&
+          typeof props.name === 'string' &&
+          props.id !== sourceStoryboardId
+        ) {
+          result.push({
+            id: props.id,
+            name: props.name,
+            sceneCount: sceneCountById.get(props.id) ?? 0,
+          });
+        }
+      }
+      return result;
+    },
+    resolveSceneStoryboard: (
+      _documentUri: string,
+      sceneId: string,
+    ): string | null => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      for (const f of features) {
+        const props = f.properties as
+          | { kind?: string; id?: string; storyboard_id?: string }
+          | null;
+        if (
+          props?.kind === 'STORYBOARD_SCENE' &&
+          props.id === sceneId &&
+          typeof props.storyboard_id === 'string'
+        ) {
+          return props.storyboard_id;
+        }
+      }
+      return null;
+    },
+  });
+
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
   resultsPanelProvider.setOutputChannel(outputChannel);
@@ -194,6 +482,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                   geometry: { type: 'Point', coordinates: [0, 0] },
                   properties: { __datasets: payload.datasets },
                 },
+                // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               ] as unknown as Array<import('@debrief/utils').SafeFeature>,
             },
           },
@@ -281,6 +570,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           for (const feature of allFeatures) {
             const props = (feature as { properties?: unknown } | null)?.properties;
             if (props !== null && typeof props === 'object') {
+              // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               const propsMap = props as Record<string, unknown>;
               const hasDatasets =
                 Array.isArray(propsMap['__datasets']) &&
@@ -364,6 +654,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
           for (const feature of allFeatures) {
             const props = (feature as { properties?: unknown } | null)?.properties;
             if (props !== null && typeof props === 'object') {
+              // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
               const propsMap = props as Record<string, unknown>;
               const hasDatasets =
                 Array.isArray(propsMap['__datasets']) &&
@@ -443,6 +734,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       'debrief.resultsPanel',
       resultsPanelProvider,
       { webviewOptions: { retainContextWhenHidden: true } },
+    ),
+    vscode.window.registerWebviewViewProvider(
+      'debrief.storyboardPanel',
+      storyboardPanelProvider,
     )
   );
 
@@ -630,6 +925,130 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     resultsPanelService
   );
   context.subscriptions.push(...commands);
+
+  // Feature 217 — register storyboard transport commands (forward,
+  // backward, clickScene, jumpPast). Must run AFTER the service is
+  // constructed and BEFORE any user interaction can reach the commands.
+  registerStoryboardTransportCommands(
+    context,
+    storyboardPlaybackService,
+    sessionManager,
+  );
+
+  // Feature 217 Phase 4 — register management commands (create,
+  // rename, delete). These drive the overflow-menu flow from the
+  // Storyboard panel.
+  registerStoryboardManagementCommands(
+    context,
+    storyboardPlaybackService,
+    sessionManager,
+  );
+
+  // Subscribe the Storyboard panel provider to the service's snapshot
+  // stream so every transport step / CRUD op / lifecycle transition
+  // refreshes the panel view.
+  context.subscriptions.push(
+    storyboardPlaybackService.onSnapshotChange((snap) => {
+      storyboardPanelProvider.applySnapshot(snap);
+    }),
+  );
+
+  // Feature 217 — wire the service's lifecycle + transport surface.
+  // Plot open: run validatePlot + seed active + install scrub override.
+  // Plot close / switch: restore scrub + drop state.
+  // #218 T089 — track the previously-active URI so we can fire
+  // onPlotClosed (→ gcOrphanAssets) when the session changes away.
+  // Features are read live from mapPanel at close time; if empty
+  // (plot already unloaded), gcOrphanAssets no-ops safely.
+  let previousActiveUri: string | null = null;
+  context.subscriptions.push(
+    sessionManager.onActiveSessionChange((session) => {
+      const activeUri = sessionManager.getActiveDocumentUri();
+      if (
+        previousActiveUri !== null &&
+        previousActiveUri !== activeUri
+      ) {
+        const finalFeatures = mapPanel?.getCurrentFeatures() ?? [];
+        if (finalFeatures.length > 0) {
+          void storyboardEditService.onPlotClosed(
+            previousActiveUri,
+            plotFromFeatures(finalFeatures),
+          );
+        }
+      }
+      if (session && activeUri) {
+        storyboardPlaybackService.onPlotOpened(activeUri);
+        // #218 T070 — kick off the stale-detection pass (early-returns
+        // on zero-storyboard plots per review 11A).
+        void storyboardEditService.onPlotOpened(
+          activeUri,
+          plotFromFeatures(mapPanel?.getCurrentFeatures() ?? []),
+        );
+        previousActiveUri = activeUri;
+      } else {
+        previousActiveUri = null;
+      }
+    }),
+  );
+
+  // Feature 217 — subscribe the service to map-panel event streams.
+  // These are set up lazily because mapPanel is mutated by the commands
+  // module when a plot is first opened.
+  let mapPanelEventsWired = false;
+  const wireMapPanelEvents = (): void => {
+    if (mapPanelEventsWired || !mapPanel) {return;}
+    mapPanelEventsWired = true;
+    mapPanel.onFeaturesChanged(() => {
+      const uri = sessionManager.getActiveDocumentUri();
+      if (uri) {storyboardPlaybackService.onPlotFeaturesChanged(uri);}
+    });
+    mapPanel.onSceneRectangleClick((sceneId) => {
+      const uri = sessionManager.getActiveDocumentUri();
+      if (uri) {void storyboardPlaybackService.goToScene(uri, sceneId);}
+    });
+  };
+  // Poll on session-change — by then MapPanel should exist.
+  context.subscriptions.push(
+    sessionManager.onActiveSessionChange(() => wireMapPanelEvents()),
+  );
+
+  // Feature 216 — register the capture-scene command. We construct the
+  // CaptureCommandContext at invoke time so every capture sees the current
+  // mapPanel / active session / actor — no stale closures.
+  context.subscriptions.push(
+    vscode.commands.registerCommand('debrief.captureScene', async () => {
+      const panel = mapPanel;
+      const session = sessionManager.getActiveSession();
+      if (!panel || !session) {
+        void vscode.window.showErrorMessage(
+          'Capture failed — no plot is currently open.',
+        );
+        return;
+      }
+      const store = panel.getCurrentStore();
+      const plot = panel.getCurrentPlot();
+      if (!store?.path || !plot?.itemPath) {
+        void vscode.window.showErrorMessage(
+          'Capture failed — plot is missing STAC item metadata.',
+        );
+        return;
+      }
+      const path = await import('path');
+      const stacItemPath = path.dirname(path.join(store.path, plot.itemPath));
+      const ctx: CaptureCommandContext = {
+        mapPanel: panel,
+        sessionStore: session,
+        stacItemPath,
+        actor: sessionManager.actor,
+        trigger: { source: 'programmatic' },
+      };
+      await captureScene(ctx, {
+        setCaptureInFlight: (inFlight: boolean) =>
+          storyboardPanelProvider.setCaptureInFlight(inFlight),
+      });
+      storyboardPanelProvider.refresh();
+    }),
+  );
 
   // Set initial context
   await vscode.commands.executeCommand('setContext', 'debrief.plotOpen', false);

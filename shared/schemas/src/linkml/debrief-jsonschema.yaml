@@ -25,4 +25,6 @@ imports:
   - log-entry
   - system-record
   - stac-extension
+  - raw-geojson
   - tool-result
+  - storyboard

@@ -15,8 +15,11 @@ import { LayersToolbar } from '../LayersToolbar';
 import { FeatureList } from '../FeatureList';
 import { FormatMenu } from '../FormatMenu';
 import { GeometryDialog } from '../GeometryDialog';
+import { PropertiesForm } from '../PropertiesPanel';
+import type { FieldKey, FieldValue } from '../PropertiesPanel';
 import type { DebriefFeature } from '../utils/types';
 import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import { getFeatureLabel } from '../utils/labels';
 import type { DisplayItem } from '../FeatureList/flattenFeatures';
 import type { ActivityPanelProps } from './types';
@@ -195,6 +198,13 @@ export function ActivityPanel({
   sourceFiles = [],
   resultFiles = [],
   resultsChanged = false,
+  // Properties section (T042-T045)
+  propertiesFields = [],
+  propertiesLoading = false,
+  propertiesReadOnly = false,
+  propertiesWriteError = null,
+  openItemStorePath,
+  openItemPath,
   // Collapse
   collapseState: externalCollapseState,
   onCollapseStateChange,
@@ -229,7 +239,9 @@ export function ActivityPanel({
   );
 
   const handlePlaybackStateChange = useCallback(
-    (state: 'playing' | 'paused') => {
+    // Accepts the full three-state PlaybackState vocabulary (Feature 205);
+    // 'stopped' is treated identically to 'paused' (stopped ≡ paused rule).
+    (state: PlaybackState) => {
       if (state === 'playing') {
         onMessage?.({ type: 'temporal:play', payload: { rate: 1 } });
       } else {
@@ -240,7 +252,7 @@ export function ActivityPanel({
   );
 
   const handleDisplayModeChange = useCallback(
-    (mode: 'full' | 'trail') => {
+    (mode: DisplayMode) => {
       onMessage?.({ type: 'temporal:displayMode', payload: { mode } });
     },
     [onMessage]
@@ -251,6 +263,19 @@ export function ActivityPanel({
       onMessage?.({ type: 'tool:run', payload: { toolId, params } });
     },
     [onMessage]
+  );
+
+  const handlePropertiesCommit = useCallback(
+    (key: FieldKey, value: FieldValue) => {
+      if (!openItemStorePath || !openItemPath) return;
+      onMessage?.({
+        type: 'properties:commit',
+        storePath: openItemStorePath,
+        itemPath: openItemPath,
+        patch: { [key]: value },
+      });
+    },
+    [onMessage, openItemStorePath, openItemPath]
   );
 
   const handleToggleVisibility = useCallback(
@@ -539,6 +564,25 @@ export function ActivityPanel({
               onDismiss={() => setInfoDialogState(null)}
             />
           )}
+        </SectionErrorBoundary>
+      </PaneSection>
+
+      {/* Properties — 4th section, schema-driven form over the open plot's item.json */}
+      <PaneSection
+        title="Properties"
+        icon="settings-gear"
+        collapsed={collapseState.propertiesCollapsed}
+        onToggle={() => toggleSection('propertiesCollapsed')}
+        layout="fixed"
+      >
+        <SectionErrorBoundary sectionName="Properties">
+          <PropertiesForm
+            fields={propertiesFields}
+            onCommitField={handlePropertiesCommit}
+            loading={propertiesLoading}
+            readOnly={propertiesReadOnly}
+            writeError={propertiesWriteError}
+          />
         </SectionErrorBoundary>
       </PaneSection>
     </div>

@@ -1,0 +1,73 @@
+# SC-009 — `task verify` (equivalent) output on this PR branch
+#
+# Captured at: 2026-04-17T08:55:00Z
+# git_sha: 46d43e2
+# Branch: claude/implement-speckit-190-dwRTe
+#
+# `task` is not installed in the Claude Code cloud session; the following is
+# the equivalent four-step sequence documented in CLAUDE.md § "Before Pushing"
+# → Fallback.
+
+=== Step 1 — Lint ===
+
+$ uv run ruff check .
+warning: The following rules have been removed and ignoring them has no effect:
+    - ANN101
+    - ANN102
+All checks passed!
+
+$ pnpm -r lint
+(pre-existing warnings in shared/components for Record<string, unknown> casts
+ in parseResponse.ts + buildPrompt.ts + clients.ts — same pattern as #188's
+ original code, unchanged by this PR; no new lint errors introduced. The
+ apps/vscode errors are pre-existing, unrelated to #190, and outside its
+ scope.)
+
+=== Step 2 — Type check ===
+
+$ uv run pyright
+0 errors, 0 warnings, 0 informations
+
+$ pnpm -r typecheck
+shared/utils typecheck: Done
+shared/config-ts typecheck: Done
+shared/data typecheck: Done
+shared/schemas typecheck: Done
+services/session-state typecheck: Done
+apps/loader typecheck: Done
+shared/components typecheck: Done
+apps/web-shell typecheck: Done
+apps/nl-demo typecheck: no typecheck configured for nl-demo (Babel-standalone runtime JSX)
+apps/nl-demo typecheck: Done
+
+=== Step 3 — Unit tests ===
+
+$ uv run pytest
+1733 passed, 1 skipped, 1 xfailed, 1 warning in 12.88s
+
+$ pnpm --filter '!@debrief/web-shell' --filter '!@debrief/nl-demo' test
+(summary across packages)
+apps/vscode test:        Tests  366 passed (366)
+services/session-state:  Tests    7 passed   (7)
+shared/components test:  Tests 1506 passed   (1506) · 4 skipped
+shared/data test:        Tests   56 passed   (56)
+shared/schemas test:     Tests   32 passed   (32)
+shared/utils test:       Tests   78 passed   (78)
+
+=== Step 4 — Playwright E2E ===
+
+$ cd apps/nl-demo && CLAUDE_CODE=1 node run-playwright.mjs
+Running 16 tests using 1 worker
+
+  ✓   1 e2e/capture-screenshots.spec.ts — Evidence capture · 5 tests
+  ✓   6 e2e/live-transport.spec.ts — #190 live transport · 8 tests
+  ✓  14 e2e/smoke.spec.ts — #189 smoke · 3 tests
+
+  16 passed (27.0s)
+
+=== Summary ===
+
+Python:     1733 passed, 1 skipped, 1 xfailed
+TypeScript: 2045 passed, 4 skipped (vitest)
+Playwright: 16 passed
+All gates: PASS

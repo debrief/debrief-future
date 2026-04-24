@@ -44,8 +44,16 @@
     "datetime": null,
     "start_datetime": "2021-08-04T08:00:00Z",
     "end_datetime": "2021-08-04T11:14:52Z",
-    "debrief:vessel_classes": [
-      "subsurface/submarine/ssbn/vanguard"
+    "debrief:platforms": [
+      {
+        "id": "HMS-HESSEN",
+        "name": "HMS Hessen",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssbn/vanguard",
+        "domain": "subsurface",
+        "vessel_role": "ssbn",
+        "vessel_type": "vanguard"
+      }
     ],
     "debrief:tags": [
       "certification",
@@ -59,13 +67,6 @@
       "sonar-contact",
       "passive-search",
       "prosecution"
-    ],
-    "debrief:track_names": [
-      "HMS Hessen"
-    ],
-    "debrief:nationalities": [
-      "GB",
-      "DK"
     ]
   },
   "links": [

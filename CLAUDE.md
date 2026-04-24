@@ -29,18 +29,25 @@ debrief/
 ├── apps/
 │   ├── loader/        # Electron mini-app
 │   └── vscode/        # VS Code extension
-├── demo/              # Browser-accessible demo environment
-│   ├── Dockerfile     # Container definition
-│   ├── fly.toml       # Fly.io configuration
-│   ├── bin/           # Entry scripts and test scripts
-│   ├── desktop/       # Desktop integration files
-│   └── samples/       # Sample data files
 └── docs/
 ```
 
 ## Demo Environment
 
-**URL**: https://debrief-demo.fly.dev — browser-accessible XFCE desktop via noVNC. See `demo/` directory and `.github/workflows/test-demo.yml` for 7-layer test suite.
+Per-PR preview apps are provisioned by **Heroku Review Apps** (configured via
+`heroku.yml` + `app.json`, built from `Dockerfile.preview`). When a PR opens,
+a GitHub Actions bot posts a "🚀 Preview Deployments" comment linking to:
+
+- **Code Server** — browser-based VS Code with the extension + sample data
+- **Web Shell** — standalone preview app (used for Playwright)
+- **Storybook** — component library browser
+
+Review apps at `https://<app>-pr-<n>.herokuapp.com`. Playwright against a
+review app is driven by `.github/workflows/heroku-e2e.yml` (manual dispatch).
+
+See ADR-018 in `docs/project_notes/decisions.md` for the history of this
+decision (the project previously ran a single persistent Fly.io demo at
+`https://debrief-demo.fly.dev` — retired 2026-04-17).
 
 ## Build Sequence (Tracer Bullet)
 
@@ -165,6 +172,19 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (STAC service), TypeScript 5.x (components, VS Code extension, web-shell) + `modern-screenshot` (DOM-to-PNG capture), `sharp` (Node.js image resize for backfill), Playwright (backfill browser automation), GoldenLayout (preview panel layout) (174-thumbnail-capture)
 - Python 3.11 (service, schema), TypeScript 5.x (frontend components, VS Code extension) + Pydantic v2 (models), LinkML >= 1.7.0 (schema), `ulid` (ID generation), React 18.x (UI), `@tanstack/react-virtual` (list virtualisation) (175-review-feedback)
 - TypeScript 5.x (VS Code extension + shared components, host + webview), Python 3.11 (no changes required — debrief-calc already returns the right shapes) + VS Code Extension API ^1.85.0, React 18.x, `@debrief/components` (`ChartPanelWrapper`, `TableRenderer`, `ChartRenderer`, `PanelContext`), `@debrief/utils` (`buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, NEW `parseCsvToTableDataset` and NEW `synthesizeTableDataset`), `@debrief/session-state` (`LogService` — extended with `recordFileSaved`), existing `apps/vscode/src/services/stacService.ts` (178-vscode-tabular-results)
+- Python 3.11, TypeScript 5.x + no new dependencies (both languages read JSON natively) (180-platform-registry)
+- Static JSON file at `shared/data/platform-registry.json` (180-platform-registry)
+- Python 3.11 (schema generation, tests), TypeScript 5.x (generated types, type checking) + LinkML >= 1.7.0 (schema source), Pydantic v2 (generated Python models), gen-pydantic/gen-typescript/gen-json-schema (code generators) (181-linkml-platform-overrides)
+- Python 3.11 + `debrief-data` (platform registry loader), `pydantic>=2.12.5` (existing), `debrief-schemas` (existing) (182-import-platform-warnings)
+- Python 3.11 + debrief-io (import pipeline), debrief-stac (catalog operations), debrief-data (platform registry loader), scripts/enrich-legacy-catalog.py (metadata enrichment) (184-regenerate-sample-catalog)
+- TypeScript 5.x (React 18.x component library under `shared/components/`) + `@debrief/schemas` (PlatformRecord type), `@debrief/components` filter engine (#126/#185 — CompoundPredicate, ArrayFilterPredicate, `array_filter` evaluator and CQL2 serde), `@dnd-kit/core` (drag lifecycle reused from #127), `vscrui` (icon set used by existing chips), `crypto.randomUUID()` (lozenge IDs, already in use) (186-filter-chips)
+- Read-only access to `shared/data/platform-registry.json` and `preview/workspace/samples/local-store/`; writes one JSON file at a stable repo-root output path (committed artefact) (187-build-time-enums)
+- TypeScript 5.x (existing toolchain — shared components + nl-demo app; no new languages) + Node stdlib (`node:http`, `node:https`) for the live-proxy sidecar, browser-native `fetch` + `AbortController` (no SDK), Anthropic Claude API (Haiku 4.5 default, operator-overridable); credentials isolated to proxy env (`.env` gitignored), no new runtime dependencies (190-live-llm-transport)
+- TypeScript 5.x (strict), React 18.x (static SPA at `apps/spec-navigator/`) + Vite 5.x, `react-markdown` + `remark-gfm` + `rehype-slug` + `rehype-autolink-headings` + `rehype-highlight` + `highlight.js` (artefact rendering), `zod ^3.22.0` (GitHub REST boundary + payload validation), `@playwright/test` + `@axe-core/playwright` (E2E + a11y); no backend, no new Python modules (191-spec-navigator)
+- TypeScript 5.x (for the loader source the config references); configuration itself is JSON (no runtime language); YAML (Taskfile + CI workflow). + `knip` — **newly added**, pinned to a specific 5.x version in root `devDependencies`. Justification recorded below in Constitution Check Article IX. No other new dependencies. (201-knip-loader-config)
+- Storyboards and Scenes are **GeoJSON Features inside the (215-storyboarding-schema)
+- Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case). (228-regenerate-blog-archive)
+- Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`, (231-blog-archive-screenshot-fix-impl)
 
 ## Before Pushing
 
@@ -192,8 +212,9 @@ uv run pyright && pnpm -r typecheck
 # Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
 uv run pytest && pnpm --filter '!@debrief/web-shell' test
 
-# Step 4: Playwright E2E tests
+# Step 4: Playwright E2E tests (web-shell + spec-navigator)
 cd apps/web-shell && node run-playwright.mjs && cd ../..
+pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node run-playwright.mjs && cd ../..
 ```
 
 **Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
@@ -209,5 +230,7 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
-- 178-vscode-tabular-results: Added TypeScript 5.x (VS Code extension + shared components, host + webview), Python 3.11 (no changes required — debrief-calc already returns the right shapes) + VS Code Extension API ^1.85.0, React 18.x, `@debrief/components` (`ChartPanelWrapper`, `TableRenderer`, `ChartRenderer`, `PanelContext`), `@debrief/utils` (`buildCsvContent`, `generateCsvFilename`, `sanitizeFilename`, NEW `parseCsvToTableDataset` and NEW `synthesizeTableDataset`), `@debrief/session-state` (`LogService` — extended with `recordFileSaved`), existing `apps/vscode/src/services/stacService.ts`
-- 175-review-feedback: Added Python 3.11 (service, schema), TypeScript 5.x (frontend components, VS Code extension) + Pydantic v2 (models), LinkML >= 1.7.0 (schema), `ulid` (ID generation), React 18.x (UI), `@tanstack/react-virtual` (list virtualisation)
+- 231-blog-archive-screenshot-fix-impl: Added Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`,
+- 228-regenerate-blog-archive: Added Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case).
+- 206-audit-non-linkml-types: Type-declaration audit landed — `docs/type-audit-2026.md` enumerates 885 in-scope TS declarations across 317 files, classifies each into one of five E11 buckets, and opens #222–#227 for the follow-up schema-promotion work. Scanner + generator committed at `scripts/audits/type-audit/` (TypeScript compiler API + vitest fixture tests). Root devDeps added: `typescript`, `vitest`, `ajv`, `@types/node`.
+- 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,

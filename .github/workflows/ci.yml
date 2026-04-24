@@ -14,10 +14,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # #190 SC-006 — fail any PR that accidentally commits a provider key.
+      # Uses the gitleaks CLI directly (no marketplace action) for predictable
+      # behaviour across private repos and org boundaries. Scans the worktree
+      # against rules + allowlist in gitleaks.toml; node_modules/, .venv/,
+      # and generated schemas are allowlisted there. The dist/ + apps/nl-demo/
+      # dist/ scan below runs after build artefacts land.
+      - name: Scan worktree for leaked credentials (gitleaks)
+        run: |
+          set -euo pipefail
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz \
+            | tar -xz -C /tmp gitleaks
+          sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks detect --no-git --source . --config gitleaks.toml --redact --verbose
+
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
-          version: 3.x
+          version: 3.49.1
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install uv
@@ -47,8 +61,33 @@ jobs:
       - name: Run linting
         run: task lint
 
+      - name: Run knip
+        run: task knip
+
       - name: Run type checking
         run: task typecheck
 
       - name: Run tests
         run: task test
+
+      # #190 SC-006 — post-build secret scan on the produced bundles. Fails if
+      # a provider key somehow entered dist/ or apps/nl-demo/dist/ (e.g. via
+      # accidental envsubst, embedded .env, or test-fixture leak).
+      - name: Scan build artefacts for leaked credentials (gitleaks)
+        if: always()
+        run: |
+          set -euo pipefail
+          command -v gitleaks >/dev/null 2>&1 || {
+            echo "[gitleaks-artefact-scan] installing gitleaks CLI"
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz \
+              | tar -xz -C /tmp gitleaks
+            sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          }
+          for dir in dist apps/nl-demo/dist; do
+            if [ -d "$dir" ]; then
+              echo "[gitleaks-artefact-scan] scanning $dir"
+              gitleaks detect --no-git --source "$dir" --config gitleaks.toml --redact --verbose
+            else
+              echo "[gitleaks-artefact-scan] $dir does not exist — skipping"
+            fi
+          done

@@ -44,8 +44,16 @@
     "datetime": null,
     "start_datetime": "2025-05-01T21:00:00Z",
     "end_datetime": "2025-05-19T07:44:30Z",
-    "debrief:vessel_classes": [
-      "surface/warship/destroyer/arleigh-burke"
+    "debrief:platforms": [
+      {
+        "id": "HNOMS-HARNOSAND",
+        "name": "HNoMS Harnosand",
+        "nationality": "NO",
+        "vessel_class": "surface/warship/destroyer/arleigh-burke",
+        "domain": "surface",
+        "vessel_role": "destroyer",
+        "vessel_type": "arleigh-burke"
+      }
     ],
     "debrief:tags": [
       "ASW",
@@ -53,13 +61,7 @@
       "training",
       "EW"
     ],
-    "debrief:feature_tags": [],
-    "debrief:track_names": [
-      "HNoMS Harnosand"
-    ],
-    "debrief:nationalities": [
-      "NO"
-    ]
+    "debrief:feature_tags": []
   },
   "links": [
     {

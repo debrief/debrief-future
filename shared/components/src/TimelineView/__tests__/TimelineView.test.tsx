@@ -25,12 +25,10 @@ function makeStacItem(overrides: Partial<StacBrowserItem> & { id: string }): Sta
     datetime: null,
     startDatetime: null,
     endDatetime: null,
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     ...overrides,
   };

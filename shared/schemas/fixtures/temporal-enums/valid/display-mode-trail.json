@@ -1,0 +1,6 @@
+{
+  "stepSize": { "value": 1, "unit": "minute" },
+  "playbackRate": 1.0,
+  "playbackState": "stopped",
+  "displayMode": "trail"
+}

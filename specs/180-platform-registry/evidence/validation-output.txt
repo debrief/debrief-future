@@ -1,0 +1,21 @@
+=== Validation Error Output ===
+
+--- Test: Missing file ---
+FileNotFoundError: Registry file not found: /tmp/does-not-exist.json
+
+--- Test: Invalid JSON ---
+RegistryError: Invalid registry format: Expecting value: line 1 column 1 (char 0)
+
+--- Test: Missing vessel_classes root key ---
+RegistryError: Registry must have 'vessel_classes' root key
+
+--- Test: Duplicate platform ID ---
+RegistryError: Duplicate platform ID 'DUPE' found at paths 'surface/a' and 'surface/b'
+
+--- Test: Platform missing name ---
+RegistryError: Platform 'NONAME' missing required field 'name'
+
+--- Test: Platform missing nationality ---
+RegistryError: Platform 'NONAT' missing required field 'nationality'
+
+=== All validation errors produce clear, actionable messages ===

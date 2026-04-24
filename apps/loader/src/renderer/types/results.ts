@@ -2,14 +2,20 @@
  * Operation result types.
  */
 
-import type { GeoJSONFeature } from '@debrief/utils';
+// #204: GeoJSONFeature is now the schema-generated RawGeoJSONFeature from
+// `@debrief/schemas`. Re-exported under the legacy name so existing main/
+// IPC modules can keep their import specifier.
+import type { RawGeoJSONFeature as GeoJSONFeature } from '@debrief/schemas';
 
 export type { GeoJSONFeature };
 
 /**
  * Error codes for categorization.
+ *
+ * Loader-local codes distinct from `@debrief/utils`'s `ErrorCode` union.
+ * Kept separate to avoid the drift-guard redeclaration; see spec #214.
  */
-export type ErrorCode =
+export type LoaderErrorCode =
   | 'PARSE_ERROR'
   | 'STORE_ERROR'
   | 'WRITE_ERROR'
@@ -18,8 +24,11 @@ export type ErrorCode =
 
 /**
  * Result of a successful load operation.
+ *
+ * Loader-local shape distinct from `@debrief/session-state`'s `LoadResult`.
+ * Kept separate to avoid the drift-guard redeclaration; see spec #214.
  */
-export interface LoadResult {
+export interface LoaderLoadResult {
   /** Target plot ID */
   plotId: string;
 
@@ -44,7 +53,7 @@ export interface LoadResult {
  */
 export interface LoaderError {
   /** Error code for categorization */
-  code: ErrorCode;
+  code: LoaderErrorCode;
 
   /** User-friendly error message */
   message: string;

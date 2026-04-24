@@ -209,7 +209,7 @@ trap cleanup EXIT
 
    PR: https://github.com/debrief/debrief.github.io/pull/XX
    Branch: future-debrief/2026-01-16-feature-name
-   Content: "Shipped: Feature Name"
+   Content: "Building Feature Name"
 
    Next steps:
    1. Review the PR

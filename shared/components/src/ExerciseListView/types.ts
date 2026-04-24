@@ -5,26 +5,29 @@
  * Review decisions: 5A (extends CatalogOverviewItem), 1A (import RecentPlot shape).
  */
 
-import type { CatalogOverviewItem } from '../filter-engine/types';
-import type { GeoJSONFeature, GeoJSONFeatureCollection } from '@debrief/utils';
+import type { CatalogOverviewItem, PlatformRecord } from '../filter-engine/types';
+export type { PlatformRecord };
+// #204: GeoJSONFeature / GeoJSONFeatureCollection have been consolidated
+// into the schema-generated RawGeoJSONFeature / RawGeoJSONFeatureCollection.
+// Re-exported here under the legacy in-package names so existing importers
+// inside ExerciseListView (utils, stories, tests, fixtures) can continue to
+// use the original names without a ripple.
+import type {
+  RawGeoJSONFeature as GeoJSONFeature,
+  RawGeoJSONFeatureCollection as GeoJSONFeatureCollection,
+} from '@debrief/schemas';
 export type { GeoJSONFeature, GeoJSONFeatureCollection };
 
 /** Exercise data for list view display. Extends CatalogOverviewItem with STAC extension metadata. */
 export interface ExerciseListItem extends CatalogOverviewItem {
-  /** Vessel taxonomy paths from debrief:vessel_classes */
-  readonly vesselClasses: readonly string[];
+  /** Per-platform metadata from debrief:platforms */
+  readonly platforms: readonly PlatformRecord[];
 
   /** Plot-level tags from debrief:tags */
   readonly tags: readonly string[];
 
   /** Exercise author from debrief:author */
   readonly author: string | null;
-
-  /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
-  readonly nationalities: readonly string[];
-
-  /** Track platform names from debrief:track_names */
-  readonly trackNames: readonly string[];
 
   /** Path to GeoJSON track data for spatial thumbnail */
   readonly trackDataHref: string | null;

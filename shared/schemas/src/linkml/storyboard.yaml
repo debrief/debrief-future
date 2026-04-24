@@ -1,0 +1,209 @@
+id: https://debrief.info/schemas/storyboard
+name: storyboard
+title: Debrief Storyboarding Schema
+description: >-
+  LinkML schema for Storyboarding — named, ordered collections of Scenes
+  attached to a single plot. Storyboards and Scenes are GeoJSON Features
+  carried inside the plot's FeatureCollection.
+
+  Introduces:
+  - StoryboardProperties (inherits BaseFeatureProperties)
+  - SceneProperties (inherits BaseFeatureProperties)
+  - Viewport (sub-record, lives inside SceneProperties.viewport)
+  - StoryboardFeature, SceneFeature (GeoJSON Feature wrappers)
+
+  Reserved slots in schema v1:
+  - SceneProperties.time_range MUST be null (reserved for v2 animated ranges)
+  - Viewport.bearing MUST be 0 (reserved for v2 rotated viewports)
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+  - geojson
+  - log-entry
+
+classes:
+  Viewport:
+    description: >-
+      Camera state sub-record inside a Scene. Captures the map viewport at
+      capture time.
+    attributes:
+      center:
+        description: "[longitude, latitude] in degrees"
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
+      zoom:
+        description: Leaflet-compatible zoom level
+        range: float
+        required: true
+      bearing:
+        description: >-
+          Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot
+          for future rotated viewports).
+        range: float
+        required: true
+        minimum_value: 0
+        maximum_value: 0
+
+  StoryboardProperties:
+    is_a: BaseFeatureProperties
+    description: >-
+      Properties class for a Storyboard parent Feature. A Storyboard is a
+      named, ordered collection of Scenes attached to a single plot.
+    attributes:
+      kind:
+        description: Feature kind discriminator (pinned to STORYBOARD)
+        range: FeatureKindEnum
+        required: true
+        equals_string: "STORYBOARD"
+      id:
+        description: ULID (26 chars, Crockford base-32). Immutable after create.
+        range: string
+        required: true
+        pattern: "^[0-9A-HJKMNP-TV-Z]{26}$"
+      name:
+        description: Display title. Non-empty. Unique within plot FeatureCollection.
+        range: string
+        required: true
+      description:
+        description: Markdown narrative description
+        range: string
+        required: false
+      schema_version:
+        description: >-
+          Schema version. Starts at 1. Monotonically non-decreasing across
+          edits; bumped only by migrations.
+        range: integer
+        required: true
+        minimum_value: 1
+
+  SceneProperties:
+    is_a: BaseFeatureProperties
+    description: >-
+      Properties class for a Scene child Feature. A Scene is a single captured
+      moment in a Storyboard — viewport, timestamp, and per-feature visibility.
+    attributes:
+      kind:
+        description: Feature kind discriminator (pinned to STORYBOARD_SCENE)
+        range: FeatureKindEnum
+        required: true
+        equals_string: "STORYBOARD_SCENE"
+      id:
+        description: ULID (26 chars, Crockford base-32). Immutable after create.
+        range: string
+        required: true
+        pattern: "^[0-9A-HJKMNP-TV-Z]{26}$"
+      storyboard_id:
+        description: Foreign key to parent Storyboard.properties.id (ULID).
+        range: string
+        required: true
+        pattern: "^[0-9A-HJKMNP-TV-Z]{26}$"
+      title:
+        description: >-
+          Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY;
+          falls back to ISO-8601 on parse failure.
+        range: string
+        required: true
+      description:
+        description: Markdown per-scene narrative
+        range: string
+        required: false
+      viewport:
+        description: Map viewport camera state at capture time
+        range: Viewport
+        required: true
+      timestamp:
+        description: >-
+          ISO-8601 instant when the Scene was captured. Drives Scene ordering
+          (ascending within a Storyboard). MUST be unique within a Storyboard.
+        range: datetime
+        required: true
+      time_range:
+        description: >-
+          Reserved slot for v2 animated time-range Scenes. MUST be absent
+          (null) in schema v1.
+        range: string
+        required: false
+      visible_feature_ids:
+        description: >-
+          Stable feature IDs visible at capture. Canonicalised (trim, reject
+          empty, dedupe, sort lexicographically) by the CRUD module before
+          hashing. Order-insensitive from the consumer's perspective.
+        range: string
+        multivalued: true
+        required: true
+      feature_set_hash:
+        description: >-
+          SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical
+          visible_feature_ids). Recomputed on every create/update touching
+          visible_feature_ids.
+        range: string
+        required: true
+        pattern: "^[0-9a-f]{64}$"
+      thumbnail_asset_ref:
+        description: >-
+          STAC asset key (path + name within the plot's STAC item). Populated
+          by #216 at capture time via #174 helpers.
+        range: string
+        required: true
+      transition_duration_ms:
+        description: >-
+          Playback transition duration in milliseconds. Default 500.
+        range: integer
+        required: true
+        minimum_value: 0
+
+  StoryboardFeature:
+    description: GeoJSON Feature representing a Storyboard parent entity
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Stable identifier (equal to properties.id). ULID.
+        required: true
+      geometry:
+        description: >-
+          Polygon hull covering the union of child Scene viewport bounds.
+          Recomputed whenever the Scene set changes.
+        range: GeoJSONPolygon
+        required: true
+      properties:
+        description: Storyboard properties
+        range: StoryboardProperties
+        required: true
+
+  SceneFeature:
+    description: GeoJSON Feature representing a Scene child entity
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Stable identifier (equal to properties.id). ULID.
+        required: true
+      geometry:
+        description: >-
+          Polygon covering the map viewport bounds at capture time.
+          Antimeridian-crossing viewports produce a best-effort Polygon in
+          MVP (module logs a warning; does not throw).
+        range: GeoJSONPolygon
+        required: true
+      properties:
+        description: Scene properties
+        range: SceneProperties
+        required: true

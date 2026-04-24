@@ -10,6 +10,7 @@
  */
 
 import type { CatalogOverviewItem } from '@debrief/components';
+import type { PlatformRecord } from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
 
 // Import fixture data via Vite's JSON import (bundled fallback for production builds)
@@ -27,11 +28,9 @@ interface StacItem {
     datetime?: string;
     start_datetime?: string;
     end_datetime?: string;
-    'debrief:vessel_classes'?: string[];
+    'debrief:platforms'?: PlatformRecord[];
     'debrief:tags'?: string[];
     'debrief:feature_tags'?: string[];
-    'debrief:nationalities'?: string[];
-    'debrief:track_names'?: string[];
   };
   assets?: Record<string, { href: string; type?: string; roles?: string[] }>;
   links?: Array<{ rel: string; href: string }>;
@@ -85,11 +84,9 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     datetime: item.properties.datetime ?? null,
     startDatetime: item.properties.start_datetime ?? null,
     endDatetime: item.properties.end_datetime ?? null,
-    vesselClasses: item.properties['debrief:vessel_classes'] ?? [],
+    platforms: item.properties['debrief:platforms'] ?? [],
     tags: item.properties['debrief:tags'] ?? [],
     featureTags: item.properties['debrief:feature_tags'] ?? [],
-    nationalities: item.properties['debrief:nationalities'] ?? [],
-    trackNames: item.properties['debrief:track_names'] ?? [],
     thumbnailHref: thumbAsset ? resolveStacHref(itemPath, thumbAsset.href) : null,
     thumbnailSmHref: thumbSmAsset ? resolveStacHref(itemPath, thumbSmAsset.href) : null,
   };
@@ -117,6 +114,21 @@ export interface MockStacService {
 
   /** Get item metadata */
   getItem(itemPath: string): StacItem | null;
+
+  /**
+   * Patch one or more properties on an in-memory item, rebuild its
+   * overview row, and notify subscribers. Mirrors the real
+   * `stacService.updateItemMetadata` contract (#193) without the
+   * disk write — suitable for the web-shell demo.
+   */
+  updateItemMetadata(itemPath: string, patch: Record<string, unknown>): void;
+
+  /**
+   * Subscribe to item-change events. The listener is called with the
+   * itemPath after every successful updateItemMetadata. Returns an
+   * unsubscribe function.
+   */
+  onItemsChanged(listener: (itemPath: string) => void): () => void;
 }
 
 /**
@@ -124,6 +136,7 @@ export interface MockStacService {
  */
 export function createMockStacService(): MockStacService {
   const itemMap = new Map<string, StacItem>();
+  const listeners = new Set<(itemPath: string) => void>();
   /** Guard against concurrent init calls (React 18 StrictMode fires effects twice). */
   let initPromise: Promise<void> | null = null;
 
@@ -223,6 +236,27 @@ export function createMockStacService(): MockStacService {
 
     getItem(itemPath: string): StacItem | null {
       return itemMap.get(itemPath) ?? null;
+    },
+
+    updateItemMetadata(itemPath: string, patch: Record<string, unknown>): void {
+      const item = itemMap.get(itemPath);
+      if (!item) return;
+      // Shallow-merge the patch into item.properties. Real hosts run
+      // a schema validator here and write an atomic temp+rename; this
+      // demo just mutates in place.
+      const nextProps = { ...item.properties, ...patch };
+      item.properties = nextProps as StacItem['properties'];
+      // Rebuild the cached overview row so `getItems()` returns the
+      // new values on the next render pass.
+      const overview = toOverviewItem(itemPath, item);
+      const idx = items.findIndex((i) => i.itemPath === itemPath);
+      if (idx >= 0) items[idx] = overview;
+      for (const listener of listeners) listener(itemPath);
+    },
+
+    onItemsChanged(listener): () => void {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
   };
 }

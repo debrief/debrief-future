@@ -1,5 +1,5 @@
 ---
-description: Coordinate media content creation (blog posts, LinkedIn, technical docs) using specialist subagents.
+description: Coordinate media content creation (feature blog posts, cached openers, technical docs) using specialist subagents.
 ---
 
 # Media Coordinator
@@ -18,7 +18,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 | Task Type | Delegate To | Agent File |
 |-----------|-------------|------------|
-| Blog posts, LinkedIn summaries, tone/voice questions | Content Specialist | `.claude/agents/media/content.md` |
+| Feature blog posts, cached openers, tone/voice questions | Content Specialist | `.claude/agents/media/content.md` |
 | Jekyll templates, layouts, CSS, site configuration | Jekyll Specialist | `.claude/agents/media/jekyll.md` |
 | Specs, architecture docs, READMEs, technical diagrams | Technical Specialist | `.claude/agents/media/technical.md` |
 
@@ -34,10 +34,9 @@ When a task spans multiple specialists, break it into subtasks and coordinate th
 
 ## Media Plan Summary
 
-- Two posts per SpecKit spec: planning (Monday) → completed (Friday)
-- GitHub Pages canonical, LinkedIn summaries
-- Feedback via GitHub Discussions
-- Start immediately with whatever is in flight
+- One post per SpecKit spec, published at ship time.
+- Opening framing (What We're Building, How It Fits, Key Decisions) is cached during `/speckit.plan` at `specs/[feature]/evidence/opening-context.md` and stitched verbatim into the feature post during `/speckit.pr`.
+- GitHub Pages canonical; feedback via GitHub Discussions.
 
 ## Workflow
 
@@ -50,20 +49,13 @@ When a task spans multiple specialists, break it into subtasks and coordinate th
 
 ## Coordination Workflows
 
-### New Blog Post Workflow
+### Feature Post Workflow (at ship time)
 
-1. **Analyze** request type (planning or shipped post)
-2. **Delegate** to Technical Specialist: "Summarise the spec/feature for blog context"
-3. **Delegate** to Content Specialist: "Write planning/shipped post using this technical summary"
+1. **Analyze** the feature and its evidence (test-summary, usage-example, screenshots)
+2. **Delegate** to Technical Specialist: "Summarise the shipped feature for blog context"
+3. **Delegate** to Content Specialist: "Write the Feature Post, copying the cached opener from `specs/[feature]/evidence/opening-context.md` verbatim as the first three sections"
 4. **Delegate** to Jekyll Specialist: "Verify front matter and provide commit instructions"
 5. **Return** completed post ready to commit
-
-### New Spec + Announcement Workflow
-
-1. **Delegate** to Technical Specialist: "Write spec for [feature]"
-2. **Delegate** to Content Specialist: "Write planning post announcing this spec"
-3. **Delegate** to Content Specialist: "Write LinkedIn summary"
-4. **Return** spec + post + LinkedIn copy as a package
 
 ### Site Update Workflow
 
@@ -86,8 +78,8 @@ Task tool prompt:
 
 [Include full content of .claude/agents/media/content.md]
 
-Your task: Write a planning post for the debrief-io Stage 2 feature.
-Context: [technical summary from previous step]"
+Your task: Write a Feature Post for the debrief-io Stage 2 feature.
+Context: [technical summary from previous step, plus the cached opener from evidence/opening-context.md]"
 ```
 
 ## Output Format

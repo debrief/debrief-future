@@ -119,6 +119,9 @@ class TestEnumConsistency:
             "MULTI_POINT",
             "MULTI_POLYGON",
             "SYSTEM_RECORD",
+            # Storyboarding (#215) — added by the storyboard.yaml module
+            "STORYBOARD",
+            "STORYBOARD_SCENE",
         ]
         assert set(enum_values) == set(expected), (
             f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
@@ -170,6 +173,108 @@ class TestEnumConsistency:
         expected = ["START", "MIDDLE", "END"]
         assert set(enum_values) == set(expected), (
             f"LineLabelPositionEnum values mismatch: {enum_values} vs {expected}"
+        )
+
+
+class TestFeature205EnumParity:
+    """LinkML ↔ Pydantic parity for Feature 205 enums (FR-008 / SC-005).
+
+    PlaybackStateEnum / DisplayModeEnum are emitted by gen-pydantic and
+    gen-typescript but NOT by gen-json-schema, because the JSON Schema
+    generator runs against `debrief-jsonschema.yaml` which deliberately
+    excludes the `session-state` module to sidestep a gen-json-schema
+    bug with multivalued-class ranges (see the file's header comment).
+    The parity contract therefore covers the two generators that
+    actually emit these enums — Pydantic and TypeScript (via the
+    generated `types.ts`).
+    """
+
+    def _load_linkml_enum(self, enum_name: str) -> set[str]:
+        import yaml  # noqa: PLC0415
+
+        linkml_file = Path(__file__).parent.parent / "src" / "linkml" / "session-state.yaml"
+        data = yaml.safe_load(linkml_file.read_text())
+        perms = data.get("enums", {}).get(enum_name, {}).get("permissible_values", {}) or {}
+        return set(perms.keys())
+
+    def _load_pydantic_enum(self, enum_name: str) -> set[str]:
+        import sys  # noqa: PLC0415
+
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
+        import debrief_schemas  # noqa: PLC0415
+
+        cls = getattr(debrief_schemas, enum_name)
+        return set(cls._member_map_.keys())
+
+    def _load_typescript_enum(self, enum_name: str) -> set[str]:
+        import re  # noqa: PLC0415
+
+        ts_file = Path(__file__).parent.parent / "src" / "generated" / "typescript" / "types.ts"
+        content = ts_file.read_text(encoding="utf-8")
+        # Match: `export enum <EnumName> { ... members ... }`
+        # Members: `    name = "value",`
+        pattern = re.compile(
+            rf"export enum {re.escape(enum_name)} \{{([^}}]*)\}}",
+            re.DOTALL,
+        )
+        match = pattern.search(content)
+        if not match:
+            return set()
+        members = re.findall(r'(\w+)\s*=\s*"[^"]*"', match.group(1))
+        return set(members)
+
+    def test_playback_state_enum_canonical_values(self) -> None:
+        """PlaybackStateEnum has canonical values stopped|playing|paused (FR-005 / SC-005)."""
+        assert self._load_linkml_enum("PlaybackStateEnum") == {
+            "stopped",
+            "playing",
+            "paused",
+        }
+
+    def test_display_mode_enum_canonical_values(self) -> None:
+        """DisplayModeEnum has canonical values full|trail (FR-002 / SC-003)."""
+        assert self._load_linkml_enum("DisplayModeEnum") == {"full", "trail"}
+
+    def test_display_mode_enum_has_no_legacy_values(self) -> None:
+        """Legacy 'normal'/'snailTrail' values MUST NOT appear in DisplayModeEnum (SC-003)."""
+        linkml_vals = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        legacy = {"normal", "snailTrail"}
+        for name, vals in [
+            ("LinkML", linkml_vals),
+            ("Pydantic", pydantic_vals),
+            ("TypeScript", typescript_vals),
+        ]:
+            leaked = vals & legacy
+            assert not leaked, (
+                f"DisplayModeEnum still carries legacy values in {name}: {leaked}. "
+                "These must be removed per Feature 205 / FR-002."
+            )
+
+    def test_playback_state_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("PlaybackStateEnum")
+        pydantic_vals = self._load_pydantic_enum("PlaybackStateEnum")
+        typescript_vals = self._load_typescript_enum("PlaybackStateEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"PlaybackStateEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
+        )
+
+    def test_display_mode_enum_three_way_parity(self) -> None:
+        linkml = self._load_linkml_enum("DisplayModeEnum")
+        pydantic_vals = self._load_pydantic_enum("DisplayModeEnum")
+        typescript_vals = self._load_typescript_enum("DisplayModeEnum")
+
+        assert linkml == pydantic_vals == typescript_vals, (
+            f"DisplayModeEnum drift: "
+            f"LinkML={sorted(linkml)}, "
+            f"Pydantic={sorted(pydantic_vals)}, "
+            f"TypeScript={sorted(typescript_vals)}"
         )
 
 
@@ -332,6 +437,130 @@ class TestRequiredFields:
 
         for field in expected:
             assert field in required, f"ReferenceLocation should require {field}"
+
+
+class TestStoryboardSchemaGeneration:
+    """Storyboarding (#215) — Pydantic-generated vs LinkML-generated schema equality.
+
+    The Article II.3 obligation: Pydantic-generated and LinkML-generated JSON
+    Schemas match field-for-field for Storyboard/Scene/Viewport. The existing
+    pipeline only emits one JSON Schema per entity (via gen-json-schema), so
+    this test walks the generated schema and asserts the Storyboard/Scene/
+    Viewport definitions contain every property declared in the LinkML source.
+    """
+
+    def _load_main_schema(self) -> dict:
+        return json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+    def test_storyboard_properties_exist(self) -> None:
+        """StoryboardProperties should have all expected fields."""
+        main_schema = self._load_main_schema()
+        props = main_schema.get("$defs", {}).get("StoryboardProperties", {}).get("properties", {})
+        for field in ("kind", "id", "name", "description", "schema_version"):
+            assert field in props, f"StoryboardProperties missing {field!r}"
+
+    def test_scene_properties_exist(self) -> None:
+        """SceneProperties should have all expected fields."""
+        main_schema = self._load_main_schema()
+        props = main_schema.get("$defs", {}).get("SceneProperties", {}).get("properties", {})
+        expected = [
+            "kind",
+            "id",
+            "storyboard_id",
+            "title",
+            "description",
+            "viewport",
+            "timestamp",
+            "time_range",
+            "visible_feature_ids",
+            "feature_set_hash",
+            "thumbnail_asset_ref",
+            "transition_duration_ms",
+        ]
+        for field in expected:
+            assert field in props, f"SceneProperties missing {field!r}"
+
+    def test_viewport_properties_exist(self) -> None:
+        """Viewport sub-record should have center/zoom/bearing."""
+        main_schema = self._load_main_schema()
+        props = main_schema.get("$defs", {}).get("Viewport", {}).get("properties", {})
+        for field in ("center", "zoom", "bearing"):
+            assert field in props, f"Viewport missing {field!r}"
+
+    def test_scene_feature_set_hash_pattern(self) -> None:
+        """feature_set_hash must be a 64-char lowercase hex string."""
+        main_schema = self._load_main_schema()
+        hash_prop = (
+            main_schema.get("$defs", {})
+            .get("SceneProperties", {})
+            .get("properties", {})
+            .get("feature_set_hash", {})
+        )
+        pattern = hash_prop.get("pattern", "")
+        assert pattern == "^[0-9a-f]{64}$", f"feature_set_hash pattern mismatch: {pattern!r}"
+
+    def test_viewport_bearing_reserved_to_zero(self) -> None:
+        """Viewport.bearing MUST be 0 (v1 reserved slot)."""
+        main_schema = self._load_main_schema()
+        bearing_prop = (
+            main_schema.get("$defs", {})
+            .get("Viewport", {})
+            .get("properties", {})
+            .get("bearing", {})
+        )
+        # Encoded as minimum=0, maximum=0 for cross-generator portability
+        assert bearing_prop.get("minimum") == 0, "bearing minimum should be 0"
+        assert bearing_prop.get("maximum") == 0, "bearing maximum should be 0"
+
+    def test_scene_ulid_pattern(self) -> None:
+        """SceneProperties.id MUST match the Crockford-base-32 ULID pattern."""
+        main_schema = self._load_main_schema()
+        id_prop = (
+            main_schema.get("$defs", {})
+            .get("SceneProperties", {})
+            .get("properties", {})
+            .get("id", {})
+        )
+        assert id_prop.get("pattern") == "^[0-9A-HJKMNP-TV-Z]{26}$"
+
+    def test_storyboard_pydantic_vs_linkml_schema(self) -> None:
+        """SC-002: Pydantic-generated JSON Schema matches LinkML-generated JSON Schema
+        field-for-field for Storyboard/Scene/Viewport.
+
+        The repo has a single generator path (LinkML → gen-json-schema), so the
+        Pydantic side is proved equivalent by round-tripping Pydantic model
+        schemas through ``.model_json_schema()`` and checking the required
+        properties line up.
+        """
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
+        from debrief_schemas import SceneFeature, StoryboardFeature, Viewport
+
+        main_schema = self._load_main_schema()
+        defs = main_schema.get("$defs", {})
+
+        # Storyboard — LinkML-generated vs Pydantic-derived property names
+        pydantic_sb_props = set(StoryboardFeature.model_json_schema()["properties"].keys())
+        linkml_sb_props = set(defs.get("StoryboardFeature", {}).get("properties", {}).keys())
+        assert pydantic_sb_props == linkml_sb_props, (
+            f"StoryboardFeature field drift: Pydantic {pydantic_sb_props} "
+            f"vs LinkML {linkml_sb_props}"
+        )
+
+        # Scene
+        pydantic_sc_props = set(SceneFeature.model_json_schema()["properties"].keys())
+        linkml_sc_props = set(defs.get("SceneFeature", {}).get("properties", {}).keys())
+        assert pydantic_sc_props == linkml_sc_props, (
+            f"SceneFeature field drift: Pydantic {pydantic_sc_props} vs LinkML {linkml_sc_props}"
+        )
+
+        # Viewport
+        pydantic_vp_props = set(Viewport.model_json_schema()["properties"].keys())
+        linkml_vp_props = set(defs.get("Viewport", {}).get("properties", {}).keys())
+        assert pydantic_vp_props == linkml_vp_props, (
+            f"Viewport field drift: Pydantic {pydantic_vp_props} vs LinkML {linkml_vp_props}"
+        )
 
 
 if __name__ == "__main__":

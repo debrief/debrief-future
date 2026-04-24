@@ -17,6 +17,7 @@ import {
   type SessionStoreWithUndo,
   type TemporalSlice,
 } from '@debrief/session-state';
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { SessionManager } from '../services/sessionManager';
 
 // Message types from webview to extension
@@ -27,12 +28,12 @@ interface TimeChangeMessage {
 
 interface PlaybackStateChangeMessage {
   type: 'playbackStateChange';
-  state: 'playing' | 'paused';
+  state: PlaybackState;
 }
 
 interface DisplayModeChangeMessage {
   type: 'displayModeChange';
-  mode: 'full' | 'trail';
+  mode: DisplayMode;
 }
 
 interface WebviewReadyMessage {
@@ -51,6 +52,21 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
   private _timeExtent: { start: number; end: number } | null = null;
+  /**
+   * Scrubbable-range override (Feature 217, R2). When set, outbound
+   * `updateTimeExtent` messages narrow `start`/`end` to this window while
+   * `dataStart`/`dataEnd` continue to reflect the session's full
+   * `timeRange`. The override survives `timeRange` updates — clearing
+   * it happens only via `setScrubbableRange(null, null)` (e.g. when the
+   * Storyboard playback service deactivates).
+   *
+   * Semantics for mixed null/non-null inputs: both must be non-null to
+   * install an override. Any call with at least one null clears the
+   * override — this keeps the call-site simple (the playback service
+   * never needs to reason about partial windows) and avoids accidental
+   * one-sided constraints.
+   */
+  private _scrubbableOverride: { start: number; end: number } | null = null;
   private _isWebviewReady = false;
   private _pendingMessages: Array<Record<string, unknown>> = [];
 
@@ -61,8 +77,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
 
   // Event callbacks (legacy - kept for backward compatibility)
   private _onTimeChangeCallback?: (time: number) => void;
-  private _onPlaybackStateChangeCallback?: (state: 'playing' | 'paused') => void;
-  private _onDisplayModeChangeCallback?: (mode: 'full' | 'trail') => void;
+  private _onPlaybackStateChangeCallback?: (state: PlaybackState) => void;
+  private _onDisplayModeChangeCallback?: (mode: DisplayMode) => void;
 
   constructor(extensionUri: vscode.Uri, sessionManager?: SessionManager) {
     this._extensionUri = extensionUri;
@@ -121,13 +137,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           start: state.timeRange.start,
           end: state.timeRange.end,
         };
-        this._postMessage({
-          type: 'updateTimeExtent',
-          start: state.timeRange.start,
-          end: state.timeRange.end,
-          dataStart: state.timeRange.start,
-          dataEnd: state.timeRange.end,
-        });
+        this._postTimeExtent(state.timeRange.start, state.timeRange.end);
       }
       if (state.currentTime !== null) {
         this._postMessage({
@@ -159,13 +169,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
         this._timeExtent.end !== newExtent.end
       ) {
         this._timeExtent = newExtent;
-        this._postMessage({
-          type: 'updateTimeExtent',
-          start: newExtent.start,
-          end: newExtent.end,
-          dataStart: newExtent.start,
-          dataEnd: newExtent.end,
-        });
+        this._postTimeExtent(newExtent.start, newExtent.end);
       }
     }
 
@@ -208,13 +212,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           this._pendingMessages = [];
           // Send current time extent if available
           if (this._timeExtent) {
-            this._postMessage({
-              type: 'updateTimeExtent',
-              start: this._timeExtent.start,
-              end: this._timeExtent.end,
-              dataStart: this._timeExtent.start,
-              dataEnd: this._timeExtent.end,
-            });
+            this._postTimeExtent(this._timeExtent.start, this._timeExtent.end);
           }
           break;
 
@@ -238,7 +236,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           // Update session state if available
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setPlaybackState(message.state === 'playing' ? 'playing' : 'paused');
+            state.setPlaybackState(message.state);
           }
           // Legacy callback
           if (this._onPlaybackStateChangeCallback) {
@@ -250,7 +248,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           // Update session state if available
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setDisplayMode(message.mode === 'trail' ? 'snailTrail' : 'normal');
+            state.setDisplayMode(message.mode);
           }
           // Legacy callback
           if (this._onDisplayModeChangeCallback) {
@@ -269,13 +267,33 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
    */
   public updateTimeExtent(start: number, end: number): void {
     this._timeExtent = { start, end };
-    this._postMessage({
-      type: 'updateTimeExtent',
-      start,
-      end,
-      dataStart: start,
-      dataEnd: end,
-    });
+    this._postTimeExtent(start, end);
+  }
+
+  /**
+   * Install (or clear) a scrubbable-range override (Feature 217 / R2).
+   *
+   * When installed, every outbound `updateTimeExtent` message narrows
+   * `start`/`end` to the given window while `dataStart`/`dataEnd`
+   * continue to reflect the session's full `timeRange`. Pass
+   * `setScrubbableRange(null, null)` to restore the full range.
+   *
+   * Mixed null/non-null inputs are treated as clears — the override
+   * either fully applies or not at all.
+   */
+  public setScrubbableRange(start: number | null, end: number | null): void {
+    if (start === null || end === null) {
+      if (this._scrubbableOverride === null) {return;}
+      this._scrubbableOverride = null;
+    } else {
+      this._scrubbableOverride = { start, end };
+    }
+    // Repost the current extent so the webview reflects the new override
+    // immediately — otherwise the narrower track would only appear on
+    // the next `timeRange` change.
+    if (this._timeExtent) {
+      this._postTimeExtent(this._timeExtent.start, this._timeExtent.end);
+    }
   }
 
   /**
@@ -319,14 +337,14 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   /**
    * Register callback for playback state changes
    */
-  public onPlaybackStateChange(callback: (state: 'playing' | 'paused') => void): void {
+  public onPlaybackStateChange(callback: (state: PlaybackState) => void): void {
     this._onPlaybackStateChangeCallback = callback;
   }
 
   /**
    * Register callback for display mode changes
    */
-  public onDisplayModeChange(callback: (mode: 'full' | 'trail') => void): void {
+  public onDisplayModeChange(callback: (mode: DisplayMode) => void): void {
     this._onDisplayModeChangeCallback = callback;
   }
 
@@ -340,6 +358,23 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     if (this._sessionChangeDisposable) {
       this._sessionChangeDisposable.dispose();
     }
+  }
+
+  /**
+   * Post an `updateTimeExtent` message to the webview, honouring the
+   * active scrubbable-range override (Feature 217, R2). `dataStart`/
+   * `dataEnd` always reflect the session's full time range; `start`/
+   * `end` narrow to the override window when installed.
+   */
+  private _postTimeExtent(dataStart: number, dataEnd: number): void {
+    const override = this._scrubbableOverride;
+    this._postMessage({
+      type: 'updateTimeExtent',
+      start: override ? override.start : dataStart,
+      end: override ? override.end : dataEnd,
+      dataStart,
+      dataEnd,
+    });
   }
 
   /**

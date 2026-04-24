@@ -1,0 +1,7 @@
+[create] storyboard id=01JUSAGEEXAMPLESTORYBOARDA name="Op Harrier — usage example"
+[create] scenes added — earlier ts=2026-04-20T10:00:00Z later ts=2026-04-20T11:00:00Z
+[list] ordered timestamps: [ '2026-04-20T10:00:00Z', '2026-04-20T11:00:00Z' ]
+[read] scene 01JUSAGESCENEEARLYAAAAAAAA stale=false canonical=["track-alpha","track-bravo"]
+[update] scene 01JUSAGESCENEEARLYAAAAAAAA op=update-to-current agent=bob new hash=2cc0afc98eb6ea6e…
+[invariant] structural sharing preserved: true
+[summary] plot has 3 features (1 Storyboard, 2 Scenes)

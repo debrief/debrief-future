@@ -31,7 +31,7 @@ import {
 } from '../types/tool';
 import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
-import type { DebriefFeature } from '@debrief/schemas';
+import type { DebriefFeature, ToolCategoryEnum } from '@debrief/schemas';
 
 const execFileAsync = promisify(execFile);
 
@@ -345,6 +345,31 @@ export class CalcService {
    */
   getCurrentTools(): Tool[] {
     return this.toolCache?.tools ?? [];
+  }
+
+  /**
+   * Feature 207: Project the cached tools into a `{toolId: category}` map
+   * for the Log Panel icon resolver. Tools without a declared category
+   * appear with `null` — the webview treats this as the grey-fallback
+   * trigger.
+   *
+   * The `category` string on each cached Tool has already been coerced to
+   * one of the five canonical `ToolCategoryEnum` values by the mcpAdapter
+   * boundary (see `parseToolUICategory`). Any other string is replaced with
+   * `null` before it ever reaches the cache. The cast in the return type is
+   * therefore safe — this is the defensive boundary already paid for.
+   *
+   * Called by `logPanelView` when pushing `tools:manifest` messages. Does
+   * NOT trigger a fetch — returns whatever is in the cache.
+   */
+  getToolCategoryMap(): Record<string, ToolCategoryEnum | null> {
+    const tools = this.toolCache?.tools ?? [];
+    const map: Record<string, ToolCategoryEnum | null> = {};
+    for (const tool of tools) {
+      // Safe cast: mcpAdapter whitelists to canonical values only.
+      map[tool.id] = (tool.category as ToolCategoryEnum | undefined) ?? null;
+    }
+    return map;
   }
 
   /**

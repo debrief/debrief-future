@@ -155,7 +155,7 @@ export async function getStorePaths(): Promise<string[]> {
   return config.stores.map((s) => s.path);
 }
 
-// TODO: Add "Manage Stores" tab in the future for:
+// TODO(#472): Add "Manage Stores" tab for:
 // - Renaming stores
 // - Reordering stores
 // - Bulk cleanup of inaccessible stores

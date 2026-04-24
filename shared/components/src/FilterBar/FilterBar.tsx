@@ -3,6 +3,9 @@
  *
  * Persistent filter bar with DnD context, lozenges, OR containers,
  * (+) add button, empty state hint, and error banner.
+ *
+ * Extended in #186 to support a compound 'platform' chip via a new
+ * PlatformValueEditor branch in the add-filter flow.
  */
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -21,17 +24,23 @@ import type { FilterType, FilterExpression, StacBrowserItem } from '../filter-en
 import { useFilterBar } from './useFilterBar';
 import { useDistinctValues } from './useDistinctValues';
 import { useTaxonomyMatchCounts } from './useTaxonomyMatchCounts';
-import { Lozenge } from './Lozenge';
+import { Lozenge, formatPlatformLabel } from './Lozenge';
 import { OrContainer } from './OrContainer';
 import { FilterTypeMenu } from './FilterTypeMenu';
 import { QuickSearch } from './QuickSearch';
 import { ValueEditor } from './ValueEditor';
+import { PlatformValueEditor } from './PlatformValueEditor';
 import { SaveFilterButton } from './SaveFilterButton';
 import { HistoricFiltersDropdown } from './HistoricFiltersDropdown';
 import { useSavedFilters } from './useSavedFilters';
 import { InMemoryStorage } from './savedFiltersStorage';
 import { EMPTY_STATE_HINT, FILTER_ERROR_MESSAGE } from './constants';
-import type { FilterBarProps, LozengeItem, SavedFilterConfiguration } from './types';
+import type {
+  FilterBarProps,
+  LozengeItem,
+  PlatformAttributes,
+  SavedFilterConfiguration,
+} from './types';
 import './FilterBar.css';
 
 const fallbackStorage = new InMemoryStorage();
@@ -57,6 +66,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     moveToContainer,
     moveToTopLevel,
     setState: setFilterBarState,
+    addPlatformLozenge,
+    editPlatformLozenge,
+    addChildPlatformLozenge,
   } = useFilterBar(initialFilterState);
 
   const savedFilters = useSavedFilters(savedFiltersStorage ?? fallbackStorage);
@@ -96,7 +108,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       ...expression,
       predicates: [
         ...expression.predicates,
-        { type: 'title' as FilterType, value: quickSearchText },
+        { type: 'title' as Exclude<FilterType, 'platform'>, value: quickSearchText },
       ],
     };
   }, [expression, quickSearchText]);
@@ -109,7 +121,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   // Graduate quick-search into a title lozenge on Enter
   const handleQuickSearchCommit = useCallback(
     (text: string) => {
-      addLozenge('title' as FilterType, text);
+      addLozenge('title', text);
       setQuickSearchText('');
     },
     [addLozenge],
@@ -118,7 +130,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   // Filter items whenever effective expression changes
   const prevExpressionRef = useRef<FilterExpression | null>(null);
   useEffect(() => {
-    // Skip if expression hasn't changed
     if (prevExpressionRef.current === effectiveExpression) return;
     prevExpressionRef.current = effectiveExpression;
 
@@ -151,25 +162,21 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    // Only allow lozenges to be dragged (not OR containers)
     if (activeData?.kind !== 'lozenge') return;
 
     const lozengeId = String(active.id);
 
-    // Dropped on an OR container
     if (overData?.kind === 'or-container') {
       const containerId = String(over.id);
       moveToContainer(lozengeId, containerId);
       return;
     }
 
-    // Dropped on the filter bar (top level) — check if it came from a container
     if (overData?.kind === 'filter-bar' && activeData?.fromContainerId) {
       moveToTopLevel(lozengeId, activeData.fromContainerId);
     }
   }, [moveToContainer, moveToTopLevel]);
 
-  // Handle filter type selection from (+) menu
   const handleSelectType = useCallback((type: string) => {
     setAddingType(type as FilterType);
     setAddingForContainer(null);
@@ -184,9 +191,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     setAddingForContainer(containerId);
   }, []);
 
-  // Handle value selection from ValueEditor
+  // Handle simple value selection from ValueEditor
   const handleValueSelect = useCallback((value: string) => {
-    if (addingType) {
+    if (addingType && addingType !== 'platform') {
       if (addingForContainer) {
         addChildLozenge(addingForContainer, addingType, value);
       } else {
@@ -202,7 +209,28 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     setAddingForContainer(null);
   }, []);
 
-  // Find active drag item for overlay
+  // Handle compound platform confirm from PlatformValueEditor
+  const handlePlatformConfirm = useCallback(
+    (attributes: PlatformAttributes) => {
+      if (addingForContainer) {
+        addChildPlatformLozenge(addingForContainer, attributes);
+      } else {
+        addPlatformLozenge(attributes);
+      }
+      setAddingType(null);
+      setAddingForContainer(null);
+    },
+    [addingForContainer, addChildPlatformLozenge, addPlatformLozenge],
+  );
+
+  // Handle in-place edit of a platform chip
+  const handlePlatformAttributesChange = useCallback(
+    (id: string, attributes: PlatformAttributes) => {
+      editPlatformLozenge(id, attributes);
+    },
+    [editPlatformLozenge],
+  );
+
   const activeDragItem = useMemo((): LozengeItem | undefined => {
     if (!activeDragId) return undefined;
     for (const item of state.items) {
@@ -216,6 +244,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   }, [activeDragId, state.items]);
 
   const isEmpty = state.items.length === 0;
+
+  const platformDistinct = distinctValues.platform;
+
+  const renderSimpleFlatValues = useMemo(() => {
+    const { platform: _p, ...rest } = distinctValues;
+    void _p;
+    return rest as Record<Exclude<FilterType, 'platform'>, readonly string[]>;
+  }, [distinctValues]);
 
   return (
     <DndContext
@@ -264,9 +300,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onEdit={setEditingId}
                   onRemove={removeLozenge}
                   onValueChange={editLozenge}
+                  onPlatformAttributesChange={handlePlatformAttributesChange}
                   onEditClose={() => setEditingId(null)}
                   onToggleNegate={toggleNegate}
-                  availableValues={distinctValues}
+                  availableValues={renderSimpleFlatValues}
+                  platformAvailableValues={platformDistinct}
                   taxonomy={taxonomy}
                   labelMap={labelMap}
                   taxonomyCounts={taxonomyCounts}
@@ -284,9 +322,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onEditLozenge={setEditingId}
                   onRemoveLozenge={removeLozenge}
                   onValueChange={editLozenge}
+                  onPlatformAttributesChange={handlePlatformAttributesChange}
                   onEditClose={() => setEditingId(null)}
                   onToggleNegate={toggleNegate}
-                  availableValues={distinctValues}
+                  availableValues={renderSimpleFlatValues}
+                  platformAvailableValues={platformDistinct}
                   taxonomy={taxonomy}
                   labelMap={labelMap}
                   taxonomyCounts={taxonomyCounts}
@@ -308,32 +348,51 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           />
         </div>
 
-        {/* Value editor popover for adding new filter */}
-        {addingType && !addingForContainer && (
+        {/* Simple value editor for adding new filter */}
+        {addingType && addingType !== 'platform' && !addingForContainer && (
           <div className="debrief-filter-bar__adding" data-testid="filter-bar-adding">
             <ValueEditor
               filterType={addingType}
               value=""
               onSelect={handleValueSelect}
               onClose={handleValueClose}
-              availableValues={distinctValues[addingType] ?? []}
+              availableValues={renderSimpleFlatValues[addingType as Exclude<FilterType, 'platform'>] ?? []}
               taxonomy={taxonomy}
               taxonomyCounts={taxonomyCounts}
             />
           </div>
         )}
 
-        {/* Value editor for adding inside an OR container */}
-        {addingType && addingForContainer && (
+        {/* Simple value editor for adding inside an OR container */}
+        {addingType && addingType !== 'platform' && addingForContainer && (
           <div className="debrief-filter-bar__adding" data-testid="filter-bar-container-adding">
             <ValueEditor
               filterType={addingType}
               value=""
               onSelect={handleValueSelect}
               onClose={handleValueClose}
-              availableValues={distinctValues[addingType] ?? []}
+              availableValues={renderSimpleFlatValues[addingType as Exclude<FilterType, 'platform'>] ?? []}
               taxonomy={taxonomy}
               taxonomyCounts={taxonomyCounts}
+            />
+          </div>
+        )}
+
+        {/* Platform compound editor */}
+        {addingType === 'platform' && (
+          <div
+            className="debrief-filter-bar__adding"
+            data-testid={
+              addingForContainer ? 'filter-bar-platform-container-adding' : 'filter-bar-platform-adding'
+            }
+          >
+            <PlatformValueEditor
+              initialAttributes={{}}
+              availableValues={platformDistinct}
+              taxonomy={taxonomy}
+              taxonomyCounts={taxonomyCounts}
+              onConfirm={handlePlatformConfirm}
+              onCancel={handleValueClose}
             />
           </div>
         )}
@@ -346,9 +405,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               <span className="debrief-lozenge__type">{activeDragItem.filterType}</span>
               <span className="debrief-lozenge__separator">:</span>
               <span className="debrief-lozenge__value">
-                {activeDragItem.filterType === 'vessel-class'
-                  ? resolveTaxonomyLabel(activeDragItem.value, labelMap)
-                  : activeDragItem.value}
+                {activeDragItem.shape === 'platform'
+                  ? formatPlatformLabel(activeDragItem.attributes, labelMap)
+                  : activeDragItem.filterType === 'vessel-class'
+                    ? resolveTaxonomyLabel(activeDragItem.value, labelMap)
+                    : activeDragItem.value}
               </span>
             </span>
           </div>

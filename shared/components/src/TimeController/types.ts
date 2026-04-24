@@ -2,24 +2,15 @@
  * Type definitions for the TimeController component.
  */
 
+import type { DisplayMode, PlaybackState } from '@debrief/schemas';
 import type { TimeExtent } from '../utils/types';
+
+export type { DisplayMode, PlaybackState };
 
 /**
  * Playback speed multiplier options.
  */
 export type PlaybackSpeed = 1 | 2 | 4 | 8 | 16 | 32 | 64;
-
-/**
- * Track display mode.
- * - 'full': Show entire track regardless of time position
- * - 'trail': Show track history from start up to current time position
- */
-export type DisplayMode = 'full' | 'trail';
-
-/**
- * Playback state.
- */
-export type PlaybackState = 'playing' | 'paused';
 
 /**
  * UI state for the time controller.

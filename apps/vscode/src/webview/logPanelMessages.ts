@@ -21,6 +21,14 @@ import type {
   ParameterSchemaEntry,
 } from '@debrief/components';
 import type { ReplayResult } from '@debrief/session-state';
+import type { ToolCategoryEnum } from '@debrief/schemas';
+
+/**
+ * Runtime map of tool ID → visual category value (or null when the tool
+ * declared no category / declared an invalid value that was coerced at
+ * the MCP boundary). Feature 207.
+ */
+export type ToolCategoryMap = Readonly<Record<string, ToolCategoryEnum | null>>;
 
 // ─── Webview → Extension messages ────────────────────────────────────────
 
@@ -133,6 +141,24 @@ export interface SchemaResponseMessage {
 }
 
 /**
+ * Feature 207: Tool manifest snapshot for Log Panel icon category resolution.
+ *
+ * Pushed by the extension host on session start and whenever `calcService`'s
+ * tools cache refreshes. The webview stores the map and passes it to the
+ * LogPanel component as the `toolCategories` prop.
+ *
+ * Keys are tool IDs (kebab-case). Values are canonical ToolCategoryEnum
+ * values, or `null` when the tool declared no category (or declared an
+ * invalid value — coerced at the MCP boundary).
+ */
+export interface ToolsManifestMessage {
+  type: 'tools:manifest';
+  payload: {
+    categories: ToolCategoryMap;
+  };
+}
+
+/**
  * All messages the extension can post to the Log Panel webview.
  *
  * Extends `ExtensionToWebviewMessage` (timeline:update, session:change,
@@ -144,7 +170,8 @@ export type ExtensionMessage =
   | ReplayProgressMessage
   | ReplayResultMessage
   | ReplayErrorMessage
-  | SchemaResponseMessage;
+  | SchemaResponseMessage
+  | ToolsManifestMessage;
 
 // ─── Typed postMessage helpers ───────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterExpressionToCql2Json } from "../cql2-json";
+import { cql2JsonToArrayFilters, filterExpressionToCql2Json } from "../cql2-json";
 import type { FilterExpression } from "../types";
 
 describe("CQL2 JSON serialisation", () => {
@@ -26,7 +26,7 @@ describe("CQL2 JSON serialisation", () => {
     };
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "a_containedBy",
-      args: [["GB"], { property: "debrief:nationalities" }],
+      args: [["GB"], { property: "debrief:platforms[*].nationality" }],
     });
   });
 
@@ -64,7 +64,7 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "and",
       args: [
-        { op: "a_containedBy", args: [["GB"], { property: "debrief:nationalities" }] },
+        { op: "a_containedBy", args: [["GB"], { property: "debrief:platforms[*].nationality" }] },
         { op: "=", args: [{ property: "debrief:author" }, "Smith"] },
       ],
     });
@@ -86,8 +86,8 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "or",
       args: [
-        { op: "a_containedBy", args: [["type23"], { property: "debrief:vessel_classes" }] },
-        { op: "a_containedBy", args: [["type45"], { property: "debrief:vessel_classes" }] },
+        { op: "a_containedBy", args: [["type23"], { property: "debrief:platforms[*].vessel_class" }] },
+        { op: "a_containedBy", args: [["type45"], { property: "debrief:platforms[*].vessel_class" }] },
       ],
     });
   });
@@ -108,12 +108,12 @@ describe("CQL2 JSON serialisation", () => {
     expect(cql2).toEqual({
       op: "and",
       args: [
-        { op: "a_containedBy", args: [["GB"], { property: "debrief:nationalities" }] },
+        { op: "a_containedBy", args: [["GB"], { property: "debrief:platforms[*].nationality" }] },
         {
           op: "or",
           args: [
-            { op: "a_containedBy", args: [["type23"], { property: "debrief:vessel_classes" }] },
-            { op: "a_containedBy", args: [["type45"], { property: "debrief:vessel_classes" }] },
+            { op: "a_containedBy", args: [["type23"], { property: "debrief:platforms[*].vessel_class" }] },
+            { op: "a_containedBy", args: [["type45"], { property: "debrief:platforms[*].vessel_class" }] },
           ],
         },
       ],
@@ -132,16 +132,16 @@ describe("CQL2 JSON serialisation", () => {
     // Single OR predicate should not produce an "or" wrapper
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "a_containedBy",
-      args: [["GB"], { property: "debrief:nationalities" }],
+      args: [["GB"], { property: "debrief:platforms[*].nationality" }],
     });
   });
 
   it("serialises all array-valued filter types", () => {
     const arrayTypes = [
-      { type: "vessel-class" as const, prop: "debrief:vessel_classes" },
+      { type: "vessel-class" as const, prop: "debrief:platforms[*].vessel_class" },
       { type: "tag" as const, prop: "debrief:tags" },
-      { type: "track-name" as const, prop: "debrief:track_names" },
-      { type: "nationality" as const, prop: "debrief:nationalities" },
+      { type: "track-name" as const, prop: "debrief:platforms[*].name" },
+      { type: "nationality" as const, prop: "debrief:platforms[*].nationality" },
     ];
 
     for (const { type, prop } of arrayTypes) {
@@ -165,6 +165,58 @@ describe("CQL2 JSON serialisation", () => {
     expect(filterExpressionToCql2Json(expr)).toEqual({
       op: "=",
       args: [{ property: "collection" }, "exercises-2025"],
+    });
+  });
+});
+
+describe("CQL2 JSON parsing (array_filter) — Haiku 4.5 quirks (#190)", () => {
+  it("accepts a_containedBy with a singleton literal inside array_filter body", () => {
+    const cql2 = {
+      op: "array_filter",
+      args: [
+        { property: "debrief:platforms" },
+        {
+          op: "and",
+          args: [
+            { op: "=", args: [{ property: "nationality" }, "GB"] },
+            {
+              op: "a_containedBy",
+              args: [["submarine"], { property: "vessel_class" }],
+            },
+          ],
+        },
+      ],
+    };
+    const filters = cql2JsonToArrayFilters(cql2);
+    expect(filters).toHaveLength(1);
+    expect(filters[0].predicate).toEqual({
+      kind: "and",
+      children: [
+        { kind: "comparison", field: "nationality", value: "GB" },
+        { kind: "comparison", field: "vessel_class", value: "submarine" },
+      ],
+    });
+  });
+
+  it("expands multi-literal a_containedBy inside array_filter into an OR", () => {
+    const cql2 = {
+      op: "array_filter",
+      args: [
+        { property: "debrief:platforms" },
+        {
+          op: "a_containedBy",
+          args: [["submarine", "destroyer"], { property: "vessel_class" }],
+        },
+      ],
+    };
+    const filters = cql2JsonToArrayFilters(cql2);
+    expect(filters).toHaveLength(1);
+    expect(filters[0].predicate).toEqual({
+      kind: "or",
+      children: [
+        { kind: "comparison", field: "vessel_class", value: "submarine" },
+        { kind: "comparison", field: "vessel_class", value: "destroyer" },
+      ],
     });
   });
 });

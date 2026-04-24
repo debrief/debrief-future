@@ -5,6 +5,7 @@ import { ThemeProvider } from '../ThemeProvider';
 import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState } from './types';
+import type { PlatformRecord } from '@debrief/schemas';
 
 // --- Mock Data ---
 
@@ -17,12 +18,10 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     datetime: null,
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T12:00:00Z',
-    vesselClasses: [],
+    platforms: [],
     tags: [],
     featureTags: [],
     author: null,
-    trackNames: [],
-    nationalities: [],
     collection: null,
     modified: null,
     ...overrides,
@@ -32,56 +31,60 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 const MOCK_ITEMS: StacBrowserItem[] = [
   makeItem('ex-001', {
     title: 'CASEX Alpha',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'CONTACT-BRAVO', name: 'Contact Bravo', domain: 'unknown' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'blue-water'],
-    vesselClasses: ['surface/warship/frigate/type23'],
     author: 'CDR Smith',
-    trackNames: ['HMS Argyll', 'Contact Bravo'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T04:00:00Z',
   }),
   makeItem('ex-002', {
     title: 'CASEX Bravo',
-    nationalities: ['British'],
+    platforms: [
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+      { id: 'UNKNOWN-ALPHA', name: 'Unknown Alpha', domain: 'unknown' },
+    ] satisfies PlatformRecord[],
     tags: ['asw', 'shallow-water'],
-    vesselClasses: ['surface/warship/destroyer/type45'],
     author: 'CDR Jones',
-    trackNames: ['HMS Diamond', 'Unknown Alpha'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-02T12:00:00Z',
   }),
   makeItem('ex-003', {
     title: 'GROUPEX Charlie',
-    nationalities: ['French', 'British'],
+    platforms: [
+      { id: 'ARGYLL', name: 'HMS Argyll', nationality: 'GB', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+      { id: 'DIAMOND', name: 'HMS Diamond', nationality: 'GB', vessel_class: 'surface/warship/destroyer/type45', vessel_role: 'destroyer', domain: 'surface' },
+      { id: 'AQUITAINE', name: 'FS Aquitaine', nationality: 'FR', vessel_class: 'surface/warship/frigate/type23', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['convoy', 'asw'],
-    vesselClasses: ['surface/warship/frigate/type23', 'surface/warship/destroyer/type45'],
     author: 'CDR Smith',
     featureTags: ['high-priority', 'reviewed'],
-    trackNames: ['HMS Argyll', 'HMS Diamond', 'FS Aquitaine'],
     collection: 'exercises-2024',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-04T00:00:00Z',
   }),
   makeItem('ex-004', {
     title: 'TACEX Delta',
-    nationalities: ['German'],
+    platforms: [
+      { id: 'SACHSEN', name: 'FGS Sachsen', nationality: 'DE', vessel_class: 'surface/warship/frigate/type26', vessel_role: 'frigate', domain: 'surface' },
+    ] satisfies PlatformRecord[],
     tags: ['surface-action'],
-    vesselClasses: ['surface/warship/frigate/type26'],
     author: 'CDR Mueller',
-    trackNames: ['FGS Sachsen'],
     collection: 'training-2025',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-15T00:00:00Z',
   }),
   makeItem('ex-005', {
     title: 'ASW Exercise Echo',
-    nationalities: ['French'],
+    platforms: [
+      { id: 'RUBIS', name: 'FS Rubis', nationality: 'FR', vessel_class: 'subsurface/submarine/ssn', vessel_role: 'ssn', domain: 'subsurface' },
+    ] satisfies PlatformRecord[],
     tags: ['asw'],
-    vesselClasses: ['submarine/nuclear/ssn'],
     author: 'CDR Dupont',
-    trackNames: ['FS Rubis'],
     collection: 'training-2025',
     startDatetime: '2025-06-01T00:00:00Z',
     endDatetime: '2025-06-01T02:00:00Z',
@@ -168,14 +171,14 @@ function FilterBarWrapper({
 
 const SINGLE_FILTER_STATE: FilterBarState = {
   items: [
-    { kind: 'lozenge', id: 'story-1', filterType: 'nationality', value: 'French' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-1', filterType: 'nationality', value: 'French' },
   ],
 };
 
 const MULTIPLE_AND_STATE: FilterBarState = {
   items: [
-    { kind: 'lozenge', id: 'story-1', filterType: 'nationality', value: 'French' },
-    { kind: 'lozenge', id: 'story-2', filterType: 'tag', value: 'asw' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-1', filterType: 'nationality', value: 'French' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-2', filterType: 'tag', value: 'asw' },
   ],
 };
 
@@ -185,29 +188,81 @@ const OR_GROUP_STATE: FilterBarState = {
       kind: 'or-container',
       id: 'story-or-1',
       children: [
-        { kind: 'lozenge', id: 'story-or-c1', filterType: 'nationality', value: 'French' },
-        { kind: 'lozenge', id: 'story-or-c2', filterType: 'nationality', value: 'British' },
+        { kind: 'lozenge', shape: 'simple', id: 'story-or-c1', filterType: 'nationality', value: 'French' },
+        { kind: 'lozenge', shape: 'simple', id: 'story-or-c2', filterType: 'nationality', value: 'British' },
       ],
     },
-    { kind: 'lozenge', id: 'story-3', filterType: 'tag', value: 'convoy' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-3', filterType: 'tag', value: 'convoy' },
   ],
 };
 
 const ALL_TYPES_STATE: FilterBarState = {
   items: [
-    { kind: 'lozenge', id: 'story-t1', filterType: 'vessel-class', value: 'surface/warship/frigate/type23' },
-    { kind: 'lozenge', id: 'story-t2', filterType: 'tag', value: 'asw' },
-    { kind: 'lozenge', id: 'story-t3', filterType: 'author', value: 'CDR Smith' },
-    { kind: 'lozenge', id: 'story-t4', filterType: 'nationality', value: 'French' },
-    { kind: 'lozenge', id: 'story-t5', filterType: 'duration', value: '<24H' },
-    { kind: 'lozenge', id: 'story-t6', filterType: 'title', value: 'CASEX' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t1', filterType: 'vessel-class', value: 'surface/warship/frigate/type23' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t2', filterType: 'tag', value: 'asw' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t3', filterType: 'author', value: 'CDR Smith' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t4', filterType: 'nationality', value: 'French' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t5', filterType: 'duration', value: '<24H' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t6', filterType: 'title', value: 'CASEX' },
   ],
 };
 
 const ZERO_RESULTS_STATE: FilterBarState = {
   items: [
-    { kind: 'lozenge', id: 'story-z1', filterType: 'nationality', value: 'German' },
-    { kind: 'lozenge', id: 'story-z2', filterType: 'author', value: 'CDR Smith' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-z1', filterType: 'nationality', value: 'German' },
+    { kind: 'lozenge', shape: 'simple', id: 'story-z2', filterType: 'author', value: 'CDR Smith' },
+  ],
+};
+
+// Platform chip story states (#186)
+
+const PLATFORM_CHIP_STATE: FilterBarState = {
+  items: [
+    {
+      kind: 'lozenge',
+      shape: 'platform',
+      id: 'story-p1',
+      filterType: 'platform',
+      attributes: { nationality: 'GB', domain: 'subsurface' },
+    },
+  ],
+};
+
+const PLATFORM_AND_TAG_STATE: FilterBarState = {
+  items: [
+    {
+      kind: 'lozenge',
+      shape: 'platform',
+      id: 'story-p2',
+      filterType: 'platform',
+      attributes: { nationality: 'GB', vessel_role: 'frigate' },
+    },
+    { kind: 'lozenge', shape: 'simple', id: 'story-t-exercise', filterType: 'tag', value: 'convoy' },
+  ],
+};
+
+const PLATFORM_OR_STATE: FilterBarState = {
+  items: [
+    {
+      kind: 'or-container',
+      id: 'story-or-plat',
+      children: [
+        {
+          kind: 'lozenge',
+          shape: 'platform',
+          id: 'story-p3',
+          filterType: 'platform',
+          attributes: { nationality: 'GB', domain: 'subsurface' },
+        },
+        {
+          kind: 'lozenge',
+          shape: 'platform',
+          id: 'story-p4',
+          filterType: 'platform',
+          attributes: { nationality: 'DE', vessel_role: 'frigate' },
+        },
+      ],
+    },
   ],
 };
 
@@ -324,6 +379,68 @@ export const ZeroResults: Story = {
     docs: {
       description: {
         story: 'Add incompatible filters (e.g., Nationality: German + Author: CDR Smith) to see the "0 of 5" state.',
+      },
+    },
+  },
+};
+
+// --- Platform Chip Stories (#186) ---
+
+export const WithPlatformChip: Story = {
+  name: 'With Platform Chip',
+  render: () => (
+    <FilterBarWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialFilterState={PLATFORM_CHIP_STATE}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compound "GB + Subsurface" platform chip (#186). The chip serialises to one ' +
+          '`array_filter` CQL2 node over `debrief:platforms`, matching only plots where a ' +
+          'single platform record satisfies all selected attributes.',
+      },
+    },
+  },
+};
+
+export const PlatformChipPlusTag: Story = {
+  name: 'Platform Chip + Tag',
+  render: () => (
+    <FilterBarWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialFilterState={PLATFORM_AND_TAG_STATE}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A platform chip alongside a tag chip. Combines via top-level AND: only items with ' +
+          'a matching platform AND the required tag appear.',
+      },
+    },
+  },
+};
+
+export const PlatformChipOrGroup: Story = {
+  name: 'Platform Chips in an OR Group',
+  render: () => (
+    <FilterBarWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialFilterState={PLATFORM_OR_STATE}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Two platform chips inside an OR container: "British submarines OR German frigates".',
       },
     },
   },

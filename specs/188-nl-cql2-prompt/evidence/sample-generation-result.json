@@ -1,0 +1,52 @@
+{
+  "phrase": "UK submarines",
+  "cql2": {
+    "op": "array_filter",
+    "args": [
+      {
+        "property": "debrief:platforms"
+      },
+      {
+        "op": "and",
+        "args": [
+          {
+            "op": "=",
+            "args": [
+              {
+                "property": "nationality"
+              },
+              "GB"
+            ]
+          },
+          {
+            "op": "=",
+            "args": [
+              {
+                "property": "domain"
+              },
+              "subsurface"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "lozenges": [
+    {
+      "filterType": "nationality",
+      "value": "GB"
+    },
+    {
+      "filterType": "vessel-class",
+      "value": "submarine"
+    }
+  ],
+  "unrecognisedTerms": [],
+  "error": null,
+  "diagnostics": {
+    "promptHash": "1f64452b69b59aee0d3f2aa12622cddddabf2bcb0255461e93aff8771afad7fa",
+    "promptVersion": "2026-04-16.1",
+    "responseHash": "775842cca8545c9bb8112287c515e9f5a15a70d55de16993f997e2d44c9472f0",
+    "usedLlm": true
+  }
+}

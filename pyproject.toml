@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 [tool.uv.workspace]
 members = [
     "shared/schemas",
+    "shared/data",
     "services/stac",
     "services/io",
     "services/config",
@@ -18,6 +19,7 @@ members = [
 
 [tool.uv.sources]
 debrief-schemas = { workspace = true }
+debrief-data = { workspace = true }
 debrief-stac = { workspace = true }
 debrief-io = { workspace = true }
 debrief-config = { workspace = true }
@@ -27,6 +29,7 @@ debrief-cli = { workspace = true }
 [dependency-groups]
 dev = [
     "debrief-schemas",
+    "debrief-data",
     "debrief-stac",
     "debrief-io",
     "debrief-config",
@@ -43,7 +46,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests", "services/calc/tests"]
+testpaths = ["tests", "shared/schemas/tests", "shared/data/tests", "services/io/tests", "services/config/tests", "services/calc/tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "--import-mode=importlib --ignore=services/stac/tests"

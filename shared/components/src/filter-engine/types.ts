@@ -8,16 +8,19 @@
  * (migrated from CatalogOverview/types.ts in #132-three-view-sync).
  */
 
+import type { PlatformRecord } from '@debrief/schemas';
+export type { PlatformRecord };
+
 /**
  * A single item in a STAC catalog overview.
  * Canonical definition — previously in CatalogOverview/types.ts.
  *
  * Schema equivalent: @debrief/schemas#StacItemSummary
  * Not migrated: the generated StacItemSummary uses snake_case field names
- * (item_path, start_datetime, end_datetime, vessel_classes, feature_tags,
- * track_names) while this type uses camelCase. All consumers (ExerciseListView,
- * FilterBar, timeline helpers) depend on camelCase field access. Rename would
- * require coordinated update across many consumers.
+ * (item_path, start_datetime, end_datetime, feature_tags) while this type uses
+ * camelCase. All consumers (ExerciseListView, FilterBar, timeline helpers)
+ * depend on camelCase field access. Rename would require coordinated update
+ * across many consumers.
  */
 export interface CatalogOverviewItem {
   /** STAC Item ID */
@@ -34,20 +37,32 @@ export interface CatalogOverviewItem {
   startDatetime: string | null;
   /** Range end datetime (ISO 8601) */
   endDatetime: string | null;
-  /** Vessel taxonomy paths from debrief:vessel_classes */
-  vesselClasses?: readonly string[];
+  /** Per-platform metadata from debrief:platforms */
+  platforms?: readonly PlatformRecord[];
   /** Plot-level tags from debrief:tags */
   tags?: readonly string[];
   /** Feature-level tags from debrief:feature_tags */
   featureTags?: readonly string[];
-  /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities */
-  nationalities?: readonly string[];
-  /** Track platform names from debrief:track_names */
-  trackNames?: readonly string[];
   /** Href to large thumbnail PNG (800x600), or null if not captured */
   thumbnailHref?: string | null;
   /** Href to small thumbnail PNG (200x150), or null if not captured */
   thumbnailSmHref?: string | null;
+}
+
+/** Fields on PlatformRecord that can be compared within array_filter */
+export type PlatformField = "id" | "name" | "nationality" | "vessel_class" | "vessel_type" | "vessel_role" | "domain";
+
+/** A recursive boolean expression tree for compound predicates */
+export type CompoundPredicate =
+  | { readonly kind: "comparison"; readonly field: PlatformField; readonly value: string }
+  | { readonly kind: "and"; readonly children: readonly CompoundPredicate[] }
+  | { readonly kind: "or"; readonly children: readonly CompoundPredicate[] };
+
+/** An array_filter() call — compound predicate evaluated per-element */
+export interface ArrayFilterPredicate {
+  readonly array: "platforms";
+  readonly predicate: CompoundPredicate;
+  readonly negated?: boolean;
 }
 
 /** All supported metadata filter types from SRD Section 4.4 */
@@ -62,7 +77,8 @@ export type FilterType =
   | "plot-contents"
   | "track-name"
   | "nationality"
-  | "collection";
+  | "collection"
+  | "platform";
 
 /** Valid duration bucket values */
 export type DurationBucket = "<6H" | "<24H" | "<72H" | "<10D" | ">10D";
@@ -82,10 +98,11 @@ export interface OrGroup {
   readonly predicates: readonly Predicate[];
 }
 
-/** The complete filter state: AND of top-level predicates + OR groups */
+/** The complete filter state: AND of top-level predicates + OR groups + array filters */
 export interface FilterExpression {
   readonly predicates: readonly Predicate[];
   readonly orGroups: readonly OrGroup[];
+  readonly arrayFilters?: readonly ArrayFilterPredicate[];
 }
 
 /**
@@ -93,12 +110,10 @@ export interface FilterExpression {
  * Extends CatalogOverviewItem with the properties defined by #125.
  */
 export interface StacBrowserItem extends CatalogOverviewItem {
-  readonly vesselClasses: readonly string[];
+  readonly platforms: readonly PlatformRecord[];
   readonly tags: readonly string[];
   readonly featureTags: readonly string[];
   readonly author: string | null;
-  readonly trackNames: readonly string[];
-  readonly nationalities: readonly string[];
   readonly collection: string | null;
   /** ISO 8601 datetime when the item was last modified */
   readonly modified: string | null;

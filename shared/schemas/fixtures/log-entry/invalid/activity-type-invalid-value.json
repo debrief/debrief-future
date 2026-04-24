@@ -1,0 +1,13 @@
+{
+  "activity_id": "c0ffee00-0208-4000-8000-000000000003",
+  "timestamp": "2026-04-22T07:10:00Z",
+  "was_generated_by": {
+    "tool": "calculate-range",
+    "tool_version": "1.2.0",
+    "parameters": []
+  },
+  "used": [],
+  "generated": [],
+  "execution_duration": "PT0.1S",
+  "activity_type": "invalid"
+}

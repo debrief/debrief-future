@@ -37,6 +37,11 @@ import {
   parseTaxonomy,
   useIsMobile,
   MobileTabLayout,
+  PropertiesForm,
+} from '@debrief/components';
+import type {
+  PropertiesFormField,
+  PropertiesFormProps,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance, AssociatedFile } from '@debrief/components';
 import type {
@@ -58,15 +63,10 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
-import {
-  getSessionStore,
-  resetSessionStore,
-  type DisplayMode as StoreDisplayMode,
-} from '@debrief/session-state';
+import { getSessionStore, resetSessionStore } from '@debrief/session-state';
 import type { RawTaxonomy } from '@debrief/components';
-import type { GeoJSONFeature } from '@debrief/utils';
+import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
-import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
@@ -87,12 +87,6 @@ function featureProps(f: { properties: unknown }): { [key: string]: unknown } {
 type StyleObj = { [key: string]: unknown };
 type OverridesObj = { [key: string]: StyleObj };
 
-// Map between session-state DisplayMode ('normal'|'snailTrail') and
-// components DisplayMode ('full'|'trail') — the two enums diverged historically.
-const toComponentMode = (m: StoreDisplayMode): ComponentDisplayMode =>
-  m === 'snailTrail' ? 'trail' : 'full';
-const toStoreMode = (m: string): StoreDisplayMode =>
-  m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
@@ -187,6 +181,11 @@ export default function App() {
   const [savedResultFiles, setSavedResultFiles] = useState<AssociatedFile[]>([]);
   const [highlightedFilePaths, setHighlightedFilePaths] = useState<string[]>([]);
 
+  // Properties panel demo — tracks which catalog item is highlighted in the
+  // StacBrowser preview so the stacked Properties slot can render its fields.
+  const [propertiesHighlightedPath, setPropertiesHighlightedPath] =
+    useState<string | null>(null);
+
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
   const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
@@ -227,17 +226,23 @@ export default function App() {
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Re-render the catalog whenever an item's metadata is patched (Properties
+  // Panel commits → stacService.updateItemMetadata → bumps revision).
+  useEffect(() => {
+    return stacService.onItemsChanged(() => {
+      setCatalogRevision(r => r + 1);
+    });
+  }, []);
+
   // Catalog items — map to StacBrowserItem for StacBrowser component
   const catalogItems = useMemo<StacBrowserItem[]>(() => {
     void catalogRevision; // dependency — re-compute when store items arrive
     return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
       ...item,
-      vesselClasses: item.vesselClasses ?? [],
+      platforms: item.platforms ?? [],
       tags: item.tags ?? [],
       featureTags: item.featureTags ?? [],
       author: null,
-      trackNames: item.trackNames ?? [],
-      nationalities: item.nationalities ?? [],
       collection: null,
       modified: null,
     }));
@@ -545,6 +550,7 @@ export default function App() {
               geometry: JSON.parse(saved.geometry) as Feature['geometry'],
               properties: {
                 ...(f.properties ?? {}),
+                // eslint-disable-next-line no-restricted-syntax -- pre-existing ADR-011, unrelated to #214
                 ...(saved.properties ? JSON.parse(saved.properties) as Record<string, unknown> : {}),
               },
             };
@@ -959,7 +965,7 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+      store.getState().addResultLayers(allResultLayers as RawGeoJSONFeature[]);
 
       // Record last tool execution for single-step undo (#110)
       const resultIds = allResultLayers.map((layer, i) =>
@@ -1058,7 +1064,7 @@ export default function App() {
         playback.pause();
         break;
       case 'temporal:displayMode':
-        store.getState().setDisplayMode(toStoreMode(message.payload.mode));
+        store.getState().setDisplayMode(message.payload.mode);
         break;
       case 'tool:run':
         handleRunTool(message.payload.toolId, message.payload.params);
@@ -1272,7 +1278,7 @@ export default function App() {
       currentTime: playback.currentTime,
       playbackState: playback.playbackState,
       playbackSpeed: playback.speed,
-      displayMode: toComponentMode(state.displayMode),
+      displayMode: state.displayMode,
       timeUiState: timeExtent ? 'ready' : 'empty',
       tools,
       toolMatches,
@@ -1288,7 +1294,7 @@ export default function App() {
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
       currentTime: playback.currentTime,
-      displayMode: toComponentMode(state.displayMode),
+      displayMode: state.displayMode,
       drawingMode,
       onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
@@ -1357,6 +1363,144 @@ export default function App() {
 
   // Render welcome view
   if (view === 'welcome') {
+    const highlightedItem = propertiesHighlightedPath
+      ? catalogItems.find((i) => i.itemPath === propertiesHighlightedPath) ?? null
+      : null;
+
+    const highlightedFields: PropertiesFormField[] = highlightedItem
+      ? [
+          {
+            key: 'title',
+            label: 'Title',
+            value: highlightedItem.title,
+            spec: { kind: 'string' },
+            derivation: 'user',
+            required: true,
+            error: null,
+          },
+          {
+            key: 'datetime',
+            label: 'Datetime',
+            value: highlightedItem.datetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'auto-derived',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'start_datetime',
+            label: 'Start datetime',
+            value: highlightedItem.startDatetime ?? null,
+            spec: { kind: 'datetime' },
+            derivation: 'override',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:tags',
+            label: 'Tags',
+            value: highlightedItem.tags ?? [],
+            spec: { kind: 'string-array' },
+            derivation: 'user',
+            required: false,
+            error: null,
+          },
+          {
+            key: 'debrief:platforms',
+            label: 'Platforms (derived from features)',
+            value: highlightedItem.platforms ?? [],
+            spec: { kind: 'platform-array' },
+            derivation: 'auto-derived',
+            required: false,
+            error: null,
+            // Platforms are re-synthesised from the plot's features on every
+            // save, so editing them from the Catalog Browser would be
+            // silently overwritten. Long-term the editor should push writes
+            // back into features.geojson; for now it's display-only.
+            readOnly: true,
+          },
+        ]
+      : [];
+
+    const handleDemoCommit: PropertiesFormProps['onCommitField'] = (key, value) => {
+      if (!highlightedItem) return;
+      // Route through the mock service so the commit path matches what a
+      // real host does: patch the in-memory item, rebuild its overview
+      // row, notify subscribers. The onItemsChanged subscription above
+      // then re-renders the catalog list so the edited row reflects the
+      // new title/tags/etc. immediately.
+      stacService.updateItemMetadata(highlightedItem.itemPath, {
+        [key]: value,
+      });
+    };
+
+    const propertiesSlot = (
+      <div
+        className="web-shell__properties-slot"
+        style={{
+          // Seed VS Code light-theme variables so the Properties form
+          // renders with legible contrast on the web-shell's light
+          // welcome surface (inside the extension, VS Code supplies
+          // these for both light and dark themes automatically).
+          colorScheme: 'light',
+          ['--vscode-editor-background' as string]: '#ffffff',
+          ['--vscode-editor-foreground' as string]: '#1f1f1f',
+          ['--vscode-foreground' as string]: '#1f1f1f',
+          ['--vscode-descriptionForeground' as string]: '#595959',
+          ['--vscode-panel-border' as string]: '#d4d4d4',
+          ['--vscode-input-background' as string]: '#ffffff',
+          ['--vscode-input-foreground' as string]: '#1f1f1f',
+          ['--vscode-input-border' as string]: '#cecece',
+          ['--vscode-badge-background' as string]: '#616161',
+          ['--vscode-badge-foreground' as string]: '#ffffff',
+          ['--vscode-button-background' as string]: '#005fb8',
+          ['--vscode-button-foreground' as string]: '#ffffff',
+          ['--vscode-button-hoverBackground' as string]: '#0258a8',
+          ['--vscode-editorWarning-foreground' as string]: '#bf8803',
+          padding: '8px 12px',
+          height: '100%',
+          overflowY: 'auto',
+          background: '#ffffff',
+          color: '#1f1f1f',
+          fontSize: 13,
+        }}
+        aria-label="Properties Panel demo"
+      >
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 8,
+          }}
+        >
+          <span>Properties</span>
+          <span style={{ fontSize: 11, opacity: 0.7 }}>#193 demo</span>
+        </div>
+        {highlightedItem ? (
+          <PropertiesForm
+            fields={highlightedFields}
+            onCommitField={handleDemoCommit}
+            loading={false}
+            readOnly={false}
+            writeError={null}
+          />
+        ) : (
+          <div
+            style={{
+              opacity: 0.65,
+              fontStyle: 'italic',
+              padding: '8px 0',
+            }}
+          >
+            Hover an exercise to preview its metadata here.
+          </div>
+        )}
+      </div>
+    );
+
     return (
       <div className="web-shell web-shell--welcome">
         <header className="web-shell__header">
@@ -1386,6 +1530,8 @@ export default function App() {
             items={catalogItems}
             taxonomy={VESSEL_TAXONOMY}
             onItemSelect={handlePlotSelect}
+            onItemHighlight={setPropertiesHighlightedPath}
+            propertiesSlot={propertiesSlot}
             className="web-shell__catalog"
           />
         </main>

@@ -31,6 +31,10 @@ export enum FeatureKindEnum {
     MULTI_POLYGON = "MULTI_POLYGON",
     /** Plot-level system record (snapshot chain, branches) */
     SYSTEM_RECORD = "SYSTEM_RECORD",
+    /** Storyboard parent feature (panel-only entity, Polygon hull over child Scene viewports) */
+    STORYBOARD = "STORYBOARD",
+    /** Storyboard Scene feature (Polygon viewport bounds, captured moment in a Storyboard) */
+    STORYBOARD_SCENE = "STORYBOARD_SCENE",
 };
 /**
 * Type of track feature
@@ -80,6 +84,13 @@ export enum PointShapeEnum {
     /** Cross/plus shape */
     cross = "cross",
 };
+/**
+* Template-literal derivation of the permissible point-marker shapes
+* from PointShapeEnum. Narrows the `symbol` field on PositionStyle /
+* PositionStyleOverride so TypeScript rejects an unknown shape at
+* compile time (Feature 201 / FR-014).
+*/
+export type PointShape = `${PointShapeEnum}`;
 /**
 * Predefined named colours for styling tool parameters
 */
@@ -213,6 +224,18 @@ export enum LineCapEnum {
     square = "square",
 };
 /**
+* Top-level vessel domain classification
+*/
+export enum VesselDomainEnum {
+    
+    /** Surface vessels (warships, auxiliaries, merchant) */
+    surface = "surface",
+    /** Subsurface vessels (submarines) */
+    subsurface = "subsurface",
+    /** Vessel domain not determined or not applicable */
+    unknown = "unknown",
+};
+/**
 * How line segment joints are rendered (SVG/CSS standard)
 */
 export enum LineJoinEnum {
@@ -301,6 +324,18 @@ export enum LineLabelPositionEnum {
     END = "END",
 };
 /**
+* Semantic discriminator for provenance records. Consumers use this field to choose rendering or handling behaviour independently of visual tool-category grouping. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading tool-category.
+*/
+export enum ActivityType {
+    
+    /** Manual checkpoint entry. */
+    snapshot = "snapshot",
+    /** Regular tool invocation. Default for records without an explicit activity_type. */
+    tool = "tool",
+    /** Reserved for future standalone tune-action entries. */
+    tune = "tune",
+};
+/**
 * Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
 */
 export enum OutputKindEnum {
@@ -345,6 +380,23 @@ export enum ParameterTypeEnum {
     ReferencePointPattern = "ReferencePointPattern",
 };
 /**
+* Visual category for Log Panel icon rendering. Declared by the tool at registration; consumed by frontends to colour tool-icon glyphs. See docs/log-panel-ux-srd.md §5.
+This enum defines only the declarable values. The neutral-grey "unknown" state shown by the Log Panel when a tool has no declared category is NOT a value of this enum — it is a rendering-layer fallback produced when the attribute is null or absent.
+*/
+export enum ToolCategoryEnum {
+    
+    /** File / data ingestion tools (e.g., REP loader, DPF parser, CSV import) */
+    import = "import",
+    /** Appearance-changing tools (e.g., set-track-color, symbol style, label interval) */
+    style = "style",
+    /** Analytical computation tools (e.g., range-bearing, course/speed, statistics) */
+    calc = "calc",
+    /** Tools that narrow the dataset (time filter, spatial filter, trim) */
+    filter = "filter",
+    /** Tools that export or capture state (export-png, export-csv, export-geojson) */
+    snapshot = "snapshot",
+};
+/**
 * Type of file-level provenance event.
 */
 export enum FileProvEventTypeEnum {
@@ -365,19 +417,7 @@ export enum FileProvDirectionEnum {
     target = "target",
 };
 /**
-* Top-level vessel domain classification
-*/
-export enum VesselDomainEnum {
-    
-    /** Surface vessels (warships, auxiliaries, merchant) */
-    surface = "surface",
-    /** Subsurface vessels (submarines) */
-    subsurface = "subsurface",
-    /** Vessel domain not determined or not applicable */
-    unknown = "unknown",
-};
-/**
-* Current state of time playback
+* Current state of time playback. Component consumers treat `stopped` as equivalent to `paused`. See ADR-022 in docs/project_notes/decisions.md.
 */
 export enum PlaybackStateEnum {
     
@@ -389,15 +429,29 @@ export enum PlaybackStateEnum {
     paused = "paused",
 };
 /**
-* Track visualization display mode
+* Template-literal derivation of the permissible playback states from
+* PlaybackStateEnum. Narrows the `playbackState` field on TemporalSlice
+* so TypeScript rejects an unknown state at compile time (Feature 205 /
+* FR-007).
+*/
+export type PlaybackState = `${PlaybackStateEnum}`;
+/**
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
 */
 export enum DisplayModeEnum {
     
-    /** Standard track display */
-    normal = "normal",
-    /** Trail showing recent positions */
-    snailTrail = "snailTrail",
+    /** Render the entire track regardless of current time */
+    full = "full",
+    /** Render a snail-trail from track start up to current time */
+    trail = "trail",
 };
+/**
+* Template-literal derivation of the permissible display modes from
+* DisplayModeEnum. Narrows the `displayMode` field on TemporalSlice so
+* TypeScript rejects an unknown mode at compile time (Feature 205 /
+* FR-007).
+*/
+export type DisplayMode = `${DisplayModeEnum}`;
 /**
 * Units for time step navigation
 */
@@ -573,7 +627,7 @@ export interface PositionStyle {
     /** Whether to display a symbol at positions */
     show_symbol: boolean,
     /** Shape to use for position symbols */
-    symbol: string,
+    symbol: PointShape,
     /** Whether to display labels at positions */
     show_label: boolean,
 }
@@ -586,7 +640,7 @@ export interface PositionStyleOverride {
     /** Override whether to show symbol (null = use default/interval) */
     show_symbol?: boolean,
     /** Override symbol shape */
-    symbol?: string,
+    symbol?: PointShape,
     /** Override whether to show label */
     show_label?: boolean,
     /** Custom label text (null = use timestamp) */
@@ -865,6 +919,18 @@ export interface TrackProperties extends BaseFeatureProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
+    /** Human-readable platform display name override. When set, overrides the registry-derived name for this track. */
+    display_name?: string,
+    /** ISO 3166-1 alpha-2 country code override (e.g., GB, US). When set, overrides the registry-derived nationality. */
+    nationality?: string,
+    /** Full vessel classification path override using slash-separated notation (e.g., surface/warship/frigate/type23). When set, overrides registry-derived path. */
+    vessel_class?: string,
+    /** Vessel type override (leaf of classification path, e.g., type23). When set, overrides the registry-derived type. */
+    vessel_type?: string,
+    /** Vessel role override (parent of leaf in classification path, e.g., frigate). When set, overrides the registry-derived role. */
+    vessel_role?: string,
+    /** Vessel domain override. When set, overrides the registry-derived domain. */
+    domain?: string,
 }
 
 
@@ -1074,6 +1140,10 @@ export interface LogEntry {
     disabled?: boolean,
     /** Free-text analyst annotation explaining the reasoning for this operation. */
     rationale?: string,
+    /** Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records. */
+    agent?: string,
+    /** Semantic kind of this provenance record. Optional; absent records are treated as `tool` by consumers. Introduced by feature 208 so future entry types (manual checkpoint, standalone tune, manual rationale) can be distinguished without overloading visual tool-category. See `shared/components/src/LogPanel/types.ts` `TimelineEntryKind` for the UI-side mirror. */
+    activity_type?: ActivityType,
 }
 
 
@@ -1388,6 +1458,8 @@ export interface Tool {
     version?: string,
     /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
     requirements?: SelectionRequirement[],
+    /** Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey "Other" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md §R5). Feature 207. */
+    category?: string,
 }
 
 
@@ -1499,25 +1571,73 @@ export interface FileProvEntry {
 
 
 /**
+ * Fully-resolved metadata for a single platform within a STAC item. Produced by save-time resolution merging registry lookups with analyst overrides. Only id is required; all other fields may be absent for unregistered platforms.
+
+ */
+export interface PlatformRecord {
+    /** Platform identifier (e.g., "NELSON"). Matches platform_id on TrackProperties. */
+    id: string,
+    /** Human-readable platform name (e.g., "HMS Nelson") */
+    name?: string,
+    /** ISO 3166-1 alpha-2 country code (e.g., GB, US) */
+    nationality?: string,
+    /** Full vessel classification path using slash-separated notation (e.g., surface/warship/frigate/type23).
+ */
+    vessel_class?: string,
+    /** Vessel type — leaf of classification path (e.g., type23) */
+    vessel_type?: string,
+    /** Vessel role — parent of leaf in classification path (e.g., frigate) */
+    vessel_role?: string,
+    /** Top-level vessel domain classification */
+    domain?: string,
+}
+
+
+/**
+ * Single entry in item.properties["debrief:provenance_log"] recording one Properties Panel commit. Appended by stacService.updateItemMetadata (single writer — Article IV.2). Immutable once written (Article III.3); archive rotation preserves entries by moving to a sibling provenance_log_archive.jsonl — entries are never mutated or deleted in place.
+
+ */
+export interface PropertiesProvenanceEntry {
+    /** ULID generated by the service writer at commit time. Monotonic sort key for replay, undo, and LogPanel cross-referencing.
+ */
+    activity_id: string,
+    /** ISO-8601 UTC timestamp set by the service at write time. */
+    timestamp: string,
+    /** Sentinel identifying the Properties Panel as the writer. MUST equal "debrief.propertiesPanel".
+ */
+    tool: string,
+    /** Versioned method identifier matching ^properties-panel@.+$, populated from the @debrief/components package.json version.
+ */
+    method: string,
+    /** Non-empty list of field names touched in this commit. Sorted alphabetically for deterministic replay.
+ */
+    fields: string[],
+    /** Origin of the edit. MUST equal "user" — Properties Panel edits are human-initiated.
+ */
+    source: string,
+}
+
+
+/**
  * Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
 
  */
 export interface StacExtensionProperties {
-    /** Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+    /** Fully-resolved per-platform metadata array. Each entry represents one platform in the plot with merged registry + override data.
  */
-    vessel_classes?: string[],
+    platforms?: PlatformRecord[],
     /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
  */
     tags?: string[],
     /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
  */
     feature_tags?: string[],
-    /** Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
+    /** Flat list of field names on item.properties that the analyst has overridden via the Properties Panel. Auto-derivation routines (e.g. stacService.updateTemporalMetadata) MUST skip any field whose name appears here. Sorted alphabetically on write; deduplicated.
  */
-    track_names?: string[],
-    /** Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+    overrides?: string[],
+    /** Per-commit provenance entries written by the Properties Panel. Bounded at 500 entries per item; overflow rotates to sibling provenance_log_archive.jsonl in the item directory. Append-only (Article III.3 — audit trail immutable).
  */
-    nationalities?: string[],
+    provenance_log?: PropertiesProvenanceEntry[],
 }
 
 
@@ -1584,18 +1704,43 @@ export interface StacItemSummary {
     start_datetime?: string,
     /** Range end datetime (ISO 8601) */
     end_datetime?: string,
-    /** Vessel taxonomy paths from debrief:vessel_classes. Inherited from StacExtensionProperties semantics.
+    /** Fully-resolved per-platform metadata array for filtering. Same structure as StacExtensionProperties.platforms.
  */
-    vessel_classes?: string[],
+    platforms?: PlatformRecord[],
     /** Plot-level tags from debrief:tags */
     tags?: string[],
     /** Feature-level tags from debrief:feature_tags */
     feature_tags?: string[],
-    /** ISO 3166-1 alpha-2 nationality codes from debrief:nationalities
+}
+
+
+/**
+ * Parse-boundary GeoJSON Feature (RFC 7946 §3.2). Consumers narrow this to a domain feature (TrackFeature, ReferenceLocation, SystemState, MultiPointFeature, MultiPolygonFeature) after validating the properties.kind discriminator. Narrowing is done via the existing isDebriefFeature / isTrackFeature / isReferenceLocation type guards in @debrief/schemas/unions.ts (TypeScript) and debrief_schemas.unions (Python). Note: geometry is REQUIRED — callers handling possibly-null geometry payloads (e.g. NarrativeEntry features) either narrow at the parse boundary or defer to the domain-specific feature class that allows the looser shape (see ADR-021 for the ingress-coercion deferral).
  */
-    nationalities?: string[],
-    /** Track platform names from debrief:track_names */
-    track_names?: string[],
+export interface RawGeoJSONFeature {
+    /** GeoJSON object type — always "Feature". */
+    type: "Feature",
+    /** Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion. */
+    id?: string | number,
+    /** GeoJSON geometry — any_of union over the seven existing geometry classes in geojson.yaml (GeoJSONPoint, GeoJSONEmptyPoint, GeoJSONLineString, GeoJSONPolygon, GeoJSONMultiPoint, GeoJSONMultiLineString, GeoJSONMultiPolygon). Pydantic validates via try-each-alternative; observed cost is ~25µs per feature (10 000 features in ~250ms). */
+    geometry: GeoJSONPoint | GeoJSONEmptyPoint | GeoJSONLineString | GeoJSONPolygon | GeoJSONMultiPoint | GeoJSONMultiLineString | GeoJSONMultiPolygon,
+    /** Free-form properties dictionary. Consumers narrow to a domain properties class (TrackProperties, ReferenceLocationProperties, etc.) after validating the kind discriminator. May be absent or null per RFC 7946 §3.2. */
+    properties?: Record<string, unknown> | null,
+    /** Optional bounding box. Either [minLon, minLat, maxLon, maxLat] (length 4) or [minLon, minLat, minAlt, maxLon, maxLat, maxAlt] (length 6). */
+    bbox?: number[],
+}
+
+
+/**
+ * Parse-boundary GeoJSON FeatureCollection (RFC 7946 §3.3). Used by STAC item payloads and tool-result layers before narrowing.
+ */
+export interface RawGeoJSONFeatureCollection {
+    /** GeoJSON object type — always "FeatureCollection". */
+    type: "FeatureCollection",
+    /** The collection's features, in document order. */
+    features: RawGeoJSONFeature[],
+    /** Optional bounding box, shaped as in RawGeoJSONFeature.bbox. */
+    bbox?: number[],
 }
 
 
@@ -1622,13 +1767,13 @@ export interface TimeRange {
 
 
 /**
- * Constraints on the visible time window
+ * Constraints on the visible time window (epoch milliseconds; null = unbounded)
  */
 export interface TimeFilter {
-    /** Filter start (null = unbounded) */
-    start?: TimeInstant,
-    /** Filter end (null = unbounded) */
-    end?: TimeInstant,
+    /** Filter start as epoch milliseconds (null/missing = unbounded on the start) */
+    start?: number,
+    /** Filter end as epoch milliseconds (null/missing = unbounded on the end) */
+    end?: number,
 }
 
 
@@ -1660,6 +1805,8 @@ export interface Coordinate {
 export interface ViewportPolygon {
     /** Four corners in clockwise order [NW, NE, SE, SW] */
     coordinates: Coordinate[],
+    /** Map zoom level for restoring the view (optional) */
+    zoom?: number,
 }
 
 
@@ -1704,9 +1851,9 @@ export interface TemporalSlice {
     /** Playback speed multiplier 0.1-100x (FR-009) */
     playbackRate: number,
     /** Current playback state - ephemeral (FR-010) */
-    playbackState: string,
+    playbackState: PlaybackState,
     /** Track visualization mode (FR-011) */
-    displayMode: string,
+    displayMode: DisplayMode,
 }
 
 
@@ -1746,29 +1893,6 @@ export interface DocumentSlice {
 
 
 /**
- * GeoJSON geometry object (type + coordinates pair)
- */
-export interface GeoJSONGeometry {
-    /** GeoJSON geometry type (e.g., Point, LineString, Polygon) */
-    type: string,
-}
-
-
-/**
- * GeoJSON Feature representation used for tool result layers. Feature 109-unify-result-layer-lifecycle.
-
- */
-export interface GeoJSONFeature {
-    /** GeoJSON object type — always "Feature" */
-    type: string,
-    /** Optional feature identifier (string or numeric, stored as string) */
-    id?: string,
-    /** GeoJSON geometry object */
-    geometry: GeoJSONGeometry,
-}
-
-
-/**
  * Record of the last tool execution, enabling single-step undo. Feature 110-tool-level-undo-gap.
 
  */
@@ -1788,7 +1912,7 @@ export interface LastToolExecution {
  */
 export interface ResultsSlice {
     /** Accumulated tool result features */
-    result_layers: GeoJSONFeature[],
+    result_layers: RawGeoJSONFeature[],
     /** Last tool execution record for single-step undo */
     last_tool_execution?: LastToolExecution,
 }
@@ -1947,6 +2071,97 @@ export interface DatasetEntry {
     /** Named data series for multi-line/multi-series charts. Corresponds to DatasetEnvelope.series (DataSeries[]). Absent when data_points is populated.
  */
     series?: DatasetSeries[],
+}
+
+
+/**
+ * Camera state sub-record inside a Scene. Captures the map viewport at capture time.
+ */
+export interface Viewport {
+    /** [longitude, latitude] in degrees */
+    center: number[],
+    /** Leaflet-compatible zoom level */
+    zoom: number,
+    /** Viewport bearing in degrees. MUST be 0 in schema v1 (reserved slot for future rotated viewports). */
+    bearing: number,
+}
+
+
+/**
+ * Properties class for a Storyboard parent Feature. A Storyboard is a named, ordered collection of Scenes attached to a single plot.
+ */
+export interface StoryboardProperties extends BaseFeatureProperties {
+    /** Feature kind discriminator (pinned to STORYBOARD) */
+    kind: string,
+    /** ULID (26 chars, Crockford base-32). Immutable after create. */
+    id: string,
+    /** Display title. Non-empty. Unique within plot FeatureCollection. */
+    name: string,
+    /** Markdown narrative description */
+    description?: string,
+    /** Schema version. Starts at 1. Monotonically non-decreasing across edits; bumped only by migrations. */
+    schema_version: number,
+}
+
+
+/**
+ * Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard — viewport, timestamp, and per-feature visibility.
+ */
+export interface SceneProperties extends BaseFeatureProperties {
+    /** Feature kind discriminator (pinned to STORYBOARD_SCENE) */
+    kind: string,
+    /** ULID (26 chars, Crockford base-32). Immutable after create. */
+    id: string,
+    /** Foreign key to parent Storyboard.properties.id (ULID). */
+    storyboard_id: string,
+    /** Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure. */
+    title: string,
+    /** Markdown per-scene narrative */
+    description?: string,
+    /** Map viewport camera state at capture time */
+    viewport: Viewport,
+    /** ISO-8601 instant when the Scene was captured. Drives Scene ordering (ascending within a Storyboard). MUST be unique within a Storyboard. */
+    timestamp: string,
+    /** Reserved slot for v2 animated time-range Scenes. MUST be absent (null) in schema v1. */
+    time_range?: string,
+    /** Stable feature IDs visible at capture. Canonicalised (trim, reject empty, dedupe, sort lexicographically) by the CRUD module before hashing. Order-insensitive from the consumer's perspective. */
+    visible_feature_ids: string[],
+    /** SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids. */
+    feature_set_hash: string,
+    /** STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers. */
+    thumbnail_asset_ref: string,
+    /** Playback transition duration in milliseconds. Default 500. */
+    transition_duration_ms: number,
+}
+
+
+/**
+ * GeoJSON Feature representing a Storyboard parent entity
+ */
+export interface StoryboardFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Stable identifier (equal to properties.id). ULID. */
+    id: string,
+    /** Polygon hull covering the union of child Scene viewport bounds. Recomputed whenever the Scene set changes. */
+    geometry: GeoJSONPolygon,
+    /** Storyboard properties */
+    properties: StoryboardProperties,
+}
+
+
+/**
+ * GeoJSON Feature representing a Scene child entity
+ */
+export interface SceneFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Stable identifier (equal to properties.id). ULID. */
+    id: string,
+    /** Polygon covering the map viewport bounds at capture time. Antimeridian-crossing viewports produce a best-effort Polygon in MVP (module logs a warning; does not throw). */
+    geometry: GeoJSONPolygon,
+    /** Scene properties */
+    properties: SceneProperties,
 }
 
 

@@ -11,6 +11,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { TrackFeature, PositionStyle, PositionStyleOverride } from '@debrief/schemas';
+import type { PointShape } from '@debrief/utils';
 import { MapView } from './MapView';
 import { TimeController } from '../TimeController/TimeController';
 import type { DisplayMode } from '../TimeController/types';
@@ -188,7 +189,7 @@ export default meta;
 
 // ------------- Per-track default symbol shapes (simulates apply-symbol-style tool output) -------
 
-const SHAPES: Array<{ shape: string; name: string; color: string }> = [
+const SHAPES: Array<{ shape: PointShape; name: string; color: string }> = [
   { shape: 'circle', name: 'Circle (default)', color: '#2196F3' },
   { shape: 'square', name: 'Square', color: '#4CAF50' },
   { shape: 'triangle', name: 'Triangle', color: '#FF9800' },
