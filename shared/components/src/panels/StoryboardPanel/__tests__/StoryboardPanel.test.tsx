@@ -499,4 +499,130 @@ describe('StoryboardPanel', () => {
     fireEvent.click(screen.getByTestId('scene-edit-form-action-delete'));
     expect(onSceneDeleteRequested).toHaveBeenCalledWith('a');
   });
+
+  // ── Feature 230 — in-panel affordances ─────────────────────────────
+
+  it('chevron clicks surface onSceneRowExpandToggle (FR-001)', () => {
+    const onSceneRowExpandToggle = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        onSceneRowExpandToggle={onSceneRowExpandToggle}
+      />,
+    );
+    const chevrons = screen.getAllByTestId('scene-row-chevron');
+    fireEvent.click(chevrons[1]!);
+    expect(onSceneRowExpandToggle).toHaveBeenCalledWith('b');
+  });
+
+  it('renders the overflow menu when overflowMenuOpenFor is set (FR-003)', () => {
+    const anchor = {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 30,
+      top: 0,
+      right: 200,
+      bottom: 30,
+      left: 0,
+      toJSON: () => ({}),
+    } as DOMRect;
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        overflowMenuOpenFor="a"
+        overflowMenuAnchorRect={anchor}
+        onSceneOverflowMenuClose={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('scene-overflow-menu')).toBeInTheDocument();
+    expect(screen.getAllByRole('menuitem')).toHaveLength(6);
+  });
+
+  it('overflow menu Delete click fires onSceneDeleteRequested (FR-005)', () => {
+    const anchor = {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 30,
+      top: 0,
+      right: 200,
+      bottom: 30,
+      left: 0,
+      toJSON: () => ({}),
+    } as DOMRect;
+    const onSceneDeleteRequested = vi.fn();
+    const onSceneOverflowMenuClose = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        overflowMenuOpenFor="a"
+        overflowMenuAnchorRect={anchor}
+        onSceneOverflowMenuClose={onSceneOverflowMenuClose}
+        onSceneDeleteRequested={onSceneDeleteRequested}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('scene-overflow-menuitem-delete'));
+    expect(onSceneDeleteRequested).toHaveBeenCalledWith('a');
+    expect(onSceneOverflowMenuClose).toHaveBeenCalled();
+  });
+
+  it('renders Refresh all stale (N) button with stale count (FR-012)', () => {
+    const onStoryboardRefreshAllStaleClicked = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        activeStoryboardId="sb-1"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'A',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: false,
+            stale: true,
+            unresolvedFeatureIds: ['f1'],
+            missingData: { kind: 'ok' },
+          },
+          b: {
+            sceneId: 'b',
+            title: 'B',
+            description: null,
+            timestamp: '2026-04-20T10:05:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+        onStoryboardRefreshAllStaleClicked={
+          onStoryboardRefreshAllStaleClicked
+        }
+      />,
+    );
+    const button = screen.getByTestId('refresh-all-stale');
+    expect(button.textContent).toContain('Refresh all stale (1)');
+    fireEvent.click(button);
+    expect(onStoryboardRefreshAllStaleClicked).toHaveBeenCalledWith('sb-1');
+  });
 });
