@@ -151,12 +151,15 @@ runtime dependencies**):
   `detectMissingDataForScene`, `computeFeatureSetHash`,
   `canonicaliseVisibleFeatureIds`, `listScenesOrdered`,
   `formatDtg`, `validatePlot`, `readSceneWithStaleness` (all shipped
-  by #215). **Three additive extensions** shipped inside #218's
-  diff (per review fold-in): `restoreScene` (byte-identical undo),
-  `checkSceneTimestamp` (pre-flight collision detection for
-  `update-to-current` — 1A), and the existing internal `op` union
-  re-exported as `StoryboardOp` (6A — lets #218's `StoryboardEditOp`
-  extend rather than duplicate).
+  by #215). **Four additive extensions** shipped inside #218's
+  diff (three per review fold-in + one per analyze patch I1):
+  `restoreScene` (byte-identical undo), `checkSceneTimestamp`
+  (pre-flight collision detection for `update-to-current` — 1A),
+  the internal `op` union re-exported as `StoryboardOp` (6A — lets
+  #218's `StoryboardEditOp` extend rather than duplicate), and
+  `describeStoryboard` (analyze patch I1 — keeps the
+  Storyboard-description edit path inside #215's module; preserves
+  FR-EDIT-022 + SC-009).
 - `@debrief/components` — the `StoryboardPanel` (extended by #217),
   `MapView` (read-only here — this slice doesn't touch the map
   overlay), `ThemeProvider` tokens, `vscrui` icons, and **new**
@@ -498,7 +501,7 @@ services/session-state/
 shared/components/
 └── src/
     ├── storyboard/
-    │   ├── crud.ts                             ← EDIT (additive): +restoreScene(plot, { …, preservedProvenance }): strict superset of createScene; the only function permitted to accept a pre-built provenance[]. +export checkSceneTimestamp (thin wrapper around internal findConflictingSceneTimestamp) for 1A pre-flight. ~60 LOC.
+    │   ├── crud.ts                             ← EDIT (additive): +restoreScene(plot, { …, preservedProvenance }) — strict superset of createScene; only function permitted to accept a pre-built provenance[]. +export checkSceneTimestamp for 1A pre-flight. +describeStoryboard (analyze patch I1) — mirrors renameStoryboard; preserves FR-EDIT-022/SC-009. ~90 LOC total.
     │   ├── index.ts                            ← EDIT: re-export the internal StoryboardOp union (6A); re-export restoreScene + checkSceneTimestamp.
     │   └── __tests__/
     │       └── crud.test.ts                    ← EDIT: +tests for restoreScene (byte-identical provenance preservation, restore-after-cascade error, idOverride enforced); +tests for checkSceneTimestamp.

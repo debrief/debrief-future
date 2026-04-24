@@ -49,4 +49,8 @@ Three questions where we'd genuinely benefit from outside perspectives:
 
 - **One log card per edit vs. aggregated bursts.** A rename plus two describes plus a delete-and-undo currently emits five cards to the Analysis Log. On a polish-heavy session that can get noisy. Should the LogService collapse fast successive edits into a single aggregated card ("6 edits in the last 2 minutes") with a drill-down, or is the one-card-per-op rule more important than the noise?
 
+## Added during review
+
+A spec review midway through planning added three cross-cutting items we didn't originally scope, all of which land in this slice rather than a follow-up: a **bulk "Refresh all stale"** action at the Storyboard level (per-Scene refresh one-at-a-time gets tedious on long-lived plots — the per-Scene version stays, the bulk is a Storyboard-header overflow), an **orphan-thumbnail garbage-collection** pass on plot close (a belt-and-braces safety net against the rare edit sequence that could leave PNG assets unreferenced, plus a pre-flight collision check on update-to-current that closes the primary orphan-creation window), and a **consecutive-same-op collapse** in the Analysis Log Panel (a polish-heavy session that produces twenty rename cards in a row reads better as a single collapsed card with ×20 and an expand affordance, gated on a setting so power users can opt out). All three are reflected in the task list; the shipped post will tell the full story end-to-end.
+
 → [Join the discussion]({{DISCUSSION_URL}})

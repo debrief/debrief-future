@@ -419,11 +419,15 @@ new setting `debrief.logPanel.collapseConsecutiveSameOp`, default
   store would make the provenance at #215 (1 entry/op) disagree with
   the LogService timeline (1 entry/batch). That cross-layer skew is
   exactly the kind of audit-trail tension Article III.3 forbids.
-- **120 s window, count ≥ 3 threshold**: large enough to collapse
-  obvious rapid-fire polish (deleting three bad captures in a row;
-  renaming five Scenes in sequence); small enough that a 5-minute
-  pause re-opens the timeline to individual cards. Threshold of 3
-  prevents collapse of incidental pairs.
+- **120 s rolling window, count ≥ 3 threshold**: **rolling** means
+  each candidate entry checks the 120 s immediately preceding its
+  own timestamp for same-op + same-actor matches; an entry 119 s
+  after the first in a run joins the run, an entry 121 s after
+  breaks it. Large enough to collapse obvious rapid-fire polish
+  (deleting three bad captures in a row; renaming five Scenes in
+  sequence); small enough that a 5-minute pause re-opens the
+  timeline to individual cards. Threshold of 3 prevents collapse
+  of incidental pairs.
 - **Setting default on, opt-out available** — a power user who
   wants a full audit view in the panel can toggle off; default
   matches the polish-loop UX.

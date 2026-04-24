@@ -330,11 +330,15 @@ recorded.
 - **FR-EDIT-026**: The Analysis Log Panel (#176) MUST support
   **consecutive-same-op collapse** for `debrief.storyboardEdit`
   entries: when ≥ 3 consecutive entries with identical `op` +
-  `actor` fall within a 120-second window, they MUST render as a
-  single collapsed card showing the count + an expand action that
-  reveals the individual cards. The behaviour MUST be gated on a
-  new VS Code setting `debrief.logPanel.collapseConsecutiveSameOp`
-  (default **true**) so power users can opt out.
+  `actor` fall within a **rolling** 120-second window (each
+  candidate entry checks the 120 s immediately preceding its own
+  timestamp for same-op + same-actor matches — an entry 119 s
+  after the first in a run joins the run, an entry 121 s after
+  breaks it), they MUST render as a single collapsed card showing
+  the count + an expand action that reveals the individual cards.
+  The behaviour MUST be gated on a new VS Code setting
+  `debrief.logPanel.collapseConsecutiveSameOp` (default **true**)
+  so power users can opt out.
 
 ### Key Entities
 
@@ -458,9 +462,12 @@ No new Features are introduced and no new sub-entities are added.
   Scene; `thumbnail_asset_ref`, `feature_set_hash`, and provenance
   remain byte-identical to their pre-refresh state.
 - **SC-006 — Full provenance coverage.** **100%** of edit ops
-  produce exactly one new `HistoryEntry` with the correct `op`,
-  and **100%** of those ops land a corresponding entry in #176
-  with the Scene thumbnail attached.
+  produce exactly one new `HistoryEntry` per affected Feature
+  with the correct `op`, and **100%** of those ops land a
+  corresponding entry in #176 with the Scene thumbnail attached.
+  **Exception**: `copy-to-other-storyboard` writes two
+  `HistoryEntry`s (one per affected Scene) and emits two #176
+  cards linked by a shared `pairActivityId` — both must land.
 - **SC-007 — No silent overwrites on copy / duplicate.** **100%**
   of duplicate-timestamp collisions arising from `duplicate` or
   `copy-to-other-storyboard` present the Replace / Offset / Cancel

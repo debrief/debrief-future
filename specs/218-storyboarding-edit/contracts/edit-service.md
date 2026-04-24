@@ -341,10 +341,13 @@ with matching `pairActivityId`.
 
 ### `describeStoryboard`
 
-- Delegates to #215 `updateScene`-like method on the Storyboard (in
-  practice: a direct edit via the Storyboard entity API surface —
-  #215 exposes this; if not, the service uses `produce` on the plot
-  and appends a `describe` LogEntry via `buildStoryboardCrudLogEntry`).
+- Delegates to #215's newly-exported `describeStoryboard(plot, input)`
+  helper (added to the module in this slice's diff — see §#215
+  module extensions below). No direct Feature write from #218 code;
+  the `storyboard.describe` LogEntry is appended inside the CRUD
+  module via its `buildStoryboardCrudLogEntry` path, matching the
+  `renameStoryboard` pattern exactly. Preserves FR-EDIT-022 and SC-009
+  (analyze patch I1).
 
 ## #215 module extensions shipped in this slice's diff
 
@@ -403,6 +406,33 @@ Exposes the internal op taxonomy so #218's `StoryboardEditOp` can
 (Article II) consequence: new storyboard ops added by any future
 #215 follow-up are automatically visible to #218's recorder without
 a manual sync.
+
+### `describeStoryboard` (new — per analyze patch I1)
+
+```ts
+// shared/components/src/storyboard/crud.ts  (additive; ~30 LOC)
+export interface DescribeStoryboardInput {
+  readonly storyboardId: string;
+  readonly description: string | null;
+  readonly actor: string;
+  readonly now?: string;
+  readonly activityIdOverride?: string;
+  readonly rationale?: string;
+}
+
+export async function describeStoryboard(
+  plot: Plot,
+  input: DescribeStoryboardInput,
+): Promise<{ plot: Plot; storyboard: StoryboardFeature }>;
+```
+
+Mirrors `renameStoryboard` in shape and invariant (throws
+`UnknownStoryboardError` on missing id; appends a
+`{ op: 'storyboard.describe' }` LogEntry via
+`buildStoryboardCrudLogEntry`; updates the Feature via `produce`).
+Exists so #218's `StoryboardEditService.describeStoryboard` can
+delegate rather than directly edit a Storyboard Feature from
+extension code — preserving FR-EDIT-022 + SC-009.
 
 ### `sceneThumbnailService.gcOrphanAssets` (new)
 
