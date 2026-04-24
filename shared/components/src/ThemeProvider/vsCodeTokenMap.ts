@@ -32,11 +32,17 @@ export const VS_CODE_TOKEN_MAP: Record<VSCodeThemeVariant, Record<string, string
     '--vscode-editor-foreground': '#000000',
     '--vscode-editor-background': '#ffffff',
     '--vscode-sideBar-background': '#f3f3f3',
-    '--vscode-descriptionForeground': '#717171',
+    // Darkened from VS Code's default #717171 so #209 audit passes WCAG AA
+    // contrast against the light sideBar background (#f3f3f3). At #595959
+    // the ratio is ~7.0 vs. 4.40 at #717171.
+    '--vscode-descriptionForeground': '#595959',
     '--vscode-errorForeground': '#a1260d',
     '--vscode-disabledForeground': '#a5a5a5',
     '--vscode-icon-foreground': '#424242',
-    '--vscode-focusBorder': '#0090f1',
+    // Darkened from VS Code's default #0090f1 so white text over the active
+    // toggle button meets WCAG AA (4.5:1). At #005a9e the ratio is ~6.4
+    // vs. 3.35 at #0090f1.
+    '--vscode-focusBorder': '#005a9e',
     '--vscode-contrastBorder': 'transparent',
     '--vscode-widget-border': '#d4d4d4',
     '--vscode-panel-border': '#e5e5e5',
@@ -112,7 +118,10 @@ export const VS_CODE_TOKEN_MAP: Record<VSCodeThemeVariant, Record<string, string
     '--vscode-errorForeground': '#f48771',
     '--vscode-disabledForeground': '#cccccc80',
     '--vscode-icon-foreground': '#c5c5c5',
-    '--vscode-focusBorder': '#007fd4',
+    // Darkened from VS Code's default #007fd4 so white text over the active
+    // toggle button meets WCAG AA (4.5:1). At #006abd the ratio is ~4.9
+    // vs. 4.21 at #007fd4. #209 audit.
+    '--vscode-focusBorder': '#006abd',
     '--vscode-contrastBorder': 'transparent',
     '--vscode-widget-border': '#303031',
     '--vscode-panel-border': '#80808059',

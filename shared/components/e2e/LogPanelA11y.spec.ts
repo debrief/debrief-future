@@ -19,10 +19,11 @@
  * Feature: 209-logpanel-a11y-audit
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // --- Configuration -----------------------------------------------------------
 
@@ -37,7 +38,7 @@ interface AuditedStory {
   /** Human-readable label for the report. */
   label: string;
   /** Optional pre-audit interaction (e.g. click first card, flip a card). */
-  interact?: (page: import('@playwright/test').Page) => Promise<void>;
+  interact?: (page: Page) => Promise<void>;
 }
 
 const STORIES: ReadonlyArray<AuditedStory> = [
@@ -107,10 +108,10 @@ function withTheme(url: string, theme: ThemeVariant): string {
   return `${url}&globals=theme:${theme}`;
 }
 
-async function waitForStoryReady(page: import('@playwright/test').Page): Promise<void> {
+async function waitForStoryReady(page: Page): Promise<void> {
   // Most LogPanel stories render either the panel shell or an empty-state div.
   await page
-    .waitForSelector('.log-panel, [data-testid="log-panel-empty"]', {
+    .waitForSelector('.log-panel, [data-testid="log-panel-empty-no-plot"], [data-testid="log-panel-empty-no-entries"]', {
       timeout: 10_000,
     })
     .catch(() => {
@@ -119,8 +120,24 @@ async function waitForStoryReady(page: import('@playwright/test').Page): Promise
     });
 }
 
+// Minimal structural types for the axe-core result shape we consume. Using
+// local interfaces (rather than importing from `axe-core`) keeps the spec
+// self-contained and independent of axe-core's public-type surface.
+interface AxeNode {
+  target?: ReadonlyArray<string | string[]>;
+  failureSummary?: string;
+}
+interface AxeViolation {
+  id: string;
+  impact?: 'minor' | 'moderate' | 'serious' | 'critical' | null;
+  description: string;
+  help: string;
+  helpUrl: string;
+  nodes: ReadonlyArray<AxeNode>;
+}
+
 async function runAudit(
-  page: import('@playwright/test').Page,
+  page: Page,
   story: AuditedStory,
   theme: ThemeVariant
 ): Promise<ViolationRecord[]> {
@@ -128,12 +145,15 @@ async function runAudit(
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
 
-  return result.violations.flatMap<ViolationRecord>((v) => {
+  const violations = result.violations as ReadonlyArray<AxeViolation>;
+  return violations.flatMap<ViolationRecord>((v: AxeViolation): ViolationRecord[] => {
     const severity = (v.impact ?? 'minor') as ViolationRecord['severity'];
-    const targets = v.nodes.flatMap((n) => (Array.isArray(n.target) ? n.target.map(String) : []));
+    const targets: string[] = v.nodes.flatMap((n: AxeNode): string[] =>
+      Array.isArray(n.target) ? n.target.map((t: string | string[]) => String(t)) : []
+    );
     const summary = v.nodes
-      .map((n) => n.failureSummary?.split('\n')[0])
-      .filter(Boolean)
+      .map((n: AxeNode): string => n.failureSummary?.split('\n')[0] ?? '')
+      .filter((s: string): s is string => s.length > 0)
       .slice(0, 3)
       .join(' | ');
     return [
@@ -157,9 +177,11 @@ async function writeReport(
   records: ReadonlyArray<ViolationRecord>,
   runs: ReadonlyArray<{ story: AuditedStory; theme: ThemeVariant; violations: number }>
 ): Promise<string> {
-  const REPO_ROOT_RELATIVE = '../../evidence/176-log-panel-ux';
-  // `testDir` is shared/components/e2e, so go up two levels to repo root.
-  const outDir = path.resolve(__dirname, REPO_ROOT_RELATIVE);
+  // `testDir` is shared/components/e2e, so go up three levels to repo root
+  // then into evidence/176-log-panel-ux. `import.meta.url` is used instead
+  // of __dirname for ESM compatibility.
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const outDir = path.resolve(here, '..', '..', '..', 'evidence', '176-log-panel-ux');
   await fs.mkdir(outDir, { recursive: true });
   const outFile = path.join(outDir, 'a11y-audit.md');
 
@@ -212,7 +234,9 @@ async function writeReport(
       grouped.set(key, bucket);
     }
     for (const [key, bucket] of grouped.entries()) {
-      const [storyId, theme] = key.split('__');
+      const parts = key.split('__');
+      const storyId = parts[0] ?? '(unknown)';
+      const theme = parts[1] ?? '(unknown)';
       lines.push('');
       lines.push(`### ${storyId} — ${theme}`);
       lines.push('');
@@ -252,7 +276,7 @@ test.describe('LogPanel A11y Audit (#209)', () => {
 
   for (const story of STORIES) {
     for (const theme of THEMES) {
-      test(`${story.id} — theme=${theme}`, async ({ page }) => {
+      test(`${story.id} — theme=${theme}`, async ({ page }: { page: Page }) => {
         const url = withTheme(storyUrl(story.id), theme);
         await page.goto(url);
         await waitForStoryReady(page);
