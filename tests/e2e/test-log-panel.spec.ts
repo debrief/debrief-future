@@ -1,17 +1,14 @@
 /**
  * E2E Test: Log Panel — VS Code Extension
  *
- * Adapted from web-shell test: apps/web-shell/playwright/tests/log-panel.spec.ts
- * Tests exercise the same workflows through VS Code's webview iframe hierarchy.
- *
- * CREATED: 2026-03-06 — Dual-platform E2E expansion (SC-006)
+ * Exercises the LogPanel webview through the openvscode-server integration
+ * path (code-server → VS Code extension host → sidebar webview iframe →
+ * LogPanel DOM). Mirrors the user-observable behaviours covered by the
+ * web-shell parity baseline at apps/web-shell/playwright/tests/log-panel.spec.ts.
  */
 import { test, expect } from './fixtures/base';
 
-// Blocked by issue #143 (webview iframe selector instability in openvscode-server).
-// Converted from `skip` to `fixme` so CI flags it as a known-pending suite
-// rather than silently dropping the whole describe block. Feature 176 decision 9A.
-test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
+test.describe('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,
@@ -62,5 +59,44 @@ test.describe.fixme('Log Panel', () => { // blocked: webview iframe (#143)
     const entries = logFrame.locator('.log-panel__entry');
     await entries.first().waitFor({ state: 'visible', timeout: 15_000 });
     expect(await entries.count()).toBeGreaterThanOrEqual(2);
+  });
+
+  test('clicking a log entry selects it', async ({ codeServerPage }) => {
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
+
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
+    const firstEntry = logFrame.locator('.log-panel__entry').first();
+    await firstEntry.waitFor({ state: 'visible', timeout: 15_000 });
+
+    await firstEntry.click();
+    await expect(firstEntry).toHaveClass(/selected/);
+  });
+
+  test('clicking a selected log entry deselects it', async ({
+    codeServerPage,
+  }) => {
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
+
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
+    const firstEntry = logFrame.locator('.log-panel__entry').first();
+    await firstEntry.waitFor({ state: 'visible', timeout: 15_000 });
+
+    await firstEntry.click();
+    await expect(firstEntry).toHaveClass(/selected/);
+
+    await firstEntry.click();
+    await expect(firstEntry).not.toHaveClass(/selected/);
   });
 });
