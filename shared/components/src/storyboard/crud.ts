@@ -867,5 +867,166 @@ export async function copySceneToOtherStoryboard(
   return { plot: nextPlot, scene: copied };
 }
 
+// ---------------------------------------------------------------------------
+// #218 additive extensions — kept inside the CRUD module so every write path
+// continues to flow through one boundary (FR-EDIT-022 / SC-009).
+// ---------------------------------------------------------------------------
+
+/**
+ * Thin wrapper over the internal `findConflictingSceneTimestamp` helper so
+ * `StoryboardEditService.updateSceneToCurrent` can pre-flight the
+ * duplicate-timestamp check before invoking the thumbnail pipeline (review
+ * 1A). Returns the conflicting Scene or `null`. Pass `excludingSceneId` to
+ * skip self (required when checking an existing Scene's new timestamp);
+ * pass `null` for new-Scene checks.
+ */
+export function checkSceneTimestamp(
+  plot: Plot,
+  storyboardId: string,
+  timestamp: string,
+  excludingSceneId: string | null,
+): SceneFeature | null {
+  return findConflictingSceneTimestamp(
+    plot,
+    storyboardId,
+    timestamp,
+    excludingSceneId === null ? undefined : excludingSceneId,
+  );
+}
+
+/**
+ * Storyboard-level `describe` mutation — mirrors `renameStoryboard` in
+ * shape and invariant. Added alongside #218's edit suite so
+ * `StoryboardEditService.describeStoryboard` can delegate rather than
+ * directly edit a Storyboard Feature from extension code (preserves
+ * FR-EDIT-022 + SC-009; analyze patch I1).
+ */
+export interface DescribeStoryboardInput {
+  storyboardId: string;
+  description: string | null;
+  actor: string;
+  now?: string;
+  activityIdOverride?: string;
+  rationale?: string;
+}
+
+export async function describeStoryboard(
+  plot: Plot,
+  input: DescribeStoryboardInput,
+): Promise<{ plot: Plot; storyboard: StoryboardFeature }> {
+  const idx = findStoryboardIndex(plot, input.storyboardId);
+  if (idx === -1) throw new UnknownStoryboardError(input.storyboardId);
+  const now = input.now ?? defaultNow();
+  const activityId = input.activityIdOverride ?? defaultUuid();
+  const existing = plot.features[idx] as unknown as StoryboardFeature;
+  const logEntry = buildStoryboardCrudLogEntry({
+    op: "describe",
+    actor: input.actor,
+    now,
+    summary: truncateSummary(
+      `describe storyboard "${existing.properties.name}"`,
+    ),
+    used: [],
+    generated: [input.storyboardId],
+    activityId,
+    rationale: input.rationale,
+  });
+  const nextPlot = produce(plot, (draft) => {
+    const sb = draft.features[idx] as unknown as StoryboardFeature;
+    if (input.description === null) {
+      delete (sb.properties as { description?: string }).description;
+    } else {
+      sb.properties.description = input.description;
+    }
+    appendProvenance(sb.properties, logEntry);
+  });
+  const updated = nextPlot.features[idx] as unknown as StoryboardFeature;
+  return { plot: nextPlot, storyboard: updated };
+}
+
+/**
+ * `restoreScene` — byte-identical recreation of a previously-deleted Scene,
+ * used exclusively by `StoryboardEditService.undoDeleteScene`. Strict
+ * superset of `createScene`: behaves identically when `preservedProvenance`
+ * is empty, and is the only function permitted to accept a pre-built
+ * `provenance[]`. The restore entry is appended on top of the preserved
+ * tail so `provenance[last].timestamp ≥ provenance[second-last].timestamp`
+ * remains the module's monotonicity invariant (FR-EDIT-004, SC-003).
+ */
+export interface RestoreSceneInput extends CreateSceneInput {
+  /** Full provenance[] from the pre-delete Scene, including the `{op:
+   *  "delete"}` tail entry that #215's `deleteScene` appended before
+   *  removal (crud.ts appends-before-remove — see `deleteScene`). */
+  preservedProvenance: readonly LogEntry[];
+}
+
+export async function restoreScene(
+  plot: Plot,
+  input: RestoreSceneInput,
+): Promise<{ plot: Plot; scene: SceneFeature }> {
+  const sbIdx = findStoryboardIndex(plot, input.storyboardId);
+  if (sbIdx === -1) {
+    throw new OrphanSceneError(
+      input.idOverride ?? "<restore-scene>",
+      input.storyboardId,
+    );
+  }
+  assertViewportBearingZero(input.viewport);
+  const conflict = findConflictingSceneTimestamp(
+    plot,
+    input.storyboardId,
+    input.timestamp,
+  );
+  if (conflict !== null) {
+    throw new DuplicateTimestampError(
+      input.timestamp,
+      conflict.properties.id,
+    );
+  }
+  const canonical = canonicaliseVisibleFeatureIds(input.visibleFeatureIds);
+  const hash = await computeFeatureSetHash(canonical);
+  const newId = input.idOverride ?? generateUlid();
+  const now = input.now ?? defaultNow();
+  const activityId = input.activityIdOverride ?? defaultUuid();
+  const title = input.title ?? formatDtg(input.timestamp);
+  const restoreEntry = buildStoryboardCrudLogEntry({
+    op: "restore",
+    actor: input.actor,
+    now,
+    summary: truncateSummary(`restore scene @ ${input.timestamp}`),
+    used: [],
+    generated: [newId],
+    activityId,
+    rationale: input.rationale,
+  });
+  const props: SceneProperties = {
+    kind: "STORYBOARD_SCENE",
+    id: newId,
+    storyboard_id: input.storyboardId,
+    title,
+    description: input.description,
+    viewport: input.viewport,
+    timestamp: input.timestamp,
+    visible_feature_ids: canonical,
+    feature_set_hash: hash,
+    thumbnail_asset_ref: input.thumbnailAssetRef,
+    transition_duration_ms: input.transitionDurationMs ?? 500,
+    tags: [],
+    provenance: [...input.preservedProvenance, restoreEntry],
+  };
+  const sceneFeature: SceneFeature = {
+    type: "Feature",
+    id: newId,
+    geometry: viewportToPolygon(input.viewport),
+    properties: props,
+  };
+  const nextPlot = appendFeatureAndRecomputeHull(
+    plot,
+    sceneFeature as unknown as PlotFeature,
+    input.storyboardId,
+  );
+  return { plot: nextPlot, scene: sceneFeature };
+}
+
 // Re-export the LogEntry type alias for downstream test clarity.
 export type { LogEntry, WasGeneratedBy };

@@ -39,12 +39,21 @@ import type {
 // extension does not pull the runtime ESM bundle.
 import type {
   TimelineEntry,
+  TimelineEntryKind,
   LogParameterValue,
   OperationCategory,
   ParameterSchemaEntry,
   ViewMode,
 } from '@debrief/components';
 import { VALID_VIEW_MODES } from '@debrief/components';
+
+// `ActivityType` is the source-of-truth discriminator on LogEntry (LinkML);
+// this file projects it onto the UI-side `TimelineEntry.kind` union.
+// Imported as a value (not type-only) so case clauses can compare against
+// enum members — eslint `@typescript-eslint/no-unsafe-enum-comparison`
+// rejects comparing an enum-typed switch predicate to plain string literals.
+// Feature: 208-timeline-entry-kind.
+import { ActivityType } from '@debrief/schemas';
 
 // Webview ↔ Extension message types are imported from `../webview/logPanelMessages`
 // (shared with the webview side to enforce a single contract).
@@ -68,9 +77,37 @@ function classifyOperation(toolId: string): OperationCategory {
 }
 
 /**
- * Convert a LogEntry from the log service to a display-oriented TimelineEntry.
+ * Project the PROV-side `activity_type` signal onto the UI-side
+ * `TimelineEntryKind` discriminator. Total, non-throwing, reads only the
+ * schema field (no tool-name heuristics — FR-005 / SC-005). Absent, null,
+ * or unrecognised values fall back to `'tool'` (FR-006).
+ * Feature: 208-timeline-entry-kind.
  */
-function toTimelineEntry(entry: LogEntry): TimelineEntry {
+export function kindFromActivityType(
+  activityType: ActivityType | undefined | null
+): TimelineEntryKind {
+  switch (activityType) {
+    case ActivityType.snapshot:
+      return 'snapshot';
+    case ActivityType.tune:
+      return 'tune';
+    case ActivityType.tool:
+      return 'tool';
+    case undefined:
+    case null:
+      return 'tool';
+    default:
+      return 'tool';
+  }
+}
+
+/**
+ * Convert a LogEntry from the log service to a display-oriented TimelineEntry.
+ *
+ * Exported for unit testing of the `kind` projection; not part of the module's
+ * public API otherwise. Feature: 208-timeline-entry-kind.
+ */
+export function toTimelineEntry(entry: LogEntry): TimelineEntry {
   return {
     activity_id: entry.activity_id,
     timestamp: entry.timestamp,
@@ -88,6 +125,7 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     tuneAnnotation: entry.tune
       ? { parameter: entry.tune.parameter, previous_value: entry.tune.previous_value, new_value: entry.tune.new_value }
       : null,
+    kind: kindFromActivityType(entry.activity_type),
   };
 }
 

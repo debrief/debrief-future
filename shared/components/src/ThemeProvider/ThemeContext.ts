@@ -50,6 +50,10 @@ export interface ThemeTokens {
   // Selection
   selectionBg: string;
   selectionBorder: string;
+
+  // Storyboard scene rectangles (Feature 217)
+  sceneRectangleStroke: string;
+  sceneRectangleFill: string;
 }
 
 /**

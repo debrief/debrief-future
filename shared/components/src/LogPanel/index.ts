@@ -39,8 +39,10 @@ export type {
   TrackBadgeProps,
   // Feature 207: manifest-fed icon resolution
   ToolCategoryMap,
+  // Feature 208: TimelineEntry kind discriminator
+  TimelineEntryKind,
 } from './types';
-export { DEFAULT_FILTER_STATE, VALID_VIEW_MODES } from './types';
+export { DEFAULT_FILTER_STATE, VALID_VIEW_MODES, TIMELINE_ENTRY_KINDS, assertNeverKind } from './types';
 export { ParameterEditor } from './ParameterEditor';
 export type { ParameterEditorProps } from './ParameterEditor';
 export { ReplayProgress } from './ReplayProgress';

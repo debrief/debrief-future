@@ -17,6 +17,12 @@ Use bullet lists for simplicity. Older entries can be manually removed when they
 
 <!-- Add new entries below this line -->
 
+- **2026-04-21** — `TimeScrubber` prop shape trap: single `timeExtent`, not separate `data*`/`scrub*` pairs
+  - **Cause:** `#217` plan.md R2 assumed `TimeScrubber` accepted separate `dataStart`/`dataEnd` + `start`/`end` pairs, so an "outer track with a narrowed handle" scrub-lock affordance would fall out. Actual prop shape is a single `timeExtent: TimeExtent`. The extension ↔ webview `updateTimeExtent` message *does* carry both pairs (`apps/vscode/src/views/timeRangeView.ts:125-131`), but the scrubber visually clamps to whichever `start`/`end` pair it receives.
+  - **Fix:** The extension-side override via `TimeRangeViewProvider.setScrubbableRange(start, end)` works as designed — narrowing `start`/`end` in the outbound message shrinks the scrubber's clickable track, enforcing FR-PLAY-012. UX compromise: scrubber visually shrinks to the Scene window rather than showing the full data range with a narrowed handle.
+  - **Prevention:** If a future slice needs the "full range + narrowed handle" visual affordance, `TimeScrubber` would need to accept both pairs as separate props — the extension side already has the data.
+  - **Evidence:** `specs/217-storyboarding-playback/evidence/test-summary.md`
+
 - **2026-01-30** — Tool execution failed: `Feature not found: layer-*` when result layer selected
   - **Cause:** `resolveFeatures()` in `calcService.ts` only searched tracks and locations, not result layers
   - **Fix:** Added result layer lookup via `panel.getResultLayers()`, expands contained features with `kind: 'result'` metadata. Added `getFeatureKind()` returning `'RESULT'` for result layer IDs.

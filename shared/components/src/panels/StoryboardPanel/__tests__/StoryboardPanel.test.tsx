@@ -8,7 +8,11 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { StoryboardPanel } from '../StoryboardPanel';
-import type { SceneRowViewModel } from '../types';
+import type {
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+} from '../types';
 
 function row(overrides: Partial<SceneRowViewModel> & { sceneId: string }): SceneRowViewModel {
   return {
@@ -170,5 +174,329 @@ describe('StoryboardPanel', () => {
     expect(sceneRow.getAttribute('role')).toBe('listitem');
     expect(sceneRow.getAttribute('aria-label')).toBe('X — Y');
     expect(sceneRow.getAttribute('data-testid')).toBe('scene-row');
+  });
+
+  // ── #217 TransportRow + currentSceneId integration ─────────────────
+
+  function transport(overrides: Partial<TransportViewModel> = {}): TransportViewModel {
+    return {
+      canGoBackward: overrides.canGoBackward ?? true,
+      canGoForward: overrides.canGoForward ?? true,
+      sceneNumber: overrides.sceneNumber ?? 1,
+      sceneTotal: overrides.sceneTotal ?? 3,
+      transitionInFlight: overrides.transitionInFlight ?? false,
+    };
+  }
+
+  it('does NOT render TransportRow when transport prop is undefined', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('transport-row')).toBeNull();
+  });
+
+  it('renders TransportRow when transport prop is provided', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        transport={transport({ sceneNumber: 1, sceneTotal: 1 })}
+      />,
+    );
+    expect(screen.getByTestId('transport-row')).toBeTruthy();
+  });
+
+  it('marks the current-scene row with data-active="true" via currentSceneId', () => {
+    render(
+      <StoryboardPanel
+        scenes={[
+          row({ sceneId: 'a' }),
+          row({ sceneId: 'b' }),
+          row({ sceneId: 'c' }),
+        ]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        currentSceneId="b"
+        transport={transport({ sceneNumber: 2, sceneTotal: 3 })}
+      />,
+    );
+    const rows = screen.getAllByTestId('scene-row');
+    expect(rows[0]!.getAttribute('data-active')).not.toBe('true');
+    expect(rows[1]!.getAttribute('data-active')).toBe('true');
+    expect(rows[2]!.getAttribute('data-active')).not.toBe('true');
+  });
+
+  it('no row has data-active="true" when currentSceneId is not supplied', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    const rows = screen.getAllByTestId('scene-row');
+    rows.forEach((r) => expect(r.getAttribute('data-active')).not.toBe('true'));
+  });
+
+  it('TransportRow Forward click fires onTransportForward', () => {
+    const onTransportForward = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        currentSceneId="a"
+        transport={transport({ sceneNumber: 1, sceneTotal: 2 })}
+        onTransportForward={onTransportForward}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('transport-forward'));
+    expect(onTransportForward).toHaveBeenCalledTimes(1);
+  });
+
+  it('TransportRow Backward click fires onTransportBackward', () => {
+    const onTransportBackward = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        currentSceneId="b"
+        transport={transport({ sceneNumber: 2, sceneTotal: 2 })}
+        onTransportBackward={onTransportBackward}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('transport-backward'));
+    expect(onTransportBackward).toHaveBeenCalledTimes(1);
+  });
+
+  // ── #217 StoryboardHeader integration (Phase 4.2 / T410) ──────────
+
+  function sbOption(
+    storyboardId: string,
+    name = storyboardId.toUpperCase(),
+    sceneCount = 1,
+  ): StoryboardOptionViewModel {
+    return {
+      storyboardId,
+      name,
+      sceneCount,
+      lastModifiedIso: '2026-04-20T14:00:00.000Z',
+    };
+  }
+
+  it('does NOT render StoryboardHeader when storyboards prop is undefined', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-header')).toBeNull();
+  });
+
+  it('does NOT render StoryboardHeader when storyboards prop is empty', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[]}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-header')).toBeNull();
+  });
+
+  it('renders StoryboardHeader above the Scene list when storyboards non-empty', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[sbOption('sb-a', 'Alpha'), sbOption('sb-b', 'Bravo')]}
+        activeStoryboardId="sb-a"
+        onActiveStoryboardChange={() => undefined}
+      />,
+    );
+    expect(screen.getByTestId('storyboard-header')).toBeTruthy();
+  });
+
+  it('header dropdown change fires onActiveStoryboardChange with storyboardId', () => {
+    const onActiveStoryboardChange = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        storyboards={[sbOption('sb-a', 'Alpha'), sbOption('sb-b', 'Bravo')]}
+        activeStoryboardId="sb-a"
+        onActiveStoryboardChange={onActiveStoryboardChange}
+      />,
+    );
+    const select = screen.getByTestId('storyboard-header-select') as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: 'sb-b' } });
+    expect(onActiveStoryboardChange).toHaveBeenCalledWith('sb-b');
+  });
+
+  // ─── #218 edit-suite wiring ────────────────────────────────────────
+
+  it('renders SceneEditForm inline when sceneEditViewModels[sceneId].editFormOpen is true', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: true,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByTestId('scene-edit-form')).toBeTruthy();
+  });
+
+  it('does NOT render SceneEditForm when editFormOpen is false', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    expect(screen.queryByTestId('scene-edit-form')).toBeNull();
+  });
+
+  it('hides rows flagged pendingDelete (undo window active)', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: true,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    const rows = screen.queryAllByTestId('scene-row');
+    expect(rows.map((r) => r.getAttribute('data-scene-id'))).toEqual(['b']);
+  });
+
+  it('renders UndoToast when pendingUndoToast is set; Undo click fires onSceneUndoDeleteClicked', () => {
+    const onSceneUndoDeleteClicked = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        pendingUndoToast={{
+          sceneId: 'a',
+          sceneTitle: 'Opening',
+          deletedAt: '2026-04-24T12:00:00Z',
+          canUndo: true,
+        }}
+        onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('undo-toast-undo-button'));
+    expect(onSceneUndoDeleteClicked).toHaveBeenCalledWith('a');
+  });
+
+  it('SceneEditForm row-action delete click surfaces via onSceneDeleteRequested', () => {
+    const onSceneDeleteRequested = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: true,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+        onSceneDeleteRequested={onSceneDeleteRequested}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('scene-edit-form-action-delete'));
+    expect(onSceneDeleteRequested).toHaveBeenCalledWith('a');
   });
 });

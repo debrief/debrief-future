@@ -36,37 +36,24 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Check for existing branches before creating new one**:
+2. **Delegate branch numbering to the script**:
 
-   a. First, fetch all remote branches to ensure we have the latest information:
+   The script assigns the next available 3-digit feature number by globally scanning local branches, remote branches, and `specs/` directories for the highest existing `NNN-*` entry (regex `^[0-9]{3}-`), then incrementing. Claude does **not** pre-compute the number.
 
-      ```bash
-      git fetch --all --prune
-      ```
+   **Exception — backlog-driven sessions**: If the feature description starts with a `[backlog-id:NNN]` tag (e.g. it was handed off from `/speckit.start 210`), extract `NNN` and pass it as `--number NNN` to the script. Strip the tag from the description before using it. This preserves the `BACKLOG.md` ID → spec-dir prefix invariant (`| 210 | ... | [desc](specs/210-short-name/spec.md) | ...`), which would otherwise break because the script's auto-numbering is `highest+1`, not the backlog ID.
 
-   b. Find the highest feature number across all sources for the short-name:
-      - Remote branches: `git ls-remote --heads origin | grep -E 'refs/heads/[0-9]+-<short-name>$'`
-      - Local branches: `git branch | grep -E '^[* ]*[0-9]+-<short-name>$'`
-      - Specs directories: Check for directories matching `specs/[0-9]+-<short-name>`
+   Run the script once, passing only the short-name and feature description (plus `--number` only if the exception applies):
 
-   c. Determine the next available number:
-      - Extract all numbers from all three sources
-      - Find the highest number N
-      - Use N+1 for the new branch number
-
-   d. Run the script `.specify/scripts/bash/create-new-feature.sh --json "$ARGUMENTS"` with the calculated number and short-name:
-      - Pass `--number N+1` and `--short-name "your-short-name"` along with the feature description
-      - Bash example: `.specify/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --json --number 5 --short-name "user-auth" "Add user authentication"`
-      - PowerShell example: `.specify/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" -Json -Number 5 -ShortName "user-auth" "Add user authentication"`
+   - Bash example (standalone): `.specify/scripts/bash/create-new-feature.sh --json --short-name "user-auth" "Add user authentication"`
+   - Bash example (from `/speckit.start 210`): `.specify/scripts/bash/create-new-feature.sh --json --number 210 --short-name "user-auth" "Add user authentication"`
+   - PowerShell example: `.specify/scripts/bash/create-new-feature.sh --json -ShortName "user-auth" "Add user authentication"`
 
    **IMPORTANT**:
-   - Check all three sources (remote branches, local branches, specs directories) to find the highest number
-   - Only match branches/directories with the exact short-name pattern
-   - If no existing branches/directories found with this short-name, start with number 1
-   - You must only ever run this script once per feature
-   - The JSON is provided in the terminal as output - always refer to it to get the actual content you're looking for
-   - The JSON output will contain BRANCH_NAME and SPEC_FILE paths
-   - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
+   - Run the script exactly once per feature.
+   - Do **not** pass `--number` **unless** the description arrived with a `[backlog-id:NNN]` tag (see exception above). For standalone use, let the script compute the number — feature numbers are **global** (shared across all short-names) and zero-padded to 3 digits (e.g. `207-user-auth`), never reset per short-name.
+   - The JSON is provided in the terminal as output — always refer to it to get the actual content you're looking for.
+   - The JSON output contains `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`, and (in worktree mode) `WORKTREE_PATH`.
+   - For single quotes in args like "I'm Groot", use escape syntax: e.g. `'I'\''m Groot'` (or double-quote if possible: `"I'm Groot"`).
 
 3. Load `.specify/templates/spec-template.md` to understand required sections.
 

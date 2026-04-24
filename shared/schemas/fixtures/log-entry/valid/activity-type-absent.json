@@ -1,0 +1,14 @@
+{
+  "activity_id": "c0ffee00-0208-4000-8000-000000000002",
+  "timestamp": "2026-04-22T07:05:00Z",
+  "was_generated_by": {
+    "tool": "calculate-range",
+    "tool_version": "1.2.0",
+    "parameters": [
+      { "value": "60", "default": true, "tunable": true }
+    ]
+  },
+  "used": ["track-alpha", "track-bravo"],
+  "generated": ["range-result-001"],
+  "execution_duration": "PT0.3S"
+}

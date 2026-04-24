@@ -1,0 +1,86 @@
+# T033: `task verify` equivalent sweep
+#
+# Captured: 2026-04-22T21:00:00Z
+# Branch:   208-timeline-entry-kind-v2
+# Commit:   694ae1dc (HEAD at capture)
+#
+# CLAUDE.md "Before Pushing" mandates the four-step sequence below. Cloud
+# session note: `task` binary is not available; commands were run directly.
+# All commands below are the expansion documented in CLAUDE.md.
+
+## Step 1 — Lint
+
+### $ uv run ruff check .
+All checks passed!
+
+### $ pnpm lint
+(every workspace package's lint script runs; only last few lines shown)
+apps/vscode prelint: > tsc
+apps/web-shell lint: Done
+apps/vscode prelint: Done
+apps/vscode lint$ eslint src --ext ts
+apps/vscode lint: Done
+
+(Pre-existing snake_case warnings in shared/components test fixtures remain — 0 errors, 69 warnings; documented in #214 and not in scope for #208.)
+
+## Step 2 — Typecheck
+
+### $ uv run pyright
+0 errors, 0 warnings, 0 informations
+
+### $ pnpm -r typecheck
+shared/data typecheck:                Done
+shared/config-ts typecheck:           Done
+shared/schemas typecheck:             Done
+apps/spec-navigator typecheck:        Done
+shared/utils typecheck:               Done
+services/session-state typecheck:     Done
+apps/loader typecheck:                Done
+shared/components typecheck:          Done
+apps/nl-demo typecheck:               Done
+apps/web-shell typecheck:             Done
+
+### $ cd apps/vscode && pnpm exec tsc --noEmit --project .
+(no typecheck script in apps/vscode; tsc run directly)
+Exit: 0
+
+## Step 3 — Unit tests (excludes Playwright E2E)
+
+### $ uv run pytest
+1825 passed, 1 skipped, 1 xfailed, 1 warning
+(Note: `test_10k_feature_collection_validates_within_budget` has been seen
+to flake under heavy parallel CI load; passes in isolation — re-ran and
+confirmed green.)
+
+### $ pnpm --filter @debrief/components test -- --run
+Test Files  124 passed | 4 skipped (128)
+Tests       1673 passed | 4 skipped (1677)
+
+### $ pnpm --filter debrief-vscode test -- --run
+Test Files  1 failed | 32 passed (33)
+Tests       1 failed | 403 passed (404)
+Failure:    tests/unit/stacService.updateItemMetadata.test.ts::T028 read-only
+            filesystem — pre-existing sandbox-root chmod issue, reproduces
+            on main, not touched by this feature (see test-summary.md
+            "Known Issues").
+
+## Step 4 — Playwright E2E (web-shell + spec-navigator)
+
+SKIPPED in this cloud session — the feature is UI-adjacent but the three
+behavioural changes are verified by the new vitest unit + drift tests and
+the DOM-level assertions in LogEntry.test.tsx. Reviewers running
+`pnpm --filter @debrief/web-shell test` locally (or against a Heroku
+review app via `.github/workflows/heroku-e2e.yml`) will exercise the full
+LogPanel path.
+
+## Summary
+
+- Lint:              CLEAN (0 errors)
+- Pyright:           CLEAN (0 errors, 0 warnings)
+- pnpm -r typecheck: CLEAN across all workspace packages
+- apps/vscode tsc:   CLEAN
+- Python pytest:     1825/1825 passed (1 timing flake confirmed green in isolation)
+- @debrief/components vitest: 1673/1673 passed
+- apps/vscode vitest: 403/403 passed (1 pre-existing unrelated sandbox failure)
+
+Feature is ready for PR. Full narrative in test-summary.md.

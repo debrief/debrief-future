@@ -1,0 +1,19 @@
+usage: regenerate-blog-archive [-h] [--dry-run] [--verbose]
+                               [--out-index OUT_INDEX]
+                               [--composite-window-days COMPOSITE_WINDOW_DAYS]
+                               [--near-miss-max-days NEAR_MISS_MAX_DAYS]
+                               [--skip-gh] [--fail-fast]
+                               [--repo-root REPO_ROOT]
+
+One-shot blog-archive regenerator (spec 228).
+
+options:
+  -h, --help            show this help message and exit
+  --dry-run
+  --verbose
+  --out-index OUT_INDEX
+  --composite-window-days COMPOSITE_WINDOW_DAYS
+  --near-miss-max-days NEAR_MISS_MAX_DAYS
+  --skip-gh
+  --fail-fast
+  --repo-root REPO_ROOT

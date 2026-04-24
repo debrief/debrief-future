@@ -45,7 +45,8 @@ import {
 } from '@debrief/utils';
 import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
-import type { TrackProperties } from '@debrief/schemas';
+import type { TrackProperties, Viewport, SceneFeature } from '@debrief/schemas';
+import type { SceneRectangleSnapshot } from './messages';
 
 // eslint-disable-next-line no-restricted-syntax -- VS Code-local MapPanel is the extension host wrapper; name collides with @debrief/components.MapPanel (React component). Follow-up to rename the host class, #214 scope-adjacent
 export class MapPanel {
@@ -80,6 +81,15 @@ export class MapPanel {
   private onExportPngCallback:
     | ((requestId: string) => Promise<void>)
     | undefined;
+
+  // Storyboard playback (#217) — events + token allocator
+  private readonly _onSceneRectangleClick = new vscode.EventEmitter<string>();
+  public readonly onSceneRectangleClick: vscode.Event<string> = this._onSceneRectangleClick.event;
+  private readonly _onFlyToComplete = new vscode.EventEmitter<number>();
+  public readonly onFlyToComplete: vscode.Event<number> = this._onFlyToComplete.event;
+  private readonly _onFeaturesChanged = new vscode.EventEmitter<DebriefFeature[]>();
+  public readonly onFeaturesChanged: vscode.Event<DebriefFeature[]> = this._onFeaturesChanged.event;
+  private flyToTokenCounter = 0;
 
   // Session manager integration (Feature: 029)
   private activeSession?: SessionStoreApi;
@@ -578,6 +588,10 @@ export class MapPanel {
   public setFeatures(features: DebriefFeature[]): void {
     this.currentFeatures = features.slice();
     if (this.currentPlot === null) {
+      // Still fire onFeaturesChanged — downstream consumers (e.g. the
+      // StoryboardPlaybackService) may care about feature-set transitions
+      // even before a plot title has been resolved.
+      this._onFeaturesChanged.fire(this.currentFeatures.slice());
       return;
     }
     this.postMessage({
@@ -589,6 +603,73 @@ export class MapPanel {
         bbox: this.currentPlot.bbox,
         timeExtent: this.currentPlot.timeExtent,
       },
+    });
+    this._onFeaturesChanged.fire(this.currentFeatures.slice());
+  }
+
+  /**
+   * Kick off an animated flyTo on the map (#217).
+   * Returns a fresh monotonic token that the caller uses to correlate
+   * completion via `onFlyToComplete`. A `durationMs === 0` value is
+   * forwarded to the webview as a "jump" (`setView` with `animate:false`
+   * — see `contracts/map-view-flyto.md` §1).
+   */
+  public flyToViewport(viewport: Viewport, durationMs: number): number {
+    const token = ++this.flyToTokenCounter;
+    const centerLon = viewport.center[0];
+    const centerLat = viewport.center[1];
+    if (centerLon === undefined || centerLat === undefined) {
+      // Preserve the token but drop the message; completion fires
+      // synchronously so the caller's transition state clears cleanly.
+      queueMicrotask(() => this._onFlyToComplete.fire(token));
+      return token;
+    }
+    this.postMessage({
+      type: 'flyTo',
+      token,
+      center: [centerLat, centerLon],
+      zoom: viewport.zoom,
+      durationMs,
+    });
+    return token;
+  }
+
+  /**
+   * Push the active Storyboard's Scene rectangles to the webview (#217).
+   * Passing `scenes: null` clears the overlay. The webview-side
+   * SceneRectangleLayer reads `scene.geometry.coordinates` (the GeoJSON
+   * Polygon) for each rectangle — not `scene.properties.viewport.corners`
+   * (plan Fix D).
+   */
+  public setSceneRectangles(
+    scenes: ReadonlyArray<SceneFeature> | null,
+    activeStoryboardId: string | null,
+    currentSceneId: string | null,
+  ): void {
+    const snapshots: SceneRectangleSnapshot[] | null = scenes === null
+      ? null
+      : scenes.map((s) => {
+          const geom = s.geometry as
+            | { type: 'Polygon'; coordinates: number[][][] }
+            | undefined;
+          const polygon: readonly (readonly (readonly [number, number])[])[] =
+            geom && geom.type === 'Polygon' && Array.isArray(geom.coordinates)
+              ? geom.coordinates.map((ring) =>
+                  ring.map((pt) => [pt[0] as number, pt[1] as number] as const),
+                )
+              : [[]];
+          return {
+            sceneId: s.properties.id,
+            viewport: s.properties.viewport,
+            timestamp: s.properties.timestamp,
+            polygon,
+          };
+        });
+    this.postMessage({
+      type: 'setSceneRectangles',
+      scenes: snapshots,
+      activeStoryboardId,
+      currentSceneId,
     });
   }
 
@@ -829,6 +910,11 @@ export class MapPanel {
       clearTimeout(this.viewportUpdateTimeout);
     }
 
+    // Clean up storyboard playback emitters (#217)
+    this._onSceneRectangleClick.dispose();
+    this._onFlyToComplete.dispose();
+    this._onFeaturesChanged.dispose();
+
     // Clean up resources
     this.panel.dispose();
 
@@ -986,6 +1072,16 @@ export class MapPanel {
             smallPngBase64: message.smallPngBase64,
           });
         }
+        break;
+
+      case 'flyToComplete':
+        // Storyboard playback flyTo animation ended (#217)
+        this._onFlyToComplete.fire(message.token);
+        break;
+
+      case 'sceneRectangleClicked':
+        // Storyboard Scene rectangle clicked on the map (#217)
+        this._onSceneRectangleClick.fire(message.sceneId);
         break;
     }
   }

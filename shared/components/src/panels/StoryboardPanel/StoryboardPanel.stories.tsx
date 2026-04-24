@@ -8,7 +8,13 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { StoryboardPanel } from './StoryboardPanel';
-import type { SceneRowViewModel } from './types';
+import { HardBlockModal } from './HardBlockModal';
+import type {
+  SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
+} from './types';
 
 function makeSceneRow(
   sceneId: string,
@@ -104,5 +110,221 @@ export const Capturing: Story = {
     captureInFlight: true,
     onCaptureClick: () => undefined,
     onSceneRowClick: () => undefined,
+  },
+};
+
+// ─── #217 stories ─────────────────────────────────────────────────────
+
+const TRANSPORT_AT_1: TransportViewModel = {
+  canGoBackward: false,
+  canGoForward: true,
+  sceneNumber: 1,
+  sceneTotal: 3,
+  transitionInFlight: false,
+};
+
+export const Transport: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    currentSceneId: 'scene-1',
+    transport: TRANSPORT_AT_1,
+    onTransportForward: () => undefined,
+    onTransportBackward: () => undefined,
+  },
+};
+
+const HARD_BLOCK_REASON: MissingDataReason = {
+  kind: 'missing-features',
+  missingFeatureIds: ['track-nimitz', 'annotation-bearing-lock'],
+};
+
+const MULTI_STORYBOARDS: readonly StoryboardOptionViewModel[] = [
+  {
+    storyboardId: 'sb-commander',
+    name: "Commander's view",
+    sceneCount: 5,
+    lastModifiedIso: '2026-04-20T15:00:00.000Z',
+  },
+  {
+    storyboardId: 'sb-asw',
+    name: 'ASW evidence',
+    sceneCount: 3,
+    lastModifiedIso: '2026-04-20T14:30:00.000Z',
+  },
+  {
+    storyboardId: 'sb-training',
+    name: 'Training debrief',
+    sceneCount: 2,
+    lastModifiedIso: '2026-04-20T14:00:00.000Z',
+  },
+];
+
+const FIVE_SCENES: SceneRowViewModel[] = [
+  makeSceneRow('scene-1', '2026-04-20T14:00:00.000Z', 'Exercise start'),
+  makeSceneRow('scene-2', '2026-04-20T14:10:00.000Z', 'First contact'),
+  makeSceneRow('scene-3', '2026-04-20T14:20:00.000Z', 'Bearing fix'),
+  makeSceneRow('scene-4', '2026-04-20T14:30:00.000Z', 'CPA estimate'),
+  makeSceneRow('scene-5', '2026-04-20T14:45:00.000Z', 'Disengagement'),
+];
+
+const TRANSPORT_MULTI: TransportViewModel = {
+  canGoBackward: true,
+  canGoForward: true,
+  sceneNumber: 2,
+  sceneTotal: 5,
+  transitionInFlight: false,
+};
+
+export const WithMultipleStoryboards: Story = {
+  args: {
+    scenes: FIVE_SCENES,
+    activeStoryboardName: "Commander's view",
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    storyboards: MULTI_STORYBOARDS,
+    activeStoryboardId: 'sb-commander',
+    currentSceneId: 'scene-2',
+    transport: TRANSPORT_MULTI,
+    onActiveStoryboardChange: () => undefined,
+    onCreateStoryboard: () => undefined,
+    onRenameStoryboard: () => undefined,
+    onDeleteStoryboard: () => undefined,
+    onTransportForward: () => undefined,
+    onTransportBackward: () => undefined,
+  },
+};
+
+export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
+  name: 'HardBlockModal (missing features)',
+  render: () => (
+    <HardBlockModal
+      sceneTitle="201435Z APR 26 — Surface contact"
+      reason={HARD_BLOCK_REASON}
+      jumpPastLabel="Jump past this scene"
+      openForEditingLabel="Open for editing"
+      onJumpPast={() => undefined}
+      onOpenForEditing={() => undefined}
+      onDismiss={() => undefined}
+    />
+  ),
+};
+
+// ─── #218 edit-suite stories (T064) ─────────────────────────────────
+
+const EDIT_VM_BASE = {
+  sceneId: 'scene-1',
+  title: 'Exercise start — North channel',
+  description: null as string | null,
+  timestamp: '2026-04-20T14:00:00.000Z',
+  titleIsEditing: false,
+  editFormOpen: false,
+  pendingDelete: false,
+  stale: false,
+  unresolvedFeatureIds: [] as readonly string[],
+  missingData: { kind: 'ok' as const },
+};
+
+export const WithEditForm: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-1': {
+        ...EDIT_VM_BASE,
+        description: '**Brief:** contact gained bearing 023°. Hold course.',
+        editFormOpen: true,
+      },
+    },
+    onSceneTitleRenameCommit: () => undefined,
+    onSceneDescriptionSubmit: () => undefined,
+    onSceneDeleteRequested: () => undefined,
+    onSceneUpdateToCurrentClicked: () => undefined,
+    onSceneDuplicateClicked: () => undefined,
+    onSceneCopyToOtherClicked: () => undefined,
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};
+
+export const WithUndoToast: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    pendingUndoToast: {
+      sceneId: 'scene-2',
+      sceneTitle: 'Contact with surface group',
+      deletedAt: '2026-04-24T12:00:00.000Z',
+      canUndo: true,
+    },
+    sceneEditViewModels: {
+      'scene-2': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        pendingDelete: true,
+      },
+    },
+    onSceneUndoDeleteClicked: () => undefined,
+  },
+};
+
+export const WithStaleBadge: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        stale: true,
+        unresolvedFeatureIds: ['track-alpha', 'track-bravo'],
+      },
+    },
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};
+
+export const WithMissingDataRemediation: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-3': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-3',
+        title: 'Bearing-only track lock',
+        description: null,
+        timestamp: '2026-04-20T14:35:00.000Z',
+        editFormOpen: true,
+        missingData: {
+          kind: 'missing-features',
+          ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+        },
+      },
+    },
+    onSceneTitleRenameCommit: () => undefined,
+    onSceneDescriptionSubmit: () => undefined,
+    onSceneDeleteRequested: () => undefined,
+    onSceneUpdateToCurrentClicked: () => undefined,
+    onSceneDuplicateClicked: () => undefined,
+    onSceneCopyToOtherClicked: () => undefined,
+    onSceneRefreshThumbnailClicked: () => undefined,
   },
 };
