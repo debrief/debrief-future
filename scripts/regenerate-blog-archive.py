@@ -955,17 +955,24 @@ def _merge_opener_with_shipped_body(opener: str, shipped_body: str) -> str:
     If the first `## ...` heading in the shipped body matches the past-tense
     twin of `## What We're Building`, splice its opening paragraph onto the
     tail of `## Key Decisions` in the opener and drop the duplicate heading.
+
+    Spec 231: also preserve the remainder of the twin-heading section (images,
+    follow-up paragraphs) by emitting it as an un-headed body block after the
+    opener — closes the 176-log-panel-ux fourth-image silent drop (FR-005).
     """
     sections = _split_markdown_sections(shipped_body)
     if not sections:
         return opener.rstrip() + "\n"
     first_heading, first_body = sections[0]
-    rest = sections[1:]
+    rest: list[tuple[str, str]] = list(sections[1:])
     if first_heading and TENSE_INVERTED_HEADING_RE.match(first_heading):
         twin_paragraph = _first_paragraph(first_body)
         opener = _append_to_key_decisions(opener, twin_paragraph)
+        remainder = _drop_first_paragraph(first_body).strip()
+        if remainder:
+            rest.insert(0, ("", remainder))
     else:
-        rest = sections
+        rest = list(sections)
 
     parts = [opener.rstrip(), ""]
     for heading, section_body in rest:
@@ -975,6 +982,14 @@ def _merge_opener_with_shipped_body(opener: str, shipped_body: str) -> str:
             parts.append(section_body.rstrip())
         parts.append("")
     return "\n".join(parts).rstrip() + "\n"
+
+
+def _drop_first_paragraph(text: str) -> str:
+    """Return `text` with its first paragraph removed (paragraph-split on
+    blank lines). Used by the twin-heading splice to avoid duplicating the
+    first paragraph that already got spliced into Key Decisions."""
+    parts = re.split(r"\n\s*\n", text.strip(), maxsplit=1)
+    return parts[1] if len(parts) > 1 else ""
 
 
 def _first_paragraph(text: str) -> str:
@@ -1271,6 +1286,29 @@ def stitch_epic_rollup(
         )
         body_lines.append(f"- {link} — {ship}")
     body_lines.append("")
+    # Spec 231: new `## Member Features` section preserves each member's
+    # first paragraph + screenshots (Issue 1A).
+    body_lines.append("## Member Features")
+    body_lines.append("")
+    for m in sorted(shipped_members, key=lambda s: s.number):
+        assert m.shipped_post_path is not None
+        assert m.front_matter is not None
+        m_body = extract_shipped_body(m.shipped_post_path)
+        refs, _malformed = harvest_image_refs(m_body, m)
+        body_lines.append(
+            f"### {m.number:03d}-{m.slug} — {m.front_matter.date.isoformat()}"
+        )
+        body_lines.append("")
+        intro = _first_paragraph(m_body)
+        if intro:
+            body_lines.append(intro)
+            body_lines.append("")
+        if refs:
+            body_lines.append("#### Screenshots")
+            body_lines.append("")
+            for ref in refs:
+                body_lines.append(f"![{ref.alt}]({ref.rewritten_path})")
+            body_lines.append("")
     body_lines.append("## What Shipped")
     body_lines.append("")
     body_lines.append(
@@ -1470,9 +1508,18 @@ def stitch_composite_post(cluster: CompositeCluster) -> GeneratedPost:
     for m in cluster.members:
         if m.shipped_post_path is None:
             continue
-        first = _first_paragraph(extract_shipped_body(m.shipped_post_path))
+        m_body = extract_shipped_body(m.shipped_post_path)
+        first = _first_paragraph(m_body)
         if first:
             body_lines.append(f"**{m.number:03d}-{m.slug}** — {first}\n")
+        # Spec 231: preserve member screenshots under a per-member block
+        # (no new top-level section; screenshots appear inline).
+        refs, _malformed = harvest_image_refs(m_body, m)
+        if refs:
+            body_lines.append("#### Screenshots\n")
+            for ref in refs:
+                body_lines.append(f"![{ref.alt}]({ref.rewritten_path})")
+            body_lines.append("")
     body_lines.append("## Lessons Learned\n")
     body_lines.append(
         "_Composite narrative — author may want to edit manually before publishing._"
