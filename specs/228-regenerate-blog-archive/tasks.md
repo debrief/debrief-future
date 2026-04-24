@@ -388,7 +388,7 @@ Task: "Run test_atomic_writer.py"
 
 ### PR creation
 
-- [ ] T124 Create PR and publish blog: run `/speckit.pr`
+- [x] T124 Create PR and publish blog: run `/speckit.pr`
 
 **Task T124 must run last.** It depends on every other task. `/speckit.pr` creates the feature PR in `debrief-future` and the blog PR in `debrief.github.io`, returning both URLs. Script + tests are already deleted by T120/T121; reviewers can inspect them in the intermediate commit history (NFR-004).
 
