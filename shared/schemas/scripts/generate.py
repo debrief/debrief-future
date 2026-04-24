@@ -560,11 +560,7 @@ def generate_typescript() -> bool:
                 "effect — gen-typescript output no longer contains the expected "
                 "`activity_type?: string` token. Update generate.py (Feature 208)."
             )
-        content = (
-            content[:_log_entry_start]
-            + _new_log_entry_block
-            + content[_log_entry_end:]
-        )
+        content = content[:_log_entry_start] + _new_log_entry_block + content[_log_entry_end:]
 
         # Post-process (#214): tag the generated `GeoJSONFeature` interface
         # with `// canonical` so the `scripts/check-no-geojson-feature.sh`
