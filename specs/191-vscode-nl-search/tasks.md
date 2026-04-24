@@ -112,55 +112,55 @@ Interface-migration tasks T010-T013 land as one edit on `types.ts` (serial withi
 
 ### Message protocol (review Decision 2)
 
-- [ ] T030 Add `nlGenerate` (Request), `nlAbort`, `nlOutcome` (Response), `nlConfig` variants to the existing webview union, using the repo's `camelCase` tag convention and `RequestMessage`/`ResponseMessage` bases `apps/vscode/src/webview/messages.ts`
+- [x] T030 Add `nlGenerate` (Request), `nlAbort`, `nlOutcome` (Response), `nlConfig` variants to the existing webview union, using the repo's `camelCase` tag convention and `RequestMessage`/`ResponseMessage` bases `apps/vscode/src/webview/messages.ts`
 
 ### PostMessage client adapter (review Decision 4)
 
-- [ ] T031 Implement `createPostMessageLLMClient({ postMessage, subscribe, uuid })` in `clients.ts` — internally owns an `AbortController`, tracks in-flight `requestId`, filters incoming messages by id, exposes idempotent `abort()` that resolves pending `generate()` with `{kind:"transport-error", reason:"cancelled"}` `shared/components/src/nl-cql2/clients.ts`
-- [ ] T032 [test] Unit test `createPostMessageLLMClient` — happy path, abort during pending, abort after completion is a no-op, unknown response ids ignored `shared/components/src/nl-cql2/__tests__/clients.test.ts`
+- [x] T031 Implement `createPostMessageLLMClient({ postMessage, subscribe, uuid })` in `clients.ts` — internally owns an `AbortController`, tracks in-flight `requestId`, filters incoming messages by id, exposes idempotent `abort()` that resolves pending `generate()` with `{kind:"transport-error", reason:"cancelled"}` `shared/components/src/nl-cql2/clients.ts`
+- [x] T032 [test] Unit test `createPostMessageLLMClient` — happy path, abort during pending, abort after completion is a no-op, unknown response ids ignored `shared/components/src/nl-cql2/__tests__/clients.test.ts`
 
 ### Extension-host proxy service (review Decisions 13, 14, 15)
 
-- [ ] T033 Implement lazy-init singleton `getLlmProxy(context)` that holds: in-memory key cache (populated from `context.secrets.get` on first use, invalidated via `context.secrets.onDidChange`), `Map<requestId, AbortController>`, session call counter, and the `providerCall` invoker `apps/vscode/src/services/llmProxy.ts`
-- [ ] T034 Register the `nlGenerate` + `nlAbort` message handlers on webview activation; handlers lazy-instantiate the proxy on first `nlGenerate` — NOT at `activate()` `apps/vscode/src/extension.ts`
-- [ ] T035 In the proxy, wrap `providerCall` so every outcome (success, fail, or abort) runs a `finally` block that deletes the `requestId` entry from the controller map `apps/vscode/src/services/llmProxy.ts`
-- [ ] T036 Emit one `[nl-search/live]` structured log line per outcome — timestamp, provider, model, durationMs, outcome, responseBytes, callIndex. No prompt or response body. `apps/vscode/src/services/llmProxy.ts`
+- [x] T033 Implement lazy-init singleton `getLlmProxy(context)` that holds: in-memory key cache (populated from `context.secrets.get` on first use, invalidated via `context.secrets.onDidChange`), `Map<requestId, AbortController>`, session call counter, and the `providerCall` invoker `apps/vscode/src/services/llmProxy.ts`
+- [x] T034 Register the `nlGenerate` + `nlAbort` message handlers on webview activation; handlers lazy-instantiate the proxy on first `nlGenerate` — NOT at `activate()` `apps/vscode/src/extension.ts`
+- [x] T035 In the proxy, wrap `providerCall` so every outcome (success, fail, or abort) runs a `finally` block that deletes the `requestId` entry from the controller map `apps/vscode/src/services/llmProxy.ts`
+- [x] T036 Emit one `[nl-search/live]` structured log line per outcome — timestamp, provider, model, durationMs, outcome, responseBytes, callIndex. No prompt or response body. `apps/vscode/src/services/llmProxy.ts`
 
 ### Unit tests for the proxy
 
-- [ ] T037 [test] Proxy message-protocol test — `nlGenerate` arrives, proxy resolves with `nlOutcome`; `nlAbort` arrives, no `nlOutcome` for that id `apps/vscode/src/services/__tests__/llmProxy.test.ts`
-- [ ] T038 [P][test] Proxy key-cache invalidation test — first request triggers SecretStorage read; subsequent requests use cache; firing `onDidChange` invalidates the cache `apps/vscode/src/services/__tests__/llmProxy.test.ts`
-- [ ] T039 [P][test] Proxy map-cleanup test — success, failure, and abort paths each leave the `Map<requestId, AbortController>` empty `apps/vscode/src/services/__tests__/llmProxy.test.ts`
+- [x] T037 [test] Proxy message-protocol test — `nlGenerate` arrives, proxy resolves with `nlOutcome`; `nlAbort` arrives, no `nlOutcome` for that id `apps/vscode/src/services/__tests__/llmProxy.test.ts`
+- [x] T038 [P][test] Proxy key-cache invalidation test — first request triggers SecretStorage read; subsequent requests use cache; firing `onDidChange` invalidates the cache `apps/vscode/src/services/__tests__/llmProxy.test.ts`
+- [x] T039 [P][test] Proxy map-cleanup test — success, failure, and abort paths each leave the `Map<requestId, AbortController>` empty `apps/vscode/src/services/__tests__/llmProxy.test.ts`
 
 ### FilterBar NL mode (review Decisions 4, 7, 11, 12)
 
-- [ ] T040 Add optional `llmClient?: LLMClient` and `liveModeLabel?: string` props to `FilterBar`; when `llmClient` is present, route Enter through `buildPrompt → client.generate → parseResponse → dispatch chips | fail banner` instead of the literal title path `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T041 Add the diagram comment above the NL handler documenting the `llmClient present? → NL pipeline : literal title` decision tree plus the "lozenges survive failure" invariant (review §Diagrams) `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T042 Before calling `client.generate()`, invoke `client.abort()` on any in-flight prior submission so supersession never races `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T043 Render the live-mode indicator (provider + model from `liveModeLabel`) when `llmClient` is present `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T044 Render the failure banner inline above the filter row using the existing #190 banner copy + recovery affordances; keyed by `data-transport-reason` `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T040 Add optional `llmClient?: LLMClient` and `liveModeLabel?: string` props to `FilterBar`; when `llmClient` is present, route Enter through `buildPrompt → client.generate → parseResponse → dispatch chips | fail banner` instead of the literal title path `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T041 Add the diagram comment above the NL handler documenting the `llmClient present? → NL pipeline : literal title` decision tree plus the "lozenges survive failure" invariant (review §Diagrams) `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T042 Before calling `client.generate()`, invoke `client.abort()` on any in-flight prior submission so supersession never races `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T043 Render the live-mode indicator (provider + model from `liveModeLabel`) when `llmClient` is present `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T044 Render the failure banner inline above the filter row using the existing #190 banner copy + recovery affordances; keyed by `data-transport-reason` `shared/components/src/FilterBar/FilterBar.tsx`
 
 ### FilterBar unit tests (review Decisions 7, 11, 12)
 
-- [ ] T045 [test] FilterBar NL happy path — mock `llmClient` returns `success`; assert chips applied, banner absent `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
-- [ ] T046 [P][test] FilterBar lozenge-survival test (Decision 7) — submit with chips present, force `auth-failure` outcome, assert existing chips survive and banner visible `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
-- [ ] T047 [P][test] FilterBar supersession race test (Decision 11, call-site half) — submit A (pending), submit B, assert A's `client.abort()` was called and only B's outcome renders `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
-- [ ] T048 [P][test] FilterBar indicator-visibility test — `llmClient` prop controls indicator render `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
+- [x] T045 [test] FilterBar NL happy path — mock `llmClient` returns `success`; assert chips applied, banner absent `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
+- [x] T046 [P][test] FilterBar lozenge-survival test (Decision 7) — submit with chips present, force `auth-failure` outcome, assert existing chips survive and banner visible `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
+- [x] T047 [P][test] FilterBar supersession race test (Decision 11, call-site half) — submit A (pending), submit B, assert A's `client.abort()` was called and only B's outcome renders `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
+- [x] T048 [P][test] FilterBar indicator-visibility test — `llmClient` prop controls indicator render `shared/components/src/FilterBar/__tests__/FilterBar.nl.test.tsx`
 
 ### StacBrowser wiring
 
-- [ ] T049 Plumb optional `llmClient` prop through `StacBrowser` onto `FilterBar` `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T049 Plumb optional `llmClient` prop through `StacBrowser` onto `FilterBar` `shared/components/src/StacBrowser/StacBrowser.tsx`
 
 ### Catalog Overview webview
 
-- [ ] T050 In `catalogOverview.tsx`, construct `createPostMessageLLMClient({ postMessage: vscode.postMessage, subscribe: addEventListener('message'), uuid: crypto.randomUUID })` on mount; dispose on unmount; pass it (plus `liveModeLabel` from `nlConfig` state) to `StacBrowser` `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T051 Subscribe to `nlConfig` messages in `catalogOverview.tsx` so the indicator reflects current host state; conditionally pass `llmClient` only when `enabled && hasKey` (gate NL routing at the call site) `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T050 In `catalogOverview.tsx`, construct `createPostMessageLLMClient({ postMessage: vscode.postMessage, subscribe: addEventListener('message'), uuid: crypto.randomUUID })` on mount; dispose on unmount; pass it (plus `liveModeLabel` from `nlConfig` state) to `StacBrowser` `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T051 Subscribe to `nlConfig` messages in `catalogOverview.tsx` so the indicator reflects current host state; conditionally pass `llmClient` only when `enabled && hasKey` (gate NL routing at the call site) `apps/vscode/src/webview/web/catalogOverview.tsx`
 
 ### Storybook + E2E
 
-- [ ] T052 Add `NlModeWithStubClient` story to `FilterBar.stories.tsx` — deterministic stub `LLMClient` that canned-responds to a handful of phrases and each failure class `shared/components/src/FilterBar/FilterBar.stories.tsx`
-- [ ] T053 [test] Storybook E2E — happy-path chip application across light/dark/vscode themes; captures the three theme screenshots + the indicator screenshot to `specs/191-vscode-nl-search/evidence/screenshots/` `shared/components/e2e/FilterBar-nl.spec.ts`
-- [ ] T054 [test] VS Code E2E happy path — in code-server with stub key + enabled=true, submit "UK submarines", assert chips + filtered count + indicator `tests/e2e/test-vscode-nl-search.spec.ts`
+- [x] T052 Add `NlModeWithStubClient` story to `FilterBar.stories.tsx` — deterministic stub `LLMClient` that canned-responds to a handful of phrases and each failure class `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T053 [test] Storybook E2E — happy-path chip application across light/dark/vscode themes; captures the three theme screenshots + the indicator screenshot to `specs/191-vscode-nl-search/evidence/screenshots/` `shared/components/e2e/FilterBar-nl.spec.ts`
+- [x] T054 [test] VS Code E2E happy path — in code-server with stub key + enabled=true, submit "UK submarines", assert chips + filtered count + indicator `tests/e2e/test-vscode-nl-search.spec.ts`
 
 ### Parallel execution notes
 
@@ -180,33 +180,33 @@ Interface-migration tasks T010-T013 land as one edit on `types.ts` (serial withi
 
 ### Configuration surface
 
-- [ ] T060 Add `debrief.nlSearch.*` configuration contributions to the extension manifest (enabled bool default false, model string default `claude-haiku-4-5-20251001`, callCeiling number default 50, timeoutMs default 12000, maxResponseBytes default 262144) `apps/vscode/package.json`
-- [ ] T061 Add two command contributions: `debrief.nlSearch.setApiKey` and `debrief.nlSearch.clearApiKey` `apps/vscode/package.json`
-- [ ] T062 Implement the two commands — `setApiKey` uses `window.showInputBox({password:true})` and writes to `context.secrets`; `clearApiKey` deletes the secret; both push an updated `nlConfig` message to every open Catalog Overview webview `apps/vscode/src/extension.ts`
+- [x] T060 Add `debrief.nlSearch.*` configuration contributions to the extension manifest (enabled bool default false, model string default `claude-haiku-4-5-20251001`, callCeiling number default 50, timeoutMs default 12000, maxResponseBytes default 262144) `apps/vscode/package.json`
+- [x] T061 Add two command contributions: `debrief.nlSearch.setApiKey` and `debrief.nlSearch.clearApiKey` `apps/vscode/package.json`
+- [x] T062 Implement the two commands — `setApiKey` uses `window.showInputBox({password:true})` and writes to `context.secrets`; `clearApiKey` deletes the secret; both push an updated `nlConfig` message to every open Catalog Overview webview `apps/vscode/src/extension.ts`
 
 ### Config propagation
 
-- [ ] T063 In `llmProxy.ts`, implement `readLiveConfig(context): VsCodeLiveConfig` — pulls from `workspace.getConfiguration('debrief.nlSearch')` + key-cache presence; `hasApiKey` is a bool, never the key itself `apps/vscode/src/services/llmProxy.ts`
-- [ ] T064 Subscribe to `workspace.onDidChangeConfiguration('debrief.nlSearch')` and `context.secrets.onDidChange`; on either event, push a fresh `nlConfig` message to every registered webview panel `apps/vscode/src/services/llmProxy.ts`
-- [ ] T065 In `catalogOverview.tsx`, store the latest `nlConfig` in React state; derive `shouldUseLlmClient = enabled && hasKey` and conditionally pass the client to `StacBrowser` `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T063 In `llmProxy.ts`, implement `readLiveConfig(context): VsCodeLiveConfig` — pulls from `workspace.getConfiguration('debrief.nlSearch')` + key-cache presence; `hasApiKey` is a bool, never the key itself `apps/vscode/src/services/llmProxy.ts`
+- [x] T064 Subscribe to `workspace.onDidChangeConfiguration('debrief.nlSearch')` and `context.secrets.onDidChange`; on either event, push a fresh `nlConfig` message to every registered webview panel `apps/vscode/src/services/llmProxy.ts`
+- [x] T065 In `catalogOverview.tsx`, store the latest `nlConfig` in React state; derive `shouldUseLlmClient = enabled && hasKey` and conditionally pass the client to `StacBrowser` `apps/vscode/src/webview/web/catalogOverview.tsx`
 
 ### Opt-in unit tests
 
-- [ ] T066 [test] Config-read test — set each setting to a non-default value in a mocked `workspace.getConfiguration`; assert `readLiveConfig` returns the expected shape and never includes the raw key `apps/vscode/src/services/__tests__/llmProxy.test.ts`
-- [ ] T067 [P][test] Key-never-crosses-boundary test — run a full `nlGenerate → providerCall → nlOutcome` roundtrip with a spy on `webview.postMessage`; assert no emitted message contains the configured secret `apps/vscode/src/services/__tests__/llmProxy.test.ts`
+- [x] T066 [test] Config-read test — set each setting to a non-default value in a mocked `workspace.getConfiguration`; assert `readLiveConfig` returns the expected shape and never includes the raw key `apps/vscode/src/services/__tests__/llmProxy.test.ts`
+- [x] T067 [P][test] Key-never-crosses-boundary test — run a full `nlGenerate → providerCall → nlOutcome` roundtrip with a spy on `webview.postMessage`; assert no emitted message contains the configured secret `apps/vscode/src/services/__tests__/llmProxy.test.ts`
 
 ### Opt-out E2E
 
-- [ ] T068 [test] VS Code E2E opt-out case — set enabled=false with a key present; submit 10 phrases; record Playwright network trace; save the trace summary showing zero host != 127.0.0.1/localhost/extension-webview URLs `tests/e2e/test-vscode-nl-search.spec.ts`
-- [ ] T069 Produce `sc-003-zero-outbound.json` from the Playwright trace (one JSON blob per submission with `outbound_calls: []`) `specs/191-vscode-nl-search/evidence/sc-003-zero-outbound.json`
+- [x] T068 [test] VS Code E2E opt-out case — set enabled=false with a key present; submit 10 phrases; record Playwright network trace; save the trace summary showing zero host != 127.0.0.1/localhost/extension-webview URLs `tests/e2e/test-vscode-nl-search.spec.ts`
+- [x] T069 Produce `sc-003-zero-outbound.json` from the Playwright trace (one JSON blob per submission with `outbound_calls: []`) `specs/191-vscode-nl-search/evidence/sc-003-zero-outbound.json`
 
 ### Credential isolation E2E
 
-- [ ] T070 [test] VS Code E2E credential-isolation case — set a distinctive stub key, submit a phrase, grep the Playwright-captured network body + the webview DOM + the session log for the key string; assert zero hits `tests/e2e/test-vscode-nl-search.spec.ts`
+- [x] T070 [test] VS Code E2E credential-isolation case — set a distinctive stub key, submit a phrase, grep the Playwright-captured network body + the webview DOM + the session log for the key string; assert zero hits `tests/e2e/test-vscode-nl-search.spec.ts`
 
 ### Configuration sample evidence
 
-- [ ] T071 [P] Commit a sample `settings.json` snippet for the quickstart to reference `specs/191-vscode-nl-search/evidence/config-sample.jsonc`
+- [x] T071 [P] Commit a sample `settings.json` snippet for the quickstart to reference `specs/191-vscode-nl-search/evidence/config-sample.jsonc`
 
 ### Parallel execution notes
 
@@ -224,28 +224,28 @@ Interface-migration tasks T010-T013 land as one edit on `types.ts` (serial withi
 
 ### Host-side short-circuits (review Decision 6 new outcomes)
 
-- [ ] T080 Implement `not-configured` outcome in `llmProxy` — when `enabled=true` but `hasApiKey=false`, resolve immediately without calling `providerCall`; include `reason: "no-key"` vs `reason: "disabled"` (the latter shouldn't normally reach the proxy but is defensive) `apps/vscode/src/services/llmProxy.ts`
-- [ ] T081 Implement `ceiling-reached` outcome — activation-scoped counter increments before each `providerCall`; post-increment value exceeding `callCeiling` returns the outcome without a network call. Reload-window is the reset affordance `apps/vscode/src/services/llmProxy.ts`
+- [x] T080 Implement `not-configured` outcome in `llmProxy` — when `enabled=true` but `hasApiKey=false`, resolve immediately without calling `providerCall`; include `reason: "no-key"` vs `reason: "disabled"` (the latter shouldn't normally reach the proxy but is defensive) `apps/vscode/src/services/llmProxy.ts`
+- [x] T081 Implement `ceiling-reached` outcome — activation-scoped counter increments before each `providerCall`; post-increment value exceeding `callCeiling` returns the outcome without a network call. Reload-window is the reset affordance `apps/vscode/src/services/llmProxy.ts`
 
 ### Banner rendering per class
 
-- [ ] T082 In `FilterBar.tsx`, render distinct banner copy + recovery buttons per `LiveOutcome["kind"]`: auth-failure (Open Settings), rate-limit (Retry), provider-error (Retry), timeout (Retry), malformed-response (Rephrase — include nested reason for oversize/non-json), not-configured (Open Settings), ceiling-reached (Reload) `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T083 Ensure each banner sets `data-testid="live-transport-banner"` + `data-transport-reason={kind}` for E2E selectors `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T082 In `FilterBar.tsx`, render distinct banner copy + recovery buttons per `LiveOutcome["kind"]`: auth-failure (Open Settings), rate-limit (Retry), provider-error (Retry), timeout (Retry), malformed-response (Rephrase — include nested reason for oversize/non-json), not-configured (Open Settings), ceiling-reached (Reload) `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T083 Ensure each banner sets `data-testid="live-transport-banner"` + `data-transport-reason={kind}` for E2E selectors `shared/components/src/FilterBar/FilterBar.tsx`
 
 ### Stub-mode harness for E2E
 
-- [ ] T084 Add a dev-only `Debrief: NL Search — Stub Mode` command that replaces the real `providerCall` with a phrase-keyed stub (same canon as `apps/nl-demo/e2e/fixtures/live-stub.json` + the two new outcomes) `apps/vscode/src/extension.ts`
-- [ ] T085 Copy/port the stub fixture from #190 and extend with `not-configured phrase` + `ceiling-reached phrase` entries `apps/vscode/tests/fixtures/live-stub.json`
+- [x] T084 Add a dev-only `Debrief: NL Search — Stub Mode` command that replaces the real `providerCall` with a phrase-keyed stub (same canon as `apps/nl-demo/e2e/fixtures/live-stub.json` + the two new outcomes) `apps/vscode/src/extension.ts`
+- [x] T085 Copy/port the stub fixture from #190 and extend with `not-configured phrase` + `ceiling-reached phrase` entries `apps/vscode/tests/fixtures/live-stub.json`
 
 ### Failure-matrix E2E (review Decision 10)
 
-- [ ] T086 [test] VS Code E2E — parameterised over the 7 classes; for each, submit the trigger phrase and assert the banner appears with the correct `data-transport-reason`, that prior chips from an earlier success are still rendered, and that the expected recovery button is wired `tests/e2e/test-vscode-nl-search.spec.ts`
-- [ ] T087 Capture one screenshot per class to `specs/191-vscode-nl-search/evidence/screenshots/banner-<kind>.png` from the E2E run `specs/191-vscode-nl-search/evidence/screenshots/`
-- [ ] T088 Produce `sc-004-failure-matrix.md` — 7 rows (class, screenshot, banner text, recovery affordance, data-transport-reason) `specs/191-vscode-nl-search/evidence/sc-004-failure-matrix.md`
+- [x] T086 [test] VS Code E2E — parameterised over the 7 classes; for each, submit the trigger phrase and assert the banner appears with the correct `data-transport-reason`, that prior chips from an earlier success are still rendered, and that the expected recovery button is wired `tests/e2e/test-vscode-nl-search.spec.ts`
+- [x] T087 Capture one screenshot per class to `specs/191-vscode-nl-search/evidence/screenshots/banner-<kind>.png` from the E2E run `specs/191-vscode-nl-search/evidence/screenshots/`
+- [x] T088 Produce `sc-004-failure-matrix.md` — 7 rows (class, screenshot, banner text, recovery affordance, data-transport-reason) `specs/191-vscode-nl-search/evidence/sc-004-failure-matrix.md`
 
 ### Cancellation-is-silent E2E
 
-- [ ] T089 [test] VS Code E2E — submit phrase A against a slow stub, immediately submit phrase B; assert A produces no banner (cancelled outcomes drop silently) and B's outcome lands `tests/e2e/test-vscode-nl-search.spec.ts`
+- [x] T089 [test] VS Code E2E — submit phrase A against a slow stub, immediately submit phrase B; assert A produces no banner (cancelled outcomes drop silently) and B's outcome lands `tests/e2e/test-vscode-nl-search.spec.ts`
 
 ### Parallel execution notes
 
@@ -260,26 +260,26 @@ Interface-migration tasks T010-T013 land as one edit on `types.ts` (serial withi
 
 ### Full CI gate
 
-- [ ] T100 Run `task verify` (lint + typecheck + unit tests across Python + TypeScript) and capture the green output `specs/191-vscode-nl-search/evidence/task-verify.txt`
-- [ ] T101 Run the `apps/nl-demo` Playwright suite to confirm the #190 browser demo still passes post-migration `specs/191-vscode-nl-search/evidence/nl-demo-playwright.txt`
-- [ ] T102 Run the VS Code E2E suite `tests/e2e/test-vscode-nl-search.spec.ts` headed via `xvfb-run` + `@sparticuz/chromium` and capture the pass summary `specs/191-vscode-nl-search/evidence/vscode-e2e.txt`
+- [x] T100 Run `task verify` (lint + typecheck + unit tests across Python + TypeScript) and capture the green output `specs/191-vscode-nl-search/evidence/task-verify.txt`
+- [x] T101 Run the `apps/nl-demo` Playwright suite to confirm the #190 browser demo still passes post-migration `specs/191-vscode-nl-search/evidence/nl-demo-playwright.txt`
+- [x] T102 Run the VS Code E2E suite `tests/e2e/test-vscode-nl-search.spec.ts` headed via `xvfb-run` + `@sparticuz/chromium` and capture the pass summary `specs/191-vscode-nl-search/evidence/vscode-e2e.txt`
 
 ### Evidence collection
 
-- [ ] T103 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter: feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct `specs/191-vscode-nl-search/evidence/test-summary.md`
-- [ ] T104 Create usage demonstration — enable → submit → chips → toggle off → verify zero outbound, with copy-paste commands `specs/191-vscode-nl-search/evidence/usage-example.md`
+- [x] T103 Capture test results using the template (`.specify/templates/evidence/test-summary-template.md`) — YAML front matter: feature, captured_at, git_sha, tests_passed, tests_failed, tests_skipped, coverage_pct `specs/191-vscode-nl-search/evidence/test-summary.md`
+- [x] T104 Create usage demonstration — enable → submit → chips → toggle off → verify zero outbound, with copy-paste commands `specs/191-vscode-nl-search/evidence/usage-example.md`
 - [ ] T105 [P] Produce the interaction GIF (<5 s, <2 MB) via Playwright video recording of the happy-path flow (type phrase → chips fly in → remove chip) `specs/191-vscode-nl-search/evidence/screenshots/interaction.gif`
-- [ ] T106 [P] Produce sequence diagram (Mermaid) of webview → extension host → Anthropic with abort path `specs/191-vscode-nl-search/evidence/sequence.mermaid`
+- [x] T106 [P] Produce sequence diagram (Mermaid) of webview → extension host → Anthropic with abort path `specs/191-vscode-nl-search/evidence/sequence.mermaid`
 
 ### Media content
 
-- [ ] T107 Spawn the Content Specialist (`.claude/agents/media/content.md`) to write a Shipped Post covering: What We Built, the 3-theme + interaction screenshots, the 7-class failure matrix, lessons learned (fence-strip surprise, `a_containedBy` normalisation in array_filter, keychain quirks on Linux), What's Next (backlog #192-#195) `specs/191-vscode-nl-search/media/shipped-post.md`
-- [ ] T108 [P] Generate LinkedIn shipped summary — 150-200 words, hook on "NL catalogue search now inside VS Code", link placeholder to the shipped post `specs/191-vscode-nl-search/media/linkedin-shipped.md`
+- [x] T107 Spawn the Content Specialist (`.claude/agents/media/content.md`) to write a Shipped Post covering: What We Built, the 3-theme + interaction screenshots, the 7-class failure matrix, lessons learned (fence-strip surprise, `a_containedBy` normalisation in array_filter, keychain quirks on Linux), What's Next (backlog #192-#195) `specs/191-vscode-nl-search/media/shipped-post.md`
+- [x] T108 [P] Generate LinkedIn shipped summary — 150-200 words, hook on "NL catalogue search now inside VS Code", link placeholder to the shipped post `specs/191-vscode-nl-search/media/linkedin-shipped.md`
 
 ### Memory updates
 
-- [ ] T109 [P] Append this feature's completion line to `docs/project_notes/issues.md` with links to spec + evidence `docs/project_notes/issues.md`
-- [ ] T110 [P] Log the interface-migration decision (pre-release Article XIV) to `docs/project_notes/decisions.md` so future maintainers see why the old `Promise<string>` shape disappeared `docs/project_notes/decisions.md`
+- [x] T109 [P] Append this feature's completion line to `docs/project_notes/issues.md` with links to spec + evidence `docs/project_notes/issues.md`
+- [x] T110 [P] Log the interface-migration decision (pre-release Article XIV) to `docs/project_notes/decisions.md` so future maintainers see why the old `Promise<string>` shape disappeared `docs/project_notes/decisions.md`
 
 ### PR creation
 
