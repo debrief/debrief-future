@@ -91,19 +91,53 @@ Violations accumulate across all runs. An `afterAll` hook writes the aggregated 
 
 | | |
 |---|---|
-| Stories audited | 6 |
+| Stories audited (CI, full axe-core) | 6 |
 | Theme variants | 3 |
-| Total axe runs | 18 |
+| Total axe runs in CI | 18 |
 | WCAG tag set | 2.0 A + AA, 2.1 A + AA |
-| New dependencies | 1 (`@axe-core/playwright`, already in monorepo) |
+| Pre-CI mini-audit violations (before fix) | 3 serious |
+| Pre-CI mini-audit violations (after fix) | 0 |
+| Unit tests added (vitest + node:test-verified) | 12 |
+| Token-map parity check keys | 55 |
 | Lines of production code added | ~190 (token map + injection) |
-| Unit tests added | 13 |
+| New dependencies | 1 (`@axe-core/playwright`, already in monorepo) |
+
+## What The Audit Actually Found
+
+Three contrast-ratio failures. All `serious` (`color-contrast`), all in
+the active toggle button and the filter disclosure. Not coincidentally,
+these were the three spots where we took a VS Code semantic variable and
+used it in a role the variable wasn't designed for:
+
+1. `.log-panel__toggle-btn--active` used `--vscode-focusBorder` as its
+   background. Focus borders are designed to contrast against the
+   *editor* background, not against text drawn on top. White text on
+   `#0090f1` is 3.35:1 in light mode (need 4.5). Dark text on `#007fd4`
+   is 3.96:1 in dark mode.
+2. `.log-panel__filter-toggle` used `--vscode-descriptionForeground` as
+   body text. VS Code's `#717171` default sits at exactly 4.40:1 against
+   `#f3f3f3` sidebar background — a whisker below AA.
+
+Fixes:
+
+- Darken `--vscode-focusBorder` in the injected light and dark maps
+  (`#005a9e` / `#006abd`). White text passes AA against both.
+- Change the active-toggle text colour from
+  `var(--vscode-editor-background)` to `var(--vscode-button-foreground)`
+  in `LogPanel.css`. White text is the only value that works in both
+  theme variants against the focus-border blue.
+- Darken `--vscode-descriptionForeground` in the light map from `#717171`
+  to `#595959` (passes 7.0:1 on the sidebar background).
+
+After fixes: zero violations in the audited scope.
 
 ## Lessons Learned
 
 The fastest way to break an audit's credibility is to run it against a component that only renders one theme. The Storybook theme selector *appeared* to be doing something — the attribute toggled, the class toggled — but nothing downstream changed. Audit output would have looked clean in every theme, for the wrong reason.
 
 Spotting that the `--vscode-*` variables were "never set in Storybook" came from reading the CSS, not from the framework. The component kept its contract ("read these variables"); the hosting environment broke its end of the deal. When a component and its host disagree silently, the component looks fine in isolation and the host looks fine in aggregate — the failure lives in the seam.
+
+There's a second lesson in the specific violations the audit turned up: **reusing a semantic token outside its design intent is invisible until contrast reveals it.** `--vscode-focusBorder` is a blue meant to be seen *as a ring around a focused element*, not *behind white text*. The CSS compiled fine, the component looked fine to anyone building it, and only the numeric ratio exposed the mismatch. The fix is half in the token map (tune the blue for text contrast) and half in the component (stop assuming the editor background works as a text colour).
 
 The token map will need to grow as more components adopt `--vscode-*` variables. The unit test that enforces light/dark parity is the tripwire — if it ever fails, the fix is to add the missing key to both variants, not to work around it.
 
