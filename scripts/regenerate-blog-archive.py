@@ -227,9 +227,9 @@ class ArchiveIndex:
     unresolved: list[UnresolvedGrouping] = field(default_factory=list)
     near_misses: list[NearMiss] = field(default_factory=list)
     # Image-handling bookkeeping (spec 231 additions — FR-006, FR-007, FR-013).
-    orphans: list["OrphanImage"] = field(default_factory=list)
-    broken_refs: list["BrokenImageReference"] = field(default_factory=list)
-    malformed_refs: list["MalformedImageReference"] = field(default_factory=list)
+    orphans: list[OrphanImage] = field(default_factory=list)
+    broken_refs: list[BrokenImageReference] = field(default_factory=list)
+    malformed_refs: list[MalformedImageReference] = field(default_factory=list)
     run_started_at: _dt.datetime = field(
         default_factory=lambda: _dt.datetime.now(tz=_dt.UTC),
     )
@@ -1122,6 +1122,38 @@ def harvest_image_refs(
     return refs, malformed
 
 
+def rewrite_image_paths_in_body(body: str, source_spec: SpecRecord) -> str:
+    """Apply `rewrite_image_path` to every markdown + HTML image ref in body.
+
+    Preserves surrounding prose and any markdown title-arm; only the path
+    substring inside `![...](...)` and `<img src="...">` is substituted.
+    """
+    spec_key = _spec_key(source_spec)
+
+    def md_repl(match: re.Match[str]) -> str:
+        alt = match.group("alt")
+        path = match.group("path")
+        new_path = rewrite_image_path(path, spec_key)
+        # Preserve any title-arm (` "title"`) that sits between the path and the closing `)`.
+        after_path = match.group(0)[match.end("path") - match.start(0):-1]
+        return f"![{alt}]({new_path}{after_path})"
+
+    body = _IMAGE_RE.sub(md_repl, body)
+
+    def html_repl(match: re.Match[str]) -> str:
+        quote = match.group("q")
+        path = match.group("path")
+        new_path = rewrite_image_path(path, spec_key)
+        return match.group(0).replace(
+            f"src={quote}{path}{quote}",
+            f"src={quote}{new_path}{quote}",
+            1,
+        )
+
+    body = _HTML_IMG_RE.sub(html_repl, body)
+    return body
+
+
 def scan_orphans(
     spec: SpecRecord,
     referenced_basenames: set[str],
@@ -1245,6 +1277,7 @@ def stitch_unified_post(
     title = _building_title(spec.front_matter.title)
     shipped_body = extract_shipped_body(spec.shipped_post_path)
     merged = _merge_opener_with_shipped_body(opener, shipped_body)
+    merged = rewrite_image_paths_in_body(merged, spec)
     fm = _format_front_matter(
         title=title,
         date=ship_date,
