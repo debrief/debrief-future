@@ -384,7 +384,7 @@ Task: "Run test_atomic_writer.py"
 
 ### Pre-push verification
 
-- [ ] T123 Run `task verify` (or the fallback four-step sequence from CLAUDE.md "Before Pushing") — lint, typecheck, unit tests, Playwright all green — script + tests are deleted so these are pure-repo checks `(run command)`
+- [x] T123 Run `task verify` (or the fallback four-step sequence from CLAUDE.md "Before Pushing") — lint, typecheck, unit tests, Playwright all green — script + tests are deleted so these are pure-repo checks `(run command)`
 
 ### PR creation
 
