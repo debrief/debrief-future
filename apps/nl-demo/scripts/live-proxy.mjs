@@ -23,8 +23,21 @@
 import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
-import { Agent, request as httpsRequest } from "node:https";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { dirname, join as pathJoin } from "node:path";
+
+// #191 T025: the upstream Anthropic call is now served by the shared
+// provider-call core (`shared/components/src/nl-cql2/providerCall.mjs`) so
+// the VS Code extension host (#191 Phase 3) and this browser-side proxy
+// classify outcomes identically.
+const here = dirname(fileURLToPath(import.meta.url));
+const { providerCall } = await import(
+  pathJoin(
+    here,
+    "../../../shared/components/src/nl-cql2/providerCall.mjs",
+  )
+);
 
 // ---------------------------------------------------------------------------
 // Config (read-once at startup)
@@ -126,15 +139,9 @@ const startBanner = {
 };
 console.error(`[proxy] startup config:`, startBanner);
 
-// ---------------------------------------------------------------------------
-// Shared upstream HTTPS agent (keep-alive, per proxy-http.md §Performance)
-// ---------------------------------------------------------------------------
-
-const upstreamAgent = new Agent({
-  keepAlive: true,
-  keepAliveMsecs: 30_000,
-  maxSockets: 4,
-});
+// The shared upstream HTTPS agent lives inside
+// shared/components/src/nl-cql2/providerCall.mjs so both #190 (browser demo)
+// and #191 (VS Code host) share one keep-alive pool.
 
 // ---------------------------------------------------------------------------
 // Request handling
@@ -195,162 +202,120 @@ function extractPhrase(prompt) {
 // Upstream (live mode)
 // ---------------------------------------------------------------------------
 
+// Running call counter — feeds the shared providerCall's callIndex field
+// (used by the structured log line, never included in the response body).
+let proxyCallCounter = 0;
+
 /**
- * Issue the HTTPS POST to Anthropic Messages API. Streams-and-counts to enforce
- * MAX_PROVIDER_BYTES without buffering unbounded output.
+ * Translate a `LiveOutcome` from the shared provider-call core into this
+ * proxy's on-the-wire envelope (the shape documented in
+ * `specs/190-live-llm-transport/contracts/proxy-http.md`). Existing browser
+ * clients continue to consume this envelope; the browser-side adapter in
+ * `shared/components/src/nl-cql2/clients.ts` then maps it back into the
+ * #191 `LiveOutcome` union.
  */
-function callAnthropic(prompt, model) {
-  return new Promise((resolvePromise) => {
-    const url = new URL(env.ANTHROPIC_ENDPOINT);
-
-    const upstreamBody = JSON.stringify({
-      model,
-      max_tokens: 1024,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const startedAt = process.hrtime.bigint();
-
-    const req = httpsRequest(
-      {
-        agent: upstreamAgent,
-        hostname: url.hostname,
-        path: url.pathname + url.search,
-        port: url.port || 443,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": env.ANTHROPIC_API_KEY,
-          "anthropic-version": env.ANTHROPIC_VERSION,
-          "Content-Length": Buffer.byteLength(upstreamBody, "utf-8"),
-        },
-        timeout: env.PROVIDER_TIMEOUT_MS,
-      },
-      (upstreamRes) => {
-        const chunks = [];
-        let total = 0;
-        let oversize = false;
-        upstreamRes.on("data", (chunk) => {
-          if (oversize) return;
-          total += chunk.byteLength;
-          if (total > env.MAX_PROVIDER_BYTES) {
-            oversize = true;
-            upstreamRes.destroy();
-            return;
-          }
-          chunks.push(chunk);
-        });
-        upstreamRes.on("end", () => {
-          const durationMs =
-            Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-          if (oversize) {
-            resolvePromise({
-              ok: false,
-              kind: "oversize-response",
-              providerStatus: upstreamRes.statusCode ?? null,
-              message: "Upstream response exceeded proxy-side cap.",
-              providerLatencyMs: durationMs,
-            });
-            return;
-          }
-          const body = Buffer.concat(chunks).toString("utf-8");
-          const status = upstreamRes.statusCode ?? 0;
-          if (status === 200) {
-            try {
-              const parsed = JSON.parse(body);
-              const blocks = Array.isArray(parsed.content) ? parsed.content : [];
-              const rawResponse = blocks
-                .filter((b) => b && b.type === "text" && typeof b.text === "string")
-                .map((b) => b.text)
-                .join("");
-              resolvePromise({
-                ok: true,
-                rawResponse,
-                bytes: Buffer.byteLength(rawResponse, "utf-8"),
-                providerLatencyMs: durationMs,
-              });
-              return;
-            } catch (err) {
-              resolvePromise({
-                ok: false,
-                kind: "provider-error",
-                providerStatus: status,
-                message: "Upstream returned unparseable JSON.",
-                providerLatencyMs: durationMs,
-              });
-              return;
-            }
-          }
-          if (status === 401 || status === 403) {
-            resolvePromise({
-              ok: false,
-              kind: "auth-failure",
-              providerStatus: status,
-              message: "Provider rejected the credential.",
-              providerLatencyMs: durationMs,
-            });
-            return;
-          }
-          if (status === 429) {
-            resolvePromise({
-              ok: false,
-              kind: "rate-limit",
-              providerStatus: status,
-              message: "Provider rate limit reached.",
-              providerLatencyMs: durationMs,
-            });
-            return;
-          }
-          resolvePromise({
-            ok: false,
-            kind: "provider-error",
-            providerStatus: status,
-            message: `Provider returned HTTP ${status}.`,
-            providerLatencyMs: durationMs,
-          });
-        });
-        upstreamRes.on("error", (err) => {
-          const durationMs =
-            Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-          resolvePromise({
-            ok: false,
-            kind: "provider-error",
-            providerStatus: upstreamRes.statusCode ?? null,
-            message: `Upstream stream error: ${err.message}`,
-            providerLatencyMs: durationMs,
-          });
-        });
-      },
-    );
-
-    req.on("timeout", () => {
-      req.destroy();
-      const durationMs =
-        Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-      resolvePromise({
+function outcomeToProxyEnvelope(outcome) {
+  switch (outcome.kind) {
+    case "success":
+      return {
+        ok: true,
+        rawResponse: outcome.rawResponse,
+        bytes: outcome.responseBytes,
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "auth-failure":
+      return {
+        ok: false,
+        kind: "auth-failure",
+        providerStatus: outcome.providerStatus,
+        message: "Provider rejected the credential.",
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "rate-limit":
+      return {
+        ok: false,
+        kind: "rate-limit",
+        providerStatus: outcome.providerStatus,
+        message: "Provider rate limit reached.",
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "provider-error":
+      return {
+        ok: false,
+        kind: "provider-error",
+        providerStatus: outcome.providerStatus,
+        message: `Provider returned HTTP ${outcome.providerStatus}.`,
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "timeout":
+      return {
         ok: false,
         kind: "timeout",
         providerStatus: null,
         message: `Upstream did not respond within ${env.PROVIDER_TIMEOUT_MS} ms.`,
-        providerLatencyMs: durationMs,
-      });
-    });
-
-    req.on("error", (err) => {
-      const durationMs =
-        Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-      resolvePromise({
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "malformed-response":
+      // The browser client maps both non-json and oversize back into a
+      // single `malformed-response` outcome (review Decision 6).
+      return {
+        ok: false,
+        kind: outcome.reason === "oversize" ? "oversize-response" : "provider-error",
+        providerStatus: null,
+        message:
+          outcome.reason === "oversize"
+            ? "Upstream response exceeded proxy-side cap."
+            : "Upstream returned unparseable JSON.",
+        providerLatencyMs: outcome.durationMs,
+      };
+    case "transport-error":
+      return {
         ok: false,
         kind: "provider-error",
         providerStatus: null,
-        message: `Upstream connection failed: ${err.message}`,
-        providerLatencyMs: durationMs,
-      });
-    });
+        message: `Upstream connection failed: ${outcome.reason}`,
+        providerLatencyMs: outcome.durationMs,
+      };
+    default:
+      return {
+        ok: false,
+        kind: "provider-error",
+        providerStatus: null,
+        message: `Unexpected upstream outcome: ${outcome.kind}`,
+        providerLatencyMs: outcome.durationMs ?? 0,
+      };
+  }
+}
 
-    req.write(upstreamBody);
-    req.end();
-  });
+/**
+ * Issue the HTTPS POST to Anthropic Messages API via the shared
+ * provider-call core. Streams-and-counts / timeout / outcome classification
+ * all live in the shared module so #190 + #191 are identical at the
+ * provider edge.
+ */
+async function callAnthropic(prompt, model) {
+  const controller = new AbortController();
+  const timeoutHandle = setTimeout(
+    () => controller.abort(),
+    env.PROVIDER_TIMEOUT_MS + 500, // belt-and-braces — providerCall owns the primary timeout.
+  );
+  try {
+    const outcome = await providerCall(
+      {
+        prompt,
+        model,
+        apiKey: env.ANTHROPIC_API_KEY,
+        timeoutMs: env.PROVIDER_TIMEOUT_MS,
+        maxResponseBytes: env.MAX_PROVIDER_BYTES,
+        signal: controller.signal,
+        callIndex: proxyCallCounter++,
+      },
+      { endpoint: env.ANTHROPIC_ENDPOINT },
+    );
+    return outcomeToProxyEnvelope(outcome);
+  } finally {
+    clearTimeout(timeoutHandle);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -633,7 +598,8 @@ server.listen(env.PROXY_PORT, env.PROXY_BIND, () => {
 function shutdown(signal) {
   console.error(`[proxy] received ${signal}, closing server.`);
   server.close(() => {
-    upstreamAgent.destroy();
+    // providerCall owns its own keep-alive agent; it tears down with the
+    // process.
     process.exit(0);
   });
   setTimeout(() => process.exit(0), 1000).unref();

@@ -3,6 +3,6 @@
   "proxyUrl": "http://127.0.0.1:18082/generate",
   "model": "claude-haiku-4-5-20251001",
   "timeoutMs": 4000,
-  "maxCalls": 50,
+  "callCeiling": 50,
   "maxResponseBytes": 262144
 }

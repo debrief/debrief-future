@@ -49,11 +49,11 @@
 
 **Goal**: Scaffold the workspace so Phase 2 can start. No behaviour changes yet.
 
-- [ ] T001 Create evidence + media directories for this feature `specs/191-vscode-nl-search/evidence/.gitkeep`
-- [ ] T002 [P] Add empty placeholder for the shared provider-call module `shared/components/src/nl-cql2/providerCall.ts`
-- [ ] T003 [P] Add empty placeholder for the VS Code proxy service `apps/vscode/src/services/llmProxy.ts`
-- [ ] T004 [P] Add empty placeholder for the post-message client factory `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T005 [P] Re-run `pnpm install` + `task verify` on the pre-change tree to capture a green baseline before touching anything `specs/191-vscode-nl-search/evidence/baseline-verify.txt`
+- [x] T001 Create evidence + media directories for this feature `specs/191-vscode-nl-search/evidence/.gitkeep`
+- [x] T002 [P] Add empty placeholder for the shared provider-call module `shared/components/src/nl-cql2/providerCall.ts`
+- [x] T003 [P] Add empty placeholder for the VS Code proxy service `apps/vscode/src/services/llmProxy.ts`
+- [x] T004 [P] Add empty placeholder for the post-message client factory `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T005 [P] Re-run `pnpm install` + `task verify` on the pre-change tree to capture a green baseline before touching anything `specs/191-vscode-nl-search/evidence/baseline-verify.txt`
 
 ## Phase 2: Foundation — Shared Core
 
@@ -63,37 +63,37 @@
 
 ### Interface migration (review Decisions 1, 5, 6, 8)
 
-- [ ] T010 Replace `LLMClient` signature with `generate(prompt): Promise<LiveOutcome>` and add idempotent `abort(): void` `shared/components/src/nl-cql2/types.ts`
-- [ ] T011 Collapse the old `LiveLLMClient` extension into the same `LLMClient` (no separate extension type) `shared/components/src/nl-cql2/types.ts`
-- [ ] T012 Replace `LiveConfig` with the discriminated `BrowserLiveConfig | VsCodeLiveConfig` union per `contracts/llm-client.ts` `shared/components/src/nl-cql2/types.ts`
-- [ ] T013 Collapse `LiveTransportErrorReason` + `GenerationResultError` into the canonical `LiveOutcome` union: rename `usage-cap-reached` → `ceiling-reached`; fold `oversize-response` into `malformed-response` with nested `reason`; add `not-configured` `shared/components/src/nl-cql2/types.ts`
+- [x] T010 Replace `LLMClient` signature with `generate(prompt): Promise<LiveOutcome>` and add idempotent `abort(): void` `shared/components/src/nl-cql2/types.ts`
+- [x] T011 Collapse the old `LiveLLMClient` extension into the same `LLMClient` (no separate extension type) `shared/components/src/nl-cql2/types.ts`
+- [x] T012 Replace `LiveConfig` with the discriminated `BrowserLiveConfig | VsCodeLiveConfig` union per `contracts/llm-client.ts` `shared/components/src/nl-cql2/types.ts`
+- [x] T013 Collapse `LiveTransportErrorReason` + `GenerationResultError` into the canonical `LiveOutcome` union: rename `usage-cap-reached` → `ceiling-reached`; fold `oversize-response` into `malformed-response` with nested `reason`; add `not-configured` `shared/components/src/nl-cql2/types.ts`
 
 ### Shared provider-call core (review Decision 3)
 
-- [ ] T014 Implement the extracted `providerCall({prompt, model, apiKey, timeoutMs, maxResponseBytes, signal, callIndex}) → Promise<LiveOutcome>` with streams-and-counts response handling, timeout, signal-driven socket close, and full outcome classification `shared/components/src/nl-cql2/providerCall.ts`
-- [ ] T015 Export `providerCall` + the new `LiveOutcome`/`LiveConfig` types from the nl-cql2 barrel `shared/components/src/nl-cql2/index.ts`
+- [x] T014 Implement the extracted `providerCall({prompt, model, apiKey, timeoutMs, maxResponseBytes, signal, callIndex}) → Promise<LiveOutcome>` with streams-and-counts response handling, timeout, signal-driven socket close, and full outcome classification `shared/components/src/nl-cql2/providerCall.ts`
+- [x] T015 Export `providerCall` + the new `LiveOutcome`/`LiveConfig` types from the nl-cql2 barrel `shared/components/src/nl-cql2/index.ts`
 
 ### Provider-call unit tests (review Decisions 9 + 11)
 
-- [ ] T016 [test] Happy-path test — 200 OK with valid Anthropic response body; assert `kind: "success"`, correct `durationMs` + `responseBytes` + `model` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T017 [P][test] Failure-class tests — one case each for 401 → `auth-failure`, 429 → `rate-limit`, 500 → `provider-error`, socket hang-up → `transport-error/network` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T018 [P][test] Timeout test — mock slow-response past `timeoutMs`; assert `kind: "timeout"` and socket torn down `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T019 [P][test] Malformed test — non-JSON body → `kind: "malformed-response", reason: "non-json"` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T020 [P][test] Oversize truncation test — response body exceeds `maxResponseBytes`; assert `kind: "malformed-response", reason: "oversize"` and response stream terminated `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
-- [ ] T021 [P][test] Abort-mid-stream race test — signal.abort() fired while body streaming; assert `kind: "transport-error", reason: "cancelled"` + socket closed (HTTPS-layer half of Decision 11) `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T016 [test] Happy-path test — 200 OK with valid Anthropic response body; assert `kind: "success"`, correct `durationMs` + `responseBytes` + `model` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T017 [P][test] Failure-class tests — one case each for 401 → `auth-failure`, 429 → `rate-limit`, 500 → `provider-error`, socket hang-up → `transport-error/network` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T018 [P][test] Timeout test — mock slow-response past `timeoutMs`; assert `kind: "timeout"` and socket torn down `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T019 [P][test] Malformed test — non-JSON body → `kind: "malformed-response", reason: "non-json"` `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T020 [P][test] Oversize truncation test — response body exceeds `maxResponseBytes`; assert `kind: "malformed-response", reason: "oversize"` and response stream terminated `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
+- [x] T021 [P][test] Abort-mid-stream race test — signal.abort() fired while body streaming; assert `kind: "transport-error", reason: "cancelled"` + socket closed (HTTPS-layer half of Decision 11) `shared/components/src/nl-cql2/__tests__/providerCall.test.ts`
 
 ### Migrate existing consumers (review Decision 1, 3)
 
-- [ ] T022 Update `createRecordedLLMClient` to return `LiveOutcome` (wrap fixture string in `{kind:"success", rawResponse, ...}`) `shared/components/src/nl-cql2/clients.ts`
-- [ ] T023 Update `createPassthroughLLMClient` to the new shape `shared/components/src/nl-cql2/clients.ts`
-- [ ] T024 Rewire `createLiveLLMClient` to delegate its HTTPS work to `providerCall`; retain the HTTP-proxy adapter responsibilities only (URL assembly, token header, response forwarding) `shared/components/src/nl-cql2/clients.ts`
-- [ ] T025 Port `apps/nl-demo/scripts/live-proxy.mjs` to import `providerCall` from the shared module instead of its own `callAnthropic` (node-friendly wrapper around the shared core) `apps/nl-demo/scripts/live-proxy.mjs`
-- [ ] T026 Migrate `apps/nl-demo/demo.jsx` to the new `result.error.kind === "…"` shape (outcome-driven banner dispatch) `apps/nl-demo/demo.jsx`
-- [ ] T027 Re-run `apps/nl-demo/run-playwright.mjs` to prove the 21-test suite stays green under the new contract `specs/191-vscode-nl-search/evidence/migration-nl-demo-playwright.txt`
+- [x] T022 Update `createRecordedLLMClient` to return `LiveOutcome` (wrap fixture string in `{kind:"success", rawResponse, ...}`) `shared/components/src/nl-cql2/clients.ts`
+- [x] T023 Update `createPassthroughLLMClient` to the new shape `shared/components/src/nl-cql2/clients.ts`
+- [x] T024 Rewire `createLiveLLMClient` to delegate its HTTPS work to `providerCall`; retain the HTTP-proxy adapter responsibilities only (URL assembly, token header, response forwarding) `shared/components/src/nl-cql2/clients.ts`
+- [x] T025 Port `apps/nl-demo/scripts/live-proxy.mjs` to import `providerCall` from the shared module instead of its own `callAnthropic` (node-friendly wrapper around the shared core) `apps/nl-demo/scripts/live-proxy.mjs`
+- [x] T026 Migrate `apps/nl-demo/demo.jsx` to the new `result.error.kind === "…"` shape (outcome-driven banner dispatch) `apps/nl-demo/demo.jsx`
+- [x] T027 Re-run `apps/nl-demo/run-playwright.mjs` to prove the 21-test suite stays green under the new contract `specs/191-vscode-nl-search/evidence/migration-nl-demo-playwright.txt`
 
 ### Regression gate (review Decision 12)
 
-- [ ] T028 [test] Add one assertion to an existing FilterBar test confirming behaviour with no `llmClient` prop is byte-identical to today (literal-substring path) `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
+- [x] T028 [test] Add one assertion to an existing FilterBar test confirming behaviour with no `llmClient` prop is byte-identical to today (literal-substring path) `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
 
 ### Parallel execution notes
 

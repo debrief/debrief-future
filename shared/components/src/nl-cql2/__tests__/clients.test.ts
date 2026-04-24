@@ -1,8 +1,11 @@
 /**
- * Tests for the LLM clients (#188 T026).
+ * Tests for the LLM clients (#188 T026, updated for #191 Decision 1).
  *
- * - `RecordedLLMClient` hit / miss / prompt-hash mismatch.
- * - `PassthroughLLMClient` forwards the prompt correctly.
+ * - `RecordedLLMClient` hit / miss / prompt-hash mismatch. Miss and hash
+ *   mismatch still throw (programmer errors); hits now resolve to
+ *   `LiveOutcome.success`.
+ * - `PassthroughLLMClient` forwards the prompt and wraps the returned string
+ *   in a `LiveOutcome.success` outcome.
  */
 
 import { describe, expect, it } from "vitest";
@@ -26,7 +29,7 @@ describe("extractPhraseFromPrompt", () => {
 });
 
 describe("createRecordedLLMClient (T026)", () => {
-  it("returns the recorded response on a hit (canonicalised phrase, matching hash)", async () => {
+  it("returns a success outcome on a hit (canonicalised phrase, matching hash)", async () => {
     const prompt = "preamble\n\nPhrase: UK submarines";
     const hash = await sha256Hex(prompt);
     const responses: ResponseMap = {
@@ -39,7 +42,11 @@ describe("createRecordedLLMClient (T026)", () => {
     };
     const client = createRecordedLLMClient(responses);
     const out = await client.generate(prompt);
-    expect(out).toBe("{\"ok\": true}");
+    expect(out.kind).toBe("success");
+    if (out.kind === "success") {
+      expect(out.rawResponse).toBe("{\"ok\": true}");
+      expect(out.model).toBe("hand-authored");
+    }
   });
 
   it("throws on unknown phrase", async () => {
@@ -79,19 +86,30 @@ describe("createRecordedLLMClient (T026)", () => {
     };
     const client = createRecordedLLMClient(responses);
     const out = await client.generate(prompt);
-    expect(out).toBe("{\"hit\": true}");
+    expect(out.kind).toBe("success");
+    if (out.kind === "success") {
+      expect(out.rawResponse).toBe("{\"hit\": true}");
+    }
+  });
+
+  it("abort() is a no-op (nothing in flight)", () => {
+    const client = createRecordedLLMClient({});
+    expect(() => client.abort()).not.toThrow();
   });
 });
 
 describe("createPassthroughLLMClient (T026)", () => {
-  it("forwards the prompt to the supplied function", async () => {
+  it("forwards the prompt to the supplied function and wraps the result", async () => {
     const calls: string[] = [];
     const client = createPassthroughLLMClient(async (prompt) => {
       calls.push(prompt);
       return "OK";
     });
     const out = await client.generate("hello");
-    expect(out).toBe("OK");
+    expect(out.kind).toBe("success");
+    if (out.kind === "success") {
+      expect(out.rawResponse).toBe("OK");
+    }
     expect(calls).toEqual(["hello"]);
   });
 
@@ -100,5 +118,10 @@ describe("createPassthroughLLMClient (T026)", () => {
       throw new Error("boom");
     });
     await expect(client.generate("x")).rejects.toThrow(/boom/);
+  });
+
+  it("abort() is a no-op (nothing in flight)", () => {
+    const client = createPassthroughLLMClient(async () => "ok");
+    expect(() => client.abort()).not.toThrow();
   });
 });

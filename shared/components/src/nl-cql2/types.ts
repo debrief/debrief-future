@@ -1,9 +1,18 @@
 /**
- * Public and internal types for the NL → CQL2 generator (#188).
+ * Public and internal types for the NL → CQL2 generator (#188) + live
+ * transport (#190, #191).
+ *
+ * Shape history:
+ *   - #188 established the `LLMClient` contract and the core
+ *     `GenerationResult`/`LozengeSeed` shapes.
+ *   - #190 added a browser-side loopback proxy implementation.
+ *   - #191 (review Decisions 1, 5, 6, 8) collapsed the dual `LLMClient` /
+ *     `LiveLLMClient` interfaces into ONE canonical interface returning the
+ *     `LiveOutcome` union, and split `LiveConfig` into a discriminated union
+ *     so the same nl-cql2 module feeds both the browser demo and the VS Code
+ *     extension.
  *
  * All entities are in-memory TypeScript types; there is no persistence layer.
- * The `LozengeSeed` shape reuses the canonical filter-bar chip model
- * (decision 5A) rather than inventing a parallel summary type.
  */
 
 import type {
@@ -20,10 +29,6 @@ export type Cql2Json = Record<string, unknown>;
  * The chip seed the LLM emits. Picks the three persistable fields of a
  * simple `LozengeItem` — the consumer assembles the full `LozengeItem` by
  * adding `kind: 'lozenge'`, `shape: 'simple'`, and a generated `id`.
- * Decision 5A.
- *
- * Platform chips (#186) are not emitted by the NL generator; saved filters
- * include them via the CQL2 round-trip path rather than a seed.
  */
 export type LozengeSeed = {
   readonly filterType: Extract<LozengeItem, { shape: 'simple' }>['filterType'];
@@ -31,7 +36,7 @@ export type LozengeSeed = {
   readonly negated?: boolean;
 };
 
-/** All five generator-level failure reasons (decision 8A). */
+/** All five generator-level failure reasons. */
 export type GenerationErrorReason =
   | "malformed-json"
   | "schema-violation"
@@ -63,18 +68,189 @@ export interface GenerationResult {
   readonly unrecognisedTerms: readonly string[];
   /**
    * Discriminated union so the demo can route generator-level (#188) vs
-   * transport-level (#190) failures to the correct banner. `null` on success.
+   * transport-level (#190/#191) failures to the correct banner. `null` on
+   * success.
    */
   readonly error: GenerationResultError | null;
   readonly diagnostics: GenerationDiagnostics;
 }
 
 // ---------------------------------------------------------------------------
-// LLM client abstraction
+// LiveConfig — one discriminated union, two transports (review Decision 5)
 // ---------------------------------------------------------------------------
 
+interface LiveConfigBase {
+  readonly enabled: boolean;
+  readonly model: string;
+  /** Upper-bound wall-clock per call, milliseconds. */
+  readonly timeoutMs: number;
+  /**
+   * Per-session ceiling; call index `callCeiling` is the last permitted call.
+   * Renamed from #190's `maxCalls` (review Decision 6).
+   */
+  readonly callCeiling: number;
+  /**
+   * Defensive truncation threshold for the provider's response body,
+   * measured in UTF-8 bytes.
+   */
+  readonly maxResponseBytes: number;
+}
+
+/**
+ * Browser variant (#189/#190). The credential lives in a loopback proxy's
+ * environment; the browser speaks HTTP to that proxy and the proxy speaks
+ * HTTPS to the provider.
+ */
+export interface BrowserLiveConfig extends LiveConfigBase {
+  readonly transport: "browser-proxy";
+  readonly proxyUrl: string;
+  /**
+   * Optional X-Proxy-Token. Required when the proxy is bound to a
+   * non-loopback interface (`PROXY_ALLOW_REMOTE=true`). `null` when the
+   * proxy is loopback-only.
+   */
+  readonly proxyToken: string | null;
+}
+
+/**
+ * VS Code variant (#191). The extension host owns the credential in
+ * SecretStorage; the webview speaks `postMessage` to the host and the host
+ * speaks HTTPS to the provider.
+ */
+export interface VsCodeLiveConfig extends LiveConfigBase {
+  readonly transport: "vscode-host";
+  /** Presence bool — the key itself NEVER leaves the extension host. */
+  readonly hasApiKey: boolean;
+}
+
+export type LiveConfig = BrowserLiveConfig | VsCodeLiveConfig;
+
+export interface LiveConfigValidationError {
+  readonly field: string;
+  readonly message: string;
+}
+
+export type LiveConfigValidationResult =
+  | { readonly ok: true; readonly value: LiveConfig }
+  | { readonly ok: false; readonly errors: readonly LiveConfigValidationError[] };
+
+// ---------------------------------------------------------------------------
+// LiveOutcome — the single canonical result union (review Decision 6)
+// ---------------------------------------------------------------------------
+
+/**
+ * Outcome of one NL → CQL2 provider call. A discriminated union; every
+ * consumer branches on `kind`. No transport-specific variants — both the
+ * browser and VS Code clients produce exactly this shape.
+ *
+ * Renames/absorptions vs #190:
+ *   - `usage-cap-reached` → `ceiling-reached`.
+ *   - `oversize-response` folded into `malformed-response` with
+ *     `reason: "oversize"`.
+ *   - `not-configured` added for #191's opt-in toggle (enabled without key).
+ */
+export type LiveOutcome =
+  | LiveSuccess
+  | LiveAuthFailure
+  | LiveRateLimit
+  | LiveProviderError
+  | LiveTransportError
+  | LiveTimeout
+  | LiveMalformedResponse
+  | LiveNotConfigured
+  | LiveCeilingReached;
+
+export interface LiveSuccess {
+  readonly kind: "success";
+  readonly rawResponse: string;
+  readonly durationMs: number;
+  readonly responseBytes: number;
+  readonly model: string;
+}
+
+export interface LiveAuthFailure {
+  readonly kind: "auth-failure";
+  readonly providerStatus: number; // 401/403
+  readonly durationMs: number;
+}
+
+export interface LiveRateLimit {
+  readonly kind: "rate-limit";
+  readonly providerStatus: number; // 429
+  readonly retryAfterSeconds: number | null;
+  readonly durationMs: number;
+}
+
+export interface LiveProviderError {
+  readonly kind: "provider-error";
+  readonly providerStatus: number;
+  readonly durationMs: number;
+}
+
+export interface LiveTransportError {
+  readonly kind: "transport-error";
+  readonly reason: "network" | "cancelled" | "unknown";
+  readonly durationMs: number;
+}
+
+export interface LiveTimeout {
+  readonly kind: "timeout";
+  readonly durationMs: number;
+}
+
+/**
+ * Covers both non-JSON and oversize responses (review Decision 6). The
+ * `reason` discriminates.
+ */
+export interface LiveMalformedResponse {
+  readonly kind: "malformed-response";
+  readonly reason: "non-json" | "oversize" | "truncated";
+  readonly durationMs: number;
+  readonly responseBytes: number;
+}
+
+export interface LiveNotConfigured {
+  readonly kind: "not-configured";
+  readonly reason: "disabled" | "no-key";
+  readonly durationMs: 0;
+}
+
+export interface LiveCeilingReached {
+  readonly kind: "ceiling-reached";
+  readonly ceiling: number;
+  readonly durationMs: 0;
+}
+
+/**
+ * Discriminated error union carried by `GenerationResult.error`.
+ *
+ * `kind: "generation"` surfaces a #188-level parse/schema/evaluation failure
+ * with full `GenerationError` details. `kind: "transport"` surfaces a
+ * non-success `LiveOutcome` from the provider/transport layer (#190/#191).
+ */
+export type GenerationResultError =
+  | { readonly kind: "generation"; readonly error: GenerationError }
+  | { readonly kind: "transport"; readonly outcome: Exclude<LiveOutcome, LiveSuccess> };
+
+// ---------------------------------------------------------------------------
+// LLMClient — single canonical interface (review Decisions 1, 8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Transport-agnostic NL → CQL2 client. The phrase goes in; exactly one
+ * `LiveOutcome` comes out. All failure paths are encoded as outcomes —
+ * `generate` NEVER throws on normal failure paths.
+ *
+ * Cancellation is `abort()`, owned by each implementation (review
+ * Decision 4). FilterBar calls `client.abort()` when a new submission
+ * supersedes an in-flight one; the superseded call resolves to
+ * `{ kind: "transport-error", reason: "cancelled" }` and is dropped by
+ * the caller (no banner for cancellations).
+ */
 export interface LLMClient {
-  generate(prompt: string): Promise<string>;
+  generate(prompt: string): Promise<LiveOutcome>;
+  /** Idempotent; cancels every in-flight `generate()`. */
+  abort(): void;
 }
 
 export interface RecordedResponse {
@@ -85,6 +261,26 @@ export interface RecordedResponse {
 }
 
 export type ResponseMap = Readonly<Record<string, RecordedResponse>>;
+
+// ---------------------------------------------------------------------------
+// Telemetry — structured log record emitted per call (unchanged from #190)
+// ---------------------------------------------------------------------------
+
+/**
+ * Observability record emitted via `console.info("[nl-demo/live]", record)`
+ * or `console.info("[nl-search/live]", record)` once per live call (success
+ * or failure). NEVER contains prompt, response, or credential content.
+ */
+export interface TransportCallRecord {
+  readonly ts: string;
+  readonly provider: "anthropic";
+  readonly model: string;
+  readonly durationMs: number;
+  readonly outcome: LiveOutcome["kind"];
+  /** UTF-8 byte count; null on non-success. */
+  readonly responseBytes: number | null;
+  readonly callIndex: number;
+}
 
 // ---------------------------------------------------------------------------
 // Enum bundle (shape of shared/data/enum-bundle.json — narrowed at load time)
@@ -182,119 +378,6 @@ export interface RunHarnessDeps {
   readonly catalog: readonly StacBrowserItem[];
   readonly filterConfig?: FilterEngineConfig;
   readonly promptVersion?: string;
-}
-
-// ---------------------------------------------------------------------------
-// Live LLM transport (#190) — plugs a real provider behind the LLMClient
-// contract. Added here rather than a sibling file to match the package's
-// "one file per concern" convention (see plan.md → Structure Decision).
-// ---------------------------------------------------------------------------
-
-/**
- * Runtime configuration for the live LLM client.
- *
- * Loaded at demo boot from `apps/nl-demo/live-config.json` (gitignored, app
- * root). Credentials MUST NOT appear on this type — they live only in the
- * proxy's environment (see `ProxyEnv` in data-model.md §2).
- */
-export interface LiveConfig {
-  readonly enabled: boolean;
-  readonly proxyUrl: string;
-  readonly model: string;
-  readonly timeoutMs: number;
-  readonly maxCalls: number;
-  /** UTF-8 byte count (not UTF-16 code units). Enforced by a streaming reader. */
-  readonly maxResponseBytes: number;
-  /**
-   * Required only when the proxy was started with `PROXY_ALLOW_REMOTE=true`.
-   * Sent as `X-Proxy-Token` on every `/generate` and `/health` request.
-   * Omitted (or empty) for the default loopback-bound proxy.
-   */
-  readonly proxyToken?: string;
-}
-
-export interface LiveConfigValidationError {
-  readonly field: keyof LiveConfig;
-  readonly message: string;
-}
-
-export type LiveConfigValidationResult =
-  | { readonly ok: true; readonly value: LiveConfig }
-  | { readonly ok: false; readonly errors: readonly LiveConfigValidationError[] };
-
-/** Seven disjoint failure classes surfaced by the live transport. */
-export type LiveTransportErrorReason =
-  | "auth-failure"
-  | "rate-limit"
-  | "provider-error"
-  | "transport-error"
-  | "timeout"
-  | "oversize-response"
-  | "usage-cap-reached";
-
-/**
- * Plain data interface — NOT an Error subclass. The live client returns this
- * via `GenerationResult.error` with `kind: "transport"`. It is never thrown,
- * preserving #188's "generateCql2 never throws on normal failure paths"
- * invariant.
- */
-export interface LiveTransportError {
-  readonly reason: LiveTransportErrorReason;
-  readonly message: string;
-  readonly providerStatus: number | null;
-  readonly durationMs: number;
-  readonly callIndex: number;
-}
-
-/**
- * Observability record emitted via `console.info("[nl-demo/live]", record)`
- * once per live call (success or failure). NEVER contains prompt, response,
- * or credential content.
- */
-export interface TransportCallRecord {
-  readonly ts: string;
-  readonly provider: "anthropic";
-  readonly model: string;
-  readonly durationMs: number;
-  readonly outcome: "success" | LiveTransportErrorReason;
-  /** UTF-8 byte count; null on non-success. */
-  readonly responseBytes: number | null;
-  readonly callIndex: number;
-}
-
-/**
- * Discriminated error union carried by `GenerationResult.error`. Routes
- * generator-level (#188) vs transport-level (#190) failures to the correct
- * demo banner via a `switch (result.error.kind)` dispatch.
- */
-export type GenerationResultError =
-  | { readonly kind: "generation"; readonly error: GenerationError }
-  | { readonly kind: "transport"; readonly error: LiveTransportError };
-
-/**
- * LLMClient backed by a real provider. Extends the #188 contract with the
- * methods the demo needs to implement FR-012 (supersession) and SC-008
- * (usage cap surfacing).
- *
- * `generate()` returns `rawResponse: string` on success (matching the
- * LLMClient contract). On transport failure it throws a `LiveTransportAbort`
- * marker carrying the typed `LiveTransportError`; `generateCql2` catches and
- * wraps it into `GenerationResult.error` with `kind: "transport"` — the
- * LiveTransportError value itself is never thrown, preserving the
- * "generateCql2 never throws on normal failure paths" invariant.
- */
-export interface LiveLLMClient extends LLMClient {
-  /**
-   * Abort every in-flight `generate()` call. Used by the demo when a new
-   * phrase supersedes an older one (FR-012). Aborted calls settle as
-   * transport errors with `reason: "transport-error"` and
-   * `message: "superseded"`; the demo's existing submission-token filter
-   * discards these before they reach the UI.
-   */
-  cancelPending(): void;
-
-  /** Read-only view of the usage counter. */
-  readonly usage: { readonly used: number; readonly cap: number };
 }
 
 // ---------------------------------------------------------------------------

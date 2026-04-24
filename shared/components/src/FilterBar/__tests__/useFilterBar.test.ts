@@ -14,6 +14,22 @@ describe('useFilterBar', () => {
     expect(result.current.expression).toEqual({ predicates: [], orGroups: [] });
   });
 
+  // #191 T028 — regression guard (review Decision 12).
+  // Phase 3 of #191 adds an optional `llmClient` prop to `FilterBar` that
+  // routes Enter through a natural-language → CQL2 pipeline. This test
+  // pins today's baseline: `useFilterBar` has no LLM dependency and no
+  // LLM-related surface. If Phase 3 later makes the literal QuickSearch
+  // path implicitly depend on an llmClient, this assertion fails and the
+  // regression is caught at CI time.
+  it('[#191 regression] operates without any live-LLM client (literal path unchanged)', () => {
+    const { result } = renderHook(() => useFilterBar());
+    act(() => result.current.addLozenge('nationality', 'French'));
+    expect(result.current.state.items).toHaveLength(1);
+    const api = result.current as unknown as Record<string, unknown>;
+    expect(api).not.toHaveProperty('llmClient');
+    expect(api).not.toHaveProperty('generateFromPhrase');
+  });
+
   describe('add lozenge', () => {
     it('adds a lozenge to the bar', () => {
       const { result } = renderHook(() => useFilterBar());
