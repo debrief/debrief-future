@@ -1,9 +1,26 @@
 import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
 import { ThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
 import { getThemeTokens, mergeThemeTokens, defaultTheme } from './defaultTheme';
-import { isVSCodeEnvironment } from './vsCodeAdapter';
 import { VS_CODE_TOKEN_MAP, type VSCodeThemeVariant } from './vsCodeTokenMap';
 import '../styles/tokens.css';
+
+/**
+ * Narrow "am I running inside a real VS Code webview?" check.
+ *
+ * Deliberately does NOT use `isVSCodeEnvironment()` from `vsCodeAdapter` —
+ * that helper has a fallback that checks `getComputedStyle()` for the
+ * `--vscode-editor-background` CSS variable, which produces a FALSE POSITIVE
+ * after this file has injected synthetic `--vscode-*` values (it sees our
+ * own inline value and incorrectly reports "yes, in VS Code"). That breaks
+ * variant switching — specifically, switching from `dark` → `vscode` would
+ * hit the early-return and leave stale synthetic values in place.
+ *
+ * `acquireVsCodeApi` is only defined by the real webview host, so checking
+ * for it is reliable and has no false-positive mode.
+ */
+function isRealVSCodeWebview(): boolean {
+  return typeof window !== 'undefined' && 'acquireVsCodeApi' in window;
+}
 
 export interface ThemeProviderProps {
   /** Initial theme configuration */
@@ -82,7 +99,7 @@ const VS_CODE_TOKEN_KEYS: readonly string[] = Array.from(
  */
 function applyVSCodeTokensForVariant(variant: Exclude<ThemeVariant, 'system'>): void {
   if (typeof document === 'undefined') return;
-  if (isVSCodeEnvironment()) return;
+  if (isRealVSCodeWebview()) return;
 
   const root = document.documentElement;
 
