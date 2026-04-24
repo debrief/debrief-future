@@ -850,3 +850,57 @@ Pydantic and TypeScript — `PlaybackStateEnum` with three canonical values;
 
 **Originating issue:** Backlog item #205 (Tech Debt). Spec:
 `specs/205-displaymode-playbackstate-linkml/`.
+
+---
+
+### ADR-023: Schema-Rooted `kind` Discriminator on `TimelineEntry` (2026-04-22)
+
+**Context.**
+
+Feature 176 Decision 2A introduced a short-term technique for detecting "manual checkpoint" entries in the LogPanel: the consumer checked whether the tool's visual `ToolCategory` was `'snapshot'` (i.e. `resolveToolCategory(entry.toolName).category === 'snapshot'`). The pattern landed as explicit tech debt — the rule conflates *entry semantics* ("what is this record?") with *visual category* ("how should it look?"). Two concrete failure modes followed:
+
+1. **Export-tool conflation.** `export-png`, `export-csv`, `export-geojson` are listed in `TOOL_ID_TO_CATEGORY` as `'snapshot'` because of their icon / colour grouping. The consumer therefore rendered every export row with the "Manual checkpoint" placeholder and a suppressed duration — plainly wrong.
+2. **Manual-checkpoint invisibility.** A record whose `toolName` is literally `manual-checkpoint` is *not* in `TOOL_ID_TO_CATEGORY`, so it resolves to the neutral fallback and renders as a regular tool row — the exact opposite of the intended snapshot rendering.
+
+Backlog item #208 captured the follow-up work, describing the dependency on a "PROV-side signal". Two parallel Claude sessions ran `/speckit.plan` and reached different architectures:
+
+- **PR #508 (UI-projection-only).** Added `kind` to the `TimelineEntry` UI projection type; derived it in the host via `classifyKind(toolName) = resolveToolCategory(toolName).category === 'snapshot' ? 'snapshot' : 'tool'`. Its own `visual-parity.md` proved `kind === 'snapshot'` is identically equal to `ToolCategory === 'snapshot'` as predicates over `toolName`. That rename moved the coupling from the renderer to the populator; it did not remove it. Both failure modes above persisted.
+- **PR #507 (schema-rooted, planning-only).** Added an optional `activity_type` enum on the LinkML `LogEntry`, regenerated Pydantic / TypeScript / JSON Schema, projected onto `TimelineEntry.kind`. Rejected all tool-name-matching heuristics in FR-005. Identified the export-tool / manual-checkpoint failure modes as intentional correctness fixes, not collateral damage.
+
+**Decision.**
+
+Adopt the schema-rooted approach. Concretely:
+
+1. Add `ActivityType: 'snapshot' | 'tool' | 'tune'` as a LinkML enum on `LogEntry.activity_type` (optional — existing records remain valid, Article XIV.4 pre-release freedom makes the additive change cheap).
+2. Regenerate Pydantic, TypeScript, JSON Schema via the existing `shared/schemas/Makefile generate` pipeline. Post-process the TS output to narrow `activity_type?: string` to `activity_type?: ActivityType` (same pattern as `TemporalSlice` / `RawGeoJSONFeature` — `gen-typescript` flattens enum ranges to `string` at interface fields).
+3. VS Code host populates `TimelineEntry.kind` via `kindFromActivityType(entry.activity_type)` — a total, non-throwing, closed-union projection that reads *only* the schema field. No `toolName` reference, no tool-ID literal, no `resolveToolCategory` call in the kind-resolution path.
+4. Consumer `LogEntry.tsx` gates on `entry.kind === 'snapshot'`. The `resolveToolCategory` import is removed from this file. `ToolCategoryIcon` retains its internal `resolveToolCategory` call — that path is correctly scoped to *visual* decisions.
+5. The two latent-bug failure modes are fixed as direct consequences:
+   - An `export-png` row with no `activity_type` renders as a tool row (chips visible, duration visible).
+   - A record with `activity_type: 'snapshot'` renders the placeholder, whatever its `toolName`.
+6. Two CI-run drift tests lock SC-001 (semantic-gate drift) and SC-005 (projection-purity drift) against reintroduction of the anti-pattern. See `shared/components/src/LogPanel/__tests__/semantic-gate-drift.test.ts` and `apps/vscode/tests/unit/projection-purity.test.ts`.
+
+**Alternatives Considered.**
+
+- **Do nothing / defer.** Leave feature 176 Decision 2A in place. Rejected: conflation is active user-visible behaviour, not just a code-smell — export tools actively misrepresent themselves. Deferring means every new entry-type feature (manual snapshot button, tune markers, manual rationale entries — on the upcoming roadmap) has to either add its own ToolCategory entry or fight the rule per-feature.
+- **UI-projection-only `kind` populated by `classifyKind(toolName)` (PR #508).** Rejected: renames the coupling without removing it. `kind === 'snapshot'` would remain identically equal to `ToolCategory === 'snapshot'`, so the export-tool bug persists and the spec claim of "decoupling" is false by construction. Article II (LinkML single source of truth) and the #206 Type Audit explicitly flag hand-typed cross-domain discriminators as candidates for schema promotion — shipping one the day after the audit would be weak.
+- **Infer kind from existing fields** (e.g. presence of `tune` annotation; `generated_result_id`). Rejected: every such rule is a heuristic. FR-005 forbids tool-name matching as the kind-resolution signal; derivation from other record fields is equivalently fragile and cannot distinguish cases the schema was designed to express.
+- **Replace `ToolCategory` entirely with `ActivityType`.** Rejected: they model different things. `ToolCategory` is the visual grouping (`import`, `style`, `calc`, `filter`, `snapshot`) driving icons / colours; `ActivityType` is the entry semantic (`snapshot`, `tool`, `tune`). Keeping both — with a clean boundary between *how it looks* and *what it is* — is the stable separation.
+
+**Consequences.**
+
+- **Correctness.** Export-tool rows no longer render as manual-checkpoint placeholders. A record explicitly flagged `activity_type: 'snapshot'` renders as a checkpoint regardless of its `toolName` — including the eventual `manual-checkpoint` tool.
+- **Contract clarity.** The Pydantic model validates `activity_type` at ingest. Producers that want to emit a checkpoint entry set the field; no heuristic upgrades. Future entry types (manual snapshot button, tune marker, manual rationale) slot in by setting `activity_type`; the discriminator expands with a single, type-checked, compiler-enforced extension point.
+- **Backward compat.** `activity_type` is optional. Pre-existing records without the field resolve to `kind: 'tool'` via the projection fallback. No migration needed.
+- **Storybook rebaseline (intentional).** Two pre-existing snapshot-demo fixtures (`cat-snapshot`, `edge-snapshot` in `LogPanel.stories.tsx`) that were leaning on the ToolCategory conflation to render as checkpoints now set `kind: 'snapshot'` explicitly. Their rendered appearance is unchanged; the driving signal is correct. No other stories change.
+- **Drift guard.** The two source-file-grep drift tests catch any future regression at compile/test time. Article II enforcement becomes a CI check, not a review-time reminder.
+- **Supersedes feature 176 Decision 2A.** That decision documented the conflation as explicit tech debt with the expectation that a PROV-side signal would arrive. This ADR closes that loop.
+
+**Originating issue:** Backlog item #208 (Tech Debt). Spec: `specs/208-timeline-entry-kind/`.
+
+**Evidence:**
+- `specs/208-timeline-entry-kind/evidence/visual-regression-evidence.md` — pre/post DOM narrative, contrasts with PR #508's misleading `visual-parity.md`.
+- `specs/208-timeline-entry-kind/evidence/semantic-gate-grep.txt` — SC-001 transcript.
+- `specs/208-timeline-entry-kind/evidence/projection-purity-check.txt` — SC-005 transcript.
+- `specs/208-timeline-entry-kind/evidence/round-trip-evidence.md` — Python ↔ JSON schema adherence proof.
+- `specs/208-timeline-entry-kind/evidence/test-summary.md` — full CI summary.

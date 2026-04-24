@@ -16,7 +16,7 @@ import type { DebriefFeature } from '@debrief/components';
 
 const extensionUri = { fsPath: '/ext', scheme: 'file', path: '/ext' } as unknown as vscode.Uri;
 
-function makeSessionManager(): SessionManager {
+function makeSessionManager(activeDocumentUri: string | null = null): SessionManager {
   const disposables: (() => void)[] = [];
   return {
     onActiveSessionChange: (listener: () => void) => {
@@ -24,6 +24,7 @@ function makeSessionManager(): SessionManager {
       return { dispose: () => undefined };
     },
     getActiveSession: () => null,
+    getActiveDocumentUri: () => activeDocumentUri,
     actor: 'test-actor',
   } as unknown as SessionManager;
 }
@@ -213,7 +214,7 @@ describe('StoryboardPanelViewProvider', () => {
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith('debrief.captureScene');
   });
 
-  it('scene-row-clicked is a no-op in #216 and does not execute any command', () => {
+  it('scene-row-clicked dispatches debrief.storyboard.clickScene (#217 — behaviour changed from #216 no-op)', () => {
     const sessionManager = makeSessionManager();
     const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
     provider.setMapPanelResolver(() => makeMapPanelStub([]));
@@ -222,7 +223,10 @@ describe('StoryboardPanelViewProvider', () => {
     messageHandler?.({ type: 'ready' });
     (vscode.commands.executeCommand as ReturnType<typeof vi.fn>).mockClear();
     messageHandler?.({ type: 'scene-row-clicked', sceneId: 'sc-1' });
-    expect(vscode.commands.executeCommand).not.toHaveBeenCalled();
+    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+      'debrief.storyboard.clickScene',
+      'sc-1',
+    );
   });
 
   it('setCaptureInFlight posts the captureInFlight message', async () => {
@@ -290,5 +294,195 @@ describe('StoryboardPanelViewProvider', () => {
     expect(() =>
       messageHandler?.({ type: 'log', level: 'warn', message: 'hello' }),
     ).not.toThrow();
+  });
+});
+
+// ─── Edit-suite dispatcher (Feature 218 — T067) ─────────────────────────
+
+describe('StoryboardPanelViewProvider — edit dispatcher', () => {
+  const DOC = 'file:///tmp/plot.geojson';
+
+  function makeEditServiceMock() {
+    return {
+      activate: vi.fn(() => ({ dispose: vi.fn() })),
+      dispose: vi.fn(),
+      setPanelSink: vi.fn(),
+      setLogService: vi.fn(),
+      setMapPanel: vi.fn(),
+      setSessionManager: vi.fn(),
+      setThumbnailService: vi.fn(),
+      renameScene: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      describeScene: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      deleteScene: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      undoDeleteScene: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      renameStoryboard: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      describeStoryboard: vi.fn().mockResolvedValue({ kind: 'ok' }),
+      openSceneForMissingDataEdit: vi.fn().mockResolvedValue(undefined),
+    };
+  }
+
+  function setupDispatcher() {
+    const sessionManager = makeSessionManager(DOC);
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub([]));
+    const svcMock = makeEditServiceMock();
+    // setEditService signature accepts StoryboardEditService; we pass a
+    // structural mock — cast once at the boundary.
+    provider.setEditService(svcMock as unknown as Parameters<typeof provider.setEditService>[0]);
+    const { webview } = makeWebview();
+    const { messageHandler } = resolveView(provider, webview);
+    messageHandler?.({ type: 'ready' });
+    return { messageHandler, svcMock };
+  }
+
+  it('scene-title-rename-committed → editService.renameScene', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({
+      type: 'scene-title-rename-committed',
+      sceneId: 's-1',
+      newTitle: 'New Title',
+    });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.renameScene).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, sceneId: 's-1', newTitle: 'New Title' }),
+    );
+  });
+
+  it('scene-description-edit-submitted → editService.describeScene', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({
+      type: 'scene-description-edit-submitted',
+      sceneId: 's-1',
+      description: '# Notes',
+    });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.describeScene).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, sceneId: 's-1', description: '# Notes' }),
+    );
+  });
+
+  it('scene-delete-requested → editService.deleteScene', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({ type: 'scene-delete-requested', sceneId: 's-1' });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.deleteScene).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, sceneId: 's-1' }),
+    );
+  });
+
+  it('scene-undo-delete-clicked → editService.undoDeleteScene', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({ type: 'scene-undo-delete-clicked', sceneId: 's-1' });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.undoDeleteScene).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, sceneId: 's-1' }),
+    );
+  });
+
+  it('storyboard-name-rename-committed → editService.renameStoryboard', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({
+      type: 'storyboard-name-rename-committed',
+      storyboardId: 'sb-1',
+      newName: 'Renamed',
+    });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.renameStoryboard).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, storyboardId: 'sb-1', newName: 'Renamed' }),
+    );
+  });
+
+  it('storyboard-description-edit-submitted → editService.describeStoryboard', async () => {
+    const { messageHandler, svcMock } = setupDispatcher();
+    messageHandler?.({
+      type: 'storyboard-description-edit-submitted',
+      storyboardId: 'sb-1',
+      description: 'Notes',
+    });
+    await new Promise((r) => setImmediate(r));
+    expect(svcMock.describeStoryboard).toHaveBeenCalledWith(
+      expect.objectContaining({ documentUri: DOC, storyboardId: 'sb-1', description: 'Notes' }),
+    );
+  });
+
+  it('scene-update-to-current-clicked → executes debrief.storyboard.updateSceneToCurrent command', async () => {
+    const execSpy = vi
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockResolvedValue(undefined as never);
+    const { messageHandler } = setupDispatcher();
+    execSpy.mockClear();
+    messageHandler?.({ type: 'scene-update-to-current-clicked', sceneId: 's-1' });
+    expect(execSpy).toHaveBeenCalledWith('debrief.storyboard.updateSceneToCurrent', {
+      sceneId: 's-1',
+    });
+    execSpy.mockRestore();
+  });
+
+  it('scene-duplicate-clicked → executes debrief.storyboard.duplicateScene command', async () => {
+    const execSpy = vi
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockResolvedValue(undefined as never);
+    const { messageHandler } = setupDispatcher();
+    execSpy.mockClear();
+    messageHandler?.({ type: 'scene-duplicate-clicked', sceneId: 's-1' });
+    expect(execSpy).toHaveBeenCalledWith('debrief.storyboard.duplicateScene', {
+      sceneId: 's-1',
+    });
+    execSpy.mockRestore();
+  });
+
+  it('scene-copy-to-other-clicked → executes debrief.storyboard.copySceneToOtherStoryboard', async () => {
+    const execSpy = vi
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockResolvedValue(undefined as never);
+    const { messageHandler } = setupDispatcher();
+    execSpy.mockClear();
+    messageHandler?.({ type: 'scene-copy-to-other-clicked', sceneId: 's-1' });
+    expect(execSpy).toHaveBeenCalledWith(
+      'debrief.storyboard.copySceneToOtherStoryboard',
+      { sceneId: 's-1' },
+    );
+    execSpy.mockRestore();
+  });
+
+  it('scene-refresh-thumbnail-clicked → executes refreshSceneThumbnail command', async () => {
+    const execSpy = vi
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockResolvedValue(undefined as never);
+    const { messageHandler } = setupDispatcher();
+    execSpy.mockClear();
+    messageHandler?.({ type: 'scene-refresh-thumbnail-clicked', sceneId: 's-1' });
+    expect(execSpy).toHaveBeenCalledWith('debrief.storyboard.refreshSceneThumbnail', {
+      sceneId: 's-1',
+    });
+    execSpy.mockRestore();
+  });
+
+  it('storyboard-refresh-all-stale-clicked → executes refreshAllStaleThumbnails command', async () => {
+    const execSpy = vi
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockResolvedValue(undefined as never);
+    const { messageHandler } = setupDispatcher();
+    execSpy.mockClear();
+    messageHandler?.({
+      type: 'storyboard-refresh-all-stale-clicked',
+      storyboardId: 'sb-1',
+    });
+    expect(execSpy).toHaveBeenCalledWith(
+      'debrief.storyboard.refreshAllStaleThumbnails',
+      { storyboardId: 'sb-1' },
+    );
+    execSpy.mockRestore();
+  });
+
+  it('setEditService installs the panel as the service sink (panel.post flows back to webview)', () => {
+    const sessionManager = makeSessionManager(DOC);
+    const provider = new StoryboardPanelViewProvider(extensionUri, sessionManager);
+    provider.setMapPanelResolver(() => makeMapPanelStub([]));
+    const svcMock = makeEditServiceMock();
+    provider.setEditService(svcMock as unknown as Parameters<typeof provider.setEditService>[0]);
+    expect(svcMock.setPanelSink).toHaveBeenCalledTimes(1);
+    const sinkArg = svcMock.setPanelSink.mock.calls[0]![0] as { postMessage: (m: unknown) => void };
+    expect(typeof sinkArg.postMessage).toBe('function');
   });
 });

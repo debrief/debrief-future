@@ -42,7 +42,14 @@ export type {
 } from './StacFileTree';
 
 export { MapView } from './MapView';
-export type { MapViewProps } from './MapView';
+export type { MapViewProps, FlyToTarget } from './MapView';
+export {
+  SceneRectangleLayer,
+  geoJsonPolygonToLeafletCoords,
+  computeFillOpacity,
+  computeOverlapRanks,
+} from './MapView/SceneRectangleLayer';
+export type { SceneRectangleLayerProps } from './MapView/SceneRectangleLayer';
 
 export { Timeline } from './Timeline';
 export type { TimelineProps } from './Timeline';
@@ -253,10 +260,14 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 208: TimelineEntry kind discriminator
+  TimelineEntryKind,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,
   VALID_VIEW_MODES,
+  TIMELINE_ENTRY_KINDS,
+  assertNeverKind,
 } from './LogPanel';
 export type {
   FilterState as LogFilterState,
@@ -334,9 +345,32 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
-// Storyboard panel — presentational React component (Feature: 216-storyboarding-capture)
-export { StoryboardPanel, SceneRow, SceneList } from './panels/StoryboardPanel';
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit)
+export {
+  StoryboardPanel,
+  SceneRow,
+  SceneList,
+  TransportRow,
+  HardBlockModal,
+  StoryboardHeader,
+  SceneEditForm,
+  UndoToast,
+  StaleBadge,
+} from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
+  StoryboardOptionViewModel,
+  TransportViewModel,
+  MissingDataReason,
+  TransportRowProps,
+  HardBlockModalProps,
+  StoryboardHeaderProps,
+  SceneEditFormProps,
+  SceneMissingData,
+  UndoToastProps,
+  UndoToastState,
+  StaleBadgeProps,
+  SceneEditViewModel,
+  StoryboardEditViewModel,
 } from './panels/StoryboardPanel';

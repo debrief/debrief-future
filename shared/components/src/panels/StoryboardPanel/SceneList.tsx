@@ -1,16 +1,33 @@
 /**
  * Renders the list of Scene rows for the active Storyboard (Feature 216).
- * Prepends a pending row when `captureInFlight` is true.
+ * Prepends a pending row when `captureInFlight` is true. Feature 218
+ * additions: renders `<SceneEditForm>` inline beneath a row when
+ * `sceneEditViewModels[sceneId]?.editFormOpen === true`.
  */
 
 import React from 'react';
 import { SceneRow } from './SceneRow';
-import type { SceneRowViewModel } from './types';
+import { SceneEditForm } from './SceneEditForm';
+import { StaleBadge } from './StaleBadge';
+import type { SceneEditViewModel, SceneRowViewModel } from './types';
 
 export interface SceneListProps {
   readonly scenes: readonly SceneRowViewModel[];
   readonly captureInFlight: boolean;
+  /** ID of the current transport scene — that row gets `data-active="true"`. */
+  readonly currentSceneId?: string | null;
   onSceneRowClick(sceneId: string): void;
+
+  // ── #218 edit-suite optional props (panel-driven) ────────────────
+  readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
+  onSceneTitleRenameCommit?(sceneId: string, newTitle: string): void;
+  onSceneDescriptionSubmit?(sceneId: string, description: string | null): void;
+  onSceneDeleteRequested?(sceneId: string): void;
+  onSceneUpdateToCurrentClicked?(sceneId: string): void;
+  onSceneDuplicateClicked?(sceneId: string): void;
+  onSceneCopyToOtherClicked?(sceneId: string): void;
+  onSceneRefreshThumbnailClicked?(sceneId: string): void;
+  onSceneEditFormCancel?(sceneId: string): void;
 }
 
 const PENDING_SCENE: SceneRowViewModel = {
@@ -25,7 +42,17 @@ const PENDING_SCENE: SceneRowViewModel = {
 export function SceneList({
   scenes,
   captureInFlight,
+  currentSceneId,
   onSceneRowClick,
+  sceneEditViewModels,
+  onSceneTitleRenameCommit,
+  onSceneDescriptionSubmit,
+  onSceneDeleteRequested,
+  onSceneUpdateToCurrentClicked,
+  onSceneDuplicateClicked,
+  onSceneCopyToOtherClicked,
+  onSceneRefreshThumbnailClicked,
+  onSceneEditFormCancel,
 }: SceneListProps): React.ReactElement {
   return (
     <div
@@ -37,13 +64,61 @@ export function SceneList({
       {captureInFlight && (
         <SceneRow scene={PENDING_SCENE} onClick={onSceneRowClick} />
       )}
-      {scenes.map((scene) => (
-        <SceneRow
-          key={scene.sceneId}
-          scene={scene}
-          onClick={onSceneRowClick}
-        />
-      ))}
+      {scenes.map((scene) => {
+        const editVm = sceneEditViewModels?.[scene.sceneId];
+        // Rows flagged pendingDelete are hidden until the analyst acts
+        // on the undo toast (#218 data-model §3 rendering rule).
+        if (editVm?.pendingDelete) {
+          return null;
+        }
+        return (
+          <React.Fragment key={scene.sceneId}>
+            <SceneRow
+              scene={scene}
+              active={currentSceneId === scene.sceneId}
+              onClick={onSceneRowClick}
+            />
+            {editVm?.stale && (
+              <StaleBadge
+                sceneId={scene.sceneId}
+                unresolvedFeatureIds={editVm.unresolvedFeatureIds}
+                onRefreshThumbnail={(): void =>
+                  onSceneRefreshThumbnailClicked?.(scene.sceneId)
+                }
+              />
+            )}
+            {editVm?.editFormOpen && (
+              <SceneEditForm
+                sceneId={scene.sceneId}
+                title={editVm.title}
+                description={editVm.description}
+                timestamp={editVm.timestamp}
+                missingData={editVm.missingData}
+                onTitleRenameCommit={(newTitle): void =>
+                  onSceneTitleRenameCommit?.(scene.sceneId, newTitle)
+                }
+                onDescriptionSubmit={(description): void =>
+                  onSceneDescriptionSubmit?.(scene.sceneId, description)
+                }
+                onUpdateToCurrent={(): void =>
+                  onSceneUpdateToCurrentClicked?.(scene.sceneId)
+                }
+                onDuplicate={(): void =>
+                  onSceneDuplicateClicked?.(scene.sceneId)
+                }
+                onCopyToOther={(): void =>
+                  onSceneCopyToOtherClicked?.(scene.sceneId)
+                }
+                onDelete={(): void => onSceneDeleteRequested?.(scene.sceneId)}
+                onRefreshThumbnail={(): void =>
+                  onSceneRefreshThumbnailClicked?.(scene.sceneId)
+                }
+                onCancel={(): void => onSceneEditFormCancel?.(scene.sceneId)}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }

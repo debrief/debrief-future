@@ -7,13 +7,16 @@ import type { SceneRowViewModel } from './types';
 
 export interface SceneRowProps {
   readonly scene: SceneRowViewModel;
+  /** When true, the row renders with bolder styling + `data-active="true"` —
+   *  used by Feature 217 to highlight the current transport scene. */
+  readonly active?: boolean;
   onClick(sceneId: string): void;
 }
 
 const THUMBNAIL_WIDTH = 200;
 const THUMBNAIL_HEIGHT = 150;
 
-export function SceneRow({ scene, onClick }: SceneRowProps): React.ReactElement {
+export function SceneRow({ scene, active = false, onClick }: SceneRowProps): React.ReactElement {
   const handleClick = (): void => {
     if (scene.state.kind === 'pending') return;
     onClick(scene.sceneId);
@@ -32,8 +35,9 @@ export function SceneRow({ scene, onClick }: SceneRowProps): React.ReactElement 
       data-testid="scene-row"
       data-scene-id={scene.sceneId}
       data-state={scene.state.kind}
+      data-active={active ? 'true' : undefined}
       tabIndex={isPending ? -1 : 0}
-      className={`storyboard-scene-row ${isPending ? 'is-pending' : ''}`}
+      className={`storyboard-scene-row ${isPending ? 'is-pending' : ''} ${active ? 'is-active' : ''}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       style={{
@@ -43,6 +47,10 @@ export function SceneRow({ scene, onClick }: SceneRowProps): React.ReactElement 
         alignItems: 'flex-start',
         cursor: isPending ? 'default' : 'pointer',
         opacity: isPending ? 0.6 : 1,
+        outline: active ? '2px solid var(--vscode-focusBorder, #007acc)' : 'none',
+        background: active
+          ? 'var(--vscode-list-activeSelectionBackground, rgba(0, 122, 204, 0.15))'
+          : 'transparent',
       }}
     >
       {isPending ? (

@@ -87,16 +87,18 @@ You **MUST** consider the user input before proceeding (if not empty).
    an existing PR. The `<num>` token is the PR number returned by the
    `gh pr view` / `gh pr create` response.
 
-6. **Generate or verify media content**:
+6. **Generate or verify feature post**:
    - Check for `FEATURE_DIR/media/` directory
-   - If shipped-post.md is missing or incomplete:
+   - Read the cached opener from `FEATURE_DIR/evidence/opening-context.md` (created during `/speckit.plan`)
+     - If it's missing, warn the user — the generator will synthesise an opener from spec.md, plan.md, and research.md instead, but prose quality may suffer
+   - If `shipped-post.md` is missing or incomplete:
      - Read Content Specialist agent from `.claude/agents/media/content.md`
      - Spawn Content Specialist via Task tool with:
+       - The cached opener content (verbatim — must appear as the first three sections of the post)
        - Feature summary from spec.md
        - Evidence artifacts from evidence/
        - Lessons learned from implementation
-     - Generate shipped-post.md following the Shipped Post template
-     - Generate linkedin-shipped.md (150-200 words)
+     - Generate `shipped-post.md` following the Feature Post template (title prefix `Building `)
      - Save media content to `FEATURE_DIR/media/`
 
 7. **Collect evidence artifacts**:
@@ -247,11 +249,6 @@ You **MUST** consider the user input before proceeding (if not empty).
     1. Review and merge the feature PR
     2. Review and merge the blog PR
     3. Post will appear at: https://debrief.github.io/future/blog/
-
-    ## LinkedIn Summary
-
-    Ready at: specs/{feature}/media/linkedin-shipped.md
-    Copy and post after blog PR is merged.
     ```
 
     If blog publishing was skipped:
@@ -324,9 +321,9 @@ When incorporating evidence into the PR:
 
 ## Media Content Integration
 
-When creating media content for the shipped feature:
+When creating the feature post at ship time:
 
-### Shipped Post Generation
+### Feature Post Generation
 
 Spawn the Content Specialist agent via Task tool:
 
@@ -337,29 +334,22 @@ prompt: |
 
   [Include .claude/agents/media/content.md content]
 
-  Create a Shipped Post for:
+  Create a Feature Post for:
   - Feature: [name from spec.md]
+  - Cached opener (copy verbatim as the first three sections): [contents of evidence/opening-context.md]
   - What was built: [summary from evidence/usage-example.md]
   - Test results: [from evidence/test-summary.md]
   - Key decisions: [from research.md if exists]
 
-  Follow the Shipped Post template exactly.
+  Follow the Feature Post template exactly. Title must be prefixed with `Building `.
+  The first three sections (What We're Building, How It Fits, Key Decisions) must be
+  copied verbatim from the cached opener above — do not paraphrase.
 ```
-
-### LinkedIn Summary
-
-Generate alongside the shipped post:
-- 150-200 words
-- Hook opening (not "I'm excited to announce...")
-- Key accomplishment highlight
-- Link placeholder: `[Read the full post: LINK]`
-- Tags: `#FutureDebrief #MaritimeAnalysis #OpenSource`
 
 ### Output Files
 
 Save to `FEATURE_DIR/media/`:
-- `shipped-post.md` - Full blog post
-- `linkedin-shipped.md` - LinkedIn summary
+- `shipped-post.md` — full feature post (filename retained for continuity with the publishing pipeline)
 
 ## Error Handling
 
