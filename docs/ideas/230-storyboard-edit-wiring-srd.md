@@ -4,7 +4,8 @@
 **Component:** Storyboard panel (VS Code webview + web-shell) + edit-error triage
 **Version:** 0.1.0
 **Date:** 2026-04-24
-**Status:** Draft
+**Status:** Approved
+**Backlog ID:** 230 (V=4, M=4, A=4, Total=12, Complexity=Medium)
 **Parent:** [#218 Storyboarding — Edit Suite + Housekeeping](../../specs/218-storyboarding-edit/spec.md)
 **Related PR:** [#520](https://github.com/debrief/debrief-future/pull/520)
 
