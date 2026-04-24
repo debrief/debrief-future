@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--slicedemo",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.697880555555557,
+          57.18628611111111
+        ],
+        [
+          -21.697880555555557,
+          57.18628611111111
+        ],
+        [
+          -21.697880555555557,
+          57.18628611111111
+        ],
+        [
+          -21.697880555555557,
+          57.18628611111111
+        ],
+        [
+          -21.697880555555557,
+          57.18628611111111
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.697880555555557,
+    57.18628611111111,
+    -21.697880555555557,
+    57.18628611111111
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Slicedemo",
+    "datetime": "2001-01-01T14:00:47.812000+00:00",
+    "description": "Saxon Warrior: Slicedemo — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Mahan.",
+    "start_datetime": "2001-01-01T14:00:47.812000+00:00",
+    "end_datetime": "2001-01-01T18:00:49.546000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "OS",
+        "name": "USS Mahan",
+        "nationality": "US",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_type": "type26",
+        "vessel_role": "frigate"
+      }
+    ],
+    "debrief:tags": [
+      "EW",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sprint-and-drift",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "SliceDemo (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/SliceDemo.rep",
+      "title": "SliceDemo.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-SliceDemo": {
+      "href": "./assets/SliceDemo.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "SliceDemo.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/SliceDemo.rep",
+        "load_timestamp": "2026-04-13T23:12:32.522046Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
