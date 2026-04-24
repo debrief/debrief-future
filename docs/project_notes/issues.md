@@ -16,6 +16,12 @@ Each entry should include:
 
 <!-- Add new entries below this line -->
 
+### 2026-04-22 - Backlog #208: Schema-rooted `kind` discriminator on TimelineEntry
+- **Status**: Completed (PR #513 open — supersedes PR #508 and PR #507)
+- **Description**: Added optional `activity_type` enum to LinkML `LogEntry`; regenerated Pydantic / TypeScript / JSON Schema; projected onto UI-side `TimelineEntry.kind`; switched `LogEntry.tsx` off the feature-176 `ToolCategory === 'snapshot'` conflation; fixed the latent bug where export tools (`export-png`, `export-csv`, `export-geojson`) rendered with the "Manual checkpoint" placeholder. Added two CI drift tests (SC-001 semantic-gate, SC-005 projection-purity). Supersedes feature 176 Decision 2A (ADR-023).
+- **URL**: https://github.com/debrief/debrief-future/pull/513
+- **Evidence**: [`specs/208-timeline-entry-kind/evidence/`](../../specs/208-timeline-entry-kind/evidence/)
+
 ### 2026-04-21 - #217: Storyboarding — Panel + Playback (E024 3/4)
 - **Status**: Completed (implementation merged)
 - **Description**: Multi-Storyboard dropdown, TransportRow (Prev/Next + scoped Left/Right-arrow keybindings), Leaflet `flyTo` animation, scrub-window lock via `TimeRangeViewProvider.setScrubbableRange`, on-map `SceneRectangleLayer` overlay for the active Storyboard, missing-data hard-block modal with `Jump Past` chain-walker. `StoryboardPlaybackService` on the extension host; three-trigger (moveend / visibility-false / safety-timer) transition-clear invariant with idempotent-by-token clear handler. ~154 unit tests across 11 suites; 23 commits; zero new runtime dependencies.

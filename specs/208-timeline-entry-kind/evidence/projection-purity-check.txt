@@ -1,0 +1,55 @@
+# SC-005 projection-purity evidence
+#
+# Captured: 2026-04-22T20:27:14Z
+# Branch:   208-timeline-entry-kind-v2
+# Commit:   6f1dccbd
+#
+# SC-005: the host projection derives TimelineEntry.kind from the schema-level
+# activity_type field ONLY. No tool-ID string literal appears in the kind
+# resolution path. The stronger runtime guarantee is enforced by
+# apps/vscode/tests/unit/projection-purity.test.ts (parses the function body
+# and asserts the absence of forbidden literals).
+
+## Query 1: What does kindFromActivityType look like in the source?
+$ awk '/^export function kindFromActivityType/,/^\}/' apps/vscode/src/views/logPanelView.ts
+export function kindFromActivityType(
+  activityType: ActivityType | undefined | null
+): TimelineEntryKind {
+  switch (activityType) {
+    case ActivityType.snapshot:
+      return 'snapshot';
+    case ActivityType.tune:
+      return 'tune';
+    case ActivityType.tool:
+      return 'tool';
+    case undefined:
+    case null:
+      return 'tool';
+    default:
+      return 'tool';
+  }
+}
+
+## Query 2: Search the kind-resolution path for known tool-ID literals
+$ rg "'(manual-checkpoint|export-png|export-csv|export-geojson|import-rep|bearing-between-tracks|calculate-range|time-filter|change-color|set-display-mode)'" apps/vscode/src/views/logPanelView.ts
+  'import-rep': 'import',
+  'export-png': 'export',
+  'export-csv': 'export',
+  'export-geojson': 'export',
+  'change-color': 'property-edit',
+  'set-display-mode': 'property-edit',
+
+# Expected hits (not regressions): `TOOL_CATEGORY_MAP` in the same file contains
+# these literals, but that map belongs to `classifyOperation(toolId)` — the
+# *visual OperationCategory* derivation that was always UI-scoped and that
+# feature 208 does not touch. `classifyOperation` runs independently of
+# `kindFromActivityType`; the projection-purity drift test scopes its
+# assertion to the latter's function body only.
+
+## Verdict
+
+SC-005 satisfied. `kindFromActivityType` reads only its `activityType`
+parameter (typed `ActivityType | undefined | null`). The switch arms
+enumerate ActivityType enum members; the fallback arms cover undefined,
+null, and default — none use `toolName` or any tool-ID literal. Automated
+guard: apps/vscode/tests/unit/projection-purity.test.ts.
