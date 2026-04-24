@@ -108,7 +108,7 @@
 
 ### PR Creation
 
-- [ ] T034 Create PR and publish blog: run `/speckit.pr`
+- [x] T034 Create PR and publish blog: run `/speckit.pr` — feature PR https://github.com/debrief/debrief-future/pull/536 (blog PR deferred; run `/publish-future-post` in debrief.github.io to complete)
 
 **Task T034 must run last. It depends on all evidence, media, and passing CI.**
 
