@@ -82,8 +82,10 @@ function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
 
 /**
  * Wrapper that reads URL params and mounts the harness view (#230 US4).
+ * Exported from App.tsx so `main.tsx` can pick it up before App's hooks
+ * run — keeps the hook-order invariant clean in App.
  */
-function StoryboardEditHarnessMount(): JSX.Element {
+export function StoryboardEditHarnessMount(): JSX.Element {
   const initial = parseHarnessQueryString(window.location.search);
   return <StoryboardEditHarness initial={initial} />;
 }
@@ -175,16 +177,6 @@ function getMimeType(filePath: string): string {
  * Main application component.
  */
 export default function App() {
-  // #230 US4 — top-level branch: when `?storyboard-edit-harness` is
-  // present, mount the harness view instead of the standard shell so
-  // Playwright can drive the polish loop without VS Code.
-  if (
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).has('storyboard-edit-harness')
-  ) {
-    return <StoryboardEditHarnessMount />;
-  }
-
   // Session-state store (reactive via useSyncExternalStore)
   const state = useSessionStore();
   const store = getSessionStore();
