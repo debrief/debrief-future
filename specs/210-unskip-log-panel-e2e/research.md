@@ -47,7 +47,12 @@ Seven research items covering: confirmation that blockers are in place, a perfor
 - Reducing scenario count to 3 (drop the 2 selection parity scenarios). Rejected — FR-006 and User Story 3 explicitly call for the parity coverage; it's why the spec differs from what's already in the `fixme`'d file.
 - Run scenarios in parallel (`fullyParallel: true`). Rejected — the CI config pins `workers: 1` for openvscode-server stability across all suites; this suite MUST NOT override that.
 
-**Mitigation if budget is exceeded**: If post-merge measurement shows median >90 s, the first lever is to consolidate the two selection scenarios into one ("click selects then deselects" in a single `test(...)` body) — still satisfies FR-006's parity intent. Consolidation saves one full `openPlotViaStacTree` cycle.
+**Mitigation — SC-005 reactive trigger**: Ship 5 scenarios. Apply the fallback **reactively**, not pre-emptively, according to the following rule:
+
+- **Warning (85 s)**: If the 10-run median on `main` exceeds 85 s, open a tracking issue. No code change yet; the suite is still within budget but the headroom has narrowed.
+- **Breach (90 s)**: If the 10-run median exceeds 90 s on any rolling window, consolidate the two selection scenarios into a single `test(...)` body ("click → assert selected → click again → assert deselected") that shares one `openPlotViaStacTree` cycle. This still satisfies FR-006's parity intent and saves ~12–15 s of per-suite wall-clock.
+
+Pre-emptive consolidation (shipping with 4 scenarios from the outset) is rejected because per-scenario debuggability is valuable at current headroom — a failing selection assertion in a dedicated scenario is easier to triage than a failure midway through a compound scenario.
 
 ---
 
@@ -108,12 +113,20 @@ Seven research items covering: confirmation that blockers are in place, a perfor
 
 **Rationale — flagging risk is correct**: If reactivation reveals the `getLogPanelFrame()` → `findWebviewFrameByContent` path still has intermittent failures in CI (beyond what #143 stabilised for STAC tree resolution), that's a real outcome. The plan's mitigation: ship with monitoring, not with blind confidence.
 
-**Mitigation if CI reveals flakiness post-merge**:
+**Mitigation — revert-to-`fixme` trigger rule**:
 
-1. First, verify the failure is reproducible (not a one-off).
-2. If reproducible, the PR is reverted to `test.describe.fixme` (not `skip`, because the blocker is no longer #143 but a new follow-up issue).
-3. A new bug ticket is opened capturing the specific failure mode (which iframe didn't resolve, which timeout fired, which assertion failed).
-4. That ticket becomes the new blocker for this feature; #210 reopens until resolved.
+**Trigger condition** (fires the moment either branch evaluates true on `main`): revert-to-`test.describe.fixme` is invoked when `tests/e2e/test-log-panel.spec.ts` shows either
+
+- **2 consecutive failures within a 24-hour window** on `main`, OR
+- **≥ 3 failures in the last 10 main-branch runs** (rolling window).
+
+Either branch counts as "reproducible, not a one-off" and removes ambiguity about when to act (replacing the earlier intent-only "verify reproducible" step).
+
+Once triggered, the response is:
+
+1. Open the fastest-available PR reverting `test.describe(...)` → `test.describe.fixme(...)` (one-line change).
+2. File a new bug ticket capturing the specific failure mode — which iframe didn't resolve, which timeout fired, which assertion failed, trace artefact attached.
+3. That ticket becomes the new blocker for this feature; #210 reopens until resolved.
 
 **Alternatives considered**:
 

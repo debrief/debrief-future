@@ -46,9 +46,16 @@ Convert the `test.describe.fixme(...)` block in `tests/e2e/test-log-panel.spec.t
 **Post-design re-check (2026-04-24, after Phase 0 + Phase 1 artefacts written)**:
 
 - The design artefacts (research.md, quickstart.md, opening-context.md) introduce **no new Constitution implications**. No new dependencies, no new schemas, no new data boundaries.
-- Research R5 ("four sibling suites remain `.skip`") is disclosed as a known risk with a documented mitigation path (revert to `fixme`, file a new bug) — consistent with Article I ("no silent failures") and Article VII ("iterate on failures with specific feedback").
+- Research R5 ("four sibling suites remain `.skip`") is disclosed as a known risk with a documented mitigation path (revert to `fixme`, file a new bug) — consistent with Article I ("no silent failures") and Article VII ("iterate on failures with specific feedback"). The revert trigger is now pinned to a concrete, machine-checkable rule (2 consecutive main failures within 24 h, or ≥ 3 failures in the last 10 main runs).
 - `data-model.md` and `contracts/` are explicitly omitted (see Project Structure above) because no entities or APIs are introduced. This is consistent with Article VIII ("specs before code") — the spec, plan, research, quickstart, and cached opener collectively cover the "documented" bar without padding empty artefacts.
 - **Verdict**: Design remains gate-clean. Proceed to `/speckit.tasks` when ready.
+
+**Second re-check (2026-04-24, after `/speckit.review` feedback applied)**:
+
+- Spec FR-010 (assertion form pinned as `toHaveClass(/selected/)` regex) and FR-011 (lint-level skip-guard) added — neither introduces new dependencies, schemas, or architectural surface. Article IX (Dependencies) holds; the optional ESLint implementation path reuses the existing `@typescript-eslint` toolchain already present in the monorepo.
+- Research R2 mitigation is now expressed as a reactive trigger (85 s warning / 90 s breach → scenario consolidation). No pre-emptive scope reduction.
+- Research R5 mitigation now has a concrete trigger rule. Both changes strengthen Article I (Defence-Grade Reliability — no silent degradation) by making the two soft intents machine-checkable.
+- **Verdict**: Still gate-clean. Proceed to `/speckit.tasks`.
 
 ## Project Structure
 
@@ -82,7 +89,7 @@ tests/e2e/
 shared/components/src/LogPanel/        # UNCHANGED (component source — no touch)
 ```
 
-**Structure Decision**: Single-file edit within an existing monorepo directory. The test file `tests/e2e/test-log-panel.spec.ts` is the **only** guaranteed change; `tests/e2e/models/code-server-page.ts` may receive an additive helper **only if** Phase 0 research confirms it's required for scenario independence (default: no change).
+**Structure Decision**: Single-file edit within an existing monorepo directory. The test file `tests/e2e/test-log-panel.spec.ts` is the **only** guaranteed change; `tests/e2e/models/code-server-page.ts` may receive an additive helper **only if** Phase 0 research confirms it's required for scenario independence (default: no change). In addition, a **lint-level skip-guard** (spec FR-011) is added to the project's lint step — implementation is either a one-line grep in the Taskfile `lint` target (exits non-zero if `tests/e2e/test-log-panel.spec.ts` contains `test\.(skip|fixme)` or `test\.describe\.(skip|fixme)`), or an ESLint `no-restricted-syntax` rule scoped via `overrides` to that file. The implementer picks whichever matches the project's existing lint wiring; either form satisfies FR-011 and makes User Story 2 machine-verifiable.
 
 ## Media Components
 

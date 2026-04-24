@@ -75,6 +75,8 @@ As a reviewer comparing host surfaces, I need the VS Code log-panel E2E suite to
 - **FR-007**: The reactivation MUST NOT introduce regressions in adjacent suites. Any changes to shared helpers (page model, fixtures) MUST preserve the public surface consumed by other suites.
 - **FR-008**: The suite source MUST NOT retain residual comments referring to the prior blocked state (e.g. "blocked by #143", "Feature 176 decision 9A"). Historical context MUST live in the PR description and project notes, not in the test file.
 - **FR-009**: The suite MUST follow the existing naming and header convention used by sibling active suites in `tests/e2e/` (header comment describing the target, fixtures import, `test.describe` block).
+- **FR-010**: Selection-state assertions in the two new parity scenarios MUST use class-presence regex matching (`toHaveClass(/selected/)`), mirroring the web-shell `log-panel.spec.ts` pattern, rather than exact-class-string equality (e.g. `toHaveClass('log-panel__entry--selected')`). This maintains coverage parity with the web-shell suite and keeps the assertion resilient to BEM-modifier class renames.
+- **FR-011**: The repository MUST include a CI-gated lint check that fails when `tests/e2e/test-log-panel.spec.ts` contains any `test.skip(`, `test.fixme(`, `test.describe.skip(`, or `test.describe.fixme(` call. This prevents silent re-skipping from regressing User Story 2 ("visible pass/fail signal, not silent skips"). Implementation may be either a grep-based step in the Taskfile `lint` target or an ESLint `no-restricted-syntax` rule scoped via overrides to this file — either form satisfies this requirement.
 
 ### Key Entities
 
@@ -91,7 +93,7 @@ As a reviewer comparing host surfaces, I need the VS Code log-panel E2E suite to
 - **SC-002**: The log-panel suite passes green in 10 of the last 10 CI runs on `main` (rolling window) after merge, with no retries beyond the default Playwright retry policy configured for the rest of the E2E job.
 - **SC-003**: When a contrived regression is introduced on a spike branch (e.g. removing `[data-testid="log-panel"]` from the LogPanel component), the suite fails within its inherited timeout and emits a screenshot plus trace artefact for the failing scenario — confirming the suite exercises the real integration path and is not silently passing.
 - **SC-004**: Running the suite executes at least one assertion against the LogPanel rendered inside the VS Code webview iframe (verifiable by inspecting the Playwright trace for frame navigation into a webview URL).
-- **SC-005**: The suite's total wall-clock runtime on the CI runner is ≤ 90 seconds for the expected 4–5 scenarios, measured as a median across 10 consecutive runs.
+- **SC-005**: The suite's total wall-clock runtime on the CI runner is ≤ 90 seconds for the expected 4–5 scenarios, measured as a median across 10 consecutive runs. A warning threshold of 85 seconds (median over any rolling 10-run window on `main`) triggers a tracking issue; breach of the 90-second threshold triggers the scenario-consolidation fallback defined in research.md § R2.
 - **SC-006**: The suite's scenario list, when diffed against the web-shell log-panel suite, covers the parity baseline (empty state, entry creation, ordering, selection, deselection) with at most one documented omission.
 
 ## Assumptions
