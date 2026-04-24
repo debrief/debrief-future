@@ -37,6 +37,8 @@ import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import { registerStoryboardEditCommands } from './commands/storyboardEdit';
+import { StoryboardEditService } from './services/storyboardEdit';
 import {
   StoryboardPlaybackService,
   type ModalPromptPort,
@@ -221,6 +223,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // #217 Phase 4 — the panel needs the service reference so it can
   // call setActiveStoryboard synchronously on dropdown-change messages.
   storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
+
+  // #218 — Storyboard edit orchestration service. Phase 1 registers
+  // the service + commands; real behaviour is wired in Phase 2/3 tasks.
+  const storyboardEditService = new StoryboardEditService();
+  context.subscriptions.push(storyboardEditService.activate());
+  registerStoryboardEditCommands(context, {
+    service: storyboardEditService,
+    sessionManager: {
+      getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    },
+  });
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
