@@ -143,7 +143,7 @@
 
 ### Media content
 
-- [ ] T038 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/231-blog-archive-screenshot-fix/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T033–T036. Front matter: `layout: future-post`, `title: "Building Screenshot-Complete Blog Archive"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, media]`, `excerpt` ≤ 150 chars. `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`
+- [x] T038 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/231-blog-archive-screenshot-fix/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T033–T036. Front matter: `layout: future-post`, `title: "Building Screenshot-Complete Blog Archive"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, media]`, `excerpt` ≤ 150 chars. `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`
 
 ### PR creation
 
