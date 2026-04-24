@@ -153,6 +153,11 @@ class SpecRecord:
     def has_shipped_post(self) -> bool:
         return self.shipped_post_path is not None
 
+    @property
+    def key(self) -> str:
+        """Canonical spec key used by ImageReference / OrphanImage."""
+        return f"{self.number:03d}-{self.slug}"
+
 
 @dataclass(frozen=True)
 class Epic:
@@ -232,6 +237,10 @@ class ArchiveIndex:
     run_completed_at: _dt.datetime | None = None
     run_tool_versions: dict[str, str] = field(default_factory=dict)
     run_log_lines: list[str] = field(default_factory=list)
+    # Spec 231: image audit surfaces (orphan/broken/malformed)
+    orphans: list[OrphanImage] = field(default_factory=list)
+    broken_refs: list[BrokenImageReference] = field(default_factory=list)
+    malformed_refs: list[MalformedImageReference] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -973,6 +982,135 @@ def _first_paragraph(text: str) -> str:
         if paragraph.strip():
             return paragraph.strip()
     return ""
+
+
+# ---------------------------------------------------------------------------
+# Spec 231: image harvest + Jekyll path rewrite
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ImageReference:
+    alt: str
+    source_path: str
+    rewritten_path: str
+    source_spec_key: str
+    line_number: int
+    kind: Literal["markdown", "html"]
+
+
+@dataclass(frozen=True)
+class OrphanImage:
+    spec_key: str
+    filename: str
+    relative_path: Path
+    resolved_path: Path  # dedup key for symlinked evidence dirs (FR-012)
+
+
+@dataclass(frozen=True)
+class BrokenImageReference:
+    spec_key: str
+    source_path: str
+    alt: str
+
+
+@dataclass(frozen=True)
+class MalformedImageReference:
+    spec_key: str
+    line_number: int
+    snippet: str
+
+
+_IMAGE_RE = re.compile(
+    r'!\[(?P<alt>[^\]]*)\]'
+    r'\((?P<path>[^)\s]+)'
+    r'(?:\s+"[^"]*")?\)'
+)
+
+_HTML_IMG_RE = re.compile(
+    r'<img\b[^>]*?\bsrc=(?P<q>["\'])(?P<path>[^"\']+)(?P=q)'
+    r'(?:[^>]*?\balt=["\'](?P<alt>[^"\']*)["\'])?',
+    re.IGNORECASE,
+)
+
+
+def rewrite_image_path(path: str, source_spec_slug: str) -> str:
+    """Convert source-relative image paths to Jekyll absolute form.
+
+    Rules (first match wins):
+      1. Scheme URIs (http://, https://, data:) → pass-through.
+      2. Absolute paths (leading /) → pass-through.
+      3. Strip the first occurrence of ?query or #fragment suffix; preserve
+         for reattachment.
+      4. Loop-strip every leading `./`, `../`, or `evidence/` segment
+         (FR-011). Multi-level climbs (`../../evidence/foo.png`) fully resolve.
+      5. Basename via Path(stripped).name.
+      6. Return `/assets/images/future-debrief/{slug}/{basename}{suffix}`.
+    """
+    if path.startswith(("http://", "https://", "data:")):
+        return path
+    if path.startswith("/"):
+        return path
+    suffix = ""
+    for sep in ("?", "#"):
+        if sep in path:
+            path, suffix_rest = path.split(sep, 1)
+            suffix = sep + suffix_rest
+            break
+    changed = True
+    while changed:
+        changed = False
+        for prefix in ("./", "../", "evidence/"):
+            if path.startswith(prefix):
+                path = path[len(prefix):]
+                changed = True
+                break
+    basename = Path(path).name
+    return f"/assets/images/future-debrief/{source_spec_slug}/{basename}{suffix}"
+
+
+def harvest_image_refs(
+    body: str,
+    source_spec: SpecRecord,
+) -> tuple[list[ImageReference], list[MalformedImageReference]]:
+    """Scan body for markdown + HTML image references.
+
+    Returns (well-formed refs in document order, malformed rows for each
+    unmatched `![` occurrence per FR-013 / Issue 8A).
+    """
+    refs: list[ImageReference] = []
+    malformed: list[MalformedImageReference] = []
+    for lineno, line in enumerate(body.splitlines(keepends=False), start=1):
+        matches_on_line = 0
+        for match in _IMAGE_RE.finditer(line):
+            refs.append(ImageReference(
+                alt=match.group("alt"),
+                source_path=match.group("path"),
+                rewritten_path=rewrite_image_path(match.group("path"), source_spec.key),
+                source_spec_key=source_spec.key,
+                line_number=lineno,
+                kind="markdown",
+            ))
+            matches_on_line += 1
+        for match in _HTML_IMG_RE.finditer(line):
+            refs.append(ImageReference(
+                alt=match.group("alt") or "",
+                source_path=match.group("path"),
+                rewritten_path=rewrite_image_path(match.group("path"), source_spec.key),
+                source_spec_key=source_spec.key,
+                line_number=lineno,
+                kind="html",
+            ))
+        raw_count = line.count("![")
+        if raw_count > matches_on_line:
+            snippet = line[:80] + ("…" if len(line) > 80 else "")
+            for _ in range(raw_count - matches_on_line):
+                malformed.append(MalformedImageReference(
+                    spec_key=source_spec.key,
+                    line_number=lineno,
+                    snippet=snippet,
+                ))
+    return refs, malformed
 
 
 def _append_to_key_decisions(opener: str, paragraph: str) -> str:
