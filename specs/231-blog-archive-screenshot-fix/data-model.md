@@ -1,6 +1,6 @@
 # Phase 1 Data Model — Screenshot Fix Helpers
 
-**Feature**: 230 (specs/229-blog-archive-screenshot-fix/)
+**Feature**: 231 (specs/231-blog-archive-screenshot-fix/)
 **Date**: 2026-04-24
 **Scope**: Three dataclasses internal to `scripts/regenerate-blog-archive.py`.
 

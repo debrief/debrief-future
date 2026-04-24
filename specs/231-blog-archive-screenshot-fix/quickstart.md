@@ -1,8 +1,8 @@
 # Quickstart — Screenshot Fix for Regenerated Blog Archive
 
-**Feature**: 230 (specs/229-blog-archive-screenshot-fix/)
+**Feature**: 231 (specs/231-blog-archive-screenshot-fix/)
 **Audience**: implementer executing the patch.
-**Prerequisite**: on branch `229-blog-archive-screenshot-fix-impl` off `main`.
+**Prerequisite**: on branch `231-blog-archive-screenshot-fix-impl` off `main`.
 
 Six linear commits, one PR. Expect 45–90 min end-to-end.
 
@@ -48,7 +48,7 @@ uv run pyright scripts/regenerate-blog-archive.py      # expect 0 errors
 uv run ruff check scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/
 ```
 
-Commit as `feat(230): revive #228 generator for screenshot-fix work`.
+Commit as `feat(231): revive #228 generator for screenshot-fix work`.
 
 ---
 
@@ -57,7 +57,7 @@ Commit as `feat(230): revive #228 generator for screenshot-fix work`.
 Insert below `_first_paragraph` (line ~971 of revival source):
 
 ```python
-# --- Phase 230 additions: image harvest + Jekyll path rewrite ---
+# --- Phase 231 additions: image harvest + Jekyll path rewrite ---
 
 @dataclass(frozen=True)
 class ImageReference:
@@ -183,7 +183,7 @@ uv run pytest tests/regenerate_blog_archive/test_image_harvest.py tests/regenera
 # → expect new tests pass; 54 existing tests still pass
 ```
 
-Commit as `feat(230): add image harvester + path rewriter with unit tests`.
+Commit as `feat(231): add image harvester + path rewriter with unit tests`.
 
 ---
 
@@ -261,7 +261,7 @@ stitcher already has (title, front matter, destination, no-overwrite,
 section headings), then add 3 screenshot-specific assertions per
 stitcher. Full matrix in `contracts/helpers.md`.
 
-Commit as `feat(230): patch three stitchers to preserve + rewrite member images`.
+Commit as `feat(231): patch three stitchers to preserve + rewrite member images`.
 
 ---
 
@@ -365,7 +365,7 @@ uv run pytest tests/regenerate_blog_archive/test_index.py -v
 # → expect orphan + broken + malformed + deterministic-sort regression pass
 ```
 
-Commit as `feat(230): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md`.
+Commit as `feat(231): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md`.
 
 ---
 
@@ -414,7 +414,7 @@ git diff --name-only specs/*/media/ ARCHIVE-REBUILD.md | wc -l
 # → expect 0 (byte-identical)
 ```
 
-Commit as `feat(230): re-run generator with screenshot fix`.
+Commit as `feat(231): re-run generator with screenshot fix`.
 
 ---
 
@@ -423,7 +423,7 @@ Commit as `feat(230): re-run generator with screenshot fix`.
 ```sh
 git rm scripts/regenerate-blog-archive.py
 git rm -r tests/regenerate_blog_archive/
-git commit -m "feat(230): delete revived generator per FR-009"
+git commit -m "feat(231): delete revived generator per FR-009"
 ```
 
 ---
@@ -442,7 +442,7 @@ without green.**
 
 ## PR
 
-Title: `fix(230): preserve + rewrite screenshot references across blog archive`
+Title: `fix(231): preserve + rewrite screenshot references across blog archive`
 
 Body (bullet summary):
 

@@ -1,7 +1,7 @@
 # Tasks: Fix Screenshot Handling in Regenerated Blog Archive
 
-**Feature**: 230 (specs/229-blog-archive-screenshot-fix/)
-**Branch**: `229-blog-archive-screenshot-fix-impl`
+**Feature**: 231 (specs/231-blog-archive-screenshot-fix/)
+**Branch**: `231-blog-archive-screenshot-fix-impl`
 **Total tasks**: 38
 **Estimate**: 45–90 min end-to-end (per spec §Dependencies & Constraints)
 
@@ -9,8 +9,8 @@
 
 ## Evidence Requirements
 
-**Evidence Directory**: `specs/229-blog-archive-screenshot-fix/evidence/`
-**Media Directory**: `specs/229-blog-archive-screenshot-fix/media/`
+**Evidence Directory**: `specs/231-blog-archive-screenshot-fix/evidence/`
+**Media Directory**: `specs/231-blog-archive-screenshot-fix/media/`
 
 ### Planned Artifacts
 
@@ -45,7 +45,7 @@
 
 - [ ] T001 Revive generator source via `git show 19406178:scripts/regenerate-blog-archive.py > scripts/regenerate-blog-archive.py` `scripts/regenerate-blog-archive.py`
 - [ ] T002 Revive test package via `git checkout 19406178 -- tests/regenerate_blog_archive/` `tests/regenerate_blog_archive/`
-- [ ] T003 Sanity-check revival: `uv run pytest tests/regenerate_blog_archive/ -q` (expect 54 passed), `uv run pyright scripts/regenerate-blog-archive.py` (expect 0 errors), `uv run ruff check scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/` (expect clean). Commit as `feat(230): revive #228 generator for screenshot-fix work`. `scripts/regenerate-blog-archive.py`
+- [ ] T003 Sanity-check revival: `uv run pytest tests/regenerate_blog_archive/ -q` (expect 54 passed), `uv run pyright scripts/regenerate-blog-archive.py` (expect 0 errors), `uv run ruff check scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/` (expect clean). Commit as `feat(231): revive #228 generator for screenshot-fix work`. `scripts/regenerate-blog-archive.py`
 
 **Phase 1 completion gate**: 54 existing tests pass on a clean revival.
 
@@ -61,7 +61,7 @@
 - [ ] T007 [P][test] Write 12 unit cases for `rewrite_image_path` (see table in `contracts/helpers.md`): basic, multi-level climb, repeated `./`, absolute pass-through, Jekyll pass-through, scheme URI (http/https/data), query-string suffix, fragment suffix, combined suffix + climb. `tests/regenerate_blog_archive/test_path_rewrite.py`
 - [ ] T008 Implement `harvest_image_refs(body, source_spec) -> tuple[list[ImageReference], list[MalformedImageReference]]`. Line-by-line scan applying `_IMAGE_RE` then `_HTML_IMG_RE`; populate `kind` field; run the malformed pass (`line.count("![")` vs markdown matches on that line) and emit `MalformedImageReference(spec_key, line_number, snippet=line[:80]+…)` for each unmatched `![`. Reference quickstart §2 for the canonical implementation. Depends on T004+T005+T006. `scripts/regenerate-blog-archive.py`
 - [ ] T009 [test] Write 11 harvester unit cases (see table in `contracts/helpers.md`): empty body, single markdown, HTML with alt, HTML without alt, uppercase `<IMG>`, markdown+HTML mixed line, repeated refs, empty-alt markdown, title-arm markdown, unclosed-paren malformed on line 7, 176-log-panel-ux four-image fixture. Depends on T008. `tests/regenerate_blog_archive/test_image_harvest.py`
-- [ ] T010 Run `uv run pytest tests/regenerate_blog_archive/test_path_rewrite.py tests/regenerate_blog_archive/test_image_harvest.py -v` — expect all new cases green; run full suite `uv run pytest tests/regenerate_blog_archive/ -q` — expect 54 baseline + 23 new tests pass. Commit as `feat(230): add image harvester + path rewriter with unit tests`. `tests/regenerate_blog_archive/`
+- [ ] T010 Run `uv run pytest tests/regenerate_blog_archive/test_path_rewrite.py tests/regenerate_blog_archive/test_image_harvest.py -v` — expect all new cases green; run full suite `uv run pytest tests/regenerate_blog_archive/ -q` — expect 54 baseline + 23 new tests pass. Commit as `feat(231): add image harvester + path rewriter with unit tests`. `tests/regenerate_blog_archive/`
 
 **Phase 2 completion gate**: 77 tests pass (54 baseline + 23 new). US4 satisfied at helper level.
 
@@ -99,7 +99,7 @@
 - [ ] T018 [test] Extend `test_stitch.py` with 2 splice-preservation cases: (a) `test_twin_heading_splice_preserves_all_four_images` using a `176-log-panel-ux`-shaped fixture (4 image refs across two `## Screenshots` sections) — assert 4 refs in merged output; (b) `test_non_twin_heading_merge_unchanged` — regression guard that the existing 1-paragraph splice path still works for posts without twin headings. `tests/regenerate_blog_archive/test_stitch.py`
 - [ ] T019 Run `uv run pytest tests/regenerate_blog_archive/test_stitch.py -v` — expect 5 baseline + 8 rollup + 8 composite + 2 splice = 23 stitcher tests pass. Also run `uv run pytest tests/regenerate_blog_archive/ -q` — expect 77 + 2 = 79 total green. `tests/regenerate_blog_archive/test_stitch.py`
 
-**Phase 5 completion gate**: splice-path regression closed; concat branch covered by test. Commit as `feat(230): patch three stitchers to preserve + rewrite member images` (can also fold T011/T014 into this commit — one logical change is "the three stitcher patches").
+**Phase 5 completion gate**: splice-path regression closed; concat branch covered by test. Commit as `feat(231): patch three stitchers to preserve + rewrite member images` (can also fold T011/T014 into this commit — one logical change is "the three stitcher patches").
 
 ## Phase 6: User Story 5 — Orphan / Broken / Malformed Sections in Archive Index (P2)
 
@@ -114,7 +114,7 @@
 - [ ] T024 [test] Extend `test_index.py` with 9 cases: `test_orphan_section_always_present_even_when_empty`, `test_orphans_render_in_deterministic_order` (insert reverse order → output sorted), `test_three_orphan_fixture_matches_baseline` (085×9, 118×9, 142×1), `test_broken_section_always_present_even_when_empty`, `test_broken_ref_with_query_string_preserves_suffix_in_row`, `test_broken_ref_with_escaped_alt_text_renders_safely`, `test_malformed_section_always_present_even_when_empty`, `test_malformed_ref_row_shows_line_number_and_snippet`, `test_byte_identical_across_two_successive_str_calls` (strong reproducibility gate — Issue 3A). `tests/regenerate_blog_archive/test_index.py`
 - [ ] T025 [test] Add four `scan_orphans` cases to `test_index.py`: `test_orphan_scanner_emits_all_when_no_shipped_post`, `test_orphan_scanner_dedupes_by_resolved_path`, `test_orphan_scanner_skips_referenced_basenames`, `test_orphan_scanner_includes_top_level_evidence_gif`. `tests/regenerate_blog_archive/test_index.py`
 - [ ] T026 [test] Write `test_end_to_end.py` per `contracts/helpers.md` §End-to-end test (Issue 9A). Minimal 3-spec fixture tree: one unified w/ twin-heading + 4 images, one rollup with one 3-image member, one composite with three members carrying 7+5+4 images. Run full `regenerate_blog_archive` flow; assert SC-001 (ref-count parity), SC-002 (zero source-relative paths across all three filename patterns), SC-005 (three new sections present), reproducibility (`str(index) == str(index)` + second run byte-identical), NFR-001 (`elapsed < 10.0s` at 3-spec scale per Issue 10A). `tests/regenerate_blog_archive/test_end_to_end.py`
-- [ ] T027 Run `uv run pytest tests/regenerate_blog_archive/ -q` — expect 79 prior + 13 index extensions + 1 E2E = 93 total tests pass. Commit Phase 6 as two atomic commits: `feat(230): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md` (T020–T025) and `test(230): add end-to-end integration test` (T026). `tests/regenerate_blog_archive/`
+- [ ] T027 Run `uv run pytest tests/regenerate_blog_archive/ -q` — expect 79 prior + 13 index extensions + 1 E2E = 93 total tests pass. Commit Phase 6 as two atomic commits: `feat(231): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md` (T020–T025) and `test(231): add end-to-end integration test` (T026). `tests/regenerate_blog_archive/`
 
 **Phase 6 completion gate**: all generator patches landed + full unit/integration coverage green. Ready to run against the real archive.
 
@@ -128,22 +128,22 @@
 - [ ] T029 Run `uv run python scripts/regenerate-blog-archive.py --force` and capture stdout + run-log output for `evidence/cli-demo.txt` (T035). Expect ≤ 60 s elapsed (NFR-001). `ARCHIVE-REBUILD.md`
 - [ ] T030 Verify SC-001 / SC-002 / SC-003 / SC-004 / SC-005 via three-explicit-globs grep bundle from research R8: count generated refs ≥ baseline, zero source-relative paths, 185 composite ≥ 16 refs, 125 rollup has 3 thumbnail refs, three new index sections present. **Use three separate globs; brace expansion silently misses `epic-rollup.md`.** `specs/*/media/ ARCHIVE-REBUILD.md`
 - [ ] T031 Verify NFR-005 reproducibility: re-run `uv run python scripts/regenerate-blog-archive.py --force` a second time; assert `git diff --name-only specs/*/media/ ARCHIVE-REBUILD.md | wc -l` is `0` (byte-identical). `specs/*/media/ ARCHIVE-REBUILD.md`
-- [ ] T032 Run `task verify` (lint + typecheck + pytest + Playwright E2E). All gates green before delete. Commit as `feat(230): re-run generator with screenshot fix` (includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md`). `specs/229-blog-archive-screenshot-fix/evidence/`
+- [ ] T032 Run `task verify` (lint + typecheck + pytest + Playwright E2E). All gates green before delete. Commit as `feat(231): re-run generator with screenshot fix` (includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md`). `specs/231-blog-archive-screenshot-fix/evidence/`
 
 ### Evidence collection
 
-- [ ] T033 Capture test results using `.specify/templates/evidence/test-summary-template.md` in `specs/229-blog-archive-screenshot-fix/evidence/test-summary.md`. YAML front matter must include `feature: 230`, `captured_at` (ISO timestamp), `git_sha` (branch HEAD), `tests_passed` (expect ~93: 54 baseline + 39 new), `tests_failed: 0`, `tests_skipped: 0`, `coverage_pct` (≥ 77 % per NFR-004). Body: test counts per file, key scenarios verified (SC-001 through SC-009 mapping). `specs/229-blog-archive-screenshot-fix/evidence/test-summary.md`
-- [ ] T034 [P] Create usage demonstration in `specs/229-blog-archive-screenshot-fix/evidence/usage-example.md` — walk reader through the full revive → patch → re-run → delete cycle with commands and expected outputs. Show how a reviewer reproduces the fix locally from a fresh checkout of `main`. `specs/229-blog-archive-screenshot-fix/evidence/usage-example.md`
-- [ ] T035 [P] Capture generator terminal session in `specs/229-blog-archive-screenshot-fix/evidence/cli-demo.txt` (from T029 output). Show the summary block with post counts + run log + elapsed time. `specs/229-blog-archive-screenshot-fix/evidence/cli-demo.txt`
-- [ ] T036 [P] Capture before/after sample in `specs/229-blog-archive-screenshot-fix/evidence/before-after-sample.md`. Two excerpts: (a) `specs/185-cql2-array-filter/media/composite-post.md` before (pre-patch commit) showing 0 images vs after showing ≥ 16 images under three `#### Screenshots` blocks; (b) `specs/176-log-panel-ux/media/unified-post.md` before (3 refs with `./evidence/` paths) vs after (4 refs with Jekyll `/assets/images/future-debrief/...` paths). Use `git show HEAD~N:specs/...` for the before side. `specs/229-blog-archive-screenshot-fix/evidence/before-after-sample.md`
+- [ ] T033 Capture test results using `.specify/templates/evidence/test-summary-template.md` in `specs/231-blog-archive-screenshot-fix/evidence/test-summary.md`. YAML front matter must include `feature: 231`, `captured_at` (ISO timestamp), `git_sha` (branch HEAD), `tests_passed` (expect ~93: 54 baseline + 39 new), `tests_failed: 0`, `tests_skipped: 0`, `coverage_pct` (≥ 77 % per NFR-004). Body: test counts per file, key scenarios verified (SC-001 through SC-009 mapping). `specs/231-blog-archive-screenshot-fix/evidence/test-summary.md`
+- [ ] T034 [P] Create usage demonstration in `specs/231-blog-archive-screenshot-fix/evidence/usage-example.md` — walk reader through the full revive → patch → re-run → delete cycle with commands and expected outputs. Show how a reviewer reproduces the fix locally from a fresh checkout of `main`. `specs/231-blog-archive-screenshot-fix/evidence/usage-example.md`
+- [ ] T035 [P] Capture generator terminal session in `specs/231-blog-archive-screenshot-fix/evidence/cli-demo.txt` (from T029 output). Show the summary block with post counts + run log + elapsed time. `specs/231-blog-archive-screenshot-fix/evidence/cli-demo.txt`
+- [ ] T036 [P] Capture before/after sample in `specs/231-blog-archive-screenshot-fix/evidence/before-after-sample.md`. Two excerpts: (a) `specs/185-cql2-array-filter/media/composite-post.md` before (pre-patch commit) showing 0 images vs after showing ≥ 16 images under three `#### Screenshots` blocks; (b) `specs/176-log-panel-ux/media/unified-post.md` before (3 refs with `./evidence/` paths) vs after (4 refs with Jekyll `/assets/images/future-debrief/...` paths). Use `git show HEAD~N:specs/...` for the before side. `specs/231-blog-archive-screenshot-fix/evidence/before-after-sample.md`
 
 ### Delete the generator (FR-009)
 
-- [ ] T037 Delete generator and tests: `git rm scripts/regenerate-blog-archive.py && git rm -r tests/regenerate_blog_archive/`. Verify SC-006: neither path exists in HEAD. Commit as `feat(230): delete revived generator per FR-009`. `scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/`
+- [ ] T037 Delete generator and tests: `git rm scripts/regenerate-blog-archive.py && git rm -r tests/regenerate_blog_archive/`. Verify SC-006: neither path exists in HEAD. Commit as `feat(231): delete revived generator per FR-009`. `scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/`
 
 ### Media content
 
-- [ ] T038 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/229-blog-archive-screenshot-fix/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/229-blog-archive-screenshot-fix/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T033–T036. Front matter: `layout: future-post`, `title: "Building Screenshot-Complete Blog Archive"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, media]`, `excerpt` ≤ 150 chars. `specs/229-blog-archive-screenshot-fix/media/shipped-post.md`
+- [ ] T038 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/231-blog-archive-screenshot-fix/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (Screenshots, By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T033–T036. Front matter: `layout: future-post`, `title: "Building Screenshot-Complete Blog Archive"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, media]`, `excerpt` ≤ 150 chars. `specs/231-blog-archive-screenshot-fix/media/shipped-post.md`
 
 ### PR creation
 
@@ -194,13 +194,13 @@ Phase 2 (Foundation — satisfies US4 at helper level)
 
 Mirrors the quickstart §6 Commits:
 
-1. `feat(230): revive #228 generator for screenshot-fix work` (T001–T003)
-2. `feat(230): add image harvester + path rewriter with unit tests` (T004–T010)
-3. `feat(230): patch three stitchers to preserve + rewrite member images` (T011–T019 — Phases 3+4+5 folded; all three stitcher patches belong together as one logical change)
-4. `feat(230): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md` (T020–T025)
-5. `test(230): add end-to-end integration test` (T026–T027) — separate commit so reviewer can read the integration assertions without the stitcher noise
-6. `feat(230): re-run generator with screenshot fix` (T028–T032; includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md` — this is the big prose diff the reviewer reads)
-7. `feat(230): delete revived generator per FR-009` (T037) + evidence + blog post folded into this or a follow-up commit
+1. `feat(231): revive #228 generator for screenshot-fix work` (T001–T003)
+2. `feat(231): add image harvester + path rewriter with unit tests` (T004–T010)
+3. `feat(231): patch three stitchers to preserve + rewrite member images` (T011–T019 — Phases 3+4+5 folded; all three stitcher patches belong together as one logical change)
+4. `feat(231): add orphan + broken + malformed sections to ARCHIVE-REBUILD.md` (T020–T025)
+5. `test(231): add end-to-end integration test` (T026–T027) — separate commit so reviewer can read the integration assertions without the stitcher noise
+6. `feat(231): re-run generator with screenshot fix` (T028–T032; includes the regenerated `specs/*/media/*.md` + `ARCHIVE-REBUILD.md` — this is the big prose diff the reviewer reads)
+7. `feat(231): delete revived generator per FR-009` (T037) + evidence + blog post folded into this or a follow-up commit
 
 Expect 6–7 commits. Reviewer reads 2, 3, 4 carefully; skims 1, 5, 6, 7.
 

@@ -1,6 +1,6 @@
 # Phase 0 Research — Screenshot Fix for Regenerated Blog Archive
 
-**Feature**: 230 (specs/229-blog-archive-screenshot-fix/)
+**Feature**: 231 (specs/231-blog-archive-screenshot-fix/)
 **Date**: 2026-04-24
 **Goal**: Resolve all open questions before committing to a patch strategy.
 

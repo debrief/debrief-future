@@ -1,6 +1,6 @@
 # Feature Specification: Fix Screenshot Handling in Regenerated Blog Archive
 
-**Feature Branch**: `229-blog-archive-screenshot-fix`
+**Feature Branch**: `231-blog-archive-screenshot-fix`
 **Created**: 2026-04-24
 **Status**: Draft
 **Depends on**: #228 (PR #518) — the one-shot generator that shipped the archive
@@ -206,7 +206,7 @@ Every `![alt](path)` reference in every generated post (unified, rollup, composi
 ### Phase 0 — Revive
 
 ```bash
-git checkout -b 229-blog-archive-screenshot-fix main
+git checkout -b 231-blog-archive-screenshot-fix main
 git show 19406178:scripts/regenerate-blog-archive.py > scripts/regenerate-blog-archive.py
 git checkout 19406178 -- tests/regenerate_blog_archive/
 # verify revival
@@ -319,7 +319,7 @@ task verify
 # delete
 git rm scripts/regenerate-blog-archive.py
 git rm -r tests/regenerate_blog_archive/
-git commit -m "feat(230): delete revived generator per FR-009"
+git commit -m "feat(231): delete revived generator per FR-009"
 ```
 
 ### PR shape
