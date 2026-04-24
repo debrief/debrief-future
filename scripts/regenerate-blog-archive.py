@@ -226,6 +226,10 @@ class ArchiveIndex:
     skipped_specs: list[SpecRecord] = field(default_factory=list)
     unresolved: list[UnresolvedGrouping] = field(default_factory=list)
     near_misses: list[NearMiss] = field(default_factory=list)
+    # Image-handling bookkeeping (spec 231 additions — FR-006, FR-007, FR-013).
+    orphans: list["OrphanImage"] = field(default_factory=list)
+    broken_refs: list["BrokenImageReference"] = field(default_factory=list)
+    malformed_refs: list["MalformedImageReference"] = field(default_factory=list)
     run_started_at: _dt.datetime = field(
         default_factory=lambda: _dt.datetime.now(tz=_dt.UTC),
     )
@@ -1118,6 +1122,100 @@ def harvest_image_refs(
     return refs, malformed
 
 
+def scan_orphans(
+    spec: SpecRecord,
+    referenced_basenames: set[str],
+    seen_resolved: set[Path],
+    *,
+    repo_root: Path,
+) -> list[OrphanImage]:
+    """Walk evidence/screenshots/** + top-level evidence/*.png|gif for spec.
+
+    Returns orphan rows for files whose basename is not in referenced_basenames
+    and whose resolved path is not yet in seen_resolved. Mutates seen_resolved
+    (first-seen wins — FR-012 symlink dedup).
+    """
+    screenshots_dir = spec.path / "evidence" / "screenshots"
+    evidence_top = spec.path / "evidence"
+    candidates: list[Path] = []
+    if screenshots_dir.is_dir():
+        for pat in ("*.png", "*.gif", "*.jpg", "*.jpeg"):
+            candidates.extend(screenshots_dir.rglob(pat))
+    if evidence_top.is_dir():
+        for pat in ("*.png", "*.gif"):
+            candidates.extend(evidence_top.glob(pat))
+    out: list[OrphanImage] = []
+    for p in sorted(candidates):
+        try:
+            resolved = p.resolve()
+        except OSError:
+            resolved = p
+        if resolved in seen_resolved:
+            continue
+        seen_resolved.add(resolved)
+        if p.name in referenced_basenames:
+            continue
+        try:
+            rel = p.relative_to(repo_root)
+        except ValueError:
+            rel = p
+        out.append(OrphanImage(
+            spec_key=_spec_key(spec),
+            filename=p.name,
+            relative_path=rel,
+            resolved_path=resolved,
+        ))
+    return out
+
+
+def scan_images_and_orphans(
+    specs: list[SpecRecord],
+    *,
+    repo_root: Path,
+) -> tuple[list[OrphanImage], list[BrokenImageReference], list[MalformedImageReference]]:
+    """Scan every spec for on-disk orphans, broken refs, malformed markdown.
+
+    Applies the harvester on each spec's shipped-post body, resolves every
+    path against `shipped_post_path.parent` (Issue 2A) for broken-ref
+    detection, and collects malformed ![ occurrences. Shipped-post-less
+    specs surface every asset as an orphan (Issue 5A).
+    """
+    orphans: list[OrphanImage] = []
+    broken: list[BrokenImageReference] = []
+    malformed: list[MalformedImageReference] = []
+    seen_resolved: set[Path] = set()
+    for spec in specs:
+        if spec.shipped_post_path is not None:
+            body = extract_shipped_body(spec.shipped_post_path)
+            refs, spec_malformed = harvest_image_refs(body, spec)
+            malformed.extend(spec_malformed)
+            referenced_basenames = {
+                Path(r.source_path.split("?")[0].split("#")[0]).name
+                for r in refs
+            }
+            shipped_dir = spec.shipped_post_path.parent
+            for r in refs:
+                if r.source_path.startswith(("http://", "https://", "data:", "/")):
+                    continue
+                clean = r.source_path.split("?")[0].split("#")[0]
+                try:
+                    resolved = (shipped_dir / clean).resolve()
+                except OSError:
+                    continue
+                if not resolved.is_file():
+                    broken.append(BrokenImageReference(
+                        spec_key=_spec_key(spec),
+                        source_path=r.source_path,
+                        alt=r.alt,
+                    ))
+        else:
+            referenced_basenames = set()
+        orphans.extend(scan_orphans(
+            spec, referenced_basenames, seen_resolved, repo_root=repo_root,
+        ))
+    return orphans, broken, malformed
+
+
 def _append_to_key_decisions(opener: str, paragraph: str) -> str:
     if not paragraph:
         return opener
@@ -1905,6 +2003,79 @@ def serialise_archive_index(index: ArchiveIndex, *, args: CliArgs) -> str:
                     lines.append(f"  {detail_line}")
                 lines.append("")
 
+    # Orphan / broken / malformed image sections (spec 231 — FR-006/007/013).
+    # Always present (empty-body placeholder paragraph allowed).
+    # Sorted at serialisation for NFR-005 byte-identical reproducibility.
+    post_by_anchor: dict[str, GeneratedPost] = {}
+    for post in index.generated_posts:
+        anchor_num = post.member_spec_numbers[0] if post.kind == "unified" else min(post.member_spec_numbers)
+        post_by_anchor.setdefault(f"{anchor_num:03d}", post)
+
+    lines.append("## Orphan Screenshots")
+    lines.append("")
+    if not index.orphans:
+        lines.append("_No orphan screenshots detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "Screenshot files present on disk but not referenced by any source "
+            "`shipped-post.md`. Maintainer may hand-embed into the generated "
+            "posts below at publication time."
+        )
+        lines.append("")
+        lines.append("| Spec | Filename | Relative Path | Generated Post |")
+        lines.append("|------|----------|---------------|-----------------|")
+        for orphan in sorted(index.orphans, key=lambda o: (o.spec_key, o.filename)):
+            spec_num = orphan.spec_key.split("-", 1)[0]
+            generated_post = post_by_anchor.get(spec_num)
+            if generated_post is not None:
+                gen_rel = _relpath(generated_post.destination, args.repo_root)
+                gen_cell = f"`{gen_rel}`"
+            else:
+                gen_cell = "(no shipped post)"
+            lines.append(
+                f"| {orphan.spec_key} | `{orphan.filename}` | `{orphan.relative_path}` | {gen_cell} |"
+            )
+        lines.append("")
+
+    lines.append("## Broken Image References")
+    lines.append("")
+    if not index.broken_refs:
+        lines.append("_No broken image references detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "Image references in source `shipped-post.md` files whose target "
+            "file does not exist on disk. Paths are rewritten regardless — "
+            "the maintainer must locate the missing assets."
+        )
+        lines.append("")
+        lines.append("| Spec | Source Path | Alt Text |")
+        lines.append("|------|-------------|----------|")
+        for ref in sorted(index.broken_refs, key=lambda r: (r.spec_key, r.source_path)):
+            safe_alt = ref.alt.replace("|", "\\|").replace("`", "'")
+            lines.append(f"| {ref.spec_key} | `{ref.source_path}` | {safe_alt} |")
+        lines.append("")
+
+    lines.append("## Malformed Image References")
+    lines.append("")
+    if not index.malformed_refs:
+        lines.append("_No malformed image references detected._")
+        lines.append("")
+    else:
+        lines.append(
+            "Occurrences of `![` in source bodies that did not parse as a "
+            "complete markdown image reference. Review and fix the source "
+            "post."
+        )
+        lines.append("")
+        lines.append("| Spec | Line | Snippet |")
+        lines.append("|------|-----:|---------|")
+        for m in sorted(index.malformed_refs, key=lambda m: (m.spec_key, m.line_number)):
+            safe_snippet = m.snippet.replace("|", "\\|").replace("`", "'")
+            lines.append(f"| {m.spec_key} | {m.line_number} | {safe_snippet} |")
+        lines.append("")
+
     lines.append("## Runbook")
     lines.append("")
     lines.append(
@@ -2169,6 +2340,12 @@ def main(argv: list[str] | None = None) -> int:
             index.skipped_specs = [
                 c.spec for c in classifications if c.category == "skipped"
             ]
+            orphans, broken, malformed = scan_images_and_orphans(
+                specs, repo_root=args.repo_root,
+            )
+            index.orphans = orphans
+            index.broken_refs = broken
+            index.malformed_refs = malformed
             for post in posts:
                 writer.stage(post.destination, post.body)
 
