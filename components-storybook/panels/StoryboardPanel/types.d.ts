@@ -71,6 +71,43 @@ export type MissingDataReason = {
     readonly plotStartIso: string;
     readonly plotEndIso: string;
 };
+/**
+ * Per-Scene edit view-model (#218 data-model §3). Populated by the
+ * extension from the plot FeatureCollection + `StaleFlagCache` + per-row
+ * UI state. Consumed by StoryboardPanel's row renderer to drive inline
+ * rename, edit form expansion, stale badge, pending-delete visibility.
+ */
+export interface SceneEditViewModel {
+    readonly sceneId: string;
+    readonly title: string;
+    readonly description: string | null;
+    readonly timestamp: string;
+    readonly titleIsEditing: boolean;
+    readonly editFormOpen: boolean;
+    readonly pendingDelete: boolean;
+    readonly stale: boolean;
+    readonly unresolvedFeatureIds: readonly string[];
+    readonly missingData: {
+        readonly kind: 'ok';
+    } | {
+        readonly kind: 'missing-features';
+        readonly ids: readonly string[];
+    } | {
+        readonly kind: 'out-of-range';
+        readonly scenario: 'before-start' | 'after-end';
+    };
+}
+/**
+ * Storyboard-level edit view-model (#218 data-model §4).
+ */
+export interface StoryboardEditViewModel {
+    readonly storyboardId: string;
+    readonly name: string;
+    readonly description: string | null;
+    readonly nameIsEditing: boolean;
+    readonly descriptionExpanded: boolean;
+    readonly sceneCount: number;
+}
 export interface StoryboardPanelProps {
     /** Ordered by `timestampIso` ascending. Empty when no active Storyboard. */
     readonly scenes: readonly SceneRowViewModel[];
@@ -109,5 +146,28 @@ export interface StoryboardPanelProps {
     onTransportForward?(): void;
     /** Fires when the analyst clicks Backward or presses scoped Left arrow. */
     onTransportBackward?(): void;
+    /** Per-Scene edit view-model keyed by sceneId. If absent for a given
+     *  sceneId, the row falls back to #216/#217 behaviour. */
+    readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
+    /** Storyboard-level edit view-model for the active Storyboard. */
+    readonly storyboardEditViewModel?: StoryboardEditViewModel;
+    /** Pending delete (session undo) descriptor — `null` when no undo window. */
+    readonly pendingUndoToast?: {
+        readonly sceneId: string;
+        readonly sceneTitle: string;
+        readonly deletedAt: string;
+        readonly canUndo: boolean;
+    } | null;
+    onSceneTitleRenameCommit?(sceneId: string, newTitle: string): void;
+    onSceneDescriptionSubmit?(sceneId: string, description: string | null): void;
+    onSceneDeleteRequested?(sceneId: string): void;
+    onSceneUndoDeleteClicked?(sceneId: string): void;
+    onSceneUpdateToCurrentClicked?(sceneId: string): void;
+    onSceneDuplicateClicked?(sceneId: string): void;
+    onSceneCopyToOtherClicked?(sceneId: string): void;
+    onSceneRefreshThumbnailClicked?(sceneId: string): void;
+    onStoryboardRefreshAllStaleClicked?(storyboardId: string): void;
+    onStoryboardNameRenameCommit?(storyboardId: string, newName: string): void;
+    onStoryboardDescriptionSubmit?(storyboardId: string, description: string | null): void;
 }
 //# sourceMappingURL=types.d.ts.map
