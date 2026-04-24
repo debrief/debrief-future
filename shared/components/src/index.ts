@@ -345,7 +345,7 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
-// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback)
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit)
 export {
   StoryboardPanel,
   SceneRow,
@@ -353,6 +353,9 @@ export {
   TransportRow,
   HardBlockModal,
   StoryboardHeader,
+  SceneEditForm,
+  UndoToast,
+  StaleBadge,
 } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
@@ -363,4 +366,11 @@ export type {
   TransportRowProps,
   HardBlockModalProps,
   StoryboardHeaderProps,
+  SceneEditFormProps,
+  SceneMissingData,
+  UndoToastProps,
+  UndoToastState,
+  StaleBadgeProps,
+  SceneEditViewModel,
+  StoryboardEditViewModel,
 } from './panels/StoryboardPanel';

@@ -283,6 +283,61 @@
         "command": "debrief.storyboard.openPanel",
         "title": "Storyboard: Show Panel",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.renameScene",
+        "title": "Storyboard: Rename Scene",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.describeScene",
+        "title": "Storyboard: Edit Scene Description",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.deleteScene",
+        "title": "Storyboard: Delete Scene",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.updateSceneToCurrent",
+        "title": "Storyboard: Update Scene to Current",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.duplicateScene",
+        "title": "Storyboard: Duplicate Scene",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.copySceneToOtherStoryboard",
+        "title": "Storyboard: Copy Scene to Another Storyboard",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.refreshSceneThumbnail",
+        "title": "Storyboard: Refresh Scene Thumbnail",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.refreshAllStaleThumbnails",
+        "title": "Storyboard: Refresh All Stale Thumbnails",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.renameStoryboard",
+        "title": "Storyboard: Rename Storyboard (via edit service)",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.describeStoryboard",
+        "title": "Storyboard: Edit Storyboard Description",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.storyboard.editScene",
+        "title": "Storyboard: Open Scene for Editing",
+        "category": "Debrief"
       }
     ],
     "keybindings": [
@@ -574,6 +629,50 @@
         {
           "command": "debrief.storyboard.backward",
           "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.renameScene",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.describeScene",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.deleteScene",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.updateSceneToCurrent",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.duplicateScene",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.copySceneToOtherStoryboard",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.refreshSceneThumbnail",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.refreshAllStaleThumbnails",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.renameStoryboard",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.describeStoryboard",
+          "when": "debrief.storyboardActive"
+        },
+        {
+          "command": "debrief.storyboard.editScene",
+          "when": "false"
         }
       ]
     },
@@ -584,6 +683,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable animated glow effect on selected tracks"
+        },
+        "debrief.logPanel.collapseConsecutiveSameOp": {
+          "type": "boolean",
+          "default": true,
+          "description": "When 3+ consecutive storyboard edit entries share the same op + actor within a 120-second window, render them as a single collapsed card in the Analysis Log Panel. Turn off for full granularity."
         },
         "debrief.tracks.defaultColors": {
           "type": "array",

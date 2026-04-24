@@ -213,3 +213,118 @@ export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
     />
   ),
 };
+
+// ─── #218 edit-suite stories (T064) ─────────────────────────────────
+
+const EDIT_VM_BASE = {
+  sceneId: 'scene-1',
+  title: 'Exercise start — North channel',
+  description: null as string | null,
+  timestamp: '2026-04-20T14:00:00.000Z',
+  titleIsEditing: false,
+  editFormOpen: false,
+  pendingDelete: false,
+  stale: false,
+  unresolvedFeatureIds: [] as readonly string[],
+  missingData: { kind: 'ok' as const },
+};
+
+export const WithEditForm: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-1': {
+        ...EDIT_VM_BASE,
+        description: '**Brief:** contact gained bearing 023°. Hold course.',
+        editFormOpen: true,
+      },
+    },
+    onSceneTitleRenameCommit: () => undefined,
+    onSceneDescriptionSubmit: () => undefined,
+    onSceneDeleteRequested: () => undefined,
+    onSceneUpdateToCurrentClicked: () => undefined,
+    onSceneDuplicateClicked: () => undefined,
+    onSceneCopyToOtherClicked: () => undefined,
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};
+
+export const WithUndoToast: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    pendingUndoToast: {
+      sceneId: 'scene-2',
+      sceneTitle: 'Contact with surface group',
+      deletedAt: '2026-04-24T12:00:00.000Z',
+      canUndo: true,
+    },
+    sceneEditViewModels: {
+      'scene-2': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        pendingDelete: true,
+      },
+    },
+    onSceneUndoDeleteClicked: () => undefined,
+  },
+};
+
+export const WithStaleBadge: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        stale: true,
+        unresolvedFeatureIds: ['track-alpha', 'track-bravo'],
+      },
+    },
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};
+
+export const WithMissingDataRemediation: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-3': {
+        ...EDIT_VM_BASE,
+        sceneId: 'scene-3',
+        title: 'Bearing-only track lock',
+        description: null,
+        timestamp: '2026-04-20T14:35:00.000Z',
+        editFormOpen: true,
+        missingData: {
+          kind: 'missing-features',
+          ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+        },
+      },
+    },
+    onSceneTitleRenameCommit: () => undefined,
+    onSceneDescriptionSubmit: () => undefined,
+    onSceneDeleteRequested: () => undefined,
+    onSceneUpdateToCurrentClicked: () => undefined,
+    onSceneDuplicateClicked: () => undefined,
+    onSceneCopyToOtherClicked: () => undefined,
+    onSceneRefreshThumbnailClicked: () => undefined,
+  },
+};

@@ -9,8 +9,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   writeSceneThumbnail,
   deleteSceneThumbnail,
+  gcOrphanAssets,
   type FsLike,
   type SceneThumbnailServiceDeps,
+  type GcOrphanAssetsPlot,
 } from '../../src/services/sceneThumbnailService';
 import { SceneThumbnailError } from '../../src/services/sceneThumbnailError';
 
@@ -387,5 +389,95 @@ describe('deleteSceneThumbnail', () => {
     await expect(() =>
       deleteSceneThumbnail(setup.itemPath, VALID_ULID, setup.deps),
     ).rejects.toMatchObject({ code: 'unknown-scene' });
+  });
+});
+
+// ─── gcOrphanAssets (Feature 218 — FR-EDIT-024) ──────────────────────────
+
+function makeScene(sceneId: string, thumbnailKey: string): GcOrphanAssetsPlot['features'][number] {
+  return {
+    properties: {
+      kind: 'STORYBOARD_SCENE',
+      thumbnail_asset_ref: thumbnailKey,
+    },
+  };
+}
+
+describe('gcOrphanAssets', () => {
+  it('unlinks PNG files and asset entries whose scene has been removed', async () => {
+    const setup = setupFs();
+    // Seed two scenes' thumbnails in item.json + on disk.
+    await writeSceneThumbnail(setup.itemPath, VALID_ULID, pngBase64, pngBase64Small, setup.deps);
+    await writeSceneThumbnail(setup.itemPath, OTHER_ULID, pngBase64, pngBase64Small, setup.deps);
+
+    // Plot only references the FIRST scene; OTHER_ULID is now orphaned.
+    const plot: GcOrphanAssetsPlot = {
+      features: [makeScene(VALID_ULID, `scene-thumbnail-${VALID_ULID}`)],
+    };
+
+    const { reclaimed } = await gcOrphanAssets(setup.itemPath, plot, setup.deps);
+    expect(reclaimed).toHaveLength(2); // large + small for OTHER_ULID
+
+    // Orphan PNGs gone
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${OTHER_ULID}.png`)).toBe(false);
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${OTHER_ULID}-sm.png`)).toBe(false);
+    // Live PNGs untouched
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${VALID_ULID}.png`)).toBe(true);
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${VALID_ULID}-sm.png`)).toBe(true);
+
+    // item.json asset entries pruned for orphans only
+    const raw = await setup.deps.fs.readFile('/store/item/item.json', 'utf8');
+    const parsed = JSON.parse(raw) as { assets: Record<string, unknown> };
+    expect(parsed.assets[`scene-thumbnail-${OTHER_ULID}`]).toBeUndefined();
+    expect(parsed.assets[`scene-thumbnail-${OTHER_ULID}-sm`]).toBeUndefined();
+    expect(parsed.assets[`scene-thumbnail-${VALID_ULID}`]).toBeDefined();
+    expect(parsed.assets[`scene-thumbnail-${VALID_ULID}-sm`]).toBeDefined();
+  });
+
+  it('leaves referenced PNGs untouched and returns empty reclaimed list when no orphans', async () => {
+    const setup = setupFs();
+    await writeSceneThumbnail(setup.itemPath, VALID_ULID, pngBase64, pngBase64Small, setup.deps);
+
+    const plot: GcOrphanAssetsPlot = {
+      features: [makeScene(VALID_ULID, `scene-thumbnail-${VALID_ULID}`)],
+    };
+
+    const { reclaimed } = await gcOrphanAssets(setup.itemPath, plot, setup.deps);
+    expect(reclaimed).toEqual([]);
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${VALID_ULID}.png`)).toBe(true);
+  });
+
+  it('handles an empty plot (no scenes → every thumbnail asset is orphan)', async () => {
+    const setup = setupFs();
+    await writeSceneThumbnail(setup.itemPath, VALID_ULID, pngBase64, pngBase64Small, setup.deps);
+
+    const { reclaimed } = await gcOrphanAssets(setup.itemPath, { features: [] }, setup.deps);
+    expect(reclaimed).toHaveLength(2);
+    expect(setup.fs.existsPath(`/store/item/scene-thumbnails/scene-${VALID_ULID}.png`)).toBe(false);
+  });
+
+  it('does not touch non-scene-thumbnail assets', async () => {
+    const setup = setupFs();
+    // Seed item.json with a non-scene asset entry alongside a scene thumbnail.
+    const itemJson = JSON.parse(
+      await setup.deps.fs.readFile('/store/item/item.json', 'utf8'),
+    ) as { assets: Record<string, unknown> };
+    itemJson.assets = itemJson.assets || {};
+    itemJson.assets['some-other-asset'] = { href: 'assets/report.pdf', type: 'application/pdf' };
+    await setup.deps.fs.writeFile(
+      '/store/item/item.json',
+      `${JSON.stringify(itemJson, null, 2)}\n`,
+    );
+
+    // Add an orphan thumbnail too.
+    await writeSceneThumbnail(setup.itemPath, VALID_ULID, pngBase64, pngBase64Small, setup.deps);
+
+    const { reclaimed } = await gcOrphanAssets(setup.itemPath, { features: [] }, setup.deps);
+    expect(reclaimed).toHaveLength(2);
+
+    const after = JSON.parse(
+      await setup.deps.fs.readFile('/store/item/item.json', 'utf8'),
+    ) as { assets: Record<string, unknown> };
+    expect(after.assets['some-other-asset']).toBeDefined();
   });
 });

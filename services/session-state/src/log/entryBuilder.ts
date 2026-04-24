@@ -12,7 +12,9 @@ import type {
   WasGeneratedBy,
   ToolResultForLog,
   ExpandedToolResultFields,
+  RecordStoryboardEditInput,
 } from './types.js';
+import { STORYBOARD_EDIT_TOOL_SENTINEL } from './types.js';
 
 /**
  * Convert milliseconds to ISO 8601 duration string.
@@ -225,5 +227,57 @@ export function buildLogEntry(
     generated_result_id: expanded?.created_assets?.[0]?.result_id ?? null,
     tune: null,
     input_state: inputState ?? toolResult.input_state ?? null,
+  };
+}
+
+/**
+ * Build a LogEntry for a Storyboard edit operation (Feature 218).
+ *
+ * Pure — no I/O. The op, sceneId, storyboardId, thumbnailAssetRef,
+ * underlyingActivityId, and pairActivityId are carried as
+ * `was_generated_by.parameters` entries so #176's card renderer (and
+ * the existing `getTimeline` machinery) can read them without a
+ * schema change.
+ *
+ * The `rationale` field carries the one-line summary so the
+ * LogPanel's Compact view can render it directly.
+ */
+export function buildStoryboardEditLogEntry(
+  input: RecordStoryboardEditInput,
+): LogEntry {
+  const param = (value: unknown): ParameterValue => ({
+    value,
+    default: false,
+    tunable: false,
+  });
+  const parameters: Record<string, ParameterValue> = {
+    op: param(input.op),
+    actor: param(input.actor),
+    storyboardId: param(input.storyboardId),
+    sceneId: param(input.sceneId),
+    thumbnailAssetRef: param(input.thumbnailAssetRef),
+    underlyingActivityId: param(input.underlyingActivityId),
+    pairActivityId: param(input.pairActivityId),
+  };
+  const used: string[] = [input.storyboardId];
+  if (input.sceneId !== null) {
+    used.push(input.sceneId);
+  }
+  const generated: string[] = [input.sceneId ?? input.storyboardId];
+  const wasGeneratedBy: WasGeneratedBy = {
+    tool: STORYBOARD_EDIT_TOOL_SENTINEL,
+    tool_version: '1',
+    parameters,
+  };
+  return {
+    activity_id: generateActivityId(),
+    timestamp: input.timestamp,
+    was_generated_by: wasGeneratedBy,
+    used,
+    generated,
+    execution_duration: 'PT0S',
+    generated_result_id: null,
+    tune: null,
+    rationale: input.summary,
   };
 }

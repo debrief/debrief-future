@@ -60,6 +60,10 @@ export {
   deleteScene,
   duplicateScene,
   copySceneToOtherStoryboard,
+  // #218 additive extensions (review 2A + analyze patch I1)
+  describeStoryboard,
+  restoreScene,
+  checkSceneTimestamp,
 } from "./crud";
 export type {
   CreateStoryboardInput,
@@ -71,6 +75,9 @@ export type {
   DeleteSceneInput,
   DuplicateSceneInput,
   CopySceneToOtherStoryboardInput,
+  // #218 additive extensions
+  DescribeStoryboardInput,
+  RestoreSceneInput,
 } from "./crud";
 
 // ---------------------------------------------------------------------------
@@ -132,3 +139,9 @@ export type {
   StoryboardCrudOp,
   StoryboardCrudLogEntryInput,
 } from "./provenance";
+
+// #218 review 6A — alias the canonical op union as `StoryboardOp` so
+// downstream recorders (session-state `StoryboardEditOp`) can `extend`
+// rather than `duplicate`. Any future op added to `StoryboardCrudOp` is
+// automatically visible to #218's recorder without a manual sync.
+export type { StoryboardCrudOp as StoryboardOp } from "./provenance";
