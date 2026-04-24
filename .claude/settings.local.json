@@ -89,7 +89,8 @@
       "Bash(npx playwright:*)",
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell dev:*)",
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell generate-thumbnails:*)",
-      "Bash(STAC_STORE_PATH=* npx tsx apps/web-shell/scripts/capture-single.ts:*)"
+      "Bash(STAC_STORE_PATH=* npx tsx apps/web-shell/scripts/capture-single.ts:*)",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }

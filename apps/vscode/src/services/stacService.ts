@@ -330,7 +330,11 @@ export class StacService {
       // Verify required fields for downstream consumers — missing
       // `properties.datetime` leads to a cryptic `Failed to load plot`
       // later in the pipeline.
-      if (!item.properties || typeof item.properties !== 'object') {
+      if (
+        item.properties === null ||
+        item.properties === undefined ||
+        typeof item.properties !== 'object'
+      ) {
         this.logDiagnostic(
           `[stac.loadPlot] item-has-no-properties: store=${store.path} itemPath=${itemPath}`,
         );
