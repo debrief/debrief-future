@@ -40,4 +40,27 @@ export const storyboardEdit = {
     `Refreshed ${count} scene${count === 1 ? '' : 's'}.`,
   refreshAllStalePartial: (succeeded: number, failed: number): string =>
     `Refreshed ${succeeded} scene${succeeded === 1 ? '' : 's'}. ${failed} failed — see Log Panel.`,
+  // #230 FR-003 / FR-005 — scene overflow menu labels (six items).
+  overflowMenuEditDescription: (): string => `Edit description`,
+  overflowMenuUpdateToCurrent: (): string => `Update to current`,
+  overflowMenuDuplicate: (): string => `Duplicate`,
+  overflowMenuCopyToOther: (): string => `Copy to other storyboard`,
+  overflowMenuDelete: (): string => `Delete`,
+  overflowMenuRefreshThumbnail: (): string => `Refresh thumbnail`,
+  overflowMenuTriggerAriaLabel: (sceneTitle: string): string =>
+    `Scene actions menu for ${sceneTitle}`,
+  overflowMenuAriaLabel: (sceneTitle: string): string =>
+    `Actions for scene ${sceneTitle}`,
+  // #230 FR-001 — chevron ARIA labels.
+  chevronExpandLabel: (sceneTitle: string): string =>
+    `Expand edit form for ${sceneTitle}`,
+  chevronCollapseLabel: (sceneTitle: string): string =>
+    `Collapse edit form for ${sceneTitle}`,
+  // #230 FR-012 — Refresh all stale button label.
+  refreshAllStaleButton: (staleCount: number): string =>
+    staleCount === 0
+      ? `Refresh all stale`
+      : `Refresh all stale (${staleCount})`,
+  // #230 — UndoToast dismiss label.
+  undoToastDismissLabel: (): string => `Dismiss undo toast`,
 } as const;

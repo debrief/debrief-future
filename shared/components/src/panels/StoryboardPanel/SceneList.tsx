@@ -28,6 +28,10 @@ export interface SceneListProps {
   onSceneCopyToOtherClicked?(sceneId: string): void;
   onSceneRefreshThumbnailClicked?(sceneId: string): void;
   onSceneEditFormCancel?(sceneId: string): void;
+
+  // ── #230 chevron + right-click affordances (panel-driven) ─────────
+  onSceneRowExpandToggle?(sceneId: string): void;
+  onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
 }
 
 const PENDING_SCENE: SceneRowViewModel = {
@@ -53,6 +57,8 @@ export function SceneList({
   onSceneCopyToOtherClicked,
   onSceneRefreshThumbnailClicked,
   onSceneEditFormCancel,
+  onSceneRowExpandToggle,
+  onSceneOverflowMenuOpen,
 }: SceneListProps): React.ReactElement {
   return (
     <div
@@ -76,7 +82,10 @@ export function SceneList({
             <SceneRow
               scene={scene}
               active={currentSceneId === scene.sceneId}
+              editFormOpen={editVm?.editFormOpen ?? false}
               onClick={onSceneRowClick}
+              onExpandToggle={onSceneRowExpandToggle}
+              onOverflowMenuOpen={onSceneOverflowMenuOpen}
             />
             {editVm?.stale && (
               <StaleBadge
