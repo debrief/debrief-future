@@ -975,6 +975,132 @@ def _first_paragraph(text: str) -> str:
     return ""
 
 
+# ---------------------------------------------------------------------------
+# Phase 231: image harvest + Jekyll path rewrite
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ImageReference:
+    alt: str
+    source_path: str
+    rewritten_path: str
+    source_spec_key: str
+    line_number: int
+    kind: Literal["markdown", "html"]
+
+
+@dataclass(frozen=True)
+class OrphanImage:
+    spec_key: str
+    filename: str
+    relative_path: Path
+    resolved_path: Path  # dedup key for symlinked evidence dirs (FR-012)
+
+
+@dataclass(frozen=True)
+class BrokenImageReference:
+    spec_key: str
+    source_path: str
+    alt: str
+
+
+@dataclass(frozen=True)
+class MalformedImageReference:
+    spec_key: str
+    line_number: int
+    snippet: str
+
+
+_IMAGE_RE = re.compile(
+    r"!\[(?P<alt>[^\]]*)\]"
+    r"\((?P<path>[^)\s]+)"
+    r'(?:\s+"[^"]*")?\)'
+)
+
+_HTML_IMG_RE = re.compile(
+    r"<img\b[^>]*?\bsrc=(?P<q>[\"'])(?P<path>[^\"']+)(?P=q)"
+    r"(?:[^>]*?\balt=[\"'](?P<alt>[^\"']*)[\"'])?",
+    re.IGNORECASE,
+)
+
+
+def rewrite_image_path(path: str, source_spec_slug: str) -> str:
+    """Convert ./evidence/... → /assets/images/future-debrief/{slug}/{basename}.
+
+    Rules (first rule to apply wins):
+    1. Scheme URIs (http://, https://, data:) → unchanged.
+    2. Already absolute (/...) → unchanged.
+    3. Split off ?query or #fragment suffix, preserve for reattachment.
+    4. Loop-strip every leading ./ ../ evidence/ segment (FR-011).
+    5. Basename-only output.
+    """
+    if path.startswith(("http://", "https://", "data:")):
+        return path
+    if path.startswith("/"):
+        return path
+    suffix = ""
+    for sep in ("?", "#"):
+        if sep in path:
+            path, suffix_rest = path.split(sep, 1)
+            suffix = sep + suffix_rest
+            break
+    changed = True
+    while changed:
+        changed = False
+        for prefix in ("./", "../", "evidence/"):
+            if path.startswith(prefix):
+                path = path[len(prefix):]
+                changed = True
+                break
+    basename = Path(path).name
+    return f"/assets/images/future-debrief/{source_spec_slug}/{basename}{suffix}"
+
+
+def harvest_image_refs(
+    body: str,
+    source_spec: SpecRecord,
+) -> tuple[list[ImageReference], list[MalformedImageReference]]:
+    """Scan body for markdown and HTML image references, plus unmatched ![ occurrences.
+
+    Returns (well-formed refs in document order, malformed rows).
+    """
+    refs: list[ImageReference] = []
+    malformed: list[MalformedImageReference] = []
+    spec_key = _spec_key(source_spec)
+    for lineno, line in enumerate(body.splitlines(keepends=False), start=1):
+        markdown_matches = 0
+        for match in _IMAGE_RE.finditer(line):
+            refs.append(ImageReference(
+                alt=match.group("alt"),
+                source_path=match.group("path"),
+                rewritten_path=rewrite_image_path(match.group("path"), spec_key),
+                source_spec_key=spec_key,
+                line_number=lineno,
+                kind="markdown",
+            ))
+            markdown_matches += 1
+        for match in _HTML_IMG_RE.finditer(line):
+            refs.append(ImageReference(
+                alt=match.group("alt") or "",
+                source_path=match.group("path"),
+                rewritten_path=rewrite_image_path(match.group("path"), spec_key),
+                source_spec_key=spec_key,
+                line_number=lineno,
+                kind="html",
+            ))
+        raw_count = line.count("![")
+        if raw_count > markdown_matches:
+            snippet = line[:80] + ("…" if len(line) > 80 else "")
+            for _ in range(raw_count - markdown_matches):
+                malformed.append(MalformedImageReference(
+                    spec_key=spec_key,
+                    line_number=lineno,
+                    snippet=snippet,
+                ))
+    return refs, malformed
+
+
 def _append_to_key_decisions(opener: str, paragraph: str) -> str:
     if not paragraph:
         return opener
