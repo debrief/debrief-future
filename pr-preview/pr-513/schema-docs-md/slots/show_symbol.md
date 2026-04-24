@@ -17,8 +17,8 @@ Alias: show_symbol
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PositionStyle](../classes/PositionStyle.md) | Default styling configuration for track positions |  no  |
 | [PositionStyleOverride](../classes/PositionStyleOverride.md) | Per-position style override |  no  |
+| [PositionStyle](../classes/PositionStyle.md) | Default styling configuration for track positions |  no  |
 
 
 
