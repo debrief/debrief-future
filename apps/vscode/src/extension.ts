@@ -1,6 +1,7 @@
 // Fix: track symbols/labels visibility preserved when running styling tools
 // Data quality: sensor-only plots merged into track companions, timestamps fixed
 import * as vscode from 'vscode';
+import * as path from 'path';
 import {
   subscribeToDirty,
   subscribeToSelection,
@@ -37,6 +38,13 @@ import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
+import { registerStoryboardEditCommands } from './commands/storyboardEdit';
+import { StoryboardEditService } from './services/storyboardEdit';
+import { plotFromFeatures } from './services/plotFromFeatures';
+import {
+  gcOrphanAssets as sceneThumbnailGcOrphanAssets,
+  writeSceneThumbnail,
+} from './services/sceneThumbnailService';
 import {
   StoryboardPlaybackService,
   type ModalPromptPort,
@@ -47,6 +55,7 @@ import {
   type PlaybackTimeRangeView,
 } from './services/storyboardPlayback';
 import { formatDtg } from '@debrief/components';
+import { calculateViewportCenter } from '@debrief/utils';
 import type { DebriefFeature } from '@debrief/components';
 
 let mapPanel: MapPanel | undefined;
@@ -221,6 +230,198 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // #217 Phase 4 — the panel needs the service reference so it can
   // call setActiveStoryboard synchronously on dropdown-change messages.
   storyboardPanelProvider.setPlaybackService(storyboardPlaybackService);
+
+  // #218 — Storyboard edit orchestration service. Phase 3 wires the
+  // panel view as the edit sink so inbound messages (scene-edit-form-
+  // open, scene-undo-toast-shown) flow back to the webview. The
+  // remaining ports (mapPanel, sessionManager, thumbnailService,
+  // logService) are wired via setters below.
+  const storyboardEditService = new StoryboardEditService();
+  context.subscriptions.push(storyboardEditService.activate());
+  storyboardPanelProvider.setEditService(storyboardEditService);
+
+  // #218 Phase 4/5 — wire the runtime ports for stale detection, refresh,
+  // and orphan-asset GC on plot close.
+  storyboardEditService.setMapPanel({
+    getCurrentFeatures: (): DebriefFeature[] =>
+      mapPanel?.getCurrentFeatures?.() ?? [],
+    setFeatures: (features): void => {
+      mapPanel?.setFeatures?.([...features]);
+    },
+  });
+  storyboardEditService.setSessionManager({
+    getActiveDocumentUri: (): string | null =>
+      sessionManager.getActiveDocumentUri(),
+    resolveStoreContext: (_documentUri: string) => {
+      const store = mapPanel?.getCurrentStore?.();
+      const plot = mapPanel?.getCurrentPlot?.();
+      if (!store?.path || !plot?.itemPath) {return null;}
+      return {
+        storePath: store.path,
+        itemPath: path.join(store.path, plot.itemPath),
+      };
+    },
+  });
+  storyboardEditService.setThumbnailService({
+    captureThumbnail: async ({ stacItemPath, sceneId }) => {
+      const panel = mapPanel;
+      if (!panel) {
+        throw new Error('captureThumbnail: mapPanel not initialised');
+      }
+      const pair = await panel.requestThumbnailCapture();
+      if (!pair.largePngBase64 || !pair.smallPngBase64) {
+        throw new Error('captureThumbnail: mapPanel returned empty PNG pair');
+      }
+      const res = await writeSceneThumbnail(
+        stacItemPath,
+        sceneId,
+        pair.largePngBase64,
+        pair.smallPngBase64,
+      );
+      return { assetKey: res.assetKey };
+    },
+    deepCopyAsset: (
+      sourceAssetRef: string,
+      destStoryboardId: string,
+    ): Promise<string> => {
+      // Minimal safe fallback: returns a DIFFERENT ref (contract
+      // requires distinctness per FR-MODULE-015). Full deep-copy
+      // (tmp+fsync+rename of PNG pair + new asset entry) lands with
+      // the #216/#174 integration follow-up.
+      return Promise.resolve(`${sourceAssetRef}-copy-${destStoryboardId}`);
+    },
+    gcOrphanAssets: sceneThumbnailGcOrphanAssets,
+  });
+  // LogService binds dynamically — the per-plot LogService is owned by
+  // MapPanel (same pattern as ResultsPanelService).
+  //
+  // Note on typing: the service's port declares `op: string` (loose;
+  // the service internally uses a closed set of op names matching
+  // StoryboardEditOp). We narrow at this boundary by reshaping the
+  // payload rather than with an `as unknown as` cast.
+  const syncLogService = (): void => {
+    const svc = mapPanel?.getLogService?.();
+    if (svc) {
+      storyboardEditService.setLogService({
+        recordStoryboardEdit: (input) => {
+          type SvcInput = Parameters<typeof svc.recordStoryboardEdit>[0];
+          type SvcOp = SvcInput['op'];
+          const narrowed: SvcInput = {
+            storePath: input.storePath,
+            itemPath: input.itemPath,
+            op: input.op as SvcOp,
+            storyboardId: input.storyboardId,
+            sceneId: input.sceneId,
+            thumbnailAssetRef: input.thumbnailAssetRef,
+            actor: input.actor,
+            summary: input.summary,
+            timestamp: input.timestamp,
+            underlyingActivityId: input.underlyingActivityId,
+            pairActivityId: input.pairActivityId,
+          };
+          return svc.recordStoryboardEdit(narrowed);
+        },
+      });
+    } else {
+      storyboardEditService.setLogService(null);
+    }
+  };
+  syncLogService();
+  registerStoryboardEditCommands(context, {
+    service: storyboardEditService,
+    sessionManager: {
+      getActiveDocumentUri: (): string | null => sessionManager.getActiveDocumentUri(),
+    },
+    readCurrentMapView: (): {
+      viewport: { center: number[]; zoom: number; bearing: number };
+      timestamp: string;
+      visibleFeatureIds: readonly string[];
+    } | null => {
+      const panel = mapPanel;
+      if (!panel) {return null;}
+      const docUri = sessionManager.getActiveDocumentUri();
+      if (docUri === null) {return null;}
+      const session = sessionManager.getSession(docUri);
+      const state = session?.getState();
+      const viewport = state?.viewport ?? null;
+      const currentTime = state?.currentTime ?? null;
+      if (!viewport || viewport.zoom === undefined || currentTime === null) {
+        return null;
+      }
+      const centerObj = calculateViewportCenter(viewport);
+      const features = panel.getCurrentFeatures();
+      const hiddenIds = new Set(state?.hiddenFeatureIds ?? []);
+      const visibleFeatureIds: string[] = [];
+      for (const f of features) {
+        const props = f.properties as { id?: string | null } | null;
+        const id = props?.id;
+        if (typeof id !== 'string' || id.length === 0) {continue;}
+        if (hiddenIds.has(id)) {continue;}
+        visibleFeatureIds.push(id);
+      }
+      return {
+        viewport: {
+          center: [centerObj.longitude, centerObj.latitude],
+          zoom: viewport.zoom,
+          bearing: 0,
+        },
+        timestamp: new Date(currentTime).toISOString(),
+        visibleFeatureIds,
+      };
+    },
+    listSiblingStoryboards: (
+      _documentUri: string,
+      sourceStoryboardId: string,
+    ): readonly { id: string; name: string; sceneCount: number }[] => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      const sceneCountById = new Map<string, number>();
+      for (const f of features) {
+        const props = f.properties as { kind?: string; storyboard_id?: string } | null;
+        if (props?.kind === 'STORYBOARD_SCENE' && typeof props.storyboard_id === 'string') {
+          sceneCountById.set(
+            props.storyboard_id,
+            (sceneCountById.get(props.storyboard_id) ?? 0) + 1,
+          );
+        }
+      }
+      const result: { id: string; name: string; sceneCount: number }[] = [];
+      for (const f of features) {
+        const props = f.properties as { kind?: string; id?: string; name?: string } | null;
+        if (
+          props?.kind === 'STORYBOARD' &&
+          typeof props.id === 'string' &&
+          typeof props.name === 'string' &&
+          props.id !== sourceStoryboardId
+        ) {
+          result.push({
+            id: props.id,
+            name: props.name,
+            sceneCount: sceneCountById.get(props.id) ?? 0,
+          });
+        }
+      }
+      return result;
+    },
+    resolveSceneStoryboard: (
+      _documentUri: string,
+      sceneId: string,
+    ): string | null => {
+      const features = mapPanel?.getCurrentFeatures() ?? [];
+      for (const f of features) {
+        const props = f.properties as
+          | { kind?: string; id?: string; storyboard_id?: string }
+          | null;
+        if (
+          props?.kind === 'STORYBOARD_SCENE' &&
+          props.id === sceneId &&
+          typeof props.storyboard_id === 'string'
+        ) {
+          return props.storyboard_id;
+        }
+      }
+      return null;
+    },
+  });
 
   // Results panel (Feature: 178-vscode-tabular-results)
   const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
@@ -755,11 +956,37 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Feature 217 — wire the service's lifecycle + transport surface.
   // Plot open: run validatePlot + seed active + install scrub override.
   // Plot close / switch: restore scrub + drop state.
+  // #218 T089 — track the previously-active URI so we can fire
+  // onPlotClosed (→ gcOrphanAssets) when the session changes away.
+  // Features are read live from mapPanel at close time; if empty
+  // (plot already unloaded), gcOrphanAssets no-ops safely.
+  let previousActiveUri: string | null = null;
   context.subscriptions.push(
     sessionManager.onActiveSessionChange((session) => {
       const activeUri = sessionManager.getActiveDocumentUri();
+      if (
+        previousActiveUri !== null &&
+        previousActiveUri !== activeUri
+      ) {
+        const finalFeatures = mapPanel?.getCurrentFeatures() ?? [];
+        if (finalFeatures.length > 0) {
+          void storyboardEditService.onPlotClosed(
+            previousActiveUri,
+            plotFromFeatures(finalFeatures),
+          );
+        }
+      }
       if (session && activeUri) {
         storyboardPlaybackService.onPlotOpened(activeUri);
+        // #218 T070 — kick off the stale-detection pass (early-returns
+        // on zero-storyboard plots per review 11A).
+        void storyboardEditService.onPlotOpened(
+          activeUri,
+          plotFromFeatures(mapPanel?.getCurrentFeatures() ?? []),
+        );
+        previousActiveUri = activeUri;
+      } else {
+        previousActiveUri = null;
       }
     }),
   );

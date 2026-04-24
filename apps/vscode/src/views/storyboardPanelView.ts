@@ -22,6 +22,7 @@ import type { SceneRowViewModel } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import type { StoryboardPlaybackService, StoryboardPlaybackSnapshot } from '../services/storyboardPlayback';
+import type { StoryboardEditService } from '../services/storyboardEdit';
 import { plotFromFeatures } from '../services/plotFromFeatures';
 import type {
   StoryboardPanelMessage,
@@ -39,6 +40,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   private sessionChangeDisposable: vscode.Disposable | undefined;
   private getMapPanel: () => MapPanel | undefined = () => undefined;
   private playbackService: StoryboardPlaybackService | undefined;
+  private editService: StoryboardEditService | undefined;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -60,6 +62,19 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setPlaybackService(service: StoryboardPlaybackService): void {
     this.playbackService = service;
+  }
+
+  /**
+   * #218: provide the edit service. Also installs the panel as a sink
+   * for inbound edit messages (scene-edit-form-open, stale-flags-updated,
+   * scene-undo-toast-shown) so the service can push UI state back to the
+   * webview without a direct dependency on this class.
+   */
+  public setEditService(service: StoryboardEditService): void {
+    this.editService = service;
+    service.setPanelSink({
+      postMessage: (msg): void => this.post(msg),
+    });
   }
 
   public resolveWebviewView(
@@ -255,6 +270,124 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         }
         // debug-level logs are intentionally dropped in production builds.
         break;
+
+      // #218 — edit suite (Scene-level ops). Each dispatches directly to
+      // the edit service rather than via command palette, because the
+      // webview carries all the params the service needs (new title,
+      // description, timestamp) — going through palette would require
+      // packaging + unpacking args.
+      case 'scene-title-rename-committed':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.renameScene({
+            documentUri: uri,
+            sceneId: message.sceneId,
+            newTitle: message.newTitle,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+      case 'scene-description-edit-submitted':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.describeScene({
+            documentUri: uri,
+            sceneId: message.sceneId,
+            description: message.description,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+      case 'scene-delete-requested':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.deleteScene({
+            documentUri: uri,
+            sceneId: message.sceneId,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+      case 'scene-undo-delete-clicked':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.undoDeleteScene({
+            documentUri: uri,
+            sceneId: message.sceneId,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+      case 'scene-update-to-current-clicked':
+        // Palette-style route — needs the current map view + optional
+        // prompts; delegate to the command handler. The command reads
+        // mapPanel state and wires collision modals.
+        void vscode.commands.executeCommand(
+          'debrief.storyboard.updateSceneToCurrent',
+          { sceneId: message.sceneId },
+        );
+        break;
+      case 'scene-duplicate-clicked':
+        void vscode.commands.executeCommand(
+          'debrief.storyboard.duplicateScene',
+          { sceneId: message.sceneId },
+        );
+        break;
+      case 'scene-copy-to-other-clicked':
+        void vscode.commands.executeCommand(
+          'debrief.storyboard.copySceneToOtherStoryboard',
+          { sceneId: message.sceneId },
+        );
+        break;
+      case 'scene-refresh-thumbnail-clicked':
+        void vscode.commands.executeCommand(
+          'debrief.storyboard.refreshSceneThumbnail',
+          { sceneId: message.sceneId },
+        );
+        break;
+      case 'storyboard-refresh-all-stale-clicked':
+        void vscode.commands.executeCommand(
+          'debrief.storyboard.refreshAllStaleThumbnails',
+          { storyboardId: message.storyboardId },
+        );
+        break;
+      case 'storyboard-name-rename-committed':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.renameStoryboard({
+            documentUri: uri,
+            storyboardId: message.storyboardId,
+            newName: message.newName,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+      case 'storyboard-description-edit-submitted':
+        void this.dispatchEdit(async (svc, uri) =>
+          svc.describeStoryboard({
+            documentUri: uri,
+            storyboardId: message.storyboardId,
+            description: message.description,
+            actor: 'vscode-user',
+          }),
+        );
+        break;
+    }
+  }
+
+  /**
+   * INVARIANT: `dispatchEdit` must remain O(active-Storyboard Scenes) at
+   * spec bound (5 × 50 scenes); expensive work here breaks the polish-
+   * loop UX (review 13A sentinel — SC-014 / research.md R4).
+   */
+  private async dispatchEdit<T>(
+    op: (svc: StoryboardEditService, documentUri: string) => Promise<T>,
+  ): Promise<void> {
+    const uri = this.sessionManager.getActiveDocumentUri();
+    const svc = this.editService;
+    if (uri === null || !svc) {
+      return;
+    }
+    try {
+      await op(svc, uri);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[StoryboardPanel edit dispatch] ${msg}`);
     }
   }
 

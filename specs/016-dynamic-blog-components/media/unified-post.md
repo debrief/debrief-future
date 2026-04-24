@@ -45,6 +45,8 @@ This keeps interactive demos in sync with code — if a component changes, the n
 
 Blog posts can now include live, interactive component demos. When a feature includes visual components with Storybook stories, the speckit workflow automatically identifies them during planning, bundles them during implementation, and deploys them alongside the blog post during publishing.
 
+No screenshots. No embedded videos. Readers can interact with actual React components rendered inline in the post.
+
 ## The Workflow Changes
 
 We modified five markdown files that define the speckit command workflow:

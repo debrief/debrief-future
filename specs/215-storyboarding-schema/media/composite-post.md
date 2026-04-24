@@ -30,6 +30,14 @@ This composite post groups specs that shipped within 1 days of each other and sh
 
 **216-storyboarding-capture** — ## What We Built
 
+#### Screenshots
+
+![Storyboard panel — empty state](/assets/images/future-debrief/216-storyboarding-capture/panel-empty.png)
+![Storyboard panel — three scenes](/assets/images/future-debrief/216-storyboarding-capture/panel-three-scenes-light.png)
+![Storyboard panel — three scenes in VS Code theme](/assets/images/future-debrief/216-storyboarding-capture/panel-three-scenes-vscode.png)
+![Capture-in-flight](/assets/images/future-debrief/216-storyboarding-capture/capture-in-flight.png)
+![Interaction](/assets/images/future-debrief/216-storyboarding-capture/interaction.gif)
+
 **217-storyboarding-playback** — ## What We Built
 
 ## Lessons Learned

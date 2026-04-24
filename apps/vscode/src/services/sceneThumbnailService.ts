@@ -329,3 +329,89 @@ export async function deleteSceneThumbnail(
     );
   }
 }
+
+/**
+ * Minimal structural view of the plot FeatureCollection that `gcOrphanAssets`
+ * needs. Using a loose shape keeps the thumbnail service decoupled from
+ * `@debrief/components`'s `Plot` type while still being type-safe for the
+ * fields we actually read.
+ */
+export interface GcOrphanAssetsPlot {
+  readonly features: ReadonlyArray<{
+    readonly properties?: {
+      readonly thumbnail_asset_ref?: string;
+      readonly kind?: string;
+    } | null;
+  }>;
+}
+
+/**
+ * Garbage-collect orphan scene-thumbnail asset entries from `item.json`
+ * and unlink their on-disk PNGs. An asset is "orphan" when it's keyed
+ * under `scene-thumbnail-{id}` (or the `-sm` small variant) and no Scene
+ * Feature in `plot` carries a `thumbnail_asset_ref` matching that key.
+ *
+ * Returns the list of reclaimed asset hrefs so callers can log telemetry.
+ * Best-effort: a failure to unlink a PNG file does not abort the pass —
+ * the `item.json` rewrite is the authoritative "asset removed" signal.
+ *
+ * Feature: 218-storyboarding-edit (FR-EDIT-024). Invoked on plot close
+ * by `StoryboardEditService.onPlotClosed`.
+ */
+export async function gcOrphanAssets(
+  stacItemPath: string,
+  plot: GcOrphanAssetsPlot,
+  deps: SceneThumbnailServiceDeps = DEFAULT_DEPS,
+): Promise<{ reclaimed: readonly string[] }> {
+  const itemJsonPath = await validateStacItemPath(deps, stacItemPath);
+  const item = await readItemJson(deps, itemJsonPath);
+  const assets = item.assets ?? {};
+
+  // Collect live thumbnail asset keys from Scene features. Each Scene's
+  // `thumbnail_asset_ref` is the LARGE asset key; the small variant is
+  // `${ref}-sm` by convention (see assetKeyForSmall).
+  const liveKeys = new Set<string>();
+  for (const f of plot.features) {
+    const ref = f.properties?.thumbnail_asset_ref;
+    if (typeof ref === 'string' && ref.length > 0) {
+      liveKeys.add(ref);
+      liveKeys.add(`${ref}-sm`);
+    }
+  }
+
+  const reclaimed: string[] = [];
+  const nextAssets: StacItemAssets = {};
+  for (const [key, value] of Object.entries(assets)) {
+    if (key.startsWith('scene-thumbnail-') && !liveKeys.has(key)) {
+      reclaimed.push(value.href);
+      const diskPath = path.isAbsolute(value.href)
+        ? value.href
+        : path.join(stacItemPath, value.href);
+      try {
+        await deps.fs.unlink(diskPath);
+      } catch {
+        // best-effort: the file may already be gone
+      }
+      continue;
+    }
+    nextAssets[key] = value;
+  }
+
+  if (reclaimed.length === 0) {
+    return { reclaimed: [] };
+  }
+
+  const nextItem: StacItem = { ...item, assets: nextAssets };
+  const serialised = `${JSON.stringify(nextItem, null, 2)}\n`;
+  try {
+    await writeAtomic(deps, itemJsonPath, serialised);
+  } catch (cause) {
+    throw new SceneThumbnailError(
+      'rename-failed',
+      `Could not commit updated ${itemJsonPath}`,
+      cause,
+    );
+  }
+
+  return { reclaimed };
+}

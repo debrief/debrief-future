@@ -29,7 +29,39 @@ export type StoryboardPanelMessage =
   | { readonly type: 'transport-backward-clicked' }
   | { readonly type: 'create-storyboard-requested' }
   | { readonly type: 'rename-storyboard-requested' }
-  | { readonly type: 'delete-storyboard-requested' };
+  | { readonly type: 'delete-storyboard-requested' }
+  // #218 — edit suite (Scene-level ops)
+  | {
+      readonly type: 'scene-title-rename-committed';
+      readonly sceneId: string;
+      readonly newTitle: string;
+    }
+  | {
+      readonly type: 'scene-description-edit-submitted';
+      readonly sceneId: string;
+      readonly description: string | null;
+    }
+  | { readonly type: 'scene-delete-requested'; readonly sceneId: string }
+  | { readonly type: 'scene-undo-delete-clicked'; readonly sceneId: string }
+  | { readonly type: 'scene-update-to-current-clicked'; readonly sceneId: string }
+  | { readonly type: 'scene-duplicate-clicked'; readonly sceneId: string }
+  | { readonly type: 'scene-copy-to-other-clicked'; readonly sceneId: string }
+  | { readonly type: 'scene-refresh-thumbnail-clicked'; readonly sceneId: string }
+  // #218 — edit suite (Storyboard-level ops)
+  | {
+      readonly type: 'storyboard-refresh-all-stale-clicked';
+      readonly storyboardId: string;
+    }
+  | {
+      readonly type: 'storyboard-name-rename-committed';
+      readonly storyboardId: string;
+      readonly newName: string;
+    }
+  | {
+      readonly type: 'storyboard-description-edit-submitted';
+      readonly storyboardId: string;
+      readonly description: string | null;
+    };
 
 /**
  * Full snapshot projection for the panel (#217). Replaces the narrower
@@ -43,6 +75,29 @@ export interface StoryboardPlaybackSnapshotMessage {
   readonly activeStoryboardName: string | null;
   readonly currentSceneId: string | null;
   readonly transport: TransportViewModel;
+}
+
+/**
+ * Per-Scene stale-flag update emitted by `StoryboardEditService.onPlotOpened`
+ * (Feature 218 — FR-EDIT-016). Consumed by the panel to render `StaleBadge`
+ * on the affected rows.
+ */
+export interface SceneStaleFlagUpdate {
+  readonly sceneId: string;
+  readonly stale: boolean;
+  readonly unresolvedFeatureIds: readonly string[];
+}
+
+/**
+ * Undo-toast descriptor (Feature 218 — FR-EDIT-003). The extension fires
+ * this inbound message after a successful delete so the panel can
+ * render the session-scoped undo button. `null` clears the toast.
+ */
+export interface SceneUndoToastDescriptor {
+  readonly sceneId: string;
+  readonly sceneTitle: string;
+  readonly deletedAt: string;
+  readonly canUndo: boolean;
 }
 
 /** Extension → Webview. */
@@ -62,4 +117,24 @@ export type ExtensionToStoryboardPanelMessage =
       readonly theme: 'light' | 'dark' | 'vscode';
     }
   // #217 — full playback snapshot
-  | StoryboardPlaybackSnapshotMessage;
+  | StoryboardPlaybackSnapshotMessage
+  // #218 — edit-suite inbound messages (3 new variants)
+  | {
+      /** Open the edit form on a specific Scene row. Fires from the hard-
+       *  block prompt (FR-EDIT-015) so the form lands with missing-data
+       *  details pre-filled. */
+      readonly type: 'scene-edit-form-open';
+      readonly sceneId: string;
+    }
+  | {
+      /** Per-Scene stale-flag bulk update. Extension emits this after the
+       *  on-plot-open stale-detection pass and after every mutation that
+       *  invalidates a Scene's hash. */
+      readonly type: 'scene-stale-flags-updated';
+      readonly flags: readonly SceneStaleFlagUpdate[];
+    }
+  | {
+      /** Session-scoped undo-toast descriptor; `toast === null` clears. */
+      readonly type: 'scene-undo-toast-shown';
+      readonly toast: SceneUndoToastDescriptor | null;
+    };

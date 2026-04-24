@@ -16,6 +16,7 @@ import React from 'react';
 import { SceneList } from './SceneList';
 import { TransportRow } from './TransportRow';
 import { StoryboardHeader } from './StoryboardHeader';
+import { UndoToast } from './UndoToast';
 import type { StoryboardPanelProps } from './types';
 
 const EMPTY_STATE_COPY =
@@ -40,6 +41,17 @@ export function StoryboardPanel({
   onDeleteStoryboard,
   onTransportForward,
   onTransportBackward,
+  // #218 edit-suite optional props
+  sceneEditViewModels,
+  pendingUndoToast,
+  onSceneTitleRenameCommit,
+  onSceneDescriptionSubmit,
+  onSceneDeleteRequested,
+  onSceneUndoDeleteClicked,
+  onSceneUpdateToCurrentClicked,
+  onSceneDuplicateClicked,
+  onSceneCopyToOtherClicked,
+  onSceneRefreshThumbnailClicked,
 }: StoryboardPanelProps): React.ReactElement {
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
@@ -154,6 +166,14 @@ export function StoryboardPanel({
             captureInFlight={captureInFlight}
             currentSceneId={currentSceneId ?? null}
             onSceneRowClick={onSceneRowClick}
+            sceneEditViewModels={sceneEditViewModels}
+            onSceneTitleRenameCommit={onSceneTitleRenameCommit}
+            onSceneDescriptionSubmit={onSceneDescriptionSubmit}
+            onSceneDeleteRequested={onSceneDeleteRequested}
+            onSceneUpdateToCurrentClicked={onSceneUpdateToCurrentClicked}
+            onSceneDuplicateClicked={onSceneDuplicateClicked}
+            onSceneCopyToOtherClicked={onSceneCopyToOtherClicked}
+            onSceneRefreshThumbnailClicked={onSceneRefreshThumbnailClicked}
           />
         </div>
       )}
@@ -163,6 +183,20 @@ export function StoryboardPanel({
           transport={transport}
           onForwardClick={onTransportForward ?? ((): void => undefined)}
           onBackwardClick={onTransportBackward ?? ((): void => undefined)}
+        />
+      )}
+
+      {pendingUndoToast && (
+        <UndoToast
+          state={pendingUndoToast}
+          onUndo={(): void =>
+            onSceneUndoDeleteClicked?.(pendingUndoToast.sceneId)
+          }
+          onDismiss={(): void => {
+            // Dismiss is panel-local — the extension does not currently
+            // receive a dismiss event. The session-scoped undo buffer
+            // keeps the delete finalizable on plot close.
+          }}
         />
       )}
     </div>

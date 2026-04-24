@@ -36,6 +36,13 @@ The guide makes that transparent.
 
 We documented the three-layer Storybook VS Code theming architecture in a single reference guide. The documentation covers:
 
+- **All 21 VS Code variable mappings** — how theme variables (e.g., `editorBackground`, `editorForeground`) connect to semantic color tokens
+- **Complete token reference tables** — light and dark values for every color across the palette
+- **Context decorator usage** — how to structure components to pick up theme changes in Storybook
+- **Step-by-step how-to** — concrete code examples for creating a themed component from scratch
+
+The existing theming system was already solid; the gap was simply that nobody had written it down comprehensively. Developers building themed components were piecing it together from scattered comments and trial-and-error.
+
 ## Lessons Learned
 
 The architecture was well-structured. Three clear layers—VS Code variables at the bottom, semantic tokens in the middle, component styles on top—with good separation of concerns. The real challenge wasn't rethinking the design; it was ensuring completeness. Every token needed a light and dark value. Every VS Code variable needed to map to something concrete. No gaps left for developers to guess.

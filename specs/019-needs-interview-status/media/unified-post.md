@@ -32,6 +32,8 @@ The workflow becomes: quick capture → deferred interview → scoring → appro
 
 Ideas arrive at inconvenient times. You're debugging, a thought strikes, and you need to capture it before it vanishes. But the full requirements interview takes several minutes.
 
+The speckit workflow now includes a `needs-interview` status. Add `--defer` to the `/idea` command, capture the essence in seconds, then batch-process deferred items later with the new `/interview` command. The backlog tracks which items need attention, and validation gates prevent premature specification of incomplete ideas.
+
 ## Screenshots
 
 The workflow now branches at the idea stage:

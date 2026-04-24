@@ -37,6 +37,14 @@ The demo environment makes that possible without asking anyone to install Python
 
 The browser-accessible demo environment for Debrief is now live. Navigate to a URL, and you get a full Linux desktop with VS Code and the Debrief extension ready for maritime analysis. No installation required.
 
+**Demo URL**: https://debrief-demo.fly.dev
+
+The environment uses:
+- **XFCE desktop** served through noVNC
+- **VS Code** with the Debrief extension pre-installed
+- **Sample .rep files** ready to open and explore
+- **Fly.io** with suspend mode for cost-efficient hosting
+
 ## What's Inside
 
 ### Container Infrastructure

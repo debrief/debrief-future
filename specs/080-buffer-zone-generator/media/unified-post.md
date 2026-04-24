@@ -31,6 +31,8 @@ This is the third tool in Epic E03's five-tool reactive cascade. The sequence: g
 
 The buffer-zone-generator is a calc tool that wraps a vessel track in three concentric detection-likelihood polygons. Hand it a track feature and it returns zones at 3nm (75%), 6nm (50%), and 12nm (25%) — each a proper GeoJSON Polygon with provenance linking back to the source track.
 
+The geometry uses the same Vincenty destination formula from move-shape. For each track vertex, we project 36 points outward at 10-degree intervals, then compute the convex hull with Andrew's monotone chain algorithm. The result: valid polygons that faithfully follow the track's shape, generated with nothing but Python's `math` module.
+
 ## How It Works
 
 The tool separates detection ranges from polygon construction through a SensorModel Protocol. The stub returns fixed distances, but any implementation satisfying `get_detection_zones(track) -> list[SensorModelZone]` slots in without touching the generation logic. Three optional parameters (`distance_1_nm`, `distance_2_nm`, `distance_3_nm`) let analysts override distances for what-if exploration — distances are auto-sorted so the highest likelihood always maps to the innermost zone.

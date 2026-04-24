@@ -34,6 +34,10 @@ This composite post groups specs that shipped within 4 days of each other and sh
 
 **119-array-offset-calc** — ## What We Built
 
+#### Screenshots
+
+![PLAIN vs WORM vs MEASURED comparison (real Leaflet renderer)](/assets/images/future-debrief/119-array-offset-calc/array-offset-comparison-default.png)
+
 **179-sensor-aware-layers-rendering** — ## What We Built
 
 ## Lessons Learned

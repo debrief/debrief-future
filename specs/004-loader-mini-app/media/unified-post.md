@@ -37,27 +37,31 @@ It's deliberately minimal. No map, no analysis, no fancy visualisations — just
 
 The Loader Mini-App is now ready. It's a cross-platform Electron application that turns "I have a data file" into "that data is stored with full provenance" — in under 30 seconds for typical REP files.
 
+Right-click a REP file, select "Open with Debrief Loader", and a two-step wizard guides you through the process. First, pick your destination STAC store. Then choose to create a new plot or add data to an existing one. Click Load, and the app orchestrates debrief-io for parsing, debrief-stac for storage, and records provenance linking your source file to every feature it produced.
+
+For first-time users without any stores configured, the app guides you through creating a local STAC catalog. No configuration files to edit, no terminal commands — just pick a folder and you're ready to go.
+
 ## Screenshots
 
 ### Store Selection
 
-![Store Selection](./evidence/screenshots/03-store-selector-multiple.png)
+![Store Selection](/assets/images/future-debrief/004-loader-mini-app/03-store-selector-multiple.png)
 
 *Choose from your configured STAC stores. Each card shows the store path and how many plots it contains.*
 
 ### Plot Configuration
 
-![Create New Plot](./evidence/screenshots/04-plot-config-create-new.png)
+![Create New Plot](/assets/images/future-debrief/004-loader-mini-app/04-plot-config-create-new.png)
 
 *Create a new plot with a name and optional description. The tabbed interface lets you switch to "Add to Existing" if you want to append to an existing plot.*
 
 ### Processing & Success
 
-![Progress View](./evidence/screenshots/06-progress-midway.png)
+![Progress View](/assets/images/future-debrief/004-loader-mini-app/06-progress-midway.png)
 
 *Clear progress feedback during file parsing and catalog writes.*
 
-![Success View](./evidence/screenshots/07-success.png)
+![Success View](/assets/images/future-debrief/004-loader-mini-app/07-success.png)
 
 *Confirmation with feature count and provenance status.*
 

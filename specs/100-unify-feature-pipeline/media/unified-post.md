@@ -35,6 +35,14 @@ After this change, adding a new feature kind requires changes only in the render
 
 The feature pipeline now flows in one direction, without splitting and rejoining.
 
+`stacService.loadPlotData()` used to return three separate arrays — `tracks`, `locations`, `otherFeatures` — which every consumer immediately merged back together before doing anything useful. `mapView.tsx` had two transform functions (`trackToFeature`, `locationToFeature`) whose only job was converting the service's local types back into the `DebriefFeature` shape that the rendering layer already spoke. That round-trip existed because the service was making classification decisions that belonged at the render boundary.
+
+Now the service returns a single `DebriefFeatureCollection`. Each feature carries `properties.kind` — `TRACK`, `POINT`, `CIRCLE`, and so on. Components that need to distinguish track features from location markers call `isTrackFeature()` or `isReferenceLocation()` at the point where the distinction matters. The layers tree derives its groups from `properties.kind` inside `getChildren()`. The map routes features to their renderers the same way. Nothing upstream has to know.
+
+The message protocol between the extension host and webviews went from three fields (`tracks`, `locations`, `otherFeatures`) to one (`features`). Selection messages went from `trackIds[]` + `locationIds[]` to a unified `featureIds[]`, which is what session state was already using. The three `setTracks()` / `setLocations()` / `setShapes()` methods on view providers collapsed to a single `setFeatures()`.
+
+Net result: 9 files changed, 304 lines added, 517 removed. The 213-line reduction is almost entirely deleted transform code that was doing work the schema types had already done.
+
 ## Screenshots
 
 _Screenshots pending — the change is internal to the data pipeline. No visible UI difference is the point._

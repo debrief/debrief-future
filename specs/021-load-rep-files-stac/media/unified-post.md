@@ -35,6 +35,11 @@ The architecture is deliberately simple: the extension orchestrates, the Python 
 
 REP file import now works inside the VS Code extension. Two ways to get data in:
 
+1. **Drag-and-drop** — drop a `.rep` file directly onto the map panel
+2. **Context menu** — right-click any REP file in the Explorer, pick your target plot
+
+Either way, the file is parsed, stored as a STAC asset (for provenance), and the tracks appear on the map. The view automatically zooms to fit everything.
+
 ## The Flow
 
 Drop a file. Watch the progress:

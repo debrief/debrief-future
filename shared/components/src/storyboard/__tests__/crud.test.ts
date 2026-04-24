@@ -1,15 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  checkSceneTimestamp,
   copySceneToOtherStoryboard,
   createScene,
   createStoryboard,
   deleteScene,
   deleteStoryboard,
+  describeStoryboard,
   duplicateScene,
   renameStoryboard,
+  restoreScene,
   updateScene,
 } from "../crud";
+import { OrphanSceneError, UnknownStoryboardError } from "../errors";
 import type { Plot } from "../types";
 import { isSceneFeature, isStoryboardFeature } from "../types";
 
@@ -381,3 +385,241 @@ describe("copySceneToOtherStoryboard", () => {
     expect(p3.features.length).toBe(p2.features.length + 1);
   });
 });
+
+// ──────────────────────────────────────────────────────────────────────
+// #218 additive extensions
+// ──────────────────────────────────────────────────────────────────────
+
+describe("checkSceneTimestamp (#218)", () => {
+  it("returns null when no scene has the target timestamp", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const { plot: p1 } = await seedScene(p0, storyboardId, "2026-04-20T10:00:00Z");
+    expect(
+      checkSceneTimestamp(p1, storyboardId, "2026-04-20T12:00:00Z", null),
+    ).toBeNull();
+  });
+
+  it("returns the conflicting Scene when timestamps collide", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const { plot: p1, scene } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+    );
+    const conflict = checkSceneTimestamp(
+      p1,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+      null,
+    );
+    expect(conflict?.properties.id).toBe(scene.properties.id);
+  });
+
+  it("respects excludingSceneId (self-check), never flagging the excluded scene", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const { plot: p1, scene } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+    );
+    expect(
+      checkSceneTimestamp(
+        p1,
+        storyboardId,
+        "2026-04-20T10:00:00Z",
+        scene.properties.id,
+      ),
+    ).toBeNull();
+  });
+
+  it("scopes the conflict check to a single Storyboard", async () => {
+    const { plot: p0, storyboardId: a } = await seedStoryboard(
+      emptyPlot(),
+      "A",
+      "01JSBAA000000000000000AAAA",
+    );
+    const { plot: p1, storyboardId: b } = await seedStoryboard(
+      p0,
+      "B",
+      "01JSBBB000000000000000BBBB",
+    );
+    const { plot: p2 } = await seedScene(p1, a, "2026-04-20T10:00:00Z");
+    // Same timestamp on a DIFFERENT storyboard is fine — check scoped per SB.
+    expect(
+      checkSceneTimestamp(p2, b, "2026-04-20T10:00:00Z", null),
+    ).toBeNull();
+  });
+});
+
+describe("describeStoryboard (#218)", () => {
+  it("sets description and appends a describe entry to provenance", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "My Brief");
+    const { plot: p1, storyboard } = await describeStoryboard(p0, {
+      storyboardId,
+      description: "Initial briefing state.",
+      actor: ALICE,
+      now: NOW,
+      activityIdOverride: "20000000-0000-4000-8000-000000000001",
+    });
+    expect(storyboard.properties.description).toBe("Initial briefing state.");
+    const last = storyboard.properties.provenance?.slice(-1)[0];
+    expect(last?.was_generated_by.parameters[0]?.value).toBe("describe");
+    expect(last?.agent).toBe(ALICE);
+    // p1 does not mutate p0 (CRUD immutability)
+    expect(p1).not.toBe(p0);
+  });
+
+  it("clears description when passed null", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "My Brief");
+    const { plot: p1 } = await describeStoryboard(p0, {
+      storyboardId,
+      description: "temp",
+      actor: ALICE,
+      now: NOW,
+      activityIdOverride: "20000000-0000-4000-8000-000000000002",
+    });
+    const { storyboard } = await describeStoryboard(p1, {
+      storyboardId,
+      description: null,
+      actor: ALICE,
+      now: NOW,
+      activityIdOverride: "20000000-0000-4000-8000-000000000003",
+    });
+    expect(storyboard.properties.description).toBeUndefined();
+  });
+
+  it("throws UnknownStoryboardError for missing id", async () => {
+    await expect(
+      describeStoryboard(emptyPlot(), {
+        storyboardId: "does-not-exist",
+        description: "x",
+        actor: ALICE,
+        now: NOW,
+        activityIdOverride: "20000000-0000-4000-8000-000000000004",
+      }),
+    ).rejects.toBeInstanceOf(UnknownStoryboardError);
+  });
+});
+
+describe("restoreScene (#218)", () => {
+  it("with empty preservedProvenance behaves like createScene (restore entry is the sole entry)", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const { plot, scene } = await restoreScene(p0, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 10, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "thumbnails/scene-restore.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: "01JSC00000000000000000AAAA",
+      activityIdOverride: "30000000-0000-4000-8000-000000000001",
+      preservedProvenance: [],
+    });
+    expect(isSceneFeature(plot.features[plot.features.length - 1]!)).toBe(true);
+    expect(scene.properties.provenance).toHaveLength(1);
+    expect(scene.properties.provenance?.[0]?.was_generated_by.parameters[0]?.value).toBe(
+      "restore",
+    );
+  });
+
+  it("non-empty preservedProvenance yields [...preserved, restoreEntry] byte-identically", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const { plot: p1, scene: original } = await seedScene(
+      p0,
+      storyboardId,
+      "2026-04-20T10:00:00Z",
+    );
+    // Simulate a delete — #215's deleteScene appends the delete entry
+    // to provenance BEFORE removing the feature.
+    const { plot: p2 } = await deleteScene(p1, {
+      sceneId: original.properties.id,
+      actor: ALICE,
+      now: "2026-04-20T10:05:00Z",
+      activityIdOverride: "30000000-0000-4000-8000-000000000010",
+    });
+    // Capture the pre-delete provenance (includes the {op:'delete'} entry
+    // appended by deleteScene prior to removal — per crud.ts)
+    // We captured `original` BEFORE delete; the delete modified `p1`
+    // in-place via produce, so re-read from p2 is not possible (the
+    // feature is gone). Instead we reconstruct: the buffer will hold
+    // the in-draft Scene Feature (with the delete entry already on it).
+    //
+    // For this test we build `preservedProvenance` from the original
+    // provenance + a fake delete entry, asserting ordering.
+    const preserved = [
+      ...(original.properties.provenance ?? []),
+      {
+        activity_id: "delete-entry-id",
+        timestamp: "2026-04-20T10:05:00Z",
+        was_generated_by: {
+          tool: "storyboard-crud",
+          tool_version: "1.0.0",
+          parameters: [{ value: "delete" }, { value: "delete scene" }],
+        },
+        used: [],
+        generated: [original.properties.id],
+        execution_duration: "PT0S",
+        agent: ALICE,
+      },
+    ];
+    const { scene: restored } = await restoreScene(p2, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 10, bearing: 0 },
+      timestamp: "2026-04-20T10:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "thumbnails/scene.png",
+      actor: ALICE,
+      now: "2026-04-20T10:06:00Z",
+      idOverride: original.properties.id,
+      activityIdOverride: "30000000-0000-4000-8000-000000000011",
+      preservedProvenance: preserved,
+    });
+    const prov = restored.properties.provenance!;
+    // Byte-identical preserved tail
+    expect(prov.length).toBe(preserved.length + 1);
+    for (let i = 0; i < preserved.length; i++) {
+      expect(JSON.stringify(prov[i])).toBe(JSON.stringify(preserved[i]));
+    }
+    // Restore entry on top
+    const last = prov[prov.length - 1]!;
+    expect(last.was_generated_by.parameters[0]?.value).toBe("restore");
+    expect(last.activity_id).toBe("30000000-0000-4000-8000-000000000011");
+  });
+
+  it("honours idOverride (restored scene keeps the original id)", async () => {
+    const { plot: p0, storyboardId } = await seedStoryboard(emptyPlot(), "SB");
+    const FIXED_ID = "01JSC00000000000000000BBBB";
+    const { scene } = await restoreScene(p0, {
+      storyboardId,
+      viewport: { center: [-5.0, 50.0], zoom: 10, bearing: 0 },
+      timestamp: "2026-04-20T11:00:00Z",
+      visibleFeatureIds: [],
+      thumbnailAssetRef: "thumbnails/scene.png",
+      actor: ALICE,
+      now: NOW,
+      idOverride: FIXED_ID,
+      activityIdOverride: "30000000-0000-4000-8000-000000000020",
+      preservedProvenance: [],
+    });
+    expect(scene.properties.id).toBe(FIXED_ID);
+  });
+
+  it("throws OrphanSceneError when the target storyboard is gone", async () => {
+    await expect(
+      restoreScene(emptyPlot(), {
+        storyboardId: "missing-sb",
+        viewport: { center: [0, 0], zoom: 10, bearing: 0 },
+        timestamp: "2026-04-20T10:00:00Z",
+        visibleFeatureIds: [],
+        thumbnailAssetRef: "thumbnails/x.png",
+        actor: ALICE,
+        now: NOW,
+        idOverride: "01JSC00000000000000000CCCC",
+        activityIdOverride: "30000000-0000-4000-8000-000000000030",
+        preservedProvenance: [],
+      }),
+    ).rejects.toBeInstanceOf(OrphanSceneError);
+  });
+});
+

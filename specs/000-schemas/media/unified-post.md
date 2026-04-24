@@ -35,6 +35,8 @@ Without validated schemas, we can't guarantee data integrity across the stack. T
 
 The Schema Foundation is live. We now have a single LinkML schema that generates validated Pydantic models for Python, JSON Schema for frontend validation, and TypeScript interfaces for type-safe UI development.
 
+This means when a Python service validates a TrackFeature and the TypeScript frontend renders it, they're both working from the same schema definition. No drift. No surprises. No manual synchronisation.
+
 ## Key Accomplishments
 
 - **LinkML schemas** for TrackFeature and ReferenceLocation (the tracer bullet scope)
