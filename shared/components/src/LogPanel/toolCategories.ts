@@ -1,23 +1,25 @@
 /**
- * Static tool category configuration map.
+ * Tool category configuration + resolver.
  *
- * Maps tool IDs to visual categories for icon rendering.
- * Future: replaced by tool manifest lookup.
- *
- * Feature: 176-log-panel-ux
+ * Feature: 176-log-panel-ux (introduced the five-bucket visual taxonomy).
+ * Feature: 207 (Commit B — the interim `TOOL_ID_TO_CATEGORY` shim has
+ *               been retired; every tool now declares its `category` at
+ *               its registration site and the value reaches the Log
+ *               Panel via the MCP `tools/list` → `tools:manifest`
+ *               webview pipeline).
  */
 
-import type { ToolCategory, ToolCategoryConfig } from './types';
+import type { ToolCategory, ToolCategoryConfig, ToolCategoryMap } from './types';
 
 /**
  * Visual config for each tool category.
  */
 export const TOOL_CATEGORY_CONFIGS: Record<ToolCategory, ToolCategoryConfig> = {
-  import: { category: 'import', background: '#dbeafe', glyph: '\u2B07', label: 'Import' },
-  style: { category: 'style', background: '#ede9fe', glyph: '\uD83C\uDFA8', label: 'Style' },
-  calc: { category: 'calc', background: '#dcfce7', glyph: '\u223F', label: 'Calculation' },
-  filter: { category: 'filter', background: '#fff7ed', glyph: '\u29D6', label: 'Filter' },
-  snapshot: { category: 'snapshot', background: '#fef9c3', glyph: '\uD83D\uDCF7', label: 'Snapshot' },
+  import: { category: 'import', background: '#dbeafe', glyph: '⬇', label: 'Import' },
+  style: { category: 'style', background: '#ede9fe', glyph: '🎨', label: 'Style' },
+  calc: { category: 'calc', background: '#dcfce7', glyph: '∿', label: 'Calculation' },
+  filter: { category: 'filter', background: '#fff7ed', glyph: '⧖', label: 'Filter' },
+  snapshot: { category: 'snapshot', background: '#fef9c3', glyph: '📷', label: 'Snapshot' },
 };
 
 /**
@@ -31,40 +33,32 @@ export const UNKNOWN_CATEGORY_CONFIG: ToolCategoryConfig = {
 };
 
 /**
- * Static mapping of known tool IDs to categories.
- */
-const TOOL_ID_TO_CATEGORY: Record<string, ToolCategory> = {
-  // Import tools
-  'import-rep': 'import',
-  'import-csv': 'import',
-  'load-rep': 'import',
-  // Style / property-edit tools
-  'change-color': 'style',
-  'change-track-color': 'style',
-  'set-display-mode': 'style',
-  // Calculation tools
-  'bearing-between-tracks': 'calc',
-  'range-between-tracks': 'calc',
-  'course-speed-from-positions': 'calc',
-  'move-track': 'calc',
-  // Filter tools
-  'time-filter': 'filter',
-  'spatial-filter': 'filter',
-  // Snapshot tools
-  'export-png': 'snapshot',
-  'export-csv': 'snapshot',
-  'export-geojson': 'snapshot',
-  'delete-features': 'style',
-};
-
-/**
  * Resolve the tool category for a given tool name.
- * Returns the ToolCategoryConfig if known, or the fallback config.
+ *
+ * Resolution (feature 207 Commit B):
+ *   1. If the manifest map declares a canonical category for this tool → use it.
+ *   2. Otherwise → unknown (neutral-grey fallback). "Otherwise" covers:
+ *       - manifest `undefined` (webview hasn't received `tools:manifest` yet)
+ *       - manifest map missing this tool (tool not registered, or old log
+ *         entry referencing a renamed tool)
+ *       - manifest declares `null` for this tool (tool author chose not
+ *         to declare a category — exempt for contrib tools per spec A3)
+ *       - manifest declares a non-canonical value (defensive — should not
+ *         happen after the `mcpAdapter` boundary coerces)
+ *
+ * See specs/207-tool-manifest-categories/research.md §R4 for load-race
+ * handling and §R5 for CI coverage enforcement.
  */
-export function resolveToolCategory(toolName: string): ToolCategoryConfig {
-  const category = TOOL_ID_TO_CATEGORY[toolName];
-  if (category) {
-    return TOOL_CATEGORY_CONFIGS[category];
+export function resolveToolCategory(
+  toolName: string,
+  toolCategories?: ToolCategoryMap,
+): ToolCategoryConfig {
+  if (toolCategories === undefined) {
+    return UNKNOWN_CATEGORY_CONFIG;
+  }
+  const declared = toolCategories[toolName];
+  if (declared && declared in TOOL_CATEGORY_CONFIGS) {
+    return TOOL_CATEGORY_CONFIGS[declared as ToolCategory];
   }
   return UNKNOWN_CATEGORY_CONFIG;
 }

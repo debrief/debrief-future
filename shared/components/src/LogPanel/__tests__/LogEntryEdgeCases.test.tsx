@@ -54,6 +54,10 @@ describe('LogEntry edge cases', () => {
         featureNames={{}}
         viewMode="timeline"
         isSelected={false}
+        // Feature 207 Commit B — snapshot detection now reads from the
+        // manifest map (static shim retired). Supply the map the
+        // extension host would push in production.
+        toolCategories={{ 'export-png': 'snapshot' }}
       />
     );
     expect(screen.getByTestId('manual-checkpoint-placeholder').textContent).toContain(

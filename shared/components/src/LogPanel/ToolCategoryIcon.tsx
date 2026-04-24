@@ -10,10 +10,11 @@ import { resolveToolCategory } from './toolCategories';
 
 export function ToolCategoryIcon({
   toolName,
+  toolCategories,
   size = 18,
   className,
 }: ToolCategoryIconProps): React.ReactElement {
-  const config = resolveToolCategory(toolName);
+  const config = resolveToolCategory(toolName, toolCategories);
 
   return (
     <span

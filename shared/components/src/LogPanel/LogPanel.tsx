@@ -37,6 +37,7 @@ export function LogPanel({
   hasActiveSession = false,
   actionResultMessage = null,
   replayProgress,
+  toolCategories,
   onMessage,
   onViewModeChange,
   onFilterStateChange,
@@ -323,6 +324,7 @@ export function LogPanel({
           featureNames={featureNames}
           viewMode={viewMode}
           selectedEntryId={selectedEntryId}
+          toolCategories={toolCategories}
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}
           onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}
@@ -339,6 +341,7 @@ export function LogPanel({
           featureNames={featureNames}
           viewMode={viewMode}
           selectedEntryId={selectedEntryId}
+          toolCategories={toolCategories}
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}
           onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}

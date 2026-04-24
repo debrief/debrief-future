@@ -14,7 +14,13 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 from debrief_schemas import OutputKindEnum
 
@@ -85,6 +91,7 @@ def _bounds_from_features(features: list[GeoJSONFeatureDict]) -> list[float] | N
     input_kinds=["TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "REGION", "POLYGON", "POLY"],
     output_kind=OutputKindEnum.regionSOLIDUSstatistics,
     context_type=ContextType.MULTI,
+    category=ToolCategoryEnum.calc,
     parameters=[
         ToolParameter(
             name="include_centroid",

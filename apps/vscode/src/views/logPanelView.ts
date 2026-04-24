@@ -379,6 +379,10 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
               payload: { hasActiveSession: false, plotName: null },
             });
           }
+
+          // Feature 207: push tool-category manifest for icon rendering.
+          // Fire-and-forget — failure falls back to neutral-grey icons.
+          void this._sendToolsManifest();
           break;
 
         case 'entry:select':
@@ -488,6 +492,34 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     } else {
       this._pendingMessages.push(message);
     }
+  }
+
+  /**
+   * Feature 207: push the latest tool-category map to the webview.
+   *
+   * Triggers a `listTools()` fetch if the cache is cold, then projects
+   * the result into `{toolId: categoryOrNull}`. Failures are swallowed —
+   * the Log Panel falls back to neutral grey for every card rather than
+   * surfacing a connection error (consistent with how the panel already
+   * handles missing services elsewhere).
+   */
+  private async _sendToolsManifest(): Promise<void> {
+    if (!this._calcService) {
+      return;
+    }
+    try {
+      // Warm the cache so `getToolCategoryMap()` has data to project.
+      await this._calcService.listTools();
+    } catch {
+      // Connection issues or MCP unavailability → stay silent. Webview
+      // already handles undefined-manifest state (renders grey fallback).
+      return;
+    }
+    const categories = this._calcService.getToolCategoryMap();
+    this._postMessage({
+      type: 'tools:manifest',
+      payload: { categories },
+    });
   }
 
   // ─── Service wiring guard ────────────────────────────────────────
