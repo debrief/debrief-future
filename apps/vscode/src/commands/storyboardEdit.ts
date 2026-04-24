@@ -84,11 +84,34 @@ export const describeStoryboardHandler = (_deps: HandlerDeps): CommandFn =>
     // Phase 3 T053 — open description editor in panel header via postMessage.
   };
 
-export const editSceneHandler = (_deps: HandlerDeps): CommandFn =>
-  async (_args): Promise<void> => {
-    // Phase 3 T056 — delegate to service.openSceneForMissingDataEdit. Replaces
-    // #217's inline stub in StoryboardPlaybackService.resolveHardBlockByOpeningForEditing.
+export const editSceneHandler = (deps: HandlerDeps): CommandFn =>
+  async (...args): Promise<void> => {
+    const documentUri = deps.sessionManager.getActiveDocumentUri();
+    if (documentUri === null) {
+      return;
+    }
+    const sceneId = extractSceneId(args);
+    if (sceneId === null) {
+      return;
+    }
+    await deps.service.openSceneForMissingDataEdit({ documentUri, sceneId });
   };
+
+function extractSceneId(args: readonly unknown[]): string | null {
+  // The hard-block modal (#217) passes either a bare sceneId string or an
+  // object `{ sceneId }` (matching storyboardEditStub's historical shape).
+  const arg = args[0];
+  if (typeof arg === 'string') {
+    return arg;
+  }
+  if (typeof arg === 'object' && arg !== null && 'sceneId' in arg) {
+    const s = (arg as { sceneId?: unknown }).sceneId;
+    if (typeof s === 'string') {
+      return s;
+    }
+  }
+  return null;
+}
 
 // ── Registration ────────────────────────────────────────────────────
 

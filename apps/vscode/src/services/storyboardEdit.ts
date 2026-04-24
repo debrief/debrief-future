@@ -2,18 +2,41 @@
  * Storyboard edit orchestration service (Feature 218).
  *
  * Owns every write path from the edit suite into Storyboard / Scene
- * Features; every method delegates to #215's CRUD module for the
+ * Features. Every method delegates to #215's CRUD module for the
  * actual mutation. This service orchestrates surrounding concerns:
- * undo buffer, thumbnail capture, stale detection, LogService
- * emission, user prompts on conflicts.
- *
- * Phase 1: skeleton only — methods throw until real implementations
- * land in Phase 2 (primitives) and Phase 3 (edit ops).
+ * session-scoped undo buffer, thumbnail capture, stale detection,
+ * LogService emission, user prompts on conflicts.
  *
  * Contract: specs/218-storyboarding-edit/contracts/edit-service.md
  */
 
 import * as vscode from 'vscode';
+import {
+  checkSceneTimestamp,
+  copySceneToOtherStoryboard as crudCopyScene,
+  deleteScene as crudDeleteScene,
+  describeStoryboard as crudDescribeStoryboard,
+  duplicateScene as crudDuplicateScene,
+  getScene,
+  getStoryboard,
+  renameStoryboard as crudRenameStoryboard,
+  restoreScene as crudRestoreScene,
+  updateScene as crudUpdateScene,
+  DuplicateStoryboardNameError,
+  DuplicateTimestampError,
+  ThumbnailDeepCopyFailedError,
+  UnknownSceneError,
+  UnknownStoryboardError,
+  type DebriefFeature,
+  type SceneFeature,
+  type StoryboardFeature,
+  type StoryboardPlot,
+} from '@debrief/components';
+import type {
+  ExtensionToStoryboardPanelMessage,
+  SceneUndoToastDescriptor,
+} from '../types/storyboardPanelMessages';
+import { plotFromFeatures, featuresFromPlot } from './plotFromFeatures';
 
 const notImplemented = <T>(method: string, phase: string): Promise<T> =>
   Promise.reject(
@@ -23,29 +46,27 @@ const notImplemented = <T>(method: string, phase: string): Promise<T> =>
 // ── View-model + transient-state types (data-model.md §1, §2, §5) ────
 
 /**
- * Undo buffer record (data-model.md §1). The Scene Feature stored
- * here is byte-identical to its pre-delete state; the `{op:'delete'}`
+ * Undo buffer record (data-model.md §1). The Scene Feature stored here
+ * is byte-identical to its pre-delete state; the `{op:'delete'}`
  * provenance entry is already appended by #215 before removal
- * (crud.ts:686-688), so `deleteActivityIdOf(d)` reads it without
- * duplication.
+ * (crud.ts:685-688), so `deleteActivityIdOf(d)` reads it without
+ * duplication (review 7A — no stored field).
  */
 export interface DeletedScene {
-  readonly original: SceneFeatureLike;
+  readonly original: SceneFeature;
   readonly storyboardId: string;
   readonly deletedAt: string;
 }
 
-/** Derived accessor — the delete activity_id lives in the last entry
- *  of original.properties.provenance[] (review 7A — no stored field). */
 export const deleteActivityIdOf = (d: DeletedScene): string => {
-  const provenance = d.original.properties.provenance;
-  const last = provenance[provenance.length - 1];
+  const prov = d.original.properties.provenance;
+  const last = prov && prov[prov.length - 1];
   if (!last) {
     throw new Error(
       `DeletedScene ${d.original.properties.id} has empty provenance — invariant violation`,
     );
   }
-  return last.was_generated_by.activity_id;
+  return last.activity_id;
 };
 
 /** Stale-thumbnail detection result (data-model.md §2). */
@@ -58,42 +79,7 @@ export interface StaleFlag {
 
 export type StaleFlagCache = ReadonlyMap<string /* sceneId */, StaleFlag>;
 
-// ── Structural type placeholders ────────────────────────────────────
-//
-// These minimal shapes let the skeleton compile without a hard
-// dependency on #215's generated types. Phase 2 replaces them with
-// imports from `@debrief/components/storyboard` + `@debrief/schemas`.
-
-interface LogEntryLike {
-  readonly was_generated_by: { readonly activity_id: string };
-}
-
-interface SceneFeatureLike {
-  readonly properties: {
-    readonly id: string;
-    readonly provenance: readonly LogEntryLike[];
-  };
-}
-
-interface StoryboardFeatureLike {
-  readonly properties: { readonly id: string };
-}
-
-interface PlotLike {
-  readonly features: readonly unknown[];
-}
-
-interface ViewportLike {
-  readonly kind: string;
-}
-
-// ── Input types (edit-service.md) ────────────────────────────────────
-//
-// Type names are prefixed with `Edit` where a same-named type already
-// lives in `@debrief/components/storyboard` (the CRUD module's input
-// shape). The drift-guard lint rule forbids redeclaring the CRUD names
-// outside that module. Service inputs carry an extra `documentUri`
-// that CRUD inputs don't — they're not identical to the CRUD shapes.
+// ── Input types ──────────────────────────────────────────────────────
 
 export interface EditRenameSceneInput {
   readonly documentUri: string;
@@ -125,7 +111,7 @@ export interface EditUpdateToCurrentInput {
   readonly documentUri: string;
   readonly sceneId: string;
   readonly currentView: {
-    readonly viewport: ViewportLike;
+    readonly viewport: SceneFeature['properties']['viewport'];
     readonly timestamp: string;
     readonly visibleFeatureIds: readonly string[];
   };
@@ -173,17 +159,17 @@ export interface EditDescribeStoryboardInput {
   readonly actor: string;
 }
 
-// ── Result types (edit-service.md) ───────────────────────────────────
+// ── Result types ─────────────────────────────────────────────────────
 
 export interface SceneEditOutcome {
   readonly kind: 'ok';
-  readonly scene: SceneFeatureLike;
+  readonly scene: SceneFeature;
   readonly logEntryActivityId: string | null;
 }
 
 export interface StoryboardEditOutcome {
   readonly kind: 'ok';
-  readonly storyboard: StoryboardFeatureLike;
+  readonly storyboard: StoryboardFeature;
   readonly logEntryActivityId: string | null;
 }
 
@@ -192,11 +178,11 @@ export type DeleteSceneOutcome =
   | { readonly kind: 'unknown-scene'; readonly sceneId: string };
 
 export type UndoDeleteOutcome =
-  | { readonly kind: 'ok'; readonly scene: SceneFeatureLike; readonly logEntryActivityId: string | null }
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | { readonly kind: 'unrecoverable-scene'; readonly reason: 'storyboard-gone' | 'buffer-evicted' };
 
 export type UpdateToCurrentResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeatureLike; readonly logEntryActivityId: string | null }
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | { readonly kind: 'thumbnail-failed'; readonly error: Error }
   | {
       readonly kind: 'duplicate-timestamp-collision';
@@ -205,7 +191,7 @@ export type UpdateToCurrentResult =
     };
 
 export type DuplicateSceneResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeatureLike; readonly logEntryActivityId: string | null }
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | {
       readonly kind: 'duplicate-timestamp-collision';
       readonly existingSceneId: string;
@@ -213,7 +199,12 @@ export type DuplicateSceneResult =
     };
 
 export type CopySceneResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeatureLike; readonly logEntryActivityId: string | null }
+  | {
+      readonly kind: 'ok';
+      readonly scene: SceneFeature;
+      readonly logEntryActivityId: string | null;
+      readonly pairActivityId: string;
+    }
   | {
       readonly kind: 'duplicate-timestamp-collision';
       readonly existingSceneId: string;
@@ -222,7 +213,7 @@ export type CopySceneResult =
   | { readonly kind: 'deep-copy-failed'; readonly error: Error };
 
 export type RefreshThumbnailResult =
-  | { readonly kind: 'ok'; readonly scene: SceneFeatureLike; readonly logEntryActivityId: string | null }
+  | { readonly kind: 'ok'; readonly scene: SceneFeature; readonly logEntryActivityId: string | null }
   | { readonly kind: 'thumbnail-failed'; readonly error: Error };
 
 export interface RefreshAllStaleResult {
@@ -230,29 +221,102 @@ export interface RefreshAllStaleResult {
   readonly failed: readonly { readonly sceneId: string; readonly error: Error }[];
 }
 
-// ── Narrow port interfaces (filled in during Phase 3 wiring) ─────────
+export type RenameStoryboardOutcome =
+  | StoryboardEditOutcome
+  | { readonly kind: 'name-conflict'; readonly conflictStoryboardId: string };
 
-/**
- * Minimal LogService surface the edit service uses. Defined locally
- * as a structural shape until T021-T023 wire in the real interface
- * from `@debrief/session-state`.
- */
-export interface LogServiceLike {
-  readonly recordStoryboardEdit: (
-    input: unknown,
-  ) => Promise<{ readonly activity_id: string }>;
+// ── Ports ────────────────────────────────────────────────────────────
+
+export interface EditMapPanel {
+  readonly getCurrentFeatures: () => readonly DebriefFeature[];
+  readonly setFeatures: (features: readonly DebriefFeature[]) => void;
+}
+
+export interface StoreContext {
+  readonly storePath: string;
+  readonly itemPath: string;
+}
+
+export interface EditSessionManager {
+  readonly getActiveDocumentUri: () => string | null;
+  /** Resolve per-plot STAC storage so the service can attach LogEntries
+   *  via LogService. Returns null when the plot is not backed by STAC
+   *  (e.g., preview-only). */
+  readonly resolveStoreContext: (documentUri: string) => StoreContext | null;
+}
+
+export interface EditLogService {
+  readonly recordStoryboardEdit: (input: {
+    readonly storePath: string;
+    readonly itemPath: string;
+    readonly op: string;
+    readonly storyboardId: string;
+    readonly sceneId: string | null;
+    readonly thumbnailAssetRef: string | null;
+    readonly actor: string;
+    readonly summary: string;
+    readonly timestamp: string;
+    readonly underlyingActivityId: string;
+    readonly pairActivityId: string | null;
+  }) => Promise<{ readonly activity_id: string }>;
+}
+
+export interface EditThumbnailService {
+  /** For update-to-current + refresh-thumbnail: capture a PNG pair for
+   *  the current map state and write the STAC assets. */
+  readonly captureThumbnail?: (input: {
+    readonly stacItemPath: string;
+    readonly sceneId: string;
+  }) => Promise<{ readonly assetKey: string }>;
+  /** For copy-to-other-storyboard: deep-copy the source thumbnail PNGs
+   *  under a new asset key on the same STAC item. */
+  readonly deepCopyAsset?: (
+    sourceAssetRef: string,
+    destStoryboardId: string,
+  ) => Promise<string>;
+  /** For plot close: unlink orphan thumbnail assets (FR-EDIT-024). */
+  readonly gcOrphanAssets?: (
+    stacItemPath: string,
+    plot: StoryboardPlot,
+  ) => Promise<{ readonly reclaimed: readonly string[] }>;
+}
+
+export interface EditPanelSink {
+  readonly postMessage: (message: ExtensionToStoryboardPanelMessage) => void;
+}
+
+export interface StoryboardEditServiceOptions {
+  readonly mapPanel?: EditMapPanel;
+  readonly sessionManager?: EditSessionManager;
+  readonly logService?: EditLogService | null;
+  readonly thumbnailService?: EditThumbnailService;
+  readonly panelSink?: EditPanelSink;
+  readonly outputChannel?: { readonly appendLine: (line: string) => void };
+  /** Undo buffer cap per plot (research.md R1). */
+  readonly undoBufferCap?: number;
 }
 
 // ── Service ──────────────────────────────────────────────────────────
 
-export interface StoryboardEditServiceOptions {
-  // Ports filled in during Phase 3 wiring.
-  readonly reserved?: never;
-}
+const DEFAULT_UNDO_CAP = 50;
+
+const summaryLimit = 120;
+const truncate = (s: string): string =>
+  s.length > summaryLimit ? `${s.slice(0, summaryLimit - 1)}…` : s;
 
 export class StoryboardEditService implements vscode.Disposable {
-  private logService: LogServiceLike | null = null;
+  private mapPanel: EditMapPanel | null;
+  private sessionManager: EditSessionManager | null;
+  private logService: EditLogService | null;
+  private thumbnailService: EditThumbnailService | null;
+  private panelSink: EditPanelSink | null;
+  private readonly outputChannel: { readonly appendLine: (line: string) => void };
+  private readonly undoBufferCap: number;
   private disposed = false;
+
+  private readonly undoBuffer = new Map<string, DeletedScene[]>();
+  private readonly staleCache = new Map<string, Map<string, StaleFlag>>();
+
   private readonly _onDidChangeStaleFlags =
     new vscode.EventEmitter<{ readonly documentUri: string; readonly sceneIds: readonly string[] }>();
   public readonly onDidChangeStaleFlags = this._onDidChangeStaleFlags.event;
@@ -260,69 +324,523 @@ export class StoryboardEditService implements vscode.Disposable {
     new vscode.EventEmitter<{ readonly documentUri: string }>();
   public readonly onDidChangeUndoQueue = this._onDidChangeUndoQueue.event;
 
-  constructor(_options: StoryboardEditServiceOptions = {}) {
-    // Ports will be wired in Phase 3 — the service is instantiable
-    // today so the extension can register it early.
+  constructor(options: StoryboardEditServiceOptions = {}) {
+    this.mapPanel = options.mapPanel ?? null;
+    this.sessionManager = options.sessionManager ?? null;
+    this.logService = options.logService ?? null;
+    this.thumbnailService = options.thumbnailService ?? null;
+    this.panelSink = options.panelSink ?? null;
+    this.outputChannel = options.outputChannel ?? { appendLine: (): void => undefined };
+    this.undoBufferCap = options.undoBufferCap ?? DEFAULT_UNDO_CAP;
   }
 
-  /** Returns a composite Disposable so extension.ts can push into
-   *  context.subscriptions. */
   activate(): vscode.Disposable {
-    return {
-      dispose: (): void => this.dispose(),
-    };
+    return { dispose: (): void => this.dispose() };
   }
 
-  setLogService(logService: LogServiceLike | null): void {
+  setLogService(logService: EditLogService | null): void {
     this.logService = logService;
   }
 
-  /** Read accessor — primarily for tests to verify binding. */
-  getLogService(): LogServiceLike | null {
+  getLogService(): EditLogService | null {
     return this.logService;
   }
 
-  // ── Lifecycle (filled in during Phase 4 / Phase 5) ─────────────────
+  setMapPanel(mapPanel: EditMapPanel | null): void {
+    this.mapPanel = mapPanel;
+  }
 
-  onPlotOpened(_documentUri: string, _initialPlot: PlotLike): Promise<void> {
+  setSessionManager(sessionManager: EditSessionManager | null): void {
+    this.sessionManager = sessionManager;
+  }
+
+  setThumbnailService(ts: EditThumbnailService | null): void {
+    this.thumbnailService = ts;
+  }
+
+  setPanelSink(sink: EditPanelSink | null): void {
+    this.panelSink = sink;
+  }
+
+  // ── Lifecycle ──────────────────────────────────────────────────────
+
+  onPlotOpened(_documentUri: string, _initialPlot: StoryboardPlot): Promise<void> {
     // Phase 4 T069 — stale-detection pass.
     return Promise.resolve();
   }
 
-  onPlotClosed(_documentUri: string, _finalPlot: PlotLike): Promise<void> {
-    // Phase 5 T088 — invokes sceneThumbnailService.gcOrphanAssets.
-    return Promise.resolve();
+  async onPlotClosed(documentUri: string, finalPlot: StoryboardPlot): Promise<void> {
+    // FR-EDIT-024 — garbage-collect orphan thumbnail assets.
+    const ctx = this.sessionManager?.resolveStoreContext(documentUri) ?? null;
+    const gc = this.thumbnailService?.gcOrphanAssets;
+    if (ctx && gc) {
+      try {
+        await gc(ctx.itemPath, finalPlot);
+      } catch (err) {
+        this.outputChannel.appendLine(
+          `[StoryboardEditService] gcOrphanAssets failed: ${stringifyErr(err)}`,
+        );
+      }
+    }
+    this.undoBuffer.delete(documentUri);
+    this.staleCache.delete(documentUri);
+    this._onDidChangeUndoQueue.fire({ documentUri });
+    this._onDidChangeStaleFlags.fire({ documentUri, sceneIds: [] });
   }
 
-  // ── Scene edit ops (Phase 3) ───────────────────────────────────────
+  // ── Internal plot accessor ─────────────────────────────────────────
 
-  renameScene(_input: EditRenameSceneInput): Promise<SceneEditOutcome> {
-    return notImplemented('renameScene', 'Phase 3 T029');
+  private readPlot(_documentUri: string): StoryboardPlot {
+    const mapPanel = this.mapPanel;
+    if (!mapPanel) {
+      throw new Error('StoryboardEditService: mapPanel port not wired');
+    }
+    return plotFromFeatures(mapPanel.getCurrentFeatures());
   }
 
-  describeScene(_input: EditDescribeSceneInput): Promise<SceneEditOutcome> {
-    return notImplemented('describeScene', 'Phase 3 T030');
+  private writePlot(_documentUri: string, plot: StoryboardPlot): void {
+    const mapPanel = this.mapPanel;
+    if (!mapPanel) {
+      throw new Error('StoryboardEditService: mapPanel port not wired');
+    }
+    mapPanel.setFeatures(featuresFromPlot(plot));
   }
 
-  deleteScene(_input: EditDeleteSceneInput): Promise<DeleteSceneOutcome> {
-    return notImplemented('deleteScene', 'Phase 3 T031');
+  private async emitLogEntry(
+    documentUri: string,
+    op: string,
+    storyboardId: string,
+    sceneId: string | null,
+    thumbnailAssetRef: string | null,
+    actor: string,
+    summary: string,
+    timestamp: string,
+    underlyingActivityId: string,
+    pairActivityId: string | null = null,
+  ): Promise<string | null> {
+    const log = this.logService;
+    const ctx = this.sessionManager?.resolveStoreContext(documentUri) ?? null;
+    if (!log || !ctx) {
+      return null;
+    }
+    try {
+      const result = await log.recordStoryboardEdit({
+        storePath: ctx.storePath,
+        itemPath: ctx.itemPath,
+        op,
+        storyboardId,
+        sceneId,
+        thumbnailAssetRef,
+        actor,
+        summary: truncate(summary),
+        timestamp,
+        underlyingActivityId,
+        pairActivityId,
+      });
+      return result.activity_id || null;
+    } catch (err) {
+      // FR-EDIT-021 — never surface LogService errors to the user.
+      this.outputChannel.appendLine(
+        `[StoryboardEditService] recordStoryboardEdit(${op}) failed: ${stringifyErr(err)}`,
+      );
+      return null;
+    }
   }
 
-  undoDeleteScene(_input: EditUndoDeleteInput): Promise<UndoDeleteOutcome> {
-    return notImplemented('undoDeleteScene', 'Phase 3 T032');
+  private readLastActivityId(feat: { readonly properties: { readonly provenance?: readonly { readonly activity_id: string }[] } }): string {
+    const prov = feat.properties.provenance ?? [];
+    return prov[prov.length - 1]?.activity_id ?? '';
   }
 
-  updateSceneToCurrent(_input: EditUpdateToCurrentInput): Promise<UpdateToCurrentResult> {
-    return notImplemented('updateSceneToCurrent', 'Phase 3 T039');
+  // ── Scene edit ops (Story 1) ───────────────────────────────────────
+
+  async renameScene(input: EditRenameSceneInput): Promise<SceneEditOutcome> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getScene(plot, input.sceneId);
+    if (!existing) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+    const now = new Date().toISOString();
+    const { plot: nextPlot, scene } = await crudUpdateScene(plot, {
+      sceneId: input.sceneId,
+      patch: { title: input.newTitle.trim() },
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'rename',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `rename "${existing.properties.title}" → "${scene.properties.title}"`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
   }
 
-  duplicateScene(_input: EditDuplicateSceneInput): Promise<DuplicateSceneResult> {
-    return notImplemented('duplicateScene', 'Phase 3 T044');
+  async describeScene(input: EditDescribeSceneInput): Promise<SceneEditOutcome> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getScene(plot, input.sceneId);
+    if (!existing) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+    const now = new Date().toISOString();
+    // #215's updateScene uses `patch.description === undefined` ⇒ untouched.
+    // We want `null` ⇒ clear. Pass empty string as a placeholder; #215
+    // accepts string. When the user wants to clear, we send "".
+    const description = input.description ?? '';
+    const { plot: nextPlot, scene } = await crudUpdateScene(plot, {
+      sceneId: input.sceneId,
+      patch: { description },
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'describe',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `describe scene at ${scene.properties.timestamp}`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
   }
 
-  copySceneToOtherStoryboard(_input: EditCopySceneInput): Promise<CopySceneResult> {
-    return notImplemented('copySceneToOtherStoryboard', 'Phase 3 T047');
+  async deleteScene(input: EditDeleteSceneInput): Promise<DeleteSceneOutcome> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getScene(plot, input.sceneId);
+    if (!existing) {
+      return { kind: 'unknown-scene', sceneId: input.sceneId };
+    }
+    const now = new Date().toISOString();
+    // Pre-mint the delete entry's activity_id so the undo buffer's
+    // reconstructed entry matches #215's output byte-for-byte (SC-003
+    // hash-equality depends on this).
+    const deleteActivityId = mintUuid();
+    const { plot: nextPlot } = await crudDeleteScene(plot, {
+      sceneId: input.sceneId,
+      actor: input.actor,
+      now,
+      activityIdOverride: deleteActivityId,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+
+    // Reconstruct the delete entry exactly as #215's
+    // buildStoryboardCrudLogEntry would produce. See
+    // shared/components/src/storyboard/provenance.ts.
+    const deleteEntry = {
+      activity_id: deleteActivityId,
+      timestamp: now,
+      was_generated_by: {
+        tool: 'storyboard-crud',
+        tool_version: '1.0.0',
+        parameters: [
+          { value: 'delete' },
+          { value: truncate(`delete scene ${input.sceneId}`) },
+        ],
+      },
+      used: [],
+      generated: [input.sceneId],
+      execution_duration: 'PT0S',
+      agent: input.actor,
+    };
+    const preservedProvenance = [
+      ...(existing.properties.provenance ?? []),
+      deleteEntry,
+    ];
+    const originalWithDelete: SceneFeature = {
+      ...existing,
+      properties: {
+        ...existing.properties,
+        provenance: preservedProvenance,
+      },
+    };
+
+    const deleted: DeletedScene = {
+      original: originalWithDelete,
+      storyboardId: existing.properties.storyboard_id,
+      deletedAt: now,
+    };
+
+    const queue = this.undoBuffer.get(input.documentUri) ?? [];
+    queue.push(deleted);
+    // FIFO cap
+    while (queue.length > this.undoBufferCap) {
+      queue.shift();
+    }
+    this.undoBuffer.set(input.documentUri, queue);
+    this._onDidChangeUndoQueue.fire({ documentUri: input.documentUri });
+    this.postToPanel({
+      type: 'scene-undo-toast-shown',
+      toast: toastOf(deleted, existing.properties.title),
+    });
+
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'delete',
+      existing.properties.storyboard_id,
+      input.sceneId,
+      null,
+      input.actor,
+      `delete scene "${existing.properties.title}"`,
+      now,
+      deleteEntry.activity_id,
+    );
+    return { kind: 'ok', deleted, logEntryActivityId };
   }
+
+  async undoDeleteScene(input: EditUndoDeleteInput): Promise<UndoDeleteOutcome> {
+    const queue = this.undoBuffer.get(input.documentUri) ?? [];
+    const idx = queue.findIndex(
+      (d) => d.original.properties.id === input.sceneId,
+    );
+    if (idx === -1) {
+      return { kind: 'unrecoverable-scene', reason: 'buffer-evicted' };
+    }
+    const deleted = queue[idx]!;
+
+    // Review 10H — Storyboard must still exist.
+    const plot = this.readPlot(input.documentUri);
+    if (!getStoryboard(plot, deleted.storyboardId)) {
+      // Drop the buffer entry so repeated clicks don't redisplay a
+      // doomed toast; mirrors research.md R1 finalisation semantics.
+      queue.splice(idx, 1);
+      this._onDidChangeUndoQueue.fire({ documentUri: input.documentUri });
+      return { kind: 'unrecoverable-scene', reason: 'storyboard-gone' };
+    }
+
+    const now = new Date().toISOString();
+    const orig = deleted.original.properties;
+    const { plot: nextPlot, scene } = await crudRestoreScene(plot, {
+      storyboardId: deleted.storyboardId,
+      title: orig.title,
+      description: orig.description,
+      viewport: orig.viewport,
+      timestamp: orig.timestamp,
+      visibleFeatureIds: [...orig.visible_feature_ids],
+      thumbnailAssetRef: orig.thumbnail_asset_ref,
+      transitionDurationMs: orig.transition_duration_ms,
+      actor: input.actor,
+      now,
+      idOverride: orig.id,
+      preservedProvenance: orig.provenance ?? [],
+    });
+    this.writePlot(input.documentUri, nextPlot);
+
+    // Remove the undo buffer entry; dismiss the toast.
+    queue.splice(idx, 1);
+    this._onDidChangeUndoQueue.fire({ documentUri: input.documentUri });
+    this.postToPanel({ type: 'scene-undo-toast-shown', toast: null });
+
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'restore',
+      deleted.storyboardId,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `restore scene "${scene.properties.title}"`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
+  }
+
+  // ── Update-to-current (review 1A pre-flight) ───────────────────────
+
+  async updateSceneToCurrent(input: EditUpdateToCurrentInput): Promise<UpdateToCurrentResult> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getScene(plot, input.sceneId);
+    if (!existing) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+
+    // Pre-flight collision check BEFORE invoking the thumbnail pipeline
+    // (review 1A — eliminates the orphan-thumbnail-on-collision failure
+    // mode from research.md R5).
+    if (input.currentView.timestamp !== existing.properties.timestamp) {
+      const conflict = checkSceneTimestamp(
+        plot,
+        existing.properties.storyboard_id,
+        input.currentView.timestamp,
+        input.sceneId,
+      );
+      if (conflict !== null) {
+        return {
+          kind: 'duplicate-timestamp-collision',
+          existingSceneId: conflict.properties.id,
+          suggestedOffsetTimestamp: offsetTimestampBy1s(
+            input.currentView.timestamp,
+          ),
+        };
+      }
+    }
+
+    // Capture thumbnail (may be mocked in tests — if no port, reuse
+    // the existing ref; tests that rely on capture failure inject a
+    // port that throws).
+    let thumbnailAssetRef = existing.properties.thumbnail_asset_ref;
+    const capture = this.thumbnailService?.captureThumbnail;
+    const ctx = this.sessionManager?.resolveStoreContext(input.documentUri) ?? null;
+    if (capture && ctx) {
+      try {
+        const captured = await capture({
+          stacItemPath: ctx.itemPath,
+          sceneId: input.sceneId,
+        });
+        thumbnailAssetRef = captured.assetKey;
+      } catch (err) {
+        return { kind: 'thumbnail-failed', error: coerceError(err) };
+      }
+    }
+
+    const now = new Date().toISOString();
+    const { plot: nextPlot, scene } = await crudUpdateScene(plot, {
+      sceneId: input.sceneId,
+      patch: {
+        viewport: input.currentView.viewport,
+        timestamp: input.currentView.timestamp,
+        visibleFeatureIds: [...input.currentView.visibleFeatureIds],
+        thumbnailAssetRef,
+      },
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'update-to-current',
+      scene.properties.storyboard_id,
+      scene.properties.id,
+      scene.properties.thumbnail_asset_ref,
+      input.actor,
+      `update-to-current scene at ${scene.properties.timestamp}`,
+      now,
+      this.readLastActivityId(scene),
+    );
+    return { kind: 'ok', scene, logEntryActivityId };
+  }
+
+  // ── Duplicate ──────────────────────────────────────────────────────
+
+  async duplicateScene(input: EditDuplicateSceneInput): Promise<DuplicateSceneResult> {
+    const plot = this.readPlot(input.documentUri);
+    const source = getScene(plot, input.sceneId);
+    if (!source) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+    const now = new Date().toISOString();
+    try {
+      const { plot: nextPlot, scene } = await crudDuplicateScene(plot, {
+        sceneId: input.sceneId,
+        newTimestamp: input.newTimestamp,
+        actor: input.actor,
+        now,
+      });
+      this.writePlot(input.documentUri, nextPlot);
+      const logEntryActivityId = await this.emitLogEntry(
+        input.documentUri,
+        'duplicate',
+        scene.properties.storyboard_id,
+        scene.properties.id,
+        scene.properties.thumbnail_asset_ref,
+        input.actor,
+        `duplicate scene → ${scene.properties.timestamp}`,
+        now,
+        this.readLastActivityId(scene),
+      );
+      return { kind: 'ok', scene, logEntryActivityId };
+    } catch (err) {
+      if (err instanceof DuplicateTimestampError) {
+        return {
+          kind: 'duplicate-timestamp-collision',
+          existingSceneId: err.conflictingSceneId,
+          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
+        };
+      }
+      throw err;
+    }
+  }
+
+  // ── Copy-to-other-storyboard (review 3A two-card emission) ─────────
+
+  async copySceneToOtherStoryboard(input: EditCopySceneInput): Promise<CopySceneResult> {
+    const plot = this.readPlot(input.documentUri);
+    const source = getScene(plot, input.sceneId);
+    if (!source) {
+      throw new UnknownSceneError(input.sceneId);
+    }
+    if (!getStoryboard(plot, input.destinationStoryboardId)) {
+      throw new UnknownStoryboardError(input.destinationStoryboardId);
+    }
+    const deepCopy =
+      this.thumbnailService?.deepCopyAsset ??
+      ((ref: string): Promise<string> => Promise.resolve(`${ref}-copy`));
+
+    const now = new Date().toISOString();
+    try {
+      const { plot: nextPlot, scene } = await crudCopyScene(plot, {
+        sceneId: input.sceneId,
+        destinationStoryboardId: input.destinationStoryboardId,
+        newTimestamp: input.newTimestamp,
+        deepCopyThumbnail: deepCopy,
+        actor: input.actor,
+        now,
+      });
+      this.writePlot(input.documentUri, nextPlot);
+
+      // Review 3A — two log cards sharing a freshly-minted pairActivityId.
+      const pairActivityId = mintUuid();
+      const logEntryActivityId = await this.emitLogEntry(
+        input.documentUri,
+        'copy-out',
+        source.properties.storyboard_id,
+        source.properties.id,
+        source.properties.thumbnail_asset_ref,
+        input.actor,
+        `copy scene to Storyboard ${input.destinationStoryboardId}`,
+        now,
+        this.readLastActivityId(scene),
+        pairActivityId,
+      );
+      await this.emitLogEntry(
+        input.documentUri,
+        'copy-in',
+        input.destinationStoryboardId,
+        scene.properties.id,
+        scene.properties.thumbnail_asset_ref,
+        input.actor,
+        `copy scene to Storyboard ${input.destinationStoryboardId}`,
+        now,
+        this.readLastActivityId(scene),
+        pairActivityId,
+      );
+      return { kind: 'ok', scene, logEntryActivityId, pairActivityId };
+    } catch (err) {
+      if (err instanceof ThumbnailDeepCopyFailedError) {
+        return { kind: 'deep-copy-failed', error: err };
+      }
+      if (err instanceof DuplicateTimestampError) {
+        return {
+          kind: 'duplicate-timestamp-collision',
+          existingSceneId: err.conflictingSceneId,
+          suggestedOffsetTimestamp: offsetTimestampBy1s(input.newTimestamp),
+        };
+      }
+      throw err;
+    }
+  }
+
+  // ── Refresh thumbnail (Phase 4 — stubbed for now) ──────────────────
 
   refreshSceneThumbnail(_input: EditRefreshThumbnailInput): Promise<RefreshThumbnailResult> {
     return notImplemented('refreshSceneThumbnail', 'Phase 4 T074');
@@ -332,42 +850,149 @@ export class StoryboardEditService implements vscode.Disposable {
     return notImplemented('refreshAllStaleThumbnails', 'Phase 4 T078');
   }
 
-  // ── Storyboard edit ops (Phase 3) ──────────────────────────────────
+  // ── Storyboard-level edits ─────────────────────────────────────────
 
-  renameStoryboard(_input: EditRenameStoryboardInput): Promise<StoryboardEditOutcome> {
-    return notImplemented('renameStoryboard', 'Phase 3 T052');
+  async renameStoryboard(input: EditRenameStoryboardInput): Promise<RenameStoryboardOutcome> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getStoryboard(plot, input.storyboardId);
+    if (!existing) {
+      throw new UnknownStoryboardError(input.storyboardId);
+    }
+    const now = new Date().toISOString();
+    try {
+      const { plot: nextPlot, storyboard } = await crudRenameStoryboard(plot, {
+        storyboardId: input.storyboardId,
+        newName: input.newName,
+        actor: input.actor,
+        now,
+      });
+      this.writePlot(input.documentUri, nextPlot);
+      const logEntryActivityId = await this.emitLogEntry(
+        input.documentUri,
+        'rename',
+        storyboard.properties.id,
+        null,
+        null,
+        input.actor,
+        `storyboard rename "${existing.properties.name}" → "${storyboard.properties.name}"`,
+        now,
+        this.readLastActivityId(storyboard),
+      );
+      return { kind: 'ok', storyboard, logEntryActivityId };
+    } catch (err) {
+      if (err instanceof DuplicateStoryboardNameError) {
+        return {
+          kind: 'name-conflict',
+          conflictStoryboardId: err.conflictingStoryboardId,
+        };
+      }
+      throw err;
+    }
   }
 
-  describeStoryboard(_input: EditDescribeStoryboardInput): Promise<StoryboardEditOutcome> {
-    return notImplemented('describeStoryboard', 'Phase 3 T052');
+  async describeStoryboard(input: EditDescribeStoryboardInput): Promise<StoryboardEditOutcome> {
+    const plot = this.readPlot(input.documentUri);
+    const existing = getStoryboard(plot, input.storyboardId);
+    if (!existing) {
+      throw new UnknownStoryboardError(input.storyboardId);
+    }
+    const now = new Date().toISOString();
+    const { plot: nextPlot, storyboard } = await crudDescribeStoryboard(plot, {
+      storyboardId: input.storyboardId,
+      description: input.description,
+      actor: input.actor,
+      now,
+    });
+    this.writePlot(input.documentUri, nextPlot);
+    const logEntryActivityId = await this.emitLogEntry(
+      input.documentUri,
+      'describe',
+      storyboard.properties.id,
+      null,
+      null,
+      input.actor,
+      `storyboard describe`,
+      now,
+      this.readLastActivityId(storyboard),
+    );
+    return { kind: 'ok', storyboard, logEntryActivityId };
   }
 
-  // ── Missing-data routing (Phase 3 T055-T056) ───────────────────────
+  // ── Missing-data routing ───────────────────────────────────────────
 
-  openSceneForMissingDataEdit(_input: {
+  openSceneForMissingDataEdit(input: {
     readonly documentUri: string;
     readonly sceneId: string;
   }): Promise<void> {
-    return notImplemented('openSceneForMissingDataEdit', 'Phase 3 T055');
+    this.postToPanel({ type: 'scene-edit-form-open', sceneId: input.sceneId });
+    return Promise.resolve();
   }
 
-  // ── Read-only views for the panel ─────────────────────────────────
+  // ── Read-only views ────────────────────────────────────────────────
 
-  getStaleFlag(_documentUri: string, _sceneId: string): StaleFlag | null {
-    return null;
+  getStaleFlag(documentUri: string, sceneId: string): StaleFlag | null {
+    return this.staleCache.get(documentUri)?.get(sceneId) ?? null;
   }
 
-  getPendingDeletes(_documentUri: string): readonly DeletedScene[] {
-    return [];
+  getPendingDeletes(documentUri: string): readonly DeletedScene[] {
+    return this.undoBuffer.get(documentUri) ?? [];
   }
 
-  // ── Disposal ──────────────────────────────────────────────────────
+  // ── Internals ──────────────────────────────────────────────────────
+
+  private postToPanel(message: ExtensionToStoryboardPanelMessage): void {
+    if (this.panelSink) {
+      this.panelSink.postMessage(message);
+    }
+  }
+
+  // ── Disposal ───────────────────────────────────────────────────────
 
   dispose(): void {
-    if (this.disposed) {return;}
+    if (this.disposed) {
+      return;
+    }
     this.disposed = true;
     this.logService = null;
+    this.undoBuffer.clear();
+    this.staleCache.clear();
     this._onDidChangeStaleFlags.dispose();
     this._onDidChangeUndoQueue.dispose();
   }
 }
+
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function toastOf(deleted: DeletedScene, title: string): SceneUndoToastDescriptor {
+  return {
+    sceneId: deleted.original.properties.id,
+    sceneTitle: title,
+    deletedAt: deleted.deletedAt,
+    canUndo: true,
+  };
+}
+
+function offsetTimestampBy1s(iso: string): string {
+  const ms = Date.parse(iso);
+  if (Number.isNaN(ms)) {
+    return iso;
+  }
+  return new Date(ms + 1000).toISOString();
+}
+
+function coerceError(err: unknown): Error {
+  return err instanceof Error ? err : new Error(String(err));
+}
+
+function stringifyErr(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+function mintUuid(): string {
+  const g = globalThis.crypto as { randomUUID?: () => string } | undefined;
+  if (g && typeof g.randomUUID === 'function') {
+    return g.randomUUID();
+  }
+  return `00000000-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
+}
+
