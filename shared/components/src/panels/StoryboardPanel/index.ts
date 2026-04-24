@@ -23,4 +23,6 @@ export type {
   StoryboardOptionViewModel,
   TransportViewModel,
   MissingDataReason,
+  SceneEditViewModel,
+  StoryboardEditViewModel,
 } from './types';

@@ -371,4 +371,6 @@ export type {
   UndoToastProps,
   UndoToastState,
   StaleBadgeProps,
+  SceneEditViewModel,
+  StoryboardEditViewModel,
 } from './panels/StoryboardPanel';

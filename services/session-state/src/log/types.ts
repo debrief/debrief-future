@@ -122,6 +122,79 @@ export interface FeatureProvenance {
  */
 export const FILE_SAVE_TOOL_SENTINEL = 'debrief.fileSave';
 
+/**
+ * Sentinel tool name used on StoryboardEditEvent LogEntries produced by
+ * `LogService.recordStoryboardEdit`. Distinct from both ToolRunEvent and
+ * FileSavedEvent so #176 (Analysis Log Panel) can render them with a
+ * storyboard-edit-specific card.
+ *
+ * Feature: 218-storyboarding-edit (FR-EDIT-020)
+ */
+export const STORYBOARD_EDIT_TOOL_SENTINEL = 'debrief.storyboardEdit';
+
+/**
+ * The canonical storyboard-edit op discriminator.
+ *
+ * Mirrors #215's `StoryboardCrudOp` (exported as `StoryboardOp` from
+ * `@debrief/components/storyboard`) plus two #218-only ops that live
+ * entirely in the orchestration layer (no CRUD counterpart):
+ *   - `copy-out`         : source-side of a copy-to-other-storyboard pair
+ *   - `refresh-all-stale`: rollup emitted after the bulk refresh (FR-EDIT-025)
+ *
+ * Note: `restore` and `refresh-thumbnail` are already in the CRUD op
+ * union — the CRUD module emits them on Scene provenance and this
+ * recorder echoes them onto the timeline.
+ *
+ * Duplicated (rather than imported) because `@debrief/session-state` must
+ * not depend on the higher-level `@debrief/components` package (layering
+ * constraint). A drift-guard test in #215's test suite asserts the two
+ * unions stay aligned. Review decision 6A intent is preserved: any new
+ * CRUD op requires a paired update here.
+ */
+export type StoryboardEditOp =
+  | 'create'
+  | 'rename'
+  | 'describe'
+  | 'delete'
+  | 'restore'
+  | 'update-to-current'
+  | 'duplicate'
+  | 'copy-in'
+  | 'insert-middle'
+  | 'refresh-thumbnail'
+  | 'copy-out'
+  | 'refresh-all-stale';
+
+/**
+ * Input shape for `LogService.recordStoryboardEdit`. Review decision 3A
+ * adds `pairActivityId` so the two halves of a copy-to-other-storyboard
+ * can render as linked cards in the LogPanel.
+ *
+ * Feature: 218-storyboarding-edit (contract:
+ *   specs/218-storyboarding-edit/contracts/log-service-extension.md)
+ */
+export interface RecordStoryboardEditInput {
+  readonly storePath: string;
+  readonly itemPath: string;
+  readonly op: StoryboardEditOp;
+  readonly storyboardId: string;
+  /** null for Storyboard-level ops. */
+  readonly sceneId: string | null;
+  /** null for delete / storyboard.delete-cascade (asset unreferenced). */
+  readonly thumbnailAssetRef: string | null;
+  readonly actor: string;
+  /** One-line ≤ 120 char summary rendered on the LogPanel card. */
+  readonly summary: string;
+  /** ISO-8601 of the edit. */
+  readonly timestamp: string;
+  /** activity_id of the underlying #215 LogEntry (cross-link for #176). */
+  readonly underlyingActivityId: string;
+  /** Non-null for paired ops (currently copy-out + copy-in only).
+   *  Both halves carry the SAME pairActivityId so #176 can render
+   *  them as visually linked cards. Review decision 3A. */
+  readonly pairActivityId: string | null;
+}
+
 export interface LogService {
   recordToolResult(
     toolResult: ToolResultForLog,
@@ -156,6 +229,27 @@ export interface LogService {
     parentActivityId: string,
     filename: string,
     timestamp: string
+  ): Promise<{ activity_id: string }>;
+
+  /**
+   * Append a StoryboardEditEvent to the analysis log.
+   *
+   * Creates a LogEntry with `was_generated_by.tool =
+   * STORYBOARD_EDIT_TOOL_SENTINEL` carrying the op + affected
+   * storyboard/scene ids + thumbnail ref + cross-link to the underlying
+   * #215 LogEntry. Attaches to the affected Scene's provenance (or the
+   * Storyboard's for Storyboard-level ops; falls back to the first
+   * feature in the collection if neither carrier is present).
+   *
+   * Degraded-path contract (FR-EDIT-021): if the plot is unreachable
+   * (deps.loadGeoJson returns null), returns `{ activity_id: '' }`
+   * without throwing — the storyboard-edit is already persisted in the
+   * affected Feature's provenance[] by #215's CRUD module.
+   *
+   * Feature: 218-storyboarding-edit (FR-EDIT-020)
+   */
+  recordStoryboardEdit(
+    input: RecordStoryboardEditInput
   ): Promise<{ activity_id: string }>;
 
   getTimeline(
