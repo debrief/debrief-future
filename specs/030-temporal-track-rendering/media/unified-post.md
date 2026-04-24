@@ -39,6 +39,12 @@ Utility functions handle the temporal logic: a binary search finds the track poi
 
 The map now understands time. Pass a `currentTime` to MapView and tracks with timestamp data render temporally instead of statically.
 
+Two display modes:
+- **Full-track**: The entire path stays visible. A red circle marker shows where the vessel was at the selected time. Move the scrubber and the marker follows.
+- **Snail-trail**: Only the path from start to current time is visible. Advance time and the track draws itself forward. Rewind and it contracts.
+
+Both modes work with the TimeController we shipped last week. Scrub, play, pause, change speed — the tracks respond.
+
 ## How It Works
 
 The core is a binary search (`findNearestPointIndex`) that finds the closest recorded position to any given time in O(log n). For a track with 10,000 positions, that's ~13 comparisons instead of 10,000.

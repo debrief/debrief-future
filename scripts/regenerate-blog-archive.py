@@ -1038,7 +1038,10 @@ class MalformedImageReference:
 
 _IMAGE_RE = re.compile(
     r'!\[(?P<alt>[^\]]*)\]'
-    r'\((?P<path>[^)\s]+)'
+    # Path may contain spaces when wrapped in Liquid-style `{{ ... }}`
+    # template expansion (real archive — see 216-storyboarding-capture).
+    # Accept anything up to a closing paren or an optional `"title"` arm.
+    r'\((?P<path>[^)]+?)'
     r'(?:\s+"[^"]*")?\)'
 )
 
@@ -2232,6 +2235,7 @@ class CliArgs:
     skip_gh: bool
     fail_fast: bool
     repo_root: Path
+    force: bool = False  # Spec 231: overwrite existing generated posts
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -2255,6 +2259,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-gh", action="store_true")
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--repo-root", type=Path, default=None)
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Overwrite existing generated posts (spec 231 re-run).",
+    )
     return parser
 
 
@@ -2282,6 +2290,7 @@ def parse_cli_args(argv: list[str]) -> CliArgs:
         skip_gh=ns.skip_gh,
         fail_fast=ns.fail_fast,
         repo_root=repo_root,
+        force=ns.force,
     )
 
 
@@ -2387,7 +2396,10 @@ def main(argv: list[str] | None = None) -> int:
             # Spec 231: image audit — orphan, broken, malformed surfaces.
             audit_image_references(index=index, specs=specs, repo_root=args.repo_root)
             for post in posts:
-                writer.stage(post.destination, post.body)
+                if args.force:
+                    writer.stage_overwrite(post.destination, post.body)
+                else:
+                    writer.stage(post.destination, post.body)
 
             assert_coverage_invariant(
                 specs=specs, classifications=classifications, logger=logger,

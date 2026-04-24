@@ -32,6 +32,12 @@ This is the first feature in Epic E04 (Results Visualization). It provides the r
 
 We shipped a `ChartRenderer` component that wraps vega-embed with proper error boundaries, loading states, and empty state handling. It lives in the shared components library alongside the map and timeline components.
 
+The architectural piece that matters: we built a registry-based `transformDataset()` function that sits between analysis tools and the renderer. Tools produce standard dataset JSON — `{ type, title, metadata, data }` — and the transformer converts those to Vega-Lite specs. The renderer paints whatever spec it receives. This means the transformer is the ONLY component that knows about Vega-Lite. Swapping to a different chart library means replacing one 200-line file, not touching the tools.
+
+Right now we support two dataset types: `zone_histogram` maps to bar charts, `range_bearing_series` maps to line charts. Each type has its own transformer function in the registry. Charts automatically adapt to light/dark/VS Code themes via CSS custom properties — no manual theme switching required.
+
+We added 28 new tests, bringing the shared components suite to 434 passing. Storybook has stories for all chart types and edge cases: bar charts, line charts, empty data, error states, and a 10K-point performance scenario. All charts render in under 100ms.
+
 ## Architecture
 
 The three-tier error handling approach worked cleanly:

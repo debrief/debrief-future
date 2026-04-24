@@ -36,6 +36,12 @@ We're also adding a Python `@tool_spec` decorator that links implementations to 
 
 We've shipped a tool specification system that sits between our Python services and TypeScript frontends. Each tool now has a markdown document in `shared/tools/` that defines exactly what it does using language-neutral pseudocode. Four initial specs validate the structure: set-track-color, apply-symbol-style, label-interval, and symbol-interval.
 
+The template has nine sections. Metadata provides machine-readable info for tooling. An MCP section describes the tool in language optimized for Claude to understand when choosing tools. Inputs and Outputs reference our existing GeoJSON and ToolResults schemas. The Algorithm section is the heart—pseudocode detailed enough that two developers working independently produce implementations that behave identically. Edge cases document boundary conditions. Examples include golden input/output JSON pairs. Changelog tracks evolution. References link to related tools and schemas.
+
+Golden examples live alongside specs as JSON file pairs. `set-track-color.basic.input.json` and `set-track-color.basic.output.json` define correct behavior. Run any implementation against the input; if the output matches, it's correct. If not, either the implementation has a bug or the spec needs clarification. This removes ambiguity.
+
+We also built a Python `@tool_spec` decorator in `services/debrief-tools/`. When you annotate a function with `@tool_spec("track/styling/set-track-color.1.0")`, it validates the spec exists at import time. No waiting until runtime to discover a typo. The decorator stores the spec path on the function for introspection—useful when generating documentation or building MCP tool registries. 19 tests pass, covering path resolution, validation, introspection, and error messages.
+
 ## How It Works
 
 The pseudocode uses readable keywords like `FUNCTION`, `FOR EACH`, `IF`, `END IF`, `RETURN`. No language-specific syntax. The `set-track-color` algorithm shows the pattern:

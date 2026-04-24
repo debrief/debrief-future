@@ -39,6 +39,46 @@ The brief was small: two interfaces called `ResolvedPositionStyle` had
 drifted. One listed three marker shapes, the other five. One called the
 label field `label`, the other `labelText`. Make them one. A half-day job.
 
+The `/speckit.review` pass made it a week. If the interface had drifted,
+what about the enum it points at? The resolver that produces it? The
+renderer switch that consumes it? The VS Code tool that takes a shape as a
+parameter? We went and looked. The answer was drift in every direction.
+
+So the work expanded along a single axis — marker shapes — from the LinkML
+schema all the way to the MCP tool input schema. Every link in that chain
+now points at one source of truth: `PointShapeEnum` in
+`shared/schemas/src/linkml/common.yaml`. Change a value there, rerun
+`pnpm --filter @debrief/schemas build`, and the type widens or narrows
+everywhere that uses it, automatically.
+
+The moving parts that landed together:
+
+- **One interface.** `ResolvedPositionStyle` lives in `@debrief/utils`.
+  `symbol: PointShape` (template-literal derivation of the schema enum),
+  `labelText: string | null`. The components-side duplicate is gone; its
+  file now re-exports.
+- **One resolver.** `resolvePositionStyle` and `computeAllPositionStyles`
+  are single-implementation in `@debrief/utils`. The components-side copy
+  — which had subtly different null-override semantics — is gone. The
+  winner: `null` means "no override, use the cascaded default", matching
+  the LinkML attribute description.
+- **One exhaustive switch.** Every renderer switch on `symbol` now has an
+  `assertNever(shape)` default branch. Adding a 6th shape in LinkML
+  breaks the build in every renderer file that needs updating, until it
+  does.
+- **A real runtime guard.** Before: a JSON payload with
+  `symbol: "star"` silently drew a circle. After: it throws
+  `InvalidPointShapeError` with the offending value and the valid set;
+  the renderer catches, logs, and skips the symbol — without crashing
+  the rest of the track.
+- **Narrowed generator output.** A post-process step in
+  `scripts/generate.py` rewrites `symbol: string,` to `symbol: PointShape,`
+  on the two enum-ranged attributes after `gen-typescript` runs. No more
+  "`string` in the type, enum in the comment" gap.
+- **Pinned enum parity.** A new schema-adherence test keeps
+  `PointShapeEnum` and `MarkerSymbolEnum` from silently drifting again —
+  the ADR from feature #091 is honoured, the drift surface is closed.
+
 ## Numbers
 
 | | Before | After |

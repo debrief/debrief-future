@@ -39,9 +39,16 @@ The web-shell already proved the orchestration logic works. Now we extend that c
 
 A month ago, the VS Code E2E test suite had 8 spec files -- all skipped. The web-shell had 81 tests across 13 categories, all passing, but those tests exercised orchestration through mock data. Nothing verified that a scientist could open a real REP file in the real extension, see real tracks parsed by real Python services, select features, and run analysis tools end-to-end.
 
+![STAC catalog browser showing Exercise Alpha and Training Run 1 with timeline overview](/assets/images/future-debrief/005-e2e-workflow-tests/web-shell-catalog.png)
+*STAC catalog browser — the entry point for both web-shell and VS Code E2E tests*
+
+Now the VS Code E2E suite has 18 active spec files. Four previously-skipped specs have been restored with live assertions. Ten new spec files cover selection sync, time controller, drawing tools, catalog browsing, log panel, edit face, event propagation, styling tools, undo/redo, and evidence capture. The `DebriefWebview` page object gained 40+ new selectors and methods to support all of this.
+
+Both suites run in parallel CI. The web-shell tests (~30 seconds, mock data, 13 specs) catch orchestration regressions fast. The VS Code E2E tests (~3 minutes, real services, 18 specs) catch the integration problems that only surface when debrief-io parses an actual REP file and debrief-stac stores actual STAC Items.
+
 ## How It Works
 
-![Analysis view showing map with HMS Defender and USS Freedom tracks, time controller, tools panel, and layers panel](../evidence/screenshots/web-shell-map-tracks.png)
+![Analysis view showing map with HMS Defender and USS Freedom tracks, time controller, tools panel, and layers panel](/assets/images/future-debrief/005-e2e-workflow-tests/web-shell-map-tracks.png)
 *Full analysis view — navigation tree, time controller, tools panel, layers (left) and Leaflet map with real tracks (right)*
 
 The VS Code E2E tests drive openvscode-server with the Debrief extension sideloaded. Behind the scenes, three Python services -- debrief-io, debrief-stac, and debrief-calc -- are running and reachable. When a test opens a REP file, the extension calls debrief-io to parse it, debrief-stac to catalogue it, and debrief-calc to run analysis. The test then inspects the webview DOM to verify tracks rendered and results appeared.
@@ -58,7 +65,7 @@ test('loads REP file and shows tracks', async ({ codeServerPage }) => {
 });
 ```
 
-![Selection sync — track selected on map with feature list and tools panel visible](../evidence/screenshots/web-shell-selection.png)
+![Selection sync — track selected on map with feature list and tools panel visible](/assets/images/future-debrief/005-e2e-workflow-tests/web-shell-selection.png)
 *Selection sync — clicking a track on the map highlights it and activates context-sensitive tools*
 
 That last assertion -- `toBeGreaterThan(0)` rather than `toEqual(3)` -- is deliberate. Real service output varies. Structural assertions ("at least one track exists") are resilient to changes in sample data or parsing improvements. Value-exact assertions against real data break constantly for the wrong reasons.
