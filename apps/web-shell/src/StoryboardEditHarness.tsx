@@ -55,11 +55,15 @@ function applyInitialState(
   sceneEditViewModels: Readonly<Record<string, SceneEditViewModel>>;
   staleFlags: readonly StaleFlagEntry[];
 } {
+  // Baseline VMs carry stale:false — the staleFlags message is the sole
+  // source of truth for stale state (data-model §E3 — `staleFlags` is a
+  // full-replacement inbound). Carrying `stale: true` on both the
+  // baseline and the flag map leaves the baseline stuck in `stale` after
+  // a refresh-all clears the map.
   const out: Record<string, SceneEditViewModel> = {};
   const staleFlags: StaleFlagEntry[] = [];
   for (const row of fixture.scenes) {
     const base = fixture.sceneEditViewModels[row.sceneId];
-    const isStale = initial.staleSceneIds.includes(row.sceneId);
     const pendingDelete = initial.pendingDeleteSceneIds.includes(row.sceneId);
     const missingIds = initial.missingDataBySceneId[row.sceneId];
     const missingData =
@@ -74,11 +78,11 @@ function applyInitialState(
       titleIsEditing: false,
       editFormOpen: false,
       pendingDelete,
-      stale: isStale,
-      unresolvedFeatureIds: isStale ? ['track-alpha', 'track-bravo'] : [],
+      stale: false,
+      unresolvedFeatureIds: [],
       missingData,
     };
-    if (isStale) {
+    if (initial.staleSceneIds.includes(row.sceneId)) {
       staleFlags.push({
         sceneId: row.sceneId,
         stale: true,
