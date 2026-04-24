@@ -380,6 +380,23 @@ export enum ParameterTypeEnum {
     ReferencePointPattern = "ReferencePointPattern",
 };
 /**
+* Visual category for Log Panel icon rendering. Declared by the tool at registration; consumed by frontends to colour tool-icon glyphs. See docs/log-panel-ux-srd.md §5.
+This enum defines only the declarable values. The neutral-grey "unknown" state shown by the Log Panel when a tool has no declared category is NOT a value of this enum — it is a rendering-layer fallback produced when the attribute is null or absent.
+*/
+export enum ToolCategoryEnum {
+    
+    /** File / data ingestion tools (e.g., REP loader, DPF parser, CSV import) */
+    import = "import",
+    /** Appearance-changing tools (e.g., set-track-color, symbol style, label interval) */
+    style = "style",
+    /** Analytical computation tools (e.g., range-bearing, course/speed, statistics) */
+    calc = "calc",
+    /** Tools that narrow the dataset (time filter, spatial filter, trim) */
+    filter = "filter",
+    /** Tools that export or capture state (export-png, export-csv, export-geojson) */
+    snapshot = "snapshot",
+};
+/**
 * Type of file-level provenance event.
 */
 export enum FileProvEventTypeEnum {
@@ -1441,6 +1458,8 @@ export interface Tool {
     version?: string,
     /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
     requirements?: SelectionRequirement[],
+    /** Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey "Other" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md §R5). Feature 207. */
+    category?: string,
 }
 
 

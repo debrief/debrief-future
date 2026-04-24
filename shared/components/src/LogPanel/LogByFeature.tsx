@@ -18,6 +18,7 @@ export function LogByFeature({
   featureNames,
   viewMode,
   selectedEntryId,
+  toolCategories,
   onEntryClick,
   onTuneClick,
   onRestoreClick,
@@ -67,6 +68,7 @@ export function LogByFeature({
               featureNames={featureNames}
               viewMode={viewMode}
               isSelected={entry.activity_id === selectedEntryId}
+              toolCategories={toolCategories}
               onClick={onEntryClick}
               onTuneClick={onTuneClick}
               onRestoreClick={onRestoreClick}

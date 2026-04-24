@@ -6,7 +6,7 @@ import math
 from datetime import datetime
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolCategoryEnum
 from debrief_calc.registry import tool
 
 EARTH_RADIUS_NM = 3440.065
@@ -52,6 +52,7 @@ def _parse_timestamp(iso_str: str) -> float:
     input_kinds=["TRACK"],
     output_kind="mutation/track/courses_speeds",
     context_type=ContextType.MULTI,
+    category=ToolCategoryEnum.calc,
     parameters=[],
 )
 def generate_courses_speeds(

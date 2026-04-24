@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-invalid-category",
+  "name": "Test Invalid Category",
+  "description": "Tool with invalid category value - schema should reject",
+  "category": "geometry"
+}
