@@ -624,6 +624,10 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   propertiesSlot,
   className,
   colorMap,
+  // #191 T049 — NL-search client plumbed through to FilterBar.
+  llmClient,
+  nlEnums,
+  liveModeLabel,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<GoldenLayout | null>(null);
@@ -926,6 +930,9 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             items={items as StacBrowserItem[]}
             taxonomy={taxonomy}
             onFilteredItems={handleFilteredItems}
+            llmClient={llmClient}
+            nlEnums={nlEnums}
+            liveModeLabel={liveModeLabel}
           />
         </div>
         {activeFilterCount > 0 && (

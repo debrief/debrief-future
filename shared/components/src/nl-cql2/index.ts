@@ -17,10 +17,12 @@ export {
   createRecordedLLMClient,
   createPassthroughLLMClient,
   createLiveLLMClient,
+  createPostMessageLLMClient,
   extractPhraseFromPrompt,
   validateLiveConfig,
   isLiveTransportError,
 } from "./clients";
+export type { PostMessageLLMClientOptions } from "./clients";
 export { canonicalisePhrase, sha256Hex } from "./hash";
 export { parseResponse } from "./parseResponse";
 export { providerCall } from "./providerCall";

@@ -12,6 +12,7 @@ import type {
   StacBrowserItem,
   VesselTaxonomyNode,
 } from '../filter-engine';
+import type { LLMClient, EnumBundle } from '../nl-cql2';
 
 /** Input method used by a filter type's value editor */
 export type InputMethod =
@@ -131,6 +132,21 @@ export interface FilterBarProps {
   readonly onExpressionChange?: (expression: FilterExpression) => void;
   readonly initialFilterState?: FilterBarState;
   readonly savedFiltersStorage?: SavedFiltersStorage;
+
+  /**
+   * Optional NL-search client (#191). When both `llmClient` and `nlEnums` are
+   * provided, hitting Enter in QuickSearch routes through the NL → CQL2
+   * pipeline (`buildPrompt → client.generate → parseResponse → dispatch
+   * chips`) instead of graduating the literal text as a title lozenge.
+   *
+   * Absence of these props is the default behaviour — #191 explicitly
+   * preserves today's literal path when the prop is omitted (review
+   * Decision 12).
+   */
+  readonly llmClient?: LLMClient;
+  readonly nlEnums?: EnumBundle;
+  /** Display label for the live-mode indicator (e.g. "Live · Anthropic · claude-haiku-4-5-20251001"). */
+  readonly liveModeLabel?: string;
 }
 
 /** Distinct-value collection for platform-chip pickers (#186) */

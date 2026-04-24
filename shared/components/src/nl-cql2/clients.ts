@@ -644,6 +644,106 @@ function mapProxyErrorToOutcome(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Post-message client — VS Code webview flavour (#191 T031, Decision 4)
+// ---------------------------------------------------------------------------
+
+/**
+ * Dependency-injection surface for `createPostMessageLLMClient`.
+ * The webview supplies:
+ *   - `postMessage` — typically `acquireVsCodeApi().postMessage` bound.
+ *   - `subscribe`   — an `addEventListener('message', handler)` bridge that
+ *     returns an unsubscribe function.
+ *   - `uuid`        — injectable id generator; production passes
+ *     `() => crypto.randomUUID()`.
+ */
+export interface PostMessageLLMClientOptions {
+  readonly postMessage: (msg: unknown) => void;
+  readonly subscribe: (handler: (msg: unknown) => void) => () => void;
+  readonly uuid: () => string;
+}
+
+/**
+ * Build an `LLMClient` that forwards `generate()` calls across the
+ * webview ↔ extension-host boundary via `postMessage`. The extension host
+ * owns the credential and the HTTPS call; this client is a transport
+ * adapter that waits for the matching `nlOutcome` response.
+ *
+ * Contract:
+ *   - One `generate()` call issues exactly one `nlGenerate` message with a
+ *     fresh `requestId` and waits for an `nlOutcome` with the same id.
+ *   - `abort()` fires an `nlAbort` for every currently-pending id and
+ *     resolves each pending `generate()` to
+ *     `{kind:"transport-error", reason:"cancelled"}`.
+ *   - Unknown response ids (e.g. after an abort) are ignored silently.
+ *   - The client NEVER throws on normal failure paths — every outcome flows
+ *     back as a `LiveOutcome`.
+ */
+export function createPostMessageLLMClient(
+  options: PostMessageLLMClientOptions,
+): LLMClient {
+  interface PendingEntry {
+    readonly resolve: (outcome: LiveOutcome) => void;
+    readonly startedAt: number;
+  }
+  const pending = new Map<string, PendingEntry>();
+
+  const unsubscribe = options.subscribe((rawMsg: unknown) => {
+    if (typeof rawMsg !== "object" || rawMsg === null) return;
+    const msg = rawMsg as { type?: string; requestId?: string; outcome?: LiveOutcome };
+    if (msg.type !== "nlOutcome") return;
+    if (typeof msg.requestId !== "string") return;
+    const entry = pending.get(msg.requestId);
+    if (!entry) return; // unknown id — silently ignored
+    pending.delete(msg.requestId);
+    entry.resolve(msg.outcome as LiveOutcome);
+  });
+
+  void unsubscribe; // subscription stays live for the lifetime of the client.
+
+  function resolveAllWithCancelled(): void {
+    const entries = Array.from(pending.entries());
+    pending.clear();
+    for (const [requestId, entry] of entries) {
+      try {
+        options.postMessage({ type: "nlAbort", requestId });
+      } catch {
+        // postMessage failures aren't actionable — we've already decided
+        // to cancel.
+      }
+      const durationMs = Math.max(0, performance.now() - entry.startedAt);
+      entry.resolve({
+        kind: "transport-error",
+        reason: "cancelled",
+        durationMs,
+      });
+    }
+  }
+
+  return {
+    generate(prompt: string): Promise<LiveOutcome> {
+      return new Promise<LiveOutcome>((resolve) => {
+        const requestId = options.uuid();
+        pending.set(requestId, { resolve, startedAt: performance.now() });
+        try {
+          options.postMessage({ type: "nlGenerate", requestId, prompt });
+        } catch (err) {
+          pending.delete(requestId);
+          resolve({
+            kind: "transport-error",
+            reason: "unknown",
+            durationMs: 0,
+          });
+          void err;
+        }
+      });
+    },
+    abort(): void {
+      resolveAllWithCancelled();
+    },
+  };
+}
+
 // Re-export the config type so consumers can write `LiveConfig` without
 // always reaching into types.ts.
 export type { LiveConfig };
