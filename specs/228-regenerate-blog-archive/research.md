@@ -67,7 +67,7 @@ Every synthesised opener prepends a single-line HTML comment: `<!-- OPENER SYNTH
 **Rationale**:
 - FR-006 requires verbatim copy when the cache exists and synthesis when it doesn't; this design gives a deterministic, reviewable synthesis rather than free-form generation.
 - The visible marker + index flag satisfies Constitution I.3 ("no silent failures") at the content level.
-- ~137 specs currently have `evidence/opening-context.md`; roughly 20 shipped specs are missing it. Synthesis is the minority path but must not be silent.
+- 138 specs currently have `evidence/opening-context.md`; 18 shipped specs are missing it. Synthesis is the minority path but must not be silent.
 
 **Alternatives considered**:
 - *Call an LLM to synthesise prose*: violates Constitution I.1 (offline by default) and I.4 (reproducibility). Rejected.
@@ -110,7 +110,7 @@ Each spec's index row records the PR-description source: `pr-body=gh` or `pr-bod
 
 ## R7 — In-flight skip criteria
 
-**Decision**: A spec is skipped iff `specs/NNN-<slug>/media/shipped-post.md` does **not** exist. The PR-merged state is NOT used as a secondary signal: the shipped-post is the canonical "this is ready for the public archive" marker. A spec with a merged PR but no `shipped-post.md` is still skipped — it probably didn't get a public post on purpose (internal plumbing, reverts, etc.).
+**Decision**: A spec is skipped iff **no** shipped post exists under `specs/NNN-<slug>/media/`. The shipped-post locator matches EITHER the canonical `media/shipped-post.md` OR the legacy date-stamped pattern `media/YYYY-MM-DD-shipped-*.md` (the older convention used by specs `000-schemas`, `001-debrief-stac`, `002-debrief-io`, and similar early specs). When multiple legacy-named files exist in one media folder, the one with the latest ISO date in its filename wins. The PR-merged state is NOT used as a secondary signal: the shipped-post is the canonical "this is ready for the public archive" marker. A spec with a merged PR but no shipped post (by either naming) is still skipped — it probably didn't get a public post on purpose (internal plumbing, reverts, etc.).
 
 Skipped specs produce no post file but DO produce a row in `ARCHIVE-REBUILD.md` under a "Skipped Specs" sub-section so the website maintainer can see what was intentionally left out.
 
