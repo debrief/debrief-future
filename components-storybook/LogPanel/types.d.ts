@@ -48,6 +48,31 @@ export type ViewMode = 'timeline' | 'by-feature' | 'compact' | 'detailed';
  */
 export declare const VALID_VIEW_MODES: readonly ViewMode[];
 /**
+ * Semantic classification of a timeline entry, independent of its visual
+ * category. Projected from the PROV-side `LogEntry.activity_type` field on
+ * the LinkML schema (source of truth). Feature: 208-timeline-entry-kind.
+ *
+ * - 'snapshot': a distinguished moment in the session (manual checkpoint,
+ *   future: manual snapshot button, rationale markers).
+ * - 'tool':     an ordinary tool invocation.
+ * - 'tune':     reserved for future standalone tune-action entries. No
+ *   populator emits `'tune'` in feature 208 — it lands when a producer
+ *   sets `activity_type: 'tune'` on the record.
+ */
+export type TimelineEntryKind = 'snapshot' | 'tool' | 'tune';
+/**
+ * All values of TimelineEntryKind, for runtime enumeration (tests, fixtures,
+ * documentation). Feature: 208-timeline-entry-kind.
+ */
+export declare const TIMELINE_ENTRY_KINDS: readonly TimelineEntryKind[];
+/**
+ * Exhaustiveness guard. Call at the default branch of a switch/if-chain that
+ * enumerates TimelineEntryKind values. Adding a new kind without handling it
+ * surfaces as a type-check failure at this site.
+ * Feature: 208-timeline-entry-kind.
+ */
+export declare function assertNeverKind(value: never): never;
+/**
  * Display-oriented timeline entry derived from LogEntry.
  *
  * T023: TimelineEntry is a UI projection, not a schema type. It carries
@@ -75,6 +100,15 @@ export interface TimelineEntry {
     } | null;
     /** Pre-tool geometry for mutation tools — enables correct tune replay. */
     input_state?: InputFeatureState[] | null;
+    /**
+     * Semantic classification of this entry, independent of its visual category.
+     * Populated by the VS Code host on every emitted entry from the PROV-side
+     * `LogEntry.activity_type` signal. Optional only because Storybook fixtures
+     * and legacy mocks may omit it; consumers treat `undefined` the same as
+     * `'tool'` — there is no secondary tool-name fallback.
+     * Feature: 208-timeline-entry-kind.
+     */
+    kind?: TimelineEntryKind;
 }
 /**
  * Feature display info for resolving names.
