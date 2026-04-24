@@ -216,7 +216,9 @@ class GeneratedPost:
     title: str
     date: _dt.date
     member_spec_numbers: tuple[int, ...]
+    member_spec_keys: tuple[str, ...]
     opener_source: Literal["cached", "synthesised", "charter-framing"]
+    bucket_id: str  # e.g. epic_id like "E02" or composite_id "comp-100-101"; "" for unified
 
 
 @dataclass
@@ -1019,7 +1021,9 @@ def stitch_unified_post(
         title=title,
         date=ship_date,
         member_spec_numbers=(spec.number,),
+        member_spec_keys=(_spec_key(spec),),
         opener_source=opener_source,
+        bucket_id="",
     )
 
 
@@ -1156,7 +1160,9 @@ def stitch_epic_rollup(
         title=epic.title,
         date=latest_date,
         member_spec_numbers=tuple(sorted(m.number for m in members)),
+        member_spec_keys=tuple(sorted(_spec_key(m) for m in members)),
         opener_source="charter-framing",
+        bucket_id=epic.id,
     )
 
 
@@ -1360,7 +1366,9 @@ def stitch_composite_post(cluster: CompositeCluster) -> GeneratedPost:
         title=title,
         date=earliest_date,
         member_spec_numbers=tuple(m.number for m in cluster.members),
+        member_spec_keys=tuple(_spec_key(m) for m in cluster.members),
         opener_source="charter-framing",
+        bucket_id=cluster.id,
     )
 
 
@@ -1764,17 +1772,26 @@ def _find_post_for_classification(
     c: Classification,
     posts: list[GeneratedPost],
 ) -> GeneratedPost | None:
+    key = _spec_key(c.spec)
     if c.category == "unified":
         for post in posts:
-            if post.kind == "unified" and c.spec.number in post.member_spec_numbers:
+            if post.kind == "unified" and key in post.member_spec_keys:
                 return post
-    if c.category == "epic-member":
+    if c.category == "epic-member" and c.epic_id is not None:
         for post in posts:
-            if post.kind == "epic-rollup" and c.spec.number in post.member_spec_numbers:
+            if (
+                post.kind == "epic-rollup"
+                and post.bucket_id == c.epic_id
+                and key in post.member_spec_keys
+            ):
                 return post
-    if c.category == "composite-member":
+    if c.category == "composite-member" and c.composite_id is not None:
         for post in posts:
-            if post.kind == "composite" and c.spec.number in post.member_spec_numbers:
+            if (
+                post.kind == "composite"
+                and post.bucket_id == c.composite_id
+                and key in post.member_spec_keys
+            ):
                 return post
     return None
 

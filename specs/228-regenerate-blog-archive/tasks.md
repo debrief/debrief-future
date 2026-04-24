@@ -353,28 +353,28 @@ Task: "Run test_atomic_writer.py"
 
 ### Full-suite test gate
 
-- [ ] T107 Run `uv run pytest tests/regenerate_blog_archive/ -v --cov=scripts.regenerate_blog_archive --cov-report=term` and capture output `(run command)`
-- [ ] T108 [P] Run `uv run ruff check scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/` — zero lint errors `(run command)`
-- [ ] T109 [P] Run `uv run pyright scripts/regenerate-blog-archive.py` — zero type errors (Article XV strict gate) `(run command)`
+- [x] T107 Run `uv run pytest tests/regenerate_blog_archive/ -v --cov=scripts.regenerate_blog_archive --cov-report=term` and capture output `(run command)`
+- [x] T108 [P] Run `uv run ruff check scripts/regenerate-blog-archive.py tests/regenerate_blog_archive/` — zero lint errors `(run command)`
+- [x] T109 [P] Run `uv run pyright scripts/regenerate-blog-archive.py` — zero type errors (Article XV strict gate) `(run command)`
 
 ### Real run
 
-- [ ] T110 Run `python scripts/regenerate-blog-archive.py` (no flags — production defaults) against the live `specs/` tree; capture stdout summary block `(run command)`
-- [ ] T111 Inspect `ARCHIVE-REBUILD.md` — verify every section present (index table, Skipped sub-section, Unresolved Groupings sub-sections, runbook, raw-log `<details>`) `ARCHIVE-REBUILD.md`
-- [ ] T112 Spot-check 3 representative generated posts per SC-003 (one unified — e.g. 206; one epic rollup — e.g. E02 at 070; one composite if any) — verify sections 1–3 byte-for-byte match corresponding `evidence/opening-context.md` `(manual inspection)`
+- [x] T110 Run `python scripts/regenerate-blog-archive.py` (no flags — production defaults) against the live `specs/` tree; capture stdout summary block `(run command)`
+- [x] T111 Inspect `ARCHIVE-REBUILD.md` — verify every section present (index table, Skipped sub-section, Unresolved Groupings sub-sections, runbook, raw-log `<details>`) `ARCHIVE-REBUILD.md`
+- [x] T112 Spot-check 3 representative generated posts per SC-003 (one unified — e.g. 206; one epic rollup — e.g. E02 at 070; one composite if any) — verify sections 1–3 byte-for-byte match corresponding `evidence/opening-context.md` `(manual inspection)`
 
 ### Evidence collection
 
-- [ ] T113 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — include `feature: 228-regenerate-blog-archive`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` in front matter `specs/228-regenerate-blog-archive/evidence/test-summary.md`
-- [ ] T114 [P] Create usage demonstration — includes real stdout summary block from T110 + quickstart walkthrough annotated with actual counts `specs/228-regenerate-blog-archive/evidence/usage-example.md`
-- [ ] T115 [P] Capture CLI demo — terminal session transcript showing `--help`, `--dry-run --verbose`, and real run `specs/228-regenerate-blog-archive/evidence/cli-demo.txt`
-- [ ] T116 [P] Extract raw run log from the `<details>` block in `ARCHIVE-REBUILD.md` into a standalone evidence file `specs/228-regenerate-blog-archive/evidence/run-log.txt`
-- [ ] T117 [P] Capture no-overwrite proof — sha256sum of all existing-before-run files under `specs/*/` pre- and post-run, diff shows only additions `specs/228-regenerate-blog-archive/evidence/no-overwrite-proof.md`
-- [ ] T118 [P] Capture corpus coverage — one row per spec directory × classification bucket, verifies SC-001 invariant `specs/228-regenerate-blog-archive/evidence/corpus-coverage.md`
+- [x] T113 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — include `feature: 228-regenerate-blog-archive`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` in front matter `specs/228-regenerate-blog-archive/evidence/test-summary.md`
+- [x] T114 [P] Create usage demonstration — includes real stdout summary block from T110 + quickstart walkthrough annotated with actual counts `specs/228-regenerate-blog-archive/evidence/usage-example.md`
+- [x] T115 [P] Capture CLI demo — terminal session transcript showing `--help`, `--dry-run --verbose`, and real run `specs/228-regenerate-blog-archive/evidence/cli-demo.txt`
+- [x] T116 [P] Extract raw run log from the `<details>` block in `ARCHIVE-REBUILD.md` into a standalone evidence file `specs/228-regenerate-blog-archive/evidence/run-log.txt`
+- [x] T117 [P] Capture no-overwrite proof — sha256sum of all existing-before-run files under `specs/*/` pre- and post-run, diff shows only additions `specs/228-regenerate-blog-archive/evidence/no-overwrite-proof.md`
+- [x] T118 [P] Capture corpus coverage — one row per spec directory × classification bucket, verifies SC-001 invariant `specs/228-regenerate-blog-archive/evidence/corpus-coverage.md`
 
 ### Media content
 
-- [ ] T119 Create feature blog post — spawn Content Specialist via Task tool per `.claude/commands/media.md`; first three sections copied verbatim from `specs/228-regenerate-blog-archive/evidence/opening-context.md`; sections 4–7 (Screenshots, By the Numbers, Lessons Learned, What's Next) written from this phase's evidence; front matter `title: "Building Blog-Archive Regeneration"`, `layout: future-post`, `author: Ian`, `track: [momentum]`, `reading_time` calculated, `excerpt` ≤ 150 chars, `tags: [tracer-bullet, content, tooling, shipped]` `specs/228-regenerate-blog-archive/media/shipped-post.md`
+- [x] T119 Create feature blog post — spawn Content Specialist via Task tool per `.claude/commands/media.md`; first three sections copied verbatim from `specs/228-regenerate-blog-archive/evidence/opening-context.md`; sections 4–7 (Screenshots, By the Numbers, Lessons Learned, What's Next) written from this phase's evidence; front matter `title: "Building Blog-Archive Regeneration"`, `layout: future-post`, `author: Ian`, `track: [momentum]`, `reading_time` calculated, `excerpt` ≤ 150 chars, `tags: [tracer-bullet, content, tooling, shipped]` `specs/228-regenerate-blog-archive/media/shipped-post.md`
 
 ### Cleanup (FR-009 — delete the one-shot)
 
