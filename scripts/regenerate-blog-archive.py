@@ -955,6 +955,12 @@ def _merge_opener_with_shipped_body(opener: str, shipped_body: str) -> str:
     if first_heading and TENSE_INVERTED_HEADING_RE.match(first_heading):
         twin_paragraph = _first_paragraph(first_body)
         opener = _append_to_key_decisions(opener, twin_paragraph)
+        # Preserve the remainder of first_body so images and follow-up
+        # paragraphs are not silently dropped at the splice boundary
+        # (FR-005 / Issue 176-log-panel-ux).
+        remainder = _body_after_first_paragraph(first_body)
+        if remainder.strip():
+            rest = [("", remainder), *rest]
     else:
         rest = sections
 
@@ -973,6 +979,17 @@ def _first_paragraph(text: str) -> str:
         if paragraph.strip():
             return paragraph.strip()
     return ""
+
+
+def _body_after_first_paragraph(text: str) -> str:
+    """Return everything after the first non-empty paragraph (preserving blank-line structure)."""
+    stripped = text.strip()
+    if not stripped:
+        return ""
+    match = re.search(r"\n\s*\n", stripped)
+    if match is None:
+        return ""
+    return stripped[match.end():]
 
 
 # ---------------------------------------------------------------------------
@@ -1259,6 +1276,26 @@ def stitch_epic_rollup(
         )
         body_lines.append(f"- {link} — {ship}")
     body_lines.append("")
+    body_lines.append("## Member Features")
+    body_lines.append("")
+    for m in sorted(shipped_members, key=lambda s: s.number):
+        assert m.shipped_post_path is not None
+        assert m.front_matter is not None
+        member_body = extract_shipped_body(m.shipped_post_path)
+        refs, _malformed = harvest_image_refs(member_body, m)
+        header = f"### {m.number:03d}-{m.slug} — {m.front_matter.date.isoformat()}"
+        body_lines.append(header)
+        body_lines.append("")
+        intro = _first_paragraph(member_body)
+        if intro:
+            body_lines.append(intro)
+            body_lines.append("")
+        if refs:
+            body_lines.append("#### Screenshots")
+            body_lines.append("")
+            for ref in refs:
+                body_lines.append(f"![{ref.alt}]({ref.rewritten_path})")
+            body_lines.append("")
     body_lines.append("## What Shipped")
     body_lines.append("")
     body_lines.append(
@@ -1458,9 +1495,16 @@ def stitch_composite_post(cluster: CompositeCluster) -> GeneratedPost:
     for m in cluster.members:
         if m.shipped_post_path is None:
             continue
-        first = _first_paragraph(extract_shipped_body(m.shipped_post_path))
+        member_body = extract_shipped_body(m.shipped_post_path)
+        first = _first_paragraph(member_body)
         if first:
             body_lines.append(f"**{m.number:03d}-{m.slug}** — {first}\n")
+        refs, _malformed = harvest_image_refs(member_body, m)
+        if refs:
+            body_lines.append("#### Screenshots\n")
+            for ref in refs:
+                body_lines.append(f"![{ref.alt}]({ref.rewritten_path})")
+            body_lines.append("")
     body_lines.append("## Lessons Learned\n")
     body_lines.append(
         "_Composite narrative — author may want to edit manually before publishing._"
