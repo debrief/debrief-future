@@ -35,6 +35,10 @@ We already have a demo environment on Fly.io, but that's a full XFCE desktop wit
 
 Reviewing the VS Code extension no longer requires a local install. Phase 1 is complete: the preview container builds, runs code-server with the Debrief extension pre-loaded, and includes sample STAC catalogs and REP files. You can build it locally with `task preview:build`, run it with `task preview:run`, and open `http://localhost:8080` to see the full extension environment in your browser.
 
+The container lives in a dedicated `preview/` directory, separate from the existing Fly.io demo environment. It's smaller (around 400MB vs the demo's gigabyte-plus desktop image), faster to spin up, and purpose-built for code review rather than general demonstration. The Dockerfile starts from `codercom/code-server:latest`, copies in the extension `.vsix` built by CI, installs it automatically, and opens a pre-configured workspace with sample tracks and STAC items ready to explore.
+
+At the repo root, `app.json` and `heroku.yml` tell Heroku how to build and deploy the container. Once Heroku Review Apps are manually enabled (Phase 2), every PR will get its own preview URL. For now, the container works perfectly locally and CI validates the build on every push.
+
 ## How It Actually Works
 
 The entrypoint script binds code-server to Heroku's dynamically-assigned `$PORT` (or falls back to 8080 locally). When the container starts, code-server launches with `--auth none` (no password prompt for ephemeral preview environments), installs the Debrief extension from the bundled `.vsix`, and opens the workspace at `/home/coder/workspace`. That workspace contains `samples/` with REP files and a complete STAC catalog structure, plus a `WELCOME.md` that displays by default.

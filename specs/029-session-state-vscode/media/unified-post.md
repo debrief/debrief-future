@@ -30,6 +30,10 @@ Integrate session-state service into VS Code extension (multi-document support)
 
 The session-state service (from feature 024) is now wired into the VS Code extension. Every plot document gets its own Zustand store that holds time, viewport, selected features, and visibility settings. When you switch between tabs, the UI instantly restores the state you left it in. When you change the time slider, that update flows through the store to every subscribed component.
 
+This is the foundation for multi-document support. Each document is independent — its own session cache, its own state tree. No cross-document pollution. The moment you click a different tab, the extension swaps out which session is "active" and components re-render with the new state.
+
+The tricky part wasn't the state management itself. Zustand is solid. The hard part was threading it into VS Code's lifecycle: when a plot is opened, create a session. When the document closes, dispose of it. When the user switches editors, notify subscribers to switch sessions. When a component receives a new active session, it needs to unsubscribe from the old one before subscribing to the new one, otherwise you leak subscriptions.
+
 ## Technical Highlights
 
 - **SessionManager singleton** manages all document sessions, tracks the active document, holds the session cache. Created on extension activation.

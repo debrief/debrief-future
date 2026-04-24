@@ -38,6 +38,10 @@ The shared `ToolMatchService` in `shared/components` consumes tool definitions f
 
 The planning post asked: how do you make the same analysis tool work in a desktop app and a static website with no backend? Across 8 phases and 52 tasks, we now have an answer that actually works.
 
+Four styling tools -- set-track-color, apply-symbol-style, label-interval, symbol-interval -- are implemented in both Python and TypeScript. The Python implementations run in the calc service, exposed via MCP. The TypeScript implementations run directly in the browser. Both produce identical outputs for the same inputs (verified down to 1e-9 floating-point tolerance). An analyst using VS Code and an analyst using the web-shell see the same tools, get the same filtering behavior, and get the same results.
+
+The piece that ties it together is the `@tool` decorator. A Python function decorated with `@tool` auto-generates a complete MCP tool definition -- name, description, input schema, selection requirements, category. Scientists writing new tools don't maintain separate definition files. They write a function, add a decorator, and the tool appears in the MCP `tools/list` response. The CalcService picks it up. The Layers Toolbar picks it up. No UI changes needed.
+
 ## How It Works
 
 Tool discovery happens through MCP's standard `tools/list` endpoint. Each tool definition carries `debrief:selectionRequirements` annotations -- the namespaced approach we settled on from the planning post's open question. These annotations tell the UI what features a tool needs: "one or more tracks" for styling tools, "one track and one shape" for range-bearing.

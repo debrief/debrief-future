@@ -30,6 +30,15 @@ Task also gives us CI/local parity. The exact same `task test` command runs in G
 
 The debrief-future monorepo now uses [Task](https://taskfile.dev) for all build operations. One `Taskfile.yml` replaced the 72-line Makefile and unified our Python (uv) and TypeScript (pnpm) tooling behind consistent commands.
 
+**The commands:**
+- `task install` — installs Python and Node dependencies
+- `task test` — runs pytest and vitest across all packages
+- `task build` — compiles Python wheels and TypeScript bundles
+- `task dev` — starts Storybook watch mode
+- `task lint` / `task lint:fix` — checks/fixes code style
+
+All major commands automatically ensure dependencies are installed first via task dependencies. But here's the key: Task uses checksum-based caching. When lockfiles haven't changed, `task install` completes instantly. The dependency check adds zero overhead to repeated `task test` runs.
+
 ## Screenshots
 
 ```bash

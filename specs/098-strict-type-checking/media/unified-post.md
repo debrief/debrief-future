@@ -44,6 +44,10 @@ The decision to adopt pyright rather than mypy is deliberate. Every Python servi
 
 The codebase now enforces strict type safety end-to-end. We added pyright (Python), promoted ESLint's `no-explicit-any` rule to error (TypeScript), and wired both into CI as merge gates. The existing ~143 `Any` usages in Python got replaced with concrete types — only 2 remain, both in a single function handling recursive GeoJSON coordinates, and both documented. All 65+ explicit `any` in TypeScript are gone. Zero violations.
 
+This also meant updating CONSTITUTION.md with Article XV, which mandates explicit type annotations everywhere and prohibits `Any`/`any` in production code. The constitution was already committed, so this part of the work didn't require coding — but it matters because it makes the standard non-negotiable across future sessions.
+
+The approach was pragmatic: pyright over mypy because it understands Pydantic v2 natively (our schema generator produces Pydantic models), and ESLint over TypeScript's built-in strict checks because the project already runs ESLint and the error reporting is clearer. Type checking runs in CI after linting, before tests, so developers see type errors as fast as possible without slowing pre-commit.
+
 ## How It Happened
 
 The violations fell into three categories:

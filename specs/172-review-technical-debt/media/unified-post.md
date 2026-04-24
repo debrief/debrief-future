@@ -45,6 +45,10 @@ This cleanup enforces the boundary that the architecture document describes. Typ
 
 The monorepo had drifted. Twenty packages sharing types across import boundaries, dependency versions disagreeing between similar packages, type definitions duplicated 25 times over. None of it was breaking anything today, but each duplication made the next feature harder and the next refactor riskier.
 
+This week was a focused cleanup pass. The kind of work that doesn't add user-facing capability but makes the codebase quieter and more reliable.
+
+The numbers: 1458 tests passing (up from spec baseline), zero failures. 30 files modified across Python and TypeScript. All CI gates passing.
+
 ## Specific Accomplishments
 
 **Type Consolidation**: Created `DebriefFeature` union type and `SchemaAnnotationFeature` in `@debrief/schemas`. Replaced 21 local `GeoJSONFeature` definitions with canonical imports from `@debrief/utils`. Identical change for `MCPToolDefinition` and `MCPToolResponse` — moved to `@debrief/utils`, eliminated 3 separate copies across the codebase.

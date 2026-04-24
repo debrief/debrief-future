@@ -36,6 +36,12 @@ We've folded the fix into this PR. It's one line on the call site (replace a 35-
 
 Two copies of `calculateBounds` and `mergeBounds` that had drifted are now one. The duplicate at `apps/vscode/src/utils/bounds.ts` — 116 lines that were 95 % identical to the shared copy — has been deleted. Its duplicate unit test has been deleted. The VS Code map panel now imports `calculateBounds`, `mergeBounds`, and `boundsToLeaflet` from `@debrief/utils` and passes its real feature arrays (`SafeFeature[]` on plot-open, `DebriefFeature[]` on selection-zoom) without an `as`-cast at either call site.
 
+The null-geometry guard that lived in the VS Code copy and not the shared copy — the drift that originally motivated this work — now lives in the canonical utility, so every current and future consumer benefits. A regression test in `shared/utils/tests/bounds.test.ts` locks that behaviour in for good; it was specifically designed to fail against the pre-change shared implementation, then pass after the guard was lifted.
+
+Three commits tell the TDD story: widen the parameter (type-only), add the null-geometry test (the failing one), lift the guard (the passing one). In between, the widened parameter funnels its untyped `coordinates: unknown` through a single named helper — `coerceCoordinates` — anchored in source by a comment to constitution Article XV.5. It's the reviewable narrowing gate that makes the widening safe: no `any`, no double-cast, one place to inspect.
+
+And the `fitToSelection` bug that `/speckit.review` surfaced adjacent to this work — the 35-line inline bounds loop in `mapPanel.ts` that silently missed every `Polygon`, `MultiPolygon`, `MultiPoint`, and `MultiLineString` selection — is fixed. The call site is now three lines that delegate to the consolidated utility. Six new per-geometry-type unit tests assert that every supported shape produces correct bounds in isolation, so the "no silent miss" property can't quietly regress later.
+
 ## Lessons Learned
 
 The review gate was the story here. The v1 spec passed every quality check on its own terms — but `/speckit.review` flagged two things that the authoring session hadn't:

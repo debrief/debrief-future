@@ -35,6 +35,10 @@ The annotation schemas were completed in our recent styling work (PR #58). This 
 
 REP files have been Debrief's core data format for 25 years. Until this week, our parser saw only half the picture — track positions but not the rich annotation layer operators embed during exercise recording.
 
+That changes now. The `debrief-io` REP handler extracts narratives, shapes, and text labels from special comment lines (those starting with `;NARRATIVE:`, `;CIRCLE:`, `;RECT:`, etc.). Annotations arrive as GeoJSON features alongside tracks, styled and ready for display. Analysts get the full operational context — not just dots on a map, but the search areas, reference bearings, and timestamped decision logs that make exercise replay meaningful.
+
+This was an extension, not a replacement. Track parsing remains completely unchanged — all 47 legacy tests still pass. We added 117 annotation-specific tests covering coordinate parsing, symbol codes, timestamps, and six annotation types. Total test count: 189 passing in under one second.
+
 ## What's Included
 
 **P1 Annotation Types** (Implemented):

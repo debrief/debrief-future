@@ -39,6 +39,8 @@ The Constitution requires pure transformations with no side effects. debrief-io 
 
 The debrief-io service is operational. REP files — Debrief's primary legacy format — now transform into validated GeoJSON features. Every output feature is checked against our Stage 0 Pydantic models. Every error includes the exact line number that caused it.
 
+This isn't just a parser. It's an extensible handler registry. Add a new format handler, and the system routes files automatically. REP today. GPX tomorrow. The architecture stays the same.
+
 ## Key Accomplishments
 
 - **REP format parsing** for tracks and reference locations
