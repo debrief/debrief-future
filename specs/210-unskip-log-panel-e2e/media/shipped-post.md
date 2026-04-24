@@ -4,10 +4,10 @@ title: "Building Un-Skipping the Webview Log-Panel E2E Suite"
 date: 2026-04-24
 track: [credibility]
 author: Ian
-reading_time: 8
-tags: [e2e, playwright, vscode, logpanel, test-infrastructure]
+reading_time: 5
+tags: [e2e, playwright, vscode, log-panel, test-infrastructure]
 feature_id: 210
-excerpt: "Reactivated the dormant LogPanel E2E suite, closing the integration gap that Storybook and the web-shell suite can't cover."
+excerpt: "Reactivated 3 dormant Playwright scenarios for the LogPanel webview, added 2 parity scenarios, and wired a lint-level skip-guard so CI can't go quiet again."
 ---
 
 ## What We're Building
@@ -34,7 +34,7 @@ This is the follow-through on two earlier pieces of work. #143 stabilised the we
 
 ## Screenshots
 
-This is a test-infrastructure feature — there's no UI to photograph. The diagram below shows the runtime chain each scenario traverses, and highlights in red the VS Code ↔ webview `postMessage` boundary that Storybook and the web-shell suite physically cannot cross:
+This is a test-infrastructure feature — there is no UI to screenshot. The diagram below shows what each of the five scenarios actually traverses at runtime. The red-bordered section is the VS Code ↔ webview `postMessage` boundary that Storybook and the web-shell suite never reach, and it's what justifies the suite's existence.
 
 ```mermaid
 sequenceDiagram
@@ -105,27 +105,28 @@ sequenceDiagram
 | Taskfile integration | 1 line appended to `lint` target |
 | Sibling suites still on `.skip` (out of scope) | 4 |
 
-The 22-line skip-guard (`scripts/check-log-panel-skip-guard.sh`) is wired into `task lint`. It exits non-zero the moment `test.skip`, `test.fixme`, `test.describe.skip`, or `test.describe.fixme` appears in `test-log-panel.spec.ts`, which means a contributor who re-silences the suite gets a CI failure, not a quietly degraded test run.
+The 22-line skip-guard (`scripts/check-log-panel-skip-guard.sh`) is wired into `task lint`. It exits non-zero the moment `test.skip`, `test.fixme`, `test.describe.skip`, or `test.describe.fixme` appears in `test-log-panel.spec.ts`, so a contributor who re-silences the suite gets a CI failure rather than a quietly degraded test run.
 
-The wall-clock range across five scenarios (76–109 s as modelled in the E2E run report) straddles the 90 s median target. Research R2 chose not to pre-emptively consolidate scenarios — that consolidation is available as a reactive fallback if the 10-run post-merge median trips 90 s.
+The modelled wall-clock range across five scenarios is 76–109 s — straddling the 90 s median target. Research R2 chose not to consolidate scenarios pre-emptively; that option is the reactive fallback if the 10-run post-merge median trips the breach threshold.
 
 ## Lessons Learned
 
-**`fixme` as a deliberate staging signal works — but only if the backlog tracks the debt.** Marking the suite `fixme` rather than `skip` under #176 was the right call: it preserved visibility in CI and signalled intent. The signal is only useful, though, if the team actively monitors the count of open `fixme` items. Silent skips erode CI trust; a named staging decision in the spec prevents the same erosion, provided someone is watching the queue.
+**`fixme` as a deliberate staging signal is useful, but only if the backlog tracks the reactivation debt.** Promoting from `test.describe.skip` to `test.describe.fixme` under #176 was the right move — it preserved some CI visibility and marked the suite as the intended front-runner. The problem: `fixme` entries still count as "skipped" in CI summaries, so the signal is invisible unless someone is actively watching the pending queue. Without #210 explicitly naming the reactivation obligation, the suite could have stayed `fixme` indefinitely while CI reported green. The lesson isn't to avoid `fixme` — it's to treat every `fixme` as an open ticket, not a deferred decision.
 
-**Machine-checkable guards beat human vigilance for "don't let this slip back."** The skip-guard is 22 lines of bash. It does one thing — `grep -nE` for skip/fixme annotations in a single file — and the failure message includes the line number. The alternative was an ESLint `no-restricted-syntax` override scoped to a single file, which would have required wiring `@typescript-eslint/parser` into a part of the tree that isn't currently linted by ESLint. The bash grep is the right weight: discoverable, consistent with four existing sibling guard scripts in the repo, and zero new toolchain surface.
+**Lint-level machine-checkable guards beat human vigilance for "don't let this slip back."** The skip-guard is 22 lines of bash doing one thing: `grep -nE` for skip/fixme annotations in a single file. The failure message prints the offending line number. The alternative — an ESLint `no-restricted-syntax` override scoped to `tests/e2e/` — would require wiring `@typescript-eslint/parser` into a part of the tree that isn't currently linted by ESLint at all, plus an `overrides` block scoped to a single file. That's a heavier and less-discoverable solution for a one-regex check. Four sibling guard scripts in the repo already use the same bash pattern; this fits without introducing a new abstraction.
 
-**Parity isn't uniformity.** The web-shell suite has two scenarios that have no VS Code equivalent — one that asserts GoldenLayout tab chrome (`.lm_active`) and one that tests switching between GoldenLayout-managed panels. Those behaviours don't exist in VS Code, where the sidebar is managed by native view containers, not GoldenLayout. Forcing parity there would have meant asserting against host UI that the VS Code extension neither owns nor needs to assert against. The parity baseline belongs at the user-observable data-flow layer, not the host-chrome layer.
+**Parity isn't uniformity.** The web-shell suite has two scenarios with no VS Code equivalent — one asserting GoldenLayout tab chrome (`.lm_active`) and one testing GoldenLayout tab-switching. Those behaviours don't exist on the VS Code surface: the LogPanel is a standalone webview in a native sidebar container, not a GoldenLayout tab. Forcing equivalence there would have meant asserting against host chrome the extension neither owns nor controls. The parity baseline is correctly defined at the user-observable data-flow layer (empty state, entry creation, ordering, selection, deselection) — not the host-chrome layer. Documented asymmetries are the right outcome, not a parity failure.
 
-**Reactive monitoring beats pre-emptive scope cuts.** Research R2 estimated the 5-scenario suite at 76–109 s — a range that straddles the 90 s target. The temptation was to consolidate the two selection scenarios into one body up-front, saving roughly 12–15 s of wall-clock. We didn't: per-scenario debuggability is worth more than the headroom at current budgets. The 85 s warning and 90 s breach thresholds are machine-checkable post-merge; the consolidation fires if and when it's actually needed.
+**Reactive monitoring is a better guardrail than pre-emptive scope cuts.** Research R2 estimated the 5-scenario suite at 76–109 s wall-clock — a range that straddles the SC-005 target. The pre-emptive option was to consolidate the two selection scenarios into a single `test()` body from the start, saving roughly 12–15 s and avoiding the straddled range entirely. We rejected that: per-scenario debuggability is worth more than the headroom recovered. A failing selection assertion in its own scenario is straightforward to triage; a failure midway through a compound body is not. The 85 s warning and 90 s breach thresholds are concrete and machine-readable post-merge. Consolidation fires if it's actually needed, not before.
 
 ## What's Next
 
-Four sibling suites — `test-analysis-tool`, `test-log-edit-face`, `test-event-log-propagation`, and `test-capture-log-evidence` — still sit at `.skip` with the same `#143` blocker comment. Reactivating them is the natural follow-on, but each has an independent risk: `test-analysis-tool` also needs `debrief-calc` available in the E2E environment, `test-log-edit-face` has its own stability history, and `test-event-log-propagation` has cross-scenario state coupling concerns that need their own research pass. This suite was the canary; those are the flock.
+Four sibling suites — `test-analysis-tool`, `test-log-edit-face`, `test-event-log-propagation`, and `test-capture-log-evidence` — still sit at `.skip` with the same `#143` blocker comment. Each has its own independent risk: `test-analysis-tool` also requires `debrief-calc` available in the E2E environment; `test-log-edit-face` has its own stability history; `test-event-log-propagation` has cross-scenario state coupling concerns. Reactivating them is the natural next step, but each warrants its own spec and research pass rather than a batch reactivation.
 
-`aria-selected` accessibility-attribute coverage for log entries lives in #209 and is deliberately not in scope here. Keeping the concerns separate means #209 can land the full axe-core audit of the LogPanel without being gated on E2E reactivation timelines.
+`aria-selected` accessibility-attribute coverage for log entries is scoped to #209 and is deliberately absent here. Keeping the concerns separate means #209 can land the full axe-core audit without being gated on E2E reactivation timelines.
 
-Post-merge: if the 10-run main-branch median breaches 85 s, a tracking issue opens automatically per the SC-005 monitoring rules. If it breaches 90 s, scenarios D and E consolidate into a single `test(...)` body. The trigger rules are in the spec — no manual judgement call required.
+Post-merge, if the 10-run main-branch median breaches 85 s, a tracking issue opens per the SC-005 monitoring rules. If it breaches 90 s, scenarios D and E consolidate into a single `test(...)` body. The trigger rules are in the spec — no manual judgement call required.
 
 → [See the spec](../spec.md)
 → [See the research](../research.md)
+→ [See the parity diff](../evidence/parity-diff.md)
