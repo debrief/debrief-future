@@ -1,6 +1,6 @@
 # Contracts — New Helpers & Patched Stitchers
 
-**Feature**: 230 (specs/229-blog-archive-screenshot-fix/)
+**Feature**: 231 (specs/231-blog-archive-screenshot-fix/)
 **Scope**: Function signatures + behavioural contracts for the revived
 generator's patched surface. All helpers live in
 `scripts/regenerate-blog-archive.py` and are deleted per FR-009.

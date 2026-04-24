@@ -1,8 +1,8 @@
 # Implementation Plan: Fix Screenshot Handling in Regenerated Blog Archive
 
-**Branch**: `229-blog-archive-screenshot-fix-impl` | **Date**: 2026-04-24 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/229-blog-archive-screenshot-fix/spec.md`
-**Backlog item**: #230 (follow-up to #228 / PR #518)
+**Branch**: `231-blog-archive-screenshot-fix-impl` | **Date**: 2026-04-24 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/231-blog-archive-screenshot-fix/spec.md`
+**Backlog item**: #231 (follow-up to #228 / PR #518)
 
 ## Summary
 
@@ -109,7 +109,7 @@ Complexity Tracking.
 ### Documentation (this feature)
 
 ```text
-specs/229-blog-archive-screenshot-fix/
+specs/231-blog-archive-screenshot-fix/
 ├── spec.md              # Feature specification (authored 2026-04-24)
 ├── plan.md              # This file
 ├── research.md          # Phase 0 — decisions R1–R8
