@@ -54,14 +54,14 @@ The generator's **output itself** (the index + generated posts) is primary evide
 
 **Purpose**: Create the one-shot script scaffold, its test package, and the review-phase-patches to plan/research/data-model identified during `/speckit.review`.
 
-- [ ] T001 Apply review patch 1 (legacy shipped-post locator) — widen R7 language in `specs/228-regenerate-blog-archive/research.md`
-- [ ] T002 [P] Apply review patch 3 (stitch rule for tense-inverted twin heading) in `specs/228-regenerate-blog-archive/data-model.md`
-- [ ] T003 [P] Apply review patch 4 (add C11 malformed-YAML contract test row) in `specs/228-regenerate-blog-archive/contracts/cli.md`
-- [ ] T004 [P] Apply review patch 5 (correct factual numbers: 138 opening-context, 18 missing cached opener) in `specs/228-regenerate-blog-archive/research.md`
-- [ ] T005 [P] Apply review patch 1 companion note in `specs/228-regenerate-blog-archive/plan.md`
-- [ ] T006 Create script scaffold with docstring + `if __name__ == "__main__": main()` entrypoint `scripts/regenerate-blog-archive.py`
-- [ ] T007 [P] Create test package init `tests/regenerate_blog_archive/__init__.py`
-- [ ] T008 [P] Create test fixtures directory with README explaining fixture curation `tests/regenerate_blog_archive/fixtures/README.md`
+- [x] T001 Apply review patch 1 (legacy shipped-post locator) — widen R7 language in `specs/228-regenerate-blog-archive/research.md`
+- [x] T002 [P] Apply review patch 3 (stitch rule for tense-inverted twin heading) in `specs/228-regenerate-blog-archive/data-model.md`
+- [x] T003 [P] Apply review patch 4 (add C11 malformed-YAML contract test row) in `specs/228-regenerate-blog-archive/contracts/cli.md`
+- [x] T004 [P] Apply review patch 5 (correct factual numbers: 138 opening-context, 18 missing cached opener) in `specs/228-regenerate-blog-archive/research.md`
+- [x] T005 [P] Apply review patch 1 companion note in `specs/228-regenerate-blog-archive/plan.md`
+- [x] T006 Create script scaffold with docstring + `if __name__ == "__main__": main()` entrypoint `scripts/regenerate-blog-archive.py`
+- [x] T007 [P] Create test package init `tests/regenerate_blog_archive/__init__.py`
+- [x] T008 [P] Create test fixtures directory with README explaining fixture curation `tests/regenerate_blog_archive/fixtures/README.md`
 
 **Checkpoint**: Review patches applied; script file + test package exist with empty placeholders. Foundation phase can begin.
 

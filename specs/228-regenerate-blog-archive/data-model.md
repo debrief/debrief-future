@@ -194,6 +194,7 @@ class GeneratedPost:
 - `destination.parts` contains `media` and ends with one of `unified-post.md`, `epic-rollup.md`, `composite-post.md`.
 - `title` starts with `Building ` when `kind == "unified"` or `kind == "composite"`; for `epic-rollup`, title is derived from the epic's BACKLOG title (no prefix — per Q11).
 - `body` MUST contain the seven required sections: `## What We're Building`, `## How It Fits`, `## Key Decisions`, `## Screenshots`, `## By the Numbers`, `## Lessons Learned`, `## What's Next`. Sections 1–3 come verbatim from `evidence/opening-context.md` when cached; 4–7 stitched from `shipped-post.md` body + planning + research + evidence.
+- **Tense-inverted twin heading stitch rule** (US1 stitcher): when the shipped-post body's first top-level heading is a past-tense twin of the cached opener's `## What We're Building` — specifically `## What We Built`, `## What Shipped`, or any `^## (What|Why|How) We ?(Built|Shipped|Delivered)` variant — the stitcher treats it as an alias for the opener's third section rather than a fourth section. It strips the duplicate heading and splices the body's opening paragraph onto the tail of `## Key Decisions` (separated by a blank line). This prevents the reader seeing "## What We're Building / … / ## What We Built / …" adjacent in the unified post.
 - No existing file at `destination` (FR-007 guard enforced by the atomic writer, not by this dataclass).
 
 ---

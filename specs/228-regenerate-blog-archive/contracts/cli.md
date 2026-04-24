@@ -134,5 +134,6 @@ Each row maps to a test that MUST exist before the script is merged (Constitutio
 | C8 | Near-miss pair at Δdays=7 with shared tag → one entry under "Unresolved Groupings → Near Misses" | `test_composite_pairs.py::test_near_miss_seven_days` |
 | C9 | Composite cluster with date span = 5 days → single composite (boundary inclusive) | `test_composite_pairs.py::test_boundary_five_days` |
 | C10 | Epic rollup at `specs/<lowest-NNN-member>/media/epic-rollup.md` | `test_epic_charter.py::test_rollup_anchor_is_lowest_nnn` |
+| C11 | Malformed YAML front matter (e.g. unquoted colon in `title:`) produces an `UnresolvedGrouping` of kind `charter-prefix-mismatch`→`malformed-yaml` and the run continues (no crash); spec is classified `skipped` with reason | `test_parse_front_matter.py::test_malformed_yaml_surfaces_and_continues` |
 
 SC-001 is observationally checked by C7 + a smoke assertion that every `SpecRecord` ends up in exactly one of: a row as a generated post, an epic-rollup member list, a composite-cluster member list, or the Skipped sub-section.
