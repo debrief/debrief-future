@@ -363,4 +363,140 @@ describe('StoryboardPanel', () => {
     fireEvent.change(select, { target: { value: 'sb-b' } });
     expect(onActiveStoryboardChange).toHaveBeenCalledWith('sb-b');
   });
+
+  // ─── #218 edit-suite wiring ────────────────────────────────────────
+
+  it('renders SceneEditForm inline when sceneEditViewModels[sceneId].editFormOpen is true', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: true,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByTestId('scene-edit-form')).toBeTruthy();
+  });
+
+  it('does NOT render SceneEditForm when editFormOpen is false', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    expect(screen.queryByTestId('scene-edit-form')).toBeNull();
+  });
+
+  it('hides rows flagged pendingDelete (undo window active)', () => {
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' }), row({ sceneId: 'b' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: false,
+            pendingDelete: true,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+      />,
+    );
+    const rows = screen.queryAllByTestId('scene-row');
+    expect(rows.map((r) => r.getAttribute('data-scene-id'))).toEqual(['b']);
+  });
+
+  it('renders UndoToast when pendingUndoToast is set; Undo click fires onSceneUndoDeleteClicked', () => {
+    const onSceneUndoDeleteClicked = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        pendingUndoToast={{
+          sceneId: 'a',
+          sceneTitle: 'Opening',
+          deletedAt: '2026-04-24T12:00:00Z',
+          canUndo: true,
+        }}
+        onSceneUndoDeleteClicked={onSceneUndoDeleteClicked}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('undo-toast-undo-button'));
+    expect(onSceneUndoDeleteClicked).toHaveBeenCalledWith('a');
+  });
+
+  it('SceneEditForm row-action delete click surfaces via onSceneDeleteRequested', () => {
+    const onSceneDeleteRequested = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[row({ sceneId: 'a' })]}
+        activeStoryboardName="Alpha"
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        sceneEditViewModels={{
+          a: {
+            sceneId: 'a',
+            title: 'Opening',
+            description: null,
+            timestamp: '2026-04-20T10:00:00Z',
+            titleIsEditing: false,
+            editFormOpen: true,
+            pendingDelete: false,
+            stale: false,
+            unresolvedFeatureIds: [],
+            missingData: { kind: 'ok' },
+          },
+        }}
+        onSceneDeleteRequested={onSceneDeleteRequested}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('scene-edit-form-action-delete'));
+    expect(onSceneDeleteRequested).toHaveBeenCalledWith('a');
+  });
 });
