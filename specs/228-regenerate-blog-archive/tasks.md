@@ -77,59 +77,59 @@ The generator's **output itself** (the index + generated posts) is primary evide
 
 ### Typed domain models
 
-- [ ] T009 [P] Define `FrontMatter` dataclass with typed fields + noise-tag filter at parsing boundary `scripts/regenerate-blog-archive.py`
-- [ ] T010 [P] Define `SpecRecord`, `Epic`, `Classification`, `CompositeCluster`, `NearMiss`, `UnresolvedGrouping`, `GeneratedPost`, `ArchiveIndex` dataclasses per `data-model.md` `scripts/regenerate-blog-archive.py`
+- [x] T009 [P] Define `FrontMatter` dataclass with typed fields + noise-tag filter at parsing boundary `scripts/regenerate-blog-archive.py`
+- [x] T010 [P] Define `SpecRecord`, `Epic`, `Classification`, `CompositeCluster`, `NearMiss`, `UnresolvedGrouping`, `GeneratedPost`, `ArchiveIndex` dataclasses per `data-model.md` `scripts/regenerate-blog-archive.py`
 
 ### CLI argument surface
 
-- [ ] T011 Implement argparse surface per `contracts/cli.md` (all flags + constraint validation + exit-code-2 on bad args) `scripts/regenerate-blog-archive.py`
-- [ ] T012 [P][test] Write C2 contract test — exit 2 on invalid `--composite-window-days` `tests/regenerate_blog_archive/test_cli_args.py`
-- [ ] T013 [P][test] Write C3 contract test — exit 2 on `--out-index` pointing at existing non-index file `tests/regenerate_blog_archive/test_cli_args.py`
+- [x] T011 Implement argparse surface per `contracts/cli.md` (all flags + constraint validation + exit-code-2 on bad args) `scripts/regenerate-blog-archive.py`
+- [x] T012 [P][test] Write C2 contract test — exit 2 on invalid `--composite-window-days` `tests/regenerate_blog_archive/test_cli_args.py`
+- [x] T013 [P][test] Write C3 contract test — exit 2 on `--out-index` pointing at existing non-index file `tests/regenerate_blog_archive/test_cli_args.py`
 
 ### YAML front-matter parser
 
-- [ ] T014 Implement `parse_front_matter(path: Path) -> FrontMatter` using `yaml.safe_load` at the boundary — filters noise tags `{tracer-bullet, shipped, debrief}` before constructing `FrontMatter` `scripts/regenerate-blog-archive.py`
-- [ ] T015 [P][test] Write parser unit tests — happy path + missing `title` + missing `date` + track as string vs list `tests/regenerate_blog_archive/test_parse_front_matter.py`
-- [ ] T016 [test] Write C11 contract test — malformed YAML becomes `UnresolvedGrouping`, run continues, no crash `tests/regenerate_blog_archive/test_parse_front_matter.py`
-- [ ] T017 [P] Curate fixture: one valid shipped-post front matter `tests/regenerate_blog_archive/fixtures/shipped-post-valid.md`
-- [ ] T018 [P] Curate fixture: malformed shipped-post front matter (unquoted colon in title) `tests/regenerate_blog_archive/fixtures/shipped-post-malformed.md`
+- [x] T014 Implement `parse_front_matter(path: Path) -> FrontMatter` using `yaml.safe_load` at the boundary — filters noise tags `{tracer-bullet, shipped, debrief}` before constructing `FrontMatter` `scripts/regenerate-blog-archive.py`
+- [x] T015 [P][test] Write parser unit tests — happy path + missing `title` + missing `date` + track as string vs list `tests/regenerate_blog_archive/test_parse_front_matter.py`
+- [x] T016 [test] Write C11 contract test — malformed YAML becomes `UnresolvedGrouping`, run continues, no crash `tests/regenerate_blog_archive/test_parse_front_matter.py`
+- [x] T017 [P] Curate fixture: one valid shipped-post front matter `tests/regenerate_blog_archive/fixtures/shipped-post-valid.md`
+- [x] T018 [P] Curate fixture: malformed shipped-post front matter (unquoted colon in title) `tests/regenerate_blog_archive/fixtures/shipped-post-malformed.md`
 
 ### Spec discovery
 
-- [ ] T019 Implement `discover_specs(repo_root: Path) -> list[SpecRecord]` — walks `specs/*/`, locates shipped-post via R7 rule (matches `media/shipped-post.md` OR `media/YYYY-MM-DD-shipped-*.md`; latest ISO date wins) `scripts/regenerate-blog-archive.py`
-- [ ] T020 [test] Write test — legacy date-stamped naming recognised (covers 000-schemas, 001-debrief-stac, 002-debrief-io — fixes the Issue 1 silent-failure gap) `tests/regenerate_blog_archive/test_discover_specs.py`
-- [ ] T021 [P][test] Write test — multiple legacy shipped posts in one dir → latest ISO date wins `tests/regenerate_blog_archive/test_discover_specs.py`
-- [ ] T022 [P][test] Write test — spec directory with no spec.md is skipped quietly (not an error) `tests/regenerate_blog_archive/test_discover_specs.py`
-- [ ] T023 [P] Curate fixture: synthetic legacy-named spec dir `tests/regenerate_blog_archive/fixtures/specs/legacy-dated/`
+- [x] T019 Implement `discover_specs(repo_root: Path) -> list[SpecRecord]` — walks `specs/*/`, locates shipped-post via R7 rule (matches `media/shipped-post.md` OR `media/YYYY-MM-DD-shipped-*.md`; latest ISO date wins) `scripts/regenerate-blog-archive.py`
+- [x] T020 [test] Write test — legacy date-stamped naming recognised (covers 000-schemas, 001-debrief-stac, 002-debrief-io — fixes the Issue 1 silent-failure gap) `tests/regenerate_blog_archive/test_discover_specs.py`
+- [x] T021 [P][test] Write test — multiple legacy shipped posts in one dir → latest ISO date wins `tests/regenerate_blog_archive/test_discover_specs.py`
+- [x] T022 [P][test] Write test — spec directory with no spec.md is skipped quietly (not an error) `tests/regenerate_blog_archive/test_discover_specs.py`
+- [x] T023 [P] Curate fixture: synthetic legacy-named spec dir `tests/regenerate_blog_archive/fixtures/specs/legacy-dated/`
 
 ### Ship-date resolver
 
-- [ ] T024 Implement three-tier ship-date resolver per R2 — front-matter → `gh pr list --search` → `git log -1 --format=%cI` `scripts/regenerate-blog-archive.py`
-- [ ] T025 [P][test] Write test — tier-1 (front matter present) `tests/regenerate_blog_archive/test_ship_date.py`
-- [ ] T026 [P][test] Write test — tier-3 fallback (no front matter, no gh) produces git-log date and records `date_source=git-log` `tests/regenerate_blog_archive/test_ship_date.py`
+- [x] T024 Implement three-tier ship-date resolver per R2 — front-matter → `gh pr list --search` → `git log -1 --format=%cI` `scripts/regenerate-blog-archive.py`
+- [x] T025 [P][test] Write test — tier-1 (front matter present) `tests/regenerate_blog_archive/test_ship_date.py`
+- [x] T026 [P][test] Write test — tier-3 fallback (no front matter, no gh) produces git-log date and records `date_source=git-log` `tests/regenerate_blog_archive/test_ship_date.py`
 
 ### PR-body retriever with graceful degradation
 
-- [ ] T027 Implement `get_pr_body(spec: SpecRecord) -> tuple[str, Literal["gh","shipped-post","missing"]]` — 5 s timeout, catches missing-gh / non-zero / empty, returns source tag per R6 `scripts/regenerate-blog-archive.py`
-- [ ] T028 [test] Write C6 contract test — `--skip-gh` forces `pr-body=shipped-post` for every spec `tests/regenerate_blog_archive/test_pr_body.py`
-- [ ] T029 [P][test] Write test — missing `gh` binary produces `pr-body=shipped-post`, not a crash `tests/regenerate_blog_archive/test_pr_body.py`
+- [x] T027 Implement `get_pr_body(spec: SpecRecord) -> tuple[str, Literal["gh","shipped-post","missing"]]` — 5 s timeout, catches missing-gh / non-zero / empty, returns source tag per R6 `scripts/regenerate-blog-archive.py`
+- [x] T028 [test] Write C6 contract test — `--skip-gh` forces `pr-body=shipped-post` for every spec `tests/regenerate_blog_archive/test_pr_body.py`
+- [x] T029 [P][test] Write test — missing `gh` binary produces `pr-body=shipped-post`, not a crash `tests/regenerate_blog_archive/test_pr_body.py`
 
 ### Atomic writer (stage-and-promote)
 
-- [ ] T030 Implement `AtomicWriter` context manager — `tempfile.mkdtemp(prefix="archive-rebuild-")`, promote via `shutil.move`, rollback on any exception per R5 `scripts/regenerate-blog-archive.py`
-- [ ] T031 [test] Write C1 contract test — `--dry-run` stages but does NOT promote `tests/regenerate_blog_archive/test_atomic_writer.py`
-- [ ] T032 [P][test] Write C5 contract test — zero existing files mutated (sha256 of `specs/*/` before/after identical except for new files) `tests/regenerate_blog_archive/test_atomic_writer.py`
-- [ ] T033 [P][test] Write no-overwrite guard test — attempt to stage a path that already exists → raise → rollback `tests/regenerate_blog_archive/test_atomic_writer.py`
-- [ ] T034 [P][test] Write rollback test — exception during stage leaves temp dir removed and repo untouched `tests/regenerate_blog_archive/test_atomic_writer.py`
+- [x] T030 Implement `AtomicWriter` context manager — `tempfile.mkdtemp(prefix="archive-rebuild-")`, promote via `shutil.move`, rollback on any exception per R5 `scripts/regenerate-blog-archive.py`
+- [x] T031 [test] Write C1 contract test — `--dry-run` stages but does NOT promote `tests/regenerate_blog_archive/test_atomic_writer.py`
+- [x] T032 [P][test] Write C5 contract test — zero existing files mutated (sha256 of `specs/*/` before/after identical except for new files) `tests/regenerate_blog_archive/test_atomic_writer.py`
+- [x] T033 [P][test] Write no-overwrite guard test — attempt to stage a path that already exists → raise → rollback `tests/regenerate_blog_archive/test_atomic_writer.py`
+- [x] T034 [P][test] Write rollback test — exception during stage leaves temp dir removed and repo untouched `tests/regenerate_blog_archive/test_atomic_writer.py`
 
 ### Run orchestrator skeleton
 
-- [ ] T035 Implement `main()` orchestrator — wires discover → classify (placeholder for US phases) → promote → emit index; uses `AtomicWriter`; honours `--fail-fast` vs continue `scripts/regenerate-blog-archive.py`
-- [ ] T036 [test] Write C4 contract test — `--fail-fast` exits 1 on first parse error; default continues and records UnresolvedGrouping `tests/regenerate_blog_archive/test_classify.py`
+- [x] T035 Implement `main()` orchestrator — wires discover → classify (placeholder for US phases) → promote → emit index; uses `AtomicWriter`; honours `--fail-fast` vs continue `scripts/regenerate-blog-archive.py`
+- [x] T036 [test] Write C4 contract test — `--fail-fast` exits 1 on first parse error; default continues and records UnresolvedGrouping `tests/regenerate_blog_archive/test_classify.py`
 
 ### Help output evidence
 
-- [ ] T037 Run `python scripts/regenerate-blog-archive.py --help` and capture stdout `specs/228-regenerate-blog-archive/evidence/help-output.txt`
+- [x] T037 Run `python scripts/regenerate-blog-archive.py --help` and capture stdout `specs/228-regenerate-blog-archive/evidence/help-output.txt`
 
 **Checkpoint**: Typed models, CLI surface, parser, discovery, date resolver, PR-body retriever, atomic writer all green. User story phases can now start **in parallel** (they only touch the classifier branches, not the foundation).
 
@@ -163,31 +163,31 @@ Task: "Run test_atomic_writer.py"
 
 ### Opener-loader + synthesis fallback
 
-- [ ] T038 [US1] Implement `load_or_synthesise_opener(spec: SpecRecord) -> tuple[str, Literal["cached","synthesised"]]` — verbatim copy when `evidence/opening-context.md` exists; synthesise three deterministic slices per R4 when absent `scripts/regenerate-blog-archive.py`
-- [ ] T039 [P][US1][test] Write test — cached opener copied byte-for-byte (no mutation, no added whitespace) `tests/regenerate_blog_archive/test_opener.py`
-- [ ] T040 [P][US1][test] Write test — synthesis fallback produces three sections AND prepends the `<!-- OPENER SYNTHESISED FROM spec.md — verify before publish -->` marker `tests/regenerate_blog_archive/test_opener.py`
-- [ ] T041 [P][US1] Curate fixture: spec with full `evidence/opening-context.md` `tests/regenerate_blog_archive/fixtures/specs/with-opener/`
-- [ ] T042 [P][US1] Curate fixture: spec with NO opening-context, forcing synthesis `tests/regenerate_blog_archive/fixtures/specs/no-opener/`
+- [x] T038 [US1] Implement `load_or_synthesise_opener(spec: SpecRecord) -> tuple[str, Literal["cached","synthesised"]]` — verbatim copy when `evidence/opening-context.md` exists; synthesise three deterministic slices per R4 when absent `scripts/regenerate-blog-archive.py`
+- [x] T039 [P][US1][test] Write test — cached opener copied byte-for-byte (no mutation, no added whitespace) `tests/regenerate_blog_archive/test_opener.py`
+- [x] T040 [P][US1][test] Write test — synthesis fallback produces three sections AND prepends the `<!-- OPENER SYNTHESISED FROM spec.md — verify before publish -->` marker `tests/regenerate_blog_archive/test_opener.py`
+- [x] T041 [P][US1] Curate fixture: spec with full `evidence/opening-context.md` `tests/regenerate_blog_archive/fixtures/specs/with-opener/`
+- [x] T042 [P][US1] Curate fixture: spec with NO opening-context, forcing synthesis `tests/regenerate_blog_archive/fixtures/specs/no-opener/`
 
 ### Seven-section stitcher
 
-- [ ] T043 [US1] Implement `stitch_unified_post(spec: SpecRecord, opener: str, opener_source: Literal) -> GeneratedPost` — assembles front matter + opener + sections 4–7 from shipped-post body with the tense-inverted-twin-heading rule per data-model.md `scripts/regenerate-blog-archive.py`
-- [ ] T044 [P][US1][test] Write test — `## What We Built` immediately after opener is detected as twin and its opening paragraph spliced onto `## Key Decisions` tail `tests/regenerate_blog_archive/test_stitch.py`
-- [ ] T045 [P][US1][test] Write test — optional sections (`## Screenshots`, `## By the Numbers`) omitted when source lacks them (no empty scaffolding) `tests/regenerate_blog_archive/test_stitch.py`
-- [ ] T046 [P][US1][test] Write test — title pattern is exactly `Building <Feature Name>` derived from shipped-post title (strip leading `Shipped: ` / `Planning: `) `tests/regenerate_blog_archive/test_stitch.py`
-- [ ] T047 [P][US1][test] Write test — front matter preserves original `date`, `track`, `author`, `excerpt` and sets `layout: future-post` `tests/regenerate_blog_archive/test_stitch.py`
-- [ ] T048 [P][US1][test] Write C5 round-trip test — stitching a spec whose shipped-post already exists produces a new file at `media/unified-post.md` and leaves `shipped-post.md` identical `tests/regenerate_blog_archive/test_stitch.py`
+- [x] T043 [US1] Implement `stitch_unified_post(spec: SpecRecord, opener: str, opener_source: Literal) -> GeneratedPost` — assembles front matter + opener + sections 4–7 from shipped-post body with the tense-inverted-twin-heading rule per data-model.md `scripts/regenerate-blog-archive.py`
+- [x] T044 [P][US1][test] Write test — `## What We Built` immediately after opener is detected as twin and its opening paragraph spliced onto `## Key Decisions` tail `tests/regenerate_blog_archive/test_stitch.py`
+- [x] T045 [P][US1][test] Write test — optional sections (`## Screenshots`, `## By the Numbers`) omitted when source lacks them (no empty scaffolding) `tests/regenerate_blog_archive/test_stitch.py`
+- [x] T046 [P][US1][test] Write test — title pattern is exactly `Building <Feature Name>` derived from shipped-post title (strip leading `Shipped: ` / `Planning: `) `tests/regenerate_blog_archive/test_stitch.py`
+- [x] T047 [P][US1][test] Write test — front matter preserves original `date`, `track`, `author`, `excerpt` and sets `layout: future-post` `tests/regenerate_blog_archive/test_stitch.py`
+- [x] T048 [P][US1][test] Write C5 round-trip test — stitching a spec whose shipped-post already exists produces a new file at `media/unified-post.md` and leaves `shipped-post.md` identical `tests/regenerate_blog_archive/test_stitch.py`
 
 ### Unified classifier branch
 
-- [ ] T049 [US1] Implement `classify_unified(specs: list[SpecRecord]) -> list[Classification]` — returns `category="unified"` for specs surviving epic + composite precedence (placeholder for now; wired up fully after US2/US3) `scripts/regenerate-blog-archive.py`
-- [ ] T050 [US1][test] Write test — spec with `shipped-post.md` and no epic/composite membership classifies as `unified` `tests/regenerate_blog_archive/test_classify.py`
-- [ ] T051 [US1][test] Write test — spec with `evidence/opening-context.md` but no `shipped-post.md` AND no legacy-dated shipped file classifies as `skipped` (no post generated, reason recorded) `tests/regenerate_blog_archive/test_classify.py`
+- [x] T049 [US1] Implement `classify_unified(specs: list[SpecRecord]) -> list[Classification]` — returns `category="unified"` for specs surviving epic + composite precedence (placeholder for now; wired up fully after US2/US3) `scripts/regenerate-blog-archive.py`
+- [x] T050 [US1][test] Write test — spec with `shipped-post.md` and no epic/composite membership classifies as `unified` `tests/regenerate_blog_archive/test_classify.py`
+- [x] T051 [US1][test] Write test — spec with `evidence/opening-context.md` but no `shipped-post.md` AND no legacy-dated shipped file classifies as `skipped` (no post generated, reason recorded) `tests/regenerate_blog_archive/test_classify.py`
 
 ### US1 integration smoke
 
-- [ ] T052 [US1] Wire US1 path into `main()` — iterate classified-unified specs, call `stitch_unified_post`, stage each `GeneratedPost` via `AtomicWriter` `scripts/regenerate-blog-archive.py`
-- [ ] T053 [US1] Run `python scripts/regenerate-blog-archive.py --dry-run` against the live `specs/` tree and confirm unified counts look sane (~90–100 expected) — capture stdout summary for later evidence `(run command)`
+- [x] T052 [US1] Wire US1 path into `main()` — iterate classified-unified specs, call `stitch_unified_post`, stage each `GeneratedPost` via `AtomicWriter` `scripts/regenerate-blog-archive.py`
+- [x] T053 [US1] Run `python scripts/regenerate-blog-archive.py --dry-run` against the live `specs/` tree and confirm unified counts look sane (~90–100 expected) — capture stdout summary for later evidence `(run command)`
 
 **Checkpoint**: US1 produces unified posts for every standalone shipped spec. US2 (epics) and US3 (composites) can now whittle this set down.
 
@@ -208,37 +208,37 @@ Task: "Run test_atomic_writer.py"
 
 ### Epic charter parser
 
-- [ ] T054 [US2] Implement `parse_backlog_epics(backlog_path: Path) -> list[Epic]` — parses the Epics table between `## Epics` and next `##`, strips `~~strike~~`, resolves member numbers to `SpecRecord` directories `scripts/regenerate-blog-archive.py`
-- [ ] T055 [P][US2][test] Write test — BACKLOG table round-trip (known E02 / E08 produce expected member tuples) `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T056 [P][US2][test] Write test — stricken / complete epics still parsed (status = `complete`) `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T057 [P][US2][test] Write test — in-progress epics (status != `complete`) emit no rollup; their shipped members fall through to unified `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T058 [P][US2] Curate fixture: BACKLOG-excerpt with E02 + E99 (synthetic proposed) `tests/regenerate_blog_archive/fixtures/backlog-excerpt.md`
+- [x] T054 [US2] Implement `parse_backlog_epics(backlog_path: Path) -> list[Epic]` — parses the Epics table between `## Epics` and next `##`, strips `~~strike~~`, resolves member numbers to `SpecRecord` directories `scripts/regenerate-blog-archive.py`
+- [x] T055 [P][US2][test] Write test — BACKLOG table round-trip (known E02 / E08 produce expected member tuples) `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T056 [P][US2][test] Write test — stricken / complete epics still parsed (status = `complete`) `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T057 [P][US2][test] Write test — in-progress epics (status != `complete`) emit no rollup; their shipped members fall through to unified `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T058 [P][US2] Curate fixture: BACKLOG-excerpt with E02 + E99 (synthetic proposed) `tests/regenerate_blog_archive/fixtures/backlog-excerpt.md`
 
 ### `[Ex]` prefix scan + mismatch detection
 
-- [ ] T059 [US2] Implement `scan_ex_prefixes(specs: list[SpecRecord]) -> dict[str, list[SpecRecord]]` — groups specs by `[Ex]` prefix in spec.md title/Input `scripts/regenerate-blog-archive.py`
-- [ ] T060 [US2] Implement `detect_charter_prefix_mismatches(epics, prefixes) -> list[UnresolvedGrouping]` — flags both directions: prefix-without-BACKLOG-entry AND BACKLOG-entry-without-prefix `scripts/regenerate-blog-archive.py`
-- [ ] T061 [P][US2][test] Write test — spec with `[E02]` prefix but absent from E02 `Items` column → surfaced as `charter-prefix-mismatch` `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T062 [P][US2][test] Write test — BACKLOG lists spec 999 (no directory) → surfaced as `missing-charter-member` `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T063 [P][US2][test] Write test — `legacy-charter` detection (epic in BACKLOG with no `docs/ideas/Exx-*.md` AND no `[Ex]` member prefix) `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T059 [US2] Implement `scan_ex_prefixes(specs: list[SpecRecord]) -> dict[str, list[SpecRecord]]` — groups specs by `[Ex]` prefix in spec.md title/Input `scripts/regenerate-blog-archive.py`
+- [x] T060 [US2] Implement `detect_charter_prefix_mismatches(epics, prefixes) -> list[UnresolvedGrouping]` — flags both directions: prefix-without-BACKLOG-entry AND BACKLOG-entry-without-prefix `scripts/regenerate-blog-archive.py`
+- [x] T061 [P][US2][test] Write test — spec with `[E02]` prefix but absent from E02 `Items` column → surfaced as `charter-prefix-mismatch` `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T062 [P][US2][test] Write test — BACKLOG lists spec 999 (no directory) → surfaced as `missing-charter-member` `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T063 [P][US2][test] Write test — `legacy-charter` detection (epic in BACKLOG with no `docs/ideas/Exx-*.md` AND no `[Ex]` member prefix) `tests/regenerate_blog_archive/test_epic_charter.py`
 
 ### Rollup stitcher
 
-- [ ] T064 [US2] Implement `stitch_epic_rollup(epic: Epic, members: list[SpecRecord]) -> GeneratedPost` — title derived from `Epic.title` (no `Building` prefix), opener from `docs/ideas/Exx-*.md` when present else `Epic.description`, body references every member (with link), date = latest member ship date `scripts/regenerate-blog-archive.py`
-- [ ] T065 [P][US2][test] Write C10 contract test — rollup lands at `specs/<lowest-NNN-member>/media/epic-rollup.md` `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T066 [P][US2][test] Write test — title does NOT start with `Building `; instead uses `Epic.title` verbatim `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T067 [P][US2][test] Write test — every member spec referenced in body (member count == link count) `tests/regenerate_blog_archive/test_epic_charter.py`
-- [ ] T068 [P][US2][test] Write test — charter's own `planning-post.md` / `shipped-post.md` on disk are untouched (spec Scenario 3) `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T064 [US2] Implement `stitch_epic_rollup(epic: Epic, members: list[SpecRecord]) -> GeneratedPost` — title derived from `Epic.title` (no `Building` prefix), opener from `docs/ideas/Exx-*.md` when present else `Epic.description`, body references every member (with link), date = latest member ship date `scripts/regenerate-blog-archive.py`
+- [x] T065 [P][US2][test] Write C10 contract test — rollup lands at `specs/<lowest-NNN-member>/media/epic-rollup.md` `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T066 [P][US2][test] Write test — title does NOT start with `Building `; instead uses `Epic.title` verbatim `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T067 [P][US2][test] Write test — every member spec referenced in body (member count == link count) `tests/regenerate_blog_archive/test_epic_charter.py`
+- [x] T068 [P][US2][test] Write test — charter's own `planning-post.md` / `shipped-post.md` on disk are untouched (spec Scenario 3) `tests/regenerate_blog_archive/test_epic_charter.py`
 
 ### Classifier precedence (epic wins)
 
-- [ ] T069 [US2] Update classifier to apply precedence: `epic-member` wins over `composite-member` / `unified` (FR-001) `scripts/regenerate-blog-archive.py`
-- [ ] T070 [US2][test] Write test — spec in both an E02 member table AND within 5 days of another shipped spec → classifies as `epic-member`, not `composite-member` (spec edge case) `tests/regenerate_blog_archive/test_classify.py`
+- [x] T069 [US2] Update classifier to apply precedence: `epic-member` wins over `composite-member` / `unified` (FR-001) `scripts/regenerate-blog-archive.py`
+- [x] T070 [US2][test] Write test — spec in both an E02 member table AND within 5 days of another shipped spec → classifies as `epic-member`, not `composite-member` (spec edge case) `tests/regenerate_blog_archive/test_classify.py`
 
 ### US2 integration smoke
 
-- [ ] T071 [US2] Wire US2 path into `main()` — emit one rollup per complete epic, remove member specs from unified bucket `scripts/regenerate-blog-archive.py`
-- [ ] T072 [US2] Run `python scripts/regenerate-blog-archive.py --dry-run` and confirm expected rollups (E02, E05, E08 at least; possibly E04) appear in summary `(run command)`
+- [x] T071 [US2] Wire US2 path into `main()` — emit one rollup per complete epic, remove member specs from unified bucket `scripts/regenerate-blog-archive.py`
+- [x] T072 [US2] Run `python scripts/regenerate-blog-archive.py --dry-run` and confirm expected rollups (E02, E05, E08 at least; possibly E04) appear in summary `(run command)`
 
 **Checkpoint**: US1 + US2 complete. Shipped standalone specs have unified posts; complete epics have rollups; members deduplicated.
 
@@ -259,40 +259,40 @@ Task: "Run test_atomic_writer.py"
 
 ### Composite pair detector
 
-- [ ] T073 [US3] Implement `find_composite_pairs(specs: list[SpecRecord], window_days: int) -> list[tuple[SpecRecord, SpecRecord, frozenset[str]]]` — pairs within ≤N days with ≥1 shared tag (after noise filter already applied at parse boundary) `scripts/regenerate-blog-archive.py`
-- [ ] T074 [P][US3][test] Write C9 contract test — pair with date span = 5 days (boundary inclusive) → qualifies `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T075 [P][US3][test] Write test — pair 2 days apart with zero non-noise tag overlap → no composite, no near-miss (noise-only matches must not qualify) `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T076 [P][US3][test] Write test — pair with both specs lacking non-noise tags → no composite, no near-miss (zero signal) `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T073 [US3] Implement `find_composite_pairs(specs: list[SpecRecord], window_days: int) -> list[tuple[SpecRecord, SpecRecord, frozenset[str]]]` — pairs within ≤N days with ≥1 shared tag (after noise filter already applied at parse boundary) `scripts/regenerate-blog-archive.py`
+- [x] T074 [P][US3][test] Write C9 contract test — pair with date span = 5 days (boundary inclusive) → qualifies `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T075 [P][US3][test] Write test — pair 2 days apart with zero non-noise tag overlap → no composite, no near-miss (noise-only matches must not qualify) `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T076 [P][US3][test] Write test — pair with both specs lacking non-noise tags → no composite, no near-miss (zero signal) `tests/regenerate_blog_archive/test_composite_pairs.py`
 
 ### Union-find clusterer
 
-- [ ] T077 [US3] Implement `cluster_composites(pairs) -> list[CompositeCluster]` — transitive union-find so A↔B + B↔C becomes one 3-member cluster rooted at lowest-`NNN` `scripts/regenerate-blog-archive.py`
-- [ ] T078 [P][US3][test] Write test — three-way cluster (A-B + B-C qualify, A-C does not pairwise) lands as one composite at A `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T079 [P][US3][test] Write test — tie on ship date for lowest-NNN anchor resolves to the lower `NNN` `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T080 [P][US3][test] Write test — cluster size > 5 emits a warning to stderr (tag-filter tuning alarm) `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T077 [US3] Implement `cluster_composites(pairs) -> list[CompositeCluster]` — transitive union-find so A↔B + B↔C becomes one 3-member cluster rooted at lowest-`NNN` `scripts/regenerate-blog-archive.py`
+- [x] T078 [P][US3][test] Write test — three-way cluster (A-B + B-C qualify, A-C does not pairwise) lands as one composite at A `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T079 [P][US3][test] Write test — tie on ship date for lowest-NNN anchor resolves to the lower `NNN` `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T080 [P][US3][test] Write test — cluster size > 5 emits a warning to stderr (tag-filter tuning alarm) `tests/regenerate_blog_archive/test_composite_pairs.py`
 
 ### Near-miss detector
 
-- [ ] T081 [US3] Implement `find_near_misses(specs, composite_window, near_miss_max) -> list[NearMiss]` — pairs in `(composite_window, near_miss_max]` day band with ≥1 shared non-noise tag, not already in a cluster `scripts/regenerate-blog-archive.py`
-- [ ] T082 [P][US3][test] Write C8 contract test — pair at Δ=7 days with shared tag produces one `NearMiss`, not a composite `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T083 [P][US3][test] Write test — pair at Δ=11 days (above near-miss max) produces nothing — neither composite nor near-miss `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T081 [US3] Implement `find_near_misses(specs, composite_window, near_miss_max) -> list[NearMiss]` — pairs in `(composite_window, near_miss_max]` day band with ≥1 shared non-noise tag, not already in a cluster `scripts/regenerate-blog-archive.py`
+- [x] T082 [P][US3][test] Write C8 contract test — pair at Δ=7 days with shared tag produces one `NearMiss`, not a composite `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T083 [P][US3][test] Write test — pair at Δ=11 days (above near-miss max) produces nothing — neither composite nor near-miss `tests/regenerate_blog_archive/test_composite_pairs.py`
 
 ### Composite stitcher
 
-- [ ] T084 [US3] Implement `stitch_composite_post(cluster: CompositeCluster) -> GeneratedPost` — title `Building <theme>` derived from shared tags, opener combines each member's cached opener (or synthesis fallback), body lists each member and links to them, date = earliest member ship date `scripts/regenerate-blog-archive.py`
-- [ ] T085 [P][US3][test] Write test — composite lands at `specs/<lowest-NNN-anchor>/media/composite-post.md` `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T086 [P][US3][test] Write test — title starts with `Building ` (unified/composite contract) `tests/regenerate_blog_archive/test_composite_pairs.py`
-- [ ] T087 [P][US3][test] Write test — every cluster member appears in the body (link count == cluster size) `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T084 [US3] Implement `stitch_composite_post(cluster: CompositeCluster) -> GeneratedPost` — title `Building <theme>` derived from shared tags, opener combines each member's cached opener (or synthesis fallback), body lists each member and links to them, date = earliest member ship date `scripts/regenerate-blog-archive.py`
+- [x] T085 [P][US3][test] Write test — composite lands at `specs/<lowest-NNN-anchor>/media/composite-post.md` `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T086 [P][US3][test] Write test — title starts with `Building ` (unified/composite contract) `tests/regenerate_blog_archive/test_composite_pairs.py`
+- [x] T087 [P][US3][test] Write test — every cluster member appears in the body (link count == cluster size) `tests/regenerate_blog_archive/test_composite_pairs.py`
 
 ### Classifier precedence (composite wins over unified)
 
-- [ ] T088 [US3] Update classifier — cluster members become `composite-member`, removed from `unified` bucket. Epic membership still trumps (from US2) `scripts/regenerate-blog-archive.py`
-- [ ] T089 [US3][test] Write test — spec that qualifies for both a composite pair AND is an epic member classifies as `epic-member` (FR-001 precedence) `tests/regenerate_blog_archive/test_classify.py`
+- [x] T088 [US3] Update classifier — cluster members become `composite-member`, removed from `unified` bucket. Epic membership still trumps (from US2) `scripts/regenerate-blog-archive.py`
+- [x] T089 [US3][test] Write test — spec that qualifies for both a composite pair AND is an epic member classifies as `epic-member` (FR-001 precedence) `tests/regenerate_blog_archive/test_classify.py`
 
 ### US3 integration smoke
 
-- [ ] T090 [US3] Wire US3 path into `main()` — emit one composite per cluster, emit `NearMiss` records to pass to the index (US4) `scripts/regenerate-blog-archive.py`
-- [ ] T091 [US3] Run `python scripts/regenerate-blog-archive.py --dry-run` and confirm composite counts + near-miss list look sane (if zero composites, that's acceptable per Open Question — retune thresholds is a dry-run-tuning activity, not a code fix) `(run command)`
+- [x] T090 [US3] Wire US3 path into `main()` — emit one composite per cluster, emit `NearMiss` records to pass to the index (US4) `scripts/regenerate-blog-archive.py`
+- [x] T091 [US3] Run `python scripts/regenerate-blog-archive.py --dry-run` and confirm composite counts + near-miss list look sane (if zero composites, that's acceptable per Open Question — retune thresholds is a dry-run-tuning activity, not a code fix) `(run command)`
 
 **Checkpoint**: All classification branches done. Every spec is in exactly one of: unified / epic-member / composite-member / skipped. Ready to emit the index.
 
@@ -313,33 +313,33 @@ Task: "Run test_atomic_writer.py"
 
 ### Index serialiser
 
-- [ ] T092 [US4] Implement `serialise_archive_index(index: ArchiveIndex) -> str` — produces the full ARCHIVE-REBUILD.md body per data-model.md serialisation contract: H1 + run metadata + index table + skipped sub-section + unresolved groupings + runbook + `<details>` raw log `scripts/regenerate-blog-archive.py`
-- [ ] T093 [P][US4][test] Write C7 contract test — every `GeneratedPost` appears as exactly one row; every skipped spec appears once under Skipped `tests/regenerate_blog_archive/test_index.py`
-- [ ] T094 [P][US4][test] Write test — Unresolved Groupings section has one sub-heading per `kind` (charter-prefix-mismatch, legacy-charter, near-miss, missing-charter-member, future-date) `tests/regenerate_blog_archive/test_index.py`
-- [ ] T095 [P][US4][test] Write test — runbook contains the four canonical steps (wipe / copy / front-matter / deploy) verbatim `tests/regenerate_blog_archive/test_index.py`
-- [ ] T096 [P][US4][test] Write test — index columns present: `Spec | Category | Title | Date | Generated Path | Opener | PR Body Source | Notes` `tests/regenerate_blog_archive/test_index.py`
-- [ ] T097 [P][US4][test] Write test — every index row cites `opener_source` (cached / synthesised / charter-framing) and `pr_body_source` (gh / shipped-post / missing) `tests/regenerate_blog_archive/test_index.py`
+- [x] T092 [US4] Implement `serialise_archive_index(index: ArchiveIndex) -> str` — produces the full ARCHIVE-REBUILD.md body per data-model.md serialisation contract: H1 + run metadata + index table + skipped sub-section + unresolved groupings + runbook + `<details>` raw log `scripts/regenerate-blog-archive.py`
+- [x] T093 [P][US4][test] Write C7 contract test — every `GeneratedPost` appears as exactly one row; every skipped spec appears once under Skipped `tests/regenerate_blog_archive/test_index.py`
+- [x] T094 [P][US4][test] Write test — Unresolved Groupings section has one sub-heading per `kind` (charter-prefix-mismatch, legacy-charter, near-miss, missing-charter-member, future-date) `tests/regenerate_blog_archive/test_index.py`
+- [x] T095 [P][US4][test] Write test — runbook contains the four canonical steps (wipe / copy / front-matter / deploy) verbatim `tests/regenerate_blog_archive/test_index.py`
+- [x] T096 [P][US4][test] Write test — index columns present: `Spec | Category | Title | Date | Generated Path | Opener | PR Body Source | Notes` `tests/regenerate_blog_archive/test_index.py`
+- [x] T097 [P][US4][test] Write test — every index row cites `opener_source` (cached / synthesised / charter-framing) and `pr_body_source` (gh / shipped-post / missing) `tests/regenerate_blog_archive/test_index.py`
 
 ### Run-log embedding
 
-- [ ] T098 [US4] Implement run-log capture — write all classifier decisions to `<temp-dir>/run.log` during the run, append into a `<details>` block at the bottom of `ARCHIVE-REBUILD.md` on success `scripts/regenerate-blog-archive.py`
-- [ ] T099 [P][US4][test] Write test — run-log captured in dry-run mode is equivalent to real-run for the same input (reproducibility) `tests/regenerate_blog_archive/test_index.py`
+- [x] T098 [US4] Implement run-log capture — write all classifier decisions to `<temp-dir>/run.log` during the run, append into a `<details>` block at the bottom of `ARCHIVE-REBUILD.md` on success `scripts/regenerate-blog-archive.py`
+- [x] T099 [P][US4][test] Write test — run-log captured in dry-run mode is equivalent to real-run for the same input (reproducibility) `tests/regenerate_blog_archive/test_index.py`
 
 ### SC-001 verifier
 
-- [ ] T100 [US4] Implement `assert_coverage_invariant(specs, generated_posts, skipped_specs, clusters, epics)` — raises if any spec appears in more than one bucket or is missing entirely; called at end of classification before staging `scripts/regenerate-blog-archive.py`
-- [ ] T101 [US4][test] Write test — planted double-classification (spec in both epic and composite) is detected and raises, not silently ignored `tests/regenerate_blog_archive/test_classify.py`
-- [ ] T102 [US4][test] Write test — planted missing-classification (spec present on disk but not in any bucket) is detected and raises `tests/regenerate_blog_archive/test_classify.py`
+- [x] T100 [US4] Implement `assert_coverage_invariant(specs, generated_posts, skipped_specs, clusters, epics)` — raises if any spec appears in more than one bucket or is missing entirely; called at end of classification before staging `scripts/regenerate-blog-archive.py`
+- [x] T101 [US4][test] Write test — planted double-classification (spec in both epic and composite) is detected and raises, not silently ignored `tests/regenerate_blog_archive/test_classify.py`
+- [x] T102 [US4][test] Write test — planted missing-classification (spec present on disk but not in any bucket) is detected and raises `tests/regenerate_blog_archive/test_classify.py`
 
 ### Stdout summary block
 
-- [ ] T103 [US4] Implement `print_summary(index: ArchiveIndex)` — prints the exact summary block format from contracts/cli.md (copy-pasteable into PR description) `scripts/regenerate-blog-archive.py`
-- [ ] T104 [P][US4][test] Write test — summary counts match index rows (e.g., `Unified posts: N` where N == count of `GeneratedPost` with `kind="unified"`) `tests/regenerate_blog_archive/test_index.py`
+- [x] T103 [US4] Implement `print_summary(index: ArchiveIndex)` — prints the exact summary block format from contracts/cli.md (copy-pasteable into PR description) `scripts/regenerate-blog-archive.py`
+- [x] T104 [P][US4][test] Write test — summary counts match index rows (e.g., `Unified posts: N` where N == count of `GeneratedPost` with `kind="unified"`) `tests/regenerate_blog_archive/test_index.py`
 
 ### US4 integration smoke
 
-- [ ] T105 [US4] Wire US4 path into `main()` — `ArchiveIndex` builder populated with everything from US1/US2/US3 + skipped specs + unresolved groupings, serialised to `--out-index` (default: repo root) `scripts/regenerate-blog-archive.py`
-- [ ] T106 [US4] Run `python scripts/regenerate-blog-archive.py --dry-run --verbose` against the live `specs/` tree; copy the would-be index to `specs/228-regenerate-blog-archive/evidence/dry-run-index.md` for pre-run inspection `specs/228-regenerate-blog-archive/evidence/dry-run-index.md`
+- [x] T105 [US4] Wire US4 path into `main()` — `ArchiveIndex` builder populated with everything from US1/US2/US3 + skipped specs + unresolved groupings, serialised to `--out-index` (default: repo root) `scripts/regenerate-blog-archive.py`
+- [x] T106 [US4] Run `python scripts/regenerate-blog-archive.py --dry-run --verbose` against the live `specs/` tree; copy the would-be index to `specs/228-regenerate-blog-archive/evidence/dry-run-index.md` for pre-run inspection `specs/228-regenerate-blog-archive/evidence/dry-run-index.md`
 
 **Checkpoint**: Generator is feature-complete. Dry run passes against the full corpus. Ready for the real run in Polish.
 
