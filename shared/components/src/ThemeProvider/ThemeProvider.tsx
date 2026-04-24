@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
 import { ThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
 import { getThemeTokens, mergeThemeTokens, defaultTheme } from './defaultTheme';
+import { isVSCodeEnvironment } from './vsCodeAdapter';
+import { VS_CODE_TOKEN_MAP, type VSCodeThemeVariant } from './vsCodeTokenMap';
 import '../styles/tokens.css';
 
 export interface ThemeProviderProps {
@@ -60,6 +62,46 @@ function applyThemeTokens(variant: Exclude<ThemeVariant, 'system'>, customTokens
 }
 
 /**
+ * Keys of the light+dark VS Code token map — used to clean up injected
+ * variables before re-applying a new variant (prevents stale values from
+ * bleeding between theme switches).
+ */
+const VS_CODE_TOKEN_KEYS: readonly string[] = Array.from(
+  new Set(Object.values(VS_CODE_TOKEN_MAP).flatMap((entry) => Object.keys(entry)))
+);
+
+/**
+ * Inject a synthetic set of `--vscode-*` CSS custom properties for the given
+ * variant. Only runs outside a real VS Code webview, so production consumers
+ * receive the real host-supplied values untouched.
+ *
+ * When `variant === 'vscode'` we STRIP any previously-injected variables so
+ * the real VS Code host can supply them cleanly.
+ *
+ * See `vsCodeTokenMap.ts` for the rationale and source values.
+ */
+function applyVSCodeTokensForVariant(variant: Exclude<ThemeVariant, 'system'>): void {
+  if (typeof document === 'undefined') return;
+  if (isVSCodeEnvironment()) return;
+
+  const root = document.documentElement;
+
+  if (variant === 'vscode') {
+    // Don't inject — the real VS Code host supplies these. Remove any we
+    // set earlier so stale Storybook-light values don't leak through.
+    for (const key of VS_CODE_TOKEN_KEYS) {
+      root.style.removeProperty(key);
+    }
+    return;
+  }
+
+  const variantMap = VS_CODE_TOKEN_MAP[variant as VSCodeThemeVariant];
+  for (const [key, value] of Object.entries(variantMap)) {
+    root.style.setProperty(key, value);
+  }
+}
+
+/**
  * ThemeProvider component that provides theming context to child components.
  *
  * @example
@@ -100,6 +142,7 @@ export function ThemeProvider({ theme: initialTheme, children, container }: Them
     targetElement.setAttribute('data-theme', resolvedVariant);
 
     applyThemeTokens(resolvedVariant, theme.tokens);
+    applyVSCodeTokensForVariant(resolvedVariant);
   }, [resolvedVariant, theme.tokens, container]);
 
   const setTheme = useCallback((value: Theme | ((prev: Theme) => Theme)) => {
