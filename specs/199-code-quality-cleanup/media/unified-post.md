@@ -40,6 +40,18 @@ This is debt-repayment cadence, not feature work. The theory of the operation is
 
 Five cleanups shipped in a single PR from a code-quality review pass (PR #465):
 
+1. **Knip false-positive silencing** — added `knip.json` to the root with `"ignore": ["specs/**"]`, which silenced 57 specs-related entries that knip was reporting as "unused" (they're speckit contracts, not production code). Pinned `knip` to `5.88.1` as a root devDependency to close a reproducibility gap — `pnpm dlx knip@latest` was drifting between contributors depending on what was latest that morning.
+
+2. **LogPanel prop consolidation** — merged `LogTimelineProps` and `LogByFeatureProps` into a single `LogPanelProps` interface. Three interfaces were effectively the same shape, slowly drifting. One canonical interface stops future reviewers second-guessing which one to use.
+
+3. **ADR-019** — documented two `import type`-only cycles in the VS Code extension (`mapPanel ↔ activityPanelView ↔ calcService` and `activityPanelView ↔ resultsPanelService`). Both are erased at runtime. The cycles are deliberate for now — the eventual fix is interface extraction, which is a bigger job. The ADR ensures a future refactor doesn't waste a day "fixing" something already considered and accepted. ADR count grew from 18 to 19.
+
+4. **Loader `plotName` fix** — replaced a `// TODO: Get actual name from plot list` placeholder in `useLoadWorkflow.ts` with a proper lookup that threads the plot's display name from the plot list instead of using its ID. The one-line fix is backed by a new vitest (`apps/loader/tests/unit/useLoadWorkflow.test.ts`) that fails if anyone reintroduces the placeholder. A revert-and-red sanity check proved the test was a real gate, not a tautology.
+
+5. **TODO promotion** — filed two new GitHub issues (#472 "Manage Stores" tab, #473 "Create new store" button) and replaced bare `// TODO:` markers in the loader with `TODO(#472):` and `TODO(#473):` references. A pre-push grep guard (`grep "TODO(#NNN)"`) prevents shipping literal placeholders when someone forgets a step.
+
+Bonus: removed `shared/components/diff/`, an orphaned staging artefact from April with zero consumers.
+
 ## By the Numbers
 
 | | |

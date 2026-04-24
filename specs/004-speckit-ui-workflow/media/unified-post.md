@@ -31,6 +31,8 @@ SpecKit itself is our tool for standardised specification workflows. This is the
 
 SpecKit now distinguishes between UI features and backend services. When you run `/speckit.specify` with a description mentioning "dialog", "wizard", or "dashboard", the generated specification includes a dedicated section for capturing interaction design details: what decisions users face, how screens progress, and what different states look like.
 
+We discovered this gap when specifying the Loader Mini-App. The functional requirements were solid: load a file, select a store, create a plot. But nothing captured *how* users would experience it. Single screen or wizard? What decisions would they face? What would error states look like? These details surfaced during clarification, forcing backtracking that could have been avoided.
+
 ## How It Works
 
 The enhancement adds keyword-based feature detection to the `/speckit.specify` command. Three lists drive the logic:

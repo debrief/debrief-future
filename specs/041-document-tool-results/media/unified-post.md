@@ -28,6 +28,10 @@ _Synthesis fallback — no in-scope/dependencies bullets detected._
 
 When a calculation tool smooths a track or computes a closest point of approach, something needs to classify that result, persist it to the STAC catalog, and update the display. We've now built the machinery that connects these pieces.
 
+The system introduces four top-level result types: mutation (modified features), addition (new features), deletion (removed features), and artifact (reports, images, datasets). Every tool response is an MCP-compliant content array containing one or more items, each classified into one of these types and carrying three required annotations: the result type path, source feature IDs, and a human-readable label.
+
+On the storage side, debrief-stac exposes four atomic operations: update features, add features, delete features, and store artifact. The service has no knowledge of result types. The orchestrator (frontend or LLM) interprets each content item's type and calls the appropriate operation. After each operation, a diff utility compares the old and new FeatureCollections and the display updates incrementally.
+
 ## How It Works
 
 Here's a Python tool returning a smoothed track:

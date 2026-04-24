@@ -33,6 +33,15 @@ The Activity Panel is a shared React component used across the VS Code extension
 
 When you collapse the Time Controller and Tools sections in the Activity Panel, the Layers section should expand to fill the space. It didn't. Instead, a large gap appeared below your layers list — sometimes half the panel height, sitting empty while your layer entries were squeezed into a fixed 300px box.
 
+The root cause was a mismatch between two levels of the layout. The Activity Panel's outer flex column correctly allocated space to sections when siblings collapsed. But inside the Layers section, the FeatureList component was locked at a fixed 300px height, and its container wasn't a flex item. So the list sat at 300px, and everything below it was wasted whitespace.
+
+The fix is two CSS rule changes, both in the Activity Panel stylesheet:
+
+1. Make `.section-content` a flex column container inside collapsible sections
+2. Add `flex: 1 1 0%` to `.debrief-feature-list` so it expands to fill remaining space
+
+The flex shorthand's `flex-basis: 0%` overrides the inline 300px height via standard CSS specificity — no component changes, no `!important` hacks. Scrolling responsibility moves one level down in the DOM (to FeatureList's existing scroll container), but that's invisible to users.
+
 ## How It Works
 
 Three collapsible sections in a flex column: Time Controller (fixed height), Tools (flexible), Layers (flexible). When you collapse Tools, the outer flex layout frees up that section's space. Before the fix, the Layers container would grow, but its child FeatureList wouldn't — it stayed locked at 300px. After the fix, the FeatureList participates in flex layout and expands to fill the container.

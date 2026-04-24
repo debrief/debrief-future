@@ -57,20 +57,20 @@ bottom dock, next to Terminal / Output / Problems).  Before any tool
 has run, it sits quiet with a placeholder — no empty tab bar, no
 clutter in the editor:
 
-![VS Code with the empty Debrief Results panel docked at the bottom](../evidence/screenshots/canonical-01-empty-state-in-vscode.png)
+![VS Code with the empty Debrief Results panel docked at the bottom](/assets/images/future-debrief/178-vscode-tabular-results/canonical-01-empty-state-in-vscode.png)
 *The new Debrief Results tab is visible in the VS Code panel dock, alongside Problems / Output / Terminal. "No results to display" is rendered by the real `@debrief/components` label from feature 177 — no strings forked.*
 
 Run `track-stats` against a selected track and the real `TableRenderer`
 mounts inside the panel, showing the statistics inline without ever
 leaving the plot view:
 
-![The Debrief Results panel showing a track-stats table tab with unsaved-dot indicator and metric/value rows](../evidence/screenshots/canonical-02-populated-in-vscode.png)
+![The Debrief Results panel showing a track-stats table tab with unsaved-dot indicator and metric/value rows](/assets/images/future-debrief/178-vscode-tabular-results/canonical-02-populated-in-vscode.png)
 *Track Alpha — Stats, with the yellow unsaved-dot indicator, Save / Save As buttons on the right, and the `TableRenderer` showing total distance, average speed, point count, and duration. This screenshot is captured end-to-end from a real openvscode-server instance running the Debrief VSIX through the Hybrid A+D Playwright pipeline.*
 
 When a tool returns multiple datasets — like `range-bearing` producing
 separate Range and Bearing series — each envelope gets its own tab:
 
-![Range and Bearing chart tabs side-by-side, both with unsaved-dot indicators](../evidence/screenshots/03-two-chart-tabs.png)
+![Range and Bearing chart tabs side-by-side, both with unsaved-dot indicators](/assets/images/future-debrief/178-vscode-tabular-results/03-two-chart-tabs.png)
 *Range-bearing results fan out into two chart tabs. The active tab is highlighted with a blue underline; both carry the unsaved-dot indicator until saved. Chart content is rendered by the shared `ChartRenderer` via `transformDataset`.*
 
 ## Saving a result
@@ -89,13 +89,13 @@ Saving is one click.  Click **Save** on the active tab, and the host:
 If you want a custom filename, click **Save As** and an inline form
 appears above the table:
 
-![Save As form with Name and Tag inputs visible above the table content](../evidence/screenshots/04-save-as-form.png)
+![Save As form with Name and Tag inputs visible above the table content](/assets/images/future-debrief/178-vscode-tabular-results/04-save-as-form.png)
 *The Save As form is rendered inline, not in a modal. Name + optional tag, both sanitised server-side before composing the filename.*
 
 After a successful save, the unsaved-dot disappears, the tab label
 switches to the saved filename, and Save / Save As grey out:
 
-![Saved tab showing the CSV filename as the tab label, with greyed-out Save buttons](../evidence/screenshots/05-saved-state.png)
+![Saved tab showing the CSV filename as the tab label, with greyed-out Save buttons](/assets/images/future-debrief/178-vscode-tabular-results/05-saved-state.png)
 *The tab now reads `track-stats--2026-04-07.csv` — matches what's on disk. Save buttons are disabled because there's nothing new to save. Re-run the tool to create a fresh unsaved tab.*
 
 From the Layers toolbar Associated Files dropdown you can **Open** a
@@ -112,7 +112,7 @@ No more silent failures in the corner.  Run a tool against an invalid
 selection and you get an error tab right where you're looking for the
 result:
 
-![Error tab with red "Tool execution failed" heading and blue Retry button](../evidence/screenshots/06-error-retry.png)
+![Error tab with red "Tool execution failed" heading and blue Retry button](/assets/images/future-debrief/178-vscode-tabular-results/06-error-retry.png)
 *The error surfaces where the user is looking, not buried in the notification pile. Clicking Retry re-invokes the tool with the original parameters. Crucially, no provenance is recorded for the failed attempt (FR-019) — so the log stays clean.*
 
 ## Shared code — zero forks

@@ -35,6 +35,8 @@ Results come back as GeoJSON with inline provenance. Every analysis result knows
 
 Context-sensitive analysis tools for maritime tactical analysis — the "calc" layer of Future Debrief. When you select track data, the system shows applicable analysis operations. When you run those operations, you get valid GeoJSON results with complete provenance tracking.
 
+This is stage 5 of our tracer bullet delivery, and it enables two critical capabilities. Scientists can write Python analysis tools without touching the core platform — decorate a function and it registers automatically. The VS Code extension (stage 6, coming next) gets a library of operations to expose via right-click menus and keyboard shortcuts.
+
 ## What's Included
 
 ### debrief-calc Library

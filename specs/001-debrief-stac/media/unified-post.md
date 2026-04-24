@@ -37,6 +37,8 @@ Constitution Article III requires provenance tracking, so every source file copi
 
 The debrief-stac service is operational. Debrief v4.x can now create local STAC catalogs, store analysis plots as STAC Items, append GeoJSON features, and preserve source files with full provenance tracking.
 
+Every plot is a STAC Item. Every track and reference location lives in validated GeoJSON assets. Every original source file is preserved with metadata recording when it was loaded, what tool processed it, and the original file path.
+
 ## Key Accomplishments
 
 - **Create local STAC catalogs** at user-specified paths with valid `catalog.json`

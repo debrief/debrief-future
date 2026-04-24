@@ -48,6 +48,22 @@ Other decisions worth naming:
 
 Three weeks ago we planned to set up an unused-code scanner for the Electron loader with a promise: twelve findings would become zero, and stay zero. We shipped exactly that.
 
+The baseline was straightforward. Running `knip` across `apps/loader/src/main/` reported twelve findings. Eleven were false positives — knip can't infer where an Electron app starts, so every module in the main process looked unreachable. The twelfth, `updater.ts`, was real: a commented-out `electron-updater` import with zero call sites.
+
+We could have quieted the scanner two ways. Both were shortcuts; both were wrong.
+
+**Shortcut one:** add `ignore: [updater.ts]` to the config. Zero source changes, clean output, a codebase quietly hiding a true finding. Refused — a scanner that silences real findings is worse than no scanner.
+
+**Shortcut two:** run knip ad-hoc via `pnpm dlx` instead of pinning it. One line lighter in `package.json`. Refused — the moment CI depends on a tool's output, its version has to be locked. A silent upgrade shouldn't turn a green build red.
+
+Instead we shipped:
+
+1. A fifteen-line `knip.json` at the repo root declaring three entry points for the loader: main (`src/main/index.ts`), preload (`src/preload/index.ts`), renderer (`src/main.tsx`). The eleven false positives are now gone.
+2. Deletion of `updater.ts`. Auto-update is a real feature that belongs in its own spec (it needs code signing, an update server, proper testing). Until then, the module is weight.
+3. A `task knip` target in the `Taskfile.yml` and a "Run knip" step in `.github/workflows/ci.yml` directly after lint. Knip is now a gate, not a diagnostic.
+4. Knip pinned as a dev dependency at `^5` (resolved to 5.88.1 in the lockfile). No more `pnpm dlx`.
+5. A JSON Schema under `specs/201-knip-loader-config/contracts/` that rejects `ignore` keys and extra workspace stanzas on `knip.json`. If someone tries to quiet a future finding by expanding the file, validation fails before review does.
+
 ## By the Numbers
 
 | Metric | Result |

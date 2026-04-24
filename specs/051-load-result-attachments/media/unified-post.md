@@ -42,6 +42,22 @@ No UI changes. No new patterns. Just scanning what's already there and feeding i
 
 One of the persistent frustrations with the old interface was that analysis results would vanish when you closed a plot. You'd run a calculation, examine the output, close the plot to work on something else, then reopen it later only to find all those results gone. The work was still sitting in the STAC catalog, but disconnected from the UI.
 
+We've now fixed that by teaching the system to read result files from STAC item assets when a plot opens. Any results saved to a plot's STAC item come back automatically in the attachments dropdown, exactly where you left them.
+
+The implementation sits entirely in stacService—seven new methods that extract, identify, and deduplicate result files:
+
+- `parseViewerType()` extracts the viewer type from multi-suffix filenames (`file.2d.json` becomes viewerType: '2d')
+- `parseFileFormat()` gets the actual file format from the extension
+- `assetToAssociatedFile()` transforms STAC assets into AssociatedFile objects the UI understands
+- `isResultAsset()` identifies which assets are results using `roles: ["result"]` as the primary signal, with fallbacks to `debrief:toolId` property or filename patterns for edge cases
+- `getResultFilesFromItem()` extracts all results from a single STAC item
+- `loadResultFiles()` loads the item and extracts results in one call
+- `setResultFiles()` on activityPanelView handles integration with the UI
+
+We wired this into `openPlot.ts` so results load automatically whenever you open a plot.
+
+One complication: when you reload a plot, you might have both persisted results (from the STAC catalog) and runtime results (from tools you ran during this session). Deduplication logic prevents duplicates when merging them.
+
 ## Lessons Learned
 
 STAC asset metadata turned out to be more reliable than we expected. The `roles` field was explicitly designed for this kind of classification—marking assets as `["result"]` gives a canonical signal that doesn't require guessing. For edge cases (manually-placed files, legacy formats predating this convention), fallback patterns using `debrief:toolId` and filename conventions catch them cleanly without false positives.
