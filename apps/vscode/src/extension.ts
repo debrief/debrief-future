@@ -770,7 +770,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       provider: { webview?: vscode.Webview | undefined } | undefined,
     ): void => {
       const wv = provider?.webview;
-      if (wv) panels.push({ webview: wv });
+      if (wv) {
+        panels.push({ webview: wv });
+      }
     };
 
     pushIfWebview(activityPanelProvider);
@@ -781,7 +783,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     // MapPanel — per-document panels created via createWebviewPanel.
     const mp = mapPanel?.getPanel?.();
-    if (mp) panels.push({ webview: mp.webview });
+    if (mp) {
+      panels.push({ webview: mp.webview });
+    }
 
     // CatalogOverviewPanel — per-store popup panels.
     for (const overview of CatalogOverviewPanel.getActivePanels()) {

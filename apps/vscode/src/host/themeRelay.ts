@@ -73,12 +73,13 @@ export function startThemeRelay(
     for (const panel of panels) {
       try {
         // `postMessage` returns a Thenable; swallow rejections so a single
-        // disposed-panel error doesn't break sibling panels.
-        Promise.resolve(panel.webview.postMessage(message)).catch((err) => {
-          console.debug('[themeRelay] postMessage rejected', err);
+        // disposed-panel error doesn't break sibling panels. A panel being
+        // disposed between get-and-post is normal and uninteresting.
+        Promise.resolve(panel.webview.postMessage(message)).catch(() => {
+          /* disposed panel — ignore */
         });
-      } catch (err) {
-        console.debug('[themeRelay] postMessage threw', err);
+      } catch {
+        /* disposed panel — ignore */
       }
     }
   });
