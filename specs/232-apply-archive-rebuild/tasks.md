@@ -158,11 +158,11 @@
 
 ### Delete the helper (FR-014)
 
-- [ ] T050 Delete migration helper and tests: `git rm scripts/232-apply-archive-rebuild.py && git rm -r tests/apply_archive_rebuild/`. Verify SC-006 equivalent (FR-014): neither path exists in HEAD. Commit as `feat(232): delete migration helper per FR-014`. `scripts/232-apply-archive-rebuild.py tests/apply_archive_rebuild/`
+- [x] T050 Delete migration helper and tests: `git rm scripts/232-apply-archive-rebuild.py && git rm -r tests/apply_archive_rebuild/`. Verify SC-006 equivalent (FR-014): neither path exists in HEAD. Commit as `feat(232): delete migration helper per FR-014`. `scripts/232-apply-archive-rebuild.py tests/apply_archive_rebuild/`
 
 ### Media content
 
-- [ ] T051 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/232-apply-archive-rebuild/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/232-apply-archive-rebuild/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T043–T047. No Screenshots section (this is a CLI/infrastructure feature with no visual surface — in lieu, include code/grep excerpts from `before-after-sample.md` as a "Before/After" block). Front matter: `layout: future-post`, `title: "Building [Content-Specialist-chosen noun]"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, migration, media]`, `excerpt` ≤ 150 chars. `specs/232-apply-archive-rebuild/media/shipped-post.md`
+- [x] T051 Spawn Content Specialist (`.claude/agents/media/content.md`) via Task tool to create the Feature Post at `specs/232-apply-archive-rebuild/media/shipped-post.md`. First three sections (What We're Building, How It Fits, Key Decisions) **MUST be copied verbatim** from `specs/232-apply-archive-rebuild/evidence/opening-context.md` (already cached during `/speckit.plan`). Remaining sections (By the Numbers, Lessons Learned, What's Next) written from evidence files captured in T043–T047. No Screenshots section (this is a CLI/infrastructure feature with no visual surface — in lieu, include code/grep excerpts from `before-after-sample.md` as a "Before/After" block). Front matter: `layout: future-post`, `title: "Building [Content-Specialist-chosen noun]"`, `track: [credibility]`, `author: Ian`, `reading_time` calculated, `tags: [tracer-bullet, archive, migration, media]`, `excerpt` ≤ 150 chars. `specs/232-apply-archive-rebuild/media/shipped-post.md`
 
 ### PR creation
 
