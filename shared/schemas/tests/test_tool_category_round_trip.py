@@ -24,11 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "pyt
 from debrief_schemas import Tool, ToolCategoryEnum
 
 JSON_SCHEMA_PATH = (
-    Path(__file__).parent.parent
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "Tool.schema.json"
+    Path(__file__).parent.parent / "src" / "generated" / "json-schema" / "Tool.schema.json"
 )
 
 

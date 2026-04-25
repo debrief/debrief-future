@@ -199,16 +199,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         // Success — apply lozenges. Replace the existing state with the
         // generator's suggestions so "UK submarines" replaces prior chips
         // from a different phrase (matches nl-demo behaviour).
+        // `LozengeSeed.filterType` is already `Exclude<FilterType, 'platform'>`
+        // (the generator never emits platform chips — see
+        // `nl-cql2/types.ts`), so no runtime guard is needed.
         const seeds: readonly LozengeSeed[] = result.lozenges;
         const nextItems = seeds.map((seed, idx) => {
           // Generate a deterministic-ish id per chip. We do not need
           // cryptographic uniqueness — only stable-within-this-batch.
           const id = `nl-${token}-${idx}-${seed.filterType}-${seed.value}`;
-          if (seed.filterType === 'platform') {
-            // The generator currently never emits platform chips (see
-            // nl-cql2/types.ts LozengeSeed) but fall-through safely.
-            return null;
-          }
           return {
             kind: 'lozenge' as const,
             shape: 'simple' as const,
@@ -217,7 +215,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value: seed.value,
             ...(seed.negated !== undefined ? { negated: seed.negated } : {}),
           };
-        }).filter((x): x is NonNullable<typeof x> => x !== null);
+        });
 
         setFilterBarState({ items: nextItems });
       } catch {
