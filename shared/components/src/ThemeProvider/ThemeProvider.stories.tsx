@@ -93,8 +93,11 @@ function ThemeDemo() {
         <button style={buttonStyle} onClick={() => setTheme({ variant: 'dark' })}>
           Dark
         </button>
-        <button style={buttonStyle} onClick={() => setTheme({ variant: 'vscode' })}>
-          VS Code
+        <button style={buttonStyle} onClick={() => setTheme({ variant: 'high-contrast-light' })}>
+          HC Light
+        </button>
+        <button style={buttonStyle} onClick={() => setTheme({ variant: 'high-contrast-dark' })}>
+          HC Dark
         </button>
       </div>
     </div>
@@ -117,9 +120,17 @@ export const DarkTheme: Story = {
   ),
 };
 
-export const VSCodeTheme: Story = {
+export const HighContrastLightTheme: Story = {
   render: () => (
-    <ThemeProvider theme={{ variant: 'vscode' }}>
+    <ThemeProvider theme={{ variant: 'high-contrast-light' }}>
+      <ThemeDemo />
+    </ThemeProvider>
+  ),
+};
+
+export const HighContrastDarkTheme: Story = {
+  render: () => (
+    <ThemeProvider theme={{ variant: 'high-contrast-dark' }}>
       <ThemeDemo />
     </ThemeProvider>
   ),

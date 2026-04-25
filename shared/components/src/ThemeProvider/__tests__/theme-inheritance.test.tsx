@@ -88,6 +88,7 @@ describe('Theme Inheritance', () => {
   beforeEach(() => {
     document.documentElement.removeAttribute('data-theme');
     document.documentElement.style.cssText = '';
+    document.body.className = '';
   });
 
   describe('ThemeProvider propagation', () => {
@@ -115,16 +116,28 @@ describe('Theme Inheritance', () => {
       expect(screen.getByTestId('nested-isDark')).toHaveTextContent('yes');
     });
 
-    it('propagates vscode theme to nested components', () => {
+    it('propagates high-contrast-dark theme to nested components', () => {
       render(
-        <ThemeProvider theme={{ variant: 'vscode' }}>
+        <ThemeProvider theme={{ variant: 'high-contrast-dark' }}>
           <ThemeChecker testId="nested" />
         </ThemeProvider>
       );
 
-      expect(screen.getByTestId('nested-variant')).toHaveTextContent('vscode');
-      expect(screen.getByTestId('nested-resolved')).toHaveTextContent('vscode');
+      expect(screen.getByTestId('nested-variant')).toHaveTextContent('high-contrast-dark');
+      expect(screen.getByTestId('nested-resolved')).toHaveTextContent('high-contrast-dark');
       expect(screen.getByTestId('nested-isDark')).toHaveTextContent('yes');
+    });
+
+    it('propagates high-contrast-light theme to nested components', () => {
+      render(
+        <ThemeProvider theme={{ variant: 'high-contrast-light' }}>
+          <ThemeChecker testId="nested" />
+        </ThemeProvider>
+      );
+
+      expect(screen.getByTestId('nested-variant')).toHaveTextContent('high-contrast-light');
+      expect(screen.getByTestId('nested-resolved')).toHaveTextContent('high-contrast-light');
+      expect(screen.getByTestId('nested-isDark')).toHaveTextContent('no');
     });
   });
 
@@ -149,14 +162,24 @@ describe('Theme Inheritance', () => {
       expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     });
 
-    it('sets data-theme attribute for vscode theme', () => {
+    it('sets data-theme attribute for high-contrast-dark theme', () => {
       render(
-        <ThemeProvider theme={{ variant: 'vscode' }}>
+        <ThemeProvider theme={{ variant: 'high-contrast-dark' }}>
           <div>Content</div>
         </ThemeProvider>
       );
 
-      expect(document.documentElement.getAttribute('data-theme')).toBe('vscode');
+      expect(document.documentElement.getAttribute('data-theme')).toBe('high-contrast-dark');
+    });
+
+    it('sets data-theme attribute for high-contrast-light theme', () => {
+      render(
+        <ThemeProvider theme={{ variant: 'high-contrast-light' }}>
+          <div>Content</div>
+        </ThemeProvider>
+      );
+
+      expect(document.documentElement.getAttribute('data-theme')).toBe('high-contrast-light');
     });
   });
 

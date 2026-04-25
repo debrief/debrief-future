@@ -1,22 +1,20 @@
-import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type ReactNode } from 'react';
 import { ThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
 import { getThemeTokens, mergeThemeTokens, defaultTheme } from './defaultTheme';
 import { VS_CODE_TOKEN_MAP, type VSCodeThemeVariant } from './vsCodeTokenMap';
+import { vsCodeBodyClassSource, bodyClassToVariant } from './vsCodeAdapter';
+import { mediaQuerySource } from './browserAdapter';
+import type { ResolvedVariant, ThemeSource } from './ThemeSource';
 import '../styles/tokens.css';
 
 /**
  * Narrow "am I running inside a real VS Code webview?" check.
  *
- * Deliberately does NOT use `isVSCodeEnvironment()` from `vsCodeAdapter` —
- * that helper has a fallback that checks `getComputedStyle()` for the
- * `--vscode-editor-background` CSS variable, which produces a FALSE POSITIVE
- * after this file has injected synthetic `--vscode-*` values (it sees our
- * own inline value and incorrectly reports "yes, in VS Code"). That breaks
- * variant switching — specifically, switching from `dark` → `vscode` would
- * hit the early-return and leave stale synthetic values in place.
- *
- * `acquireVsCodeApi` is only defined by the real webview host, so checking
- * for it is reliable and has no false-positive mode.
+ * Uses `acquireVsCodeApi` (only defined by the real webview host) — a
+ * reliable signal with no false-positive mode. This is *not* the same
+ * thing as "did VS Code apply a body class" — a Storybook iframe could
+ * be made to sport a `vscode-dark` body class without `acquireVsCodeApi`,
+ * and the synthetic `--vscode-*` injection should still happen there.
  */
 function isRealVSCodeWebview(): boolean {
   return typeof window !== 'undefined' && 'acquireVsCodeApi' in window;
@@ -31,22 +29,21 @@ export interface ThemeProviderProps {
 
   /** Container element to apply theme data attribute */
   container?: HTMLElement;
-}
 
-/**
- * Detect system color scheme preference
- */
-function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') {
-    return 'light';
-  }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  /**
+   * Override the auto-detected source.
+   *
+   * Default: `vsCodeBodyClassSource()` if a `vscode-*` body class is present
+   * at mount, else `mediaQuerySource()`. Pinned tests / stories should pass
+   * `staticSource(variant)` to opt out of live updates.
+   */
+  source?: ThemeSource;
 }
 
 /**
  * Apply theme tokens as CSS custom properties
  */
-function applyThemeTokens(variant: Exclude<ThemeVariant, 'system'>, customTokens?: Theme['tokens']) {
+function applyThemeTokens(variant: ResolvedVariant, customTokens?: Theme['tokens']) {
   const tokens = mergeThemeTokens(getThemeTokens(variant), customTokens);
 
   // Apply to document root
@@ -79,9 +76,9 @@ function applyThemeTokens(variant: Exclude<ThemeVariant, 'system'>, customTokens
 }
 
 /**
- * Keys of the light+dark VS Code token map — used to clean up injected
- * variables before re-applying a new variant (prevents stale values from
- * bleeding between theme switches).
+ * Keys of the VS Code token map — used to clean up injected variables
+ * before re-applying a new variant (prevents stale values from bleeding
+ * between theme switches).
  */
 const VS_CODE_TOKEN_KEYS: readonly string[] = Array.from(
   new Set(Object.values(VS_CODE_TOKEN_MAP).flatMap((entry) => Object.keys(entry)))
@@ -91,30 +88,49 @@ const VS_CODE_TOKEN_KEYS: readonly string[] = Array.from(
  * Inject a synthetic set of `--vscode-*` CSS custom properties for the given
  * variant. Only runs outside a real VS Code webview, so production consumers
  * receive the real host-supplied values untouched.
- *
- * When `variant === 'vscode'` we STRIP any previously-injected variables so
- * the real VS Code host can supply them cleanly.
- *
- * See `vsCodeTokenMap.ts` for the rationale and source values.
  */
-function applyVSCodeTokensForVariant(variant: Exclude<ThemeVariant, 'system'>): void {
+function applyVSCodeTokensForVariant(variant: ResolvedVariant): void {
   if (typeof document === 'undefined') return;
   if (isRealVSCodeWebview()) return;
 
   const root = document.documentElement;
 
-  if (variant === 'vscode') {
-    // Don't inject — the real VS Code host supplies these. Remove any we
-    // set earlier so stale Storybook-light values don't leak through.
-    for (const key of VS_CODE_TOKEN_KEYS) {
-      root.style.removeProperty(key);
-    }
-    return;
+  // Clean any previously-injected variables before re-applying the new
+  // variant to prevent stale values bleeding between theme switches.
+  for (const key of VS_CODE_TOKEN_KEYS) {
+    root.style.removeProperty(key);
   }
 
   const variantMap = VS_CODE_TOKEN_MAP[variant as VSCodeThemeVariant];
+  if (!variantMap) return;
   for (const [key, value] of Object.entries(variantMap)) {
     root.style.setProperty(key, value);
+  }
+}
+
+/**
+ * Pick the default `ThemeSource` for the current environment.
+ *
+ * Inside a VS Code webview (signalled by a `vscode-*` body class), use
+ * the body-class source. Otherwise, use the OS media-query source.
+ */
+function pickDefaultSource(): ThemeSource {
+  if (typeof document !== 'undefined') {
+    const variant = bodyClassToVariant(document.body.classList);
+    if (variant !== null) return vsCodeBodyClassSource();
+  }
+  return mediaQuerySource();
+}
+
+/**
+ * Resolve `'system'` to one of the four explicit variants by reading the
+ * source synchronously.
+ */
+function resolveSystemFromSource(source: ThemeSource): ResolvedVariant {
+  try {
+    return source.read();
+  } catch {
+    return 'light';
   }
 }
 
@@ -127,31 +143,73 @@ function applyVSCodeTokensForVariant(variant: Exclude<ThemeVariant, 'system'>): 
  *   <MapView features={data} />
  * </ThemeProvider>
  * ```
+ *
+ * @example
+ * ```tsx
+ * // Inside a VS Code webview — auto-detects body class:
+ * <ThemeProvider source={vsCodeBodyClassSource()}>
+ *   <Panel />
+ * </ThemeProvider>
+ * ```
  */
-export function ThemeProvider({ theme: initialTheme, children, container }: ThemeProviderProps) {
+export function ThemeProvider({
+  theme: initialTheme,
+  children,
+  container,
+  source: sourceProp,
+}: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(initialTheme ?? defaultTheme);
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
 
-  // Listen for system theme changes
+  // Stable per-instance source. Only re-built if the prop reference changes.
+  const sourceRef = useRef<ThemeSource | null>(null);
+  if (sourceRef.current === null) {
+    sourceRef.current = sourceProp ?? pickDefaultSource();
+  }
+  // Keep source in sync if the caller passes a new one between renders.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (sourceProp && sourceRef.current !== sourceProp) {
+      sourceRef.current = sourceProp;
+    }
+  }, [sourceProp]);
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
+  // Source-derived variant (used when `theme.variant === 'system'`).
+  const [sourceVariant, setSourceVariant] = useState<ResolvedVariant>(() =>
+    resolveSystemFromSource(sourceRef.current!)
+  );
+
+  // Subscribe to source changes
+  useEffect(() => {
+    const source = sourceRef.current;
+    if (!source) return;
+
+    let cleanup: (() => void) | undefined;
+    try {
+      cleanup = source.subscribe((next) => setSourceVariant(next));
+    } catch (err) {
+      // Source failure is non-fatal — fall back to the most recent value.
+      console.warn('ThemeProvider: source.subscribe() failed', err);
+    }
+
+    // If the source changed since first read, reflect it now.
+    try {
+      const current = source.read();
+      setSourceVariant((prev) => (prev === current ? prev : current));
+    } catch {
+      // ignore — keep the previous value
+    }
+
+    return () => {
+      if (cleanup) cleanup();
     };
-
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
+  }, [sourceProp]);
 
   // Resolve the actual theme variant
-  const resolvedVariant = useMemo<Exclude<ThemeVariant, 'system'>>(() => {
+  const resolvedVariant = useMemo<ResolvedVariant>(() => {
     if (theme.variant === 'system') {
-      return systemTheme;
+      return sourceVariant;
     }
     return theme.variant;
-  }, [theme.variant, systemTheme]);
+  }, [theme.variant, sourceVariant]);
 
   // Apply theme to DOM
   useEffect(() => {
@@ -160,13 +218,25 @@ export function ThemeProvider({ theme: initialTheme, children, container }: Them
 
     applyThemeTokens(resolvedVariant, theme.tokens);
     applyVSCodeTokensForVariant(resolvedVariant);
+
+    return () => {
+      // Clean up the data-theme attribute on unmount so a sibling
+      // provider does not inherit a stale value.
+      if (targetElement.getAttribute('data-theme') === resolvedVariant) {
+        targetElement.removeAttribute('data-theme');
+      }
+    };
   }, [resolvedVariant, theme.tokens, container]);
 
   const setTheme = useCallback((value: Theme | ((prev: Theme) => Theme)) => {
     setThemeState((prev) => (typeof value === 'function' ? value(prev) : value));
   }, []);
 
-  const isDark = resolvedVariant === 'dark' || resolvedVariant === 'vscode';
+  const isDark =
+    resolvedVariant === 'dark' || resolvedVariant === 'high-contrast-dark';
+  const isHighContrast =
+    resolvedVariant === 'high-contrast-light' ||
+    resolvedVariant === 'high-contrast-dark';
 
   const contextValue = useMemo<ThemeContextValue>(
     () => ({
@@ -174,8 +244,9 @@ export function ThemeProvider({ theme: initialTheme, children, container }: Them
       resolvedVariant,
       setTheme,
       isDark,
+      isHighContrast,
     }),
-    [theme, resolvedVariant, setTheme, isDark]
+    [theme, resolvedVariant, setTheme, isDark, isHighContrast]
   );
 
   return (
@@ -184,3 +255,6 @@ export function ThemeProvider({ theme: initialTheme, children, container }: Them
     </ThemeContext.Provider>
   );
 }
+
+// Re-export ThemeVariant type for downstream consumers.
+export type { ThemeVariant };

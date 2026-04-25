@@ -1,4 +1,5 @@
 import type { Theme } from './ThemeContext';
+import type { ResolvedVariant, ThemeSource } from './ThemeSource';
 
 /**
  * VS Code CSS variable mappings to Debrief tokens.
@@ -32,19 +33,54 @@ const VS_CODE_VARIABLE_MAP: Record<string, string> = {
 };
 
 /**
+ * Body-class → variant boundary table.
+ *
+ * Maps VS Code's `<body>` class to the canonical `ResolvedVariant`.
+ * Order matches the contracts/theme-source.md §3 R2 mapping. Adding a
+ * new VS Code theme kind requires extending this table and re-running
+ * the assertion suite.
+ */
+const BODY_CLASS_TO_VARIANT: Readonly<Record<string, ResolvedVariant>> = Object.freeze({
+  'vscode-high-contrast-light': 'high-contrast-light',
+  'vscode-high-contrast': 'high-contrast-dark',
+  'vscode-light': 'light',
+  'vscode-dark': 'dark',
+});
+
+/**
+ * Pure boundary translator: read the VS Code body class, return a variant.
+ *
+ * Order in the lookup matters — VS Code applies BOTH `vscode-dark` and
+ * `vscode-high-contrast` together for the high-contrast-dark theme, so
+ * the high-contrast classes must be checked before the basic ones.
+ *
+ * Returns `null` when no `vscode-*` body class is present (the only
+ * signal for "we are not inside a VS Code webview"). Callers MUST NOT
+ * call `read()` and get a fictional variant back.
+ *
+ * Pure: does not write to the DOM.
+ */
+export function bodyClassToVariant(classList: DOMTokenList): ResolvedVariant | null {
+  for (const cls of Object.keys(BODY_CLASS_TO_VARIANT)) {
+    if (classList.contains(cls)) return BODY_CLASS_TO_VARIANT[cls]!;
+  }
+  return null;
+}
+
+/**
  * Check if running in a VS Code webview environment.
+ *
+ * Strict-by-default: returns true only if the `<body>` carries one of
+ * the `vscode-*` classes that VS Code itself applies. This avoids the
+ * false-positive trap where computed-style probing of a synthetic
+ * `--vscode-editor-background` (injected by Storybook's decorator)
+ * incorrectly reports "yes, we're in VS Code".
  */
 export function isVSCodeEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
-
-  // Check for VS Code webview API
   if ('acquireVsCodeApi' in window) return true;
-
-  // Check for VS Code CSS variables
-  const computedStyle = getComputedStyle(document.documentElement);
-  const hasVSCodeVar = computedStyle.getPropertyValue('--vscode-editor-background');
-
-  return Boolean(hasVSCodeVar);
+  if (typeof document === 'undefined') return false;
+  return bodyClassToVariant(document.body.classList) !== null;
 }
 
 /**
@@ -90,18 +126,102 @@ export function applyVSCodeTokens(): void {
 }
 
 /**
+ * Read the active VS Code variant from the body class. Falls back to
+ * `'dark'` when no `vscode-*` class is present (consumer should not
+ * mount this source in that case — see `bodyClassToVariant` above).
+ */
+function readVariantFromBody(): ResolvedVariant {
+  if (typeof document === 'undefined') return 'dark';
+  return bodyClassToVariant(document.body.classList) ?? 'dark';
+}
+
+/**
+ * Construct a `ThemeSource` driven by VS Code's body class + the
+ * `vscode-theme-changed` postMessage relay.
+ *
+ * `subscribe()` wires:
+ *   1. A `MutationObserver` on `<body>`'s `class` attribute.
+ *   2. A `window.message` listener for `vscode-theme-changed` events
+ *      from the extension host (sent by `themeRelay.ts`).
+ *
+ * Cleanup is idempotent: safe to call multiple times. Identical
+ * back-to-back values are de-duplicated before reaching `onChange`.
+ */
+export function vsCodeBodyClassSource(): ThemeSource {
+  return {
+    read(): ResolvedVariant {
+      return readVariantFromBody();
+    },
+
+    subscribe(onChange: (variant: ResolvedVariant) => void): () => void {
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return () => {};
+      }
+
+      let lastEmitted: ResolvedVariant = readVariantFromBody();
+
+      const emit = (next: ResolvedVariant): void => {
+        if (next === lastEmitted) return;
+        lastEmitted = next;
+        onChange(next);
+      };
+
+      const observer = new MutationObserver(() => {
+        const next = bodyClassToVariant(document.body.classList);
+        if (next !== null) emit(next);
+      });
+
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+
+      const messageHandler = (event: MessageEvent<unknown>): void => {
+        const data = event.data;
+        if (
+          typeof data === 'object' &&
+          data !== null &&
+          (data as { type?: unknown }).type === 'vscode-theme-changed'
+        ) {
+          // Re-read from body class — VS Code updates the class before
+          // dispatching the message, so the body class is the source of truth.
+          const next = bodyClassToVariant(document.body.classList);
+          if (next !== null) emit(next);
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+
+      let disposed = false;
+      return () => {
+        if (disposed) return;
+        disposed = true;
+        observer.disconnect();
+        window.removeEventListener('message', messageHandler);
+      };
+    },
+  };
+}
+
+/**
  * Detect if VS Code is in dark mode.
+ *
+ * Prefer reading the body class via `bodyClassToVariant` — this fall-through
+ * via `extractVSCodeTokens` is retained for legacy callers only.
  */
 export function isVSCodeDarkMode(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+
+  const variant = bodyClassToVariant(document.body.classList);
+  if (variant !== null) {
+    return variant === 'dark' || variant === 'high-contrast-dark';
+  }
 
   const computedStyle = getComputedStyle(document.documentElement);
   const bgColor = computedStyle.getPropertyValue('--vscode-editor-background').trim();
 
   if (!bgColor) return false;
 
-  // Parse color to determine if dark
-  // Simple heuristic: check if luminance is low
   const hexMatch = bgColor.match(/^#([0-9a-f]{6})$/i);
   if (hexMatch && hexMatch[1]) {
     const hex = hexMatch[1];
@@ -112,7 +232,6 @@ export function isVSCodeDarkMode(): boolean {
     return luminance < 0.5;
   }
 
-  // Check for rgb/rgba format
   const rgbMatch = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
   if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
     const r = parseInt(rgbMatch[1], 10);
@@ -122,61 +241,43 @@ export function isVSCodeDarkMode(): boolean {
     return luminance < 0.5;
   }
 
-  // Default to dark if can't determine
   return true;
 }
 
 /**
  * Create a VS Code-adapted theme configuration.
+ *
+ * Returns a `Theme` whose variant is the resolved body-class variant
+ * (one of the four explicit values). The legacy `'vscode'` variant is
+ * retired (#220).
  */
 export function createVSCodeTheme(): Theme {
   const tokens = extractVSCodeTokens();
+  const variant = readVariantFromBody();
 
   return {
-    variant: 'vscode',
+    variant,
     tokens,
   };
 }
 
 /**
- * Set up VS Code theme synchronization.
- * Listens for theme changes and updates tokens accordingly.
+ * Set up VS Code theme synchronisation (legacy callable form).
+ *
+ * Thin wrapper around `vsCodeBodyClassSource()` that preserves the
+ * pre-#220 callsite signature. New code should consume the source
+ * directly so multiple subscribers can share one observer.
  *
  * @returns Cleanup function to remove listeners
  */
 export function setupVSCodeThemeSync(onThemeChange: (theme: Theme) => void): () => void {
   if (typeof window === 'undefined') return () => {};
 
-  // Initial sync
   applyVSCodeTokens();
 
-  // Watch for theme changes via MutationObserver
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-        applyVSCodeTokens();
-        onThemeChange(createVSCodeTheme());
-      }
-    }
+  const source = vsCodeBodyClassSource();
+  return source.subscribe(() => {
+    applyVSCodeTokens();
+    onThemeChange(createVSCodeTheme());
   });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['style', 'class'],
-  });
-
-  // Also listen for VS Code theme change messages
-  const messageHandler = (event: MessageEvent) => {
-    if (event.data?.type === 'vscode-theme-changed') {
-      applyVSCodeTokens();
-      onThemeChange(createVSCodeTheme());
-    }
-  };
-
-  window.addEventListener('message', messageHandler);
-
-  return () => {
-    observer.disconnect();
-    window.removeEventListener('message', messageHandler);
-  };
 }
