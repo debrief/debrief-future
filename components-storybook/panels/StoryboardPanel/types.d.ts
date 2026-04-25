@@ -169,5 +169,25 @@ export interface StoryboardPanelProps {
     onStoryboardRefreshAllStaleClicked?(storyboardId: string): void;
     onStoryboardNameRenameCommit?(storyboardId: string, newName: string): void;
     onStoryboardDescriptionSubmit?(storyboardId: string, description: string | null): void;
+    /** Which row's overflow menu is currently open. `null` = no menu open. */
+    readonly overflowMenuOpenFor?: string | null;
+    /** Anchor rect for positioning the overflow menu popover. `null` when
+     *  no menu is open. */
+    readonly overflowMenuAnchorRect?: DOMRect | null;
+    /** Fires when the analyst clicks the chevron on a Scene row, or double-
+     *  clicks the row body. Toggles the inline edit form for that Scene. */
+    onSceneRowExpandToggle?(sceneId: string): void;
+    /** Fires when the analyst right-clicks (or presses Shift+F10 / Context
+     *  Menu key) on a Scene row. The menu is positioned at the provided
+     *  anchor rect. */
+    onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
+    /** Fires when the overflow menu is dismissed (Escape / click outside /
+     *  menu item activated). */
+    onSceneOverflowMenuClose?(): void;
+    /** Fires when the analyst cancels the inline edit form (Escape with
+     *  form focus but textarea unfocused). */
+    onSceneEditFormCancel?(sceneId: string): void;
+    /** Fires when the analyst dismisses the Undo toast (close button). */
+    onUndoToastDismiss?(): void;
 }
 //# sourceMappingURL=types.d.ts.map

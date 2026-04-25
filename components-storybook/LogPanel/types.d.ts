@@ -1,6 +1,15 @@
-import { ParameterValue, InputFeatureState } from '../../../schemas/src/generated/typescript/index.ts';
+import { ParameterValue, InputFeatureState, ToolCategoryEnum } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { ParameterValue, InputFeatureState };
+/**
+ * Feature 207: runtime map of tool ID → visual category (or null when the
+ * tool declared no category / declared an invalid value). Consumed by
+ * `resolveToolCategory()` to paint each Log Panel card's icon.
+ *
+ * `undefined` at the prop level means "manifest not yet loaded" — every
+ * card renders the grey fallback until a map arrives.
+ */
+export type ToolCategoryMap = Readonly<Record<string, ToolCategoryEnum | null>>;
 /**
  * Operation category derived from tool ID.
  */
@@ -234,6 +243,12 @@ export interface LogPanelProps {
     plotName?: string | null;
     /** LogPanel root only. */
     actionResultMessage?: string | null;
+    /**
+     * Feature 207: manifest-declared tool categories. When provided, card
+     * icons render using `toolCategories[entry.toolName]`; otherwise every
+     * icon falls back to neutral grey.
+     */
+    toolCategories?: ToolCategoryMap;
     onMessage?: (message: LogPanelMessage) => void;
     onViewModeChange?: (mode: ViewMode) => void;
     onFilterStateChange?: (state: FilterState) => void;
@@ -288,6 +303,11 @@ export interface LogEntryProps {
     featureNames: Record<string, string>;
     viewMode: ViewMode;
     isSelected: boolean;
+    /**
+     * Feature 207: manifest-declared tool categories. Forwarded to
+     * `ToolCategoryIcon` for icon rendering.
+     */
+    toolCategories?: ToolCategoryMap;
     onClick?: (entry: TimelineEntry) => void;
     onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
     onRestoreClick?: (entry: TimelineEntry) => void;
@@ -345,6 +365,11 @@ export interface LogActionBarProps {
  */
 export interface ToolCategoryIconProps {
     toolName: string;
+    /**
+     * Feature 207: manifest-declared tool categories. When provided, the icon
+     * uses `toolCategories[toolName]`; otherwise falls back to grey.
+     */
+    toolCategories?: ToolCategoryMap;
     size?: number;
     className?: string;
 }

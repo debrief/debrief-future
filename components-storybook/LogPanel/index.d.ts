@@ -5,7 +5,7 @@
  * Updated: 176-log-panel-ux (rich card UX, unified ViewMode)
  */
 export { LogPanel } from './LogPanel';
-export type { LogPanelProps, LogEntryProps, LogFilterRowProps, LogActionBarProps, SnapshotBoundaryProps, TimelineEntry, InputFeatureState, OperationCategory, ViewMode, FilterState, ParameterValue, FeatureDisplayInfo, ActionType, LogPanelMessage, ExtensionToWebviewMessage, TimelineUpdatePayload, SessionChangePayload, SelectionUpdatePayload, ActionResultPayload, ModeInitPayload, ParameterSchemaEntry, CardReplayStatus, ToolCategory, ParamType, ToolCategoryConfig, ParamChipData, ToolCategoryIconProps, ParameterChipProps, TrackBadgeProps, TimelineEntryKind, } from './types';
+export type { LogPanelProps, LogEntryProps, LogFilterRowProps, LogActionBarProps, SnapshotBoundaryProps, TimelineEntry, InputFeatureState, OperationCategory, ViewMode, FilterState, ParameterValue, FeatureDisplayInfo, ActionType, LogPanelMessage, ExtensionToWebviewMessage, TimelineUpdatePayload, SessionChangePayload, SelectionUpdatePayload, ActionResultPayload, ModeInitPayload, ParameterSchemaEntry, CardReplayStatus, ToolCategory, ParamType, ToolCategoryConfig, ParamChipData, ToolCategoryIconProps, ParameterChipProps, TrackBadgeProps, ToolCategoryMap, TimelineEntryKind, } from './types';
 export { DEFAULT_FILTER_STATE, VALID_VIEW_MODES, TIMELINE_ENTRY_KINDS, assertNeverKind } from './types';
 export { ParameterEditor } from './ParameterEditor';
 export type { ParameterEditorProps } from './ParameterEditor';
