@@ -59,36 +59,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run linting
-        # TEMPORARY (#191 PR debug) — capture lint output and surface the
-        # failing workspace's tail as annotations. ESLint stylish format
-        # prints `  N:N  error  msg  rule` but pnpm -r prefixes it
-        # variably, so we use a broad pattern + bigger context window.
-        run: |
-          set +e
-          task lint 2>&1 | tee /tmp/lint.log
-          EXIT=${PIPESTATUS[0]}
-          set -e
-          if [ "$EXIT" -ne 0 ]; then
-            echo "::group::Lint failure — last 200 lines (diagnostic — see #191 PR)"
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log | tail -200
-            echo "::endgroup::"
-            # Pull lines containing ESLint's `error` token within the
-            # row format (col-numbers, "error", text). Loose match to
-            # cope with whatever pnpm prefixing strips.
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log \
-              | grep -E '[0-9]+:[0-9]+[[:space:]]+error[[:space:]]' \
-              | head -8 \
-              > /tmp/lint-errs.log || true
-            if [ -s /tmp/lint-errs.log ]; then
-              while IFS= read -r line; do
-                short=$(printf '%.300s' "$line")
-                echo "::warning::lint-error: $short"
-              done < /tmp/lint-errs.log
-            else
-              echo "::warning::lint-error: no row matched ESLint stylish 'N:N error msg' pattern; check the log group above"
-            fi
-          fi
-          exit "$EXIT"
+        run: task lint
 
       - name: Run knip
         run: task knip

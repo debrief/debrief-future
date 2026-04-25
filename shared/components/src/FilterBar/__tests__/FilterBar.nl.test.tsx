@@ -11,7 +11,7 @@
  *   T048  indicator visibility — `llmClient` prop controls indicator render
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { FilterBar } from '../FilterBar';
 import type {
@@ -80,7 +80,7 @@ function makeMockClient(
 ): LLMClient & { abortCalls: number } {
   const state = { abortCalls: 0 };
   const client: LLMClient & { abortCalls: number } = {
-    async generate(_prompt: string): Promise<LiveOutcome> {
+    async generate(): Promise<LiveOutcome> {
       if (typeof nextOutcome === 'function') return nextOutcome();
       return nextOutcome;
     },
