@@ -82,10 +82,16 @@ jobs:
             echo "::endgroup::"
             if [ "$rc" -ne 0 ]; then
               echo "::warning::test-failed: $label (exit $rc)"
-              # Surface vitest's "FAIL  path" + "✗" rows from the log.
+              # Surface vitest's "FAIL  path" rows + the immediately
+              # following error line. ESLint/vitest output:
+              #   FAIL  src/foo.test.ts > suite > test
+              #     Error: actual message
+              #   ⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯
+              #    FAIL  src/foo.test.ts [ src/foo.test.ts ]
+              #    Error: import failed: ...
               sed 's/\x1b\[[0-9;]*m//g' "/tmp/test-${label}.log" \
-                | grep -E '(^FAIL|✗ |⎯⎯⎯|^\s*✘|Tests\s*\([0-9]+\s*failed|Test Files\s*\([0-9]+\s*failed|^\s*Failures:|TypeError|ReferenceError|AssertionError|^Error:|Expected:|Received:|^\s+at\s+/)' \
-                | head -12 \
+                | grep -E '(^\s*FAIL\s|FAIL\s+src/|FAIL\s+tests/|Error:|TypeError|ReferenceError|AssertionError|Expected:|Received:|Test Files\s+[0-9]+\s+failed|Tests\s+[0-9]+\s+failed|Cannot find module|Failed to resolve|Snapshot mismatch)' \
+                | head -20 \
                 | while IFS= read -r line; do
                     short=$(printf '%.300s' "$line")
                     echo "::warning::${label}: $short"
