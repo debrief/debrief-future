@@ -68,29 +68,39 @@ jobs:
         run: task typecheck
 
       - name: Run tests
-        # TEMPORARY (#191 PR debug) — capture test output and surface
-        # failing assertions / stack traces as annotations on failure.
-        # Revert to `run: task test` once the underlying failure is
-        # identified.
+        # TEMPORARY (#191 PR debug) — split task test into its sub-commands
+        # and report which one fails. Revert to `run: task test` once the
+        # underlying failure is identified.
         run: |
           set +e
-          task test 2>&1 | tee /tmp/test.log
-          EXIT=${PIPESTATUS[0]}
-          set -e
-          if [ "$EXIT" -ne 0 ]; then
-            echo "::group::Test failure — last 200 lines (diagnostic — see #191 PR)"
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/test.log | tail -200
+
+          run_step() {
+            local label="$1"; shift
+            echo "::group::Test step: $label"
+            "$@" 2>&1 | tee "/tmp/test-${label}.log"
+            local rc=${PIPESTATUS[0]}
             echo "::endgroup::"
-            # Extract vitest/pytest failure markers as annotations.
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/test.log \
-              | grep -E '(FAIL|✗|×|Error:|AssertionError|TypeError|ReferenceError|expect\(|Expected|Received|at .+\.tsx?:|^\s+❯)' \
-              | head -10 \
-              | while IFS= read -r line; do
-                  short=$(printf '%.300s' "$line")
-                  echo "::warning::test: $short"
-                done
-          fi
-          exit "$EXIT"
+            if [ "$rc" -ne 0 ]; then
+              echo "::warning::test-failed: $label (exit $rc)"
+              # Surface vitest's "FAIL  path" + "✗" rows from the log.
+              sed 's/\x1b\[[0-9;]*m//g' "/tmp/test-${label}.log" \
+                | grep -E '(^FAIL|✗ |⎯⎯⎯|^\s*✘|Tests\s*\([0-9]+\s*failed|Test Files\s*\([0-9]+\s*failed|^\s*Failures:|TypeError|ReferenceError|AssertionError|^Error:|Expected:|Received:|^\s+at\s+/)' \
+                | head -12 \
+                | while IFS= read -r line; do
+                    short=$(printf '%.300s' "$line")
+                    echo "::warning::${label}: $short"
+                  done
+            fi
+            return $rc
+          }
+
+          run_step pytest uv run pytest || EXIT=$?
+          run_step vitest pnpm --filter '!@debrief/web-shell' test || EXIT=$?
+          run_step web-shell-pw bash -c 'cd apps/web-shell && node run-playwright.mjs' || EXIT=$?
+          run_step spec-nav-build pnpm --filter @debrief/spec-navigator build || EXIT=$?
+          run_step spec-nav-pw bash -c 'cd apps/spec-navigator && node run-playwright.mjs' || EXIT=$?
+
+          exit "${EXIT:-0}"
 
       # #190 SC-006 — post-build secret scan on the produced bundles. Fails if
       # a provider key somehow entered dist/ or apps/nl-demo/dist/ (e.g. via
