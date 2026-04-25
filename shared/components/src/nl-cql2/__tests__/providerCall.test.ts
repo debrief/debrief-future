@@ -38,7 +38,15 @@ const httpsMock = vi.hoisted(() => {
   };
 });
 
+// Vitest needs a `default` export on the mock so any `import https from
+// "node:https"` chain (CJS-interop synthetic default) resolves cleanly.
+// Both providerCall.ts and providerCall.mjs use named imports only, but
+// vitest's CJS-interop stage requires the default to exist.
 vi.mock("node:https", () => ({
+  default: {
+    request: httpsMock.request,
+    Agent: httpsMock.Agent,
+  },
   request: httpsMock.request,
   Agent: httpsMock.Agent,
 }));
