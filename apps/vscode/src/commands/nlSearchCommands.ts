@@ -39,8 +39,12 @@ export function createSetApiKeyCommand(
         placeHolder: 'sk-ant-…',
         validateInput: (value) => {
           const v = value.trim();
-          if (v.length === 0) return 'API key cannot be empty';
-          if (v.length < 8) return 'API key looks too short';
+          if (v.length === 0) {
+            return 'API key cannot be empty';
+          }
+          if (v.length < 8) {
+            return 'API key looks too short';
+          }
           return null;
         },
       });
@@ -79,7 +83,9 @@ export function createClearApiKeyCommand(
         { modal: true },
         'Clear',
       );
-      if (confirm !== 'Clear') return;
+      if (confirm !== 'Clear') {
+        return;
+      }
       await context.secrets.delete(SECRET_KEY);
       void vscode.window.showInformationMessage(
         'NL Search: Anthropic API key cleared.',

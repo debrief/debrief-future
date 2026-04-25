@@ -333,7 +333,9 @@ export class CatalogOverviewPanel {
   }
 
   private ensureNlProxy(): LlmProxy {
-    if (this.nlProxy) return this.nlProxy;
+    if (this.nlProxy) {
+      return this.nlProxy;
+    }
     this.nlProxy = getLlmProxy(this.context, {
       workspace: {
         getConfiguration: vscode.workspace.getConfiguration.bind(vscode.workspace),

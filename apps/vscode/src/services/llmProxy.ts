@@ -122,7 +122,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
       fireConfigChange();
     }
   });
-  if (secretsChangeListener) disposables.push(secretsChangeListener);
+  if (secretsChangeListener) {
+    disposables.push(secretsChangeListener);
+  }
 
   // Re-emit config snapshots whenever the user touches the settings.
   const configChangeListener = vscodeApi.workspace.onDidChangeConfiguration((e) => {
@@ -144,7 +146,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
   }
 
   async function readApiKey(): Promise<string | null> {
-    if (cachedKey !== undefined) return cachedKey;
+    if (cachedKey !== undefined) {
+      return cachedKey;
+    }
     const value = await vscodeApi.secrets.get(SECRET_KEY);
     const resolved: string | null = value ?? null;
     cachedKey = resolved;
@@ -231,7 +235,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
 
   function handleAbort(params: { requestId: string }): void {
     const ctrl = controllers.get(params.requestId);
-    if (!ctrl) return;
+    if (!ctrl) {
+      return;
+    }
     try {
       ctrl.abort();
     } catch {
@@ -306,7 +312,9 @@ export function getLlmProxy(
     secrets?: vscode.SecretStorage;
   },
 ): LlmProxy {
-  if (lazyInstance) return lazyInstance;
+  if (lazyInstance) {
+    return lazyInstance;
+  }
   const api: LlmProxyVsCodeApi = {
     workspace: vscodeApi.workspace,
     secrets: vscodeApi.secrets ?? context.secrets,
