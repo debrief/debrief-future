@@ -57,6 +57,7 @@ const FILE_SNAPSHOT_ALLOWLIST: ReadonlySet<string> = new Set([
   'LayersToolbar/FilterDropdown.css',
   'LayersToolbar/LayersToolbar.css',
   'LayersToolbar/RunDropdown.css',
+  'LayersToolbar/YellowHalo.css',
   'LogPanel/EditFace.css',
   'LogPanel/LogPanel.css',
   'LogPanel/ParameterEditor.css',
