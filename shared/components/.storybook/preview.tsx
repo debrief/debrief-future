@@ -1,41 +1,25 @@
 import type { Preview, Decorator } from '@storybook/react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'vscrui/dist/codicon.css';
 import '../src/styles/tokens.css';
 import { ThemeProvider, staticSource } from '../src/ThemeProvider';
 import type { ThemeVariant } from '../src/ThemeProvider/ThemeContext';
 import type { ResolvedVariant } from '../src/ThemeProvider/ThemeSource';
-import { VSCODE_TOKEN_MAP } from './vscode-token-map';
 
 /**
- * Apply the per-variant `--vscode-*` token map to `documentElement`.
+ * Storybook root theme decorator.
  *
- * Inside VS Code these variables are supplied by the host. In Storybook
- * we inject them so components that style themselves with
- * `var(--vscode-..., FALLBACK)` show the right colours per variant
- * instead of falling through to the dark fallback.
+ * Wraps every story in a single `<ThemeProvider>` driven by the toolbar's
+ * variant global. The provider itself injects the per-variant `--vscode-*`
+ * token map and applies `data-theme` to `document.documentElement`, so the
+ * decorator does not need to do that work separately (#220).
  *
- * Re-runs on every render of the decorator. Cleans up keys on unmount
- * so a switch to a hypothetical no-vscode-tokens preview doesn't leave
- * stale values behind.
+ * For an explicit variant, we pin the source so the toolbar is the source
+ * of truth. For `'system'`, we leave the source unspecified so it falls
+ * through to `mediaQuerySource()` (OS prefers-color-scheme +
+ * prefers-contrast).
  */
-function useVSCodeTokenInjection(variant: ResolvedVariant): void {
-  useEffect(() => {
-    const map = VSCODE_TOKEN_MAP[variant];
-    if (!map) return;
-    const root = document.documentElement;
-    for (const [key, value] of Object.entries(map)) {
-      root.style.setProperty(key, value);
-    }
-    return () => {
-      for (const key of Object.keys(map)) {
-        root.style.removeProperty(key);
-      }
-    };
-  }, [variant]);
-}
-
 function StorybookThemeWrapper({
   variant,
   children,
@@ -43,24 +27,7 @@ function StorybookThemeWrapper({
   variant: ThemeVariant;
   children: React.ReactNode;
 }): React.ReactElement {
-  // For 'system', the source resolves via prefers-color-scheme + prefers-contrast
-  // (the ThemeProvider default); the token map below uses the resolved value
-  // observed via document.documentElement.dataset.theme when emitted.
-  // For an explicit variant, we pin the source so the Storybook toolbar
-  // is the source of truth.
   const isExplicit = variant !== 'system';
-
-  // For token injection we need a concrete variant. When 'system' is
-  // selected, mirror the OS preference at mount; the runtime source then
-  // updates it via the ThemeProvider effect chain.
-  const tokenVariant: ResolvedVariant = isExplicit
-    ? (variant as ResolvedVariant)
-    : (window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light');
-
-  useVSCodeTokenInjection(tokenVariant);
 
   return (
     <ThemeProvider

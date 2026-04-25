@@ -1,5 +1,13 @@
-import { useState, useEffect, useMemo, useCallback, useRef, type ReactNode } from 'react';
-import { ThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useContext,
+  type ReactNode,
+} from 'react';
+import { ThemeContext, defaultThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
 import { getThemeTokens, mergeThemeTokens, defaultTheme } from './defaultTheme';
 import { VS_CODE_TOKEN_MAP, type VSCodeThemeVariant } from './vsCodeTokenMap';
 import { vsCodeBodyClassSource, bodyClassToVariant } from './vsCodeAdapter';
@@ -41,38 +49,73 @@ export interface ThemeProviderProps {
 }
 
 /**
- * Apply theme tokens as CSS custom properties
+ * Apply theme tokens as CSS custom properties to a target element.
+ *
+ * When the target is `document.documentElement` (the default), values
+ * cascade to the whole tree. When the target is a local wrapper (used by
+ * nested providers — see `scoped` mode below), values are scoped to that
+ * subtree, so an inner `<ThemeProvider variant='dark'>` inside an outer
+ * `<ThemeProvider variant='light'>` no longer fights over global state.
  */
-function applyThemeTokens(variant: ResolvedVariant, customTokens?: Theme['tokens']) {
+function applyThemeTokens(
+  variant: ResolvedVariant,
+  customTokens: Theme['tokens'] | undefined,
+  target: HTMLElement,
+): void {
   const tokens = mergeThemeTokens(getThemeTokens(variant), customTokens);
 
-  // Apply to document root
-  const root = document.documentElement;
+  target.style.setProperty('--debrief-color-primary', tokens.colorPrimary);
+  target.style.setProperty('--debrief-color-secondary', tokens.colorSecondary);
+  target.style.setProperty('--debrief-color-success', tokens.colorSuccess);
+  target.style.setProperty('--debrief-color-warning', tokens.colorWarning);
+  target.style.setProperty('--debrief-color-danger', tokens.colorDanger);
 
-  root.style.setProperty('--debrief-color-primary', tokens.colorPrimary);
-  root.style.setProperty('--debrief-color-secondary', tokens.colorSecondary);
-  root.style.setProperty('--debrief-color-success', tokens.colorSuccess);
-  root.style.setProperty('--debrief-color-warning', tokens.colorWarning);
-  root.style.setProperty('--debrief-color-danger', tokens.colorDanger);
+  target.style.setProperty('--debrief-color-ownship', tokens.colorOwnship);
+  target.style.setProperty('--debrief-color-contact', tokens.colorContact);
+  target.style.setProperty('--debrief-color-reference', tokens.colorReference);
+  target.style.setProperty('--debrief-color-solution', tokens.colorSolution);
 
-  root.style.setProperty('--debrief-color-ownship', tokens.colorOwnship);
-  root.style.setProperty('--debrief-color-contact', tokens.colorContact);
-  root.style.setProperty('--debrief-color-reference', tokens.colorReference);
-  root.style.setProperty('--debrief-color-solution', tokens.colorSolution);
+  target.style.setProperty('--debrief-bg-primary', tokens.bgPrimary);
+  target.style.setProperty('--debrief-bg-secondary', tokens.bgSecondary);
+  target.style.setProperty('--debrief-bg-tertiary', tokens.bgTertiary);
 
-  root.style.setProperty('--debrief-bg-primary', tokens.bgPrimary);
-  root.style.setProperty('--debrief-bg-secondary', tokens.bgSecondary);
-  root.style.setProperty('--debrief-bg-tertiary', tokens.bgTertiary);
+  target.style.setProperty('--debrief-text-primary', tokens.textPrimary);
+  target.style.setProperty('--debrief-text-secondary', tokens.textSecondary);
+  target.style.setProperty('--debrief-text-muted', tokens.textMuted);
 
-  root.style.setProperty('--debrief-text-primary', tokens.textPrimary);
-  root.style.setProperty('--debrief-text-secondary', tokens.textSecondary);
-  root.style.setProperty('--debrief-text-muted', tokens.textMuted);
+  target.style.setProperty('--debrief-border-color', tokens.borderColor);
+  target.style.setProperty('--debrief-border-color-focus', tokens.borderColorFocus);
 
-  root.style.setProperty('--debrief-border-color', tokens.borderColor);
-  root.style.setProperty('--debrief-border-color-focus', tokens.borderColorFocus);
+  target.style.setProperty('--debrief-selection-bg', tokens.selectionBg);
+  target.style.setProperty('--debrief-selection-border', tokens.selectionBorder);
+}
 
-  root.style.setProperty('--debrief-selection-bg', tokens.selectionBg);
-  root.style.setProperty('--debrief-selection-border', tokens.selectionBorder);
+const DEBRIEF_TOKEN_KEYS: readonly string[] = [
+  '--debrief-color-primary',
+  '--debrief-color-secondary',
+  '--debrief-color-success',
+  '--debrief-color-warning',
+  '--debrief-color-danger',
+  '--debrief-color-ownship',
+  '--debrief-color-contact',
+  '--debrief-color-reference',
+  '--debrief-color-solution',
+  '--debrief-bg-primary',
+  '--debrief-bg-secondary',
+  '--debrief-bg-tertiary',
+  '--debrief-text-primary',
+  '--debrief-text-secondary',
+  '--debrief-text-muted',
+  '--debrief-border-color',
+  '--debrief-border-color-focus',
+  '--debrief-selection-bg',
+  '--debrief-selection-border',
+];
+
+function clearDebriefTokens(target: HTMLElement): void {
+  for (const key of DEBRIEF_TOKEN_KEYS) {
+    target.style.removeProperty(key);
+  }
 }
 
 /**
@@ -86,25 +129,32 @@ const VS_CODE_TOKEN_KEYS: readonly string[] = Array.from(
 
 /**
  * Inject a synthetic set of `--vscode-*` CSS custom properties for the given
- * variant. Only runs outside a real VS Code webview, so production consumers
- * receive the real host-supplied values untouched.
+ * variant into `target`. Only runs outside a real VS Code webview, so
+ * production consumers receive the real host-supplied values untouched.
  */
-function applyVSCodeTokensForVariant(variant: ResolvedVariant): void {
+function applyVSCodeTokensForVariant(
+  variant: ResolvedVariant,
+  target: HTMLElement,
+): void {
   if (typeof document === 'undefined') return;
   if (isRealVSCodeWebview()) return;
 
-  const root = document.documentElement;
-
-  // Clean any previously-injected variables before re-applying the new
-  // variant to prevent stale values bleeding between theme switches.
   for (const key of VS_CODE_TOKEN_KEYS) {
-    root.style.removeProperty(key);
+    target.style.removeProperty(key);
   }
 
   const variantMap = VS_CODE_TOKEN_MAP[variant as VSCodeThemeVariant];
   if (!variantMap) return;
   for (const [key, value] of Object.entries(variantMap)) {
-    root.style.setProperty(key, value);
+    target.style.setProperty(key, value);
+  }
+}
+
+function clearVSCodeTokens(target: HTMLElement): void {
+  if (typeof document === 'undefined') return;
+  if (isRealVSCodeWebview()) return;
+  for (const key of VS_CODE_TOKEN_KEYS) {
+    target.style.removeProperty(key);
   }
 }
 
@@ -137,6 +187,13 @@ function resolveSystemFromSource(source: ThemeSource): ResolvedVariant {
 /**
  * ThemeProvider component that provides theming context to child components.
  *
+ * **Nested providers**: when one `<ThemeProvider>` is mounted inside another,
+ * the inner provider scopes ALL its DOM writes (data-theme, --debrief-*,
+ * --vscode-*) to a local wrapper `<div>` instead of fighting with the outer
+ * provider over `document.documentElement`. The CSS cascade then applies the
+ * inner variant to its subtree only — perfect for Storybook stories that
+ * pin a specific variant inside a toolbar-driven decorator.
+ *
  * @example
  * ```tsx
  * <ThemeProvider theme={{ variant: 'dark' }}>
@@ -159,6 +216,12 @@ export function ThemeProvider({
   source: sourceProp,
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(initialTheme ?? defaultTheme);
+
+  // If we're nested inside another ThemeProvider, scope our DOM writes to
+  // a local wrapper element (a per-instance ref) instead of documentElement.
+  const parentContext = useContext(ThemeContext);
+  const isNested = parentContext !== defaultThemeContext;
+  const scopeRef = useRef<HTMLDivElement>(null);
 
   // Stable per-instance source. Only re-built if the prop reference changes.
   const sourceRef = useRef<ThemeSource | null>(null);
@@ -213,20 +276,33 @@ export function ThemeProvider({
 
   // Apply theme to DOM
   useEffect(() => {
-    const targetElement = container ?? document.documentElement;
-    targetElement.setAttribute('data-theme', resolvedVariant);
+    let targetElement: HTMLElement;
+    if (container) {
+      targetElement = container;
+    } else if (isNested) {
+      const ref = scopeRef.current;
+      if (!ref) return;
+      targetElement = ref;
+    } else {
+      targetElement = document.documentElement;
+    }
 
-    applyThemeTokens(resolvedVariant, theme.tokens);
-    applyVSCodeTokensForVariant(resolvedVariant);
+    targetElement.setAttribute('data-theme', resolvedVariant);
+    applyThemeTokens(resolvedVariant, theme.tokens, targetElement);
+    applyVSCodeTokensForVariant(resolvedVariant, targetElement);
 
     return () => {
-      // Clean up the data-theme attribute on unmount so a sibling
-      // provider does not inherit a stale value.
+      // Clean up: remove data-theme + clear inline style values so a
+      // sibling provider does not inherit a stale state.
       if (targetElement.getAttribute('data-theme') === resolvedVariant) {
         targetElement.removeAttribute('data-theme');
       }
+      if (isNested || container) {
+        clearDebriefTokens(targetElement);
+        clearVSCodeTokens(targetElement);
+      }
     };
-  }, [resolvedVariant, theme.tokens, container]);
+  }, [resolvedVariant, theme.tokens, container, isNested]);
 
   const setTheme = useCallback((value: Theme | ((prev: Theme) => Theme)) => {
     setThemeState((prev) => (typeof value === 'function' ? value(prev) : value));
@@ -251,7 +327,13 @@ export function ThemeProvider({
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      {children}
+      {isNested && !container ? (
+        <div ref={scopeRef} style={{ display: 'contents' }}>
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </ThemeContext.Provider>
   );
 }

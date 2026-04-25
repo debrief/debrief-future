@@ -136,4 +136,41 @@ describe('ThemeProvider — source subscription', () => {
     expect(typeof source.read).toBe('function');
     expect(typeof source.subscribe).toBe('function');
   });
+
+  it('nested provider scopes data-theme to a local wrapper, not documentElement', () => {
+    // The outer provider keeps documentElement at 'light'; the inner provider
+    // should write 'dark' to a local wrapper instead of overwriting the outer.
+    const { container } = render(
+      <ThemeProvider theme={{ variant: 'light' }}>
+        <ThemeProvider theme={{ variant: 'dark' }}>
+          <div data-testid="nested-content">hello</div>
+        </ThemeProvider>
+      </ThemeProvider>
+    );
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+
+    // The inner wrapper's data-theme should be 'dark'.
+    const nestedRoots = container.querySelectorAll('[data-theme="dark"]');
+    expect(nestedRoots.length).toBeGreaterThan(0);
+  });
+
+  it('nested provider injects its own --debrief-bg-primary via inline style', () => {
+    const { container } = render(
+      <ThemeProvider theme={{ variant: 'light' }}>
+        <ThemeProvider theme={{ variant: 'dark' }}>
+          <div data-testid="nested">x</div>
+        </ThemeProvider>
+      </ThemeProvider>
+    );
+
+    const wrapper = container.querySelector(
+      '[data-theme="dark"]',
+    ) as HTMLElement | null;
+    expect(wrapper).not.toBeNull();
+    // The wrapper's inline style holds the dark background value, scoped
+    // to its subtree (CSS cascade) rather than fighting with the outer's
+    // documentElement value.
+    expect(wrapper!.style.getPropertyValue('--debrief-bg-primary')).toBeTruthy();
+  });
 });
