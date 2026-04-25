@@ -16,6 +16,8 @@ export interface SceneListProps {
     onSceneCopyToOtherClicked?(sceneId: string): void;
     onSceneRefreshThumbnailClicked?(sceneId: string): void;
     onSceneEditFormCancel?(sceneId: string): void;
+    onSceneRowExpandToggle?(sceneId: string): void;
+    onSceneOverflowMenuOpen?(sceneId: string, anchorRect: DOMRect): void;
 }
-export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneTitleRenameCommit, onSceneDescriptionSubmit, onSceneDeleteRequested, onSceneUpdateToCurrentClicked, onSceneDuplicateClicked, onSceneCopyToOtherClicked, onSceneRefreshThumbnailClicked, onSceneEditFormCancel, }: SceneListProps): React.ReactElement;
+export declare function SceneList({ scenes, captureInFlight, currentSceneId, onSceneRowClick, sceneEditViewModels, onSceneTitleRenameCommit, onSceneDescriptionSubmit, onSceneDeleteRequested, onSceneUpdateToCurrentClicked, onSceneDuplicateClicked, onSceneCopyToOtherClicked, onSceneRefreshThumbnailClicked, onSceneEditFormCancel, onSceneRowExpandToggle, onSceneOverflowMenuOpen, }: SceneListProps): React.ReactElement;
 //# sourceMappingURL=SceneList.d.ts.map

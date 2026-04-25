@@ -16,5 +16,9 @@ export { UndoToast } from './UndoToast';
 export type { UndoToastProps, UndoToastState } from './UndoToast';
 export { StaleBadge } from './StaleBadge';
 export type { StaleBadgeProps } from './StaleBadge';
+export { SceneOverflowMenu } from './SceneOverflowMenu';
+export type { SceneOverflowMenuProps, SceneOverflowMenuItem, SceneOverflowAction, } from './SceneOverflowMenu';
 export type { StoryboardPanelProps, SceneRowViewModel, StoryboardOptionViewModel, TransportViewModel, MissingDataReason, SceneEditViewModel, StoryboardEditViewModel, } from './types';
+export { useStoryboardEditReducer, storyboardEditReducer, createInitialStoryboardEditState, composeSceneEditViewModels, } from './useStoryboardEditReducer';
+export type { StoryboardEditAction, StoryboardEditReducerState, StoryboardEditReducerHandle, ScenesPayload, SnapshotPayload, UndoToastDescriptor, StaleFlagEntry, ThemeVariant, } from './useStoryboardEditReducer';
 //# sourceMappingURL=index.d.ts.map
