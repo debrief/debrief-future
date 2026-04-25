@@ -1,20 +1,84 @@
 import type { Preview, Decorator } from '@storybook/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'vscrui/dist/codicon.css';
 import '../src/styles/tokens.css';
-import { ThemeProvider } from '../src/ThemeProvider';
+import { ThemeProvider, staticSource } from '../src/ThemeProvider';
 import type { ThemeVariant } from '../src/ThemeProvider/ThemeContext';
+import type { ResolvedVariant } from '../src/ThemeProvider/ThemeSource';
+import { VSCODE_TOKEN_MAP } from './vscode-token-map';
 
-// Theme decorator that applies the selected global theme
-const withThemeProvider: Decorator = (Story, context) => {
-  const theme = context.globals.theme as ThemeVariant;
+/**
+ * Apply the per-variant `--vscode-*` token map to `documentElement`.
+ *
+ * Inside VS Code these variables are supplied by the host. In Storybook
+ * we inject them so components that style themselves with
+ * `var(--vscode-..., FALLBACK)` show the right colours per variant
+ * instead of falling through to the dark fallback.
+ *
+ * Re-runs on every render of the decorator. Cleans up keys on unmount
+ * so a switch to a hypothetical no-vscode-tokens preview doesn't leave
+ * stale values behind.
+ */
+function useVSCodeTokenInjection(variant: ResolvedVariant): void {
+  useEffect(() => {
+    const map = VSCODE_TOKEN_MAP[variant];
+    if (!map) return;
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(map)) {
+      root.style.setProperty(key, value);
+    }
+    return () => {
+      for (const key of Object.keys(map)) {
+        root.style.removeProperty(key);
+      }
+    };
+  }, [variant]);
+}
 
-  // Use JSX syntax for proper Story component rendering
+function StorybookThemeWrapper({
+  variant,
+  children,
+}: {
+  variant: ThemeVariant;
+  children: React.ReactNode;
+}): React.ReactElement {
+  // For 'system', the source resolves via prefers-color-scheme + prefers-contrast
+  // (the ThemeProvider default); the token map below uses the resolved value
+  // observed via document.documentElement.dataset.theme when emitted.
+  // For an explicit variant, we pin the source so the Storybook toolbar
+  // is the source of truth.
+  const isExplicit = variant !== 'system';
+
+  // For token injection we need a concrete variant. When 'system' is
+  // selected, mirror the OS preference at mount; the runtime source then
+  // updates it via the ThemeProvider effect chain.
+  const tokenVariant: ResolvedVariant = isExplicit
+    ? (variant as ResolvedVariant)
+    : (window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light');
+
+  useVSCodeTokenInjection(tokenVariant);
+
   return (
-    <ThemeProvider theme={{ variant: theme }}>
-      <Story />
+    <ThemeProvider
+      theme={{ variant }}
+      source={isExplicit ? staticSource(variant as ResolvedVariant) : undefined}
+    >
+      {children}
     </ThemeProvider>
+  );
+}
+
+const withThemeProvider: Decorator = (Story, context) => {
+  const variant = context.globals.theme as ThemeVariant;
+
+  return (
+    <StorybookThemeWrapper variant={variant}>
+      <Story />
+    </StorybookThemeWrapper>
   );
 };
 
@@ -32,7 +96,8 @@ const preview: Preview = {
       values: [
         { name: 'light', value: '#ffffff' },
         { name: 'dark', value: '#1e1e1e' },
-        { name: 'vscode-dark', value: '#252526' },
+        { name: 'high-contrast-light', value: '#ffffff' },
+        { name: 'high-contrast-dark', value: '#000000' },
       ],
     },
   },
@@ -46,7 +111,17 @@ const preview: Preview = {
         items: [
           { value: 'light', title: 'Light', icon: 'sun' },
           { value: 'dark', title: 'Dark', icon: 'moon' },
-          { value: 'vscode', title: 'VS Code', icon: 'lightning' },
+          {
+            value: 'high-contrast-light',
+            title: 'HC Light',
+            icon: 'circlehollow',
+          },
+          {
+            value: 'high-contrast-dark',
+            title: 'HC Dark',
+            icon: 'contrast',
+          },
+          { value: 'system', title: 'System', icon: 'browser' },
         ],
         dynamicTitle: true,
       },
