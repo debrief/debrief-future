@@ -60,10 +60,10 @@ jobs:
 
       - name: Run linting
         # TEMPORARY (#191 PR debug) — capture lint output and surface the
-        # last 30 lines as annotations on failure. Tail-based (rather than
-        # grep-based) because vite's build summary contains chunks with
-        # "error" in the filename (e.g. internal-error.cjs) that swamped
-        # the previous filter. Revert once the underlying failure is
+        # ESLint error-level lines as annotations on failure. ESLint's
+        # stylish formatter prints errors as `  N:N  error  message  rule`
+        # — grep specifically for `  error  ` between two double-spaces to
+        # avoid catching warnings. Revert once the underlying failure is
         # identified.
         run: |
           set +e
@@ -71,14 +71,16 @@ jobs:
           EXIT=${PIPESTATUS[0]}
           set -e
           if [ "$EXIT" -ne 0 ]; then
-            echo "::group::Lint failure — final output (diagnostic — see #191 PR)"
-            sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log | tail -100
+            echo "::group::Lint failure — error-level ESLint lines (diagnostic — see #191 PR)"
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log \
+              | grep -B 2 -E '^\s+[0-9]+:[0-9]+\s+error\s' \
+              | head -60
             echo "::endgroup::"
             sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log \
-              | tail -30 \
-              | grep -v '^[[:space:]]*$' \
-              | tail -8 \
+              | grep -B 1 -E '^\s+[0-9]+:[0-9]+\s+error\s' \
+              | head -8 \
               | while IFS= read -r line; do
+                  [ -z "$line" ] && continue
                   short=$(printf '%.300s' "$line")
                   echo "::warning::lint: $short"
                 done
