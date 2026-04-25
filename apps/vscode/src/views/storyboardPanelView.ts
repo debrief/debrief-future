@@ -17,6 +17,8 @@ import {
   isSceneFeature,
   type StoryboardPlot,
   type SceneFeature,
+  type SceneEditViewModel,
+  type StoryboardEditViewModel,
 } from '@debrief/components';
 import type { SceneRowViewModel } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
@@ -27,6 +29,7 @@ import { plotFromFeatures } from '../services/plotFromFeatures';
 import type {
   StoryboardPanelMessage,
   ExtensionToStoryboardPanelMessage,
+  SceneUndoToastDescriptor,
 } from '../types/storyboardPanelMessages';
 
 const VIEW_TYPE = 'debrief.storyboardPanel';
@@ -116,12 +119,110 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       activeId,
       this.view.webview,
     );
+    // #230 T017 — enrich refresh payload with edit view-models so the
+    // panel reducer hydrates without round-trips.
+    // INVARIANT: composing these VMs MUST stay O(active-storyboard Scenes)
+    // — we iterate only `scenes` already filtered to the active Storyboard
+    // (review 13A from #218 / FR-008 of #230). Do not introduce per-Scene
+    // cross-plot lookups here.
+    const docUri = this.sessionManager.getActiveDocumentUri();
+    const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
+    for (const row of scenes) {
+      sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
+        plot,
+        row,
+        docUri,
+      );
+    }
+    const storyboardEditViewModel: StoryboardEditViewModel | null =
+      activeStoryboard !== null
+        ? {
+            storyboardId: activeStoryboard.properties.id,
+            name: activeStoryboard.properties.name,
+            description: activeStoryboard.properties.description ?? null,
+            nameIsEditing: false,
+            descriptionExpanded: false,
+            sceneCount: scenes.length,
+          }
+        : null;
+    const pendingUndoToast = this.composePendingUndoToast(docUri);
     this.post({
       type: 'scenes',
       scenes,
       activeStoryboardName: activeName,
       activeStoryboardId: activeId,
+      sceneEditViewModels,
+      pendingUndoToast,
+      storyboardEditViewModel,
     });
+  }
+
+  /**
+   * Compose a per-Scene edit view-model bundle for the refresh payload.
+   * Read-only; draws on the edit service's staleCache + undoBuffer.
+   *
+   * Defensive against mocks/partial services: `getStaleFlag` and
+   * `getPendingDeletes` are both optional-at-runtime.
+   */
+  private composeSceneEditViewModel(
+    plot: StoryboardPlot,
+    row: SceneRowViewModel,
+    documentUri: string | null,
+  ): SceneEditViewModel {
+    const svc = this.editService;
+    const staleFlag =
+      documentUri !== null && svc && typeof svc.getStaleFlag === 'function'
+        ? svc.getStaleFlag(documentUri, row.sceneId)
+        : null;
+    const pendingList =
+      documentUri !== null && svc && typeof svc.getPendingDeletes === 'function'
+        ? svc.getPendingDeletes(documentUri)
+        : [];
+    const pending = pendingList.some(
+      (d) => d.original.properties.id === row.sceneId,
+    );
+    let description: string | null = null;
+    for (const f of plot.features) {
+      if (isSceneFeature(f) && f.properties.id === row.sceneId) {
+        description = f.properties.description ?? null;
+        break;
+      }
+    }
+    return {
+      sceneId: row.sceneId,
+      title: row.title,
+      description,
+      timestamp: row.timestampIso,
+      titleIsEditing: false,
+      editFormOpen: false,
+      pendingDelete: pending,
+      stale: staleFlag?.stale ?? false,
+      unresolvedFeatureIds: staleFlag?.unresolvedFeatureIds ?? [],
+      missingData: { kind: 'ok' },
+    };
+  }
+
+  /**
+   * Compose the pending-undo-toast descriptor for the refresh payload —
+   * the most recent delete buffered for the active document. Null when
+   * the buffer is empty. Defensive against mocks without the read method.
+   */
+  private composePendingUndoToast(
+    documentUri: string | null,
+  ): SceneUndoToastDescriptor | null {
+    if (documentUri === null || !this.editService) {return null;}
+    const svc = this.editService;
+    if (typeof svc.getPendingDeletes !== 'function') {return null;}
+    const deletes = svc.getPendingDeletes(documentUri);
+    if (deletes.length === 0) {return null;}
+    const latest = deletes[deletes.length - 1];
+    if (latest === undefined) {return null;}
+    return {
+      sceneId: latest.original.properties.id,
+      sceneTitle: latest.original.properties.title,
+      deletedAt: latest.deletedAt,
+      canUndo: true,
+    };
   }
 
   /**
@@ -140,6 +241,51 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         ? this.resolveThumbnailHrefForActiveItem(row.sceneId)
         : row.thumbnailHref,
     }));
+    // #230 T017 — enrich snapshot with edit view-models for the panel
+    // reducer. Same O(active-storyboard Scenes) invariant as refresh().
+    const docUri = this.sessionManager.getActiveDocumentUri();
+    const plotFeatures = this.getMapPanel()?.getCurrentFeatures() ?? [];
+    const plot: StoryboardPlot = plotFromFeatures(plotFeatures);
+    const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
+    for (const row of enrichedScenes) {
+      sceneEditViewModels[row.sceneId] = this.composeSceneEditViewModel(
+        plot,
+        row,
+        docUri,
+      );
+    }
+    let storyboardEditViewModel: StoryboardEditViewModel | null = null;
+    if (snapshot.activeStoryboardId !== null) {
+      const found = snapshot.storyboards.find(
+        (s) => s.storyboardId === snapshot.activeStoryboardId,
+      );
+      if (found !== undefined) {
+        let description: string | null = null;
+        for (const f of plot.features) {
+          if (
+            f.properties !== null &&
+            typeof f.properties === 'object' &&
+            'id' in f.properties &&
+            (f.properties as { id: string }).id === found.storyboardId &&
+            'description' in f.properties
+          ) {
+            const desc = (f.properties as { description?: string | null })
+              .description;
+            description = desc ?? null;
+            break;
+          }
+        }
+        storyboardEditViewModel = {
+          storyboardId: found.storyboardId,
+          name: found.name,
+          description,
+          nameIsEditing: false,
+          descriptionExpanded: false,
+          sceneCount: enrichedScenes.length,
+        };
+      }
+    }
+    const pendingUndoToast = this.composePendingUndoToast(docUri);
     this.post({
       type: 'snapshot',
       storyboards: snapshot.storyboards,
@@ -148,6 +294,9 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       activeStoryboardName: snapshot.activeStoryboardName,
       currentSceneId: snapshot.currentSceneId,
       transport: snapshot.transport,
+      sceneEditViewModels,
+      pendingUndoToast,
+      storyboardEditViewModel,
     });
   }
 

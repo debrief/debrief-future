@@ -112,7 +112,12 @@ tasks:
       - bash scripts/check-no-geojson-feature.sh
       - bash scripts/check-no-hand-typed-temporal-enums.sh
       - bash scripts/check-adr-refs.sh
-      - bash scripts/check-log-panel-skip-guard.sh
+      # #210's log-panel skip-guard removed 2026-04-24 per spec 233. It
+      # asserted the log-panel E2E suite was stable, but the underlying
+      # openvscode-server webview-frame flakiness (research sprint #142)
+      # keeps the suite failing in CI. The tests are currently
+      # `test.describe.fixme`-suspended; the guard is re-introduced when
+      # #142 resolves and the suite is un-muted. See #233.
 
   lint:fix:
     desc: "Auto-fix code style issues"
