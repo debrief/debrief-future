@@ -12,15 +12,38 @@ get_repo_root() {
     fi
 }
 
-# Get current branch, with fallback for non-git repositories
+# Get current branch, with fallback for non-git repositories.
+#
+# Lookup order (first match wins):
+#   1. $SPECIFY_FEATURE environment variable (process-scoped override)
+#   2. .specify/.active-feature file at the repo root (worktree-scoped override,
+#      single line containing the spec dir name e.g. "220-fix-theme-responsiveness").
+#      Useful in Claude Code cloud sessions where the branch name is forced to
+#      "claude/<topic>-<random>" and cannot follow the NNN- convention.
+#   3. The current git branch name.
+#   4. Highest-numbered directory under specs/ (last resort, non-git only).
 get_current_branch() {
-    # First check if SPECIFY_FEATURE environment variable is set
+    # 1. SPECIFY_FEATURE env var
     if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
         echo "$SPECIFY_FEATURE"
         return
     fi
 
-    # Then check git if available
+    # 2. .specify/.active-feature file at repo root
+    local repo_root_for_active=""
+    if git rev-parse --show-toplevel >/dev/null 2>&1; then
+        repo_root_for_active=$(git rev-parse --show-toplevel)
+    fi
+    if [[ -n "$repo_root_for_active" && -f "$repo_root_for_active/.specify/.active-feature" ]]; then
+        local active_feature
+        active_feature=$(head -n 1 "$repo_root_for_active/.specify/.active-feature" | tr -d '[:space:]')
+        if [[ -n "$active_feature" ]]; then
+            echo "$active_feature"
+            return
+        fi
+    fi
+
+    # 3. Git branch
     if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
         git rev-parse --abbrev-ref HEAD
         return
@@ -72,13 +95,35 @@ check_feature_branch() {
         return 0
     fi
 
-    if [[ ! "$branch" =~ ^[0-9]{3}- ]]; then
-        echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
-        echo "Feature branches should be named like: 001-feature-name" >&2
-        return 1
+    # Accept any branch that contains an NNN- token at the start or after a /.
+    # The trailing [a-z] avoids matching commit hashes or version numbers.
+    # Examples that pass: 220-fix-theme, claude/220-fix-theme-tAFvB, feature/220-foo
+    # Example that fails: claude/research-theme-switching-tAFvB (no NNN- token)
+    if [[ "$branch" =~ (^|/)[0-9]{3}-[a-z] ]]; then
+        return 0
     fi
 
-    return 0
+    echo "ERROR: Could not resolve a feature for branch: $branch" >&2
+    echo "" >&2
+    echo "Speckit looks up the active feature in this order:" >&2
+    echo "  1. \$SPECIFY_FEATURE environment variable" >&2
+    echo "  2. .specify/.active-feature file at the repo root" >&2
+    echo "  3. The current git branch (must contain an NNN- token, e.g. 220-fix-foo)" >&2
+    echo "" >&2
+
+    local repo_root
+    repo_root=$(get_repo_root)
+    if [[ -d "$repo_root/specs" ]]; then
+        echo "Available specs (most recent shown first):" >&2
+        ls -1 "$repo_root/specs" 2>/dev/null | sort -r | head -10 | sed 's/^/  /' >&2
+        echo "" >&2
+    fi
+
+    echo "To unblock now, set the active feature explicitly:" >&2
+    echo "  export SPECIFY_FEATURE=<spec-dir-name>" >&2
+    echo "or persist it for this worktree:" >&2
+    echo "  echo <spec-dir-name> > .specify/.active-feature" >&2
+    return 1
 }
 
 get_feature_dir() { echo "$1/specs/$2"; }
@@ -90,14 +135,18 @@ find_feature_dir_by_prefix() {
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
 
-    # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
-    if [[ ! "$branch_name" =~ ^([0-9]{3})- ]]; then
-        # If branch doesn't have numeric prefix, fall back to exact match
+    # Extract numeric prefix from anywhere in the branch name. Matches both
+    # "220-foo" and "claude/220-foo-bar". The trailing [a-z] avoids matching
+    # commit hashes, version numbers, etc.
+    local prefix=""
+    if [[ "$branch_name" =~ (^|/)([0-9]{3})-[a-z] ]]; then
+        prefix="${BASH_REMATCH[2]}"
+    fi
+    if [[ -z "$prefix" ]]; then
+        # No numeric token found - fall back to exact match
         echo "$specs_dir/$branch_name"
         return
     fi
-
-    local prefix="${BASH_REMATCH[1]}"
 
     # Search for directories in specs/ that start with this prefix
     local matches=()
