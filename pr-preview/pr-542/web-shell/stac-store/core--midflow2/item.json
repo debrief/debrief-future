@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--midflow2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.8737112,
+          4.9211105
+        ],
+        [
+          30,
+          4.9211105
+        ],
+        [
+          30,
+          5
+        ],
+        [
+          29.8737112,
+          5
+        ],
+        [
+          29.8737112,
+          4.9211105
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.8737112,
+    4.9211105,
+    30,
+    5
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Midflow2",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Saxon Warrior: Midflow2 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Northumberland.",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "USS Northumberland",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "certification",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "midflow2 (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/midflow2.dpf",
+      "title": "midflow2.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-midflow2": {
+      "href": "./assets/midflow2.dpf",
+      "type": "application/octet-stream",
+      "title": "midflow2.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/midflow2.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.088722Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

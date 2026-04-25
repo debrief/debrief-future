@@ -1,0 +1,134 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--otherownship-trimmed",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.410166666666665,
+          44.14557222222222
+        ],
+        [
+          -21.101244444444447,
+          44.14557222222222
+        ],
+        [
+          -21.101244444444447,
+          44.630652777777776
+        ],
+        [
+          -21.410166666666665,
+          44.630652777777776
+        ],
+        [
+          -21.410166666666665,
+          44.14557222222222
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.410166666666665,
+    44.14557222222222,
+    -21.101244444444447,
+    44.630652777777776
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Otherownship Trimmed",
+    "datetime": "2011-03-21T22:08:02.380000+00:00",
+    "description": "Saxon Warrior: Otherownship Trimmed — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Northumberland.",
+    "start_datetime": "2011-03-21T22:08:02.380000+00:00",
+    "end_datetime": "2011-03-22T04:47:54.870000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "TRIAL_ALPHA",
+        "name": "FS Northumberland",
+        "nationality": "FR",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "amphibious",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "track-merge",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "OtherOwnship_Trimmed (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/OtherOwnship_Trimmed.rep",
+      "title": "OtherOwnship_Trimmed.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-OtherOwnship_Trimmed": {
+      "href": "./assets/OtherOwnship_Trimmed.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "OtherOwnship_Trimmed.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/OtherOwnship_Trimmed.rep",
+        "load_timestamp": "2026-04-13T23:12:32.466392Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
