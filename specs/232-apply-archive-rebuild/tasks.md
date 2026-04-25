@@ -60,13 +60,13 @@
 
 **Independent test for Phase 2**: `test_parse_archive_index.py` covers the ARCHIVE-REBUILD.md index parse; `test_front_matter.py` covers YAML narrowing into `FrontMatter`. Both run against real fixtures (the real `ARCHIVE-REBUILD.md` from `debrief-future` main + at least one real site post).
 
-- [ ] T006 [P] Add 7 `@dataclass(frozen=True)` classes per `data-model.md`: `ArchivePost`, `SitePost`, `FrontMatter`, `ImageRef`, `Classification`, `Divergence`, `AssetCopy`. `scripts/232-apply-archive-rebuild.py`
-- [ ] T007 [P] Add `MigrationPlan` dataclass (non-frozen, with `is_blocked` property) + `AssetResolver` helper signature stubs. `scripts/232-apply-archive-rebuild.py`
-- [ ] T008 Implement `parse_front_matter(text: str) -> FrontMatter` — reuses the spec's front-matter shape (narrow YAML → typed fields, pack unknowns into `extra`). Depends on T006. `scripts/232-apply-archive-rebuild.py`
-- [ ] T009 Implement `parse_archive_index(runbook_path: Path) -> dict[str, ArchivePostRef]` per `contracts/helpers.md`. Parses ARCHIVE-REBUILD.md's `## Index` table. Depends on T006. `scripts/232-apply-archive-rebuild.py`
-- [ ] T010 [test] Write 6 unit cases for `parse_archive_index`: real ARCHIVE-REBUILD.md (expect 131 rows), missing heading (returns `{}` with warning), extra pipes (escaped cells), malformed row (skipped + stderr warning), empty file, duplicate spec_key (raises). Depends on T009. `tests/apply_archive_rebuild/test_classifier.py`
-- [ ] T011 [test] Write 5 unit cases for `parse_front_matter`: archive shape (layout + 7 required fields), site shape with `reading_time`, site shape with `permalink`, unknown field packed into `extra`, malformed YAML raises `FrontMatterError`. Depends on T008. `tests/apply_archive_rebuild/test_front_matter.py`
-- [ ] T012 Run `uv run pytest tests/apply_archive_rebuild/ -q` — expect 11 tests pass. Commit as `feat(232): add front-matter parser + archive-index reader with unit tests`. `tests/apply_archive_rebuild/`
+- [x] T006 [P] Add 7 `@dataclass(frozen=True)` classes per `data-model.md`: `ArchivePost`, `SitePost`, `FrontMatter`, `ImageRef`, `Classification`, `Divergence`, `AssetCopy`. `scripts/232-apply-archive-rebuild.py`
+- [x] T007 [P] Add `MigrationPlan` dataclass (non-frozen, with `is_blocked` property) + `AssetResolver` helper signature stubs. `scripts/232-apply-archive-rebuild.py`
+- [x] T008 Implement `parse_front_matter(text: str) -> FrontMatter` — reuses the spec's front-matter shape (narrow YAML → typed fields, pack unknowns into `extra`). Depends on T006. `scripts/232-apply-archive-rebuild.py`
+- [x] T009 Implement `parse_archive_index(runbook_path: Path) -> dict[str, ArchivePostRef]` per `contracts/helpers.md`. Parses ARCHIVE-REBUILD.md's `## Index` table. Depends on T006. `scripts/232-apply-archive-rebuild.py`
+- [x] T010 [test] Write 6 unit cases for `parse_archive_index`: real ARCHIVE-REBUILD.md (expect 131 rows), missing heading (returns `{}` with warning), extra pipes (escaped cells), malformed row (skipped + stderr warning), empty file, duplicate spec_key (raises). Depends on T009. `tests/apply_archive_rebuild/test_classifier.py`
+- [x] T011 [test] Write 5 unit cases for `parse_front_matter`: archive shape (layout + 7 required fields), site shape with `reading_time`, site shape with `permalink`, unknown field packed into `extra`, malformed YAML raises `FrontMatterError`. Depends on T008. `tests/apply_archive_rebuild/test_front_matter.py`
+- [x] T012 Run `uv run pytest tests/apply_archive_rebuild/ -q` — expect 11 tests pass. Commit as `feat(232): add front-matter parser + archive-index reader with unit tests`. `tests/apply_archive_rebuild/`
 
 **Phase 2 completion gate**: 11 tests green. Dataclasses + two parsers ready for stories to consume.
 

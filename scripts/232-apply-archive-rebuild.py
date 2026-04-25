@@ -15,12 +15,14 @@ See `specs/232-apply-archive-rebuild/contracts/helpers.md`.
 from __future__ import annotations
 
 import argparse
-import datetime as _dt  # noqa: TC003  # used at runtime in Phase 2+ parsing
+import datetime as _dt
 import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
+
+import yaml
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -172,6 +174,189 @@ class MigrationResult:
     site_posts_written: list[Path]
     assets_copied: list[Path]
     config_edited: bool
+
+
+# ---------------------------------------------------------------------------
+# Front matter
+# ---------------------------------------------------------------------------
+
+
+_FRONT_MATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n(.*)\Z", re.DOTALL)
+_KNOWN_FIELDS: frozenset[str] = frozenset(
+    {
+        "layout",
+        "title",
+        "date",
+        "author",
+        "track",
+        "tags",
+        "excerpt",
+        "reading_time",
+        "permalink",
+        "redirect_from",
+    }
+)
+_REQUIRED_FIELDS: tuple[str, ...] = ("layout", "title", "date")
+
+
+def _coerce_date(value: object) -> _dt.date:
+    if isinstance(value, _dt.datetime):
+        return value.date()
+    if isinstance(value, _dt.date):
+        return value
+    if isinstance(value, str):
+        try:
+            return _dt.date.fromisoformat(value[:10])
+        except ValueError as exc:
+            msg = f"invalid ISO date: {value!r}"
+            raise FrontMatterError(msg) from exc
+    msg = f"unsupported date type: {type(value).__name__}"
+    raise FrontMatterError(msg)
+
+
+def _coerce_str_list(value: object) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [str(item) for item in value]  # pyright: ignore[reportUnknownVariableType]
+    msg = f"expected list or string, got {type(value).__name__}"
+    raise FrontMatterError(msg)
+
+
+def parse_front_matter(text: str) -> tuple[FrontMatter, str]:
+    """Parse a markdown file's front matter and return (FrontMatter, body)."""
+    match = _FRONT_MATTER_RE.match(text)
+    if match is None:
+        msg = "missing or malformed front-matter block"
+        raise FrontMatterError(msg)
+    raw_yaml, body = match.group(1), match.group(2)
+    try:
+        loaded = yaml.safe_load(raw_yaml)
+    except yaml.YAMLError as exc:
+        msg = f"YAML parse failure: {exc}"
+        raise FrontMatterError(msg) from exc
+    if not isinstance(loaded, dict):
+        msg = f"front matter must be a mapping, got {type(loaded).__name__}"
+        raise FrontMatterError(msg)
+    fields: dict[str, Any] = dict(loaded)  # pyright: ignore[reportUnknownArgumentType]
+
+    for required in _REQUIRED_FIELDS:
+        if required not in fields:
+            msg = f"missing required field: {required}"
+            raise FrontMatterError(msg)
+
+    track_raw = fields.get("track")
+    if track_raw is not None and not isinstance(track_raw, (str, list)):
+        msg = f"track must be string or list, got {type(track_raw).__name__}"
+        raise FrontMatterError(msg)
+    track: str | list[str]
+    if isinstance(track_raw, list):
+        track = [str(item) for item in track_raw]  # pyright: ignore[reportUnknownVariableType]
+    else:
+        track = track_raw if track_raw is not None else ""
+
+    extras = {k: v for k, v in fields.items() if k not in _KNOWN_FIELDS}
+    fm = FrontMatter(
+        layout=str(fields["layout"]),
+        title=str(fields["title"]),
+        date=_coerce_date(fields["date"]),
+        author=str(fields.get("author", "")),
+        track=track,
+        tags=_coerce_str_list(fields.get("tags")),
+        excerpt=fields.get("excerpt"),
+        reading_time=fields.get("reading_time"),
+        permalink=fields.get("permalink"),
+        redirect_from=_coerce_str_list(fields.get("redirect_from")),
+        extra=extras,
+    )
+    return fm, body
+
+
+# ---------------------------------------------------------------------------
+# Archive index parser
+# ---------------------------------------------------------------------------
+
+
+_INDEX_HEADING_RE = re.compile(r"^##\s+Index\s*$", re.MULTILINE)
+_TABLE_ROW_RE = re.compile(r"^\|(.+)\|\s*$")
+
+
+def parse_archive_index(runbook_path: Path) -> dict[str, ArchivePostRef]:
+    """Parse ARCHIVE-REBUILD.md's `## Index` table into a {spec_key: ref} map.
+
+    Tolerates extra pipe characters inside cells (escaped `\\|`).
+    Logs malformed rows to stderr; raises only on duplicate spec keys.
+    """
+    if not runbook_path.exists():
+        return {}
+    text = runbook_path.read_text(encoding="utf-8")
+    heading = _INDEX_HEADING_RE.search(text)
+    if heading is None:
+        print(f"[232] warning: no '## Index' heading in {runbook_path}", file=sys.stderr)
+        return {}
+
+    table_text = text[heading.end():]
+    rows: list[list[str]] = []
+    for line in table_text.splitlines():
+        if line.startswith("## "):
+            break
+        match = _TABLE_ROW_RE.match(line)
+        if match is None:
+            continue
+        cells = _split_cells(match.group(1))
+        rows.append(cells)
+
+    if len(rows) < 2:
+        return {}
+    # rows[0] = headers, rows[1] = separator, rows[2:] = data
+    data_rows = [r for r in rows[2:] if not all(set(c) <= {"-", " "} for c in r)]
+
+    out: dict[str, ArchivePostRef] = {}
+    for row in data_rows:
+        if len(row) < 5:
+            print(
+                f"[232] warning: skipping malformed index row (need 5 cells): {row!r}",
+                file=sys.stderr,
+            )
+            continue
+        spec_key = row[0].strip()
+        if not spec_key:
+            continue
+        if spec_key in out:
+            msg = f"duplicate spec_key in archive index: {spec_key}"
+            raise ValueError(msg)
+        out[spec_key] = ArchivePostRef(
+            spec_key=spec_key,
+            category=row[1].strip(),
+            title=row[2].strip(),
+            date=row[3].strip(),
+            generated_path=row[4].strip().strip("`"),
+        )
+    return out
+
+
+def _split_cells(row_inner: str) -> list[str]:
+    """Split a markdown table row body on `|` while respecting `\\|` escapes."""
+    cells: list[str] = []
+    current: list[str] = []
+    i = 0
+    while i < len(row_inner):
+        ch = row_inner[i]
+        if ch == "\\" and i + 1 < len(row_inner) and row_inner[i + 1] == "|":
+            current.append("|")
+            i += 2
+            continue
+        if ch == "|":
+            cells.append("".join(current).strip())
+            current = []
+            i += 1
+            continue
+        current.append(ch)
+        i += 1
+    cells.append("".join(current).strip())
+    return cells
 
 
 # ---------------------------------------------------------------------------
