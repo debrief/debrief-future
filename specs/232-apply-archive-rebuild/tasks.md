@@ -48,11 +48,11 @@
 
 **Phase 1 completion gate**: Script file exists with `__main__` block that prints help; empty test package with conftest importing the script works; companion PR opened on `debrief.github.io` (merge status tracked through Polish).
 
-- [ ] T001 Create script skeleton with `argparse` for `--site-clone`, `--dry-run`, `--execute` and a `__main__` block that prints help. Pyright-strict compliant. `scripts/232-apply-archive-rebuild.py`
-- [ ] T002 [P] Create test package with `conftest.py` that loads the script via `importlib.util` (mirror pattern from `tests/regenerate_blog_archive/conftest.py`). `tests/apply_archive_rebuild/conftest.py`
-- [ ] T003 [P] Create fixture tree for the 3-post synthetic baseline used by `test_end_to_end.py`: 1 unified-post source + 1 rollup with 1 member + 1 composite with 2 members, plus matching site-post fixtures. `tests/apply_archive_rebuild/fixtures/`
-- [ ] T004 Open the companion PR on `debrief.github.io:master` — one-line addition to `_config.yml` (`  - jekyll-redirect-from` under `plugins:`) + new `.github/workflows/jekyll-build.yml` per `contracts/helpers.md` §"Site CI workflow". Merge before T036 (PR creation). **Cross-repo task — run from a sibling clone of `debrief.github.io`.** `debrief.github.io:_config.yml`, `debrief.github.io:.github/workflows/jekyll-build.yml`
-- [ ] T005 Sanity-check revival: `uv run pytest tests/apply_archive_rebuild/ -q` (expect 0 collected, 0 failed — no tests yet), `uv run pyright scripts/232-apply-archive-rebuild.py` (expect 0 errors), `uv run ruff check scripts/ tests/apply_archive_rebuild/` (expect clean). Commit as `feat(232): scaffold migration helper + companion PR reference`. `scripts/232-apply-archive-rebuild.py tests/apply_archive_rebuild/`
+- [x] T001 Create script skeleton with `argparse` for `--site-clone`, `--dry-run`, `--execute` and a `__main__` block that prints help. Pyright-strict compliant. `scripts/232-apply-archive-rebuild.py`
+- [x] T002 [P] Create test package with `conftest.py` that loads the script via `importlib.util` (mirror pattern from `tests/regenerate_blog_archive/conftest.py`). `tests/apply_archive_rebuild/conftest.py`
+- [x] T003 [P] Create fixture tree for the 3-post synthetic baseline used by `test_end_to_end.py`: 1 unified-post source + 1 rollup with 1 member + 1 composite with 2 members, plus matching site-post fixtures. `tests/apply_archive_rebuild/fixtures/`
+- [ ] T004 Open the companion PR on `debrief.github.io:master` — one-line addition to `_config.yml` (`  - jekyll-redirect-from` under `plugins:`) + new `.github/workflows/jekyll-build.yml` per `contracts/helpers.md` §"Site CI workflow". Merge before T036 (PR creation). **Cross-repo task — run from a sibling clone of `debrief.github.io`.** Deferred to Phase 7. `debrief.github.io:_config.yml`, `debrief.github.io:.github/workflows/jekyll-build.yml`
+- [x] T005 Sanity-check revival: `uv run pytest tests/apply_archive_rebuild/ -q` (expect 0 collected, 0 failed — no tests yet), `uv run pyright scripts/232-apply-archive-rebuild.py` (expect 0 errors), `uv run ruff check scripts/ tests/apply_archive_rebuild/` (expect clean). Commit as `feat(232): scaffold migration helper + companion PR reference`. `scripts/232-apply-archive-rebuild.py tests/apply_archive_rebuild/`
 
 ## Phase 2: Foundation
 
