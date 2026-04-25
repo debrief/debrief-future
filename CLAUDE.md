@@ -201,6 +201,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Storyboards and Scenes are **GeoJSON Features inside the (215-storyboarding-schema)
 - Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case). (228-regenerate-blog-archive)
 - Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`, (231-blog-archive-screenshot-fix-impl)
+- TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.** (219-buffer-asset-entries)
 
 ## Before Pushing
 
@@ -246,5 +247,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 219-buffer-asset-entries: Added TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.**
 - 231-blog-archive-screenshot-fix-impl: Added Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`,
 - 228-regenerate-blog-archive: Added Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case).
