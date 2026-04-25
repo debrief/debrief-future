@@ -250,3 +250,7 @@ vite.config.ts.timestamp-*
 
 # Type-audit scanner intermediate output (regenerated per run)
 tmp/
+
+# Speckit per-worktree active-feature override (used when branch name doesn't
+# follow the NNN-name convention, e.g. inside Claude Code cloud sessions)
+.specify/.active-feature
