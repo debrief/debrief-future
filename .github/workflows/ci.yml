@@ -59,7 +59,29 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run linting
-        run: task lint
+        # TEMPORARY (#191 PR debug) — capture lint output and surface every
+        # line as a warning-level annotation when the step fails. This makes
+        # the failing lint diagnostic visible without GitHub login. Revert
+        # to `run: task lint` once the underlying failure is identified.
+        run: |
+          set +e
+          task lint 2>&1 | tee /tmp/lint.log
+          EXIT=${PIPESTATUS[0]}
+          set -e
+          if [ "$EXIT" -ne 0 ]; then
+            echo "::group::Full lint output (diagnostic — see #191 PR)"
+            cat /tmp/lint.log
+            echo "::endgroup::"
+            # Surface every non-empty line as a separate annotation so the
+            # PR review surface (where we're triaging this) shows them.
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/lint.log | while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              # Truncate per-line to keep within annotation size limits.
+              short=$(printf '%.300s' "$line")
+              echo "::warning::lint: $short"
+            done
+          fi
+          exit "$EXIT"
 
       - name: Run knip
         run: task knip
