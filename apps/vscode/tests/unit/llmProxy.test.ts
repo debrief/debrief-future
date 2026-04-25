@@ -14,16 +14,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LiveOutcome } from '@debrief/components';
 
 // Mock the shared nl-cql2 provider-call so no network traffic occurs.
+// `providerCall` is exposed via the Node-only subpath (#191 split — keeps
+// node types out of the main browser barrel).
 const providerCallMock = vi.hoisted(() => {
   return vi.fn<(input: unknown) => Promise<LiveOutcome>>();
 });
-vi.mock('@debrief/components', async (importOriginal) => {
-  const orig = (await importOriginal()) as Record<string, unknown>;
-  return {
-    ...orig,
-    providerCall: providerCallMock,
-  };
-});
+vi.mock('@debrief/components/nl-cql2-node', () => ({
+  providerCall: providerCallMock,
+}));
 
 import {
   __resetLlmProxyForTests,

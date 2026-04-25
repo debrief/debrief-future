@@ -25,8 +25,11 @@ export {
 export type { PostMessageLLMClientOptions } from "./clients";
 export { canonicalisePhrase, sha256Hex } from "./hash";
 export { parseResponse } from "./parseResponse";
-export { providerCall } from "./providerCall";
-export type { ProviderCall, ProviderCallInput, ProviderCallOverrides } from "./providerCall";
+
+// `providerCall` is Node-only — it imports `node:https`. Node consumers
+// (VS Code host, scripts) import it via the dedicated subpath
+// `@debrief/components/nl-cql2-node`. Re-exporting it here would cascade
+// node types into every browser consumer of `@debrief/components`.
 
 export type {
   Cql2Json,

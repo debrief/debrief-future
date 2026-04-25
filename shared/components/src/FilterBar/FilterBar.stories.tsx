@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import type { ReactElement } from 'react';
 import { useState, useCallback } from 'react';
 import { FilterBar } from './FilterBar';
 import { ThemeProvider } from '../ThemeProvider';
@@ -659,7 +660,7 @@ function createStubClient(opts: { latencyMs?: number } = {}): LLMClient {
   };
 }
 
-function NlModeWrapper(): React.ReactElement {
+function NlModeWrapper(): ReactElement {
   const [filteredCount, setFilteredCount] = useState(MOCK_ITEMS.length);
   const handleFiltered = useCallback((filtered: StacBrowserItem[]) => {
     setFilteredCount(filtered.length);

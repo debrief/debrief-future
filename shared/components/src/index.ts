@@ -393,7 +393,13 @@ export type {
   ThemeVariant,
 } from './panels/StoryboardPanel';
 
-// NL → CQL2 generator + live transport (#188, #190, #191)
+// NL → CQL2 generator + live transport (#188, #190, #191).
+//
+// `providerCall` (the Node-only HTTPS core) is intentionally NOT
+// re-exported from this main barrel — pulling it in would cascade node
+// types into every browser consumer. Node-side consumers (e.g. the VS
+// Code extension host) import it via the explicit subpath
+// `@debrief/components/nl-cql2-node`.
 export {
   generateCql2,
   PROMPT_VERSION,
@@ -406,7 +412,6 @@ export {
   extractPhraseFromPrompt,
   validateLiveConfig,
   isLiveTransportError,
-  providerCall,
   parseResponse,
   canonicalisePhrase,
   sha256Hex,
@@ -442,8 +447,5 @@ export type {
   LiveNotConfigured,
   LiveCeilingReached,
   TransportCallRecord,
-  ProviderCall,
-  ProviderCallInput,
-  ProviderCallOverrides,
   PostMessageLLMClientOptions,
 } from './nl-cql2';

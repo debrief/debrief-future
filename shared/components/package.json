@@ -55,6 +55,10 @@
     "./PropertiesPanel/autoDerivedFields": {
       "types": "./src/PropertiesPanel/autoDerivedFields.ts",
       "import": "./src/PropertiesPanel/autoDerivedFields.ts"
+    },
+    "./nl-cql2-node": {
+      "types": "./src/nl-cql2/node.ts",
+      "import": "./src/nl-cql2/node.ts"
     }
   },
   "sideEffects": [

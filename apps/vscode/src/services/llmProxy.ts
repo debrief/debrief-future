@@ -22,7 +22,7 @@
  */
 
 import type * as vscode from 'vscode';
-import { providerCall } from '@debrief/components';
+import { providerCall } from '@debrief/components/nl-cql2-node';
 import type {
   LiveOutcome,
   TransportCallRecord,
