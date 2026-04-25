@@ -4,10 +4,13 @@
  * Asserts FR-002 / SC-001 / SC-008: every Debrief panel re-themes within
  * 1 second when VS Code's body class mutates.
  *
- * The web-shell harness simulates the body-class mutation that VS Code
- * itself performs when the user changes themes. The `<Bootstrap>` wrapper
- * mounts a `vsCodeBodyClassSource` which observes the mutation and
- * re-renders every panel.
+ * The web-shell `main.tsx` mounts `<ThemeProvider>` without an explicit
+ * source, so the provider auto-detects: if a `vscode-*` body class is
+ * present at mount, it picks `vsCodeBodyClassSource()`; otherwise it
+ * picks `mediaQuerySource()`. This test pre-installs `vscode-dark` via
+ * `addInitScript` so the provider locks onto the body-class source for
+ * the lifetime of the page; subsequent class mutations then flow
+ * through the MutationObserver.
  *
  * Captures:
  *   - per-variant screenshots → specs/220-fix-theme-responsiveness/evidence/screenshots/
@@ -41,6 +44,25 @@ const VARIANTS = [
   { bodyClass: 'vscode-high-contrast-light', dataTheme: 'high-contrast-light' },
 ] as const;
 
+/**
+ * Install an init script that adds `vscode-dark` to `<body>` as soon as the
+ * body element exists. This MUST run before React mounts the
+ * ThemeProvider so the provider's auto-detect picks `vsCodeBodyClassSource`.
+ */
+async function preinstallVSCodeBodyClass(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const apply = (): void => {
+      if (!document.body) return;
+      document.body.classList.add('vscode-dark');
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', apply, { once: true });
+    } else {
+      apply();
+    }
+  });
+}
+
 async function setVSCodeBodyClass(page: Page, cls: string): Promise<void> {
   await page.evaluate((bodyClass) => {
     const wanted = [
@@ -58,8 +80,14 @@ test.describe('Theme runtime switch (#220 US1)', () => {
   test.setTimeout(120_000);
 
   test('every variant change updates [data-theme] within 1s', async ({ page }) => {
+    await preinstallVSCodeBodyClass(page);
     await page.goto('http://localhost:5173');
     await page.waitForLoadState('domcontentloaded');
+    // Give React a tick to mount the ThemeProvider and apply data-theme.
+    await page.waitForFunction(
+      () => document.documentElement.getAttribute('data-theme') !== null,
+      { timeout: 5_000 },
+    );
 
     for (const { bodyClass, dataTheme } of VARIANTS) {
       const start = Date.now();
@@ -97,8 +125,23 @@ test.describe('Theme runtime switch (#220 US1)', () => {
       },
     });
     const page = await context.newPage();
+    await page.addInitScript(() => {
+      const apply = (): void => {
+        if (!document.body) return;
+        document.body.classList.add('vscode-dark');
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', apply, { once: true });
+      } else {
+        apply();
+      }
+    });
     await page.goto('http://localhost:5173');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(
+      () => document.documentElement.getAttribute('data-theme') !== null,
+      { timeout: 5_000 },
+    );
     await page.waitForTimeout(400);
 
     for (const { bodyClass, dataTheme } of VARIANTS) {
