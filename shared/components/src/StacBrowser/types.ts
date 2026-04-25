@@ -5,6 +5,7 @@
 
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine/types';
 import type { PropertiesCommitMessage } from '../PropertiesPanel/messageTypes';
+import type { LLMClient, EnumBundle } from '../nl-cql2';
 
 /**
  * Messages sent from the StacBrowser surface to the host (VS Code extension).
@@ -47,6 +48,17 @@ export interface StacBrowserProps {
 
   /** Map from item ID to CSS colour string (for colour scheme engine). */
   readonly colorMap?: ReadonlyMap<string, string>;
+
+  /**
+   * Optional NL-search client (#191 T049). When both `llmClient` and
+   * `nlEnums` are provided, the embedded FilterBar routes Enter through
+   * the NL → CQL2 pipeline. The host (e.g. VS Code's Catalog Overview
+   * webview) owns the client; passing the prop is a pure relay here.
+   */
+  readonly llmClient?: LLMClient;
+  readonly nlEnums?: EnumBundle;
+  readonly liveModeLabel?: string;
+  readonly onNlBannerAction?: (action: 'open-settings' | 'retry' | 'reload') => void;
 }
 
 /**

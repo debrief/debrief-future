@@ -346,6 +346,77 @@ export interface RequestThumbnailCaptureMessage extends RequestMessage {
   type: 'requestThumbnailCapture';
 }
 
+// ============================================================================
+// NL Search Messages (#191) — review Decision 2
+// ============================================================================
+
+/**
+ * The `LiveOutcome` shape carried by `nlOutcome` messages. Mirrors the
+ * `LiveOutcome` union in `@debrief/components` (`shared/components/src/nl-cql2/
+ * types.ts`). We duplicate the type declaration here so the webview protocol
+ * does not pull the whole nl-cql2 module graph into every message consumer —
+ * the structural match is asserted in `shared/components/src/nl-cql2/
+ * __tests__/clients.test.ts::createPostMessageLLMClient`.
+ */
+export type NlLiveOutcome =
+  | { readonly kind: 'success'; readonly rawResponse: string; readonly durationMs: number; readonly responseBytes: number; readonly model: string }
+  | { readonly kind: 'auth-failure'; readonly providerStatus: number; readonly durationMs: number }
+  | { readonly kind: 'rate-limit'; readonly providerStatus: number; readonly retryAfterSeconds: number | null; readonly durationMs: number }
+  | { readonly kind: 'provider-error'; readonly providerStatus: number; readonly durationMs: number }
+  | { readonly kind: 'transport-error'; readonly reason: 'network' | 'cancelled' | 'unknown'; readonly durationMs: number }
+  | { readonly kind: 'timeout'; readonly durationMs: number }
+  | { readonly kind: 'malformed-response'; readonly reason: 'non-json' | 'oversize' | 'truncated'; readonly durationMs: number; readonly responseBytes: number }
+  | { readonly kind: 'not-configured'; readonly reason: 'disabled' | 'no-key'; readonly durationMs: 0 }
+  | { readonly kind: 'ceiling-reached'; readonly ceiling: number; readonly durationMs: 0 };
+
+/**
+ * Webview-visible NL-search configuration snapshot. Pushed by the extension
+ * host on activation + whenever `workspace.onDidChangeConfiguration` or
+ * `context.secrets.onDidChange` fires. The `hasApiKey` bool is presence-only
+ * — the key itself NEVER leaves the extension-host process.
+ */
+export interface NlLiveConfigMessage {
+  readonly type: 'nlConfig';
+  readonly config: {
+    readonly enabled: boolean;
+    readonly model: string;
+    readonly hasApiKey: boolean;
+    readonly callCeiling: number;
+    readonly timeoutMs: number;
+    readonly maxResponseBytes: number;
+  };
+}
+
+/**
+ * Request from the webview for the host to issue one NL → CQL2 call against
+ * the configured provider. The extension host resolves exactly one
+ * `nlOutcome` per `nlGenerate` (never zero, never two). Cancellations come
+ * back as `{ kind: "transport-error", reason: "cancelled" }`.
+ */
+export interface NlGenerateRequest extends RequestMessage {
+  readonly type: 'nlGenerate';
+  readonly prompt: string;
+}
+
+/**
+ * Request from the webview to abort a specific in-flight `nlGenerate`.
+ * The host cancels the matching request; the pending `nlOutcome` for that
+ * id resolves to `{ kind: "transport-error", reason: "cancelled" }`.
+ */
+export interface NlAbortMessage extends Message {
+  readonly type: 'nlAbort';
+  readonly requestId: string;
+}
+
+/**
+ * Response from the extension host with the outcome of one `nlGenerate`.
+ * Always paired with the originating `requestId`.
+ */
+export interface NlOutcomeResponse extends ResponseMessage {
+  readonly type: 'nlOutcome';
+  readonly outcome: NlLiveOutcome;
+}
+
 /** Thumbnail capture response with base64 PNG data (Webview → Extension) */
 export interface ThumbnailCaptureResponseMessage extends ResponseMessage {
   type: 'thumbnailCaptureResponse';
@@ -498,7 +569,10 @@ export type ExtensionToWebviewMessage =
   | ResultsSetLoadingMessage
   // Storyboard playback (#217)
   | FlyToMessage
-  | SetSceneRectanglesMessage;
+  | SetSceneRectanglesMessage
+  // NL search (#191)
+  | NlLiveConfigMessage
+  | NlOutcomeResponse;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -526,7 +600,10 @@ export type WebviewToExtensionMessage =
   | ResultsCloseTabMessage
   // Storyboard playback (#217)
   | FlyToCompleteMessage
-  | SceneRectangleClickedMessage;
+  | SceneRectangleClickedMessage
+  // NL search (#191)
+  | NlGenerateRequest
+  | NlAbortMessage;
 
 // ============================================================================
 // Exercise List View Messages (#129)

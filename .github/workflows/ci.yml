@@ -68,7 +68,45 @@ jobs:
         run: task typecheck
 
       - name: Run tests
-        run: task test
+        # TEMPORARY (#191 PR debug) — split task test into its sub-commands
+        # and report which one fails. Revert to `run: task test` once the
+        # underlying failure is identified.
+        run: |
+          set +e
+
+          run_step() {
+            local label="$1"; shift
+            echo "::group::Test step: $label"
+            "$@" 2>&1 | tee "/tmp/test-${label}.log"
+            local rc=${PIPESTATUS[0]}
+            echo "::endgroup::"
+            if [ "$rc" -ne 0 ]; then
+              echo "::warning::test-failed: $label (exit $rc)"
+              # Surface vitest's "FAIL  path" rows + the immediately
+              # following error line. ESLint/vitest output:
+              #   FAIL  src/foo.test.ts > suite > test
+              #     Error: actual message
+              #   ⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯
+              #    FAIL  src/foo.test.ts [ src/foo.test.ts ]
+              #    Error: import failed: ...
+              sed 's/\x1b\[[0-9;]*m//g' "/tmp/test-${label}.log" \
+                | grep -E '(^\s*FAIL\s|FAIL\s+src/|FAIL\s+tests/|Error:|TypeError|ReferenceError|AssertionError|Expected:|Received:|Test Files\s+[0-9]+\s+failed|Tests\s+[0-9]+\s+failed|Cannot find module|Failed to resolve|Snapshot mismatch)' \
+                | head -20 \
+                | while IFS= read -r line; do
+                    short=$(printf '%.300s' "$line")
+                    echo "::warning::${label}: $short"
+                  done
+            fi
+            return $rc
+          }
+
+          run_step pytest uv run pytest || EXIT=$?
+          run_step vitest pnpm --filter '!@debrief/web-shell' test || EXIT=$?
+          run_step web-shell-pw bash -c 'cd apps/web-shell && node run-playwright.mjs' || EXIT=$?
+          run_step spec-nav-build pnpm --filter @debrief/spec-navigator build || EXIT=$?
+          run_step spec-nav-pw bash -c 'cd apps/spec-navigator && node run-playwright.mjs' || EXIT=$?
+
+          exit "${EXIT:-0}"
 
       # #190 SC-006 — post-build secret scan on the produced bundles. Fails if
       # a provider key somehow entered dist/ or apps/nl-demo/dist/ (e.g. via

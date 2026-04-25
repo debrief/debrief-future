@@ -392,3 +392,60 @@ export type {
   StaleFlagEntry,
   ThemeVariant,
 } from './panels/StoryboardPanel';
+
+// NL → CQL2 generator + live transport (#188, #190, #191).
+//
+// `providerCall` (the Node-only HTTPS core) is intentionally NOT
+// re-exported from this main barrel — pulling it in would cascade node
+// types into every browser consumer. Node-side consumers (e.g. the VS
+// Code extension host) import it via the explicit subpath
+// `@debrief/components/nl-cql2-node`.
+export {
+  generateCql2,
+  PROMPT_VERSION,
+  buildPrompt,
+  schemaDescription,
+  createRecordedLLMClient,
+  createPassthroughLLMClient,
+  createLiveLLMClient,
+  createPostMessageLLMClient,
+  extractPhraseFromPrompt,
+  validateLiveConfig,
+  isLiveTransportError,
+  parseResponse,
+  canonicalisePhrase,
+  sha256Hex,
+} from './nl-cql2';
+export type {
+  Cql2Json,
+  LozengeSeed,
+  GenerationErrorReason,
+  GenerationError,
+  GenerationDiagnostics,
+  GenerationResult,
+  GenerationResultError,
+  LLMClient,
+  RecordedResponse,
+  ResponseMap,
+  EnumBundle,
+  VesselClassNode,
+  EnumBundleMeta,
+  GenerateDeps,
+  LiveConfig,
+  BrowserLiveConfig,
+  VsCodeLiveConfig,
+  LiveConfigValidationError,
+  LiveConfigValidationResult,
+  LiveOutcome,
+  LiveSuccess,
+  LiveAuthFailure,
+  LiveRateLimit,
+  LiveProviderError,
+  LiveTransportError,
+  LiveTimeout,
+  LiveMalformedResponse,
+  LiveNotConfigured,
+  LiveCeilingReached,
+  TransportCallRecord,
+  PostMessageLLMClientOptions,
+} from './nl-cql2';

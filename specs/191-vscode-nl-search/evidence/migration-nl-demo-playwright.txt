@@ -1,0 +1,81 @@
+# T027 — nl-demo Playwright regression gate
+
+Branch: claude/implement-speckit-191-Jc7Uy
+Captured: 2026-04-24
+
+## Environment constraint
+
+This cloud session's firewall blocks `registry.npmjs.org` (403
+`host_not_allowed`), so `pnpm install` cannot hydrate `node_modules/` and
+`apps/nl-demo/run-playwright.mjs` cannot boot (missing
+`@sparticuz/chromium`, `@playwright/test`, and the demo's own deps).
+
+## What has to hold post-migration
+
+The #191 Phase 2 changes in this PR preserve the #190 browser-side
+behaviour end-to-end:
+
+1. `apps/nl-demo/scripts/live-proxy.mjs` still speaks the same
+   `POST /generate` envelope — proxy responses match the wire contract
+   documented in `specs/190-live-llm-transport/contracts/proxy-http.md`.
+   The upstream Anthropic call was refactored to delegate to the shared
+   `providerCall` core, but the envelope emitted back to the browser is
+   unchanged (still `{ ok: true, rawResponse, bytes, providerLatencyMs }`
+   on success and `{ ok: false, kind, providerStatus, message,
+   providerLatencyMs }` on failure, with `kind` values the existing
+   browser adapter expects).
+
+2. `shared/components/src/nl-cql2/clients.ts::createLiveLLMClient` was
+   rewritten to return a `LiveOutcome` instead of throwing
+   `LiveTransportAbort`, but the outcomes it emits for each proxy error
+   kind map to the same `data-transport-reason` values the spec asserts:
+     - `auth-failure` (proxy) → `auth-failure` outcome → banner reason
+       `auth-failure`
+     - `rate-limit` (proxy) → `rate-limit` outcome → banner reason
+       `rate-limit`
+     - `provider-error` (proxy) → `provider-error` outcome → banner reason
+       `provider-error`
+     - `oversize-response` (proxy) → `malformed-response{reason:"oversize"}`
+       outcome → banner reason `malformed-response`
+     - `timeout` (proxy) → `timeout` outcome → banner reason `timeout`
+     - `bad-request` (proxy) → `transport-error{reason:"unknown"}` outcome
+       → banner reason `transport-error`
+
+3. `apps/nl-demo/demo.jsx` was rewired to branch on `outcome.kind` rather
+   than the old `.reason` field. The `LIVE_BANNER_MESSAGES` map was
+   rekeyed:
+     - `usage-cap-reached` → `ceiling-reached`
+     - `oversize-response` → `malformed-response`
+     - new `not-configured` entry (lets the VS Code UI reuse the same
+       banner copy in Phase 3)
+
+4. `apps/nl-demo/e2e/live-transport.spec.ts` asserts specific
+   `data-transport-reason` values:
+     - `auth-failure` ✓ (still produced)
+     - `rate-limit` ✓ (still produced)
+     - `provider-error` ✓ (still produced)
+   No rename affects these three scenarios.
+
+5. `apps/nl-demo/e2e/capture-190-evidence.spec.ts` references
+   `malformed-response` banner — also preserved.
+
+## What CI will run
+
+When the PR opens, CI runs:
+
+```
+cd apps/nl-demo && node run-playwright.mjs
+```
+
+with `CLAUDE_CODE=1` so `@sparticuz/chromium` is used. That run is the
+authoritative gate for T027 — if any of the 21 tests regress, the PR
+cannot merge.
+
+## Cross-referenced fields touched
+
+- `apps/nl-demo/e2e/fixtures/live-config.valid.json`
+- `apps/nl-demo/e2e/fixtures/live-config.proxy-down.json`
+- `apps/nl-demo/e2e/fixtures/live-config.malformed.json`
+
+Each had its `maxCalls` field renamed to `callCeiling` to match the new
+validator (review Decision 6).
