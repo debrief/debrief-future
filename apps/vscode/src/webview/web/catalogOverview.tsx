@@ -12,6 +12,7 @@ import { createRoot } from 'react-dom/client';
 import { StacBrowser, parseTaxonomy } from '@debrief/components';
 import type { CatalogOverviewItem, StacBrowserItem, RawTaxonomy } from '@debrief/components';
 import rawTaxonomy from '../../../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
+import { Bootstrap } from './_bootstrap';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -101,7 +102,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <CatalogOverviewApp />
+      <Bootstrap>
+        <CatalogOverviewApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

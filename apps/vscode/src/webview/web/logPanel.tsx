@@ -15,6 +15,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 import type {
   TimelineEntry,
   ViewMode,
@@ -366,7 +367,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <LogPanelApp />
+      <Bootstrap>
+        <LogPanelApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

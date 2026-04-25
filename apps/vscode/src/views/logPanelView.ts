@@ -133,6 +133,13 @@ export function toTimelineEntry(entry: LogEntry): TimelineEntry {
 export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.logPanel';
 
+  /**
+   * Public accessor for the active webview (#220 theme relay).
+   */
+  public get webview(): vscode.Webview | undefined {
+    return this._view?.webview;
+  }
+
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
   private _isWebviewReady = false;

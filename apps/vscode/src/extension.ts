@@ -21,6 +21,8 @@ import { ResultsPanelViewProvider } from './views/resultsPanelView';
 import { StoryboardPanelViewProvider } from './views/storyboardPanelView';
 import { ResultsPanelService } from './services/resultsPanelService';
 import { MapPanel } from './webview/mapPanel';
+import { startThemeRelay, type PostableWebview } from './host/themeRelay';
+import { CatalogOverviewPanel } from './panels/catalogOverviewPanel';
 import {
   captureScene,
   type CaptureCommandContext,
@@ -754,6 +756,39 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   console.warn('[Debrief] view providers registered');
   outputChannel.appendLine('[startup] view providers registered');
+
+  // ── #220 — Theme relay ─────────────────────────────────────────────
+  // Forward `vscode.window.onDidChangeActiveColorTheme` to every active
+  // panel/view as a `vscode-theme-changed` postMessage. The webview's
+  // `vsCodeBodyClassSource` adapter consumes it and re-resolves the
+  // variant from the body class.
+  startThemeRelay(context, () => {
+    const panels: PostableWebview[] = [];
+
+    const pushIfWebview = (
+      provider: { webview?: vscode.Webview | undefined } | undefined,
+    ): void => {
+      const wv = provider?.webview;
+      if (wv) panels.push({ webview: wv });
+    };
+
+    pushIfWebview(activityPanelProvider);
+    pushIfWebview(logPanelProvider);
+    pushIfWebview(resultsPanelProvider);
+    pushIfWebview(storyboardPanelProvider);
+    pushIfWebview(timeRangeProvider);
+
+    // MapPanel — per-document panels created via createWebviewPanel.
+    const mp = mapPanel?.getPanel?.();
+    if (mp) panels.push({ webview: mp.webview });
+
+    // CatalogOverviewPanel — per-store popup panels.
+    for (const overview of CatalogOverviewPanel.getActivePanels()) {
+      panels.push({ webview: overview.webview });
+    }
+
+    return panels;
+  });
 
   // Set storesReady context immediately so the "Loading stores…" welcome
   // view is dismissed as soon as views are registered — don't defer until
