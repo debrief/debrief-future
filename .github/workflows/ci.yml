@@ -68,7 +68,29 @@ jobs:
         run: task typecheck
 
       - name: Run tests
-        run: task test
+        # TEMPORARY (#191 PR debug) — capture test output and surface
+        # failing assertions / stack traces as annotations on failure.
+        # Revert to `run: task test` once the underlying failure is
+        # identified.
+        run: |
+          set +e
+          task test 2>&1 | tee /tmp/test.log
+          EXIT=${PIPESTATUS[0]}
+          set -e
+          if [ "$EXIT" -ne 0 ]; then
+            echo "::group::Test failure — last 200 lines (diagnostic — see #191 PR)"
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/test.log | tail -200
+            echo "::endgroup::"
+            # Extract vitest/pytest failure markers as annotations.
+            sed 's/\x1b\[[0-9;]*m//g' /tmp/test.log \
+              | grep -E '(FAIL|✗|×|Error:|AssertionError|TypeError|ReferenceError|expect\(|Expected|Received|at .+\.tsx?:|^\s+❯)' \
+              | head -10 \
+              | while IFS= read -r line; do
+                  short=$(printf '%.300s' "$line")
+                  echo "::warning::test: $short"
+                done
+          fi
+          exit "$EXIT"
 
       # #190 SC-006 — post-build secret scan on the produced bundles. Fails if
       # a provider key somehow entered dist/ or apps/nl-demo/dist/ (e.g. via
