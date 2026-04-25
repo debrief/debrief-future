@@ -260,6 +260,8 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 207: manifest-fed icon resolution
+  ToolCategoryMap,
   // Feature 208: TimelineEntry kind discriminator
   TimelineEntryKind,
 } from './LogPanel';
@@ -345,7 +347,7 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
-// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit)
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit + 230-storyboard-edit-wiring)
 export {
   StoryboardPanel,
   SceneRow,
@@ -356,6 +358,11 @@ export {
   SceneEditForm,
   UndoToast,
   StaleBadge,
+  SceneOverflowMenu,
+  useStoryboardEditReducer,
+  storyboardEditReducer,
+  createInitialStoryboardEditState,
+  composeSceneEditViewModels,
 } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
@@ -371,8 +378,19 @@ export type {
   UndoToastProps,
   UndoToastState,
   StaleBadgeProps,
+  SceneOverflowMenuProps,
+  SceneOverflowMenuItem,
+  SceneOverflowAction,
   SceneEditViewModel,
   StoryboardEditViewModel,
+  StoryboardEditAction,
+  StoryboardEditReducerState,
+  StoryboardEditReducerHandle,
+  ScenesPayload,
+  SnapshotPayload,
+  UndoToastDescriptor,
+  StaleFlagEntry,
+  ThemeVariant,
 } from './panels/StoryboardPanel';
 
 // NL → CQL2 generator + live transport (#188, #190, #191)

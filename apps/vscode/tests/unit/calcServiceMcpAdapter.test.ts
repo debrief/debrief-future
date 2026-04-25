@@ -162,3 +162,108 @@ describe('CalcService MCP adapter integration (T015)', () => {
     });
   });
 });
+
+
+describe('adaptMCPToolsForMatching — debrief:uiCategory (feature 207)', () => {
+  it('carries canonical uiCategory through to the adapted Tool', () => {
+    const mcp: MCPToolDefinition[] = [
+      {
+        name: 'range-bearing',
+        description: 'Range and bearing',
+        inputSchema: { type: 'object' as const, properties: {} },
+        annotations: {
+          'debrief:selectionRequirements': [{ kind: 'TRACK', min: 2 }],
+          'debrief:category': 'dataset/range_bearing_series',
+          'debrief:version': '1.0.0',
+          'debrief:outputKind': 'dataset/range_bearing_series',
+          'debrief:uiCategory': 'calc',
+        },
+      },
+    ];
+    const tools = adaptMCPToolsForMatching(mcp);
+    expect(tools).toHaveLength(1);
+    expect(tools[0].category).toBe('calc');
+  });
+
+  it('omits category when tool declared none', () => {
+    const mcp: MCPToolDefinition[] = [
+      {
+        name: 'legacy',
+        description: 'Legacy without category',
+        inputSchema: { type: 'object' as const, properties: {} },
+        annotations: {
+          'debrief:selectionRequirements': [{ kind: 'TRACK', min: 1 }],
+          'debrief:category': 'track',
+          'debrief:version': '1.0.0',
+          'debrief:outputKind': 'track/statistics',
+        },
+      },
+    ];
+    const tools = adaptMCPToolsForMatching(mcp);
+    expect(tools[0].category).toBeUndefined();
+  });
+
+  it('coerces invalid uiCategory to undefined + warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const mcp: MCPToolDefinition[] = [
+        {
+          name: 'bad-tool',
+          description: 'Invalid category',
+          inputSchema: { type: 'object' as const, properties: {} },
+          annotations: {
+            'debrief:selectionRequirements': [{ kind: 'TRACK', min: 1 }],
+            'debrief:category': 'track',
+            'debrief:version': '1.0.0',
+            'debrief:outputKind': 'track/statistics',
+            // @ts-expect-error — deliberately invalid for boundary testing
+            'debrief:uiCategory': 'geometry',
+          },
+        },
+      ];
+      const tools = adaptMCPToolsForMatching(mcp);
+      expect(tools[0].category).toBeUndefined();
+      expect(warn).toHaveBeenCalledTimes(1);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('projects category map as Record<toolId, category-or-null> (projection logic)', () => {
+    // Simulates CalcService.getToolCategoryMap() projection logic.
+    const mcp: MCPToolDefinition[] = [
+      {
+        name: 'a-calc-tool',
+        description: '',
+        inputSchema: { type: 'object' as const, properties: {} },
+        annotations: {
+          'debrief:selectionRequirements': [{ kind: 'TRACK', min: 1 }],
+          'debrief:category': 'track',
+          'debrief:version': '1.0.0',
+          'debrief:outputKind': 'track/statistics',
+          'debrief:uiCategory': 'calc',
+        },
+      },
+      {
+        name: 'a-legacy-tool',
+        description: '',
+        inputSchema: { type: 'object' as const, properties: {} },
+        annotations: {
+          'debrief:selectionRequirements': [{ kind: 'TRACK', min: 1 }],
+          'debrief:category': 'track',
+          'debrief:version': '1.0.0',
+          'debrief:outputKind': 'track/statistics',
+        },
+      },
+    ];
+    const tools = adaptMCPToolsForMatching(mcp);
+    const map: Record<string, string | null> = {};
+    for (const tool of tools) {
+      map[tool.id] = tool.category ?? null;
+    }
+    expect(map).toEqual({
+      'a-calc-tool': 'calc',
+      'a-legacy-tool': null,
+    });
+  });
+});

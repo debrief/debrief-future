@@ -796,3 +796,61 @@ class TestSystemRecordProperties:
                 timestamp=datetime.now(UTC),
                 direction="invalid",  # type: ignore[arg-type]
             )
+
+
+class TestToolCategory:
+    """Feature 207: Tool.category field behaviour."""
+
+    def test_tool_accepts_valid_category(self) -> None:
+        """Construction with a canonical ToolCategoryEnum value succeeds."""
+        from debrief_calc.models import ToolCategoryEnum
+
+        tool = Tool(
+            name="sample",
+            description="Sample",
+            input_kinds=["TRACK"],
+            output_kind="track/statistics",
+            context_type=ContextType.SINGLE,
+            category=ToolCategoryEnum.calc,
+        )
+        # use_enum_values=True → stored as string
+        assert tool.category == "calc"
+
+    def test_tool_accepts_null_category(self) -> None:
+        """Construction without category defaults to None."""
+        tool = Tool(
+            name="sample",
+            description="Sample",
+            input_kinds=["TRACK"],
+            output_kind="track/statistics",
+            context_type=ContextType.SINGLE,
+        )
+        assert tool.category is None
+
+    def test_tool_rejects_invalid_category_string(self) -> None:
+        """Non-canonical string fails Pydantic validation."""
+        with pytest.raises(PydanticValidationError):
+            Tool.model_validate(
+                {
+                    "name": "sample",
+                    "description": "Sample",
+                    "input_kinds": ["TRACK"],
+                    "output_kind": "track/statistics",
+                    "context_type": "single",
+                    "category": "geometry",
+                }
+            )
+
+    def test_tool_rejects_invalid_category_typo(self) -> None:
+        """Typo ('calcs' vs 'calc') fails Pydantic validation."""
+        with pytest.raises(PydanticValidationError):
+            Tool.model_validate(
+                {
+                    "name": "sample",
+                    "description": "Sample",
+                    "input_kinds": ["TRACK"],
+                    "output_kind": "track/statistics",
+                    "context_type": "single",
+                    "category": "calcs",
+                }
+            )

@@ -131,14 +131,19 @@ describe('LogEntry — card anatomy', () => {
     expect(badges).toHaveLength(2);
   });
 
-  it('uses resolveToolCategory icon for all 5 categories', () => {
-    const names: Array<[string, string]> = [
+  it('uses resolveToolCategory icon for all 5 categories (feature 207 manifest path)', () => {
+    const names: Array<[string, 'import' | 'style' | 'calc' | 'filter' | 'snapshot']> = [
       ['import-rep', 'import'],
       ['change-color', 'style'],
       ['bearing-between-tracks', 'calc'],
       ['time-filter', 'filter'],
       ['export-png', 'snapshot'],
     ];
+    // Feature 207: manifest-fed resolution replaces the static shim.
+    // Supply a `toolCategories` map that assigns each test tool its expected
+    // category — this is exactly what the extension host does via the
+    // `tools:manifest` webview message in production.
+    const toolCategories = Object.fromEntries(names);
     for (const [toolName, category] of names) {
       const { unmount } = render(
         <LogEntry
@@ -146,6 +151,7 @@ describe('LogEntry — card anatomy', () => {
           featureNames={featureNames}
           viewMode="timeline"
           isSelected={false}
+          toolCategories={toolCategories}
         />
       );
       expect(screen.getByTestId(`tool-category-icon-${category}`)).toBeTruthy();

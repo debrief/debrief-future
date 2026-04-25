@@ -35,6 +35,7 @@ from debrief_schemas import (  # noqa: TC001 — re-exported, needed at runtime
     SnapshotLinks,
     SnapshotRef,
     SystemRecordProperties,
+    ToolCategoryEnum,
     TuneAnnotation,
     WasGeneratedBy,
 )
@@ -54,6 +55,7 @@ __all__ = [
     "SnapshotLinks",
     "SnapshotRef",
     "SystemRecordProperties",
+    "ToolCategoryEnum",
     "TuneAnnotation",
     "WasGeneratedBy",
 ]
@@ -325,6 +327,15 @@ class Tool(BaseModel):
     parameters: list[ToolParameter] = Field(
         default_factory=list, description="Configurable parameters"
     )
+    category: ToolCategoryEnum | None = Field(
+        default=None,
+        description=(
+            "Visual category for Log Panel icon rendering (feature 207). "
+            "Null tools render with the neutral-grey 'Other' icon. "
+            "First-party tools MUST declare a value — enforced by "
+            "test_first_party_categories.py."
+        ),
+    )
     handler: Callable | None = Field(
         default=None, exclude=True, description="Python function implementing the tool"
     )
@@ -392,6 +403,24 @@ class Tool(BaseModel):
             param_schema = self._param_to_json_schema(param)
             param_properties[param.name] = param_schema
 
+        annotations: dict[str, Any] = {
+            "debrief:selectionRequirements": selection_requirements,
+            "debrief:category": category,
+            "debrief:version": self.version,
+            "debrief:outputKind": self.output_kind,
+        }
+        # Feature 207: emit visual category when the tool declared one.
+        # Absent (not null) when not declared — optional-field convention.
+        if self.category is not None:
+            # `use_enum_values=True` in the generated base means `self.category`
+            # may be a `ToolCategoryEnum` *or* the underlying string depending on
+            # how the Tool was constructed. Normalise to the string.
+            annotations["debrief:uiCategory"] = (
+                self.category.value
+                if isinstance(self.category, ToolCategoryEnum)
+                else self.category
+            )
+
         return {
             "name": self.name,
             "description": self.description,
@@ -410,12 +439,7 @@ class Tool(BaseModel):
                     },
                 },
             },
-            "annotations": {
-                "debrief:selectionRequirements": selection_requirements,
-                "debrief:category": category,
-                "debrief:version": self.version,
-                "debrief:outputKind": self.output_kind,
-            },
+            "annotations": annotations,
         }
 
     def _build_selection_requirements(self) -> list[dict[str, Any]]:

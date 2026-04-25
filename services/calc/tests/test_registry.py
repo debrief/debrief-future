@@ -298,3 +298,49 @@ class TestFindToolsEdgeCases:
         assert tools1 == tools2
         assert tools1 is not tools2
         assert tools1[0].name == "multi-tool"  # alphabetically first
+
+
+class TestToolDecoratorCategory:
+    """Feature 207: @tool decorator accepts `category` kwarg."""
+
+    def test_decorator_forwards_category_to_tool(self) -> None:
+        from debrief_calc.models import ToolCategoryEnum
+        from debrief_calc.registry import registry, tool
+
+        # Use a uniquely named tool to avoid clashing with globally registered tools.
+        @tool(
+            name="f207-decorator-test-filter",
+            description="Test tool for feature 207 decorator",
+            input_kinds=["TRACK"],
+            output_kind="track/statistics",
+            context_type=ContextType.SINGLE,
+            category=ToolCategoryEnum.filter,
+        )
+        def _filter_tool(context: SelectionContext, params: dict) -> list[dict]:
+            return []
+
+        try:
+            registered = registry.get_tool("f207-decorator-test-filter")
+            assert registered.category == "filter"
+        finally:
+            # Clean up so the global registry doesn't leak test fixtures.
+            registry._tools.pop("f207-decorator-test-filter", None)
+
+    def test_decorator_without_category_leaves_tool_category_none(self) -> None:
+        from debrief_calc.registry import registry, tool
+
+        @tool(
+            name="f207-decorator-test-none",
+            description="Test tool without category",
+            input_kinds=["TRACK"],
+            output_kind="track/statistics",
+            context_type=ContextType.SINGLE,
+        )
+        def _no_category_tool(context: SelectionContext, params: dict) -> list[dict]:
+            return []
+
+        try:
+            registered = registry.get_tool("f207-decorator-test-none")
+            assert registered.category is None
+        finally:
+            registry._tools.pop("f207-decorator-test-none", None)

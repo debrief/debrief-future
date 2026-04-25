@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 
 
@@ -14,6 +20,7 @@ from debrief_calc.registry import tool
     input_kinds=["TRACK"],
     output_kind="mutation/track/styled",
     context_type=ContextType.MULTI,
+    category=ToolCategoryEnum.style,
     parameters=[
         ToolParameter(
             name="symbol",

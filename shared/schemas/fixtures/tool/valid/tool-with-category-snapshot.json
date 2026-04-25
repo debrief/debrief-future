@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-snapshot",
+  "name": "Test Snapshot Tool",
+  "description": "Sample snapshot tool",
+  "category": "snapshot"
+}

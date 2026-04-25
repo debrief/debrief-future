@@ -1,0 +1,7 @@
+{
+  "id": "test-tool-calc",
+  "name": "Test Calc Tool",
+  "description": "Sample calc tool with category declared",
+  "version": "1.0.0",
+  "category": "calc"
+}

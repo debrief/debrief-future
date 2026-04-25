@@ -14,7 +14,13 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 from debrief_schemas import OutputKindEnum
 
@@ -133,6 +139,7 @@ def _calculate_track_stats(
     input_kinds=["TRACK"],
     output_kind=OutputKindEnum.trackSOLIDUSstatistics,
     context_type=ContextType.SINGLE,
+    category=ToolCategoryEnum.calc,
     parameters=[
         ToolParameter(
             name="distance_unit",

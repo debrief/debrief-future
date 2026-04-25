@@ -23,6 +23,13 @@ Each entry should include:
 - **Evidence**: [`specs/191-vscode-nl-search/evidence/`](../../specs/191-vscode-nl-search/evidence/) — test-summary, usage-example, sequence diagram, sc-004 failure matrix, config sample, baseline-verify, nl-demo migration note
 - **Migration note**: `LLMClient` contract migrated from `Promise<string>` → `Promise<LiveOutcome>`; `LiveTransportAbort` removed. See ADR-019 below for rationale.
 
+### 2026-04-20 - Feature #176: Analysis Log Panel — Rich Card UX
+- **Status**: Completed (PR #480 merged)
+- **Description**: Transformed the Log Panel's read-only card face into rich, analyst-readable cards: 3-row anatomy (header / meta / params), 5-category tool icons, type-aware parameter chips (colour / number / boolean / range / enum), track badges, 4-tab view mode (Timeline / By Feature / Compact / Detailed), ARIA tablist with roving `tabIndex` + arrow-key navigation, `isDefault` → `isNonDefault` polarity flip, UTC timestamp formatting, single-decimal duration formatting, `+N more` chip overflow indicator, "No parameters" / "Manual checkpoint" placeholders, `aria-selected` + step-numbered `aria-label` on card root. Reduced-scope 22-task list (T001–T022) superseded the original 88-task plan per `/speckit.review` decisions 1A–11A.
+- **URL**: https://github.com/debrief/debrief-future/pull/480
+- **Evidence**: [`specs/176-log-panel-ux/evidence/`](../../specs/176-log-panel-ux/evidence/)
+- **Follow-ups**: #209 (axe-core a11y audit), #210 (un-skip webview E2E, complete), #208 (TimelineEntry `kind` discriminator, supersedes Decision 2A), #207 (tool-manifest category lookup)
+
 ### 2026-04-22 - Backlog #208: Schema-rooted `kind` discriminator on TimelineEntry
 - **Status**: Completed (PR #513 open — supersedes PR #508 and PR #507)
 - **Description**: Added optional `activity_type` enum to LinkML `LogEntry`; regenerated Pydantic / TypeScript / JSON Schema; projected onto UI-side `TimelineEntry.kind`; switched `LogEntry.tsx` off the feature-176 `ToolCategory === 'snapshot'` conflation; fixed the latent bug where export tools (`export-png`, `export-csv`, `export-geojson`) rendered with the "Manual checkpoint" placeholder. Added two CI drift tests (SC-001 semantic-gate, SC-005 projection-purity). Supersedes feature 176 Decision 2A (ADR-023).

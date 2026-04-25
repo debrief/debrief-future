@@ -228,3 +228,70 @@ class TestToMcpTool:
         params_schema = mcp["inputSchema"]["properties"]["params"]["properties"]
         assert params_schema["color"]["enum"] == ["red", "blue", "green"]
         assert params_schema["color"]["x-debrief-param-type"] == "NamedColor"
+
+
+class TestToolCategory:
+    """Feature 207: visual category emission in to_mcp_tool()."""
+
+    def test_tool_with_category_emits_ui_category_annotation(self) -> None:
+        """Declared category is emitted as `debrief:uiCategory` annotation."""
+        from debrief_calc.models import ToolCategoryEnum
+
+        tool = Tool(
+            name="range-bearing",
+            description="Calculate range and bearing",
+            input_kinds=["TRACK"],
+            output_kind="dataset/range_bearing_series",
+            context_type=ContextType.MULTI,
+            category=ToolCategoryEnum.calc,
+        )
+        mcp = tool.to_mcp_tool()
+        assert mcp["annotations"]["debrief:uiCategory"] == "calc"
+
+    def test_tool_without_category_omits_ui_category_annotation(self) -> None:
+        """Absent category means the annotation key is absent (not null)."""
+        tool = Tool(
+            name="legacy-tool",
+            description="No category declared",
+            input_kinds=["TRACK"],
+            output_kind="track/statistics",
+            context_type=ContextType.SINGLE,
+        )
+        mcp = tool.to_mcp_tool()
+        assert "debrief:uiCategory" not in mcp["annotations"]
+
+    def test_all_five_categories_round_trip_through_mcp(self) -> None:
+        """Every canonical category value survives construction → to_mcp_tool()."""
+        from debrief_calc.models import ToolCategoryEnum
+
+        for cat in ToolCategoryEnum:
+            tool = Tool(
+                name=f"sample-{cat.value}",
+                description=f"Sample {cat.value} tool",
+                input_kinds=["TRACK"],
+                output_kind="track/statistics",
+                context_type=ContextType.SINGLE,
+                category=cat,
+            )
+            mcp = tool.to_mcp_tool()
+            assert mcp["annotations"]["debrief:uiCategory"] == cat.value
+
+    def test_category_keeps_hierarchical_debrief_category_untouched(self) -> None:
+        """FR-011: the existing debrief:category annotation is unaffected."""
+        from debrief_calc.models import ToolCategoryEnum
+
+        tool = Tool(
+            name="set-track-color",
+            description="Set track colour",
+            input_kinds=["TRACK"],
+            output_kind="mutation/track/styled",
+            context_type=ContextType.MULTI,
+            category=ToolCategoryEnum.style,
+        )
+        mcp = tool.to_mcp_tool()
+        # Hierarchical category derived from output_kind — unchanged by this
+        # feature. `_derive_category()` produces "track" for output_kind
+        # "mutation/track/styled" (parts[1:-1] joined = ["track"]).
+        assert mcp["annotations"]["debrief:category"] == "track"
+        # New visual category is additive.
+        assert mcp["annotations"]["debrief:uiCategory"] == "style"

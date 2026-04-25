@@ -29,7 +29,13 @@ from functools import wraps
 from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 
 from debrief_calc.exceptions import ToolNotFoundError
-from debrief_calc.models import ContextType, SelectionContext, Tool, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    SelectionContext,
+    Tool,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -183,6 +189,7 @@ def tool(
     context_type: ContextType,
     version: str = "1.0.0",
     parameters: list[ToolParameter] | None = None,
+    category: ToolCategoryEnum | None = None,
 ) -> Callable:
     """
     Decorator to register a function as a tool.
@@ -199,7 +206,8 @@ def tool(
             description="Calculate statistics for a single track",
             input_kinds=["TRACK"],
             output_kind="track/statistics",
-            context_type=ContextType.SINGLE
+            context_type=ContextType.SINGLE,
+            category=ToolCategoryEnum.calc,
         )
         def track_stats(context: SelectionContext, params: dict) -> list[dict]:
             feature = context.features[0]
@@ -214,6 +222,9 @@ def tool(
         context_type: Required selection context
         version: Semantic version (default: "1.0.0")
         parameters: Optional list of configurable parameters
+        category: Optional visual category for Log Panel icon rendering
+            (feature 207). One of import/style/calc/filter/snapshot.
+            First-party tools MUST declare a value.
 
     Returns:
         Decorator function that registers the tool
@@ -229,6 +240,7 @@ def tool(
             output_kind=output_kind,
             context_type=context_type,
             parameters=parameters or [],
+            category=category,
             handler=func,
         )
 

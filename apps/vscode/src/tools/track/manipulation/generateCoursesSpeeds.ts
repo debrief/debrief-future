@@ -68,6 +68,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:category': 'track/manipulation',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'mutation/track/courses_speeds',
+    'debrief:uiCategory': 'calc',
   },
 };
 

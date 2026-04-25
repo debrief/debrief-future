@@ -37,6 +37,8 @@ export type {
   ToolCategoryIconProps,
   ParameterChipProps,
   TrackBadgeProps,
+  // Feature 207: manifest-fed icon resolution
+  ToolCategoryMap,
   // Feature 208: TimelineEntry kind discriminator
   TimelineEntryKind,
 } from './types';

@@ -41,6 +41,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:category': 'track/styling',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'mutation/track/styled',
+    'debrief:uiCategory': 'style',
   },
 };
 

@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-typo-category",
+  "name": "Test Typo Category",
+  "description": "Tool with typo 'calcs' instead of 'calc' - should be rejected",
+  "category": "calcs"
+}

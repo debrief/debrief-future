@@ -49,6 +49,7 @@ export const toolDefinition: MCPToolDefinition = {
     'debrief:category': 'reference/classification',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'mutation/reference/classified_points',
+    'debrief:uiCategory': 'calc',
   },
 };
 

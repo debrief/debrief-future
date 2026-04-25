@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-import",
+  "name": "Test Import Tool",
+  "description": "Sample import tool",
+  "category": "import"
+}

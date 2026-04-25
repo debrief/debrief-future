@@ -11,7 +11,13 @@ import math
 import time
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 
 # LCG PRNG constants (Numerical Recipes) — identical in Python and TypeScript
@@ -173,6 +179,7 @@ def _generate_scatter(
     input_kinds=["RECTANGLE", "POLY", "CIRCLE"],
     output_kind="reference/generated_points",
     context_type=ContextType.SINGLE,
+    category=ToolCategoryEnum.calc,
     parameters=[
         ToolParameter(
             name="pattern",

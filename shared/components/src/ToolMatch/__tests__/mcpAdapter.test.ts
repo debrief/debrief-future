@@ -2,7 +2,7 @@
  * Unit tests for MCP adapter.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fromMCPTool, fromMCPTools, extractParameters, type MCPToolDefinition } from '../mcpAdapter';
 
 describe('mcpAdapter', () => {
@@ -236,4 +236,89 @@ describe('mcpAdapter', () => {
       });
     });
   });
+});
+
+describe('mcpAdapter — debrief:uiCategory (feature 207)', () => {
+  const sampleWithCategory = (
+    uiCategory: unknown | undefined,
+    name = 'sample-tool',
+  ): MCPToolDefinition =>
+    ({
+      name,
+      description: 'Sample',
+      inputSchema: {
+        type: 'object' as const,
+        properties: {
+          features: { type: 'array', items: { type: 'object' } },
+          params: { type: 'object', properties: {} },
+        },
+      },
+      annotations: {
+        'debrief:selectionRequirements': [{ kind: 'TRACK', min: 1 }],
+        'debrief:category': 'track/styling',
+        'debrief:version': '1.0.0',
+        'debrief:outputKind': 'mutation/track/styled',
+        ...(uiCategory !== undefined ? { 'debrief:uiCategory': uiCategory } : {}),
+      },
+    }) as unknown as MCPToolDefinition;
+
+  it('extracts canonical debrief:uiCategory into Tool.category', async () => {
+    const { fromMCPTool } = await import('../mcpAdapter');
+    const tool = fromMCPTool(sampleWithCategory('style'));
+    expect(tool.category).toBe('style');
+  });
+
+  it('returns undefined category when annotation is missing', async () => {
+    const { fromMCPTool } = await import('../mcpAdapter');
+    const tool = fromMCPTool(sampleWithCategory(undefined));
+    expect(tool.category).toBeUndefined();
+  });
+
+  it('coerces an invalid string to undefined and warns exactly once', async () => {
+    const { fromMCPTool } = await import('../mcpAdapter');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const tool = fromMCPTool(sampleWithCategory('geometry', 'bad-tool'));
+      expect(tool.category).toBeUndefined();
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toContain('bad-tool');
+      expect(warn.mock.calls[0][0]).toContain('geometry');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('coerces a non-string value to undefined and warns', async () => {
+    const { fromMCPTool } = await import('../mcpAdapter');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // @ts-expect-error — deliberately wrong type for boundary testing
+      const tool = fromMCPTool(sampleWithCategory(42, 'numeric-tool'));
+      expect(tool.category).toBeUndefined();
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toContain('numeric-tool');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('does NOT warn when annotation is absent', async () => {
+    const { fromMCPTool } = await import('../mcpAdapter');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      fromMCPTool(sampleWithCategory(undefined, 'quiet-tool'));
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it.each([['import'], ['style'], ['calc'], ['filter'], ['snapshot']])(
+    'accepts canonical category value %s',
+    async (value) => {
+      const { fromMCPTool } = await import('../mcpAdapter');
+      const tool = fromMCPTool(sampleWithCategory(value));
+      expect(tool.category).toBe(value);
+    },
+  );
 });

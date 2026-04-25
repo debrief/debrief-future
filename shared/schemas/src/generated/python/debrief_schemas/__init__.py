@@ -715,6 +715,33 @@ class ParameterTypeEnum(str, Enum):
     """
 
 
+class ToolCategoryEnum(str, Enum):
+    """
+    Visual category for Log Panel icon rendering. Declared by the tool at registration; consumed by frontends to colour tool-icon glyphs. See docs/log-panel-ux-srd.md §5.
+This enum defines only the declarable values. The neutral-grey "unknown" state shown by the Log Panel when a tool has no declared category is NOT a value of this enum — it is a rendering-layer fallback produced when the attribute is null or absent.
+    """
+    import_ = "import"
+    """
+    File / data ingestion tools (e.g., REP loader, DPF parser, CSV import)
+    """
+    style = "style"
+    """
+    Appearance-changing tools (e.g., set-track-color, symbol style, label interval)
+    """
+    calc = "calc"
+    """
+    Analytical computation tools (e.g., range-bearing, course/speed, statistics)
+    """
+    filter = "filter"
+    """
+    Tools that narrow the dataset (time filter, spatial filter, trim)
+    """
+    snapshot = "snapshot"
+    """
+    Tools that export or capture state (export-png, export-csv, export-geojson)
+    """
+
+
 class FileProvEventTypeEnum(str, Enum):
     """
     Type of file-level provenance event.
@@ -3714,6 +3741,7 @@ class Tool(ConfiguredBaseModel):
                        'SceneProperties']} })
     version: Optional[str] = Field(default=None, description="""Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool', 'SessionFile']} })
     requirements: Optional[list[SelectionRequirement]] = Field(default=[], description="""List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
+    category: Optional[ToolCategoryEnum] = Field(default=None, description="""Visual category for Log Panel icon rendering. Null / absent tools render with the neutral-grey \"Other\" icon. First-party tools MUST declare a value (enforced by test policy; see specs/207-tool-manifest-categories/research.md §R5). Feature 207.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
 
 
 class ToolParameter(ConfiguredBaseModel):

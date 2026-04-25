@@ -10,7 +10,7 @@ import math
 import uuid
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext
+from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolCategoryEnum
 from debrief_calc.registry import tool
 from debrief_schemas import OutputKindEnum
 
@@ -116,6 +116,7 @@ def _feature_name(feature: GeoJSONFeatureDict, fallback: str) -> str:
     output_kind=OutputKindEnum.datasetSOLIDUSrange_bearing_series,
     context_type=ContextType.MULTI,
     parameters=[],
+    category=ToolCategoryEnum.calc,
 )
 def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[GeoJSONFeatureDict]:
     """

@@ -69,6 +69,28 @@ enums:
       ReferencePointPattern:
         description: Reference point generation patterns (maps to ReferencePointPatternEnum)
 
+  ToolCategoryEnum:
+    description: >-
+      Visual category for Log Panel icon rendering. Declared by the tool
+      at registration; consumed by frontends to colour tool-icon glyphs.
+      See docs/log-panel-ux-srd.md §5.
+
+      This enum defines only the declarable values. The neutral-grey
+      "unknown" state shown by the Log Panel when a tool has no declared
+      category is NOT a value of this enum — it is a rendering-layer
+      fallback produced when the attribute is null or absent.
+    permissible_values:
+      import:
+        description: File / data ingestion tools (e.g., REP loader, DPF parser, CSV import)
+      style:
+        description: Appearance-changing tools (e.g., set-track-color, symbol style, label interval)
+      calc:
+        description: Analytical computation tools (e.g., range-bearing, course/speed, statistics)
+      filter:
+        description: Tools that narrow the dataset (time filter, spatial filter, trim)
+      snapshot:
+        description: Tools that export or capture state (export-png, export-csv, export-geojson)
+
 # ============================================================================
 # Classes
 # ============================================================================
@@ -150,6 +172,15 @@ classes:
         required: false
         multivalued: true
         inlined_as_list: true
+      category:
+        description: >-
+          Visual category for Log Panel icon rendering. Null / absent
+          tools render with the neutral-grey "Other" icon. First-party
+          tools MUST declare a value (enforced by test policy; see
+          specs/207-tool-manifest-categories/research.md §R5).
+          Feature 207.
+        range: ToolCategoryEnum
+        required: false
 
   ToolParameter:
     description: >-

@@ -31,6 +31,7 @@ export function LogEntry({
   featureNames,
   viewMode,
   isSelected,
+  toolCategories,
   onClick,
   // onTuneClick is kept in props for API compat but not used by rich card layout
   onRestoreClick,
@@ -110,10 +111,12 @@ export function LogEntry({
   const showDetails = viewMode === 'detailed';
 
   // Snapshot entries ("Manual checkpoint") — detect via the PROV-side `kind`
-  // discriminator, not via visual `ToolCategory`. Feature 208 replaces the
-  // feature 176 Decision 2A ToolCategory-equality check here; entry semantics
-  // now flow from `LogEntry.activity_type` on the LinkML schema, not from
-  // inferring meaning from the tool's visual category.
+  // discriminator (Feature 208), not via visual `ToolCategory`. Feature 208
+  // replaced the feature 176 Decision 2A ToolCategory-equality check; entry
+  // semantics now flow from `LogEntry.activity_type` on the LinkML schema,
+  // not from inferring meaning from the tool's visual category. The Log
+  // Panel icon itself still reads the manifest-declared visual category via
+  // `ToolCategoryIcon` below (Feature 207).
   const isSnapshot = entry.kind === 'snapshot';
 
   const ariaLabel =
@@ -145,7 +148,7 @@ export function LogEntry({
         {stepIndex != null && (
           <span className="log-panel__entry-step">{stepIndex}</span>
         )}
-        <ToolCategoryIcon toolName={entry.toolName} size={18} />
+        <ToolCategoryIcon toolName={entry.toolName} toolCategories={toolCategories} size={18} />
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {entry.rationale && (
           <span

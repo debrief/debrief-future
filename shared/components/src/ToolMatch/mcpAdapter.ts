@@ -8,8 +8,58 @@
 
 import type { Tool, SelectionRequirement, ToolParameter } from './types';
 import type { MCPToolDefinition, MCPSelectionRequirement } from '@debrief/utils';
+import type { ToolCategoryEnum } from '@debrief/schemas';
 
 export type { MCPToolDefinition, MCPSelectionRequirement };
+
+/**
+ * Canonical set of visual category values — the five `ToolCategoryEnum`
+ * permissible values. Hand-rolled whitelist (rather than deriving from
+ * `ToolCategoryEnum`'s entries) because it must survive transpilation
+ * unchanged and be efficient to check at runtime.
+ *
+ * Feature 207 (see shared/schemas/src/linkml/tool.yaml).
+ */
+const CANONICAL_TOOL_CATEGORIES: ReadonlySet<string> = new Set([
+  'import',
+  'style',
+  'calc',
+  'filter',
+  'snapshot',
+]);
+
+/**
+ * Boundary coercion for `debrief:uiCategory` from MCP annotations.
+ *
+ * Accepts only one of the five canonical ToolCategoryEnum values. Anything
+ * else — missing, null, unknown string, wrong type — produces `undefined`
+ * (the renderer's grey-fallback trigger). Unknown non-null strings emit a
+ * `console.warn` naming the tool and the offending value so that developers
+ * see the problem; end-users do not.
+ *
+ * Feature 207 (FR-007, FR-008).
+ */
+export function parseToolUICategory(
+  raw: unknown,
+  toolName: string,
+): ToolCategoryEnum | undefined {
+  if (raw === undefined || raw === null) return undefined;
+  if (typeof raw !== 'string') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[debrief:uiCategory] tool "${toolName}" declared a non-string category (${typeof raw}); falling back to neutral grey`,
+    );
+    return undefined;
+  }
+  if (!CANONICAL_TOOL_CATEGORIES.has(raw)) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[debrief:uiCategory] tool "${toolName}" declared category "${raw}" which is not one of import|style|calc|filter|snapshot; falling back to neutral grey`,
+    );
+    return undefined;
+  }
+  return raw as ToolCategoryEnum;
+}
 
 /**
  * Convert a single MCP tool definition to ToolMatchService Tool format.
@@ -25,12 +75,18 @@ export function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
       ...(req.max !== undefined ? { max: req.max } : {}),
     }));
 
+  const uiCategory = parseToolUICategory(
+    mcpTool.annotations['debrief:uiCategory'],
+    mcpTool.name,
+  );
+
   return {
     id: mcpTool.name,
     name: formatToolName(mcpTool.name),
     description: mcpTool.description,
     version: mcpTool.annotations['debrief:version'],
     requirements,
+    ...(uiCategory !== undefined ? { category: uiCategory } : {}),
   };
 }
 

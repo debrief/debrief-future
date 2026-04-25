@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from debrief_calc.models import ContextType, GeoJSONFeatureDict, SelectionContext, ToolParameter
+from debrief_calc.models import (
+    ContextType,
+    GeoJSONFeatureDict,
+    SelectionContext,
+    ToolCategoryEnum,
+    ToolParameter,
+)
 from debrief_calc.registry import tool
 
 ANNOTATION_KINDS = {"CIRCLE", "RECTANGLE", "LINE", "TEXT", "VECTOR"}
@@ -92,6 +98,7 @@ def _scale_coords_list(
     input_kinds=["CIRCLE", "RECTANGLE", "LINE", "TEXT", "VECTOR"],
     output_kind="mutation/shape/scaled",
     context_type=ContextType.MULTI,
+    category=ToolCategoryEnum.calc,
     parameters=[
         ToolParameter(
             name="scale_factor",

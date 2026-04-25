@@ -114,6 +114,24 @@ function isReadOnlyFsError(err: unknown): boolean {
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
   private itemCache: Map<string, StacItem> = new Map();
+  // #230 FR-051 — structured diagnostics for plot-load failures. Each
+  // null-return branch of loadPlot writes a line here so failures can be
+  // attributed to a specific step instead of just a silent `Failed to
+  // load plot` toast.
+  private diagnosticSink: { appendLine(line: string): void } | null = null;
+
+  /**
+   * #230 FR-051 — wire the Debrief output channel (or any line-sink) in
+   * at extension-activation time so `loadPlot` null-branches surface a
+   * structured failure cause.
+   */
+  setDiagnosticSink(sink: { appendLine(line: string): void }): void {
+    this.diagnosticSink = sink;
+  }
+
+  private logDiagnostic(line: string): void {
+    this.diagnosticSink?.appendLine(line);
+  }
 
   /**
    * Validate that a path contains a valid STAC catalog
@@ -299,12 +317,33 @@ export class StacService {
    * Load a plot from a STAC item
    */
   async loadPlot(store: StacStore, itemPath: string): Promise<Plot | null> {
+    const fullPath = path.join(store.path, itemPath);
     try {
-      const fullPath = path.join(store.path, itemPath);
       const item = await this.loadItem(fullPath);
 
       if (!item) {
+        this.logDiagnostic(
+          `[stac.loadPlot] item-not-found or unreadable: store=${store.path} itemPath=${itemPath} fullPath=${fullPath}`,
+        );
         return null;
+      }
+      // Verify required fields for downstream consumers — missing
+      // `properties.datetime` leads to a cryptic `Failed to load plot`
+      // later in the pipeline.
+      if (
+        item.properties === null ||
+        item.properties === undefined ||
+        typeof item.properties !== 'object'
+      ) {
+        this.logDiagnostic(
+          `[stac.loadPlot] item-has-no-properties: store=${store.path} itemPath=${itemPath}`,
+        );
+        return null;
+      }
+      if (item.properties.datetime === undefined) {
+        this.logDiagnostic(
+          `[stac.loadPlot] item-missing-required-field properties.datetime: store=${store.path} itemPath=${itemPath}`,
+        );
       }
 
       // Find GeoJSON asset
@@ -372,6 +411,10 @@ export class StacService {
         locationCount,
       };
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logDiagnostic(
+        `[stac.loadPlot] caught-exception: store=${store.path} itemPath=${itemPath} fullPath=${fullPath} error=${msg}`,
+      );
       console.error('Failed to load plot:', err);
       return null;
     }

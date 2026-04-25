@@ -1,0 +1,6 @@
+{
+  "id": "test-tool-no-category",
+  "name": "Test Tool Without Category",
+  "description": "Category omitted - should use grey fallback at render time",
+  "version": "1.0.0"
+}

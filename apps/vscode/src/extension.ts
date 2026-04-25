@@ -124,6 +124,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Wire output channel to services for cross-ecosystem diagnostics
   calcService.setOutputChannel(outputChannel);
   ioService.setOutputChannel(outputChannel);
+  // #230 FR-051 — structured loadPlot diagnostics so `Failed to load
+  // plot` failures attribute to a specific null-return branch.
+  stacService.setDiagnosticSink(outputChannel);
 
   console.warn('[Debrief] services initialized');
   outputChannel.appendLine('[startup] services initialized');
