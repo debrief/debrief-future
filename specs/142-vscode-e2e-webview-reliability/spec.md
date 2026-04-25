@@ -2,7 +2,7 @@
 
 **Feature Branch**: `142-vscode-e2e-webview-reliability`
 **Created**: 2026-03-18
-**Status**: Draft
+**Status**: Implementation complete (2026-04-25) — pending /speckit.pr (T032)
 **Input**: User description: "VS Code E2E webview reliability — research sprint: `resolveWebviewView` never fires in openvscode-server, causing ~15 test files (~50+ tests) to self-skip; research sprint to find reliable approach for real extension webview content in headless Playwright CI"
 
 ## Context
