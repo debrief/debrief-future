@@ -53,9 +53,7 @@ def _load_all_tools() -> None:
 
 def test_every_first_party_tool_has_a_category() -> None:
     """FR-003: first-party tools MUST declare a visual category."""
-    tools_without_category = [
-        t.name for t in registry.list_all() if t.category is None
-    ]
+    tools_without_category = [t.name for t in registry.list_all() if t.category is None]
     assert not tools_without_category, (
         "The following first-party tools have no visual category declared:\n"
         + "\n".join(f"  - {n}" for n in tools_without_category)
@@ -80,9 +78,8 @@ def test_every_category_is_canonical() -> None:
         value = t.category.value if isinstance(t.category, ToolCategoryEnum) else t.category
         if value not in CANONICAL_CATEGORY_VALUES:
             non_canonical.append((t.name, t.category))
-    assert not non_canonical, (
-        "Tools with non-canonical category values:\n"
-        + "\n".join(f"  - {n!r}: {c!r}" for n, c in non_canonical)
+    assert not non_canonical, "Tools with non-canonical category values:\n" + "\n".join(
+        f"  - {n!r}: {c!r}" for n, c in non_canonical
     )
 
 
@@ -96,14 +93,12 @@ def test_every_first_party_tool_emits_ui_category_annotation() -> None:
     ]
     assert not missing, (
         "Tools with a declared category whose to_mcp_tool() output omits "
-        "the debrief:uiCategory annotation:\n"
-        + "\n".join(f"  - {n}" for n in missing)
+        "the debrief:uiCategory annotation:\n" + "\n".join(f"  - {n}" for n in missing)
     )
 
 
 def test_registry_is_non_empty() -> None:
     """Sanity check — ensure we are actually measuring something."""
     assert len(registry.list_all()) >= len(_TOOL_MODULES), (
-        f"Expected at least {len(_TOOL_MODULES)} tools registered; "
-        f"got {len(registry.list_all())}."
+        f"Expected at least {len(_TOOL_MODULES)} tools registered; got {len(registry.list_all())}."
     )
