@@ -107,8 +107,8 @@
 
 **Independent test criteria**: A fresh reader of the runbook sees (a) step 1's `rm` target matches reality (`_posts/*.md`, no `future/` subdir), (b) a step explicitly covering image-asset copy. Verified by reading the patched `ARCHIVE-REBUILD.md`.
 
-- [ ] T026 Patch `ARCHIVE-REBUILD.md` on `debrief-future` main: step 1's `rm debrief.github.io/_posts/future/*.md` → `rm debrief.github.io/_posts/*.md`. `ARCHIVE-REBUILD.md`
-- [ ] T027 Insert new step (after step 2 "Copy generated files") in `ARCHIVE-REBUILD.md`: "Copy image assets. For every `![alt](/assets/images/future-debrief/<slug>/<basename>)` reference in a copied post, copy `specs/<slug>/evidence/screenshots/<basename>` (or `specs/<slug>/evidence/<basename>` for top-level GIFs) into `debrief.github.io:assets/images/future-debrief/<slug>/<basename>`. The migration helper at `scripts/232-apply-archive-rebuild.py` automates this." Renumber subsequent steps accordingly. Commit as `docs(232): fix ARCHIVE-REBUILD.md runbook bugs`. `ARCHIVE-REBUILD.md`
+- [x] T026 Patch `ARCHIVE-REBUILD.md` on `debrief-future` main: step 1's `rm debrief.github.io/_posts/future/*.md` → `rm debrief.github.io/_posts/*.md`. `ARCHIVE-REBUILD.md`
+- [x] T027 Insert new step (after step 2 "Copy generated files") in `ARCHIVE-REBUILD.md`: "Copy image assets. For every `![alt](/assets/images/future-debrief/<slug>/<basename>)` reference in a copied post, copy `specs/<slug>/evidence/screenshots/<basename>` (or `specs/<slug>/evidence/<basename>` for top-level GIFs) into `debrief.github.io:assets/images/future-debrief/<slug>/<basename>`. The migration helper at `scripts/232-apply-archive-rebuild.py` automates this." Renumber subsequent steps accordingly. Commit as `docs(232): fix ARCHIVE-REBUILD.md runbook bugs`. `ARCHIVE-REBUILD.md`
 
 **Phase 5 completion gate**: Runbook reads cleanly; fresh maintainer can follow it without tripping over the two documented defects. US3 satisfied.
 

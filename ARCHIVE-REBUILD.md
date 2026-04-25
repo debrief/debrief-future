@@ -430,18 +430,30 @@ _No malformed references detected._
 
 Hand this index to the `debrief.github.io` maintainer. They execute the four steps below without needing follow-up questions.
 
-1. **Wipe existing future posts** on `debrief.github.io`:
+1. **Wipe existing future posts** on `debrief.github.io`. Posts live at
+   `_posts/*.md` (flat — there is no `_posts/future/` subdirectory). Only
+   delete the subset that is superseded or merged by the archive — non-Future-Debrief
+   legacy posts must be preserved (see #232 FR-002):
    ```sh
-   rm debrief.github.io/_posts/future/*.md
+   # Subset is computed by the migration helper — do not blanket-delete.
+   rm debrief.github.io/_posts/<files-classified-as-replace-or-merge>.md
    ```
 2. **Copy generated files**: for every row in the index table, copy the file at
-   `Generated Path` into `debrief.github.io/_posts/future/YYYY-MM-DD-<slug>.md`,
+   `Generated Path` into `debrief.github.io/_posts/YYYY-MM-DD-<slug>.md`,
    where `YYYY-MM-DD` is the `Date` column and `<slug>` derives from the
    `Title` column (kebab-case, lowercased, `Building` prefix stripped).
-3. **Adjust front matter** of each copied file: ensure `layout: future-post`,
-   add `permalink: /future/<slug>/`, verify `excerpt` is a single sentence
-   under 150 characters, and confirm `date` matches the filename.
-4. **Build and deploy**:
+3. **Copy image assets**: for every `![alt](/assets/images/future-debrief/<slug>/<basename>)`
+   reference in a copied post, copy `specs/<slug>/evidence/screenshots/<basename>`
+   (or `specs/<slug>/evidence/<basename>` for top-level GIFs) into
+   `debrief.github.io/assets/images/future-debrief/<slug>/<basename>`. Symlinks
+   are resolved to the real file at copy time. The migration helper at
+   `scripts/232-apply-archive-rebuild.py` (spec 232) automates this and
+   pre-flight-blocks if any reference fails to resolve.
+4. **Adjust front matter** of each copied file: ensure `layout: future-post`,
+   verify `excerpt` is a single sentence under 150 characters, and confirm
+   `date` matches the filename. Preserve any existing site-side `permalink`
+   and `reading_time` values via the front-matter merge (#232 FR-005).
+5. **Build and deploy**:
    ```sh
    cd debrief.github.io
    bundle exec jekyll build
