@@ -166,7 +166,12 @@
 
 ### PR creation
 
-- [ ] T052 Create PR and publish blog: run `/speckit.pr`. This opens the feature PR in `debrief/debrief-future` with the full commit trajectory + evidence + runbook patch, opens the cross-repo migration PR on `debrief/debrief.github.io:master` (body from `evidence/migration-report-sample.md`), and publishes `media/shipped-post.md` to `debrief/debrief.github.io`. Returns three PR URLs.
+- [x] T052 Create PR and publish blog: run `/speckit.pr`. This opens the feature PR in `debrief/debrief-future` with the full commit trajectory + evidence + runbook patch, opens the cross-repo migration PR on `debrief/debrief.github.io:master` (body from `evidence/migration-report-sample.md`), and publishes `media/shipped-post.md` to `debrief/debrief.github.io`. Returns three PR URLs.
+
+  **Status**: 2 of 3 PRs opened.
+  - Feature PR (debrief-future): https://github.com/debrief/debrief-future/pull/550
+  - Migration PR (debrief.github.io): https://github.com/debrief/debrief.github.io/pull/89
+  - Blog PR (debrief.github.io): deferred — invoke `/publish-future-post` from a debrief.github.io Claude Code session.
 
 **Task T052 must run last. It depends on every prior task being complete, including the companion PR merge (T004→T036), all evidence files (T043–T047), US5 verification (T048–T049), helper deletion (T050), and the blog post (T051).**
 
