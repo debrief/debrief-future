@@ -146,8 +146,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
   async function readApiKey(): Promise<string | null> {
     if (cachedKey !== undefined) return cachedKey;
     const value = await vscodeApi.secrets.get(SECRET_KEY);
-    cachedKey = value ?? null;
-    return cachedKey;
+    const resolved: string | null = value ?? null;
+    cachedKey = resolved;
+    return resolved;
   }
 
   function readConfigSync(): HostLiveConfig {

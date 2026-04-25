@@ -13,6 +13,13 @@
  * `createLiveLLMClient` keeps its `fetch()` call to the loopback proxy; the
  * proxy's upstream call is what now delegates here.
  *
+ * The triple-slash directive below pulls Node's type definitions into THIS
+ * file only — the `@debrief/components` tsconfig deliberately omits `node`
+ * from `types` so the rest of the package retains its DOM-only typing
+ * surface. Without this directive, `Buffer`, `process`, and the `node:https`
+ * specifier all surface as TS2591 "Cannot find name" errors during
+ * `pnpm --filter @debrief/components build`.
+ *
  * Behaviour guarantees:
  *   - Never throws. Every outcome — success, failure, cancellation, timeout —
  *     is returned as a `LiveOutcome`.
@@ -23,6 +30,8 @@
  *   - Wall-clock `timeoutMs` is enforced via `setTimeout` + `req.destroy`.
  *   - Neither `apiKey` nor prompt/response bodies are logged anywhere.
  */
+
+/// <reference types="node" />
 
 import { Agent, request as httpsRequest } from "node:https";
 
