@@ -23,6 +23,8 @@ import type {
 } from '@debrief/components';
 import type { ReplayResult } from '@debrief/session-state';
 
+export type { ToolCategoryMap };
+
 // ─── Webview → Extension messages ────────────────────────────────────────
 
 /** Phase 6 (Feature 076-replay-tune): request a parameter tune + replay. */

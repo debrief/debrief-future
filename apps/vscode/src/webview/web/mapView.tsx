@@ -9,7 +9,7 @@
  * - Keyboard shortcuts for undo/redo
  */
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MapView, createDrawnFeature, getPaletteStyleOverrides, captureMapAsDataUrl, downscaleDataUrl } from '@debrief/components';
 import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance, FlyToTarget, SceneRectangleLayerProps } from '@debrief/components';
@@ -237,19 +237,55 @@ function MapViewApp(): React.ReactElement {
     });
   }, []);
 
-  // Viewport change callback
+  // Track current zoom so bounds-change emissions carry a real zoom
+  // rather than the prior hard-coded `10`. handleZoomChange updates this.
+  const currentZoomRef = useRef<number>(10);
+
+  // Viewport change callback. #230 FR-050: emit a full `viewportChanged`
+  // including the polygon bounds so `mapPanel.handleViewportChanged` can
+  // update the session store. Previously this fired `viewStateChanged`
+  // without bounds — the host-side branch skipped the update and a fresh
+  // capture surfaced "map has not reported a viewport yet".
+  // `bounds` from MapView.tsx is [west, south, east, north] (WSEN).
   const handleBoundsChange = useCallback((bounds: Bounds) => {
+    const [west, south, east, north] = bounds;
+    const center: [number, number] = [
+      (south + north) / 2,
+      (west + east) / 2,
+    ];
+    // Four-corner polygon NW, NE, SE, SW in [lng, lat] GeoJSON order.
+    const polygon: [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ] = [
+      [west, north],
+      [east, north],
+      [east, south],
+      [west, south],
+    ];
     vscode.postMessage({
-      type: 'viewStateChanged',
-      state: {
-        center: [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2],
-        zoom: 10, // Approximate - actual zoom handled by onZoomChange
-        timeRange: { start: '', end: '' },
+      type: 'viewportChanged',
+      viewport: {
+        center,
+        zoom: currentZoomRef.current,
+        bounds: polygon,
+      } as {
+        center: [number, number];
+        zoom: number;
+        bounds: [
+          [number, number],
+          [number, number],
+          [number, number],
+          [number, number],
+        ];
       },
     });
   }, []);
 
   const handleZoomChange = useCallback((zoom: number) => {
+    currentZoomRef.current = zoom;
     const currentState = vscode.getState() ?? {};
     vscode.setState({ ...currentState, zoom });
   }, []);

@@ -6,7 +6,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@debrief/components';
-import App from './App';
+import App, { StoryboardEditHarnessMount } from './App';
 import './App.css';
 
 // Import Leaflet CSS for map rendering
@@ -25,10 +25,18 @@ if (!container) {
 
 const root = createRoot(container);
 
+// #230 US4 — top-level branch: when `?storyboard-edit-harness` is
+// present, mount the harness view instead of the standard shell so
+// Playwright can drive the polish loop without VS Code. Routed here
+// (not in App) so App's hook order stays deterministic per-render.
+const isHarness =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).has('storyboard-edit-harness');
+
 root.render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      {isHarness ? <StoryboardEditHarnessMount /> : <App />}
     </ThemeProvider>
   </StrictMode>
 );

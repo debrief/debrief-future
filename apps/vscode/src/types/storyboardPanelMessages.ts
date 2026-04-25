@@ -8,7 +8,9 @@
  */
 
 import type {
+  SceneEditViewModel,
   SceneRowViewModel,
+  StoryboardEditViewModel,
   StoryboardOptionViewModel,
   TransportViewModel,
 } from '@debrief/components';
@@ -75,6 +77,12 @@ export interface StoryboardPlaybackSnapshotMessage {
   readonly activeStoryboardName: string | null;
   readonly currentSceneId: string | null;
   readonly transport: TransportViewModel;
+  // #230 — edit-suite enrichments (FR-020). Optional so #217 fixtures /
+  // tests keep compiling. When present, the panel renders edit forms,
+  // stale badges, and undo toasts against the supplied view-models.
+  readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
+  readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
+  readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
 }
 
 /**
@@ -107,6 +115,11 @@ export type ExtensionToStoryboardPanelMessage =
       readonly scenes: SceneRowViewModel[];
       readonly activeStoryboardName: string | null;
       readonly activeStoryboardId: string | null;
+      // #230 — edit-suite enrichments (FR-020). Same fields as the
+      // `snapshot` message so the panel reducer handles both uniformly.
+      readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
+      readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
+      readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
     }
   | {
       readonly type: 'captureInFlight';
