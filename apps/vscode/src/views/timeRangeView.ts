@@ -49,6 +49,11 @@ type WebviewMessage =
 export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.timeRange';
 
+  /** Public accessor for the active webview (#220 theme relay). */
+  public get webview(): vscode.Webview | undefined {
+    return this._view?.webview;
+  }
+
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
   private _timeExtent: { start: number; end: number } | null = null;

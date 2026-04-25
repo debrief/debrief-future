@@ -931,3 +931,36 @@ Adopt the schema-rooted approach. Concretely:
 - `specs/191-vscode-nl-search/evidence/migration-nl-demo-playwright.txt` — on-the-wire envelope regression tracking.
 - `specs/191-vscode-nl-search/contracts/llm-client.ts` — canonical contract.
 
+### ADR-025: Theme Variant Model — Flat Union with First-Class High Contrast (2026-04-25)
+
+**Decision.** Replace the muddled `'light' | 'dark' | 'vscode' | 'system'` `ThemeVariant` union with a flat first-class enumeration:
+
+```ts
+type ThemeVariant =
+  | 'light'
+  | 'dark'
+  | 'high-contrast-light'
+  | 'high-contrast-dark'
+  | 'system';
+```
+
+The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the variant resolves to one of the four explicit values via `vsCodeBodyClassSource`, which reads the `vscode-light` / `vscode-dark` / `vscode-high-contrast` / `vscode-high-contrast-light` body class that VS Code applies to every webview.
+
+**Rejected alternatives.**
+
+- **Separate contrast axis.** Modelled as `{ palette: 'light' | 'dark', highContrast: boolean }`. Rejected: a single `data-theme` attribute is simpler than two sources of truth, and components that style themselves with `[data-theme='high-contrast-dark']` don't need to compose two CSS selectors. The `isHighContrast` derived flag is exposed on the `useTheme()` hook for components that genuinely need both axes.
+- **CSS-only hook.** Rely on the user's OS preference for `prefers-contrast: more` and let CSS handle everything. Rejected: VS Code does not propagate the OS contrast preference to webviews — the host explicitly chooses a high-contrast theme based on its own settings, and the body-class signal is the only authoritative source for which one is active.
+- **Keep `'vscode'` as a synonym for "use VS Code tokens".** Rejected: it carries no information that the four explicit values don't. It also forced a runtime `isVSCodeEnvironment()` check inside `ThemeProvider` whose `getComputedStyle()` fallback produced a false-positive when Storybook injected synthetic `--vscode-*` values; that bug bit twice during the #209 audit.
+
+**Consequences.**
+
+- **Single value, single attribute.** A variant maps 1:1 to a `[data-theme]` attribute and to a key in `VS_CODE_TOKEN_MAP`. Adding a new VS Code theme kind requires extending exactly one table (`bodyClassToVariant` in `vsCodeAdapter.ts`); the structural-parity test at `vsCodeTokenMap.test.ts` enforces every variant covers the same set of `--vscode-*` keys.
+- **Contract clarity.** The `ThemeSource` interface (`contracts/theme-source.md`) makes the source of the variant explicit at the boundary: webviews subscribe to `vsCodeBodyClassSource()`, web-shell / Storybook to `mediaQuerySource()`, pinned tests to `staticSource(variant)`. No more scattered `prefers-color-scheme` listeners or computed-style probes.
+- **Backward compat.** Pre-release freedom (Constitution Article XIV) permits retiring the `'vscode'` value without a deprecation shim. All call-sites under `shared/components/src/` and `apps/vscode/src/` migrated in a single commit.
+
+**Originating issue:** Backlog item #220 (Tech Debt). Spec: `specs/220-fix-theme-responsiveness/`.
+
+**Evidence:**
+- `specs/220-fix-theme-responsiveness/evidence/test-summary.md` — full test transcript across the four variants.
+- `specs/220-fix-theme-responsiveness/evidence/screenshots/all-panels-{light,dark,high-contrast-light,high-contrast-dark}.png` — visual consistency proof.
+- `specs/220-fix-theme-responsiveness/evidence/screenshots/interaction.gif` — runtime-switch demo.

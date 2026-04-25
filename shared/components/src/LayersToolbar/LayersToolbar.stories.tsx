@@ -238,7 +238,7 @@ export const MultiContext: Story = {
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>VS Code</div>
-          <ThemeProvider theme={{ variant: 'vscode' }}>
+          <ThemeProvider theme={{ variant: 'dark' }}>
             <LayersToolbar {...sharedProps} />
           </ThemeProvider>
         </div>

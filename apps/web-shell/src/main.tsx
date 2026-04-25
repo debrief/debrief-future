@@ -33,9 +33,14 @@ const isHarness =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).has('storyboard-edit-harness');
 
+// #220 — request `system` so the ThemeProvider's resolved variant tracks
+// the active source (auto-detected: vsCodeBodyClassSource if a `vscode-*`
+// body class is present, else mediaQuerySource on prefers-color-scheme +
+// prefers-contrast). With the default `{ variant: 'light' }` the source
+// would be ignored and `data-theme` would never reflect runtime changes.
 root.render(
   <StrictMode>
-    <ThemeProvider>
+    <ThemeProvider theme={{ variant: 'system' }}>
       {isHarness ? <StoryboardEditHarnessMount /> : <App />}
     </ThemeProvider>
   </StrictMode>

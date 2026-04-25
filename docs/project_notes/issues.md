@@ -66,3 +66,9 @@ Each entry should include:
 - **Status**: Completed
 - **Description**: Added schema definitions for GeoJSON styling
 - **URL**: https://github.com/debrief/debrief-future/pull/59
+
+### 2026-04-25 - #220: VS Code Theme Responsiveness
+- **Status**: Implementation complete (PR pending)
+- **Description**: Make every Debrief webview reflect VS Code's active colour theme on load and update within 1s on switch. Replace muddled `'vscode'` variant with a flat first-class enum that distinguishes high-contrast variants. Wire every webview through a shared `<Bootstrap>` wrapper. Inject `--vscode-*` token map per variant in Storybook so the toolbar actually drives component colours.
+- **Spec**: `specs/220-fix-theme-responsiveness/spec.md`
+- **ADR**: ADR-025 in `docs/project_notes/decisions.md`

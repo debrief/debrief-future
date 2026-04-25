@@ -13,7 +13,6 @@ import React, { useCallback, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   StoryboardPanel,
-  ThemeProvider,
   useStoryboardEditReducer,
 } from '@debrief/components';
 import type {
@@ -22,10 +21,10 @@ import type {
   TransportViewModel,
   SceneEditViewModel,
   StoryboardEditViewModel,
-  Theme,
   UndoToastDescriptor,
   StaleFlagEntry,
 } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 
 interface AcquiredVsCodeApi {
   postMessage(message: unknown): void;
@@ -50,7 +49,7 @@ interface CaptureInFlightMessage {
 
 interface ThemeMessage {
   type: 'theme';
-  theme: 'light' | 'dark' | 'vscode';
+  theme: 'light' | 'dark' | 'high-contrast-light' | 'high-contrast-dark';
 }
 
 interface SnapshotMessage {
@@ -283,10 +282,12 @@ function StoryboardPanelApp(): React.ReactElement {
     [],
   );
 
-  const themeConfig: Theme = { variant: state.theme };
+  // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
+  // local `state.theme` is retained only because the reducer's existing
+  // shape accepts it; it no longer drives the React tree.
 
   return (
-    <ThemeProvider theme={themeConfig}>
+    <>
       <StoryboardPanel
         scenes={state.sceneRows}
         activeStoryboardName={state.activeStoryboardName}
@@ -329,11 +330,15 @@ function StoryboardPanelApp(): React.ReactElement {
         onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
         onUndoToastDismiss={dismissUndoToast}
       />
-    </ThemeProvider>
+    </>
   );
 }
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
-  createRoot(rootEl).render(<StoryboardPanelApp />);
+  createRoot(rootEl).render(
+    <Bootstrap>
+      <StoryboardPanelApp />
+    </Bootstrap>
+  );
 }

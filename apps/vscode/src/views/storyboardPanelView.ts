@@ -37,6 +37,13 @@ const VIEW_TYPE = 'debrief.storyboardPanel';
 export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = VIEW_TYPE;
 
+  /**
+   * Public accessor for the active webview (#220 theme relay).
+   */
+  public get webview(): vscode.Webview | undefined {
+    return this.view?.webview;
+  }
+
   private view: vscode.WebviewView | undefined;
   private webviewReady = false;
   private pendingMessages: ExtensionToStoryboardPanelMessage[] = [];

@@ -102,6 +102,16 @@ type OverviewToExtensionMessage =
 export class CatalogOverviewPanel {
   public static readonly viewType = 'debrief.catalogOverview';
 
+  /** Iterate every active CatalogOverview panel (used by the theme relay #220). */
+  public static getActivePanels(): readonly CatalogOverviewPanel[] {
+    return Array.from(CatalogOverviewPanel.panels.values());
+  }
+
+  /** Public accessor for the underlying webview (#220 theme relay). */
+  public get webview(): vscode.Webview {
+    return this.panel.webview;
+  }
+
   private static panels: Map<string, CatalogOverviewPanel> = new Map();
 
   private readonly panel: vscode.WebviewPanel;

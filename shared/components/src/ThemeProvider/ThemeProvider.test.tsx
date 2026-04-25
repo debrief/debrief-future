@@ -7,12 +7,13 @@ import { VS_CODE_TOKEN_MAP } from './vsCodeTokenMap';
 
 // Test component to access theme context
 function ThemeConsumer() {
-  const { theme, resolvedVariant, isDark, setTheme } = useTheme();
+  const { theme, resolvedVariant, isDark, isHighContrast, setTheme } = useTheme();
   return (
     <div>
       <span data-testid="variant">{theme.variant}</span>
       <span data-testid="resolved">{resolvedVariant}</span>
       <span data-testid="isDark">{isDark ? 'dark' : 'light'}</span>
+      <span data-testid="isHighContrast">{isHighContrast ? 'hc' : 'normal'}</span>
       <button onClick={() => setTheme({ variant: 'dark' })} data-testid="setDark">
         Set Dark
       </button>
@@ -24,6 +25,7 @@ describe('ThemeProvider', () => {
   beforeEach(() => {
     // Reset document attributes
     document.documentElement.removeAttribute('data-theme');
+    document.body.className = '';
   });
 
   it('provides default light theme', () => {
@@ -77,15 +79,30 @@ describe('ThemeProvider', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 
-  it('supports vscode theme variant', () => {
+  it('supports high-contrast-light variant with isHighContrast flag', () => {
     render(
-      <ThemeProvider theme={{ variant: 'vscode' }}>
+      <ThemeProvider theme={{ variant: 'high-contrast-light' }}>
         <ThemeConsumer />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('variant')).toHaveTextContent('vscode');
-    expect(screen.getByTestId('isDark')).toHaveTextContent('dark'); // vscode is treated as dark
+    expect(screen.getByTestId('variant')).toHaveTextContent('high-contrast-light');
+    expect(screen.getByTestId('resolved')).toHaveTextContent('high-contrast-light');
+    expect(screen.getByTestId('isDark')).toHaveTextContent('light');
+    expect(screen.getByTestId('isHighContrast')).toHaveTextContent('hc');
+  });
+
+  it('supports high-contrast-dark variant with isHighContrast flag', () => {
+    render(
+      <ThemeProvider theme={{ variant: 'high-contrast-dark' }}>
+        <ThemeConsumer />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('variant')).toHaveTextContent('high-contrast-dark');
+    expect(screen.getByTestId('resolved')).toHaveTextContent('high-contrast-dark');
+    expect(screen.getByTestId('isDark')).toHaveTextContent('dark');
+    expect(screen.getByTestId('isHighContrast')).toHaveTextContent('hc');
   });
 
   it('renders children', () => {
@@ -118,9 +135,10 @@ describe('ThemeProvider', () => {
   });
 });
 
-describe('ThemeProvider — VS Code variable injection (Feature 209)', () => {
+describe('ThemeProvider — VS Code variable injection (Feature 209/220)', () => {
   beforeEach(() => {
     document.documentElement.removeAttribute('data-theme');
+    document.body.className = '';
     // Clear any previously-injected --vscode-* variables so each test starts clean.
     const root = document.documentElement;
     for (const entry of Object.values(VS_CODE_TOKEN_MAP)) {
@@ -162,19 +180,32 @@ describe('ThemeProvider — VS Code variable injection (Feature 209)', () => {
       .toBe(VS_CODE_TOKEN_MAP.dark['--vscode-editor-background']);
   });
 
-  it('does NOT inject --vscode-* values when variant is vscode (real host supplies them)', () => {
+  it('injects high-contrast-light --vscode-* values when variant is high-contrast-light', () => {
     render(
-      <ThemeProvider theme={{ variant: 'vscode' }}>
+      <ThemeProvider theme={{ variant: 'high-contrast-light' }}>
         <div>Content</div>
       </ThemeProvider>
     );
 
     const root = document.documentElement;
-    // No synthetic inline value — the inline style property should be empty
-    // (VS Code supplies the variable in a real stylesheet at the host level,
-    // which getPropertyValue on inline style does not reflect).
-    expect(root.style.getPropertyValue('--vscode-foreground')).toBe('');
-    expect(root.style.getPropertyValue('--vscode-sideBar-background')).toBe('');
+    expect(root.style.getPropertyValue('--vscode-foreground'))
+      .toBe(VS_CODE_TOKEN_MAP['high-contrast-light']['--vscode-foreground']);
+    expect(root.style.getPropertyValue('--vscode-sideBar-background'))
+      .toBe(VS_CODE_TOKEN_MAP['high-contrast-light']['--vscode-sideBar-background']);
+  });
+
+  it('injects high-contrast-dark --vscode-* values when variant is high-contrast-dark', () => {
+    render(
+      <ThemeProvider theme={{ variant: 'high-contrast-dark' }}>
+        <div>Content</div>
+      </ThemeProvider>
+    );
+
+    const root = document.documentElement;
+    expect(root.style.getPropertyValue('--vscode-foreground'))
+      .toBe(VS_CODE_TOKEN_MAP['high-contrast-dark']['--vscode-foreground']);
+    expect(root.style.getPropertyValue('--vscode-sideBar-background'))
+      .toBe(VS_CODE_TOKEN_MAP['high-contrast-dark']['--vscode-sideBar-background']);
   });
 
   it('switching from light to dark re-applies the correct variant values', () => {
@@ -208,13 +239,13 @@ describe('ThemeProvider — VS Code variable injection (Feature 209)', () => {
       .toBe(VS_CODE_TOKEN_MAP.dark['--vscode-foreground']);
   });
 
-  it('switching from dark to vscode removes the synthetic values', () => {
+  it('switching variants clears the previous variant values', () => {
     function Switcher() {
       const { setTheme } = useTheme();
       return (
         <button
-          onClick={() => setTheme({ variant: 'vscode' })}
-          data-testid="switch-to-vscode"
+          onClick={() => setTheme({ variant: 'high-contrast-dark' })}
+          data-testid="switch-hc-dark"
         >
           switch
         </button>
@@ -228,16 +259,15 @@ describe('ThemeProvider — VS Code variable injection (Feature 209)', () => {
     );
 
     const root = document.documentElement;
-    // Sanity check: dark values injected first.
     expect(root.style.getPropertyValue('--vscode-foreground'))
       .toBe(VS_CODE_TOKEN_MAP.dark['--vscode-foreground']);
 
     act(() => {
-      screen.getByTestId('switch-to-vscode').click();
+      screen.getByTestId('switch-hc-dark').click();
     });
 
-    // After switching to vscode, synthetic inline values are cleared.
-    expect(root.style.getPropertyValue('--vscode-foreground')).toBe('');
+    expect(root.style.getPropertyValue('--vscode-foreground'))
+      .toBe(VS_CODE_TOKEN_MAP['high-contrast-dark']['--vscode-foreground']);
   });
 });
 

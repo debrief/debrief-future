@@ -18,6 +18,7 @@ import type {
   WebviewToExtensionMessage,
   SceneRectangleSnapshot,
 } from '../messages';
+import { Bootstrap } from './_bootstrap';
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -471,5 +472,9 @@ function MapViewApp(): React.ReactElement {
 const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);
-  root.render(<MapViewApp />);
+  root.render(
+    <Bootstrap>
+      <MapViewApp />
+    </Bootstrap>
+  );
 }

@@ -13,7 +13,23 @@ export {
   defaultTheme,
   lightThemeTokens,
   darkThemeTokens,
-  vsCodeThemeTokens,
+  highContrastLightThemeTokens,
+  highContrastDarkThemeTokens,
   getThemeTokens,
   mergeThemeTokens,
 } from './defaultTheme';
+
+export type { ResolvedVariant, ThemeSource } from './ThemeSource';
+
+export {
+  vsCodeBodyClassSource,
+  bodyClassToVariant,
+  isVSCodeEnvironment,
+  setupVSCodeThemeSync,
+  createVSCodeTheme,
+  applyVSCodeTokens,
+  extractVSCodeTokens,
+  isVSCodeDarkMode,
+} from './vsCodeAdapter';
+
+export { mediaQuerySource, staticSource } from './browserAdapter';

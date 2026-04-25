@@ -1,26 +1,32 @@
 import { describe, it, expect } from 'vitest';
 import { VS_CODE_TOKEN_MAP, REQUIRED_VS_CODE_KEYS } from '../vsCodeTokenMap';
 
+const VARIANTS = ['light', 'dark', 'high-contrast-light', 'high-contrast-dark'] as const;
+
 describe('VS_CODE_TOKEN_MAP', () => {
-  it('defines entries for both light and dark variants', () => {
-    expect(Object.keys(VS_CODE_TOKEN_MAP).sort()).toEqual(['dark', 'light']);
+  it('defines entries for every explicit variant', () => {
+    expect(Object.keys(VS_CODE_TOKEN_MAP).sort()).toEqual([...VARIANTS].sort());
   });
 
-  it('each variant entry is a non-empty record', () => {
-    expect(Object.keys(VS_CODE_TOKEN_MAP.light).length).toBeGreaterThan(0);
-    expect(Object.keys(VS_CODE_TOKEN_MAP.dark).length).toBeGreaterThan(0);
+  it('every variant entry is a non-empty record', () => {
+    for (const variant of VARIANTS) {
+      expect(Object.keys(VS_CODE_TOKEN_MAP[variant]).length).toBeGreaterThan(0);
+    }
   });
 
-  it('light and dark variants have identical key sets (structural parity)', () => {
-    const lightKeys = Object.keys(VS_CODE_TOKEN_MAP.light).sort();
-    const darkKeys = Object.keys(VS_CODE_TOKEN_MAP.dark).sort();
-    expect(lightKeys).toEqual(darkKeys);
+  it('every variant has identical key sets (structural parity)', () => {
+    const reference = Object.keys(VS_CODE_TOKEN_MAP.light).sort();
+    for (const variant of VARIANTS) {
+      const keys = Object.keys(VS_CODE_TOKEN_MAP[variant]).sort();
+      expect(keys, `variant=${variant}`).toEqual(reference);
+    }
   });
 
   it('every required key is present in every variant', () => {
     for (const key of REQUIRED_VS_CODE_KEYS) {
-      expect(VS_CODE_TOKEN_MAP.light[key], `light: ${key}`).toBeDefined();
-      expect(VS_CODE_TOKEN_MAP.dark[key], `dark: ${key}`).toBeDefined();
+      for (const variant of VARIANTS) {
+        expect(VS_CODE_TOKEN_MAP[variant][key], `${variant}: ${key}`).toBeDefined();
+      }
     }
   });
 
@@ -31,7 +37,7 @@ describe('VS_CODE_TOKEN_MAP', () => {
   });
 
   it('every value is a non-empty string', () => {
-    for (const variant of ['light', 'dark'] as const) {
+    for (const variant of VARIANTS) {
       for (const [key, value] of Object.entries(VS_CODE_TOKEN_MAP[variant])) {
         expect(typeof value, `${variant}.${key} type`).toBe('string');
         expect(value.length, `${variant}.${key} length`).toBeGreaterThan(0);
@@ -48,6 +54,15 @@ describe('VS_CODE_TOKEN_MAP', () => {
     );
     expect(VS_CODE_TOKEN_MAP.light['--vscode-sideBar-background']).not.toBe(
       VS_CODE_TOKEN_MAP.dark['--vscode-sideBar-background']
+    );
+  });
+
+  it('high-contrast variants differ from their non-HC counterparts', () => {
+    expect(VS_CODE_TOKEN_MAP['high-contrast-light']['--vscode-contrastBorder']).not.toBe(
+      VS_CODE_TOKEN_MAP.light['--vscode-contrastBorder']
+    );
+    expect(VS_CODE_TOKEN_MAP['high-contrast-dark']['--vscode-contrastBorder']).not.toBe(
+      VS_CODE_TOKEN_MAP.dark['--vscode-contrastBorder']
     );
   });
 
@@ -81,8 +96,9 @@ describe('VS_CODE_TOKEN_MAP', () => {
       '--vscode-editor-font-family',
     ];
     for (const key of logPanelKeys) {
-      expect(VS_CODE_TOKEN_MAP.light[key], `light: ${key}`).toBeDefined();
-      expect(VS_CODE_TOKEN_MAP.dark[key], `dark: ${key}`).toBeDefined();
+      for (const variant of VARIANTS) {
+        expect(VS_CODE_TOKEN_MAP[variant][key], `${variant}: ${key}`).toBeDefined();
+      }
     }
   });
 });

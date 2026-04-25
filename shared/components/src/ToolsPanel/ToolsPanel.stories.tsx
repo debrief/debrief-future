@@ -263,7 +263,7 @@ export const VSCodeTheme: Story = {
     tools: MIXED_TOOLS,
   },
   render: (args) => (
-    <ThemeProvider theme={{ variant: 'vscode' }}>
+    <ThemeProvider theme={{ variant: 'dark' }}>
       <div style={{ width: 320, padding: 16, background: '#1e1e1e' }}>
         <ToolsPanel {...args} />
       </div>

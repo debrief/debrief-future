@@ -26,6 +26,7 @@ import rawTaxonomy from '../../../../../shared/schemas/fixtures/stac-browser/ves
 // bundle is shipped as a static JSON asset under `shared/data/` and bundled
 // into the webview by esbuild at compile time.
 import rawEnumBundle from '../../../../../shared/data/enum-bundle.json';
+import { Bootstrap } from './_bootstrap';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -196,7 +197,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <CatalogOverviewApp />
+      <Bootstrap>
+        <CatalogOverviewApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

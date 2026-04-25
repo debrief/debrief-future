@@ -127,7 +127,11 @@ export type ExtensionToStoryboardPanelMessage =
     }
   | {
       readonly type: 'theme';
-      readonly theme: 'light' | 'dark' | 'vscode';
+      readonly theme:
+        | 'light'
+        | 'dark'
+        | 'high-contrast-light'
+        | 'high-contrast-dark';
     }
   // #217 — full playback snapshot
   | StoryboardPlaybackSnapshotMessage

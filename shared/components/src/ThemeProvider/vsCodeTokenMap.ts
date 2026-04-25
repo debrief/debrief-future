@@ -11,19 +11,23 @@
  *
  * Fix:
  *   `ThemeProvider` injects this map into `document.documentElement` when
- *   the resolved variant is `'light'` or `'dark'` and we are NOT inside a
- *   VS Code webview. When the resolved variant is `'vscode'`, injection is
- *   skipped so the real VS Code host supplies the variables.
+ *   the resolved variant is one of the four explicit values and we are
+ *   NOT inside a VS Code webview (where the host supplies the variables).
  *
- * Values sourced from VS Code's published `Default Light+` and
- * `Default Dark+` themes (as of VS Code ^1.85). Only keys actually used by
- * components in `shared/components/src/**\/*.css` are included — adding new
- * VS Code variables to component CSS requires adding them here too.
+ * Values sourced from VS Code's published `Default Light+`, `Default Dark+`,
+ * `Default High Contrast Light`, and `Default High Contrast` themes (as of
+ * VS Code ^1.85). Only keys actually used by components in
+ * `shared/components/src/**\/*.css` are included — adding new VS Code
+ * variables to component CSS requires adding them here too.
  *
- * Feature: 209-logpanel-a11y-audit
+ * Features: 209-logpanel-a11y-audit, 220-fix-theme-responsiveness
  */
 
-export type VSCodeThemeVariant = 'light' | 'dark';
+export type VSCodeThemeVariant =
+  | 'light'
+  | 'dark'
+  | 'high-contrast-light'
+  | 'high-contrast-dark';
 
 export const VS_CODE_TOKEN_MAP: Record<VSCodeThemeVariant, Record<string, string>> = {
   light: {
@@ -187,12 +191,164 @@ export const VS_CODE_TOKEN_MAP: Record<VSCodeThemeVariant, Record<string, string
     '--vscode-editorInfo-background': 'rgba(55, 148, 255, 0.15)',
     '--vscode-progressBar-background': '#0e70c0',
   },
+  'high-contrast-light': {
+    // Core
+    '--vscode-foreground': '#292929',
+    '--vscode-editor-foreground': '#292929',
+    '--vscode-editor-background': '#ffffff',
+    '--vscode-sideBar-background': '#ffffff',
+    '--vscode-descriptionForeground': '#292929',
+    '--vscode-errorForeground': '#B5200D',
+    '--vscode-disabledForeground': '#7f7f7f',
+    '--vscode-icon-foreground': '#0F4A85',
+    '--vscode-focusBorder': '#006BBE',
+    '--vscode-contrastBorder': '#0F4A85',
+    '--vscode-widget-border': '#0F4A85',
+    '--vscode-panel-border': '#0F4A85',
+    '--vscode-textLink-foreground': '#0F4A85',
+
+    // Font
+    '--vscode-font-family': "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif",
+    '--vscode-font-size': '13px',
+    '--vscode-editor-font-family': "'Menlo', 'Monaco', 'Courier New', monospace",
+
+    // Buttons
+    '--vscode-button-background': '#0F4A85',
+    '--vscode-button-foreground': '#ffffff',
+    '--vscode-button-hoverBackground': '#0F4A85',
+    '--vscode-button-border': '#292929',
+    '--vscode-button-secondaryBackground': '#ffffff',
+    '--vscode-button-secondaryForeground': '#0F4A85',
+    '--vscode-button-secondaryHoverBackground': '#cce4ff',
+
+    // Badges
+    '--vscode-badge-background': '#0F4A85',
+    '--vscode-badge-foreground': '#ffffff',
+
+    // Inputs
+    '--vscode-input-background': '#ffffff',
+    '--vscode-input-foreground': '#292929',
+    '--vscode-input-border': '#0F4A85',
+    '--vscode-input-placeholderForeground': '#7f7f7f',
+    '--vscode-inputValidation-errorBackground': '#ffffff',
+    '--vscode-inputValidation-errorBorder': '#B5200D',
+
+    // Dropdowns
+    '--vscode-dropdown-background': '#ffffff',
+    '--vscode-dropdown-foreground': '#292929',
+    '--vscode-dropdown-border': '#0F4A85',
+
+    // Lists
+    '--vscode-list-activeSelectionBackground': '#0F4A85',
+    '--vscode-list-activeSelectionForeground': '#ffffff',
+    '--vscode-list-hoverBackground': '#cce4ff',
+    '--vscode-list-inactiveSelectionBackground': '#cce4ff',
+
+    // Editor widgets / hover / tabs / menu
+    '--vscode-editorWidget-background': '#ffffff',
+    '--vscode-editorWidget-foreground': '#292929',
+    '--vscode-editorWidget-border': '#0F4A85',
+    '--vscode-editorHoverWidget-background': '#ffffff',
+    '--vscode-editorHoverWidget-border': '#0F4A85',
+    '--vscode-editorGroupHeader-tabsBackground': '#ffffff',
+    '--vscode-tab-activeBackground': '#ffffff',
+    '--vscode-tab-activeForeground': '#292929',
+    '--vscode-tab-inactiveForeground': '#7f7f7f',
+    '--vscode-menu-background': '#ffffff',
+    '--vscode-menu-foreground': '#292929',
+    '--vscode-menu-border': '#0F4A85',
+    '--vscode-menu-selectionBackground': '#0F4A85',
+
+    // Semantic colours
+    '--vscode-editorError-foreground': '#B5200D',
+    '--vscode-editorWarning-foreground': '#B5500D',
+    '--vscode-editorWarning-background': 'rgba(181, 80, 13, 0.15)',
+    '--vscode-editorInfo-foreground': '#0F4A85',
+    '--vscode-editorInfo-background': 'rgba(15, 74, 133, 0.15)',
+    '--vscode-progressBar-background': '#0F4A85',
+  },
+  'high-contrast-dark': {
+    // Core
+    '--vscode-foreground': '#ffffff',
+    '--vscode-editor-foreground': '#ffffff',
+    '--vscode-editor-background': '#000000',
+    '--vscode-sideBar-background': '#000000',
+    '--vscode-descriptionForeground': '#ffffff',
+    '--vscode-errorForeground': '#F48771',
+    '--vscode-disabledForeground': '#a5a5a5',
+    '--vscode-icon-foreground': '#ffffff',
+    '--vscode-focusBorder': '#F38518',
+    '--vscode-contrastBorder': '#6FC3DF',
+    '--vscode-widget-border': '#6FC3DF',
+    '--vscode-panel-border': '#6FC3DF',
+    '--vscode-textLink-foreground': '#3AA0F3',
+
+    // Font
+    '--vscode-font-family': "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif",
+    '--vscode-font-size': '13px',
+    '--vscode-editor-font-family': "'Menlo', 'Monaco', 'Courier New', monospace",
+
+    // Buttons
+    '--vscode-button-background': '#000000',
+    '--vscode-button-foreground': '#ffffff',
+    '--vscode-button-hoverBackground': '#0a3458',
+    '--vscode-button-border': '#6FC3DF',
+    '--vscode-button-secondaryBackground': '#000000',
+    '--vscode-button-secondaryForeground': '#ffffff',
+    '--vscode-button-secondaryHoverBackground': '#0a3458',
+
+    // Badges
+    '--vscode-badge-background': '#000000',
+    '--vscode-badge-foreground': '#ffffff',
+
+    // Inputs
+    '--vscode-input-background': '#000000',
+    '--vscode-input-foreground': '#ffffff',
+    '--vscode-input-border': '#6FC3DF',
+    '--vscode-input-placeholderForeground': '#a5a5a5',
+    '--vscode-inputValidation-errorBackground': '#000000',
+    '--vscode-inputValidation-errorBorder': '#F48771',
+
+    // Dropdowns
+    '--vscode-dropdown-background': '#000000',
+    '--vscode-dropdown-foreground': '#ffffff',
+    '--vscode-dropdown-border': '#6FC3DF',
+
+    // Lists
+    '--vscode-list-activeSelectionBackground': '#f3a823',
+    '--vscode-list-activeSelectionForeground': '#000000',
+    '--vscode-list-hoverBackground': '#0a3458',
+    '--vscode-list-inactiveSelectionBackground': '#0a3458',
+
+    // Editor widgets / hover / tabs / menu
+    '--vscode-editorWidget-background': '#000000',
+    '--vscode-editorWidget-foreground': '#ffffff',
+    '--vscode-editorWidget-border': '#6FC3DF',
+    '--vscode-editorHoverWidget-background': '#000000',
+    '--vscode-editorHoverWidget-border': '#6FC3DF',
+    '--vscode-editorGroupHeader-tabsBackground': '#000000',
+    '--vscode-tab-activeBackground': '#000000',
+    '--vscode-tab-activeForeground': '#ffffff',
+    '--vscode-tab-inactiveForeground': '#a5a5a5',
+    '--vscode-menu-background': '#000000',
+    '--vscode-menu-foreground': '#ffffff',
+    '--vscode-menu-border': '#6FC3DF',
+    '--vscode-menu-selectionBackground': '#f3a823',
+
+    // Semantic colours
+    '--vscode-editorError-foreground': '#F48771',
+    '--vscode-editorWarning-foreground': '#FFD602',
+    '--vscode-editorWarning-background': 'rgba(255, 214, 2, 0.15)',
+    '--vscode-editorInfo-foreground': '#3AA0F3',
+    '--vscode-editorInfo-background': 'rgba(58, 160, 243, 0.15)',
+    '--vscode-progressBar-background': '#3AA0F3',
+  },
 };
 
 /**
  * Keys that every variant entry MUST provide.
  * Derived from the union of keys across all variants so unit tests can
- * enforce structural parity between `light` and `dark`.
+ * enforce structural parity between every variant.
  */
 export const REQUIRED_VS_CODE_KEYS: readonly string[] = Object.freeze(
   Array.from(

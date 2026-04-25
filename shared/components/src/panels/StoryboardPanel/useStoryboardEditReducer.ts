@@ -39,7 +39,18 @@ export interface StaleFlagEntry {
   readonly unresolvedFeatureIds: readonly string[];
 }
 
-export type ThemeVariant = 'light' | 'dark' | 'vscode';
+/**
+ * Local theme variant for the Storyboard panel reducer state.
+ *
+ * Aligned with the project-wide flat union (#220) — the legacy `'vscode'`
+ * value has been retired. Inside a VS Code webview the panel resolves to
+ * one of the four explicit values via `vsCodeBodyClassSource`.
+ */
+export type ThemeVariant =
+  | 'light'
+  | 'dark'
+  | 'high-contrast-light'
+  | 'high-contrast-dark';
 
 export interface StoryboardEditReducerState {
   // Inbound scene list
@@ -128,7 +139,7 @@ export function createInitialStoryboardEditState(
     currentSceneId: null,
     transport: undefined,
     captureInFlight: false,
-    theme: 'vscode',
+    theme: 'dark',
     sceneEditViewModelsFromExtension: {},
     storyboardEditViewModel: null,
     staleFlags: new Map(),

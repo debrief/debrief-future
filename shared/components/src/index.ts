@@ -80,6 +80,13 @@ export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
 
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
+export {
+  vsCodeBodyClassSource,
+  bodyClassToVariant,
+  mediaQuerySource,
+  staticSource,
+} from './ThemeProvider';
+export type { ResolvedVariant, ThemeSource } from './ThemeProvider';
 
 // Temporal Track Rendering
 export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';

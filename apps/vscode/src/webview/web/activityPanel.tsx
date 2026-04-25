@@ -8,6 +8,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ActivityPanel } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 
 // Import codicon font CSS for vscrui icons (esbuild loads as text string)
 import codiconCss from 'vscrui/dist/codicon.css';
@@ -232,7 +233,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <ActivityPanelApp />
+      <Bootstrap>
+        <ActivityPanelApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

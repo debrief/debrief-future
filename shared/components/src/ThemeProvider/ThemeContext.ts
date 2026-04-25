@@ -1,9 +1,27 @@
 import { createContext } from 'react';
 
 /**
- * Theme variant identifier
+ * Theme variant identifier.
+ *
+ * Flat union mirroring VS Code's body-class taxonomy:
+ *   `vscode-light` → `'light'`
+ *   `vscode-dark` → `'dark'`
+ *   `vscode-high-contrast-light` → `'high-contrast-light'`
+ *   `vscode-high-contrast` → `'high-contrast-dark'`
+ *
+ * `'system'` is a request: it is resolved to one of the four explicit
+ * values via the active `ThemeSource` (OS media queries, body class, etc.).
+ *
+ * The legacy `'vscode'` variant has been retired (#220) — when running
+ * inside a VS Code webview, the variant is one of the four explicit
+ * values resolved from the body class.
  */
-export type ThemeVariant = 'light' | 'dark' | 'vscode' | 'system';
+export type ThemeVariant =
+  | 'light'
+  | 'dark'
+  | 'high-contrast-light'
+  | 'high-contrast-dark'
+  | 'system';
 
 /**
  * Theme configuration for Debrief components
@@ -63,7 +81,7 @@ export interface ThemeContextValue {
   /** Current theme configuration */
   theme: Theme;
 
-  /** Resolved theme variant (handles 'system' based on prefers-color-scheme) */
+  /** Resolved theme variant (handles 'system' based on active source) */
   resolvedVariant: Exclude<ThemeVariant, 'system'>;
 
   /** Update the theme */
@@ -71,6 +89,9 @@ export interface ThemeContextValue {
 
   /** Check if dark mode is active */
   isDark: boolean;
+
+  /** Whether the resolved variant is one of the high-contrast accessibility variants */
+  isHighContrast: boolean;
 }
 
 /**
@@ -83,6 +104,7 @@ export const defaultThemeContext: ThemeContextValue = {
     console.warn('ThemeProvider not found. Wrap your app with <ThemeProvider>.');
   },
   isDark: false,
+  isHighContrast: false,
 };
 
 /**

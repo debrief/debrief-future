@@ -191,7 +191,7 @@ function MultiContextFilter() {
       </div>
       <div>
         <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>VS Code</div>
-        <ThemeProvider theme={{ variant: 'vscode' }}>
+        <ThemeProvider theme={{ variant: 'dark' }}>
           <FilterDropdown
             featureKinds={SAMPLE_KINDS}
             filterState={vscodeState}

@@ -31,6 +31,7 @@ import {
   type PanelContextValue,
   type ChartRendererProps,
 } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 
 // ---------------------------------------------------------------------------
 // VS Code API handle
@@ -341,5 +342,9 @@ function ResultsPanelApp(): React.ReactElement {
 const rootEl = document.getElementById('root');
 if (rootEl) {
   const root = createRoot(rootEl);
-  root.render(<ResultsPanelApp />);
+  root.render(
+    <Bootstrap>
+      <ResultsPanelApp />
+    </Bootstrap>
+  );
 }

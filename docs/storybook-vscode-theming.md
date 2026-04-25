@@ -4,27 +4,63 @@ How theming works in Debrief shared components and how to create correctly theme
 
 ## 1. Overview
 
-Debrief uses a three-layer theming architecture:
+Debrief uses a four-layer theming architecture (#220):
 
 ```
 tokens.css                    →  Base CSS custom properties (--debrief-*)
-                                 with light/dark/vscode variant overrides
+                                 with one [data-theme] block per explicit
+                                 variant: light, dark, high-contrast-light,
+                                 high-contrast-dark.
 
-vsCodeAdapter.ts              →  Maps VS Code's --vscode-* variables to
-                                 --debrief-* tokens at runtime
+ThemeSource (vsCodeAdapter /  →  Live source of the active variant.
+ browserAdapter)                 - vsCodeBodyClassSource() reads VS Code's
+                                   `vscode-*` body class + listens to the
+                                   `vscode-theme-changed` postMessage.
+                                 - mediaQuerySource() reads OS prefers-
+                                   color-scheme + prefers-contrast.
+                                 - staticSource(variant) for pinned tests.
 
-ThemeProvider.tsx              →  React context that sets data-theme attribute
-                                 and applies token values to the DOM
+ThemeProvider.tsx             →  React context that subscribes to a source,
+                                 sets [data-theme] on documentElement, and
+                                 re-applies --debrief-* tokens on every emit.
+                                 Exposes `isHighContrast` for contrast-
+                                 sensitive styling.
+
+.storybook/preview.tsx        →  Toolbar exposes 4 explicit variants +
+                                 'system'. Decorator injects `--vscode-*`
+                                 values per variant via the shared
+                                 `.storybook/vscode-token-map.ts`
+                                 (re-exports the runtime map under a strict
+                                 `--vscode-${string}` key type).
 ```
+
+**Variants (`ThemeVariant`)**:
+
+The variant union is a flat enumeration mirroring VS Code's body-class
+taxonomy:
+
+| `ThemeVariant`         | VS Code body class            | `data-theme` attr        |
+|------------------------|--------------------------------|--------------------------|
+| `light`                | `vscode-light`                 | `light`                  |
+| `dark`                 | `vscode-dark`                  | `dark`                   |
+| `high-contrast-light`  | `vscode-high-contrast-light`   | `high-contrast-light`    |
+| `high-contrast-dark`   | `vscode-high-contrast`         | `high-contrast-dark`     |
+| `system`               | (no body class, OS pref)       | resolved via media query |
+
+The legacy `'vscode'` variant is **retired** as of #220 — when a webview
+runs inside a VS Code host, the variant is resolved from the body class
+to one of the four explicit values.
 
 **How it works at runtime:**
 
-1. `tokens.css` defines `--debrief-*` custom properties on `:root` (light defaults)
-2. CSS `[data-theme='dark']` and `[data-theme='vscode']` selectors override those properties
-3. `ThemeProvider` sets `data-theme` on `document.documentElement` based on the active variant
-4. In VS Code webviews, `vsCodeAdapter.ts` copies `--vscode-*` values into `--debrief-*` properties so components inherit the user's editor theme
+1. `tokens.css` defines `--debrief-*` custom properties on `:root` (defaults)
+2. CSS `[data-theme='light' | 'dark' | 'high-contrast-light' | 'high-contrast-dark']` selectors override those properties for each variant
+3. `ThemeProvider` sets `data-theme` on `document.documentElement` from the source's resolved variant
+4. In VS Code webviews, the host supplies `--vscode-*` variables natively; in Storybook / web-shell, the decorator injects them per variant from `.storybook/vscode-token-map.ts`
 
-Components should only use `--debrief-*` tokens. Never use raw hex colors.
+Components should only use `--debrief-*` tokens (or `var(--vscode-..., FALLBACK)`
+when stylistically tied to a specific VS Code surface). Never use raw hex
+colors. The `no-hardcoded-colours.test.ts` static gate enforces this.
 
 ## 2. Token Reference
 
