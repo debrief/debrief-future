@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import difflib
 import re
 import sys
 from dataclasses import dataclass, field
@@ -721,6 +722,112 @@ def resolve_asset(image_ref: ImageRef, archive_root: Path) -> AssetCopy:
 
 
 # ---------------------------------------------------------------------------
+# Divergence + front-matter merge (Phase 6 / US4)
+# ---------------------------------------------------------------------------
+
+
+_FM_FIELDS_FOR_DIFF: tuple[str, ...] = (
+    "title",
+    "date",
+    "author",
+    "track",
+    "tags",
+    "excerpt",
+    "reading_time",
+    "permalink",
+    "redirect_from",
+)
+
+
+def _fm_to_dict(fm: FrontMatter) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "layout": fm.layout,
+        "title": fm.title,
+        "date": fm.date,
+        "author": fm.author,
+        "track": fm.track,
+        "tags": fm.tags,
+    }
+    if fm.excerpt is not None:
+        out["excerpt"] = fm.excerpt
+    if fm.reading_time is not None:
+        out["reading_time"] = fm.reading_time
+    if fm.permalink is not None:
+        out["permalink"] = fm.permalink
+    if fm.redirect_from:
+        out["redirect_from"] = fm.redirect_from
+    out.update(fm.extra)
+    return out
+
+
+def _normalise_body(body: str) -> list[str]:
+    return [line.rstrip() for line in body.splitlines()]
+
+
+def diff_post(site_post: SitePost, archive_post: ArchivePost) -> Divergence:
+    """Compute front-matter and body divergence between site and archive."""
+    site_fm = _fm_to_dict(site_post.front_matter)
+    archive_fm = _fm_to_dict(archive_post.front_matter)
+
+    site_keys = set(site_fm.keys())
+    archive_keys = set(archive_fm.keys())
+    site_only_fields = {k: site_fm[k] for k in site_keys - archive_keys}
+    archive_only_fields = {k: archive_fm[k] for k in archive_keys - site_keys}
+    value_mismatches: dict[str, tuple[Any, Any]] = {}
+    for k in site_keys & archive_keys:
+        if site_fm[k] != archive_fm[k]:
+            value_mismatches[k] = (site_fm[k], archive_fm[k])
+
+    site_body = _normalise_body(site_post.body)
+    archive_body = _normalise_body(archive_post.body)
+    diff_iter = difflib.unified_diff(
+        site_body, archive_body, fromfile="site", tofile="archive", lineterm=""
+    )
+    diff_lines = [line for line in diff_iter if line.startswith(("+", "-"))]
+    body_diff_lines = sum(1 for line in diff_lines if not line.startswith(("+++", "---")))
+    summary_iter = difflib.unified_diff(
+        site_body, archive_body, fromfile="site", tofile="archive", lineterm=""
+    )
+    body_diff_summary = "\n".join(list(summary_iter)[:10])
+
+    return Divergence(
+        site_post=site_post,
+        archive_post=archive_post,
+        site_only_fields=site_only_fields,
+        archive_only_fields=archive_only_fields,
+        value_mismatches=value_mismatches,
+        body_diff_lines=body_diff_lines,
+        body_diff_summary=body_diff_summary,
+    )
+
+
+def merge_front_matter(site_fm: FrontMatter, archive_fm: FrontMatter) -> FrontMatter:
+    """Archive wins on source-derived fields; site preserves reading_time +
+    permalink + redirect_from union."""
+    merged_redirects = list(
+        dict.fromkeys([*archive_fm.redirect_from, *site_fm.redirect_from])
+    )
+    merged_extra: dict[str, Any] = {**archive_fm.extra, **site_fm.extra}
+    return FrontMatter(
+        layout=archive_fm.layout,
+        title=archive_fm.title,
+        date=archive_fm.date,
+        author=archive_fm.author or site_fm.author,
+        track=archive_fm.track,
+        tags=archive_fm.tags or site_fm.tags,
+        excerpt=archive_fm.excerpt if archive_fm.excerpt is not None else site_fm.excerpt,
+        reading_time=site_fm.reading_time
+        if site_fm.reading_time is not None
+        else archive_fm.reading_time,
+        permalink=site_fm.permalink
+        if site_fm.permalink is not None
+        else archive_fm.permalink,
+        redirect_from=merged_redirects,
+        extra=merged_extra,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Plan + execute
 # ---------------------------------------------------------------------------
 
@@ -762,12 +869,17 @@ def build_migration_plan(
     leaks = detect_source_relative_leaks(unique_archive_posts)
     collisions = detect_filename_collisions(unique_archive_posts)
 
+    divergences: list[Divergence] = []
+    for cls in classifications:
+        if cls.bucket == "replace" and cls.replacement is not None:
+            divergences.append(diff_post(cls.site_post, cls.replacement))
+
     config_text = (site_root / "_config.yml").read_text(encoding="utf-8")
     config_edit_needed = "jekyll-redirect-from" not in config_text
 
     return MigrationPlan(
         classifications=classifications,
-        divergences=[],  # populated by Phase 6 diff_post
+        divergences=divergences,
         asset_copies=asset_copies,
         filename_collisions=collisions,
         source_relative_leaks=leaks,
@@ -829,8 +941,9 @@ def execute_migration_plan(
     for cls in plan.classifications:
         if cls.bucket == "replace" and cls.replacement is not None:
             ap = cls.replacement
+            merged_fm = merge_front_matter(cls.site_post.front_matter, ap.front_matter)
             out_path = posts_dir / ap.target_filename
-            content = _serialise_front_matter(ap.front_matter) + ap.body
+            content = _serialise_front_matter(merged_fm) + ap.body
             out_path.write_text(content, encoding="utf-8")
             written.append(out_path)
 
@@ -890,6 +1003,118 @@ def _enable_redirect_plugin(config_text: str) -> str:
     if not inserted and inside_plugins:
         out.append("  - jekyll-redirect-from\n")
     return "".join(out)
+
+
+# ---------------------------------------------------------------------------
+# PR body generator (FR-005, FR-011, NFR-004)
+# ---------------------------------------------------------------------------
+
+
+def generate_pr_body(plan: MigrationPlan, result: MigrationResult | None = None) -> str:
+    """Render the migration PR's markdown body from plan + (optional) result."""
+    parts: list[str] = []
+
+    # 1. Summary
+    by_bucket: dict[str, int] = {"replace": 0, "merge": 0, "legacy": 0}
+    for cls in plan.classifications:
+        by_bucket[cls.bucket] = by_bucket.get(cls.bucket, 0) + 1
+    parts.append("## Summary\n")
+    parts.append(
+        f"- {len(plan.classifications)} site posts classified — "
+        f"{by_bucket['replace']} replace, {by_bucket['merge']} merge, "
+        f"{by_bucket['legacy']} preserve (legacy).\n"
+    )
+    parts.append(f"- {len(plan.asset_copies)} image assets copied from `debrief-future` evidence.\n")
+    parts.append(
+        f"- Pre-flight scans: "
+        f"{len(plan.source_relative_leaks)} leaks, "
+        f"{sum(1 for ac in plan.asset_copies if not ac.found)} missing assets, "
+        f"{len(plan.filename_collisions)} filename collisions.\n\n"
+    )
+
+    # 2. Bucket classification (FR-011)
+    parts.append("## Bucket classification\n\n")
+    parts.append("| Site post | Bucket | Reason |\n|---|---|---|\n")
+    for cls in sorted(plan.classifications, key=lambda c: c.site_post.filename):
+        parts.append(
+            f"| `{cls.site_post.filename}` | {cls.bucket} | {cls.reason} |\n"
+        )
+    parts.append("\n")
+
+    # 3. Pre-flight scans (NFR-004)
+    parts.append("## Pre-flight scans\n\n")
+    parts.append(
+        f"- **FR-008 source-relative leaks**: "
+        f"{len(plan.source_relative_leaks)}"
+        f"{' (BLOCKER)' if plan.source_relative_leaks else ' ✓'}\n"
+    )
+    missing_assets = [ac for ac in plan.asset_copies if not ac.found]
+    parts.append(
+        f"- **FR-009 missing assets**: {len(missing_assets)} of "
+        f"{len(plan.asset_copies)}"
+        f"{' (BLOCKER)' if missing_assets else ' ✓'}\n"
+    )
+    if missing_assets:
+        parts.append("\n  Missing:\n")
+        for ac in missing_assets:
+            parts.append(
+                f"  - `{ac.image_ref.slug}/{ac.image_ref.basename}` "
+                f"(referenced from archive)\n"
+            )
+    parts.append(
+        f"- **FR-010 filename collisions**: "
+        f"{len(plan.filename_collisions)}"
+        f"{' (BLOCKER)' if plan.filename_collisions else ' ✓'}\n\n"
+    )
+
+    # 4. Editorial divergences (FR-005)
+    parts.append("## Editorial divergences\n\n")
+    dirty = [d for d in plan.divergences if not d.is_clean]
+    if not dirty:
+        parts.append("All replace-bucket diffs are clean.\n\n")
+    else:
+        parts.append(f"{len(dirty)} divergence(s) need reviewer attention:\n\n")
+        for div in dirty:
+            parts.append(
+                f"<details><summary><code>{div.site_post.filename}</code></summary>\n\n"
+            )
+            if div.site_only_fields:
+                parts.append(f"- Site-only fields: `{div.site_only_fields}`\n")
+            if div.archive_only_fields:
+                parts.append(f"- Archive-only fields: `{div.archive_only_fields}`\n")
+            if div.value_mismatches:
+                parts.append(f"- Value mismatches: `{div.value_mismatches}`\n")
+            if div.body_diff_lines > 0:
+                parts.append(f"- Body diverged ({div.body_diff_lines} lines):\n")
+                parts.append(f"\n```diff\n{div.body_diff_summary}\n```\n")
+            parts.append("\n</details>\n\n")
+
+    # 5. Asset coverage
+    parts.append("## Asset coverage\n\n")
+    parts.append(
+        f"- Total references: {len(plan.asset_copies)}\n"
+        f"- Resolved: {sum(1 for ac in plan.asset_copies if ac.found)}\n"
+        f"- Missing: {len(missing_assets)}\n\n"
+    )
+
+    # 6. Test plan
+    parts.append("## Test plan\n\n")
+    parts.append(
+        "- [ ] Jekyll build succeeds (`bundle exec jekyll build --safe --trace`)\n"
+        "- [ ] Sample 5 random `/assets/images/future-debrief/.../...` URLs return 200\n"
+        "- [ ] Each `## Orphan Screenshots` row's Generated Post link resolves\n"
+        "- [ ] No external URL regressions (`redirect_from:` entries verified)\n"
+    )
+
+    if result is not None:
+        parts.append(
+            f"\n## Execution\n\n"
+            f"- Posts deleted: {len(result.site_posts_deleted)}\n"
+            f"- Posts written: {len(result.site_posts_written)}\n"
+            f"- Assets copied: {len(result.assets_copied)}\n"
+            f"- `_config.yml` edited: {result.config_edited}\n"
+        )
+    return "".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -961,18 +1186,25 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     plan = build_migration_plan(args.archive_root, args.site_clone)
     print(_summarise_plan(plan))
+
+    report_path = args.site_clone / "MIGRATION-REPORT.md"
     if args.dry_run:
+        report_path.write_text(generate_pr_body(plan), encoding="utf-8")
+        print(f"[232] dry-run report → {report_path}", file=sys.stderr)
         return 0
     if plan.is_blocked:
         print("[232] refusing to execute — plan is blocked.", file=sys.stderr)
+        report_path.write_text(generate_pr_body(plan), encoding="utf-8")
         return 2
     result = execute_migration_plan(plan, args.site_clone, args.archive_root)
+    report_path.write_text(generate_pr_body(plan, result), encoding="utf-8")
     print(
         f"\nExecution complete:\n"
         f"  posts deleted: {len(result.site_posts_deleted)}\n"
         f"  posts written: {len(result.site_posts_written)}\n"
         f"  assets copied: {len(result.assets_copied)}\n"
         f"  _config.yml edited: {result.config_edited}\n"
+        f"  PR body → {report_path}\n"
     )
     return 0
 

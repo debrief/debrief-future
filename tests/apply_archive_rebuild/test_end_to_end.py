@@ -98,6 +98,24 @@ def test_blocked_plan_refuses_to_execute(
         aar.execute_migration_plan(plan, site_clone, archive_root)
 
 
+def test_pr_body_has_six_sections(
+    aar: ModuleType, fixtures_root: Path, tmp_path: Path
+) -> None:
+    archive_root = fixtures_root / "archive"
+    site_clone = _seed_site_clone(fixtures_root, tmp_path)
+    plan = aar.build_migration_plan(archive_root, site_clone)
+    body = aar.generate_pr_body(plan)
+    for section in (
+        "## Summary",
+        "## Bucket classification",
+        "## Pre-flight scans",
+        "## Editorial divergences",
+        "## Asset coverage",
+        "## Test plan",
+    ):
+        assert section in body, f"missing section: {section}"
+
+
 def test_source_relative_leaks_detect_synthetic(
     aar: ModuleType, fixtures_root: Path
 ) -> None:
