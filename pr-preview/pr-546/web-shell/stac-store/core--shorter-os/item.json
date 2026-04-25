@@ -1,0 +1,134 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--shorter-os",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.8883759,
+          4.927321
+        ],
+        [
+          29.9800744,
+          4.927321
+        ],
+        [
+          29.9800744,
+          4.9818109
+        ],
+        [
+          29.8883759,
+          4.9818109
+        ],
+        [
+          29.8883759,
+          4.927321
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.8883759,
+    4.927321,
+    29.9800744,
+    4.9818109
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Shorter Os",
+    "datetime": "2009-07-22T04:08:20+00:00",
+    "description": "Saxon Warrior: Shorter Os — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including USS Otto Sverdrup.",
+    "start_datetime": "2009-07-22T04:08:20+00:00",
+    "end_datetime": "2009-07-22T05:26:04+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "USS Otto Sverdrup",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "NGFS",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "minefield",
+      "radar-detection"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "shorter_os (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/shorter_os.dpf",
+      "title": "shorter_os.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-shorter_os": {
+      "href": "./assets/shorter_os.dpf",
+      "type": "application/octet-stream",
+      "title": "shorter_os.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/shorter_os.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.721104Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

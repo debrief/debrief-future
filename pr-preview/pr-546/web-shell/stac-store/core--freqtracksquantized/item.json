@@ -1,0 +1,131 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--freqtracksquantized",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          29.8737112,
+          4.9211105
+        ],
+        [
+          30,
+          4.9211105
+        ],
+        [
+          30,
+          5
+        ],
+        [
+          29.8737112,
+          5
+        ],
+        [
+          29.8737112,
+          4.9211105
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    29.8737112,
+    4.9211105,
+    30,
+    5
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Freqtracksquantized",
+    "datetime": "2009-07-22T03:50:04+00:00",
+    "description": "Saxon Warrior: Freqtracksquantized — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
+    "start_datetime": "2009-07-22T03:50:04+00:00",
+    "end_datetime": "2009-07-22T05:40:04+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NONSUCH",
+        "name": "HMS Fridtjof Nansen",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/virginia",
+        "domain": "subsurface",
+        "vessel_type": "virginia",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "FreqTracksQuantized (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/FreqTracksQuantized.dpf",
+      "title": "FreqTracksQuantized.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-FreqTracksQuantized": {
+      "href": "./assets/FreqTracksQuantized.dpf",
+      "type": "application/octet-stream",
+      "title": "FreqTracksQuantized.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/FreqTracksQuantized.dpf",
+        "load_timestamp": "2026-04-13T23:12:31.833063Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

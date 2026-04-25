@@ -1,0 +1,143 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--sample-lots-of-sensors",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -11.8660803,
+          11.8942194
+        ],
+        [
+          -11.57275,
+          11.8942194
+        ],
+        [
+          -11.57275,
+          12.1862861
+        ],
+        [
+          -11.8660803,
+          12.1862861
+        ],
+        [
+          -11.8660803,
+          11.8942194
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -11.8660803,
+    11.8942194,
+    -11.57275,
+    12.1862861
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Sample Lots Of Sensors",
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Saxon Warrior: Sample Lots Of Sensors — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS De Zeven Provincien, USS Bretagne. 19 narrative entries. Multi-national participation: GB, US.",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "OSPREY",
+        "name": "HMS De Zeven Provincien",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_type": "visby",
+        "vessel_role": "corvette"
+      },
+      {
+        "id": "ALLIANCE",
+        "name": "USS Bretagne",
+        "nationality": "US",
+        "vessel_class": "surface/warship/carrier/queen-elizabeth",
+        "domain": "surface",
+        "vessel_type": "queen-elizabeth",
+        "vessel_role": "carrier"
+      }
+    ],
+    "debrief:tags": [
+      "MCM",
+      "boarding",
+      "certification",
+      "training",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "radar-detection"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sample_lots_of_sensors (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/sample_lots_of_sensors.dpf",
+      "title": "sample_lots_of_sensors.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sample_lots_of_sensors": {
+      "href": "./assets/sample_lots_of_sensors.dpf",
+      "type": "application/octet-stream",
+      "title": "sample_lots_of_sensors.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/sample_lots_of_sensors.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.610808Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
