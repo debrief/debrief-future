@@ -1,4 +1,5 @@
 import { Theme, ThemeVariant } from './ThemeContext';
+import { ResolvedVariant } from './ThemeSource';
 
 /**
  * Electron IPC channel names for theme communication.
@@ -28,11 +29,11 @@ export declare function saveTheme(theme: Theme): Promise<void>;
 /**
  * Resolve 'system' theme variant to actual light/dark value.
  */
-export declare function resolveThemeVariant(variant: ThemeVariant): Promise<'light' | 'dark' | 'vscode'>;
+export declare function resolveThemeVariant(variant: ThemeVariant): Promise<ResolvedVariant>;
 /**
  * Get default tokens for a theme variant.
  */
-export declare function getDefaultTokens(variant: 'light' | 'dark' | 'vscode'): Record<string, string>;
+export declare function getDefaultTokens(variant: ResolvedVariant): Record<string, string>;
 /**
  * Create an Electron-adapted theme configuration.
  */

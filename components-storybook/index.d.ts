@@ -29,6 +29,8 @@ export type { LayersToolbarProps, FilterDropdownProps, FilterState, AssociatedFi
 export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
+export { vsCodeBodyClassSource, bodyClassToVariant, mediaQuerySource, staticSource, } from './ThemeProvider';
+export type { ResolvedVariant, ThemeSource } from './ThemeProvider';
 export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';
 export type { TemporalTrackLayerProps } from './MapView/TemporalTrackLayer';
 export { TrackHighlightMarker } from './MapView/TrackHighlightMarker';
