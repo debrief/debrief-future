@@ -1,1 +1,0 @@
-import{r as t}from"./index-B2-qRKKC.js";import{T as r}from"./defaultTheme-CXXPMGCe.js";function m(){const e=t.useContext(r);if(!e)throw new Error("useTheme must be used within a ThemeProvider");return e}export{m as u};
