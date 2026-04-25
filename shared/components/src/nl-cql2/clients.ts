@@ -1,54 +1,62 @@
 /**
  * LLM client implementations for the NL → CQL2 generator (#188) + the live
- * transport (#190).
+ * transport (#190, #191).
  *
  * In-tree clients:
  *   - `createRecordedLLMClient(responses)` — replays a map of hand-authored
  *     fixtures keyed by canonicalised phrase. Throws on miss or prompt-hash
- *     mismatch. Used in CI and offline stakeholder demos.
+ *     mismatch (fixture-authoring programmer errors). Used in CI and offline
+ *     stakeholder demos.
  *   - `createPassthroughLLMClient(fn)` — trivial wrapper that forwards to a
- *     caller-supplied async function. Used by #189 transport integration and
- *     by the fixture-authoring workflow.
- *   - `createLiveLLMClient(config)` — #190's real-provider client. Routes
+ *     caller-supplied async function returning the raw provider text. Used
+ *     by the fixture-authoring workflow and by tests.
+ *   - `createLiveLLMClient(config)` — #190's browser-side client. Routes
  *     through a loopback HTTP proxy (see `apps/nl-demo/scripts/live-proxy.mjs`)
  *     so provider credentials never enter the browser bundle.
  *
+ * After #191 (review Decisions 1, 6, 8) all three return `LiveOutcome`; the
+ * old `LiveTransportAbort` throw/catch pattern is removed.
+ *
  * A fourth client — `createBadLLMClient` — lives under `__tests__/` and is
- * not exported from the public barrel (decision 9A).
+ * not exported from the public barrel.
  */
 
 import { canonicalisePhrase, sha256Hex } from "./hash";
 import type {
+  BrowserLiveConfig,
   LLMClient,
   LiveConfig,
   LiveConfigValidationError,
   LiveConfigValidationResult,
-  LiveLLMClient,
+  LiveOutcome,
   LiveTransportError,
-  LiveTransportErrorReason,
   ResponseMap,
   TransportCallRecord,
 } from "./types";
+
+// ---------------------------------------------------------------------------
+// Recorded fixture client (hand-authored responses map)
+// ---------------------------------------------------------------------------
 
 /**
  * A client that plays back pre-recorded responses from a hand-authored map.
  *
  * Lookup strategy:
- *   1. Canonicalise the phrase (the implementer is responsible for passing
- *      the phrase into `generate(prompt)` alongside the prompt — but since
- *      the LLMClient contract only exposes the prompt, we encode the phrase
- *      inside the prompt and recover it here).
- *   2. Verify the stored `promptHash` matches the SHA-256 of the prompt we
- *      received. Any mismatch means the fixture was recorded against a
- *      different prompt template and must be re-authored.
+ *   1. Canonicalise the phrase recovered from the prompt's `Phrase: <text>`
+ *      suffix (see `buildPrompt.ts`).
+ *   2. Verify the stored `promptHash` matches SHA-256 of the received prompt.
+ *      Any mismatch means the fixture was recorded against a different prompt
+ *      template and must be re-authored.
  *
- * Prompt-suffix convention: the prompt's last non-blank line is
- * `Phrase: <text>` (see `buildPrompt.ts`). This client extracts that line to
- * canonicalise and look up the fixture.
+ * Miss or hash-mismatch throws an `Error` — this is a programmer / fixture
+ * authoring bug, NOT a normal transport failure, so it does not map to a
+ * `LiveOutcome`. Callers wrap `generateCql2` in try/catch if they want
+ * fallback behaviour (e.g. `apps/nl-demo` surfaces it as an off-corpus
+ * banner).
  */
 export function createRecordedLLMClient(responses: ResponseMap): LLMClient {
   return {
-    async generate(prompt: string): Promise<string> {
+    async generate(prompt: string): Promise<LiveOutcome> {
       const phrase = extractPhraseFromPrompt(prompt);
       const canonical = canonicalisePhrase(phrase);
       const fixture = responses[canonical];
@@ -67,24 +75,47 @@ export function createRecordedLLMClient(responses: ResponseMap): LLMClient {
             `changed since the fixture was recorded — re-author the fixture.`,
         );
       }
-      return fixture.rawResponse;
+      return {
+        kind: "success",
+        rawResponse: fixture.rawResponse,
+        durationMs: 0,
+        responseBytes: byteLength(fixture.rawResponse),
+        model: fixture.model,
+      };
+    },
+    abort() {
+      // No in-flight state to cancel.
     },
   };
 }
 
 /**
- * Trivial wrapper around a caller-supplied async function.
+ * Trivial wrapper around a caller-supplied async function. The function
+ * returns the raw provider response string; this wrapper adapts it to the
+ * `LiveOutcome` contract by producing a `success` outcome.
  *
- * Callers use this to plug in a live transport (MCP, HTTP, local model) or a
- * deterministic stub (e.g. to record new fixtures). #188 never invokes a live
- * model; that responsibility is owned by #190.
+ * If the function throws, the throw propagates out of `generate()` — the
+ * contract's "never throws on normal failure paths" guarantee applies to the
+ * live transport, not to caller-supplied stubs.
  */
 export function createPassthroughLLMClient(
   fn: (prompt: string) => Promise<string>,
+  opts: { readonly model?: string } = {},
 ): LLMClient {
+  const model = opts.model ?? "passthrough";
   return {
-    async generate(prompt: string): Promise<string> {
-      return fn(prompt);
+    async generate(prompt: string): Promise<LiveOutcome> {
+      const rawResponse = await fn(prompt);
+      return {
+        kind: "success",
+        rawResponse,
+        durationMs: 0,
+        responseBytes: byteLength(rawResponse),
+        model,
+      };
+    },
+    abort() {
+      // No in-flight state to cancel.
     },
   };
 }
@@ -106,19 +137,30 @@ export function extractPhraseFromPrompt(prompt: string): string {
   );
 }
 
+function byteLength(s: string): number {
+  if (typeof TextEncoder !== "undefined") {
+    return new TextEncoder().encode(s).byteLength;
+  }
+  // Fallback for environments without TextEncoder (shouldn't happen in the
+  // Node + modern-browser targets we ship to).
+  let total = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    total += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+  }
+  return total;
+}
+
 // ---------------------------------------------------------------------------
-// #190 Live LLM Transport
+// LiveConfig validator (browser variant only; VS Code reads via its own config
+// service — see apps/vscode/src/services/llmProxy.ts readLiveConfig).
 // ---------------------------------------------------------------------------
 
 const VALID_PROXY_PROTOCOLS: ReadonlySet<string> = new Set(["http:", "https:"]);
 
-/** Internal upper bound for `timeoutMs` (5 min). */
 const MAX_TIMEOUT_MS = 300_000;
-/** Internal upper bound for `maxCalls`. */
 const MAX_CALLS_CEILING = 1_000;
-/** Internal lower bound for `maxResponseBytes` (1 KB). */
 const MIN_RESPONSE_BYTES = 1_024;
-/** Internal upper bound for `maxResponseBytes` (10 MB). */
 const MAX_RESPONSE_BYTES = 10_485_760;
 
 function isPositiveInteger(v: unknown, upper: number): v is number {
@@ -131,9 +173,13 @@ function isIntegerInRange(v: unknown, lo: number, hi: number): v is number {
 
 /**
  * Parse a raw value loaded from `live-config.json` into a validated
- * `LiveConfig`. Never throws on user-input errors — returns a tagged union so
- * the demo can route misconfig to a fallback-to-fixture banner naming the
- * specific field that failed.
+ * `BrowserLiveConfig`. The `transport` discriminator is filled in by the
+ * validator (users don't write it in their local config); `callCeiling`
+ * replaces the #190 `maxCalls` field (review Decision 6).
+ *
+ * Never throws on user-input errors — returns a tagged union so the demo
+ * can route misconfig to a fallback-to-fixture banner naming the specific
+ * field that failed.
  */
 export function validateLiveConfig(raw: unknown): LiveConfigValidationResult {
   const errors: LiveConfigValidationError[] = [];
@@ -186,9 +232,9 @@ export function validateLiveConfig(raw: unknown): LiveConfigValidationResult {
     });
   }
 
-  if (!isPositiveInteger(obj.maxCalls, MAX_CALLS_CEILING)) {
+  if (!isPositiveInteger(obj.callCeiling, MAX_CALLS_CEILING)) {
     errors.push({
-      field: "maxCalls",
+      field: "callCeiling",
       message: `must be a positive integer ≤ ${MAX_CALLS_CEILING}`,
     });
   }
@@ -200,11 +246,11 @@ export function validateLiveConfig(raw: unknown): LiveConfigValidationResult {
     });
   }
 
-  if (obj.proxyToken !== undefined) {
+  if (obj.proxyToken !== undefined && obj.proxyToken !== null) {
     if (typeof obj.proxyToken !== "string" || obj.proxyToken.length === 0) {
       errors.push({
         field: "proxyToken",
-        message: "must be a non-empty string when present",
+        message: "must be a non-empty string or null",
       });
     }
   }
@@ -213,60 +259,40 @@ export function validateLiveConfig(raw: unknown): LiveConfigValidationResult {
     return { ok: false, errors };
   }
 
-  const value: LiveConfig = {
+  const value: BrowserLiveConfig = {
+    transport: "browser-proxy",
     enabled: obj.enabled as boolean,
     proxyUrl: obj.proxyUrl as string,
     model: obj.model as string,
     timeoutMs: obj.timeoutMs as number,
-    maxCalls: obj.maxCalls as number,
+    callCeiling: obj.callCeiling as number,
     maxResponseBytes: obj.maxResponseBytes as number,
-    ...(typeof obj.proxyToken === "string"
-      ? { proxyToken: obj.proxyToken }
-      : {}),
+    proxyToken: typeof obj.proxyToken === "string" ? obj.proxyToken : null,
   };
 
   return { ok: true, value };
 }
 
+// ---------------------------------------------------------------------------
+// Live LLM transport — browser flavour (#190, #191 T024)
+// ---------------------------------------------------------------------------
+
 /**
  * Type guard for `LiveTransportError`. Shape check only — NOT `instanceof`,
- * because the value flows as plain data through a discriminated union in
- * `GenerationResult.error` and may have crossed a structuredClone boundary.
+ * because the value may have crossed a structuredClone boundary.
  */
 export function isLiveTransportError(value: unknown): value is LiveTransportError {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
+  if (v.kind !== "transport-error") return false;
   if (typeof v.reason !== "string") return false;
-  if (typeof v.message !== "string") return false;
-  if (!(v.providerStatus === null || typeof v.providerStatus === "number")) return false;
   if (typeof v.durationMs !== "number") return false;
-  if (typeof v.callIndex !== "number") return false;
-  const validReasons: ReadonlySet<string> = new Set<LiveTransportErrorReason>([
-    "auth-failure",
-    "rate-limit",
-    "provider-error",
-    "transport-error",
-    "timeout",
-    "oversize-response",
-    "usage-cap-reached",
+  const validReasons: ReadonlySet<string> = new Set<LiveTransportError["reason"]>([
+    "network",
+    "cancelled",
+    "unknown",
   ]);
   return validReasons.has(v.reason);
-}
-
-/**
- * Marker class thrown by `createLiveLLMClient` to signal a typed transport
- * failure through the string-returning `LLMClient.generate` contract.
- * Caught inside `generate.ts` and wrapped into `GenerationResult.error` with
- * `kind: "transport"` — consumers of `generateCql2` see the typed error, not
- * this marker.
- */
-export class LiveTransportAbort extends Error {
-  readonly transportError: LiveTransportError;
-  constructor(transportError: LiveTransportError) {
-    super(transportError.message);
-    this.name = "LiveTransportAbort";
-    this.transportError = transportError;
-  }
 }
 
 /**
@@ -321,9 +347,6 @@ async function readBodyWithCap(
 ): Promise<{ ok: true; text: string; bytes: number } | { ok: false; reason: "oversize" }> {
   const body = response.body;
   if (!hasReadableStreamReader(body)) {
-    // Environments without a streaming body fall back to text(). This is a
-    // defence-in-depth path only — the browser and Node 18+ both expose
-    // ReadableStream bodies on fetch Responses.
     const text = await response.text();
     const bytes = new TextEncoder().encode(text).byteLength;
     if (bytes > maxBytes) return { ok: false, reason: "oversize" };
@@ -342,8 +365,7 @@ async function readBodyWithCap(
       try {
         await reader.cancel();
       } catch {
-        // reader.cancel() rejections are not actionable — we've already
-        // decided to abort the read and return oversize.
+        // reader.cancel rejections are not actionable.
       }
       return { ok: false, reason: "oversize" };
     }
@@ -360,25 +382,6 @@ async function readBodyWithCap(
   return { ok: true, text, bytes: accumulated };
 }
 
-function mapProxyErrorKind(kind: ProxyResponseError["kind"]): LiveTransportErrorReason {
-  switch (kind) {
-    case "auth-failure":
-      return "auth-failure";
-    case "rate-limit":
-      return "rate-limit";
-    case "provider-error":
-      return "provider-error";
-    case "timeout":
-      return "timeout";
-    case "oversize-response":
-      return "oversize-response";
-    case "bad-request":
-      // bad-request indicates a client-version mismatch, not a user-actionable
-      // failure class. Map to transport-error per data-model.md §4.
-      return "transport-error";
-  }
-}
-
 function emitRecord(record: TransportCallRecord): void {
   if (typeof console !== "undefined" && typeof console.info === "function") {
     console.info("[nl-demo/live]", record);
@@ -386,32 +389,26 @@ function emitRecord(record: TransportCallRecord): void {
 }
 
 /**
- * Build a live LLM client backed by a local proxy. Caller owns the config
- * loading; this function does no filesystem I/O.
+ * Build a live LLM client backed by a local loopback HTTP proxy. The proxy
+ * itself holds the Anthropic credential in its environment and speaks HTTPS
+ * upstream via the shared `providerCall` core. This client's responsibilities
+ * are URL assembly, optional `X-Proxy-Token`, streams-and-counts response
+ * reading, outcome classification, and cancellation via `abort()`.
  *
- * The client:
- *   - issues POST /generate against `config.proxyUrl`
- *   - adds `X-Proxy-Token: <config.proxyToken>` when `proxyToken` is present
- *   - enforces `timeoutMs` per-call via AbortController
- *   - enforces `maxCalls` by short-circuiting further calls with a
- *     `usage-cap-reached` LiveTransportError (no fetch issued)
- *   - enforces `maxResponseBytes` as a UTF-8 byte count via a streaming
- *     reader that aborts the response once the accumulated byte count
- *     exceeds the cap, raising `oversize-response`
- *   - emits one TransportCallRecord per call to console.info
- *   - maps proxy `{ ok: false, kind: "bad-request" }` to client
- *     `reason: "transport-error"`
- *
- * All failure paths surface via a thrown `LiveTransportAbort` marker which
- * `generateCql2` catches and converts into `GenerationResult.error` with
- * `kind: "transport"` — generateCql2 itself never throws.
+ * Behaviour invariants:
+ *   - `generate()` NEVER throws — all outcomes are `LiveOutcome`.
+ *   - `abort()` is idempotent. It tears down every in-flight `fetch()` and
+ *     causes the pending `generate()` to resolve with
+ *     `{kind:"transport-error", reason:"cancelled"}`.
+ *   - Per-session call ceiling short-circuits without issuing a fetch.
+ *   - Per-call response budget enforced via streaming reader.
  */
-export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
+export function createLiveLLMClient(config: BrowserLiveConfig): LLMClient {
   let callsUsed = 0;
   const inFlight = new Set<AbortController>();
 
   function makeRecord(
-    outcome: "success" | LiveTransportErrorReason,
+    outcome: LiveOutcome["kind"],
     durationMs: number,
     responseBytes: number | null,
     callIndex: number,
@@ -427,37 +424,27 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
     };
   }
 
-  function abort(
-    reason: LiveTransportErrorReason,
-    message: string,
-    providerStatus: number | null,
-    startedAt: number,
+  function finalise(
+    outcome: LiveOutcome,
     callIndex: number,
-  ): never {
-    const durationMs = Math.max(0, safePerformanceNow() - startedAt);
-    const record = makeRecord(reason, durationMs, null, callIndex);
-    emitRecord(record);
-    throw new LiveTransportAbort({
-      reason,
-      message,
-      providerStatus,
-      durationMs,
-      callIndex,
-    });
+    responseBytes: number | null,
+  ): LiveOutcome {
+    emitRecord(makeRecord(outcome.kind, outcome.durationMs, responseBytes, callIndex));
+    return outcome;
   }
 
   return {
-    async generate(prompt: string): Promise<string> {
+    async generate(prompt: string): Promise<LiveOutcome> {
       const startedAt = safePerformanceNow();
+      const durationMs = (): number =>
+        Math.max(0, safePerformanceNow() - startedAt);
 
-      // Usage-cap short-circuit BEFORE any fetch (SC-008, FR-010).
-      if (callsUsed >= config.maxCalls) {
-        abort(
-          "usage-cap-reached",
-          `Live-mode call limit reached (${config.maxCalls}) — reload to reset.`,
-          null,
-          startedAt,
+      // Per-session ceiling short-circuits before any fetch.
+      if (callsUsed >= config.callCeiling) {
+        return finalise(
+          { kind: "ceiling-reached", ceiling: config.callCeiling, durationMs: 0 },
           callsUsed,
+          null,
         );
       }
 
@@ -500,33 +487,30 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
           (err instanceof DOMException && err.name === "AbortError") ||
           (err as { name?: string } | null)?.name === "AbortError";
         if (aborted) {
-          // Could be a timeout OR a supersession via cancelPending().
+          // Could be a timeout, or an explicit abort() supersession.
           const reason = controller.signal.reason;
-          const supersededMsg = "superseded";
           const isSupersede =
             reason !== undefined &&
             typeof reason === "object" &&
             reason !== null &&
             (reason as { name?: string }).name === "SupersededError";
           if (isSupersede) {
-            abort("transport-error", supersededMsg, null, startedAt, callIndex);
+            return finalise(
+              { kind: "transport-error", reason: "cancelled", durationMs: durationMs() },
+              callIndex,
+              null,
+            );
           }
-          abort(
-            "timeout",
-            `The language-model proxy did not respond within ${config.timeoutMs} ms.`,
-            null,
-            startedAt,
+          return finalise(
+            { kind: "timeout", durationMs: durationMs() },
             callIndex,
+            null,
           );
         }
-        const message =
-          err instanceof Error ? err.message : "unknown network error";
-        abort(
-          "transport-error",
-          `Could not reach the language-model proxy at ${config.proxyUrl}: ${message}`,
-          null,
-          startedAt,
+        return finalise(
+          { kind: "transport-error", reason: "network", durationMs: durationMs() },
           callIndex,
+          null,
         );
       }
 
@@ -536,12 +520,15 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
         if (!read.ok) {
           clearTimeout(timeoutHandle);
           inFlight.delete(controller);
-          abort(
-            "oversize-response",
-            `Proxy response exceeded the configured ${config.maxResponseBytes}-byte cap.`,
-            response.status,
-            startedAt,
+          return finalise(
+            {
+              kind: "malformed-response",
+              reason: "oversize",
+              durationMs: durationMs(),
+              responseBytes: config.maxResponseBytes,
+            },
             callIndex,
+            null,
           );
         }
         try {
@@ -549,25 +536,25 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
         } catch {
           clearTimeout(timeoutHandle);
           inFlight.delete(controller);
-          abort(
-            "provider-error",
-            `Proxy returned a body that is not valid JSON (HTTP ${response.status}).`,
-            response.status,
-            startedAt,
+          return finalise(
+            {
+              kind: "malformed-response",
+              reason: "non-json",
+              durationMs: durationMs(),
+              responseBytes: read.bytes,
+            },
             callIndex,
+            null,
           );
         }
       } catch (err) {
-        if (err instanceof LiveTransportAbort) throw err;
         clearTimeout(timeoutHandle);
         inFlight.delete(controller);
-        const message = err instanceof Error ? err.message : String(err);
-        abort(
-          "transport-error",
-          `Failed reading proxy response: ${message}`,
-          null,
-          startedAt,
+        void err;
+        return finalise(
+          { kind: "transport-error", reason: "network", durationMs: durationMs() },
           callIndex,
+          null,
         );
       }
 
@@ -575,23 +562,28 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
       inFlight.delete(controller);
 
       if (parsed.ok) {
-        const durationMs = Math.max(0, safePerformanceNow() - startedAt);
-        const responseBytes = new TextEncoder().encode(parsed.rawResponse).byteLength;
-        emitRecord(makeRecord("success", durationMs, responseBytes, callIndex));
-        return parsed.rawResponse;
+        const responseBytes = byteLength(parsed.rawResponse);
+        return finalise(
+          {
+            kind: "success",
+            rawResponse: parsed.rawResponse,
+            durationMs: durationMs(),
+            responseBytes,
+            model: config.model,
+          },
+          callIndex,
+          responseBytes,
+        );
       }
 
-      const reason = mapProxyErrorKind(parsed.kind);
-      abort(
-        reason,
-        parsed.message,
-        parsed.providerStatus ?? response.status,
-        startedAt,
+      return finalise(
+        mapProxyErrorToOutcome(parsed, response.status, durationMs()),
         callIndex,
+        null,
       );
     },
 
-    cancelPending(): void {
+    abort(): void {
       const superseded = (() => {
         try {
           return new DOMException("superseded", "SupersededError");
@@ -605,14 +597,153 @@ export function createLiveLLMClient(config: LiveConfig): LiveLLMClient {
         try {
           controller.abort(superseded);
         } catch {
-          // Abort is best-effort; the fetch is already winding down.
+          // Abort is best-effort.
         }
       }
       inFlight.clear();
     },
+  };
+}
 
-    get usage() {
-      return { used: callsUsed, cap: config.maxCalls };
+function mapProxyErrorToOutcome(
+  err: ProxyResponseError,
+  httpStatus: number,
+  durationMs: number,
+): LiveOutcome {
+  switch (err.kind) {
+    case "auth-failure":
+      return {
+        kind: "auth-failure",
+        providerStatus: err.providerStatus ?? httpStatus,
+        durationMs,
+      };
+    case "rate-limit":
+      return {
+        kind: "rate-limit",
+        providerStatus: err.providerStatus ?? httpStatus,
+        retryAfterSeconds: null,
+        durationMs,
+      };
+    case "provider-error":
+      return {
+        kind: "provider-error",
+        providerStatus: err.providerStatus ?? httpStatus,
+        durationMs,
+      };
+    case "timeout":
+      return { kind: "timeout", durationMs };
+    case "oversize-response":
+      return {
+        kind: "malformed-response",
+        reason: "oversize",
+        durationMs,
+        responseBytes: 0,
+      };
+    case "bad-request":
+      return { kind: "transport-error", reason: "unknown", durationMs };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Post-message client — VS Code webview flavour (#191 T031, Decision 4)
+// ---------------------------------------------------------------------------
+
+/**
+ * Dependency-injection surface for `createPostMessageLLMClient`.
+ * The webview supplies:
+ *   - `postMessage` — typically `acquireVsCodeApi().postMessage` bound.
+ *   - `subscribe`   — an `addEventListener('message', handler)` bridge that
+ *     returns an unsubscribe function.
+ *   - `uuid`        — injectable id generator; production passes
+ *     `() => crypto.randomUUID()`.
+ */
+export interface PostMessageLLMClientOptions {
+  readonly postMessage: (msg: unknown) => void;
+  readonly subscribe: (handler: (msg: unknown) => void) => () => void;
+  readonly uuid: () => string;
+}
+
+/**
+ * Build an `LLMClient` that forwards `generate()` calls across the
+ * webview ↔ extension-host boundary via `postMessage`. The extension host
+ * owns the credential and the HTTPS call; this client is a transport
+ * adapter that waits for the matching `nlOutcome` response.
+ *
+ * Contract:
+ *   - One `generate()` call issues exactly one `nlGenerate` message with a
+ *     fresh `requestId` and waits for an `nlOutcome` with the same id.
+ *   - `abort()` fires an `nlAbort` for every currently-pending id and
+ *     resolves each pending `generate()` to
+ *     `{kind:"transport-error", reason:"cancelled"}`.
+ *   - Unknown response ids (e.g. after an abort) are ignored silently.
+ *   - The client NEVER throws on normal failure paths — every outcome flows
+ *     back as a `LiveOutcome`.
+ */
+export function createPostMessageLLMClient(
+  options: PostMessageLLMClientOptions,
+): LLMClient {
+  interface PendingEntry {
+    readonly resolve: (outcome: LiveOutcome) => void;
+    readonly startedAt: number;
+  }
+  const pending = new Map<string, PendingEntry>();
+
+  const unsubscribe = options.subscribe((rawMsg: unknown) => {
+    if (typeof rawMsg !== "object" || rawMsg === null) return;
+    const msg = rawMsg as { type?: string; requestId?: string; outcome?: LiveOutcome };
+    if (msg.type !== "nlOutcome") return;
+    if (typeof msg.requestId !== "string") return;
+    const entry = pending.get(msg.requestId);
+    if (!entry) return; // unknown id — silently ignored
+    pending.delete(msg.requestId);
+    entry.resolve(msg.outcome as LiveOutcome);
+  });
+
+  void unsubscribe; // subscription stays live for the lifetime of the client.
+
+  function resolveAllWithCancelled(): void {
+    const entries = Array.from(pending.entries());
+    pending.clear();
+    for (const [requestId, entry] of entries) {
+      try {
+        options.postMessage({ type: "nlAbort", requestId });
+      } catch {
+        // postMessage failures aren't actionable — we've already decided
+        // to cancel.
+      }
+      const durationMs = Math.max(0, performance.now() - entry.startedAt);
+      entry.resolve({
+        kind: "transport-error",
+        reason: "cancelled",
+        durationMs,
+      });
+    }
+  }
+
+  return {
+    generate(prompt: string): Promise<LiveOutcome> {
+      return new Promise<LiveOutcome>((resolve) => {
+        const requestId = options.uuid();
+        pending.set(requestId, { resolve, startedAt: performance.now() });
+        try {
+          options.postMessage({ type: "nlGenerate", requestId, prompt });
+        } catch (err) {
+          pending.delete(requestId);
+          resolve({
+            kind: "transport-error",
+            reason: "unknown",
+            durationMs: 0,
+          });
+          void err;
+        }
+      });
+    },
+    abort(): void {
+      resolveAllWithCancelled();
     },
   };
 }
+
+// Re-export the config type so consumers can write `LiveConfig` without
+// always reaching into types.ts.
+export type { LiveConfig };

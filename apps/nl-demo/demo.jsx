@@ -267,9 +267,10 @@ function EmptyState({ onClearAll }) {
 // ---------------------------------------------------------------------------
 
 /**
- * Per-reason human-readable messages for LiveTransportError. Must stay in
- * sync with research R4 table and with specs/190-live-llm-transport/spec.md §
- * acceptance scenarios.
+ * Per-outcome human-readable messages for non-success LiveOutcome kinds.
+ * Keyed by `LiveOutcome["kind"]` after the #191 migration (Decision 6
+ * renamed `usage-cap-reached` → `ceiling-reached` and folded
+ * `oversize-response` into `malformed-response`).
  */
 const LIVE_BANNER_MESSAGES = {
   "auth-failure":
@@ -282,10 +283,12 @@ const LIVE_BANNER_MESSAGES = {
     "Could not reach the language-model proxy. Is it running?",
   timeout:
     "The provider did not respond in time. Try a different phrase or retry.",
-  "oversize-response":
-    "The provider's response was too large to process. Try a different phrase.",
-  "usage-cap-reached":
+  "malformed-response":
+    "The provider's response could not be processed. Try a different phrase.",
+  "ceiling-reached":
     "Live-mode call limit reached — reload to reset.",
+  "not-configured":
+    "Live mode is not configured — turn it on and provide a key to proceed.",
 };
 
 function LiveConfigBanner({ message }) {
@@ -312,7 +315,7 @@ function LiveTransportBanner({ reason, message, onRetry }) {
     >
       <div className="banner__title">Live-mode call failed</div>
       <div>{userMessage}</div>
-      {onRetry ? (
+      {onRetry && reason !== "ceiling-reached" ? (
         <div style={{ marginTop: 6 }}>
           <button type="button" className="clear-all" onClick={onRetry}>
             Try again
@@ -663,7 +666,7 @@ function App() {
       // FR-012: supersede any in-flight live call so earlier chip sets cannot
       // land after a newer phrase is submitted.
       if (liveMode.mode === "live" && liveClientRef.current) {
-        liveClientRef.current.cancelPending();
+        liveClientRef.current.abort();
       }
 
       setBusy(true);
@@ -683,24 +686,29 @@ function App() {
         if (submissionToken.current !== token) return; // stale
 
         if (result.error && result.error.kind === "transport") {
-          // The supersession path manifests as reason === "transport-error"
-          // with message === "superseded" — already ignored by the token
-          // guard above, but belt-and-braces:
-          if (result.error.error.message === "superseded") return;
+          const { outcome } = result.error;
+          // Cancellations are silent by design — the token guard above
+          // usually catches them first, but belt-and-braces.
+          if (
+            outcome.kind === "transport-error" &&
+            outcome.reason === "cancelled"
+          ) {
+            return;
+          }
           setTransportBanner({
-            reason: result.error.error.reason,
-            message: result.error.error.message,
+            reason: outcome.kind,
+            message: LIVE_BANNER_MESSAGES[outcome.kind] ?? "Live-mode call failed.",
           });
           return;
         }
 
         if (result.error && result.error.kind === "generation") {
-          // In live mode a malformed response lands here — show the
-          // transport banner's provider-error variant (closest user-facing
-          // class). In fixture mode this path would have thrown.
+          // In live mode a malformed JSON response from the provider lands
+          // here — surface it as the malformed-response banner variant.
+          // In fixture mode this path would have thrown.
           if (liveMode.mode === "live") {
             setTransportBanner({
-              reason: "provider-error",
+              reason: "malformed-response",
               message: result.error.error.message,
             });
             return;

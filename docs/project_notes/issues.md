@@ -16,6 +16,13 @@ Each entry should include:
 
 <!-- Add new entries below this line -->
 
+### 2026-04-24 - #191-vscode-nl-search: NL search in VS Code Catalog Overview
+- **Status**: Completed (claude/implement-speckit-191-Jc7Uy, PR forthcoming)
+- **Description**: Surface the NL → CQL2 pipeline (shipped in `apps/nl-demo` via #188/#189/#190) inside the VS Code Catalog Overview. Opt-in, default-off, API key in SecretStorage, seven-class failure banner matrix. Single canonical `LLMClient` contract returning `LiveOutcome` across browser + VS Code; `createPostMessageLLMClient` bridges the webview↔host boundary.
+- **URL**: spec at [`specs/191-vscode-nl-search/spec.md`](../../specs/191-vscode-nl-search/spec.md)
+- **Evidence**: [`specs/191-vscode-nl-search/evidence/`](../../specs/191-vscode-nl-search/evidence/) — test-summary, usage-example, sequence diagram, sc-004 failure matrix, config sample, baseline-verify, nl-demo migration note
+- **Migration note**: `LLMClient` contract migrated from `Promise<string>` → `Promise<LiveOutcome>`; `LiveTransportAbort` removed. See ADR-019 below for rationale.
+
 ### 2026-04-20 - Feature #176: Analysis Log Panel — Rich Card UX
 - **Status**: Completed (PR #480 merged)
 - **Description**: Transformed the Log Panel's read-only card face into rich, analyst-readable cards: 3-row anatomy (header / meta / params), 5-category tool icons, type-aware parameter chips (colour / number / boolean / range / enum), track badges, 4-tab view mode (Timeline / By Feature / Compact / Detailed), ARIA tablist with roving `tabIndex` + arrow-key navigation, `isDefault` → `isNonDefault` polarity flip, UTC timestamp formatting, single-decimal duration formatting, `+N more` chip overflow indicator, "No parameters" / "Manual checkpoint" placeholders, `aria-selected` + step-numbered `aria-label` on card root. Reduced-scope 22-task list (T001–T022) superseded the original 88-task plan per `/speckit.review` decisions 1A–11A.

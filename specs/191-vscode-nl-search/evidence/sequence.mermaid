@@ -1,0 +1,64 @@
+sequenceDiagram
+    autonumber
+    actor Analyst
+    participant FB as FilterBar<br/>(webview)
+    participant PMC as createPostMessageLLMClient<br/>(webview)
+    participant CO as CatalogOverviewPanel<br/>(extension host)
+    participant Proxy as LlmProxy<br/>(extension host)
+    participant Sec as SecretStorage
+    participant PC as providerCall<br/>(shared core)
+    participant API as Anthropic<br/>Messages API
+
+    Note over Analyst,API: Happy path — analyst submits a phrase
+
+    Analyst->>FB: Type "UK submarines", press Enter
+    FB->>FB: Abort prior in-flight (supersession)
+    FB->>PMC: generate(prompt)
+    PMC->>PMC: new requestId = uuid()
+    PMC->>CO: postMessage { type:nlGenerate, requestId, prompt }
+    CO->>Proxy: handleGenerate({requestId, prompt})
+
+    alt Key cache miss
+        Proxy->>Sec: get(nlSearch.anthropicApiKey)
+        Sec-->>Proxy: apiKey
+    end
+
+    Proxy->>PC: providerCall({prompt, apiKey, signal, ...})
+    PC->>API: POST /v1/messages
+    API-->>PC: 200 OK {content:[{type:text, text:…}]}
+    PC-->>Proxy: LiveOutcome{kind:success, rawResponse, ...}
+    Proxy->>Proxy: delete requestId from controller map
+    Proxy->>Proxy: emit [nl-search/live] log (no prompt, no response)
+    Proxy-->>CO: LiveOutcome
+    CO->>FB: postMessage { type:nlOutcome, requestId, outcome }
+    FB->>PMC: handler(nlOutcome)
+    PMC->>FB: resolve pending generate(prompt)
+    FB->>FB: parseResponse → lozenges → dispatch chips
+    FB->>Analyst: Chip bar + filtered map/list update
+
+    Note over Analyst,API: Abort path — analyst submits a new phrase mid-call
+
+    Analyst->>FB: Type "French frigates", press Enter
+    FB->>PMC: abort()
+    PMC->>CO: postMessage { type:nlAbort, requestId:PREVIOUS }
+    CO->>Proxy: handleAbort({requestId})
+    Proxy->>PC: signal.abort()
+    PC->>API: req.destroy() (socket close)
+    PC-->>Proxy: LiveOutcome{kind:transport-error, reason:cancelled}
+    Proxy-->>CO: LiveOutcome
+    CO->>FB: postMessage { type:nlOutcome, requestId:PREVIOUS, outcome:cancelled }
+    FB->>FB: Drop silently (cancellation)
+    FB->>PMC: generate(NEW prompt) — proceeds as happy path
+
+    Note over Analyst,API: Never-reaches-network paths
+
+    alt Feature disabled
+        Proxy-->>Proxy: not-configured{reason:disabled}
+    end
+    alt Feature enabled but no key
+        Proxy-->>Proxy: not-configured{reason:no-key}
+    end
+    alt Per-session ceiling hit
+        Proxy-->>Proxy: ceiling-reached{ceiling:50}
+    end
+    Note right of Proxy: All three outcomes skip providerCall entirely —<br/>the analyst's budget is spent only on real<br/>in-flight provider calls.
