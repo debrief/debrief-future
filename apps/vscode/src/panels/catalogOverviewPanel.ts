@@ -84,10 +84,10 @@ interface NlAbortMessage {
   requestId: string;
 }
 
-/** NL-search banner-action request from the webview (#191 T082). */
+/** NL-search banner-action request from the webview (#191 T082, #198). */
 interface NlBannerActionMessage {
   type: 'nlBannerAction';
-  action: 'open-settings' | 'retry' | 'reload';
+  action: 'open-settings' | 'retry' | 'reload' | 'help';
 }
 
 type OverviewToExtensionMessage =
@@ -338,6 +338,15 @@ export class CatalogOverviewPanel {
         break;
       case 'retry':
         // FilterBar handles retry locally; no host action required.
+        break;
+      case 'help':
+        // #198 Decision 4 — open the static troubleshooting docs page.
+        // We never shell out to keyring daemons; help is documentation only.
+        void vscode.env.openExternal(
+          vscode.Uri.parse(
+            'https://debrief.github.io/docs/nl-search-troubleshooting#keyring-unavailable',
+          ),
+        );
         break;
     }
   }
