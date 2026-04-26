@@ -151,21 +151,65 @@ docker run -p 8080:8080 -e PORT=8080 debrief-preview
 - Adapter bridging session↔matching: `toolMatchAdapter.ts`
 - Feature resolution for execution: `calcService.ts` → `resolveFeatures()`
 
-### Claude Code Session: Browser Testing
+### Claude Code on the Web: Network Access (per-environment setting)
 
-**Playwright/Puppeteer Installation:**
-- Standard browser downloads blocked (403 from cdn.playwright.dev)
-- Workaround: Use `@sparticuz/chromium` npm package (bundles Chromium)
-- External network from browser blocked (`ERR_TUNNEL_CONNECTION_FAILED`)
-- Local HTML/JavaScript tests work via `page.setContent()`
-- Research document: `docs/project_notes/playwright-installation-research.md`
+**Claude Code on the web** runs each session in an Anthropic-managed VM
+with a configurable **Network access** mode. The mode is set
+**per-cloud-environment** at `claude.ai/code` → environment settings.
+Local desktop CLI sessions are unaffected by this setting.
 
-**Working Setup:**
-```bash
-PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @playwright/test playwright-chromium
-npm install @sparticuz/chromium
+| Mode (UI label may vary) | What it allows |
+|---|---|
+| **None** | No outbound network at all |
+| **Trusted** / restricted (UI sometimes calls this "custom") | Anthropic-curated list of common package registries — npm, PyPI, RubyGems, crates.io, plus admin-added domains |
+| **Unrestricted** / **Full** | Full outbound network |
+
+**Symptom of the wrong mode:** every public package registry returns HTTP
+403 with `x-deny-reason: host_not_allowed`, breaking `pnpm install`,
+`uv sync`, `pip install`, `corepack`, the `packageManager` handoff, and
+any Playwright/Chromium download. Detect with:
+
+```sh
+curl -sS -i https://registry.npmjs.org/pnpm | head -3
+# 403 with x-deny-reason → env is on None, or hitting upstream UX bug #10223
+# 200                    → env has package-registry access
 ```
-- Config requires `executablePath: '/tmp/chromium'` and sandbox-disable flags
+
+**Fix:** change the env's Network access mode at `claude.ai/code`. The new
+mode applies only to **freshly-provisioned VMs** — start a new session
+after changing it; the running session keeps the old policy until it
+exits. (Resolved on this repo's environment 2026-04-26 by switching from
+`custom` to `full`.)
+
+**Known upstream UX bug:** [#10223 "Inconsistent Network Behavior and
+Unclear UX in Default Cloud Environment"](https://github.com/anthropics/claude-code/issues/10223)
+tracks cases where the per-env setting is set but not honoured at runtime.
+If the curl above still 403s after a fresh session on a non-`None` mode,
+that's the bug — file evidence on #10223 with `ANT_IMAGE_TAG` from `env`.
+
+#### What still works under the restrictive modes (useful when "None" is intentional)
+
+- **The loopback git proxy clones arbitrary public GitHub repos.** A local
+  proxy on `127.0.0.1:<random-port>` (port chosen per-session, leaked in
+  `git push` output) mediates all git traffic and does **not** restrict to
+  the designated repo. Verified 2026-04-26: `git clone --depth=1
+  https://github.com/anthropics/claude-code` succeeded from a fully-blocked
+  session. Anything reachable as a git object on GitHub is reachable.
+- **The GitHub MCP** (`mcp__github__*` tools) works for the scoped repo —
+  reads, writes, PR ops, file fetches.
+- **Bundled tooling on disk:** `/opt/node22/bin/pnpm` (v10.33.0 — note this
+  differs from this repo's `packageManager: "pnpm@9.15.5"` pin; bundled
+  pnpm 10 will try to fetch the pinned 9.15.5 and 403 unless you set
+  `manage-package-manager-versions=false` in `.npmrc`); bundled `eslint`,
+  `prettier`, `typescript`, `playwright` in `/opt/node22/lib/node_modules/`;
+  bundled Python 3.11 + uv. None of these need network to run if `node_modules/`
+  and `.venv/` are already on disk.
+
+#### Plan-tier scope
+
+Claude Code on the web is available to **Pro, Max, Team, and Enterprise
+(premium-seat)** plans. The Network access setting is owned by whoever
+created the cloud environment.
 
 ### E2E Testing Infrastructure
 

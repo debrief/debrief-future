@@ -207,6 +207,17 @@ Only updated when a feature introduces a technology not already listed here.
 
 **Always run the full CI check before pushing any commits.** Do not push if any step fails.
 
+> **Heads-up for Claude Code on the web sessions:** if `pnpm install` or
+> `uv sync` 403s on the package registry, the cloud environment's
+> **Network access** mode is set to `None` (or "custom" with a too-narrow
+> allowlist). Fix at `claude.ai/code` → environment settings → Network
+> access → set to **Trusted** (allows package registries) or **Full**.
+> The change applies to **freshly-provisioned VMs only** — start a new
+> session after toggling. Local desktop CLI is unaffected. See
+> `docs/project_notes/key_facts.md` → "Claude Code on the Web: Network
+> Access" for the full table, the verification command, and the
+> upstream UX-bug tracker.
+
 ### Using `task` (preferred)
 
 ```sh
