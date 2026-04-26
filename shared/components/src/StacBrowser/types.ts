@@ -58,7 +58,9 @@ export interface StacBrowserProps {
   readonly llmClient?: LLMClient;
   readonly nlEnums?: EnumBundle;
   readonly liveModeLabel?: string;
-  readonly onNlBannerAction?: (action: 'open-settings' | 'retry' | 'reload') => void;
+  readonly onNlBannerAction?: (
+    action: 'open-settings' | 'retry' | 'reload' | 'help',
+  ) => void;
 }
 
 /**

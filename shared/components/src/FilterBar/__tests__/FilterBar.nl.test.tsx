@@ -11,7 +11,7 @@
  *   T048  indicator visibility — `llmClient` prop controls indicator render
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { FilterBar } from '../FilterBar';
 import type {
@@ -268,6 +268,180 @@ describe('FilterBar NL supersession race (T047)', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('live-transport-banner')).toBeNull();
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #198 — keyring-unavailable banner
+// ---------------------------------------------------------------------------
+
+describe('FilterBar NL keyring-unavailable banner (#198 T023)', () => {
+  it('renders with the correct data-transport-reason and OS-neutral headline', async () => {
+    const client = makeMockClient({
+      kind: 'keyring-unavailable',
+      platformHint: 'linux',
+      durationMs: 0,
+    });
+    render(
+      <FilterBar
+        items={items}
+        taxonomy={taxonomy}
+        onFilteredItems={() => undefined}
+        llmClient={client}
+        nlEnums={enums}
+        liveModeLabel="live"
+      />,
+    );
+
+    const input = screen.getByTestId('quick-search-input');
+    await act(async () => {
+      await typeAndEnter(input, 'UK submarines');
+    });
+
+    const banner = await waitFor(() =>
+      screen.getByTestId('live-transport-banner'),
+    );
+    expect(banner).toHaveAttribute('data-transport-reason', 'keyring-unavailable');
+
+    // Headline / body must mention the keyring and must NOT instruct the
+    // analyst to re-enter their key (FR-004, FR-010).
+    expect(banner.textContent ?? '').toMatch(/keyring/i);
+    expect(banner.textContent ?? '').not.toMatch(/re-?enter/i);
+  });
+
+  it('shows the platform-specific hint paragraph for linux/macos/windows and suppresses it for unknown', async () => {
+    const platforms: Array<{
+      platformHint: 'linux' | 'macos' | 'windows' | 'unknown';
+      regex: RegExp | null;
+    }> = [
+      { platformHint: 'linux', regex: /gnome-keyring|kwallet/i },
+      { platformHint: 'macos', regex: /keychain/i },
+      { platformHint: 'windows', regex: /credential manager/i },
+      { platformHint: 'unknown', regex: null },
+    ];
+
+    for (const { platformHint, regex } of platforms) {
+      const client = makeMockClient({
+        kind: 'keyring-unavailable',
+        platformHint,
+        durationMs: 0,
+      });
+      const { unmount } = render(
+        <FilterBar
+          items={items}
+          taxonomy={taxonomy}
+          onFilteredItems={() => undefined}
+          llmClient={client}
+          nlEnums={enums}
+          liveModeLabel="live"
+        />,
+      );
+      const input = screen.getByTestId('quick-search-input');
+      await act(async () => {
+        await typeAndEnter(input, 'UK submarines');
+      });
+
+      const banner = await waitFor(() =>
+        screen.getByTestId('live-transport-banner'),
+      );
+      const hint = banner.querySelector('[data-testid="live-transport-banner-hint"]');
+      if (regex) {
+        expect(hint).not.toBeNull();
+        expect(hint!.textContent ?? '').toMatch(regex);
+        expect(hint!.getAttribute('data-platform-hint')).toBe(platformHint);
+      } else {
+        // unknown — no hint paragraph rendered
+        expect(hint).toBeNull();
+      }
+      unmount();
+    }
+  });
+
+  it('renders BOTH primary "Help" and secondary "Open settings" actions', async () => {
+    const onBannerAction = vi.fn();
+    const client = makeMockClient({
+      kind: 'keyring-unavailable',
+      platformHint: 'linux',
+      durationMs: 0,
+    });
+    render(
+      <FilterBar
+        items={items}
+        taxonomy={taxonomy}
+        onFilteredItems={() => undefined}
+        llmClient={client}
+        nlEnums={enums}
+        liveModeLabel="live"
+        onBannerAction={onBannerAction}
+      />,
+    );
+    const input = screen.getByTestId('quick-search-input');
+    await act(async () => {
+      await typeAndEnter(input, 'UK submarines');
+    });
+
+    const helpBtn = await waitFor(() =>
+      screen.getByTestId('live-transport-banner-help'),
+    );
+    const settingsBtn = screen.getByTestId('live-transport-banner-open-settings');
+    expect(helpBtn.textContent ?? '').toMatch(/keyring/i);
+    expect(settingsBtn).toBeInTheDocument();
+
+    fireEvent.click(helpBtn);
+    expect(onBannerAction).toHaveBeenCalledWith('help');
+  });
+
+  it('preserves existing chips when keyring-unavailable replaces a prior outcome (FR-006 inherited)', async () => {
+    // Build a sequence: success → adds chip; keyring-unavailable → chip stays.
+    const outcomes: LiveOutcome[] = [
+      {
+        kind: 'success',
+        rawResponse: JSON.stringify({
+          cql2: {},
+          lozenges: [{ filterType: 'nationality', value: 'GB' }],
+          unrecognised_terms: [],
+        }),
+        durationMs: 12,
+        responseBytes: 100,
+        model: 'test',
+      },
+      { kind: 'keyring-unavailable', platformHint: 'linux', durationMs: 0 },
+    ];
+    let call = 0;
+    const client = makeMockClient(async () => outcomes[call++]!);
+    render(
+      <FilterBar
+        items={items}
+        taxonomy={taxonomy}
+        onFilteredItems={() => undefined}
+        llmClient={client}
+        nlEnums={enums}
+        liveModeLabel="live"
+      />,
+    );
+
+    const input = screen.getByTestId('quick-search-input');
+
+    // 1st submission — chip applied.
+    await act(async () => {
+      await typeAndEnter(input, 'UK submarines');
+    });
+    await waitFor(() => {
+      expect(screen.queryByTestId('live-transport-banner')).toBeNull();
+    });
+    const chipsBefore = document.querySelectorAll('[data-testid^="lozenge-"]');
+
+    // 2nd submission — keyring fails; chip MUST survive.
+    await act(async () => {
+      await typeAndEnter(input, 'French frigates');
+    });
+    await waitFor(() => {
+      const banner = screen.getByTestId('live-transport-banner');
+      expect(banner).toHaveAttribute('data-transport-reason', 'keyring-unavailable');
+    });
+
+    const chipsAfter = document.querySelectorAll('[data-testid^="lozenge-"]');
+    expect(chipsAfter.length).toBeGreaterThanOrEqual(chipsBefore.length);
   });
 });
 

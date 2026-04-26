@@ -1,12 +1,51 @@
 <!--
 Cached opener for the feature post. Written during `/speckit.plan`, read
-verbatim by `/speckit.pr` as the first three sections of `media/shipped-post.md`.
+by `/speckit.pr` to assemble the top of `media/shipped-post.md`.
 
 - No YAML front matter. Prose only.
-- Three sections with `##` headings, in the order below.
+- Four sections with `##` headings, in the order below.
+- The `## Hook` heading is stripped at ship time — its content sits at the
+  very top of the post above "What We're Building", with no heading.
+- The other three sections are copied verbatim into the final post.
 - Voice: first-person, conversational — see `.claude/agents/media/content.md`.
 - Do NOT include calls to action, feedback solicitations, or LinkedIn copy.
 -->
+
+## Hook
+
+[The lead asset for the post — what the reader sees first, before any prose.
+Pick ONE of the following forms (preference order: screenshot → mermaid →
+capability bullets → before/after table). See "The Hook" in
+`.claude/agents/media/content.md` for guidance on which form fits which
+kind of feature.
+
+Examples:
+
+  - Planned screenshot:
+    `![FilterBar with three active platform filters](images/filterbar-active.png)`
+    (Path is the future ship-time location. The screenshot itself is
+    captured during evidence collection, not now.)
+
+  - Mermaid diagram (inline, will be copied as-is):
+    ```mermaid
+    flowchart LR
+      Loader --> STAC
+      STAC --> VSCode
+    ```
+
+  - Capability bullets:
+    - Filter tracks by platform class without leaving the map
+    - Save filter combinations as named lozenges
+    - Share filter URLs across team members
+
+  - Before/after table:
+    | Before | After |
+    |---|---|
+    | Manual JSON edits to filter | One-click platform-class chip |
+    | Filters lost on reload | Persisted in session state |
+
+If unsure which form fits, default to a planned screenshot — it's the
+single highest-value opener and works for most UI features.]
 
 ## What We're Building
 

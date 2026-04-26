@@ -65,6 +65,19 @@ Show what readers could do that they can't today. Use sparingly until Tracks 1 a
 
 One post per feature, published at ship time. Opening framing is captured during planning (see Cached Opening Context below) and stitched into the final article.
 
+### Sizing the Post
+
+Match the post to the change. Don't pad small work into a full template — a short, honest post about a small change reads better than a stretched one.
+
+| Change Type | Post Shape |
+|---|---|
+| **Minor / no UI** — refactors, dependency bumps, tidying, internal renames, docs-only | **Short post**: Hook + 1–2 paragraphs (what changed, why it mattered) + link to PR. Skip "Screenshots", "By the Numbers", "Lessons Learned", "What's Next". |
+| **Bug fix** | **Short or full**, judgement call. If the bug had a visible symptom worth showing (before/after screenshot, GIF), use full template. Otherwise short. |
+| **Feature with UI** | **Full template**. Hook, screenshots, Storybook links, diagrams as warranted. |
+| **Architectural / infra** | **Full template** with Hook leaning on a mermaid diagram. |
+
+When in doubt, lean shorter.
+
 ### Feature Post
 
 Purpose: Show what we built — including *why* it was worth building — and share learnings.
@@ -82,6 +95,11 @@ tags: [tracer-bullet, relevant-component]
 excerpt: "One-line summary of what we delivered"
 ---
 
+[HOOK — see "The Hook" section below. No heading. One of: lead screenshot,
+mermaid diagram, capability bullets, or before/after table. Comes BEFORE
+"What We're Building" so a reader can decide in two seconds whether to
+keep reading.]
+
 ## What We're Building
 
 [1-2 paragraphs from cached opening context: the capability, why it matters]
@@ -96,7 +114,13 @@ excerpt: "One-line summary of what we delivered"
 
 ## Screenshots
 
-[2-4 annotated screenshots showing it working]
+[Annotated screenshots showing it working — as many as the feature warrants.
+Before/after pairs are encouraged. See Screenshot Guidelines below.]
+
+## Try It Yourself
+
+[Storybook links to deployed components — see Storybook Links section below.
+Omit if the feature has no shippable UI components.]
 
 ## By the Numbers
 
@@ -114,19 +138,43 @@ excerpt: "One-line summary of what we delivered"
 → [Try it yourself](if applicable)
 ```
 
-The first three sections (*What We're Building*, *How It Fits*, *Key Decisions*) come verbatim from `specs/[feature]/evidence/opening-context.md` — the cached opener written during `/speckit.plan`. Read that file and prepend its contents; do not rewrite them. Sections 4 onwards are written fresh at ship time from evidence.
+The Hook is captured during `/speckit.plan` (see Cached Opening Context below) so the opener has been thought-through before ship time, not improvised.
+
+Sections *What We're Building*, *How It Fits*, *Key Decisions* come verbatim from `specs/[feature]/evidence/opening-context.md` — the cached opener written during `/speckit.plan`. Read that file and copy them in; do not rewrite. Sections from *Screenshots* onwards are written fresh at ship time from evidence.
+
+### The Hook
+
+The first thing on the page after the front matter. The reader has not yet committed — give them something to react to.
+
+Pick **one** of these forms, in order of preference:
+
+1. **Lead screenshot** — preferred for any feature with a visible UI. Show the finished thing in action; for before/after stories, a side-by-side pair works well. Place above all prose. Alt text required.
+
+2. **Mermaid diagram** — preferred for architectural / infrastructure / data-flow features where the most interesting thing is the *shape* of the change. Render with a fenced ` ```mermaid ` block (gh-pages renders these natively — see Diagrams section below).
+
+3. **Capability callout** — bulleted list of what's now possible that wasn't before. Use when the feature unlocks several discrete things and a single screenshot can't capture them. Keep to 3–6 bullets, action-led ("Filter tracks by platform class", not "Added filter capability").
+
+4. **Before/after table** — two-column markdown table contrasting the old state with the new. Use when the change is best understood as a delta (ergonomics improvements, performance changes, removed friction).
+
+The Hook is **not** a heading. No `## Hook` line. Just the asset, sitting above `## What We're Building`.
 
 ### Cached Opening Context
 
-During `/speckit.plan`, the Content Specialist writes a cached opener to `specs/[feature]/evidence/opening-context.md`. This file contains prose — no front matter — for the three sections that frame the feature:
+During `/speckit.plan`, the Content Specialist writes a cached opener to `specs/[feature]/evidence/opening-context.md`. This file contains prose — no front matter — for the four sections that frame the feature:
 
-1. `## What We're Building` — 1–2 paragraphs: the capability and why it matters.
-2. `## How It Fits` — 1 paragraph: how this connects to the overall architecture and vision.
-3. `## Key Decisions` — bullet list or short paragraphs: choices made and their trade-offs.
+1. `## Hook` — the lead asset for the post. One of: planned screenshot (with the path it will live at once captured), mermaid diagram (inline as a fenced ` ```mermaid ` block), capability bullets, or before/after table. Decide *which form* during planning, even if the screenshot itself is captured later.
+2. `## What We're Building` — 1–2 paragraphs: the capability and why it matters.
+3. `## How It Fits` — 1 paragraph: how this connects to the overall architecture and vision.
+4. `## Key Decisions` — bullet list or short paragraphs: choices made and their trade-offs.
 
-When writing the Feature Post at ship time, open `evidence/opening-context.md` and copy those three sections verbatim into the post above *Screenshots*. Do not paraphrase; the planning-time framing is the article's opening.
+When writing the Feature Post at ship time:
 
-If `opening-context.md` is missing (e.g., for features that pre-date this workflow), generate the three sections from `spec.md`, `plan.md`, and `research.md` and note their absence when reporting back.
+- Strip the `## Hook` heading and place its content (resolving any planned screenshot path against the actual evidence file) at the top of the post — above `## What We're Building`. The Hook is presented without a heading.
+- Copy `## What We're Building`, `## How It Fits`, `## Key Decisions` verbatim. Do not paraphrase.
+
+If `opening-context.md` is missing (e.g., for features that pre-date this workflow), generate the sections from `spec.md`, `plan.md`, and `research.md` and note their absence when reporting back.
+
+If the cached Hook plan referenced a screenshot path that doesn't exist at ship time, fall back to the next-best Hook form (capability bullets or before/after table from evidence) — do not ship a broken image link.
 
 ### Evidence-Driven Content
 
@@ -201,12 +249,64 @@ The primary feedback channel is GitHub Discussions. Link to specific discussions
 
 ## Screenshot Guidelines
 
-- Annotate with arrows/callouts for key elements
-- Crop to focus — no full-screen captures unless necessary
-- Include before/after when showing changes
-- Alt text for accessibility
-- Save as PNG, reasonable file size
-- Place in `media/images/` directory
+Lean into screenshots. They are the single highest-value asset in a post — readers scroll, they don't read top-to-bottom. Aim for *as many as the feature warrants*, not a fixed number. A feature with a busy UI may justify 6–8; a small change may need only 1.
+
+- **Show it working** — prefer screenshots taken at the moment the feature does its job (filter applied, plot rendered, tool returning a result), not idle states.
+- **Before/after pairs** — strongly preferred for any change that replaces or improves an existing surface. Stack them vertically with brief captions, or use a two-column layout.
+- **Interaction GIFs over static** — if the feature is about behaviour (drag, hover, animation, state transitions), a short GIF beats a still. See "Interaction GIF Guidance" in `tasks-template.md`.
+- **Annotate** — arrows, callouts, or numbered markers for key elements. A screenshot the reader has to puzzle out is a wasted screenshot.
+- **Crop to focus** — no full-screen captures unless the layout itself is the point.
+- **Alt text required** — for accessibility and so the post survives broken image links.
+- **PNG, reasonable file size** — optimise before committing.
+- Place in `media/images/` directory.
+
+Source of record for screenshots is the web-shell Playwright suite (`apps/web-shell/playwright/tests/`) — see `docs/e2e-testing-guide.md` §3. Capturing them through tests means they refresh automatically and survive UI churn.
+
+## Storybook Links
+
+Storybook stories are first-class assets, not just internal scaffolding. Three reasons to include them in posts:
+
+1. **Reviewers can play with the component** — far more convincing than a screenshot.
+2. **They underwrite future Playwright tests** — pointing readers at them implicitly advertises that the component is regression-protected.
+3. **They are permanent** — the gh-pages-hosted Storybook outlives any in-post screenshot.
+
+When a feature has a Storybook story (check the plan's *Media Components* table), include a `## Try It Yourself` section with permanent gh-pages links:
+
+```markdown
+## Try It Yourself
+
+The component is live in Storybook — drag, click, and break it without leaving the browser:
+
+- [FilterBar — default state](https://debrief.github.io/debrief-future/storybook/?path=/story/components-filterbar--default)
+- [FilterBar — with active filters](https://debrief.github.io/debrief-future/storybook/?path=/story/components-filterbar--with-filters)
+```
+
+URL pattern: `https://debrief.github.io/debrief-future/storybook/?path=/story/[story-id]`. The story-id comes from the `Meta.title` and story export name in the `.stories.tsx` file (kebab-cased, joined with `--`).
+
+Omit the section entirely for backend / infrastructure features. Do not invent links or speculate about stories that don't exist.
+
+## Diagrams (Mermaid)
+
+GitHub Pages renders mermaid blocks natively — use them. A diagram beats prose for anything topological: data flow, sequence of events, component relationships, state machines.
+
+When to reach for a diagram:
+
+- The Hook for an architectural / infrastructure feature (often the most striking opener).
+- Inside *How It Fits* when the change touches multiple services and the wiring is the interesting bit.
+- Sequence diagrams for features that introduce new round-trips or message flows.
+
+Use a fenced mermaid block:
+
+````markdown
+```mermaid
+flowchart LR
+  Loader --> STAC[STAC Catalog]
+  STAC --> VSCode[VS Code Extension]
+  VSCode --> MapView[MapView Panel]
+```
+````
+
+Keep diagrams small and readable — 5–10 nodes is usually plenty. If a diagram needs more, split it into two. Prefer `flowchart LR` (horizontal) for architectural pictures and `sequenceDiagram` for interactions over time.
 
 ## Cross-Platform Consistency
 
@@ -244,6 +344,11 @@ Before marking a post complete:
 - [ ] `excerpt` under 150 characters
 - [ ] Tags are lowercase and hyphenated
 - [ ] Headings use `##` (not `#`)
-- [ ] First three sections copied verbatim from `evidence/opening-context.md`
+- [ ] **Hook present at top** — screenshot, mermaid, capability bullets, or before/after table (no `## Hook` heading)
+- [ ] **Post sized to match the change** — short post for minor work; full template for features with UI or architectural reach
+- [ ] First three sections copied verbatim from `evidence/opening-context.md` (full-template posts only)
+- [ ] **Storybook links included** when the feature has stories (pull from `plan.md` *Media Components* table)
+- [ ] Screenshots are annotated, cropped, and have alt text (where the post includes any)
+- [ ] Mermaid diagrams use ` ```mermaid ` fenced blocks (gh-pages renders these natively)
 - [ ] Links to code/PRs included where relevant
 - [ ] Ends with substance (no generic calls to action)
