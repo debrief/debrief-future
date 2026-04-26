@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-26
 **Branch:** `claude/research-mermaid-diagrams-0gl5e`
-**Status:** Research spike — no implementation yet
+**Status:** Accepted — Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout). See ADR-026 in `docs/project_notes/decisions.md`. Website-repo patch staged at `docs/project_notes/mermaid-website-patch/`.
 **Scope:** Posts shipped to `debrief.github.io/_posts/` via `/speckit.pr` → `/publish`
 
 ## TL;DR
@@ -79,19 +79,19 @@ Same as Option B, but emit both — leave the ` ```mermaid ` fence in the publis
 
 Replace existing fences with hand-drawn screenshots/asciinema/SVG-by-hand. Cheapest in build complexity, most expensive in author time, and we lose the GitHub-preview win. Listed for completeness only.
 
-## Recommendation (for discussion, not decided)
+## Decision (2026-04-26)
 
-Lean **Option A2** (vendored client-side `mermaid.js` in `future-post` layout). Reasons:
+**Option A1 — CDN-loaded `mermaid.js` in the `future-post` layout.**
 
-- Smallest code surface; one PR against `debrief.github.io`, no change here.
-- Retroactively fixes the 3+ posts that already contain Mermaid fences without backfill work.
-- Vendoring satisfies offline-by-default.
-- Diagrams stay text-diffable in `_posts/` git history.
+The owner clarified that the blog site does not need to function offline, so the offline-by-default constraint that originally pushed toward A2 (vendored) does not apply here. A1 is strictly simpler:
 
-Fall back to **Option B** if any of these turn out to be true:
-- The `future-post` layout is shared with other content where loading mermaid.js on every page is unacceptable.
-- We later need diagrams to appear in non-HTML contexts (RSS feed, PDF export, etc.).
-- The site moves off stock GitHub Pages to a static-build Actions workflow for unrelated reasons (in which case pre-rendering is essentially free).
+- One Liquid-gated `<script type="module">` block in `_layouts/future-post.html`, pinned at `mermaid@11`.
+- No vendored binary in the website repo's git history.
+- Same retroactive coverage of the 3+ posts that already contain Mermaid fences.
+
+Verification before this was accepted: the live 210 post (`https://debrief.github.io/future/2026/04/24/...`) was confirmed to currently render the `sequenceDiagram` source as raw text — i.e. the `future-post` layout has no Mermaid wiring today.
+
+Fall back to **Option B** (pre-render to SVG in `/publish`) if we later need diagrams to appear in non-HTML contexts (RSS feed, PDF export) or the site moves off stock GitHub Pages.
 
 ## Verification Steps Before Implementing
 
