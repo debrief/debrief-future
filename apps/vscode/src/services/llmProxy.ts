@@ -127,7 +127,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
   //     will surface `LiveKeyringUnavailable` only if the cache has no
   //     usable value).
   const secretsChangeListener = vscodeApi.secrets.onDidChange?.((e) => {
-    if (e.key !== SECRET_KEY) return;
+    if (e.key !== SECRET_KEY) {
+      return;
+    }
     void (async () => {
       try {
         const value = await vscodeApi.secrets.get(SECRET_KEY);
@@ -230,12 +232,12 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
     const keyResult = await readApiKey();
     if (!keyResult.ok) {
       // #198 — `secrets.get` rejected; classify as keyring-unavailable.
-      const outcome: LiveOutcome = {
+      const outcome: NlLiveOutcome = {
         kind: 'keyring-unavailable',
         platformHint: detectPlatformHint(),
         durationMs: 0,
       };
-      emitRecord(makeRecord(outcome, settings.model, 0));
+      emitRecord(makeRecord(outcome as LiveOutcome, settings.model, 0));
       return outcome;
     }
     const apiKey = keyResult.value;
@@ -331,7 +333,9 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
  * platform-specific hint sentence (FR-010 — headline stays OS-neutral).
  */
 export function detectPlatformHint(): 'linux' | 'macos' | 'windows' | 'unknown' {
-  if (typeof process === 'undefined' || !process.platform) return 'unknown';
+  if (typeof process === 'undefined' || !process.platform) {
+    return 'unknown';
+  }
   switch (process.platform) {
     case 'linux':
       return 'linux';
