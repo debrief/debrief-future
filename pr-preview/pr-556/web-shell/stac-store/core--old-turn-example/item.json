@@ -1,0 +1,142 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--old-turn-example",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.7566036,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.1649972
+        ],
+        [
+          30.9332722,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.212115
+        ],
+        [
+          30.7566036,
+          5.1649972
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.7566036,
+    5.1649972,
+    30.9332722,
+    5.212115
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Old Turn Example",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Saxon Warrior: Old Turn Example — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including USS Roald Amundsen, FS Hamburg. Multi-national participation: FR, US.",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "MAYO",
+        "name": "USS Roald Amundsen",
+        "nationality": "US",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "T-second attempt",
+        "name": "FS Hamburg",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_type": "visby",
+        "vessel_role": "corvette"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "escort",
+      "replenishment",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "old_turn_example (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/old_turn_example.dpf",
+      "title": "old_turn_example.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-old_turn_example": {
+      "href": "./assets/old_turn_example.dpf",
+      "type": "application/octet-stream",
+      "title": "old_turn_example.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/old_turn_example.dpf",
+        "load_timestamp": "2026-04-13T23:12:33.250496Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
