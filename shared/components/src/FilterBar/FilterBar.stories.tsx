@@ -703,3 +703,117 @@ export const NlModeWithStubClient: Story = {
     },
   },
 };
+
+// ---------------------------------------------------------------------------
+// #198 T030 — keyring-unavailable banner variants (one per platformHint)
+// ---------------------------------------------------------------------------
+
+function createKeyringStubClient(
+  platformHint: 'linux' | 'macos' | 'windows' | 'unknown',
+): LLMClient {
+  return {
+    async generate(): Promise<LiveOutcome> {
+      // Tiny latency so the pending-state transition is observable.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return { kind: 'keyring-unavailable', platformHint, durationMs: 0 };
+    },
+    abort() {
+      // No-op — there is nothing in-flight worth aborting.
+    },
+  };
+}
+
+function NlKeyringUnavailableWrapper({
+  platformHint,
+}: {
+  platformHint: 'linux' | 'macos' | 'windows' | 'unknown';
+}): ReactElement {
+  const [client] = useState(() => createKeyringStubClient(platformHint));
+  const handleBannerAction = useCallback(
+    (action: 'open-settings' | 'retry' | 'reload' | 'help') => {
+      // Storybook-only — log so reviewers can confirm the wiring without
+      // a real VS Code host.
+      // eslint-disable-next-line no-console
+      console.info(`[storybook] banner action dispatched: ${action}`);
+    },
+    [],
+  );
+  return (
+    <div>
+      <FilterBar
+        items={MOCK_ITEMS}
+        taxonomy={MOCK_TAXONOMY}
+        onFilteredItems={() => undefined}
+        llmClient={client}
+        nlEnums={NL_STUB_ENUMS}
+        liveModeLabel="Live · Anthropic · claude-haiku-4-5-20251001 (stub)"
+        onBannerAction={handleBannerAction}
+      />
+      <div
+        style={{
+          padding: '8px 12px',
+          fontSize: '12px',
+          color: 'var(--vscode-descriptionForeground, #666)',
+        }}
+      >
+        Submit any phrase — the stub returns
+        <code> kind: &quot;keyring-unavailable&quot;, platformHint: &quot;{platformHint}&quot; </code>
+        once. The banner&apos;s headline stays OS-neutral; the platform hint
+        paragraph (when not <code>unknown</code>) names the appropriate
+        OS keyring tool.
+      </div>
+    </div>
+  );
+}
+
+export const NlModeKeyringUnavailable: Story = {
+  name: 'NL Mode — keyring-unavailable (Linux)',
+  render: () => <NlKeyringUnavailableWrapper platformHint="linux" />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#198 — Linux keyring-unavailable banner. Headline names the OS keyring (not the API key); body has a Linux-specific hint paragraph; primary action opens troubleshooting help; secondary action opens settings (deliberately NOT primary, to avoid misdirecting the analyst into re-entering a key that is already saved).',
+      },
+    },
+  },
+};
+
+export const NlModeKeyringUnavailableMacos: Story = {
+  name: 'NL Mode — keyring-unavailable (macOS)',
+  render: () => <NlKeyringUnavailableWrapper platformHint="macos" />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#198 — macOS variant. Same banner, hint paragraph names Keychain Access.',
+      },
+    },
+  },
+};
+
+export const NlModeKeyringUnavailableWindows: Story = {
+  name: 'NL Mode — keyring-unavailable (Windows)',
+  render: () => <NlKeyringUnavailableWrapper platformHint="windows" />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#198 — Windows variant. Same banner, hint paragraph names Credential Manager.',
+      },
+    },
+  },
+};
+
+export const NlModeKeyringUnavailableUnknown: Story = {
+  name: 'NL Mode — keyring-unavailable (unknown OS)',
+  render: () => <NlKeyringUnavailableWrapper platformHint="unknown" />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#198 — fallback variant for unrecognised platforms. The platform-specific hint paragraph is suppressed (no placeholder text), but the banner remains usable with the same primary/secondary actions.',
+      },
+    },
+  },
+};

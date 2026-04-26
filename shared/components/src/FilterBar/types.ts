@@ -151,9 +151,12 @@ export interface FilterBarProps {
    * Invoked when the user presses a recovery button inside the NL failure
    * banner. Hosts (e.g. VS Code's Catalog Overview) map the action to the
    * right command — e.g. `open-settings` → `workbench.action.openSettings`,
-   * `retry` → re-submit the phrase.
+   * `retry` → re-submit the phrase, `help` → open the troubleshooting
+   * docs URL via `vscode.env.openExternal` (#198 Decision 4).
    */
-  readonly onBannerAction?: (action: 'open-settings' | 'retry' | 'reload') => void;
+  readonly onBannerAction?: (
+    action: 'open-settings' | 'retry' | 'reload' | 'help',
+  ) => void;
 }
 
 /** Distinct-value collection for platform-chip pickers (#186) */

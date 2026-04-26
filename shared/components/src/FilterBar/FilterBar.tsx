@@ -419,7 +419,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         )}
 
         {/* #191 T044 / T082 — NL failure banner with per-class recovery
-            affordance. Keyed by `data-transport-reason` for E2E selectors. */}
+            affordance. Keyed by `data-transport-reason` for E2E selectors.
+            #198 — `keyring-unavailable` renders a primary "Help: unlock
+            your keyring" + secondary "Open settings"; the headline stays
+            OS-neutral with an optional platform hint paragraph. */}
         {nlBanner && (
           <div
             className="debrief-filter-bar__live-banner"
@@ -430,30 +433,36 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <span className="debrief-filter-bar__live-banner-message">
               {nlBannerMessage(nlBanner)}
             </span>
-            {(() => {
-              const action = nlBannerAction(nlBanner);
-              if (!action) return null;
-              return (
-                <button
-                  type="button"
-                  className="debrief-filter-bar__live-banner-action"
-                  data-testid={`live-transport-banner-${action.kind}`}
-                  onClick={() => {
-                    setNlBanner(null);
-                    if (onBannerAction) onBannerAction(action.kind);
-                    else if (action.kind === 'retry') {
-                      // Default retry behaviour when the host doesn't
-                      // override: re-run the last submitted phrase.
-                      // QuickSearch has already been cleared, so use the
-                      // last prompt text if available via the input DOM —
-                      // a no-op here is acceptable for minimal surface.
-                    }
-                  }}
+            {nlBanner.kind === 'keyring-unavailable'
+              && nlBanner.platformHint
+              && nlBanner.platformHint !== 'unknown'
+              && (
+                <span
+                  className="debrief-filter-bar__live-banner-hint"
+                  data-testid="live-transport-banner-hint"
+                  data-platform-hint={nlBanner.platformHint}
                 >
-                  {action.label}
-                </button>
-              );
-            })()}
+                  {keyringPlatformHint(nlBanner.platformHint)}
+                </span>
+              )}
+            {nlBannerActions(nlBanner).map((action) => (
+              <button
+                key={action.kind}
+                type="button"
+                className={
+                  action.primary
+                    ? 'debrief-filter-bar__live-banner-action'
+                    : 'debrief-filter-bar__live-banner-action debrief-filter-bar__live-banner-action--secondary'
+                }
+                data-testid={`live-transport-banner-${action.kind}`}
+                onClick={() => {
+                  setNlBanner(null);
+                  if (onBannerAction) onBannerAction(action.kind);
+                }}
+              >
+                {action.label}
+              </button>
+            ))}
             <button
               type="button"
               className="debrief-filter-bar__live-banner-dismiss"
@@ -607,35 +616,44 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 };
 
 /**
- * Default banner copy per non-success LiveOutcome kind (#191 T044). Phase 5
- * (T082) will replace this with per-class copy + recovery affordances. For
- * now each banner shows a minimal user-legible sentence so the literal path
- * keeps working while the Phase-5 UX lands.
+ * Per-class recovery affordances for the NL failure banner (#191 T082, #198).
+ *
+ * Returns 0..N action descriptors. `primary: true` is rendered as the main
+ * call-to-action; `primary: false` is rendered as a secondary action. The
+ * `keyring-unavailable` variant returns BOTH a primary "Help" and a
+ * secondary "Open settings" — the secondary affordance is intentionally
+ * NOT the primary CTA because telling a user with a saved-but-unreachable
+ * key to "set your API key" misdirects them (#198 FR-004).
+ *
+ * No affordance ever applies to `success`.
  */
-/**
- * Per-class recovery affordance for the NL failure banner (#191 T082).
- * Returns the button kind + visible label, or null when no recovery
- * affordance applies (e.g. the success variant).
- */
-function nlBannerAction(
-  outcome: LiveOutcome,
-): { readonly kind: 'open-settings' | 'retry' | 'reload'; readonly label: string } | null {
+interface BannerActionDescriptor {
+  readonly kind: 'open-settings' | 'retry' | 'reload' | 'help';
+  readonly label: string;
+  readonly primary: boolean;
+}
+
+function nlBannerActions(outcome: LiveOutcome): readonly BannerActionDescriptor[] {
   switch (outcome.kind) {
     case 'success':
-      return null;
+      return [];
     case 'auth-failure':
     case 'not-configured':
-      return { kind: 'open-settings', label: 'Open settings' };
+      return [{ kind: 'open-settings', label: 'Open settings', primary: true }];
     case 'rate-limit':
     case 'provider-error':
     case 'timeout':
-      return { kind: 'retry', label: 'Retry' };
-    case 'malformed-response':
-      return { kind: 'retry', label: 'Rephrase' };
     case 'transport-error':
-      return { kind: 'retry', label: 'Retry' };
+      return [{ kind: 'retry', label: 'Retry', primary: true }];
+    case 'malformed-response':
+      return [{ kind: 'retry', label: 'Rephrase', primary: true }];
     case 'ceiling-reached':
-      return { kind: 'reload', label: 'Reload window' };
+      return [{ kind: 'reload', label: 'Reload window', primary: true }];
+    case 'keyring-unavailable':
+      return [
+        { kind: 'help', label: 'Help: unlock your keyring', primary: true },
+        { kind: 'open-settings', label: 'Open settings', primary: false },
+      ];
   }
 }
 
@@ -661,5 +679,29 @@ function nlBannerMessage(outcome: LiveOutcome): string {
         : 'NL search needs an API key — run the “Debrief: Set Anthropic API Key” command.';
     case 'ceiling-reached':
       return `Live-mode call limit reached (${outcome.ceiling}). Reload the editor to reset.`;
+    case 'keyring-unavailable':
+      // Headline stays OS-neutral (FR-010). Body explains that the saved
+      // key could not be read because the OS credential keyring is the
+      // gate — and intentionally does NOT instruct the analyst to
+      // re-enter their key (FR-004).
+      return 'Saved API key could not be read — the OS credential keyring is unavailable.';
+  }
+}
+
+/**
+ * Optional platform-specific hint sentence for the keyring-unavailable
+ * banner. Selected by `platformHint` (#198 Decision 3). The headline copy
+ * stays OS-neutral regardless; only this secondary sentence varies.
+ */
+function keyringPlatformHint(
+  hint: 'linux' | 'macos' | 'windows',
+): string {
+  switch (hint) {
+    case 'linux':
+      return 'Unlock your gnome-keyring or KWallet and try again.';
+    case 'macos':
+      return 'Unlock Keychain Access and try again.';
+    case 'windows':
+      return 'Check Credential Manager service and try again.';
   }
 }
