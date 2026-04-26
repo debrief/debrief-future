@@ -44,7 +44,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Feature name and goal from spec.md
      - Key technical decisions from research.md
      - Architecture overview from plan.md
-   - Request the cached opener — three prose sections (`## What We're Building`, `## How It Fits`, `## Key Decisions`), no front matter, matching the contract in the agent definition
+     - Media Components table from plan.md (Storybook stories, if any)
+   - Request the cached opener — four sections (`## Hook`, `## What We're Building`, `## How It Fits`, `## Key Decisions`), no front matter, matching the contract in the agent definition. The Hook form (screenshot / mermaid / bullets / before-after) is chosen at planning time so the post has a deliberate opener, not an improvised one.
    - Save to `FEATURE_DIR/evidence/opening-context.md` (create the `evidence/` directory if missing)
 
 5. **Stop and report**: Command ends after planning. Report branch, IMPL_PLAN path, generated artifacts, and the cached opener path.
@@ -138,19 +139,20 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. **Create evidence directory**: `mkdir -p FEATURE_DIR/evidence/`
 
 2. **Spawn Content Specialist** via Task tool:
-   - Read `.claude/agents/media/content.md` for agent definition (Cached Opening Context section)
+   - Read `.claude/agents/media/content.md` for agent definition (Cached Opening Context section + "The Hook" guidance)
    - Provide context:
      ```text
      Feature: [name from spec.md]
      Goal: [goal statement from spec.md]
      Key Decisions: [from research.md]
      Architecture: [summary from plan.md]
+     Media Components: [from plan.md "Media Components" section, if populated — list of Storybook stories]
      Audience: DSTL scientists, potential contributors, defence maritime analysis community
      ```
-   - Request: "Write the cached opener — three prose sections: What We're Building, How It Fits, Key Decisions. Prose only, no front matter, no feedback solicitation."
+   - Request: "Write the cached opener — four sections: Hook, What We're Building, How It Fits, Key Decisions. Prose only, no front matter, no feedback solicitation. For the Hook, choose the form (screenshot path / mermaid diagram / capability bullets / before/after table) best suited to this feature; if a screenshot is the right answer, predict the path it will live at after evidence collection."
 
 3. **Write cached opener**: Save to `FEATURE_DIR/evidence/opening-context.md`
-   - Three sections with `##` headings: `## What We're Building`, `## How It Fits`, `## Key Decisions`
+   - Four sections with `##` headings: `## Hook`, `## What We're Building`, `## How It Fits`, `## Key Decisions`
    - No YAML front matter
    - Use the template at `.specify/templates/evidence/opening-context-template.md` as the structural reference
 
