@@ -367,6 +367,7 @@ export type NlLiveOutcome =
   | { readonly kind: 'timeout'; readonly durationMs: number }
   | { readonly kind: 'malformed-response'; readonly reason: 'non-json' | 'oversize' | 'truncated'; readonly durationMs: number; readonly responseBytes: number }
   | { readonly kind: 'not-configured'; readonly reason: 'disabled' | 'no-key'; readonly durationMs: 0 }
+  | { readonly kind: 'keyring-unavailable'; readonly platformHint?: 'linux' | 'macos' | 'windows' | 'unknown'; readonly durationMs: 0 }
   | { readonly kind: 'ceiling-reached'; readonly ceiling: number; readonly durationMs: 0 };
 
 /**

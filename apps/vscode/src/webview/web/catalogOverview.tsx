@@ -168,11 +168,12 @@ function CatalogOverviewApp(): React.ReactElement {
 
   // #191 T082 — host wiring for the NL failure-banner recovery buttons.
   // `retry` is handled inside FilterBar (re-submits the last phrase); here
-  // we route `open-settings` and `reload` through VS Code commands by
-  // posting a message back to the extension host, which maps them to the
-  // matching `vscode.commands.executeCommand`.
+  // we route `open-settings`, `reload`, and `help` through VS Code commands
+  // by posting a message back to the extension host, which maps them to
+  // the matching `vscode.commands.executeCommand` (`help` resolves via
+  // `vscode.env.openExternal` — #198 Decision 4).
   const handleNlBannerAction = useCallback(
-    (action: 'open-settings' | 'retry' | 'reload') => {
+    (action: 'open-settings' | 'retry' | 'reload' | 'help') => {
       vscode.postMessage({ type: 'nlBannerAction', action });
     },
     [],
