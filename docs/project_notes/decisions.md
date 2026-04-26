@@ -964,3 +964,32 @@ The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the varian
 - `specs/220-fix-theme-responsiveness/evidence/test-summary.md` — full test transcript across the four variants.
 - `specs/220-fix-theme-responsiveness/evidence/screenshots/all-panels-{light,dark,high-contrast-light,high-contrast-dark}.png` — visual consistency proof.
 - `specs/220-fix-theme-responsiveness/evidence/screenshots/interaction.gif` — runtime-switch demo.
+
+### ADR-026: Mermaid Diagrams in Shipped Blog Posts via CDN-Loaded Client-Side Renderer (2026-04-26)
+
+**Decision.** Mermaid diagrams in shipped feature blog posts (`debrief.github.io/_posts/`) are rendered client-side by `mermaid@11` loaded from the jsDelivr CDN, wired into the `future-post` Jekyll layout via a Liquid-gated `<script type="module">` block that only fires when the post body contains a `language-mermaid` code class. Authors continue to write standard ` ```mermaid ` fences in `specs/NNN/media/shipped-post.md` — no new authoring syntax. The `/publish` pipeline is unchanged.
+
+**Context.** Mermaid fences have been authored in shipped posts since at least #061 (Feb 2026), but the publishing pipeline took no action on them and the live site currently renders them as `<pre><code>` text (confirmed visually against the #210 post on 2026-04-26). Three viable paths existed: (A1) client-side Mermaid via CDN in the website layout; (A2) same but vendoring the script into the website repo for offline-safety; (B) pre-render to SVG inside `/publish` using `mmdc`. Stock GitHub Pages excludes `jekyll-mermaid` from its plugin allowlist, so a server-side Jekyll plugin was not an option.
+
+**Rejected alternatives.**
+
+- **A2 — vendor `mermaid.min.js` in the website repo.** Originally preferred to satisfy the constitution's offline-by-default principle. Owner clarified the public marketing site is explicitly an online-only surface (the principle applies to *core platform functionality* — services, schemas, file IO — not to the project's website). Vendoring would cost ~600 KB of git history per upgrade for no benefit.
+- **B — pre-render to SVG in `/publish`.** Would add a Node + Puppeteer/Chromium dependency to the publish step and require backfill of already-published posts. Worth revisiting only if diagrams later need to appear in non-HTML contexts (RSS feed, PDF export) or the site moves to a custom Actions Jekyll build.
+- **Custom Liquid tag (`{% mermaid %}…{% endmermaid %}`).** Rejected: would break GitHub's native preview of the source post and force the technical-specialist agent to learn a new syntax. The whole point of using Mermaid is that ` ```mermaid ` fences render everywhere they're seen.
+
+**Consequences.**
+
+- **Retroactive fix.** All three already-published posts that contain Mermaid fences (#061, #210, plus #217's evidence pages if linked) start rendering as soon as the website-repo PR merges. No backfill needed.
+- **Per-page cost is gated.** The Liquid `{% if page.content contains "language-mermaid" %}` guard means non-diagram posts pay zero bytes for mermaid.js. Only diagram-bearing posts trigger the CDN fetch.
+- **Authoring guideline updated.** `.claude/agents/media/technical.md` and `docs/CLAUDE-media-agents.md` now state that Mermaid renders both in GitHub previews and on the published site, removing the previous implicit "GitHub-preview-only" framing.
+- **CDN is a soft external dependency.** If jsDelivr is blocked or down, diagrams degrade to the pre-existing raw-text fallback — non-fatal and consistent with current behaviour.
+
+**Originating issue:** ad-hoc research spike (no backlog item). Spike: `docs/project_notes/mermaid-in-blog-posts.md`. Branch: `claude/research-mermaid-diagrams-0gl5e`.
+
+**Evidence:**
+- `docs/project_notes/mermaid-in-blog-posts.md` — full options analysis and decision rationale.
+- `docs/project_notes/mermaid-website-patch/future-post-layout-snippet.html` — exact website-repo patch to apply to `_layouts/future-post.html`.
+- `docs/project_notes/mermaid-website-patch/README.md` — application instructions for the website-repo PR.
+- Screenshot supplied by owner (2026-04-26) — confirmed `sequenceDiagram` body of #210 post rendering as raw text on live site.
+- Implementing PR: [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90) (submitted 2026-04-26; the patch landed in `_layouts/future-post.html` at end-of-file rather than before `</body>` because the post layout delegates to `_layouts/future-default.html` for the document shell — see implementation notes in the spike doc).
+- End-to-end verification (2026-04-26): owner confirmed a freshly-published meta-post drafted from `specs/999-mermaid-blog-rendering/spec.md` renders its embedded `flowchart LR` Mermaid diagram as an SVG on `debrief.github.io`, closing the cycle from author-side fence → kramdown → layout shim → CDN runtime → rendered SVG.

@@ -116,6 +116,24 @@ docker run -p 8080:8080 -e PORT=8080 debrief-preview
 - Demo: per-PR Heroku Review Apps (see "Demo Environment" above for URL
   pattern + how to reach them)
 
+### Website Repo (debrief.github.io) — Layout Architecture
+
+When writing cross-repo briefs against `debrief/debrief.github.io`, know
+that `_layouts/future-post.html` does **not** own the document shell. It
+declares `layout: future-default` in its front matter and is rendered
+into `{{ content }}` inside `_layouts/future-default.html`, which owns
+`<html>`, `<head>`, `<body>`, the footer include, and any site-wide
+scripts.
+
+Practical consequence: anything that needs to be appended "before
+`</body>`" of a post page either (a) goes at the end of
+`future-post.html` and relies on the rendered output landing inside
+`<body>` near the end of the page (fine for `type="module"` scripts
+that are deferred anyway — see ADR-026), or (b) goes in
+`future-default.html` if it must be page-wide. Don't write briefs
+that say "before `</body>` in `future-post.html`" — that tag is not
+in that file.
+
 ### CI Secrets
 
 **WEBSITE_PUSH_TOKEN** (required for the schema-docs auto-sync in
