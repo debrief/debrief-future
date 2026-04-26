@@ -114,13 +114,30 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
   let cachedKey: string | null | undefined = undefined; // undefined = not yet read; null = read, not present
   let callsUsed = 0;
 
-  // Key-cache invalidation: clear the cache on every secrets change so the
-  // next `nlGenerate` re-reads. (Review Decision 14.)
+  // Key-cache invalidation on secrets change (review Decision 14).
+  //
+  // #198 FR-008 — a throw during the cache-refresh re-read MUST NOT evict
+  // a previously-working `cachedKey`. We re-read eagerly inside the
+  // listener so the next `nlGenerate` already has the fresh value, and
+  // we wrap the re-read in its own try/catch:
+  //   * resolved with value     → replace `cachedKey`
+  //   * resolved with undefined → evict (key was deleted)
+  //   * rejected / threw        → leave `cachedKey` UNCHANGED (the
+  //     previously-working key remains usable; the next `nlGenerate`
+  //     will surface `LiveKeyringUnavailable` only if the cache has no
+  //     usable value).
   const secretsChangeListener = vscodeApi.secrets.onDidChange?.((e) => {
-    if (e.key === SECRET_KEY) {
-      cachedKey = undefined;
+    if (e.key !== SECRET_KEY) return;
+    void (async () => {
+      try {
+        const value = await vscodeApi.secrets.get(SECRET_KEY);
+        cachedKey = value ?? null;
+      } catch {
+        // FR-008 — preserve the previously-working cached key on throw.
+        // Intentionally NO `cachedKey = ...` assignment here.
+      }
       fireConfigChange();
-    }
+    })();
   });
   if (secretsChangeListener) {
     disposables.push(secretsChangeListener);
@@ -145,14 +162,35 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
     };
   }
 
-  async function readApiKey(): Promise<string | null> {
+  /**
+   * Three-way result for `readApiKey()`:
+   *   - `{ ok: true, value }` — key is present (or genuinely absent
+   *     `null`); proceed using `value` (or short-circuit on `null` to
+   *     `not-configured`).
+   *   - `{ ok: false }`       — `secrets.get` rejected/threw on first
+   *     read AND we have no usable cached value; surface
+   *     `keyring-unavailable` (#198 FR-002).
+   */
+  type ReadApiKeyResult =
+    | { readonly ok: true; readonly value: string | null }
+    | { readonly ok: false };
+
+  async function readApiKey(): Promise<ReadApiKeyResult> {
     if (cachedKey !== undefined) {
-      return cachedKey;
+      return { ok: true, value: cachedKey };
     }
-    const value = await vscodeApi.secrets.get(SECRET_KEY);
-    const resolved: string | null = value ?? null;
-    cachedKey = resolved;
-    return resolved;
+    try {
+      const value = await vscodeApi.secrets.get(SECRET_KEY);
+      const resolved: string | null = value ?? null;
+      cachedKey = resolved;
+      return { ok: true, value: resolved };
+    } catch {
+      // #198 — any rejection (Error, string, undefined, DOMException…)
+      // classifies as `keyring-unavailable`. We do NOT inspect error
+      // shapes (Decision 1). We do NOT cache the failure — the next
+      // submission re-attempts `secrets.get` (FR-007).
+      return { ok: false };
+    }
   }
 
   function readConfigSync(): HostLiveConfig {
@@ -189,8 +227,19 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
       return outcome;
     }
 
-    const apiKey = await readApiKey();
-    if (apiKey === null || apiKey === undefined || apiKey === '') {
+    const keyResult = await readApiKey();
+    if (!keyResult.ok) {
+      // #198 — `secrets.get` rejected; classify as keyring-unavailable.
+      const outcome: LiveOutcome = {
+        kind: 'keyring-unavailable',
+        platformHint: detectPlatformHint(),
+        durationMs: 0,
+      };
+      emitRecord(makeRecord(outcome, settings.model, 0));
+      return outcome;
+    }
+    const apiKey = keyResult.value;
+    if (apiKey === null || apiKey === '') {
       const outcome: LiveOutcome = { kind: 'not-configured', reason: 'no-key', durationMs: 0 };
       emitRecord(makeRecord(outcome, settings.model, 0));
       fireConfigChange(); // hasApiKey boolean changed if webview was out of sync
@@ -271,6 +320,28 @@ export function createLlmProxy(vscodeApi: LlmProxyVsCodeApi): LlmProxy {
   }
 
   return { handleGenerate, handleAbort, readConfig, onConfigChange, dispose };
+}
+
+/**
+ * Map `process.platform` to the optional `platformHint` carried by a
+ * `keyring-unavailable` outcome (#198 Decision 3). Pure; no side effects.
+ *
+ * Only Linux/macOS/Windows have OS credential keyrings worth naming;
+ * everything else gets `"unknown"` and the banner suppresses the
+ * platform-specific hint sentence (FR-010 — headline stays OS-neutral).
+ */
+export function detectPlatformHint(): 'linux' | 'macos' | 'windows' | 'unknown' {
+  if (typeof process === 'undefined' || !process.platform) return 'unknown';
+  switch (process.platform) {
+    case 'linux':
+      return 'linux';
+    case 'darwin':
+      return 'macos';
+    case 'win32':
+      return 'windows';
+    default:
+      return 'unknown';
+  }
 }
 
 function makeRecord(

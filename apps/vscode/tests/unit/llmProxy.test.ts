@@ -321,6 +321,184 @@ describe('llmProxy — controller-map cleanup (T039)', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// #198 — keyring-unavailable classification
+// ---------------------------------------------------------------------------
+
+describe('llmProxy — keyring-unavailable classification (#198 T010-T013)', () => {
+  it('classifies a rejected secrets.get as keyring-unavailable (not not-configured)', async () => {
+    const f = makeFakeApi({ storedKey: undefined });
+    f.secretsGet.mockReset().mockRejectedValueOnce(new Error('keyring locked'));
+    const proxy = createLlmProxy(f.api);
+    const outcome = await proxy.handleGenerate({ requestId: 'r1', prompt: 'x' });
+    expect(outcome.kind).toBe('keyring-unavailable');
+    if (outcome.kind === 'keyring-unavailable') {
+      // platformHint is derived from process.platform — assert it's one of
+      // the expected literals (the actual value depends on the test host).
+      expect(['linux', 'macos', 'windows', 'unknown']).toContain(outcome.platformHint);
+      expect(outcome.durationMs).toBe(0);
+    }
+    // Provider call MUST NOT have been attempted — the failure is purely
+    // host-side.
+    expect(providerCallMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps not-configured/no-key when secrets.get resolves to undefined (regression)', async () => {
+    // FR-003 — the no-key-ever-saved path must NOT regress.
+    const f = makeFakeApi({ storedKey: undefined });
+    const proxy = createLlmProxy(f.api);
+    const outcome = await proxy.handleGenerate({ requestId: 'r1', prompt: 'x' });
+    expect(outcome.kind).toBe('not-configured');
+    if (outcome.kind === 'not-configured') {
+      expect(outcome.reason).toBe('no-key');
+    }
+    expect(providerCallMock).not.toHaveBeenCalled();
+  });
+
+  it('non-Error rejection (string) still classifies as keyring-unavailable', async () => {
+    // Edge case — `secrets.get` may reject with non-Error values
+    // (string, undefined, DOMException). The discriminator is "was the
+    // promise rejected", not "what was thrown".
+    const f = makeFakeApi({ storedKey: undefined });
+    f.secretsGet.mockReset().mockRejectedValueOnce('locked');
+    const proxy = createLlmProxy(f.api);
+    const outcome = await proxy.handleGenerate({ requestId: 'r1', prompt: 'x' });
+    expect(outcome.kind).toBe('keyring-unavailable');
+  });
+
+  it('non-Error rejection (undefined) still classifies as keyring-unavailable', async () => {
+    const f = makeFakeApi({ storedKey: undefined });
+    f.secretsGet.mockReset().mockRejectedValueOnce(undefined);
+    const proxy = createLlmProxy(f.api);
+    const outcome = await proxy.handleGenerate({ requestId: 'r1', prompt: 'x' });
+    expect(outcome.kind).toBe('keyring-unavailable');
+  });
+
+  it('second submission after keyring-unavailable re-reads the secret (FR-007)', async () => {
+    // First read rejects, second resolves with a real key — the second
+    // submission must succeed without any extension reload. Classification
+    // is NOT cached/sticky.
+    providerCallMock.mockResolvedValueOnce(SUCCESS_OUTCOME);
+    const f = makeFakeApi({ storedKey: undefined });
+    f.secretsGet
+      .mockReset()
+      .mockRejectedValueOnce(new Error('locked'))
+      .mockResolvedValueOnce('sk-recovered');
+    const proxy = createLlmProxy(f.api);
+
+    const first = await proxy.handleGenerate({ requestId: 'r1', prompt: 'a' });
+    expect(first.kind).toBe('keyring-unavailable');
+    expect(f.secretsGet).toHaveBeenCalledTimes(1);
+
+    // Second submission re-attempts the read.
+    const second = await proxy.handleGenerate({ requestId: 'r2', prompt: 'b' });
+    expect(second.kind).toBe('success');
+    expect(f.secretsGet).toHaveBeenCalledTimes(2);
+  });
+
+  it('cache-refresh throw preserves the previously-working cachedKey (FR-008)', async () => {
+    // First read succeeds → cache populated. onDidChange fires; the re-read
+    // throws. The next submission must succeed using the *previously
+    // cached* key — eviction must NOT occur on a throw.
+    providerCallMock.mockResolvedValueOnce(SUCCESS_OUTCOME);
+    providerCallMock.mockResolvedValueOnce(SUCCESS_OUTCOME);
+    const f = makeFakeApi({ storedKey: 'sk-original' });
+    const proxy = createLlmProxy(f.api);
+
+    // Hydrate the cache.
+    const first = await proxy.handleGenerate({ requestId: 'r1', prompt: 'a' });
+    expect(first.kind).toBe('success');
+    expect(f.secretsGet).toHaveBeenCalledTimes(1);
+
+    // Configure the next read (driven by onDidChange) to reject.
+    f.secretsGet.mockRejectedValueOnce(new Error('keyring went down'));
+    f.fireSecretsChange('debrief.nlSearch.anthropicApiKey');
+    // Allow the async re-read inside the listener to settle.
+    await new Promise((r) => setTimeout(r, 5));
+
+    // Cache should still hold the original key — the next handleGenerate
+    // must NOT trigger a fresh read (cache hit) AND must succeed.
+    const second = await proxy.handleGenerate({ requestId: 'r2', prompt: 'b' });
+    expect(second.kind).toBe('success');
+    // 1 call for hydration + 1 call from onDidChange (which threw) = 2.
+    expect(f.secretsGet).toHaveBeenCalledTimes(2);
+    // The provider call must have received the original key.
+    const lastArgs = providerCallMock.mock.calls.at(-1)![0] as { apiKey: string };
+    expect(lastArgs.apiKey).toBe('sk-original');
+  });
+
+  it('cache-refresh resolves with undefined → cache evicted (no false retention)', async () => {
+    // The complement of the previous test: a *successful* re-read that
+    // resolves to undefined IS an eviction. The next submission should
+    // surface not-configured.
+    providerCallMock.mockResolvedValueOnce(SUCCESS_OUTCOME);
+    const f = makeFakeApi({ storedKey: 'sk-original' });
+    const proxy = createLlmProxy(f.api);
+
+    await proxy.handleGenerate({ requestId: 'r1', prompt: 'a' });
+    expect(f.secretsGet).toHaveBeenCalledTimes(1);
+
+    f.secretsGet.mockResolvedValueOnce(undefined);
+    f.fireSecretsChange('debrief.nlSearch.anthropicApiKey');
+    await new Promise((r) => setTimeout(r, 5));
+
+    const second = await proxy.handleGenerate({ requestId: 'r2', prompt: 'b' });
+    expect(second.kind).toBe('not-configured');
+    if (second.kind === 'not-configured') {
+      expect(second.reason).toBe('no-key');
+    }
+  });
+
+  it('telemetry record carries outcome="keyring-unavailable" distinctly (FR-009)', async () => {
+    const records: unknown[] = [];
+    const consoleInfoSpy = vi
+      .spyOn(console, 'info')
+      .mockImplementation((tag: unknown, record: unknown) => {
+        if (tag === '[nl-search/live]') records.push(record);
+      });
+
+    try {
+      const f = makeFakeApi({ storedKey: undefined });
+      f.secretsGet.mockReset().mockRejectedValueOnce(new Error('locked'));
+      const proxy = createLlmProxy(f.api);
+      await proxy.handleGenerate({ requestId: 'r1', prompt: 'x' });
+
+      expect(records).toHaveLength(1);
+      expect((records[0] as { outcome: string }).outcome).toBe('keyring-unavailable');
+    } finally {
+      consoleInfoSpy.mockRestore();
+    }
+  });
+});
+
+describe('llmProxy — detectPlatformHint (#198 T012)', () => {
+  it('returns one of the documented literals on this host', async () => {
+    const { detectPlatformHint } = await import('../../src/services/llmProxy');
+    const hint = detectPlatformHint();
+    expect(['linux', 'macos', 'windows', 'unknown']).toContain(hint);
+  });
+
+  it('maps process.platform values to the documented hints', async () => {
+    const { detectPlatformHint } = await import('../../src/services/llmProxy');
+    const original = process.platform;
+    const cases: Array<[NodeJS.Platform, ReturnType<typeof detectPlatformHint>]> = [
+      ['linux', 'linux'],
+      ['darwin', 'macos'],
+      ['win32', 'windows'],
+      ['freebsd', 'unknown'],
+      ['aix', 'unknown'],
+    ];
+    try {
+      for (const [platform, expected] of cases) {
+        Object.defineProperty(process, 'platform', { value: platform, configurable: true });
+        expect(detectPlatformHint()).toBe(expected);
+      }
+    } finally {
+      Object.defineProperty(process, 'platform', { value: original, configurable: true });
+    }
+  });
+});
+
 describe('llmProxy — config snapshot + change events', () => {
   it('readConfig reflects hasApiKey after the first generate() resolves', async () => {
     providerCallMock.mockResolvedValueOnce(SUCCESS_OUTCOME);
