@@ -1,5 +1,16 @@
 # Playwright Installation in Claude Code Sessions
 
+> **2026-04-26 note.** "NPM Package Installation works ✅" depends on the
+> cloud environment's **Network access** mode in Claude Code on the web. If
+> the env is on `None` or a narrow custom allowlist, `npm install` 403s on
+> `registry.npmjs.org`. Set it to **Trusted** or **Full** at `claude.ai/code`
+> → environment settings to restore registry access. Local desktop CLI is
+> unaffected. The browser-side findings in this doc (sandbox flags,
+> `@sparticuz/chromium` extraction, `ERR_TUNNEL_CONNECTION_FAILED`,
+> local-content-only testing) remain accurate regardless of the mode. See
+> `docs/project_notes/key_facts.md` → "Claude Code on the Web: Network
+> Access" for the full table.
+
 ## Research Date: 2026-02-05
 
 ## Executive Summary

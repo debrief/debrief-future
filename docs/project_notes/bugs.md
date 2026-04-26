@@ -17,6 +17,13 @@ Use bullet lists for simplicity. Older entries can be manually removed when they
 
 <!-- Add new entries below this line -->
 
+- **2026-04-26** — `pnpm install` / `uv sync` 403 in Claude Code on the web sessions
+  - **Symptom:** `curl https://registry.npmjs.org/pnpm` returns `HTTP/2 403` with `x-deny-reason: host_not_allowed`; same for `pypi.org`, `api.github.com`, `playwright.azureedge.net`. `pnpm install`, `uv sync`, `task verify` all fail. Local desktop CLI is unaffected.
+  - **Cause:** Not a global Anthropic regression. Claude Code on the web has a per-cloud-environment **Network access** setting (None / Trusted / Full); this repo's environment was on a restrictive `custom` mode that excluded package registries.
+  - **Fix:** At `claude.ai/code` → environment settings → **Network access**, set to **Trusted** (allows package registries) or **Full**. Setting applies to **freshly-provisioned VMs only** — start a new session after toggling, the running session keeps the old policy.
+  - **Prevention:** New cloud envs default to **Trusted**, which already allows npm/PyPI. Avoid setting to None or a narrow custom allowlist unless you genuinely need offline-only.
+  - **Reference:** `docs/project_notes/key_facts.md` → "Claude Code on the Web: Network Access" for the full table, the verification curl, the git-proxy operational nugget, and the upstream UX-bug tracker ([#10223](https://github.com/anthropics/claude-code/issues/10223)).
+
 - **2026-04-21** — `TimeScrubber` prop shape trap: single `timeExtent`, not separate `data*`/`scrub*` pairs
   - **Cause:** `#217` plan.md R2 assumed `TimeScrubber` accepted separate `dataStart`/`dataEnd` + `start`/`end` pairs, so an "outer track with a narrowed handle" scrub-lock affordance would fall out. Actual prop shape is a single `timeExtent: TimeExtent`. The extension ↔ webview `updateTimeExtent` message *does* carry both pairs (`apps/vscode/src/views/timeRangeView.ts:125-131`), but the scrubber visually clamps to whichever `start`/`end` pair it receives.
   - **Fix:** The extension-side override via `TimeRangeViewProvider.setScrubbableRange(start, end)` works as designed — narrowing `start`/`end` in the outbound message shrinks the scrubber's clickable track, enforcing FR-PLAY-012. UX compromise: scrubber visually shrinks to the Scene window rather than showing the full data range with a narrowed handle.

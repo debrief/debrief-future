@@ -24,10 +24,20 @@ Validated experimentally on 2026-03-19:
 | CDN downloads blocked | `cdn.playwright.dev`, `dl.google.com` return 403 |
 | Browser network blocked | `net::ERR_TUNNEL_CONNECTION_FAILED` for external URLs |
 | Docker unavailable | No bridge networking, no overlay2, registry DNS fails |
-| npm registry works | `@sparticuz/chromium` installs and extracts fine |
-| GitHub releases work | openvscode-server tarball downloads fine |
+| npm registry works | ✅ when env's Network access is **Trusted** or **Full** at `claude.ai/code`; 403 on **None**/custom — see note below |
+| GitHub releases work | ✅ when env's Network access is **Trusted** or **Full**; 403 on **None**/custom — see note below |
 | localhost networking works | Servers on `localhost:8080` fully reachable from Chromium |
 | Snap blocked | `snap-confine` fails — no snapd in sandbox |
+
+> **2026-04-26 note.** Whether `npm install` and GitHub-release downloads
+> work in Claude Code on the web depends on the cloud environment's
+> **Network access** mode (`claude.ai/code` → environment settings). On
+> `None` or a narrow custom allowlist, they 403; on **Trusted** or
+> **Full** they work as documented above. The `npm install
+> @sparticuz/chromium` and `wget openvscode-server-*.tar.gz` steps in
+> this doc require at least Trusted. Local desktop CLI is unaffected. See
+> `docs/project_notes/key_facts.md` → "Claude Code on the Web: Network
+> Access".
 
 ## What Works Today
 
