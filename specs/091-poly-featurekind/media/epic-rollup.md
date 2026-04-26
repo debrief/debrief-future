@@ -58,12 +58,7 @@ Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) 
 
 ## What We Built
 
-#### Screenshots
-
-![Results panel showing three tabs — a chart, an image, and a GeoJSON file](/assets/images/future-debrief/095-results-bottom-panel/results-panel-three-tabs.png)
-![Context menu on catalog tree item with "Open Result" command](/assets/images/future-debrief/095-results-bottom-panel/context-menu-open-result.png)
-![Tab disambiguation when the same result belongs to multiple plots](/assets/images/future-debrief/095-results-bottom-panel/disambiguated-tabs.png)
-![Auto-open behavior after tool execution](/assets/images/future-debrief/095-results-bottom-panel/auto-open-after-tool.png)
+_(screenshots referenced in source `shipped-post.md` were never captured to `evidence/screenshots/` — references dropped during #232 migration to keep image references valid)_
 
 ### 096-add-goldenlayout-panels — 2026-02-14
 

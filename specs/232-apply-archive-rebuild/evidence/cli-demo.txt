@@ -1,0 +1,55 @@
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 092-integrate-geoman-drawing-library; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 093-drawing-toolbar-shape-palette; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 094-show-points-in-layers; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 096-add-goldenlayout-panels; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 130-map-spatial-filtering; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 131-timeline-gantt-view; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 132-three-view-sync; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 134-colour-scheme-engine; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 136-stac-collection-summaries; keeping first
+[232] dry-run report → ../debrief.github.io/MIGRATION-REPORT.md
+Migration plan:
+  77 site posts classified:
+     21 replace
+     27 merge
+     29 legacy
+
+  Pre-flight scans:
+    FR-008 source-relative-leak:    0
+    FR-009 missing-asset:           5 of 56
+    FR-010 filename-collision:      0
+
+  Plan blocked: True
+  Config edit needed (jekyll-redirect-from): True
+
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 092-integrate-geoman-drawing-library; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 093-drawing-toolbar-shape-palette; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 094-show-points-in-layers; keeping first
+[232] warning: duplicate title 'Shape Drawing Tools' maps to 091-tool-parameter-context-menus and 096-add-goldenlayout-panels; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 130-map-spatial-filtering; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 131-timeline-gantt-view; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 132-three-view-sync; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 134-colour-scheme-engine; keeping first
+[232] warning: duplicate title 'STAC Stack Browser Discovery UI' maps to 129-list-view-thumbnails and 136-stac-collection-summaries; keeping first
+Migration plan:
+  77 site posts classified:
+     21 replace
+     27 merge
+     29 legacy
+
+  Pre-flight scans:
+    FR-008 source-relative-leak:    0
+    FR-009 missing-asset:           0 of 51
+    FR-010 filename-collision:      0
+
+  Plan blocked: False
+  Config edit needed (jekyll-redirect-from): True
+
+
+Execution complete:
+  posts deleted: 48
+  posts written: 21
+  assets copied: 51
+  _config.yml edited: True
+  PR body → ../debrief.github.io/MIGRATION-REPORT.md
+

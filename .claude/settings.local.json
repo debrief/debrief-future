@@ -90,6 +90,9 @@
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell dev:*)",
       "Bash(STAC_STORE_PATH=* pnpm --filter @debrief/web-shell generate-thumbnails:*)",
       "Bash(STAC_STORE_PATH=* npx tsx apps/web-shell/scripts/capture-single.ts:*)",
+      "Bash(git log *)",
+      "Read(//Users/ian/git/worktrees/232-apply-archive-rebuild/specs/232-apply-archive-rebuild/**)",
+      "Bash(git ls-tree *)",
       "Bash(echo \"exit=$?\")"
     ]
   }
