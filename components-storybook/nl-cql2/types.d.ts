@@ -109,7 +109,7 @@ export type LiveConfigValidationResult = {
  *     `reason: "oversize"`.
  *   - `not-configured` added for #191's opt-in toggle (enabled without key).
  */
-export type LiveOutcome = LiveSuccess | LiveAuthFailure | LiveRateLimit | LiveProviderError | LiveTransportError | LiveTimeout | LiveMalformedResponse | LiveNotConfigured | LiveCeilingReached;
+export type LiveOutcome = LiveSuccess | LiveAuthFailure | LiveRateLimit | LiveProviderError | LiveTransportError | LiveTimeout | LiveMalformedResponse | LiveNotConfigured | LiveKeyringUnavailable | LiveCeilingReached;
 export interface LiveSuccess {
     readonly kind: "success";
     readonly rawResponse: string;
@@ -155,6 +155,29 @@ export interface LiveMalformedResponse {
 export interface LiveNotConfigured {
     readonly kind: "not-configured";
     readonly reason: "disabled" | "no-key";
+    readonly durationMs: 0;
+}
+/**
+ * The OS credential keyring rejected (or threw on) the secret read (#198).
+ *
+ * Distinct from `not-configured`/`no-key` — this outcome means a key was
+ * almost certainly saved but the keyring is currently unreachable
+ * (locked gnome-keyring/KWallet, missing libsecret service, corrupted
+ * Keychain, Credential Manager policy lockout). Telling the analyst to
+ * "set your API key" would be misleading; the banner tells them to unlock
+ * the keyring instead.
+ *
+ * The discriminator is purely "was the `Promise` rejected?" — we never
+ * inspect error shapes (Decision 1).
+ */
+export interface LiveKeyringUnavailable {
+    readonly kind: "keyring-unavailable";
+    /**
+     * Optional non-sensitive platform hint used by the banner to render an
+     * OS-appropriate secondary sentence. The headline stays OS-neutral
+     * regardless (FR-010, Decision 3).
+     */
+    readonly platformHint?: "linux" | "macos" | "windows" | "unknown";
     readonly durationMs: 0;
 }
 export interface LiveCeilingReached {
