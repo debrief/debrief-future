@@ -11,6 +11,11 @@ import * as path from 'path';
 import type { StacItemSummary, Catalog, PlatformRecord } from '../types/stac';
 import type { StacService } from '../services/stacService';
 import { AUTO_DERIVED_FIELDS } from '@debrief/components/PropertiesPanel/autoDerivedFields';
+import { getLlmProxy, makeNlConfigMessage, type LlmProxy } from '../services/llmProxy';
+import type {
+  NlLiveConfigMessage,
+  NlOutcomeResponse,
+} from '../webview/messages';
 
 /** Message sent from extension to webview */
 interface LoadCatalogOverviewMessage {
@@ -36,7 +41,10 @@ interface LoadCatalogOverviewMessage {
   };
 }
 
-type ExtensionToOverviewMessage = LoadCatalogOverviewMessage;
+type ExtensionToOverviewMessage =
+  | LoadCatalogOverviewMessage
+  | NlLiveConfigMessage
+  | NlOutcomeResponse;
 
 /** Message sent from webview to extension */
 interface OverviewItemSelectedMessage {
@@ -63,14 +71,46 @@ interface PropertiesCommitMessage {
   patch: Record<string, unknown>;
 }
 
+/** NL-search generate request from the webview (#191 T034). */
+interface NlGenerateMessage {
+  type: 'nlGenerate';
+  requestId: string;
+  prompt: string;
+}
+
+/** NL-search abort request from the webview (#191 T034). */
+interface NlAbortMessage {
+  type: 'nlAbort';
+  requestId: string;
+}
+
+/** NL-search banner-action request from the webview (#191 T082). */
+interface NlBannerActionMessage {
+  type: 'nlBannerAction';
+  action: 'open-settings' | 'retry' | 'reload';
+}
+
 type OverviewToExtensionMessage =
   | OverviewItemSelectedMessage
   | OverviewWebviewReadyMessage
   | OverviewViewportChangedMessage
-  | PropertiesCommitMessage;
+  | PropertiesCommitMessage
+  | NlGenerateMessage
+  | NlAbortMessage
+  | NlBannerActionMessage;
 
 export class CatalogOverviewPanel {
   public static readonly viewType = 'debrief.catalogOverview';
+
+  /** Iterate every active CatalogOverview panel (used by the theme relay #220). */
+  public static getActivePanels(): readonly CatalogOverviewPanel[] {
+    return Array.from(CatalogOverviewPanel.panels.values());
+  }
+
+  /** Public accessor for the underlying webview (#220 theme relay). */
+  public get webview(): vscode.Webview {
+    return this.panel.webview;
+  }
 
   private static panels: Map<string, CatalogOverviewPanel> = new Map();
 
@@ -84,6 +124,8 @@ export class CatalogOverviewPanel {
   private storeId = '';
   private viewportBounds: [number, number, number, number] | null = null;
   private stacService?: StacService;
+  private nlProxy?: LlmProxy;
+  private nlConfigSubscription?: vscode.Disposable;
 
   /**
    * Wire the StacService used by the Properties Panel commit handler
@@ -236,6 +278,12 @@ export class CatalogOverviewPanel {
             });
           }
         }
+        // #191 T034 — push the current NL-search config snapshot so the
+        // webview can light the indicator / gate the client on mount. We
+        // lazily ensure the proxy exists but only to READ the snapshot;
+        // the actual network-owning instance is still created on first
+        // `nlGenerate` (review Decision 13).
+        this.pushNlConfigSnapshot();
         // Flush pending messages
         for (const pending of this.pendingMessages) {
           void this.panel.webview.postMessage(pending);
@@ -260,7 +308,84 @@ export class CatalogOverviewPanel {
         // #193 / backlog #191 — direct-write item metadata via single-writer service.
         void this.handlePropertiesCommit(message);
         break;
+
+      case 'nlGenerate':
+        // #191 T034 — lazy-init the proxy on first nlGenerate, not at
+        // activation (review Decision 13).
+        void this.handleNlGenerate(message);
+        break;
+
+      case 'nlAbort':
+        this.handleNlAbort(message);
+        break;
+
+      case 'nlBannerAction':
+        this.handleNlBannerAction(message);
+        break;
     }
+  }
+
+  private handleNlBannerAction(message: NlBannerActionMessage): void {
+    switch (message.action) {
+      case 'open-settings':
+        void vscode.commands.executeCommand(
+          'workbench.action.openSettings',
+          '@ext:debrief.debrief-vscode debrief.nlSearch',
+        );
+        break;
+      case 'reload':
+        void vscode.commands.executeCommand('workbench.action.reloadWindow');
+        break;
+      case 'retry':
+        // FilterBar handles retry locally; no host action required.
+        break;
+    }
+  }
+
+  private ensureNlProxy(): LlmProxy {
+    if (this.nlProxy) {
+      return this.nlProxy;
+    }
+    this.nlProxy = getLlmProxy(this.context, {
+      workspace: {
+        getConfiguration: vscode.workspace.getConfiguration.bind(vscode.workspace),
+        onDidChangeConfiguration: vscode.workspace.onDidChangeConfiguration.bind(vscode.workspace),
+      },
+      secrets: this.context.secrets,
+    });
+    // Push updated config to the webview whenever the host-side snapshot
+    // changes (settings toggled, key added/cleared).
+    this.nlConfigSubscription = this.nlProxy.onConfigChange((snapshot) => {
+      if (this.isWebviewReady) {
+        void this.panel.webview.postMessage(makeNlConfigMessage(snapshot));
+      }
+    });
+    this.disposables.push(this.nlConfigSubscription);
+    return this.nlProxy;
+  }
+
+  private pushNlConfigSnapshot(): void {
+    const proxy = this.ensureNlProxy();
+    void this.panel.webview.postMessage(makeNlConfigMessage(proxy.readConfig()));
+  }
+
+  private async handleNlGenerate(message: NlGenerateMessage): Promise<void> {
+    const proxy = this.ensureNlProxy();
+    const outcome = await proxy.handleGenerate({
+      requestId: message.requestId,
+      prompt: message.prompt,
+    });
+    void this.panel.webview.postMessage({
+      type: 'nlOutcome',
+      requestId: message.requestId,
+      success: outcome.kind === 'success',
+      outcome,
+    } satisfies NlOutcomeResponse);
+  }
+
+  private handleNlAbort(message: NlAbortMessage): void {
+    // If no proxy has been instantiated yet, there is nothing to abort.
+    this.nlProxy?.handleAbort({ requestId: message.requestId });
   }
 
   private async handlePropertiesCommit(

@@ -1,4 +1,4 @@
-import type { Theme, ThemeTokens } from './ThemeContext';
+import type { Theme, ThemeTokens, ThemeVariant } from './ThemeContext';
 
 /**
  * Default light theme tokens
@@ -69,27 +69,95 @@ export const darkThemeTokens: ThemeTokens = {
 };
 
 /**
- * VS Code theme tokens (adapts to VS Code's color scheme)
+ * High-contrast light theme tokens.
+ *
+ * Sourced from VS Code's "Default High Contrast Light" palette (#hc-light).
+ * Heavier borders, pure-white background, near-black text for AA+ contrast.
  */
-export const vsCodeThemeTokens: ThemeTokens = {
-  ...darkThemeTokens,
-  // These will be overridden by CSS custom properties from VS Code
+export const highContrastLightThemeTokens: ThemeTokens = {
+  colorPrimary: '#0F4A85',
+  colorSecondary: '#264F78',
+  colorSuccess: '#0F633F',
+  colorWarning: '#B5500D',
+  colorDanger: '#B5200D',
 
-  // Storyboard scene rectangles (Feature 217) — route through VS Code
-  // theme variables so the colours track the user's editor palette.
-  sceneRectangleStroke: 'var(--vscode-focusBorder)',
-  sceneRectangleFill: 'var(--vscode-selection-background)',
+  colorOwnship: '#0F4A85',
+  colorContact: '#B5200D',
+  colorReference: '#292929',
+  colorSolution: '#0F633F',
+
+  bgPrimary: '#ffffff',
+  bgSecondary: '#ffffff',
+  bgTertiary: '#f2f2f2',
+
+  textPrimary: '#292929',
+  textSecondary: '#292929',
+  textMuted: '#7f7f7f',
+
+  borderColor: '#0F4A85',
+  borderColorFocus: '#006BBE',
+
+  selectionBg: '#0F4A85',
+  selectionBorder: '#0F4A85',
+
+  // Storyboard scene rectangles — heavier border for HC
+  sceneRectangleStroke: '#0F4A85',
+  sceneRectangleFill: '#cce4ff',
 };
+
+/**
+ * High-contrast dark theme tokens.
+ *
+ * Sourced from VS Code's "Default High Contrast" palette (#hc-dark).
+ * Heavier borders, pure-black background, near-white text.
+ */
+export const highContrastDarkThemeTokens: ThemeTokens = {
+  colorPrimary: '#3AA0F3',
+  colorSecondary: '#A2A4A5',
+  colorSuccess: '#5DB572',
+  colorWarning: '#FFD602',
+  colorDanger: '#F48771',
+
+  colorOwnship: '#3AA0F3',
+  colorContact: '#F48771',
+  colorReference: '#A2A4A5',
+  colorSolution: '#5DB572',
+
+  bgPrimary: '#000000',
+  bgSecondary: '#000000',
+  bgTertiary: '#0a0a0a',
+
+  textPrimary: '#ffffff',
+  textSecondary: '#ffffff',
+  textMuted: '#9d9d9d',
+
+  borderColor: '#6FC3DF',
+  borderColorFocus: '#F38518',
+
+  selectionBg: '#f3a823',
+  selectionBorder: '#F38518',
+
+  // Storyboard scene rectangles — heavier border for HC
+  sceneRectangleStroke: '#F38518',
+  sceneRectangleFill: '#0a3458',
+};
+
+/**
+ * Resolved (non-system) variants — used by the token selector.
+ */
+type ResolvedVariant = Exclude<ThemeVariant, 'system'>;
 
 /**
  * Get tokens for a theme variant
  */
-export function getThemeTokens(variant: 'light' | 'dark' | 'vscode'): ThemeTokens {
+export function getThemeTokens(variant: ResolvedVariant): ThemeTokens {
   switch (variant) {
     case 'dark':
       return darkThemeTokens;
-    case 'vscode':
-      return vsCodeThemeTokens;
+    case 'high-contrast-light':
+      return highContrastLightThemeTokens;
+    case 'high-contrast-dark':
+      return highContrastDarkThemeTokens;
     case 'light':
     default:
       return lightThemeTokens;

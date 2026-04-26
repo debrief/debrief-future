@@ -81,6 +81,22 @@ decision (the project previously ran a single persistent Fly.io demo at
 
 `/speckit.start` auto-creates worktrees in `../worktrees/` (local) or branches (cloud). Set `SPECKIT_WORKTREES=true|false` to override. Cleanup: `source .specify/scripts/bash/common.sh && cleanup_stale_worktrees`.
 
+### Resolving the active feature
+
+Speckit scripts (`/speckit.plan`, `/speckit.tasks`, `/speckit.clarify`, etc.) need to know which spec directory to operate on. They look it up in this order:
+
+1. **`SPECIFY_FEATURE` environment variable** — process-scoped override. Example: `export SPECIFY_FEATURE=220-fix-theme-responsiveness`.
+2. **`.specify/.active-feature` file at the repo root** — single line containing the spec dir name. Persists across commands in the same worktree. Useful in Claude Code cloud sessions where the branch is forced to `claude/<topic>-<random>` and cannot follow the `NNN-name` convention. The file is gitignored.
+3. **The current git branch** — must contain an `NNN-` token (e.g. `220-fix-foo`, `claude/220-fix-foo-xyz`, or `feature/220-foo`). The first matching `NNN-` is used.
+
+If none of those resolve, the scripts list available specs and show the recovery hint. To work on spec `NNN-xxx` from a `claude/...` branch, run:
+
+```sh
+echo NNN-xxx > .specify/.active-feature
+```
+
+once at the start of the session.
+
 ## Key Documents
 
 - `CONSTITUTION.md` — immutable development principles (supersedes all other docs)
@@ -185,6 +201,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Storyboards and Scenes are **GeoJSON Features inside the (215-storyboarding-schema)
 - Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case). (228-regenerate-blog-archive)
 - Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`, (231-blog-archive-screenshot-fix-impl)
+- TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.** (219-buffer-asset-entries)
 
 ## Before Pushing
 
@@ -230,7 +247,6 @@ pnpm --filter @debrief/spec-navigator build && cd apps/spec-navigator && node ru
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 219-buffer-asset-entries: Added TypeScript 5.x (strict mode), Node 20.x runtime via VS Code extension host + VS Code Extension API (^1.85.0), existing modules — `sceneThumbnailService`, `storyboardEditService`, `sessionManager`, `MapPanel`, `saveSession` command. **No new runtime dependencies.**
 - 231-blog-archive-screenshot-fix-impl: Added Python 3.11 (matches project baseline, stdlib-first) + Python stdlib (`re`, `pathlib`, `dataclasses`,
 - 228-regenerate-blog-archive: Added Python 3.11 (matches project baseline; stdlib-first). + Python stdlib (`pathlib`, `re`, `datetime`, `argparse`, `json`, `urllib.request`, `subprocess`), `PyYAML` (already in `uv.lock` via `linkml` transitively; used for shipped-post front matter parsing). Optional: `gh` CLI (shelled out for PR description retrieval; graceful degradation if absent — see FR-010 edge case).
-- 206-audit-non-linkml-types: Type-declaration audit landed — `docs/type-audit-2026.md` enumerates 885 in-scope TS declarations across 317 files, classifies each into one of five E11 buckets, and opens #222–#227 for the follow-up schema-promotion work. Scanner + generator committed at `scripts/audits/type-audit/` (TypeScript compiler API + vitest fixture tests). Root devDeps added: `typescript`, `vitest`, `ajv`, `@types/node`.
-- 215-storyboarding-schema: Added Python 3.11 (Pydantic models, fixture validation, + LinkML (`gen-pydantic`, `gen-json-schema`,

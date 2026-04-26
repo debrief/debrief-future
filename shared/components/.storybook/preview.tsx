@@ -3,18 +3,49 @@ import React from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'vscrui/dist/codicon.css';
 import '../src/styles/tokens.css';
-import { ThemeProvider } from '../src/ThemeProvider';
+import { ThemeProvider, staticSource } from '../src/ThemeProvider';
 import type { ThemeVariant } from '../src/ThemeProvider/ThemeContext';
+import type { ResolvedVariant } from '../src/ThemeProvider/ThemeSource';
 
-// Theme decorator that applies the selected global theme
-const withThemeProvider: Decorator = (Story, context) => {
-  const theme = context.globals.theme as ThemeVariant;
+/**
+ * Storybook root theme decorator.
+ *
+ * Wraps every story in a single `<ThemeProvider>` driven by the toolbar's
+ * variant global. The provider itself injects the per-variant `--vscode-*`
+ * token map and applies `data-theme` to `document.documentElement`, so the
+ * decorator does not need to do that work separately (#220).
+ *
+ * For an explicit variant, we pin the source so the toolbar is the source
+ * of truth. For `'system'`, we leave the source unspecified so it falls
+ * through to `mediaQuerySource()` (OS prefers-color-scheme +
+ * prefers-contrast).
+ */
+function StorybookThemeWrapper({
+  variant,
+  children,
+}: {
+  variant: ThemeVariant;
+  children: React.ReactNode;
+}): React.ReactElement {
+  const isExplicit = variant !== 'system';
 
-  // Use JSX syntax for proper Story component rendering
   return (
-    <ThemeProvider theme={{ variant: theme }}>
-      <Story />
+    <ThemeProvider
+      theme={{ variant }}
+      source={isExplicit ? staticSource(variant as ResolvedVariant) : undefined}
+    >
+      {children}
     </ThemeProvider>
+  );
+}
+
+const withThemeProvider: Decorator = (Story, context) => {
+  const variant = context.globals.theme as ThemeVariant;
+
+  return (
+    <StorybookThemeWrapper variant={variant}>
+      <Story />
+    </StorybookThemeWrapper>
   );
 };
 
@@ -32,7 +63,8 @@ const preview: Preview = {
       values: [
         { name: 'light', value: '#ffffff' },
         { name: 'dark', value: '#1e1e1e' },
-        { name: 'vscode-dark', value: '#252526' },
+        { name: 'high-contrast-light', value: '#ffffff' },
+        { name: 'high-contrast-dark', value: '#000000' },
       ],
     },
   },
@@ -46,7 +78,17 @@ const preview: Preview = {
         items: [
           { value: 'light', title: 'Light', icon: 'sun' },
           { value: 'dark', title: 'Dark', icon: 'moon' },
-          { value: 'vscode', title: 'VS Code', icon: 'lightning' },
+          {
+            value: 'high-contrast-light',
+            title: 'HC Light',
+            icon: 'circlehollow',
+          },
+          {
+            value: 'high-contrast-dark',
+            title: 'HC Dark',
+            icon: 'contrast',
+          },
+          { value: 'system', title: 'System', icon: 'browser' },
         ],
         dynamicTitle: true,
       },

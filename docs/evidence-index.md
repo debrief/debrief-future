@@ -25,3 +25,5 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 217-storyboarding-playback | 4 | md | 2026-04-21 | current | [#505](https://github.com/debrief/debrief-future/pull/505) |
 | 206-audit-non-linkml-types | 8 | md, txt, json | 2026-04-22 | current | [#504](https://github.com/debrief/debrief-future/pull/504) |
 | 228-regenerate-blog-archive | 9 | md, txt | 2026-04-24 | current | [#518](https://github.com/debrief/debrief-future/pull/518) |
+| 230-storyboard-edit-wiring | 6 | md, txt, png | 2026-04-24 | current | [#534](https://github.com/debrief/debrief-future/pull/534) |
+| 142-vscode-e2e-webview-reliability | 6 | md, sh, txt, png | 2026-03-18 | current | [#548](https://github.com/debrief/debrief-future/pull/548) |

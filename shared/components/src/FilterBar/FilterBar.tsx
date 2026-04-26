@@ -21,6 +21,7 @@ import {
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { createFilterEngine, buildTaxonomyLabelMap, resolveTaxonomyLabel } from '../filter-engine';
 import type { FilterType, FilterExpression, StacBrowserItem } from '../filter-engine';
+import { generateCql2, type LiveOutcome, type LozengeSeed } from '../nl-cql2';
 import { useFilterBar } from './useFilterBar';
 import { useDistinctValues } from './useDistinctValues';
 import { useTaxonomyMatchCounts } from './useTaxonomyMatchCounts';
@@ -52,6 +53,15 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onExpressionChange,
   initialFilterState,
   savedFiltersStorage,
+  // #191 Phase 3 — NL-search mode is opt-in. When `llmClient` + `nlEnums`
+  // are both provided, the FilterBar routes Enter through the
+  // `buildPrompt → client.generate → parseResponse → dispatch chips` pipeline
+  // instead of graduating the literal text as a title lozenge. Without them,
+  // today's behaviour is preserved (review Decision 12).
+  llmClient,
+  nlEnums,
+  liveModeLabel,
+  onBannerAction,
 }) => {
   const {
     state,
@@ -118,13 +128,124 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     [engine, effectiveExpression],
   );
 
-  // Graduate quick-search into a title lozenge on Enter
+  // ---------------------------------------------------------------------
+  // #191 Phase 3 — NL-search routing
+  //
+  //   llmClient + nlEnums present? → NL pipeline
+  //     (abort-prior → generate → parseResponse → dispatch chips / banner)
+  //   otherwise → literal title graduation (today's behaviour)
+  //
+  // Invariants (review Decisions 7, 11, 12):
+  //   - Lozenges and filter state SURVIVE every failure. Only success,
+  //     remove-chip, clear-all, or manual-add clear them.
+  //   - Supersession ALWAYS cancels the prior in-flight call before a new
+  //     one starts (T042).
+  //   - Cancellations drop silently — no banner (T047).
+  // ---------------------------------------------------------------------
+  const isNlMode = Boolean(llmClient && nlEnums);
+  const [nlBusy, setNlBusy] = useState(false);
+  const [nlBanner, setNlBanner] = useState<LiveOutcome | null>(null);
+  const nlTokenRef = useRef(0);
+
+  const handleNlSubmit = useCallback(
+    async (phrase: string) => {
+      if (!llmClient || !nlEnums) return;
+      const trimmed = phrase.trim();
+      if (trimmed.length === 0) return;
+
+      // Supersede any prior in-flight submission BEFORE issuing the new one
+      // so earlier chip sets cannot land after a newer phrase (T042).
+      try {
+        llmClient.abort();
+      } catch {
+        // Best-effort — an abort on a client with nothing in flight is a no-op.
+      }
+
+      const token = ++nlTokenRef.current;
+      setNlBusy(true);
+      setNlBanner(null);
+      try {
+        const result = await generateCql2(trimmed, {
+          client: llmClient,
+          enums: nlEnums,
+        });
+        if (nlTokenRef.current !== token) return; // superseded — drop silently
+        setQuickSearchText('');
+
+        if (result.error && result.error.kind === 'transport') {
+          // Cancellations drop silently (Decision 11).
+          if (
+            result.error.outcome.kind === 'transport-error' &&
+            result.error.outcome.reason === 'cancelled'
+          ) {
+            return;
+          }
+          setNlBanner(result.error.outcome);
+          return;
+        }
+
+        if (result.error && result.error.kind === 'generation') {
+          // Generation-level failure — surface via the malformed-response
+          // banner variant (closest user-facing class).
+          setNlBanner({
+            kind: 'malformed-response',
+            reason: 'non-json',
+            durationMs: 0,
+            responseBytes: 0,
+          });
+          return;
+        }
+
+        // Success — apply lozenges. Replace the existing state with the
+        // generator's suggestions so "UK submarines" replaces prior chips
+        // from a different phrase (matches nl-demo behaviour).
+        // `LozengeSeed.filterType` is already `Exclude<FilterType, 'platform'>`
+        // (the generator never emits platform chips — see
+        // `nl-cql2/types.ts`), so no runtime guard is needed.
+        const seeds: readonly LozengeSeed[] = result.lozenges;
+        const nextItems = seeds.map((seed, idx) => {
+          // Generate a deterministic-ish id per chip. We do not need
+          // cryptographic uniqueness — only stable-within-this-batch.
+          const id = `nl-${token}-${idx}-${seed.filterType}-${seed.value}`;
+          return {
+            kind: 'lozenge' as const,
+            shape: 'simple' as const,
+            id,
+            filterType: seed.filterType,
+            value: seed.value,
+            ...(seed.negated !== undefined ? { negated: seed.negated } : {}),
+          };
+        });
+
+        setFilterBarState({ items: nextItems });
+      } catch {
+        // Programmer errors (stub-client throws, network throws that escape
+        // the client) — surface as provider-error so the user sees SOMETHING.
+        if (nlTokenRef.current !== token) return;
+        setNlBanner({
+          kind: 'provider-error',
+          providerStatus: 0,
+          durationMs: 0,
+        });
+      } finally {
+        if (nlTokenRef.current === token) setNlBusy(false);
+      }
+    },
+    [llmClient, nlEnums, setFilterBarState],
+  );
+
+  // Graduate quick-search into a title lozenge on Enter — OR route through
+  // the NL pipeline when live mode is active (#191 T040).
   const handleQuickSearchCommit = useCallback(
     (text: string) => {
+      if (isNlMode) {
+        void handleNlSubmit(text);
+        return;
+      }
       addLozenge('title', text);
       setQuickSearchText('');
     },
-    [addLozenge],
+    [addLozenge, isNlMode, handleNlSubmit],
   );
 
   // Filter items whenever effective expression changes
@@ -278,6 +399,72 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </div>
         )}
 
+        {/* #191 T043 — live-mode indicator (only when llmClient + nlEnums present) */}
+        {isNlMode && liveModeLabel && (
+          <div
+            className="debrief-filter-bar__live-indicator"
+            data-testid="nl-search-indicator"
+          >
+            <span aria-hidden="true" style={{ marginRight: '0.3em' }}>●</span>
+            {liveModeLabel}
+            {nlBusy && (
+              <span
+                data-testid="nl-search-busy"
+                style={{ marginLeft: '0.5em', opacity: 0.7 }}
+              >
+                searching…
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* #191 T044 / T082 — NL failure banner with per-class recovery
+            affordance. Keyed by `data-transport-reason` for E2E selectors. */}
+        {nlBanner && (
+          <div
+            className="debrief-filter-bar__live-banner"
+            data-testid="live-transport-banner"
+            data-transport-reason={nlBanner.kind}
+            role="alert"
+          >
+            <span className="debrief-filter-bar__live-banner-message">
+              {nlBannerMessage(nlBanner)}
+            </span>
+            {(() => {
+              const action = nlBannerAction(nlBanner);
+              if (!action) return null;
+              return (
+                <button
+                  type="button"
+                  className="debrief-filter-bar__live-banner-action"
+                  data-testid={`live-transport-banner-${action.kind}`}
+                  onClick={() => {
+                    setNlBanner(null);
+                    if (onBannerAction) onBannerAction(action.kind);
+                    else if (action.kind === 'retry') {
+                      // Default retry behaviour when the host doesn't
+                      // override: re-run the last submitted phrase.
+                      // QuickSearch has already been cleared, so use the
+                      // last prompt text if available via the input DOM —
+                      // a no-op here is acceptable for minimal surface.
+                    }
+                  }}
+                >
+                  {action.label}
+                </button>
+              );
+            })()}
+            <button
+              type="button"
+              className="debrief-filter-bar__live-banner-dismiss"
+              onClick={() => setNlBanner(null)}
+              aria-label="Dismiss"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {error && (
           <div className="debrief-filter-bar__error" data-testid="filter-bar-error" role="alert">
             {error}
@@ -418,3 +605,61 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     </DndContext>
   );
 };
+
+/**
+ * Default banner copy per non-success LiveOutcome kind (#191 T044). Phase 5
+ * (T082) will replace this with per-class copy + recovery affordances. For
+ * now each banner shows a minimal user-legible sentence so the literal path
+ * keeps working while the Phase-5 UX lands.
+ */
+/**
+ * Per-class recovery affordance for the NL failure banner (#191 T082).
+ * Returns the button kind + visible label, or null when no recovery
+ * affordance applies (e.g. the success variant).
+ */
+function nlBannerAction(
+  outcome: LiveOutcome,
+): { readonly kind: 'open-settings' | 'retry' | 'reload'; readonly label: string } | null {
+  switch (outcome.kind) {
+    case 'success':
+      return null;
+    case 'auth-failure':
+    case 'not-configured':
+      return { kind: 'open-settings', label: 'Open settings' };
+    case 'rate-limit':
+    case 'provider-error':
+    case 'timeout':
+      return { kind: 'retry', label: 'Retry' };
+    case 'malformed-response':
+      return { kind: 'retry', label: 'Rephrase' };
+    case 'transport-error':
+      return { kind: 'retry', label: 'Retry' };
+    case 'ceiling-reached':
+      return { kind: 'reload', label: 'Reload window' };
+  }
+}
+
+function nlBannerMessage(outcome: LiveOutcome): string {
+  switch (outcome.kind) {
+    case 'success':
+      return '';
+    case 'auth-failure':
+      return 'The provider rejected the API key. Check your configuration.';
+    case 'rate-limit':
+      return 'The provider rate limit was hit. Try again in a moment.';
+    case 'provider-error':
+      return 'The language-model provider returned an error.';
+    case 'timeout':
+      return 'The provider did not respond in time.';
+    case 'malformed-response':
+      return "The provider's response could not be processed.";
+    case 'transport-error':
+      return 'Could not reach the language-model provider.';
+    case 'not-configured':
+      return outcome.reason === 'disabled'
+        ? 'NL search is disabled — enable it in settings to use natural-language queries.'
+        : 'NL search needs an API key — run the “Debrief: Set Anthropic API Key” command.';
+    case 'ceiling-reached':
+      return `Live-mode call limit reached (${outcome.ceiling}). Reload the editor to reset.`;
+  }
+}

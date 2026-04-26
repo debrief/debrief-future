@@ -21,6 +21,8 @@ import { ResultsPanelViewProvider } from './views/resultsPanelView';
 import { StoryboardPanelViewProvider } from './views/storyboardPanelView';
 import { ResultsPanelService } from './services/resultsPanelService';
 import { MapPanel } from './webview/mapPanel';
+import { startThemeRelay, type PostableWebview } from './host/themeRelay';
+import { CatalogOverviewPanel } from './panels/catalogOverviewPanel';
 import {
   captureScene,
   type CaptureCommandContext,
@@ -39,6 +41,7 @@ import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 import { registerStoryboardTransportCommands } from './commands/storyboardTransport';
 import { registerStoryboardManagementCommands } from './commands/storyboardManagement';
 import { registerStoryboardEditCommands } from './commands/storyboardEdit';
+import { registerNlSearchCommands } from './commands/nlSearchCommands';
 import { StoryboardEditService } from './services/storyboardEdit';
 import { plotFromFeatures } from './services/plotFromFeatures';
 import {
@@ -123,6 +126,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Wire output channel to services for cross-ecosystem diagnostics
   calcService.setOutputChannel(outputChannel);
   ioService.setOutputChannel(outputChannel);
+  // #230 FR-051 — structured loadPlot diagnostics so `Failed to load
+  // plot` failures attribute to a specific null-return branch.
+  stacService.setDiagnosticSink(outputChannel);
 
   console.warn('[Debrief] services initialized');
   outputChannel.appendLine('[startup] services initialized');
@@ -752,6 +758,43 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   console.warn('[Debrief] view providers registered');
   outputChannel.appendLine('[startup] view providers registered');
 
+  // ── #220 — Theme relay ─────────────────────────────────────────────
+  // Forward `vscode.window.onDidChangeActiveColorTheme` to every active
+  // panel/view as a `vscode-theme-changed` postMessage. The webview's
+  // `vsCodeBodyClassSource` adapter consumes it and re-resolves the
+  // variant from the body class.
+  startThemeRelay(context, () => {
+    const panels: PostableWebview[] = [];
+
+    const pushIfWebview = (
+      provider: { webview?: vscode.Webview | undefined } | undefined,
+    ): void => {
+      const wv = provider?.webview;
+      if (wv) {
+        panels.push({ webview: wv });
+      }
+    };
+
+    pushIfWebview(activityPanelProvider);
+    pushIfWebview(logPanelProvider);
+    pushIfWebview(resultsPanelProvider);
+    pushIfWebview(storyboardPanelProvider);
+    pushIfWebview(timeRangeProvider);
+
+    // MapPanel — per-document panels created via createWebviewPanel.
+    const mp = mapPanel?.getPanel?.();
+    if (mp) {
+      panels.push({ webview: mp.webview });
+    }
+
+    // CatalogOverviewPanel — per-store popup panels.
+    for (const overview of CatalogOverviewPanel.getActivePanels()) {
+      panels.push({ webview: overview.webview });
+    }
+
+    return panels;
+  });
+
   // Set storesReady context immediately so the "Loading stores…" welcome
   // view is dismissed as soon as views are registered — don't defer until
   // Phase 3 which can be blocked by async work.
@@ -773,6 +816,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     // Register activity bar restore command
     context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
+
+    // #191 T062 — NL search set/clear API key commands.
+    for (const cmd of registerNlSearchCommands(context)) {
+      context.subscriptions.push(cmd);
+    }
   } catch (err) {
     console.error('[Debrief] ActivityBarService failed:', err);
     outputChannel.appendLine(`[startup] ActivityBarService failed: ${err instanceof Error ? err.message : String(err)}`);

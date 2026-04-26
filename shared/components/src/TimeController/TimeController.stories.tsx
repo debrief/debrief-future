@@ -492,7 +492,7 @@ export const DarkTheme: Story = {
  */
 export const VSCodeTheme: Story = {
   render: () => (
-    <ThemeProvider theme={{ variant: 'vscode' }}>
+    <ThemeProvider theme={{ variant: 'dark' }}>
       <div style={{ width: 300, padding: 16, background: '#1e1e1e' }}>
         <InteractiveTimeController timeExtent={MEDIUM_RANGE} />
       </div>

@@ -114,13 +114,13 @@
 ### Infrastructure Updates
 
 - [x] T019 Clean up obsolete functions in `tests/e2e/helpers/webview-injector.ts` after fix validated
-- [ ] T020 Update skip conditions in `tests/e2e/models/debrief-webview.ts` to reflect new readiness model
+- [x] T020 Update skip conditions in `tests/e2e/models/debrief-webview.ts` to reflect new readiness model
 - [x] T021 Add sidebar toggle test for webview disposal/re-creation in `tests/e2e/test-webview-resolve.spec.ts`
 
 ### CI Workflow Updates
 
 - [x] T022 Add CI smoke check in `.github/workflows/e2e.yml` — verify `patch-webview.sh` exits 0 and prints success markers
-- [ ] T023 Verify both web-shell and VS Code E2E suites run as parallel CI jobs within 25-minute timeout
+- [x] T023 Verify both web-shell and VS Code E2E suites run as parallel CI jobs within 25-minute timeout
 
 **Checkpoint**: At least 5 previously-skipped test files now execute. CI workflow updated.
 
@@ -133,7 +133,7 @@
 ### Documentation
 
 - [x] T024 Update `docs/project_notes/webview-e2e-research.md` with complete resolution findings, reproduction steps, and evidence
-- [ ] T025 Update `specs/142-vscode-e2e-webview-reliability/quickstart.md` with validated reproduction steps
+- [x] T025 Update `specs/142-vscode-e2e-webview-reliability/quickstart.md` with validated reproduction steps
 
 ### Evidence Collection (REQUIRED)
 
@@ -141,17 +141,17 @@
 
 - [x] T026 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/142-vscode-e2e-webview-reliability/evidence/test-summary.md`
 - [x] T027 Create usage demonstration in `specs/142-vscode-e2e-webview-reliability/evidence/usage-example.md`
-- [ ] T028 [P] Capture patch configuration sample in `specs/142-vscode-e2e-webview-reliability/evidence/config-sample.sh`
-- [ ] T029 [P] Capture CI-like validation output in `specs/142-vscode-e2e-webview-reliability/evidence/validation-output.txt`
+- [x] T028 [P] Capture patch configuration sample in `specs/142-vscode-e2e-webview-reliability/evidence/config-sample.sh`
+- [x] T029 [P] Capture CI-like validation output in `specs/142-vscode-e2e-webview-reliability/evidence/validation-output.txt`
 
 ### Media Content
 
-- [ ] T030 Create shipped blog post in `specs/142-vscode-e2e-webview-reliability/media/shipped-post.md`
-- [ ] T031 [P] Create LinkedIn shipped summary in `specs/142-vscode-e2e-webview-reliability/media/linkedin-shipped.md`
+- [x] T030 Create shipped blog post in `specs/142-vscode-e2e-webview-reliability/media/shipped-post.md`
+- [x] T031 [P] Create LinkedIn shipped summary in `specs/142-vscode-e2e-webview-reliability/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T032 Create PR and publish blog: run /speckit.pr
+- [x] T032 Create PR and publish blog: run /speckit.pr
 
 **Task T032 must run last. It depends on all evidence and media tasks being complete.**
 

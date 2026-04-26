@@ -17,6 +17,13 @@ interface IncomingMessage {
 export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.resultsPanel';
 
+  /**
+   * Public accessor for the active webview (#220 theme relay).
+   */
+  public get webview(): vscode.Webview | undefined {
+    return this._view?.webview;
+  }
+
   private _view?: vscode.WebviewView;
   private _pendingMessages: Array<Record<string, unknown>> = [];
   private _isReady = false;

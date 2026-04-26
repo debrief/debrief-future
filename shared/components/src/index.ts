@@ -80,6 +80,13 @@ export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
 
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
+export {
+  vsCodeBodyClassSource,
+  bodyClassToVariant,
+  mediaQuerySource,
+  staticSource,
+} from './ThemeProvider';
+export type { ResolvedVariant, ThemeSource } from './ThemeProvider';
 
 // Temporal Track Rendering
 export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';
@@ -347,7 +354,7 @@ export type {
 // Storyboard CRUD module (Feature: 215-storyboarding-schema)
 export * from './storyboard';
 
-// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit)
+// Storyboard panel — presentational React component (Features: 216-storyboarding-capture + 217-storyboarding-playback + 218-storyboarding-edit + 230-storyboard-edit-wiring)
 export {
   StoryboardPanel,
   SceneRow,
@@ -358,6 +365,11 @@ export {
   SceneEditForm,
   UndoToast,
   StaleBadge,
+  SceneOverflowMenu,
+  useStoryboardEditReducer,
+  storyboardEditReducer,
+  createInitialStoryboardEditState,
+  composeSceneEditViewModels,
 } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
@@ -373,6 +385,74 @@ export type {
   UndoToastProps,
   UndoToastState,
   StaleBadgeProps,
+  SceneOverflowMenuProps,
+  SceneOverflowMenuItem,
+  SceneOverflowAction,
   SceneEditViewModel,
   StoryboardEditViewModel,
+  StoryboardEditAction,
+  StoryboardEditReducerState,
+  StoryboardEditReducerHandle,
+  ScenesPayload,
+  SnapshotPayload,
+  UndoToastDescriptor,
+  StaleFlagEntry,
+  ThemeVariant,
 } from './panels/StoryboardPanel';
+
+// NL → CQL2 generator + live transport (#188, #190, #191).
+//
+// `providerCall` (the Node-only HTTPS core) is intentionally NOT
+// re-exported from this main barrel — pulling it in would cascade node
+// types into every browser consumer. Node-side consumers (e.g. the VS
+// Code extension host) import it via the explicit subpath
+// `@debrief/components/nl-cql2-node`.
+export {
+  generateCql2,
+  PROMPT_VERSION,
+  buildPrompt,
+  schemaDescription,
+  createRecordedLLMClient,
+  createPassthroughLLMClient,
+  createLiveLLMClient,
+  createPostMessageLLMClient,
+  extractPhraseFromPrompt,
+  validateLiveConfig,
+  isLiveTransportError,
+  parseResponse,
+  canonicalisePhrase,
+  sha256Hex,
+} from './nl-cql2';
+export type {
+  Cql2Json,
+  LozengeSeed,
+  GenerationErrorReason,
+  GenerationError,
+  GenerationDiagnostics,
+  GenerationResult,
+  GenerationResultError,
+  LLMClient,
+  RecordedResponse,
+  ResponseMap,
+  EnumBundle,
+  VesselClassNode,
+  EnumBundleMeta,
+  GenerateDeps,
+  LiveConfig,
+  BrowserLiveConfig,
+  VsCodeLiveConfig,
+  LiveConfigValidationError,
+  LiveConfigValidationResult,
+  LiveOutcome,
+  LiveSuccess,
+  LiveAuthFailure,
+  LiveRateLimit,
+  LiveProviderError,
+  LiveTransportError,
+  LiveTimeout,
+  LiveMalformedResponse,
+  LiveNotConfigured,
+  LiveCeilingReached,
+  TransportCallRecord,
+  PostMessageLLMClientOptions,
+} from './nl-cql2';

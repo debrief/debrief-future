@@ -111,6 +111,14 @@ type WebviewMessage =
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.activityPanel';
 
+  /**
+   * Public accessor to the active webview, if any. Used by the theme
+   * relay (#220) to broadcast `vscode-theme-changed` to every panel.
+   */
+  public get webview(): vscode.Webview | undefined {
+    return this._view?.webview;
+  }
+
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
   private _isWebviewReady = false;

@@ -55,6 +55,10 @@
     "./PropertiesPanel/autoDerivedFields": {
       "types": "./src/PropertiesPanel/autoDerivedFields.ts",
       "import": "./src/PropertiesPanel/autoDerivedFields.ts"
+    },
+    "./nl-cql2-node": {
+      "types": "./src/nl-cql2/node.ts",
+      "import": "./src/nl-cql2/node.ts"
     }
   },
   "sideEffects": [
@@ -105,6 +109,7 @@
     "ulid": "^3.0.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.8.5",
     "@playwright/test": "^1.58.0",
     "@sparticuz/chromium": "^143.0.4",
     "@storybook/addon-a11y": "^8.4.0",

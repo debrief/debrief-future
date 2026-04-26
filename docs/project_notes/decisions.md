@@ -904,3 +904,63 @@ Adopt the schema-rooted approach. Concretely:
 - `specs/208-timeline-entry-kind/evidence/projection-purity-check.txt` — SC-005 transcript.
 - `specs/208-timeline-entry-kind/evidence/round-trip-evidence.md` — Python ↔ JSON schema adherence proof.
 - `specs/208-timeline-entry-kind/evidence/test-summary.md` — full CI summary.
+
+
+### ADR-024: Migrate shared `LLMClient` to `Promise<LiveOutcome>` without deprecation (#191, 2026-04-24)
+
+**Context**: Feature #191 (NL search in VS Code) needed a second consumer of the NL→CQL2 live transport alongside the existing browser demo (#190). Two sharp observations from /speckit.review forced a choice:
+
+1. The #188 `LLMClient` contract was `generate(prompt): Promise<string>` — every failure path flowed as a thrown `LiveTransportAbort` marker that `generateCql2` caught and wrapped. That pattern puts type-unsafe information flow in the critical path: "the error is in err.transportError.reason" is documented, not typed.
+2. The second consumer (VS Code extension host) could not usefully re-use the old shape. Its natural output is a classified outcome object, not a string; throwing would cross the webview ↔ host postMessage boundary as a generic error, losing the classification.
+
+**Decision**: Migrate the shared `LLMClient` contract to return a canonical `LiveOutcome` discriminated union. `generate()` NEVER throws on normal failure paths. `LiveTransportAbort` is removed. `apps/nl-demo` (#190) migrates in the same PR; Article XIV (pre-release freedom) permits the breaking change because v4.0.0 has not shipped.
+
+**Alternatives considered**:
+- **Keep the string-returning contract, add a sibling `LiveLLMClient` extension that returns outcomes.** Rejected — two contracts, two code paths to maintain, the VS Code side would still need to reshape.
+- **Return `Result<string, LiveTransportError>`** (Rust-ish). Rejected — our codebase has no other Result-style surface; introducing one for a single API was inconsistency for inconsistency's sake.
+- **Keep the throw but make `LiveTransportAbort` a structured class consumers introspect.** Rejected — throwing is still a non-typed signalling channel. The concrete bug this prevents: any caller who *forgets* to install the catch gets a crash, not a banner.
+
+**Consequences**:
+- (+) Single canonical outcome surface across the browser demo and VS Code. `createRecordedLLMClient`, `createPassthroughLLMClient`, `createLiveLLMClient`, `createPostMessageLLMClient`, and `createBadLLMClient` all share one contract.
+- (+) `LiveConfig` becomes a clean discriminated union (`transport: "browser-proxy" | "vscode-host"`); the `hasApiKey` presence bool on the VS Code variant lets the webview decide whether to gate without ever seeing the key.
+- (-) Outcome-renames touch user-facing `live-config.json` field names. Only impacts the #190 dev loop (gitignored file); documented in `specs/191-vscode-nl-search/evidence/migration-nl-demo-playwright.txt`.
+- (-) The provider-call core now exists as parallel `.ts` and `.mjs` siblings (VS Code host is TypeScript-compiled; `apps/nl-demo/scripts/live-proxy.mjs` is pure Node). A future cleanup could unify via tsx/register, but two 220-line files that document their own sync-by-convention policy are less risky than the alternative build-step gymnastics.
+
+**Evidence**:
+- `specs/191-vscode-nl-search/evidence/test-summary.md` — migrated liveClient.test.ts, new providerCall.test.ts, new postMessageClient.test.ts, new FilterBar.nl.test.tsx.
+- `specs/191-vscode-nl-search/evidence/migration-nl-demo-playwright.txt` — on-the-wire envelope regression tracking.
+- `specs/191-vscode-nl-search/contracts/llm-client.ts` — canonical contract.
+
+### ADR-025: Theme Variant Model — Flat Union with First-Class High Contrast (2026-04-25)
+
+**Decision.** Replace the muddled `'light' | 'dark' | 'vscode' | 'system'` `ThemeVariant` union with a flat first-class enumeration:
+
+```ts
+type ThemeVariant =
+  | 'light'
+  | 'dark'
+  | 'high-contrast-light'
+  | 'high-contrast-dark'
+  | 'system';
+```
+
+The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the variant resolves to one of the four explicit values via `vsCodeBodyClassSource`, which reads the `vscode-light` / `vscode-dark` / `vscode-high-contrast` / `vscode-high-contrast-light` body class that VS Code applies to every webview.
+
+**Rejected alternatives.**
+
+- **Separate contrast axis.** Modelled as `{ palette: 'light' | 'dark', highContrast: boolean }`. Rejected: a single `data-theme` attribute is simpler than two sources of truth, and components that style themselves with `[data-theme='high-contrast-dark']` don't need to compose two CSS selectors. The `isHighContrast` derived flag is exposed on the `useTheme()` hook for components that genuinely need both axes.
+- **CSS-only hook.** Rely on the user's OS preference for `prefers-contrast: more` and let CSS handle everything. Rejected: VS Code does not propagate the OS contrast preference to webviews — the host explicitly chooses a high-contrast theme based on its own settings, and the body-class signal is the only authoritative source for which one is active.
+- **Keep `'vscode'` as a synonym for "use VS Code tokens".** Rejected: it carries no information that the four explicit values don't. It also forced a runtime `isVSCodeEnvironment()` check inside `ThemeProvider` whose `getComputedStyle()` fallback produced a false-positive when Storybook injected synthetic `--vscode-*` values; that bug bit twice during the #209 audit.
+
+**Consequences.**
+
+- **Single value, single attribute.** A variant maps 1:1 to a `[data-theme]` attribute and to a key in `VS_CODE_TOKEN_MAP`. Adding a new VS Code theme kind requires extending exactly one table (`bodyClassToVariant` in `vsCodeAdapter.ts`); the structural-parity test at `vsCodeTokenMap.test.ts` enforces every variant covers the same set of `--vscode-*` keys.
+- **Contract clarity.** The `ThemeSource` interface (`contracts/theme-source.md`) makes the source of the variant explicit at the boundary: webviews subscribe to `vsCodeBodyClassSource()`, web-shell / Storybook to `mediaQuerySource()`, pinned tests to `staticSource(variant)`. No more scattered `prefers-color-scheme` listeners or computed-style probes.
+- **Backward compat.** Pre-release freedom (Constitution Article XIV) permits retiring the `'vscode'` value without a deprecation shim. All call-sites under `shared/components/src/` and `apps/vscode/src/` migrated in a single commit.
+
+**Originating issue:** Backlog item #220 (Tech Debt). Spec: `specs/220-fix-theme-responsiveness/`.
+
+**Evidence:**
+- `specs/220-fix-theme-responsiveness/evidence/test-summary.md` — full test transcript across the four variants.
+- `specs/220-fix-theme-responsiveness/evidence/screenshots/all-panels-{light,dark,high-contrast-light,high-contrast-dark}.png` — visual consistency proof.
+- `specs/220-fix-theme-responsiveness/evidence/screenshots/interaction.gif` — runtime-switch demo.

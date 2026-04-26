@@ -565,7 +565,7 @@ export const DarkTheme: Story = {
  */
 export const VSCodeTheme: Story = {
   render: () => (
-    <ThemeProvider theme={{ variant: 'vscode' }}>
+    <ThemeProvider theme={{ variant: 'dark' }}>
       <div style={{ width: 320, height: 600, background: '#1e1e1e' }}>
         <InteractiveActivityPanel />
       </div>

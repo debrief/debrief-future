@@ -84,7 +84,10 @@
 
 .log-panel__toggle-btn--active {
   background: var(--vscode-focusBorder, #007fd4);
-  color: var(--vscode-editor-background, #1e1e1e);
+  /* Feature 209: white text on the focus-border blue meets WCAG AA 4.5:1
+     in both light and dark theme variants (the previous
+     var(--vscode-editor-background) fell below 4.5:1 in dark). */
+  color: var(--vscode-button-foreground, #ffffff);
 }
 
 .log-panel__toggle-btn:hover:not(.log-panel__toggle-btn--active) {

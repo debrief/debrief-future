@@ -119,32 +119,77 @@
   --debrief-list-selected-bg: var(--debrief-selection-bg);
 }
 
+/* Light theme — explicit (matches the :root baseline above) */
+[data-theme='light'] {
+  --debrief-bg-primary: var(--vscode-editor-background, #ffffff);
+  --debrief-bg-secondary: var(--vscode-sideBar-background, #f8f9fa);
+  --debrief-bg-tertiary: var(--vscode-editorWidget-background, #e9ecef);
+  --debrief-text-primary: var(--vscode-editor-foreground, #212529);
+  --debrief-text-secondary: var(--vscode-descriptionForeground, #6c757d);
+  --debrief-border-color: var(--vscode-panel-border, #dee2e6);
+  --debrief-border-color-focus: var(--vscode-focusBorder, #0066cc);
+  --debrief-color-primary: var(--vscode-textLink-foreground, #0066cc);
+}
+
 /* Dark theme overrides */
 [data-theme='dark'],
 .debrief-dark {
-  --debrief-bg-primary: #1e1e1e;
-  --debrief-bg-secondary: #252526;
-  --debrief-bg-tertiary: #2d2d30;
+  --debrief-bg-primary: var(--vscode-editor-background, #1e1e1e);
+  --debrief-bg-secondary: var(--vscode-sideBar-background, #252526);
+  --debrief-bg-tertiary: var(--vscode-editorWidget-background, #2d2d30);
   --debrief-bg-overlay: rgba(0, 0, 0, 0.7);
 
-  --debrief-text-primary: #cccccc;
-  --debrief-text-secondary: #9d9d9d;
+  --debrief-text-primary: var(--vscode-editor-foreground, #cccccc);
+  --debrief-text-secondary: var(--vscode-descriptionForeground, #9d9d9d);
   --debrief-text-muted: #6d6d6d;
   --debrief-text-inverse: #1e1e1e;
 
-  --debrief-border-color: #3c3c3c;
+  --debrief-border-color: var(--vscode-panel-border, #3c3c3c);
+  --debrief-border-color-focus: var(--vscode-focusBorder, #4da6ff);
+  --debrief-color-primary: var(--vscode-textLink-foreground, #4da6ff);
 
   --debrief-map-controls-bg: rgba(30, 30, 30, 0.9);
 
   --debrief-timeline-grid-color: rgba(255, 255, 255, 0.1);
 }
 
-/* VS Code theme integration */
-[data-theme='vscode'] {
-  --debrief-bg-primary: var(--vscode-editor-background, #1e1e1e);
-  --debrief-bg-secondary: var(--vscode-sideBar-background, #252526);
-  --debrief-text-primary: var(--vscode-editor-foreground, #cccccc);
-  --debrief-text-secondary: var(--vscode-descriptionForeground, #9d9d9d);
-  --debrief-border-color: var(--vscode-panel-border, #3c3c3c);
-  --debrief-color-primary: var(--vscode-focusBorder, #0066cc);
+/* High-contrast light variant */
+[data-theme='high-contrast-light'] {
+  --debrief-bg-primary: var(--vscode-editor-background, #ffffff);
+  --debrief-bg-secondary: var(--vscode-sideBar-background, #ffffff);
+  --debrief-bg-tertiary: var(--vscode-editorWidget-background, #f2f2f2);
+
+  --debrief-text-primary: var(--vscode-editor-foreground, #292929);
+  --debrief-text-secondary: var(--vscode-descriptionForeground, #292929);
+  --debrief-text-muted: #7f7f7f;
+
+  --debrief-border-color: var(--vscode-contrastBorder, #0F4A85);
+  --debrief-border-color-focus: var(--vscode-focusBorder, #006BBE);
+  --debrief-color-primary: var(--vscode-textLink-foreground, #0F4A85);
+
+  --debrief-selection-bg: var(--vscode-list-activeSelectionBackground, #0F4A85);
+  --debrief-selection-border: var(--vscode-contrastActiveBorder, #0F4A85);
+}
+
+/* High-contrast dark variant */
+[data-theme='high-contrast-dark'] {
+  --debrief-bg-primary: var(--vscode-editor-background, #000000);
+  --debrief-bg-secondary: var(--vscode-sideBar-background, #000000);
+  --debrief-bg-tertiary: var(--vscode-editorWidget-background, #0a0a0a);
+  --debrief-bg-overlay: rgba(0, 0, 0, 0.85);
+
+  --debrief-text-primary: var(--vscode-editor-foreground, #ffffff);
+  --debrief-text-secondary: var(--vscode-descriptionForeground, #ffffff);
+  --debrief-text-muted: #9d9d9d;
+  --debrief-text-inverse: #000000;
+
+  --debrief-border-color: var(--vscode-contrastBorder, #6FC3DF);
+  --debrief-border-color-focus: var(--vscode-focusBorder, #F38518);
+  --debrief-color-primary: var(--vscode-textLink-foreground, #3AA0F3);
+
+  --debrief-selection-bg: var(--vscode-list-activeSelectionBackground, #f3a823);
+  --debrief-selection-border: var(--vscode-contrastActiveBorder, #F38518);
+
+  --debrief-map-controls-bg: rgba(0, 0, 0, 0.95);
+  --debrief-timeline-grid-color: rgba(255, 255, 255, 0.2);
 }

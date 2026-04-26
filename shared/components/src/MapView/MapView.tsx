@@ -186,6 +186,41 @@ function MapController({
   const map = useMap();
   const prevBoundsRef = useRef<Bounds | null>(null);
 
+  // #230 FR-050 — emit an initial bounds report as soon as Leaflet is
+  // ready, so downstream capture flows don't fail with "map has not
+  // reported a viewport yet" before the user pans/zooms. The session-
+  // store reducer is idempotent per field, so this double-emit with the
+  // subsequent moveend report is safe.
+  useEffect(() => {
+    if (!onBoundsChange) return;
+    const emitInitialBounds = (): void => {
+      try {
+        const mb = map.getBounds();
+        onBoundsChange([
+          mb.getWest(),
+          mb.getSouth(),
+          mb.getEast(),
+          mb.getNorth(),
+        ]);
+      } catch {
+        // Swallow — in test environments the map stub may not expose
+        // `getBounds()` synchronously. The next real bounds event still
+        // fires on moveend.
+      }
+    };
+    // Cover both arms: immediate emit (map container is sized) + whenReady
+    // (Leaflet's initial layout has settled).
+    emitInitialBounds();
+    if (typeof (map as { whenReady?: unknown }).whenReady === 'function') {
+      (
+        map as unknown as {
+          whenReady: (cb: () => void) => void;
+        }
+      ).whenReady(emitInitialBounds);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Auto-fit bounds on initial load or when features change
   useEffect(() => {
     if (autoFitBounds && bounds) {

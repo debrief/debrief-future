@@ -5,10 +5,16 @@
  * All selectors target Debrief-controlled components (map, catalog, tool UI)
  * whose DOM structure is owned and stabilised by this project.
  *
- * The frame is resolved lazily — call waitForMapReady() or getFrame() after
- * opening a plot via CodeServerPage.openPlotViaStacTree().
+ * Readiness model (post-#142):
+ *   The frame is resolved lazily — call waitForMapReady() or getFrame() after
+ *   opening a plot via CodeServerPage.openPlotViaStacTree(). With patch-webview.sh
+ *   Patch 3 applied, resolveWebviewView() fires unconditionally so the real
+ *   extension HTML is in place; selectors here assume real content (no skip
+ *   guard required at the page-object layer). Per-test fixme markers remain
+ *   only for genuinely unimplemented upstream features (calc, drawing).
  *
  * @see contracts/webview-selectors.md for the full selector contract
+ * @see specs/142-vscode-e2e-webview-reliability/evidence/root-cause-analysis.md
  */
 import type { FrameLocator, Locator } from '@playwright/test';
 import type { CodeServerPage } from './code-server-page';

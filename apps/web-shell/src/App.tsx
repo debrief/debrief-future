@@ -68,12 +68,26 @@ import type { RawTaxonomy } from '@debrief/components';
 import type { RawGeoJSONFeature } from '@debrief/schemas';
 import { buildCsvContent, generateCsvFilename } from '@debrief/utils';
 import rawTaxonomy from '../../../shared/schemas/fixtures/stac-browser/vessel-taxonomy.json';
+import {
+  StoryboardEditHarness,
+  parseHarnessQueryString,
+} from './StoryboardEditHarness';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
 /** Bridge: cast Feature[] to DebriefFeature[] (structural overlap). */
 function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
   return features as DebriefFeature[];
+}
+
+/**
+ * Wrapper that reads URL params and mounts the harness view (#230 US4).
+ * Exported from App.tsx so `main.tsx` can pick it up before App's hooks
+ * run — keeps the hook-order invariant clean in App.
+ */
+export function StoryboardEditHarnessMount(): JSX.Element {
+  const initial = parseHarnessQueryString(window.location.search);
+  return <StoryboardEditHarness initial={initial} />;
 }
 
 /** Extract indexable properties from a feature safely. */

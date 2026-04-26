@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { TimeController } from '@debrief/components';
 import type { PlaybackState, DisplayMode } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -160,7 +161,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <TimeControllerApp />
+      <Bootstrap>
+        <TimeControllerApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

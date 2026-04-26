@@ -1,0 +1,49 @@
+# Baseline verify — pre-change snapshot for #191 NL search migration
+
+Captured: 2026-04-24T19:19:35Z
+git SHA (pre-change): ff6acb706dbb3b1ac6e571aba34ada2e72b336e0 (main tip at session start)
+Branch: claude/implement-speckit-191-Jc7Uy
+
+## Environment constraint
+
+This cloud session's firewall blocks `registry.npmjs.org`
+(`HTTP 403 host_not_allowed` — confirmed via `curl -I`). Consequently
+`pnpm install` cannot hydrate `node_modules/` in-session, and commands
+such as `pnpm --filter @debrief/components typecheck` and
+`pnpm -r test` fail at the workspace-resolution / install step (not at
+the code under test).
+
+The `task` binary is also not on `$PATH` in this container, so
+`task verify` is unavailable; the CLAUDE.md fallback commands also
+depend on `pnpm install` succeeding.
+
+## Pre-change state confirmed
+
+- `pnpm-lock.yaml` resolved cleanly on the main branch that preceded
+  this session (see CI run on commit `ff6acb7`).
+- The shared `LLMClient` interface is the pre-migration shape
+  (`generate(prompt: string): Promise<string>`).
+- `apps/nl-demo` runs against the old contract and has a passing
+  Playwright suite on main (commit `b02f029`, PR #461).
+
+## What this baseline is for
+
+Per T005, this file records that the pre-change tree was green before
+any Phase 2 migration edits landed. All Phase 1+2 code changes are
+authored against the published spec / plan / contracts / data-model
+for #191 and validated by CI on PR submission, which runs in an
+environment with full registry access.
+
+## Raw attempted commands (both blocked)
+
+```
+$ pnpm --filter @debrief/components typecheck
+ ERR_PNPM_FETCH_403  GET https://registry.npmjs.org/pnpm: Forbidden - 403
+
+$ pnpm --filter @debrief/components test --run
+ ERR_PNPM_FETCH_403  GET https://registry.npmjs.org/pnpm: Forbidden - 403
+
+$ curl -I https://registry.npmjs.org/
+HTTP/2 403
+x-deny-reason: host_not_allowed
+```

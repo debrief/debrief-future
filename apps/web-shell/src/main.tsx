@@ -6,7 +6,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@debrief/components';
-import App from './App';
+import App, { StoryboardEditHarnessMount } from './App';
 import './App.css';
 
 // Import Leaflet CSS for map rendering
@@ -25,10 +25,23 @@ if (!container) {
 
 const root = createRoot(container);
 
+// #230 US4 — top-level branch: when `?storyboard-edit-harness` is
+// present, mount the harness view instead of the standard shell so
+// Playwright can drive the polish loop without VS Code. Routed here
+// (not in App) so App's hook order stays deterministic per-render.
+const isHarness =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).has('storyboard-edit-harness');
+
+// #220 — request `system` so the ThemeProvider's resolved variant tracks
+// the active source (auto-detected: vsCodeBodyClassSource if a `vscode-*`
+// body class is present, else mediaQuerySource on prefers-color-scheme +
+// prefers-contrast). With the default `{ variant: 'light' }` the source
+// would be ignored and `data-theme` would never reflect runtime changes.
 root.render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
+    <ThemeProvider theme={{ variant: 'system' }}>
+      {isHarness ? <StoryboardEditHarnessMount /> : <App />}
     </ThemeProvider>
   </StrictMode>
 );

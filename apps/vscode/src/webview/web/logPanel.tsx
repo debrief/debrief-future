@@ -15,18 +15,19 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
+import { Bootstrap } from './_bootstrap';
 import type {
   TimelineEntry,
   ViewMode,
   LogFilterState,
   LogPanelMessage,
   ParameterSchemaEntry,
+  ToolCategoryMap,
 } from '@debrief/components';
 // Shared message contract — single source of truth for both extension and webview.
 import type {
   ExtensionMessage,
   ReplayProgressPayload,
-  ToolCategoryMap,
 } from '../logPanelMessages';
 import { postWebviewMessage } from '../logPanelMessages';
 
@@ -366,7 +367,9 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <LogPanelApp />
+      <Bootstrap>
+        <LogPanelApp />
+      </Bootstrap>
     </React.StrictMode>
   );
 }

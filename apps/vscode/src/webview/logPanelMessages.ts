@@ -19,16 +19,11 @@ import type {
   LogPanelMessage,
   ExtensionToWebviewMessage,
   ParameterSchemaEntry,
+  ToolCategoryMap,
 } from '@debrief/components';
 import type { ReplayResult } from '@debrief/session-state';
-import type { ToolCategoryEnum } from '@debrief/schemas';
 
-/**
- * Runtime map of tool ID → visual category value (or null when the tool
- * declared no category / declared an invalid value that was coerced at
- * the MCP boundary). Feature 207.
- */
-export type ToolCategoryMap = Readonly<Record<string, ToolCategoryEnum | null>>;
+export type { ToolCategoryMap };
 
 // ─── Webview → Extension messages ────────────────────────────────────────
 
