@@ -91,14 +91,22 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check for `FEATURE_DIR/media/` directory
    - Read the cached opener from `FEATURE_DIR/evidence/opening-context.md` (created during `/speckit.plan`)
      - If it's missing, warn the user — the generator will synthesise an opener from spec.md, plan.md, and research.md instead, but prose quality may suffer
+   - Read the *Media Components* table from `FEATURE_DIR/plan.md` (if present) — this provides the Storybook story links to embed in the post's "Try It Yourself" section
+   - **Decide post sizing** before generating:
+     - Inspect `tasks.md` and the diff scope. If the change is minor (refactor, dependency bump, internal rename, docs-only, no UI change), instruct the Content Specialist to produce a **short post** — Hook + 1–2 paragraphs + link to PR, skipping Screenshots / By the Numbers / Lessons Learned / What's Next.
+     - Otherwise, instruct the Content Specialist to produce a **full post** following the Feature Post template.
+     - See "Sizing the Post" in `.claude/agents/media/content.md`.
    - If `shipped-post.md` is missing or incomplete:
      - Read Content Specialist agent from `.claude/agents/media/content.md`
      - Spawn Content Specialist via Task tool with:
-       - The cached opener content (verbatim — must appear as the first three sections of the post)
+       - The cached opener content (the `## Hook` section becomes the post's lead asset *without a heading*; the other three sections are copied verbatim — full posts only)
+       - Post sizing decision (short vs. full)
        - Feature summary from spec.md
-       - Evidence artifacts from evidence/
+       - Evidence artifacts from evidence/ (especially screenshots and any `.mermaid` files)
+       - Storybook story links from `plan.md` *Media Components* table (for the "Try It Yourself" section — omit section if no stories)
        - Lessons learned from implementation
      - Generate `shipped-post.md` following the Feature Post template (title prefix `Building `)
+     - For features with mermaid diagrams in evidence, embed them inline as ` ```mermaid ` fenced blocks — gh-pages renders these natively
      - Save media content to `FEATURE_DIR/media/`
 
 7. **Collect evidence artifacts**:
@@ -336,14 +344,31 @@ prompt: |
 
   Create a Feature Post for:
   - Feature: [name from spec.md]
-  - Cached opener (copy verbatim as the first three sections): [contents of evidence/opening-context.md]
+  - Post sizing: [short | full]  # short for minor / no-UI changes; full otherwise
+  - Cached opener (4 sections — Hook, What We're Building, How It Fits, Key Decisions):
+    [contents of evidence/opening-context.md]
+  - Storybook stories (for "Try It Yourself" — omit section if none):
+    [Media Components table from plan.md]
   - What was built: [summary from evidence/usage-example.md]
   - Test results: [from evidence/test-summary.md]
   - Key decisions: [from research.md if exists]
+  - Mermaid diagrams: [list any .mermaid files in evidence/]
+  - Screenshots: [list of evidence/screenshots/*.png and *.gif]
 
-  Follow the Feature Post template exactly. Title must be prefixed with `Building `.
-  The first three sections (What We're Building, How It Fits, Key Decisions) must be
-  copied verbatim from the cached opener above — do not paraphrase.
+  Rules:
+  - Title prefixed with `Building `.
+  - The Hook from the cached opener goes at the very top, BELOW the front matter
+    and ABOVE "What We're Building", with NO `## Hook` heading. If it referenced
+    a planned screenshot path, resolve against the actual evidence file; if
+    missing, fall back to capability bullets or before/after table.
+  - Sections "What We're Building", "How It Fits", "Key Decisions" copied verbatim
+    from the cached opener (full posts only).
+  - For SHORT posts: front matter + Hook + 1–2 paragraphs + link to PR. Skip
+    Screenshots / By the Numbers / Lessons Learned / What's Next.
+  - For FULL posts: include Screenshots (annotated, as many as warranted), Try
+    It Yourself (Storybook links if present), By the Numbers, Lessons Learned,
+    What's Next.
+  - Mermaid blocks use ` ```mermaid ` fenced syntax (gh-pages renders natively).
 ```
 
 ### Output Files
