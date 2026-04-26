@@ -124,7 +124,7 @@ test.describe.skip('NL search in VS Code Catalog Overview — needs harness (T05
     expect(domHtml).not.toContain('sk-ISOLATION-PROBE-XYZ');
   });
 
-  test('7-class failure matrix (T086-T088)', async ({ page }) => {
+  test('8-class failure matrix (T086-T088 + #198 T043)', async ({ page }) => {
     const classes: Array<{ phrase: string; reason: string }> = [
       { phrase: 'auth-failure test', reason: 'auth-failure' },
       { phrase: 'rate-limit test', reason: 'rate-limit' },
@@ -133,6 +133,8 @@ test.describe.skip('NL search in VS Code Catalog Overview — needs harness (T05
       { phrase: 'malformed test', reason: 'malformed-response' },
       { phrase: 'not-configured test', reason: 'not-configured' },
       { phrase: 'ceiling-reached test', reason: 'ceiling-reached' },
+      // #198 T043 — extends the matrix from 7 to 8 classes.
+      { phrase: 'keyring-unavailable test', reason: 'keyring-unavailable' },
     ];
     for (const c of classes) {
       await page.goto(WEBVIEW_URL);
@@ -159,5 +161,134 @@ test.describe.skip('NL search in VS Code Catalog Overview — needs harness (T05
     await page.locator('[data-testid^="lozenge-"]').first().waitFor({ timeout: 10_000 });
     // Only B resolved; no banner.
     await expect(page.getByTestId('live-transport-banner')).toHaveCount(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #198 T040–T042 — keyring-unavailable scenarios
+//
+// These extend the same harness-skipped suite. The harness must support a
+// new test hook that monkey-patches the proxy's getter to control whether
+// `secrets.get` rejects, resolves with a value, or resolves with undefined.
+// (Documented in plan.md §VS Code Webview E2E Testing.)
+// ---------------------------------------------------------------------------
+
+const KEYRING_EVIDENCE_DIR = resolve(
+  HERE,
+  '..',
+  '..',
+  'specs',
+  '198-nl-keyring-banner',
+  'evidence',
+  'screenshots',
+);
+mkdirSync(KEYRING_EVIDENCE_DIR, { recursive: true });
+
+test.describe.skip('NL search — keyring-unavailable scenarios (#198 T040-T042)', () => {
+  test('T040 — secrets.get throws → keyring-unavailable banner with distinct copy', async ({
+    page,
+  }) => {
+    // Harness pre-condition: stub `context.secrets.get` to reject on EVERY
+    // call. Then submit any phrase; the banner must surface.
+    await page.goto(WEBVIEW_URL);
+    await page.getByTestId('nl-search-indicator').waitFor({ timeout: 10_000 });
+
+    const input = page.getByTestId('quick-search-input');
+    await input.fill('UK submarines');
+    await input.press('Enter');
+
+    const banner = page.getByTestId('live-transport-banner');
+    await banner.waitFor({ timeout: 10_000 });
+    await expect(banner).toHaveAttribute(
+      'data-transport-reason',
+      'keyring-unavailable',
+    );
+
+    // Body copy MUST mention the keyring and MUST NOT instruct the user
+    // to re-enter their key (FR-004).
+    const text = (await banner.textContent()) ?? '';
+    expect(text).toMatch(/keyring/i);
+    expect(text).not.toMatch(/re-?enter/i);
+
+    // Both action buttons rendered; secondary "Open settings" must NOT
+    // be the primary call to action — the harness asserts via the
+    // `--secondary` modifier class on its `data-testid`.
+    await expect(page.getByTestId('live-transport-banner-help')).toBeVisible();
+    await expect(
+      page.getByTestId('live-transport-banner-open-settings'),
+    ).toBeVisible();
+
+    await page.screenshot({
+      path: resolve(KEYRING_EVIDENCE_DIR, 'vscode-keyring-unavailable.png'),
+      fullPage: false,
+    });
+  });
+
+  test('T041 — regression: no key saved → not-configured banner unchanged', async ({
+    page,
+  }) => {
+    // Harness pre-condition: stub `context.secrets.get` to RESOLVE with
+    // `undefined` (no key ever saved). Behaviour must not regress.
+    await page.goto(WEBVIEW_URL);
+    await page.getByTestId('nl-search-indicator').waitFor({ timeout: 10_000 });
+
+    const input = page.getByTestId('quick-search-input');
+    await input.fill('UK submarines');
+    await input.press('Enter');
+
+    const banner = page.getByTestId('live-transport-banner');
+    await banner.waitFor({ timeout: 10_000 });
+    await expect(banner).toHaveAttribute(
+      'data-transport-reason',
+      'not-configured',
+    );
+
+    // Existing copy still mentions setting an API key.
+    expect((await banner.textContent()) ?? '').toMatch(/api key/i);
+
+    await page.screenshot({
+      path: resolve(KEYRING_EVIDENCE_DIR, 'banner-not-configured-unchanged.png'),
+      fullPage: false,
+    });
+  });
+
+  test('T042 — recovery: throw once, resolve next; second submission succeeds', async ({
+    page,
+  }) => {
+    // Harness pre-condition: stub `context.secrets.get` to REJECT on the
+    // first call, then RESOLVE with a valid key on the second call. The
+    // first submission shows the banner; the second succeeds (chip
+    // applied) without any extension reload (FR-007).
+    await page.goto(WEBVIEW_URL);
+    await page.getByTestId('nl-search-indicator').waitFor({ timeout: 10_000 });
+
+    // 1st submission — banner up.
+    const input = page.getByTestId('quick-search-input');
+    await input.fill('UK submarines');
+    await input.press('Enter');
+    const banner = page.getByTestId('live-transport-banner');
+    await banner.waitFor({ timeout: 10_000 });
+    await expect(banner).toHaveAttribute(
+      'data-transport-reason',
+      'keyring-unavailable',
+    );
+
+    // Trace the recovery animation for an evidence GIF; the harness
+    // exposes `page.video()`-like trace via Playwright's standard
+    // `recordVideo` config.
+    await input.fill('French frigates');
+    await input.press('Enter');
+
+    // Second submission must produce a chip and clear the banner.
+    await page
+      .locator('[data-testid^="lozenge-"]')
+      .first()
+      .waitFor({ timeout: 10_000 });
+    await expect(page.getByTestId('live-transport-banner')).toHaveCount(0);
+
+    await page.screenshot({
+      path: resolve(KEYRING_EVIDENCE_DIR, 'recovery-after-unlock-final.png'),
+      fullPage: false,
+    });
   });
 });
