@@ -991,3 +991,4 @@ The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the varian
 - `docs/project_notes/mermaid-website-patch/future-post-layout-snippet.html` — exact website-repo patch to apply to `_layouts/future-post.html`.
 - `docs/project_notes/mermaid-website-patch/README.md` — application instructions for the website-repo PR.
 - Screenshot supplied by owner (2026-04-26) — confirmed `sequenceDiagram` body of #210 post rendering as raw text on live site.
+- Implementing PR: [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90) (submitted 2026-04-26; the patch landed in `_layouts/future-post.html` at end-of-file rather than before `</body>` because the post layout delegates to `_layouts/future-default.html` for the document shell — see implementation notes in the spike doc).

@@ -1,8 +1,10 @@
 # Mermaid in Blog Posts — Website-Repo Patch
 
-This directory contains the change that needs to land in
+> **Status (2026-04-26):** Submitted as [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90), awaiting review/merge. This directory is retained as the reference artefact, not as pending work. See implementation notes in the spike doc for details on how the patch was actually placed (`future-post.html` has no `</body>` of its own — it delegates to `future-default.html`).
+
+This directory contains the change that needed to land in
 **`debrief/debrief.github.io`** to make Mermaid diagrams render in shipped
-Future Debrief blog posts. It cannot be applied from this repo — the
+Future Debrief blog posts. It could not be applied from this repo — the
 `debrief-future` MCP scope does not extend to the website repo.
 
 Decision context: ADR-026 in `docs/project_notes/decisions.md`.

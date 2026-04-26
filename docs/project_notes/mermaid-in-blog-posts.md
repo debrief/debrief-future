@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-26
 **Branch:** `claude/research-mermaid-diagrams-0gl5e`
-**Status:** Accepted — Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout). See ADR-026 in `docs/project_notes/decisions.md`. Website-repo patch staged at `docs/project_notes/mermaid-website-patch/`.
+**Status:** Accepted — Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout). See ADR-026 in `docs/project_notes/decisions.md`. **Website-repo PR submitted as [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90)** (awaiting merge as of 2026-04-26). Staged patch retained under `docs/project_notes/mermaid-website-patch/` for reference.
 **Scope:** Posts shipped to `debrief.github.io/_posts/` via `/speckit.pr` → `/publish`
 
 ## TL;DR
@@ -89,7 +89,14 @@ The owner clarified that the blog site does not need to function offline, so the
 - No vendored binary in the website repo's git history.
 - Same retroactive coverage of the 3+ posts that already contain Mermaid fences.
 
-Verification before this was accepted: the live 210 post (`https://debrief.github.io/future/2026/04/24/...`) was confirmed to currently render the `sequenceDiagram` source as raw text — i.e. the `future-post` layout has no Mermaid wiring today.
+Verification before this was accepted: the live 210 post ([`/future/2026/04/24/un-skipping-the-webview-log-panel-e2e-suite.html`](https://debrief.github.io/future/2026/04/24/un-skipping-the-webview-log-panel-e2e-suite.html)) was confirmed to currently render the `sequenceDiagram` source as raw text — i.e. the `future-post` layout has no Mermaid wiring today.
+
+**Implementation notes from PR #90** (worth recording so the next person who reads the spike doesn't re-derive them):
+
+- `_layouts/future-post.html` does not actually contain `</body>` — it sets `layout: future-default` in its front matter, and `_layouts/future-default.html` owns `<html>`, `<head>`, `<body>`. The post layout is rendered into `{{ content }}` inside the default. The script block was therefore appended at the end of `future-post.html` (after `</main>`), which lands inside `<body>` near the end of the rendered page. `type="module"` defers execution until DOM parse completes, so `mermaid.run()` still finds all the `<pre class="mermaid">` elements.
+- Putting the block in `future-default.html` was considered and rejected: `page.content` is the post body, and gating the script on a per-post `language-mermaid` check belongs in the post layout, not the page-wide default.
+- The `2026-02-13` post (`shipped-generate-courses-and-speeds-tool`) referenced in the original brief **does not yet exist** on `debrief.github.io`. Its source `specs/061-.../media/shipped-post.md` is in `debrief-future` but hasn't been pushed through the cross-repo publish flow yet. The layout change is content-agnostic — that post will pick up rendering automatically the moment it ships.
+- The `2026-04-24` post's actual filename is `un-skipping-the-webview-log-panel-e2e-suite.md` (no `building-` prefix). The brief's verification URL was off by that prefix. Corrected URL is the link above.
 
 Fall back to **Option B** (pre-render to SVG in `/publish`) if we later need diagrams to appear in non-HTML contexts (RSS feed, PDF export) or the site moves off stock GitHub Pages.
 
