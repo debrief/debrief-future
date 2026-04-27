@@ -98,15 +98,66 @@ task lint
 
 ## Step 5 — Run the suite locally
 
-The cloud-friendly runner (matches CI):
+The canonical Playwright invocation (matches CI — see `.github/workflows/e2e.yml` line 193):
 
 ```sh
-node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel
+npx playwright test --config tests/e2e/playwright.config.ts test-log-panel
 ```
+
+> **Note**: earlier drafts of this quickstart referenced
+> `node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel` by analogy
+> with the web-shell and spec-navigator runners. That file does not exist —
+> the VS Code E2E suite uses the root-level `tests/e2e/playwright.config.ts`
+> directly. Use the `npx playwright test ...` form above.
 
 **Expected outcome**: 5 tests passed, 0 failed, 0 skipped.
 
 If any test fails, **stop**. Triage that specific failure — #142 may be incomplete, or a residual flake survived. The spec's `Edge Cases` section (line 60) describes the narrow-mute fallback (per-test `test.fixme` rather than re-`.describe.fixme`-ing the whole block).
+
+---
+
+## Step 5b — Dispose the superseded webview-injection POC (FR-006)
+
+The probe at `tests/e2e/test-webview-probe.spec.ts` is explicitly marked superseded by `tests/e2e/test-webview-resolve.spec.ts` (see the inline comment on line 44). Delete it:
+
+```sh
+# 1. Confirm the replacement exists and is active (not muted):
+grep -n "test\.describe\." tests/e2e/test-webview-resolve.spec.ts | head -3
+# Expect: a plain `test.describe(...)` — no `.skip` or `.fixme`.
+
+# 2. Check whether webview-injector.ts has importers besides the probe:
+grep -rln "webview-injector" tests/e2e/ --include="*.ts" | grep -v test-webview-probe.spec.ts
+# If output is empty: safe to delete the helper too.
+# If output lists other files: leave webview-injector.ts in place; capture as a one-line note in evidence/.
+
+# 3. Delete the probe (and the helper if step 2 returned empty):
+git rm tests/e2e/test-webview-probe.spec.ts
+# Conditionally:
+#   git rm tests/e2e/helpers/webview-injector.ts
+```
+
+If `webview-injector.ts` had other importers, append to `specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md` under a new "Orphan helpers" section listing the file and its remaining importers — that's the deferred follow-up.
+
+---
+
+## Step 5c — Verify the muted-suite triage artefact (FR-007)
+
+The triage table at `specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md` is created as part of this PR. Verify it:
+
+```sh
+# Confirm row count matches reality:
+grep -cE "^\| [0-9]+ \|" specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md
+# Expect: 16
+
+# Confirm each row's spec file actually exists and is currently muted:
+for f in $(grep -oE "test-[a-z-]+\.spec\.ts" specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md | sort -u); do
+  [ -f "tests/e2e/$f" ] || echo "MISSING: $f"
+  grep -lE "test\.describe\.(skip|fixme)" "tests/e2e/$f" >/dev/null || echo "NOT MUTED: $f"
+done
+# Expect: no output (all sixteen exist and are muted).
+```
+
+The optional spot-check on `test-real-webview` (FR-007 sub-requirement) is documented inside the triage file itself; do it only if you're uncertain Patch 3 was complete.
 
 ---
 
@@ -123,31 +174,46 @@ Use the existing struck-through rows for #142 / #143 as your formatting referenc
 
 ## Step 7 — Atomic commit
 
-All five files in one commit (Decision 2 in research.md):
+All files in one commit (Decision 2 in research.md). The commit covers FR-001..FR-008 — the un-mute itself plus the three review-pulled-in adjacents (probe disposal FR-006, triage table FR-007, skip-guard scaling decision FR-008):
 
 ```sh
 git add tests/e2e/test-log-panel.spec.ts \
         scripts/check-log-panel-skip-guard.sh \
         Taskfile.yml \
         BACKLOG.md \
-        specs/233-resuspend-log-panel-e2e/  # plan + research + data-model + contracts + quickstart + evidence
+        specs/233-resuspend-log-panel-e2e/   # plan + research + data-model + contracts + quickstart + evidence/
+
+# Conditional adds for FR-006:
+git add -u tests/e2e/test-webview-probe.spec.ts   # `git rm` already staged the deletion
+# If webview-injector.ts had no other importers and you deleted it too:
+# git add -u tests/e2e/helpers/webview-injector.ts
 
 git commit -m "$(cat <<'EOF'
-test(233): re-activate log-panel E2E suite, restore skip-guard
+test(233): re-activate log-panel E2E suite, restore skip-guard, dispose probe POC
 
 #142 (visibility-gate Patch 3) is merged; the openvscode-server
 resolveWebviewView lifecycle now fires reliably. This commit:
 
 - removes test.describe.fixme from tests/e2e/test-log-panel.spec.ts
-  (5 cases return to active CI coverage)
+  (5 cases return to active CI coverage)                        [FR-001]
 - removes the #233 mute comment block from the same file
-- restores scripts/check-log-panel-skip-guard.sh (verbatim from 5385f6e8)
-- re-wires it into Taskfile.yml lint task
-- removes the temporary mute-explanation comment from Taskfile.yml
-- strikes through BACKLOG.md row 233 (status: complete)
+  AND the corresponding Taskfile.yml mute-explanation comment   [FR-002]
+- restores scripts/check-log-panel-skip-guard.sh
+  (verbatim from 5385f6e8)                                       [FR-005]
+- re-wires it into Taskfile.yml lint task                        [FR-005]
+- strikes through BACKLOG.md row 233 (status: complete)          [FR-004]
+- deletes tests/e2e/test-webview-probe.spec.ts
+  (POC superseded by test-webview-resolve.spec.ts)               [FR-006]
+- adds specs/233-resuspend-log-panel-e2e/evidence/
+    muted-suite-triage.md
+  (16-row catalogue of #143-blocked suites, NOT un-muted here)   [FR-007]
+- records "Decision 6 — Skip-guard scaling" in research.md
+  (decision only — keep per-suite scripts; no implementation)    [FR-008]
 
-Verified: 5 passed, 0 failed, 0 skipped via run-playwright.mjs locally.
-Three CI re-runs requested on this PR before merge (FR-003).
+Verified: 5 passed, 0 failed, 0 skipped via
+  `npx playwright test --config tests/e2e/playwright.config.ts test-log-panel`
+  locally (matches CI invocation in .github/workflows/e2e.yml:193).
+Three CI re-runs requested on this PR before merge              [FR-003].
 
 Closes #233.
 
@@ -174,6 +240,15 @@ Open the PR. After the first CI run finishes, hit **Re-run jobs → Re-run faile
 
 **Stability gate**: all three runs MUST be green for the `VS Code E2E` job before merge. If any of the three runs has a log-panel-suite failure, treat the merge as blocked until the cause is identified — do not merge a flaky un-mute.
 
+**SC-003 manual gate**: open the `VS Code E2E` job log of the merge-candidate run (the third re-run) and search it for two strings:
+
+```text
+Webview frame with content "[data-testid=\"log-panel\"]" not found after 15000ms
+resolveWebviewView
+```
+
+The first MUST be absent (it was the #142 symptom). Lines containing the second MAY appear as informational trace, but MUST NOT appear as warnings or errors. If either fails, treat the merge as blocked even when the five tests are green — there is no automated CI assertion for this; the operator owns the check. Capture the grep result (or its absence) in the PR description so the reviewer can verify.
+
 ---
 
 ## Done criteria checklist
@@ -182,9 +257,12 @@ Map directly to the spec's Success Criteria:
 
 - [ ] **SC-001**: `VS Code E2E` job shows `5 passed` for the log-panel suite on three consecutive runs of this PR.
 - [ ] **SC-002**: `grep -nE '^\s*test(\.describe)?\.(skip|fixme)\s*\(' tests/e2e/test-log-panel.spec.ts` returns nothing.
-- [ ] **SC-003**: CI logs do not contain `Webview frame with content "[data-testid=\"log-panel\"]" not found after 15000ms` or any `resolveWebviewView` warnings.
+- [ ] **SC-003** (manual gate — operator-owned, no CI assertion): CI logs do not contain `Webview frame with content "[data-testid=\"log-panel\"]" not found after 15000ms` or any `resolveWebviewView` warnings. Verified via the log-grep in Step 8; result recorded in the PR description.
 - [ ] **SC-004**: The `// #233 — Re-suspended pending #142 ...` comment block is absent from `tests/e2e/test-log-panel.spec.ts`.
 - [ ] **FR-005**: `task lint` exits 0 with the new skip-guard line in place.
+- [ ] **FR-006**: `tests/e2e/test-webview-probe.spec.ts` is deleted; `webview-injector.ts` either deleted (no importers) or kept with an evidence note (orphan flagged).
+- [ ] **FR-007**: `specs/233-resuspend-log-panel-e2e/evidence/muted-suite-triage.md` exists, has 16 rows, and every row's spec file is verified-present-and-muted (Step 5c command produced no output).
+- [ ] **FR-008**: `specs/233-resuspend-log-panel-e2e/research.md` contains "Decision 6 — Skip-guard scaling" with rationale; no parametrised guard or ESLint rule is implemented in this PR.
 - [ ] **BACKLOG**: row 233 is struck-through and marked `complete`.
 
 When every box is ticked, merge the PR. The feature is closed at that moment.

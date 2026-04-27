@@ -12,12 +12,12 @@ Reverse the narrow mute applied by #534 to the openvscode-server log-panel E2E s
 **Language/Version**: TypeScript 5.x (Playwright spec file), Bash (skip-guard script + `Taskfile.yml`)
 **Primary Dependencies**: `@playwright/test ^1.57.0`, `@sparticuz/chromium` (cloud Chromium), openvscode-server (currently v1.109.5; whatever #142 settled on), existing `tests/e2e/fixtures/base.ts` + `tests/e2e/models/code-server-page.ts`
 **Storage**: N/A — test-only feature
-**Testing**: Playwright E2E (existing `tests/e2e/test-log-panel.spec.ts`, 5 cases) executed via `node apps/vscode/tests/e2e/run-playwright.mjs test-log-panel`; the suite under test IS the deliverable
+**Testing**: Playwright E2E (existing `tests/e2e/test-log-panel.spec.ts`, 5 cases) executed via `npx playwright test --config tests/e2e/playwright.config.ts test-log-panel` (the canonical CI invocation — see `.github/workflows/e2e.yml` line 193 and `.github/workflows/heroku-e2e.yml` line 55, which both invoke the same `tests/e2e/playwright.config.ts` directly); the suite under test IS the deliverable. There is no `apps/vscode/tests/e2e/run-playwright.mjs` runner — earlier drafts of this plan referenced one by analogy with `apps/web-shell/run-playwright.mjs` and `apps/spec-navigator/run-playwright.mjs`, but the VS Code E2E suite uses the root-level `tests/e2e/` config directly.
 **Target Platform**: CI VS Code E2E job (Linux, Chromium via `@sparticuz/chromium`); the same job already runs in cloud Claude Code sessions
 **Project Type**: Single-repo monorepo (test surface only — no `apps/` / `services/` source touched)
 **Performance Goals**: 5/5 tests passing in < 90s wall time (matches the suite's existing budget); zero flakes across 3 consecutive CI runs (the stability gate from FR-003 / SC-001)
 **Constraints**: Must not modify the openvscode-server image, the Chromium image, or the test bodies themselves (Out of Scope §132–134); the un-mute is a pure revert plus skip-guard restoration. Must preserve atomic-commit discipline (Constitution XIII.1) — `.fixme` removal, comment block removal, guard restoration, `Taskfile.yml` re-wiring, and BACKLOG strike-through ALL ship in one commit.
-**Scale/Scope**: 1 test file edited (~12 line removal), 1 script restored (~40 lines), 1 Taskfile line re-added, 1 BACKLOG row struck-through. ~5 file touches total. 0.5 dev-day per spec estimate §145.
+**Scale/Scope**: 1 test file edited (~12 line removal), 1 script restored (~40 lines), 1 Taskfile line re-added, 1 BACKLOG row struck-through, plus the three review-pulled-in items from spec.md FR-006/FR-007/FR-008 — 1 spec file deleted (`tests/e2e/test-webview-probe.spec.ts`, plus possibly `tests/e2e/helpers/webview-injector.ts` if no other importers), 1 new evidence triage table (`evidence/muted-suite-triage.md`, ~16 rows), 1 new Decision 6 in `research.md` (skip-guard scaling decision only — no implementation). ~7–8 file touches total. Estimate revised from spec §145's 0.5 dev-day to ~0.75 dev-day to absorb the triage authoring; the un-mute itself is unchanged.
 
 ## Constitution Check
 
@@ -31,13 +31,13 @@ Reverse the narrow mute applied by #534 to the openvscode-server log-panel E2E s
 | IV — Architectural Boundaries | No service/UI boundary touched. | ✅ N/A |
 | V — Extensibility | No extension surface touched. | ✅ N/A |
 | VI — Testing | This *is* a testing feature: it returns 5 active integration tests to the gate and re-arms the lint-level skip-guard that prevents silent re-skips. Strengthens Article VI. | ✅ Pass |
-| VII — Test-Driven AI Collaboration | Spec FR-001..FR-005 + SC-001..SC-004 form the executable acceptance criteria; the un-suspend recipe in `spec.md` §76–107 is the verifiable definition of done. | ✅ Pass |
+| VII — Test-Driven AI Collaboration | Spec FR-001..FR-008 + SC-001..SC-004 form the executable acceptance criteria; the un-suspend recipe in `spec.md` §76–107 plus the Adjacent Cleanup section's FR-006/FR-007/FR-008 are the verifiable definition of done. | ✅ Pass |
 | VIII — Documentation | Spec already exists; this plan adds research/quickstart. BACKLOG strike-through and (if needed) ADR cross-link captured below. | ✅ Pass |
 | IX — Dependencies | Zero new dependencies — restoring a 40-line bash script that already lived in repo history. | ✅ Pass |
 | X — Security | No secrets, no network calls, no classification surface. | ✅ N/A |
 | XI — Internationalisation | No user-facing strings touched. | ✅ N/A |
 | XII — Community Engagement | Public PR; the spec already documents the suspend/un-suspend pattern as a reusable precedent (Story 2). | ✅ Pass |
-| XIII — Contribution Standards | One atomic commit (FR-001..FR-005 wording is explicit on `same commit`), PR review required, CI must pass — already the working pattern. | ✅ Pass |
+| XIII — Contribution Standards | One atomic commit (FR-001..FR-008 wording is explicit on `same commit`; FR-006/FR-007/FR-008 are documentation/disposal additions that ride along with the un-mute), PR review required, CI must pass — already the working pattern. | ✅ Pass |
 | XIV — Pre-Release Freedom | Not invoked — no breaking changes. | ✅ N/A |
 | XV — Strict Type Safety | Test file is TypeScript strict-mode; the only edits are removing `.fixme` and a comment block — no new types introduced, no `any` involved. Skip-guard is bash (out of scope for type-safety). | ✅ Pass |
 
@@ -71,19 +71,22 @@ debrief-future/
 │       │   └── base.ts                       # (untouched — provides `codeServerPage` fixture)
 │       ├── models/
 │       │   └── code-server-page.ts           # (untouched — `getLogPanelFrame()` at line 602 must resolve consistently post-#142)
+│       ├── playwright.config.ts              # (untouched — the config the canonical `npx playwright test --config tests/e2e/playwright.config.ts` invocation uses)
+│       ├── helpers/
+│       │   └── webview-injector.ts           # ⚠️ CHECK importers per FR-006: delete only if `test-webview-probe.spec.ts` was its sole consumer; otherwise leave and note the orphan question in evidence/
+│       ├── test-webview-probe.spec.ts        # 🗑️ DELETE per FR-006 (POC superseded by `test-webview-resolve.spec.ts`)
 │       └── test-log-panel.spec.ts            # ✏️ EDIT: `test.describe.fixme(...)` → `test.describe(...)`; delete the #233 mute comment (~lines 11–18)
 ├── scripts/
 │   └── check-log-panel-skip-guard.sh         # ✏️ RESTORE: re-create from `git show 5385f6e8:scripts/check-log-panel-skip-guard.sh`
-├── apps/
-│   └── vscode/
-│       └── tests/
-│           └── e2e/
-│               └── run-playwright.mjs        # (untouched — the runner used to verify locally)
 ├── Taskfile.yml                              # ✏️ EDIT: re-add `bash scripts/check-log-panel-skip-guard.sh` under `lint:` task; remove the #233 explanatory comment block (lines 115–120)
+├── specs/233-resuspend-log-panel-e2e/
+│   ├── evidence/
+│   │   └── muted-suite-triage.md             # ✨ NEW per FR-007: 16-row catalog of #143-blocked suites
+│   └── research.md                           # ✏️ EDIT per FR-008: add "Decision 6 — Skip-guard scaling"
 └── BACKLOG.md                                # ✏️ EDIT: strike-through row 233; status `complete`
 ```
 
-**Structure Decision**: This is a tests + lint-gate restoration feature. No `Option 1/2/3` source-tree decision applies — the work lives entirely in `tests/e2e/`, `scripts/`, `Taskfile.yml`, and `BACKLOG.md`. The five edits above are surgical and ship together as one atomic commit per FR-001..FR-005.
+**Structure Decision**: This is a tests + lint-gate restoration feature, plus the three review-pulled-in adjacents (probe disposal, muted-suite triage, skip-guard scaling decision). No `Option 1/2/3` source-tree decision applies — the work lives entirely in `tests/e2e/`, `scripts/`, `Taskfile.yml`, `BACKLOG.md`, and the spec directory. The eight edits above ship together as one atomic commit per FR-001..FR-008 (the FR-007 evidence file and FR-008 research decision do not depend on CI green status — they are documentation deliverables that can be authored before the un-mute is verified).
 
 ## Media Components
 

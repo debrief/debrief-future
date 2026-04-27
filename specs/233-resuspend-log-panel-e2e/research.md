@@ -53,6 +53,20 @@ This document resolves the unknowns surfaced during planning. The spec arrived w
   - *Keep an abbreviated "see spec 233 for history" pointer comment*: Rejected — Story 2's audit trail lives in the spec itself; the test file is not the right place for historical pointers once the issue is resolved.
   - *Replace with a one-line "#233 reactivated 2026-MM-DD" comment*: Marginally tempting, but git blame on the same line gives the same information without code-comment noise. Rejected.
 
+### Decision 6 — Skip-guard scaling (decision only, per FR-008)
+
+- **Decision**: **Keep the per-suite bash + grep pattern; do NOT generalise yet.** Each future un-mute spec authors its own `scripts/check-<suite>-skip-guard.sh` (cloned from `check-log-panel-skip-guard.sh` and re-pointed) and adds the corresponding line to `Taskfile.yml`'s `lint:` task. Implementation of this pattern in any other suite is OUT of scope for this PR (FR-008 explicit).
+- **Rationale**:
+  1. *Per-suite scripts already match the existing `scripts/check-*.sh` family* (`check-adr-refs.sh`, `check-tracer-plan-refs.sh`, etc. — all single-purpose, single-file, single-regex). Adding a parametrised wrapper would be the *only* `check-*.sh` script in the repo that takes an argument; that's a higher-friction departure than just copying the 41-line template each time.
+  2. *Sixteen muted suites is finite and known* (FR-007 lists them). The recurrence rate of "new un-mute spec needs a skip-guard" is bounded above by sixteen between now and #143's resolution — and each un-mute already authors a focused spec (per the Story 2 precedent), so the marginal cost of also cloning a 41-line bash file is negligible.
+  3. *ESLint rule alternative* would require teaching ESLint about a Playwright-specific lexicon (`test.describe.skip` etc.) and selectively applying it per file. That's higher complexity than `bash + grep`, with no offsetting flexibility (the same regex works in both).
+  4. *Generalised `scripts/check-suite-skip-guard.sh <file>`* is plausible but creates a new failure mode: if the wrapper is invoked with a typo'd path it silently passes (no file matches the regex). The per-suite script makes the path a hard-coded invariant, so this class of bug is unrepresentable.
+- **Consequence for future un-mute specs**: The per-suite template stays as-is. Every un-mute spec following the #233 pattern (Story 2) MUST include FR-005-equivalent language specifying its own per-suite skip-guard restoration. If/when the count of per-suite scripts exceeds twenty, revisit the decision in a dedicated tech-debt spec — twenty being the point at which the duplication outweighs the per-script clarity.
+- **Alternatives considered (logged in detail per FR-008's "decide and record rationale" requirement)**:
+  - *Parametrised `scripts/check-suite-skip-guard.sh <file>`*: Rejected on (4) above and on the inconsistency with the rest of the `check-*.sh` family.
+  - *ESLint rule (`no-test-skip` or similar) with a path-based opt-in*: Rejected on (3) above; also requires the ESLint pass to run against `tests/e2e/` (which it currently does, so the cost there is zero — but the ESLint config surface for per-suite opt-in is heavier than 41 lines of bash).
+  - *Pre-commit hook instead of `task lint`*: Rejected — pre-commit hooks bypass via `--no-verify` are already a pattern Constitution Article XIII.1 forbids; the lint-gate placement is the right enforcement point.
+
 ---
 
 ## Best Practices
@@ -87,8 +101,11 @@ All unknowns flagged during Technical Context filling are now closed:
 | Has #142 actually merged? | Yes — backlog struck-through, PR #548 merged 2026-04-25, research.md status "Resolved". |
 | What is the exact root cause #142 fixed? | `isBodyVisible()` gate in openvscode-server's `oc()` resolution method; Patch 3 removes the gate, `resolveWebviewView` now fires. |
 | Source SHA for the skip-guard restoration? | `5385f6e8` (per spec line 90); script is 41 lines of bash, restored verbatim. |
-| Atomicity boundary for the commit? | All five FRs ship in one commit (Decision 2). |
+| Atomicity boundary for the commit? | All FRs (FR-001..FR-008 after review pull-in) ship in one commit (Decision 2). |
 | How many CI runs before merging? | Three consecutive on the feature branch (Decision 4). |
 | Comment surface to remove? | Test file lines 11–18 + Taskfile.yml lines 115–120 (Decision 5). |
+| Should the skip-guard pattern generalise? | No — keep per-suite scripts, revisit at >20 (Decision 6, per FR-008). |
+| Is the webview-injection POC still useful? | No — `test-webview-resolve.spec.ts` supersedes it post-Patch-3; delete `test-webview-probe.spec.ts` per FR-006. |
+| What's the inventory of still-muted E2E suites? | Sixteen suites blocked on **#143** (separate from #142). Catalogued at `evidence/muted-suite-triage.md` per FR-007. |
 
 No `NEEDS CLARIFICATION` markers remain.
