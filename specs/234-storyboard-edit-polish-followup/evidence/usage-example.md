@@ -2,6 +2,8 @@
 
 This walks through the user-visible surfaces the partial implementation in this session adds. Phase 3 / 5 / 7 surfaces (interactive stories, a11y audit, GIF, scenario set) need follow-up commits.
 
+**Architecture note 2026-04-27:** Phase 3 was originally specified as `PortContext` + `OutboundMessage` + production webview rewrite. ADR-027 pivots Phase 3 to a callback-adapter helper (`useStoryOnlyMockHandlers`) — `<StoryboardPanel>` stays purely presentational; production code is untouched. The follow-up commits implement the simpler architecture. See `research.md` R10b + `contracts/harness-knobs.md` §2.
+
 ## 1. Foundation — `composeSceneEditViewModels` is now a contracted public API
 
 ```sh

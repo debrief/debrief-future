@@ -178,7 +178,11 @@ No new patterns invented; every new file slots into a pattern that already exist
 
 ---
 
-## R10 — `PortContext` injection + no-provider failure mode (review-driven)
+## R10 — `PortContext` injection + no-provider failure mode (review-driven) — **SUPERSEDED by R10b (2026-04-27)**
+
+> **Superseded.** This research item was the basis for plan v1's `PortContext` + `OutboundMessage` architecture. It is preserved here for the audit trail. The adopted decision is in **R10b** below; the architectural pivot is recorded in **ADR-027** (`docs/project_notes/decisions.md`).
+>
+> Summary of supersession reasoning: re-examination of `apps/vscode/src/webview/web/storyboardPanel.tsx:170-260` confirmed the panel is already cleanly presentational with ~20 callback props; the postMessage translation lives in the webview entry (production) and harness (test). The "prop drilling" + "idiomatic context" rationale below compares the new port architecture against a different new architecture (port-as-prop), not against the current callback-prop architecture. The shared-behavioural-layer goal (FR-003) is met by a callback-adapter helper (R10b) without rewriting the panel internals or the production webview entry.
 
 ### Decision
 Introduce a React context `PortContext` (defined alongside the reducer in `shared/components/src/panels/StoryboardPanel/`) whose value is a `MockPortHandle['port']`-shaped object (`{ postMessage(msg): void }`). The production webview entry (`apps/vscode/src/webview/web/storyboardPanel.tsx`) wraps the panel in `<PortContext.Provider value={vscode}>` where `vscode = acquireVsCodeApi()`. The harness + stories wrap the panel in `<PortContext.Provider value={mockPort.port}>`.
@@ -198,6 +202,100 @@ The default context value is **NOT undefined**. It is a port shim that throws `E
 
 ### Test coverage (T1A)
 Unit test in `shared/components/src/panels/StoryboardPanel/__tests__/PortContext.test.tsx` covers: (a) provider supplies port → dispatch → message emitted; (b) no provider → mount succeeds → dispatch throws the documented error message.
+
+---
+
+## R10b — Shared callback-adapter helper (adopted; supersedes R10)
+
+### Decision
+
+Introduce a **single shared callback-adapter helper** at `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`:
+
+```ts
+export interface MockHandlersHandle {
+  /** Live state — read in the consumer for rendering. */
+  readonly state: StoryboardEditReducerState;
+  /** Dispatch a reducer action directly (escape hatch for stories that
+   *  want to seed state without going through the panel UI). */
+  readonly dispatch: (action: StoryboardEditAction) => void;
+  /** The handlers spread — pass directly into <StoryboardPanel {...handlers}>.
+   *  Each handler translates a panel callback into the corresponding
+   *  reducer dispatch (post-knob filter for failure injection). */
+  readonly handlers: Pick<
+    StoryboardPanelProps,
+    | 'onSceneRowClick'
+    | 'onSceneRowExpandToggle'
+    | 'onSceneOverflowMenuOpen'
+    | 'onSceneOverflowMenuClose'
+    | 'onSceneEditFormCancel'
+    | 'onSceneTitleRenameCommit'
+    | 'onSceneDescriptionSubmit'
+    | 'onSceneDeleteRequested'
+    | 'onSceneUndoDeleteClicked'
+    | 'onSceneUpdateToCurrentClicked'
+    | 'onSceneDuplicateClicked'
+    | 'onSceneCopyToOtherClicked'
+    | 'onSceneRefreshThumbnailClicked'
+    | 'onStoryboardRefreshAllStaleClicked'
+    | 'onStoryboardNameRenameCommit'
+    | 'onStoryboardDescriptionSubmit'
+    | 'onUndoToastDismiss'
+    | 'onCaptureClick'
+  >;
+}
+
+export function useStoryOnlyMockHandlers(
+  seed: SceneEditFixtureSeed,
+  knobs?: MockPortKnobs,
+): MockHandlersHandle;
+```
+
+The harness imports it; each of the four stories imports it. Knobs (`induceCopyFailure`, `induceRefreshFailure`) thread through to the relevant handler bodies, deterministically routing matching sceneIds to failure-branch dispatches.
+
+### Why this over R10's PortContext
+
+| Concern | R10 (PortContext) | R10b (callback adapter) |
+|---------|-------------------|--------------------------|
+| `<StoryboardPanel>` reusability | Coupled to a port provider | Stays purely presentational |
+| Production code path change | Rewrites `apps/vscode/src/webview/web/storyboardPanel.tsx` | Untouched |
+| New types introduced | `OutboundMessage` discriminated union (~20 variants) | None — uses existing `Pick<StoryboardPanelProps>` |
+| Files touched in panel internals | SceneRow, SceneOverflowMenu, StoryboardHeader, … (every emitter) | None |
+| Single behavioural layer (FR-003) | ✅ via mock-port helper | ✅ via mock-handlers helper |
+| Failure-injection knobs (FR-043) | Inside mock-port handlers | Inside callback-adapter handlers |
+| Smoke E2E gate (T022) needed | Yes (production webview rewrite is risky) | Yes (the harness refactor still needs it, but the blast radius is the harness file alone) |
+| Phase 3 estimate | Multi-hour; cross-cutting | 30–60 min; additive |
+
+### What R10's "throwing default port" addresses, in this model
+
+R10 worried about a silent `undefined.postMessage` if a developer mounts the panel without wrapping it. In the callback-prop model:
+
+- All edit-suite callbacks (`onSceneTitleRenameCommit`, etc.) are **optional + defaulted** (the panel falls back to no-op for unwired hosts — see `StoryboardPanelProps`).
+- A consumer that wires the panel without the helpers gets exactly today's behaviour: clicks fire their callbacks, callbacks default to no-op, panel renders. This is the existing #216/#217/#218 reality.
+- A consumer that wires *some* callbacks but misses one for an action it cares about fails the same way callbacks always do — at the React render boundary with a typed prop signature, not deep in event handlers.
+
+So Article I.3 (no silent failures) is honoured by the existing prop typing — no throwing default needed.
+
+### Test coverage (replaces R10's T1A)
+
+Unit test in `shared/components/src/panels/StoryboardPanel/__testing__/__tests__/storyOnlyMockHandlers.test.ts`:
+
+- (a) seed → `state` matches the fixture;
+- (b) `handlers.onSceneTitleRenameCommit('s1', 'new')` → next render shows new title;
+- (c) `handlers.onSceneDeleteRequested('s1')` → row removed AND `pendingUndoToast` populated;
+- (d) `knobs.induceCopyFailure === 's1'` → `onSceneCopyToOtherClicked('s1')` dispatches the failure-branch action;
+- (e) `knobs.induceRefreshFailure === 's2'` → `onSceneRefreshThumbnailClicked('s2')` dispatches the failure-branch action.
+
+Five cases, no DOM, no Storybook, no Playwright — pure vitest against the helper + reducer.
+
+### What changes elsewhere in this research file
+
+R1's "shared mock-port" terminology is read as "shared mock-handlers" going forward. Bidirectional knobs (induceCopyFailure / induceRefreshFailure) still flow via `MockPortKnobs` — the type name is retained because data-model.md §1 already pins it. Cross-references that mention "the mock-port helper" should be read as "the mock-handlers helper" until the spec text catches up.
+
+### See also
+
+- **ADR-027** (`docs/project_notes/decisions.md`) — the architecture pivot record, including the Constitution Article XV note (callback-prop surface remains strict-typed).
+- **contracts/harness-knobs.md §2** — the helper API contract; §3 (PortContext) deleted.
+- **data-model.md §1** (`MockPortKnobs` retained) — §4 (`PanelPort`) deleted.
 
 ---
 

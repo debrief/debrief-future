@@ -8,6 +8,8 @@
 **Contracts**: [contracts/harness-knobs.md](./contracts/harness-knobs.md)
 **Quickstart**: [quickstart.md](./quickstart.md)
 
+> **Architecture pivot 2026-04-27 (ADR-027):** Phase 2's `PortContext` (T008/T009/T010) and Phase 3's production-webview wrap (T020) are **dropped**. The shared behavioural layer is delivered by `useStoryOnlyMockHandlers` — a callback-adapter helper that returns `{state, dispatch, handlers}`; the harness + each upgraded story spread `{...handlers}` onto `<StoryboardPanel>`. `<StoryboardPanel>` stays purely presentational. Tasks T011/T012/T021/T023-T026 are revised to reflect this. See `research.md` R10b + `contracts/harness-knobs.md` §2.
+
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`.
 
 > **ffmpeg required** — FR-045 wires `task verify:ffmpeg` into `task verify`; install via Homebrew (`brew install ffmpeg`), apt, or scoop. Prior art: #217 T520, #189 T048.
@@ -71,10 +73,10 @@
 
 ## Phase 2: Foundation
 
-**Goal**: Land the shared building blocks every user story depends on — the `PortContext`, the shared mock-port helper, the extended query-string parser, the public-API contract for `composeSceneEditViewModels`, the ESLint rule, and the Taskfile ffmpeg check. Nothing in Phase 3+ runs cleanly until this is green.
+**Goal**: Land the shared building blocks every user story depends on — the shared callback-adapter helper, the extended query-string parser, the public-API contract for `composeSceneEditViewModels`, the ESLint rule, and the Taskfile ffmpeg check. Nothing in Phase 3+ runs cleanly until this is green. (Per ADR-027 the `PortContext` no longer features.)
 
 **Independent test criteria**: After this phase:
-- `pnpm --filter @debrief/components test PortContext` passes (T1A unit test).
+- `pnpm --filter @debrief/components test storyOnlyMockHandlers` passes (T1A unit test, post-ADR-027).
 - `pnpm --filter @debrief/web-shell test storyboard-edit-harness-querystring` passes (T3A unit test).
 - `pnpm lint` fails when a temporary import of `**/__testing__/**` is added under `apps/vscode/src/**` (FR-044 enforcement).
 - `task verify:ffmpeg` exits 0 with ffmpeg present, exits non-zero with a remediation message when ffmpeg is missing (FR-045).
@@ -86,15 +88,16 @@
 - [x] T006 Add an "Unreleased — Public API" entry to `shared/components/CHANGELOG.md` promoting `composeSceneEditViewModels` from "exported helper" to "public API with perf invariant"; cite FR-046
 - [x] T007 Update the JSDoc on `composeSceneEditViewModels` in `shared/components/src/panels/StoryboardPanel/types.ts` (line 325) to point at `CONTRACTS.md`
 
-### `PortContext` (D3A)
+### ~~`PortContext` (D3A)~~ — **REMOVED 2026-04-27 (ADR-027)**
 
-- [ ] T008 Create the React context, default thrower port, and `usePanelPort()` hook per contracts/harness-knobs.md §3 `shared/components/src/panels/StoryboardPanel/PortContext.tsx`
-- [ ] T009 [test] Unit test the provider + no-provider-throws behaviour per T1A `shared/components/src/panels/StoryboardPanel/__tests__/PortContext.test.tsx`
-- [ ] T010 Wire `StoryboardPanel.tsx` to consume the port via `usePanelPort()` instead of any direct `acquireVsCodeApi()` call (production webview entry will provide the value in Phase 3 step T020) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+> Removed. The shared behavioural layer is delivered by the callback-adapter helper below; no React context is introduced. Original tasks T008/T009/T010 (`PortContext.tsx`, `PortContext.test.tsx`, panel rewires) are dropped.
 
-### Shared story-only mock-port helper (FR-003)
+### Shared story-only mock-handlers helper (FR-003)
 
-- [ ] T011 Create the `__testing__/` directory and add the shared mock-port helper exporting `useStoryOnlyMockPort`, `MockPortKnobs`, `SceneEditFixtureSeed`, `SceneFixtureSeed` per contracts/harness-knobs.md §2 + data-model.md §2 (uses `Pick<SceneRowViewModel, ...>` composition — D2A) `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockPort.ts`
+- [ ] T008 [test] Unit-test the shared callback-adapter helper per T1A: (a) seed → `state` matches fixture; (b) `handlers.onSceneTitleRenameCommit('s1','new')` → state shows new title; (c) `handlers.onSceneDeleteRequested('s1')` → row removed AND `pendingUndoToast` populated; (d) `knobs.induceCopyFailure==='s1'` → `onSceneCopyToOtherClicked('s1')` dispatches the failure-branch action; (e) `knobs.induceRefreshFailure==='s2'` → `onSceneRefreshThumbnailClicked('s2')` retains the stale flag. `shared/components/src/panels/StoryboardPanel/__testing__/__tests__/storyOnlyMockHandlers.test.ts` *(post-ADR-027 — replaces the deleted T009 PortContext test)*
+- [ ] T009 *(reserved — was the PortContext unit test; replaced by T008 above. Kept as a placeholder so downstream task IDs stay stable.)*
+- [ ] T010 *(reserved — was `StoryboardPanel.tsx` rewires to `usePanelPort()`; not needed in the callback-adapter architecture. The panel's existing callback-prop surface is the test seam.)*
+- [ ] T011 Create the `__testing__/` directory and add the shared callback-adapter helper exporting `useStoryOnlyMockHandlers`, `MockPortKnobs`, `SceneEditFixtureSeed`, `SceneFixtureSeed`, `MockHandlers` per contracts/harness-knobs.md §2 + data-model.md §1, §2 (uses `Pick<SceneRowViewModel, ...>` for the seed and `Pick<StoryboardPanelProps, ...>` for the handlers — D2A) `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`
 - [ ] T012 Re-export the helper from the panel barrel so harness + stories import via the package surface (2A convention) `shared/components/src/panels/StoryboardPanel/index.ts`
 
 ### Extended query-string parser (FR-043, dual-knob)
@@ -111,9 +114,9 @@
 
 - [x] T017 Add the `verify:ffmpeg` target (or inline check) that runs `ffmpeg -version >/dev/null 2>&1` and exits non-zero with a clear remediation message ("ffmpeg required for GIF capture (#234 FR-045) — install via Homebrew/apt/scoop") when missing; wire it as a dependency of `verify` `Taskfile.yml`
 
-### Parallel-execution example for Phase 2
+### Parallel-execution example for Phase 2 (revised post-ADR-027)
 
-T005, T006, T008, T011, T013, T015, T017 touch independent files and may run in parallel; T007/T010/T012/T016 depend on their respective siblings. T009 and T014 are tests that depend on the implementation files (T008 + T013 respectively).
+T005, T006, T011, T013, T015, T017 touch independent files and may run in parallel; T007/T012/T016 depend on their respective siblings. T008 (helper unit test) depends on T011 (helper exists). T014 (parser unit test) depends on T013. T009/T010/T020 are removed (PortContext path).
 
 ## Phase 3: US1 — Interactive Storybook (P1)
 
@@ -121,20 +124,20 @@ T005, T006, T008, T011, T013, T015, T017 touch independent files and may run in 
 
 **Independent test criteria**: `pnpm --filter @debrief/components storybook` opens; each of the four stories responds to the documented interactions (chevron → edit form, Delete → Undo cycle, Refresh badge, keyboard-Tab to remediation). The smoke E2E suite (`storyboard-edit.spec.ts`) continues to pass after the harness has been refactored to use the shared helper.
 
-### Production webview wiring (D3A — provider value comes from `acquireVsCodeApi()`)
+### ~~Production webview wiring (D3A)~~ — **REMOVED 2026-04-27 (ADR-027)**
 
-- [ ] T020 Wrap the production `StoryboardPanel` mount in `<PortContext.Provider value={acquireVsCodeApi()}>` so the panel resolves its outbound port via context in production too (depends on T008 + T010) `apps/vscode/src/webview/web/storyboardPanel.tsx`
+- [ ] T020 *(removed — the production webview entry `apps/vscode/src/webview/web/storyboardPanel.tsx` is unchanged. `<StoryboardPanel>` stays purely presentational and continues to use callback props. No `<PortContext.Provider>` wrap.)*
 
-### Refactor the harness to import the shared mock-port (FR-003)
+### Refactor the harness to import the shared mock-handlers helper (FR-003)
 
-- [ ] T021 Replace the harness's inline mock-extension layer with `useStoryOnlyMockPort` from the shared helper; wrap `<StoryboardPanel>` in `<PortContext.Provider value={mockPort.port}>`; preserve the existing reducer wiring (the harness already calls `useStoryboardEditReducer()` at line 117 — that does not change). Depends on T011 + T012 + T010 `apps/web-shell/src/StoryboardEditHarness.tsx`
+- [ ] T021 Replace the harness's inline reducer + handler wiring with `useStoryOnlyMockHandlers` from the shared helper. Spread the returned `handlers` onto the panel: `<StoryboardPanel ...stateProps {...handlers} />`. Thread the parsed query-string knobs (`induceCopyFailure`, `induceRefreshFailure`) through to the helper. **No `PortContext.Provider` wrap (post-ADR-027).** The harness's existing `useStoryboardEditReducer()` call at line 117 is removed — `useStoryOnlyMockHandlers` owns the reducer wiring now. Depends on T011 + T012. `apps/web-shell/src/StoryboardEditHarness.tsx`
 - [ ] T022 Run the existing storyboard-edit smoke E2E to prove the refactor preserves behaviour: `cd apps/web-shell && node run-playwright.mjs storyboard-edit` — record output to `specs/234-storyboard-edit-polish-followup/evidence/harness-refactor-smoke.txt`
 
 ### Upgrade the four stories (FR-001, FR-002)
 
-- [ ] T023 Upgrade `WithEditForm` (line 232): replace `args` with a render function that calls `useStoryOnlyMockPort(seed)` and wraps in `<PortContext.Provider>`; demonstrates form open/submit/cancel `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [ ] T023 Upgrade `WithEditForm` (line 232): replace `args` with a render function that calls `useStoryOnlyMockHandlers(seed)` and spreads `{...handlers}` onto `<StoryboardPanel>`; demonstrates form open/submit/cancel. **No `PortContext.Provider` wrap.** `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 - [ ] T024 Upgrade `WithUndoToast` (line 256): same pattern; demonstrates delete + Undo cycle `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T025 Upgrade `WithStaleBadge` (line 281): pass `{ induceRefreshFailure: '<sceneId>' }` knob via story args so the failure toggle is exercisable from Storybook controls `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [ ] T025 Upgrade `WithStaleBadge` (line 281): pass `{ induceRefreshFailure: '<sceneId>' }` knob via story args so the failure toggle is exercisable from Storybook controls. The story render reads it from args and passes it to `useStoryOnlyMockHandlers(seed, knobs)`. `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 - [ ] T026 Upgrade `WithMissingDataRemediation` (line 301): same pattern; demonstrates keyboard-Tab focus + Enter dispatch `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
 ### Verification
@@ -144,7 +147,7 @@ T005, T006, T008, T011, T013, T015, T017 touch independent files and may run in 
 
 ### Parallel-execution example for Phase 3
 
-T023, T024, T025, T026 all edit the same `StoryboardPanel.stories.tsx` file → must run sequentially. T020 and T021 touch different files and may run in parallel after their dependencies. T022 + T027 + T028 depend on the upgrades being complete.
+T023, T024, T025, T026 all edit the same `StoryboardPanel.stories.tsx` file → must run sequentially. T021 (harness refactor) is independent. T022 + T027 + T028 depend on the upgrades being complete. (T020 was removed — no production-webview wrap step in the callback-adapter architecture.)
 
 ## Phase 4: US2 — Code-server chrome E2E (P1)
 
@@ -259,9 +262,9 @@ T060 + T061 are linked (same file) → sequential. T062 + T063 depend on the tes
 - [x] T071 Check in the 50 KB sample webm fixture for the helper's unit test (1 second of solid colour) `apps/web-shell/playwright/fixtures/sample.webm`
 - [x] T072 [test] Unit-test the helper per T2A: output GIF exists, fps ≤ 12, size > 0, duration matches input ± 0.1 s; skip when ffmpeg missing locally `apps/web-shell/playwright/helpers/__tests__/videoToGif.test.ts`
 
-### Wire the dual-knob into the harness mock-port (FR-043 — depends on T013/T014/T021)
+### Wire the dual-knob into the harness mock-handlers (FR-043 — depends on T013/T014/T021)
 
-- [ ] T073 Pass parsed knobs from `parseStoryboardEditHarnessQueryString()` into `useStoryOnlyMockPort(seed, knobs)` so both `induceCopyFailure` and `induceRefreshFailure` reach the mock-port handlers `apps/web-shell/src/StoryboardEditHarness.tsx`
+- [ ] T073 Pass parsed knobs from `parseStoryboardEditHarnessQueryString()` into `useStoryOnlyMockHandlers(seed, knobs)` so both `induceCopyFailure` and `induceRefreshFailure` reach the failure-branch handlers (post-ADR-027) `apps/web-shell/src/StoryboardEditHarness.tsx`
 
 ### Seven new web-shell scenarios (FR-040, FR-041)
 
@@ -297,7 +300,7 @@ T070 + T071 + T073 touch independent files and may run in parallel. T072 depends
 
 ### Final CI gate
 
-- [ ] T090 Run the full pre-push gate from CLAUDE.md "Before Pushing": `task verify` — must include `verify:ffmpeg` (FR-045), `pnpm lint` (FR-044 ESLint rule active), `pyright`, all unit tests (incl. PortContext, querystring parser, a11y categoriser, videoToGif, perf), web-shell Playwright (incl. a11y + GIF), code-server Playwright. All green; record output to `specs/234-storyboard-edit-polish-followup/evidence/final-verify.txt`
+- [ ] T090 Run the full pre-push gate from CLAUDE.md "Before Pushing": `task verify` — must include `verify:ffmpeg` (FR-045), `pnpm lint` (FR-044 ESLint rule active), `pyright`, all unit tests (incl. storyOnlyMockHandlers, querystring parser, a11y categoriser, videoToGif, perf), web-shell Playwright (incl. a11y + GIF), code-server Playwright. All green; record output to `specs/234-storyboard-edit-polish-followup/evidence/final-verify.txt`
 
 ### Evidence Collection
 
@@ -328,9 +331,9 @@ T091, T092, T093, T094 are independent and may run in parallel. T095 depends on 
 Phase 1 (Setup)
    │
    ▼
-Phase 2 (Foundation: PortContext, mock-port, parser, contracts, ESLint, Taskfile)
+Phase 2 (Foundation: shared mock-handlers helper, parser, contracts, ESLint, Taskfile)
    │
-   ├──────────► Phase 3 (US1 — Interactive Storybook) ────► gated by T021 + T020 (production wiring) + T011/T012 (mock-port + barrel)
+   ├──────────► Phase 3 (US1 — Interactive Storybook) ────► gated by T021 (harness refactor) + T011/T012 (helper + barrel). T020 removed post-ADR-027.
    │
    ├──────────► Phase 4 (US2 — Code-server chrome E2E) ──► independent of US1; gated only by Phase 1 baseline
    │
@@ -345,7 +348,7 @@ Phase 2 (Foundation: PortContext, mock-port, parser, contracts, ESLint, Taskfile
 ```
 
 **Hard prerequisites**:
-- T020 (production webview wraps in PortContext.Provider) MUST land before T021 (harness refactor) is verified — otherwise the smoke E2E uses inconsistent wiring.
+- T011 + T012 (shared mock-handlers helper + barrel re-export) MUST land before T021 (harness refactor) and T023-T026 (story upgrades). The helper is the single behavioural source FR-003 requires.
 - T013 + T014 (dual-knob parser) MUST land before T077 + T080 (the failure-injection scenarios).
 - T070 + T071 + T072 (videoToGif helper + fixture + unit test) MUST land before T081 (interaction GIF spec depends on the helper).
 - T015 + T017 (ESLint + Taskfile) MUST land before T090 (final CI gate exercises both).
@@ -362,8 +365,8 @@ This is a **closure feature** — each user story closes a deferred item from #2
 
 **Recommended commit cadence** (one PR, multiple commits):
 
-1. **Phase 2 foundation commit** — lands the shared building blocks (PortContext, mock-port helper, dual-knob parser, CONTRACTS.md + CHANGELOG entry, ESLint rule, Taskfile target). Self-contained; verifiable via the unit tests added in the same commit. Bumps `pnpm lint` + `task verify` surface area.
-2. **US1 commit (Phase 3)** — production webview wraps in PortContext + harness refactor + 4 story upgrades + smoke regression. Headline ergonomics win. Visible in Storybook on first hover.
+1. **Phase 2 foundation commit** — lands the shared building blocks (mock-handlers helper, dual-knob parser, CONTRACTS.md + CHANGELOG entry, ESLint rule, Taskfile target). Self-contained; verifiable via the unit tests added in the same commit. Bumps `pnpm lint` + `task verify` surface area. (PortContext removed per ADR-027.)
+2. **US1 commit (Phase 3)** — harness refactor (replace inline reducer + handlers with `useStoryOnlyMockHandlers`) + 4 story upgrades + smoke regression. Headline ergonomics win. Visible in Storybook on first hover. **Production webview entry untouched.**
 3. **US2 commit (Phase 4)** — code-server chrome E2E spec + native-chrome screenshot. Slowest single test addition (~150 LOC); landed alone so triage is easy if a flake surfaces.
 4. **US3 commit (Phase 5)** — a11y categoriser + audit spec + report + raw JSON. Includes any moderate-violation accepted-risk entries.
 5. **US4 commit (Phase 6)** — perf test + regression-loud verification + perf-budget evidence. Smallest commit but the highest insurance value.
@@ -371,7 +374,7 @@ This is a **closure feature** — each user story closes a deferred item from #2
 7. **Polish commit (Phase 8)** — evidence files + shipped-post.md + final `task verify` output. Followed by `/speckit.pr`.
 
 **Risk-management notes**:
-- Phase 2's PortContext default-thrower is the load-bearing piece; if it lands wrong, every downstream story sees confusing errors. Land it first, exercise its unit test, then build on top.
+- Phase 2's shared mock-handlers helper is the load-bearing piece; if its handler-to-dispatch mapping is wrong, every downstream story sees confusing reducer state. Land it first, exercise its unit test (T008), then build on top. (Plan v1's PortContext default-thrower risk is moot — there is no PortContext.)
 - The ffmpeg `task verify:ffmpeg` (T017) is also Phase 2 — running it before Phase 7 starts means the GIF helper never fails locally for a missing-binary reason that would otherwise look like a Playwright bug.
 - Phase 5's a11y audit is sequenced **after** Phase 3 because the 4 upgraded stories are part of the audit surface (FR-021). Running it earlier would only audit the 3 harness states.
 - Phase 6's perf test references `CONTRACTS.md`, written in Phase 2 (T005). Sequencing matters for the failure-message integrity (FR-032 + FR-046).

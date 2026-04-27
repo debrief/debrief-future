@@ -993,3 +993,49 @@ The legacy `'vscode'` value is **retired**. Inside a VS Code webview, the varian
 - Screenshot supplied by owner (2026-04-26) — confirmed `sequenceDiagram` body of #210 post rendering as raw text on live site.
 - Implementing PR: [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90) (submitted 2026-04-26; the patch landed in `_layouts/future-post.html` at end-of-file rather than before `</body>` because the post layout delegates to `_layouts/future-default.html` for the document shell — see implementation notes in the spike doc).
 - End-to-end verification (2026-04-26): owner confirmed a freshly-published meta-post drafted from `specs/999-mermaid-blog-rendering/spec.md` renders its embedded `flowchart LR` Mermaid diagram as an SVG on `debrief.github.io`, closing the cycle from author-side fence → kramdown → layout shim → CDN runtime → rendered SVG.
+
+### ADR-027: Storyboard edit-suite test seam — callback adapter, not PortContext (#234, 2026-04-27)
+
+**Decision.** Feature 234's "interactive Storybook + shared mock layer" goal is met with a **callback-adapter helper** (`useStoryOnlyMockHandlers(seed, knobs)` returning `{state, dispatch, handlers}`) that the harness + four edit-suite stories spread onto `<StoryboardPanel {...handlers} />`. The previously-planned `PortContext` + `OutboundMessage` discriminated union + production webview rewrite (#234 plan v1) is **not** adopted.
+
+**Context.** Feature 234 plan v1 introduced `PortContext` so `<StoryboardPanel>` would emit typed `OutboundMessage` values via a context-supplied port; production wrapped with `<PortContext.Provider value={acquireVsCodeApi()}>`, harness/stories with `<PortContext.Provider value={mockPort.port}>`. The stated rationale (research R10) was idiomatic-context, prop-drilling avoidance, and a throwing default for "no provider" misuse.
+
+Re-examination of the current code (`apps/vscode/src/webview/web/storyboardPanel.tsx:170-260`) found the panel is **already cleanly presentational**: it declares ~20 callback props; the webview entry translates each callback to `vscode.postMessage(...)`, and the harness translates each callback to `useStoryboardEditReducer().dispatch(...)`. The translation layer is the only repetition; the panel itself emits no postMessage and is reusable in any host.
+
+The `PortContext` proposal would have:
+
+1. Defined a new `OutboundMessage` discriminated union (~20 variants).
+2. Pushed `usePanelPort()` into every panel sub-component that today fires a callback (SceneRow, SceneOverflowMenu, StoryboardHeader, the edit form, the toast, …).
+3. Rewritten the production webview entry (`apps/vscode/src/webview/web/storyboardPanel.tsx`) to drop ~50 lines of postMessage glue in favour of one provider.
+4. Required a smoke E2E pass (T022) as the only regression gate against a wrong port wiring deep in event handlers.
+
+**Decision rationale.**
+
+- **The "prop drilling" objection in research R10 is a strawman.** The current callback props are already prop-drilled — that's the existing idiom. Replacing N callback props with N message variants threaded through `usePanelPort()` is not less drilling; it just relocates the surface.
+- **The panel becomes less reusable, not more.** Today it is presentational and composable into any host (Storybook + harness + production). Adding `usePanelPort()` couples it to the existence of a port provider — a non-VS Code consumer would have to fake one.
+- **The "shared behavioural layer" goal (FR-003) is independent of the port abstraction.** Whether the helper exposes `port: { postMessage }` or `handlers: {...}` is a representation choice; both produce one source of truth that harness + four stories share.
+- **The throwing-default-port argument (Article I.3 — no silent failures) is moot in the callback model.** Missing a callback today produces an immediate React `prop.fn is not a function` at the call site — the same actionable error the throwing default was meant to provide.
+- **Risk profile is meaningfully lower.** Callback adapter touches: 1 new helper file (`__testing__/storyOnlyMockHandlers.ts` ≈ 80 LOC), 1 harness refactor, 4 story upgrades. PortContext touched: that plus a new `PortContext.tsx`, panel rewires, every emitter rewires, the production webview entry — gated by a single E2E run. The smaller blast radius is itself a quality.
+
+**Alternatives considered.**
+
+- **`PortContext` + typed `OutboundMessage` (plan v1).** Rejected as above. The architectural abstraction is defensible on its own merits but does not earn its cost as a side-effect of "make four stories interactive." Worth revisiting as a standalone refactor with its own spec if the production webview entry's postMessage glue grows past current scale.
+- **Patch `acquireVsCodeApi` at module scope for tests.** Rejected — couples the test seam to a global; not strict-type-safe.
+- **Callback adapter inline in each story.** Rejected — duplicates ~80 LOC across four stories; drifts the moment one story adds a knob (the FR-003 violation `PortContext` was meant to prevent, also prevented by a single shared helper).
+
+**Consequences.**
+
+- ✅ Phase 3 estimate drops from "multi-hour, cross-cutting, E2E-gated" to "30–60 min, additive, helper-gated".
+- ✅ `<StoryboardPanel>` stays presentational — no architectural debt added.
+- ✅ Production code path (`apps/vscode/src/webview/web/storyboardPanel.tsx`) is untouched; existing 2,400+ test baseline from #230 is unchanged.
+- ✅ FR-001/-002/-003/-044/-045/-046 all still met. FR-044's ESLint rule still applies — `__testing__/` is still the test-only export surface.
+- ⚠️ **Constitution Article XV (Strict Type Safety).** Plan v1 cited Article XV as supporting `PortContext` ("explicit context > module-scope global"). The callback adapter is also strict-typed: each callback prop has an explicit signature, and `useStoryOnlyMockHandlers` returns the same `Pick<StoryboardPanelProps, ...>` surface. Article XV row remains Pass; the supporting note shifts from "explicit context for IO" to "explicit callback-prop surface for IO". Flagged for transparency; no Constitution Check breach.
+- ❌ The `PortContext`-shaped audit trail (research R10) is preserved with a "Superseded by R10b" header. Reviewers asking "did you consider a typed message port?" find a written answer rather than silent absence.
+
+**Originating issue:** Feature 234, Phase 3 plan-pivot triggered by review comment 2026-04-27. Spec artefacts revised in the same commit that records this ADR.
+
+**Evidence:**
+- `specs/234-storyboard-edit-polish-followup/research.md` R10 (Superseded) + R10b (Adopted).
+- `specs/234-storyboard-edit-polish-followup/contracts/harness-knobs.md` §2 (callback-adapter API; §3 PortContext deleted).
+- `specs/234-storyboard-edit-polish-followup/data-model.md` §1 (`MockPortKnobs` retained); §4 (`PanelPort`) deleted.
+- Code touchpoints baseline: `apps/vscode/src/webview/web/storyboardPanel.tsx:170-260` (read 2026-04-27 to verify current callback architecture); `apps/web-shell/src/StoryboardEditHarness.tsx:117` (existing reducer wiring).

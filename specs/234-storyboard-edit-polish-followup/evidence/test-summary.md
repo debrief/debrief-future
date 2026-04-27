@@ -54,9 +54,9 @@ These tasks were intentionally not attempted in this session because they requir
 
 | Phase | User story | Why deferred |
 |-------|-------------|--------------|
-| 3 | US1 — Interactive Storybook stories (T020..T028) | Needs new `PortContext` + shared mock-port helper + harness refactor + 4 story upgrades; cross-cutting; smoke E2E gate. |
+| 3 | US1 — Interactive Storybook stories (T011/T012/T021..T028) — **scope reduced post-ADR-027** | Needs shared `useStoryOnlyMockHandlers` callback-adapter helper + harness refactor + 4 story upgrades; smoke E2E gate. (T008/T009/T010/T020 PortContext path dropped per ADR-027.) |
 | 5 | US3 — A11y audit spec + report + raw JSON (T052..T058) | Depends on Phase 3 (story iframes audited). Helper + tests already shipped. |
-| 7 | US5 — 7 web-shell scenarios + interaction GIF capture spec (T073..T085) | Depends on Phase 3 (harness uses shared mock port via `PortContext`). Helpers shipped. |
+| 7 | US5 — 7 web-shell scenarios + interaction GIF capture spec (T073..T085) | Depends on Phase 3 (harness imports `useStoryOnlyMockHandlers`). Helpers shipped. |
 | 8 | Final `task verify` + shipped-post.md + `/speckit.pr` (T090..T096) | Gated on Phases 3, 5, 7 above. |
 
 ## What this evidence covers

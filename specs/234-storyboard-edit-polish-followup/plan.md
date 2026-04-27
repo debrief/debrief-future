@@ -1,11 +1,12 @@
 # Implementation Plan: Storyboard Edit Suite — Polish Follow-up (stories, code-server E2E, a11y, perf, scenario completion)
 
-**Branch**: `234-storyboard-edit-polish-followup` | **Date**: 2026-04-26 | **Spec**: [spec.md](./spec.md)
+**Branch**: `234-storyboard-edit-polish-followup` | **Date**: 2026-04-26 (revised 2026-04-27) | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/234-storyboard-edit-polish-followup/spec.md`
+**Architecture pivot 2026-04-27 (ADR-027):** Phase 3's shared behavioural layer is delivered via a callback-adapter helper, not `PortContext`. See `research.md` R10b + `contracts/harness-knobs.md` §2. Sections of this plan that referenced `PortContext` are revised below.
 
 ## Summary
 
-Close the five polish items #230 deferred so the Storyboard edit suite can retire its "follow-up" status and the #218 evidence table can be marked complete, **plus** three review-driven additions (ESLint test-only boundary, ffmpeg system-binary check, public-API contract on `composeSceneEditViewModels`). Concretely: (1) upgrade the four edit-suite Storybook stories from static `args`-based props to interactive ones backed by `useStoryboardEditReducer` via a new shared story-only mock-port helper + a new `PortContext` for clean test/production wiring; (2) add a thin code-server chrome E2E spec at `tests/e2e/test-storyboard-edit.spec.ts` that exercises only what cannot be reached from the web-shell (command palette, native input-box, native quick-pick, native notification toasts); (3) run `@axe-core/playwright` against the three highest-risk harness states + the four upgraded stories with both a markdown `evidence/a11y-report.md` AND a raw `evidence/a11y-results.json`; (4) add a vitest perf test on the **pure exported** `composeSceneEditViewModels` function at the spec scale (5 × 50 Scenes; budget guards the active-only 50-Scene workload), promoting that function to a contracted public-API surface; (5) extend the web-shell Playwright suite with the seven still-uncovered scenarios, **two** symmetric harness knobs (`?induceCopyFailure`, `?induceRefreshFailure`), and a < 5 s / < 2 MB interaction GIF (1.8 MB soft warning). **Technical approach:** zero new npm runtime deps; ffmpeg is acknowledged as an explicit system-binary dependency (proven path from #217 T520) surfaced by a new `task verify:ffmpeg` check. Each user story is independent and can ship behind its own commit. All new evidence lands either under this feature's `evidence/` (a11y-report, a11y-results.json, opening-context) or under `specs/218-storyboarding-edit/evidence/screenshots/` (vscode-native-chrome.png, interaction.gif) per FR-015 / FR-042 — completing the parent #218 evidence table in one PR.
+Close the five polish items #230 deferred so the Storyboard edit suite can retire its "follow-up" status and the #218 evidence table can be marked complete, **plus** three review-driven additions (ESLint test-only boundary, ffmpeg system-binary check, public-API contract on `composeSceneEditViewModels`). Concretely: (1) upgrade the four edit-suite Storybook stories from static `args`-based props to interactive ones backed by `useStoryboardEditReducer` via a new shared story-only mock-handlers helper (`useStoryOnlyMockHandlers`) — `<StoryboardPanel>` stays purely presentational; the helper's `handlers` field is spread onto the panel; production webview entry is unchanged; (2) add a thin code-server chrome E2E spec at `tests/e2e/test-storyboard-edit.spec.ts` that exercises only what cannot be reached from the web-shell (command palette, native input-box, native quick-pick, native notification toasts); (3) run `@axe-core/playwright` against the three highest-risk harness states + the four upgraded stories with both a markdown `evidence/a11y-report.md` AND a raw `evidence/a11y-results.json`; (4) add a vitest perf test on the **pure exported** `composeSceneEditViewModels` function at the spec scale (5 × 50 Scenes; budget guards the active-only 50-Scene workload), promoting that function to a contracted public-API surface; (5) extend the web-shell Playwright suite with the seven still-uncovered scenarios, **two** symmetric harness knobs (`?induceCopyFailure`, `?induceRefreshFailure`), and a < 5 s / < 2 MB interaction GIF (1.8 MB soft warning). **Technical approach:** zero new npm runtime deps; ffmpeg is acknowledged as an explicit system-binary dependency (proven path from #217 T520) surfaced by a new `task verify:ffmpeg` check. Each user story is independent and can ship behind its own commit. All new evidence lands either under this feature's `evidence/` (a11y-report, a11y-results.json, opening-context) or under `specs/218-storyboarding-edit/evidence/screenshots/` (vscode-native-chrome.png, interaction.gif) per FR-015 / FR-042 — completing the parent #218 evidence table in one PR.
 
 ## Technical Context
 
@@ -13,7 +14,7 @@ Close the five polish items #230 deferred so the Storyboard edit suite can retir
 **Primary Dependencies**:
   - `@debrief/components` (StoryboardPanel + `useStoryboardEditReducer` + the already-exported `composeSceneEditViewModels` pure function — existing from #230)
   - `@debrief/session-state` (existing)
-  - React 18.x (`useReducer`, `useEffect`, `createContext` for the new `PortContext`)
+  - React 18.x (`useReducer`, `useEffect` — no new context introduced post-ADR-027)
   - VS Code Extension API ^1.85.0 (palette, `showInputBox`, `showQuickPick`, `showInformationMessage`, `showWarningMessage`)
   - Playwright ^1.57.0 + `@sparticuz/chromium` (already installed); `recordVideo` already wired in `properties-screenshots.spec.ts:121` and `theme-runtime-switch.spec.ts:122`
   - **`@axe-core/playwright` ^4.8.5** — already present in `shared/components/package.json` (added during #230 research R11). No new dep.
@@ -41,14 +42,14 @@ Close the five polish items #230 deferred so the Storyboard edit suite can retir
   - The `composeSceneEditViewModels` invariant remains O(active-storyboard Scenes) — perf test (FR-030) is the regression guard, not a behavioural change. Pinned via FR-046's public-API contract.
   - Zero new npm runtime deps (Article IX); ffmpeg system binary surfaced explicitly via FR-045
   - No serious/critical axe violations permitted; moderate violations either fixed or recorded with rationale (FR-022, FR-023); raw axe JSON also captured (FR-023)
-  - Story-only mock port MUST share its behavioural layer with the web-shell harness's mock port (FR-003) — single source of truth for fixture seed + reducer wiring
+  - Story-only mock-handlers helper MUST share its behavioural layer with the web-shell harness's translation layer (FR-003) — single source of truth for fixture seed + reducer wiring (post-ADR-027 the shared layer is a callback adapter, not a port)
   - `__testing__/` directory is the test-only export surface; FR-044 ESLint rule prevents production `apps/vscode/` code from importing it
-  - `PortContext` default value MUST throw at action-emit time (NOT mount time, NOT silently); see contracts/harness-knobs.md §3 (Article I.3)
+  - `<StoryboardPanel>` stays purely presentational — no `usePanelPort()` hook, no `OutboundMessage` discriminated union, no production webview rewrite (post-ADR-027)
   - All new strings continue to route through `apps/vscode/src/messages/storyboardEdit.ts` (Article XI; no new top-level strings expected — code-server spec uses existing prompts)
   - `tests/e2e/test-storyboard-edit.spec.ts` MUST NOT duplicate any flow already covered by `apps/web-shell/playwright/tests/storyboard-edit.spec.ts` (FR-014 — chrome-only; web-shell owns click flows)
 **Scale/Scope**:
-  - 4 Storybook stories upgraded (story file edits + 1 new shared mock-port helper)
-  - 1 new `PortContext` (provider + default thrower + unit test) — touches StoryboardPanel.tsx + production webview entry
+  - 4 Storybook stories upgraded (story file edits + 1 new shared mock-handlers helper)
+  - 1 new shared callback-adapter helper at `__testing__/storyOnlyMockHandlers.ts` (~80 LOC; 1 unit test file ~5 cases). No `PortContext`, no `OutboundMessage` type, no production webview rewrite (post-ADR-027).
   - 1 new code-server spec (~150 LOC; 11 commands × ~15 LOC each) at `tests/e2e/test-storyboard-edit.spec.ts`
   - 1 new a11y spec (~120 LOC; 7 surfaces × 3 themes × axe.run + assertions) + 1 new pure categoriser helper (`a11yCategoriser.ts`) + its unit test
   - 1 new perf spec at `shared/components/.../__tests__/composeSceneEditViewModels.perf.test.ts` (~80 LOC; methodology from `storyboardEditService.perf.test.ts`, target is the pure exported composer)
@@ -80,7 +81,7 @@ Close the five polish items #230 deferred so the Storyboard edit suite can retir
 | XII. Community Engagement | ✅ Pass | Shipped blog post + LinkedIn summary in `/speckit.pr` Phase E. The interactive Storybook stories are the post's headline asset. |
 | XIII. Contribution Standards | ✅ Pass | Atomic commits per user story (US1 → US5); PR review required; CI must pass. |
 | XIV. Pre-Release Freedom | ✅ Pass | Pre-v4.0.0 — no backwards compat gates. |
-| XV. Strict Type Safety | ✅ Pass | All new spec files use TS strict; no `any`. The story-only mock-port helper exposes the same discriminated-union action surface as the production reducer. |
+| XV. Strict Type Safety | ✅ Pass (revised note post-ADR-027) | All new spec files use TS strict; no `any`. The shared callback-adapter helper exposes its handlers as `Pick<StoryboardPanelProps, ...>` — adding a new callback to the panel widens the helper's contract automatically; missing-implementation is a TS compile error. The original v1 note cited Article XV as supporting `PortContext` ("explicit context > module-scope global"). Post-ADR-027 the strict-type guarantee comes from the existing typed callback-prop surface; the spirit is preserved (no implicit IO seam, no globals patched), the mechanism shifts. **Flagged for transparency — no Article XV breach.** |
 
 **No violations — no complexity-tracking entries required.**
 
@@ -92,11 +93,11 @@ Close the five polish items #230 deferred so the Storyboard edit suite can retir
 specs/234-storyboard-edit-polish-followup/
 ├── plan.md                        # This file (/speckit.plan output)
 ├── spec.md                        # Feature spec (already exists)
-├── research.md                    # Phase 0 output
-├── data-model.md                  # Phase 1 output (stub — no schema changes)
+├── research.md                    # Phase 0 output (R10 superseded by R10b post-ADR-027)
+├── data-model.md                  # Phase 1 output (§4 PanelPort removed post-ADR-027)
 ├── quickstart.md                  # Phase 1 output (developer walkthrough)
 ├── contracts/
-│   └── harness-knobs.md           # ?induceCopyFailure=<sceneId> contract + story-only mock-port API
+│   └── harness-knobs.md           # Dual-knob URL contract + shared callback-adapter helper API (§3 PortContext removed post-ADR-027)
 └── evidence/
     ├── opening-context.md         # Phase 2 output (cached blog-post opener)
     └── a11y-report.md             # Phase 8 output (per FR-023; written by /speckit.implement, not /speckit.plan)
@@ -109,14 +110,20 @@ All paths repo-relative.
 ```text
 shared/components/src/panels/StoryboardPanel/
 ├── StoryboardPanel.stories.tsx                       # [EDIT] Upgrade WithEditForm/WithUndoToast/WithStaleBadge/WithMissingDataRemediation to interactive — FR-001, FR-002
-├── PortContext.tsx                                   # [NEW] React context + default thrower + usePanelPort() — D3A
 ├── CONTRACTS.md                                      # [NEW] Pinned signature + perf invariant for composeSceneEditViewModels — FR-046
-├── index.ts                                          # [EDIT] Re-export storyOnlyMockPort barrel + PortContext + CONTRACTS reference (2A)
+├── index.ts                                          # [EDIT] Re-export storyOnlyMockHandlers barrel + CONTRACTS reference (2A)
 ├── __testing__/
-│   └── storyOnlyMockPort.ts                          # [NEW] Shared story-only mock-port helper (reducer + fixture seed via Pick<>) — FR-003
+│   ├── storyOnlyMockHandlers.ts                      # [NEW] Shared callback-adapter helper (reducer + fixture seed via Pick<>) — FR-003 (post-ADR-027)
+│   └── __tests__/
+│       └── storyOnlyMockHandlers.test.ts             # [NEW] 5-case unit test (seed → state, handler → reducer dispatch, knob routing) — T1A
 └── __tests__/
-    ├── composeSceneEditViewModels.perf.test.ts       # [NEW] Vitest perf test against the pure composer — FR-030, FR-031, FR-032 (D1A)
-    └── PortContext.test.tsx                          # [NEW] Provider + no-provider-throws unit test — T1A
+    └── composeSceneEditViewModels.perf.test.ts       # [NEW] Vitest perf test against the pure composer — FR-030, FR-031, FR-032 (D1A)
+
+# REMOVED post-ADR-027:
+#   - shared/components/src/panels/StoryboardPanel/PortContext.tsx
+#   - shared/components/src/panels/StoryboardPanel/__tests__/PortContext.test.tsx
+#   - apps/vscode/src/webview/web/storyboardPanel.tsx [EDIT] (Provider wrap)
+# Rationale: callback-adapter helper makes these unnecessary. See ADR-027.
 
 shared/components/
 └── CHANGELOG.md                                      # [EDIT] "Unreleased — Public API" entry promoting composeSceneEditViewModels — FR-046
@@ -126,7 +133,7 @@ apps/web-shell/
 │   ├── storyboard-edit-harness-querystring.ts        # [EDIT] Add ?induceCopyFailure + ?induceRefreshFailure knobs — FR-043
 │   ├── __tests__/
 │   │   └── storyboard-edit-harness-querystring.test.ts  # [NEW] 5-case parser unit test — T3A
-│   └── StoryboardEditHarness.tsx                     # [EDIT] Wire both knobs into mock-port copy + refresh paths; wrap in PortContext.Provider
+│   └── StoryboardEditHarness.tsx                     # [EDIT] Replace inline mock-extension layer with useStoryOnlyMockHandlers; spread {...handlers} onto <StoryboardPanel>; thread parsed knobs through. NO PortContext.Provider wrap.
 ├── playwright/
 │   ├── tests/
 │   │   ├── storyboard-edit.spec.ts                   # [EDIT] Add 7 new scenarios + Log Panel card assertions — FR-040, FR-041
@@ -142,8 +149,6 @@ apps/web-shell/
 │       └── sample.webm                               # [NEW] 50 KB checked-in webm for videoToGif unit test — R11
 
 apps/vscode/
-├── src/webview/web/
-│   └── storyboardPanel.tsx                           # [EDIT] Wrap StoryboardPanel in <PortContext.Provider value={acquireVsCodeApi()}> — D3A
 └── .eslintrc.* (or apps/vscode/eslint.config.*)      # [EDIT] Add no-restricted-imports rule forbidding **/__testing__/** — FR-044
 
 tests/e2e/
@@ -153,6 +158,8 @@ Taskfile.yml                                          # [EDIT] Add verify:ffmpeg
 ```
 
 **Structure Decision**: No new projects, no new workspaces. All work lands in existing directories. Evidence destined for #218's already-shipped table (vscode-native-chrome.png, interaction.gif) lands under `specs/218-storyboarding-edit/evidence/screenshots/` per FR-015 / FR-042; everything else (a11y-report, a11y-results.json, opening-context, perf-budget update) lives under this feature's `evidence/`.
+
+**ADR-027 deltas:** the production webview entry (`apps/vscode/src/webview/web/storyboardPanel.tsx`) is **untouched**. `<StoryboardPanel>` stays purely presentational. Phase 3 work is contained to the `__testing__/` surface + harness refactor + 4 story upgrades — see Constitution Article XV note in the table below.
 
 ## Media Components
 

@@ -29,39 +29,64 @@ All three MUST exist. If any are missing, #230 has not landed yet — stop and r
 
 ---
 
-## US1 — Interactive Storybook (P1)
+## US1 — Interactive Storybook (P1) — **revised post-ADR-027**
 
-### 1.1 Add `PortContext` (D3A)
-New file: `shared/components/src/panels/StoryboardPanel/PortContext.tsx`. Defines the context, the default thrower, and the `usePanelPort()` hook per `contracts/harness-knobs.md` §3.
+> **Architecture note.** The plan-v1 `PortContext` + production-webview rewrite is dropped per ADR-027. US1 now lands via a callback-adapter helper. `<StoryboardPanel>` stays purely presentational; production code at `apps/vscode/src/webview/web/storyboardPanel.tsx` is unchanged. See `research.md` R10b + `contracts/harness-knobs.md` §2.
 
-### 1.2 Wire `PortContext` into the production webview entry
-File: `apps/vscode/src/webview/web/storyboardPanel.tsx`. Wrap the existing `<StoryboardPanel>` mount in `<PortContext.Provider value={vscodeApi}>` where `vscodeApi = acquireVsCodeApi()`. Now the panel resolves its outbound port via context — both production and test paths share the same wiring.
+### 1.1 Create the shared mock-handlers helper (T011)
+New file: `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`. Implements `useStoryOnlyMockHandlers(seed, knobs)` returning `{state, dispatch, handlers}` per `contracts/harness-knobs.md` §2. The fixture-seed types compose `Pick<SceneRowViewModel, ...>` per `data-model.md` §2; the handlers spread is `Pick<StoryboardPanelProps, ...>` so the panel's callback surface stays the contract.
 
-### 1.3 Create the shared mock-port helper
-File: `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockPort.ts`. Implements `useStoryOnlyMockPort` per `contracts/harness-knobs.md` §2. The fixture-seed types compose `Pick<SceneRowViewModel, ...>` per `data-model.md` §2 — do NOT redeclare scene fields.
+### 1.2 Add the helper unit test (T008, T1A)
+New file: `shared/components/src/panels/StoryboardPanel/__testing__/__tests__/storyOnlyMockHandlers.test.ts`. Five cases:
+- (a) seed → `state` matches the fixture
+- (b) `handlers.onSceneTitleRenameCommit('s1', 'new')` → state shows new title
+- (c) `handlers.onSceneDeleteRequested('s1')` → row removed AND `pendingUndoToast` populated
+- (d) `knobs.induceCopyFailure === 's1'` → `onSceneCopyToOtherClicked('s1')` dispatches the failure-branch action
+- (e) `knobs.induceRefreshFailure === 's2'` → `onSceneRefreshThumbnailClicked('s2')` retains the stale flag
 
-### 1.4 Refactor the harness to share the helper
-The existing `apps/web-shell/src/StoryboardEditHarness.tsx` (334 LOC) is **already reducer-driven** — it calls `useStoryboardEditReducer()` at line 117 and dispatches actions from event handlers. The work here is to **extract** the fixture-seed + mock-extension layer (the bit that fakes the postMessage round-trip) into `useStoryOnlyMockPort` and have the harness import it. The reducer wiring itself does not change. After refactor, the existing `storyboard-edit.spec.ts` smoke suite MUST still pass — it is the regression gate.
+Pure vitest; no DOM, no Storybook, no Playwright.
+
+### 1.3 Re-export the helper from the package barrel (T012, 2A)
+File: `shared/components/src/panels/StoryboardPanel/index.ts`. Add `export * from './__testing__/storyOnlyMockHandlers';` so harness + stories can import via the barrel. Convention only — production safety is enforced by FR-044's ESLint rule, not by build tooling.
+
+### 1.4 Refactor the harness to use the helper (T021)
+The existing `apps/web-shell/src/StoryboardEditHarness.tsx` (334 LOC) is **already reducer-driven** — it calls `useStoryboardEditReducer()` at line 117 and dispatches actions from event handlers. The work here is to **replace** that inline wiring with a single call to `useStoryOnlyMockHandlers(seed, knobs)` and spread the returned `{...handlers}` onto `<StoryboardPanel>`. Thread parsed `?induceCopyFailure` / `?induceRefreshFailure` knobs through. **No `PortContext.Provider` wrap.** After refactor, the existing `storyboard-edit.spec.ts` smoke suite MUST still pass — it is the regression gate.
 
 ```sh
 cd apps/web-shell && node run-playwright.mjs storyboard-edit
 ```
 
-### 1.5 Upgrade each of the four stories
+### 1.5 Upgrade each of the four stories (T023..T026)
 File: `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
-For `WithEditForm`, `WithUndoToast`, `WithStaleBadge`, `WithMissingDataRemediation` (lines 232 / 256 / 281 / 301), replace `args: { ... }` with a render function that calls `useStoryOnlyMockPort(seed, knobs)` and wraps `<StoryboardPanel>` in `<PortContext.Provider value={mockPort.port}>`. The `WithStaleBadge` story passes `{ induceRefreshFailure: 'sceneB' }` so its failure-path control is exercisable from Storybook.
+For `WithEditForm`, `WithUndoToast`, `WithStaleBadge`, `WithMissingDataRemediation` (lines 232 / 256 / 281 / 301), replace `args: { ... }` with a render function:
 
-### 1.6 Re-export the helper from the package barrel (2A)
-File: `shared/components/src/panels/StoryboardPanel/index.ts`. Add `export * from './__testing__/storyOnlyMockPort';` so harness + stories can import via the barrel. Convention only — production safety is enforced by FR-044's ESLint rule, not by build tooling.
+```tsx
+render: (args) => {
+  const knobs = { /* args.induceRefreshFailure for WithStaleBadge */ };
+  const { state, handlers } = useStoryOnlyMockHandlers(seed, knobs);
+  return (
+    <StoryboardPanel
+      scenes={state.sceneRows}
+      activeStoryboardName={state.activeStoryboardName}
+      sceneEditViewModels={composeSceneEditViewModels(state)}
+      pendingUndoToast={state.pendingUndoToast}
+      // … other state-derived props
+      {...handlers}
+    />
+  );
+},
+```
 
-### 1.7 Verify
+The `WithStaleBadge` story exposes `induceRefreshFailure` as a Storybook arg so reviewers can toggle the failure path from the controls panel.
+
+### 1.6 Verify
 ```sh
 pnpm --filter @debrief/components storybook
 # Open each story; click chevron, Delete, Refresh, keyboard-Tab to remediation. Each must respond.
 
-pnpm --filter @debrief/components test PortContext
-# T1A: provider supplies port → dispatch → message emitted; no provider → first postMessage throws.
+pnpm --filter @debrief/components test storyOnlyMockHandlers
+# T1A: 5 cases (seed → state, handler → reducer dispatch, knob routing).
 
 pnpm --filter @debrief/components test
 # Reducer + component unit tests stay green (88+ assertions from #230)
@@ -172,7 +197,7 @@ File: `apps/vscode/.eslintrc.*` (or `apps/vscode/eslint.config.*`). Add a rule f
 Verify:
 ```sh
 # Add a temporary import in apps/vscode/src/views/storyboardPanelView.ts:
-#   import { useStoryOnlyMockPort } from '@debrief/components/.../__testing__/storyOnlyMockPort';
+#   import { useStoryOnlyMockHandlers } from '@debrief/components/.../__testing__/storyOnlyMockHandlers';
 pnpm lint
 # MUST fail with the no-restricted-imports rule citing the __testing__ path. Then revert.
 ```

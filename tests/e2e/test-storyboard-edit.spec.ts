@@ -30,18 +30,19 @@
  *
  * --- Status ---
  *
- * test.describe.skip is intentional for now. Two upstream prerequisites
- * must land before this suite can run live:
+ * test.describe.skip is intentional for now. The upstream prerequisite
+ * is Issue #143 (webview iframe hierarchy in openvscode-server) —
+ * currently blocking the storyboard-playback spec the same way.
  *
- *   1. Issue #143 (webview iframe hierarchy in openvscode-server) —
- *      currently blocking the storyboard-playback spec the same way.
- *   2. Feature 234 Phase 3 — PortContext + production webview wiring +
- *      harness refactor (T020, T021). Without those, the panel still
- *      uses prop-drilled callbacks and the command palette cannot reach
- *      every dispatch path.
+ * Note (post-ADR-027): the original plan also gated this suite on
+ * Feature 234 Phase 3's PortContext + production webview wiring (T020).
+ * That dependency is dropped — Phase 3 now lands as a callback-adapter
+ * helper that does not touch production code, so the only remaining
+ * gate is #143. See `specs/234-storyboard-edit-polish-followup/research.md`
+ * R10b for the architecture pivot.
  *
- * Each scenario below is structurally complete: when the prerequisites
- * land, removing `test.describe.skip` makes the suite executable. The
+ * Each scenario below is structurally complete: when #143 resolves,
+ * removing `test.describe.skip` makes the suite executable. The
  * native-chrome selectors, command titles, and Log Panel data-op
  * assertions are pinned against the implementation that already exists.
  */
@@ -119,7 +120,7 @@ async function expectLogPanelCardWithOp(
 }
 
 test.describe.skip(
-  'Storyboard Edit Suite — VS Code-native chrome (blocked: #143 + Feature 234 Phase 3)',
+  'Storyboard Edit Suite — VS Code-native chrome (blocked: #143)',
   () => {
     // ---- FR-010: each of the 11 commands reaches the dispatch path ----
     for (const cmd of EDIT_COMMANDS) {

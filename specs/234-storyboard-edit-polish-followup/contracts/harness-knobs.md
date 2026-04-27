@@ -1,12 +1,13 @@
-# Contract — Harness Knobs + Story-only Mock-Port API
+# Contract — Harness Knobs + Story-only Mock-Handlers API
 
 **Feature**: 234-storyboard-edit-polish-followup
-**Date**: 2026-04-26
+**Date**: 2026-04-26 (revised 2026-04-27)
+**Architecture pivot:** ADR-027 — this contract replaces the original PortContext + mock-port API with a simpler callback-adapter helper. See `research.md` R10b. The `__testing__/` boundary + FR-044 ESLint enforcement are unchanged.
 
 This document is the contract for the two new test-time surfaces this feature introduces:
 
-1. The web-shell harness query-string knob `?induceCopyFailure=<sceneId>`.
-2. The shared story-only mock-port helper `createStoryOnlyMockPort`.
+1. The web-shell harness query-string knobs `?induceCopyFailure=<sceneId>` + `?induceRefreshFailure=<sceneId>`.
+2. The shared story-only mock-handlers helper `useStoryOnlyMockHandlers`.
 
 Both surfaces are test-only — they MUST NOT appear in any production-bundled code path.
 
@@ -77,10 +78,10 @@ Both new fields are optional; URLs that omit them behave exactly as before. No e
 
 ---
 
-## 2. Story-only mock-port API
+## 2. Story-only mock-handlers API
 
 ### Location
-`shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockPort.ts` (new file).
+`shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts` (new file).
 
 ### Public API
 
@@ -88,122 +89,149 @@ Both new fields are optional; URLs that omit them behave exactly as before. No e
 import { useStoryboardEditReducer } from '../useStoryboardEditReducer';
 import type {
   StoryboardEditAction,
-  StoryboardEditState,
-  OutboundMessage,
-  SceneId,
+  StoryboardEditReducerState,
+  StoryboardPanelProps,
 } from '../types';
 
 export interface MockPortKnobs {
-  induceCopyFailure?: SceneId;
-  induceRefreshFailure?: SceneId;
+  /** When set, the copy-to-other handler routes the matching sceneId to the
+   *  deep-copy failure branch. Type retained as MockPortKnobs (data-model §1)
+   *  even though the architecture is callback-adapter, not port. */
+  induceCopyFailure?: string;
+  /** When set, refresh-thumbnail / refresh-all-stale routes the matching
+   *  sceneId to the per-Scene failure branch. */
+  induceRefreshFailure?: string;
 }
 
 export interface SceneEditFixtureSeed {
   storyboards: ReadonlyArray<{
-    id: StoryboardId;
+    storyboardId: string;
     title: string;
     description: string;
     scenes: ReadonlyArray<SceneFixtureSeed>;
   }>;
-  activeStoryboardId: StoryboardId;
-}
-
-export interface MockPortHandle {
-  /** Live state — read in the React component for rendering. */
-  state: StoryboardEditState;
-  /** Dispatch a reducer action. Pure synchronous call. */
-  dispatch: (action: StoryboardEditAction) => void;
-  /** The fake outbound message port the panel writes to.
-   *  Internally it routes messages back through dispatch (post-knob filter). */
-  port: { postMessage: (msg: OutboundMessage) => void };
-}
-
-/** React hook factory — call inside a story or harness mount. */
-export function useStoryOnlyMockPort(
-  seed: SceneEditFixtureSeed,
-  knobs?: MockPortKnobs,
-): MockPortHandle;
-```
-
-### Behavioural contract
-
-For every outbound message the panel sends:
-
-| Outbound `type` | Default behaviour | Knob override |
-|----------------|-------------------|---------------|
-| `editScene` | Dispatch `sceneEdited` with the same fields | — |
-| `deleteScene` | Dispatch `sceneDeleted` + `undoToastShown` | — |
-| `undoDelete` | Dispatch `sceneRestored` + `undoToastDismissed` | — |
-| `refreshScene` | Dispatch `sceneRefreshed` (clears stale) | If `knobs.induceRefreshFailure === sceneId` → dispatch `sceneRefreshFailed` (badge stays) |
-| `refreshAllStale` | Dispatch `sceneRefreshed` for each stale scene | If any scene matches `induceRefreshFailure` → that scene fails; others succeed (partial failure scenario) |
-| `duplicateScene` | Dispatch `sceneDuplicated` at offset timestamp | — |
-| `copySceneToOther` | Dispatch `sceneCopiedToOther` | If `knobs.induceCopyFailure === sceneId` → dispatch `sceneCopyFailed` (rollback) |
-| `renameStoryboard` / `describeStoryboard` | Dispatch matching state action | — |
-| `updateSceneToCurrent` | Dispatch `sceneUpdated` with refreshed thumbnail + visibleFeatureIds | — |
-| `refreshThumbnail` | Dispatch `sceneThumbnailRefreshed` | If `knobs.induceRefreshFailure === sceneId` → dispatch `sceneRefreshFailed` |
-
-### Constraints
-- Mock-port MUST NOT use `setTimeout`, `Promise.resolve().then(...)`, or any async deferral. All dispatches are synchronous so Storybook's controls + Playwright's `expect` assertions resolve deterministically.
-- Mock-port MUST NOT call `window.postMessage`, `chrome.runtime.*`, or any cross-frame API. It is purely in-memory.
-- Mock-port MUST NOT import from `apps/web-shell/` or `apps/vscode/` (Lerna boundary; lint-enforced).
-
-### TypeScript-level guarantees
-- `MockPortKnobs.induceCopyFailure` and `induceRefreshFailure` are typed as `SceneId`, not `string`; pass-through narrows to the production discriminant.
-- `MockPortHandle.dispatch` accepts only the production `StoryboardEditAction` discriminated union — adding a new action elsewhere automatically widens the contract here without code change.
-
----
-
-## 3. PortContext (production-side change for stories + harness)
-
-### Surface
-
-The production `StoryboardPanel` component does not currently accept a port prop — webview entries call `vscode.postMessage()` directly via `acquireVsCodeApi()`. To make the panel usable by stories + harness without prop drilling, this feature adds a React context.
-
-### Location
-`shared/components/src/panels/StoryboardPanel/PortContext.tsx` (new file).
-
-### Public API
-
-```ts
-export interface PanelPort {
-  postMessage(message: OutboundMessage): void;
+  activeStoryboardId: string;
 }
 
 /**
- * React context holding the outbound message port for the StoryboardPanel.
- *
- * - Production webview entry wraps the panel:
- *     <PortContext.Provider value={acquireVsCodeApi()}>
- *
- * - Harness + stories wrap the panel with the mock port:
- *     <PortContext.Provider value={mockPort.port}>
- *
- * The default value (no provider in the tree) is a "thrower" port: calling
- * postMessage on it throws an explicit Error naming the missing wiring.
- * This honours Article I.3 (no silent failures) — mounting an unwrapped
- * panel does not crash, but the first user dispatch makes the gap obvious.
+ * The handler subset of StoryboardPanelProps the helper wires — every
+ * callback the panel may fire that has a corresponding reducer action.
+ * Composed via Pick<> so adding a new callback to StoryboardPanelProps
+ * surfaces here as a TS compile error (helper must implement it).
  */
-export const PortContext: React.Context<PanelPort>;
+export type MockHandlers = Pick<
+  StoryboardPanelProps,
+  | 'onSceneRowClick'
+  | 'onSceneRowExpandToggle'
+  | 'onSceneOverflowMenuOpen'
+  | 'onSceneOverflowMenuClose'
+  | 'onSceneEditFormCancel'
+  | 'onSceneTitleRenameCommit'
+  | 'onSceneDescriptionSubmit'
+  | 'onSceneDeleteRequested'
+  | 'onSceneUndoDeleteClicked'
+  | 'onSceneUpdateToCurrentClicked'
+  | 'onSceneDuplicateClicked'
+  | 'onSceneCopyToOtherClicked'
+  | 'onSceneRefreshThumbnailClicked'
+  | 'onStoryboardRefreshAllStaleClicked'
+  | 'onStoryboardNameRenameCommit'
+  | 'onStoryboardDescriptionSubmit'
+  | 'onUndoToastDismiss'
+  | 'onCaptureClick'
+>;
 
-export function usePanelPort(): PanelPort;
+export interface MockHandlersHandle {
+  /** Live state — read in the React component for rendering. */
+  readonly state: StoryboardEditReducerState;
+  /** Dispatch a reducer action directly (escape hatch for stories that
+   *  want to seed state without going through panel UI). Pure sync call. */
+  readonly dispatch: (action: StoryboardEditAction) => void;
+  /** The handler spread — pass directly into <StoryboardPanel {...handlers} />.
+   *  Each handler translates a panel callback into the corresponding reducer
+   *  dispatch (post-knob filter for failure injection). */
+  readonly handlers: MockHandlers;
+}
+
+/** React hook factory — call inside a story or harness mount. */
+export function useStoryOnlyMockHandlers(
+  seed: SceneEditFixtureSeed,
+  knobs?: MockPortKnobs,
+): MockHandlersHandle;
 ```
 
 ### Behavioural contract
 
-| Scenario | Behaviour |
-|----------|-----------|
-| Provider supplies a real port (production) | `postMessage(msg)` forwards to the supplied port |
-| Provider supplies the mock port (harness/stories) | `postMessage(msg)` flows back through `useStoryOnlyMockPort.dispatch` (the mock-port wires this internally) |
-| No provider in the tree | Mount succeeds; `postMessage(msg)` throws `Error("StoryboardPanel: no PortContext.Provider in the tree — production webview must wrap with acquireVsCodeApi(); stories/harness must wrap with createStoryOnlyMockPort().port")` |
+For every panel callback the helper wires:
+
+| Panel callback | Default dispatch | Knob override |
+|----------------|------------------|---------------|
+| `onSceneTitleRenameCommit(id, t)` | `{type: 'scene-edit-form-close'}` then a synthesised `scenes-message` with the renamed row | — |
+| `onSceneDescriptionSubmit(id, d)` | Update the matching SceneEditViewModel's `description` via a `scenes-message` re-emit | — |
+| `onSceneDeleteRequested(id)` | Drop the row + dispatch `{type: 'scene-undo-toast-shown', toast: {sceneId: id, ...}}` | — |
+| `onSceneUndoDeleteClicked(id)` | Restore the row + dispatch `{type: 'scene-undo-toast-dismissed'}` | — |
+| `onSceneUpdateToCurrentClicked(id)` | Update the matching SceneEditViewModel's thumbnail + visibleFeatureIds | — |
+| `onSceneDuplicateClicked(id)` | Insert a duplicated row at an offset timestamp | — |
+| `onSceneCopyToOtherClicked(id)` | Mark the row as "copied to other" + log-panel card | If `knobs.induceCopyFailure === id` → dispatch the failure branch instead (rollback, no row added at destination) |
+| `onSceneRefreshThumbnailClicked(id)` | Clear the matching `staleFlags` entry | If `knobs.induceRefreshFailure === id` → keep the stale flag (failure branch) |
+| `onStoryboardRefreshAllStaleClicked(_)` | Clear all stale flags for the active storyboard | Any scene matching `induceRefreshFailure` retains its flag (partial-failure scenario) |
+| `onStoryboardNameRenameCommit(id, n)` | Update `storyboardEditViewModel.name` + matching `storyboards[]` entry | — |
+| `onStoryboardDescriptionSubmit(id, d)` | Update `storyboardEditViewModel.description` | — |
+| `onSceneRowExpandToggle(id)` | `dispatch({type: 'expand-row-toggle', sceneId: id})` (uses existing reducer action) | — |
+| `onSceneOverflowMenuOpen(id, rect)` | `dispatch({type: 'overflow-menu-open', sceneId: id, anchorRect: rect})` | — |
+| `onSceneOverflowMenuClose()` | `dispatch({type: 'overflow-menu-close'})` | — |
+| `onSceneEditFormCancel(_)` | `dispatch({type: 'scene-edit-form-close'})` | — |
+| `onUndoToastDismiss()` | `dispatch({type: 'scene-undo-toast-dismissed'})` | — |
+| `onCaptureClick()` | No-op (or dispatch a synthesised in-flight + new-row sequence; story-specific) | — |
+| `onSceneRowClick(id)` | Set `currentSceneId` via a synthesised `snapshot-message` | — |
+
+### Wiring in the harness + stories
+
+```tsx
+// Harness (apps/web-shell/src/StoryboardEditHarness.tsx) and each upgraded
+// story file follow the same pattern:
+const seed = makeFixtureSeed(/* ... */);
+const knobs = parseHarnessQueryString(window.location.search);
+const { state, handlers } = useStoryOnlyMockHandlers(seed, knobs);
+
+return (
+  <StoryboardPanel
+    scenes={state.sceneRows}
+    activeStoryboardName={state.activeStoryboardName}
+    activeStoryboardId={state.activeStoryboardId}
+    captureInFlight={state.captureInFlight}
+    sceneEditViewModels={composeSceneEditViewModels(state)}
+    storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
+    pendingUndoToast={state.pendingUndoToast}
+    overflowMenuOpenFor={state.overflowMenuOpenFor}
+    overflowMenuAnchorRect={state.overflowMenuAnchorRect}
+    {...handlers}
+  />
+);
+```
+
+No provider, no context, no production webview change. The harness's existing reducer wiring (`useStoryboardEditReducer()` at `StoryboardEditHarness.tsx:117`) is replaced by `useStoryOnlyMockHandlers` — same reducer, factored through one helper.
 
 ### Constraints
-- The default thrower MUST throw at action-emit time (when `postMessage` is called), NOT at mount time. Reason: Storybook may render the panel during its docs page generation without intent to dispatch; throwing at mount would break Storybook builds.
-- The error message MUST include both required wrappings (production + test) so the reader knows whether the bug is in their app code or their test setup.
+- Helper MUST NOT use `setTimeout`, `Promise.resolve().then(...)`, or any async deferral. All dispatches are synchronous so Storybook controls + Playwright `expect` assertions resolve deterministically.
+- Helper MUST NOT call `window.postMessage`, `chrome.runtime.*`, or any cross-frame API. It is purely in-memory.
+- Helper MUST NOT import from `apps/web-shell/` or `apps/vscode/` — `shared/components` cannot depend on an app (Lerna boundary; lint-enforced via the existing `no-redeclare-components-exports.cjs` family).
+- Knobs route their failure branches synchronously (no race window). A `?induceCopyFailure=s1` URL → `handlers.onSceneCopyToOtherClicked('s1')` → failure-branch dispatch in the same React tick.
 
-### Test coverage
-Unit test at `shared/components/src/panels/StoryboardPanel/__tests__/PortContext.test.tsx`:
-- (a) provider supplies port → dispatch → message emitted to provider
-- (b) no provider → mount succeeds → first `postMessage` call throws the documented error
+### TypeScript-level guarantees
+- `MockPortKnobs.induceCopyFailure` / `induceRefreshFailure` are typed as `string` (the project's existing sceneId discriminant — feature 234 does not introduce a `SceneId` branded type).
+- `MockHandlersHandle.dispatch` accepts only the production `StoryboardEditAction` discriminated union.
+- `MockHandlers` is `Pick<StoryboardPanelProps, ...>`. Adding a new callback to `StoryboardPanelProps` widens the helper's contract automatically — TS surfaces the missing implementation as a compile error.
+
+---
+
+## 3. ~~PortContext (production-side change for stories + harness)~~ — **REMOVED 2026-04-27**
+
+> **Removed.** ADR-027 (`docs/project_notes/decisions.md`) records the architecture pivot from `PortContext` to a callback-adapter helper (§2 above). The `PortContext` API, `OutboundMessage` discriminated union, default-thrower port, production webview wrapper change, and `usePanelPort()` hook are **not** introduced. `<StoryboardPanel>` stays purely presentational; production code at `apps/vscode/src/webview/web/storyboardPanel.tsx` is unchanged.
+>
+> The Article I.3 (no silent failures) goal is met by the existing typed callback-prop surface: a missing handler that the panel actually fires throws a normal React `prop.fn is not a function` at the call site.
+>
+> See `research.md` R10 (Superseded) and R10b (Adopted) for the design history.
 
 ---
 
