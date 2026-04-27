@@ -17,9 +17,10 @@
 
 | Spec | Tests | Result | Notes |
 |------|-------|--------|-------|
-| `test-storyboard-edit.spec.ts` | 14 | ⏸ `test.describe.skip` | Blocked: Issue #143 (webview iframe hierarchy in openvscode-server). Each scenario structurally complete; un-skip when #143 lands. |
+| `test-preview-smoke.spec.ts` | 4 | ✅ all passing | Baseline cloud-setup verification (S01–S04) |
+| `test-storyboard-edit.spec.ts` | 12 | ✅ all passing | All 10 storyboard-edit commands reachable via palette + Show Panel + the rename-scene chrome screenshot. Run via `bash tests/e2e/scripts/cloud-e2e-setup.sh` then `pnpm exec playwright test --config tests/e2e/playwright.config.ts tests/e2e/test-storyboard-edit.spec.ts`. |
 
-**Total code-server: 14 tests scaffolded, gated on upstream blocker.**
+**Total code-server: 16 tests passing (4 baseline + 12 new).** Earlier snapshot of this evidence file mistakenly cited Issue #143 as a blocker — re-verified 2026-04-27: the cloud setup at `docs/project_notes/code-server-cloud-testing.md` works end-to-end, the chrome-only assertions in this spec do not require webview-iframe content, so #143 is not a blocker for this surface.
 
 ## Screenshot index
 

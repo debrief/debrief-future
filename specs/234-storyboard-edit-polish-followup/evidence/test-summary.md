@@ -40,9 +40,11 @@ Phase 3 was delivered post-pivot per ADR-027 (callback adapter, not PortContext)
 | `apps/web-shell/playwright/tests/storyboard-edit.spec.ts` | 19 (12 smoke + 7 new) | ✅ all passing |
 | `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts` | 5 | ✅ all passing — 0 serious/critical, 0 moderate |
 | `apps/web-shell/playwright/tests/storyboard-edit-interaction-gif.spec.ts` | 1 | ✅ passing — 1.44 MB / 3.80 s (under 1.8 MB soft / 2 MB hard / 5 s) |
-| `tests/e2e/test-storyboard-edit.spec.ts` | 14 | ⏸ `test.describe.skip` (blocked: #143) — Playwright `--list` confirms structural validity |
+| `tests/e2e/test-storyboard-edit.spec.ts` | 12 | ✅ all passing against live openvscode-server | All 10 edit commands reachable via palette + Show Panel + native-chrome screenshot capture |
 
-**79 new tests added; 0 failures.** 14 Playwright tests intentionally skipped pending Issue #143 (webview iframe hierarchy in openvscode-server).
+**91 new tests added; 0 failures.**
+
+The previous version of this evidence cited Issue #143 as a blocker for the code-server spec. Re-verification on 2026-04-27 found that #143 is not relevant to chrome-only assertions (palette + input box + notification toast) — only to webview-iframe-rendered content. The cloud-testing path documented at `docs/project_notes/code-server-cloud-testing.md` works end-to-end via `bash tests/e2e/scripts/cloud-e2e-setup.sh`. Original Hybrid A+D MessagePort fixtures were dropped in favour of the simpler direct page.goto pattern from `test-preview-smoke.spec.ts`.
 
 ## A11y audit — real WCAG fixes (Phase 5)
 
@@ -73,7 +75,7 @@ T001 (baseline `task verify` capture) and T028 (manual Storybook walkthrough) an
 ## Spec acceptance criteria
 
 - **SC-001** ✅ Four edit-suite stories drive the polish loop through `useStoryboardEditReducer`.
-- **SC-002** ✅ `tests/e2e/test-storyboard-edit.spec.ts` exists with 14 structurally-valid tests (skipped pending #143).
+- **SC-002** ✅ `tests/e2e/test-storyboard-edit.spec.ts` passes 12/12 against live openvscode-server; all 10 edit commands reachable via palette; vscode-native-chrome.png captured.
 - **SC-003** ✅ `evidence/a11y-report.md` zero serious/critical, zero moderate.
 - **SC-004** ✅ Perf test asserts 50 ms median; measured 0.017 ms (~3000× headroom).
 - **SC-005** ✅ Web-shell suite covers smoke + 7 new scenarios.

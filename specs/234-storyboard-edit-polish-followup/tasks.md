@@ -181,7 +181,7 @@ T023, T024, T025, T026 all edit the same `StoryboardPanel.stories.tsx` file → 
 
 ### Verification
 
-- [ ] T043 Run the full code-server spec: `cd apps/web-shell && node run-playwright.mjs test-storyboard-edit` — all 11 commands pass; vscode-native-chrome.png lands at the target path
+- [x] T043 Run the full code-server spec: `cd apps/web-shell && node run-playwright.mjs test-storyboard-edit` — all 11 commands pass; vscode-native-chrome.png lands at the target path
 
 ### Parallel-execution example for Phase 4
 
