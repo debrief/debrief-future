@@ -311,11 +311,11 @@ T070 + T071 + T073 touch independent files and may run in parallel. T072 depends
 
 ### Media Content
 
-- [ ] T095 Spawn the Content Specialist agent (`.claude/agents/media/content.md`) via Task tool to create the Feature Post — title prefixed `Building `; first three sections (`What We're Building`, `How It Fits`, `Key Decisions`) copied **verbatim** from `evidence/opening-context.md`; remaining sections (`Screenshots`, `Try It Yourself` with the four story Storybook links from plan.md Media Components, `By the Numbers` with metrics from `evidence/test-summary.md`, `Lessons Learned`, `What's Next`) written from evidence; track `[credibility]`; Hook is the before/after table from `evidence/opening-context.md` `specs/234-storyboard-edit-polish-followup/media/shipped-post.md`
+- [x] T095 Spawn the Content Specialist agent (`.claude/agents/media/content.md`) via Task tool to create the Feature Post — title prefixed `Building `; first three sections (`What We're Building`, `How It Fits`, `Key Decisions`) copied **verbatim** from `evidence/opening-context.md`; remaining sections (`Screenshots`, `Try It Yourself` with the four story Storybook links from plan.md Media Components, `By the Numbers` with metrics from `evidence/test-summary.md`, `Lessons Learned`, `What's Next`) written from evidence; track `[credibility]`; Hook is the before/after table from `evidence/opening-context.md` `specs/234-storyboard-edit-polish-followup/media/shipped-post.md`
 
 ### PR Creation
 
-- [ ] T096 Create PR and publish blog: run `/speckit.pr` — creates the `debrief-future` PR + cross-repo `debrief.github.io` blog PR; returns both URLs
+- [x] T096 Create PR and publish blog: run `/speckit.pr` — creates the `debrief-future` PR + cross-repo `debrief.github.io` blog PR; returns both URLs
 
 **Task T096 must run last. It depends on every other task in this file being complete (CI gate green + all evidence captured + shipped-post.md written).**
 
