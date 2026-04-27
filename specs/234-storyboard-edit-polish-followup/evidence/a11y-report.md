@@ -1,8 +1,8 @@
 # A11y Audit — Storyboard Edit Suite (#234 US3)
 
-**Captured at:** 2026-04-27T20:28:34.362Z
+**Captured at:** 2026-04-27T20:34:00.475Z
 **axe-core version:** 4.8.5
-**Git SHA:** cf429e7
+**Git SHA:** 9d606d3
 **Result:** PASS — 0 serious/critical, 0 moderate.
 
 Audits each panel state via the web-shell harness (research R4: avoids parallel Storybook server). The four upgraded interactive stories (Phase 3 T023..T026) consume the same `useStoryOnlyMockHandlers` helper so they cover the same accessibility surface.

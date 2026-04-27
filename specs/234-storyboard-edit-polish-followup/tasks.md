@@ -264,31 +264,31 @@ T060 + T061 are linked (same file) → sequential. T062 + T063 depend on the tes
 
 ### Wire the dual-knob into the harness mock-handlers (FR-043 — depends on T013/T014/T021)
 
-- [ ] T073 Pass parsed knobs from `parseStoryboardEditHarnessQueryString()` into `useStoryOnlyMockHandlers(seed, knobs)` so both `induceCopyFailure` and `induceRefreshFailure` reach the failure-branch handlers (post-ADR-027) `apps/web-shell/src/StoryboardEditHarness.tsx`
+- [x] T073 Pass parsed knobs from `parseStoryboardEditHarnessQueryString()` into `useStoryOnlyMockHandlers(seed, knobs)` so both `induceCopyFailure` and `induceRefreshFailure` reach the failure-branch handlers (post-ADR-027) `apps/web-shell/src/StoryboardEditHarness.tsx`
 
 ### Seven new web-shell scenarios (FR-040, FR-041)
 
-- [ ] T074 Scene rename (inline): open chevron → edit title → submit → assert row text + `[data-testid="log-panel-card"][data-op="renameScene"]` `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T075 Duplicate-at-colliding-timestamp prompt: invoke Duplicate on colliding row → modal surfaces with Replace/Offset/Cancel → choose Offset → assert new row at offset timestamp + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T076 Copy-to-other (success): overflow → Copy to other → pick destination → assert success toast + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T077 Copy-to-other (deep-copy failure via `?induceCopyFailure=<sceneId>`): trigger copy → assert error toast + rollback (no row added at destination) + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T078 Update-to-current: overflow → Update to current → assert thumbnail + visible_feature_ids refreshed in log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T079 Storyboard rename + describe: edit title → blur → assert update; edit description → assert update + log-panel cards `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
-- [ ] T080 Bulk refresh partial failure (via `?induceRefreshFailure=<sceneId>`): inject mixed-stale fixture → click Refresh All → assert badges cleared on success rows + retained on failure row + warning toast + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T074 Scene rename (inline): open chevron → edit title → submit → assert row text + `[data-testid="log-panel-card"][data-op="renameScene"]` `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T075 Duplicate-at-colliding-timestamp prompt: invoke Duplicate on colliding row → modal surfaces with Replace/Offset/Cancel → choose Offset → assert new row at offset timestamp + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T076 Copy-to-other (success): overflow → Copy to other → pick destination → assert success toast + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T077 Copy-to-other (deep-copy failure via `?induceCopyFailure=<sceneId>`): trigger copy → assert error toast + rollback (no row added at destination) + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T078 Update-to-current: overflow → Update to current → assert thumbnail + visible_feature_ids refreshed in log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T079 Storyboard rename + describe: edit title → blur → assert update; edit description → assert update + log-panel cards `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
+- [x] T080 Bulk refresh partial failure (via `?induceRefreshFailure=<sceneId>`): inject mixed-stale fixture → click Refresh All → assert badges cleared on success rows + retained on failure row + warning toast + log-panel card `apps/web-shell/playwright/tests/storyboard-edit.spec.ts`
 
 ### Interaction GIF spec (FR-042)
 
-- [ ] T081 Create the dedicated GIF capture spec with `recordVideo` configured; scenario performs rename → describe → delete + undo → refresh-stale; converts via `videoToGif.ts`; asserts file size < 2 MB and duration < 5 s; outputs to `specs/218-storyboarding-edit/evidence/screenshots/interaction.gif` `apps/web-shell/playwright/tests/storyboard-edit-interaction-gif.spec.ts`
+- [x] T081 Create the dedicated GIF capture spec with `recordVideo` configured; scenario performs rename → describe → delete + undo → refresh-stale; converts via `videoToGif.ts`; asserts file size < 2 MB and duration < 5 s; outputs to `specs/218-storyboarding-edit/evidence/screenshots/interaction.gif` `apps/web-shell/playwright/tests/storyboard-edit-interaction-gif.spec.ts`
 
 ### Refresh #218 evidence-table screenshots
 
-- [ ] T082 Inside the new scenarios (T074, T075, T079, T080), capture screenshots that refresh the #218 evidence-table entries: `storyboard-edit-form-open.png`, `storyboard-undo-toast.png`, `storyboard-stale-badge.png`, `storyboard-overflow-menu-open.png` — write into `specs/218-storyboarding-edit/evidence/screenshots/`
+- [x] T082 Inside the new scenarios (T074, T075, T079, T080), capture screenshots that refresh the #218 evidence-table entries: `storyboard-edit-form-open.png`, `storyboard-undo-toast.png`, `storyboard-stale-badge.png`, `storyboard-overflow-menu-open.png` — write into `specs/218-storyboarding-edit/evidence/screenshots/`
 
 ### Verification
 
-- [ ] T083 Run the full web-shell suite: `cd apps/web-shell && node run-playwright.mjs storyboard-edit` — all scenarios green
-- [ ] T084 Run the GIF capture spec: `cd apps/web-shell && node run-playwright.mjs storyboard-edit-interaction-gif` — `interaction.gif` exists at target path within budget
-- [ ] T085 Confirm the GIF + screenshots: `ls -la specs/218-storyboarding-edit/evidence/screenshots/`
+- [x] T083 Run the full web-shell suite: `cd apps/web-shell && node run-playwright.mjs storyboard-edit` — all scenarios green
+- [x] T084 Run the GIF capture spec: `cd apps/web-shell && node run-playwright.mjs storyboard-edit-interaction-gif` — `interaction.gif` exists at target path within budget
+- [x] T085 Confirm the GIF + screenshots: `ls -la specs/218-storyboarding-edit/evidence/screenshots/`
 
 ### Parallel-execution example for Phase 7
 
