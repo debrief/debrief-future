@@ -19,6 +19,7 @@
 |------|-------|--------|-------|
 | `test-preview-smoke.spec.ts` | 4 | ✅ all passing | Baseline cloud-setup verification (S01–S04) |
 | `test-storyboard-edit.spec.ts` | 12 | ✅ all passing | All 10 storyboard-edit commands reachable via palette + Show Panel + the rename-scene chrome screenshot. Run via `bash tests/e2e/scripts/cloud-e2e-setup.sh` then `pnpm exec playwright test --config tests/e2e/playwright.config.ts tests/e2e/test-storyboard-edit.spec.ts`. |
+| `test-storyboard-panel-screenshot.spec.ts` | 1 | ✅ passing (1 retry on first run — STAC tree timing) | Captures the analyst's actual workflow surface — Storyboard panel + map view side-by-side after loading Exercise Alpha via the STAC tree. |
 
 **Total code-server: 16 tests passing (4 baseline + 12 new).** Earlier snapshot of this evidence file mistakenly cited Issue #143 as a blocker — re-verified 2026-04-27: the cloud setup at `docs/project_notes/code-server-cloud-testing.md` works end-to-end, the chrome-only assertions in this spec do not require webview-iframe content, so #143 is not a blocker for this surface.
 
@@ -38,11 +39,13 @@
 | `storyboard-missing-data-remediation.png` | storyboard-edit.spec.ts:150 | smoke `missing-data harness knob renders affordance` |
 | `interaction.gif` | storyboard-edit-interaction-gif.spec.ts | Phase 7 interaction recording |
 
-### Phase 4 — pending vscode-native chrome capture
+### Phase 4 — VS Code chrome captures (live openvscode-server)
 
-| File | Source spec | Status |
-|------|-------------|--------|
-| `vscode-native-chrome.png` | tests/e2e/test-storyboard-edit.spec.ts | Pending — captured during `rename scene → native input-box visible mid-flow` once #143 unblocks |
+| File | Source spec | Captured by |
+|------|-------------|-------------|
+| `vscode-native-chrome.png` | tests/e2e/test-storyboard-edit.spec.ts | rename-scene mid-flow — palette pre-typed `>Storyboard: Rename Scene` |
+| `vscode-debrief-sidebar.png` | tests/e2e/test-storyboard-panel-screenshot.spec.ts | Debrief sidebar (no plot) showing TIME CONTROLLER, TOOLS, LAYERS, PROPERTIES |
+| `vscode-storyboard-panel.png` | tests/e2e/test-storyboard-panel-screenshot.spec.ts | Storyboard view + Map view side-by-side after loading Exercise Alpha — the analyst's actual viewport-selection workflow |
 
 ## Cloud testing path
 
