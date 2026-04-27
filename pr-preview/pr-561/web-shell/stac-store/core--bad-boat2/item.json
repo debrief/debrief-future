@@ -1,0 +1,130 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--bad-boat2",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.59394722222222,
+          21.913313888888887
+        ],
+        [
+          -21.586852777777775,
+          21.913313888888887
+        ],
+        [
+          -21.586852777777775,
+          21.92915
+        ],
+        [
+          -21.59394722222222,
+          21.92915
+        ],
+        [
+          -21.59394722222222,
+          21.913313888888887
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.59394722222222,
+    21.913313888888887,
+    -21.586852777777775,
+    21.92915
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Bad Boat2",
+    "datetime": "1995-12-12T05:19:00+00:00",
+    "description": "Saxon Warrior: Bad Boat2 — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Collingwood.",
+    "start_datetime": "1995-12-12T05:19:00+00:00",
+    "end_datetime": "1995-12-12T05:34:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "COLLINGWOOD",
+        "name": "HMS Collingwood",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer"
+      }
+    ],
+    "debrief:tags": [
+      "force-protection",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BAD_boat2 (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/BAD_boat2.rep",
+      "title": "BAD_boat2.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BAD_boat2": {
+      "href": "./assets/BAD_boat2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "BAD_boat2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/BAD_boat2.rep",
+        "load_timestamp": "2026-04-13T23:12:29.948990Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
