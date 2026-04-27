@@ -94,11 +94,11 @@
 
 ### Shared story-only mock-handlers helper (FR-003)
 
-- [ ] T008 [test] Unit-test the shared callback-adapter helper per T1A: (a) seed → `state` matches fixture; (b) `handlers.onSceneTitleRenameCommit('s1','new')` → state shows new title; (c) `handlers.onSceneDeleteRequested('s1')` → row removed AND `pendingUndoToast` populated; (d) `knobs.induceCopyFailure==='s1'` → `onSceneCopyToOtherClicked('s1')` dispatches the failure-branch action; (e) `knobs.induceRefreshFailure==='s2'` → `onSceneRefreshThumbnailClicked('s2')` retains the stale flag. `shared/components/src/panels/StoryboardPanel/__testing__/__tests__/storyOnlyMockHandlers.test.ts` *(post-ADR-027 — replaces the deleted T009 PortContext test)*
+- [x] T008 [test] Unit-test the shared callback-adapter helper per T1A: (a) seed → `state` matches fixture; (b) `handlers.onSceneTitleRenameCommit('s1','new')` → state shows new title; (c) `handlers.onSceneDeleteRequested('s1')` → row removed AND `pendingUndoToast` populated; (d) `knobs.induceCopyFailure==='s1'` → `onSceneCopyToOtherClicked('s1')` dispatches the failure-branch action; (e) `knobs.induceRefreshFailure==='s2'` → `onSceneRefreshThumbnailClicked('s2')` retains the stale flag. `shared/components/src/panels/StoryboardPanel/__testing__/__tests__/storyOnlyMockHandlers.test.ts` *(post-ADR-027 — replaces the deleted T009 PortContext test)*
 - [ ] T009 *(reserved — was the PortContext unit test; replaced by T008 above. Kept as a placeholder so downstream task IDs stay stable.)*
 - [ ] T010 *(reserved — was `StoryboardPanel.tsx` rewires to `usePanelPort()`; not needed in the callback-adapter architecture. The panel's existing callback-prop surface is the test seam.)*
-- [ ] T011 Create the `__testing__/` directory and add the shared callback-adapter helper exporting `useStoryOnlyMockHandlers`, `MockPortKnobs`, `SceneEditFixtureSeed`, `SceneFixtureSeed`, `MockHandlers` per contracts/harness-knobs.md §2 + data-model.md §1, §2 (uses `Pick<SceneRowViewModel, ...>` for the seed and `Pick<StoryboardPanelProps, ...>` for the handlers — D2A) `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`
-- [ ] T012 Re-export the helper from the panel barrel so harness + stories import via the package surface (2A convention) `shared/components/src/panels/StoryboardPanel/index.ts`
+- [x] T011 Create the `__testing__/` directory and add the shared callback-adapter helper exporting `useStoryOnlyMockHandlers`, `MockPortKnobs`, `SceneEditFixtureSeed`, `SceneFixtureSeed`, `MockHandlers` per contracts/harness-knobs.md §2 + data-model.md §1, §2 (uses `Pick<SceneRowViewModel, ...>` for the seed and `Pick<StoryboardPanelProps, ...>` for the handlers — D2A) `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`
+- [x] T012 Re-export the helper from the panel barrel so harness + stories import via the package surface (2A convention) `shared/components/src/panels/StoryboardPanel/index.ts`
 
 ### Extended query-string parser (FR-043, dual-knob)
 
@@ -130,19 +130,19 @@ T005, T006, T011, T013, T015, T017 touch independent files and may run in parall
 
 ### Refactor the harness to import the shared mock-handlers helper (FR-003)
 
-- [ ] T021 Replace the harness's inline reducer + handler wiring with `useStoryOnlyMockHandlers` from the shared helper. Spread the returned `handlers` onto the panel: `<StoryboardPanel ...stateProps {...handlers} />`. Thread the parsed query-string knobs (`induceCopyFailure`, `induceRefreshFailure`) through to the helper. **No `PortContext.Provider` wrap (post-ADR-027).** The harness's existing `useStoryboardEditReducer()` call at line 117 is removed — `useStoryOnlyMockHandlers` owns the reducer wiring now. Depends on T011 + T012. `apps/web-shell/src/StoryboardEditHarness.tsx`
-- [ ] T022 Run the existing storyboard-edit smoke E2E to prove the refactor preserves behaviour: `cd apps/web-shell && node run-playwright.mjs storyboard-edit` — record output to `specs/234-storyboard-edit-polish-followup/evidence/harness-refactor-smoke.txt`
+- [x] T021 Replace the harness's inline reducer + handler wiring with `useStoryOnlyMockHandlers` from the shared helper. Spread the returned `handlers` onto the panel: `<StoryboardPanel ...stateProps {...handlers} />`. Thread the parsed query-string knobs (`induceCopyFailure`, `induceRefreshFailure`) through to the helper. **No `PortContext.Provider` wrap (post-ADR-027).** The harness's existing `useStoryboardEditReducer()` call at line 117 is removed — `useStoryOnlyMockHandlers` owns the reducer wiring now. Depends on T011 + T012. `apps/web-shell/src/StoryboardEditHarness.tsx`
+- [x] T022 Run the existing storyboard-edit smoke E2E to prove the refactor preserves behaviour: `cd apps/web-shell && node run-playwright.mjs storyboard-edit` — record output to `specs/234-storyboard-edit-polish-followup/evidence/harness-refactor-smoke.txt`
 
 ### Upgrade the four stories (FR-001, FR-002)
 
-- [ ] T023 Upgrade `WithEditForm` (line 232): replace `args` with a render function that calls `useStoryOnlyMockHandlers(seed)` and spreads `{...handlers}` onto `<StoryboardPanel>`; demonstrates form open/submit/cancel. **No `PortContext.Provider` wrap.** `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T024 Upgrade `WithUndoToast` (line 256): same pattern; demonstrates delete + Undo cycle `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T025 Upgrade `WithStaleBadge` (line 281): pass `{ induceRefreshFailure: '<sceneId>' }` knob via story args so the failure toggle is exercisable from Storybook controls. The story render reads it from args and passes it to `useStoryOnlyMockHandlers(seed, knobs)`. `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T026 Upgrade `WithMissingDataRemediation` (line 301): same pattern; demonstrates keyboard-Tab focus + Enter dispatch `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T023 Upgrade `WithEditForm` (line 232): replace `args` with a render function that calls `useStoryOnlyMockHandlers(seed)` and spreads `{...handlers}` onto `<StoryboardPanel>`; demonstrates form open/submit/cancel. **No `PortContext.Provider` wrap.** `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T024 Upgrade `WithUndoToast` (line 256): same pattern; demonstrates delete + Undo cycle `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T025 Upgrade `WithStaleBadge` (line 281): pass `{ induceRefreshFailure: '<sceneId>' }` knob via story args so the failure toggle is exercisable from Storybook controls. The story render reads it from args and passes it to `useStoryOnlyMockHandlers(seed, knobs)`. `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T026 Upgrade `WithMissingDataRemediation` (line 301): same pattern; demonstrates keyboard-Tab focus + Enter dispatch `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
 ### Verification
 
-- [ ] T027 Run `pnpm --filter @debrief/components test` — reducer + component unit tests stay green (88+ assertions from #230 must still pass)
+- [x] T027 Run `pnpm --filter @debrief/components test` — reducer + component unit tests stay green (88+ assertions from #230 must still pass)
 - [ ] T028 Manual Storybook walkthrough: open each upgraded story; click chevron / Delete + Undo / Refresh / keyboard-Tab; confirm UI responds via the real reducer. Record results in `specs/234-storyboard-edit-polish-followup/evidence/storybook-walkthrough.md`
 
 ### Parallel-execution example for Phase 3
