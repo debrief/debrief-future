@@ -93,11 +93,18 @@ export function SceneRow({
     ? `Collapse edit form for ${scene.title}`
     : `Expand edit form for ${scene.title}`;
   return (
+    // 234 US3 fix (FR-022): role="listitem" was paired with role="list"
+    // on the parent SceneList; both removed because the parent
+    // interleaves rows with StaleBadge + SceneEditForm overlays
+    // (axe-core aria-required-children — critical). Accessible name
+    // remains via aria-label.
     <div
       ref={rowRef}
-      role="listitem"
       aria-label={`${scene.dtgLabel} — ${scene.title}`}
-      aria-expanded={onExpandToggle ? editFormOpen : undefined}
+      // 234 US3 fix (FR-022): aria-expanded was on the row div without
+      // a supporting role (axe-core aria-allowed-attr — critical). The
+      // attribute is correctly carried by the chevron button below; no
+      // duplication needed.
       data-testid="scene-row"
       data-scene-id={scene.sceneId}
       data-state={scene.state.kind}

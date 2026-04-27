@@ -202,20 +202,20 @@ T031–T041 all edit the same `test-storyboard-edit.spec.ts` file → must run s
 
 ### A11y spec (FR-020, FR-021, FR-023)
 
-- [ ] T052 Create the a11y spec with shared setup (axe version read from `@axe-core/playwright/package.json` once at suite start) `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
-- [ ] T053 Audit harness state #1: overflow menu open — call `categoriseAxeViolations`; collect serious/critical/moderate counts `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
-- [ ] T054 Audit harness state #2: edit form open + stale badge visible — same pattern `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
-- [ ] T055 Audit harness state #3: missing-data remediation visible — same pattern `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
-- [ ] T056 Audit each of the 4 story iframes × 3 theme variants (light/dark/vscode) using the iframe URL pattern `/iframe.html?id=components-storyboardpanel--with-edit-form&globals=theme:vscode` per research R4 `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
+- [x] T052 Create the a11y spec with shared setup (axe version read from `@axe-core/playwright/package.json` once at suite start) `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
+- [x] T053 Audit harness state #1: overflow menu open — call `categoriseAxeViolations`; collect serious/critical/moderate counts `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
+- [x] T054 Audit harness state #2: edit form open + stale badge visible — same pattern `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
+- [x] T055 Audit harness state #3: missing-data remediation visible — same pattern `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
+- [x] T056 Audit each of the 4 story iframes × 3 theme variants (light/dark/vscode) using the iframe URL pattern `/iframe.html?id=components-storyboardpanel--with-edit-form&globals=theme:vscode` per research R4 `apps/web-shell/playwright/tests/storyboard-edit-a11y.spec.ts`
 
 ### Evidence outputs (FR-023)
 
-- [ ] T057 Write `evidence/a11y-report.md` per data-model.md §3a — markdown table of (surface, theme, axe version, severity counts, status) + Accepted Risks section enumerating any moderate violations `specs/234-storyboard-edit-polish-followup/evidence/a11y-report.md`
-- [ ] T058 Write `evidence/a11y-results.json` per data-model.md §3b — consolidated raw axe results JSON (capturedAt + axeVersion + gitSha + per-surface results) `specs/234-storyboard-edit-polish-followup/evidence/a11y-results.json`
+- [x] T057 Write `evidence/a11y-report.md` per data-model.md §3a — markdown table of (surface, theme, axe version, severity counts, status) + Accepted Risks section enumerating any moderate violations `specs/234-storyboard-edit-polish-followup/evidence/a11y-report.md`
+- [x] T058 Write `evidence/a11y-results.json` per data-model.md §3b — consolidated raw axe results JSON (capturedAt + axeVersion + gitSha + per-surface results) `specs/234-storyboard-edit-polish-followup/evidence/a11y-results.json`
 
 ### Verification
 
-- [ ] T059 Run the full a11y suite: `cd apps/web-shell && node run-playwright.mjs storyboard-edit-a11y` — passes with zero serious/critical; total runtime measured (P3A: revisit if > 60 s); both report files written
+- [x] T059 Run the full a11y suite: `cd apps/web-shell && node run-playwright.mjs storyboard-edit-a11y` — passes with zero serious/critical; total runtime measured (P3A: revisit if > 60 s); both report files written
 
 ### Parallel-execution example for Phase 5
 
