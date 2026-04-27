@@ -1,9 +1,9 @@
 # Feature Specification: Storyboard Edit Suite — Polish Follow-up (stories, code-server E2E, a11y, perf, scenario completion)
 
-**Feature Branch**: `232-storyboard-edit-polish-followup`
+**Feature Branch**: `234-storyboard-edit-polish-followup`
 **Created**: 2026-04-24
 **Status**: Draft
-**Input**: Backlog item 232 (follow-up to #230, which landed the core wiring + harness + smoke E2E but deferred five discrete polish items). Parent: #230 Storyboard edit suite webview wiring.
+**Input**: Backlog item 234 (follow-up to #230, which landed the core wiring + harness + smoke E2E but deferred five discrete polish items). Parent: #230 Storyboard edit suite webview wiring. *Originally captured as backlog #232; renumbered to #234 on 2026-04-26 to disambiguate from the unrelated `232-apply-archive-rebuild` migration.*
 
 ---
 
@@ -79,7 +79,7 @@ A developer changing the Storyboard panel's refresh path can't silently regress 
 
 **Why this priority**: Medium-value regression guard. #230's refresh-payload enrichment preserved the bound structurally, but without a test, future changes could walk the scene list twice unintentionally. The test is cheap; the insurance is valuable.
 
-**Independent Test**: Run `pnpm --filter debrief-vscode test perf`. The perf test builds a synthetic plot with the spec-bound scale (5 Storyboards × 50 Scenes each), calls `storyboardPanelView.refresh()` 100 times, and asserts the median wall-clock is ≤ 50 ms.
+**Independent Test**: Run `pnpm --filter @debrief/components test composeSceneEditViewModels.perf`. The perf test builds a synthetic plot with the spec-bound scale (5 Storyboards × 50 Scenes each), calls `composeSceneEditViewModels()` against the active storyboard 100 times, and asserts the median wall-clock is ≤ 50 ms (60 ms in CI). The test targets the pure composer rather than the webview-coupled `storyboardPanelView.refresh()` — see research R5 + FR-030 for the rationale; the FR-008 active-only invariant is what the budget really guards.
 
 **Acceptance Scenarios**:
 
@@ -127,7 +127,7 @@ A reviewer looking at the shipped blog post or the #218 evidence table wants to 
 
 **Code-server chrome-only E2E (US2)**
 
-- **FR-010**: `apps/vscode/tests/e2e/test-storyboard-edit.spec.ts` MUST exist and cover command-palette invocation for each of the 11 new commands (rename, describe, delete, undo, update-to-current, duplicate, copy-to-other, refresh-thumbnail, refresh-all-stale, storyboard-rename, storyboard-describe).
+- **FR-010**: `tests/e2e/test-storyboard-edit.spec.ts` (repo root, alongside the existing `test-storyboard-playback.spec.ts`) MUST exist and cover command-palette invocation for each of the 11 new commands (rename, describe, delete, undo, update-to-current, duplicate, copy-to-other, refresh-thumbnail, refresh-all-stale, storyboard-rename, storyboard-describe).
 - **FR-011**: The spec MUST exercise each native input-box prompt (rename scene, duplicate-timestamp collision, storyboard rename) via `.monaco-inputbox input`.
 - **FR-012**: The spec MUST exercise the native quick-pick for copy-to-other destination via `.quick-input-widget input`.
 - **FR-013**: The spec MUST observe the native `showInformationMessage` / `showWarningMessage` toast surfaces for success + error paths.
@@ -139,20 +139,26 @@ A reviewer looking at the shipped blog post or the #218 evidence table wants to 
 - **FR-020**: An `@axe-core/playwright` audit MUST run against three harness states (overflow menu open; edit form + stale badge visible; missing-data remediation visible).
 - **FR-021**: The same audit MUST run against the iframe of each of the four upgraded Storybook stories.
 - **FR-022**: No `serious` or `critical` violations are permitted. `moderate` violations MUST be either fixed or logged in `evidence/a11y-report.md` with an accepted-risk rationale.
-- **FR-023**: `evidence/a11y-report.md` MUST enumerate: surfaces audited, axe version, violation counts by severity, and any accepted-risk entries.
+- **FR-023**: `evidence/a11y-report.md` MUST enumerate: surfaces audited, axe version, violation counts by severity, and any accepted-risk entries. The audit MUST also write `evidence/a11y-results.json` containing the raw axe output per surface (one consolidated JSON file or per-surface files) so future re-analysis can run without re-executing the suite.
 
 **Perf budget (US4)**
 
-- **FR-030**: An automated perf test MUST build a 5 × 50-Scene synthetic plot, invoke `storyboardPanelView.refresh()` 100 times, and assert median wall-clock ≤ 50 ms (hard budget) with a CI-only 20 % tolerance buffer.
-- **FR-031**: The perf test MUST run as part of the `debrief-vscode` test suite so CI catches regressions.
+- **FR-030**: An automated perf test MUST build a synthetic plot at 5 Storyboards × 50 Scenes (= 250 Scenes in memory) and invoke `composeSceneEditViewModels()` against the **active** Storyboard's 50 Scenes 100 times. The 5 × 50 fixture exists to validate the FR-008 active-storyboard-only invariant carried forward from #230 — i.e., the composer MUST NOT walk the inactive Storyboards' scenes. Median wall-clock ≤ 50 ms (hard budget); CI tolerance buffer of 20 % (60 ms soft cap). The target is the pure exported function at `shared/components/src/panels/StoryboardPanel/types.ts:325` rather than `storyboardPanelView.refresh()`, because the latter is webview-coupled and would require extensive `vscode` API mocks that obscure the measurement.
+- **FR-031**: The perf test MUST run as part of the `@debrief/components` (or `debrief-vscode`) vitest suite so CI catches regressions.
 - **FR-032**: A deliberate regression MUST fail the test loudly with the measured median in the failure message — the test is not allowed to pass without an explicit assertion on the upper bound.
 
 **Playwright scenario completion + interaction GIF (US5)**
 
-- **FR-040**: The web-shell E2E spec MUST cover, in addition to #230's smoke set: Scene title rename (inline edit), duplicate-at-colliding-timestamp prompt, copy-to-other-storyboard (success), copy-to-other deep-copy failure (via `?induceCopyFailure` knob), update-to-current, Storyboard rename + describe, and bulk refresh partial failure.
+- **FR-040**: The web-shell E2E spec MUST cover, in addition to #230's smoke set: Scene title rename (inline edit), duplicate-at-colliding-timestamp prompt, copy-to-other-storyboard (success), copy-to-other deep-copy failure (via `?induceCopyFailure` knob), update-to-current, Storyboard rename + describe, and bulk refresh partial failure (via `?induceRefreshFailure` knob).
 - **FR-041**: Every successful edit op MUST assert a matching Log Panel card via `[data-testid="log-panel-card"]` with a `data-op` attribute matching the operation type (FR-035 from #230 extended to the new scenarios).
-- **FR-042**: A short (< 5 s, < 2 MB) interaction GIF MUST be captured showing rename → describe → delete + undo → refresh-stale, rendered at `specs/218-storyboarding-edit/evidence/screenshots/interaction.gif`.
-- **FR-043**: The harness MUST support an `?induceCopyFailure=<sceneId>` query-string knob so the deep-copy failure path is deterministically reachable by Playwright.
+- **FR-042**: A short (< 5 s, < 2 MB) interaction GIF MUST be captured showing rename → describe → delete + undo → refresh-stale, rendered at `specs/218-storyboarding-edit/evidence/screenshots/interaction.gif`. The capture helper MUST emit a build warning at 1.8 MB (10 % soft margin) and fail the test at 2 MB (hard cap) so runner-variance does not silently breach the budget.
+- **FR-043**: The harness MUST support two query-string knobs so failure paths are deterministically reachable by Playwright: `?induceCopyFailure=<sceneId>` (routes copy-to-other to the deep-copy rollback branch for the matching Scene) AND `?induceRefreshFailure=<sceneId>` (routes refresh-thumbnail / refresh-all-stale to the per-Scene failure branch for the matching Scene). Both knobs are parsed by `apps/web-shell/src/storyboard-edit-harness-querystring.ts` and threaded through `MockPortKnobs`.
+
+**Test-only boundary, ffmpeg toolchain, public API contract (review-driven additions)**
+
+- **FR-044**: The `__testing__/` directory under `shared/components/src/panels/StoryboardPanel/` is the test-only export surface for stories + harness. An ESLint `no-restricted-imports` rule MUST forbid any file under `apps/vscode/src/**` from importing `@debrief/components/**/__testing__/*` (or the equivalent deep import path). The rule MUST live in the `apps/vscode/` ESLint config and be exercised by `pnpm lint`. Convention alone is not load-bearing; CI enforces it.
+- **FR-045**: A new Taskfile target (`task verify:ffmpeg` or inline check inside `task verify`) MUST verify that `ffmpeg` is available on the PATH and exits non-zero with a clear remediation message if it is not. The Playwright GIF helper depends on ffmpeg as a system binary (proven by #217 T520); failing fast at `task verify` time prevents the GIF spec from emitting an unhelpful Playwright error mid-run.
+- **FR-046**: `composeSceneEditViewModels()` MUST be formalised as a public-API surface of `@debrief/components`. Concretely: (a) its full signature + invariant ("active storyboard scenes only, O(active-storyboard Scenes)") MUST be documented in a new `shared/components/src/panels/StoryboardPanel/CONTRACTS.md`; (b) the perf test (FR-030) cites this contract so the regression-loud failure message references the contract rather than just the function name; (c) `shared/components/CHANGELOG.md` MUST gain an entry promoting `composeSceneEditViewModels` from "exported helper" to "public API with perf invariant" so downstream consumers know the surface is stable.
 
 ### Key Entities
 
@@ -176,6 +182,7 @@ A reviewer looking at the shipped blog post or the #218 evidence table wants to 
 - **SC-006**: `specs/218-storyboarding-edit/evidence/screenshots/interaction.gif` exists, is < 5 s and < 2 MB, and shows the core polish loop.
 - **SC-007**: #230's and #218's test baselines both remain 100 % green; no regressions in existing component / vscode / web-shell / Playwright suites.
 - **SC-008**: Every functional requirement in this spec is covered by at least one automated test or capture step.
+- **SC-009**: `pnpm lint` fails when any file under `apps/vscode/src/**` imports a `__testing__/*` path (FR-044 enforcement); `task verify` fails when ffmpeg is missing on the local toolchain (FR-045); `composeSceneEditViewModels` appears in `shared/components/CHANGELOG.md` with a "public-API + perf invariant" entry (FR-046).
 
 ---
 
