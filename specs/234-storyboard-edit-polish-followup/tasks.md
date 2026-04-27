@@ -65,9 +65,9 @@
 **Goal**: Confirm baseline green before any changes; create the feature evidence + media directories.
 
 - [ ] T001 Confirm baseline green by running `task verify` on main + the feature branch. Capture output to `specs/234-storyboard-edit-polish-followup/evidence/baseline-verify.txt`
-- [ ] T002 [P] Create the feature evidence directory if missing `specs/234-storyboard-edit-polish-followup/evidence/`
-- [ ] T003 [P] Create the feature media directory `specs/234-storyboard-edit-polish-followup/media/`
-- [ ] T004 [P] Confirm ffmpeg is available locally (`ffmpeg -version`) — this is the baseline check FR-045 will automate; document the version + remediation path in `specs/234-storyboard-edit-polish-followup/evidence/baseline-verify.txt`
+- [x] T002 [P] Create the feature evidence directory if missing `specs/234-storyboard-edit-polish-followup/evidence/`
+- [x] T003 [P] Create the feature media directory `specs/234-storyboard-edit-polish-followup/media/`
+- [x] T004 [P] Confirm ffmpeg is available locally (`ffmpeg -version`) — this is the baseline check FR-045 will automate; document the version + remediation path in `specs/234-storyboard-edit-polish-followup/evidence/baseline-verify.txt`
 
 ## Phase 2: Foundation
 
@@ -82,9 +82,9 @@
 
 ### Public-API contract for `composeSceneEditViewModels` (FR-046)
 
-- [ ] T005 Create the public-API contract document `shared/components/src/panels/StoryboardPanel/CONTRACTS.md` with the pinned signature, the FR-008 active-only invariant, the FR-030 perf budget (50 ms hard / 60 ms soft), and re-baselining conditions per data-model.md §5
-- [ ] T006 Add an "Unreleased — Public API" entry to `shared/components/CHANGELOG.md` promoting `composeSceneEditViewModels` from "exported helper" to "public API with perf invariant"; cite FR-046
-- [ ] T007 Update the JSDoc on `composeSceneEditViewModels` in `shared/components/src/panels/StoryboardPanel/types.ts` (line 325) to point at `CONTRACTS.md`
+- [x] T005 Create the public-API contract document `shared/components/src/panels/StoryboardPanel/CONTRACTS.md` with the pinned signature, the FR-008 active-only invariant, the FR-030 perf budget (50 ms hard / 60 ms soft), and re-baselining conditions per data-model.md §5
+- [x] T006 Add an "Unreleased — Public API" entry to `shared/components/CHANGELOG.md` promoting `composeSceneEditViewModels` from "exported helper" to "public API with perf invariant"; cite FR-046
+- [x] T007 Update the JSDoc on `composeSceneEditViewModels` in `shared/components/src/panels/StoryboardPanel/types.ts` (line 325) to point at `CONTRACTS.md`
 
 ### `PortContext` (D3A)
 
@@ -99,17 +99,17 @@
 
 ### Extended query-string parser (FR-043, dual-knob)
 
-- [ ] T013 Extend the harness query-string parser to accept BOTH `induceCopyFailure` AND `induceRefreshFailure` knobs per contracts/harness-knobs.md §1; empty values drop the field with a console warning `apps/web-shell/src/storyboard-edit-harness-querystring.ts`
-- [ ] T014 [test] Unit-test the parser with 5 cases per T3A: copy set, refresh set, both set, missing, invalid (empty) `apps/web-shell/src/__tests__/storyboard-edit-harness-querystring.test.ts`
+- [x] T013 Extend the harness query-string parser to accept BOTH `induceCopyFailure` AND `induceRefreshFailure` knobs per contracts/harness-knobs.md §1; empty values drop the field with a console warning `apps/web-shell/src/storyboard-edit-harness-querystring.ts`
+- [x] T014 [test] Unit-test the parser with 5 cases per T3A: copy set, refresh set, both set, missing, invalid (empty) `apps/web-shell/src/__tests__/storyboard-edit-harness-querystring.test.ts`
 
 ### ESLint test-only boundary (FR-044)
 
-- [ ] T015 Add a `no-restricted-imports` rule under the `apps/vscode/` ESLint config forbidding any path matching `**/__testing__/**` or `@debrief/components/**/__testing__/*`; verify the rule fires by adding a temporary forbidden import then reverting `apps/vscode/eslint.config.mjs` (or `.eslintrc.cjs` per current config style)
-- [ ] T016 Confirm `pnpm lint` from repo root exercises the new rule (no new script needed — existing `pnpm lint` should already cover `apps/vscode`)
+- [x] T015 Add a `no-restricted-imports` rule under the `apps/vscode/` ESLint config forbidding any path matching `**/__testing__/**` or `@debrief/components/**/__testing__/*`; verify the rule fires by adding a temporary forbidden import then reverting `apps/vscode/eslint.config.mjs` (or `.eslintrc.cjs` per current config style)
+- [x] T016 Confirm `pnpm lint` from repo root exercises the new rule (no new script needed — existing `pnpm lint` should already cover `apps/vscode`)
 
 ### Taskfile ffmpeg check (FR-045)
 
-- [ ] T017 Add the `verify:ffmpeg` target (or inline check) that runs `ffmpeg -version >/dev/null 2>&1` and exits non-zero with a clear remediation message ("ffmpeg required for GIF capture (#234 FR-045) — install via Homebrew/apt/scoop") when missing; wire it as a dependency of `verify` `Taskfile.yml`
+- [x] T017 Add the `verify:ffmpeg` target (or inline check) that runs `ffmpeg -version >/dev/null 2>&1` and exits non-zero with a clear remediation message ("ffmpeg required for GIF capture (#234 FR-045) — install via Homebrew/apt/scoop") when missing; wire it as a dependency of `verify` `Taskfile.yml`
 
 ### Parallel-execution example for Phase 2
 
@@ -156,25 +156,25 @@ T023, T024, T025, T026 all edit the same `StoryboardPanel.stories.tsx` file → 
 
 ### Spec scaffolding
 
-- [ ] T030 Create the code-server E2E spec with the global setup boilerplate copied from `tests/e2e/test-storyboard-playback.spec.ts` (selector helpers `.monaco-inputbox input`, `.quick-input-widget input`, notification-surface) `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T030 Create the code-server E2E spec with the global setup boilerplate copied from `tests/e2e/test-storyboard-playback.spec.ts` (selector helpers `.monaco-inputbox input`, `.quick-input-widget input`, notification-surface) `tests/e2e/test-storyboard-edit.spec.ts`
 
 ### Per-command coverage (FR-010)
 
-- [ ] T031 Cover `Storyboard: Rename scene` — palette → native input-box → assert `[data-testid="log-panel-card"][data-op="renameScene"]` appears `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T032 Cover `Storyboard: Describe scene` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T033 Cover `Storyboard: Delete scene` — palette → assert deletion + Undo toast surface (no native prompt) `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T034 Cover `Storyboard: Undo delete` — palette → assert restoration `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T035 Cover `Storyboard: Update scene to current` — palette → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T036 Cover `Storyboard: Duplicate scene` — palette → if collision detected, native modal surfaces with Replace/Offset/Cancel options (FR-011) → choose Offset → assert new row at offset timestamp `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T037 Cover `Storyboard: Copy scene to other storyboard` — palette → native quick-pick (FR-012) → select destination → assert success toast (FR-013) `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T038 Cover `Storyboard: Refresh scene thumbnail` — palette → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T039 Cover `Storyboard: Refresh all stale` — palette → assert log-panel card with summary `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T040 Cover `Storyboard: Rename storyboard` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
-- [ ] T041 Cover `Storyboard: Describe storyboard` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T031 Cover `Storyboard: Rename scene` — palette → native input-box → assert `[data-testid="log-panel-card"][data-op="renameScene"]` appears `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T032 Cover `Storyboard: Describe scene` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T033 Cover `Storyboard: Delete scene` — palette → assert deletion + Undo toast surface (no native prompt) `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T034 Cover `Storyboard: Undo delete` — palette → assert restoration `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T035 Cover `Storyboard: Update scene to current` — palette → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T036 Cover `Storyboard: Duplicate scene` — palette → if collision detected, native modal surfaces with Replace/Offset/Cancel options (FR-011) → choose Offset → assert new row at offset timestamp `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T037 Cover `Storyboard: Copy scene to other storyboard` — palette → native quick-pick (FR-012) → select destination → assert success toast (FR-013) `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T038 Cover `Storyboard: Refresh scene thumbnail` — palette → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T039 Cover `Storyboard: Refresh all stale` — palette → assert log-panel card with summary `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T040 Cover `Storyboard: Rename storyboard` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
+- [x] T041 Cover `Storyboard: Describe storyboard` — palette → native input-box → assert log-panel card `tests/e2e/test-storyboard-edit.spec.ts`
 
 ### Native-chrome screenshot (FR-015)
 
-- [ ] T042 During the rename-scene flow (T031), capture one mid-flow screenshot showing the native `.monaco-inputbox` visible, save to `specs/218-storyboarding-edit/evidence/screenshots/vscode-native-chrome.png`
+- [x] T042 During the rename-scene flow (T031), capture one mid-flow screenshot showing the native `.monaco-inputbox` visible, save to `specs/218-storyboarding-edit/evidence/screenshots/vscode-native-chrome.png`
 
 ### Verification
 
@@ -194,8 +194,8 @@ T031–T041 all edit the same `test-storyboard-edit.spec.ts` file → must run s
 
 ### Pure categoriser helper (T4A — pull pass/fail/warn logic out of the spec)
 
-- [ ] T050 Create the pure categoriser helper `categoriseAxeViolations(results)` returning `{ fail, warn, ignore }` per research R12 `apps/web-shell/playwright/helpers/a11yCategoriser.ts`
-- [ ] T051 [test] Unit-test the categoriser per T4A: serious → fail, critical → fail, moderate → warn + report-row written via injectable writer, minor → ignore, mixed input partitioned correctly `apps/web-shell/playwright/helpers/__tests__/a11yCategoriser.test.ts`
+- [x] T050 Create the pure categoriser helper `categoriseAxeViolations(results)` returning `{ fail, warn, ignore }` per research R12 `apps/web-shell/playwright/helpers/a11yCategoriser.ts`
+- [x] T051 [test] Unit-test the categoriser per T4A: serious → fail, critical → fail, moderate → warn + report-row written via injectable writer, minor → ignore, mixed input partitioned correctly `apps/web-shell/playwright/helpers/__tests__/a11yCategoriser.test.ts`
 
 ### A11y spec (FR-020, FR-021, FR-023)
 
@@ -226,8 +226,8 @@ T050 + T052 are independent files and may run in parallel. T051 depends on T050.
 
 ### Perf test (FR-030, FR-031, FR-032)
 
-- [ ] T060 Create the perf test mirroring the `storyboardEditService.perf.test.ts` methodology (median over 100 iterations, JIT warm-up untimed, vitest); target is `composeSceneEditViewModels` per data-model.md §5 + research R5; failure message cites `CONTRACTS.md` per FR-046 `shared/components/src/panels/StoryboardPanel/__tests__/composeSceneEditViewModels.perf.test.ts`
-- [ ] T061 Build the 5 × 50 Scene synthetic fixture inline in the test file (or in a sibling fixtures helper) — 250 scenes total, only the active storyboard's 50 are exercised per call `shared/components/src/panels/StoryboardPanel/__tests__/composeSceneEditViewModels.perf.test.ts`
+- [x] T060 Create the perf test mirroring the `storyboardEditService.perf.test.ts` methodology (median over 100 iterations, JIT warm-up untimed, vitest); target is `composeSceneEditViewModels` per data-model.md §5 + research R5; failure message cites `CONTRACTS.md` per FR-046 `shared/components/src/panels/StoryboardPanel/__tests__/composeSceneEditViewModels.perf.test.ts`
+- [x] T061 Build the 5 × 50 Scene synthetic fixture inline in the test file (or in a sibling fixtures helper) — 250 scenes total, only the active storyboard's 50 are exercised per call `shared/components/src/panels/StoryboardPanel/__tests__/composeSceneEditViewModels.perf.test.ts`
 
 ### Regression-loud verification (FR-032)
 
@@ -235,7 +235,7 @@ T050 + T052 are independent files and may run in parallel. T051 depends on T050.
 
 ### Evidence
 
-- [ ] T063 Write `specs/234-storyboard-edit-polish-followup/evidence/perf-budget-234.md` — measured median + p95 from a clean run, the synthetic regression failure transcript from T062, references to FR-008 + FR-030 + FR-046
+- [x] T063 Write `specs/234-storyboard-edit-polish-followup/evidence/perf-budget-234.md` — measured median + p95 from a clean run, the synthetic regression failure transcript from T062, references to FR-008 + FR-030 + FR-046
 
 ### Verification
 
@@ -255,9 +255,9 @@ T060 + T061 are linked (same file) → sequential. T062 + T063 depend on the tes
 
 ### videoToGif helper (T2A)
 
-- [ ] T070 Create the GIF conversion helper `convertWebmToGif(input, output, opts?)` shelling out to ffmpeg via `child_process.execFile` with palettegen + paletteuse + 10 fps + max-width 960 px; return measured size + duration; warn at 1.8 MB (P2A) `apps/web-shell/playwright/helpers/videoToGif.ts`
-- [ ] T071 Check in the 50 KB sample webm fixture for the helper's unit test (1 second of solid colour) `apps/web-shell/playwright/fixtures/sample.webm`
-- [ ] T072 [test] Unit-test the helper per T2A: output GIF exists, fps ≤ 12, size > 0, duration matches input ± 0.1 s; skip when ffmpeg missing locally `apps/web-shell/playwright/helpers/__tests__/videoToGif.test.ts`
+- [x] T070 Create the GIF conversion helper `convertWebmToGif(input, output, opts?)` shelling out to ffmpeg via `child_process.execFile` with palettegen + paletteuse + 10 fps + max-width 960 px; return measured size + duration; warn at 1.8 MB (P2A) `apps/web-shell/playwright/helpers/videoToGif.ts`
+- [x] T071 Check in the 50 KB sample webm fixture for the helper's unit test (1 second of solid colour) `apps/web-shell/playwright/fixtures/sample.webm`
+- [x] T072 [test] Unit-test the helper per T2A: output GIF exists, fps ≤ 12, size > 0, duration matches input ± 0.1 s; skip when ffmpeg missing locally `apps/web-shell/playwright/helpers/__tests__/videoToGif.test.ts`
 
 ### Wire the dual-knob into the harness mock-port (FR-043 — depends on T013/T014/T021)
 
