@@ -57,4 +57,46 @@ describe('parseHarnessQueryString', () => {
     expect(out.pendingDeleteSceneIds).toEqual(['sceneB']);
     expect(out.missingDataBySceneId).toEqual({ sceneC: ['f1'] });
   });
+
+  // --- Feature 234 FR-043 — dual failure-injection knobs (T3A) ---------
+  describe('failure-injection knobs (FR-043)', () => {
+    it('parses `induceCopyFailure=sceneB`', () => {
+      const out = parseHarnessQueryString('?induceCopyFailure=sceneB');
+      expect(out.induceCopyFailure).toBe('sceneB');
+      expect(out.induceRefreshFailure).toBeUndefined();
+    });
+
+    it('parses `induceRefreshFailure=sceneC`', () => {
+      const out = parseHarnessQueryString('?induceRefreshFailure=sceneC');
+      expect(out.induceRefreshFailure).toBe('sceneC');
+      expect(out.induceCopyFailure).toBeUndefined();
+    });
+
+    it('parses both knobs independently when set together', () => {
+      const out = parseHarnessQueryString(
+        '?induceCopyFailure=sceneB&induceRefreshFailure=sceneC',
+      );
+      expect(out.induceCopyFailure).toBe('sceneB');
+      expect(out.induceRefreshFailure).toBe('sceneC');
+    });
+
+    it('omits both fields when neither knob is present', () => {
+      const out = parseHarnessQueryString('?stale=sceneA');
+      expect(out.induceCopyFailure).toBeUndefined();
+      expect(out.induceRefreshFailure).toBeUndefined();
+    });
+
+    it('drops an empty knob value with a warning', () => {
+      const warnings: string[] = [];
+      const out = parseHarnessQueryString(
+        '?induceCopyFailure=&induceRefreshFailure=   ',
+        { warn: (m) => warnings.push(m) },
+      );
+      expect(out.induceCopyFailure).toBeUndefined();
+      expect(out.induceRefreshFailure).toBeUndefined();
+      expect(warnings.length).toBe(2);
+      expect(warnings[0]).toContain('induceCopyFailure');
+      expect(warnings[1]).toContain('induceRefreshFailure');
+    });
+  });
 });

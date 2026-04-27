@@ -321,6 +321,12 @@ export function storyboardEditReducer(
  * Rows without a baseline entry synthesise a minimal view-model so the
  * chevron/overflow affordances still work (fallback for fixtures that
  * don't provide per-row edit VMs).
+ *
+ * **Public API — see `./CONTRACTS.md` for the pinned signature, the
+ * O(active-storyboard Scenes) invariant (FR-008), and the perf budget
+ * (median ≤ 50 ms over 100 iterations on a 50-Scene active storyboard,
+ * FR-030). The perf-regression guard is
+ * `__tests__/composeSceneEditViewModels.perf.test.ts`.**
  */
 export function composeSceneEditViewModels(
   state: StoryboardEditReducerState,
