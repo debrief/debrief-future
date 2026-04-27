@@ -304,10 +304,10 @@ T070 + T071 + T073 touch independent files and may run in parallel. T072 depends
 
 ### Evidence Collection
 
-- [ ] T091 Capture test results using `.specify/templates/evidence/test-summary-template.md` with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body enumerates: total tests, passed, failed, coverage %, key scenarios verified across US1–US5 + FR-044/045/046 `specs/234-storyboard-edit-polish-followup/evidence/test-summary.md`
-- [ ] T092 [P] Create usage demonstration showing the polish loop end-to-end: open a story, click chevron, type new title, submit, observe row update + log-panel card; include code-server palette example for one command + web-shell scenario for one new flow `specs/234-storyboard-edit-polish-followup/evidence/usage-example.md`
-- [ ] T093 [P] Write the web-shell + code-server E2E summary: pass/fail per spec file + screenshot index `specs/234-storyboard-edit-polish-followup/evidence/webview-e2e-summary.md`
-- [ ] T094 [P] Confirm all evidence files exist per the table at the top of this file: opening-context.md (✓ already), test-summary.md, usage-example.md, a11y-report.md, a11y-results.json, webview-e2e-summary.md, perf-budget-234.md, plus the cross-feature screenshots/interaction.gif under `specs/218-storyboarding-edit/evidence/screenshots/`
+- [x] T091 Capture test results using `.specify/templates/evidence/test-summary-template.md` with YAML front matter (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`); body enumerates: total tests, passed, failed, coverage %, key scenarios verified across US1–US5 + FR-044/045/046 `specs/234-storyboard-edit-polish-followup/evidence/test-summary.md`
+- [x] T092 [P] Create usage demonstration showing the polish loop end-to-end: open a story, click chevron, type new title, submit, observe row update + log-panel card; include code-server palette example for one command + web-shell scenario for one new flow `specs/234-storyboard-edit-polish-followup/evidence/usage-example.md`
+- [x] T093 [P] Write the web-shell + code-server E2E summary: pass/fail per spec file + screenshot index `specs/234-storyboard-edit-polish-followup/evidence/webview-e2e-summary.md`
+- [x] T094 [P] Confirm all evidence files exist per the table at the top of this file: opening-context.md (✓ already), test-summary.md, usage-example.md, a11y-report.md, a11y-results.json, webview-e2e-summary.md, perf-budget-234.md, plus the cross-feature screenshots/interaction.gif under `specs/218-storyboarding-edit/evidence/screenshots/`
 
 ### Media Content
 
