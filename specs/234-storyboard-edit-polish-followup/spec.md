@@ -106,7 +106,7 @@ A reviewer looking at the shipped blog post or the #218 evidence table wants to 
 
 ### Edge Cases
 
-- **Storybook story interactivity without VS Code postMessage**: the stories need a thin mock-port wrapper (same pattern as the web-shell harness but simpler — no URL knobs required). Stories must work when Storybook opens their iframe in isolation.
+- **Storybook story interactivity without VS Code postMessage**: the stories need the shared callback-adapter helper (`useStoryOnlyMockHandlers`) — same shape as the web-shell harness but stories don't parse URL knobs (story args may pass them inline). Stories must work when Storybook opens their iframe in isolation. Post-ADR-027 there is no port to wrap; the helper translates panel callbacks directly to reducer dispatches.
 - **Code-server native selectors across VS Code versions**: `.monaco-inputbox input` and `.quick-input-widget input` selectors are stable in VS Code 1.85+, but regression guard by re-using the selector helpers from `test-storyboard-playback.spec.ts:261` rather than re-declaring.
 - **Axe noise on the whole panel**: do not run axe against the full panel — scope to the specific surface under test. A full-panel scan leaks out into non-230 surfaces (LogPanel, etc.) that are not this feature's contract.
 - **Perf test variance**: wall-clock medians are susceptible to CI-machine noise. Run the refresh 100× and use the median (not the mean); allow a CI-only 20 % tolerance buffer (hard budget 50 ms, soft budget 60 ms).
@@ -123,7 +123,7 @@ A reviewer looking at the shipped blog post or the #218 evidence table wants to 
 
 - **FR-001**: The four edit-suite Storybook stories (`WithEditForm`, `WithUndoToast`, `WithStaleBadge`, `WithMissingDataRemediation`) MUST consume `useStoryboardEditReducer` via a story-only mock-port wrapper. Static `args`-based props are replaced.
 - **FR-002**: Each story MUST support the specific interactive flow for its name (form open/submit/cancel, delete+undo, stale refresh success + induced failure, missing-data remediation keyboard reach).
-- **FR-003**: The story-only mock-port MUST be the same behavioural layer as the web-shell harness's mock port — if the harness's port exports a reusable factory, the stories import it; otherwise factor out a shared helper in `shared/components/src/panels/StoryboardPanel/`.
+- **FR-003**: The story-only behavioural layer MUST be **shared** with the web-shell harness — a single helper (`useStoryOnlyMockHandlers`) under `shared/components/src/panels/StoryboardPanel/__testing__/` that the harness AND each of the four upgraded stories import. The helper translates panel callbacks into reducer dispatches (post-knob filter for failure injection) and returns `{state, dispatch, handlers}` where `handlers` is a `Pick<StoryboardPanelProps, ...>` spread onto `<StoryboardPanel {...handlers} />`. **Architecture: callback adapter, not port — see ADR-027.** `<StoryboardPanel>` stays purely presentational; no `PortContext`, no `OutboundMessage`, no production webview rewrite.
 
 **Code-server chrome-only E2E (US2)**
 

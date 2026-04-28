@@ -1,14 +1,15 @@
 # Phase 1 Data Model — Storyboard Edit Suite Polish Follow-up
 
 **Feature**: 234-storyboard-edit-polish-followup
-**Date**: 2026-04-26
+**Date**: 2026-04-26 (revised 2026-04-27)
+**Architecture pivot:** ADR-027 — entry §4 (`PanelPort`) **deleted** with the move from `PortContext` to a shared callback-adapter helper. See `research.md` R10b and `contracts/harness-knobs.md` §2.
 **Status**: No persistent schema changes. This document records the test-time entities introduced.
 
 ---
 
 ## Summary
 
-This feature adds **no production data structures, no LinkML changes, no Pydantic models, and no new persisted state**. It introduces three test-time entities — captured here so reviewers can audit them without spelunking through code.
+This feature adds **no production data structures, no LinkML changes, no Pydantic models, and no new persisted state**. It introduces three test-time entities + one promoted public-API entry — captured here so reviewers can audit them without spelunking through code.
 
 ---
 
@@ -16,20 +17,22 @@ This feature adds **no production data structures, no LinkML changes, no Pydanti
 
 ### 1. `MockPortKnobs`
 
-Small bag of optional flags consumed by the shared story-only mock-port (R1, R7). Defined in `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockPort.ts`.
+Small bag of optional flags consumed by the shared story-only **mock-handlers helper** (R1 + R10b post-pivot, R7). Defined in `shared/components/src/panels/StoryboardPanel/__testing__/storyOnlyMockHandlers.ts`.
+
+> **Naming.** The type is named `MockPortKnobs` (rather than e.g. `MockHandlerKnobs`) for continuity with the URL-knob contract in `contracts/harness-knobs.md` §1, and because the spec references this name throughout. Post-ADR-027 there is no port; the type name is a vestigial label, not an architectural claim.
 
 **Type:**
 
 ```ts
 export interface MockPortKnobs {
   /** When set, the copy-to-other handler routes the matching sceneId to the deep-copy failure branch. */
-  induceCopyFailure?: SceneId;
-  /** When set, the refresh-thumbnail handler returns an error for the matching sceneId. */
-  induceRefreshFailure?: SceneId;
+  induceCopyFailure?: string;
+  /** When set, the refresh-thumbnail handler routes the matching sceneId to the per-Scene failure branch. */
+  induceRefreshFailure?: string;
 }
 ```
 
-**Validation**: both fields are optional. When unset, the mock-port behaves as the happy path. The fields are case-sensitive `SceneId` strings (matching the production SceneId discriminant).
+**Validation**: both fields are optional. When unset, the helper behaves as the happy path. The fields are case-sensitive sceneId strings (matching the existing string sceneId discriminant — feature 234 does not introduce a branded `SceneId` type).
 
 **Lifetime**: per harness mount or per Storybook story instance. Reset on page reload.
 
@@ -128,21 +131,9 @@ interface A11yResultsFile {
 
 ---
 
-### 4. `PanelPort` (PortContext value type) — review-driven addition
+### 4. ~~`PanelPort` (PortContext value type)~~ — **REMOVED 2026-04-27**
 
-The value type for the new `PortContext` introduced by this feature. Defined in `shared/components/src/panels/StoryboardPanel/PortContext.tsx`.
-
-```ts
-export interface PanelPort {
-  /** Forwards an outbound message to whatever consumer the provider supplied:
-   *  - production: forwards to acquireVsCodeApi().postMessage
-   *  - test (harness/stories): forwards through the mock-port back into the reducer
-   *  - no provider: throws an explicit Error naming the missing wiring (Article I.3) */
-  postMessage(message: OutboundMessage): void;
-}
-```
-
-The default context value is a thrower (NOT undefined, NOT a no-op silently-swallowing port). See `contracts/harness-knobs.md` §3 for the full behavioural contract.
+> Removed. ADR-027 records the pivot from `PortContext` to a callback-adapter helper. The `PanelPort` interface, `OutboundMessage` discriminated union, default-thrower port, and `PortContext.tsx` file are not introduced by this feature. See `contracts/harness-knobs.md` §3 (also removed) and `research.md` R10b.
 
 ---
 

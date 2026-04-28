@@ -214,117 +214,221 @@ export const HardBlockModalStory: StoryObj<typeof HardBlockModal> = {
   ),
 };
 
-// ─── #218 edit-suite stories (T064) ─────────────────────────────────
+// ─── #218 edit-suite stories (T064; upgraded to interactive in #234 T023..T026) ───
 
-const EDIT_VM_BASE = {
+import {
+  useStoryOnlyMockHandlers,
+  composeSceneEditViewModels,
+  type MockHandlersFixture,
+  type MockHandlersInitial,
+  type MockPortKnobs,
+  type SceneEditViewModel,
+  type StoryboardEditViewModel,
+} from './index';
+
+const EDIT_VM_BASE: SceneEditViewModel = {
   sceneId: 'scene-1',
   title: 'Exercise start — North channel',
-  description: null as string | null,
+  description: null,
   timestamp: '2026-04-20T14:00:00.000Z',
   titleIsEditing: false,
   editFormOpen: false,
   pendingDelete: false,
   stale: false,
-  unresolvedFeatureIds: [] as readonly string[],
-  missingData: { kind: 'ok' as const },
+  unresolvedFeatureIds: [],
+  missingData: { kind: 'ok' },
 };
 
-export const WithEditForm: Story = {
-  args: {
-    scenes: SCENES_THREE,
+const STORYBOARD_EDIT_VM: StoryboardEditViewModel = {
+  storyboardId: 'sb-alpha',
+  name: 'Exercise Alpha',
+  description: 'Surface-group exercise — North channel',
+  nameIsEditing: false,
+  descriptionExpanded: false,
+  sceneCount: SCENES_THREE.length,
+};
+
+/**
+ * Build the helper-shaped fixture for the four edit-suite stories. All
+ * stories share the same three scenes; per-row edit VM overrides are
+ * passed by each story to set the starting condition (e.g. WithEditForm
+ * pre-opens scene-1's edit form).
+ */
+function makeEditFixture(
+  perRowOverrides: Partial<Record<string, Partial<SceneEditViewModel>>>,
+): MockHandlersFixture {
+  const sceneEditViewModels: Record<string, SceneEditViewModel> = {};
+  for (const row of SCENES_THREE) {
+    const baseForRow: SceneEditViewModel = {
+      ...EDIT_VM_BASE,
+      sceneId: row.sceneId,
+      title: row.title,
+      timestamp: row.timestampIso,
+    };
+    sceneEditViewModels[row.sceneId] = {
+      ...baseForRow,
+      ...perRowOverrides[row.sceneId],
+    };
+  }
+  return {
+    storyboards: [
+      {
+        storyboardId: 'sb-alpha',
+        name: 'Exercise Alpha',
+        sceneCount: SCENES_THREE.length,
+        lastModifiedIso: '2026-04-20T14:35:00.000Z',
+      },
+      {
+        storyboardId: 'sb-bravo',
+        name: 'Exercise Bravo',
+        sceneCount: 0,
+        lastModifiedIso: '2026-04-20T13:00:00.000Z',
+      },
+    ],
+    activeStoryboardId: 'sb-alpha',
     activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-1': {
-        ...EDIT_VM_BASE,
-        description: '**Brief:** contact gained bearing 023°. Hold course.',
-        editFormOpen: true,
+    scenes: SCENES_THREE,
+    sceneEditViewModels,
+    storyboardEditViewModel: STORYBOARD_EDIT_VM,
+  };
+}
+
+interface InteractiveStoryArgs {
+  /** Storybook control: enable copy-to-other failure for a sceneId. */
+  readonly induceCopyFailure?: string;
+  /** Storybook control: enable refresh-thumbnail failure for a sceneId. */
+  readonly induceRefreshFailure?: string;
+}
+
+interface InteractivePanelProps {
+  readonly fixture: MockHandlersFixture;
+  readonly initial?: MockHandlersInitial;
+  readonly knobs?: MockPortKnobs;
+}
+
+/**
+ * Renders the panel with the shared callback-adapter wired in. Each
+ * edit-suite story uses this in its `render` function.
+ */
+function InteractiveStoryboardPanel({
+  fixture,
+  initial,
+  knobs,
+}: InteractivePanelProps): React.ReactElement {
+  const { state, handlers } = useStoryOnlyMockHandlers(fixture, {
+    initial,
+    knobs,
+  });
+  const sceneEditViewModels = composeSceneEditViewModels(state);
+  return (
+    <StoryboardPanel
+      scenes={state.sceneRows}
+      activeStoryboardName={state.activeStoryboardName}
+      captureInFlight={state.captureInFlight}
+      storyboards={
+        state.storyboards.length > 0 ? state.storyboards : undefined
+      }
+      activeStoryboardId={state.activeStoryboardId}
+      currentSceneId={state.currentSceneId}
+      transport={state.transport}
+      sceneEditViewModels={sceneEditViewModels}
+      storyboardEditViewModel={state.storyboardEditViewModel ?? undefined}
+      pendingUndoToast={state.pendingUndoToast}
+      overflowMenuOpenFor={state.overflowMenuOpenFor}
+      overflowMenuAnchorRect={state.overflowMenuAnchorRect}
+      {...handlers}
+    />
+  );
+}
+
+export const WithEditForm: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Click the chevron on a row to expand its inline edit form. Submit persists the new title via the reducer; Cancel discards. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
-    onSceneTitleRenameCommit: () => undefined,
-    onSceneDescriptionSubmit: () => undefined,
-    onSceneDeleteRequested: () => undefined,
-    onSceneUpdateToCurrentClicked: () => undefined,
-    onSceneDuplicateClicked: () => undefined,
-    onSceneCopyToOtherClicked: () => undefined,
-    onSceneRefreshThumbnailClicked: () => undefined,
   },
-};
-
-export const WithUndoToast: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    pendingUndoToast: {
-      sceneId: 'scene-2',
-      sceneTitle: 'Contact with surface group',
-      deletedAt: '2026-04-24T12:00:00.000Z',
-      canUndo: true,
-    },
-    sceneEditViewModels: {
-      'scene-2': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-2',
-        title: 'Contact with surface group',
-        pendingDelete: true,
-      },
-    },
-    onSceneUndoDeleteClicked: () => undefined,
-  },
-};
-
-export const WithStaleBadge: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-2': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-2',
-        title: 'Contact with surface group',
-        stale: true,
-        unresolvedFeatureIds: ['track-alpha', 'track-bravo'],
-      },
-    },
-    onSceneRefreshThumbnailClicked: () => undefined,
-  },
-};
-
-export const WithMissingDataRemediation: Story = {
-  args: {
-    scenes: SCENES_THREE,
-    activeStoryboardName: 'Exercise Alpha',
-    captureInFlight: false,
-    onCaptureClick: () => undefined,
-    onSceneRowClick: () => undefined,
-    sceneEditViewModels: {
-      'scene-3': {
-        ...EDIT_VM_BASE,
-        sceneId: 'scene-3',
-        title: 'Bearing-only track lock',
-        description: null,
-        timestamp: '2026-04-20T14:35:00.000Z',
-        editFormOpen: true,
-        missingData: {
-          kind: 'missing-features',
-          ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+  render: () => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({
+        'scene-1': {
+          description: '**Brief:** contact gained bearing 023°. Hold course.',
         },
+      })}
+    />
+  ),
+};
+
+export const WithUndoToast: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Right-click (or Shift+F10) any row → Delete to remove it; the Undo toast appears, click Undo to restore. Driven by the shared `useStoryOnlyMockHandlers` helper (Feature 234, ADR-027).',
       },
     },
-    onSceneTitleRenameCommit: () => undefined,
-    onSceneDescriptionSubmit: () => undefined,
-    onSceneDeleteRequested: () => undefined,
-    onSceneUpdateToCurrentClicked: () => undefined,
-    onSceneDuplicateClicked: () => undefined,
-    onSceneCopyToOtherClicked: () => undefined,
-    onSceneRefreshThumbnailClicked: () => undefined,
   },
+  render: () => (
+    <InteractiveStoryboardPanel fixture={makeEditFixture({})} />
+  ),
+};
+
+export const WithStaleBadge: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Scene 2 starts stale; click its overflow → Refresh thumbnail to clear the badge. Toggle the `induceRefreshFailure` arg to "scene-2" to exercise the per-Scene failure branch (FR-043).',
+      },
+    },
+  },
+  argTypes: {
+    induceRefreshFailure: {
+      control: 'select',
+      options: [undefined, 'scene-1', 'scene-2', 'scene-3'],
+      description:
+        'Feature 234 FR-043 — when set, refresh on the matching sceneId routes to the failure branch (badge stays).',
+    },
+  },
+  args: {
+    induceRefreshFailure: undefined,
+  },
+  render: (args) => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({})}
+      initial={{ staleSceneIds: ['scene-2'] }}
+      knobs={{ induceRefreshFailure: args.induceRefreshFailure }}
+    />
+  ),
+};
+
+export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Scene 3 starts in a missing-features state. Tab through the panel — focus lands on the remediation affordance with a visible focus ring; press Enter to dispatch the remediation action.',
+      },
+    },
+  },
+  render: () => (
+    <InteractiveStoryboardPanel
+      fixture={makeEditFixture({
+        'scene-3': {
+          editFormOpen: true,
+          missingData: {
+            kind: 'missing-features',
+            ids: ['track-alpha', 'track-bravo', 'track-charlie'],
+          },
+        },
+      })}
+      initial={{
+        missingDataBySceneId: {
+          'scene-3': ['track-alpha', 'track-bravo', 'track-charlie'],
+        },
+      }}
+    />
+  ),
 };

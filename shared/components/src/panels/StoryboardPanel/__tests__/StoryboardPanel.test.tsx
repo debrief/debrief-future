@@ -160,7 +160,11 @@ describe('StoryboardPanel', () => {
     expect(img?.getAttribute('loading')).toBe('lazy');
   });
 
-  it('scene row has accessible aria-label and role=listitem', () => {
+  it('scene row has accessible aria-label (post #234 US3 a11y fix: role=listitem dropped)', () => {
+    // 234 US3 fix (FR-022): role="list" + role="listitem" dropped because
+    // SceneList interleaves rows with StaleBadge + SceneEditForm overlays
+    // (axe-core aria-required-children — critical). Accessible name remains
+    // via aria-label; the row is reachable + labelable for screen readers.
     render(
       <StoryboardPanel
         scenes={[row({ sceneId: 'a', dtgLabel: 'X', title: 'Y' })]}
@@ -171,9 +175,10 @@ describe('StoryboardPanel', () => {
       />,
     );
     const sceneRow = screen.getByTestId('scene-row');
-    expect(sceneRow.getAttribute('role')).toBe('listitem');
     expect(sceneRow.getAttribute('aria-label')).toBe('X — Y');
     expect(sceneRow.getAttribute('data-testid')).toBe('scene-row');
+    // role=listitem intentionally absent — see FR-022 comment in SceneList.tsx
+    expect(sceneRow.getAttribute('role')).toBeNull();
   });
 
   // ── #217 TransportRow + currentSceneId integration ─────────────────

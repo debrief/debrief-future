@@ -150,3 +150,192 @@ test.describe('Storyboard edit harness — smoke', () => {
     await saveScreenshot(page, 'storyboard-missing-data-remediation.png');
   });
 });
+
+// ─── Phase 7 (Feature 234 US5) — extended scenario set + dual-knob ─────
+//
+// These extend the smoke suite with the seven flows enumerated in plan.md
+// §Web-Shell E2E Testing. Each scenario asserts both a state change in the
+// harness AND a matching outbound message on `window.__harnessOutbound__`
+// — which is the harness's analog of FR-041's "Log Panel card" assertion
+// (the harness has no LogPanel; the outbound recorder is the contract surface).
+//
+// Two scenarios deliberately deviate from the spec table because their
+// real UI lives in VS Code-native chrome (palette + input box / quick-pick),
+// not in the panel:
+//   - Storyboard rename + describe — covered in tests/e2e/test-storyboard-edit.spec.ts
+//     (Phase 4 code-server spec). Replaced here with "scene description submit"
+//     which exercises the same dispatch contract through the panel's inline UI.
+//   - Duplicate-at-colliding-timestamp prompt — collision modal is VS Code
+//     chrome. Replaced here with a basic Duplicate-click assertion.
+//
+// FR-040: scenario set; FR-041: outbound assertion as Log-Panel-card analog;
+// FR-043: dual knobs.
+
+test.describe('Storyboard edit harness — extended scenarios (#234 US5)', () => {
+  test('inline scene rename — type new title, blur → outbound + state updated', async ({
+    page,
+  }) => {
+    const harness = new StoryboardEditPage(page);
+    await harness.open();
+    await harness.chevronFor('sceneA').click();
+    const titleInput = page.locator(
+      '[data-testid="scene-edit-form-title-input"]',
+    );
+    await titleInput.fill('Renamed via E2E');
+    await titleInput.blur();
+    // The form's commit fires on blur. Assert the new title surfaces in
+    // the row + an outbound rename message was recorded.
+    await expect(harness.sceneRow('sceneA')).toContainText('Renamed via E2E');
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-title-rename-committed' &&
+          m.payload.sceneId === 'sceneA' &&
+          m.payload.newTitle === 'Renamed via E2E',
+      ),
+    ).toBe(true);
+  });
+
+  test('scene description submit — covers FR-040 row "scene-level description edit"', async ({
+    page,
+  }) => {
+    const harness = new StoryboardEditPage(page);
+    await harness.open();
+    await harness.chevronFor('sceneB').click();
+    const desc = page.locator(
+      '[data-testid="scene-edit-form-description-textarea"]',
+    );
+    await desc.fill('**Brief:** held bearing 060°, contact lost.');
+    await page
+      .locator('[data-testid="scene-edit-form-save-description"]')
+      .click();
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-description-edit-submitted' &&
+          m.payload.sceneId === 'sceneB',
+      ),
+    ).toBe(true);
+  });
+
+  test('copy-to-other (success) — overflow → Copy → outbound dispatched', async ({
+    page,
+  }) => {
+    const harness = new StoryboardEditPage(page);
+    await harness.open();
+    await harness.sceneRow('sceneA').click({ button: 'right' });
+    await harness.overflowMenuItem('copy-to-other').click();
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-copy-to-other-clicked' &&
+          m.payload.sceneId === 'sceneA',
+      ),
+    ).toBe(true);
+    // No failure event for the success path.
+    expect(
+      outbound.some((m) => m.type === 'scene-copy-to-other-failed'),
+    ).toBe(false);
+  });
+
+  test('copy-to-other (failure via ?induceCopyFailure=sceneB) — FR-043 deep-copy rollback branch', async ({
+    page,
+  }) => {
+    await page.goto('/?storyboard-edit-harness=1&induceCopyFailure=sceneB');
+    const harness = new StoryboardEditPage(page);
+    // page.goto bypassed the helper; wait for the panel manually.
+    await page.waitForSelector('[data-testid="storyboard-panel"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
+    // Trigger copy on the matching sceneId — should route to failure.
+    await harness.sceneRow('sceneB').click({ button: 'right' });
+    await harness.overflowMenuItem('copy-to-other').click();
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-copy-to-other-failed' &&
+          m.payload.sceneId === 'sceneB',
+      ),
+    ).toBe(true);
+    // And NOT the success type for the same sceneId.
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-copy-to-other-clicked' &&
+          m.payload.sceneId === 'sceneB',
+      ),
+    ).toBe(false);
+  });
+
+  test('update-to-current — overflow → Update → outbound dispatched', async ({
+    page,
+  }) => {
+    const harness = new StoryboardEditPage(page);
+    await harness.open();
+    await harness.sceneRow('sceneA').click({ button: 'right' });
+    await harness.overflowMenuItem('update-to-current').click();
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-update-to-current-clicked' &&
+          m.payload.sceneId === 'sceneA',
+      ),
+    ).toBe(true);
+  });
+
+  test('duplicate — overflow → Duplicate → outbound dispatched (modal is VS Code chrome, covered in code-server spec)', async ({
+    page,
+  }) => {
+    const harness = new StoryboardEditPage(page);
+    await harness.open();
+    await harness.sceneRow('sceneA').click({ button: 'right' });
+    await harness.overflowMenuItem('duplicate').click();
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'scene-duplicate-clicked' &&
+          m.payload.sceneId === 'sceneA',
+      ),
+    ).toBe(true);
+  });
+
+  test('bulk refresh partial failure (?induceRefreshFailure=sceneA) — sceneA badge retained, others cleared', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/?storyboard-edit-harness=1&stale=sceneA,sceneB,sceneC&induceRefreshFailure=sceneA',
+    );
+    const harness = new StoryboardEditPage(page);
+    await page.waitForSelector('[data-testid="storyboard-panel"]', {
+      state: 'visible',
+      timeout: 10000,
+    });
+    await expect(harness.staleBadgeFor('sceneA')).toBeVisible();
+    await expect(harness.staleBadgeFor('sceneB')).toBeVisible();
+    await expect(harness.staleBadgeFor('sceneC')).toBeVisible();
+
+    await harness.refreshAllStaleButton().click();
+
+    // sceneA's badge should persist (failure-injected); the others clear.
+    await expect(harness.staleBadgeFor('sceneA')).toBeVisible();
+    await expect(harness.staleBadgeFor('sceneB')).toHaveCount(0);
+    await expect(harness.staleBadgeFor('sceneC')).toHaveCount(0);
+
+    const outbound = await harness.outboundMessages();
+    expect(
+      outbound.some(
+        (m) =>
+          m.type === 'storyboard-refresh-all-stale-partial-failure' &&
+          Array.isArray(m.payload.failedSceneIds) &&
+          (m.payload.failedSceneIds as string[]).includes('sceneA'),
+      ),
+    ).toBe(true);
+  });
+});
