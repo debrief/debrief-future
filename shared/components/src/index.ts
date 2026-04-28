@@ -370,6 +370,8 @@ export {
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  // 234 FR-003 / ADR-027 — shared callback-adapter for stories + harness
+  useStoryOnlyMockHandlers,
 } from './panels/StoryboardPanel';
 export type {
   StoryboardPanelProps,
@@ -398,6 +400,14 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  // 234 FR-003 / ADR-027 — types for the shared callback-adapter helper
+  MockPortKnobs,
+  MockHandlers,
+  MockHandlersFixture,
+  MockHandlersInitial,
+  MockHandlersHandle,
+  MockOutboundRecorder,
+  UseStoryOnlyMockHandlersOptions,
 } from './panels/StoryboardPanel';
 
 // NL → CQL2 generator + live transport (#188, #190, #191).

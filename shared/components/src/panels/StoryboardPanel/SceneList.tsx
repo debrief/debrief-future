@@ -61,8 +61,13 @@ export function SceneList({
   onSceneOverflowMenuOpen,
 }: SceneListProps): React.ReactElement {
   return (
+    // 234 US3 fix (FR-022): role="list" was rejected by axe-core
+    // (aria-required-children — critical) because the list interleaves
+    // SceneRows with StaleBadge and SceneEditForm overlays, which are
+    // not listitems. Drop the ARIA list semantics; the wrapper stays
+    // a plain div with data-testid for tests + the existing keyboard
+    // nav + accessible-name pattern on each row.
     <div
-      role="list"
       data-testid="scene-list"
       className="storyboard-scene-list"
       style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 4 }}

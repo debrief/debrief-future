@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-26
 **Branch:** `claude/research-mermaid-diagrams-0gl5e`
-**Status:** Research spike — no implementation yet
+**Status:** ✅ **Verified end-to-end on 2026-04-26.** Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout) is live. The cycle was tested by publishing a meta-post via `/publish-future-post` from `specs/999-mermaid-blog-rendering/`; owner confirmed the embedded `flowchart LR` renders as a real diagram on `debrief.github.io`. Layout patch shipped as [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90). Decision recorded as ADR-026 in `docs/project_notes/decisions.md`. Staged patch retained under `docs/project_notes/mermaid-website-patch/` for reference.
 **Scope:** Posts shipped to `debrief.github.io/_posts/` via `/speckit.pr` → `/publish`
 
 ## TL;DR
@@ -79,19 +79,26 @@ Same as Option B, but emit both — leave the ` ```mermaid ` fence in the publis
 
 Replace existing fences with hand-drawn screenshots/asciinema/SVG-by-hand. Cheapest in build complexity, most expensive in author time, and we lose the GitHub-preview win. Listed for completeness only.
 
-## Recommendation (for discussion, not decided)
+## Decision (2026-04-26)
 
-Lean **Option A2** (vendored client-side `mermaid.js` in `future-post` layout). Reasons:
+**Option A1 — CDN-loaded `mermaid.js` in the `future-post` layout.**
 
-- Smallest code surface; one PR against `debrief.github.io`, no change here.
-- Retroactively fixes the 3+ posts that already contain Mermaid fences without backfill work.
-- Vendoring satisfies offline-by-default.
-- Diagrams stay text-diffable in `_posts/` git history.
+The owner clarified that the blog site does not need to function offline, so the offline-by-default constraint that originally pushed toward A2 (vendored) does not apply here. A1 is strictly simpler:
 
-Fall back to **Option B** if any of these turn out to be true:
-- The `future-post` layout is shared with other content where loading mermaid.js on every page is unacceptable.
-- We later need diagrams to appear in non-HTML contexts (RSS feed, PDF export, etc.).
-- The site moves off stock GitHub Pages to a static-build Actions workflow for unrelated reasons (in which case pre-rendering is essentially free).
+- One Liquid-gated `<script type="module">` block in `_layouts/future-post.html`, pinned at `mermaid@11`.
+- No vendored binary in the website repo's git history.
+- Same retroactive coverage of the 3+ posts that already contain Mermaid fences.
+
+Verification before this was accepted: the live 210 post ([`/future/2026/04/24/un-skipping-the-webview-log-panel-e2e-suite.html`](https://debrief.github.io/future/2026/04/24/un-skipping-the-webview-log-panel-e2e-suite.html)) was confirmed to currently render the `sequenceDiagram` source as raw text — i.e. the `future-post` layout has no Mermaid wiring today.
+
+**Implementation notes from PR #90** (worth recording so the next person who reads the spike doesn't re-derive them):
+
+- `_layouts/future-post.html` does not actually contain `</body>` — it sets `layout: future-default` in its front matter, and `_layouts/future-default.html` owns `<html>`, `<head>`, `<body>`. The post layout is rendered into `{{ content }}` inside the default. The script block was therefore appended at the end of `future-post.html` (after `</main>`), which lands inside `<body>` near the end of the rendered page. `type="module"` defers execution until DOM parse completes, so `mermaid.run()` still finds all the `<pre class="mermaid">` elements.
+- Putting the block in `future-default.html` was considered and rejected: `page.content` is the post body, and gating the script on a per-post `language-mermaid` check belongs in the post layout, not the page-wide default.
+- The `2026-02-13` post (`shipped-generate-courses-and-speeds-tool`) referenced in the original brief **does not yet exist** on `debrief.github.io`. Its source `specs/061-.../media/shipped-post.md` is in `debrief-future` but hasn't been pushed through the cross-repo publish flow yet. The layout change is content-agnostic — that post will pick up rendering automatically the moment it ships.
+- The `2026-04-24` post's actual filename is `un-skipping-the-webview-log-panel-e2e-suite.md` (no `building-` prefix). The brief's verification URL was off by that prefix. Corrected URL is the link above.
+
+Fall back to **Option B** (pre-render to SVG in `/publish`) if we later need diagrams to appear in non-HTML contexts (RSS feed, PDF export) or the site moves off stock GitHub Pages.
 
 ## Verification Steps Before Implementing
 

@@ -29,6 +29,7 @@
     "vscrui": "^0.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.8.5",
     "@playwright/test": "^1.58.0",
     "sharp": "^0.33.0",
     "@sparticuz/chromium": "^143.0.4",

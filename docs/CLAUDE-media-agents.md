@@ -254,7 +254,7 @@ You write technical documentation: specs, architecture docs, READMEs, and diagra
 
 ### Diagram Conventions
 
-- Use Mermaid for diagrams (renders in GitHub)
+- Use Mermaid for diagrams. Renders in GitHub previews **and** in shipped blog posts on `debrief.github.io` (the `future-post` Jekyll layout includes mermaid.js — see ADR-026).
 - Flowcharts for processes, sequence diagrams for interactions
 - Keep diagrams focused — one concept per diagram
 - Include diagram source in markdown (not just images)

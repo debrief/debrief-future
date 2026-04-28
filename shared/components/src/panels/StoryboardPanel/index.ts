@@ -48,3 +48,20 @@ export type {
   StaleFlagEntry,
   ThemeVariant,
 } from './useStoryboardEditReducer';
+
+// 234 FR-003 / ADR-027 — shared callback-adapter helper for stories +
+// harness. Re-exported so consumers go through the package surface; the
+// __testing__/ path is forbidden in apps/vscode/src/** by the FR-044
+// ESLint rule.
+export {
+  useStoryOnlyMockHandlers,
+} from './__testing__/storyOnlyMockHandlers';
+export type {
+  MockPortKnobs,
+  MockHandlers,
+  MockHandlersFixture,
+  MockHandlersInitial,
+  MockHandlersHandle,
+  MockOutboundRecorder,
+  UseStoryOnlyMockHandlersOptions,
+} from './__testing__/storyOnlyMockHandlers';

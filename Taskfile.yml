@@ -127,10 +127,25 @@ tasks:
       - uv run ruff format .
       - pnpm lint -- --fix
 
+  verify:ffmpeg:
+    desc: "Verify ffmpeg system binary is present (Feature 234 FR-045 — required for Playwright GIF capture)"
+    cmds:
+      - |
+        if ! command -v ffmpeg >/dev/null 2>&1; then
+          echo "task verify:ffmpeg: FAIL — ffmpeg not found on PATH."
+          echo "  ffmpeg required for Playwright video → GIF conversion (#234 FR-045)."
+          echo "  Install via: brew install ffmpeg  (macOS)"
+          echo "             apt install ffmpeg   (Debian/Ubuntu)"
+          echo "             scoop install ffmpeg (Windows)"
+          exit 1
+        fi
+        echo "task verify:ffmpeg: PASS — $(ffmpeg -version 2>&1 | head -1)"
+
   verify:
-    desc: "Run full CI checks locally (lint + typecheck + test + knip) before pushing"
+    desc: "Run full CI checks locally (lint + typecheck + test + knip + ffmpeg) before pushing"
     deps: [install]
     cmds:
+      - task: verify:ffmpeg
       - task: lint
       - task: typecheck
       - task: test
