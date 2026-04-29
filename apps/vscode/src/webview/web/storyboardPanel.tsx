@@ -23,6 +23,8 @@ import type {
   StoryboardEditViewModel,
   UndoToastDescriptor,
   StaleFlagEntry,
+  NamingRowPushState,
+  CollisionBannerPushState,
 } from '@debrief/components';
 import { Bootstrap } from './_bootstrap';
 
@@ -40,6 +42,8 @@ interface ScenesMessage {
   sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   pendingUndoToast?: UndoToastDescriptor | null;
   storyboardEditViewModel?: StoryboardEditViewModel | null;
+  namingRow?: NamingRowPushState | null;
+  collisionBanner?: CollisionBannerPushState | null;
 }
 
 interface CaptureInFlightMessage {
@@ -63,6 +67,8 @@ interface SnapshotMessage {
   sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   pendingUndoToast?: UndoToastDescriptor | null;
   storyboardEditViewModel?: StoryboardEditViewModel | null;
+  namingRow?: NamingRowPushState | null;
+  collisionBanner?: CollisionBannerPushState | null;
 }
 
 interface SceneEditFormOpenMessage {
@@ -96,11 +102,14 @@ function StoryboardPanelApp(): React.ReactElement {
     state,
     dispatch,
     sceneEditViewModels,
+    namingRowViewModel,
+    collisionBannerViewModel,
     toggleExpandRow,
     closeEditForm,
     openOverflowMenu,
     closeOverflowMenu,
     dismissUndoToast,
+    setNamingRowPendingName,
   } = useStoryboardEditReducer();
 
   useEffect(() => {
@@ -118,6 +127,8 @@ function StoryboardPanelApp(): React.ReactElement {
               sceneEditViewModels: msg.sceneEditViewModels,
               pendingUndoToast: msg.pendingUndoToast,
               storyboardEditViewModel: msg.storyboardEditViewModel,
+              namingRow: msg.namingRow,
+              collisionBanner: msg.collisionBanner,
             },
           });
           break;
@@ -134,6 +145,8 @@ function StoryboardPanelApp(): React.ReactElement {
               sceneEditViewModels: msg.sceneEditViewModels,
               pendingUndoToast: msg.pendingUndoToast,
               storyboardEditViewModel: msg.storyboardEditViewModel,
+              namingRow: msg.namingRow,
+              collisionBanner: msg.collisionBanner,
             },
           });
           break;
@@ -282,6 +295,37 @@ function StoryboardPanelApp(): React.ReactElement {
     [],
   );
 
+  // ─── #235 — naming row + collision banner handlers ───────────────────
+  const onNamingRowTextChanged = useCallback(
+    (pendingName: string) => setNamingRowPendingName(pendingName),
+    [setNamingRowPendingName],
+  );
+
+  const onNamingRowConfirm = useCallback(() => {
+    const slice = state.namingRow;
+    if (slice === null || !slice.visible) return;
+    vscode.postMessage({
+      type: 'naming-row-confirm',
+      name: slice.pendingName.trim(),
+    });
+  }, [state.namingRow]);
+
+  const onNamingRowCancel = useCallback(() => {
+    vscode.postMessage({ type: 'naming-row-cancel' });
+  }, []);
+
+  const onCollisionReplace = useCallback((conflictingSceneId: string) => {
+    vscode.postMessage({ type: 'collision-replace', conflictingSceneId });
+  }, []);
+
+  const onCollisionOffset = useCallback(() => {
+    vscode.postMessage({ type: 'collision-offset' });
+  }, []);
+
+  const onCollisionCancel = useCallback(() => {
+    vscode.postMessage({ type: 'collision-cancel' });
+  }, []);
+
   // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
   // local `state.theme` is retained only because the reducer's existing
   // shape accepts it; it no longer drives the React tree.
@@ -329,6 +373,14 @@ function StoryboardPanelApp(): React.ReactElement {
         onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
         onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
         onUndoToastDismiss={dismissUndoToast}
+        namingRowViewModel={namingRowViewModel}
+        collisionBannerViewModel={collisionBannerViewModel}
+        onNamingRowTextChanged={onNamingRowTextChanged}
+        onNamingRowConfirm={onNamingRowConfirm}
+        onNamingRowCancel={onNamingRowCancel}
+        onCollisionReplace={onCollisionReplace}
+        onCollisionOffset={onCollisionOffset}
+        onCollisionCancel={onCollisionCancel}
       />
     </>
   );

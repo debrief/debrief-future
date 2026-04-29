@@ -366,10 +366,16 @@ export {
   UndoToast,
   StaleBadge,
   SceneOverflowMenu,
+  // 235 — first-capture inline naming row + duplicate-timestamp banner.
+  NamingRow,
+  CollisionBanner,
   useStoryboardEditReducer,
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
+  COLLISION_OFFSET_CAP,
   // 234 FR-003 / ADR-027 — shared callback-adapter for stories + harness
   useStoryOnlyMockHandlers,
 } from './panels/StoryboardPanel';
@@ -400,6 +406,15 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  // 235 — first-capture naming row + collision banner types
+  NamingRowProps,
+  NamingRowReducerState,
+  NamingRowPushState,
+  NamingRowViewModel,
+  CollisionBannerProps,
+  CollisionBannerReducerState,
+  CollisionBannerPushState,
+  CollisionBannerViewModel,
   // 234 FR-003 / ADR-027 — types for the shared callback-adapter helper
   MockPortKnobs,
   MockHandlers,

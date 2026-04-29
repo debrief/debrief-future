@@ -1,6 +1,6 @@
 /**
  * Typed message contracts for the Storyboard panel webview
- * (Features 216 + 217).
+ * (Features 216 + 217 + 235).
  *
  * All payloads are JSON-safe; no raw filesystem paths cross the boundary
  * (Article X). Discriminated unions keep extension / webview code
@@ -8,12 +8,16 @@
  */
 
 import type {
+  CollisionBannerPushState,
+  NamingRowPushState,
   SceneEditViewModel,
   SceneRowViewModel,
   StoryboardEditViewModel,
   StoryboardOptionViewModel,
   TransportViewModel,
 } from '@debrief/components';
+
+export type { CollisionBannerPushState, NamingRowPushState };
 
 /** Webview → Extension. */
 export type StoryboardPanelMessage =
@@ -63,7 +67,22 @@ export type StoryboardPanelMessage =
       readonly type: 'storyboard-description-edit-submitted';
       readonly storyboardId: string;
       readonly description: string | null;
-    };
+    }
+  // #235 — first-capture naming row + duplicate-timestamp collision banner.
+  // Stateless action posts per contracts/panel-messages.md §B. The host
+  // owns the in-flight prompt lifecycle; the panel just posts the analyst's
+  // resolution. Stale messages are dropped by the host (§C).
+  | {
+      readonly type: 'naming-row-confirm';
+      readonly name: string;
+    }
+  | { readonly type: 'naming-row-cancel' }
+  | {
+      readonly type: 'collision-replace';
+      readonly conflictingSceneId: string;
+    }
+  | { readonly type: 'collision-offset' }
+  | { readonly type: 'collision-cancel' };
 
 /**
  * Full snapshot projection for the panel (#217). Replaces the narrower
@@ -83,6 +102,10 @@ export interface StoryboardPlaybackSnapshotMessage {
   readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
   readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — host-driven first-capture naming row + collision banner.
+  // `null` clears the slice; `undefined` (or absent) leaves it unchanged.
+  readonly namingRow?: NamingRowPushState | null;
+  readonly collisionBanner?: CollisionBannerPushState | null;
 }
 
 /**
@@ -120,6 +143,9 @@ export type ExtensionToStoryboardPanelMessage =
       readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
       readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
       readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+      // #235 — see SnapshotPayload above for semantics.
+      readonly namingRow?: NamingRowPushState | null;
+      readonly collisionBanner?: CollisionBannerPushState | null;
     }
   | {
       readonly type: 'captureInFlight';
