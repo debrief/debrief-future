@@ -50,20 +50,21 @@ import {
 function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
   const queue: Array<{ html: string; allowScripts: boolean }> = [];
 
-  // Map view is the most common first webview to fire webview-ready
-  // because the editor opens before any sidebar reveal — when a plot
-  // opens via the STAC tree, the editor's MapPanel iframe is created
-  // first.  Placed at the head of the queue so that test bodies that
-  // call `getWebviewFrame()` (which returns the first
-  // `iframe.webview.ready` in DOM order) land on a frame whose React
-  // app actually renders the leaflet map.  See feature 233.
-  if (hasWebviewBundle('mapView')) {
-    queue.push({ html: generateWebviewHtml('mapView'), allowScripts: true });
-  }
-
-  // Activity panel is the typical second webview (sidebar reveal).
+  // Activity panel is the most common first webview (Debrief sidebar
+  // reveal — covers test-activity-panel-sections,
+  // test-activity-panel-screenshot, test-storyboard-panel-screenshot).
+  // Tests that need a different bundle as their first webview-ready
+  // (test-log-panel opens a plot first, so its first iframe is the
+  // editor's MapPanel) use the page-object helpers'
+  // _forceDeliver*Content() routines to overwrite the queue's
+  // assignment via the stashed port reference.
   if (hasWebviewBundle('activityPanel')) {
     queue.push({ html: generateWebviewHtml('activityPanel'), allowScripts: true });
+  }
+
+  // Map view is typically the second webview (opened via STAC tree).
+  if (hasWebviewBundle('mapView')) {
+    queue.push({ html: generateWebviewHtml('mapView'), allowScripts: true });
   }
 
   // Results panel is the panel-area webview (Feature: 178).  Added to
@@ -75,7 +76,7 @@ function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
 
   // Log panel lives in the separate `debrief-log` activity-bar
   // container.  Placed last so that (a) when a test reveals the
-  // Debrief Log container after map/activity/results have already
+  // Debrief Log container after activity/map/results have already
   // mounted the 4th webview-ready receives the logPanel bundle, and
   // (b) it becomes the post-exhaustion fallback — every subsequent
   // re-mount during the test lifecycle gets logPanel content,

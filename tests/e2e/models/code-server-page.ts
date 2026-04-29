@@ -424,11 +424,17 @@ export class CodeServerPage {
     const outerFrame = this.page.frameLocator('iframe.webview.ready').first();
     const innerFrame = outerFrame.frameLocator('#active-frame');
 
-    // Hybrid A+D shim: inject a minimal sample plot so MapView renders
-    // leaflet features.  Without this the iframe contains an empty map
-    // and tests that look for `.leaflet-interactive` time out — the
-    // real extension's `loadPlot` postMessage doesn't reach the
-    // injected iframe.  See evidence/followup-test-state-injection.md.
+    // Hybrid A+D shim: ensure the editor's iframe gets the mapView
+    // bundle.  The queue's first slot is `activityPanel` (kept that
+    // way so test-activity-panel-sections etc. continue to pass), so
+    // when a test opens a plot the editor's webview iframe receives
+    // activityPanel content by default.  We force-deliver mapView
+    // into any webview iframe that doesn't already expose
+    // `.leaflet-container`, using the stashed un-wrapped
+    // `port.postMessage` reference.  Then poll + re-dispatch
+    // `loadPlot` until at least one `.leaflet-interactive` element
+    // renders.
+    await this._forceDeliverBundleToFirstWebview('mapView', '.leaflet-container');
     await this._injectSamplePlotIntoMap();
 
     return innerFrame;
@@ -944,74 +950,97 @@ export class CodeServerPage {
   }
 
   /**
-   * Force-deliver `logPanel` HTML into every visible `iframe.webview`
-   * that doesn't yet expose `[data-testid="log-panel"]`.  Uses the
-   * un-wrapped `port.postMessage` reference stashed by
-   * `installMultiWebviewInterceptor` against the iframe's id query
-   * param.  This is the cloud-E2E shim for the case where the queue
-   * assigned the LogPanel iframe a non-logPanel bundle (the
-   * webview-ready event order is racy across openvscode-server's
-   * iframe re-mounts).
+   * Force-deliver a specific bundle's HTML into every visible
+   * `iframe.webview` whose `#active-frame` doesn't yet expose the
+   * given content marker.  Uses the un-wrapped `port.postMessage`
+   * reference stashed by `installMultiWebviewInterceptor` against the
+   * iframe's id query param.  This is the cloud-E2E shim for the
+   * case where the queue assigned a particular iframe a different
+   * bundle (the webview-ready event order is racy across
+   * openvscode-server's iframe re-mounts and varies across tests).
    *
-   * No-op for iframes that already have logPanel content or have no
+   * No-op for iframes that already expose `markerSelector` or have no
    * stashed port.  Best-effort — if a call fails, the helper silently
    * moves on; the worst case is the next assertion times out with a
-   * clear "log-panel testid not found" message.
+   * clear "marker not found" message.
+   *
+   * @param bundleName  - key into `window.__webviewBundles` (set up
+   *                       in `fixtures/base.ts`)
+   * @param markerSelector - CSS selector that the bundle's React app
+   *                         renders; used to skip iframes that
+   *                         already have the right bundle
    */
-  private async _forceDeliverLogPanelContent(): Promise<void> {
+  private async _forceDeliverBundleToFirstWebview(
+    bundleName: 'mapView' | 'activityPanel' | 'resultsPanel' | 'logPanel',
+    markerSelector: string
+  ): Promise<void> {
     await this.page
-      .evaluate(async () => {
-        const w = window as any;
-        const bundles = w.__webviewBundles ?? {};
-        const portsById = w.__webviewPortsById ?? {};
-        const buildContent = w.__buildWebviewContentMessage;
-        if (!bundles.logPanel || !buildContent) return;
+      .evaluate(
+        async (args: { bundleName: string; markerSelector: string }) => {
+          const w = window as any;
+          const bundles = w.__webviewBundles ?? {};
+          const portsById = w.__webviewPortsById ?? {};
+          const buildContent = w.__buildWebviewContentMessage;
+          if (!bundles[args.bundleName] || !buildContent) return;
 
-        const iframes = Array.from(
-          document.querySelectorAll('iframe.webview')
-        ) as HTMLIFrameElement[];
+          const iframes = Array.from(
+            document.querySelectorAll('iframe.webview')
+          ) as HTMLIFrameElement[];
 
-        for (const f of iframes) {
-          let id: string | null = null;
-          try {
-            id = new URL(f.src).searchParams.get('id');
-          } catch {
-            // skip unparsable
-          }
-          if (!id) continue;
-          const port = portsById[id];
-          if (!port) continue;
-
-          // Cheap content sniff: if the iframe's #active-frame already
-          // exposes `[data-testid="log-panel"]`, leave it alone.
-          let hasLog = false;
-          try {
-            const active = f.contentDocument?.getElementById('active-frame') as
-              | HTMLIFrameElement
-              | null;
-            if (
-              active &&
-              active.contentDocument?.querySelector('[data-testid="log-panel"]')
-            ) {
-              hasLog = true;
+          for (const f of iframes) {
+            let id: string | null = null;
+            try {
+              id = new URL(f.src).searchParams.get('id');
+            } catch {
+              // skip unparsable
             }
-          } catch {
-            // cross-origin probe may throw — fall through to deliver
-          }
-          if (hasLog) continue;
+            if (!id) continue;
+            const port = portsById[id];
+            if (!port) continue;
 
-          try {
-            port(
-              buildContent({ html: bundles.logPanel, allowScripts: true })
-            );
-          } catch {
-            // best-effort
+            // Cheap content sniff: if the iframe's #active-frame already
+            // exposes `markerSelector`, leave it alone.
+            let hasMarker = false;
+            try {
+              const active = f.contentDocument?.getElementById('active-frame') as
+                | HTMLIFrameElement
+                | null;
+              if (
+                active &&
+                active.contentDocument?.querySelector(args.markerSelector)
+              ) {
+                hasMarker = true;
+              }
+            } catch {
+              // cross-origin probe may throw — fall through to deliver
+            }
+            if (hasMarker) continue;
+
+            try {
+              port(
+                buildContent({
+                  html: bundles[args.bundleName],
+                  allowScripts: true,
+                })
+              );
+            } catch {
+              // best-effort
+            }
           }
-        }
-      })
+        },
+        { bundleName, markerSelector }
+      )
       .catch(() => {
         // best-effort
       });
+  }
+
+  /** Convenience wrapper for the LogPanel-specific force-delivery. */
+  private async _forceDeliverLogPanelContent(): Promise<void> {
+    await this._forceDeliverBundleToFirstWebview(
+      'logPanel',
+      '[data-testid="log-panel"]'
+    );
   }
 
   /**
