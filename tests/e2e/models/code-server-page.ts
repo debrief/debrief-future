@@ -959,10 +959,12 @@ export class CodeServerPage {
    * bundle (the webview-ready event order is racy across
    * openvscode-server's iframe re-mounts and varies across tests).
    *
-   * No-op for iframes that already expose `markerSelector` or have no
-   * stashed port.  Best-effort — if a call fails, the helper silently
-   * moves on; the worst case is the next assertion times out with a
-   * clear "marker not found" message.
+   * Polls every 250ms (up to 8s) waiting for at least one matching
+   * iframe to receive the bundle.  In CI the GitHub-hosted runners
+   * are ~50% slower than dev cloud envs; a one-shot evaluate (the
+   * earlier shape of this helper) raced ahead of port stashing on
+   * the first webview-ready event.  No-op once at least one delivery
+   * succeeds or the timeout elapses.
    *
    * @param bundleName  - key into `window.__webviewBundles` (set up
    *                       in `fixtures/base.ts`)
@@ -974,65 +976,92 @@ export class CodeServerPage {
     bundleName: 'mapView' | 'activityPanel' | 'resultsPanel' | 'logPanel',
     markerSelector: string
   ): Promise<void> {
-    await this.page
-      .evaluate(
-        async (args: { bundleName: string; markerSelector: string }) => {
-          const w = window as any;
-          const bundles = w.__webviewBundles ?? {};
-          const portsById = w.__webviewPortsById ?? {};
-          const buildContent = w.__buildWebviewContentMessage;
-          if (!bundles[args.bundleName] || !buildContent) return;
+    const TIMEOUT_MS = 8_000;
+    const POLL_MS = 250;
+    const start = Date.now();
 
-          const iframes = Array.from(
-            document.querySelectorAll('iframe.webview')
-          ) as HTMLIFrameElement[];
-
-          for (const f of iframes) {
-            let id: string | null = null;
-            try {
-              id = new URL(f.src).searchParams.get('id');
-            } catch {
-              // skip unparsable
+    while (Date.now() - start < TIMEOUT_MS) {
+      const result = (await this.page
+        .evaluate(
+          async (args: { bundleName: string; markerSelector: string }) => {
+            const w = window as any;
+            const bundles = w.__webviewBundles ?? {};
+            const portsById = w.__webviewPortsById ?? {};
+            const buildContent = w.__buildWebviewContentMessage;
+            if (!bundles[args.bundleName] || !buildContent) {
+              return { delivered: 0, hasMarker: 0, iframes: 0 };
             }
-            if (!id) continue;
-            const port = portsById[id];
-            if (!port) continue;
 
-            // Cheap content sniff: if the iframe's #active-frame already
-            // exposes `markerSelector`, leave it alone.
-            let hasMarker = false;
-            try {
-              const active = f.contentDocument?.getElementById('active-frame') as
-                | HTMLIFrameElement
-                | null;
-              if (
-                active &&
-                active.contentDocument?.querySelector(args.markerSelector)
-              ) {
-                hasMarker = true;
+            const iframes = Array.from(
+              document.querySelectorAll('iframe.webview')
+            ) as HTMLIFrameElement[];
+
+            let delivered = 0;
+            let hasMarker = 0;
+
+            for (const f of iframes) {
+              let id: string | null = null;
+              try {
+                id = new URL(f.src).searchParams.get('id');
+              } catch {
+                // skip unparsable
               }
-            } catch {
-              // cross-origin probe may throw — fall through to deliver
-            }
-            if (hasMarker) continue;
+              if (!id) continue;
+              const port = portsById[id];
+              if (!port) continue;
 
-            try {
-              port(
-                buildContent({
-                  html: bundles[args.bundleName],
-                  allowScripts: true,
-                })
-              );
-            } catch {
-              // best-effort
+              // Cheap content sniff: if the iframe's #active-frame
+              // already exposes `markerSelector`, leave it alone.
+              let markerPresent = false;
+              try {
+                const active = f.contentDocument?.getElementById('active-frame') as
+                  | HTMLIFrameElement
+                  | null;
+                if (
+                  active &&
+                  active.contentDocument?.querySelector(args.markerSelector)
+                ) {
+                  markerPresent = true;
+                }
+              } catch {
+                // cross-origin probe may throw — fall through to deliver
+              }
+              if (markerPresent) {
+                hasMarker++;
+                continue;
+              }
+
+              try {
+                port(
+                  buildContent({
+                    html: bundles[args.bundleName],
+                    allowScripts: true,
+                  })
+                );
+                delivered++;
+              } catch {
+                // best-effort
+              }
             }
-          }
-        },
-        { bundleName, markerSelector }
-      )
-      .catch(() => {
-        // best-effort
-      });
+
+            return { delivered, hasMarker, iframes: iframes.length };
+          },
+          { bundleName, markerSelector }
+        )
+        .catch(() => ({ delivered: 0, hasMarker: 0, iframes: 0 }))) as {
+        delivered: number;
+        hasMarker: number;
+        iframes: number;
+      };
+
+      // Exit early once we've placed the bundle into at least one
+      // iframe (delivered > 0) or once an iframe already has the
+      // marker rendered (hasMarker > 0).  Otherwise keep polling so
+      // we re-attempt after the next iframe's port lands in the
+      // stash.
+      if (result.delivered > 0 || result.hasMarker > 0) return;
+      await this.page.waitForTimeout(POLL_MS);
+    }
   }
 
   /** Convenience wrapper for the LogPanel-specific force-delivery. */
@@ -1061,7 +1090,13 @@ export class CodeServerPage {
    * that re-enter `getWebviewFrame()`) re-arm the dispatch as needed.
    */
   async _injectSamplePlotIntoMap(): Promise<void> {
-    const TIMEOUT_MS = 8_000;
+    // 20s budget — GitHub-hosted CI runners are ~50% slower per test
+    // than dev cloud envs (CI run takes ~7m vs ~5m locally for the
+    // same 33 active tests).  The previous 8s budget was tight enough
+    // that a CI flake was plausible; 20s keeps things robust without
+    // measurably extending the happy path (we exit early once a
+    // feature renders).
+    const TIMEOUT_MS = 20_000;
     const POLL_MS = 250;
     const start = Date.now();
 
