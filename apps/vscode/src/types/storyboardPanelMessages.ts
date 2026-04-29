@@ -8,6 +8,9 @@
  */
 
 import type {
+  CollisionBannerReducerState,
+  NamingRowReducerState,
+  CascadeDeleteConfirmReducerState,
   SceneEditViewModel,
   SceneRowViewModel,
   StoryboardEditViewModel,
@@ -63,7 +66,19 @@ export type StoryboardPanelMessage =
       readonly type: 'storyboard-description-edit-submitted';
       readonly storyboardId: string;
       readonly description: string | null;
-    };
+    }
+  // #235 — first-capture naming row + collision banner (panel → host)
+  | {
+      readonly type: 'naming-row-confirm-requested';
+      readonly name: string;
+    }
+  | { readonly type: 'naming-row-cancel-requested' }
+  | {
+      readonly type: 'collision-replace-requested';
+      readonly conflictingSceneId: string;
+    }
+  | { readonly type: 'collision-offset-requested' }
+  | { readonly type: 'collision-cancel-requested' };
 
 /**
  * Full snapshot projection for the panel (#217). Replaces the narrower
@@ -83,6 +98,12 @@ export interface StoryboardPlaybackSnapshotMessage {
   readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
   readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — first-capture naming row, collision banner, and inline
+  // cascade-delete confirm slices. `null` explicitly clears; absent
+  // leaves the existing slice unchanged.
+  readonly namingRow?: NamingRowReducerState | null;
+  readonly collisionBanner?: CollisionBannerReducerState | null;
+  readonly cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
 }
 
 /**
@@ -120,6 +141,10 @@ export type ExtensionToStoryboardPanelMessage =
       readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
       readonly pendingUndoToast?: SceneUndoToastDescriptor | null;
       readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+      // #235 — host-driven prompt slices (cleared by pushing `null`)
+      readonly namingRow?: NamingRowReducerState | null;
+      readonly collisionBanner?: CollisionBannerReducerState | null;
+      readonly cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
     }
   | {
       readonly type: 'captureInFlight';

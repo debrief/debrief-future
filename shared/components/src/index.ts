@@ -370,6 +370,11 @@ export {
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  // #235 — naming row + collision banner foundation
+  NamingRow,
+  CollisionBanner,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
   // 234 FR-003 / ADR-027 — shared callback-adapter for stories + harness
   useStoryOnlyMockHandlers,
 } from './panels/StoryboardPanel';
@@ -400,6 +405,14 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  // #235 — naming row + collision banner foundation
+  NamingRowViewModel,
+  CollisionBannerViewModel,
+  NamingRowReducerState,
+  CollisionBannerReducerState,
+  CascadeDeleteConfirmReducerState,
+  NamingRowProps,
+  CollisionBannerProps,
   // 234 FR-003 / ADR-027 — types for the shared callback-adapter helper
   MockPortKnobs,
   MockHandlers,
