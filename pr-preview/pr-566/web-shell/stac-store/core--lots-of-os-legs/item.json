@@ -1,0 +1,144 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--lots-of-os-legs",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.2472333,
+          60.05905
+        ],
+        [
+          0.3207417,
+          60.05905
+        ],
+        [
+          0.3207417,
+          60.2793028
+        ],
+        [
+          -0.2472333,
+          60.2793028
+        ],
+        [
+          -0.2472333,
+          60.05905
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.2472333,
+    60.05905,
+    0.3207417,
+    60.2793028
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Lots Of Os Legs",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Saxon Warrior: Lots Of Os Legs — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including FGS Hessen, Contact Alpha. Multi-national participation: DE, GB.",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "bSENSOR",
+        "name": "FGS Hessen",
+        "nationality": "DE",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      },
+      {
+        "id": "SUBJECT",
+        "name": "Contact Alpha",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/astute",
+        "domain": "subsurface",
+        "vessel_type": "astute",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "EW",
+      "gunnery",
+      "surveillance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "torpedo-run",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Lots_of_OS_Legs (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/Lots_of_OS_Legs.dpf",
+      "title": "Lots_of_OS_Legs.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Lots_of_OS_Legs": {
+      "href": "./assets/Lots_of_OS_Legs.dpf",
+      "type": "application/octet-stream",
+      "title": "Lots_of_OS_Legs.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/Lots_of_OS_Legs.dpf",
+        "load_timestamp": "2026-04-13T23:12:31.882559Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

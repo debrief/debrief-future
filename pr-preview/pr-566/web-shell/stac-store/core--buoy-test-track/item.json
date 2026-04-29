@@ -1,0 +1,160 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--buoy-test-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.8399,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          21.894219444444445
+        ],
+        [
+          -21.57275,
+          22.142258333333334
+        ],
+        [
+          -21.8399,
+          22.142258333333334
+        ],
+        [
+          -21.8399,
+          21.894219444444445
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.8399,
+    21.894219444444445,
+    -21.57275,
+    22.142258333333334
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Buoy Test Track",
+    "datetime": "1995-12-12T05:03:00+00:00",
+    "description": "Saxon Warrior: Buoy Test Track — Royal Navy training exercise in the English Channel / Western Approaches. 4 platform track(s) recorded including HMS Collingwood, USS Provence, FS Richmond and 1 other(s). Multi-national participation: DE, FR, GB, US.",
+    "start_datetime": "1995-12-12T05:03:00+00:00",
+    "end_datetime": "1995-12-12T11:45:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "COLLINGWOOD",
+        "name": "HMS Collingwood",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer"
+      },
+      {
+        "id": "B11",
+        "name": "USS Provence",
+        "nationality": "US",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_type": "visby",
+        "vessel_role": "corvette"
+      },
+      {
+        "id": "B12",
+        "name": "FS Richmond",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/frigate/type26",
+        "domain": "surface",
+        "vessel_type": "type26",
+        "vessel_role": "frigate"
+      },
+      {
+        "id": "B13",
+        "name": "FGS Bainbridge",
+        "nationality": "DE",
+        "vessel_class": "surface/warship/destroyer/type45",
+        "domain": "surface",
+        "vessel_type": "type45",
+        "vessel_role": "destroyer"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "amphibious",
+      "force-protection",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "buoy_test_track (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/buoy_test_track.rep",
+      "title": "buoy_test_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-buoy_test_track": {
+      "href": "./assets/buoy_test_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "buoy_test_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/buoy_test_track.rep",
+        "load_timestamp": "2026-04-13T23:12:32.662126Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
