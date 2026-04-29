@@ -31,10 +31,21 @@ import {
  * Returns HTML for all available webview bundles so that any
  * webview-ready event gets appropriate content.
  *
- * The queue order matters: first webview-ready gets [0], second gets [1], etc.
- * In typical usage:
- * - Sidebar reveal → activity panel (first)
- * - Plot open → map view (second)
+ * The queue is consumed in order (queueIndex 0, 1, 2, ...) and falls
+ * back to the LAST item once exhausted. With Patch 3 active, webviews
+ * are disposed and re-created during the lifecycle, so each user
+ * interaction can produce several webview-ready events. The fallback
+ * therefore matters as much as the head-of-queue.
+ *
+ * Queue ordering:
+ * 1. activityPanel — first sidebar webview when Debrief container reveals
+ * 2. mapView       — editor webview when a plot opens
+ * 3. resultsPanel  — bottom panel webview when results focus
+ * 4. logPanel      — sidebar webview in the separate Debrief Log
+ *                    container; also acts as the post-exhaustion
+ *                    fallback for tests that re-mount webviews many
+ *                    times (e.g. test-log-panel) so the LogPanel UI
+ *                    eventually renders into a discoverable iframe.
  */
 function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
   const queue: Array<{ html: string; allowScripts: boolean }> = [];
@@ -55,6 +66,18 @@ function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
   // reveal the Debrief Results panel get real bundle content injected.
   if (hasWebviewBundle('resultsPanel')) {
     queue.push({ html: generateWebviewHtml('resultsPanel'), allowScripts: true });
+  }
+
+  // Log panel lives in the separate `debrief-log` activity-bar
+  // container.  Placed last so that (a) when a test reveals the Debrief
+  // Log container after activity/map/results have already mounted the
+  // 4th webview-ready receives the logPanel bundle, and (b) it becomes
+  // the post-exhaustion fallback — every subsequent re-mount during the
+  // test lifecycle gets logPanel content, ensuring at least one frame
+  // exposes `[data-testid="log-panel"]` for `findWebviewFrameByContent`
+  // to discover.  See feature 233 (re-activate log-panel E2E suite).
+  if (hasWebviewBundle('logPanel')) {
+    queue.push({ html: generateWebviewHtml('logPanel'), allowScripts: true });
   }
 
   return queue;

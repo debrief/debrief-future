@@ -298,10 +298,13 @@ export class CodeServerPage {
   async openPlotViaCommand(plotName: string): Promise<void> {
     const page = this.page;
 
-    // Invoke "Debrief: Open Plot" via command palette
+    // Invoke "Debrief: Open Plot" via command palette.
+    // The `>` prefix is required — VS Code's QuickInput auto-inserts it
+    // when Ctrl+Shift+P is pressed; `fill()` would otherwise overwrite
+    // the prefix and drop us into QuickOpen file-search mode.
     await page.keyboard.press('Control+Shift+KeyP');
     await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-    await this.commandInput.fill('Debrief: Open Plot');
+    await this.commandInput.fill('>Debrief: Open Plot');
     await page.keyboard.press('Enter');
 
     // Wait for the Quick Pick to show the plot list, then select the plot
@@ -455,10 +458,14 @@ export class CodeServerPage {
    * @see docs/project_notes/webview-e2e-research.md — Blocker 4 resolution
    */
   async revealSidebar(): Promise<void> {
-    // Try the view container command first (focuses the entire Debrief sidebar)
+    // Try the view container command first (focuses the entire Debrief sidebar).
+    // VS Code's auto-generated focus title is `<containerTitle>: Focus on
+    // <viewName> View`. For our manifest entry that's "Debrief: Focus on
+    // Activity View" (container title "Debrief", view name "Activity"),
+    // not "Debrief: Focus on Debrief View".
     await this.page.keyboard.press('Control+Shift+KeyP');
     await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-    await this.commandInput.fill('Debrief: Focus on Debrief View');
+    await this.commandInput.fill('>Debrief: Focus on Activity View');
     await this.page.keyboard.press('Enter');
 
     // Wait for sidebar to render
@@ -509,18 +516,75 @@ export class CodeServerPage {
    * @returns FrameLocator pointing to the innermost Log Panel content
    */
   async getLogPanelFrame(): Promise<FrameLocator> {
-    // Ensure the Debrief sidebar is open
-    await this.openDebriefSidebar();
+    // Debrief Log lives in its OWN activity-bar container (id `debrief-log`,
+    // separate from the `debrief` container that hosts the Activity +
+    // Storyboard panels). The container needs an activity-bar click first
+    // to take the active sidebar slot — running the focus command alone
+    // doesn't switch the active container in openvscode-server, leaving
+    // the LogPanel webview never resolved.
+    const logBarIcon = this.page.locator(
+      [
+        '.activitybar [aria-label="Debrief Log"]',
+        '.activitybar [aria-label*="Debrief Log" i]',
+        '[role="tab"][aria-label*="Debrief Log"]',
+      ].join(', ')
+    ).first();
+    await logBarIcon.click().catch(() => {});
+    await this.page.waitForTimeout(500);
 
-    // Try to focus the Log Panel view via command palette
-    await this.page.keyboard.press('Control+Shift+P');
-    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
-    await this.commandInput.fill('Debrief Log: Focus on Debrief Log View');
-    await this.page.keyboard.press('Enter');
+    // Then run the auto-generated focus command. VS Code surfaces it as
+    // `<containerTitle>: Focus on <viewName> View` → for our manifest
+    // entry (container "Debrief Log" + view name "Log") that's
+    // "Debrief Log: Focus on Log View".  This command triggers
+    // `resolveWebviewView` (Patch 3 from #142).
+    await this.executeCommand('Debrief Log: Focus on Log View');
+    await this.page.waitForTimeout(1_000);
 
     // Find the Log Panel webview by probing frame content.
     // The Log Panel renders [data-testid="log-panel"] as its root element.
-    return this.findWebviewFrameByContent('[data-testid="log-panel"]', 15_000);
+    const frame = await this.findWebviewFrameByContent(
+      '[data-testid="log-panel"]',
+      15_000
+    );
+
+    // Simulate the extension → webview `session:change` message so the
+    // LogPanel React app reflects an active plot.  The Hybrid A+D
+    // injection framework only provides the bundled JS; extension ↔
+    // webview state messages don't flow naturally
+    // (see docs/project_notes/webview-e2e-research.md "Limitations").
+    // Without this, the panel renders the `log-panel-empty-no-plot`
+    // state even after a plot has been opened — the spec's test bodies
+    // expect `log-panel-empty-no-entries`.
+    await frame
+      .locator('[data-testid="log-panel"]')
+      .evaluate((root) => {
+        const win = (root.ownerDocument as Document).defaultView;
+        if (!win) return;
+        win.dispatchEvent(
+          new MessageEvent('message', {
+            data: {
+              type: 'session:change',
+              payload: { hasActiveSession: true, plotName: 'Exercise Alpha' },
+            },
+          })
+        );
+        // Send an empty timeline so the panel transitions out of the
+        // initial "loading" placeholder if it has one.
+        win.dispatchEvent(
+          new MessageEvent('message', {
+            data: {
+              type: 'timeline:update',
+              payload: { entries: [], featureNames: {} },
+            },
+          })
+        );
+      })
+      .catch(() => {
+        // Non-fatal — the test will report a clearer failure if the
+        // expected testid is missing.
+      });
+
+    return frame;
   }
 
   /**
@@ -602,11 +666,26 @@ export class CodeServerPage {
     throw new Error(`Webview frame with content "${selector}" not found after ${timeoutMs}ms`);
   }
 
-  /** Extract a unique identifier from a webview frame URL for locator targeting. */
+  /**
+   * Extract a unique identifier from a webview frame URL for locator targeting.
+   *
+   * In modern openvscode-server, webview iframes are served from
+   * `https://<uuid>.vscode-cdn.net/...?id=<webview-id>&...`.
+   * The query string's `id` param is the most stable identifier — it's the
+   * same value as the iframe element's `name` attribute, so a matching
+   * locator can target the EXACT iframe whose URL matched the content
+   * search.  (Older `vscode-webview://` URL form is also handled for
+   * backwards compatibility.)
+   */
   private extractFrameId(url: string): string {
-    // Webview URLs contain a unique ID. Extract a substring for matching.
-    const match = url.match(/vscode-webview:\/\/([^/]+)/);
-    return match ? match[1].substring(0, 20) : '';
+    try {
+      const id = new URL(url).searchParams.get('id');
+      if (id) return id;
+    } catch {
+      // Fall through to legacy regex
+    }
+    const legacy = url.match(/vscode-webview:\/\/([^/]+)/);
+    return legacy ? legacy[1].substring(0, 20) : '';
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -633,7 +712,7 @@ export class CodeServerPage {
     // `debrief.stacExplorer.focus` → "Explorer: Focus on STAC Stores View"
     await page.keyboard.press('Control+Shift+KeyP');
     await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-    await this.commandInput.fill('Focus on STAC Stores');
+    await this.commandInput.fill('>Explorer: Focus on STAC Stores View');
     await page.keyboard.press('Enter');
 
     // Wait for the pane header to be visible (case-insensitive match)
@@ -647,7 +726,7 @@ export class CodeServerPage {
         await page.keyboard.press('Control+Shift+KeyE');
         await page.keyboard.press('Control+Shift+KeyP');
         await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-        await this.commandInput.fill('Focus on STAC Stores');
+        await this.commandInput.fill('>Explorer: Focus on STAC Stores View');
         await page.keyboard.press('Enter');
         await stacHeader.waitFor({ state: 'visible', timeout: 5_000 }).catch(async () => {
           await this.captureTreeDiagnostics('focus-stac-pane-failed');

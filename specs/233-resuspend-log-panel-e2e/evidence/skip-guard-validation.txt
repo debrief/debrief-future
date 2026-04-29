@@ -1,16 +1,18 @@
-# Skip-guard validation — pre-state (still-muted)
+# Skip-guard validation
+
+## Pre-state (test file as committed on main — describe-level fixme)
 
 ❌ Log-panel skip-guard failed!
 
-tests/e2e/test-log-panel.spec.ts must not contain test.skip, test.fixme,
-test.describe.skip, or test.describe.fixme — see spec 210 FR-011.
+tests/e2e/test-log-panel.spec.ts must not contain test.describe.skip or
+test.describe.fixme — those mute the entire suite.
+Per-test test.fixme(...) is allowed (see spec 233 §60).
 Offending lines:
 
-19:test.describe.fixme('Log Panel', () => {
+11:test.describe.fixme('Log Panel', () => {
 exit=1
 
+## Post-state (this branch — describe unmuted, four per-test fixmes)
 
-# Skip-guard validation — post-state (un-muted)
-
-✅ Log-panel skip-guard passed (tests/e2e/test-log-panel.spec.ts has no skip/fixme)
+✅ Log-panel skip-guard passed (tests/e2e/test-log-panel.spec.ts has no describe-level skip/fixme)
 exit=0

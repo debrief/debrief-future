@@ -8,15 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// #233 — Re-suspended pending #142. After #210 un-fixme'd this suite,
-// the underlying openvscode-server webview-frame-resolution flakiness
-// (#142 research sprint) kept causing `Webview frame with content
-// "[data-testid=\"log-panel\"]" not found after 15000ms` errors in CI.
-// Every PR touching any webview code inherited the failure. The fix is
-// owned by #142 (root-cause investigation); this `.fixme` is a temporary
-// mute so unrelated PRs can land. See `specs/233-resuspend-log-panel-e2e/`
-// for the un-mute recipe once #142 resolves.
-test.describe.fixme('Log Panel', () => {
+test.describe('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,
@@ -33,7 +25,18 @@ test.describe.fixme('Log Panel', () => {
     await expect(emptyState).toBeVisible({ timeout: 5_000 });
   });
 
-  test('running a tool creates a log entry', async ({ codeServerPage }) => {
+  // Tests below require real extension state to flow into the webview
+  // (tool execution → LogService append → `timeline:update` postMessage →
+  // LogPanel re-renders).  The cloud E2E framework (Hybrid A+D —
+  // see `docs/project_notes/webview-e2e-research.md` "Limitations")
+  // injects only the bundled JS; extension ↔ webview message passing
+  // does not flow naturally.  Driving these scenarios needs the test
+  // bodies to dispatch `timeline:update` MessageEvents themselves —
+  // which is a follow-up beyond this spec's §131 out-of-scope clause.
+  // Tracked for follow-up; per spec §60 narrow-mute fallback the four
+  // assertions below are per-test `test.fixme` so the suite stays
+  // active for test #1 (the empty-state assertion).
+  test.fixme('running a tool creates a log entry', async ({ codeServerPage }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     // Select a track and run a tool to create a log entry
@@ -49,7 +52,7 @@ test.describe.fixme('Log Panel', () => {
     expect(await entries.count()).toBeGreaterThan(0);
   });
 
-  test('log entries are shown most recent first', async ({
+  test.fixme('log entries are shown most recent first', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -69,7 +72,7 @@ test.describe.fixme('Log Panel', () => {
     expect(await entries.count()).toBeGreaterThanOrEqual(2);
   });
 
-  test('clicking a log entry selects it', async ({ codeServerPage }) => {
+  test.fixme('clicking a log entry selects it', async ({ codeServerPage }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     const mapFrame = await codeServerPage.getWebviewFrame();
@@ -86,7 +89,7 @@ test.describe.fixme('Log Panel', () => {
     await expect(firstEntry).toHaveClass(/selected/);
   });
 
-  test('clicking a selected log entry deselects it', async ({
+  test.fixme('clicking a selected log entry deselects it', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
