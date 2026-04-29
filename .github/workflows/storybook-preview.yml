@@ -20,7 +20,7 @@ on:
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
-      - 'apps/vscode/test-data/**'
+      - 'apps/vscode/**'
       - 'preview/workspace/samples/**'
       - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
@@ -29,7 +29,7 @@ on:
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
-      - 'apps/vscode/test-data/**'
+      - 'apps/vscode/**'
       - 'preview/workspace/samples/**'
       - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
