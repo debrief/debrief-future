@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--dodgy-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          51.38124722222222,
+          26.101755555555556
+        ],
+        [
+          51.79861388888889,
+          26.101755555555556
+        ],
+        [
+          51.79861388888889,
+          26.437475
+        ],
+        [
+          51.38124722222222,
+          26.437475
+        ],
+        [
+          51.38124722222222,
+          26.101755555555556
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    51.38124722222222,
+    26.101755555555556,
+    51.79861388888889,
+    26.437475
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Dodgy Track",
+    "datetime": "1970-01-03T01:34:25+00:00",
+    "description": "Saxon Warrior: Dodgy Track — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Mahan.",
+    "start_datetime": "1970-01-03T01:34:25+00:00",
+    "end_datetime": "1970-01-03T04:17:25+00:00",
+    "debrief:platforms": [
+      {
+        "id": "Frigate",
+        "name": "FS Mahan",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/patrol/river",
+        "domain": "surface",
+        "vessel_type": "river",
+        "vessel_role": "patrol"
+      }
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "sprint-and-drift",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "dodgy_track (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/dodgy_track.rep",
+      "title": "dodgy_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-dodgy_track": {
+      "href": "./assets/dodgy_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "dodgy_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/dodgy_track.rep",
+        "load_timestamp": "2026-04-13T23:12:32.669402Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
