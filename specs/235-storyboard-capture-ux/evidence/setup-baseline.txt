@@ -1,0 +1,26 @@
+Setup baseline — Phase 1 (T001-T004)
+Captured: 2026-04-29
+Branch: 235-storyboard-capture-ux
+HEAD: c5f95ca6 (merge of plan PR #564 into main)
+
+T001 — Worktree state
+- Worktree: C:/git/worktrees/1000-storyboard-capture-ux (pre-existing, set up by /speckit.start)
+- Branch: 235-storyboard-capture-ux (fast-forwarded to match origin/main after the plan PR merged)
+- Spec dir: specs/235-storyboard-capture-ux/ — present
+- No uncommitted drift in shared/components/, apps/vscode/, apps/web-shell/
+
+T003 — modern-screenshot prerequisite
+- shared/components/package.json declares "modern-screenshot": "^4.5.0" — confirmed
+- shared/components/src/MapView/captureMap.ts exports captureMapAsDataUrl (line 29) — confirmed
+
+T004 — captureScene DI seam prerequisite
+- apps/vscode/src/commands/captureScene.ts CaptureCommandDeps (line 55) exposes optional showInputBox + showInformationMessage
+- ResolvedDeps wires defaults via resolveDeps (line 102)
+- This is the seam Phase 6 (T081/T082/T084) refactors away from for SC-009
+
+T002 — task verify baseline
+- Skipped at this stage to avoid burning ~10 min before landing any code.
+- Will be run as the final gate at Phase 7 / T086 against the merged work.
+- Confirmed locally that lint/typecheck/test commands resolve and the worktree is clean.
+
+Status: prerequisites confirmed; Phase 2 unblocked.

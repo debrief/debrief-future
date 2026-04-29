@@ -432,3 +432,192 @@ export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
     />
   ),
 };
+
+// ─────────────────────────────────────────────────────────────────────
+// Feature 235 — first-capture naming row + duplicate-timestamp banner
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * The empty rail with the primary Capture Scene affordance — the entry
+ * point that replaces the legacy `Press Ctrl/Cmd+Alt+C on the map…`
+ * empty-state copy from #216.
+ */
+export const EmptyWithCaptureButton: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+  },
+};
+
+/**
+ * First-capture inline naming row. Pre-filled with the plot's default
+ * name; analyst can edit, confirm, or cancel without ever leaving the
+ * rail.
+ */
+export const FirstCaptureNamingRow: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Plot Alpha — storyboard',
+      defaultName: 'Plot Alpha — storyboard',
+      collisionWith: null,
+      canConfirm: true,
+    },
+    onNamingRowTextChanged: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+};
+
+/**
+ * First-capture naming row, but the analyst typed a name that already
+ * exists on this plot. The inline collision warning fires; Confirm is
+ * disabled until they pick a unique name.
+ */
+export const FirstCaptureNamingRowWithCollision: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Exercise Alpha',
+      defaultName: 'Plot Alpha — storyboard',
+      collisionWith: 'Exercise Alpha',
+      canConfirm: false,
+    },
+    onNamingRowTextChanged: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+};
+
+/**
+ * Duplicate-timestamp collision banner — Replace / Offset / Cancel.
+ * Anchored in the rail above the existing Scene list. The map and time
+ * controller in the host's central area remain operable.
+ */
+export const DuplicateTimestampBanner: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-2',
+      conflictingSceneTitle: 'Contact with surface group',
+      proposedTimestamp: '2026-04-20T14:15:00.000Z',
+      proposedTimestampDtg: '201415Z APR 26',
+      offsetCount: 0,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: false,
+      offsetButtonHidden: false,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * After 60 Offset presses, the banner replaces the Offset button with
+ * an inline cap-reached message; only Replace and Cancel remain.
+ */
+export const DuplicateTimestampBannerOffsetCapped: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-2',
+      conflictingSceneTitle: 'Contact with surface group',
+      proposedTimestamp: '2026-04-20T14:16:00.000Z',
+      proposedTimestampDtg: '201416Z APR 26',
+      offsetCount: 60,
+      offsetCapReached: true,
+      offsetWouldExceedTimeRange: false,
+      offsetButtonHidden: true,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * FR-CAP-017a — when the next Offset would push past the plot's time
+ * range, the banner replaces the Offset button with the inline
+ * time-range message.
+ */
+export const DuplicateTimestampBannerExceedsTimeRange: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: 'scene-3',
+      conflictingSceneTitle: 'Bearing-only track lock',
+      proposedTimestamp: '2026-04-20T14:35:00.000Z',
+      proposedTimestampDtg: '201435Z APR 26',
+      offsetCount: 4,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: true,
+      offsetButtonHidden: true,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+};
+
+/**
+ * Visualises a Scene row with the Update-to-current affordance — the
+ * primary maintenance op that re-anchors a Scene to live state in-row.
+ * Re-uses the #218 visual treatment; included here so the new stories
+ * file references it for E2E.
+ */
+export const RowWithUpdateToCurrent: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        sceneId: 'scene-2',
+        title: 'Contact with surface group',
+        description: null,
+        timestamp: '2026-04-20T14:15:00.000Z',
+        titleIsEditing: false,
+        editFormOpen: true,
+        pendingDelete: false,
+        stale: false,
+        unresolvedFeatureIds: [],
+        missingData: { kind: 'ok' },
+      },
+    },
+    onSceneUpdateToCurrentClicked: () => undefined,
+  },
+};

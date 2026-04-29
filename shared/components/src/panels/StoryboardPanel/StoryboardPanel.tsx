@@ -19,6 +19,8 @@ import { SceneList } from './SceneList';
 import { TransportRow } from './TransportRow';
 import { StoryboardHeader } from './StoryboardHeader';
 import { UndoToast } from './UndoToast';
+import { NamingRow } from './NamingRow';
+import { CollisionBanner } from './CollisionBanner';
 import {
   SceneOverflowMenu,
   type SceneOverflowAction,
@@ -26,8 +28,7 @@ import {
 } from './SceneOverflowMenu';
 import type { StoryboardPanelProps } from './types';
 
-const EMPTY_STATE_COPY =
-  'No Storyboards yet. Press Ctrl/Cmd+Alt+C on the map to capture your first Scene.';
+const EMPTY_STATE_COPY = 'No storyboards yet.';
 
 const EMPTY_STORYBOARD_COPY =
   'No Scenes yet. Press Ctrl/Cmd+Alt+C on the map to capture one.';
@@ -77,6 +78,15 @@ export function StoryboardPanel({
   onSceneOverflowMenuClose,
   onSceneEditFormCancel,
   onUndoToastDismiss,
+  // #235 first-capture naming row + collision banner
+  namingRowViewModel,
+  collisionBannerViewModel,
+  onNamingRowTextChanged,
+  onNamingRowConfirm,
+  onNamingRowCancel,
+  onCollisionReplace,
+  onCollisionOffset,
+  onCollisionCancel,
 }: StoryboardPanelProps): React.ReactElement {
   const isEmptyNoStoryboard =
     activeStoryboardName === null && scenes.length === 0 && !captureInFlight;
@@ -209,6 +219,30 @@ export function StoryboardPanel({
         />
       )}
 
+      {namingRowViewModel?.visible &&
+        onNamingRowTextChanged &&
+        onNamingRowConfirm &&
+        onNamingRowCancel && (
+          <NamingRow
+            viewModel={namingRowViewModel}
+            onTextChange={onNamingRowTextChanged}
+            onConfirm={onNamingRowConfirm}
+            onCancel={onNamingRowCancel}
+          />
+        )}
+
+      {collisionBannerViewModel?.visible &&
+        onCollisionReplace &&
+        onCollisionOffset &&
+        onCollisionCancel && (
+          <CollisionBanner
+            viewModel={collisionBannerViewModel}
+            onReplace={onCollisionReplace}
+            onOffset={onCollisionOffset}
+            onCancel={onCollisionCancel}
+          />
+        )}
+
       {isEmptyNoStoryboard ? (
         <div
           data-testid="storyboard-empty-state"
@@ -216,14 +250,35 @@ export function StoryboardPanel({
           style={{
             flex: 1,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            gap: 12,
             padding: 16,
             textAlign: 'center',
-            opacity: 0.8,
+            opacity: 0.9,
           }}
         >
-          {EMPTY_STATE_COPY}
+          <span>{EMPTY_STATE_COPY}</span>
+          <button
+            type="button"
+            data-testid="capture-scene-button"
+            aria-label="Capture scene"
+            onClick={onCaptureClick}
+            onKeyDown={(e): void => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onCaptureClick();
+              }
+            }}
+            style={{
+              padding: '6px 14px',
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            Capture Scene
+          </button>
         </div>
       ) : isEmptyStoryboard ? (
         <div
