@@ -432,3 +432,219 @@ export const WithMissingDataRemediation: StoryObj<InteractiveStoryArgs> = {
     />
   ),
 };
+
+// ─── #235 stories — naming row + collision banner ───────────────────
+
+/** Empty plot with the new primary Capture Scene affordance — T021. */
+export const EmptyWithCaptureButton: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 FR-UX-003 — empty state surfaces a primary Capture Scene button instead of a textual hint. Map and time controller (not shown here, the panel is a column inside the host) remain operable next door.',
+      },
+    },
+  },
+};
+
+/** First-capture inline naming row, default name pre-filled — T022. */
+export const FirstCaptureNamingRow: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Plot Foo — storyboard',
+      defaultName: 'Plot Foo — storyboard',
+      collisionWith: null,
+      canConfirm: true,
+    },
+    onNamingRowTextChange: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 FR-CAP-015 — inline naming row replaces the legacy VS Code quick-pick. Auto-focuses the input; Enter confirms; Escape cancels.',
+      },
+    },
+  },
+};
+
+/** Naming row with collision against an existing storyboard name — T023. */
+export const FirstCaptureNamingRowWithCollision: Story = {
+  args: {
+    scenes: [],
+    activeStoryboardName: null,
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    namingRowViewModel: {
+      visible: true,
+      pendingName: 'Existing Storyboard',
+      defaultName: 'Plot Foo — storyboard',
+      collisionWith: 'Existing Storyboard',
+      canConfirm: false,
+    },
+    onNamingRowTextChange: () => undefined,
+    onNamingRowConfirm: () => undefined,
+    onNamingRowCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 FR-CAP-016 — duplicate-name collision surfaces inline; Confirm is disabled until the analyst supplies a unique name.',
+      },
+    },
+  },
+};
+
+/** Duplicate-timestamp banner anchored above the conflicting Scene row — T024. */
+export const DuplicateTimestampBanner: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: SCENES_THREE[1].sceneId,
+      conflictingSceneTitle: SCENES_THREE[1].title,
+      originalTimestamp: SCENES_THREE[1].timestampIso,
+      proposedTimestamp: SCENES_THREE[1].timestampIso,
+      proposedTimestampDtg: SCENES_THREE[1].dtgLabel,
+      offsetCount: 0,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: false,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 FR-CAP-017 — Replace / Offset / Cancel banner replaces the legacy modal. Anchored inline so the central area (map + time controller) is never occluded.',
+      },
+    },
+  },
+};
+
+/** Banner with the offset cap reached — Offset hidden — T025. */
+export const DuplicateTimestampBannerOffsetCapped: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: SCENES_THREE[1].sceneId,
+      conflictingSceneTitle: SCENES_THREE[1].title,
+      originalTimestamp: SCENES_THREE[1].timestampIso,
+      proposedTimestamp: '2026-04-20T14:11:00.000Z',
+      proposedTimestampDtg: '201411Z APR 26',
+      offsetCount: 60,
+      offsetCapReached: true,
+      offsetWouldExceedTimeRange: false,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 — banner after the analyst has pressed Offset 60 times (one minute of offsets); only Replace and Cancel remain.',
+      },
+    },
+  },
+};
+
+/** Banner where the next Offset would exceed the plot's time range — T026. */
+export const DuplicateTimestampBannerExceedsTimeRange: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    collisionBannerViewModel: {
+      visible: true,
+      conflictingSceneId: SCENES_THREE[1].sceneId,
+      conflictingSceneTitle: SCENES_THREE[1].title,
+      originalTimestamp: SCENES_THREE[1].timestampIso,
+      proposedTimestamp: SCENES_THREE[1].timestampIso,
+      proposedTimestampDtg: SCENES_THREE[1].dtgLabel,
+      offsetCount: 5,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: true,
+      cause: 'capture',
+    },
+    onCollisionReplace: () => undefined,
+    onCollisionOffset: () => undefined,
+    onCollisionCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 FR-CAP-017a — when the next Offset would push past the plot’s time range, the Offset button is hidden and an inline message replaces it; Replace and Cancel remain.',
+      },
+    },
+  },
+};
+
+/** Existing edit row overlaid with the Update-to-current affordance — T027. */
+export const RowWithUpdateToCurrent: Story = {
+  args: {
+    scenes: SCENES_THREE,
+    activeStoryboardName: 'Exercise Alpha',
+    captureInFlight: false,
+    onCaptureClick: () => undefined,
+    onSceneRowClick: () => undefined,
+    sceneEditViewModels: {
+      'scene-2': {
+        sceneId: 'scene-2',
+        title: SCENES_THREE[1].title,
+        description: 'Bearing fix from the port AIS sweep.',
+        timestamp: SCENES_THREE[1].timestampIso,
+        titleIsEditing: false,
+        editFormOpen: true,
+        pendingDelete: false,
+        stale: false,
+        unresolvedFeatureIds: [],
+        missingData: { kind: 'ok' },
+      },
+    },
+    onSceneUpdateToCurrentClicked: () => undefined,
+    onSceneEditFormCancel: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '#235 — Scene row with the existing Update-to-current affordance from #218, now reachable via in-row controls only (no modal).',
+      },
+    },
+  },
+};

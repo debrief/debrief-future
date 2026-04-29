@@ -74,3 +74,62 @@ A re-baseline MUST be paired with:
 - Research R5, R13 in `specs/234-storyboard-edit-polish-followup/research.md`.
 - Data-model entry (5) in `specs/234-storyboard-edit-polish-followup/data-model.md`.
 - Parent invariant FR-008 from `specs/230-storyboard-edit-wiring/spec.md`.
+
+---
+
+## #235 channel additions — first-capture naming row + collision banner
+
+Authoritative source: `specs/235-storyboard-capture-ux/contracts/panel-messages.md`. Summary recorded here so consumers of this panel see the channel surface alongside the panel's other public APIs.
+
+### A — Two new optional push fields on `SnapshotPayload` / `ScenesPayload`
+
+Both payloads gain two new optional fields that the host pushes when a host-driven prompt is in flight. The payload also gains an optional `cascadeDeleteConfirm` slice (used by FR-MAINT-021):
+
+| Field | Type | Pushed when |
+|-------|------|-------------|
+| `namingRow` | `NamingRowReducerState \| null` | Host has a first-capture prompt in flight; `null` clears it. |
+| `collisionBanner` | `CollisionBannerReducerState \| null` | Host has a duplicate-timestamp prompt in flight; `null` clears it. |
+| `cascadeDeleteConfirm` | `CascadeDeleteConfirmReducerState \| null` | Host has a storyboard-delete cascade-confirm in flight; `null` clears it. |
+
+When all three are absent (or `undefined`), the reducer leaves its existing slices unchanged — only `null` explicitly clears.
+
+### B — Five new stateless action posts (panel → host)
+
+| Action | Payload | When |
+|--------|---------|------|
+| `naming-row-confirm-requested` | (none) | Enter / Confirm in the naming row. The host validates `pendingName` (the panel-local source of truth) against its own state. |
+| `naming-row-cancel-requested` | (none) | Escape / Cancel / blur outside. |
+| `collision-replace-requested` | `{ conflictingSceneId }` | Replace clicked. The host re-checks `conflictingSceneId` against its banner slice — mismatches are dropped. |
+| `collision-offset-requested` | (none) | Offset (+1 s) clicked. The host advances `offsetCount` and `proposedTimestamp`, re-runs the collision check, and pushes a fresh `collisionBanner` slice. |
+| `collision-cancel-requested` | (none) | Cancel clicked. |
+
+### C — Stale-message defence (panel-side)
+
+The reducer drops any of the five action posts when its matching slice is `null` or `visible: false`. For `collision-replace-requested`, it additionally drops when the action's `conflictingSceneId` doesn't match the slice's `conflictingSceneId`. These rules mirror the existing reducer's "if `editFormOpenFor` references a Scene no longer in the list, close it" pattern.
+
+### Public API additions
+
+`useStoryboardEditReducer.ts` exports the following alongside the existing surface:
+
+```ts
+export interface NamingRowReducerState { /* visible, pendingName, defaultName, knownNames */ }
+export interface CollisionBannerReducerState { /* visible, conflictingSceneId, ..., offsetWouldExceedTimeRange, cause */ }
+export interface CascadeDeleteConfirmReducerState { /* visible, storyboardId, storyboardName, sceneCount */ }
+
+export function composeNamingRowViewModel(state): NamingRowViewModel;
+export function composeCollisionBannerViewModel(state): CollisionBannerViewModel;
+```
+
+Plus six new convenience dispatchers on `StoryboardEditReducerHandle`:
+
+- `setNamingRowText(text)`
+- `requestNamingRowConfirm()` / `requestNamingRowCancel()`
+- `requestCollisionReplace(conflictingSceneId)` / `requestCollisionOffset()` / `requestCollisionCancel()`
+
+### Components
+
+`<NamingRow />` and `<CollisionBanner />` are exported as standalone subcomponents alongside `<StoryboardPanel />`. The panel renders them when `namingRowViewModel.visible` / `collisionBannerViewModel.visible` is true.
+
+### Stability
+
+These additions follow the same stability discipline as `composeSceneEditViewModels`. The five new action types and the three new payload fields are part of the `@debrief/components` panel surface as of #235; removing or renaming them is a breaking change.
