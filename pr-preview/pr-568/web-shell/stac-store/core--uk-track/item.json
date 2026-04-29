@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "core--uk-track",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -6.129722222222222,
+          51.57485833333334
+        ],
+        [
+          -5.85703611111111,
+          51.57485833333334
+        ],
+        [
+          -5.85703611111111,
+          51.814049999999995
+        ],
+        [
+          -6.129722222222222,
+          51.814049999999995
+        ],
+        [
+          -6.129722222222222,
+          51.57485833333334
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -6.129722222222222,
+    51.57485833333334,
+    -5.85703611111111,
+    51.814049999999995
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Uk Track",
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Saxon Warrior: Uk Track — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including FS Sachsen.",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:41:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "SPLENDID",
+        "name": "FS Sachsen",
+        "nationality": "FR",
+        "vessel_class": "surface/warship/corvette/visby",
+        "domain": "surface",
+        "vessel_type": "visby",
+        "vessel_role": "corvette"
+      }
+    ],
+    "debrief:tags": [
+      "escort",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "visual-sighting"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "uk_track (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/uk_track.rep",
+      "title": "uk_track.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-uk_track": {
+      "href": "./assets/uk_track.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "uk_track.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/uk_track.rep",
+        "load_timestamp": "2026-04-13T23:12:33.870075Z",
+        "tool_version": "0.1.0"
+      }
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "thumbnail-sm": {
+      "href": "./thumbnail-sm.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (small)",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
