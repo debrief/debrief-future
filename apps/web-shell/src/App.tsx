@@ -94,8 +94,9 @@ export function StoryboardEditHarnessMount(): JSX.Element {
 /**
  * #235 — read the `?storyboardPanel=1` query string flag at module
  * load time so the analysis view conditionally renders the live rail.
- * Phase 7 / follow-up: lift this to a permanent always-on layout once
- * the GoldenLayout flex sizing is sorted.
+ * Once the rail integration is fully validated, this gate can be lifted
+ * (the rail is always-on); for now it stays so the existing
+ * `apps/web-shell/playwright/tests/*.spec.ts` suite is unaffected.
  */
 function isStoryboardPanelEnabled(): boolean {
   if (typeof window === 'undefined') return false;
@@ -811,6 +812,35 @@ export default function App() {
     store.getState().setDrawingMode(mode);
   }, [store]);
 
+  // #235 — track the latest map bounds + zoom and write a 4-corner
+  // ViewportPolygon to session-state so the capture command can read
+  // viewport / zoom synchronously. Mirrors VS Code's mapPanel.ts viewport
+  // wiring (lines 875-894) but without the postMessage bridge.
+  const latestMapZoomRef = useRef<number | null>(null);
+  const handleMapZoomChange = useCallback((zoom: number): void => {
+    latestMapZoomRef.current = zoom;
+  }, []);
+  const handleMapBoundsChange = useCallback(
+    (bounds: [number, number, number, number]): void => {
+      // bounds = [west, south, east, north]
+      const [west, south, east, north] = bounds;
+      // Default zoom to MapView's initialZoom (10) if zoomend hasn't
+      // fired yet — the capture command rejects when zoom is undefined,
+      // and zoomend is unreliable in headless browsers on initial mount.
+      const zoom = latestMapZoomRef.current ?? 10;
+      // 4-corner polygon in clockwise order [NW, NE, SE, SW] per
+      // ViewportPolygon's documented contract.
+      const coordinates = [
+        { longitude: west, latitude: north },
+        { longitude: east, latitude: north },
+        { longitude: east, latitude: south },
+        { longitude: west, latitude: south },
+      ];
+      store.getState().setViewport({ coordinates, zoom });
+    },
+    [store],
+  );
+
   // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
@@ -1324,6 +1354,8 @@ export default function App() {
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
+      onZoomChange: handleMapZoomChange,
+      onBoundsChange: handleMapBoundsChange,
       currentTime: playback.currentTime,
       displayMode: state.displayMode,
       drawingMode,
@@ -1368,7 +1400,9 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
+    selectedIds, handleMapSelect, handleBackgroundClick,
+    handleMapZoomChange, handleMapBoundsChange,
+    drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
@@ -1571,8 +1605,16 @@ export default function App() {
   }
 
   // Render analysis view
+  const showStoryboardRail =
+    currentPlot !== null && !isMobile && storyboardPanelEnabled;
   return (
-    <div className="web-shell web-shell--analysis">
+    <div
+      className={
+        showStoryboardRail
+          ? 'web-shell web-shell--analysis web-shell--with-storyboard-rail'
+          : 'web-shell web-shell--analysis'
+      }
+    >
       <header className="web-shell__header">
         <button
           type="button"
@@ -1638,53 +1680,36 @@ export default function App() {
             onLayoutReset={() => setLayoutResetCount(c => c + 1)}
           />
         )}
+        {/* #235 Storyboard panel rail — rendered as a 2nd grid column
+          * inside .web-shell__main. The CSS class
+          * `.web-shell--with-storyboard-rail` switches main to display:
+          * grid with template `1fr 360px`. Each cell becomes its own
+          * sizing context, so GoldenLayout's panel-workspace and our
+          * rail both get explicit height + width without the flex
+          * collapse that we hit during initial integration. */}
+        {showStoryboardRail && (
+          <aside
+            className="web-shell__storyboard-rail"
+            data-testid="storyboard-panel-rail"
+            aria-label="Storyboard panel"
+          >
+            <StoryboardPanelMount
+              sessionStore={store}
+              featureCollection={currentPlot!.features}
+              setFeatureCollection={(fc) =>
+                setCurrentPlot((p) =>
+                  p === null ? p : { ...p, features: fc },
+                )
+              }
+              getMapContainer={() =>
+                document.querySelector(
+                  '.leaflet-container',
+                ) as HTMLElement | null
+              }
+            />
+          </aside>
+        )}
       </main>
-      {/* #235 Storyboard panel rail.
-        *
-        * Phase 3 ships the rail behind the `?storyboardPanel=1` query
-        * string so the default Analysis view layout is undisturbed —
-        * GoldenLayout's panel sizing is sensitive to flex-row wrappers
-        * around the workspace, and a clean integration into the main
-        * layout is tracked as a Phase 7 / follow-up task.
-        *
-        * The rail is rendered as a sibling overlay aside that occupies
-        * the right 360px of the analysis view. When enabled, the panel
-        * workspace shifts left via a CSS class to avoid occlusion. */}
-      {currentPlot && !isMobile && storyboardPanelEnabled && (
-        <aside
-          data-testid="storyboard-panel-rail"
-          style={{
-            position: 'absolute',
-            top: 56, // header height
-            right: 0,
-            bottom: 0,
-            width: 360,
-            display: 'flex',
-            flexDirection: 'column',
-            borderLeft:
-              '1px solid var(--vscode-panel-border, #3c3c3c)',
-            background:
-              'var(--vscode-sideBar-background, #1e1e1e)',
-            color: 'var(--vscode-foreground, #cccccc)',
-            overflow: 'hidden',
-            zIndex: 5,
-          }}
-          aria-label="Storyboard panel"
-        >
-          <StoryboardPanelMount
-            sessionStore={store}
-            featureCollection={currentPlot.features}
-            setFeatureCollection={(fc) =>
-              setCurrentPlot((p) =>
-                p === null ? p : { ...p, features: fc },
-              )
-            }
-            getMapContainer={() =>
-              document.querySelector('.leaflet-container') as HTMLElement | null
-            }
-          />
-        </aside>
-      )}
     </div>
   );
 }

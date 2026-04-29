@@ -81,14 +81,22 @@ export class WebPanelHost implements CapturePanelSurface {
     | ((r: CollisionBannerResolution) => void)
     | null = null;
   private readonly listeners = new Set<() => void>();
+  /**
+   * Cached snapshot — `useSyncExternalStore` does an `Object.is`
+   * identity check on every getSnapshot call. If we returned a new
+   * object every time, React would loop indefinitely. So we hold the
+   * snapshot stable across reads and only allocate a fresh one when
+   * the underlying state actually changes (via `notify()`).
+   */
+  private cachedSnapshot: WebPanelHostSnapshot = {
+    namingRow: null,
+    collisionBanner: null,
+  };
 
   // ─── Snapshot accessors (read-only) ────────────────────────────────
 
   getSnapshot(): WebPanelHostSnapshot {
-    return {
-      namingRow: this.namingRow,
-      collisionBanner: this.collisionBanner,
-    };
+    return this.cachedSnapshot;
   }
 
   subscribe(listener: () => void): () => void {
@@ -96,7 +104,15 @@ export class WebPanelHost implements CapturePanelSurface {
     return () => this.listeners.delete(listener);
   }
 
+  private rebuildSnapshot(): void {
+    this.cachedSnapshot = {
+      namingRow: this.namingRow,
+      collisionBanner: this.collisionBanner,
+    };
+  }
+
   private notify(): void {
+    this.rebuildSnapshot();
     for (const l of this.listeners) {
       try {
         l();

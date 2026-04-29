@@ -434,6 +434,9 @@ async function captureSceneWebInner(
   const assetKey = thumbnailResult.assetKey;
 
   // Step 9 — call #215 createScene against the latest plot.
+  // CRITICAL: thread `plot` through tryCreateScene directly. React's
+  // setState in step 6 above is async, so reading getFeatureCollection()
+  // again would miss the newly-created Storyboard and OrphanSceneError.
   const sceneInput: CreateSceneInput = {
     storyboardId: activeStoryboardId,
     viewport: { center, zoom, bearing: 0 },
@@ -447,6 +450,7 @@ async function captureSceneWebInner(
   const result = await tryCreateScene(
     context,
     deps,
+    plot,
     sceneInput,
     timestampIso,
     0,
@@ -460,6 +464,7 @@ async function captureSceneWebInner(
 async function tryCreateScene(
   context: CaptureSceneWebContext,
   deps: ResolvedDeps,
+  plot: StoryboardPlot,
   inputs: CreateSceneInput,
   originalTimestamp: string,
   retries: number,
@@ -471,8 +476,7 @@ async function tryCreateScene(
     return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
   }
   try {
-    const fcLatest = packagePlot(context.getFeatureCollection().features);
-    const result = await createScene(fcLatest, inputs);
+    const result = await createScene(plot, inputs);
     context.setFeatureCollection(plotToFeatureCollection(result.plot));
     return { status: 'captured', scene: result.scene };
   } catch (err) {
@@ -480,6 +484,7 @@ async function tryCreateScene(
       return handleDuplicateTimestamp(
         context,
         deps,
+        plot,
         inputs,
         retries,
         originalTimestamp,
@@ -496,11 +501,12 @@ async function tryCreateScene(
 async function handleDuplicateTimestamp(
   context: CaptureSceneWebContext,
   deps: ResolvedDeps,
+  plot: StoryboardPlot,
   inputs: CreateSceneInput,
   retries: number,
   originalTimestamp: string,
 ): Promise<CaptureResult> {
-  const fc = context.getFeatureCollection();
+  const fc = plotToFeatureCollection(plot);
   const conflict = findExistingConflict(fc, inputs);
   const conflictTitle = findExistingTitle(fc, inputs) ?? 'Existing scene';
   const offsetWouldExceedTimeRange = wouldOffsetExceedTimeRange(
@@ -522,7 +528,14 @@ async function handleDuplicateTimestamp(
     return { status: 'cancelled', reason: 'duplicate-prompt' };
   }
   if (reply.kind === 'replace') {
-    return performReplace(context, deps, inputs, conflict, originalTimestamp);
+    return performReplace(
+      context,
+      deps,
+      plot,
+      inputs,
+      conflict,
+      originalTimestamp,
+    );
   }
   // reply.kind === 'offset'
   if (offsetWouldExceedTimeRange) {
@@ -534,6 +547,7 @@ async function handleDuplicateTimestamp(
   return tryCreateScene(
     context,
     deps,
+    plot,
     { ...inputs, timestamp: offsetIso },
     originalTimestamp,
     retries + 1,
@@ -543,6 +557,7 @@ async function handleDuplicateTimestamp(
 async function performReplace(
   context: CaptureSceneWebContext,
   deps: ResolvedDeps,
+  plot: StoryboardPlot,
   inputs: CreateSceneInput,
   conflictSceneId: string | null,
   originalTimestamp: string,
@@ -551,16 +566,17 @@ async function performReplace(
     deps.logError(
       '[captureSceneWeb] Replace requested but conflict scene not located; retrying createScene',
     );
-    return tryCreateScene(context, deps, inputs, originalTimestamp, 0);
+    return tryCreateScene(context, deps, plot, inputs, originalTimestamp, 0);
   }
+  let nextPlot = plot;
   try {
-    const fcLatest = packagePlot(context.getFeatureCollection().features);
-    const afterDelete = await deleteScene(fcLatest, {
+    const afterDelete = await deleteScene(plot, {
       sceneId: conflictSceneId,
       actor: context.actor,
       now: deps.now(),
     });
-    context.setFeatureCollection(plotToFeatureCollection(afterDelete.plot));
+    nextPlot = afterDelete.plot;
+    context.setFeatureCollection(plotToFeatureCollection(nextPlot));
   } catch (err) {
     deps.logError(
       `[captureSceneWeb] deleteScene (replace branch) failed: ${stringifyError(err)}`,
@@ -568,7 +584,7 @@ async function performReplace(
     deps.showError('Capture failed — could not replace the conflicting scene.');
     return { status: 'rejected', reason: 'unexpected', error: err };
   }
-  return tryCreateScene(context, deps, inputs, originalTimestamp, 0);
+  return tryCreateScene(context, deps, nextPlot, inputs, originalTimestamp, 0);
 }
 
 // `DebriefFeature` is imported only to keep the boundary cast type-safe;
