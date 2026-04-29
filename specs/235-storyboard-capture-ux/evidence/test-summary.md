@@ -51,10 +51,15 @@ The 17 pre-existing failures (sceneThumbnailService.test.ts, stacService.updateI
 
 ## Web-shell tests
 
-Existing E2E suite still passes:
-- `drawing.spec.ts` — 7 tests passed in 32.3s (re-run after rail-gating change to confirm no regression).
+- `drawing.spec.ts` — 7 tests passed in 32.3s (default rail-off layout undisturbed).
+- `storyboard-capture.spec.ts` — 2 happy-path scenarios (first capture + cancel naming row), passing locally in ~7s on a warm dev server (~1.5min on a cold one) when run individually. The cancel scenario is intermittent on Windows local headless (Vite dev-server warm-up race) but stable in isolation; CI's Linux runner should be stable.
 
-The `storyboard-capture.spec.ts` happy-path test currently has a `test.skip(...)` placeholder. The rail mounts cleanly when loaded interactively at `/?storyboardPanel=1`; debugging the headless Playwright transition is paired with the Phase 7 polish work in the follow-up PR.
+### Bugs fixed during E2E bring-up
+
+Three production-code bugs surfaced during E2E debugging and were fixed:
+1. **`WebPanelHost.getSnapshot()` infinite re-render** — `useSyncExternalStore` does Object.is identity, so returning a fresh object each call caused React to spin. Fixed by caching the snapshot internally.
+2. **Missing viewport wiring in App.tsx** — Leaflet's `onZoomChange` / `onBoundsChange` were not piped into `session-state.setViewport`. Capture command rejected every press with `viewport-unavailable`. Fixed by adding `handleMapZoomChange` + `handleMapBoundsChange` that compose a 4-corner ViewportPolygon.
+3. **Stale plot in `tryCreateScene`** — re-reading `getFeatureCollection()` after `setFeatureCollection()` returned pre-mutation state (React async), causing `OrphanSceneError` when creating a Scene against a Storyboard that hadn't propagated yet. Fixed by threading `plot` directly through the recursive helpers.
 
 ## Coverage gates
 
