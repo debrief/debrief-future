@@ -4,15 +4,14 @@
 
 ❌ Log-panel skip-guard failed!
 
-tests/e2e/test-log-panel.spec.ts must not contain test.describe.skip or
-test.describe.fixme — those mute the entire suite.
-Per-test test.fixme(...) is allowed (see spec 233 §60).
+tests/e2e/test-log-panel.spec.ts must not contain test.skip, test.fixme,
+test.describe.skip, or test.describe.fixme — see spec 233 FR-005.
 Offending lines:
 
 11:test.describe.fixme('Log Panel', () => {
 exit=1
 
-## Post-state (this branch — describe unmuted, four per-test fixmes)
+## Post-state (this branch — describe unmuted, no per-test fixmes)
 
-✅ Log-panel skip-guard passed (tests/e2e/test-log-panel.spec.ts has no describe-level skip/fixme)
+✅ Log-panel skip-guard passed (tests/e2e/test-log-panel.spec.ts has no skip/fixme)
 exit=0

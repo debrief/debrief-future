@@ -4,12 +4,34 @@ VS Code server ready at http://localhost:8080
 
 Running 5 tests using 1 worker
 
-  ✓  1 tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run (10.0s)
-  -  2 tests/e2e/test-log-panel.spec.ts:39:8 › Log Panel › running a tool creates a log entry
-  -  3 tests/e2e/test-log-panel.spec.ts:55:8 › Log Panel › log entries are shown most recent first
-  -  4 tests/e2e/test-log-panel.spec.ts:75:8 › Log Panel › clicking a log entry selects it
-  -  5 tests/e2e/test-log-panel.spec.ts:92:8 › Log Panel › clicking a selected log entry deselects it
+  ✘  1 tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run (25.7s)
+  ✓  2 tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run (retry #1) (12.2s)
+  ✓  3 tests/e2e/test-log-panel.spec.ts:28:3 › Log Panel › running a tool creates a log entry (11.4s)
+  ✓  4 tests/e2e/test-log-panel.spec.ts:44:3 › Log Panel › log entries are shown most recent first (14.8s)
+  ✓  5 tests/e2e/test-log-panel.spec.ts:64:3 › Log Panel › clicking a log entry selects it (11.7s)
+  ✓  6 tests/e2e/test-log-panel.spec.ts:81:3 › Log Panel › clicking a selected log entry deselects it (11.7s)
 External code-server — skipping teardown
 
-  4 skipped
-  1 passed (11.9s)
+
+  1) tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run 
+
+    Error: Webview frame with content "[data-testid="log-panel"]" not found after 15000ms
+
+       at models/code-server-page.ts:690
+
+      688 |       await this.page.waitForTimeout(500);
+      689 |     }
+    > 690 |     throw new Error(`Webview frame with content "${selector}" not found after ${timeoutMs}ms`);
+          |           ^
+      691 |   }
+      692 |
+      693 |   /**
+        at CodeServerPage.findWebviewFrameByContent (/home/user/debrief-future/tests/e2e/models/code-server-page.ts:690:11)
+        at CodeServerPage.getLogPanelFrame (/home/user/debrief-future/tests/e2e/models/code-server-page.ts:563:19)
+        at /home/user/debrief-future/tests/e2e/test-log-panel.spec.ts:17:22
+
+    Error Context: test-results/test-log-panel-Log-Panel-l-3dfb8-tate-when-no-tools-have-run/error-context.md
+
+  1 flaky
+    tests/e2e/test-log-panel.spec.ts:13:3 › Log Panel › log panel shows empty state when no tools have run 
+  4 passed (1.5m)

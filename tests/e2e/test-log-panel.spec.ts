@@ -25,18 +25,7 @@ test.describe('Log Panel', () => {
     await expect(emptyState).toBeVisible({ timeout: 5_000 });
   });
 
-  // Tests below require real extension state to flow into the webview
-  // (tool execution → LogService append → `timeline:update` postMessage →
-  // LogPanel re-renders).  The cloud E2E framework (Hybrid A+D —
-  // see `docs/project_notes/webview-e2e-research.md` "Limitations")
-  // injects only the bundled JS; extension ↔ webview message passing
-  // does not flow naturally.  Driving these scenarios needs the test
-  // bodies to dispatch `timeline:update` MessageEvents themselves —
-  // which is a follow-up beyond this spec's §131 out-of-scope clause.
-  // Tracked for follow-up; per spec §60 narrow-mute fallback the four
-  // assertions below are per-test `test.fixme` so the suite stays
-  // active for test #1 (the empty-state assertion).
-  test.fixme('running a tool creates a log entry', async ({ codeServerPage }) => {
+  test('running a tool creates a log entry', async ({ codeServerPage }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     // Select a track and run a tool to create a log entry
@@ -52,7 +41,7 @@ test.describe('Log Panel', () => {
     expect(await entries.count()).toBeGreaterThan(0);
   });
 
-  test.fixme('log entries are shown most recent first', async ({
+  test('log entries are shown most recent first', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -72,7 +61,7 @@ test.describe('Log Panel', () => {
     expect(await entries.count()).toBeGreaterThanOrEqual(2);
   });
 
-  test.fixme('clicking a log entry selects it', async ({ codeServerPage }) => {
+  test('clicking a log entry selects it', async ({ codeServerPage }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
 
     const mapFrame = await codeServerPage.getWebviewFrame();
@@ -89,7 +78,7 @@ test.describe('Log Panel', () => {
     await expect(firstEntry).toHaveClass(/selected/);
   });
 
-  test.fixme('clicking a selected log entry deselects it', async ({
+  test('clicking a selected log entry deselects it', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');

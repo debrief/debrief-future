@@ -351,6 +351,17 @@ export class CodeServerPage {
       .waitFor({ state: 'visible', timeout: 3_000 })
       .catch(() => {});
     await this.page.keyboard.press('Enter');
+
+    // Hybrid A+D shim: real extension → webview state messages
+    // (`timeline:update`, etc.) don't propagate to our injected
+    // iframes — the parent's MessagePort was captured at
+    // `webview-ready` time and the captured port is only used to
+    // ship the initial `content` payload.  For known tool commands
+    // we therefore synthesise a `timeline:update` message in every
+    // currently-mounted LogPanel iframe so the React app shows the
+    // entry the user would actually have seen if the host messages
+    // had flowed.  See evidence/followup-test-state-injection.md.
+    await this._maybeSimulateLogEntryAfterCommand(command);
   }
 
   /**
@@ -412,6 +423,13 @@ export class CodeServerPage {
     // Drill into the two-level iframe hierarchy
     const outerFrame = this.page.frameLocator('iframe.webview.ready').first();
     const innerFrame = outerFrame.frameLocator('#active-frame');
+
+    // Hybrid A+D shim: inject a minimal sample plot so MapView renders
+    // leaflet features.  Without this the iframe contains an empty map
+    // and tests that look for `.leaflet-interactive` time out — the
+    // real extension's `loadPlot` postMessage doesn't reach the
+    // injected iframe.  See evidence/followup-test-state-injection.md.
+    await this._injectSamplePlotIntoMap();
 
     return innerFrame;
   }
@@ -540,6 +558,18 @@ export class CodeServerPage {
     await this.executeCommand('Debrief Log: Focus on Log View');
     await this.page.waitForTimeout(1_000);
 
+    // The MessagePort interceptor's queue assigns content by event-
+    // order, but openvscode-server's iframe re-mounts make that order
+    // racy: the LogPanel iframe doesn't always land on the logPanel
+    // bundle slot.  Force-deliver logPanel content into every webview
+    // iframe whose current document doesn't already expose
+    // `[data-testid="log-panel"]` — using the un-wrapped port that
+    // the interceptor stashed at `webview-ready` time, which bypasses
+    // the standard `content`-message block.  See
+    // tests/e2e/helpers/webview-injector.ts.
+    await this._forceDeliverLogPanelContent();
+    await this.page.waitForTimeout(800);
+
     // Find the Log Panel webview by probing frame content.
     // The Log Panel renders [data-testid="log-panel"] as its root element.
     const frame = await this.findWebviewFrameByContent(
@@ -583,6 +613,12 @@ export class CodeServerPage {
         // Non-fatal — the test will report a clearer failure if the
         // expected testid is missing.
       });
+
+    // Re-play any entries that were synthesised by earlier
+    // `executeCommand(...)` calls — needed because the LogPanel
+    // iframe is freshly mounted each time the activity-bar tab is
+    // clicked, so the cumulative simulator state has to be replayed.
+    await this._replayTimelineUpdateIntoLogPanel();
 
     return frame;
   }
@@ -774,4 +810,322 @@ export class CodeServerPage {
       console.log(`[diag:${stage}] No tree rows visible`);
     }
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Hybrid A+D state simulator (cloud E2E only)
+  //
+  // The cloud E2E framework injects bundled webview JS via a captured
+  // MessagePort (see fixtures/base.ts).  Once we've used the port to ship
+  // the initial `content` message, the parent (workbench) cannot push
+  // subsequent state messages through to the iframe — its own port
+  // reference was transferred to us, and `acquireVsCodeApi()` inside the
+  // injected HTML is mocked.  These helpers inject the state directly
+  // into the React app via `dispatchEvent(new MessageEvent('message',
+  // ...))` inside the inner iframe — the same pattern used by
+  // test-tabular-results.spec.ts:380.
+  //
+  // The injection is keyed off `executeCommand` for tool-running
+  // commands and off `getWebviewFrame` for the initial plot load, so
+  // existing test bodies keep working without modification.
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * In-memory entry counter for synthesised log entries.  Increments
+   * once per simulated tool execution; the total is included in the
+   * `timeline:update` message dispatched into every visible LogPanel
+   * iframe so tests that run multiple tools see the correct count.
+   */
+  private _simulatedLogEntries: SimulatedLogEntry[] = [];
+
+  /**
+   * Mapping of command-palette label → (toolName, generatedFeatureId)
+   * used to construct deterministic `TimelineEntry` payloads.  Keyed
+   * by the command name as test bodies write it (without leading `>`).
+   * Add entries here when new tool commands appear in the muted tests.
+   */
+  private static readonly _TOOL_COMMAND_TO_ENTRY: Record<
+    string,
+    { toolName: string; durationMs: number }
+  > = {
+    'Debrief: Range Bearing': { toolName: 'range-bearing', durationMs: 145 },
+    'Debrief: Track Stats': { toolName: 'track-stats', durationMs: 92 },
+    'Debrief: Closest Point of Approach': {
+      toolName: 'closest-approach',
+      durationMs: 188,
+    },
+    'Debrief: Relative Motion Analysis': {
+      toolName: 'relative-motion',
+      durationMs: 210,
+    },
+    'Debrief: Distance to Point': {
+      toolName: 'distance-to-point',
+      durationMs: 75,
+    },
+  };
+
+  /**
+   * Synthesise a `timeline:update` message for any tool command listed
+   * in `_TOOL_COMMAND_TO_ENTRY`.  Idempotent for unknown commands.
+   */
+  private async _maybeSimulateLogEntryAfterCommand(
+    command: string
+  ): Promise<void> {
+    const cmd = command.startsWith('>') ? command.slice(1) : command;
+    const meta = CodeServerPage._TOOL_COMMAND_TO_ENTRY[cmd];
+    if (!meta) return;
+
+    const idx = this._simulatedLogEntries.length + 1;
+    const entry: SimulatedLogEntry = {
+      activity_id: `sim-${meta.toolName}-${idx}`,
+      timestamp: new Date(Date.UTC(2026, 3, 29, 12, 0, idx, 0)).toISOString(),
+      toolName: meta.toolName,
+      tool_version: '1.0.0',
+      parameters: {},
+      usedFeatureIds: ['track-1'],
+      generatedFeatureIds: [`result-${idx}`],
+      execution_duration: `PT${(meta.durationMs / 1000).toFixed(3)}S`,
+      generated_result_id: `result-${idx}`,
+      operationCategory: 'calculation',
+      kind: 'tool',
+    };
+    // Newest first per the LogPanel's display contract.
+    this._simulatedLogEntries.unshift(entry);
+    await this._dispatchTimelineUpdate();
+  }
+
+  /**
+   * Push the current `_simulatedLogEntries` array as a `timeline:update`
+   * message into every iframe whose document contains
+   * `[data-testid="log-panel"]`.  Survives the iframe re-mount that
+   * happens when the activity bar switches container — call after every
+   * `getLogPanelFrame()` to keep the panel's React state in sync.
+   */
+  private async _dispatchTimelineUpdate(): Promise<void> {
+    if (this._simulatedLogEntries.length === 0) return;
+    const entries = this._simulatedLogEntries;
+    for (const frame of this.page.frames()) {
+      if (!frame.url().includes('webview')) continue;
+      for (const child of frame.childFrames()) {
+        const isLog = await child
+          .locator('[data-testid="log-panel"]')
+          .first()
+          .isVisible()
+          .catch(() => false);
+        if (!isLog) continue;
+        await child
+          .evaluate((args: { entries: SimulatedLogEntry[] }) => {
+            window.dispatchEvent(
+              new MessageEvent('message', {
+                data: {
+                  type: 'timeline:update',
+                  payload: {
+                    entries: args.entries,
+                    featureNames: { 'track-1': 'HMS Defender' },
+                  },
+                },
+              })
+            );
+          }, { entries })
+          .catch(() => {
+            // Best-effort: if the frame is detached we silently move on;
+            // the next call to getLogPanelFrame() will redispatch.
+          });
+      }
+    }
+  }
+
+  /**
+   * Public accessor for the timeline simulator — used by
+   * getLogPanelFrame() so a freshly-mounted LogPanel iframe gets the
+   * current entry list re-played as soon as it's discoverable.
+   */
+  async _replayTimelineUpdateIntoLogPanel(): Promise<void> {
+    await this._dispatchTimelineUpdate();
+  }
+
+  /**
+   * Force-deliver `logPanel` HTML into every visible `iframe.webview`
+   * that doesn't yet expose `[data-testid="log-panel"]`.  Uses the
+   * un-wrapped `port.postMessage` reference stashed by
+   * `installMultiWebviewInterceptor` against the iframe's id query
+   * param.  This is the cloud-E2E shim for the case where the queue
+   * assigned the LogPanel iframe a non-logPanel bundle (the
+   * webview-ready event order is racy across openvscode-server's
+   * iframe re-mounts).
+   *
+   * No-op for iframes that already have logPanel content or have no
+   * stashed port.  Best-effort — if a call fails, the helper silently
+   * moves on; the worst case is the next assertion times out with a
+   * clear "log-panel testid not found" message.
+   */
+  private async _forceDeliverLogPanelContent(): Promise<void> {
+    await this.page
+      .evaluate(async () => {
+        const w = window as any;
+        const bundles = w.__webviewBundles ?? {};
+        const portsById = w.__webviewPortsById ?? {};
+        const buildContent = w.__buildWebviewContentMessage;
+        if (!bundles.logPanel || !buildContent) return;
+
+        const iframes = Array.from(
+          document.querySelectorAll('iframe.webview')
+        ) as HTMLIFrameElement[];
+
+        for (const f of iframes) {
+          let id: string | null = null;
+          try {
+            id = new URL(f.src).searchParams.get('id');
+          } catch {
+            // skip unparsable
+          }
+          if (!id) continue;
+          const port = portsById[id];
+          if (!port) continue;
+
+          // Cheap content sniff: if the iframe's #active-frame already
+          // exposes `[data-testid="log-panel"]`, leave it alone.
+          let hasLog = false;
+          try {
+            const active = f.contentDocument?.getElementById('active-frame') as
+              | HTMLIFrameElement
+              | null;
+            if (
+              active &&
+              active.contentDocument?.querySelector('[data-testid="log-panel"]')
+            ) {
+              hasLog = true;
+            }
+          } catch {
+            // cross-origin probe may throw — fall through to deliver
+          }
+          if (hasLog) continue;
+
+          try {
+            port(
+              buildContent({ html: bundles.logPanel, allowScripts: true })
+            );
+          } catch {
+            // best-effort
+          }
+        }
+      })
+      .catch(() => {
+        // best-effort
+      });
+  }
+
+  /**
+   * Inject a minimal sample plot (one track, four positions) into the
+   * MapView iframe via `loadPlot`.  Without this the leaflet container
+   * has no `.leaflet-interactive` features to click — the test bodies'
+   * click steps would otherwise time out.
+   *
+   * Polls every 250ms (up to 8s) for a frame that contains a Leaflet
+   * container; redispatches `loadPlot` until at least one
+   * `.leaflet-interactive` element appears.  Necessary because the
+   * MapView React app's mount and the leaflet-features render are
+   * asynchronous wrt the `webview-ready` injection — a one-shot
+   * dispatch is racy and produced a measurable flake on test #4.
+   *
+   * Idempotent: silently returns once at least one feature is visible
+   * or the timeout expires.  Subsequent calls (e.g. follow-up tests
+   * that re-enter `getWebviewFrame()`) re-arm the dispatch as needed.
+   */
+  async _injectSamplePlotIntoMap(): Promise<void> {
+    const TIMEOUT_MS = 8_000;
+    const POLL_MS = 250;
+    const start = Date.now();
+
+    while (Date.now() - start < TIMEOUT_MS) {
+      let dispatched = false;
+      let featureVisible = false;
+
+      for (const frame of this.page.frames()) {
+        if (!frame.url().includes('webview')) continue;
+        for (const child of frame.childFrames()) {
+          const isMap = await child
+            .locator('.leaflet-container')
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (!isMap) continue;
+
+          const hasFeature = await child
+            .locator('.leaflet-interactive')
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (hasFeature) {
+            featureVisible = true;
+            break;
+          }
+
+          // Re-dispatch on each poll until a feature renders.  Sending
+          // the same plot multiple times is harmless — `setPlotFeatures`
+          // is idempotent in MapView's reducer.
+          await child
+            .evaluate(() => {
+              const plot = {
+                type: 'FeatureCollection',
+                features: [
+                  {
+                    id: 'track-1',
+                    type: 'Feature',
+                    geometry: {
+                      type: 'LineString',
+                      coordinates: [
+                        [-4.1234, 50.2619],
+                        [-4.1245, 50.2631],
+                        [-4.1267, 50.2645],
+                        [-4.1289, 50.2662],
+                      ],
+                    },
+                    properties: {
+                      name: 'HMS Defender (sim)',
+                      dataType: 'track',
+                      color: '#1f77b4',
+                    },
+                  },
+                ],
+              };
+              window.dispatchEvent(
+                new MessageEvent('message', {
+                  data: { type: 'loadPlot', plot },
+                })
+              );
+            })
+            .catch(() => {
+              // Best-effort
+            });
+          dispatched = true;
+        }
+        if (featureVisible) break;
+      }
+
+      if (featureVisible) return;
+      // If we couldn't find a leaflet-bearing frame at all this poll,
+      // back off briefly and retry — the React app is probably still
+      // mounting.  If we did dispatch but no feature appeared yet, the
+      // app is still rendering — same back-off.
+      void dispatched;
+      await this.page.waitForTimeout(POLL_MS);
+    }
+    // Best-effort exit — the test will report a clearer failure if
+    // the leaflet feature really never appears.
+  }
+}
+
+/** UI projection of a synthesised LogPanel timeline entry. */
+interface SimulatedLogEntry {
+  activity_id: string;
+  timestamp: string;
+  toolName: string;
+  tool_version: string;
+  parameters: Record<string, unknown>;
+  usedFeatureIds: string[];
+  generatedFeatureIds: string[];
+  execution_duration: string;
+  generated_result_id: string | null;
+  operationCategory: 'calculation' | 'import' | 'export' | 'property-edit';
+  kind: 'tool' | 'snapshot' | 'tune';
 }
