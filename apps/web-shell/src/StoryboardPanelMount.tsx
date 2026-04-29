@@ -1,0 +1,405 @@
+/**
+ * Live `<StoryboardPanel>` mount for the web-shell Analysis view
+ * (#235 — T045-T048).
+ *
+ * Replaces the fixture-driven `StoryboardEditHarness` on the default
+ * Analysis-view path. Reads from the live `getSessionStore()` feature
+ * collection (passed via props from `App.tsx`) and exposes the rail
+ * next to the central area without overlapping it.
+ *
+ * Wires:
+ *   - Capture button → `captureSceneWeb`
+ *   - Naming row + collision banner → `WebPanelHost` (mirrors the
+ *     VS Code postMessage channel)
+ *   - Maintenance ops → #215 CRUD module (Phase 4 wires these; this
+ *     mount renders the panel against live state today)
+ *   - FR-WEB-029a session-only badge — visible whenever any
+ *     captured-but-unpersisted Storyboard or Scene Feature exists in
+ *     the store (web-shell has no STAC write path yet — see #236).
+ *   - Ctrl/Cmd+Alt+C keyboard shortcut (suppressed when an editable
+ *     element is focused).
+ *   - `pagehide` listener that aborts any in-flight capture.
+ */
+
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+} from 'react';
+import type { Feature, FeatureCollection } from 'geojson';
+import {
+  StoryboardPanel,
+  composeSceneEditViewModels,
+  formatDtg,
+  isSceneFeature,
+  isStoryboardFeature,
+  getActiveStoryboardDefault,
+  useStoryboardEditReducer,
+  type SceneRowViewModel,
+  type StoryboardOptionViewModel,
+  type StoryboardPlot,
+} from '@debrief/components';
+import type { SessionStoreApi } from '@debrief/session-state';
+import {
+  captureSceneWeb,
+  __abortCaptureInFlight,
+} from './commands/captureSceneWeb';
+import { WebPanelHost } from './services/webPanelHost';
+import { getSceneThumbnailStore } from './services/webSceneThumbnailAdapter';
+
+type StoryboardPlotFeature = StoryboardPlot['features'][number];
+
+export interface StoryboardPanelMountProps {
+  /** The live session-state store. Used for viewport / time / dirty state. */
+  readonly sessionStore: SessionStoreApi;
+  /** The current FeatureCollection (from React state via App.tsx). */
+  readonly featureCollection: FeatureCollection;
+  /** Push a new FeatureCollection back into App.tsx state after a CRUD op. */
+  readonly setFeatureCollection: (fc: FeatureCollection) => void;
+  /** Resolves the live `.leaflet-container` element for thumbnail capture. */
+  readonly getMapContainer: () => HTMLElement | null;
+  /** Actor identity recorded in provenance entries. */
+  readonly actor?: string;
+}
+
+function packagePlot(features: readonly Feature[]): StoryboardPlot {
+  return {
+    type: 'FeatureCollection',
+    // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+    features: features as unknown as StoryboardPlotFeature[],
+  };
+}
+
+function computeSceneRows(
+  fc: FeatureCollection,
+  activeStoryboardId: string | null,
+): SceneRowViewModel[] {
+  if (activeStoryboardId === null) return [];
+  const rows: SceneRowViewModel[] = [];
+  const thumbnailStore = getSceneThumbnailStore();
+  for (const f of fc.features) {
+    // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+    const sceneTest = f as unknown as Parameters<typeof isSceneFeature>[0];
+    if (!isSceneFeature(sceneTest)) continue;
+    if (sceneTest.properties.storyboard_id !== activeStoryboardId) continue;
+    const thumb = thumbnailStore.get(sceneTest.properties.id);
+    rows.push({
+      sceneId: sceneTest.properties.id,
+      title: sceneTest.properties.title,
+      timestampIso: sceneTest.properties.timestamp,
+      dtgLabel: formatDtg(sceneTest.properties.timestamp),
+      thumbnailHref: thumb?.smallDataUrl ?? '',
+      state: { kind: 'ok' as const },
+    });
+  }
+  rows.sort((a, b) =>
+    a.timestampIso < b.timestampIso ? -1 : a.timestampIso > b.timestampIso ? 1 : 0,
+  );
+  return rows;
+}
+
+function computeStoryboardOptions(
+  fc: FeatureCollection,
+): StoryboardOptionViewModel[] {
+  const opts: StoryboardOptionViewModel[] = [];
+  // Compute scene counts up front.
+  const sceneCounts = new Map<string, number>();
+  for (const f of fc.features) {
+    // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+    const sceneTest = f as unknown as Parameters<typeof isSceneFeature>[0];
+    if (!isSceneFeature(sceneTest)) continue;
+    const sid = sceneTest.properties.storyboard_id;
+    sceneCounts.set(sid, (sceneCounts.get(sid) ?? 0) + 1);
+  }
+  for (const f of fc.features) {
+    // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+    const sbTest = f as unknown as Parameters<typeof isStoryboardFeature>[0];
+    if (!isStoryboardFeature(sbTest)) continue;
+    const id = sbTest.properties.id;
+    const provenance = sbTest.properties.provenance;
+    const lastEntry =
+      Array.isArray(provenance) && provenance.length > 0
+        ? provenance[provenance.length - 1]
+        : null;
+    const lastModifiedIso =
+      lastEntry !== null && typeof lastEntry === 'object' && 'at' in lastEntry
+        ? String((lastEntry as { at: unknown }).at)
+        : '';
+    opts.push({
+      storyboardId: id,
+      name: sbTest.properties.name,
+      sceneCount: sceneCounts.get(id) ?? 0,
+      lastModifiedIso,
+    });
+  }
+  return opts;
+}
+
+export function StoryboardPanelMount({
+  sessionStore,
+  featureCollection,
+  setFeatureCollection,
+  getMapContainer,
+  actor = 'web-shell-user',
+}: StoryboardPanelMountProps): React.ReactElement {
+  // ─── Web panel host (singleton per mount) ────────────────────────
+  const hostRef = useRef<WebPanelHost | null>(null);
+  if (hostRef.current === null) {
+    hostRef.current = new WebPanelHost();
+  }
+  const host = hostRef.current;
+
+  // Subscribe to host snapshot for namingRow / collisionBanner pushes.
+  const hostSnapshot = useSyncExternalStore(
+    useCallback(
+      (listener: () => void) => host.subscribe(listener),
+      [host],
+    ),
+    useCallback(() => host.getSnapshot(), [host]),
+    useCallback(() => host.getSnapshot(), [host]),
+  );
+
+  // Subscribe to thumbnail store so the rail re-renders when a capture
+  // completes (the thumbnailHref otherwise stays stale).
+  const thumbnailStore = useMemo(() => getSceneThumbnailStore(), []);
+  const thumbnailRevision = useSyncExternalStore(
+    useCallback(
+      (listener: () => void) => thumbnailStore.subscribe(listener),
+      [thumbnailStore],
+    ),
+    useCallback((): boolean => thumbnailStore.hasAny(), [thumbnailStore]),
+    useCallback((): boolean => thumbnailStore.hasAny(), [thumbnailStore]),
+  );
+
+  // ─── Derive view-models from the live FeatureCollection ──────────
+  const plot = useMemo(() => packagePlot(featureCollection.features), [
+    featureCollection,
+  ]);
+  const activeStoryboard = useMemo(
+    () => getActiveStoryboardDefault(plot),
+    [plot],
+  );
+  const activeStoryboardId = activeStoryboard?.properties.id ?? null;
+  const activeStoryboardName = activeStoryboard?.properties.name ?? null;
+  const sceneRows = useMemo(
+    () => {
+      void thumbnailRevision; // re-compute when the store changes
+      return computeSceneRows(featureCollection, activeStoryboardId);
+    },
+    [featureCollection, activeStoryboardId, thumbnailRevision],
+  );
+  const storyboardOptions = useMemo(
+    () => computeStoryboardOptions(featureCollection),
+    [featureCollection],
+  );
+
+  // ─── Reducer (panel-local state) ─────────────────────────────────
+  const {
+    state,
+    dispatch,
+    namingRowViewModel,
+    collisionBannerViewModel,
+    setNamingRowPendingName,
+  } = useStoryboardEditReducer();
+
+  // Push host snapshots + derived view-models into the reducer whenever
+  // they change. Mirrors the VS Code panelView's `refresh()` /
+  // `applySnapshot()` behaviour.
+  useEffect(() => {
+    dispatch({
+      type: 'scenes-message',
+      payload: {
+        scenes: sceneRows,
+        activeStoryboardName,
+        activeStoryboardId,
+        namingRow: hostSnapshot.namingRow,
+        collisionBanner: hostSnapshot.collisionBanner,
+      },
+    });
+  }, [
+    dispatch,
+    sceneRows,
+    activeStoryboardName,
+    activeStoryboardId,
+    hostSnapshot.namingRow,
+    hostSnapshot.collisionBanner,
+  ]);
+
+  const sceneEditViewModels = useMemo(
+    () => composeSceneEditViewModels(state),
+    [state],
+  );
+
+  // ─── Capture handler ─────────────────────────────────────────────
+  const handleCaptureClick = useCallback(() => {
+    void captureSceneWeb(
+      {
+        sessionStore,
+        getFeatureCollection: () => featureCollection,
+        setFeatureCollection,
+        getMapContainer,
+        panelView: host,
+        actor,
+        trigger: { source: 'panelButton' },
+      },
+    );
+  }, [
+    sessionStore,
+    featureCollection,
+    setFeatureCollection,
+    getMapContainer,
+    host,
+    actor,
+  ]);
+
+  // ─── Naming row handlers ─────────────────────────────────────────
+  const onNamingRowTextChanged = useCallback(
+    (pendingName: string) => setNamingRowPendingName(pendingName),
+    [setNamingRowPendingName],
+  );
+  const onNamingRowConfirm = useCallback(() => {
+    const slice = state.namingRow;
+    if (slice === null || !slice.visible) return;
+    host.onNamingRowConfirm(slice.pendingName.trim());
+  }, [state.namingRow, host]);
+  const onNamingRowCancel = useCallback(() => {
+    host.onNamingRowCancel();
+  }, [host]);
+
+  // ─── Collision banner handlers ───────────────────────────────────
+  const onCollisionReplace = useCallback(
+    (conflictingSceneId: string) => {
+      host.onCollisionReplace(conflictingSceneId);
+    },
+    [host],
+  );
+  const onCollisionOffset = useCallback(() => {
+    host.onCollisionOffset();
+  }, [host]);
+  const onCollisionCancel = useCallback(() => {
+    host.onCollisionCancel();
+  }, [host]);
+
+  // ─── Keyboard shortcut: Ctrl/Cmd+Alt+C ───────────────────────────
+  useEffect(() => {
+    const handler = (e: KeyboardEvent): void => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (!e.altKey) return;
+      if (e.key.toLowerCase() !== 'c') return;
+      // Suppress when typing in an editable field.
+      const t = e.target as HTMLElement | null;
+      if (t !== null) {
+        const tag = t.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (t.isContentEditable) return;
+      }
+      e.preventDefault();
+      handleCaptureClick();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleCaptureClick]);
+
+  // ─── Pagehide cleanup (T044) ─────────────────────────────────────
+  useEffect(() => {
+    const onPageHide = (): void => {
+      __abortCaptureInFlight();
+      host.reset();
+    };
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('beforeunload', onPageHide);
+    return () => {
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('beforeunload', onPageHide);
+    };
+  }, [host]);
+
+  // ─── FR-WEB-029a session-only badge ──────────────────────────────
+  const hasSessionOnlyContent = useMemo(() => {
+    for (const f of featureCollection.features) {
+      const props = f.properties as { kind?: string } | null;
+      if (props === null) continue;
+      if (props.kind === 'STORYBOARD' || props.kind === 'STORYBOARD_SCENE') {
+        return true;
+      }
+    }
+    return false;
+  }, [featureCollection]);
+
+  // ─── No-op stubs for ops Phase 4/5 will wire up ──────────────────
+  // Phase 3 ships only US1 (capture). The rail still renders all the
+  // affordances; clicking maintenance ops is a no-op for now and a
+  // status console.warn so analysts know the deferred path.
+  const noopWithLog = useCallback(
+    (op: string) =>
+      (..._args: unknown[]): void => {
+        console.warn(
+          `[StoryboardPanelMount] ${op} — deferred to Phase 4. ` +
+            `See specs/235-storyboard-capture-ux/tasks.md.`,
+        );
+      },
+    [],
+  );
+
+  return (
+    <div
+      data-testid="storyboard-panel-mount"
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+      }}
+    >
+      {hasSessionOnlyContent && (
+        <div
+          data-testid="storyboard-session-only-badge"
+          role="status"
+          style={{
+            padding: '4px 10px',
+            fontSize: 11,
+            background:
+              'var(--vscode-editorWarning-background, rgba(255, 197, 61, 0.15))',
+            color:
+              'var(--vscode-editorWarning-foreground, #bf8803)',
+            borderBottom:
+              '1px solid var(--vscode-panel-border, #3c3c3c)',
+          }}
+        >
+          ⚠ Session-only — captures persist only for this tab. Web-shell
+          has no STAC write path yet (see issue #236).
+        </div>
+      )}
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <StoryboardPanel
+          scenes={sceneRows}
+          activeStoryboardName={activeStoryboardName}
+          captureInFlight={state.captureInFlight}
+          onCaptureClick={handleCaptureClick}
+          onSceneRowClick={noopWithLog('onSceneRowClick')}
+          storyboards={
+            storyboardOptions.length > 0 ? storyboardOptions : undefined
+          }
+          activeStoryboardId={activeStoryboardId}
+          currentSceneId={state.currentSceneId}
+          transport={state.transport}
+          onActiveStoryboardChange={noopWithLog('onActiveStoryboardChange')}
+          onCreateStoryboard={noopWithLog('onCreateStoryboard')}
+          onRenameStoryboard={noopWithLog('onRenameStoryboard')}
+          onDeleteStoryboard={noopWithLog('onDeleteStoryboard')}
+          sceneEditViewModels={sceneEditViewModels}
+          namingRowViewModel={namingRowViewModel}
+          collisionBannerViewModel={collisionBannerViewModel}
+          onNamingRowTextChanged={onNamingRowTextChanged}
+          onNamingRowConfirm={onNamingRowConfirm}
+          onNamingRowCancel={onNamingRowCancel}
+          onCollisionReplace={onCollisionReplace}
+          onCollisionOffset={onCollisionOffset}
+          onCollisionCancel={onCollisionCancel}
+        />
+      </div>
+    </div>
+  );
+}

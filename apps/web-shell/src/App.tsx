@@ -72,6 +72,7 @@ import {
   StoryboardEditHarness,
   parseHarnessQueryString,
 } from './StoryboardEditHarness';
+import { StoryboardPanelMount } from './StoryboardPanelMount';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
@@ -1605,21 +1606,50 @@ export default function App() {
         </div>
       )}
 
-      <main className="web-shell__main">
-        {isMobile ? (
-          <PanelContextProvider value={panelContextValue}>
-            <MobileTabLayout
-              hasResults={chartContextProps !== null}
+      <main className="web-shell__main" style={{ display: 'flex', flexDirection: 'row', minHeight: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          {isMobile ? (
+            <PanelContextProvider value={panelContextValue}>
+              <MobileTabLayout
+                hasResults={chartContextProps !== null}
+                className="web-shell__panel-workspace"
+              />
+            </PanelContextProvider>
+          ) : (
+            <PanelWorkspace
+              registry={panelRegistry}
+              contextWrapper={contextWrapper}
               className="web-shell__panel-workspace"
+              onLayoutReset={() => setLayoutResetCount(c => c + 1)}
             />
-          </PanelContextProvider>
-        ) : (
-          <PanelWorkspace
-            registry={panelRegistry}
-            contextWrapper={contextWrapper}
-            className="web-shell__panel-workspace"
-            onLayoutReset={() => setLayoutResetCount(c => c + 1)}
-          />
+          )}
+        </div>
+        {currentPlot && !isMobile && (
+          <aside
+            data-testid="storyboard-panel-rail"
+            style={{
+              width: 360,
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              borderLeft: '1px solid var(--vscode-panel-border, #3c3c3c)',
+              background: 'var(--vscode-sideBar-background, #1e1e1e)',
+              color: 'var(--vscode-foreground, #cccccc)',
+              minHeight: 0,
+            }}
+            aria-label="Storyboard panel"
+          >
+            <StoryboardPanelMount
+              sessionStore={store}
+              featureCollection={currentPlot.features}
+              setFeatureCollection={(fc) =>
+                setCurrentPlot((p) => (p === null ? p : { ...p, features: fc }))
+              }
+              getMapContainer={() =>
+                document.querySelector('.leaflet-container') as HTMLElement | null
+              }
+            />
+          </aside>
         )}
       </main>
     </div>
