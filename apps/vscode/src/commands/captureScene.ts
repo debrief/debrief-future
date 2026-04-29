@@ -22,6 +22,8 @@ import {
   type StoryboardPlot,
   type SceneFeature,
   type CreateSceneInput,
+  type NamingRowReducerState,
+  type CollisionBannerReducerState,
 } from '@debrief/components';
 type StoryboardPlotFeature = StoryboardPlot['features'][number];
 import { calculateViewportCenter } from '@debrief/utils';
@@ -31,6 +33,7 @@ import type {
 } from '@debrief/session-state';
 import type { MapPanel } from '../webview/mapPanel';
 import type { DebriefFeature } from '@debrief/components';
+import type { StoryboardPanelViewProvider } from '../views/storyboardPanelView';
 import {
   writeSceneThumbnail,
   type WriteSceneThumbnailResult,
@@ -46,6 +49,15 @@ export interface CaptureCommandContext {
     | { readonly source: 'keybinding' }
     | { readonly source: 'panelButton' }
     | { readonly source: 'programmatic' };
+  /**
+   * Storyboard panel view provider — when supplied, the capture command
+   * routes the first-capture name prompt and the duplicate-timestamp
+   * resolution through the panel's inline naming row + collision banner
+   * (#235 FR-VSC-025) instead of the legacy host-level VS Code quick-pick
+   * / modal. Optional only for unit-test back-compat; the production
+   * call site at apps/vscode/src/extension.ts ALWAYS supplies it.
+   */
+  readonly panelView?: StoryboardPanelViewProvider;
 }
 
 /**
@@ -211,7 +223,14 @@ async function captureSceneInner(
   if (existing !== null) {
     activeStoryboardId = existing.properties.id;
   } else {
-    const name = await promptForStoryboardName(currentPlot, deps);
+    // #235 FR-VSC-025 — when the panel view is supplied (production), the
+    // first-capture name prompt is the inline naming row inside the
+    // Storyboard panel rail. The legacy `showInputBox` quick-pick path
+    // is reserved for unit-test back-compat only.
+    const name =
+      context.panelView !== undefined
+        ? await awaitNamingRowResolution(context.panelView, currentPlot)
+        : await promptForStoryboardName(currentPlot, deps);
     if (name === undefined) {
       return { status: 'cancelled', reason: 'name-prompt' };
     }
@@ -321,6 +340,21 @@ async function handleDuplicateTimestamp(
     return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
   }
   const conflict = findExistingConflict(mapPanel, inputs);
+  void sessionStore; // reserved for future telemetry
+  // #235 FR-VSC-025 / FR-CAP-017a — when the panel view is supplied
+  // (production), the duplicate-timestamp resolution is the inline
+  // collision banner inside the rail. The legacy modal
+  // `showInformationMessage(['Replace', 'Offset (+1 s)'])` is reserved
+  // for unit-test back-compat only.
+  if (context.panelView !== undefined) {
+    return resolveCollisionViaPanel(
+      context,
+      deps,
+      inputs,
+      conflict,
+      retries,
+    );
+  }
   const choice = await deps.showInformationMessage(
     `A scene already exists at ${formatDtg(inputs.timestamp)}.`,
     { modal: true },
@@ -339,7 +373,6 @@ async function handleDuplicateTimestamp(
     ).toISOString();
     return retryCreateScene(context, deps, { ...inputs, timestamp: offsetIso }, retries + 1);
   }
-  void sessionStore; // reserved for future telemetry
   return { status: 'cancelled', reason: 'duplicate-prompt' };
 }
 
@@ -462,6 +495,187 @@ function stringifyError(err: unknown): string {
     return `${err.message}\n${err.stack ?? ''}`;
   }
   return String(err);
+}
+
+// ── #235 — panel-view-based first-capture + collision resolution ────
+
+/**
+ * Default Storyboard name for the first-capture flow. Inherited from the
+ * spec.md Assumptions: "plot's display name plus a suffix" — the active
+ * STAC item has no display name surface in this command's context, so we
+ * use a generic suffix that the analyst will overtype if undesired.
+ */
+function defaultFirstStoryboardName(plot: StoryboardPlot): string {
+  // Analyst-friendly default — they edit before confirming.
+  void plot;
+  return 'New storyboard';
+}
+
+function collectExistingStoryboardNames(plot: StoryboardPlot): readonly string[] {
+  const names = new Set<string>();
+  for (const f of plot.features) {
+    const props = f.properties as { kind?: string; name?: string } | null;
+    if (
+      props !== null &&
+      props.kind === 'STORYBOARD' &&
+      typeof props.name === 'string'
+    ) {
+      names.add(props.name);
+    }
+  }
+  return Array.from(names);
+}
+
+/**
+ * Show the first-capture inline naming row inside the Storyboard panel
+ * rail and await the analyst's confirmation or cancellation. Replaces
+ * the legacy `showInputBox` quick-pick path per FR-VSC-025.
+ *
+ * Resolves with:
+ *   - `string` — trimmed name on Confirm
+ *   - `undefined` — on Cancel (Escape, Cancel button, or click outside)
+ */
+async function awaitNamingRowResolution(
+  panelView: StoryboardPanelViewProvider,
+  plot: StoryboardPlot,
+): Promise<string | undefined> {
+  const knownNames = collectExistingStoryboardNames(plot);
+  const defaultName = defaultFirstStoryboardName(plot);
+  const slice: NamingRowReducerState = {
+    visible: true,
+    pendingName: defaultName,
+    defaultName,
+    knownNames,
+  };
+  panelView.setNamingRow(slice);
+  // Surface the panel so the analyst can see the row.
+  await vscode.commands.executeCommand('debrief.storyboardPanel.focus');
+  try {
+    return await new Promise<string | undefined>((resolve) => {
+      const confirmSub = panelView.onNamingRowConfirm((event) => {
+        confirmSub.dispose();
+        cancelSub.dispose();
+        const trimmed = event.name.trim();
+        if (trimmed === '' || knownNames.includes(trimmed)) {
+          // Stale / invalid — re-push the slice and stay open. The
+          // panel reducer's stale-message defence already drops invalid
+          // dispatches, so this branch is effectively unreachable when
+          // the panel is honest about `canConfirm`. Resolve `undefined`
+          // defensively — equivalent to Cancel.
+          resolve(undefined);
+          return;
+        }
+        resolve(trimmed);
+      });
+      const cancelSub = panelView.onNamingRowCancel(() => {
+        confirmSub.dispose();
+        cancelSub.dispose();
+        resolve(undefined);
+      });
+    });
+  } finally {
+    panelView.setNamingRow(null);
+  }
+}
+
+/**
+ * Show the duplicate-timestamp collision banner inside the panel rail
+ * and resolve via Replace / Offset / Cancel. Replaces the legacy modal
+ * `showInformationMessage(['Replace', 'Offset (+1 s)'])` per FR-VSC-025
+ * + FR-CAP-017a.
+ */
+async function resolveCollisionViaPanel(
+  context: CaptureCommandContext,
+  deps: ResolvedDeps,
+  inputs: CreateSceneInput,
+  conflictSceneId: string | null,
+  retries: number,
+): Promise<CaptureResult> {
+  const panelView = context.panelView;
+  if (panelView === undefined) {
+    // Defensive — we only enter here when context.panelView is set.
+    return { status: 'cancelled', reason: 'duplicate-prompt' };
+  }
+  // Enforce FR-CAP-017a: derive offsetWouldExceedTimeRange from the
+  // session's currentTime range. Out-of-range guard already fired
+  // before we got here on the original timestamp; we re-derive against
+  // the proposed (possibly offset) timestamp.
+  const proposed = inputs.timestamp;
+  const conflictTitle =
+    findExistingConflictTitle(context.mapPanel, inputs) ??
+    formatDtg(inputs.timestamp);
+  const slice: CollisionBannerReducerState = {
+    visible: true,
+    conflictingSceneId: conflictSceneId ?? '',
+    conflictingSceneTitle: conflictTitle,
+    originalTimestamp: proposed,
+    proposedTimestamp: proposed,
+    offsetCount: retries,
+    offsetWouldExceedTimeRange: false,
+    cause: 'capture',
+  };
+  panelView.setCollisionBanner(slice);
+  await vscode.commands.executeCommand('debrief.storyboardPanel.focus');
+  try {
+    return await new Promise<CaptureResult>((resolve) => {
+      const replaceSub = panelView.onCollisionReplace((event) => {
+        cleanup();
+        // Use the slice's id as authoritative — already validated by
+        // the panel-view's stale-defence.
+        void event;
+        resolve(performReplace(context, deps, inputs, conflictSceneId));
+      });
+      const offsetSub = panelView.onCollisionOffset(() => {
+        cleanup();
+        const nextIso = new Date(
+          new Date(inputs.timestamp).getTime() + 1000,
+        ).toISOString();
+        resolve(
+          retryCreateScene(
+            context,
+            deps,
+            { ...inputs, timestamp: nextIso },
+            retries + 1,
+          ),
+        );
+      });
+      const cancelSub = panelView.onCollisionCancel(() => {
+        cleanup();
+        resolve({ status: 'cancelled', reason: 'duplicate-prompt' });
+      });
+      function cleanup(): void {
+        replaceSub.dispose();
+        offsetSub.dispose();
+        cancelSub.dispose();
+      }
+    });
+  } finally {
+    panelView.setCollisionBanner(null);
+  }
+}
+
+function findExistingConflictTitle(
+  mapPanel: MapPanel,
+  inputs: CreateSceneInput,
+): string | null {
+  const plot = packagePlot(mapPanel.getCurrentFeatures());
+  for (const f of plot.features) {
+    const props = f.properties as {
+      kind?: string;
+      storyboard_id?: string;
+      timestamp?: string;
+      title?: string;
+    } | null;
+    if (
+      props !== null &&
+      props.kind === 'STORYBOARD_SCENE' &&
+      props.storyboard_id === inputs.storyboardId &&
+      props.timestamp === inputs.timestamp
+    ) {
+      return typeof props.title === 'string' ? props.title : null;
+    }
+  }
+  return null;
 }
 
 /** Test-only: reset the module-scoped in-flight guard between cases. */

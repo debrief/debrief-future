@@ -1089,6 +1089,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         stacItemPath,
         actor: sessionManager.actor,
         trigger: { source: 'programmatic' },
+        // #235 FR-VSC-025 — production routes the first-capture name
+        // prompt and duplicate-timestamp resolution through the
+        // panel's inline naming row + collision banner.
+        panelView: storyboardPanelProvider,
       };
       await captureScene(ctx, {
         setCaptureInFlight: (inFlight: boolean) =>
