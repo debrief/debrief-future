@@ -7,9 +7,13 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  composeCollisionBannerViewModel,
+  composeNamingRowViewModel,
   composeSceneEditViewModels,
   createInitialStoryboardEditState,
   storyboardEditReducer,
+  type CollisionBannerReducerState,
+  type NamingRowReducerState,
   type StaleFlagEntry,
   type StoryboardEditReducerState,
   type UndoToastDescriptor,
@@ -385,5 +389,304 @@ describe('composeSceneEditViewModels', () => {
     expect(Object.keys(out).length).toBe(3);
     expect(out['S1'].pendingDelete).toBe(false);
     expect(out['S1'].missingData.kind).toBe('ok');
+  });
+});
+
+// ── #235 — first-capture naming row ────────────────────────────────
+
+const NAMING_ROW_DEFAULT: NamingRowReducerState = {
+  visible: true,
+  pendingName: 'Plot Foo — storyboard',
+  defaultName: 'Plot Foo — storyboard',
+  knownNames: [],
+};
+
+const COLLISION_BANNER_DEFAULT: CollisionBannerReducerState = {
+  visible: true,
+  conflictingSceneId: 'S2',
+  conflictingSceneTitle: 'Scene S2',
+  originalTimestamp: '2026-04-20T14:00:00.000Z',
+  proposedTimestamp: '2026-04-20T14:00:00.000Z',
+  offsetCount: 0,
+  offsetWouldExceedTimeRange: false,
+  cause: 'capture',
+};
+
+describe('#235 namingRow reducer slice', () => {
+  it('lands the slice on a snapshot push', () => {
+    const base = seeded();
+    const out = storyboardEditReducer(base, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: base.sceneRows,
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: NAMING_ROW_DEFAULT,
+      },
+    });
+    expect(out.namingRow).toEqual(NAMING_ROW_DEFAULT);
+  });
+
+  it('preserves panel-local pendingName when host re-pushes the same row', () => {
+    const base: StoryboardEditReducerState = seeded({
+      namingRow: { ...NAMING_ROW_DEFAULT, pendingName: 'My typed name' },
+    });
+    const out = storyboardEditReducer(base, {
+      type: 'scenes-message',
+      payload: {
+        scenes: base.sceneRows,
+        activeStoryboardName: null,
+        activeStoryboardId: null,
+        // host re-pushes (e.g. knownNames updated) — must not clobber pendingName
+        namingRow: { ...NAMING_ROW_DEFAULT, knownNames: ['Existing Storyboard'] },
+      },
+    });
+    expect(out.namingRow?.pendingName).toBe('My typed name');
+    expect(out.namingRow?.knownNames).toEqual(['Existing Storyboard']);
+  });
+
+  it('clears the slice when host pushes null', () => {
+    const base = seeded({ namingRow: NAMING_ROW_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: base.sceneRows,
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        namingRow: null,
+      },
+    });
+    expect(out.namingRow).toBeNull();
+  });
+
+  it('updates pendingName on naming-row-text-changed', () => {
+    const base = seeded({ namingRow: NAMING_ROW_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'naming-row-text-changed',
+      text: 'New name',
+    });
+    expect(out.namingRow?.pendingName).toBe('New name');
+  });
+
+  it('drops naming-row-text-changed when slice is null (stale-defence)', () => {
+    const base = seeded();
+    const out = storyboardEditReducer(base, {
+      type: 'naming-row-text-changed',
+      text: 'leaked',
+    });
+    expect(out).toBe(base);
+    expect(out.namingRow).toBeNull();
+  });
+
+  it('drops naming-row-text-changed when slice is hidden (stale-defence)', () => {
+    const base = seeded({
+      namingRow: { ...NAMING_ROW_DEFAULT, visible: false },
+    });
+    const out = storyboardEditReducer(base, {
+      type: 'naming-row-text-changed',
+      text: 'leaked',
+    });
+    expect(out).toBe(base);
+  });
+
+  it('clears slice optimistically on confirm/cancel', () => {
+    const base = seeded({ namingRow: NAMING_ROW_DEFAULT });
+    expect(
+      storyboardEditReducer(base, { type: 'naming-row-confirm-requested' })
+        .namingRow,
+    ).toBeNull();
+    expect(
+      storyboardEditReducer(base, { type: 'naming-row-cancel-requested' })
+        .namingRow,
+    ).toBeNull();
+  });
+
+  it('drops confirm/cancel when slice is null (stale-defence)', () => {
+    const base = seeded();
+    expect(
+      storyboardEditReducer(base, { type: 'naming-row-confirm-requested' }),
+    ).toBe(base);
+    expect(
+      storyboardEditReducer(base, { type: 'naming-row-cancel-requested' }),
+    ).toBe(base);
+  });
+
+  it('projects view-model with collision-with case-insensitive match', () => {
+    const state = seeded({
+      namingRow: {
+        visible: true,
+        pendingName: 'briefing alpha',
+        defaultName: 'Plot — storyboard',
+        knownNames: ['Briefing Alpha', 'Other'],
+      },
+    });
+    const vm = composeNamingRowViewModel(state);
+    expect(vm.visible).toBe(true);
+    expect(vm.collisionWith).toBe('Briefing Alpha');
+    expect(vm.canConfirm).toBe(false);
+  });
+
+  it('projects canConfirm:true for a unique non-empty name', () => {
+    const state = seeded({
+      namingRow: {
+        visible: true,
+        pendingName: 'Fresh name',
+        defaultName: '',
+        knownNames: ['Other'],
+      },
+    });
+    const vm = composeNamingRowViewModel(state);
+    expect(vm.canConfirm).toBe(true);
+    expect(vm.collisionWith).toBeNull();
+  });
+
+  it('projects canConfirm:false for empty/whitespace-only pendingName', () => {
+    const state = seeded({
+      namingRow: { ...NAMING_ROW_DEFAULT, pendingName: '   ' },
+    });
+    const vm = composeNamingRowViewModel(state);
+    expect(vm.canConfirm).toBe(false);
+    expect(vm.collisionWith).toBeNull();
+  });
+
+  it('projects visible:false when slice is null', () => {
+    const vm = composeNamingRowViewModel(seeded());
+    expect(vm.visible).toBe(false);
+    expect(vm.canConfirm).toBe(false);
+  });
+});
+
+describe('#235 collisionBanner reducer slice', () => {
+  it('lands the slice on a snapshot push', () => {
+    const base = seeded();
+    const out = storyboardEditReducer(base, {
+      type: 'snapshot-message',
+      payload: {
+        storyboards: [],
+        scenes: base.sceneRows,
+        activeStoryboardId: null,
+        activeStoryboardName: null,
+        currentSceneId: null,
+        transport: TRANSPORT,
+        collisionBanner: COLLISION_BANNER_DEFAULT,
+      },
+    });
+    expect(out.collisionBanner).toEqual(COLLISION_BANNER_DEFAULT);
+  });
+
+  it('clears slice on Replace with matching conflictingSceneId', () => {
+    const base = seeded({ collisionBanner: COLLISION_BANNER_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-replace-requested',
+      conflictingSceneId: 'S2',
+    });
+    expect(out.collisionBanner).toBeNull();
+  });
+
+  it('drops Replace with mismatched conflictingSceneId (stale-defence)', () => {
+    const base = seeded({ collisionBanner: COLLISION_BANNER_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-replace-requested',
+      conflictingSceneId: 'WRONG',
+    });
+    expect(out).toBe(base);
+  });
+
+  it('clears slice on Cancel', () => {
+    const base = seeded({ collisionBanner: COLLISION_BANNER_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-cancel-requested',
+    });
+    expect(out.collisionBanner).toBeNull();
+  });
+
+  it('drops Replace/Offset/Cancel when slice is null (stale-defence)', () => {
+    const base = seeded();
+    expect(
+      storyboardEditReducer(base, {
+        type: 'collision-replace-requested',
+        conflictingSceneId: 'X',
+      }),
+    ).toBe(base);
+    expect(
+      storyboardEditReducer(base, { type: 'collision-offset-requested' }),
+    ).toBe(base);
+    expect(
+      storyboardEditReducer(base, { type: 'collision-cancel-requested' }),
+    ).toBe(base);
+  });
+
+  it('drops Offset when offsetWouldExceedTimeRange is true', () => {
+    const base = seeded({
+      collisionBanner: {
+        ...COLLISION_BANNER_DEFAULT,
+        offsetWouldExceedTimeRange: true,
+      },
+    });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-offset-requested',
+    });
+    expect(out).toBe(base);
+  });
+
+  it('drops Offset when offsetCount is at cap (60)', () => {
+    const base = seeded({
+      collisionBanner: { ...COLLISION_BANNER_DEFAULT, offsetCount: 60 },
+    });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-offset-requested',
+    });
+    expect(out).toBe(base);
+  });
+
+  it('Offset with no preconditions returns same state — host re-pushes after the check', () => {
+    const base = seeded({ collisionBanner: COLLISION_BANNER_DEFAULT });
+    const out = storyboardEditReducer(base, {
+      type: 'collision-offset-requested',
+    });
+    // No local mutation — host advances offsetCount and re-pushes
+    expect(out).toBe(base);
+  });
+
+  it('projects banner view-model with offsetCapReached when count >= 60', () => {
+    const state = seeded({
+      collisionBanner: { ...COLLISION_BANNER_DEFAULT, offsetCount: 60 },
+    });
+    const vm = composeCollisionBannerViewModel(state);
+    expect(vm.offsetCapReached).toBe(true);
+  });
+
+  it('projects offsetWouldExceedTimeRange through to the view-model', () => {
+    const state = seeded({
+      collisionBanner: {
+        ...COLLISION_BANNER_DEFAULT,
+        offsetWouldExceedTimeRange: true,
+      },
+    });
+    const vm = composeCollisionBannerViewModel(state);
+    expect(vm.offsetWouldExceedTimeRange).toBe(true);
+  });
+
+  it('projects DTG label from proposedTimestamp', () => {
+    const state = seeded({
+      collisionBanner: {
+        ...COLLISION_BANNER_DEFAULT,
+        proposedTimestamp: '2026-04-20T14:00:00.000Z',
+      },
+    });
+    const vm = composeCollisionBannerViewModel(state);
+    expect(vm.proposedTimestampDtg).toMatch(/201400Z APR 26/);
+  });
+
+  it('projects visible:false when slice is null', () => {
+    const vm = composeCollisionBannerViewModel(seeded());
+    expect(vm.visible).toBe(false);
+    expect(vm.offsetCount).toBe(0);
   });
 });

@@ -23,6 +23,10 @@ export type {
   SceneOverflowMenuItem,
   SceneOverflowAction,
 } from './SceneOverflowMenu';
+export { NamingRow } from './NamingRow';
+export type { NamingRowProps } from './NamingRow';
+export { CollisionBanner } from './CollisionBanner';
+export type { CollisionBannerProps } from './CollisionBanner';
 export type {
   StoryboardPanelProps,
   SceneRowViewModel,
@@ -31,12 +35,16 @@ export type {
   MissingDataReason,
   SceneEditViewModel,
   StoryboardEditViewModel,
+  NamingRowViewModel,
+  CollisionBannerViewModel,
 } from './types';
 export {
   useStoryboardEditReducer,
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
 } from './useStoryboardEditReducer';
 export type {
   StoryboardEditAction,
@@ -47,6 +55,9 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  NamingRowReducerState,
+  CollisionBannerReducerState,
+  CascadeDeleteConfirmReducerState,
 } from './useStoryboardEditReducer';
 
 // 234 FR-003 / ADR-027 — shared callback-adapter helper for stories +

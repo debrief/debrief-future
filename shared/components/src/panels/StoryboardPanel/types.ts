@@ -102,6 +102,43 @@ export interface StoryboardEditViewModel {
   readonly sceneCount: number;
 }
 
+/**
+ * First-capture inline naming row view-model (#235 data-model §NamingRowState).
+ *
+ * Surfaced inside the panel rail (NOT as a host quick-pick or modal) when the
+ * analyst presses Capture Scene on a plot with no Storyboards. Source-of-truth
+ * fields (`visible`, `defaultName`, `knownNames`) are pushed by the host on
+ * each snapshot; the panel reducer tracks `pendingName` locally as the analyst
+ * types and derives `collisionWith` against `knownNames` on every keystroke.
+ */
+export interface NamingRowViewModel {
+  readonly visible: boolean;
+  readonly pendingName: string;
+  readonly defaultName: string;
+  readonly collisionWith: string | null;
+  readonly canConfirm: boolean;
+}
+
+/**
+ * Duplicate-timestamp collision banner view-model (#235 data-model §CollisionBannerState).
+ *
+ * Anchored above the conflicting Scene row when capture or update-to-current
+ * raises a DuplicateTimestampError. Carries enough state for the inline
+ * Replace / Offset (+1 s) / Cancel banner.
+ */
+export interface CollisionBannerViewModel {
+  readonly visible: boolean;
+  readonly conflictingSceneId: string | null;
+  readonly conflictingSceneTitle: string | null;
+  readonly originalTimestamp: string | null;
+  readonly proposedTimestamp: string | null;
+  readonly proposedTimestampDtg: string | null;
+  readonly offsetCount: number;
+  readonly offsetCapReached: boolean;
+  readonly offsetWouldExceedTimeRange: boolean;
+  readonly cause: 'capture' | 'update-to-current' | null;
+}
+
 export interface StoryboardPanelProps {
   /** Ordered by `timestampIso` ascending. Empty when no active Storyboard. */
   readonly scenes: readonly SceneRowViewModel[];
@@ -207,4 +244,34 @@ export interface StoryboardPanelProps {
   onSceneEditFormCancel?(sceneId: string): void;
   /** Fires when the analyst dismisses the Undo toast (close button). */
   onUndoToastDismiss?(): void;
+
+  // ── NEW in #235 — first-capture naming row + collision banner ──────
+
+  /** First-capture inline naming row state (host-pushed + panel-local).
+   *  When `visible: true` the panel renders an inline naming row inside
+   *  the rail body; when `visible: false` (or undefined) the row is hidden. */
+  readonly namingRowViewModel?: NamingRowViewModel;
+  /** Duplicate-timestamp collision banner state. When `visible: true`
+   *  the banner is anchored above the conflicting Scene row. */
+  readonly collisionBannerViewModel?: CollisionBannerViewModel;
+
+  /** Fires when the analyst types in the naming row. The reducer is the
+   *  panel-local source of truth for `pendingName`; consumers do not
+   *  normally need to handle this directly. */
+  onNamingRowTextChange?(text: string): void;
+  /** Fires when the analyst presses Enter or clicks Confirm in the naming
+   *  row. Carries the trimmed `name`. */
+  onNamingRowConfirm?(name: string): void;
+  /** Fires when the analyst presses Escape, clicks Cancel, or clicks
+   *  outside the naming row. */
+  onNamingRowCancel?(): void;
+
+  /** Fires when the analyst clicks Replace in the collision banner.
+   *  Carries the conflicting Scene id for stale-message defence. */
+  onCollisionReplace?(conflictingSceneId: string): void;
+  /** Fires when the analyst clicks Offset (+1 s) in the collision banner.
+   *  The host advances `proposedTimestamp` and re-runs the collision check. */
+  onCollisionOffset?(): void;
+  /** Fires when the analyst clicks Cancel in the collision banner. */
+  onCollisionCancel?(): void;
 }

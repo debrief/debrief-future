@@ -19,12 +19,58 @@
 
 import { useCallback, useReducer } from 'react';
 import type {
+  CollisionBannerViewModel,
+  NamingRowViewModel,
   SceneEditViewModel,
   SceneRowViewModel,
   StoryboardEditViewModel,
   StoryboardOptionViewModel,
   TransportViewModel,
 } from './types';
+
+const OFFSET_CAP = 60;
+
+/**
+ * First-capture naming row reducer slice (#235 data-model §NamingRowState).
+ *
+ * Host owns `visible`, `defaultName`, and `knownNames`; the panel owns
+ * `pendingName` locally as the analyst types. `collisionWith` is recomputed
+ * on every keystroke against `knownNames`.
+ */
+export interface NamingRowReducerState {
+  readonly visible: boolean;
+  readonly pendingName: string;
+  readonly defaultName: string;
+  readonly knownNames: readonly string[];
+}
+
+/**
+ * Duplicate-timestamp collision banner reducer slice (#235 data-model
+ * §CollisionBannerState). All fields are host-pushed; the panel renders
+ * the banner verbatim and forwards Replace / Offset / Cancel actions.
+ */
+export interface CollisionBannerReducerState {
+  readonly visible: boolean;
+  readonly conflictingSceneId: string;
+  readonly conflictingSceneTitle: string;
+  readonly originalTimestamp: string;
+  readonly proposedTimestamp: string;
+  readonly offsetCount: number;
+  readonly offsetWouldExceedTimeRange: boolean;
+  readonly cause: 'capture' | 'update-to-current';
+}
+
+/**
+ * Optional inline cascade-delete confirmation slice for storyboard delete.
+ * Surfaced inside the rail header (no modal), per FR-MAINT-021. Host owns
+ * the cascade count.
+ */
+export interface CascadeDeleteConfirmReducerState {
+  readonly visible: boolean;
+  readonly storyboardId: string;
+  readonly storyboardName: string;
+  readonly sceneCount: number;
+}
 
 export interface UndoToastDescriptor {
   readonly sceneId: string;
@@ -74,6 +120,15 @@ export interface StoryboardEditReducerState {
   readonly editFormOpenFor: string | null;
   readonly overflowMenuOpenFor: string | null;
   readonly overflowMenuAnchorRect: DOMRect | null;
+  // ── #235 — first-capture naming row + collision banner slices ────
+  // `null` when no flow is in flight. Host pushes a fresh slice at the
+  // start of each flow and pushes `null` at the end (Confirm / Cancel /
+  // Replace). Stateless action posts that arrive while the slice is
+  // `null` or `visible:false` are dropped silently (stale-message
+  // defence — see contracts/panel-messages.md §C).
+  readonly namingRow: NamingRowReducerState | null;
+  readonly collisionBanner: CollisionBannerReducerState | null;
+  readonly cascadeDeleteConfirm: CascadeDeleteConfirmReducerState | null;
 }
 
 /**
@@ -88,6 +143,10 @@ export interface ScenesPayload {
   readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   readonly pendingUndoToast?: UndoToastDescriptor | null;
   readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — host-driven prompt slices (cleared by pushing `null`)
+  readonly namingRow?: NamingRowReducerState | null;
+  readonly collisionBanner?: CollisionBannerReducerState | null;
+  readonly cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
 }
 
 export interface SnapshotPayload {
@@ -100,6 +159,10 @@ export interface SnapshotPayload {
   readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   readonly pendingUndoToast?: UndoToastDescriptor | null;
   readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — host-driven prompt slices (cleared by pushing `null`)
+  readonly namingRow?: NamingRowReducerState | null;
+  readonly collisionBanner?: CollisionBannerReducerState | null;
+  readonly cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
 }
 
 export type StoryboardEditAction =
@@ -126,7 +189,23 @@ export type StoryboardEditAction =
       readonly sceneId: string;
       readonly anchorRect: DOMRect;
     }
-  | { readonly type: 'overflow-menu-close' };
+  | { readonly type: 'overflow-menu-close' }
+  // ── #235 — first-capture naming row actions ──────────────────────
+  // `naming-row-text-changed` is panel-local: it updates `pendingName`
+  // in the slice but does NOT round-trip through the host. The other
+  // two are stateless action posts that the host handler should send
+  // up the channel; the reducer applies them locally as a no-op so the
+  // slice clears optimistically (the host's next push confirms).
+  | { readonly type: 'naming-row-text-changed'; readonly text: string }
+  | { readonly type: 'naming-row-confirm-requested' }
+  | { readonly type: 'naming-row-cancel-requested' }
+  // ── #235 — collision banner actions (all stateless) ──────────────
+  | {
+      readonly type: 'collision-replace-requested';
+      readonly conflictingSceneId: string;
+    }
+  | { readonly type: 'collision-offset-requested' }
+  | { readonly type: 'collision-cancel-requested' };
 
 export function createInitialStoryboardEditState(
   overrides?: Partial<StoryboardEditReducerState>,
@@ -147,6 +226,9 @@ export function createInitialStoryboardEditState(
     editFormOpenFor: null,
     overflowMenuOpenFor: null,
     overflowMenuAnchorRect: null,
+    namingRow: null,
+    collisionBanner: null,
+    cascadeDeleteConfirm: null,
     ...overrides,
   };
 }
@@ -159,6 +241,26 @@ function buildStaleFlagsMap(
     m.set(f.sceneId, f);
   }
   return m;
+}
+
+/**
+ * Apply a fresh host push of the naming-row slice while preserving the
+ * panel-local `pendingName` whenever the host is opening a brand-new
+ * row (host always pushes `pendingName === defaultName` on first push,
+ * but the analyst may have started typing before the push round-trips).
+ *
+ * Rule: when transitioning from null/hidden → visible, accept the host's
+ * `pendingName` verbatim. When the host re-pushes while the row is
+ * already visible (e.g. `knownNames` updated), keep the panel's local
+ * `pendingName` so the analyst's keystrokes are not clobbered.
+ */
+function applyNamingRowPush(
+  prev: NamingRowReducerState | null,
+  next: NamingRowReducerState | null,
+): NamingRowReducerState | null {
+  if (next === null) return null;
+  if (prev === null || !prev.visible) return next;
+  return { ...next, pendingName: prev.pendingName };
 }
 
 export function storyboardEditReducer(
@@ -174,6 +276,9 @@ export function storyboardEditReducer(
         sceneEditViewModels,
         pendingUndoToast,
         storyboardEditViewModel,
+        namingRow,
+        collisionBanner,
+        cascadeDeleteConfirm,
       } = action.payload;
       // Invariant: if a form is open for a Scene no longer present,
       // close it (defensive — data-model §State Invariants).
@@ -198,6 +303,16 @@ export function storyboardEditReducer(
             ? state.storyboardEditViewModel
             : storyboardEditViewModel,
         editFormOpenFor,
+        namingRow:
+          namingRow === undefined
+            ? state.namingRow
+            : applyNamingRowPush(state.namingRow, namingRow),
+        collisionBanner:
+          collisionBanner === undefined ? state.collisionBanner : collisionBanner,
+        cascadeDeleteConfirm:
+          cascadeDeleteConfirm === undefined
+            ? state.cascadeDeleteConfirm
+            : cascadeDeleteConfirm,
       };
     }
 
@@ -212,6 +327,9 @@ export function storyboardEditReducer(
         sceneEditViewModels,
         pendingUndoToast,
         storyboardEditViewModel,
+        namingRow,
+        collisionBanner,
+        cascadeDeleteConfirm,
       } = action.payload;
       const editFormOpenFor =
         state.editFormOpenFor !== null &&
@@ -237,6 +355,16 @@ export function storyboardEditReducer(
             ? state.storyboardEditViewModel
             : storyboardEditViewModel,
         editFormOpenFor,
+        namingRow:
+          namingRow === undefined
+            ? state.namingRow
+            : applyNamingRowPush(state.namingRow, namingRow),
+        collisionBanner:
+          collisionBanner === undefined ? state.collisionBanner : collisionBanner,
+        cascadeDeleteConfirm:
+          cascadeDeleteConfirm === undefined
+            ? state.cascadeDeleteConfirm
+            : cascadeDeleteConfirm,
       };
     }
 
@@ -308,6 +436,67 @@ export function storyboardEditReducer(
         overflowMenuAnchorRect: null,
       };
     }
+
+    case 'naming-row-text-changed': {
+      // Stale-message defence: drop if the row isn't open (slice null
+      // OR visible:false). The next legitimate host push will reset
+      // any state that may have leaked.
+      if (state.namingRow === null || !state.namingRow.visible) {
+        return state;
+      }
+      return {
+        ...state,
+        namingRow: { ...state.namingRow, pendingName: action.text },
+      };
+    }
+
+    case 'naming-row-confirm-requested':
+    case 'naming-row-cancel-requested': {
+      // Stale-message defence — drop if the slice isn't visible.
+      if (state.namingRow === null || !state.namingRow.visible) {
+        return state;
+      }
+      // Optimistically clear; the host's next snapshot push will be
+      // authoritative. (If the host validates and rejects, it will
+      // re-push a fresh `namingRow` slice.)
+      return { ...state, namingRow: null };
+    }
+
+    case 'collision-replace-requested': {
+      // Stale-message defence — drop if no banner OR if the conflicting
+      // scene id mismatches the banner's id (panel-stale view-model).
+      if (
+        state.collisionBanner === null ||
+        !state.collisionBanner.visible ||
+        state.collisionBanner.conflictingSceneId !== action.conflictingSceneId
+      ) {
+        return state;
+      }
+      return { ...state, collisionBanner: null };
+    }
+
+    case 'collision-cancel-requested': {
+      if (state.collisionBanner === null || !state.collisionBanner.visible) {
+        return state;
+      }
+      return { ...state, collisionBanner: null };
+    }
+
+    case 'collision-offset-requested': {
+      // Stale-message defence — drop if no banner OR if Offset would be
+      // hidden (cap reached or out-of-range). The host re-pushes a
+      // fresh banner state on success/failure of the next collision
+      // check; this case does not mutate the slice locally.
+      if (
+        state.collisionBanner === null ||
+        !state.collisionBanner.visible ||
+        state.collisionBanner.offsetWouldExceedTimeRange ||
+        state.collisionBanner.offsetCount >= OFFSET_CAP
+      ) {
+        return state;
+      }
+      return state;
+    }
   }
 }
 
@@ -365,16 +554,126 @@ export function composeSceneEditViewModels(
   return out;
 }
 
+/**
+ * Format an ISO-8601 instant as the panel's DTG label. Mirrors the
+ * upstream `formatDtg` in #215's storyboard module without taking a
+ * dep — the reducer must not import the storyboard module (#230 rule).
+ *
+ * Falls back to the raw ISO string if the input is malformed.
+ */
+function dtgFromIso(iso: string | null): string | null {
+  if (iso === null) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const pad = (n: number, w = 2): string => String(n).padStart(w, '0');
+  const months = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ];
+  return `${pad(d.getUTCDate())}${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}Z ${
+    months[d.getUTCMonth()]
+  } ${pad(d.getUTCFullYear() % 100)}`;
+}
+
+/**
+ * Project the host-pushed naming-row slice + the panel-local pendingName
+ * into the presentational view-model the panel renders. Computes
+ * `collisionWith` by case-insensitive match against `knownNames`, and
+ * `canConfirm` from the trimmed name + null-collision invariant.
+ */
+export function composeNamingRowViewModel(
+  state: StoryboardEditReducerState,
+): NamingRowViewModel {
+  const slice = state.namingRow;
+  if (slice === null || !slice.visible) {
+    return {
+      visible: false,
+      pendingName: '',
+      defaultName: '',
+      collisionWith: null,
+      canConfirm: false,
+    };
+  }
+  const trimmed = slice.pendingName.trim();
+  const lower = trimmed.toLowerCase();
+  const collisionWith =
+    trimmed === ''
+      ? null
+      : (slice.knownNames.find((n) => n.toLowerCase() === lower) ?? null);
+  return {
+    visible: true,
+    pendingName: slice.pendingName,
+    defaultName: slice.defaultName,
+    collisionWith,
+    canConfirm: trimmed !== '' && collisionWith === null,
+  };
+}
+
+/**
+ * Project the host-pushed collision-banner slice into the presentational
+ * view-model the panel renders. Derives `offsetCapReached` from
+ * `offsetCount >= OFFSET_CAP` and `proposedTimestampDtg` via dtgFromIso.
+ */
+export function composeCollisionBannerViewModel(
+  state: StoryboardEditReducerState,
+): CollisionBannerViewModel {
+  const slice = state.collisionBanner;
+  if (slice === null || !slice.visible) {
+    return {
+      visible: false,
+      conflictingSceneId: null,
+      conflictingSceneTitle: null,
+      originalTimestamp: null,
+      proposedTimestamp: null,
+      proposedTimestampDtg: null,
+      offsetCount: 0,
+      offsetCapReached: false,
+      offsetWouldExceedTimeRange: false,
+      cause: null,
+    };
+  }
+  return {
+    visible: true,
+    conflictingSceneId: slice.conflictingSceneId,
+    conflictingSceneTitle: slice.conflictingSceneTitle,
+    originalTimestamp: slice.originalTimestamp,
+    proposedTimestamp: slice.proposedTimestamp,
+    proposedTimestampDtg: dtgFromIso(slice.proposedTimestamp),
+    offsetCount: slice.offsetCount,
+    offsetCapReached: slice.offsetCount >= OFFSET_CAP,
+    offsetWouldExceedTimeRange: slice.offsetWouldExceedTimeRange,
+    cause: slice.cause,
+  };
+}
+
 export interface StoryboardEditReducerHandle {
   readonly state: StoryboardEditReducerState;
   readonly dispatch: (action: StoryboardEditAction) => void;
   readonly sceneEditViewModels: Readonly<Record<string, SceneEditViewModel>>;
+  readonly namingRowViewModel: NamingRowViewModel;
+  readonly collisionBannerViewModel: CollisionBannerViewModel;
   // Convenience dispatchers for the webview/harness to wire handlers
   readonly toggleExpandRow: (sceneId: string) => void;
   readonly closeEditForm: () => void;
   readonly openOverflowMenu: (sceneId: string, anchorRect: DOMRect) => void;
   readonly closeOverflowMenu: () => void;
   readonly dismissUndoToast: () => void;
+  readonly setNamingRowText: (text: string) => void;
+  readonly requestNamingRowConfirm: () => void;
+  readonly requestNamingRowCancel: () => void;
+  readonly requestCollisionReplace: (conflictingSceneId: string) => void;
+  readonly requestCollisionOffset: () => void;
+  readonly requestCollisionCancel: () => void;
 }
 
 export function useStoryboardEditReducer(
@@ -409,16 +708,53 @@ export function useStoryboardEditReducer(
     dispatch({ type: 'scene-undo-toast-dismissed' });
   }, []);
 
+  const setNamingRowText = useCallback((text: string): void => {
+    dispatch({ type: 'naming-row-text-changed', text });
+  }, []);
+
+  const requestNamingRowConfirm = useCallback((): void => {
+    dispatch({ type: 'naming-row-confirm-requested' });
+  }, []);
+
+  const requestNamingRowCancel = useCallback((): void => {
+    dispatch({ type: 'naming-row-cancel-requested' });
+  }, []);
+
+  const requestCollisionReplace = useCallback(
+    (conflictingSceneId: string): void => {
+      dispatch({ type: 'collision-replace-requested', conflictingSceneId });
+    },
+    [],
+  );
+
+  const requestCollisionOffset = useCallback((): void => {
+    dispatch({ type: 'collision-offset-requested' });
+  }, []);
+
+  const requestCollisionCancel = useCallback((): void => {
+    dispatch({ type: 'collision-cancel-requested' });
+  }, []);
+
   const sceneEditViewModels = composeSceneEditViewModels(state);
+  const namingRowViewModel = composeNamingRowViewModel(state);
+  const collisionBannerViewModel = composeCollisionBannerViewModel(state);
 
   return {
     state,
     dispatch,
     sceneEditViewModels,
+    namingRowViewModel,
+    collisionBannerViewModel,
     toggleExpandRow,
     closeEditForm,
     openOverflowMenu,
     closeOverflowMenu,
     dismissUndoToast,
+    setNamingRowText,
+    requestNamingRowConfirm,
+    requestNamingRowCancel,
+    requestCollisionReplace,
+    requestCollisionOffset,
+    requestCollisionCancel,
   };
 }
