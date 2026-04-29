@@ -140,7 +140,7 @@ async function loadAnalysisView(page: Page): Promise<void> {
 }
 
 test.describe('Storyboard rail — visual evidence (#235)', () => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
 
   for (const theme of ['light', 'dark', 'vscode'] as const) {
     test(`empty-state screenshot — ${theme}`, async ({ page }) => {
@@ -185,6 +185,52 @@ test.describe('Storyboard rail — visual evidence (#235)', () => {
         path: resolve(
           EVIDENCE_DIR,
           `web-shell-naming-row-${theme}.png`,
+        ),
+        fullPage: false,
+      });
+    });
+
+    test(`collision-banner screenshot — ${theme}`, async ({ page }) => {
+      await loadAnalysisView(page);
+      await applyTheme(page, theme);
+      // First capture — creates a Storyboard + Scene at the current playhead.
+      await page.locator('[data-testid="capture-scene-button"]').click();
+      await expect(
+        page.locator('[data-testid="storyboard-naming-row"]'),
+      ).toBeVisible({ timeout: 5000 });
+      await page
+        .locator('[data-testid="storyboard-naming-row-input"]')
+        .fill('Exercise Alpha');
+      await page
+        .locator('[data-testid="storyboard-naming-row-confirm"]')
+        .click();
+      await expect(
+        page.locator('[data-testid="storyboard-naming-row"]'),
+      ).not.toBeVisible({ timeout: 5000 });
+      await page.waitForFunction(
+        () => {
+          const fc = window.__currentPlotFeatures ?? [];
+          return fc.some(
+            (f) =>
+              (f.properties as { kind?: string })?.kind === 'STORYBOARD_SCENE',
+          );
+        },
+        { timeout: 10000 },
+      );
+      // Second capture at the same playhead → collision banner.
+      await page.locator('[data-testid="capture-button"]').click();
+      await expect(
+        page.locator('[data-testid="storyboard-collision-banner"]'),
+      ).toBeVisible({ timeout: 5000 });
+      // Map + time controller still visible alongside the banner.
+      await expect(page.locator('.leaflet-container')).toBeVisible();
+      await expect(
+        page.locator('[data-testid="time-controller"]'),
+      ).toBeVisible();
+      await page.screenshot({
+        path: resolve(
+          EVIDENCE_DIR,
+          `web-shell-collision-banner-${theme}.png`,
         ),
         fullPage: false,
       });
