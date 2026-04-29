@@ -9,6 +9,10 @@ import { test, expect } from '@playwright/test';
 import { assertViewportControlsRemainAccessible } from '../helpers/viewport-invariants';
 
 test.describe('Storyboard capture — web-shell (#235 US1)', () => {
+  // Each test gets generous time to spin up Vite + load the plot +
+  // wait for Leaflet's first moveend in headless mode.
+  test.setTimeout(120_000);
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/?storyboardPanel=1');
     // Confirm welcome view loaded.
@@ -35,23 +39,23 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
     await expect(
       page.locator('[data-testid="storyboard-panel-rail"]'),
     ).toBeVisible({ timeout: 10000 });
-    // Wait for the map to report a viewport into the session store.
-    // In headless browsers, Leaflet's first moveend event sometimes
-    // misses the round-trip into App's mapViewProps wiring; force one
-    // by panning the Leaflet instance directly. The map exposes itself
-    // via the dom element's Leaflet `_leaflet_map` ref or via the
-    // global; here we drag the .leaflet-pane to trigger a real moveend.
+    // Force a Leaflet moveend by panning the map a few px — the headless
+    // browser sometimes misses the auto-fitBounds moveend round-trip.
     const map = page.locator('.leaflet-container');
     const box = await map.boundingBox();
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 2 + 5, box.y + box.height / 2);
+      await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2);
       await page.mouse.up();
     }
+    // Wait for the map to report a viewport into the session store and
+    // for the time-controller to push currentTime.
     await page.waitForFunction(
-      () => window.__sessionStore?.getState().viewport !== null,
-      { timeout: 10000 },
+      () =>
+        window.__sessionStore?.getState().viewport !== null &&
+        window.__sessionStore?.getState().currentTime !== null,
+      { timeout: 60000 },
     );
   });
 
