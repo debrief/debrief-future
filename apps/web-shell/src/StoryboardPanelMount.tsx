@@ -48,6 +48,7 @@ import {
 } from './commands/captureSceneWeb';
 import { WebPanelHost } from './services/webPanelHost';
 import { getSceneThumbnailStore } from './services/webSceneThumbnailAdapter';
+import { createStoryboardHandlers } from './handlers/storyboardHandlers';
 
 type StoryboardPlotFeature = StoryboardPlot['features'][number];
 
@@ -328,15 +329,44 @@ export function StoryboardPanelMount({
     return false;
   }, [featureCollection]);
 
-  // ─── No-op stubs for ops Phase 4/5 will wire up ──────────────────
-  // Phase 3 ships only US1 (capture). The rail still renders all the
-  // affordances; clicking maintenance ops is a no-op for now and a
-  // status console.warn so analysts know the deferred path.
+  // ─── Wired maintenance handlers (Phase 4 + Phase 5) ──────────────
+  const handlers = useMemo(
+    () =>
+      createStoryboardHandlers({
+        sessionStore,
+        getFeatureCollection: () => featureCollection,
+        setFeatureCollection,
+        getMapContainer,
+        actor,
+        notify: (msg) => {
+          // Phase 4 follow-up: route through a proper status toast.
+          // For now, console.info so the message is at least discoverable.
+          console.info(`[Storyboard] ${msg}`);
+        },
+        logError: (line) => console.error(line),
+      }),
+    [
+      sessionStore,
+      featureCollection,
+      setFeatureCollection,
+      getMapContainer,
+      actor,
+    ],
+  );
+
+  // Ops still deferred to a follow-up PR (require additional UI):
+  //   - update-to-current (re-capture viewport + timestamp + thumbnail)
+  //   - duplicate (needs inline timestamp picker)
+  //   - copy-to-other-storyboard (needs inline storyboard picker)
+  //   - create-storyboard via overflow menu (reuses naming row)
+  //   - rename-storyboard via header dropdown (inline form)
+  //   - active-storyboard switching (needs panel-local state lift)
+  // These render as no-op stubs that console.warn for visibility.
   const noopWithLog = useCallback(
     (op: string) =>
       (..._args: unknown[]): void => {
         console.warn(
-          `[StoryboardPanelMount] ${op} — deferred to Phase 4. ` +
+          `[StoryboardPanelMount] ${op} — deferred follow-up. ` +
             `See specs/235-storyboard-capture-ux/tasks.md.`,
         );
       },
@@ -388,8 +418,38 @@ export function StoryboardPanelMount({
           onActiveStoryboardChange={noopWithLog('onActiveStoryboardChange')}
           onCreateStoryboard={noopWithLog('onCreateStoryboard')}
           onRenameStoryboard={noopWithLog('onRenameStoryboard')}
-          onDeleteStoryboard={noopWithLog('onDeleteStoryboard')}
+          onDeleteStoryboard={(): void => {
+            if (activeStoryboardId !== null) {
+              handlers.onDeleteStoryboard(activeStoryboardId);
+            }
+          }}
           sceneEditViewModels={sceneEditViewModels}
+          // Phase 4 wired handlers — direct CRUD calls against the live
+          // FeatureCollection. The panel-local edit-form lifecycle
+          // (open/close) lives in the reducer; these props are the
+          // commit callbacks invoked when the user confirms.
+          onSceneTitleRenameCommit={handlers.onSceneTitleRenameCommit}
+          onSceneDescriptionSubmit={handlers.onSceneDescriptionSubmit}
+          onSceneDeleteRequested={handlers.onSceneDeleteRequested}
+          onSceneUndoDeleteClicked={handlers.onSceneUndoDeleteClicked}
+          onSceneRefreshThumbnailClicked={
+            handlers.onSceneRefreshThumbnailClicked
+          }
+          onStoryboardNameRenameCommit={handlers.onStoryboardNameRenameCommit}
+          onStoryboardDescriptionSubmit={
+            handlers.onStoryboardDescriptionSubmit
+          }
+          // Still deferred (need additional UI):
+          onSceneUpdateToCurrentClicked={noopWithLog(
+            'onSceneUpdateToCurrentClicked',
+          )}
+          onSceneDuplicateClicked={noopWithLog('onSceneDuplicateClicked')}
+          onSceneCopyToOtherClicked={noopWithLog(
+            'onSceneCopyToOtherClicked',
+          )}
+          onStoryboardRefreshAllStaleClicked={noopWithLog(
+            'onStoryboardRefreshAllStaleClicked',
+          )}
           namingRowViewModel={namingRowViewModel}
           collisionBannerViewModel={collisionBannerViewModel}
           onNamingRowTextChanged={onNamingRowTextChanged}

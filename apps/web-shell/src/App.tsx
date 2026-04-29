@@ -91,6 +91,19 @@ export function StoryboardEditHarnessMount(): JSX.Element {
   return <StoryboardEditHarness initial={initial} />;
 }
 
+/**
+ * #235 — read the `?storyboardPanel=1` query string flag at module
+ * load time so the analysis view conditionally renders the live rail.
+ * Phase 7 / follow-up: lift this to a permanent always-on layout once
+ * the GoldenLayout flex sizing is sorted.
+ */
+function isStoryboardPanelEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  const v = params.get('storyboardPanel');
+  return v === '1' || v === 'true';
+}
+
 /** Extract indexable properties from a feature safely. */
 function featureProps(f: { properties: unknown }): { [key: string]: unknown } {
   const p = f.properties;
@@ -218,6 +231,9 @@ export default function App() {
 
   // Mobile viewport detection (Feature: mobile-web-shell-preview)
   const isMobile = useIsMobile();
+
+  // #235 — storyboard panel feature flag (query string for now).
+  const storyboardPanelEnabled = useMemo(() => isStoryboardPanelEnabled(), []);
 
   // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
   const drawingMode = state.drawingMode;
@@ -1606,52 +1622,69 @@ export default function App() {
         </div>
       )}
 
-      <main className="web-shell__main" style={{ display: 'flex', flexDirection: 'row', minHeight: 0 }}>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          {isMobile ? (
-            <PanelContextProvider value={panelContextValue}>
-              <MobileTabLayout
-                hasResults={chartContextProps !== null}
-                className="web-shell__panel-workspace"
-              />
-            </PanelContextProvider>
-          ) : (
-            <PanelWorkspace
-              registry={panelRegistry}
-              contextWrapper={contextWrapper}
+      <main className="web-shell__main">
+        {isMobile ? (
+          <PanelContextProvider value={panelContextValue}>
+            <MobileTabLayout
+              hasResults={chartContextProps !== null}
               className="web-shell__panel-workspace"
-              onLayoutReset={() => setLayoutResetCount(c => c + 1)}
             />
-          )}
-        </div>
-        {currentPlot && !isMobile && (
-          <aside
-            data-testid="storyboard-panel-rail"
-            style={{
-              width: 360,
-              flexShrink: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              borderLeft: '1px solid var(--vscode-panel-border, #3c3c3c)',
-              background: 'var(--vscode-sideBar-background, #1e1e1e)',
-              color: 'var(--vscode-foreground, #cccccc)',
-              minHeight: 0,
-            }}
-            aria-label="Storyboard panel"
-          >
-            <StoryboardPanelMount
-              sessionStore={store}
-              featureCollection={currentPlot.features}
-              setFeatureCollection={(fc) =>
-                setCurrentPlot((p) => (p === null ? p : { ...p, features: fc }))
-              }
-              getMapContainer={() =>
-                document.querySelector('.leaflet-container') as HTMLElement | null
-              }
-            />
-          </aside>
+          </PanelContextProvider>
+        ) : (
+          <PanelWorkspace
+            registry={panelRegistry}
+            contextWrapper={contextWrapper}
+            className="web-shell__panel-workspace"
+            onLayoutReset={() => setLayoutResetCount(c => c + 1)}
+          />
         )}
       </main>
+      {/* #235 Storyboard panel rail.
+        *
+        * Phase 3 ships the rail behind the `?storyboardPanel=1` query
+        * string so the default Analysis view layout is undisturbed —
+        * GoldenLayout's panel sizing is sensitive to flex-row wrappers
+        * around the workspace, and a clean integration into the main
+        * layout is tracked as a Phase 7 / follow-up task.
+        *
+        * The rail is rendered as a sibling overlay aside that occupies
+        * the right 360px of the analysis view. When enabled, the panel
+        * workspace shifts left via a CSS class to avoid occlusion. */}
+      {currentPlot && !isMobile && storyboardPanelEnabled && (
+        <aside
+          data-testid="storyboard-panel-rail"
+          style={{
+            position: 'absolute',
+            top: 56, // header height
+            right: 0,
+            bottom: 0,
+            width: 360,
+            display: 'flex',
+            flexDirection: 'column',
+            borderLeft:
+              '1px solid var(--vscode-panel-border, #3c3c3c)',
+            background:
+              'var(--vscode-sideBar-background, #1e1e1e)',
+            color: 'var(--vscode-foreground, #cccccc)',
+            overflow: 'hidden',
+            zIndex: 5,
+          }}
+          aria-label="Storyboard panel"
+        >
+          <StoryboardPanelMount
+            sessionStore={store}
+            featureCollection={currentPlot.features}
+            setFeatureCollection={(fc) =>
+              setCurrentPlot((p) =>
+                p === null ? p : { ...p, features: fc },
+              )
+            }
+            getMapContainer={() =>
+              document.querySelector('.leaflet-container') as HTMLElement | null
+            }
+          />
+        </aside>
+      )}
     </div>
   );
 }
