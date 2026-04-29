@@ -55,10 +55,10 @@
 
 **Goal**: Get the worktree, branch, and tooling ready so every subsequent phase can run `task verify` cleanly. No code changes here — only verification that the existing toolchain agrees with what the plan assumes.
 
-- [ ] T001 Verify worktree state matches the plan: branch is `235-storyboard-capture-ux`, spec dir is `specs/235-storyboard-capture-ux/`, no uncommitted drift in `shared/components/`, `apps/vscode/`, or `apps/web-shell/` `specs/235-storyboard-capture-ux/evidence/setup-baseline.txt`
-- [ ] T002 [P] Confirm `task verify` passes on the unmodified worktree (lint + typecheck + Vitest + Playwright across both hosts) and capture the baseline numbers `specs/235-storyboard-capture-ux/evidence/setup-baseline.txt`
-- [ ] T003 [P] Confirm `modern-screenshot ^4.5.0` is already in `shared/components/package.json` and that `shared/components/src/MapView/captureMap.ts` exports `captureMapAsDataUrl` (research §3 prerequisite) `shared/components/package.json`
-- [ ] T004 [P] Confirm the `apps/vscode/src/commands/captureScene.ts` DI seam exists and exposes `showInputBox` + `showInformationMessage` on `CaptureCommandDeps` (research §2 prerequisite) `apps/vscode/src/commands/captureScene.ts`
+- [x] T001 Verify worktree state matches the plan: branch is `235-storyboard-capture-ux`, spec dir is `specs/235-storyboard-capture-ux/`, no uncommitted drift in `shared/components/`, `apps/vscode/`, or `apps/web-shell/` `specs/235-storyboard-capture-ux/evidence/setup-baseline.txt`
+- [ ] T002 [P] Confirm `task verify` passes on the unmodified worktree (lint + typecheck + Vitest + Playwright across both hosts) and capture the baseline numbers `specs/235-storyboard-capture-ux/evidence/setup-baseline.txt` _(deferred — full task verify run not captured in this session)_
+- [x] T003 [P] Confirm `modern-screenshot ^4.5.0` is already in `shared/components/package.json` and that `shared/components/src/MapView/captureMap.ts` exports `captureMapAsDataUrl` (research §3 prerequisite) `shared/components/package.json`
+- [x] T004 [P] Confirm the `apps/vscode/src/commands/captureScene.ts` DI seam exists and exposes `showInputBox` + `showInformationMessage` on `CaptureCommandDeps` (research §2 prerequisite) `apps/vscode/src/commands/captureScene.ts`
 
 ## Phase 2: Foundation — Shared `StoryboardPanel` extensions
 
@@ -68,42 +68,42 @@
 
 ### Tests for Phase 2 (write first)
 
-- [ ] T005 [test] Reducer transitions for `namingRow` push state — visible/hidden, defaultName, knownNames, panel-local `pendingName` overlay `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
-- [ ] T006 [P][test] Reducer transitions for `collisionBanner` push state — visible/hidden, `originalTimestamp`, `proposedTimestamp`, `offsetCount`, `offsetWouldExceedTimeRange`, `cause` `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
-- [ ] T007 [P][test] Reducer drops stateless action posts when the matching slice is `null` (stale-message defence per `contracts/panel-messages.md` §C) `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
-- [ ] T008 [P][test] `<StoryboardPanel>` renders the empty-state Capture button when no storyboards exist; click + Enter + Space all dispatch the same handler `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
-- [ ] T009 [P][test] `<StoryboardPanel>` renders the inline naming row with correct DOM (input auto-focused, default value, collision-warning slot, Confirm/Cancel buttons), Enter confirms, Escape cancels `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
-- [ ] T010 [P][test] `<StoryboardPanel>` renders the collision banner anchored to the conflicting Scene row; the three buttons dispatch the right action posts; `offsetWouldExceedTimeRange:true` hides the Offset button `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
-- [ ] T011 [P][test] Existing #230 reducer tests still pass unchanged (no regression on edit-row / overflow-menu / undo-toast machine) `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
+- [x] T005 [test] Reducer transitions for `namingRow` push state — visible/hidden, defaultName, knownNames, panel-local `pendingName` overlay `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
+- [x] T006 [P][test] Reducer transitions for `collisionBanner` push state — visible/hidden, `originalTimestamp`, `proposedTimestamp`, `offsetCount`, `offsetWouldExceedTimeRange`, `cause` `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
+- [x] T007 [P][test] Reducer drops stateless action posts when the matching slice is `null` (stale-message defence per `contracts/panel-messages.md` §C) `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
+- [x] T008 [P][test] `<StoryboardPanel>` renders the empty-state Capture button when no storyboards exist; click + Enter + Space all dispatch the same handler `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
+- [x] T009 [P][test] `<StoryboardPanel>` renders the inline naming row with correct DOM (input auto-focused, default value, collision-warning slot, Confirm/Cancel buttons), Enter confirms, Escape cancels `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
+- [x] T010 [P][test] `<StoryboardPanel>` renders the collision banner anchored to the conflicting Scene row; the three buttons dispatch the right action posts; `offsetWouldExceedTimeRange:true` hides the Offset button `shared/components/src/panels/StoryboardPanel/__tests__/StoryboardPanel.test.tsx`
+- [x] T011 [P][test] Existing #230 reducer tests still pass unchanged (no regression on edit-row / overflow-menu / undo-toast machine) `shared/components/src/panels/StoryboardPanel/__tests__/useStoryboardEditReducer.test.ts`
 
 ### Reducer + types
 
-- [ ] T012 Extend `StoryboardEditReducerState` with `namingRow: NamingRowReducerState | null` and `collisionBanner: CollisionBannerReducerState | null` slices; extend `SnapshotPayload` and `ScenesPayload` with optional `namingRow` / `collisionBanner` fields per `contracts/panel-messages.md` §A `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
-- [ ] T013 Extend `StoryboardEditAction` union with `naming-row-text-changed` (panel-local), `naming-row-confirm-requested`, `naming-row-cancel-requested`, `collision-replace-requested`, `collision-offset-requested`, `collision-cancel-requested` `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
-- [ ] T014 Implement reducer cases for the new actions including stale-message defence (drop if matching slice is `null` or `visible:false`) `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
-- [ ] T015 [P] Add `NamingRowViewModel` and `CollisionBannerViewModel` types per `data-model.md`; export from the panel barrel `shared/components/src/panels/StoryboardPanel/types.ts`
-- [ ] T016 [P] Project view-models from reducer state (similar to existing `composeSceneEditViewModels`); derive `canConfirm` and `offsetCapReached` `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
+- [x] T012 Extend `StoryboardEditReducerState` with `namingRow: NamingRowReducerState | null` and `collisionBanner: CollisionBannerReducerState | null` slices; extend `SnapshotPayload` and `ScenesPayload` with optional `namingRow` / `collisionBanner` fields per `contracts/panel-messages.md` §A `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
+- [x] T013 Extend `StoryboardEditAction` union with `naming-row-text-changed` (panel-local), `naming-row-confirm-requested`, `naming-row-cancel-requested`, `collision-replace-requested`, `collision-offset-requested`, `collision-cancel-requested` `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
+- [x] T014 Implement reducer cases for the new actions including stale-message defence (drop if matching slice is `null` or `visible:false`) `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
+- [x] T015 [P] Add `NamingRowViewModel` and `CollisionBannerViewModel` types per `data-model.md`; export from the panel barrel `shared/components/src/panels/StoryboardPanel/types.ts`
+- [x] T016 [P] Project view-models from reducer state (similar to existing `composeSceneEditViewModels`); derive `canConfirm` and `offsetCapReached` `shared/components/src/panels/StoryboardPanel/useStoryboardEditReducer.ts`
 
 ### Component — empty state, naming row, collision banner
 
-- [ ] T017 Add empty-state branch to `<StoryboardPanel>` — when `scenes.length === 0` and `storyboards.length === 0`, render the brief "No storyboards yet" header + the primary `[data-testid="capture-scene-button"]` Capture Scene affordance `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T018 [P] Add `<NamingRow>` subcomponent rendered when `namingRowViewModel.visible === true`; binds to `pendingName`, dispatches `naming-row-text-changed` on input, `naming-row-confirm-requested` on Enter / Confirm button, `naming-row-cancel-requested` on Escape / Cancel / blur-outside; data-testid `[data-testid="storyboard-naming-row"]` and `[data-testid="storyboard-naming-row-input"]` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T019 [P] Add `<CollisionBanner>` subcomponent rendered when `collisionBannerViewModel.visible === true`, anchored above the row whose `sceneId === conflictingSceneId`; three buttons (`[data-testid="collision-replace"]`, `[data-testid="collision-offset"]`, `[data-testid="collision-cancel"]`) wired to the corresponding action posts; the Offset button is hidden when `offsetWouldExceedTimeRange === true` and replaced with an inline message `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
-- [ ] T020 Update `<StoryboardHeader>` to render the cascade-delete inline confirm + the storyboard dropdown / overflow menu (these affordances exist; tighten so neither opens a modal — every confirm lives inline) `shared/components/src/panels/StoryboardPanel/StoryboardHeader.tsx`
+- [x] T017 Add empty-state branch to `<StoryboardPanel>` — when `scenes.length === 0` and `storyboards.length === 0`, render the brief "No storyboards yet" header + the primary `[data-testid="capture-scene-button"]` Capture Scene affordance `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [x] T018 [P] Add `<NamingRow>` subcomponent rendered when `namingRowViewModel.visible === true`; binds to `pendingName`, dispatches `naming-row-text-changed` on input, `naming-row-confirm-requested` on Enter / Confirm button, `naming-row-cancel-requested` on Escape / Cancel / blur-outside; data-testid `[data-testid="storyboard-naming-row"]` and `[data-testid="storyboard-naming-row-input"]` `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [x] T019 [P] Add `<CollisionBanner>` subcomponent rendered when `collisionBannerViewModel.visible === true`, anchored above the row whose `sceneId === conflictingSceneId`; three buttons (`[data-testid="collision-replace"]`, `[data-testid="collision-offset"]`, `[data-testid="collision-cancel"]`) wired to the corresponding action posts; the Offset button is hidden when `offsetWouldExceedTimeRange === true` and replaced with an inline message `shared/components/src/panels/StoryboardPanel/StoryboardPanel.tsx`
+- [ ] T020 Update `<StoryboardHeader>` to render the cascade-delete inline confirm + the storyboard dropdown / overflow menu (these affordances exist; tighten so neither opens a modal — every confirm lives inline) `shared/components/src/panels/StoryboardPanel/StoryboardHeader.tsx` _(deferred — slice in place, UI work for cascade-confirm pending Phase 5 wiring)_
 
 ### Storybook stories (drives Storybook E2E in Phase 7)
 
-- [ ] T021 [P] Story `EmptyWithCaptureButton` — empty state with primary Capture Scene button, three theme variants `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T022 [P] Story `FirstCaptureNamingRow` — naming row open, default name pre-filled, no collision warning `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T023 [P] Story `FirstCaptureNamingRowWithCollision` — naming row showing inline duplicate-storyboard-name warning; Confirm disabled `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T024 [P] Story `DuplicateTimestampBanner` — banner anchored to a Scene row with three buttons enabled `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T025 [P] Story `DuplicateTimestampBannerOffsetCapped` — banner with `offsetCount: 60`; Offset button hidden, inline cap message visible `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T026 [P] Story `DuplicateTimestampBannerExceedsTimeRange` — banner with `offsetWouldExceedTimeRange: true`; Offset button hidden, inline time-range message visible `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
-- [ ] T027 [P] Story `RowWithUpdateToCurrent` — Scene row with the Update-to-current affordance visible (re-uses #218 visuals) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T021 [P] Story `EmptyWithCaptureButton` — empty state with primary Capture Scene button, three theme variants `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T022 [P] Story `FirstCaptureNamingRow` — naming row open, default name pre-filled, no collision warning `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T023 [P] Story `FirstCaptureNamingRowWithCollision` — naming row showing inline duplicate-storyboard-name warning; Confirm disabled `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T024 [P] Story `DuplicateTimestampBanner` — banner anchored to a Scene row with three buttons enabled `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T025 [P] Story `DuplicateTimestampBannerOffsetCapped` — banner with `offsetCount: 60`; Offset button hidden, inline cap message visible `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T026 [P] Story `DuplicateTimestampBannerExceedsTimeRange` — banner with `offsetWouldExceedTimeRange: true`; Offset button hidden, inline time-range message visible `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
+- [x] T027 [P] Story `RowWithUpdateToCurrent` — Scene row with the Update-to-current affordance visible (re-uses #218 visuals) `shared/components/src/panels/StoryboardPanel/StoryboardPanel.stories.tsx`
 
 ### Documentation
 
-- [ ] T028 Update `CONTRACTS.md` to document the two new push fields, the five new stateless action posts, and the stale-message defence rule `shared/components/src/panels/StoryboardPanel/CONTRACTS.md`
+- [x] T028 Update `CONTRACTS.md` to document the two new push fields, the five new stateless action posts, and the stale-message defence rule `shared/components/src/panels/StoryboardPanel/CONTRACTS.md`
 
 ## Phase 3: User Story 1 — Capture a scene in web-shell without losing sight of map or time controls (Priority: P1)
 
@@ -206,15 +206,15 @@
 
 ### Message channel + view wiring
 
-- [ ] T077 Extend `apps/vscode/src/types/storyboardPanelMessages.ts` to encode the new optional push fields on `SnapshotPayload` / `ScenesPayload` and the five new stateless action posts; types must be strict and exhaustive (Article XV) `apps/vscode/src/types/storyboardPanelMessages.ts`
-- [ ] T078 Update `apps/vscode/src/messages/storyboardEdit.ts` with serialisers/deserialisers for the new push fields and action posts `apps/vscode/src/messages/storyboardEdit.ts`
-- [ ] T079 Update `apps/vscode/src/views/storyboardPanelView.ts` to expose `setNamingRow(state | null)` and `setCollisionBanner(state | null)` methods (which push fresh snapshots to the webview) and register listeners for the five new inbound action posts that route into the in-flight capture command `apps/vscode/src/views/storyboardPanelView.ts`
-- [ ] T080 Update `apps/vscode/src/webview/web/storyboardPanel.tsx` bootstrap to read the new push fields off `snapshot`/`scenes` and dispatch the corresponding reducer actions (mostly automatic via Phase 2's reducer) `apps/vscode/src/webview/web/storyboardPanel.tsx`
+- [x] T077 Extend `apps/vscode/src/types/storyboardPanelMessages.ts` to encode the new optional push fields on `SnapshotPayload` / `ScenesPayload` and the five new stateless action posts; types must be strict and exhaustive (Article XV) `apps/vscode/src/types/storyboardPanelMessages.ts`
+- [x] T078 Update `apps/vscode/src/messages/storyboardEdit.ts` with serialisers/deserialisers for the new push fields and action posts `apps/vscode/src/messages/storyboardEdit.ts`
+- [x] T079 Update `apps/vscode/src/views/storyboardPanelView.ts` to expose `setNamingRow(state | null)` and `setCollisionBanner(state | null)` methods (which push fresh snapshots to the webview) and register listeners for the five new inbound action posts that route into the in-flight capture command `apps/vscode/src/views/storyboardPanelView.ts`
+- [x] T080 Update `apps/vscode/src/webview/web/storyboardPanel.tsx` bootstrap to read the new push fields off `snapshot`/`scenes` and dispatch the corresponding reducer actions (mostly automatic via Phase 2's reducer) `apps/vscode/src/webview/web/storyboardPanel.tsx`
 
 ### Capture command refactor
 
-- [ ] T081 Refactor `apps/vscode/src/commands/captureScene.ts` first-capture branch — remove the `promptForStoryboardName()` helper that calls `showInputBox`; replace with a panel round-trip: call `storyboardPanelView.setNamingRow({...})`, await a Promise that resolves when the corresponding `naming-row-*-requested` action post comes back, then proceed with `createStoryboard` `apps/vscode/src/commands/captureScene.ts`
-- [ ] T082 Refactor `apps/vscode/src/commands/captureScene.ts` `handleDuplicateTimestamp` — remove the modal `showInformationMessage([…, 'Replace', 'Offset (+1 s)'])` call; replace with a panel round-trip that sets `collisionBanner`, awaits the panel's resolution action, advances `proposedTimestamp` / `offsetCount` / `offsetWouldExceedTimeRange` per FR-CAP-017a, and re-runs the collision check. Keep the existing `findExistingConflict` + `performReplace` + `retryCreateScene` plumbing on the success side `apps/vscode/src/commands/captureScene.ts`
+- [x] T081 Refactor `apps/vscode/src/commands/captureScene.ts` first-capture branch — remove the `promptForStoryboardName()` helper that calls `showInputBox`; replace with a panel round-trip: call `storyboardPanelView.setNamingRow({...})`, await a Promise that resolves when the corresponding `naming-row-*-requested` action post comes back, then proceed with `createStoryboard` `apps/vscode/src/commands/captureScene.ts`
+- [x] T082 Refactor `apps/vscode/src/commands/captureScene.ts` `handleDuplicateTimestamp` — remove the modal `showInformationMessage([…, 'Replace', 'Offset (+1 s)'])` call; replace with a panel round-trip that sets `collisionBanner`, awaits the panel's resolution action, advances `proposedTimestamp` / `offsetCount` / `offsetWouldExceedTimeRange` per FR-CAP-017a, and re-runs the collision check. Keep the existing `findExistingConflict` + `performReplace` + `retryCreateScene` plumbing on the success side `apps/vscode/src/commands/captureScene.ts`
 - [ ] T083 [P] Refactor `apps/vscode/src/commands/storyboardEdit.ts` to remove any remaining modal prompts (e.g. delete-confirm, rename input) — every confirm goes inline through the panel `apps/vscode/src/commands/storyboardEdit.ts`
 - [ ] T084 [P] Remove the `showInputBox` and modal `showInformationMessage` defaults from `CaptureCommandDeps` resolution in `apps/vscode/src/commands/captureScene.ts` so SC-009 holds: production code paths cannot invoke them `apps/vscode/src/commands/captureScene.ts`
 
