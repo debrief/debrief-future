@@ -23,6 +23,9 @@ import type {
   StoryboardEditViewModel,
   UndoToastDescriptor,
   StaleFlagEntry,
+  NamingRowReducerState,
+  CollisionBannerReducerState,
+  CascadeDeleteConfirmReducerState,
 } from '@debrief/components';
 import { Bootstrap } from './_bootstrap';
 
@@ -40,6 +43,10 @@ interface ScenesMessage {
   sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   pendingUndoToast?: UndoToastDescriptor | null;
   storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — host-driven prompt slices
+  namingRow?: NamingRowReducerState | null;
+  collisionBanner?: CollisionBannerReducerState | null;
+  cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
 }
 
 interface CaptureInFlightMessage {
@@ -63,6 +70,10 @@ interface SnapshotMessage {
   sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
   pendingUndoToast?: UndoToastDescriptor | null;
   storyboardEditViewModel?: StoryboardEditViewModel | null;
+  // #235 — host-driven prompt slices
+  namingRow?: NamingRowReducerState | null;
+  collisionBanner?: CollisionBannerReducerState | null;
+  cascadeDeleteConfirm?: CascadeDeleteConfirmReducerState | null;
 }
 
 interface SceneEditFormOpenMessage {
@@ -96,11 +107,14 @@ function StoryboardPanelApp(): React.ReactElement {
     state,
     dispatch,
     sceneEditViewModels,
+    namingRowViewModel,
+    collisionBannerViewModel,
     toggleExpandRow,
     closeEditForm,
     openOverflowMenu,
     closeOverflowMenu,
     dismissUndoToast,
+    setNamingRowText,
   } = useStoryboardEditReducer();
 
   useEffect(() => {
@@ -118,6 +132,9 @@ function StoryboardPanelApp(): React.ReactElement {
               sceneEditViewModels: msg.sceneEditViewModels,
               pendingUndoToast: msg.pendingUndoToast,
               storyboardEditViewModel: msg.storyboardEditViewModel,
+              namingRow: msg.namingRow,
+              collisionBanner: msg.collisionBanner,
+              cascadeDeleteConfirm: msg.cascadeDeleteConfirm,
             },
           });
           break;
@@ -134,6 +151,9 @@ function StoryboardPanelApp(): React.ReactElement {
               sceneEditViewModels: msg.sceneEditViewModels,
               pendingUndoToast: msg.pendingUndoToast,
               storyboardEditViewModel: msg.storyboardEditViewModel,
+              namingRow: msg.namingRow,
+              collisionBanner: msg.collisionBanner,
+              cascadeDeleteConfirm: msg.cascadeDeleteConfirm,
             },
           });
           break;
@@ -282,6 +302,37 @@ function StoryboardPanelApp(): React.ReactElement {
     [],
   );
 
+  // ─── #235 — naming row + collision banner outbound handlers ────────
+  const onNamingRowTextChange = useCallback(
+    (text: string): void => {
+      setNamingRowText(text);
+    },
+    [setNamingRowText],
+  );
+
+  const onNamingRowConfirm = useCallback((name: string): void => {
+    vscode.postMessage({ type: 'naming-row-confirm-requested', name });
+  }, []);
+
+  const onNamingRowCancel = useCallback((): void => {
+    vscode.postMessage({ type: 'naming-row-cancel-requested' });
+  }, []);
+
+  const onCollisionReplace = useCallback((conflictingSceneId: string): void => {
+    vscode.postMessage({
+      type: 'collision-replace-requested',
+      conflictingSceneId,
+    });
+  }, []);
+
+  const onCollisionOffset = useCallback((): void => {
+    vscode.postMessage({ type: 'collision-offset-requested' });
+  }, []);
+
+  const onCollisionCancel = useCallback((): void => {
+    vscode.postMessage({ type: 'collision-cancel-requested' });
+  }, []);
+
   // Theme is sourced from the parent <Bootstrap> wrapper (#220) — the
   // local `state.theme` is retained only because the reducer's existing
   // shape accepts it; it no longer drives the React tree.
@@ -329,6 +380,14 @@ function StoryboardPanelApp(): React.ReactElement {
         onStoryboardNameRenameCommit={onStoryboardNameRenameCommit}
         onStoryboardDescriptionSubmit={onStoryboardDescriptionSubmit}
         onUndoToastDismiss={dismissUndoToast}
+        namingRowViewModel={namingRowViewModel}
+        collisionBannerViewModel={collisionBannerViewModel}
+        onNamingRowTextChange={onNamingRowTextChange}
+        onNamingRowConfirm={onNamingRowConfirm}
+        onNamingRowCancel={onNamingRowCancel}
+        onCollisionReplace={onCollisionReplace}
+        onCollisionOffset={onCollisionOffset}
+        onCollisionCancel={onCollisionCancel}
       />
     </>
   );

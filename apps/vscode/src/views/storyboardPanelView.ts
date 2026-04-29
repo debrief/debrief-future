@@ -19,6 +19,9 @@ import {
   type SceneFeature,
   type SceneEditViewModel,
   type StoryboardEditViewModel,
+  type NamingRowReducerState,
+  type CollisionBannerReducerState,
+  type CascadeDeleteConfirmReducerState,
 } from '@debrief/components';
 import type { SceneRowViewModel } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
@@ -161,6 +164,11 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      // #235 — host-driven prompt slices. Always echoed on refresh so a
+      // panel reload picks them up.
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
+      cascadeDeleteConfirm: this.currentCascadeDeleteConfirm,
     });
   }
 
@@ -304,6 +312,10 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      // #235 — echo host-driven prompt slices on every snapshot push.
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
+      cascadeDeleteConfirm: this.currentCascadeDeleteConfirm,
     });
   }
 
@@ -315,6 +327,79 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
 
   public setCaptureInFlight(inFlight: boolean): void {
     this.post({ type: 'captureInFlight', inFlight });
+  }
+
+  // ── #235 — host-driven prompt slices + action emitters ──────────────
+  //
+  // The capture command sets these slices via the `setNamingRow` /
+  // `setCollisionBanner` methods, which in turn push a fresh `scenes`
+  // payload to the webview carrying the new fields. The five new action
+  // posts arriving from the webview fire through the matching emitters
+  // below; the capture command awaits a one-shot subscriber on the
+  // matching emitter to resolve its in-flight prompt.
+
+  private currentNamingRow: NamingRowReducerState | null = null;
+  private currentCollisionBanner: CollisionBannerReducerState | null = null;
+  private currentCascadeDeleteConfirm: CascadeDeleteConfirmReducerState | null =
+    null;
+
+  private readonly namingRowConfirmEmitter = new vscode.EventEmitter<{
+    readonly name: string;
+  }>();
+  private readonly namingRowCancelEmitter = new vscode.EventEmitter<void>();
+  private readonly collisionReplaceEmitter = new vscode.EventEmitter<{
+    readonly conflictingSceneId: string;
+  }>();
+  private readonly collisionOffsetEmitter = new vscode.EventEmitter<void>();
+  private readonly collisionCancelEmitter = new vscode.EventEmitter<void>();
+
+  public readonly onNamingRowConfirm = this.namingRowConfirmEmitter.event;
+  public readonly onNamingRowCancel = this.namingRowCancelEmitter.event;
+  public readonly onCollisionReplace = this.collisionReplaceEmitter.event;
+  public readonly onCollisionOffset = this.collisionOffsetEmitter.event;
+  public readonly onCollisionCancel = this.collisionCancelEmitter.event;
+
+  /**
+   * Set the host-pushed first-capture naming row slice. Pushing `null`
+   * clears the row. The next `scenes` payload carries the slice so the
+   * panel reducer applies it.
+   */
+  public setNamingRow(slice: NamingRowReducerState | null): void {
+    this.currentNamingRow = slice;
+    this.refresh();
+  }
+
+  /**
+   * Set the host-pushed duplicate-timestamp collision banner slice.
+   * Pushing `null` clears the banner.
+   */
+  public setCollisionBanner(slice: CollisionBannerReducerState | null): void {
+    this.currentCollisionBanner = slice;
+    this.refresh();
+  }
+
+  /**
+   * Set the host-pushed inline cascade-delete confirmation slice for
+   * storyboard delete (FR-MAINT-021). Pushing `null` clears it.
+   */
+  public setCascadeDeleteConfirm(
+    slice: CascadeDeleteConfirmReducerState | null,
+  ): void {
+    this.currentCascadeDeleteConfirm = slice;
+    this.refresh();
+  }
+
+  /**
+   * Read-only access to the current host-side slice values, used by
+   * the capture command for stale-message defence (it re-checks the
+   * slice it set is still the live one before acting on a panel post).
+   */
+  public getNamingRow(): NamingRowReducerState | null {
+    return this.currentNamingRow;
+  }
+
+  public getCollisionBanner(): CollisionBannerReducerState | null {
+    return this.currentCollisionBanner;
   }
 
   private computeSceneRowViewModels(
@@ -523,6 +608,54 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
           }),
         );
         break;
+      // ── #235 — naming row + collision banner inbound posts ──────────
+      case 'naming-row-confirm-requested':
+        // Stale-message defence — drop if no host-side row is in flight.
+        if (
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowConfirmEmitter.fire({ name: message.name });
+        }
+        break;
+      case 'naming-row-cancel-requested':
+        if (
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowCancelEmitter.fire();
+        }
+        break;
+      case 'collision-replace-requested':
+        // Stale-message defence — drop if no banner OR mismatched id.
+        if (
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible &&
+          this.currentCollisionBanner.conflictingSceneId ===
+            message.conflictingSceneId
+        ) {
+          this.collisionReplaceEmitter.fire({
+            conflictingSceneId: message.conflictingSceneId,
+          });
+        }
+        break;
+      case 'collision-offset-requested':
+        if (
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible &&
+          !this.currentCollisionBanner.offsetWouldExceedTimeRange
+        ) {
+          this.collisionOffsetEmitter.fire();
+        }
+        break;
+      case 'collision-cancel-requested':
+        if (
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible
+        ) {
+          this.collisionCancelEmitter.fire();
+        }
+        break;
     }
   }
 
@@ -599,6 +732,11 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   public dispose(): void {
     this.sessionChangeDisposable?.dispose();
     this.sessionChangeDisposable = undefined;
+    this.namingRowConfirmEmitter.dispose();
+    this.namingRowCancelEmitter.dispose();
+    this.collisionReplaceEmitter.dispose();
+    this.collisionOffsetEmitter.dispose();
+    this.collisionCancelEmitter.dispose();
     this.view = undefined;
   }
 }
