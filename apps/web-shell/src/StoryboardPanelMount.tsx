@@ -178,12 +178,40 @@ export function StoryboardPanelMount({
   const plot = useMemo(() => packagePlot(featureCollection.features), [
     featureCollection,
   ]);
-  const activeStoryboard = useMemo(
-    () => getActiveStoryboardDefault(plot),
-    [plot],
-  );
+  // Active-Storyboard selection is panel-local: defaults to the
+  // most-recently-modified Storyboard (#215's getActiveStoryboardDefault),
+  // can be overridden by clicking a different one in the header dropdown.
+  // Reset to null when the override no longer exists in the plot.
+  const [activeOverrideId, setActiveOverrideId] = React.useState<
+    string | null
+  >(null);
+  const activeStoryboard = useMemo(() => {
+    if (activeOverrideId !== null) {
+      const overridden = plot.features.find((f) => {
+        const props = f.properties as { id?: string; kind?: string } | null;
+        return (
+          props !== null &&
+          props.kind === 'STORYBOARD' &&
+          props.id === activeOverrideId
+        );
+      });
+      if (overridden !== undefined) {
+        // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+        return overridden as unknown as ReturnType<
+          typeof getActiveStoryboardDefault
+        >;
+      }
+    }
+    return getActiveStoryboardDefault(plot);
+  }, [plot, activeOverrideId]);
   const activeStoryboardId = activeStoryboard?.properties.id ?? null;
   const activeStoryboardName = activeStoryboard?.properties.name ?? null;
+  // Drop a stale override when the underlying storyboard is gone.
+  useEffect(() => {
+    if (activeOverrideId !== null && activeStoryboardId !== activeOverrideId) {
+      setActiveOverrideId(null);
+    }
+  }, [activeOverrideId, activeStoryboardId]);
   const sceneRows = useMemo(
     () => {
       void thumbnailRevision; // re-compute when the store changes
@@ -282,6 +310,57 @@ export function StoryboardPanelMount({
   const onCollisionCancel = useCallback(() => {
     host.onCollisionCancel();
   }, [host]);
+
+  // ─── Storyboard-level handlers (T068, T071) ──────────────────────
+  // T071 — switch active Storyboard (panel-local override).
+  const onActiveStoryboardChange = useCallback(
+    (storyboardId: string) => {
+      setActiveOverrideId(storyboardId);
+    },
+    [],
+  );
+
+  // T068 — create new Storyboard via overflow menu reuses the inline
+  // naming row that capture uses.
+  const onCreateStoryboard = useCallback(() => {
+    void (async (): Promise<void> => {
+      const knownNames: string[] = [];
+      for (const f of featureCollection.features) {
+        const props = f.properties as { kind?: string; name?: string } | null;
+        if (
+          props !== null &&
+          props.kind === 'STORYBOARD' &&
+          typeof props.name === 'string'
+        ) {
+          knownNames.push(props.name);
+        }
+      }
+      const reply = await host.promptStoryboardName({
+        defaultName: `Storyboard ${knownNames.length + 1}`,
+        knownNames,
+      });
+      if (reply === null || reply.name.trim() === '') return;
+      // Inline import to keep the call-site readable; the CRUD call
+      // is the only async work here.
+      const { createStoryboard } = await import('@debrief/components');
+      const fcLatest = packagePlot(featureCollection.features);
+      try {
+        const result = await createStoryboard(fcLatest, {
+          name: reply.name.trim(),
+          actor,
+        });
+        setFeatureCollection({
+          type: 'FeatureCollection',
+          // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
+          features: result.plot.features as unknown as Feature[],
+        });
+        setActiveOverrideId(result.storyboard.properties.id);
+        sessionStore.getState().markDirty();
+      } catch (err) {
+        console.error('[StoryboardPanelMount] createStoryboard failed:', err);
+      }
+    })();
+  }, [host, featureCollection, setFeatureCollection, sessionStore, actor]);
 
   // ─── Keyboard shortcut: Ctrl/Cmd+Alt+C ───────────────────────────
   useEffect(() => {
@@ -415,8 +494,8 @@ export function StoryboardPanelMount({
           activeStoryboardId={activeStoryboardId}
           currentSceneId={state.currentSceneId}
           transport={state.transport}
-          onActiveStoryboardChange={noopWithLog('onActiveStoryboardChange')}
-          onCreateStoryboard={noopWithLog('onCreateStoryboard')}
+          onActiveStoryboardChange={onActiveStoryboardChange}
+          onCreateStoryboard={onCreateStoryboard}
           onRenameStoryboard={noopWithLog('onRenameStoryboard')}
           onDeleteStoryboard={(): void => {
             if (activeStoryboardId !== null) {
