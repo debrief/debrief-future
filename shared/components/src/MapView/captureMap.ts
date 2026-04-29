@@ -3,7 +3,7 @@
  * Feature: 174-thumbnail-capture
  */
 
-import { domToPng } from 'modern-screenshot';
+import { domToPng, waitUntilLoad } from 'modern-screenshot';
 
 /** Default capture dimensions matching the large thumbnail spec (800x600). */
 const DEFAULT_WIDTH = 800;
@@ -20,7 +20,14 @@ export interface CaptureMapOptions {
  * Capture the Leaflet map container as a PNG data URL.
  *
  * Uses modern-screenshot's domToPng which handles cross-origin tiles
- * (requires crossOrigin="anonymous" on TileLayer).
+ * (requires crossOrigin="anonymous" on TileLayer + a `connect-src` CSP
+ * permissive enough to fetch each tile, since modern-screenshot inlines
+ * them as base64 data URLs).
+ *
+ * `waitUntilLoad` is called first so any tiles still streaming after a
+ * recent pan/zoom finish before the snapshot — without this, the PNG
+ * captures only the SVG/marker layer because tile <img>s aren't yet
+ * decodable.
  *
  * @param container - The DOM element containing the Leaflet map (.leaflet-container)
  * @param options - Optional capture dimensions
@@ -31,6 +38,8 @@ export async function captureMapAsDataUrl(
   options: CaptureMapOptions = {},
 ): Promise<string> {
   const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = options;
+
+  await waitUntilLoad(container);
 
   const dataUrl = await domToPng(container, {
     width,
