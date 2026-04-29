@@ -416,6 +416,7 @@ export function StoryboardPanelMount({
         getFeatureCollection: () => featureCollection,
         setFeatureCollection,
         getMapContainer,
+        panelView: host,
         actor,
         notify: (msg) => {
           // Phase 4 follow-up: route through a proper status toast.
@@ -429,6 +430,7 @@ export function StoryboardPanelMount({
       featureCollection,
       setFeatureCollection,
       getMapContainer,
+      host,
       actor,
     ],
   );
@@ -518,10 +520,10 @@ export function StoryboardPanelMount({
           onStoryboardDescriptionSubmit={
             handlers.onStoryboardDescriptionSubmit
           }
+          onSceneUpdateToCurrentClicked={
+            handlers.onSceneUpdateToCurrentClicked
+          }
           // Still deferred (need additional UI):
-          onSceneUpdateToCurrentClicked={noopWithLog(
-            'onSceneUpdateToCurrentClicked',
-          )}
           onSceneDuplicateClicked={noopWithLog('onSceneDuplicateClicked')}
           onSceneCopyToOtherClicked={noopWithLog(
             'onSceneCopyToOtherClicked',
