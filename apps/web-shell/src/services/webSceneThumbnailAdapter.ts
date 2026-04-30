@@ -1,0 +1,136 @@
+/**
+ * Browser-side scene thumbnail adaptor (#235 — T040).
+ *
+ * Sibling of `apps/vscode/src/services/sceneThumbnailService.ts` that
+ * captures a Leaflet container as PNG data URLs without touching the
+ * filesystem (the web-shell has no STAC write path yet — see #236).
+ *
+ * Returns the same `WriteSceneThumbnailResult` shape the VS Code adaptor
+ * uses so `captureSceneWeb.ts` is a near-mirror of `captureScene.ts`.
+ *
+ * Storage is session-only: the data URLs are held in an in-memory `Map`
+ * keyed by `sceneId`. They survive across captures within a session but
+ * are discarded on plot change / page reload — matching FR-WEB-029a's
+ * "session-only badge" promise.
+ */
+
+import { captureMapAsDataUrl } from '@debrief/components';
+
+const LARGE_DIMS = { width: 800, height: 600 };
+const SMALL_DIMS = { width: 200, height: 150 };
+
+/** Result shape mirrors the VS Code adaptor's `WriteSceneThumbnailResult`. */
+export interface WriteSceneThumbnailResult {
+  readonly assetKey: string;
+  /** Browser sibling: in-memory data URL for the large render. */
+  readonly largeDataUrl: string;
+  /** Browser sibling: in-memory data URL for the small render. */
+  readonly smallDataUrl: string;
+}
+
+/**
+ * Session-only thumbnail store. Holds the data URLs keyed by sceneId so
+ * the rail can render thumbnails without re-capturing the map.
+ */
+class WebSceneThumbnailStore {
+  private readonly store = new Map<string, WriteSceneThumbnailResult>();
+  private readonly listeners = new Set<() => void>();
+
+  get(sceneId: string): WriteSceneThumbnailResult | undefined {
+    return this.store.get(sceneId);
+  }
+
+  put(sceneId: string, result: WriteSceneThumbnailResult): void {
+    this.store.set(sceneId, result);
+    this.notify();
+  }
+
+  delete(sceneId: string): void {
+    if (this.store.delete(sceneId)) {
+      this.notify();
+    }
+  }
+
+  has(sceneId: string): boolean {
+    return this.store.has(sceneId);
+  }
+
+  /** Discards every thumbnail; call on plot change. */
+  clear(): void {
+    if (this.store.size === 0) return;
+    this.store.clear();
+    this.notify();
+  }
+
+  /** True when at least one capture has produced a session-only thumbnail. */
+  hasAny(): boolean {
+    return this.store.size > 0;
+  }
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify(): void {
+    for (const l of this.listeners) {
+      try {
+        l();
+      } catch {
+        // Listeners must not throw; swallow to keep the store consistent.
+      }
+    }
+  }
+}
+
+const sharedStore = new WebSceneThumbnailStore();
+
+/** Module-level access for the rail's session-only badge subscription. */
+export function getSceneThumbnailStore(): WebSceneThumbnailStore {
+  return sharedStore;
+}
+
+/**
+ * Capture both the large (800×600) and small (200×150) renders of the
+ * Leaflet container and stash them in the session-only store.
+ *
+ * Throws if either capture fails — the caller (capture command) should
+ * surface this as an inline error in the rail and leave the plot's
+ * dirty state unchanged.
+ */
+export async function captureSceneThumbnail(
+  container: HTMLElement,
+  sceneId: string,
+  options?: {
+    /** Override the captureMap function; defaults to the real implementation. */
+    captureMap?: typeof captureMapAsDataUrl;
+    /** Override the underlying store (used by tests). */
+    store?: WebSceneThumbnailStore;
+  },
+): Promise<WriteSceneThumbnailResult> {
+  const capture = options?.captureMap ?? captureMapAsDataUrl;
+  const store = options?.store ?? sharedStore;
+
+  // Run the two captures sequentially. modern-screenshot mutates the
+  // canvas state during a render, so parallel invocations on the same
+  // container can race — sequential is safer and the cost is small at
+  // typical Leaflet zoom levels.
+  const largeDataUrl = await capture(container, LARGE_DIMS);
+  const smallDataUrl = await capture(container, SMALL_DIMS);
+
+  const assetKey = `scene-thumbnail-${sceneId}`;
+  const result: WriteSceneThumbnailResult = {
+    assetKey,
+    largeDataUrl,
+    smallDataUrl,
+  };
+  store.put(sceneId, result);
+  return result;
+}
+
+/** Convenience export: clear the shared store on plot change. */
+export function clearSceneThumbnailStore(): void {
+  sharedStore.clear();
+}
+
+export type { WebSceneThumbnailStore };

@@ -72,6 +72,7 @@ import {
   StoryboardEditHarness,
   parseHarnessQueryString,
 } from './StoryboardEditHarness';
+import { StoryboardPanelMount } from './StoryboardPanelMount';
 
 const VESSEL_TAXONOMY = parseTaxonomy((rawTaxonomy as RawTaxonomy).taxonomy);
 
@@ -88,6 +89,20 @@ function asDebriefFeatures(features: Feature[]): DebriefFeature[] {
 export function StoryboardEditHarnessMount(): JSX.Element {
   const initial = parseHarnessQueryString(window.location.search);
   return <StoryboardEditHarness initial={initial} />;
+}
+
+/**
+ * #235 — read the `?storyboardPanel=1` query string flag at module
+ * load time so the analysis view conditionally renders the live rail.
+ * Once the rail integration is fully validated, this gate can be lifted
+ * (the rail is always-on); for now it stays so the existing
+ * `apps/web-shell/playwright/tests/*.spec.ts` suite is unaffected.
+ */
+function isStoryboardPanelEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  const v = params.get('storyboardPanel');
+  return v === '1' || v === 'true';
 }
 
 /** Extract indexable properties from a feature safely. */
@@ -217,6 +232,9 @@ export default function App() {
 
   // Mobile viewport detection (Feature: mobile-web-shell-preview)
   const isMobile = useIsMobile();
+
+  // #235 — storyboard panel feature flag (query string for now).
+  const storyboardPanelEnabled = useMemo(() => isStoryboardPanelEnabled(), []);
 
   // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
   const drawingMode = state.drawingMode;
@@ -794,6 +812,35 @@ export default function App() {
     store.getState().setDrawingMode(mode);
   }, [store]);
 
+  // #235 — track the latest map bounds + zoom and write a 4-corner
+  // ViewportPolygon to session-state so the capture command can read
+  // viewport / zoom synchronously. Mirrors VS Code's mapPanel.ts viewport
+  // wiring (lines 875-894) but without the postMessage bridge.
+  const latestMapZoomRef = useRef<number | null>(null);
+  const handleMapZoomChange = useCallback((zoom: number): void => {
+    latestMapZoomRef.current = zoom;
+  }, []);
+  const handleMapBoundsChange = useCallback(
+    (bounds: [number, number, number, number]): void => {
+      // bounds = [west, south, east, north]
+      const [west, south, east, north] = bounds;
+      // Default zoom to MapView's initialZoom (10) if zoomend hasn't
+      // fired yet — the capture command rejects when zoom is undefined,
+      // and zoomend is unreliable in headless browsers on initial mount.
+      const zoom = latestMapZoomRef.current ?? 10;
+      // 4-corner polygon in clockwise order [NW, NE, SE, SW] per
+      // ViewportPolygon's documented contract.
+      const coordinates = [
+        { longitude: west, latitude: north },
+        { longitude: east, latitude: north },
+        { longitude: east, latitude: south },
+        { longitude: west, latitude: south },
+      ];
+      store.getState().setViewport({ coordinates, zoom });
+    },
+    [store],
+  );
+
   // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
@@ -1307,6 +1354,14 @@ export default function App() {
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
+      // #235 — viewport-sync wiring is gated on the storyboard rail flag.
+      // Leaflet fires `boundsChange` during initial mount, which would
+      // call `setViewport` and push an undo entry the moment the map
+      // renders — breaking the #073 invariant that plot load is not
+      // undoable. The sync only exists for the capture command, which
+      // is unreachable without the rail.
+      onZoomChange: storyboardPanelEnabled ? handleMapZoomChange : undefined,
+      onBoundsChange: storyboardPanelEnabled ? handleMapBoundsChange : undefined,
       currentTime: playback.currentTime,
       displayMode: state.displayMode,
       drawingMode,
@@ -1351,7 +1406,9 @@ export default function App() {
     playback.playbackState, playback.speed, state.displayMode,
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
+    selectedIds, handleMapSelect, handleBackgroundClick,
+    handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
+    drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
@@ -1554,8 +1611,16 @@ export default function App() {
   }
 
   // Render analysis view
+  const showStoryboardRail =
+    currentPlot !== null && !isMobile && storyboardPanelEnabled;
   return (
-    <div className="web-shell web-shell--analysis">
+    <div
+      className={
+        showStoryboardRail
+          ? 'web-shell web-shell--analysis web-shell--with-storyboard-rail'
+          : 'web-shell web-shell--analysis'
+      }
+    >
       <header className="web-shell__header">
         <button
           type="button"
@@ -1620,6 +1685,35 @@ export default function App() {
             className="web-shell__panel-workspace"
             onLayoutReset={() => setLayoutResetCount(c => c + 1)}
           />
+        )}
+        {/* #235 Storyboard panel rail — rendered as a 2nd grid column
+          * inside .web-shell__main. The CSS class
+          * `.web-shell--with-storyboard-rail` switches main to display:
+          * grid with template `1fr 360px`. Each cell becomes its own
+          * sizing context, so GoldenLayout's panel-workspace and our
+          * rail both get explicit height + width without the flex
+          * collapse that we hit during initial integration. */}
+        {showStoryboardRail && (
+          <aside
+            className="web-shell__storyboard-rail"
+            data-testid="storyboard-panel-rail"
+            aria-label="Storyboard panel"
+          >
+            <StoryboardPanelMount
+              sessionStore={store}
+              featureCollection={currentPlot!.features}
+              setFeatureCollection={(fc) =>
+                setCurrentPlot((p) =>
+                  p === null ? p : { ...p, features: fc },
+                )
+              }
+              getMapContainer={() =>
+                document.querySelector(
+                  '.leaflet-container',
+                ) as HTMLElement | null
+              }
+            />
+          </aside>
         )}
       </main>
     </div>

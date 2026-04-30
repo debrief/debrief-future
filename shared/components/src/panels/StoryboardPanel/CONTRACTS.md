@@ -74,3 +74,74 @@ A re-baseline MUST be paired with:
 - Research R5, R13 in `specs/234-storyboard-edit-polish-followup/research.md`.
 - Data-model entry (5) in `specs/234-storyboard-edit-polish-followup/data-model.md`.
 - Parent invariant FR-008 from `specs/230-storyboard-edit-wiring/spec.md`.
+
+---
+
+## Feature 235 — first-capture naming row + duplicate-timestamp banner
+
+Origin: feature `235-storyboard-capture-ux`, contract `specs/235-storyboard-capture-ux/contracts/panel-messages.md`.
+
+### Two new optional fields on `SnapshotPayload` / `ScenesPayload` (host → panel)
+
+```ts
+export interface NamingRowPushState {
+  readonly visible: boolean;
+  readonly defaultName: string;
+  readonly knownNames: readonly string[];
+}
+
+export interface CollisionBannerPushState {
+  readonly visible: boolean;
+  readonly conflictingSceneId: string;
+  readonly conflictingSceneTitle: string;
+  readonly originalTimestamp: string;       // ISO-8601
+  readonly proposedTimestamp: string;       // ISO-8601
+  readonly offsetCount: number;             // ≥ 0
+  readonly offsetWouldExceedTimeRange: boolean; // FR-CAP-017a
+  readonly cause: 'capture' | 'update-to-current';
+}
+
+// Both fields land on SnapshotPayload AND ScenesPayload as:
+//   readonly namingRow?: NamingRowPushState | null;
+//   readonly collisionBanner?: CollisionBannerPushState | null;
+//
+// `null` clears the slice; `undefined` (or absent) leaves it unchanged.
+```
+
+### Five new stateless action posts (panel → host)
+
+The component invokes these via `StoryboardPanelProps`:
+
+| Prop | Carries | Sent when |
+|------|---------|-----------|
+| `onNamingRowConfirm(name)` | trimmed `name` | analyst presses Enter or clicks Confirm with `canConfirm: true` |
+| `onNamingRowCancel()` | — | Escape, click Cancel, blur outside |
+| `onCollisionReplace(conflictingSceneId)` | conflicting Scene ULID | Replace clicked |
+| `onCollisionOffset()` | — | Offset (+1 s) clicked. Panel does NOT compute the new timestamp; host advances and re-pushes. |
+| `onCollisionCancel()` | — | Cancel clicked |
+
+Hosts MUST treat each call as fire-and-forget and respond by re-pushing a fresh snapshot with updated `namingRow` / `collisionBanner` slices.
+
+### Stale-message defence rule
+
+Hosts MUST drop any panel→host action when:
+
+1. The matching slice (`namingRow` or `collisionBanner`) is `null` or has `visible: false`, OR
+2. (`onCollisionReplace` only) the action's `conflictingSceneId` does not match the host's current `collisionBanner.conflictingSceneId`.
+
+The reducer applies the same defence locally — actions with no live slice are no-ops.
+
+### View-model projections
+
+The panel renders from two derived view-models — never from the reducer slices directly:
+
+- `composeNamingRowViewModel(state)` → `NamingRowViewModel` with derived `canConfirm` and inline `collisionWith` lookup against `knownNames`.
+- `composeCollisionBannerViewModel(state, formatDtg?)` → `CollisionBannerViewModel` with derived `offsetCapReached` (≥ `COLLISION_OFFSET_CAP`, exported as `60`) and `offsetButtonHidden` (`offsetCapReached || offsetWouldExceedTimeRange`).
+
+The panel uses `offsetButtonHidden` to decide whether to render the Offset button at all.
+
+### Cross-references
+
+- Channel design + lifecycle diagrams: `specs/235-storyboard-capture-ux/contracts/panel-messages.md`.
+- Reducer state-machine spec: `specs/235-storyboard-capture-ux/data-model.md`.
+- FR-UX-003, FR-UX-004, FR-CAP-015, FR-CAP-017, FR-CAP-017a in `specs/235-storyboard-capture-ux/spec.md`.

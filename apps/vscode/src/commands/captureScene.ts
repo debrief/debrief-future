@@ -18,7 +18,6 @@ import {
   createScene,
   deleteScene,
   getActiveStoryboardDefault,
-  formatDtg,
   DuplicateTimestampError,
   DuplicateStoryboardNameError,
   type StoryboardPlot,
@@ -37,6 +36,32 @@ import {
   writeSceneThumbnail,
   type WriteSceneThumbnailResult,
 } from '../services/sceneThumbnailService';
+import type {
+  CollisionBannerResolution,
+  NamingRowResolution,
+} from '../views/storyboardPanelView';
+
+/**
+ * Panel-prompt surface the capture command needs (#235). The real
+ * implementation is the storyboard panel view; tests can stub it with
+ * resolved Promises.
+ */
+export interface CapturePanelSurface {
+  promptStoryboardName(args: {
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+  }): Promise<NamingRowResolution>;
+  promptCollisionResolution(state: {
+    readonly visible: boolean;
+    readonly conflictingSceneId: string;
+    readonly conflictingSceneTitle: string;
+    readonly originalTimestamp: string;
+    readonly proposedTimestamp: string;
+    readonly offsetCount: number;
+    readonly offsetWouldExceedTimeRange: boolean;
+    readonly cause: 'capture' | 'update-to-current';
+  }): Promise<CollisionBannerResolution>;
+}
 
 /** Dependencies the capture handler pulls from the activation composition root. */
 export interface CaptureCommandContext {
@@ -48,16 +73,21 @@ export interface CaptureCommandContext {
     | { readonly source: 'keybinding' }
     | { readonly source: 'panelButton' }
     | { readonly source: 'programmatic' };
+  /** #235 — panel-driven naming + collision prompts. */
+  readonly panelView: CapturePanelSurface;
 }
 
 /**
  * Override points for unit tests — real implementations default to VS Code
  * APIs + the on-disk thumbnail service.
+ *
+ * #235: the first-capture name and the duplicate-timestamp resolution are
+ * gathered through the inline panel rows (see `panelView` on the context),
+ * NOT through host-level prompts that would occlude the map. SC-009's
+ * grep-test asserts the legacy quick-pick / modal call sites are gone.
  */
 export interface CaptureCommandDeps {
-  readonly showInputBox?: typeof vscode.window.showInputBox;
   readonly showErrorMessage?: typeof vscode.window.showErrorMessage;
-  readonly showInformationMessage?: typeof vscode.window.showInformationMessage;
   readonly setStatusBarMessage?: typeof vscode.window.setStatusBarMessage;
   readonly executeCommand?: typeof vscode.commands.executeCommand;
   readonly writeSceneThumbnail?: (
@@ -94,9 +124,7 @@ export type CaptureResult =
     };
 
 interface ResolvedDeps {
-  showInputBox: NonNullable<CaptureCommandDeps['showInputBox']>;
   showErrorMessage: NonNullable<CaptureCommandDeps['showErrorMessage']>;
-  showInformationMessage: NonNullable<CaptureCommandDeps['showInformationMessage']>;
   setStatusBarMessage: NonNullable<CaptureCommandDeps['setStatusBarMessage']>;
   executeCommand: NonNullable<CaptureCommandDeps['executeCommand']>;
   writeSceneThumbnail: NonNullable<CaptureCommandDeps['writeSceneThumbnail']>;
@@ -120,10 +148,7 @@ async function defaultWriteFeatureCollection(
 function resolveDeps(input: CaptureCommandDeps | undefined): ResolvedDeps {
   const i = input ?? {};
   return {
-    showInputBox: i.showInputBox ?? vscode.window.showInputBox,
     showErrorMessage: i.showErrorMessage ?? vscode.window.showErrorMessage,
-    showInformationMessage:
-      i.showInformationMessage ?? vscode.window.showInformationMessage,
     setStatusBarMessage:
       i.setStatusBarMessage ?? vscode.window.setStatusBarMessage,
     executeCommand: i.executeCommand ?? vscode.commands.executeCommand,
@@ -224,20 +249,29 @@ async function captureSceneInner(
     visibleIds.push(rawId);
   }
 
-  // Step 6 — resolve active Storyboard (first-capture prompt if none)
+  // Step 6 — resolve active Storyboard (first-capture prompt if none).
+  // #235: the first-capture name comes from the inline panel naming row,
+  // not a host-level quick-pick that would occlude the map
+  // (FR-VIS-022/023, SC-009). The panel surface posts back the analyst's
+  // confirmed name (or null on cancel) — both paths leave the map and
+  // time controller continuously visible.
   let activeStoryboardId: string;
   let currentPlot = packagePlot(features);
   const existing = getActiveStoryboardDefault(currentPlot);
   if (existing !== null) {
     activeStoryboardId = existing.properties.id;
   } else {
-    const name = await promptForStoryboardName(currentPlot, deps);
-    if (name === undefined) {
+    const knownNames = collectStoryboardNames(currentPlot);
+    const reply = await context.panelView.promptStoryboardName({
+      defaultName: defaultStoryboardName(),
+      knownNames,
+    });
+    if (reply === null || reply.name.trim() === '') {
       return { status: 'cancelled', reason: 'name-prompt' };
     }
     try {
       const result = await createStoryboard(currentPlot, {
-        name,
+        name: reply.name.trim(),
         actor,
         now: deps.now(),
       });
@@ -316,7 +350,13 @@ async function captureSceneInner(
     return { status: 'captured', scene: result.scene };
   } catch (err) {
     if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(context, deps, sceneInput, 0);
+      return handleDuplicateTimestamp(
+        context,
+        deps,
+        sceneInput,
+        0,
+        sceneInput.timestamp,
+      );
     }
     deps.logError(
       `[captureScene] createScene failed: ${stringifyError(err)}`,
@@ -360,6 +400,9 @@ async function handleDuplicateTimestamp(
   deps: ResolvedDeps,
   inputs: CreateSceneInput,
   retries: number,
+  /** #235 — original timestamp the analyst started at; preserved across
+   *  Offset round-trips so the banner can show how far they have shifted. */
+  originalTimestamp: string,
 ): Promise<CaptureResult> {
   const { mapPanel, sessionStore } = context;
   if (retries >= 5) {
@@ -369,26 +412,83 @@ async function handleDuplicateTimestamp(
     return { status: 'rejected', reason: 'duplicate-offset-limit-exceeded' };
   }
   const conflict = findExistingConflict(mapPanel, inputs);
-  const choice = await deps.showInformationMessage(
-    `A scene already exists at ${formatDtg(inputs.timestamp)}.`,
-    { modal: true },
-    'Replace',
-    'Offset (+1 s)',
+  // #235: the duplicate prompt is the inline panel banner, NOT a
+  // host-level modal that would occlude the map (FR-VIS-022/023, SC-009).
+  // The host owns the offset count + offsetWouldExceedTimeRange computation.
+  const conflictTitle = findExistingTitle(mapPanel, inputs) ?? 'Existing scene';
+  const offsetWouldExceedTimeRange = wouldOffsetExceedTimeRange(
+    sessionStore,
+    inputs.timestamp,
   );
-  if (choice === undefined) {
+  const reply = await context.panelView.promptCollisionResolution({
+    visible: true,
+    conflictingSceneId: conflict ?? '',
+    conflictingSceneTitle: conflictTitle,
+    originalTimestamp,
+    proposedTimestamp: inputs.timestamp,
+    offsetCount: retries,
+    offsetWouldExceedTimeRange,
+    cause: 'capture',
+  });
+  if (reply.kind === 'cancel') {
     return { status: 'cancelled', reason: 'duplicate-prompt' };
   }
-  if (choice === 'Replace') {
-    return performReplace(context, deps, inputs, conflict);
+  if (reply.kind === 'replace') {
+    return performReplace(context, deps, inputs, conflict, originalTimestamp);
   }
-  if (choice === 'Offset (+1 s)') {
-    const offsetIso = new Date(
-      new Date(inputs.timestamp).getTime() + 1000,
-    ).toISOString();
-    return retryCreateScene(context, deps, { ...inputs, timestamp: offsetIso }, retries + 1);
+  // reply.kind === 'offset'
+  if (offsetWouldExceedTimeRange) {
+    // The panel hides the Offset button when this is true (FR-CAP-017a),
+    // so we should never reach this branch under normal flow. Treat as
+    // a defensive cancel — the host's own state is authoritative.
+    return { status: 'cancelled', reason: 'duplicate-prompt' };
   }
-  void sessionStore; // reserved for future telemetry
-  return { status: 'cancelled', reason: 'duplicate-prompt' };
+  const offsetIso = new Date(
+    new Date(inputs.timestamp).getTime() + 1000,
+  ).toISOString();
+  return retryCreateScene(
+    context,
+    deps,
+    { ...inputs, timestamp: offsetIso },
+    retries + 1,
+    originalTimestamp,
+  );
+}
+
+function findExistingTitle(
+  mapPanel: MapPanel,
+  inputs: CreateSceneInput,
+): string | null {
+  const plot = packagePlot(mapPanel.getCurrentFeatures());
+  for (const f of plot.features) {
+    const props = f.properties as {
+      kind?: string;
+      storyboard_id?: string;
+      timestamp?: string;
+      title?: string;
+    } | null;
+    if (
+      props !== null &&
+      props.kind === 'STORYBOARD_SCENE' &&
+      props.storyboard_id === inputs.storyboardId &&
+      props.timestamp === inputs.timestamp
+    ) {
+      return typeof props.title === 'string' ? props.title : null;
+    }
+  }
+  return null;
+}
+
+function wouldOffsetExceedTimeRange(
+  sessionStore: SessionStoreApi,
+  proposedTimestamp: string,
+): boolean {
+  const state = sessionStore.getState();
+  const range = state.timeRange;
+  if (range === null) {return false;}
+  const proposedMs = new Date(proposedTimestamp).getTime();
+  // Offsetting by 1 s — would the next attempt push past the upper bound?
+  return proposedMs + 1000 > range.end;
 }
 
 function findExistingConflict(
@@ -420,10 +520,11 @@ async function performReplace(
   deps: ResolvedDeps,
   inputs: CreateSceneInput,
   conflictSceneId: string | null,
+  originalTimestamp: string,
 ): Promise<CaptureResult> {
   if (conflictSceneId === null) {
     deps.logError('[captureScene] Replace requested but conflict scene not located; retrying createScene');
-    return retryCreateScene(context, deps, inputs, 0);
+    return retryCreateScene(context, deps, inputs, 0, originalTimestamp);
   }
   try {
     const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
@@ -445,7 +546,7 @@ async function performReplace(
     );
     return { status: 'rejected', reason: 'unexpected', error: err };
   }
-  return retryCreateScene(context, deps, inputs, 0);
+  return retryCreateScene(context, deps, inputs, 0, originalTimestamp);
 }
 
 async function retryCreateScene(
@@ -453,6 +554,7 @@ async function retryCreateScene(
   deps: ResolvedDeps,
   inputs: CreateSceneInput,
   retries: number,
+  originalTimestamp: string,
 ): Promise<CaptureResult> {
   try {
     const fcLatest = packagePlot(context.mapPanel.getCurrentFeatures());
@@ -468,7 +570,13 @@ async function retryCreateScene(
     return { status: 'captured', scene: result.scene };
   } catch (err) {
     if (err instanceof DuplicateTimestampError) {
-      return handleDuplicateTimestamp(context, deps, inputs, retries);
+      return handleDuplicateTimestamp(
+        context,
+        deps,
+        inputs,
+        retries,
+        originalTimestamp,
+      );
     }
     deps.logError(
       `[captureScene] createScene (retry) failed: ${stringifyError(err)}`,
@@ -480,30 +588,31 @@ async function retryCreateScene(
   }
 }
 
-async function promptForStoryboardName(
-  plot: StoryboardPlot,
-  deps: ResolvedDeps,
-): Promise<string | undefined> {
-  const existingNames = new Set<string>();
+/**
+ * Collect existing Storyboard names on the plot for inline collision
+ * detection in the panel's first-capture naming row (#235).
+ */
+function collectStoryboardNames(plot: StoryboardPlot): readonly string[] {
+  const names: string[] = [];
   for (const f of plot.features) {
     const props = f.properties as { kind?: string; name?: string } | null;
-    if (props !== null && props.kind === 'STORYBOARD' && typeof props.name === 'string') {
-      existingNames.add(props.name);
+    if (
+      props !== null &&
+      props.kind === 'STORYBOARD' &&
+      typeof props.name === 'string'
+    ) {
+      names.push(props.name);
     }
   }
-  return deps.showInputBox({
-    prompt: 'Name for the new Storyboard',
-    placeHolder: 'e.g. Exercise Alpha',
-    ignoreFocusOut: true,
-    validateInput: (value) => {
-      const trimmed = value.trim();
-      if (trimmed === '') {return 'Name cannot be empty';}
-      if (existingNames.has(trimmed)) {
-        return `A Storyboard named "${trimmed}" already exists on this plot`;
-      }
-      return null;
-    },
-  });
+  return names;
+}
+
+/**
+ * Default Storyboard name for the inline naming row. Kept simple — the
+ * analyst will almost always type something more meaningful.
+ */
+function defaultStoryboardName(): string {
+  return 'Storyboard';
 }
 
 function stringifyError(err: unknown): string {

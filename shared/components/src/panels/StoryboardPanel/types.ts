@@ -102,6 +102,50 @@ export interface StoryboardEditViewModel {
   readonly sceneCount: number;
 }
 
+/**
+ * First-capture inline naming row (#235 data-model §NamingRowState).
+ *
+ * Presentational projection of the host's `namingRow` push slice plus the
+ * panel's own `pendingName` typing state.
+ */
+export interface NamingRowViewModel {
+  readonly visible: boolean;
+  readonly pendingName: string;
+  readonly defaultName: string;
+  /** Existing storyboard name that collides with the trimmed `pendingName`,
+   *  or `null` when no collision. Drives the inline warning slot. */
+  readonly collisionWith: string | null;
+  /** Derived: `pendingName.trim() !== '' && collisionWith === null`. */
+  readonly canConfirm: boolean;
+}
+
+/**
+ * Duplicate-timestamp inline collision banner (#235 data-model §CollisionBannerState).
+ *
+ * Anchored above the conflicting Scene row when visible; presents
+ * Replace / Offset / Cancel. The Offset button is hidden by the panel
+ * when `offsetCapReached` is true (FR-CAP-017 cap of 60) OR when the
+ * host signals `offsetWouldExceedTimeRange` via the push payload
+ * (FR-CAP-017a) — surfaced through `offsetButtonHidden`.
+ */
+export interface CollisionBannerViewModel {
+  readonly visible: boolean;
+  readonly conflictingSceneId: string | null;
+  readonly conflictingSceneTitle: string | null;
+  readonly proposedTimestamp: string | null;
+  /** `formatDtg(proposedTimestamp)` — presentational only. */
+  readonly proposedTimestampDtg: string | null;
+  readonly offsetCount: number;
+  /** Derived: `offsetCount >= 60`. */
+  readonly offsetCapReached: boolean;
+  /** Mirror of the host's `offsetWouldExceedTimeRange` flag (FR-CAP-017a). */
+  readonly offsetWouldExceedTimeRange: boolean;
+  /** Derived: `offsetCapReached || offsetWouldExceedTimeRange`. The Offset
+   *  button is rendered only when this is `false`. */
+  readonly offsetButtonHidden: boolean;
+  readonly cause: 'capture' | 'update-to-current' | null;
+}
+
 export interface StoryboardPanelProps {
   /** Ordered by `timestampIso` ascending. Empty when no active Storyboard. */
   readonly scenes: readonly SceneRowViewModel[];
@@ -207,4 +251,38 @@ export interface StoryboardPanelProps {
   onSceneEditFormCancel?(sceneId: string): void;
   /** Fires when the analyst dismisses the Undo toast (close button). */
   onUndoToastDismiss?(): void;
+
+  // ── NEW in #235 — first-capture naming row + collision banner ──────
+  // All optional + defaulted so #216/#217/#218/#230 fixtures keep
+  // compiling. When the host has set its `namingRow` / `collisionBanner`
+  // slice, the panel renders the corresponding inline affordance.
+
+  /** First-capture naming-row view-model. When `visible:false` (or
+   *  omitted) the panel does not render the inline naming row. */
+  readonly namingRowViewModel?: NamingRowViewModel;
+  /** Duplicate-timestamp collision-banner view-model. When `visible:false`
+   *  (or omitted) the panel does not render the inline banner. */
+  readonly collisionBannerViewModel?: CollisionBannerViewModel;
+
+  /** Fires when the analyst types in the naming-row input. The panel
+   *  forwards the new text; the host echoes it back as `pendingName` on
+   *  the next push. */
+  onNamingRowTextChanged?(pendingName: string): void;
+  /** Fires when the analyst presses Enter or clicks Confirm in the
+   *  naming row with a non-empty, non-colliding name. The panel passes
+   *  the trimmed `name`. */
+  onNamingRowConfirm?(name: string): void;
+  /** Fires when the analyst presses Escape, clicks Cancel, or clicks
+   *  outside the naming row. */
+  onNamingRowCancel?(): void;
+
+  /** Fires when the analyst clicks Replace in the collision banner.
+   *  Carries the `conflictingSceneId` so the host can verify it matches
+   *  its own slice (stale-message defence per `contracts/panel-messages.md`). */
+  onCollisionReplace?(conflictingSceneId: string): void;
+  /** Fires when the analyst clicks Offset (+1 s). The panel does NOT
+   *  compute the new timestamp; the host advances and re-pushes. */
+  onCollisionOffset?(): void;
+  /** Fires when the analyst clicks Cancel in the collision banner. */
+  onCollisionCancel?(): void;
 }

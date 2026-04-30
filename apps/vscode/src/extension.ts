@@ -1089,6 +1089,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         stacItemPath,
         actor: sessionManager.actor,
         trigger: { source: 'programmatic' },
+        // #235 — panel-driven first-capture naming + collision banner
+        panelView: storyboardPanelProvider,
       };
       await captureScene(ctx, {
         setCaptureInFlight: (inFlight: boolean) =>

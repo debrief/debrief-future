@@ -37,8 +37,10 @@ describe('StoryboardPanel', () => {
       />,
     );
     const empty = screen.getByTestId('storyboard-empty-state');
-    expect(empty.textContent).toMatch(/No Storyboards yet/);
+    expect(empty.textContent).toMatch(/No storyboards yet/i);
     expect(screen.queryByTestId('scene-list')).toBeNull();
+    // #235: empty state offers a primary Capture Scene affordance.
+    expect(screen.getByTestId('capture-scene-button')).not.toBeNull();
   });
 
   it('renders empty-Storyboard copy when scenes is empty but name is set', () => {
@@ -629,5 +631,411 @@ describe('StoryboardPanel', () => {
     expect(button.textContent).toContain('Refresh all stale (1)');
     fireEvent.click(button);
     expect(onStoryboardRefreshAllStaleClicked).toHaveBeenCalledWith('sb-1');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Feature 235 — empty-state Capture button + naming row + collision banner
+// ─────────────────────────────────────────────────────────────────────
+
+describe('StoryboardPanel — empty-state Capture button (T008)', () => {
+  it('mouse click invokes onCaptureClick', () => {
+    const onCaptureClick = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={onCaptureClick}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('capture-scene-button'));
+    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('Enter key on the button invokes onCaptureClick', () => {
+    const onCaptureClick = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={onCaptureClick}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    const btn = screen.getByTestId('capture-scene-button');
+    btn.focus();
+    fireEvent.keyDown(btn, { key: 'Enter' });
+    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('Space key on the button invokes onCaptureClick', () => {
+    const onCaptureClick = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={onCaptureClick}
+        onSceneRowClick={() => undefined}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId('capture-scene-button'), { key: ' ' });
+    expect(onCaptureClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('StoryboardPanel — first-capture naming row (T009)', () => {
+  it('renders only when viewModel.visible is true', () => {
+    const { rerender } = render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: false,
+          pendingName: '',
+          defaultName: '',
+          collisionWith: null,
+          canConfirm: false,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-naming-row')).toBeNull();
+
+    rerender(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: 'Default — storyboard',
+          defaultName: 'Default — storyboard',
+          collisionWith: null,
+          canConfirm: true,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    expect(screen.getByTestId('storyboard-naming-row')).not.toBeNull();
+  });
+
+  it('input is auto-focused and pre-filled with pendingName', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: 'Plot Alpha — storyboard',
+          defaultName: 'Plot Alpha — storyboard',
+          collisionWith: null,
+          canConfirm: true,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    const input = screen.getByTestId(
+      'storyboard-naming-row-input',
+    ) as HTMLInputElement;
+    expect(input.value).toBe('Plot Alpha — storyboard');
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('Enter confirms with the trimmed name when canConfirm is true', () => {
+    const onConfirm = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: '  Echo  ',
+          defaultName: 'Echo',
+          collisionWith: null,
+          canConfirm: true,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={onConfirm}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId('storyboard-naming-row-input'), {
+      key: 'Enter',
+    });
+    expect(onConfirm).toHaveBeenCalledWith('Echo');
+  });
+
+  it('Enter does NOT confirm when canConfirm is false', () => {
+    const onConfirm = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: '',
+          defaultName: '',
+          collisionWith: null,
+          canConfirm: false,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={onConfirm}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId('storyboard-naming-row-input'), {
+      key: 'Enter',
+    });
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('Escape fires onCancel', () => {
+    const onCancel = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: 'X',
+          defaultName: 'X',
+          collisionWith: null,
+          canConfirm: true,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={onCancel}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId('storyboard-naming-row-input'), {
+      key: 'Escape',
+    });
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('typing in the input fires onNamingRowTextChanged', () => {
+    const onTextChange = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: 'A',
+          defaultName: 'A',
+          collisionWith: null,
+          canConfirm: true,
+        }}
+        onNamingRowTextChanged={onTextChange}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    fireEvent.change(screen.getByTestId('storyboard-naming-row-input'), {
+      target: { value: 'New name' },
+    });
+    expect(onTextChange).toHaveBeenCalledWith('New name');
+  });
+
+  it('shows collision warning slot when collisionWith is non-null and disables Confirm', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        namingRowViewModel={{
+          visible: true,
+          pendingName: 'Existing',
+          defaultName: 'Default',
+          collisionWith: 'Existing',
+          canConfirm: false,
+        }}
+        onNamingRowTextChanged={() => undefined}
+        onNamingRowConfirm={() => undefined}
+        onNamingRowCancel={() => undefined}
+      />,
+    );
+    expect(
+      screen.getByTestId('storyboard-naming-row-collision').textContent,
+    ).toContain('Existing');
+    const confirm = screen.getByTestId(
+      'storyboard-naming-row-confirm',
+    ) as HTMLButtonElement;
+    expect(confirm.disabled).toBe(true);
+  });
+});
+
+describe('StoryboardPanel — collision banner (T010)', () => {
+  const baseVm = {
+    visible: true,
+    conflictingSceneId: 'scene-x',
+    conflictingSceneTitle: '201400Z APR 26',
+    proposedTimestamp: '2026-04-20T14:00:00.000Z',
+    proposedTimestampDtg: null,
+    offsetCount: 0,
+    offsetCapReached: false,
+    offsetWouldExceedTimeRange: false,
+    offsetButtonHidden: false,
+    cause: 'capture' as const,
+  };
+
+  it('renders three buttons when offset is allowed', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={baseVm}
+        onCollisionReplace={() => undefined}
+        onCollisionOffset={() => undefined}
+        onCollisionCancel={() => undefined}
+      />,
+    );
+    expect(screen.getByTestId('collision-replace')).not.toBeNull();
+    expect(screen.getByTestId('collision-offset')).not.toBeNull();
+    expect(screen.getByTestId('collision-cancel')).not.toBeNull();
+  });
+
+  it('hides Offset and shows the offset-blocked message when offsetWouldExceedTimeRange', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={{
+          ...baseVm,
+          offsetWouldExceedTimeRange: true,
+          offsetButtonHidden: true,
+        }}
+        onCollisionReplace={() => undefined}
+        onCollisionOffset={() => undefined}
+        onCollisionCancel={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('collision-offset')).toBeNull();
+    expect(
+      screen.getByTestId('storyboard-collision-banner-offset-blocked')
+        .textContent,
+    ).toMatch(/time range/i);
+  });
+
+  it('hides Offset and shows cap-reached message when offsetCapReached', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={{
+          ...baseVm,
+          offsetCount: 60,
+          offsetCapReached: true,
+          offsetButtonHidden: true,
+        }}
+        onCollisionReplace={() => undefined}
+        onCollisionOffset={() => undefined}
+        onCollisionCancel={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('collision-offset')).toBeNull();
+    expect(
+      screen.getByTestId('storyboard-collision-banner-offset-blocked')
+        .textContent,
+    ).toMatch(/limit reached/i);
+  });
+
+  it('Replace passes the conflictingSceneId', () => {
+    const onReplace = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={baseVm}
+        onCollisionReplace={onReplace}
+        onCollisionOffset={() => undefined}
+        onCollisionCancel={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('collision-replace'));
+    expect(onReplace).toHaveBeenCalledWith('scene-x');
+  });
+
+  it('Offset and Cancel fire their respective callbacks', () => {
+    const onOffset = vi.fn();
+    const onCancel = vi.fn();
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={baseVm}
+        onCollisionReplace={() => undefined}
+        onCollisionOffset={onOffset}
+        onCollisionCancel={onCancel}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('collision-offset'));
+    fireEvent.click(screen.getByTestId('collision-cancel'));
+    expect(onOffset).toHaveBeenCalledTimes(1);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not render when viewModel.visible is false', () => {
+    render(
+      <StoryboardPanel
+        scenes={[]}
+        activeStoryboardName={null}
+        captureInFlight={false}
+        onCaptureClick={() => undefined}
+        onSceneRowClick={() => undefined}
+        collisionBannerViewModel={{ ...baseVm, visible: false }}
+        onCollisionReplace={() => undefined}
+        onCollisionOffset={() => undefined}
+        onCollisionCancel={() => undefined}
+      />,
+    );
+    expect(screen.queryByTestId('storyboard-collision-banner')).toBeNull();
   });
 });

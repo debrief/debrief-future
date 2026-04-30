@@ -31,12 +31,17 @@ export type {
   MissingDataReason,
   SceneEditViewModel,
   StoryboardEditViewModel,
+  NamingRowViewModel,
+  CollisionBannerViewModel,
 } from './types';
 export {
   useStoryboardEditReducer,
   storyboardEditReducer,
   createInitialStoryboardEditState,
   composeSceneEditViewModels,
+  composeNamingRowViewModel,
+  composeCollisionBannerViewModel,
+  COLLISION_OFFSET_CAP,
 } from './useStoryboardEditReducer';
 export type {
   StoryboardEditAction,
@@ -47,7 +52,15 @@ export type {
   UndoToastDescriptor,
   StaleFlagEntry,
   ThemeVariant,
+  NamingRowReducerState,
+  CollisionBannerReducerState,
+  NamingRowPushState,
+  CollisionBannerPushState,
 } from './useStoryboardEditReducer';
+export { NamingRow } from './NamingRow';
+export type { NamingRowProps } from './NamingRow';
+export { CollisionBanner } from './CollisionBanner';
+export type { CollisionBannerProps } from './CollisionBanner';
 
 // 234 FR-003 / ADR-027 — shared callback-adapter helper for stories +
 // harness. Re-exported so consumers go through the package surface; the

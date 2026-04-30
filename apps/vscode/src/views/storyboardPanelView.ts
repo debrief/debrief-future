@@ -30,9 +30,27 @@ import type {
   StoryboardPanelMessage,
   ExtensionToStoryboardPanelMessage,
   SceneUndoToastDescriptor,
+  NamingRowPushState,
+  CollisionBannerPushState,
 } from '../types/storyboardPanelMessages';
 
 const VIEW_TYPE = 'debrief.storyboardPanel';
+
+/**
+ * Resolution of the inline naming row (#235). `null` = analyst cancelled.
+ */
+export type NamingRowResolution = { readonly name: string } | null;
+
+/**
+ * Resolution of the inline collision banner (#235).
+ *  - `replace` — analyst clicked Replace; capture command should delete + retry.
+ *  - `offset` — analyst clicked Offset (+1 s); capture command advances and re-checks.
+ *  - `cancel` — analyst dismissed the banner.
+ */
+export type CollisionBannerResolution =
+  | { readonly kind: 'replace'; readonly conflictingSceneId: string }
+  | { readonly kind: 'offset' }
+  | { readonly kind: 'cancel' };
 
 export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = VIEW_TYPE;
@@ -52,6 +70,26 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   private playbackService: StoryboardPlaybackService | undefined;
   private editService: StoryboardEditService | undefined;
   private authorisedStoreRoot: string | null = null;
+
+  /**
+   * #235 — current host-driven prompt slices. Tracked so `refresh()` and
+   * `applySnapshot()` can re-include them on every push (the analyst must
+   * still see the row/banner after, e.g., a `setActiveStoryboard` triggers
+   * a refresh mid-flow).
+   */
+  private currentNamingRow: NamingRowPushState | null = null;
+  private currentCollisionBanner: CollisionBannerPushState | null = null;
+
+  /**
+   * #235 — pending resolvers for the host-driven prompts. The capture
+   * command awaits these; inbound action posts from the panel resolve them.
+   * Stale messages (no resolver) are dropped silently per
+   * contracts/panel-messages.md §C.
+   */
+  private namingRowResolver: ((r: NamingRowResolution) => void) | null = null;
+  private collisionResolver:
+    | ((r: CollisionBannerResolution) => void)
+    | null = null;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -164,6 +202,8 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
     });
   }
 
@@ -307,6 +347,8 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
       sceneEditViewModels,
       pendingUndoToast,
       storyboardEditViewModel,
+      namingRow: this.currentNamingRow,
+      collisionBanner: this.currentCollisionBanner,
     });
   }
 
@@ -318,6 +360,93 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
 
   public setCaptureInFlight(inFlight: boolean): void {
     this.post({ type: 'captureInFlight', inFlight });
+  }
+
+  /**
+   * #235 — push a naming-row state to the panel. `null` clears the slice.
+   * Most callers should use `promptStoryboardName` instead — that helper
+   * pairs the push with a Promise that resolves on the analyst's reply.
+   */
+  public setNamingRow(state: NamingRowPushState | null): void {
+    this.currentNamingRow = state;
+    this.refresh();
+  }
+
+  /**
+   * #235 — push a collision-banner state to the panel. `null` clears it.
+   * Most callers should use `promptCollisionResolution` instead.
+   */
+  public setCollisionBanner(state: CollisionBannerPushState | null): void {
+    this.currentCollisionBanner = state;
+    this.refresh();
+  }
+
+  /**
+   * #235 — show the inline naming row and await the analyst's reply.
+   * Resolves with `{ name }` on confirm or `null` on cancel. Always clears
+   * the slice before resolving.
+   *
+   * Replaces the legacy `vscode.window.showInputBox` quick-pick that
+   * occluded the map (FR-VIS-022/023, SC-009).
+   */
+  public async promptStoryboardName(args: {
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+  }): Promise<NamingRowResolution> {
+    // If a previous prompt was somehow still pending (host bug), reject it.
+    if (this.namingRowResolver !== null) {
+      const stale = this.namingRowResolver;
+      this.namingRowResolver = null;
+      stale(null);
+    }
+    this.setNamingRow({
+      visible: true,
+      defaultName: args.defaultName,
+      knownNames: args.knownNames,
+    });
+    return new Promise<NamingRowResolution>((resolve) => {
+      this.namingRowResolver = (r): void => {
+        this.namingRowResolver = null;
+        this.setNamingRow(null);
+        resolve(r);
+      };
+    });
+  }
+
+  /**
+   * #235 — show the inline collision banner and await the analyst's reply.
+   * The caller drives the offset count + proposedTimestamp; this method
+   * just renders whatever banner state is supplied and resolves on the
+   * next inbound resolution action. Does NOT clear the slice on
+   * `offset` — the caller re-pushes a fresh banner via `setCollisionBanner`
+   * (or this method again) after recomputing offsets.
+   *
+   * Replaces the legacy modal `vscode.window.showInformationMessage(…,
+   * { modal: true }, 'Replace', 'Offset (+1 s)')` that occluded the map
+   * (FR-VIS-022/023, SC-009).
+   */
+  public async promptCollisionResolution(
+    state: CollisionBannerPushState,
+  ): Promise<CollisionBannerResolution> {
+    if (this.collisionResolver !== null) {
+      const stale = this.collisionResolver;
+      this.collisionResolver = null;
+      stale({ kind: 'cancel' });
+    }
+    this.setCollisionBanner(state);
+    return new Promise<CollisionBannerResolution>((resolve) => {
+      this.collisionResolver = (r): void => {
+        this.collisionResolver = null;
+        // Offset is special: the caller will re-push a fresh banner with
+        // updated offsetCount + proposedTimestamp + offsetWouldExceedTimeRange,
+        // so we leave `currentCollisionBanner` in place. Replace and Cancel
+        // both end the flow → clear it.
+        if (r.kind !== 'offset') {
+          this.setCollisionBanner(null);
+        }
+        resolve(r);
+      };
+    });
   }
 
   private computeSceneRowViewModels(
@@ -551,6 +680,66 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
           }),
         );
         break;
+
+      // #235 — naming row + collision banner resolutions.
+      // Stale-message defence (contracts/panel-messages.md §C): drop the
+      // action when no resolver is registered or when the host's own
+      // current slice has been cleared / mismatched.
+      case 'naming-row-confirm': {
+        if (
+          this.namingRowResolver !== null &&
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowResolver({ name: message.name });
+        }
+        break;
+      }
+      case 'naming-row-cancel': {
+        if (
+          this.namingRowResolver !== null &&
+          this.currentNamingRow !== null &&
+          this.currentNamingRow.visible
+        ) {
+          this.namingRowResolver(null);
+        }
+        break;
+      }
+      case 'collision-replace': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible &&
+          this.currentCollisionBanner.conflictingSceneId ===
+            message.conflictingSceneId
+        ) {
+          this.collisionResolver({
+            kind: 'replace',
+            conflictingSceneId: message.conflictingSceneId,
+          });
+        }
+        break;
+      }
+      case 'collision-offset': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible
+        ) {
+          this.collisionResolver({ kind: 'offset' });
+        }
+        break;
+      }
+      case 'collision-cancel': {
+        if (
+          this.collisionResolver !== null &&
+          this.currentCollisionBanner !== null &&
+          this.currentCollisionBanner.visible
+        ) {
+          this.collisionResolver({ kind: 'cancel' });
+        }
+        break;
+      }
     }
   }
 
@@ -628,6 +817,20 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     this.sessionChangeDisposable?.dispose();
     this.sessionChangeDisposable = undefined;
     this.view = undefined;
+    // Cancel any in-flight prompts so the awaiting capture command
+    // unblocks instead of leaking.
+    if (this.namingRowResolver !== null) {
+      const r = this.namingRowResolver;
+      this.namingRowResolver = null;
+      r(null);
+    }
+    if (this.collisionResolver !== null) {
+      const r = this.collisionResolver;
+      this.collisionResolver = null;
+      r({ kind: 'cancel' });
+    }
+    this.currentNamingRow = null;
+    this.currentCollisionBanner = null;
   }
 }
 
