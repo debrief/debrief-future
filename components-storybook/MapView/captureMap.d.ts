@@ -12,7 +12,14 @@ export interface CaptureMapOptions {
  * Capture the Leaflet map container as a PNG data URL.
  *
  * Uses modern-screenshot's domToPng which handles cross-origin tiles
- * (requires crossOrigin="anonymous" on TileLayer).
+ * (requires crossOrigin="anonymous" on TileLayer + a `connect-src` CSP
+ * permissive enough to fetch each tile, since modern-screenshot inlines
+ * them as base64 data URLs).
+ *
+ * `waitUntilLoad` is called first so any tiles still streaming after a
+ * recent pan/zoom finish before the snapshot — without this, the PNG
+ * captures only the SVG/marker layer because tile <img>s aren't yet
+ * decodable.
  *
  * @param container - The DOM element containing the Leaflet map (.leaflet-container)
  * @param options - Optional capture dimensions
