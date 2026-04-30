@@ -594,6 +594,11 @@ export class MapPanel {
       this._onFeaturesChanged.fire(this.currentFeatures.slice());
       return;
     }
+    // In-place feature update (Scene capture appends a STORYBOARD_SCENE,
+    // edit suite renames/deletes Scenes, etc.). Suppress refitBounds so
+    // the user's current pan/zoom is preserved — refitting would snap
+    // back to the plot's loaded bbox and erase context the user was
+    // composing into the Scene.
     this.postMessage({
       type: 'loadPlot',
       plot: {
@@ -603,6 +608,7 @@ export class MapPanel {
         bbox: this.currentPlot.bbox,
         timeExtent: this.currentPlot.timeExtent,
       },
+      refitBounds: false,
     });
     this._onFeaturesChanged.fire(this.currentFeatures.slice());
   }
