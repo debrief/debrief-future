@@ -1354,8 +1354,14 @@ export default function App() {
       selectedIds: selectedIds,
       onSelect: handleMapSelect,
       onBackgroundClick: handleBackgroundClick,
-      onZoomChange: handleMapZoomChange,
-      onBoundsChange: handleMapBoundsChange,
+      // #235 — viewport-sync wiring is gated on the storyboard rail flag.
+      // Leaflet fires `boundsChange` during initial mount, which would
+      // call `setViewport` and push an undo entry the moment the map
+      // renders — breaking the #073 invariant that plot load is not
+      // undoable. The sync only exists for the capture command, which
+      // is unreachable without the rail.
+      onZoomChange: storyboardPanelEnabled ? handleMapZoomChange : undefined,
+      onBoundsChange: storyboardPanelEnabled ? handleMapBoundsChange : undefined,
       currentTime: playback.currentTime,
       displayMode: state.displayMode,
       drawingMode,
@@ -1401,7 +1407,7 @@ export default function App() {
     tools, toolMatches, allFeatures, visibleFeatures, state.selection.featureIds,
     hiddenFeatureIds, handleActivityMessage,
     selectedIds, handleMapSelect, handleBackgroundClick,
-    handleMapZoomChange, handleMapBoundsChange,
+    handleMapZoomChange, handleMapBoundsChange, storyboardPanelEnabled,
     drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
