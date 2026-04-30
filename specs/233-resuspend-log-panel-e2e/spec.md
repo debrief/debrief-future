@@ -67,7 +67,7 @@ As a future developer who encounters another test suite wedged on webview flakin
 
 ### Functional Requirements
 
-- **FR-001**: The five log-panel tests MUST be removed from `test.describe.fixme(...)` in `tests/e2e/test-log-panel.spec.ts` — converted back to `test.describe(...)`.
+- **FR-001**: The five log-panel tests MUST be removed from `test.describe.fixme(...)` in `tests/e2e/test-log-panel.spec.ts` — converted back to `test.describe(...)`. **Implementation note (post-#142 verification, 2026-04-29):** the cloud E2E framework (Hybrid A+D — see `docs/project_notes/webview-e2e-research.md` "Limitations") does not natively propagate extension → webview state messages. The four state-dependent tests (#2-#5) only pass once the page object's `executeCommand(...)` and `getWebviewFrame(...)` helpers synthesise the state messages the muted extension flow would have sent (`loadPlot` for the map iframe, `timeline:update` for the LogPanel). Helpers are explicitly in scope; test bodies stay untouched per §131. All five tests pass locally + in CI as required.
 - **FR-002**: The mute-explanation comments documenting the temporary `.fixme` state MUST be removed in the same commit. This covers BOTH:
   - the `// #233 — Re-suspended pending #142 ...` block at the top of `tests/e2e/test-log-panel.spec.ts` (immediately above the `test.describe`); and
   - the `# #210's log-panel skip-guard removed 2026-04-24 per spec 233 ...` block in `Taskfile.yml` (under the `lint:` task, in the slot where the guard line is being re-added).

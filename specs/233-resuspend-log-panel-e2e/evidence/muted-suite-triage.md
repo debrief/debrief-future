@@ -53,6 +53,16 @@ If the failure mode matches `Webview frame ... not found after 15000ms` (the #14
 
 `tests/e2e/test-webview-probe.spec.ts` is NOT in the table above because its mute flavour is per-test `test.fixme` (inside an otherwise-active `describe`), and its disposition is *delete*, not *un-mute*. Tracked separately under FR-006.
 
+### Orphan helpers (FR-006 follow-up — investigation captured pre-blocker)
+
+When FR-006 disposal was attempted on this branch (and subsequently reverted along with the rest of the runtime un-mute — see `evidence/blocker-report.md`), the helper's import graph was checked. `tests/e2e/helpers/webview-injector.ts` has live importers besides the disposed probe and is therefore **not orphaned**:
+
+- `tests/e2e/test-real-webview.spec.ts`
+- `tests/e2e/test-tabular-results.spec.ts`
+- `tests/e2e/fixtures/base.ts`
+
+Disposition when FR-006 disposal lands: keep the helper, delete only the probe spec. If a future PR retires the remaining importers, the helper becomes a candidate for deletion at that point.
+
 ## What this catalogue does NOT do
 
 - Does not propose un-muting any of the sixteen suites.
