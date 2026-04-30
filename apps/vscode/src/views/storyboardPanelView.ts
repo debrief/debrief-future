@@ -51,6 +51,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   private getMapPanel: () => MapPanel | undefined = () => undefined;
   private playbackService: StoryboardPlaybackService | undefined;
   private editService: StoryboardEditService | undefined;
+  private authorisedStoreRoot: string | null = null;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -94,6 +95,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
   ): void {
     this.view = webviewView;
     this.webviewReady = false;
+    this.authorisedStoreRoot = null;
 
     webviewView.webview.options = {
       enableScripts: true,
@@ -111,6 +113,7 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     webviewView.onDidDispose(() => {
       this.view = undefined;
       this.webviewReady = false;
+      this.authorisedStoreRoot = null;
     });
   }
 
@@ -369,8 +372,33 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
     const plot = panel?.getCurrentPlot();
     const store = panel?.getCurrentStore?.();
     if (!plot || !store?.path || !plot.itemPath) {return null;}
+    // Scene thumbnails live under `{store.path}/{plot.itemPath}/scene-thumbnails/`,
+    // outside the extension's own `dist/`. The webview will block image
+    // requests there unless the store root is whitelisted in
+    // `localResourceRoots`. Authorise it lazily here — the active store
+    // can change across sessions, so we re-set options when it does.
+    this.authoriseStoreRoot(store.path);
     const full = path.join(store.path, plot.itemPath);
     return path.dirname(full);
+  }
+
+  /**
+   * Ensure the webview is authorised to read files under `storePath`
+   * (where scene thumbnails are written). Idempotent per `storePath` —
+   * we only re-set `webview.options` when the active store changes.
+   */
+  private authoriseStoreRoot(storePath: string): void {
+    if (!this.view) {return;}
+    if (this.authorisedStoreRoot === storePath) {return;}
+    this.view.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [
+        vscode.Uri.joinPath(this.extensionUri, 'dist'),
+        vscode.Uri.joinPath(this.extensionUri, 'node_modules'),
+        vscode.Uri.file(storePath),
+      ],
+    };
+    this.authorisedStoreRoot = storePath;
   }
 
   private handleMessage(message: StoryboardPanelMessage): void {

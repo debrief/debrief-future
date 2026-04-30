@@ -347,9 +347,13 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (state.transitionId !== null) {return;}
     const index = state.sceneOrder.indexOf(sceneId);
     if (index < 0) {return;}
-    if (index === state.currentSceneIndex) {return;}
+    // Re-fly even when the click target equals `currentSceneIndex`. The
+    // map may have been panned/zoomed since the Scene was captured (or
+    // the user just landed on the storyboard with `currentSceneIndex=0`
+    // and never animated); a click is an explicit "show me this Scene"
+    // request, so honour it idempotently.
     const direction: 'forward' | 'backward' =
-      index > state.currentSceneIndex ? 'forward' : 'backward';
+      index >= state.currentSceneIndex ? 'forward' : 'backward';
     await this.stepTo(state, index, direction);
   }
 
