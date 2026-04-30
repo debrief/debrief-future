@@ -229,6 +229,7 @@ function depsFor(
       largePath: `/tmp/large-${sceneId}.png`,
       smallPath: `/tmp/small-${sceneId}.png`,
     })),
+    writeFeatureCollection: vi.fn(async () => undefined),
     generateUlid: vi.fn(() => '01HW0XGE7Z4YQZ2QZ6KMN9VPJK'),
     now: vi.fn(() => '2026-04-20T14:35:00.000Z'),
     logError: vi.fn(),
@@ -281,6 +282,18 @@ describe('captureScene — happy paths', () => {
     );
     expect(sink.calls).toEqual([true, false]);
 
+    // features.geojson is persisted eagerly so the captured scene survives
+    // a reload without requiring "Save Session" first.
+    expect(deps.writeFeatureCollection).toHaveBeenCalledTimes(1);
+    const writeArgs = (deps.writeFeatureCollection as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(writeArgs[0]).toBe('/store/item');
+    const writtenKinds = (writeArgs[1] as DebriefFeature[]).map(
+      (f) => (f.properties as { kind?: string }).kind,
+    );
+    expect(writtenKinds.filter((k) => k === 'STORYBOARD')).toHaveLength(1);
+    expect(writtenKinds.filter((k) => k === 'STORYBOARD_SCENE')).toHaveLength(1);
+
+    // Inspect stored features: one Storyboard + one Scene were appended.
     const kinds = mapPanel.features.map(
       (f: DebriefFeature) => (f.properties as { kind?: string }).kind,
     );

@@ -13,6 +13,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { saveSession, type SessionStoreWithUndo } from '@debrief/session-state';
+import type { DebriefFeature } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import { parseStacUri } from '../types/stac';
@@ -38,6 +39,32 @@ function deriveSessionPath(plotUri: string, storePath: string): string | null {
 
   // Combine with store path
   return `${storePath}/${itemPath}`;
+}
+
+/**
+ * Write the in-memory FeatureCollection back to `<item-dir>/features.geojson`.
+ *
+ * Captured Storyboard/Scene features (and any other in-session mutations)
+ * live only in the MapPanel until this point — there is no separate
+ * persistence path. Mirrors the eager write that `writeSceneThumbnail`
+ * already does for scene PNGs so the two stay in sync after a save.
+ */
+export function storeFeatureCollection(
+  storePath: string,
+  plotUri: string,
+  features: DebriefFeature[],
+): void {
+  const parsed = parseStacUri(plotUri);
+  if (!parsed) {
+    return;
+  }
+  const itemDir = path.join(storePath, path.dirname(parsed.itemPath));
+  const featuresPath = path.join(itemDir, 'features.geojson');
+  const fc = {
+    type: 'FeatureCollection' as const,
+    features,
+  };
+  fs.writeFileSync(featuresPath, `${JSON.stringify(fc, null, 2)}\n`);
 }
 
 /**
@@ -152,17 +179,26 @@ export function createSaveSessionCommand(
         `Session saved to ${result.path}`
       );
 
-      // Capture thumbnails after successful save (#174)
       const mapPanel = getMapPanel?.();
-      if (mapPanel) {
+      const parsed = parseStacUri(plotUri);
+      const storePath = parsed ? getStorePath(parsed.storeId) : undefined;
+
+      // Persist in-memory features back to features.geojson so captured
+      // Storyboard/Scene features (and any other mutations) survive reload.
+      if (mapPanel && parsed && storePath) {
         try {
-          const parsed = parseStacUri(plotUri);
-          const storePath = parsed ? getStorePath(parsed.storeId) : undefined;
-          if (parsed && storePath) {
-            const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
-            if (largePngBase64 && smallPngBase64) {
-              storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
-            }
+          storeFeatureCollection(storePath, plotUri, mapPanel.getCurrentFeatures());
+        } catch (err) {
+          console.warn('[debrief] features.geojson write failed (non-blocking):', err);
+        }
+      }
+
+      // Capture thumbnails after successful save (#174)
+      if (mapPanel && parsed && storePath) {
+        try {
+          const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
+          if (largePngBase64 && smallPngBase64) {
+            storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
           }
         } catch (err) {
           console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);

@@ -8,15 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// #233 — Re-suspended pending #142. After #210 un-fixme'd this suite,
-// the underlying openvscode-server webview-frame-resolution flakiness
-// (#142 research sprint) kept causing `Webview frame with content
-// "[data-testid=\"log-panel\"]" not found after 15000ms` errors in CI.
-// Every PR touching any webview code inherited the failure. The fix is
-// owned by #142 (root-cause investigation); this `.fixme` is a temporary
-// mute so unrelated PRs can land. See `specs/233-resuspend-log-panel-e2e/`
-// for the un-mute recipe once #142 resolves.
-test.describe.fixme('Log Panel', () => {
+test.describe('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,
