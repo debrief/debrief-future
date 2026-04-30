@@ -31,30 +31,59 @@ import {
  * Returns HTML for all available webview bundles so that any
  * webview-ready event gets appropriate content.
  *
- * The queue order matters: first webview-ready gets [0], second gets [1], etc.
- * In typical usage:
- * - Sidebar reveal → activity panel (first)
- * - Plot open → map view (second)
+ * The queue is consumed in order (queueIndex 0, 1, 2, ...) and falls
+ * back to the LAST item once exhausted. With Patch 3 active, webviews
+ * are disposed and re-created during the lifecycle, so each user
+ * interaction can produce several webview-ready events. The fallback
+ * therefore matters as much as the head-of-queue.
+ *
+ * Queue ordering:
+ * 1. activityPanel — first sidebar webview when Debrief container reveals
+ * 2. mapView       — editor webview when a plot opens
+ * 3. resultsPanel  — bottom panel webview when results focus
+ * 4. logPanel      — sidebar webview in the separate Debrief Log
+ *                    container; also acts as the post-exhaustion
+ *                    fallback for tests that re-mount webviews many
+ *                    times (e.g. test-log-panel) so the LogPanel UI
+ *                    eventually renders into a discoverable iframe.
  */
 function buildContentQueue(): Array<{ html: string; allowScripts: boolean }> {
   const queue: Array<{ html: string; allowScripts: boolean }> = [];
 
-  // Activity panel is the most common first webview (sidebar)
+  // Activity panel is the most common first webview (Debrief sidebar
+  // reveal — covers test-activity-panel-sections,
+  // test-activity-panel-screenshot, test-storyboard-panel-screenshot).
+  // Tests that need a different bundle as their first webview-ready
+  // (test-log-panel opens a plot first, so its first iframe is the
+  // editor's MapPanel) use the page-object helpers'
+  // _forceDeliver*Content() routines to overwrite the queue's
+  // assignment via the stashed port reference.
   if (hasWebviewBundle('activityPanel')) {
     queue.push({ html: generateWebviewHtml('activityPanel'), allowScripts: true });
   }
 
-  // Map view is typically the second webview (opened via STAC tree)
+  // Map view is typically the second webview (opened via STAC tree).
   if (hasWebviewBundle('mapView')) {
     queue.push({ html: generateWebviewHtml('mapView'), allowScripts: true });
   }
 
-  // Results panel is the panel-area webview (Feature: 178).  It is
-  // typically the third webview to fire `webview-ready` — after the
-  // activity panel and the map view.  Added to the queue so tests that
-  // reveal the Debrief Results panel get real bundle content injected.
+  // Results panel is the panel-area webview (Feature: 178).  Added to
+  // the queue so tests that reveal the Debrief Results panel get real
+  // bundle content injected.
   if (hasWebviewBundle('resultsPanel')) {
     queue.push({ html: generateWebviewHtml('resultsPanel'), allowScripts: true });
+  }
+
+  // Log panel lives in the separate `debrief-log` activity-bar
+  // container.  Placed last so that (a) when a test reveals the
+  // Debrief Log container after activity/map/results have already
+  // mounted the 4th webview-ready receives the logPanel bundle, and
+  // (b) it becomes the post-exhaustion fallback — every subsequent
+  // re-mount during the test lifecycle gets logPanel content,
+  // ensuring at least one frame exposes `[data-testid="log-panel"]`
+  // for `findWebviewFrameByContent` to discover.  See feature 233.
+  if (hasWebviewBundle('logPanel')) {
+    queue.push({ html: generateWebviewHtml('logPanel'), allowScripts: true });
   }
 
   return queue;
@@ -82,6 +111,20 @@ export const test = base.extend<{
     if (contentQueue.length > 0) {
       await installMultiWebviewInterceptor(page, contentQueue);
     }
+
+    // Stash bundle HTML by name on `window.__webviewBundles` so the
+    // page-object helpers (`getLogPanelFrame`, `getWebviewFrame`) can
+    // re-deliver the right bundle into a specific iframe whose
+    // queue-assigned content was wrong.  See feature 233 fix for the
+    // index-vs-iframe-identity race documented in
+    // tests/e2e/helpers/webview-injector.ts.
+    const bundleMap: Record<string, string> = {};
+    for (const name of ['mapView', 'activityPanel', 'resultsPanel', 'logPanel'] as const) {
+      if (hasWebviewBundle(name)) bundleMap[name] = generateWebviewHtml(name);
+    }
+    await page.evaluate((map) => {
+      (window as any).__webviewBundles = map;
+    }, bundleMap);
 
     await use(csPage);
   },
