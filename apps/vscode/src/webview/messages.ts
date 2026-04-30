@@ -46,6 +46,13 @@ export interface LoadPlotMessage {
     bbox: [number, number, number, number];
     timeExtent: [string, string];
   };
+  /**
+   * When true (or omitted, for back-compat), the webview refits the
+   * map to the plot's bbox. Set to `false` for in-place feature updates
+   * (e.g. Scene capture appending a STORYBOARD_SCENE feature) where the
+   * user's current pan/zoom must be preserved.
+   */
+  refitBounds?: boolean;
 }
 
 /** Set the current selection (from external source like Outline click) */

@@ -109,7 +109,13 @@ function MapViewApp(): React.ReactElement {
         case 'loadPlot':
           setPlotFeatures(msg.plot.features);
           setResultFeatures([]);
-          setFitBoundsTrigger(prev => prev + 1);
+          // Only refit when the host explicitly requests it (default true
+          // for back-compat). In-place feature updates — e.g. Scene
+          // capture sending a `setFeatures` reload — pass `refitBounds:
+          // false` to preserve the user's pan/zoom.
+          if (msg.refitBounds !== false) {
+            setFitBoundsTrigger(prev => prev + 1);
+          }
           break;
         case 'setSelection':
           setSelectedIds(new Set(msg.featureIds));

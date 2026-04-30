@@ -120,13 +120,18 @@ export function SceneRow({
         display: 'flex',
         gap: 8,
         padding: 6,
+        marginBottom: 6,
         alignItems: 'flex-start',
         cursor: isPending ? 'default' : 'pointer',
         opacity: isPending ? 0.6 : 1,
+        // Card border so adjacent Scenes are visually separated even when
+        // the captured thumbnail has a white/light background.
+        border: '1px solid var(--vscode-widget-border, var(--vscode-panel-border, #3c3c3c))',
+        borderRadius: 4,
         outline: active ? '2px solid var(--vscode-focusBorder, #007acc)' : 'none',
         background: active
           ? 'var(--vscode-list-activeSelectionBackground, rgba(0, 122, 204, 0.15))'
-          : 'transparent',
+          : 'var(--vscode-editorWidget-background, transparent)',
       }}
     >
       {onExpandToggle !== undefined && !isPending && (
