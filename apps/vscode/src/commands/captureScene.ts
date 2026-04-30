@@ -10,6 +10,8 @@
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ulid } from 'ulid';
 import {
   createStoryboard,
@@ -64,6 +66,10 @@ export interface CaptureCommandDeps {
     largePngBase64: string,
     smallPngBase64: string,
   ) => Promise<WriteSceneThumbnailResult>;
+  readonly writeFeatureCollection?: (
+    stacItemPath: string,
+    features: DebriefFeature[],
+  ) => Promise<void>;
   readonly generateUlid?: () => string;
   readonly now?: () => string;
   readonly logError?: (line: string) => void;
@@ -94,9 +100,21 @@ interface ResolvedDeps {
   setStatusBarMessage: NonNullable<CaptureCommandDeps['setStatusBarMessage']>;
   executeCommand: NonNullable<CaptureCommandDeps['executeCommand']>;
   writeSceneThumbnail: NonNullable<CaptureCommandDeps['writeSceneThumbnail']>;
+  writeFeatureCollection: NonNullable<CaptureCommandDeps['writeFeatureCollection']>;
   generateUlid: () => string;
   now: () => string;
   logError: (line: string) => void;
+}
+
+async function defaultWriteFeatureCollection(
+  stacItemPath: string,
+  features: DebriefFeature[],
+): Promise<void> {
+  const fc = { type: 'FeatureCollection' as const, features };
+  await fs.writeFile(
+    path.join(stacItemPath, 'features.geojson'),
+    `${JSON.stringify(fc, null, 2)}\n`,
+  );
 }
 
 function resolveDeps(input: CaptureCommandDeps | undefined): ResolvedDeps {
@@ -110,6 +128,8 @@ function resolveDeps(input: CaptureCommandDeps | undefined): ResolvedDeps {
       i.setStatusBarMessage ?? vscode.window.setStatusBarMessage,
     executeCommand: i.executeCommand ?? vscode.commands.executeCommand,
     writeSceneThumbnail: i.writeSceneThumbnail ?? writeSceneThumbnail,
+    writeFeatureCollection:
+      i.writeFeatureCollection ?? defaultWriteFeatureCollection,
     generateUlid: i.generateUlid ?? ((): string => ulid()),
     now: i.now ?? ((): string => new Date().toISOString()),
     logError: i.logError ?? ((line: string): void => console.error(line)),
@@ -289,6 +309,7 @@ async function captureSceneInner(
       // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       result.plot.features as unknown as DebriefFeature[],
     );
+    await persistFeatureCollection(context, deps, mapPanel.getCurrentFeatures());
     const withUndo = sessionStore.getState();
     withUndo.markDirty();
     void deps.executeCommand('debrief.storyboardPanel.focus');
@@ -304,6 +325,33 @@ async function captureSceneInner(
       'Capture failed — unexpected error. See Debrief output channel for details.',
     );
     return { status: 'rejected', reason: 'unexpected', error: err };
+  }
+}
+
+/**
+ * Eagerly persist the post-create FeatureCollection to features.geojson so
+ * the captured Storyboard / Scene survives a reload without requiring the
+ * user to run "Save Session" first. Mirrors the eager scene-PNG write that
+ * already happened in step 8.
+ *
+ * Best-effort: write failures are logged + surfaced as a non-modal warning,
+ * but do not roll back the in-memory capture (the user can retry via Save
+ * Session, and the scene PNG is already on disk).
+ */
+async function persistFeatureCollection(
+  context: CaptureCommandContext,
+  deps: ResolvedDeps,
+  features: DebriefFeature[],
+): Promise<void> {
+  try {
+    await deps.writeFeatureCollection(context.stacItemPath, features);
+  } catch (err) {
+    deps.logError(
+      `[captureScene] features.geojson write failed: ${stringifyError(err)}`,
+    );
+    void vscode.window.showWarningMessage(
+      'Scene captured, but features.geojson could not be written. Run Save Session to retry.',
+    );
   }
 }
 
@@ -413,6 +461,7 @@ async function retryCreateScene(
       // eslint-disable-next-line no-restricted-syntax -- #216: StoryboardPlotFeature ↔ DebriefFeature boundary — both are GeoJSON Features (see ADR-019).
       result.plot.features as unknown as DebriefFeature[],
     );
+    await persistFeatureCollection(context, deps, context.mapPanel.getCurrentFeatures());
     const withUndo = context.sessionStore.getState();
     withUndo.markDirty();
     void deps.executeCommand('debrief.storyboardPanel.focus');
