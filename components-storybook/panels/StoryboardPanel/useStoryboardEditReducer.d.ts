@@ -1,4 +1,4 @@
-import { SceneEditViewModel, SceneRowViewModel, StoryboardEditViewModel, StoryboardOptionViewModel, TransportViewModel } from './types';
+import { CollisionBannerViewModel, NamingRowViewModel, SceneEditViewModel, SceneRowViewModel, StoryboardEditViewModel, StoryboardOptionViewModel, TransportViewModel } from './types';
 
 export interface UndoToastDescriptor {
     readonly sceneId: string;
@@ -19,6 +19,35 @@ export interface StaleFlagEntry {
  * one of the four explicit values via `vsCodeBodyClassSource`.
  */
 export type ThemeVariant = 'light' | 'dark' | 'high-contrast-light' | 'high-contrast-dark';
+/**
+ * Host-pushed first-capture naming-row state slice (#235 contract §A).
+ *
+ * Non-null + `visible:true` → host has a capture command in flight that
+ * needs the analyst to confirm a Storyboard name. The reducer owns the
+ * panel-local `pendingName` typing state on top of this push slice.
+ */
+export interface NamingRowReducerState {
+    readonly visible: boolean;
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+    /** Panel-local typing state — initialised from `defaultName` when the
+     *  slice first becomes visible, then driven by the analyst's keystrokes. */
+    readonly pendingName: string;
+}
+/**
+ * Host-pushed duplicate-timestamp collision-banner state slice
+ * (#235 contract §A).
+ */
+export interface CollisionBannerReducerState {
+    readonly visible: boolean;
+    readonly conflictingSceneId: string;
+    readonly conflictingSceneTitle: string;
+    readonly originalTimestamp: string;
+    readonly proposedTimestamp: string;
+    readonly offsetCount: number;
+    readonly offsetWouldExceedTimeRange: boolean;
+    readonly cause: 'capture' | 'update-to-current';
+}
 export interface StoryboardEditReducerState {
     readonly sceneRows: readonly SceneRowViewModel[];
     readonly activeStoryboardId: string | null;
@@ -35,6 +64,33 @@ export interface StoryboardEditReducerState {
     readonly editFormOpenFor: string | null;
     readonly overflowMenuOpenFor: string | null;
     readonly overflowMenuAnchorRect: DOMRect | null;
+    readonly namingRow: NamingRowReducerState | null;
+    readonly collisionBanner: CollisionBannerReducerState | null;
+}
+/**
+ * Push slice for the first-capture naming row (#235 contract §A —
+ * `NamingRowPushState`). Mirrors `NamingRowReducerState` minus the
+ * panel-local `pendingName`, which is initialised by the reducer when the
+ * slice first becomes visible.
+ */
+export interface NamingRowPushState {
+    readonly visible: boolean;
+    readonly defaultName: string;
+    readonly knownNames: readonly string[];
+}
+/**
+ * Push slice for the duplicate-timestamp collision banner (#235 contract
+ * §A — `CollisionBannerPushState`).
+ */
+export interface CollisionBannerPushState {
+    readonly visible: boolean;
+    readonly conflictingSceneId: string;
+    readonly conflictingSceneTitle: string;
+    readonly originalTimestamp: string;
+    readonly proposedTimestamp: string;
+    readonly offsetCount: number;
+    readonly offsetWouldExceedTimeRange: boolean;
+    readonly cause: 'capture' | 'update-to-current';
 }
 /**
  * Payload shapes that the scenes / snapshot messages deliver. Keeping the
@@ -48,6 +104,8 @@ export interface ScenesPayload {
     readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
     readonly pendingUndoToast?: UndoToastDescriptor | null;
     readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+    readonly namingRow?: NamingRowPushState | null;
+    readonly collisionBanner?: CollisionBannerPushState | null;
 }
 export interface SnapshotPayload {
     readonly storyboards: readonly StoryboardOptionViewModel[];
@@ -59,6 +117,8 @@ export interface SnapshotPayload {
     readonly sceneEditViewModels?: Readonly<Record<string, SceneEditViewModel>>;
     readonly pendingUndoToast?: UndoToastDescriptor | null;
     readonly storyboardEditViewModel?: StoryboardEditViewModel | null;
+    readonly namingRow?: NamingRowPushState | null;
+    readonly collisionBanner?: CollisionBannerPushState | null;
 }
 export type StoryboardEditAction = {
     readonly type: 'scenes-message';
@@ -94,6 +154,20 @@ export type StoryboardEditAction = {
     readonly anchorRect: DOMRect;
 } | {
     readonly type: 'overflow-menu-close';
+} | {
+    readonly type: 'naming-row-text-changed';
+    readonly pendingName: string;
+} | {
+    readonly type: 'naming-row-confirm-requested';
+} | {
+    readonly type: 'naming-row-cancel-requested';
+} | {
+    readonly type: 'collision-replace-requested';
+    readonly conflictingSceneId: string;
+} | {
+    readonly type: 'collision-offset-requested';
+} | {
+    readonly type: 'collision-cancel-requested';
 };
 export declare function createInitialStoryboardEditState(overrides?: Partial<StoryboardEditReducerState>): StoryboardEditReducerState;
 export declare function storyboardEditReducer(state: StoryboardEditReducerState, action: StoryboardEditAction): StoryboardEditReducerState;
@@ -115,15 +189,36 @@ export declare function storyboardEditReducer(state: StoryboardEditReducerState,
  * `__tests__/composeSceneEditViewModels.perf.test.ts`.**
  */
 export declare function composeSceneEditViewModels(state: StoryboardEditReducerState): Readonly<Record<string, SceneEditViewModel>>;
+/**
+ * Maximum Offset (+1 s) press count before the panel hides the Offset
+ * button (FR-CAP-017a / data-model §CollisionBannerState invariants).
+ */
+export declare const COLLISION_OFFSET_CAP = 60;
+/**
+ * Project the reducer's `namingRow` slice into a presentational view-model.
+ * Inline duplicate-name detection runs on the trimmed `pendingName`
+ * against the host-supplied `knownNames`.
+ */
+export declare function composeNamingRowViewModel(state: StoryboardEditReducerState): NamingRowViewModel;
+/**
+ * Project the reducer's `collisionBanner` slice into a presentational
+ * view-model. The DTG label is computed lazily when a non-null formatter
+ * is supplied; callers that don't care (e.g. the test suite) can pass
+ * `undefined` and read `proposedTimestamp` directly.
+ */
+export declare function composeCollisionBannerViewModel(state: StoryboardEditReducerState, formatDtg?: (iso: string) => string): CollisionBannerViewModel;
 export interface StoryboardEditReducerHandle {
     readonly state: StoryboardEditReducerState;
     readonly dispatch: (action: StoryboardEditAction) => void;
     readonly sceneEditViewModels: Readonly<Record<string, SceneEditViewModel>>;
+    readonly namingRowViewModel: NamingRowViewModel;
+    readonly collisionBannerViewModel: CollisionBannerViewModel;
     readonly toggleExpandRow: (sceneId: string) => void;
     readonly closeEditForm: () => void;
     readonly openOverflowMenu: (sceneId: string, anchorRect: DOMRect) => void;
     readonly closeOverflowMenu: () => void;
     readonly dismissUndoToast: () => void;
+    readonly setNamingRowPendingName: (pendingName: string) => void;
 }
 export declare function useStoryboardEditReducer(initialOverrides?: Partial<StoryboardEditReducerState>): StoryboardEditReducerHandle;
 //# sourceMappingURL=useStoryboardEditReducer.d.ts.map

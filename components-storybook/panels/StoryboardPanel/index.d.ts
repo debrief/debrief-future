@@ -18,9 +18,13 @@ export { StaleBadge } from './StaleBadge';
 export type { StaleBadgeProps } from './StaleBadge';
 export { SceneOverflowMenu } from './SceneOverflowMenu';
 export type { SceneOverflowMenuProps, SceneOverflowMenuItem, SceneOverflowAction, } from './SceneOverflowMenu';
-export type { StoryboardPanelProps, SceneRowViewModel, StoryboardOptionViewModel, TransportViewModel, MissingDataReason, SceneEditViewModel, StoryboardEditViewModel, } from './types';
-export { useStoryboardEditReducer, storyboardEditReducer, createInitialStoryboardEditState, composeSceneEditViewModels, } from './useStoryboardEditReducer';
-export type { StoryboardEditAction, StoryboardEditReducerState, StoryboardEditReducerHandle, ScenesPayload, SnapshotPayload, UndoToastDescriptor, StaleFlagEntry, ThemeVariant, } from './useStoryboardEditReducer';
+export type { StoryboardPanelProps, SceneRowViewModel, StoryboardOptionViewModel, TransportViewModel, MissingDataReason, SceneEditViewModel, StoryboardEditViewModel, NamingRowViewModel, CollisionBannerViewModel, } from './types';
+export { useStoryboardEditReducer, storyboardEditReducer, createInitialStoryboardEditState, composeSceneEditViewModels, composeNamingRowViewModel, composeCollisionBannerViewModel, COLLISION_OFFSET_CAP, } from './useStoryboardEditReducer';
+export type { StoryboardEditAction, StoryboardEditReducerState, StoryboardEditReducerHandle, ScenesPayload, SnapshotPayload, UndoToastDescriptor, StaleFlagEntry, ThemeVariant, NamingRowReducerState, CollisionBannerReducerState, NamingRowPushState, CollisionBannerPushState, } from './useStoryboardEditReducer';
+export { NamingRow } from './NamingRow';
+export type { NamingRowProps } from './NamingRow';
+export { CollisionBanner } from './CollisionBanner';
+export type { CollisionBannerProps } from './CollisionBanner';
 export { useStoryOnlyMockHandlers, } from './__testing__/storyOnlyMockHandlers';
 export type { MockPortKnobs, MockHandlers, MockHandlersFixture, MockHandlersInitial, MockHandlersHandle, MockOutboundRecorder, UseStoryOnlyMockHandlersOptions, } from './__testing__/storyOnlyMockHandlers';
 //# sourceMappingURL=index.d.ts.map
