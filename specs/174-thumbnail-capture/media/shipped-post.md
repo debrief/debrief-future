@@ -1,14 +1,14 @@
 ---
 layout: future-post
 title: "Shipped: Thumbnail Capture and Gallery Preview"
-date: 2026-03-30
+date: 2026-05-01
 track: [credibility]
 author: Ian
 reading_time: 4
 feature: 174-thumbnail-capture
 epic: E08
 tags: [stac, catalog-browser, thumbnails, discovery]
-excerpt: "Save a plot and get a persistent PNG thumbnail; browse your catalog gallery with arrow-key navigation."
+excerpt: "Save a plot and get a persistent PNG thumbnail; browse your catalog gallery by clicking through the filtered list."
 ---
 
 ## What We Built
@@ -17,7 +17,19 @@ When you save a plot now, the system captures the current map view as a PNG — 
 
 ![Catalog browser gallery preview pane showing the large thumbnail alongside the filtered list](../evidence/screenshots/preview-panel.png)
 
-The catalog browser has a new gallery preview pane. Click a plot in the list and the large thumbnail appears on the right. Press the arrow keys to move through filtered results. Single-click previews; double-click opens. For existing plots created before this feature landed, a Playwright-based backfill script automates the web-shell to open each plot, fit the view to visible features, wait for tiles, and capture.
+The catalog browser has an inline gallery preview. Click a plot in the list and the large thumbnail slots in beside it, with the metadata panel on the right. Click the next item and the preview updates immediately — no separate panel to manage, no opening individual plots just to scan a few. Single-click previews; double-click opens.
+
+![Clicking through items in the catalog list — the inline thumbnail and properties panel update on each selection](../evidence/screenshots/interaction.gif)
+
+For existing plots created before this feature landed, a Playwright-based backfill script automates the web-shell to open each plot, fit the view to visible features, wait for tiles, and capture.
+
+## Across Themes
+
+The catalog browser respects the host VS Code theme — light, dark, and high-contrast all carry through to the list, the highlighted-row treatment, and the splitter chrome.
+
+![Catalog browser preview pane in the light theme](../evidence/screenshots/thumbnailpreview-light.png)
+![Catalog browser preview pane in the dark theme](../evidence/screenshots/thumbnailpreview-dark.png)
+![Catalog browser preview pane in the high-contrast theme](../evidence/screenshots/thumbnailpreview-vscode.png)
 
 ![Catalog list view with raster thumbnails rendered inline for every sample plot](../evidence/screenshots/welcome-thumbnails.png)
 
@@ -58,9 +70,11 @@ The count check — `plots with thumbnail.png / total plots = 73/73`, and the sa
 
 ## What's Next
 
-The E2E tests are written and running locally but aren't yet wired into CI — that needs a Playwright setup step in the workflow. The backfill script hasn't been exercised against a full production-sized catalog yet; performance at scale is still an open question.
+The backfill script hasn't been exercised against a full production-sized catalog yet; performance at scale is still an open question.
 
 The thumbnail staleness question from the planning post remains open. Right now, saving overwrites. We're watching whether analysts actually notice or care about stale previews before adding any staleness indicator.
+
+The ThumbnailPreview chrome itself uses a `--co-*` token convention that isn't yet bound by ThemeProvider — the surrounding panel re-themes correctly but the thumbnail surround stays dark across all variants. Tracked as a follow-up; doesn't affect the captured thumbnail content.
 
 → [See the spec](../spec.md)
 → [Sample item.json with thumbnail assets](../evidence/sample-item.json)
