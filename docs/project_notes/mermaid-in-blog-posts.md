@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-26
 **Branch:** `claude/research-mermaid-diagrams-0gl5e`
-**Status:** ✅ **Verified end-to-end on 2026-04-26.** Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout) is live. The cycle was tested by publishing a meta-post via `/publish-future-post` from `specs/999-mermaid-blog-rendering/`; owner confirmed the embedded `flowchart LR` renders as a real diagram on `debrief.github.io`. Layout patch shipped as [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90). Decision recorded as ADR-026 in `docs/project_notes/decisions.md`. Staged patch retained under `docs/project_notes/mermaid-website-patch/` for reference.
+**Status:** ✅ **Verified end-to-end on 2026-04-26.** Option A1 (CDN-loaded `mermaid.js` in the `future-post` layout) is live. The cycle was tested by publishing a meta-post via `/publish-future-post` from `specs/239-mermaid-blog-rendering/` (originally numbered `999` as a sentinel; renumbered 2026-05-01); owner confirmed the embedded `flowchart LR` renders as a real diagram on `debrief.github.io`. Layout patch shipped as [debrief/debrief.github.io#90](https://github.com/debrief/debrief.github.io/pull/90). Decision recorded as ADR-026 in `docs/project_notes/decisions.md`. Staged patch retained under `docs/project_notes/mermaid-website-patch/` for reference.
 **Scope:** Posts shipped to `debrief.github.io/_posts/` via `/speckit.pr` → `/publish`
 
 ## TL;DR
