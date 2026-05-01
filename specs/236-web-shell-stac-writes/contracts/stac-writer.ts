@@ -211,19 +211,14 @@ export interface StacWriter {
   ): Promise<WriteSceneThumbnailPairResult>;
   deleteItem(input: DeleteItemInput): Promise<DeleteItemResult>;
   deleteAsset(input: DeleteAssetInput): Promise<DeleteAssetResult>;
-
-  /**
-   * Subscribe to "item changed" events. Web-shell adaptor wires this
-   * to BroadcastChannel for cross-tab updates. VS Code adaptor's
-   * implementation is a no-op subscription (nothing else writes the
-   * catalog directory in-process).
-   *
-   * Returns an unsubscribe function.
-   */
-  subscribe(
-    listener: (event: { itemPath: string; kind: 'changed' | 'deleted' }) => void,
-  ): () => void;
 }
+
+// Cross-tab notification (BroadcastChannel) is intentionally NOT on this
+// interface. It's a host-specific concern: the web-shell adaptor's
+// catalogReadView listens to `BroadcastChannel('debrief-stac-writer-v1')`
+// directly; VS Code has no equivalent. Keeping it off the interface
+// prevents host-shaped semantics leaking into a contract that promises
+// not to expose them (FR-020).
 
 // ─── Pure overlay-merge helper (browser-safe, used by both hosts) ───────────
 

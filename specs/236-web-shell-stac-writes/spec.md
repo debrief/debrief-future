@@ -129,6 +129,7 @@ An analyst draws a new track on the map, names it, and saves. The new STAC item 
 **Constitutional change**
 
 - **FR-024**: The project constitution MUST be amended (Article IV.4) to formalise the persistence-host abstraction: frontends may persist data only via the unified writer interface, and browser-native stores (IndexedDB, OPFS, File System Access API) qualify as a persistence backend only when accessed through that abstraction. The amendment MUST be merged before, or as part of, this feature's implementation PR.
+- **FR-025**: ESLint rules MUST machine-enforce Article IV.4. Specifically: (a) `node:fs`/`fs` imports MUST be forbidden under `apps/web-shell/**`; (b) the globals `indexedDB`, `localStorage`, `sessionStorage`, and `caches` MUST be forbidden outside the host-adaptor files (`apps/web-shell/src/services/stacWriterIdb.ts` and `apps/web-shell/src/services/stacWriterCapability.ts`). The rule MUST live in `shared/eslint-rules/` and run as part of the existing `task lint` step. PRs that violate the rule MUST fail CI.
 
 ### Key Entities
 

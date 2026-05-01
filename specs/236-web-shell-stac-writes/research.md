@@ -172,7 +172,7 @@ Update the constitution's **Sync Impact Report** comment:
 **Decision**: Strangler-fig migration in three commits (revised for IndexedDB):
 
 1. Land `shared/stac-writer/` (interface + types + errors + overlay-merge functions) and `apps/vscode/src/services/stacWriterFs.ts` (Node-fs adaptor — extracted from existing scene-thumbnail and update-metadata code paths). Both hosts still use their existing inline implementations. The new package and adaptor are tested but unused in production paths.
-2. Switch VS Code's `sceneThumbnailService.writeSceneThumbnail` and `stacService.updateItemMetadataSync` to delegate to `stacWriterFs`. Existing test suites (`apps/vscode/tests/unit/`) continue to pass against the same observable behaviour. **Web-shell still session-only.**
+2. Switch VS Code's `sceneThumbnailService.writeSceneThumbnail` and `stacService.updateItemMetadataSync` to delegate to `stacWriterFs`. **In the same commit**, both `apps/vscode/src/services/stacService.ts` and `apps/web-shell/src/mocks/stacService.ts` delete their local `StacItem` and `PropertiesProvenanceEntry` declarations and import them from `@debrief/stac-writer` (review 2A — single source of truth). Existing test suites (`apps/vscode/tests/unit/`) continue to pass against the same observable behaviour. **Web-shell still session-only.**
 3. Ship `apps/web-shell/src/services/stacWriterIdb.ts`, the catalog read view's overlay merge, the capability check, and the `BroadcastChannel` listener. Switch `webSceneThumbnailAdapter` and `mocks/stacService.ts` to call them. Add Playwright reload-survival tests against the static build. Constitution amendment IV.4 lands in this commit.
 
 **Rationale**:
@@ -185,6 +185,28 @@ Update the constitution's **Sync Impact Report** comment:
 
 ---
 
+## R-009 — ESLint enforcement of Article IV.4 (review 3A)
+
+**Decision**: Add a custom rule to `shared/eslint-rules/` (the project's existing custom-ESLint home) named `no-direct-persistence-in-frontend.js`. Wire it into the existing ESLint config so it runs as part of `task lint`.
+
+The rule enforces two checks:
+
+1. **`no-restricted-imports`** — `node:fs` and `fs` imports are forbidden under `apps/web-shell/**`. Catches the obvious "developer accidentally imports Node fs into browser code" failure mode.
+2. **`no-restricted-globals`** — `indexedDB`, `localStorage`, `sessionStorage`, and `caches` are forbidden outside the explicit host-adaptor files: `apps/web-shell/src/services/stacWriterIdb.ts` and `apps/web-shell/src/services/stacWriterCapability.ts`. The capability probe legitimately needs `globalThis.indexedDB` for feature detection; everywhere else routes through the writer interface.
+
+**Rationale**:
+- Article IV.4 codifies "the writer abstraction is the persistence boundary". Without enforcement, the principle is theatrical — a future PR can add direct `localStorage.setItem(...)` and the constitution provides no guard. ESLint catches it at lint time, before it ships.
+- The project already has `shared/eslint-rules/`; cost is one new rule file (~30 LOC) plus three lines in the root ESLint config to wire it in. Article IX is satisfied — no new dependency, just an additional rule using the existing ESLint plumbing.
+- "PR review only" (Issue #3 Option C) was rejected: Article XIII requires PR review *as well as* CI checks, not as a substitute. Article VI ("untested code is broken code") extends to "unenforced principles are theatrical principles".
+
+**Alternatives considered**:
+- **CI-only grep script** (Issue #3 Option B) — rejected. Brittle (false positives on string literals containing `localStorage`), slower feedback (CI vs editor), no IDE integration.
+- **Trust PR review** (Issue #3 Option C) — rejected, see above.
+
+**Future maintenance**: when a new host adaptor is added (e.g. OPFS, mobile), its file path joins the `no-restricted-globals` allow-list. One-line change. Same for any new browser-native store the rule should police (`localFile?`, future `Storage Buckets API`).
+
+---
+
 ## Open questions
 
-None remaining. All design decisions either fixed by the spec, locked by Q1/Q2/Q3 user decisions, or resolved above.
+None remaining. All design decisions either fixed by the spec, locked by Q1/Q2/Q3 user decisions, or resolved above. Review 1A/2A/3A/4A folded back into the artefacts.

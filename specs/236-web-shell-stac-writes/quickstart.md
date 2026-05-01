@@ -142,7 +142,7 @@ The database is per-origin per-browser-profile, so you don't pollute across runs
 
 ## Common gotchas
 
-- **`URL.createObjectURL` lifecycle** — the catalog read view holds an LRU of object URLs (cap 200). Don't bypass it: every `<img src="idb:...">` MUST go through the read view's resolver. Direct `URL.createObjectURL` on a blob you read yourself will leak.
+- **`URL.createObjectURL` lifecycle** — `<img>` consumers MUST go through the `useResolvedAssetHref(href)` hook (lives in `apps/web-shell/src/services/useResolvedAssetHref.ts`). The hook owns the LRU (cap 200) and the revoke lifecycle. Direct `URL.createObjectURL` on a blob you read yourself will leak. The catalog read view emits `idb:` synthetic hrefs unresolved — eager resolution would make list re-render O(catalog) instead of O(visible).
 - **Private/incognito mode** — most browsers refuse IndexedDB or make it ephemeral. Capability check catches this; tests run in normal mode.
 - **Storage eviction** — Chrome auto-evicts unpartitioned storage after 30+ days of inactivity unless `navigator.storage.persist()` was granted. The writer requests it on first write, but the user can deny. Eviction is transparent to the writer (just looks like an empty database next time).
 - **Transaction lifetime** — IndexedDB transactions auto-commit when the JS event loop empties between `idb` calls. Don't `await` non-IDB work inside a transaction (e.g. don't `await fetch(...)` between two `tx.objectStore(...).put(...)` calls). The cross-adaptor test suite has a regression test for this.

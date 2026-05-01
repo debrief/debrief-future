@@ -30,7 +30,7 @@ Replace `apps/web-shell/src/services/webSceneThumbnailAdapter.ts`'s session-only
 | **I. Defence-Grade Reliability** | ✅ Pass | Pure browser-side persistence. No network. Errors structured (FR-017), no silent paths. Capability check (FR-021) catches IndexedDB-unavailable up-front. |
 | **II. Schema Integrity** | ✅ Pass | No new master schemas. Writer treats item records as opaque-with-known-keys; existing LinkML-derived types unchanged. |
 | **III. Data Sovereignty** | ✅ Pass | Provenance log carried through `patchItem` is preserved. Source assets never modified — bundled items are read-only by FR-007; IndexedDB writes never touch bundled bytes. Data stays local — IndexedDB is per-origin per-device, no telemetry. |
-| **IV. Architectural Boundaries** | ⚠️ **Amendment in flight** (FR-024) | The strict reading of IV.2 ("frontends never persist") is incompatible with browser-native persistence. Article IV.4 amendment formalises that browsers may persist *behind the unified writer abstraction* — the abstraction is the persistence boundary, not the host. Constitution patch is part of this PR. |
+| **IV. Architectural Boundaries** | ⚠️ **Amendment in flight + ESLint enforcement** (FR-024, FR-025) | The strict reading of IV.2 ("frontends never persist") is incompatible with browser-native persistence. Article IV.4 amendment formalises that browsers may persist *behind the unified writer abstraction* — the abstraction is the persistence boundary, not the host. Machine-enforced via ESLint rules in `shared/eslint-rules/` (review 3A) so the amendment isn't paper-only. Constitution patch is part of this PR. |
 | **V. Extensibility** | ✅ Pass | One interface, two adaptors. Future host (mobile, OPFS, server-backed) is a new adaptor, not a refactor. Broken adaptor in one host cannot crash the other. |
 | **VI. Testing** | ✅ Pass | Plan mandates parametrised cross-adaptor unit suite (Phase 1.5), plus dedicated Playwright capture-and-reload against the static build. |
 | **VII. TDD-AI** | ✅ Pass | Spec acceptance scenarios map to vitest + Playwright assertions; checklist gated. |
@@ -77,29 +77,34 @@ shared/stac-writer/                            # NEW — browser-safe types + in
 │   └── overlay.ts                             # Pure functions: mergeOverlay, dropBundledOnly
 └── tests/                                     # Type-only contract tests (no runtime)
 
-apps/web-shell/                                # MODIFIED — IndexedDB adaptor + capability check
+apps/web-shell/                                # MODIFIED — IndexedDB adaptor + capability check + cross-tab listener
 ├── src/
 │   ├── services/
 │   │   ├── stacWriterIdb.ts                   # NEW — IndexedDB implementation of StacWriter
 │   │   ├── stacWriterCapability.ts            # NEW — capability probe (`navigator.storage`, `indexedDB`)
 │   │   ├── webSceneThumbnailAdapter.ts        # MODIFIED — capture path delegates to stacWriterIdb; "Session-only" badge gated on capability report
-│   │   └── catalogReadView.ts                 # NEW — merge bundled catalog + IndexedDB overlay/items into a single read view
+│   │   ├── catalogReadView.ts                 # NEW — merge bundled catalog + IndexedDB overlay/items into a single read view; owns the BroadcastChannel('debrief-stac-writer-v1') listener directly (review 1A)
+│   │   └── useResolvedAssetHref.ts            # NEW — React hook that lazily resolves `idb:` synthetic hrefs to URL.createObjectURL blob URLs via the LRU; consumers call this per-render so resolution is O(visible) not O(catalog) (review 4A)
 │   ├── mocks/
-│   │   └── stacService.ts                     # MODIFIED — patch and getPlotData routes through stacWriterIdb + catalogReadView
-│   └── App.tsx                                # MODIFIED — wire the BroadcastChannel listener for cross-tab updates
+│   │   └── stacService.ts                     # MODIFIED — patch and getPlotData routes through stacWriterIdb + catalogReadView; deletes local StacItem declaration and imports from @debrief/stac-writer (review 2A)
+│   └── App.tsx                                # MODIFIED — wire the catalogReadView's BroadcastChannel subscription
 ├── playwright/tests/
-│   └── stac-writes.spec.ts                    # NEW — capture + reload + new-item + GeoJSON-overwrite + capability-failure
+│   └── stac-writes.spec.ts                    # NEW — capture + reload + new-item + GeoJSON-overwrite + capability-failure + cross-tab + LRU-eviction
 └── package.json                               # MODIFIED — add `idb`, `fake-indexeddb` (test only)
 
 apps/vscode/src/services/
 ├── stacWriterFs.ts                            # NEW — Node-fs implementation of StacWriter (extracted from sceneThumbnailService + stacService write methods)
 ├── sceneThumbnailService.ts                   # MODIFIED — body delegates to stacWriterFs; export shape unchanged for callers
-└── stacService.ts                             # MODIFIED — updateItemMetadataSync body delegates to stacWriterFs.patchItem; mtime conflict + provenance handling preserved
+└── stacService.ts                             # MODIFIED — updateItemMetadataSync body delegates to stacWriterFs.patchItem; mtime conflict + provenance handling preserved; deletes local StacItem and PropertiesProvenanceEntry declarations and imports from @debrief/stac-writer (review 2A)
+
+shared/eslint-rules/                           # MODIFIED — adds the IV.4 enforcement rules (review 3A)
+├── no-direct-persistence-in-frontend.js       # NEW — ESLint rule: no-restricted-imports for node:fs/fs in apps/web-shell/**; no-restricted-globals for indexedDB/localStorage/caches outside apps/web-shell/src/services/stacWriterIdb.ts and stacWriterCapability.ts
+└── README.md                                  # MODIFIED — document the new rule's intent (anchored to Article IV.4)
 
 CONSTITUTION.md                                # MODIFIED — Article IV.4 amended with persistence-host carve-out
 .specify/memory/constitution.md                # MODIFIED — synced
 
-docs/project_notes/decisions.md                # MODIFIED — new ADR recording the interface extraction + IndexedDB choice
+docs/project_notes/decisions.md                # MODIFIED — new ADR recording the interface extraction + IndexedDB choice + ESLint enforcement
 
 shared/components/                             # MODIFIED — only if the read view's overlay-merge needs a CatalogOverviewItem flag for "is bundled" provenance (TBD in Phase 1)
 ```

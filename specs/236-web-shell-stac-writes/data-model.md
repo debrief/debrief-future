@@ -252,10 +252,25 @@ Every read operation is its own `readonly` transaction. Catalog-list reads (call
 
 When the read view returns an item to the UI, it rewrites IndexedDB-backed asset hrefs to a stable pseudo-URL the UI's `<img>` tags can consume:
 
-- Bundled-only asset → unchanged: `./scene-thumbnails/scene-...png` resolved against the `/stac-store/` GET prefix.
-- IndexedDB-overlay asset → synthesised: `idb:exercise-alpha/scene-thumbnails/scene-XXX.png`. The browser doesn't know this URL scheme; the catalog read view resolves it by reading the blob and calling `URL.createObjectURL(blob)` lazily on demand.
+- Bundled-only asset → unchanged: `./scene-thumbnails/scene-...png` resolved against the `/stac-store/` GET prefix. Browser-native URL — no resolution step needed.
+- IndexedDB-overlay asset → synthesised: `idb:<itemPath>::<assetKey>` (e.g. `idb:exercise-alpha/item.json::scene-thumbnail-01HFA8...`). The browser doesn't know this URL scheme; resolution is **deferred to the consumer** (review 4A).
 
-The catalog read view holds a small LRU of resolved object URLs and revokes them when the parent item leaves the live view (avoids memory leaks).
+**Resolution: lazy via `useResolvedAssetHref` hook (review 4A)**.
+
+The catalog read view returns hrefs untouched — `idb:` synthetic for IndexedDB-backed assets, ordinary relative URLs for bundled-only assets. Consumers (typically `<img>` wrappers) call a small React hook:
+
+```ts
+function useResolvedAssetHref(href: string): string | null;
+```
+
+The hook:
+- Returns the input verbatim for non-`idb:` hrefs.
+- For `idb:` hrefs, consults a module-level LRU (cap 200). On hit, returns the cached blob URL. On miss, opens a `readonly` transaction against `assets`, reads the blob, calls `URL.createObjectURL(blob)`, inserts into the LRU, and returns the new URL.
+- Tracks reference counts via React's effect cleanup: when a consumer unmounts, the hook decrements the count; when it drops to zero AND the LRU is at capacity AND a newer entry needs the slot, the cached URL is `URL.revokeObjectURL`'d.
+
+**Why deferred**: catalog list re-renders fire on scroll, filter, sort. Eager resolution at list-build time means O(catalog) `getAll` + N `createObjectURL` calls per render. Deferred resolution makes render cost O(visible items) — bounded by viewport, not catalog size. At spec.md's operational ceiling (≤ 500 items) the difference is the gap between sub-100 ms p95 and noticeable jank.
+
+**LRU sizing**: cap of 200 entries. Empirically the active working set for a single open plot's panels is ≤ 50 entries; 200 covers two-three plot switches without churn. On eviction, `URL.revokeObjectURL` is called. If a `<img src>` element still holds a revoked URL, the browser shows a broken-image icon until React re-renders (which `useResolvedAssetHref` triggers via state update on revoke). Empirically harmless — the eviction floor is far above any single panel's working set, and the ≤ 1-frame broken-image flicker is invisible.
 
 ---
 

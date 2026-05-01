@@ -179,9 +179,10 @@ Sort order is preserved from the bundled catalog where applicable; standalone it
 ### Asset href synthesis (read-time)
 
 When the read view surfaces a merged item:
-- Bundled-only assets keep their relative `href` (`./scene-thumbnails/scene-X.png`). UI resolves them against `/stac-store/<itemDir>/`.
-- Overlay-added assets get a synthesised `href` of the form `idb:<itemPath>::<assetKey>`. The read view holds an LRU of `URL.createObjectURL(blob)` results; UI consumers see actual blob URLs that work in `<img src>` and `fetch`.
-- LRU cap: 200 entries. On eviction, `URL.revokeObjectURL` is called; if a UI element still has the URL in its DOM, it stops loading. Empirically harmless — the eviction floor (200 entries) is far above any single panel's working set.
+- Bundled-only assets keep their relative `href` (`./scene-thumbnails/scene-X.png`). UI resolves them against `/stac-store/<itemDir>/` natively.
+- Overlay-added assets get a synthesised `href` of the form `idb:<itemPath>::<assetKey>`. The read view does **not** resolve these eagerly.
+
+**Resolution is deferred to the consumer** via the `useResolvedAssetHref(href)` React hook (see data-model.md Layer 3 "Asset href synthesis"). The hook owns a module-level LRU (cap 200) of `URL.createObjectURL(blob)` results, lazily-populated on demand, with reference-counted cleanup on unmount. Render-time work is O(visible) not O(catalog) — load-bearing for the spec.md ≤ 100 ms p95 catalog read goal at the operational ceiling.
 
 ---
 
