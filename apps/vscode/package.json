@@ -830,6 +830,7 @@
     "@debrief/components": "workspace:*",
     "@debrief/schemas": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "@debrief/stac-writer": "workspace:*",
     "@debrief/utils": "workspace:*",
     "vscrui": "^0.1.0",
     "leaflet": "^1.9.4",
