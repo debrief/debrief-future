@@ -1,33 +1,21 @@
 <!--
   Sync Impact Report
   ====================
-  Version change: 0.0.0 (template) → 1.1.0
+  Version change: 1.2.0 → 1.3.0 (MINOR — new clause, no breaking change)
 
-  Modified principles: N/A (initial population from CONSTITUTION.md)
+  Modified principles: IV. Architectural Boundaries
+    - Added IV.4 "Persistence-host abstraction" — formalises that the
+      writer abstraction (not the host process) is the persistence
+      boundary, allowing browser-native stores (IndexedDB, OPFS, File
+      System Access API) to qualify as a persistence backend when
+      accessed through the unified writer interface. Machine-enforced
+      via ESLint (no-direct-persistence-in-frontend).
 
-  Added sections:
-    - Article I: Defence-Grade Reliability
-    - Article II: Schema Integrity
-    - Article III: Data Sovereignty
-    - Article IV: Architectural Boundaries
-    - Article V: Extensibility
-    - Article VI: Testing
-    - Article VII: Test-Driven AI Collaboration
-    - Article VIII: Documentation
-    - Article IX: Dependencies
-    - Article X: Security
-    - Article XI: Internationalisation
-    - Article XII: Community Engagement
-    - Article XIII: Contribution Standards
-    - Article XIV: Pre-Release Freedom
-    - Governance section
+  Earlier history: 0.0.0 (template) → 1.1.0 — initial population from
+  CONSTITUTION.md (Articles I–XIV + Governance).
 
-  Removed sections: None (template placeholders replaced)
-
-  Templates requiring updates:
-    - .specify/templates/plan-template.md: ✅ No changes needed (Constitution Check section is generic)
-    - .specify/templates/spec-template.md: ✅ No changes needed (requirements/testing aligned)
-    - .specify/templates/tasks-template.md: ✅ No changes needed (test-first pattern aligned)
+  Templates requiring updates: None (IV.4 restricts implementation
+  patterns; existing templates do not reference IV by clause).
 
   Follow-up TODOs: None
 -->
@@ -78,6 +66,7 @@ other guidance.
 1. **Services never touch UI** — Python services return data only. All display and interaction decisions belong to frontends.
 2. **Frontends never persist** — frontends orchestrate calls to services. All data writes go through services.
 3. **Services have zero MCP dependency** — domain logic lives in pure Python libraries. MCP wrappers are thin, replaceable layers.
+4. **Persistence-host abstraction.** Frontends may persist data only via the unified writer abstraction. Browser-native stores (IndexedDB, OPFS, File System Access API) qualify as a persistence backend **only** when accessed through this abstraction — frontends never own a divergent write code path. The writer abstraction is the persistence boundary; both Node-side hosts and browser-side hosts route their writes through it. Each host implements the abstraction once, against its native backend; the rest of the system depends only on the interface. Machine-enforced via ESLint (`no-direct-persistence-in-frontend`).
 
 ### V. Extensibility
 

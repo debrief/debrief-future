@@ -1,0 +1,13 @@
+
+> @debrief/web-shell@0.0.1 lint /home/user/debrief-future/apps/web-shell
+> eslint src --ext .ts,.tsx
+
+
+/home/user/debrief-future/apps/web-shell/src/sandbox-violation.ts
+  3:1   error  'fs' import is restricted from being used. Node `fs` is not available in the browser. Route persistence through `@debrief/stac-writer` (CONSTITUTION Article IV.4)  no-restricted-imports
+  4:12  error  Unexpected use of 'indexedDB'. Direct `indexedDB` access is forbidden outside the host adaptor. Route through `@debrief/stac-writer` (CONSTITUTION Article IV.4)    no-restricted-globals
+  5:12  error  Unexpected use of 'localStorage'. Direct `localStorage` access is forbidden in frontend code. Route persistence through the StacWriter interface (Article IV.4)     no-restricted-globals
+
+✖ 3 problems (3 errors, 0 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.
