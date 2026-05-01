@@ -1,6 +1,6 @@
 # Spec: Mermaid Diagram Rendering in Future Debrief Blog Posts
 
-**Spec number:** 999 (sentinel — not a real backlog item; chosen to avoid throwing future backlog numbering out of sync)
+**Spec number:** 239
 **Branch:** `claude/research-mermaid-diagrams-0gl5e`
 **Created:** 2026-04-26
 **Status:** Implementation pending merge of `debrief/debrief.github.io#90`. Decision recorded as ADR-026 in `docs/project_notes/decisions.md`.
@@ -65,7 +65,7 @@ After `debrief/debrief.github.io#90` merges and Pages rebuilds:
 
 ## Origin
 
-Ad-hoc research spike (no backlog item; not a numbered feature in the conventional sense). Triggered by an owner request on 2026-04-26 to investigate "how we can include Mermaid diagrams in the blog articles we post at the end of every spec/feature". The number 999 is a deliberate sentinel — it satisfies the speckit `NNN-slug` convention the website's `/publish-future-post` skill expects without consuming a real backlog slot or pushing future feature numbering out of sync.
+Ad-hoc research spike triggered by an owner request on 2026-04-26 to investigate "how we can include Mermaid diagrams in the blog articles we post at the end of every spec/feature". Originally captured under sentinel spec number `999` to avoid consuming a real backlog slot; renumbered to `239` on 2026-05-01 (with a retroactive `BACKLOG.md` entry) so the speckit `NNN-slug` convention stays aligned with the live numbering sequence and the sentinel does not confuse future automation.
 
 ## Related
 
