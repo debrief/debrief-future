@@ -724,12 +724,11 @@ class TestDeletionRebuildUS4:
 # license migration, and rel='license' link when license=='other'.
 # ---------------------------------------------------------------------------
 
-import sys as _sys
+import sys as _sys  # noqa: E402
 
 _sys.path.insert(0, str(Path(__file__).parent))
-from _stac_schema_harness import validate_stac_collection as _validate_stac_collection  # noqa: E402
-
 import jsonschema as _jsonschema  # noqa: E402
+from _stac_schema_harness import validate_stac_collection as _validate_stac_collection  # noqa: E402
 
 _COLLECTION_SHAPE_CONTRACT_PATH = (
     Path(__file__).parent.parent.parent.parent

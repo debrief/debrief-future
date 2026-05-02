@@ -31,8 +31,6 @@ from typing import TYPE_CHECKING, Literal
 from debrief_stac._helpers import (
     DEFAULT_PROVIDERS,
     STAC_EXTENSION_DEBRIEF,
-    STAC_EXTENSION_FILE,
-    STAC_EXTENSION_PROCESSING,
 )
 from debrief_stac.exceptions import PlotNotFoundError
 from debrief_stac.types import STAC_VERSION

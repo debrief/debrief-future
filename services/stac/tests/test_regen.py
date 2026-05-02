@@ -10,7 +10,6 @@ upgrade script against it, and asserts:
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -124,7 +123,7 @@ def _snapshot(root: Path) -> dict[Path, bytes]:
     }
 
 
-def test_regen_first_run_produces_spec_241_shape(tmp_path: Path) -> None:
+def test_regen_first_run_produces_spec_241_shape(_script_present: None, tmp_path: Path) -> None:
     catalog_root = tmp_path / "fixture-catalog"
     _make_legacy_catalog(catalog_root, ["plot-a", "plot-b"])
 
@@ -156,7 +155,7 @@ def test_regen_first_run_produces_spec_241_shape(tmp_path: Path) -> None:
     assert "item_assets" in catalog
 
 
-def test_regen_idempotent(tmp_path: Path) -> None:
+def test_regen_idempotent(_script_present: None, tmp_path: Path) -> None:
     """FR-019 / SC-007: a second run produces zero diff."""
     catalog_root = tmp_path / "fixture-catalog"
     _make_legacy_catalog(catalog_root, ["plot-a", "plot-b", "plot-c"])
@@ -178,7 +177,7 @@ def test_regen_idempotent(tmp_path: Path) -> None:
     )
 
 
-def test_regen_halts_on_validation_failure(tmp_path: Path) -> None:
+def test_regen_halts_on_validation_failure(_script_present: None, tmp_path: Path) -> None:
     """FR-020: corrupt input causes the script to exit non-zero and warn."""
     catalog_root = tmp_path / "fixture-catalog"
     _make_legacy_catalog(catalog_root, ["plot-a"])
@@ -198,7 +197,7 @@ def test_regen_halts_on_validation_failure(tmp_path: Path) -> None:
     assert "validation failure" in result.stderr.lower()
 
 
-def test_regen_existing_unit_tests_still_pass(tmp_path: Path) -> None:
+def test_regen_existing_unit_tests_still_pass(_script_present: None, tmp_path: Path) -> None:
     """FR-021: regenerated items honour the existing schema-adherence test
     invariants (created/updated lifecycle, asset shape, etc.)."""
     catalog_root = tmp_path / "fixture-catalog"

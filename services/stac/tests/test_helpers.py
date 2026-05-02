@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -18,7 +18,6 @@ from debrief_stac._helpers import (
     multihash_sha256_bytes,
     normalise_to_utc,
 )
-
 
 # --- Multihash ---------------------------------------------------------------
 
@@ -94,7 +93,7 @@ def test_normalise_to_utc_preserves_milliseconds() -> None:
 
 
 def test_normalise_to_utc_accepts_datetime_object() -> None:
-    dt = datetime(2026, 5, 2, 10, 23, 14, tzinfo=timezone.utc)
+    dt = datetime(2026, 5, 2, 10, 23, 14, tzinfo=UTC)
     assert normalise_to_utc(dt) == "2026-05-02T10:23:14.000Z"
 
 

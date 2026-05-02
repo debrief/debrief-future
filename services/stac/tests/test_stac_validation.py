@@ -12,8 +12,6 @@ import json
 from pathlib import Path
 
 import pytest
-from jsonschema import ValidationError
-
 from _stac_schema_harness import (  # noqa: E402  -- adjacent test helper
     assert_schemas_vendored,
     iter_item_validation_errors,
@@ -21,6 +19,7 @@ from _stac_schema_harness import (  # noqa: E402  -- adjacent test helper
     validate_stac_collection,
     validate_stac_item,
 )
+from jsonschema import ValidationError
 
 
 # T012 — defensive guard: if the vendored fixtures are missing, fail early

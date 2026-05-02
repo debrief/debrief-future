@@ -531,23 +531,21 @@ class TestUpdateTemporalMetadata:
 # Spec 241 — Item factory emits STAC 1.1.0 with standard metadata extensions
 # ---------------------------------------------------------------------------
 
-import time as _time
+import sys as _sys  # noqa: E402
+import time as _time  # noqa: E402
 
-import jsonschema as _jsonschema
+import jsonschema as _jsonschema  # noqa: E402
 
-import sys as _sys
 _sys.path.insert(0, str(Path(__file__).parent))
 from _stac_schema_harness import validate_stac_item as _validate_stac_item  # noqa: E402
 
 from debrief_stac._helpers import (  # noqa: E402
-    DEFAULT_PROVIDERS,
     STAC_EXTENSION_DEBRIEF,
     STAC_EXTENSION_FILE,
     STAC_EXTENSION_PROCESSING,
     multihash_sha256,
     multihash_sha256_bytes,
 )
-
 
 _ITEM_SHAPE_CONTRACT_PATH = (
     Path(__file__).parent.parent.parent.parent
@@ -708,7 +706,7 @@ class TestSpec241SourceAssetCoPublishing:
             k: v for k, v in item["assets"].items() if k.startswith("source")
         }
         assert source_assets, "expected at least one source-* asset"
-        for key, asset in source_assets.items():
+        for _key, asset in source_assets.items():
             assert "debrief:provenance" in asset
             assert "processing:software" in asset
             assert "processing:datetime" in asset

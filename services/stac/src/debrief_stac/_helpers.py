@@ -12,7 +12,7 @@ outside this package should import from this module.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -74,7 +74,7 @@ def iso_now_utc() -> str:
 
     Example: ``'2026-05-02T10:23:14.123Z'``.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     millis = now.microsecond // 1000
     return f"{now.strftime('%Y-%m-%dT%H:%M:%S')}.{millis:03d}Z"
 
@@ -98,12 +98,9 @@ def normalise_to_utc(ts: str | datetime) -> str:
         except ValueError as exc:
             raise ValueError(f"Unparseable RFC 3339 timestamp: {ts!r}") from exc
 
-    if dt.tzinfo is None:
-        # Treat timezone-naive as UTC (best-effort recovery — better than
-        # silently mislabelling).
-        dt = dt.replace(tzinfo=timezone.utc)
-    else:
-        dt = dt.astimezone(timezone.utc)
+    # Treat timezone-naive as UTC (best-effort recovery — better than silently
+    # mislabelling).
+    dt = dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
 
     millis = dt.microsecond // 1000
     return f"{dt.strftime('%Y-%m-%dT%H:%M:%S')}.{millis:03d}Z"
