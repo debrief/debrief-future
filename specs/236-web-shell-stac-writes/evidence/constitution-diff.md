@@ -102,7 +102,7 @@ all three violation classes caught.
 ## ADR linkage
 
 Architectural Decision Record:
-[`docs/project_notes/decisions.md` → ADR-028](../../../docs/project_notes/decisions.md).
+[`docs/project_notes/decisions.md` → ADR-029](../../../docs/project_notes/decisions.md).
 
 Originating spec: this feature
 ([`specs/236-web-shell-stac-writes/`](..)).
