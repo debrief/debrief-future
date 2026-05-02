@@ -14,6 +14,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Skip lint/typecheck/test for doc-only PRs — they verify nothing when
+      # only markdown / spec / evidence files change. Gitleaks below still
+      # runs unconditionally so a credential-in-a-doc cannot slip through.
+      # On push to main we always run everything (filter step is skipped, so
+      # the `code` output is empty and the fallback condition kicks in).
+      - name: Detect non-doc changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!specs/**'
+              - '!evidence/**'
+              - '!.specify/templates/**'
+              - '!LICENSE'
+
       # #190 SC-006 — fail any PR that accidentally commits a provider key.
       # Uses the gitleaks CLI directly (no marketplace action) for predictable
       # behaviour across private repos and org boundaries. Scans the worktree
@@ -28,46 +48,61 @@ jobs:
           sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
           gitleaks detect --no-git --source . --config gitleaks.toml --redact --verbose
 
+      - name: Note doc-only PR (skipping heavy steps)
+        if: github.event_name == 'pull_request' && steps.filter.outputs.code != 'true'
+        run: echo "Doc-only PR detected — skipping install/lint/typecheck/test."
+
       - name: Install Task
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         uses: arduino/setup-task@v2
         with:
           version: 3.49.1
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install uv
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         uses: astral-sh/setup-uv@v4
         with:
           version: "latest"
 
       - name: Set up Python
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: uv python install 3.11
 
       - name: Setup Node.js
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Enable corepack
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: corepack enable pnpm
 
       - name: Install dependencies
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: task install
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Install Playwright browsers
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run linting
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: task lint
 
       - name: Run knip
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: task knip
 
       - name: Run type checking
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         run: task typecheck
 
       - name: Run tests
+        if: github.event_name != 'pull_request' || steps.filter.outputs.code == 'true'
         # TEMPORARY (#191 PR debug) — split task test into its sub-commands
         # and report which one fails. Revert to `run: task test` once the
         # underlying failure is identified.
