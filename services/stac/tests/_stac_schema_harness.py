@@ -84,9 +84,7 @@ def _validator(schema_url: str) -> Draft7Validator:
 
 def validate_stac_item(item: dict[str, Any]) -> None:
     """Validate a STAC 1.1.0 Item dict; raise jsonschema.ValidationError on failure."""
-    _validator(
-        "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json"
-    ).validate(item)
+    _validator("https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json").validate(item)
 
 
 def validate_stac_collection(collection: dict[str, Any]) -> None:
@@ -105,9 +103,7 @@ def validate_stac_catalog(catalog: dict[str, Any]) -> None:
 
 def iter_item_validation_errors(item: dict[str, Any]) -> list[str]:
     """Return formatted error messages without raising. Useful for batch reports."""
-    validator = _validator(
-        "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json"
-    )
+    validator = _validator("https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json")
     return [f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in validator.iter_errors(item)]
 
 

@@ -96,9 +96,7 @@ class TestStoreThumbnail:
         derived_links = [link for link in item["links"] if link["rel"] == "derived_from"]
         assert len(derived_links) == 0
 
-    def test_drops_pre_existing_thumbnail_sm_key(
-        self, catalog_with_plot: tuple[Path, str]
-    ) -> None:
+    def test_drops_pre_existing_thumbnail_sm_key(self, catalog_with_plot: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_plot
         # Simulate an item written by an earlier code path with the legacy key.
         from debrief_stac.plot import _save_plot

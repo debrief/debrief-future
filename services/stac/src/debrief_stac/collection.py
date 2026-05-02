@@ -74,9 +74,7 @@ ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
     "source": {
         "type": "application/octet-stream",
         "roles": ["source"],
-        "title": (
-            "Source data (placeholder; per-item keys are source-*)"
-        ),
+        "title": ("Source data (placeholder; per-item keys are source-*)"),
     },
     "scene-thumbnail": {
         "type": "image/png",
