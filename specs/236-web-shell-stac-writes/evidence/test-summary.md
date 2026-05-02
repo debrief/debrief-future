@@ -1,8 +1,8 @@
 ---
 feature: "236-web-shell-stac-writes"
-captured_at: "2026-05-02T08:38:32Z"
-git_sha: "32fa802"
-tests_passed: 35
+captured_at: "2026-05-02T10:05:00Z"
+git_sha: "d83d4f4"
+tests_passed: 37
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -14,8 +14,8 @@ coverage_pct: null
 
 | Metric | Value |
 |--------|-------|
-| Total Tests | 35 |
-| Passed | 35 |
+| Total Tests | 37 |
+| Passed | 37 |
 | Failed | 0 |
 | Skipped | 0 |
 | Coverage | not measured (vitest run without --coverage) |
@@ -46,6 +46,18 @@ Driven by `fake-indexeddb` so the IDB code path runs in vitest's node env.
 
 Run: `pnpm --filter @debrief/web-shell test:unit src/services/__tests__/stacWriterIdb.test.ts`
 
+### Web-shell Playwright E2E (2 tests, screenshots evidence)
+
+Driven by `@sparticuz/chromium` so the suite runs in cloud sessions
+without a Playwright browser CDN download.
+
+| Test | Pass | Coverage | Screenshot |
+|---|---|---|---|
+| `after — IndexedDB available: badge hidden even with content` | ✅ | drives the naming-row → confirm flow with healthy IDB; asserts badge hidden | `evidence/screenshots/after-no-badge.png` |
+| `before — IndexedDB unavailable: badge visible with reason` | ✅ | stubs `globalThis.indexedDB` to undefined; drives the same flow; asserts the reason-specific badge is visible | `evidence/screenshots/before-session-only-badge.png` (= `private-mode-badge.png`) |
+
+Run: `cd apps/web-shell && node run-playwright.mjs stac-writes`
+
 ### VS Code regression gate (608 tests, pre-existing)
 
 The strangler-fig commit-2 promise — VS Code behaviour unchanged after the
@@ -75,7 +87,7 @@ Run: `pnpm --filter debrief-vscode test`
 ## Known Issues
 
 - **Drawing-toolbar UI hookup deferred**: `createStandaloneItem` in `apps/web-shell/src/mocks/stacService.ts` exposes the data path for US3 (FR-003). The actual "save drawn track" button in the drawing toolbar is not wired in this commit — a follow-up will plumb it in. The IDB writer-side and catalog-side plumbing are complete and tested.
-- **Playwright E2E against the static build deferred**: SC-006's "captures persist on a static-deployed build" promise is satisfied at the unit-test level (the in-memory `fake-indexeddb` is isomorphic to the browser one), but the headline reload-survival GIF + four `stac-writes.spec.ts` scenarios are not captured in this round. The IDB adaptor + capability check + rail re-hydration are all in place; only the spec file authoring remains.
+- **Capture-survives-reload GIF + cross-tab Playwright deferred**: the badge-visibility before/after screenshots ARE captured (see `evidence/screenshots/`), but the < 5s reload-survival GIF (FR-001 P1 visual proof) and the two-tab BroadcastChannel sync test (FR-023) are deferred. The IDB persistence path is verified at unit level via `fake-indexeddb`; the rail re-hydration helper is exercised by `hydrateSceneThumbnailStoreFromIdb`. Captured as follow-up in the spec's "What's Next" list.
 - **Pre-existing `apps/web-shell` unit-test failures unrelated to #236**: `toolService.test.ts` and `toolResponse.test.ts` fail with "Failed to load url @debrief/schemas" — a pre-existing schemas-build dependency issue not introduced by this work. Verified by `git stash` confirming the failures persist on a clean working tree.
 
 ## Reproducibility
