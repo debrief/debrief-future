@@ -67,12 +67,12 @@
 
 **Independent test criterion**: `pytest services/stac/tests/test_helpers.py` passes; `pytest services/stac/tests/test_stac_validation.py` runs unconditionally (no network probe) and validates a canned 1.1.0 Item against the vendored schemas.
 
-- [ ] T008 Create `_helpers.py` with `multihash_sha256(path)`, `multihash_sha256_bytes(data)`, `iso_now_utc()`, `normalise_to_utc(ts)`, `DEFAULT_PROVIDERS`, and the three STAC extension URI constants (debrief / processing / file). Strictly typed; no `Any`. `services/stac/src/debrief_stac/_helpers.py`
-- [ ] T009 [P][test] Write unit tests covering every helper: multihash round-trip against a known fixture; UTC normalisation of timezone-naive + non-UTC inputs; DEFAULT_PROVIDERS shape. `services/stac/tests/test_helpers.py`
-- [ ] T010 Bump `STAC_VERSION` from `"1.0.0"` to `"1.1.0"` in `services/stac/src/debrief_stac/types.py`. Update any in-module reference (e.g. `__all__`). `services/stac/src/debrief_stac/types.py`
-- [ ] T011 Remove the network probe at `services/stac/tests/test_stac_validation.py:17–23` (the `urllib.request.urlopen` gate). Replace with a configuration that points `stac_validator.StacValidate` at the vendored schemas under `services/stac/tests/fixtures/stac-schemas/v1.1.0/` (use `--schema_url` or its programmatic equivalent / a local schema-resolver hook). `services/stac/tests/test_stac_validation.py`
-- [ ] T012 [test] Add an explicit assertion in `test_stac_validation.py` that fails loudly if the vendored schemas directory is missing or empty (defensive — catches a deleted fixture during review). `services/stac/tests/test_stac_validation.py`
-- [ ] T013 [test] Add a smoke test that validates a hand-crafted minimal STAC 1.1.0 Item against the vendored schemas — proves the resolver wiring works end-to-end before any factory output exists. `services/stac/tests/test_stac_validation.py`
+- [x] T008 Create `_helpers.py` with `multihash_sha256(path)`, `multihash_sha256_bytes(data)`, `iso_now_utc()`, `normalise_to_utc(ts)`, `DEFAULT_PROVIDERS`, and the three STAC extension URI constants (debrief / processing / file). Strictly typed; no `Any`. `services/stac/src/debrief_stac/_helpers.py`
+- [x] T009 [P][test] Write unit tests covering every helper: multihash round-trip against a known fixture; UTC normalisation of timezone-naive + non-UTC inputs; DEFAULT_PROVIDERS shape. `services/stac/tests/test_helpers.py`
+- [x] T010 Bump `STAC_VERSION` from `"1.0.0"` to `"1.1.0"` in `services/stac/src/debrief_stac/types.py`. Update any in-module reference (e.g. `__all__`). `services/stac/src/debrief_stac/types.py`
+- [x] T011 Remove the network probe at `services/stac/tests/test_stac_validation.py:17–23` (the `urllib.request.urlopen` gate). Replace with a configuration that points `stac_validator.StacValidate` at the vendored schemas under `services/stac/tests/fixtures/stac-schemas/v1.1.0/` (use `--schema_url` or its programmatic equivalent / a local schema-resolver hook). `services/stac/tests/test_stac_validation.py`
+- [x] T012 [test] Add an explicit assertion in `test_stac_validation.py` that fails loudly if the vendored schemas directory is missing or empty (defensive — catches a deleted fixture during review). `services/stac/tests/test_stac_validation.py`
+- [x] T013 [test] Add a smoke test that validates a hand-crafted minimal STAC 1.1.0 Item against the vendored schemas — proves the resolver wiring works end-to-end before any factory output exists. `services/stac/tests/test_stac_validation.py`
 
 **Parallel execution**: T009 is independent of T010/T011/T012/T013 (it tests `_helpers.py` only). T011/T012/T013 all touch the same file and must run sequentially.
 

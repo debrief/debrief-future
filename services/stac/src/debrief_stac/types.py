@@ -32,7 +32,7 @@ GeoJSONFeatureCollection: TypeAlias = dict[str, Any]
 BoundingBox: TypeAlias = tuple[float, float, float, float]  # [minLon, minLat, maxLon, maxLat]
 
 # STAC spec version
-STAC_VERSION = "1.0.0"
+STAC_VERSION = "1.1.0"
 
 # Asset roles
 ASSET_ROLE_DATA = "data"
