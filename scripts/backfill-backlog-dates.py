@@ -23,7 +23,9 @@ from pathlib import Path
 SENTINEL = "2025-01-01"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BACKLOG_PATH = REPO_ROOT / "BACKLOG.md"
-DEFAULT_MISS_FILE = REPO_ROOT / "specs" / "242-backlog-navigator" / "evidence" / "backfill-misses.txt"
+DEFAULT_MISS_FILE = (
+    REPO_ROOT / "specs" / "242-backlog-navigator" / "evidence" / "backfill-misses.txt"
+)
 
 # Pre-refactor Items header (9 columns)
 ITEMS_HEADER_PRE = "| ID | Category | Description | V | M | A | Total | Complexity | Status |"
@@ -136,8 +138,9 @@ def git_last_date(item_id: str) -> str | None:
     return line.splitlines()[0] if line else None
 
 
-def refactor_items_row(row: str, fallback_dates: dict[str, tuple[str, str]],
-                       misses: list[str]) -> str:
+def refactor_items_row(
+    row: str, fallback_dates: dict[str, tuple[str, str]], misses: list[str]
+) -> str:
     """Convert a 9-column row into a 12-column row with Epic/Created/Updated."""
     if not row.strip().startswith(("|", "~")):
         return row
@@ -294,9 +297,12 @@ def refactor(text: str, misses: list[str]) -> str:
             continue
 
         # Epic rows in epics table
-        if in_epics and (
-            stripped.startswith("|") or stripped.startswith("~~|")
-        ) and not stripped.startswith("|--") and not stripped.startswith(("| ID |", "~~| ID |")):
+        if (
+            in_epics
+            and (stripped.startswith("|") or stripped.startswith("~~|"))
+            and not stripped.startswith("|--")
+            and not stripped.startswith(("| ID |", "~~| ID |"))
+        ):
             refactored = refactor_epics_row(line + "\n").rstrip("\n")
             out.append(refactored)
             continue
