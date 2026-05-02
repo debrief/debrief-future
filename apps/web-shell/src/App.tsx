@@ -122,6 +122,20 @@ import { calcService } from './mocks/calcService';
 import { executeTool, isMutationTool, listTools } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
+import { createStacWriterIdb } from './services/stacWriterIdb';
+import { probeIndexedDbCapability } from './services/stacWriterCapability';
+import {
+  setActiveStacItemPath,
+  setActiveStacWriter,
+} from './services/stacWriterRegistry';
+
+/**
+ * Strip the catalog-relative `./<plot>/item.json` form down to the bare
+ * `<plot>` segment that #236's writer expects as its `stacItemPath`.
+ */
+function stripItemPathToParent(itemPath: string): string {
+  return itemPath.replace(/^\.\//, '').replace(/\/item\.json$/, '');
+}
 
 // Expose session store on window for Playwright test introspection
 declare global {
@@ -257,6 +271,40 @@ export default function App() {
       }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // #236 — initialise the IndexedDB-backed StacWriter and probe capability.
+  // Failure modes (private mode, denied browser policy, IDB missing) are
+  // captured in the registry's CapabilityReport and surface via the
+  // session-only badge rather than throwing.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const capability = await probeIndexedDbCapability();
+      if (cancelled) return;
+      if (!capability.available) {
+        setActiveStacWriter(null, capability);
+        return;
+      }
+      try {
+        const writer = await createStacWriterIdb();
+        if (cancelled) {
+          await writer.close();
+          return;
+        }
+        setActiveStacWriter(writer, capability);
+      } catch (err) {
+        console.warn('[App] stacWriter init failed:', err);
+        setActiveStacWriter(null, {
+          available: false,
+          persistent: false,
+          reason: 'unavailable',
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Re-render the catalog whenever an item's metadata is patched (Properties
   // Panel commits → stacService.updateItemMetadata → bumps revision).
@@ -424,6 +472,9 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
+      // #236 — register the active STAC item parent so scene-thumbnail
+      // captures know which item.json overlay to land into.
+      setActiveStacItemPath(stripItemPathToParent(itemPath));
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
       freshStore.getState().setDrawingMode(null);
@@ -440,6 +491,7 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
+    setActiveStacItemPath(null);
     store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);

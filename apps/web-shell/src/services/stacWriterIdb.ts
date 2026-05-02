@@ -302,9 +302,9 @@ export async function createStacWriterIdb(
         baseMtimeMs = 0;
       }
 
-      const props: Record<string, unknown> = {
-        ...(baseItem.properties as Record<string, unknown>),
-      };
+      // baseItem.properties is typed as Record<string, unknown> by the
+      // StacWriter contract — the spread copies it exactly.
+      const props: Record<string, unknown> = { ...baseItem.properties };
       for (const [k, v] of Object.entries(input.patch)) {
         props[k] = v;
       }
@@ -397,7 +397,7 @@ export async function createStacWriterIdb(
             mtimeMs: nowMs(),
             itemPath: input.itemPath,
           },
-          [input.itemPath, 'provenance-archive'] as unknown as IDBValidKey,
+          [input.itemPath, 'provenance-archive'],
         );
       }
       await tx.done;
@@ -478,7 +478,10 @@ export async function createStacWriterIdb(
         mtimeMs: nowMs(),
       };
 
-      const tx = db.transaction(stores as unknown as string[], 'readwrite');
+      // idb's transaction overload expects a writable string[] tuple; the
+      // ReadonlyArray<string> here is structurally compatible. Spreading
+      // gives idb an array it can iterate without an `as unknown` cast.
+      const tx = db.transaction([...stores], 'readwrite');
       if (isGeoJson) {
         const payloadText =
           typeof input.body === 'string'
@@ -502,7 +505,7 @@ export async function createStacWriterIdb(
             mtimeMs: nowMs(),
             itemPath: input.itemPath,
           },
-          [input.itemPath, input.assetEntry.key] as unknown as IDBValidKey,
+          [input.itemPath, input.assetEntry.key],
         );
       }
       await tx.objectStore('items').put(stored, input.itemPath);
@@ -598,7 +601,7 @@ export async function createStacWriterIdb(
           mtimeMs: nowMs(),
           itemPath,
         },
-        [itemPath, largeKey] as unknown as IDBValidKey,
+        [itemPath, largeKey],
       );
       await assetStore.put(
         {
@@ -608,7 +611,7 @@ export async function createStacWriterIdb(
           mtimeMs: nowMs(),
           itemPath,
         },
-        [itemPath, smallKey] as unknown as IDBValidKey,
+        [itemPath, smallKey],
       );
       await tx.objectStore('items').put(stored, itemPath);
       await tx.done;
@@ -683,7 +686,7 @@ export async function createStacWriterIdb(
       await tx.objectStore('items').put(stored, input.itemPath);
       try {
         await tx.objectStore('assets').delete(
-          [input.itemPath, input.assetKey] as unknown as IDBValidKey,
+          [input.itemPath, input.assetKey],
         );
       } catch {
         // best-effort
@@ -721,7 +724,7 @@ export async function createStacWriterIdb(
     async readAssetBlob(itemPath: string, assetKey: string): Promise<Blob | null> {
       const rec = (await db.get(
         'assets',
-        [itemPath, assetKey] as unknown as IDBValidKey,
+        [itemPath, assetKey],
       )) as AssetRecord | undefined;
       return rec?.blob ?? null;
     },
@@ -751,7 +754,7 @@ async function readAssetBlobInTx(
 ): Promise<Blob | null> {
   try {
     const rec = (await tx.objectStore('assets').get(
-      [itemPath, assetKey] as unknown as IDBValidKey,
+      [itemPath, assetKey],
     )) as AssetRecord | undefined;
     return rec?.blob ?? null;
   } catch {

@@ -244,7 +244,7 @@ describe('stacWriterIdb.writeItem (standalone create)', () => {
         ctx,
         itemPath: 'exercise-alpha/item.json',
         mode: 'replace',
-        item: SAMPLE_BUNDLED as unknown as never,
+        item: SAMPLE_BUNDLED,
       }),
     ).rejects.toMatchObject({ kind: 'bundled-item-read-only' });
   });

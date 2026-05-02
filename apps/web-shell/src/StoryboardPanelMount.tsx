@@ -49,6 +49,10 @@ import {
 import { WebPanelHost } from './services/webPanelHost';
 import { getSceneThumbnailStore } from './services/webSceneThumbnailAdapter';
 import { createStoryboardHandlers } from './handlers/storyboardHandlers';
+import {
+  getActiveCapability,
+  subscribeStacWriter,
+} from './services/stacWriterRegistry';
 
 type StoryboardPlotFeature = StoryboardPlot['features'][number];
 
@@ -397,7 +401,16 @@ export function StoryboardPanelMount({
   }, [host]);
 
   // ─── FR-WEB-029a session-only badge ──────────────────────────────
-  const hasSessionOnlyContent = useMemo(() => {
+  // #236 — gate the badge on the StacWriter's capability report.
+  // available: true   → captures persist via IndexedDB; badge hidden.
+  // available: false  → badge stays visible, with a `reason`-specific
+  //                     message explaining why persistence is unavailable.
+  const capability = useSyncExternalStore(
+    useCallback((listener: () => void) => subscribeStacWriter(listener), []),
+    () => getActiveCapability(),
+    () => getActiveCapability(),
+  );
+  const hasStoryboardContent = useMemo(() => {
     for (const f of featureCollection.features) {
       const props = f.properties as { kind?: string } | null;
       if (props === null) continue;
@@ -407,6 +420,15 @@ export function StoryboardPanelMount({
     }
     return false;
   }, [featureCollection]);
+  const hasSessionOnlyContent = !capability.available && hasStoryboardContent;
+  const badgeMessage =
+    capability.reason === 'quota'
+      ? 'Browser storage is full — captures will not persist. Clear unused captures or export.'
+      : capability.reason === 'denied'
+      ? 'Browser blocked persistence — captures will not survive reload. Try a non-private window.'
+      : capability.reason === 'idb-version-mismatch'
+      ? 'Database version mismatch — captures will not persist. Reload to retry.'
+      : '⚠ Session-only — captures persist only for this tab. Browser persistence unavailable.';
 
   // ─── Wired maintenance handlers (Phase 4 + Phase 5) ──────────────
   const handlers = useMemo(
@@ -479,8 +501,7 @@ export function StoryboardPanelMount({
               '1px solid var(--vscode-panel-border, #3c3c3c)',
           }}
         >
-          ⚠ Session-only — captures persist only for this tab. Web-shell
-          has no STAC write path yet (see issue #236).
+          {badgeMessage}
         </div>
       )}
       <div style={{ flex: 1, minHeight: 0 }}>

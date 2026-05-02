@@ -15,9 +15,23 @@
  */
 
 import { captureMapAsDataUrl } from '@debrief/components';
+import { getActiveStacItemPath, getActiveStacWriter } from './stacWriterRegistry';
 
 const LARGE_DIMS = { width: 800, height: 600 };
 const SMALL_DIMS = { width: 200, height: 150 };
+
+/**
+ * Strip a `data:image/png;base64,XXXX` prefix down to the bare base64
+ * body so the StacWriter receives canonical input. Idempotent — bare
+ * base64 input is returned unchanged.
+ */
+function stripDataUrlPrefix(dataUrl: string): string {
+  const comma = dataUrl.indexOf(',');
+  if (dataUrl.startsWith('data:') && comma > 0) {
+    return dataUrl.slice(comma + 1);
+  }
+  return dataUrl;
+}
 
 /** Result shape mirrors the VS Code adaptor's `WriteSceneThumbnailResult`. */
 export interface WriteSceneThumbnailResult {
@@ -125,6 +139,39 @@ export async function captureSceneThumbnail(
     smallDataUrl,
   };
   store.put(sceneId, result);
+
+  // Best-effort: persist through the StacWriter so the capture survives
+  // a reload (#236 FR-001). The in-memory store above continues to back
+  // the rail's synchronous `thumbnailHref` lookup; the IDB write is the
+  // durability layer underneath. If no writer is registered (App boot
+  // hasn't completed yet, or capability check failed) we fall through
+  // silently — the in-memory store still serves the current session.
+  try {
+    const writer = getActiveStacWriter();
+    const stacItemPath = getActiveStacItemPath();
+    if (writer !== null && stacItemPath !== null) {
+      await writer.writeSceneThumbnailPair({
+        ctx: {
+          kind: 'idb',
+          nowMs: () => Date.now(),
+          randomId: () => sceneId,
+        },
+        stacItemPath,
+        sceneId,
+        largePngBase64: stripDataUrlPrefix(largeDataUrl),
+        smallPngBase64: stripDataUrlPrefix(smallDataUrl),
+      });
+    }
+  } catch (err) {
+    // Best-effort: capture has already succeeded into the in-memory
+    // store. Log but don't throw — Article I.3 still satisfied because
+    // the badge will continue to show "Session-only" if capability is
+    // unavailable, and the user can act on that.
+    console.warn(
+      '[webSceneThumbnailAdapter] IDB persistence failed (capture survives in-session):',
+      err,
+    );
+  }
   return result;
 }
 
