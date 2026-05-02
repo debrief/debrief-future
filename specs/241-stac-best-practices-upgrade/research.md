@@ -62,20 +62,24 @@ The spec arrives with most of the analytical work already done — ADR-028 ratif
 
 ## Decision 5 — `item_assets` shape
 
-**Decision**: the Collection's `item_assets` block declares four logical asset types every Item exposes:
+**Decision**: the Collection's `item_assets` block declares five logical asset types every Item *may* expose:
 
 | Key | `type` | `roles` | `title` |
 |---|---|---|---|
 | `features` | `application/geo+json` | `["data"]` | `Plot features` |
 | `thumbnail` | `image/png` | `["thumbnail"]` | `Thumbnail (200×150)` |
 | `overview` | `image/png` | `["overview"]` | `Overview (800×600)` |
-| `source` | (omitted — varies per item) | `["source"]` | `Source data` |
+| `source` | (omitted — varies per item) | `["source"]` | `Source data (placeholder; per-item keys are `source-*`)` |
+| `scene-thumbnail` | `image/png` | `["thumbnail"]` | `Storyboard scene thumbnail (placeholder; per-scene keys are `scene-thumbnail-*` and `scene-thumbnail-*-sm`)` |
 
-**Rationale**: `item_assets` is a contract block — it describes what every Item *should* have, not what specific files live where. The four logical types are stable across all 73 items. Per-item source asset *names* vary (`source-boat1t`, `source-foo`, etc.); we declare a single `source` placeholder and let per-item Items disambiguate via key suffixes. The keys we use in the block must match the keys an Item uses *unless* the item key is a per-item suffix; `stac-fields` and STAC Browser tolerate the suffix-pattern convention without complaint.
+The Item-shape contract's `patternProperties` accepts both `^source(-.+)?$` (existing) and `^scene-thumbnail(-.+)?$` (new) so storyboard-derived assets validate without requiring full enumeration in `item_assets`.
+
+**Rationale**: `item_assets` is a contract block — it describes what every Item *should* have, not what specific files live where. The four core logical types (`features`, `thumbnail`, `overview`, `source`) are stable across all 73 items. The fifth (`scene-thumbnail`) is included as an explicit placeholder because `apps/vscode/src/services/sceneThumbnailService.ts` writes per-scene assets keyed `scene-thumbnail-{ulid}` and `scene-thumbnail-{ulid}-sm` into the same `item.json.assets` namespace; without declaring the placeholder, the Item contract would over-reject any plot with storyboard scenes (review issue 5A). Per-item key disambiguation via suffix is the same convention used for `source-*`. `stac-fields` and STAC Browser tolerate the suffix-pattern convention without complaint.
 
 **Alternatives considered**:
 - *Wildcard `source-*` syntax in `item_assets`*: rejected — not part of the spec; would invite reader confusion.
 - *Declare every per-item source key in `item_assets`*: rejected — `item_assets` would balloon to dozens of entries describing one-of-a-kind files. The block is meant to declare a contract, not an inventory.
+- *Loosen the contract schema to allow arbitrary asset keys*: rejected — loses the validation we get from explicit pattern matching. Declaring `^scene-thumbnail(-.+)?$` keeps the schema strict where it can be while accommodating the storyboard-internal namespace. A future spec (B-241-followup-2) will fold per-scene assets into a first-class LinkML-modelled shape.
 
 ---
 
@@ -91,18 +95,19 @@ The spec arrives with most of the analytical work already done — ADR-028 ratif
 
 ---
 
-## Decision 7 — STAC Browser version pin and serving harness
+## Decision 7 — STAC Browser version pin and serving harness (revised — review decision 4A)
 
 **Decision**:
-- Pin `@radiantearth/stac-browser` to `v3.3.4` (current stable, matches the spec's PR-time release window) as a dev-dep on the Playwright test workspace. Use the `pnpm dlx` install path; the package brings `webpack`-bundled assets and Vue 3.
-- Serve the regenerated catalog from `preview/workspace/samples/local-store/` over a local Node `http-server` (added as a dev-dep) on port `4080` during the test. The Playwright test starts both servers (catalog on `:4080`, stac-browser dev server on `:8080`) inside `globalSetup`, navigates to `http://localhost:8080/?catalogUrl=http://localhost:4080/catalog.json`, and tears them down in `globalTeardown`.
+- **Vendor `radiantearth/stac-browser` v3.3.4 as a prebuilt static dist**, committed to the repository at `apps/web-shell/test-fixtures/stac-browser-v3.3.4/`. The dist is the output of running stac-browser's own `npm run build` once, configured to read the catalog from a relative URL. A small refresh script `scripts/refresh-stac-browser-fixture.sh` documents how to regenerate the fixture when bumping versions; the script itself is not run by CI.
+- The Playwright test serves both the catalog and the stac-browser dist statically via `http-server` (added as a dev-dep on the Playwright workspace) — catalog on port `4080`, stac-browser on port `8080`. Both servers are started in `globalSetup` and torn down in `globalTeardown`. Test navigates to `http://localhost:8080/?catalogUrl=http://localhost:4080/catalog.json`.
 
-**Rationale**: pinning `v3.3.4` makes screenshots reproducible (Constitution Article I.4). Two local servers is the supported stac-browser deployment shape — it's a SPA that fetches the catalog at runtime via CORS-permissive HTTP, which is exactly what `http-server` ships. Using the existing `apps/web-shell/playwright/` pattern (config + page-objects under `playwright/pages/`) keeps the new test in the established harness.
+**Rationale**: vendoring the prebuilt dist makes the test offline-clean (Article I.1) and reproducible across machines (Article I.4) — there is no `pnpm dlx` cold-start, no registry round-trip, no version drift between dev and CI. Bundle size is ~5 MB committed, which is acceptable for a test fixture and is the cost of being able to claim "this catalog renders in `stac-browser`" with a deterministic test. The 60 s budget (FR-026) is comfortably hit because there's no install step on the critical path. Using `http-server` (already familiar in the npm ecosystem) keeps the harness simple — the tool's only job is to serve static files with permissive CORS.
 
 **Alternatives considered**:
-- *Use the public hosted instance at `https://radiantearth.github.io/stac-browser/`*: rejected — needs the catalog to be on a public CORS-permissive URL. Won't run offline (Article I.1 violation). Public instance also drifts independently — tomorrow's screenshots could differ.
+- *`pnpm dlx @radiantearth/stac-browser` at test time* (the original draft): rejected — registry round-trip on every fresh CI worker / sandbox; cold-start is 30–60 s and can blow the FR-026 budget; flake-prone; not offline (Article I.1 violation).
+- *Pin `@radiantearth/stac-browser` as a regular `devDependency` (npm install handles caching)*: better than `pnpm dlx`, but still relies on network for fresh checkouts and `pnpm install` time still consumes the budget on cold caches. Vendoring is the only path that fully satisfies Article I.1.
+- *Use the public hosted instance at `https://radiantearth.github.io/stac-browser/`*: rejected — needs the catalog to be on a public CORS-permissive URL. Won't run offline. Public instance also drifts independently — tomorrow's screenshots could differ.
 - *Drive a stripped-down stac-browser-equivalent snapshot test*: rejected — defeats the demo's marketing value. The spec explicitly notes "the marketing value of using the real browser is what makes this story P1".
-- *Use `serve` instead of `http-server`*: equivalent functionally, but `http-server` is already implicitly familiar from npm-land and has fewer flags. Either would work.
 
 ---
 
@@ -118,15 +123,20 @@ The spec arrives with most of the analytical work already done — ADR-028 ratif
 
 ---
 
-## Decision 9 — Schema validation harness
+## Decision 9 — Schema validation harness (revised — review decision 3A)
 
-**Decision**: extend `services/stac/tests/test_stac_validation.py` with a new test `test_collection_validates_against_stac_1_1_schema()` and another `test_items_validate_against_stac_1_1_schema()` that fetch the official STAC 1.1 JSON Schemas (`https://schemas.stacspec.org/v1.1.0/...`) once per test run, cache them in `services/stac/tests/.schema-cache/`, and validate every regenerated artifact against them. The cache invalidates monthly (mtime-based).
+**Decision**:
+- **Vendor the official STAC 1.1 JSON Schemas** into `services/stac/tests/fixtures/stac-schemas/v1.1.0/`. Required files: `item-spec/json-schema/item.json`, `collection-spec/json-schema/collection.json`, plus the referenced sub-schemas (Asset Object, Provider Object, Link Object, etc. — `stac_validator` resolves them locally when the directory tree mirrors the spec). A small refresh script `scripts/refresh-stac-schemas.sh` documents how to bump.
+- **Remove the network probe** at `services/stac/tests/test_stac_validation.py:17–23` (`urllib.request.urlopen("https://schemas.stacspec.org", timeout=2)`). Schema validation is now unconditional; failures are loud rather than silent.
+- Configure `stac_validator.StacValidate()` to read schemas from the vendored directory (its `--schema_url`/`schema_map` parameter, or by setting up a local resolver). Validation runs against every regenerated Item and the Collection.
 
-**Rationale**: STAC Browser validates client-side against the same schemas; the test catches regressions at CI time before they reach the Playwright test. Cached schema fetch keeps Article I.1 satisfied — the schemas are bundled in the cache after first run, so subsequent CI runs are offline-capable. Existing tests already use `stac_validator.StacValidate()`; we keep that API and just bump its schema-version target.
+**Rationale**: the existing harness pretends to gate against STAC schemas but silently passes when offline (Article I.3 critical gap surfaced in review). Vendoring resolves both the offline-default principle (Article I.1) and the no-silent-failures principle (Article I.3) in one move. The marginal cost is a few hundred KB of JSON committed and a refresh script for future bumps. STAC 1.1 patch releases are infrequent (the 1.1.0 spec has been stable since 2024); the deliberate-bump-vs-silent-drift trade-off favours vendoring. Spec adherence claims now mean what they say.
 
 **Alternatives considered**:
-- *Vendor the schemas into the repo*: equivalent functionally, but a future STAC 1.1.x patch release would diverge silently. Cached-with-monthly-bust is the better tradeoff.
+- *Cache schemas locally with monthly mtime invalidation* (the original draft): rejected — moves the failure mode to "first run after a month is offline → silent skip again". The cache approach reintroduces exactly the gap we're closing.
+- *Drop the offline claim* (revise Constitution Check to acknowledge schema validation requires network): rejected — Article I.1 is non-negotiable per the constitution; downgrading our compliance claim instead of fixing the implementation is the wrong direction.
 - *Run schema validation only inside the Playwright test*: rejected — moves the gate too late. CI catches it earlier this way.
+- *Write our own JSON-Schema resolver*: rejected — `stac_validator` already does this work; we just need to point it at the right directory.
 
 ---
 
@@ -142,6 +152,41 @@ The spec arrives with most of the analytical work already done — ADR-028 ratif
 
 ---
 
+---
+
+## Decision 11 — `saveSession.ts` parallel factory: migrate to services-side write (review decision 1B)
+
+**Decision**: replace the direct asset-writing block in `apps/vscode/src/commands/saveSession.ts:88–110` (which currently writes `thumbnail.png` + `thumbnail-sm.png` and mutates `item.json.assets` from inside the VS Code extension) with an invocation of the upgraded `services/stac/src/debrief_stac/thumbnails.py:store_thumbnail()` factory. The extension passes the base64 PNG pair to the service via the existing IPC/MCP boundary used elsewhere; the service writes the bytes, computes `file:size`/`file:checksum`, emits `proj:shape`, refreshes `properties.updated`, and returns the updated Item shape.
+
+**Rationale**: spec 241 already revisits every site that writes the catalog. Leaving `saveSession.ts` alone would (a) perpetuate the pre-existing Article IV.1 violation ("frontends never persist"), (b) require parallel maintenance of the new asset shape across two factories that don't share code, and (c) emit the OLD shape on day-2 saves immediately after merge — contaminating the regenerated catalog within hours. Migrating the call site is a strict prerequisite for the spec's claim that the bundled catalog speaks STAC 1.1.0 consistently. The migration is mechanical and doesn't change the user-visible save UX.
+
+**Alternatives considered**:
+- *Lockstep update only — keep saveSession.ts writing directly but match the new naming/fields* (the conservative path): rejected — solves the data-shape problem but not the architectural one. Ratchets in two factories with identical responsibilities and overlapping bug surface.
+- *Document the gap and defer*: rejected per review — defers a known critical failure mode (silent shape drift) and would still require an immediate follow-up spec.
+- *Refactor saveSession.ts to MCP-only* (route every asset write through the MCP tool layer): out-of-scope shape change for this spec; the lighter-touch in-process call is enough to close the violation. The MCP-everywhere migration can be a future refactor if/when it earns its way in.
+
+---
+
+## Decision 12 — Internal helper layout: single `_helpers.py` (review decision 2A)
+
+**Decision**: introduce one new module `services/stac/src/debrief_stac/_helpers.py` holding the helpers added by this spec:
+
+- `multihash_sha256(path: Path) -> str` and `multihash_sha256_bytes(data: bytes) -> str` — multihash-encoded SHA-256
+- `iso_now_utc() -> str` and `normalise_to_utc(ts: str | datetime) -> str` — RFC 3339 UTC timestamp helpers
+- `DEFAULT_PROVIDERS: list[Provider]` — the sample-catalog default
+- `STAC_EXTENSION_PROCESSING`, `STAC_EXTENSION_FILE`, `STAC_EXTENSION_DEBRIEF` — extension URI string constants
+
+`ITEM_ASSETS_TEMPLATE` (the Collection's `item_assets` block contents) is **inlined as a module-level constant in `collection.py`**, not in `_helpers.py` — it's only used by the Collection factory and pulling it into a shared module would create a one-caller import dependency.
+
+**Rationale**: the original draft proposed four micro-modules (`providers.py`, `checksum.py`, `timestamps.py`, `extensions.py`) for ~50 LOC of helpers. That is over-fragmentation: each module would hold one or two functions/constants, multiplying import sites and review surfaces without any conceptual payoff. Per the engineering preferences ("minimal diff", "no premature abstraction"), a single `_helpers.py` keeps related utilities in one place and makes the import story trivial — every caller in `services/stac/` writes `from debrief_stac._helpers import ...`. The leading underscore signals these are internal; nothing outside `services/stac/` should depend on them.
+
+**Alternatives considered**:
+- *Four micro-modules* (the original draft): rejected — premature decomposition; tiny, conceptually overlapping modules.
+- *Inline everything into `plot.py` and `collection.py`* (review option 2B — smallest diff): viable but the multihash and timestamp helpers are genuinely shared across `plot.py`, `assets.py`, `thumbnails.py`, and the regenerator script; pulling them into one place is the right amount of structure.
+- *Put helpers in the existing `models.py`*: rejected — `models.py` is for Pydantic models, not utility functions. Mixing concerns.
+
+---
+
 ## Open questions (none blocking)
 
-All NEEDS CLARIFICATION items from the planning template are resolved by Decisions 1–10. No remaining unknowns.
+All NEEDS CLARIFICATION items from the planning template are resolved by Decisions 1–12. No remaining unknowns.

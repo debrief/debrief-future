@@ -60,6 +60,10 @@ Every `assets.<key>` object continues to be a STAC Asset. New fields:
 | `thumbnail-sm` (200×150 PNG) | `thumbnail` | small preview / catalog tile | `["thumbnail"]` |
 | `features` | `features` | unchanged | `["data"]` |
 | `source-*` | `source-*` | unchanged | `["source"]` |
+| `scene-thumbnail-{ulid}` | `scene-thumbnail-{ulid}` | unchanged — per-scene large thumbnail (storyboard) | `["thumbnail"]` |
+| `scene-thumbnail-{ulid}-sm` | `scene-thumbnail-{ulid}-sm` | unchanged — per-scene small thumbnail (storyboard) | `["thumbnail"]` |
+
+The per-scene thumbnail keys are **not** subject to the overview/thumbnail rename. They're written by `apps/vscode/src/services/sceneThumbnailService.ts` as part of the Storyboarding feature line (#216) and live in the same `assets` namespace; the contract schema's `patternProperties` accepts them via `^scene-thumbnail(-.+)?$` (review decision 5A). A future spec (B-241-followup-2) will fold them into a first-class LinkML-modelled shape.
 
 Both thumbnail-class assets MUST emit:
 
@@ -97,9 +101,10 @@ The Catalog-as-Collection at `preview/workspace/samples/local-store/catalog.json
 | `features` | `application/geo+json` | `["data"]` | `Plot features` |
 | `thumbnail` | `image/png` | `["thumbnail"]` | `Thumbnail (200×150)` |
 | `overview` | `image/png` | `["overview"]` | `Overview (800×600)` |
-| `source` | `application/octet-stream` | `["source"]` | `Source data` |
+| `source` | `application/octet-stream` | `["source"]` | `Source data (placeholder; per-item keys are source-*)` |
+| `scene-thumbnail` | `image/png` | `["thumbnail"]` | `Storyboard scene thumbnail (placeholder; per-scene keys are scene-thumbnail-* and scene-thumbnail-*-sm)` |
 
-`item_assets` entries do not include `href` (per spec — `item_assets` describes the contract, not specific URLs).
+`item_assets` entries do not include `href` (per spec — `item_assets` describes the contract, not specific URLs). The `source` and `scene-thumbnail` keys are placeholder declarations that document the per-item naming pattern; the Item contract's `patternProperties` accommodates `^source(-.+)?$` and `^scene-thumbnail(-.+)?$` so per-item assets validate without enumerating every possible suffix.
 
 ### Validation rules
 
@@ -116,10 +121,23 @@ Distinguish three lifecycle events in the Item factory:
 | Event | `created` | `updated` | Trigger |
 |---|---|---|---|
 | Item created (`create_plot()`) | set to `now()` | set to `now()` | New plot loaded from REP file |
-| Item edited (`add_features()`, `set_metadata()`, `add_asset()`) | preserved | refreshed to `now()` | Subsequent writes by services |
+| Item edited (`add_features()`, `set_metadata()`, `add_asset()`, `store_thumbnail()`) | preserved | refreshed to `now()` | Subsequent writes by services |
 | Item regenerated (one-shot script) | preserved (lifted from git history) | refreshed to regeneration timestamp | Migration only, runs once |
 
-Persisting `created` correctly across edits requires the factory's "load existing JSON, mutate, write" path (in `plot.py` and `assets.py`) to read the on-disk `created` value before re-emitting. New plots use `now()`; mutated existing plots preserve.
+Persisting `created` correctly across edits requires the factory's "load existing JSON, mutate, write" path (in `plot.py`, `assets.py`, and `thumbnails.py`) to read the on-disk `created` value before re-emitting. New plots use `now()`; mutated existing plots preserve.
+
+### Asset-write seams (post-spec-241)
+
+After this spec lands, **all asset writes flow through `services/stac/`**:
+
+| Caller | Path | Asset write seam |
+|---|---|---|
+| `debrief-io` import pipeline | Python in-process | `services/stac/src/debrief_stac/{plot.py, assets.py, thumbnails.py}` directly |
+| VS Code save-session command | TypeScript host → service via `@debrief/stac-writer` | `apps/vscode/src/commands/saveSession.ts` → `writePlotThumbnails()` → service-side `store_thumbnail()` (research.md Decision 11) |
+| Web-shell save (#236) | Browser → IndexedDB writer | Existing `@debrief/stac-writer` adaptor, untouched by this spec |
+| Storyboard scene capture | TypeScript host → `sceneThumbnailService.ts` | Unchanged — per-scene assets remain a separate seam (B-241-followup-2 will fold them in) |
+
+The pre-existing direct-write block in `saveSession.ts:88–110` is removed (research.md Decision 11). Frontends no longer touch `item.json.assets` or write PNGs to the item directory.
 
 ---
 

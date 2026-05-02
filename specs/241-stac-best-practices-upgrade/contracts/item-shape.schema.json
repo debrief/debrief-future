@@ -105,6 +105,15 @@
             },
             "processing:datetime": { "type": "string", "format": "date-time" }
           }
+        },
+        "^scene-thumbnail(-.+)?$": {
+          "comment": "Storyboard-derived per-scene thumbnails written by apps/vscode/src/services/sceneThumbnailService.ts. Both large (`scene-thumbnail-{ulid}`) and small (`scene-thumbnail-{ulid}-sm`) variants validate here. Future spec (B-241-followup-2) will fold these into a first-class LinkML-modelled shape.",
+          "type": "object",
+          "required": ["href", "type", "roles"],
+          "properties": {
+            "type": { "const": "image/png" },
+            "roles": { "const": ["thumbnail"] }
+          }
         }
       }
     }

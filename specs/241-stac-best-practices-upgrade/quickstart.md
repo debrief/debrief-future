@@ -74,18 +74,17 @@ This runs lint + typecheck + tests, including:
 
 ## 4 — Eyeball the rendered catalog (optional)
 
-The Playwright test pins `radiantearth/stac-browser` v3.3.4 and serves the catalog at `http://localhost:4080/catalog.json`. To render it yourself:
+The Playwright test serves a **vendored** prebuilt dist of `radiantearth/stac-browser` v3.3.4 from `apps/web-shell/test-fixtures/stac-browser-v3.3.4/` (committed to the repo — works offline, no `pnpm dlx` cold-start). To render it yourself:
 
 ```sh
 # Terminal 1 — serve the catalog
-cd preview/workspace/samples/local-store
-pnpm dlx http-server -p 4080 --cors
+pnpm exec http-server preview/workspace/samples/local-store -p 4080 --cors
 
-# Terminal 2 — run a local stac-browser
-pnpm dlx @radiantearth/stac-browser@3.3.4 --catalog http://localhost:4080/catalog.json
+# Terminal 2 — serve the vendored stac-browser dist
+pnpm exec http-server apps/web-shell/test-fixtures/stac-browser-v3.3.4 -p 8080
 ```
 
-Open `http://localhost:8080`. You should see:
+Open `http://localhost:8080/?catalogUrl=http://localhost:4080/catalog.json`. You should see:
 
 - Collection landing page with title, description, providers, item_assets block
 - A grid of 73 plot tiles, each with a 200×150 thumbnail
@@ -134,6 +133,8 @@ Expected (one example):
 
 ## 6 — What the Playwright test produces
 
+The Playwright test starts two `http-server` instances in `globalSetup` — one serving the regenerated catalog on `:4080`, one serving the vendored stac-browser dist on `:8080` — drives the navigation, asserts shape, captures three screenshots, and tears the servers down in `globalTeardown`. No network calls; entirely offline.
+
 After `task verify` (or the targeted command):
 
 ```sh
@@ -171,5 +172,6 @@ If `task verify` is green and the catalog renders in stac-browser, you have full
 | `multiformats` not found | `uv sync` skipped because of cached lockfile | `uv sync --reinstall` |
 | `git mv: fatal: not under version control` during regeneration | Working tree has uncommitted PNG changes from another branch | Stash or commit, re-run |
 | Playwright test times out at 60s | First run pulling `@sparticuz/chromium`; subsequent runs are fast | Re-run; if persistent, check `apps/web-shell/run-playwright.mjs` cache dir |
-| `stac_validator` can't reach `schemas.stacspec.org` | Network sandbox in Claude Code on the web | Cache pre-warmed; if missing, toggle Network access to `Trusted` |
+| `stac_validator` reports unknown schema URL | Local schema resolver mis-configured | Schemas are vendored at `services/stac/tests/fixtures/stac-schemas/v1.1.0/` — there is no network fetch. If `stac_validator` is still trying to fetch, the resolver setup in `test_stac_validation.py` needs fixing. |
+| `apps/web-shell/test-fixtures/stac-browser-v3.3.4/` missing | Fresh checkout from a stale branch, or the fixture was removed | Run `bash scripts/refresh-stac-browser-fixture.sh` to rebuild. The script clones stac-browser at v3.3.4, runs its `npm run build`, and copies `dist/` into the fixture path. |
 | `created` lifted onto the wrong commit | Running migration outside a git checkout | Run inside the git work tree, not a tarball extract |

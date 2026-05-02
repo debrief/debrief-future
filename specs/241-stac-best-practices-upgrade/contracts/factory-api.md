@@ -31,9 +31,10 @@ def create_plot(
     """
 ```
 
-`DEFAULT_PROVIDERS` lives in a new module `debrief_stac/providers.py`:
+`DEFAULT_PROVIDERS` lives in `debrief_stac/_helpers.py` (single internal-helpers module — research.md Decision 12):
 
 ```python
+# debrief_stac/_helpers.py
 DEFAULT_PROVIDERS: list[Provider] = [
     {"name": "Debrief", "roles": ["producer", "host"], "url": "https://debrief.info"}
 ]
@@ -132,9 +133,10 @@ def rebuild_collection_summaries(
     """
 ```
 
-`item_assets` content lives in a new module-level constant:
+`item_assets` content lives as a module-level constant in `collection.py` (inlined per research.md Decision 12 — only `collection.py` consumes it):
 
 ```python
+# debrief_stac/collection.py
 ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
     "features": {
         "type": "application/geo+json",
@@ -154,16 +156,27 @@ ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
     "source": {
         "type": "application/octet-stream",
         "roles": ["source"],
-        "title": "Source data",
+        "title": "Source data (placeholder; per-item keys are source-*)",
+    },
+    "scene-thumbnail": {
+        "type": "image/png",
+        "roles": ["thumbnail"],
+        "title": "Storyboard scene thumbnail (placeholder; per-scene keys are scene-thumbnail-* and scene-thumbnail-*-sm)",
     },
 }
 ```
 
 ---
 
-## New utility — `checksum.multihash_sha256()`
+## New utilities — `_helpers.py`
+
+All helpers introduced by this spec live in a single internal module `debrief_stac/_helpers.py`. The leading underscore signals "internal to `services/stac/`"; nothing outside the package should import from it.
 
 ```python
+# debrief_stac/_helpers.py
+
+# --- Multihash checksums ---
+
 def multihash_sha256(path: Path) -> str:
     """Compute the multihash-encoded SHA-256 of a file's bytes.
 
@@ -175,20 +188,30 @@ def multihash_sha256(path: Path) -> str:
 
 def multihash_sha256_bytes(data: bytes) -> str:
     """Same as multihash_sha256() but operates on an in-memory bytes object."""
-```
 
----
+# --- Timestamps ---
 
-## New utility — `timestamps.iso_now_utc()` and `timestamps.normalise_to_utc()`
-
-```python
 def iso_now_utc() -> str:
     """RFC 3339 UTC timestamp with millisecond precision: '2026-05-02T10:23:14.123Z'."""
 
 def normalise_to_utc(ts: str | datetime) -> str:
     """Coerce any RFC 3339 timestamp (timezone-naive accepted) to UTC RFC 3339.
     Raises ValueError if the input is unparseable."""
+
+# --- Default providers ---
+
+DEFAULT_PROVIDERS: list[Provider] = [
+    {"name": "Debrief", "roles": ["producer", "host"], "url": "https://debrief.info"}
+]
+
+# --- STAC extension URI constants ---
+
+STAC_EXTENSION_DEBRIEF: str = "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+STAC_EXTENSION_PROCESSING: str = "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
+STAC_EXTENSION_FILE: str = "https://stac-extensions.github.io/file/v2.1.0/schema.json"
 ```
+
+`ITEM_ASSETS_TEMPLATE` lives in `collection.py` (single caller) — see the Collection factory section above.
 
 ---
 
@@ -228,6 +251,57 @@ def main(catalog_root: Path = Path("preview/workspace/samples/local-store")) -> 
 
 ---
 
+## `saveSession.ts` migration to services-side write (review decision 1B)
+
+Today, `apps/vscode/src/commands/saveSession.ts:88–110` writes thumbnail PNGs and mutates `item.json.assets` directly from the VS Code extension — a pre-existing Article IV.1 violation ("frontends never persist") that spec 241 inherits. Rather than perpetuate it by lockstep-updating the extension code, this work migrates the call site to invoke the service-side factory.
+
+### Before (existing — to be removed)
+
+```typescript
+// saveSession.ts:88-110 (current — direct fs writes from the extension)
+const largePath = path.join(itemDir, 'thumbnail.png');
+const smallPath = path.join(itemDir, 'thumbnail-sm.png');
+fs.writeFileSync(largePath, Buffer.from(largePngBase64, 'base64'));
+fs.writeFileSync(smallPath, Buffer.from(smallPngBase64, 'base64'));
+
+const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8')) as { ... };
+itemData.assets['thumbnail'] = { href: './thumbnail.png', ... };
+itemData.assets['thumbnail-sm'] = { href: './thumbnail-sm.png', ... };
+fs.writeFileSync(itemJsonPath, JSON.stringify(itemData, null, 2));
+```
+
+### After (target shape)
+
+The extension delegates to a typed service-side helper. The bytes still flow through the extension (it's where the MapPanel produces them), but **persistence is owned by the service**:
+
+```typescript
+// saveSession.ts (new — delegates to services/stac)
+import { writePlotThumbnails } from '@debrief/stac-writer'; // existing TS shim or new wrapper
+
+await writePlotThumbnails({
+  storePath,
+  itemPath: parsed.itemPath,
+  largePngBase64,
+  smallPngBase64,
+});
+```
+
+`writePlotThumbnails` is the TS-side surface that calls into the Python `services/stac/src/debrief_stac/thumbnails.py:store_thumbnail()` factory through whichever transport is in use (in-process via the existing `@debrief/stac-writer` package introduced in #236, or via MCP for the VS Code Desktop path). The service:
+
+1. Writes `thumbnail.png` (200×150) and `overview.png` (800×600) to the item directory.
+2. Computes `file:size` + `file:checksum` for both PNGs.
+3. Sets `proj:shape: [150, 200]` on `assets.thumbnail` and `[600, 800]` on `assets.overview`.
+4. Refreshes `properties.updated`.
+5. Returns the updated Item shape.
+
+The extension does not touch `item.json.assets` directly. The new naming (`thumbnail` = small, `overview` = large) is enforced by the service-side factory; the extension cannot drift.
+
+### Acceptance test
+
+A VS Code integration test (or web-shell host equivalent) saves a session and asserts the resulting `item.json` shape matches `contracts/item-shape.schema.json` AND the on-disk filenames are `thumbnail.png` (200×150) and `overview.png` (800×600), not the legacy `thumbnail.png` (800×600) + `thumbnail-sm.png` (200×150) pair.
+
+---
+
 ## VS Code reader rename (TypeScript)
 
 In `apps/vscode/src/types/stac.ts`:
@@ -259,5 +333,8 @@ Every consumer is updated in lockstep — tsc strict mode enforces complete migr
 | FR-001..FR-009 | Unit test in `services/stac/tests/test_plot.py` calls `create_plot()` then `add_source_asset()` then `attach_thumbnails()` and validates the resulting Item against `contracts/item-shape.schema.json` AND the official STAC 1.1 Item schema |
 | FR-010..FR-014 | Unit test in `services/stac/tests/test_collection.py` calls `rebuild_collection_summaries()` and validates against `contracts/collection-shape.schema.json` AND the official STAC 1.1 Collection schema |
 | FR-015..FR-021 | Integration test runs `scripts/upgrade-catalog-to-stac-1.1.py` against a fixture mini-catalog (3 items), then runs it AGAIN and asserts zero diff |
-| FR-022..FR-027 | Playwright test at `apps/web-shell/playwright/tests/stac-browser-interop.spec.ts` |
+| FR-022..FR-027 | Playwright test at `apps/web-shell/playwright/tests/stac-browser-interop.spec.ts` (serves vendored stac-browser dist + regenerated catalog statically — research.md Decision 7) |
 | FR-028..FR-029 | Existing VS Code + web-shell unit tests pass with the renamed type fields (caught by tsc) |
+| Article IV.1 closure | New VS Code integration test (`saveSession` host path) asserts `saveSession.ts` no longer touches `item.json.assets` directly — research.md Decision 11 |
+| Article I.3 closure | `test_stac_validation.py` runs unconditionally against vendored schemas — no network probe, no silent skip — research.md Decision 9 |
+| `scene-thumbnail-*` validates | Item contract's `patternProperties` accepts `^scene-thumbnail(-.+)?$`; Collection's `item_assets` declares the placeholder — review decision 5A |
