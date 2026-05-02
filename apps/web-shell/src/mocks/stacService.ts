@@ -12,6 +12,7 @@
 import type { CatalogOverviewItem } from '@debrief/components';
 import type { PlatformRecord } from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
+import { getActiveStacWriter } from '../services/stacWriterRegistry';
 
 // Import fixture data via Vite's JSON import (bundled fallback for production builds)
 import exerciseAlphaItem from '@test-data/local-store/exercise-alpha/item.json';
@@ -129,6 +130,14 @@ export interface MockStacService {
    * unsubscribe function.
    */
   onItemsChanged(listener: (itemPath: string) => void): () => void;
+
+  /**
+   * #236 — re-apply IndexedDB overlays on top of the in-memory catalog.
+   * Called by App.tsx after the writer becomes available, so any race
+   * between catalog init and writer init still leaves the on-screen
+   * catalog showing persisted overlays.
+   */
+  reapplyIdbOverlays(): Promise<void>;
 }
 
 /**
@@ -197,6 +206,52 @@ export function createMockStacService(): MockStacService {
       console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
       loadBundledFallback();
     }
+    // #236 — apply IndexedDB overlays on top of the freshly-loaded
+    // catalog so saved metadata edits survive a reload (FR-002 / FR-008).
+    await applyIdbOverlays();
+  }
+
+  /**
+   * Walk every IndexedDB stored record and merge its properties on top
+   * of the matching in-memory item (overlay-wins shallow merge per
+   * data-model.md Layer 4). Best-effort — no writer or no stored items
+   * leaves the in-memory state unchanged.
+   *
+   * The writer's itemPath uses no leading `./` (e.g. `exercise-alpha/item.json`),
+   * but the in-memory itemMap keys are catalog-relative (`./exercise-alpha/item.json`).
+   * We normalise both ways during lookup.
+   */
+  async function applyIdbOverlays(): Promise<void> {
+    const writer = getActiveStacWriter();
+    if (writer === null) return;
+    try {
+      const stored = await writer.listStoredItems();
+      for (const { itemPath, stored: rec } of stored) {
+        const candidates = [itemPath, `./${itemPath}`];
+        for (const key of candidates) {
+          const existing = itemMap.get(key);
+          if (existing === undefined) continue;
+          // rec.record.properties is typed as Record<string, unknown> by
+          // the StacWriter contract; spread directly without the cast.
+          const overlayProps = rec.record.properties;
+          const mergedProps: StacItem['properties'] = {
+            ...existing.properties,
+            ...overlayProps,
+          };
+          const merged: StacItem = {
+            ...existing,
+            properties: mergedProps,
+          };
+          itemMap.set(key, merged);
+          const overview = toOverviewItem(key, merged);
+          const idx = items.findIndex((i) => i.itemPath === key);
+          if (idx >= 0) items[idx] = overview;
+          break;
+        }
+      }
+    } catch (err) {
+      console.warn('[stacService] applyIdbOverlays failed:', err);
+    }
   }
 
   return {
@@ -252,11 +307,49 @@ export function createMockStacService(): MockStacService {
       const idx = items.findIndex((i) => i.itemPath === itemPath);
       if (idx >= 0) items[idx] = overview;
       for (const listener of listeners) listener(itemPath);
+      // #236 FR-002 — persist the patch via the StacWriter so the edit
+      // survives a reload. Best-effort; the in-memory mutation above is
+      // already the user-visible source of truth for this session.
+      const writer = getActiveStacWriter();
+      if (writer !== null) {
+        const writerItemPath = itemPath.replace(/^\.\//, '');
+        void writer
+          .patchItem({
+            ctx: {
+              kind: 'idb',
+              nowMs: () => Date.now(),
+              randomId: () =>
+                typeof globalThis.crypto?.randomUUID === 'function'
+                  ? globalThis.crypto.randomUUID()
+                  : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+            },
+            itemPath: writerItemPath,
+            patch,
+            overrideFields: Object.keys(patch),
+            provenance: {
+              tool: 'debrief.propertiesPanel',
+              fields: Object.keys(patch),
+            },
+            packageVersion: '1.0.0',
+          })
+          .catch((err) => {
+            console.warn(
+              `[stacService] IDB patchItem failed for ${itemPath}:`,
+              err,
+            );
+          });
+      }
     },
 
     onItemsChanged(listener): () => void {
       listeners.add(listener);
       return () => listeners.delete(listener);
+    },
+
+    async reapplyIdbOverlays(): Promise<void> {
+      await applyIdbOverlays();
+      // Notify listeners so the catalog re-renders any overlay-touched rows.
+      for (const listener of listeners) listener('*');
     },
   };
 }

@@ -302,6 +302,10 @@ export default function App() {
           return;
         }
         setActiveStacWriter(writer, capability);
+        // Re-apply IDB metadata overlays on top of the in-memory catalog
+        // (FR-002 / FR-008). Required after writer becomes available
+        // since the stacService.init() call above may have raced ahead.
+        void stacService.reapplyIdbOverlays();
         // If a plot was already selected before the writer became
         // available (the URL ?plot= auto-open path can race the writer
         // init), re-hydrate now that the IDB read path is ready.
