@@ -203,3 +203,58 @@ class TestSTACStructuralValidation:
 def _format_errors(item: dict[str, object]) -> str:
     errs = iter_item_validation_errors(item)
     return "\n  ".join(errs) if errs else "(none)"
+
+
+# ---------------------------------------------------------------------------
+# Spec 241 T047 — every item.json under preview/workspace/samples/local-store/
+# validates against the vendored STAC 1.1 Item Schema (SC-001).
+# ---------------------------------------------------------------------------
+
+
+def _sample_catalog_root() -> Path | None:
+    candidate = (
+        Path(__file__).parent.parent.parent.parent
+        / "preview"
+        / "workspace"
+        / "samples"
+        / "local-store"
+    )
+    return candidate if candidate.is_dir() else None
+
+
+def test_sample_catalog_items_validate_against_stac_1_1() -> None:
+    """T047 / SC-001: 73/73 items validate against vendored STAC 1.1 Item Schema."""
+    root = _sample_catalog_root()
+    if root is None:
+        pytest.skip("Sample catalog not present (preview/workspace/samples/local-store)")
+
+    item_paths = sorted(root.glob("*/item.json"))
+    assert item_paths, f"No item.json files found under {root}"
+
+    failures: list[tuple[Path, str]] = []
+    for path in item_paths:
+        with open(path) as f:
+            item = json.load(f)
+        try:
+            validate_stac_item(item)
+        except ValidationError as exc:
+            failures.append((path, str(exc).splitlines()[0]))
+
+    assert not failures, "STAC 1.1 validation failures:\n  " + "\n  ".join(
+        f"{p}: {m}" for p, m in failures
+    )
+
+
+def test_sample_catalog_root_validates_against_stac_1_1() -> None:
+    """T047 / SC-001: catalog.json validates as a STAC 1.1 Collection."""
+    root = _sample_catalog_root()
+    if root is None:
+        pytest.skip("Sample catalog not present")
+
+    catalog_path = root / "catalog.json"
+    with open(catalog_path) as f:
+        catalog = json.load(f)
+    if catalog.get("type") == "Collection":
+        validate_stac_collection(catalog)
+    else:
+        validate_stac_catalog(catalog)

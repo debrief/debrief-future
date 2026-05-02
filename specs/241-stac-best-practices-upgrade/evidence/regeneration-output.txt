@@ -1,0 +1,28 @@
+# scripts/upgrade-catalog-to-stac-1.1.py output (idempotency demonstration)
+
+## First run (initial regeneration of legacy 1.0 catalog)
+```
+Upgrading catalog at preview/workspace/samples/local-store (regen timestamp 2026-05-02T08:42:53.617Z)
+  thumbnail renames — large→overview: 73; small→thumbnail: 73
+  upgrading 73 item.json files
+  upgrading preview/workspace/samples/local-store/catalog.json
+  validating against vendored STAC 1.1 schemas
+
+Done — 73 items + 1 catalog upgraded and validated against vendored STAC 1.1 schemas.
+```
+
+## Second run (idempotency proof — SC-007)
+```
+Upgrading catalog at /home/user/debrief-future/preview/workspace/samples/local-store (regen timestamp 2026-05-02T08:45:27.355Z)
+  thumbnail renames — large→overview: 0; small→thumbnail: 0
+  upgrading 73 item.json files
+  upgrading /home/user/debrief-future/preview/workspace/samples/local-store/catalog.json
+  validating against vendored STAC 1.1 schemas
+
+Done — 73 items + 1 catalog upgraded and validated against vendored STAC 1.1 schemas.
+```
+
+## Verification — zero diff between consecutive runs
+```
+Files differing between snapshots: 0
+```

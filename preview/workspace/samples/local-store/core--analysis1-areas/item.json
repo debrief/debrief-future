@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--analysis1-areas",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Analysis1 Areas",
     "datetime": "2026-04-13T23:12:29.920924+00:00",
-    "description": "Saxon Warrior: Analysis1 Areas — Royal Navy training exercise in the English Channel / Western Approaches.",
+    "description": "Saxon Warrior: Analysis1 Areas \u2014 Royal Navy training exercise in the English Channel / Western Approaches.",
     "debrief:platforms": [],
     "debrief:tags": [
       "escort",
@@ -53,6 +55,19 @@
     "debrief:feature_tags": [
       "depth-charge",
       "sprint-and-drift"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -100,23 +115,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/Analysis1_Areas.rep",
         "load_timestamp": "2026-04-13T23:12:29.922670Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:29.922Z",
+      "file:size": 255,
+      "file:checksum": "1220199c0511cc7a0f41579d0548bc253f625404aa8ae2752ffc993da2688b6b07fd"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 3483,
+      "file:checksum": "1220363c0646c1d36105e3db4a0cc0c57cb06bb28787044a8df2dd1c1357de91790d"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 6652,
+      "file:checksum": "1220706e5c135ca4ec235125fe23dddb90d1073f0345efb2fc9d368115dfe2fa48fa"
     }
   }
 }
