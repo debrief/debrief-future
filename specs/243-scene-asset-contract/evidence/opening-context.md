@@ -1,0 +1,27 @@
+## Hook
+
+| Before | After |
+|---|---|
+| `assets["scene-thumbnail-01HXYZ7K8M9N0P1Q2R3S4T5V6W"]` — what is this? | The same key, with a named `SceneThumbnailAssetEntry` LinkML class one click away in the schema bundle. |
+| Pairing rule (`-sm` always accompanies the large variant) lived in TypeScript service code. | Pairing rule named `scene-thumbnail-pair-rule-001`, cited by the validator when it fires. |
+| ULID-suffixed keys matched a permissive `^scene-thumbnail(-.+)?$` regex left over from the spec-241 placeholder. | Key shape locked to `^scene-thumbnail-[0-9A-HJKMNP-TV-Z]{26}(?:-sm)?$`, with the value shape generated into Pydantic, JSON Schema, and TypeScript from a single LinkML class. |
+| The four diagnostic questions ("what is this", "why ULID", "why pairs", "what deletes it") were answerable only by grepping `apps/vscode/src/services/sceneThumbnailService.ts`. | All four answered by the LinkML class docstring, which flows through to every generator output. |
+
+## What We're Building
+
+Storyboarding writes a pair of PNG thumbnails for every Scene into the owning Plot's STAC `item.json.assets` map, keyed by the Scene's ULID — `scene-thumbnail-{ULID}` for the 800×600 large variant and `scene-thumbnail-{ULID}-sm` for the 200×150 small one. Until now those keys had no schema document explaining themselves: spec #241 needed them to validate, so it added a placeholder `scene-thumbnail` entry to the asset catalogue and a permissive `^scene-thumbnail(-.+)?$` `patternProperties` rule. Tactical and shippable, but it left the only authoritative description of the contract sitting inside a TypeScript service file.
+
+This feature promotes that contract to a first-class, LinkML-authored shape — `SceneThumbnailAssetEntry` — with explicit pairing, lifecycle, and ownership semantics. A contributor opening a real `item.json` and seeing one of those ULID-suffixed keys can now answer "what is this", "why a ULID", "why pairs", and "what deletes it" from the schema bundle alone. The class docstring is the single source of contributor-facing documentation, and it travels into Pydantic, JSON Schema, and TypeScript outputs through the existing generators with no bespoke build steps.
+
+## How It Fits
+
+The change sits squarely on the schema seam between Storyboarding (which produces the assets), the STAC catalogue (which stores them), and the spec-241 Item shape contract (which validates them). It does not touch any write path — `sceneThumbnailService.ts` keeps producing exactly the same on-disk output — and it does not promote Scene itself to a first-class schema shape (that's tracked separately). What it does change is the *direction of authority*: the spec-241 Item contract loses its inline regex and gains an `allOf $ref` to a small JSON Schema overlay, and the overlay in turn wraps the LinkML-generated value shape. The pairing and orphan invariants, which JSON Schema cannot back-reference cleanly, live in a thin Python audit module under `services/stac/` that names each violated rule by stable ID. The result is one shape, three generator outputs, one overlay, one contract — and a couple of audit rules with names that show up in CI failures.
+
+## Key Decisions
+
+- **Hybrid LinkML + JSON-Schema-overlay rather than hand-authoring the whole thing in JSON Schema.** LinkML's `gen-json-schema` cannot emit `patternProperties`, but it can emit the value shape — so the value shape stays LinkML-authored (single source of truth) and a small hand-written overlay adds the pattern-keyed wrapper. Inventing a parallel schema source was the alternative, and it would have undermined the whole point of Article II.
+- **Pairing invariant enforced in Python, not JSON Schema.** JSON Schema 2020-12 cannot back-reference a regex group, so the rule "if `scene-thumbnail-{ULID}` exists, then `scene-thumbnail-{ULID}-sm` must also exist" is encoded in a ~80-LOC audit module. Each violation cites a stable rule ID (`scene-thumbnail-pair-rule-001`) so that a CI failure points the contributor straight at the contract document instead of at a generic JSON Schema error.
+- **Orphan detection lives in the same audit module.** The schema documents the rule (a scene-thumbnail pair whose ULID is not in the owning Storyboard's Scene list is a defect), and the audit module enforces it where Storyboard context is in scope. This keeps the lifecycle invariant *referable from the schema* even where it isn't *checkable by the schema*.
+- **Strict pairing today, with a forward-compatible enum recipe for additional variants.** Adding a `-md` (or other) variant later means extending the LinkML class and updating the overlay regex — not re-engineering the contract. Strict pairing was preferred over treating the small variant as derivable, because Storyboarding writes the pair atomically and the schema should reflect that.
+- **No new runtime dependencies, no on-disk migration.** A grep of the sample catalogue confirmed there are no real `scene-thumbnail-{ULID}` entries today, so the changeover is pure schema work — no fixtures to rewrite, no users to migrate.
+- **Pre-v4 freedom invoked to remove the spec-241 tactical artefacts cleanly.** The placeholder `scene-thumbnail` entry in `ITEM_ASSETS_TEMPLATE` and the inline `patternProperties` block in the spec-241 Item shape contract both come out in the same change, with no deprecation cycle, because there are no external consumers and the workaround was always tactical.
