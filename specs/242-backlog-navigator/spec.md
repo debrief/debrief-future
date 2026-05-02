@@ -42,6 +42,7 @@ A reviewer triages a batch of proposed items, flipping three to `approved`, fixi
 5. **Given** a reviewer changes an item's `Status` to `complete`, **When** they push, **Then** the resulting `BACKLOG.md` row is rendered with the project's existing strikethrough convention (entire row wrapped). Conversely, changing it away from `complete` removes the strikethrough.
 6. **Given** a reviewer renames an item's `ID` to a value already used by another row, **When** they attempt to commit the edit (or push), **Then** the navigator surfaces a collision warning at edit time and blocks the push until the collision is resolved.
 7. **Given** a reviewer has staged edits and the network fails during push, **When** the failure is reported, **Then** the staged edits are preserved exactly as they were (nothing is silently lost) and the reviewer can retry.
+8. **Given** the navigator is loaded in dry-run mode (e.g. on a per-PR preview deployment), **When** the reviewer stages edits and clicks **Push Changes** then confirms, **Then** the dialog clearly indicates this is a preview, the structured summary and raw diff render exactly as they would in real-write mode, no commit/branch/PR is created, and the staging area is preserved so the reviewer can re-open the dialog to re-verify the output.
 
 ---
 
@@ -118,6 +119,13 @@ A second reviewer is reviewing an open PR that touches `BACKLOG.md`. They open t
 - **FR-027**: Authentication MUST extend the existing spec-navigator PAT-in-localStorage pattern (same UX, same redaction rules, same key namespace), with the token requiring `repo` scope for write operations. Reading a public `BACKLOG.md` MUST work without a PAT; staging edits MUST require one.
 - **FR-028**: The navigator MUST detect a PAT lacking `repo` scope before attempting any write and MUST explain how to upgrade the token rather than failing opaquely mid-push.
 
+#### Dry-run mode & preview deployment
+
+- **FR-029**: The navigator MUST support a "dry-run" mode in which the **Push Changes** dialog opens, renders the full structured summary, exposes the raw-diff toggle, and offers a confirmation control — but the confirmation does NOT call any GitHub write API and produces no commit, no branch, and no PR. The dialog MUST clearly indicate (e.g. via a banner or relabelled button such as "Preview only — no PR will be opened") that the action is non-destructive.
+- **FR-030**: Dry-run mode MUST be selectable per deployment without rebuilding the application — typically via URL query parameter, build-time flag set at deploy time, or per-environment configuration. The chosen mechanism MUST be visible to the reviewer (so a reviewer in dry-run mode is never surprised that their push had no effect).
+- **FR-031**: In dry-run mode the staging area MUST be preserved across the dialog confirm (so reviewers can iterate on the same set of pending edits and re-open the dialog repeatedly to verify the rendered diff). Real-write mode clears staging only after a successful API call (per FR-023); dry-run mode never clears staging from the confirm action alone.
+- **FR-032**: The navigator MUST be deployable as part of the project's existing per-PR preview-deployment pipeline (Heroku Review Apps), so that any PR touching the navigator's source — or the schema-refactored `BACKLOG.md` — surfaces a preview URL where reviewers can exercise the navigator against the version of `BACKLOG.md` contained in that PR. Dry-run mode SHOULD be the default for these per-PR preview deployments.
+
 ### Key Entities
 
 - **Backlog Item**: A single row in the `## Items` table. Attributes: `ID`, `Category`, `Description` (Markdown), `V`, `M`, `A`, `Total`, `Complexity`, `Status`, `Epic`, `Created`, `Updated`. Identified by `ID` (which is itself editable, hence the collision-detection requirement).
@@ -153,6 +161,7 @@ A second reviewer is reviewing an open PR that touches `BACKLOG.md`. They open t
 - **Error State**: Auth errors, network errors, stale-base errors, ID-collision blocks, and parse-failure rows each surface as an actionable banner or inline message that explains the cause and the next step (e.g. "PAT lacks `repo` scope — open settings to update", "Backlog has moved on `main` since you loaded — reload and re-apply").
 - **Success State**: After a successful push, a confirmation banner shows the PR URL (clickable) and the staging area is empty.
 - **PR Mode**: When loaded with `?pr=NNN`, a persistent banner or chip indicates "Editing PR #NNN — head branch `<name>`" and the **Push Changes** action's confirmation dialog reflects the destination ("Add commit to existing PR" rather than "Open new PR").
+- **Dry-run / Preview Mode**: When the deployment is configured for dry-run (typical on per-PR preview deployments), a persistent banner or chip indicates "Preview deployment — Push Changes will not commit". The Push Changes dialog renders identically to real-write mode, but the confirm control is relabelled (e.g. "Preview submission" instead of "Open PR") and dismissing the dialog leaves staging intact.
 - **Pending-edits state**: Modified cells visually distinguished from unmodified ones; modified rows visually distinguished as well; per-edit undo control on each modified cell.
 
 ## Success Criteria *(mandatory)*
@@ -169,6 +178,7 @@ A second reviewer is reviewing an open PR that touches `BACKLOG.md`. They open t
 - **SC-008**: A round-trip "load `?pr=NNN` → stage edits → Push Changes → commit appended to PR" produces no second PR and the existing PR's diff updates in place.
 - **SC-009**: When the base has moved since load, push attempts are refused with an actionable message rather than producing a conflicting commit, and zero pending edits are lost in the refusal path.
 - **SC-010**: Reviewers report (qualitatively) that group-by-epic + per-epic progress meaningfully improves their understanding of in-flight work, compared with the pre-refactor flat table view.
+- **SC-011**: Every PR touching the navigator's source or the schema-refactored `BACKLOG.md` surfaces a preview URL where the navigator runs against that PR's version of `BACKLOG.md`, with dry-run mode active so the reviewer can exercise the full Push-Changes UX (dialog, summary, raw diff) without producing GitHub side-effects.
 
 ## Assumptions
 
@@ -180,3 +190,5 @@ A second reviewer is reviewing an open PR that touches `BACKLOG.md`. They open t
 - The strikethrough-on-`complete` convention for Items rows is preserved as today; only the Epics table drops the strikethrough convention (in favour of the explicit Status column).
 - The navigator's read path uses publicly-accessible content where possible (no PAT required to browse a public `BACKLOG.md`); only writes require auth.
 - A 3-way structured merge for stale-base reconciliation is a future enhancement, not part of this spec.
+- The project's existing Heroku Review Apps preview-deployment pipeline (per CLAUDE.md "Demo Environment") is the intended host for per-PR preview URLs; the navigator is wired into that pipeline rather than introducing a new hosting mechanism.
+- Dry-run mode is a real product capability (also useful as a "review my diff before I commit" safety affordance in real deployments), not solely a phasing artefact. That said, it is the natural way to land an initial PR that ships the browse + edit + dialog UX without yet exercising the GitHub write path; the actual write path can land in a follow-up PR while the navigator's preview deployment continues to provide an interactive smoke-test surface against any in-flight `BACKLOG.md` changes.
