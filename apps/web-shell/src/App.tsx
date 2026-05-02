@@ -1594,6 +1594,15 @@ export default function App() {
             >
               VS Code Preview &rarr;
             </a>
+            <a
+              className="web-shell__header-link"
+              href="https://debrief.github.io/debrief-future/backlog-navigator/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open the Backlog Navigator to triage / edit BACKLOG.md"
+            >
+              ⚙ Edit Backlog &rarr;
+            </a>
           </div>
         </header>
         <main className="web-shell__main">
