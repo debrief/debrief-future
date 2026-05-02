@@ -295,8 +295,10 @@ export class StacService {
             platforms: (item.properties['debrief:platforms'] as PlatformRecord[] | undefined) ?? [],
             tags: (item.properties['debrief:tags'] as string[] | undefined) ?? [],
             featureTags: (item.properties['debrief:feature_tags'] as string[] | undefined) ?? [],
+            // spec 241: assets.thumbnail is the small (200x150) variant;
+            // assets.overview is the large (800x600) variant.
             thumbnailHref: item.assets['thumbnail']?.href ?? null,
-            thumbnailSmHref: item.assets['thumbnail-sm']?.href ?? null,
+            overviewHref: item.assets['overview']?.href ?? null,
           });
         }
       }

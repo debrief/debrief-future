@@ -35,8 +35,10 @@ interface LoadCatalogOverviewMessage {
       platforms: readonly PlatformRecord[];
       tags: readonly string[];
       featureTags: readonly string[];
+      // spec 241 — thumbnailHref points at the small (200x150) variant
+      // and overviewHref at the large (800x600) variant.
       thumbnailHref: string | null;
-      thumbnailSmHref: string | null;
+      overviewHref: string | null;
     }>;
   };
 }
@@ -225,7 +227,7 @@ export class CatalogOverviewPanel {
       // code-server webviews where asWebviewUri may not serve local files (#174).
       const itemDir = path.dirname(path.join(storePath, item.itemPath));
       const thumbnailHref = readThumbnailAsDataUri(itemDir, item.thumbnailHref ?? null);
-      const thumbnailSmHref = readThumbnailAsDataUri(itemDir, item.thumbnailSmHref ?? null);
+      const overviewHref = readThumbnailAsDataUri(itemDir, item.overviewHref ?? null);
 
       return {
         id: item.id,
@@ -239,7 +241,7 @@ export class CatalogOverviewPanel {
         tags: item.tags ?? [],
         featureTags: item.featureTags ?? [],
         thumbnailHref,
-        thumbnailSmHref,
+        overviewHref,
       };
     });
 

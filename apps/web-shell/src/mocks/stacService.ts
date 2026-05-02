@@ -74,8 +74,10 @@ function resolveStacHref(itemPath: string, href: string): string {
 
 /** Convert a STAC item + its catalog-relative itemPath to a CatalogOverviewItem. */
 function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
+  // spec 241: assets.thumbnail is the small (200x150); assets.overview is
+  // the large (800x600). Naming follows STAC convention.
   const thumbAsset = item.assets?.['thumbnail'];
-  const thumbSmAsset = item.assets?.['thumbnail-sm'];
+  const overviewAsset = item.assets?.['overview'];
   return {
     id: item.id,
     title: item.properties.title ?? item.id,
@@ -88,7 +90,7 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     tags: item.properties['debrief:tags'] ?? [],
     featureTags: item.properties['debrief:feature_tags'] ?? [],
     thumbnailHref: thumbAsset ? resolveStacHref(itemPath, thumbAsset.href) : null,
-    thumbnailSmHref: thumbSmAsset ? resolveStacHref(itemPath, thumbSmAsset.href) : null,
+    overviewHref: overviewAsset ? resolveStacHref(itemPath, overviewAsset.href) : null,
   };
 }
 
