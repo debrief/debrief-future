@@ -140,6 +140,8 @@ jobs:
           run_step web-shell-pw bash -c 'cd apps/web-shell && node run-playwright.mjs' || EXIT=$?
           run_step spec-nav-build pnpm --filter @debrief/spec-navigator build || EXIT=$?
           run_step spec-nav-pw bash -c 'cd apps/spec-navigator && node run-playwright.mjs' || EXIT=$?
+          run_step backlog-nav-build pnpm --filter @debrief/backlog-navigator build || EXIT=$?
+          run_step backlog-nav-pw bash -c 'cd apps/backlog-navigator && node run-playwright.mjs' || EXIT=$?
 
           exit "${EXIT:-0}"
 
