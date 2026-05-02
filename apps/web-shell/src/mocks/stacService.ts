@@ -12,6 +12,7 @@
 import type { CatalogOverviewItem } from '@debrief/components';
 import type { PlatformRecord } from '@debrief/schemas';
 import type { FeatureCollection } from 'geojson';
+import { getActiveStacWriter } from '../services/stacWriterRegistry';
 
 // Import fixture data via Vite's JSON import (bundled fallback for production builds)
 import exerciseAlphaItem from '@test-data/local-store/exercise-alpha/item.json';
@@ -131,6 +132,29 @@ export interface MockStacService {
    * unsubscribe function.
    */
   onItemsChanged(listener: (itemPath: string) => void): () => void;
+
+  /**
+   * #236 — re-apply IndexedDB overlays on top of the in-memory catalog.
+   * Called by App.tsx after the writer becomes available, so any race
+   * between catalog init and writer init still leaves the on-screen
+   * catalog showing persisted overlays.
+   */
+  reapplyIdbOverlays(): Promise<void>;
+
+  /**
+   * #236 US3 — create a new standalone STAC item from user-drawn data.
+   * Persists both the item.json record and the GeoJSON payload through
+   * the StacWriter, then registers the item in the in-memory catalog so
+   * subsequent getItems() includes it. Returns the new itemPath
+   * (`user/<ULID>/item.json`) on success, null if no writer is available.
+   */
+  createStandaloneItem(input: {
+    title: string;
+    geojson: FeatureCollection;
+    bbox?: [number, number, number, number];
+    platforms?: PlatformRecord[];
+    tags?: string[];
+  }): Promise<string | null>;
 }
 
 /**
@@ -199,6 +223,69 @@ export function createMockStacService(): MockStacService {
       console.warn('[stacService] Failed to load from /stac-store/, using bundled fallback:', err);
       loadBundledFallback();
     }
+    // #236 — apply IndexedDB overlays on top of the freshly-loaded
+    // catalog so saved metadata edits survive a reload (FR-002 / FR-008)
+    // and register any IDB-only standalone items (FR-003 / FR-008).
+    await applyIdbOverlays();
+    await loadStandaloneItems();
+  }
+
+  /**
+   * Walk every IndexedDB stored record and merge its properties on top
+   * of the matching in-memory item (overlay-wins shallow merge per
+   * data-model.md Layer 4). Best-effort — no writer or no stored items
+   * leaves the in-memory state unchanged.
+   *
+   * The writer's itemPath uses no leading `./` (e.g. `exercise-alpha/item.json`),
+   * but the in-memory itemMap keys are catalog-relative (`./exercise-alpha/item.json`).
+   * We normalise both ways during lookup.
+   */
+  async function applyIdbOverlays(): Promise<void> {
+    const writer = getActiveStacWriter();
+    if (writer === null) return;
+    try {
+      const stored = await writer.listStoredItems();
+      for (const { itemPath, stored: rec } of stored) {
+        const candidates = [itemPath, `./${itemPath}`];
+        for (const key of candidates) {
+          const existing = itemMap.get(key);
+          if (existing === undefined) continue;
+          // rec.record.properties is typed as Record<string, unknown> by
+          // the StacWriter contract; spread directly without the cast.
+          const overlayProps = rec.record.properties;
+          const mergedProps: StacItem['properties'] = {
+            ...existing.properties,
+            ...overlayProps,
+          };
+          const merged: StacItem = {
+            ...existing,
+            properties: mergedProps,
+          };
+          itemMap.set(key, merged);
+          const overview = toOverviewItem(key, merged);
+          const idx = items.findIndex((i) => i.itemPath === key);
+          if (idx >= 0) items[idx] = overview;
+          break;
+        }
+      }
+    } catch (err) {
+      console.warn('[stacService] applyIdbOverlays failed:', err);
+    }
+  }
+
+  /**
+   * Walk every IndexedDB standalone record and register it in the
+   * in-memory catalog. Standalone items have no bundled counterpart, so
+   * they appear as fresh catalog rows after a reload. Best-effort.
+   */
+  async function loadStandaloneItems(): Promise<void> {
+    const writer = getActiveStacWriter();
+    if (writer === null) return;
+    try {
+      await loadStandaloneItemsViaWriter(writer, itemMap, items, geojsonCache);
+    } catch (err) {
+      console.warn('[stacService] loadStandaloneItems failed:', err);
+    }
   }
 
   return {
@@ -254,13 +341,169 @@ export function createMockStacService(): MockStacService {
       const idx = items.findIndex((i) => i.itemPath === itemPath);
       if (idx >= 0) items[idx] = overview;
       for (const listener of listeners) listener(itemPath);
+      // #236 FR-002 — persist the patch via the StacWriter so the edit
+      // survives a reload. Best-effort; the in-memory mutation above is
+      // already the user-visible source of truth for this session.
+      const writer = getActiveStacWriter();
+      if (writer !== null) {
+        const writerItemPath = itemPath.replace(/^\.\//, '');
+        void writer
+          .patchItem({
+            ctx: {
+              kind: 'idb',
+              nowMs: () => Date.now(),
+              randomId: () =>
+                typeof globalThis.crypto?.randomUUID === 'function'
+                  ? globalThis.crypto.randomUUID()
+                  : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+            },
+            itemPath: writerItemPath,
+            patch,
+            overrideFields: Object.keys(patch),
+            provenance: {
+              tool: 'debrief.propertiesPanel',
+              fields: Object.keys(patch),
+            },
+            packageVersion: '1.0.0',
+          })
+          .catch((err) => {
+            console.warn(
+              `[stacService] IDB patchItem failed for ${itemPath}:`,
+              err,
+            );
+          });
+      }
     },
 
     onItemsChanged(listener): () => void {
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
+
+    async reapplyIdbOverlays(): Promise<void> {
+      await applyIdbOverlays();
+      await loadStandaloneItems();
+      // Notify listeners so the catalog re-renders any overlay-touched rows.
+      for (const listener of listeners) listener('*');
+    },
+
+    async createStandaloneItem(input): Promise<string | null> {
+      const writer = getActiveStacWriter();
+      if (writer === null) return null;
+      const id = makeUlidIsh();
+      const itemPath = `user/${id}/item.json`;
+      const nowIso = new Date().toISOString();
+      const item: StacItem = {
+        id,
+        bbox: input.bbox,
+        properties: {
+          title: input.title,
+          datetime: nowIso,
+          'debrief:platforms': input.platforms ?? [],
+          'debrief:tags': input.tags ?? [],
+          'debrief:feature_tags': [],
+        },
+        assets: {
+          data: {
+            href: `idb:${itemPath}::data`,
+            type: 'application/geo+json',
+            roles: ['data'],
+          },
+        },
+      };
+      const ctx = {
+        kind: 'idb' as const,
+        nowMs: () => Date.now(),
+        randomId: () => id,
+      };
+      // Local StacItem differs structurally from @debrief/stac-writer's
+      // (no index signature). Build the writer's view of the same data
+      // by serialising-and-reparsing — no `as unknown` casts needed.
+      const writerItem: import('@debrief/stac-writer').StacItem = JSON.parse(
+        JSON.stringify({
+          id: item.id,
+          properties: item.properties,
+          assets: item.assets,
+          bbox: item.bbox,
+        }),
+      );
+      try {
+        await writer.writeItem({ ctx, itemPath, item: writerItem, mode: 'create' });
+        await writer.writeAsset({
+          ctx,
+          itemPath,
+          assetHref: './data.geojson',
+          body: JSON.stringify(input.geojson),
+          mediaType: 'application/geo+json',
+          assetEntry: { key: 'data', roles: ['data'], title: 'GeoJSON payload' },
+        });
+        // Register in the in-memory catalog so the next render pass shows it.
+        itemMap.set(itemPath, item);
+        geojsonCache.set(itemPath, input.geojson);
+        items.unshift(toOverviewItem(itemPath, item));
+        for (const listener of listeners) listener(itemPath);
+        return itemPath;
+      } catch (err) {
+        console.warn(
+          `[stacService] createStandaloneItem failed for ${itemPath}:`,
+          err,
+        );
+        return null;
+      }
+    },
   };
+}
+
+/**
+ * Walk every IndexedDB standalone record and register it in the in-memory
+ * catalog. Standalone items have no bundled counterpart, so they appear
+ * as fresh catalog rows after a reload. Best-effort.
+ */
+async function loadStandaloneItemsViaWriter(
+  writer: NonNullable<ReturnType<typeof getActiveStacWriter>>,
+  itemMap: Map<string, StacItem>,
+  items: CatalogOverviewItem[],
+  geojsonCache: Map<string, FeatureCollection>,
+): Promise<void> {
+  const stored = await writer.listStoredItems();
+  for (const { itemPath, stored: rec } of stored) {
+    if (rec.kind !== 'standalone') continue;
+    if (itemMap.has(itemPath)) continue;
+    // Round-trip through JSON to project the writer's StacItem onto the
+    // local StacItem shape (no `as unknown` cast at the boundary).
+    const stacItem = JSON.parse(JSON.stringify(rec.record)) as StacItem;
+    itemMap.set(itemPath, stacItem);
+    items.unshift(toOverviewItem(itemPath, stacItem));
+    // Fetch the GeoJSON payload from IDB if available so getPlotData
+    // resolves locally for this item (no /stac-store/ round-trip).
+    const payload = await writer.readPayload(itemPath);
+    if (payload !== null) {
+      try {
+        geojsonCache.set(itemPath, JSON.parse(payload) as FeatureCollection);
+      } catch {
+        // ignore malformed payload
+      }
+    }
+  }
+}
+
+/** Tiny ULID-ish ID — 26 chars, monotonic-enough via Date.now base. */
+function makeUlidIsh(): string {
+  // ULID alphabet
+  const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  const ts = Date.now();
+  const tsChars: string[] = [];
+  let n = ts;
+  for (let i = 0; i < 10; i++) {
+    tsChars.unshift(alphabet[n % 32] ?? '0');
+    n = Math.floor(n / 32);
+  }
+  let rand = '';
+  for (let i = 0; i < 16; i++) {
+    const r = Math.floor(Math.random() * 32);
+    rand += alphabet[r] ?? '0';
+  }
+  return tsChars.join('') + rand;
 }
 
 /** Singleton instance */

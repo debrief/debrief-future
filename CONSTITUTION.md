@@ -46,6 +46,7 @@ This constitution establishes the immutable principles governing all development
 1. **Services never touch UI** — Python services return data only. All display and interaction decisions belong to frontends.
 2. **Frontends never persist** — frontends orchestrate calls to services. All data writes go through services.
 3. **Services have zero MCP dependency** — domain logic lives in pure Python libraries. MCP wrappers are thin, replaceable layers.
+4. **Persistence-host abstraction.** Frontends may persist data only via the unified writer abstraction. Browser-native stores (IndexedDB, OPFS, File System Access API) qualify as a persistence backend **only** when accessed through this abstraction — frontends never own a divergent write code path. The writer abstraction is the persistence boundary; both Node-side hosts and browser-side hosts route their writes through it. Each host implements the abstraction once, against its native backend; the rest of the system depends only on the interface. Machine-enforced via ESLint (`no-direct-persistence-in-frontend`).
 
 ---
 

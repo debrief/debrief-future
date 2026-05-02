@@ -15,9 +15,23 @@
  */
 
 import { captureMapAsDataUrl } from '@debrief/components';
+import { getActiveStacItemPath, getActiveStacWriter } from './stacWriterRegistry';
 
 const LARGE_DIMS = { width: 800, height: 600 };
 const SMALL_DIMS = { width: 200, height: 150 };
+
+/**
+ * Strip a `data:image/png;base64,XXXX` prefix down to the bare base64
+ * body so the StacWriter receives canonical input. Idempotent — bare
+ * base64 input is returned unchanged.
+ */
+function stripDataUrlPrefix(dataUrl: string): string {
+  const comma = dataUrl.indexOf(',');
+  if (dataUrl.startsWith('data:') && comma > 0) {
+    return dataUrl.slice(comma + 1);
+  }
+  return dataUrl;
+}
 
 /** Result shape mirrors the VS Code adaptor's `WriteSceneThumbnailResult`. */
 export interface WriteSceneThumbnailResult {
@@ -125,12 +139,99 @@ export async function captureSceneThumbnail(
     smallDataUrl,
   };
   store.put(sceneId, result);
+
+  // Best-effort: persist through the StacWriter so the capture survives
+  // a reload (#236 FR-001). The in-memory store above continues to back
+  // the rail's synchronous `thumbnailHref` lookup; the IDB write is the
+  // durability layer underneath. If no writer is registered (App boot
+  // hasn't completed yet, or capability check failed) we fall through
+  // silently — the in-memory store still serves the current session.
+  try {
+    const writer = getActiveStacWriter();
+    const stacItemPath = getActiveStacItemPath();
+    if (writer !== null && stacItemPath !== null) {
+      await writer.writeSceneThumbnailPair({
+        ctx: {
+          kind: 'idb',
+          nowMs: () => Date.now(),
+          randomId: () => sceneId,
+        },
+        stacItemPath,
+        sceneId,
+        largePngBase64: stripDataUrlPrefix(largeDataUrl),
+        smallPngBase64: stripDataUrlPrefix(smallDataUrl),
+      });
+    }
+  } catch (err) {
+    // Best-effort: capture has already succeeded into the in-memory
+    // store. Log but don't throw — Article I.3 still satisfied because
+    // the badge will continue to show "Session-only" if capability is
+    // unavailable, and the user can act on that.
+    console.warn(
+      '[webSceneThumbnailAdapter] IDB persistence failed (capture survives in-session):',
+      err,
+    );
+  }
   return result;
 }
 
 /** Convenience export: clear the shared store on plot change. */
 export function clearSceneThumbnailStore(): void {
   sharedStore.clear();
+}
+
+/**
+ * Re-hydrate the in-memory thumbnail store from IndexedDB after a plot
+ * load (#236 FR-001 — captures must survive a browser reload).
+ *
+ * Scans the freshly-loaded FeatureCollection for STORYBOARD_SCENE
+ * features, resolves each Scene's `thumbnail_asset_ref` to a blob URL
+ * via the writer's `readAssetBlob`, and populates the store. Failures
+ * are silent — the rail just shows an empty thumbnail rect for missing
+ * blobs (matches the existing pre-capture rendering).
+ */
+export async function hydrateSceneThumbnailStoreFromIdb(
+  features: ReadonlyArray<{
+    properties?: { kind?: string; id?: string; thumbnail_asset_ref?: string } | null;
+  }>,
+): Promise<void> {
+  const writer = getActiveStacWriter();
+  const stacItemPath = getActiveStacItemPath();
+  if (writer === null || stacItemPath === null) return;
+  const itemPath = `${stacItemPath}/item.json`;
+
+  for (const f of features) {
+    const props = f.properties;
+    if (
+      props === null ||
+      props === undefined ||
+      props.kind !== 'STORYBOARD_SCENE'
+    )
+      continue;
+    const sceneId = props.id;
+    const ref = props.thumbnail_asset_ref;
+    if (typeof sceneId !== 'string' || typeof ref !== 'string') continue;
+
+    try {
+      const [largeBlob, smallBlob] = await Promise.all([
+        writer.readAssetBlob(itemPath, ref),
+        writer.readAssetBlob(itemPath, `${ref}-sm`),
+      ]);
+      if (largeBlob === null && smallBlob === null) continue;
+      const largeUrl = largeBlob !== null ? URL.createObjectURL(largeBlob) : '';
+      const smallUrl = smallBlob !== null ? URL.createObjectURL(smallBlob) : '';
+      sharedStore.put(sceneId, {
+        assetKey: ref,
+        largeDataUrl: largeUrl,
+        smallDataUrl: smallUrl,
+      });
+    } catch (err) {
+      console.warn(
+        `[webSceneThumbnailAdapter] hydrate failed for scene ${sceneId}:`,
+        err,
+      );
+    }
+  }
 }
 
 export type { WebSceneThumbnailStore };

@@ -42,7 +42,7 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Build shared packages
-        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/components build
+        run: pnpm --filter @debrief/utils build && pnpm --filter @debrief/stac-writer build && pnpm --filter @debrief/components build
         working-directory: .
 
       - name: Lint

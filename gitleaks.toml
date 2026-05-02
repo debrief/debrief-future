@@ -37,6 +37,11 @@ paths = [
   '''apps/nl-demo/\.env\.example$''',
   '''specs/190-live-llm-transport/.*\.md$''',
   '''specs/190-live-llm-transport/contracts/.*\.md$''',
+  # #236 evidence/usage-example.md uses ULID values to demonstrate
+  # the StacWriter's writeSceneThumbnailPair sceneId surface. ULIDs
+  # are deliberately high-entropy 26-char strings and trip the
+  # generic-api-key rule even though they're documentation examples.
+  '''specs/236-web-shell-stac-writes/.*\.md$''',
   '''gitleaks\.toml$''',
 
   # Vendored dependencies — not our source; their own hygiene is out of scope.

@@ -133,9 +133,17 @@ test.describe('Storyboard capture — web-shell (#235 US1)', () => {
     expect(counts.storyboards).toBe(1);
     expect(counts.scenes).toBe(1);
 
+    // #236 — badge is now gated on the StacWriter's CapabilityReport,
+    // not on the mere presence of storyboard content. With IndexedDB
+    // available (the default in Playwright's chromium), captures
+    // persist via the writer and the badge stays hidden. The previous
+    // assertion (`toBeVisible`) reflected the pre-#236 reality where
+    // the badge was unconditional once any storyboard content existed.
+    // The badge-visible-when-IDB-unavailable behaviour is covered by
+    // stac-writes.spec.ts ('before — IndexedDB unavailable').
     await expect(
       page.locator('[data-testid="storyboard-session-only-badge"]'),
-    ).toBeVisible();
+    ).toBeHidden();
   });
 
   test('subsequent capture at the same timestamp surfaces the collision banner with Replace / Offset / Cancel', async ({

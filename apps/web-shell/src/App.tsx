@@ -122,6 +122,24 @@ import { calcService } from './mocks/calcService';
 import { executeTool, isMutationTool, listTools } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
+import { createStacWriterIdb } from './services/stacWriterIdb';
+import { probeIndexedDbCapability } from './services/stacWriterCapability';
+import {
+  setActiveStacItemPath,
+  setActiveStacWriter,
+} from './services/stacWriterRegistry';
+import {
+  clearSceneThumbnailStore,
+  hydrateSceneThumbnailStoreFromIdb,
+} from './services/webSceneThumbnailAdapter';
+
+/**
+ * Strip the catalog-relative `./<plot>/item.json` form down to the bare
+ * `<plot>` segment that #236's writer expects as its `stacItemPath`.
+ */
+function stripItemPathToParent(itemPath: string): string {
+  return itemPath.replace(/^\.\//, '').replace(/\/item\.json$/, '');
+}
 
 // Expose session store on window for Playwright test introspection
 declare global {
@@ -199,6 +217,12 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
+  // Stable ref for the writer-init effect's hydration retry path
+  // (avoids re-running the init effect every time currentPlot changes).
+  const currentPlotRef = useRef<PlotState | null>(null);
+  useEffect(() => {
+    currentPlotRef.current = currentPlot;
+  }, [currentPlot]);
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -257,6 +281,51 @@ export default function App() {
       }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // #236 — initialise the IndexedDB-backed StacWriter and probe capability.
+  // Failure modes (private mode, denied browser policy, IDB missing) are
+  // captured in the registry's CapabilityReport and surface via the
+  // session-only badge rather than throwing.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const capability = await probeIndexedDbCapability();
+      if (cancelled) return;
+      if (!capability.available) {
+        setActiveStacWriter(null, capability);
+        return;
+      }
+      try {
+        const writer = await createStacWriterIdb();
+        if (cancelled) {
+          await writer.close();
+          return;
+        }
+        setActiveStacWriter(writer, capability);
+        // Re-apply IDB metadata overlays on top of the in-memory catalog
+        // (FR-002 / FR-008). Required after writer becomes available
+        // since the stacService.init() call above may have raced ahead.
+        void stacService.reapplyIdbOverlays();
+        // If a plot was already selected before the writer became
+        // available (the URL ?plot= auto-open path can race the writer
+        // init), re-hydrate now that the IDB read path is ready.
+        const cp = currentPlotRef.current;
+        if (cp !== null) {
+          void hydrateSceneThumbnailStoreFromIdb(cp.features.features);
+        }
+      } catch (err) {
+        console.warn('[App] stacWriter init failed:', err);
+        setActiveStacWriter(null, {
+          available: false,
+          persistent: false,
+          reason: 'unavailable',
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Re-render the catalog whenever an item's metadata is patched (Properties
   // Panel commits → stacService.updateItemMetadata → bumps revision).
@@ -424,6 +493,14 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
+      // #236 — register the active STAC item parent so scene-thumbnail
+      // captures know which item.json overlay to land into.
+      setActiveStacItemPath(stripItemPathToParent(itemPath));
+      // #236 FR-001 — re-hydrate the in-memory thumbnail store from IDB
+      // so previously-captured scenes show their thumbnails after reload.
+      // Best-effort; failures fall back to empty thumbnails.
+      clearSceneThumbnailStore();
+      void hydrateSceneThumbnailStoreFromIdb(plotData.features);
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
       freshStore.getState().setDrawingMode(null);
@@ -440,6 +517,7 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
+    setActiveStacItemPath(null);
     store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
