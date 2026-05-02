@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--l1-ownshiptrack",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: L1 Ownshiptrack",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: L1 Ownshiptrack — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Defender.",
+    "description": "Saxon Warrior: L1 Ownshiptrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Defender.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T12:30:14+00:00",
     "debrief:platforms": [
@@ -64,6 +66,19 @@
       "helicopter-ops",
       "radar-detection",
       "towed-array"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -111,23 +126,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/L1_OwnshipTrack.rep",
         "load_timestamp": "2026-04-13T23:12:31.867314Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.867Z",
+      "file:size": 5358,
+      "file:checksum": "12208091c0a7ed907393993f57cde7169019de7b690257a1d486a75aaff18c0acb49"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 6772,
+      "file:checksum": "122029f71fc301eca1280106a2cc64eee4f0a28d5f5f8fe4acb34c171c00355d3e7b"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 18626,
+      "file:checksum": "12205ece365f4bd5503fb0f9a3c6e493d986070c32b2636cc71739d0672d312522ad"
     }
   }
 }

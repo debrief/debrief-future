@@ -9,6 +9,10 @@ import mimetypes
 import shutil
 from pathlib import Path
 
+from debrief_stac._helpers import (
+    multihash_sha256,
+    normalise_to_utc,
+)
 from debrief_stac.models import AssetProvenance
 from debrief_stac.plot import _save_plot, read_plot
 from debrief_stac.types import (
@@ -80,14 +84,30 @@ def add_asset(
     # Create provenance metadata
     provenance = AssetProvenance(source_path=str(source_path.absolute()))
 
-    # Create STAC asset entry
-    item["assets"][asset_key] = {
+    # Create STAC asset entry — co-publish standard processing:* alongside the
+    # bespoke debrief:provenance per spec 241 FR-006.  debrief:* fields are
+    # retained byte-for-byte; the new fields are additive for ecosystem
+    # compatibility (STAC Browser, stac-fields).
+    asset_entry: dict[str, object] = {
         "href": f"./assets/{source_path.name}",
         "type": media_type,
         "title": source_path.name,
         "roles": [ASSET_ROLE_SOURCE],
         "debrief:provenance": provenance.model_dump(mode="json"),
+        "processing:software": {"debrief-stac": provenance.tool_version},
+        "processing:datetime": normalise_to_utc(provenance.load_timestamp),
     }
+
+    # FR-007: file:size + file:checksum on disk-backed asset bytes.  The
+    # canonical path is the copied dest under the item's assets/ directory;
+    # if dest exists (it just got copied above), hash it.  Source-side hashing
+    # would also work but the on-disk asset is the catalog's authoritative byte
+    # source.
+    if dest_path.exists():
+        asset_entry["file:size"] = dest_path.stat().st_size
+        asset_entry["file:checksum"] = multihash_sha256(dest_path)
+
+    item["assets"][asset_key] = asset_entry
 
     # Add STAC derived_from link for provenance (#138)
     source_uri = source_path.absolute().as_uri()

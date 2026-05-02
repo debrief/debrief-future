@@ -83,9 +83,9 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
       aria-selected={highlighted}
     >
       <div className="exercise-list-item-row__thumbnail">
-        {item.thumbnailSmHref ? (
+        {item.thumbnailHref ? (
           <img
-            src={item.thumbnailSmHref}
+            src={item.thumbnailHref}
             alt={`Thumbnail for ${item.title}`}
             className="exercise-list-item-row__raster-thumbnail"
             data-testid="raster-thumbnail"
@@ -99,7 +99,7 @@ export const ExerciseListItemRow: React.FC<ExerciseListItemRowProps> = ({
             }}
           />
         ) : null}
-        <div style={item.thumbnailSmHref ? { display: 'none' } : undefined}>
+        <div style={item.thumbnailHref ? { display: 'none' } : undefined}>
           <SpatialThumbnail
             bbox={item.bbox}
             trackData={trackData}

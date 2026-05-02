@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--dynamicshapesettest",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Dynamicshapesettest",
     "datetime": "1995-12-12T05:00:00+00:00",
-    "description": "Saxon Warrior: Dynamicshapesettest — Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Nelson, HMS Collingwood. Multi-national participation: FR, GB.",
+    "description": "Saxon Warrior: Dynamicshapesettest \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 2 platform track(s) recorded including HMS Nelson, HMS Collingwood. Multi-national participation: FR, GB.",
     "start_datetime": "1995-12-12T05:00:00+00:00",
     "end_datetime": "1995-12-12T11:45:00+00:00",
     "debrief:platforms": [
@@ -73,6 +75,19 @@
     "debrief:feature_tags": [
       "helicopter-ops",
       "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -120,23 +135,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/DynamicShapeSetTest.dpf",
         "load_timestamp": "2026-04-13T23:12:31.807744Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.807Z",
+      "file:size": 278196,
+      "file:checksum": "122039569fd768f66f04a7182e4c0a6b44545f97687de8a728fec81d55e099633a87"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 11947,
+      "file:checksum": "12205c0d4ca587e7a231c2868c78654ef3b717e4899c1fd58309145e83a746ebb25c"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 42567,
+      "file:checksum": "12209243b473e79e58f2891f2d9405e8dcc47d007b57345bf1140509573423bf87f7"
     }
   }
 }

@@ -28,7 +28,12 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from debrief_stac._helpers import (
+    DEFAULT_PROVIDERS,
+    STAC_EXTENSION_DEBRIEF,
+)
 from debrief_stac.exceptions import PlotNotFoundError
+from debrief_stac.types import STAC_VERSION
 
 if TYPE_CHECKING:
     from debrief_stac.models import CollectionExtent, CollectionSummaries
@@ -41,6 +46,99 @@ _SUMMARY_PROPERTIES = [
     "debrief:tags",
     "debrief:feature_tags",
 ]
+
+# Default Item-level metadata (Collection envelope) per spec 241.
+_DEFAULT_LICENSE = "other"
+
+# Spec 241 — collection-level item_assets template (STAC 1.1 promoted to core).
+# Describes the asset shape every Item is expected to expose; per-item naming
+# variation (source-* per-file, scene-thumbnail-{ulid} per-scene) is captured
+# via the patternProperties in contracts/item-shape.schema.json — the
+# Collection block declares the contract, not specific instances.
+ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
+    "features": {
+        "type": "application/geo+json",
+        "roles": ["data"],
+        "title": "Plot features",
+    },
+    "thumbnail": {
+        "type": "image/png",
+        "roles": ["thumbnail"],
+        "title": "Thumbnail (200x150)",
+    },
+    "overview": {
+        "type": "image/png",
+        "roles": ["overview"],
+        "title": "Overview (800x600)",
+    },
+    "source": {
+        "type": "application/octet-stream",
+        "roles": ["source"],
+        "title": (
+            "Source data (placeholder; per-item keys are source-*)"
+        ),
+    },
+    "scene-thumbnail": {
+        "type": "image/png",
+        "roles": ["thumbnail"],
+        "title": (
+            "Storyboard scene thumbnail (placeholder; per-scene keys are "
+            "scene-thumbnail-* and scene-thumbnail-*-sm)"
+        ),
+    },
+}
+
+_DEFAULT_COLLECTION_STAC_EXTENSIONS: list[str] = [STAC_EXTENSION_DEBRIEF]
+
+
+def _prune_empty_summaries(summaries: dict[str, list]) -> dict[str, list]:
+    """Drop summary keys whose value is empty (STAC 1.1 forbids minItems=0)."""
+    return {key: value for key, value in summaries.items() if value}
+
+
+def _ensure_license_link(catalog_data: STACCatalog) -> None:
+    """When license=='other', a rel='license' link must be present (STAC FR-012).
+
+    Idempotent — does not duplicate an existing license link.
+    """
+    if catalog_data.get("license") != "other":
+        return
+    links = catalog_data.setdefault("links", [])
+    if any(link.get("rel") == "license" for link in links):
+        return
+    links.append(
+        {
+            "rel": "license",
+            "href": "./LICENSE",
+            "title": "Sample-catalog license (Debrief internal use)",
+        }
+    )
+
+
+def _apply_collection_envelope(catalog_data: STACCatalog) -> None:
+    """Apply spec 241 envelope: stac_version, license, providers, item_assets.
+
+    Idempotent — preserves any pre-existing SPDX license, providers, and
+    custom item_assets entries (the template only fills missing keys).
+    """
+    catalog_data["stac_version"] = STAC_VERSION
+
+    # License migration: drop the deprecated 1.0 default; preserve real SPDX.
+    current_license = catalog_data.get("license")
+    if current_license in (None, "proprietary", "various"):
+        catalog_data["license"] = _DEFAULT_LICENSE
+
+    if not catalog_data.get("providers"):
+        catalog_data["providers"] = [dict(p) for p in DEFAULT_PROVIDERS]
+
+    # item_assets — fill missing keys; never overwrite custom additions.
+    existing_item_assets = catalog_data.get("item_assets") or {}
+    merged_item_assets = {k: dict(v) for k, v in ITEM_ASSETS_TEMPLATE.items()}
+    for key, asset in existing_item_assets.items():
+        merged_item_assets[key] = asset
+    catalog_data["item_assets"] = merged_item_assets
+
+    _ensure_license_link(catalog_data)
 
 
 def _extract_item_extent(
@@ -241,7 +339,9 @@ def update_collection_summaries(
     item_sums = _extract_item_summaries(item_data)
 
     catalog_data["extent"] = _merge_extent(catalog_data.get("extent"), bbox, start_dt, end_dt)
-    catalog_data["summaries"] = _merge_summaries(catalog_data.get("summaries"), item_sums)
+    catalog_data["summaries"] = _prune_empty_summaries(
+        _merge_summaries(catalog_data.get("summaries"), item_sums)
+    )
 
 
 def rebuild_collection_summaries(
@@ -263,10 +363,9 @@ def rebuild_collection_summaries(
     """
     catalog_dir = Path(catalog_path)
 
-    # Promote Catalog to Collection
+    # Promote Catalog to Collection (spec 241 — STAC 1.1 envelope).
     catalog_data["type"] = "Collection"
-    if "license" not in catalog_data:
-        catalog_data["license"] = "proprietary"
+    _apply_collection_envelope(catalog_data)
 
     # Collect all item data via link traversal
     extent: dict | None = None
@@ -297,14 +396,17 @@ def rebuild_collection_summaries(
 
     if has_items:
         catalog_data["extent"] = extent
-        catalog_data["summaries"] = summaries
+        catalog_data["summaries"] = _prune_empty_summaries(summaries or {})
     else:
-        # Zero items: clear extent/summaries but keep Collection type
+        # Zero items: clear extent/summaries but keep Collection type.
+        # STAC 1.1 forbids empty arrays in summaries (minItems: 1), so omit
+        # the empty entries entirely rather than emit []. The presence of the
+        # `summaries` key itself is allowed even when empty.
         catalog_data["extent"] = {
             "spatial": {"bbox": [[-180, -90, 180, 90]]},
             "temporal": {"interval": [[None, None]]},
         }
-        catalog_data["summaries"] = {key: [] for key in [*_SUMMARY_PROPERTIES, "debrief:platforms"]}
+        catalog_data["summaries"] = {}
 
 
 def read_collection_summaries(
