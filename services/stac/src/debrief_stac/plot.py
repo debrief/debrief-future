@@ -9,7 +9,15 @@ import json
 import re
 import uuid
 from pathlib import Path
+from typing import Any
 
+from debrief_stac._helpers import (
+    DEFAULT_PROVIDERS,
+    STAC_EXTENSION_DEBRIEF,
+    STAC_EXTENSION_FILE,
+    STAC_EXTENSION_PROCESSING,
+    iso_now_utc,
+)
 from debrief_stac.catalog import _add_item_link, _save_catalog, open_catalog
 from debrief_stac.exceptions import PlotNotFoundError
 from debrief_stac.models import PlotMetadata, TemporalExtent
@@ -18,6 +26,14 @@ from debrief_stac.types import (
     CatalogPath,
     STACItem,
 )
+
+# Default Item-level metadata required by STAC 1.1.0 + best practices (spec 241).
+_DEFAULT_LICENSE = "other"
+_DEFAULT_STAC_EXTENSIONS: list[str] = [
+    STAC_EXTENSION_DEBRIEF,
+    STAC_EXTENSION_PROCESSING,
+    STAC_EXTENSION_FILE,
+]
 
 
 def create_plot(
@@ -65,17 +81,24 @@ def create_plot(
     plot_dir = catalog_path / plot_id
     plot_dir.mkdir(parents=True, exist_ok=True)
 
-    # Build STAC Item structure
+    now = iso_now_utc()
+
+    # Build STAC Item structure (spec 241 — STAC 1.1.0 with standard metadata
+    # extensions).  Note: bbox is omitted (rather than null) when geometry is
+    # absent, since STAC 1.1's Item Schema forbids `null` bbox.
     item_data: STACItem = {
         "type": "Feature",
         "stac_version": STAC_VERSION,
-        "stac_extensions": [],
+        "stac_extensions": list(_DEFAULT_STAC_EXTENSIONS),
         "id": plot_id,
         "geometry": None,  # Updated when features are added
-        "bbox": None,  # Updated when features are added
         "properties": {
             "title": metadata.title,
             "datetime": metadata.timestamp.isoformat(),
+            "created": now,
+            "updated": now,
+            "license": _DEFAULT_LICENSE,
+            "providers": [dict(p) for p in DEFAULT_PROVIDERS],
         },
         "links": [
             {
@@ -241,16 +264,40 @@ def update_temporal_metadata(
 def _save_plot(catalog_path: CatalogPath, plot_id: str, item_data: STACItem) -> None:
     """Save plot data back to disk.
 
-    Internal function used after modifying plot assets or properties.
+    Refreshes ``properties.updated`` (RFC 3339 UTC) on every write per
+    spec 241 FR-003.  ``properties.created`` is preserved if present;
+    backfilled from on-disk Item if missing (defensive — handles items
+    written before spec 241 landed without overwriting their lineage).
 
-    Args:
-        catalog_path: Path to the catalog directory
-        plot_id: ID of the plot
-        item_data: Updated item data to save
+    Internal function used after modifying plot assets or properties.
     """
     catalog_path = Path(catalog_path)
     plot_dir = catalog_path / plot_id
     item_path = plot_dir / "item.json"
+
+    properties: dict[str, Any] = item_data.setdefault("properties", {})
+
+    # Preserve created across edits — fall back to current file's value if the
+    # in-memory item doesn't have one; only mint a fresh value if neither
+    # source has one (e.g. fresh creation flowing through this same write path).
+    if "created" not in properties:
+        if item_path.exists():
+            try:
+                with open(item_path) as f:
+                    existing = json.load(f)
+                existing_created = (
+                    existing.get("properties", {}).get("created")
+                    if isinstance(existing, dict)
+                    else None
+                )
+                if existing_created:
+                    properties["created"] = existing_created
+            except (json.JSONDecodeError, OSError):
+                pass
+        if "created" not in properties:
+            properties["created"] = iso_now_utc()
+
+    properties["updated"] = iso_now_utc()
 
     with open(item_path, "w") as f:
         json.dump(item_data, f, indent=2)

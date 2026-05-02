@@ -95,10 +95,6 @@ class TestFactoryOutputsValidate:
     once Phase 3 + 4 land. For now they document the expected end state.
     """
 
-    @pytest.mark.xfail(
-        reason="Will pass after Phase 3 (US1) lands — factory still emits 1.0 shape",
-        strict=False,
-    )
     def test_create_plot_emits_valid_1_1_0_item(self, tmp_path: Path) -> None:
         from debrief_stac.catalog import create_catalog
         from debrief_stac.models import PlotMetadata

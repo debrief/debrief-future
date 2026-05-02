@@ -170,8 +170,10 @@ class TestGeometryTypes:
         add_features(catalog_path, plot_id, features)
 
         item = read_plot(catalog_path, plot_id)
-        # bbox remains None with null geometry
-        assert item["bbox"] is None
+        # STAC 1.1 forbids null bbox — the key is omitted when no spatial data
+        # is present (spec 241).
+        assert "bbox" not in item or item["bbox"] is None
+        assert item["geometry"] is None
 
     def test_add_features_unknown_geometry_type(self, tmp_path: Path) -> None:
         """Test adding feature with unknown geometry type."""

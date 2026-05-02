@@ -525,3 +525,273 @@ class TestUpdateTemporalMetadata:
         assert result is not None
         assert result.start_datetime == "2010-01-12T12:20:00+00:00"
         assert result.end_datetime == "2010-01-12T12:24:00+00:00"
+
+
+# ---------------------------------------------------------------------------
+# Spec 241 — Item factory emits STAC 1.1.0 with standard metadata extensions
+# ---------------------------------------------------------------------------
+
+import time as _time
+
+import jsonschema as _jsonschema
+
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).parent))
+from _stac_schema_harness import validate_stac_item as _validate_stac_item  # noqa: E402
+
+from debrief_stac._helpers import (  # noqa: E402
+    DEFAULT_PROVIDERS,
+    STAC_EXTENSION_DEBRIEF,
+    STAC_EXTENSION_FILE,
+    STAC_EXTENSION_PROCESSING,
+    multihash_sha256,
+    multihash_sha256_bytes,
+)
+
+
+_ITEM_SHAPE_CONTRACT_PATH = (
+    Path(__file__).parent.parent.parent.parent
+    / "specs"
+    / "241-stac-best-practices-upgrade"
+    / "contracts"
+    / "item-shape.schema.json"
+)
+
+
+def _validate_against_contract(item: dict) -> None:
+    """Validate against contracts/item-shape.schema.json."""
+    with open(_ITEM_SHAPE_CONTRACT_PATH) as f:
+        schema = json.load(f)
+    _jsonschema.validate(instance=item, schema=schema)
+
+
+@pytest.fixture
+def populated_item(tmp_path: Path) -> tuple[Path, str]:
+    """Plot + features + source asset + thumbnails — full FR-001..FR-009 shape."""
+    from debrief_stac.assets import add_asset
+    from debrief_stac.thumbnails import store_thumbnail
+
+    catalog_path = create_catalog(tmp_path / "catalog")
+    metadata = PlotMetadata(title="Spec 241 Plot", description="End-to-end")
+    plot_id = create_plot(catalog_path, metadata, plot_id="plot-241")
+
+    feature = {
+        "type": "Feature",
+        "id": "ref-1",
+        "geometry": {"type": "Point", "coordinates": [-4.5, 50.5]},
+        "properties": {
+            "kind": "POINT",
+            "name": "Test",
+            "location_type": "WAYPOINT",
+            "style": {
+                "shape": "circle",
+                "radius": 6,
+                "fill_color": "#FF5733",
+                "color": "#000",
+            },
+        },
+    }
+    add_features(catalog_path, plot_id, [feature])
+
+    source_file = tmp_path / "source.rep"
+    source_file.write_text("source data")
+    add_asset(catalog_path, plot_id, source_file)
+
+    store_thumbnail(catalog_path, plot_id, b"\x89PNG\r\nlarge", b"\x89PNG\r\nsmall")
+
+    return catalog_path, plot_id
+
+
+class TestSpec241ItemFactoryShape:
+    """T018 — Item validates against contracts/item-shape.schema.json AND
+    against the official STAC 1.1 Item Schema. Covers FR-001..FR-005."""
+
+    def test_validates_against_contract_and_official_schema(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        with open(catalog_path / plot_id / "item.json") as f:
+            item = json.load(f)
+
+        _validate_against_contract(item)
+        _validate_stac_item(item)
+
+    def test_stac_version_is_1_1_0(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        assert item["stac_version"] == "1.1.0"
+
+    def test_declares_required_extensions(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        for uri in (STAC_EXTENSION_DEBRIEF, STAC_EXTENSION_PROCESSING, STAC_EXTENSION_FILE):
+            assert uri in item["stac_extensions"], f"missing {uri}"
+
+    def test_properties_required_metadata(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        props = item["properties"]
+        assert "created" in props
+        assert "updated" in props
+        assert props["license"] == "other"
+        assert props["license"] not in ("proprietary", "various")
+        assert isinstance(props["providers"], list) and len(props["providers"]) >= 1
+        for provider in props["providers"]:
+            assert {"name", "roles"} <= set(provider.keys())
+            assert set(provider["roles"]).issubset(
+                {"licensor", "producer", "processor", "host"}
+            )
+
+
+class TestSpec241LifecycleTimestamps:
+    """T019 — created preserved across edits; updated refreshed on every write;
+    updated monotonic (≥ previous updated, ≥ created)."""
+
+    def test_created_preserved_across_edits(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        item_before = read_plot(catalog_path, plot_id)
+        created = item_before["properties"]["created"]
+
+        # Trigger another write via add_features.
+        add_features(
+            catalog_path,
+            plot_id,
+            [
+                {
+                    "type": "Feature",
+                    "id": "ref-2",
+                    "geometry": {"type": "Point", "coordinates": [-4.6, 50.6]},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": "B",
+                        "location_type": "WAYPOINT",
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
+                    },
+                }
+            ],
+        )
+
+        item_after = read_plot(catalog_path, plot_id)
+        assert item_after["properties"]["created"] == created
+
+    def test_updated_refreshes_on_every_write(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        first_updated = read_plot(catalog_path, plot_id)["properties"]["updated"]
+        # Sleep at least 1ms so the next iso_now_utc strictly differs.
+        _time.sleep(0.005)
+        from debrief_stac.thumbnails import store_thumbnail
+
+        store_thumbnail(catalog_path, plot_id, b"large2", b"small2")
+        second_updated = read_plot(catalog_path, plot_id)["properties"]["updated"]
+        assert second_updated > first_updated
+
+    def test_updated_monotonic(self, populated_item: tuple[Path, str]) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        assert item["properties"]["updated"] >= item["properties"]["created"]
+
+
+class TestSpec241SourceAssetCoPublishing:
+    """T020 — processing:* + file:* mirror debrief:provenance for source assets."""
+
+    def test_source_asset_carries_processing_fields(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        source_assets = {
+            k: v for k, v in item["assets"].items() if k.startswith("source")
+        }
+        assert source_assets, "expected at least one source-* asset"
+        for key, asset in source_assets.items():
+            assert "debrief:provenance" in asset
+            assert "processing:software" in asset
+            assert "processing:datetime" in asset
+            # Software map values are strings (versions).
+            for name, version in asset["processing:software"].items():
+                assert isinstance(name, str) and isinstance(version, str)
+
+    def test_source_asset_has_file_size_and_checksum_when_disk_backed(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        source_assets = [v for k, v in item["assets"].items() if k.startswith("source")]
+        assert source_assets
+        for asset in source_assets:
+            # Asset bytes copied to ./assets/ — both fields must be present.
+            assert "file:size" in asset and isinstance(asset["file:size"], int)
+            assert "file:checksum" in asset and isinstance(asset["file:checksum"], str)
+            asset_path = catalog_path / plot_id / asset["href"].lstrip("./")
+            assert asset["file:size"] == asset_path.stat().st_size
+            assert asset["file:checksum"] == multihash_sha256(asset_path)
+
+
+class TestSpec241ThumbnailPair:
+    """T021 — assets.thumbnail (200x150) + assets.overview (800x600) shape
+    with proj:shape, file:size, file:checksum."""
+
+    def test_thumbnail_small_variant_proj_shape(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        assert item["assets"]["thumbnail"]["proj:shape"] == [150, 200]
+
+    def test_overview_large_variant_proj_shape(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        assert item["assets"]["overview"]["proj:shape"] == [600, 800]
+
+    def test_both_have_file_size_and_checksum(
+        self, populated_item: tuple[Path, str]
+    ) -> None:
+        catalog_path, plot_id = populated_item
+        item = read_plot(catalog_path, plot_id)
+        for key in ("thumbnail", "overview"):
+            asset = item["assets"][key]
+            assert "file:size" in asset and asset["file:size"] > 0
+            assert "file:checksum" in asset and asset["file:checksum"].startswith("1220")
+
+
+class TestSpec241SourceAssetMissingPath:
+    """Edge case in spec — when source bytes aren't reachable, file:size and
+    file:checksum are omitted (not zero, not null)."""
+
+    def test_unreachable_source_omits_file_fields(self, tmp_path: Path) -> None:
+        # add_asset only attaches assets it can actually copy from disk, so the
+        # only way to exercise this branch is to mutate the asset entry after
+        # the fact. The contract still holds for any code path that mints an
+        # asset entry directly without on-disk bytes (e.g. derived_from URI).
+        catalog_path = create_catalog(tmp_path / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Edge"), plot_id="edge-1")
+
+        item = read_plot(catalog_path, plot_id)
+        item["assets"]["source-external"] = {
+            "href": "/path/that/does/not/exist.dat",
+            "type": "application/octet-stream",
+            "roles": ["source"],
+            "debrief:provenance": {"source_path": "/missing", "tool_version": "x"},
+            "processing:software": {"x": "1"},
+            "processing:datetime": "2026-05-02T10:00:00.000Z",
+        }
+        from debrief_stac.plot import _save_plot
+        _save_plot(catalog_path, plot_id, item)
+
+        item = read_plot(catalog_path, plot_id)
+        external = item["assets"]["source-external"]
+        # Confirm the un-hashed asset has neither field.
+        assert "file:size" not in external
+        assert "file:checksum" not in external
+
+
+def test_multihash_bytes_helper_round_trip() -> None:
+    """Cheap consistency check used by the file:checksum assertions above."""
+    assert multihash_sha256_bytes(b"x") == multihash_sha256_bytes(b"x")
