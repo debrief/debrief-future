@@ -225,9 +225,9 @@
 
 ### 4f. Story 2 E2E
 
-- [ ] T097 [test] Playwright E2E: Story 2 acceptance scenarios 1–7 (PAT prompt, reload survival, dialog content, write round-trip with mocked GitHub, strikethrough toggle, ID collision block, network-failure preservation) `apps/backlog-navigator/e2e/edit.spec.ts`
+- [x] T097 [test] Playwright E2E: Story 2 acceptance scenarios 1–7 (PAT prompt, reload survival, dialog content, write round-trip with mocked GitHub, strikethrough toggle, ID collision block, network-failure preservation) `apps/backlog-navigator/e2e/edit.spec.ts`
 - [ ] T098 [test] Playwright E2E: Story 2 acceptance scenario 8 (dry-run round-trip — confirm fires no API calls, banner indicates preview, staging preserved) — capture `interaction.gif` from this run for evidence `apps/backlog-navigator/e2e/push-dryrun.spec.ts`
-- [ ] T099 [P][test] axe-core a11y assertions on the Push dialog `apps/backlog-navigator/e2e/a11y.spec.ts`
+- [x] T099 [P][test] axe-core a11y assertions on the Push dialog `apps/backlog-navigator/e2e/a11y.spec.ts`
 
 **Story 2 checkpoint**: Editing surface is fully wired with dry-run mode operational, real-write path implemented and behind the env flag, and the Push dialog is the verification surface for both modes.
 
@@ -294,7 +294,7 @@
 ### Polish
 
 - [ ] T129 [P] Audit `src/strings.ts` for completeness: every user-visible string in JSX comes from this module, no inline literals (Article XI / Constitution Check) `apps/backlog-navigator/src/strings.ts`
-- [ ] T130 [P] Update `CHANGELOG.md` with a 2-line summary of the new app + schema refactor `CHANGELOG.md`
+- [x] T130 [P] Update `CHANGELOG.md` with a 2-line summary of the new app + schema refactor `CHANGELOG.md`
 - [ ] T131 [P] Run `task verify` end-to-end and resolve any lint/typecheck/test failures before evidence capture finalises
 
 ### Media Content
