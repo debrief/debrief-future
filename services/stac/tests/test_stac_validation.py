@@ -108,10 +108,6 @@ class TestFactoryOutputsValidate:
             item = json.load(f)
         validate_stac_item(item)
 
-    @pytest.mark.xfail(
-        reason="Will pass after Phase 4 (US2) lands — collection still emits 1.0 license",
-        strict=False,
-    )
     def test_promoted_collection_validates(self, tmp_path: Path) -> None:
         from debrief_stac.catalog import create_catalog
         from debrief_stac.models import PlotMetadata
