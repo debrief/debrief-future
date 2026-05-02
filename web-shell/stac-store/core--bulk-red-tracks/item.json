@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--bulk-red-tracks",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Bulk Red Tracks",
     "datetime": "2010-01-12T12:13:14+00:00",
-    "description": "Saxon Warrior: Bulk Red Tracks — Royal Navy training exercise in the English Channel / Western Approaches. 300 platform track(s) recorded including HMS Bretagne, USS Diamond, FS Westminster and 297 other(s). Multi-national participation: DE, FR, GB, US.",
+    "description": "Saxon Warrior: Bulk Red Tracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 300 platform track(s) recorded including HMS Bretagne, USS Diamond, FS Westminster and 297 other(s). Multi-national participation: DE, FR, GB, US.",
     "start_datetime": "2010-01-12T12:13:14+00:00",
     "end_datetime": "2010-01-12T20:13:14+00:00",
     "debrief:platforms": [
@@ -2756,6 +2758,19 @@
     "debrief:feature_tags": [
       "helicopter-ops",
       "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -2803,23 +2818,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/BULK_RED_TRACKS.rep",
         "load_timestamp": "2026-04-13T23:12:30.594210Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:30.594Z",
+      "file:size": 2696281,
+      "file:checksum": "1220812c4c45f226480ae637f14889f0d0fd03a64e17bfe4a942cb1ccce1eec638a2"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 35895,
+      "file:checksum": "12201770cfde3234bb35e860a7df1ac077bbce9aa3a7ae99a2f07ec7bceaf537dc5e"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 195404,
+      "file:checksum": "1220b10a594f72cada04f4d908f99b3a5b10186827501dc2074f388d12f3f3c0000c"
     }
   }
 }

@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--offsettracks",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Offsettracks",
     "datetime": "2010-01-12T12:00:00+00:00",
-    "description": "Saxon Warrior: Offsettracks — Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including FGS Mahan, HMS Andrea Doria, Contact Alpha. Multi-national participation: DE, GB.",
+    "description": "Saxon Warrior: Offsettracks \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 3 platform track(s) recorded including FGS Mahan, HMS Andrea Doria, Contact Alpha. Multi-national participation: DE, GB.",
     "start_datetime": "2010-01-12T12:00:00+00:00",
     "end_datetime": "2010-01-12T13:00:00+00:00",
     "debrief:platforms": [
@@ -80,6 +82,19 @@
     ],
     "debrief:feature_tags": [
       "radar-detection"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -127,23 +142,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/OffsetTracks.dpf",
         "load_timestamp": "2026-04-13T23:12:31.891990Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.891Z",
+      "file:size": 71948,
+      "file:checksum": "12208515fd83f4bafb1b04d417f27196baaee0250bc100bb70e7e7912177fe2f382f"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 14797,
+      "file:checksum": "1220eecebc654ff983c5e393593d54717999ebff5ee90af719b66e5d352689c88c0e"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 48741,
+      "file:checksum": "1220fa5251d10f73765c87dde60d84268e35d9f5952ac3ad8116e5c4f90c029c36e8"
     }
   }
 }

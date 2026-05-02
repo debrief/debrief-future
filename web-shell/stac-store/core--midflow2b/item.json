@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--midflow2b",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Midflow2B",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Saxon Warrior: Midflow2B — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS De Ruyter.",
+    "description": "Saxon Warrior: Midflow2B \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS De Ruyter.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
     "debrief:platforms": [
@@ -63,6 +65,19 @@
     ],
     "debrief:feature_tags": [
       "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -110,23 +125,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/midflow2b.dpf",
         "load_timestamp": "2026-04-13T23:12:33.156473Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:33.156Z",
+      "file:size": 335438,
+      "file:checksum": "122051c848e9cd5920ad684e4af7d50a6d708314e8ea6a42e059f2e18e2e4b141814"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 19637,
+      "file:checksum": "1220a354da85ed1375cb7bb453ef17a63c1b0c84b12f371d6f60476db64c90650790"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 103213,
+      "file:checksum": "1220e8dbbb4e770244587d76165fd18d454bf9da792938bd99b772a88abe0a4159bc"
     }
   }
 }
