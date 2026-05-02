@@ -19,8 +19,10 @@
   "dependencies": {
     "@debrief/components": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "@debrief/stac-writer": "workspace:*",
     "@debrief/utils": "workspace:*",
     "golden-layout": "^2.6.0",
+    "idb": "^8.0.0",
     "leaflet": "^1.9.4",
     "memfs": "^4.0.0",
     "react": "^18.2.0",
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.8.5",
     "@playwright/test": "^1.58.0",
+    "fake-indexeddb": "^6.0.0",
     "sharp": "^0.33.0",
     "@sparticuz/chromium": "^143.0.4",
     "@types/geojson": "^7946.0.0",

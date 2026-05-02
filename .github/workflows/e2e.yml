@@ -41,7 +41,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Build workspace dependencies
-        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/components build
+        run: pnpm --filter @debrief/utils --filter @debrief/schemas --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components build
 
       - name: Run web-shell Playwright tests
         run: pnpm --filter @debrief/web-shell test
@@ -104,7 +104,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Build workspace dependencies
-        run: pnpm --filter @debrief/utils --filter @debrief/session-state --filter @debrief/components build
+        run: pnpm --filter @debrief/utils --filter @debrief/session-state --filter @debrief/stac-writer --filter @debrief/components build
 
       - name: Build and package VS Code extension
         working-directory: apps/vscode

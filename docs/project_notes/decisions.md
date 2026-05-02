@@ -1040,6 +1040,8 @@ The `PortContext` proposal would have:
 - `specs/234-storyboard-edit-polish-followup/data-model.md` §1 (`MockPortKnobs` retained); §4 (`PanelPort`) deleted.
 - Code touchpoints baseline: `apps/vscode/src/webview/web/storyboardPanel.tsx:170-260` (read 2026-04-27 to verify current callback architecture); `apps/web-shell/src/StoryboardEditHarness.tsx:117` (existing reducer wiring).
 
+---
+
 ### ADR-028: STAC Conformance Profile — adopted standards, retained `debrief:` namespace, target version (#241, 2026-05-02)
 
 **Decision.** Debrief STAC catalogs target **STAC 1.1.0** and adopt the following standard extensions alongside the bespoke `debrief:` namespace:
@@ -1106,3 +1108,107 @@ The previous convention (both PNGs at `assets.thumbnail` / `assets.thumbnail-sm`
 - `specs/241-stac-best-practices-upgrade/spec.md` (this ADR's implementation spec).
 - `specs/241-stac-best-practices-upgrade/evidence/stac-browser-collection.png`, `.../stac-browser-item.png`, `.../stac-browser-assets.png` (captured by the Playwright test in FR-022 → FR-027).
 - Original review session and audit data: branch `claude/review-stac-architecture-ON3N1` (review conversation logs, gap-table baseline of 0/73 conformance on `processing:*`, `file:*`, `created`, `updated`, `providers`).
+
+---
+
+### ADR-029: Persistence-host abstraction — IndexedDB adaptor + Article IV.4 amendment (#236, 2026-05-01)
+
+**Status:** Accepted. Implemented in feature `236-web-shell-stac-writes`.
+
+**Context.**
+
+Pre-ADR-029, the constitution's Article IV.2 ("Frontends never persist") was
+read absolutely: every write went through a Node-side service. That reading
+was sound when both hosts had a Node process — but the web-shell ships as a
+pure static site to GitHub Pages. There is no Node runtime in production.
+The pre-existing scene-thumbnail capture path silently lost data on reload
+(FR-WEB-029a "Session-only" badge in #215/#235 was the user-visible warning),
+and the user's mental model was "I captured a scene, refreshing should not
+delete it".
+
+The naive fix — add a Vite middleware POST/PUT/PATCH/DELETE under
+`/stac-store/` — works in dev and per-PR Heroku review apps but evaporates
+in production GitHub Pages. The original spec for #236 chose that path and
+was pivoted at Phase 0 review.
+
+**Decision.**
+
+Introduce a single host-agnostic TypeScript writer interface — `StacWriter`,
+in `@debrief/stac-writer` — and have each host implement it against its
+native backend:
+
+  - VS Code → `apps/vscode/src/services/stacWriterFs.ts` (Node fs; wraps
+    existing `sceneThumbnailService.writeSceneThumbnail` and
+    `stacService.updateItemMetadataSync` to preserve the 1700+ LOC test
+    corpus by construction).
+  - Web-shell → `apps/web-shell/src/services/stacWriterIdb.ts` (IndexedDB,
+    `idb`-backed). Bundled catalog items are read-only demo content; user
+    writes layer on top as IndexedDB overlays via `mergeOverlay`. New
+    items live entirely in IndexedDB.
+
+Article IV is amended with clause **IV.4 Persistence-host abstraction**: the
+*interface* is the persistence boundary, not the host process. Browser-native
+stores qualify as a persistence backend only when accessed through the
+unified writer abstraction. Machine-enforced via the new ESLint rule
+`no-direct-persistence-in-frontend` (`shared/eslint-rules/`):
+
+  - `node:fs`/`fs` imports forbidden under `apps/web-shell/**` (test files
+    excepted — vitest runs in Node and reads golden fixtures).
+  - `indexedDB`, `localStorage`, `sessionStorage`, `caches` globals
+    forbidden outside the two host-adaptor files (`stacWriterIdb.ts` and
+    `stacWriterCapability.ts`).
+
+**Constitution version bump:** 1.2.0 → 1.3.0 (MINOR — new clause, no breaking
+change to existing semantics).
+
+**Consequences.**
+
+- ✅ Web-shell remains a pure static site. Captures persist across reload
+  in production (GitHub Pages), not just dev.
+- ✅ Both hosts share one operation surface. Future hosts (mobile native,
+  OPFS, server-backed) plug in as new adaptors with no other changes.
+- ✅ Cross-adaptor parametrised tests (vitest + `fake-indexeddb`) catch
+  divergence between the two backends as it lands, rather than at the
+  next integration test.
+- ⚠️ Two new dependencies added: `idb@^8.0.0` (Promise wrapper around
+  IndexedDB, ≈ 5 KB minified gzipped, by Jake Archibald; eight years of
+  maintenance, MIT, zero transitive deps) and `fake-indexeddb@^6.0.0`
+  (test-only). Both meet Article IX's "minimal, vetted" bar.
+- ⚠️ Breaking change is permitted under Article XIV (pre-release). Keys
+  carry the database version in their name (`debrief-stac-writer-v1`)
+  so the next breaking change is a fresh database, not a migration.
+
+**Alternatives considered.**
+
+- **Vite middleware writes.** Rejected — works in dev only, breaks under
+  static deployment. The original Phase 1 plan; pivoted at Phase 0 review.
+- **Service worker intercepting `PUT /stac-store/`.** Rejected — service
+  worker registration timing and lifecycle complications add ceremony
+  for a problem IndexedDB solves directly.
+- **OPFS / File System Access API for Phase 1.** Rejected — newer browser
+  API, less universal support (Safari). Worth revisiting in Phase 2 if
+  IndexedDB blob-storage performance is a bottleneck.
+- **Strike Article IV.2 entirely.** Rejected — the principle that frontends
+  don't own a divergent write path is sound; only the absolute reading was
+  wrong. IV.4 re-anchors IV.2 around interface design, not process boundary.
+- **Per-feature exception in Complexity Tracking.** Rejected — three features
+  now lean on the host-adaptor pattern (#174, #215/#235, this one); the
+  next will too. Constitution is the right home.
+
+**Originating issue:** Feature 236 (`specs/236-web-shell-stac-writes/`).
+
+**Evidence:**
+- `specs/236-web-shell-stac-writes/research.md` R-001 (pivot rationale),
+  R-002 (interface location), R-009 (ESLint enforcement), R-006 (amendment
+  text).
+- `specs/236-web-shell-stac-writes/contracts/stac-writer.ts` (normative
+  contract for the writer interface).
+- `specs/236-web-shell-stac-writes/contracts/indexeddb-schema.md` (schema
+  for the four object stores).
+- `shared/stac-writer/` workspace package (interface + types + errors +
+  overlay merge + path guard).
+- `apps/vscode/src/services/stacWriterFs.ts` (Node-fs adaptor).
+- `apps/web-shell/src/services/stacWriterIdb.ts` (IndexedDB adaptor).
+- `shared/eslint-rules/no-direct-persistence-in-frontend.cjs` (machine
+  enforcement; sandbox-violation output captured at
+  `specs/236-web-shell-stac-writes/evidence/eslint-enforcement-output.txt`).
