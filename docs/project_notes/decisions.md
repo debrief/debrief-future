@@ -1039,3 +1039,70 @@ The `PortContext` proposal would have:
 - `specs/234-storyboard-edit-polish-followup/contracts/harness-knobs.md` §2 (callback-adapter API; §3 PortContext deleted).
 - `specs/234-storyboard-edit-polish-followup/data-model.md` §1 (`MockPortKnobs` retained); §4 (`PanelPort`) deleted.
 - Code touchpoints baseline: `apps/vscode/src/webview/web/storyboardPanel.tsx:170-260` (read 2026-04-27 to verify current callback architecture); `apps/web-shell/src/StoryboardEditHarness.tsx:117` (existing reducer wiring).
+
+### ADR-028: STAC Conformance Profile — adopted standards, retained `debrief:` namespace, target version (#241, 2026-05-02)
+
+**Decision.** Debrief STAC catalogs target **STAC 1.1.0** and adopt the following standard extensions alongside the bespoke `debrief:` namespace:
+
+| Extension | URI | What we use it for | Why standard, not bespoke |
+|---|---|---|---|
+| **Processing** v1.2.0 | `https://stac-extensions.github.io/processing/v1.2.0/schema.json` | `processing:software`, `processing:datetime` mirroring asset-level `debrief:provenance.tool_version` and `.load_timestamp`. Optional `processing:level`, `processing:facility`, `processing:lineage`. | The canonical lineage extension. STAC Browser / `stac-fields` pretty-print these; bespoke `debrief:provenance.*` is invisible to third-party tooling. |
+| **File Info** v2.1.0 | `https://stac-extensions.github.io/file/v2.1.0/schema.json` | `file:size` + `file:checksum` (multihash SHA-256) on every disk-backed asset. | Closes the "no content-hash lineage" gap previously tracked as #219 / informally elsewhere. Stable extension, broad tooling support. |
+| **Debrief** v1.0.0 | `https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json` | `debrief:platforms`, `debrief:tags`, `debrief:feature_tags`, `debrief:overrides`, `debrief:provenance_log` (item-level audit), `debrief:provenance` (asset-level). | Genuinely Debrief-specific. No standard equivalent for vessel taxonomy, properties-panel edit log, or overrides. |
+
+`debrief:provenance` and `debrief:provenance_log` are **retained** under our namespace. The `processing:*` fields are co-published — same data, two namespaces — to be legible to the STAC ecosystem without losing our richer audit shape. There is no standard provenance extension; the W3C-PROV-aligned STACD proposal (PROPL 2025) is research, not registry-stable.
+
+**Item-level common metadata.** Every Item emits the recommended common-metadata fields:
+- `properties.created` (RFC 3339 UTC; preserved across edits)
+- `properties.updated` (RFC 3339 UTC; refreshed on every write)
+- `properties.license` — SPDX expression or `"other"`. **Never `"proprietary"` or `"various"`** (deprecated in 1.1.0). `"other"` requires a `links[]` entry with `rel: "license"`.
+- `properties.providers[]` — at least one entry, `roles` from the standard enum (`licensor`/`producer`/`processor`/`host`).
+
+**Thumbnail/preview convention.** Two visual assets per Item:
+- `assets.thumbnail` — 200×150 PNG, `roles: ["thumbnail"]`, `proj:shape: [150, 200]`. STAC Browser keys off this for list/card views.
+- `assets.overview` — 800×600 PNG, `roles: ["overview"]`, `proj:shape: [600, 800]`. STAC Browser keys off this for detail-page rendering.
+
+The previous convention (both PNGs at `assets.thumbnail` / `assets.thumbnail-sm`, both with `roles: ["thumbnail"]`) is superseded. Capture pipeline (#174's modern-screenshot + sharp) is unchanged; only the asset key + role labelling moves.
+
+**Collection-level convention.** Every Collection (including the promoted `catalog.json`) emits:
+- `stac_version: "1.1.0"`.
+- `item_assets` block (new in 1.1 core spec) declaring the asset shape every Item exposes — `features` / `thumbnail` / `overview` / `source`. Self-documents the catalog contract; `stac-browser` renders this in the Collection landing page.
+- `license` (SPDX or `"other"`), `providers[]`, plus the existing `summaries` block.
+- `summaries` semantics unchanged from #136.
+
+**Self-link href: relative.** STAC 1.1.0 relaxed the "self-link MUST be absolute" guidance from 1.0. Our existing relative `./item.json` and `./catalog.json` self-links are spec-blessed under 1.1 and are retained because they keep catalogs portable across `vscode://`, `file://`, and `http://` mounts without rewriting.
+
+**Custom-namespace policy.** A field belongs under `debrief:` only if (a) no standard STAC extension covers it, AND (b) the field is genuinely Debrief-specific rather than a generic geospatial concept. New requirements that fit a standard extension MUST adopt the standard extension; the `debrief:` namespace is for what the ecosystem doesn't already model.
+
+**Verification.** Conformance is verified two ways:
+1. STAC 1.1.0 JSON Schema validation in the schema-adherence test suite — every Item and the Collection MUST pass.
+2. Playwright-driven E2E test (delivered by #241) that opens our catalog in `radiantearth/stac-browser` and asserts standard-extension fields render correctly. The test captures three screenshots (`evidence/stac-browser-collection.png`, `.../stac-browser-item.png`, `.../stac-browser-assets.png`) that serve double-duty as blog post artefacts.
+
+**Context.** A 2026-05-02 review (originating in branch `claude/review-stac-architecture-ON3N1`) cross-checked the implementation against the STAC 1.0/1.1 spec, the [STAC Best Practices guide](https://github.com/radiantearth/stac-spec/blob/master/best-practices.md), the official extensions registry, and the `radiantearth/stac-browser` rendering behaviour. The review confirmed the implementation is structurally correct and 1.0-compliant, but identified that ecosystem-standard extensions exist for things we already track (lineage via `processing`, asset integrity via `file`) — and that adopting them was strictly additive to our existing `debrief:` content. ADR-003 chose STAC for plot storage; this ADR refines the conformance profile we target.
+
+**Alternatives considered.**
+
+- **Stay on STAC 1.0.0 indefinitely.** Rejected. 1.1.0 is stable, strictly additive for our use, and unlocks `item_assets` in core (which `radiantearth/stac-browser` renders) plus the formal `"other"` license value. The migration cost is one factory bump + one catalog regeneration.
+- **Replace `debrief:provenance` with `processing:*` rather than co-publish.** Rejected. `debrief:provenance` carries `source_path` and is an unambiguous Debrief-internal record; `processing:*` is the ecosystem-legible mirror. Co-publication preserves both audiences without the schema migration cost of removing fields.
+- **Adopt the W3C-PROV-aligned STACD extension proposal.** Rejected. STACD is research-stage (PROPL 2025), not in the official extensions registry. Our retained `debrief:provenance_log` already provides W3C-PROV-shaped activity records (activity_id ULIDs, was_generated_by, used) with stronger audit guarantees (immutability, archive rotation) than STACD currently specifies. Re-evaluate if STACD reaches Stable maturity.
+- **Make `self`-link absolute (per pre-1.1 guidance).** Rejected. STAC 1.1 relaxes this; our offline-first portable-catalog use case is exactly what the relaxation was meant to allow.
+- **Add a STAC API (search/transactions extension).** Out of scope for this ADR. Static catalog conformance is the immediate need; an API is a separate architectural decision.
+
+**Consequences.**
+
+- ✅ Catalog interoperates with `radiantearth/stac-browser`, `pystac`, `stac-fields`, and any other STAC 1.1-compliant client without bespoke adapters.
+- ✅ Asset integrity (`file:checksum`) closes a long-noted gap and enables bit-identical-source verification.
+- ✅ Lineage (`processing:software`, `processing:datetime`) is now legible to third-party tooling.
+- ✅ `created`/`updated`/`license`/`providers` give STAC Browser the metadata it needs to render proper Item cards.
+- ✅ `item_assets` self-documents the catalog contract — new contributors see the expected asset shape from the catalog, not from a README.
+- ⚠️ `debrief:provenance` and `processing:*` carry duplicated data on every source asset. Tolerable (one extra small object per asset; total <100 bytes), and the duplication is deliberate.
+- ⚠️ Adds two new ext URIs to every Item's `stac_extensions[]`. Validation cost is one extra schema fetch per Item at validation time (cached after first fetch).
+- ⚠️ Sample-catalog regeneration produces a 73-file diff. Reviewers are warned upfront; the diff is structural, not semantic.
+- ❌ Asset-key change (`assets.thumbnail` → `assets.overview` for the 800×600 PNG) is a breaking read-side change for any consumer that hard-codes `thumbnail` for the large variant. Audited consumers updated as part of #241; downstream `contrib/` consumers may need patching.
+
+**Originating issue:** STAC architecture review, 2026-05-02. Implemented by spec #241.
+
+**Evidence:**
+- `specs/241-stac-best-practices-upgrade/spec.md` (this ADR's implementation spec).
+- `specs/241-stac-best-practices-upgrade/evidence/stac-browser-collection.png`, `.../stac-browser-item.png`, `.../stac-browser-assets.png` (captured by the Playwright test in FR-022 → FR-027).
+- Original review session and audit data: branch `claude/review-stac-architecture-ON3N1` (review conversation logs, gap-table baseline of 0/73 conformance on `processing:*`, `file:*`, `created`, `updated`, `providers`).
