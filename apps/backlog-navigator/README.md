@@ -35,3 +35,5 @@ pnpm --filter @debrief/backlog-navigator test:e2e:cloud # playwright (cloud / CI
 ## Architecture
 
 Mirrors `apps/spec-navigator/` exactly. Keep them in lockstep.
+
+<!-- preview-trigger: 2026-05-02T13:48:50Z -->
