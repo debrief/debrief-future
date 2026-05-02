@@ -1,0 +1,165 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--sparse-track-self-split",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.86593888888889,
+          21.96786111111111
+        ],
+        [
+          -21.592633333333332,
+          21.96786111111111
+        ],
+        [
+          -21.592633333333332,
+          22.186286111111112
+        ],
+        [
+          -21.86593888888889,
+          22.186286111111112
+        ],
+        [
+          -21.86593888888889,
+          21.96786111111111
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.86593888888889,
+    21.96786111111111,
+    -21.592633333333332,
+    22.186286111111112
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Sparse Track Self Split",
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Saxon Warrior: Sparse Track Self Split \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Nelson.",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:41:00+00:00",
+    "debrief:platforms": [
+      {
+        "id": "NELSON",
+        "name": "HMS Nelson",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/frigate/type23",
+        "domain": "surface",
+        "vessel_type": "type23",
+        "vessel_role": "frigate"
+      }
+    ],
+    "debrief:tags": [
+      "AAW",
+      "gunnery",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "torpedo-run"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sparse_track_self_split (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/sparse_track_self_split.rep",
+      "title": "sparse_track_self_split.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sparse_track_self_split": {
+      "href": "./assets/sparse_track_self_split.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "sparse_track_self_split.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/sparse_track_self_split.rep",
+        "load_timestamp": "2026-04-13T23:12:33.779323Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:33.779Z",
+      "file:size": 2219,
+      "file:checksum": "122012ab2d1d66d2af9e8a0259d585ed1736def662b4cad65b54b265de9e58d51903"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 11352,
+      "file:checksum": "12209bc1bfe23e8762f400c673aac6c538a5127832d3d5a209219de10d998996e97a"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 32412,
+      "file:checksum": "1220a54239fcb90acdd293d84033c09834547245fca23d8ca5fe5b6861fcde074ce4"
+    }
+  }
+}
