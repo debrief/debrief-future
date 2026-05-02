@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
     "pydantic>=2.12.5",
     "debrief-schemas",
+    "multiformats>=0.3.0",
 ]
 
 [project.scripts]

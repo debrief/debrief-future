@@ -51,13 +51,13 @@
 
 **Independent test criterion**: `uv sync` adds `multiformats` to `services/stac/`'s lockfile; the two fixture directories exist; `pnpm install` adds `http-server` to the web-shell workspace. No factory or reader logic changes.
 
-- [ ] T001 Pin `multiformats` (latest stable, e.g. `>=0.3.0`) in `services/stac/pyproject.toml` `dependencies`. Run `uv sync` to update lockfile. `services/stac/pyproject.toml`
-- [ ] T002 [P] Add `http-server` (latest stable major) as a `devDependency` in the web-shell workspace. `apps/web-shell/package.json`
-- [ ] T003 [P] Create the schema fixtures directory and refresh script header (no schemas yet — they're vendored in T006). `services/stac/tests/fixtures/stac-schemas/v1.1.0/.gitkeep` and `scripts/refresh-stac-schemas.sh`
-- [ ] T004 [P] Create the stac-browser fixture directory and refresh script header (no dist yet — vendored in T007). `apps/web-shell/test-fixtures/stac-browser-v3.3.4/.gitkeep` and `scripts/refresh-stac-browser-fixture.sh`
-- [ ] T005 [P] Make both refresh scripts executable and idempotent (re-runs overwrite safely). Document the bump procedure inline. `scripts/refresh-stac-schemas.sh`, `scripts/refresh-stac-browser-fixture.sh`
-- [ ] T006 Run `scripts/refresh-stac-schemas.sh` to vendor STAC 1.1.0 Item + Collection JSON Schemas plus all referenced sub-schemas. Commit the resulting tree under the v1.1.0 directory. `services/stac/tests/fixtures/stac-schemas/v1.1.0/`
-- [ ] T007 Run `scripts/refresh-stac-browser-fixture.sh` to clone radiantearth/stac-browser at v3.3.4, run its `npm run build`, and copy the `dist/` output into the fixture directory. Commit the resulting tree. `apps/web-shell/test-fixtures/stac-browser-v3.3.4/`
+- [x] T001 Pin `multiformats` (latest stable, e.g. `>=0.3.0`) in `services/stac/pyproject.toml` `dependencies`. Run `uv sync` to update lockfile. `services/stac/pyproject.toml`
+- [x] T002 [P] Add `http-server` (latest stable major) as a `devDependency` in the web-shell workspace. `apps/web-shell/package.json`
+- [x] T003 [P] Create the schema fixtures directory and refresh script header (no schemas yet — they're vendored in T006). `services/stac/tests/fixtures/stac-schemas/v1.1.0/.gitkeep` and `scripts/refresh-stac-schemas.sh`
+- [x] T004 [P] Create the stac-browser fixture directory and refresh script header (no dist yet — vendored in T007). `apps/web-shell/test-fixtures/stac-browser-v3.3.4/.gitkeep` and `scripts/refresh-stac-browser-fixture.sh`
+- [x] T005 [P] Make both refresh scripts executable and idempotent (re-runs overwrite safely). Document the bump procedure inline. `scripts/refresh-stac-schemas.sh`, `scripts/refresh-stac-browser-fixture.sh`
+- [x] T006 Run `scripts/refresh-stac-schemas.sh` to vendor STAC 1.1.0 Item + Collection JSON Schemas plus all referenced sub-schemas. Commit the resulting tree under the v1.1.0 directory. `services/stac/tests/fixtures/stac-schemas/v1.1.0/`
+- [x] T007 Run `scripts/refresh-stac-browser-fixture.sh` to clone radiantearth/stac-browser at v3.3.4, run its `npm run build`, and copy the `dist/` output into the fixture directory. Commit the resulting tree. `apps/web-shell/test-fixtures/stac-browser-v3.3.4/`
 
 **Parallel execution**: T002 / T003 / T004 / T005 are independent file creations and can run together. T006 depends on T003 + T005; T007 depends on T004 + T005.
 
