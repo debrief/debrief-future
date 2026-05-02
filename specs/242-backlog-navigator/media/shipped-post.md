@@ -36,24 +36,62 @@ The navigator is a sibling to `apps/spec-navigator/` and reuses its entire subst
 
 ## Screenshots
 
-Screenshots will be captured from the per-PR preview deployment once the
-preview workflow runs on this branch — see `evidence/screenshots/` for the
-expected paths. The MVP shipping in this PR exercises the entire reviewer
-flow up to and including the Push dialog under dry-run mode; live-write E2E
-captures land in the follow-up PR.
+### Browse view — items table with sort + filter
+
+![Backlog Navigator browse view, items table with filter strip and sort indicators](../evidence/screenshots/browse-light.png)
+
+The default landing view: every row from `BACKLOG.md` rendered as a sortable, filterable HTML `<table>`. Sort indicators on ID / Total / Updated / Created cycle ascending/descending. Status / Category / Epic / Complexity dropdowns + free-text filter. The `Group by epic` and `Expand all` toggles flip the layout in place.
+
+### Group-by-Epic — derived done/total counts and progress bars
+
+![Group-by-epic view with epic headers showing done/total counts and progress bars](../evidence/screenshots/group-by-epic.png)
+
+Items grouped under their epic (with an "(unassigned)" group for items without an `Epic`). The `done/total` counts and progress bars are derived at render time from the items table — they can't drift out of sync with the file because they aren't persisted there.
+
+### Cell editing — inline context-sensitive controls
+
+![Status dropdown opened inline on the first row of the items table](../evidence/screenshots/edit-controls.png)
+
+Click any cell to open a context-sensitive editor: status dropdown, complexity dropdown, score picker, epic picker, category combobox, native date input, ID number input with collision warning, multi-line description textarea. Modified cells are flagged in yellow; right-click a flagged cell to undo that specific edit.
+
+### Push Changes dialog — structured summary
+
+![Push Changes dialog showing PR title, body, and structured edit summary](../evidence/screenshots/push-dialog.png)
+
+Confirm dialog with auto-generated PR title (`Backlog: 1 status change`), editable PR body, and a structured tally of the staged edits. The confirm button is disabled when collisions are detected.
+
+### Push Changes dialog — raw diff toggle
+
+![Same dialog with the raw unified diff expanded inline](../evidence/screenshots/push-dialog-with-diff.png)
+
+`Show raw diff` synthesises a unified diff via `jsdiff` between the parsed-then-reserialised baseline and the parsed-then-edited candidate. Reviewers see exactly the bytes that would land in `BACKLOG.md` — no whitespace churn, no surprises.
+
+### Dry-run banner — preview deployments
+
+![Dry-run banner indicating preview deployment mode](../evidence/screenshots/dry-run-banner.png)
+
+Per-PR preview deployments bake `VITE_BACKLOG_NAV_DRY_RUN=true` into the build. The banner makes the mode obvious; the Push dialog re-labels its confirm button as `Preview submission` and bypasses every GitHub write call. Staging is preserved across confirm so reviewers can re-open the dialog to re-verify the output.
+
+### Interaction recording — stage edits → push dialog → dry-run confirm
+
+![Animated demo: staging three status edits, opening the Push dialog, toggling raw diff, confirming in dry-run mode](../evidence/screenshots/interaction.gif)
+
+The full reviewer flow in 4 seconds: three status edits land on rows 243 / 242 / 241 (yellow-highlighted as modified), the footer counts up to 3 pending, the Push dialog opens with the structured summary, the raw diff renders, and the dry-run confirm fires no GitHub API calls.
 
 ## By the Numbers
 
 | Metric | Value |
 |--------|------:|
 | New lines of TypeScript (app source) | ~2,800 |
-| Vitest tests passing | **28 / 28** |
+| Vitest unit tests passing | **51 / 51** |
+| Playwright E2E tests passing (incl. axe a11y, real-write, PR-mode, dry-run interaction recording) | **12 / 12** |
 | Lines in `BACKLOG.md` after refactor | 397 (was 395) |
 | Item rows successfully backfilled with git-history dates | ~196 / ~209 |
 | Item rows that fell back to the sentinel `2025-01-01` | 13 |
 | Epic rows where strikethrough was normalised away | 3 (E02, E05, E08) |
 | Round-trip CI gate | byte-for-byte stable on 90,750 bytes |
-| New runtime dependencies | 2 (`diff`, the only one not already in the project) |
+| Axe-core WCAG 2 AA serious violations (browse + Push dialog) | **0** |
+| New runtime dependencies | 1 (`diff`, the only one not already in the project) |
 
 ## Lessons Learned
 
