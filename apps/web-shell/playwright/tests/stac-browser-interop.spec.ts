@@ -12,9 +12,9 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { createServer, type Server } from 'node:http';
+import { createReadStream, mkdirSync, statSync } from 'node:fs';
+import { dirname, extname, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as wait } from 'node:timers/promises';
 import { StacBrowserPage } from '../pages/StacBrowserPage';
@@ -38,36 +38,85 @@ const STAC_BROWSER_PORT = 8080;
 
 mkdirSync(EVIDENCE_DIR, { recursive: true });
 
-let catalogServer: ChildProcess | undefined;
-let stacBrowserServer: ChildProcess | undefined;
+let catalogServer: Server | undefined;
+let stacBrowserServer: Server | undefined;
 
-function startHttpServer(rootDir: string, port: number): ChildProcess {
-  // http-server is the dev-dep added in Phase 1 (T002). --cors lets the
-  // stac-browser SPA fetch catalog.json across the localhost port boundary.
-  const proc = spawn(
-    'npx',
-    [
-      '--no-install',
-      'http-server',
-      rootDir,
-      '-p',
-      String(port),
-      '--cors',
-      '-s',
-    ],
-    {
-      cwd: REPO_ROOT,
-      stdio: 'pipe',
-      env: { ...process.env },
-    },
-  );
-  proc.stdout?.on('data', () => {
-    /* swallow */
+const MIME_TYPES: Record<string, string> = {
+  '.json': 'application/json; charset=utf-8',
+  '.geojson': 'application/geo+json',
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.map': 'application/json',
+};
+
+/**
+ * Minimal static-file server. In-process means no `npx`/`pnpm exec`
+ * dependency, no PATH lookup, no install step — works identically on
+ * developer machines and in CI. CORS is opened wide so stac-browser on
+ * :8080 can fetch catalog.json from :4080.
+ */
+function startHttpServer(rootDir: string, port: number): Promise<Server> {
+  const root = resolve(rootDir);
+  return new Promise((resolveStarted, rejectStarted) => {
+    const server = createServer((req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+      if (req.method === 'OPTIONS') {
+        res.statusCode = 204;
+        res.end();
+        return;
+      }
+      const reqUrl = new URL(req.url ?? '/', `http://localhost:${port}`);
+      let pathname = decodeURIComponent(reqUrl.pathname);
+      if (pathname.endsWith('/')) pathname += 'index.html';
+      const candidate = normalize(resolve(root, '.' + pathname));
+      // Path traversal guard.
+      if (!candidate.startsWith(root)) {
+        res.statusCode = 403;
+        res.end('Forbidden');
+        return;
+      }
+      let stats;
+      try {
+        stats = statSync(candidate);
+      } catch {
+        res.statusCode = 404;
+        res.end('Not found');
+        return;
+      }
+      if (stats.isDirectory()) {
+        const indexCandidate = resolve(candidate, 'index.html');
+        try {
+          statSync(indexCandidate);
+        } catch {
+          res.statusCode = 404;
+          res.end('Not found');
+          return;
+        }
+        const indexType = MIME_TYPES['.html'];
+        res.setHeader('Content-Type', indexType);
+        createReadStream(indexCandidate).pipe(res);
+        return;
+      }
+      const ext = extname(candidate).toLowerCase();
+      res.setHeader('Content-Type', MIME_TYPES[ext] ?? 'application/octet-stream');
+      createReadStream(candidate).pipe(res);
+    });
+    server.on('error', rejectStarted);
+    server.listen(port, '127.0.0.1', () => resolveStarted(server));
   });
-  proc.stderr?.on('data', (chunk) => {
-    process.stderr.write(`[http-server:${port}] ${chunk}`);
-  });
-  return proc;
+}
+
+function stopHttpServer(server: Server | undefined): Promise<void> {
+  if (!server) return Promise.resolve();
+  return new Promise((res) => server.close(() => res()));
 }
 
 async function waitForServer(url: string, timeoutMs = 10000): Promise<void> {
@@ -90,8 +139,10 @@ test.describe('Spec 241 — STAC Browser interop', () => {
   test.setTimeout(60_000);
 
   test.beforeAll(async () => {
-    catalogServer = startHttpServer(CATALOG_DIR, CATALOG_PORT);
-    stacBrowserServer = startHttpServer(STAC_BROWSER_DIST, STAC_BROWSER_PORT);
+    [catalogServer, stacBrowserServer] = await Promise.all([
+      startHttpServer(CATALOG_DIR, CATALOG_PORT),
+      startHttpServer(STAC_BROWSER_DIST, STAC_BROWSER_PORT),
+    ]);
     await Promise.all([
       waitForServer(`http://localhost:${CATALOG_PORT}/catalog.json`),
       waitForServer(`http://localhost:${STAC_BROWSER_PORT}/index.html`),
@@ -99,9 +150,7 @@ test.describe('Spec 241 — STAC Browser interop', () => {
   });
 
   test.afterAll(async () => {
-    catalogServer?.kill('SIGTERM');
-    stacBrowserServer?.kill('SIGTERM');
-    await wait(200); // brief grace period
+    await Promise.all([stopHttpServer(catalogServer), stopHttpServer(stacBrowserServer)]);
   });
 
   test('renders Collection → Item → Assets and captures evidence screenshots', async ({
