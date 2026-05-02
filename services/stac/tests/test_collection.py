@@ -218,7 +218,9 @@ class TestCollectionPromotionUS1:
         assert catalog["type"] == "Collection"
         assert "extent" in catalog
         assert "summaries" in catalog
-        assert catalog["license"] == "proprietary"
+        # spec 241 — promoted Collection defaults to STAC 1.1 'other' (the
+        # legacy 'proprietary' value is deprecated in 1.1).
+        assert catalog["license"] == "other"
 
     def test_add_item_expands_summaries(self, tmp_path: Path) -> None:
         """T016: Collection with items → add item with later date + new platform → summaries expand."""
@@ -334,13 +336,15 @@ class TestCollectionPromotionUS1:
         create_plot(catalog_path, PlotMetadata(title="Plain Plot"), plot_id="plain")
 
         catalog = open_catalog(catalog_path)
-        # Summaries should have empty arrays
+        # spec 241 — STAC 1.1 forbids empty arrays in summaries (minItems: 1).
+        # Empty summary keys are now omitted entirely; the `summaries` block
+        # itself remains present.
         for key in [
             "debrief:platforms",
             "debrief:tags",
             "debrief:feature_tags",
         ]:
-            assert catalog["summaries"][key] == []
+            assert key not in catalog["summaries"]
 
     def test_summaries_sorted_alphabetically(self, tmp_path: Path) -> None:
         """T021: tag summaries arrays are sorted alphabetically."""
@@ -462,7 +466,9 @@ class TestBackwardsCompatibilityUS2:
         assert catalog["type"] == "Collection"
         assert "extent" in catalog
         assert "summaries" in catalog
-        assert catalog["license"] == "proprietary"
+        # spec 241 — promoted Collection defaults to STAC 1.1 'other' (the
+        # legacy 'proprietary' value is deprecated in 1.1).
+        assert catalog["license"] == "other"
 
     def test_promoted_collection_retains_links(self, tmp_path: Path) -> None:
         """T032: promoted Collection retains all existing link relations."""
@@ -690,12 +696,13 @@ class TestDeletionRebuildUS4:
         catalog = open_catalog(catalog_path)
         assert catalog["type"] == "Collection"
         assert catalog["extent"]["temporal"]["interval"] == [[None, None]]
+        # spec 241 — empty summary keys are now omitted (STAC 1.1 minItems=1).
         for key in [
             "debrief:platforms",
             "debrief:tags",
             "debrief:feature_tags",
         ]:
-            assert catalog["summaries"][key] == []
+            assert key not in catalog["summaries"]
 
     def test_dangling_link_raises_plot_not_found(self, tmp_path: Path) -> None:
         """T047: dangling item link during rebuild → PlotNotFoundError."""
@@ -710,3 +717,184 @@ class TestDeletionRebuildUS4:
         catalog_data = open_catalog(catalog_path)
         with pytest.raises(PlotNotFoundError):
             rebuild_collection_summaries(catalog_data, catalog_path)
+
+
+# ---------------------------------------------------------------------------
+# Spec 241 — Collection factory emits STAC 1.1.0 with item_assets, providers,
+# license migration, and rel='license' link when license=='other'.
+# ---------------------------------------------------------------------------
+
+import sys as _sys  # noqa: E402
+
+_sys.path.insert(0, str(Path(__file__).parent))
+import jsonschema as _jsonschema  # noqa: E402
+from _stac_schema_harness import validate_stac_collection as _validate_stac_collection  # noqa: E402
+
+_COLLECTION_SHAPE_CONTRACT_PATH = (
+    Path(__file__).parent.parent.parent.parent
+    / "specs"
+    / "241-stac-best-practices-upgrade"
+    / "contracts"
+    / "collection-shape.schema.json"
+)
+
+
+def _validate_against_collection_contract(collection: dict) -> None:
+    with open(_COLLECTION_SHAPE_CONTRACT_PATH) as f:
+        schema = json.load(f)
+    _jsonschema.validate(instance=collection, schema=schema)
+
+
+@pytest.fixture
+def populated_collection(tmp_path: Path) -> Path:
+    """Collection with one Item — exercises promotion + envelope."""
+    from debrief_stac.features import add_features
+    from debrief_stac.thumbnails import store_thumbnail
+
+    catalog_path = create_catalog(tmp_path / "catalog")
+    plot_id = create_plot(catalog_path, PlotMetadata(title="Spec 241 Plot"), plot_id="p1")
+
+    feature = {
+        "type": "Feature",
+        "id": "ref-1",
+        "geometry": {"type": "Point", "coordinates": [-4.5, 50.5]},
+        "properties": {
+            "kind": "POINT",
+            "name": "X",
+            "location_type": "WAYPOINT",
+            "style": {
+                "shape": "circle",
+                "radius": 6,
+                "fill_color": "#FF5733",
+                "color": "#000",
+            },
+        },
+    }
+    add_features(catalog_path, plot_id, [feature])
+    store_thumbnail(catalog_path, plot_id, b"large", b"small")
+
+    return catalog_path
+
+
+class TestSpec241CollectionShape:
+    """T024 — Collection validates against contracts/collection-shape.schema.json
+    AND the official STAC 1.1 Collection Schema. Covers FR-010, 11, 12, 14."""
+
+    def test_validates_against_contract_and_official_schema(
+        self, populated_collection: Path
+    ) -> None:
+        catalog = open_catalog(populated_collection)
+        _validate_against_collection_contract(catalog)
+        _validate_stac_collection(catalog)
+
+    def test_stac_version_is_1_1_0(self, populated_collection: Path) -> None:
+        catalog = open_catalog(populated_collection)
+        assert catalog["stac_version"] == "1.1.0"
+
+    def test_license_not_proprietary(self, populated_collection: Path) -> None:
+        catalog = open_catalog(populated_collection)
+        assert catalog["license"] not in ("proprietary", "various")
+
+    def test_providers_populated(self, populated_collection: Path) -> None:
+        catalog = open_catalog(populated_collection)
+        providers = catalog["providers"]
+        assert isinstance(providers, list) and len(providers) >= 1
+        for p in providers:
+            assert {"name", "roles"} <= set(p.keys())
+            assert set(p["roles"]).issubset({"licensor", "producer", "processor", "host"})
+
+    def test_item_assets_keys_match_contract(self, populated_collection: Path) -> None:
+        catalog = open_catalog(populated_collection)
+        item_assets = catalog["item_assets"]
+        for required_key in ("features", "thumbnail", "overview", "source", "scene-thumbnail"):
+            assert required_key in item_assets
+        # item_assets entries must NOT carry href (they describe the contract).
+        for key, asset in item_assets.items():
+            assert "href" not in asset, f"item_assets.{key} must not include href"
+
+
+class TestSpec241SummariesUnchanged:
+    """T025 — Collection summaries contents unchanged from 1.0 baseline (FR-013)."""
+
+    def test_summaries_unchanged_after_envelope_migration(self, tmp_path: Path) -> None:
+        from debrief_stac.features import add_features
+
+        catalog_path = create_catalog(tmp_path / "catalog")
+        plot_id = create_plot(catalog_path, PlotMetadata(title="Summaries"), plot_id="s1")
+
+        # Set debrief:* on the item before promotion.
+        item = read_plot(catalog_path, plot_id)
+        item["properties"]["debrief:tags"] = ["alpha", "bravo"]
+        item["properties"]["debrief:feature_tags"] = ["t1", "t2"]
+        item["properties"]["debrief:platforms"] = [
+            {"id": "P1", "name": "Plat1", "nationality": "GB", "vessel_class": "x"}
+        ]
+        with open(catalog_path / plot_id / "item.json", "w") as f:
+            json.dump(item, f, indent=2)
+        add_features(
+            catalog_path,
+            plot_id,
+            [
+                {
+                    "type": "Feature",
+                    "id": "ref",
+                    "geometry": {"type": "Point", "coordinates": [0, 0]},
+                    "properties": {
+                        "kind": "POINT",
+                        "name": "X",
+                        "location_type": "WAYPOINT",
+                        "style": {
+                            "shape": "circle",
+                            "radius": 6,
+                            "fill_color": "#FF5733",
+                            "color": "#000",
+                        },
+                    },
+                }
+            ],
+        )
+
+        catalog = open_catalog(catalog_path)
+        summaries = catalog["summaries"]
+
+        # Same keys + same value sets as a 1.0 baseline would have produced.
+        assert sorted(summaries["debrief:tags"]) == ["alpha", "bravo"]
+        assert sorted(summaries["debrief:feature_tags"]) == ["t1", "t2"]
+        assert summaries["debrief:platforms"] == [
+            {"id": "P1", "name": "Plat1", "nationality": "GB", "vessel_class": "x"}
+        ]
+
+
+class TestSpec241LicenseLink:
+    """T026 — license=='other' requires rel='license' link; SPDX values do not."""
+
+    def test_license_other_emits_license_link(self, populated_collection: Path) -> None:
+        catalog = open_catalog(populated_collection)
+        assert catalog["license"] == "other"
+        license_links = [link for link in catalog["links"] if link.get("rel") == "license"]
+        assert len(license_links) == 1, "expected exactly one rel='license' link"
+
+    def test_spdx_license_does_not_require_link(self, tmp_path: Path) -> None:
+        from debrief_stac.catalog import _save_catalog
+
+        catalog_path = create_catalog(tmp_path / "catalog")
+        create_plot(catalog_path, PlotMetadata(title="SPDX"), plot_id="x1")
+
+        catalog = open_catalog(catalog_path)
+        catalog["license"] = "CC-BY-4.0"
+        # Strip any auto-added license link to mirror the SPDX path explicitly.
+        catalog["links"] = [
+            link for link in catalog.get("links", []) if link.get("rel") != "license"
+        ]
+        _save_catalog(catalog_path, catalog)
+
+        # Re-running rebuild must NOT introduce a license link for SPDX.
+        from debrief_stac.collection import rebuild_collection_summaries
+
+        catalog = open_catalog(catalog_path)
+        rebuild_collection_summaries(catalog, catalog_path)
+        _save_catalog(catalog_path, catalog)
+        catalog = open_catalog(catalog_path)
+        assert catalog["license"] == "CC-BY-4.0"
+        license_links = [link for link in catalog["links"] if link.get("rel") == "license"]
+        assert license_links == []

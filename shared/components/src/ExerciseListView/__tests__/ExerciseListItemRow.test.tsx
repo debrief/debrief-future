@@ -21,8 +21,8 @@ function makeItem(overrides: Partial<ExerciseListItem> = {}): ExerciseListItem {
 }
 
 describe('ExerciseListItemRow', () => {
-  it('renders raster thumbnail when thumbnailSmHref is present', () => {
-    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+  it('renders raster thumbnail when thumbnailHref is present', () => {
+    const item = makeItem({ thumbnailHref: '/thumbs/test-sm.png' });
     render(<ExerciseListItemRow item={item} />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
@@ -30,7 +30,7 @@ describe('ExerciseListItemRow', () => {
   });
 
   it('hides SpatialThumbnail when raster thumbnail is present', () => {
-    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    const item = makeItem({ thumbnailHref: '/thumbs/test-sm.png' });
     const { container } = render(<ExerciseListItemRow item={item} />);
 
     // The SpatialThumbnail wrapper div should be hidden
@@ -39,15 +39,15 @@ describe('ExerciseListItemRow', () => {
     expect((thumbnailWrapper as HTMLElement).style.display).toBe('none');
   });
 
-  it('renders SpatialThumbnail fallback when thumbnailSmHref is null', () => {
-    const item = makeItem({ thumbnailSmHref: null });
+  it('renders SpatialThumbnail fallback when thumbnailHref is null', () => {
+    const item = makeItem({ thumbnailHref: null });
     render(<ExerciseListItemRow item={item} />);
 
     // No raster thumbnail should be present
     expect(screen.queryByTestId('raster-thumbnail')).toBeNull();
   });
 
-  it('renders SpatialThumbnail fallback when thumbnailSmHref is undefined', () => {
+  it('renders SpatialThumbnail fallback when thumbnailHref is undefined', () => {
     const item = makeItem();
     render(<ExerciseListItemRow item={item} />);
 
@@ -83,7 +83,7 @@ describe('ExerciseListItemRow', () => {
   });
 
   it('uses default small thumbnail dimensions', () => {
-    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    const item = makeItem({ thumbnailHref: '/thumbs/test-sm.png' });
     render(<ExerciseListItemRow item={item} />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
@@ -92,7 +92,7 @@ describe('ExerciseListItemRow', () => {
   });
 
   it('uses medium thumbnail dimensions when thumbnailSize is medium', () => {
-    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    const item = makeItem({ thumbnailHref: '/thumbs/test-sm.png' });
     render(<ExerciseListItemRow item={item} thumbnailSize="medium" />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
@@ -101,7 +101,7 @@ describe('ExerciseListItemRow', () => {
   });
 
   it('uses large thumbnail dimensions when thumbnailSize is large', () => {
-    const item = makeItem({ thumbnailSmHref: '/thumbs/test-sm.png' });
+    const item = makeItem({ thumbnailHref: '/thumbs/test-sm.png' });
     render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
 
     const img = screen.getByTestId('raster-thumbnail') as HTMLImageElement;
@@ -110,7 +110,7 @@ describe('ExerciseListItemRow', () => {
   });
 
   it('passes correct dimensions to SpatialThumbnail for large size', () => {
-    const item = makeItem({ thumbnailSmHref: null, bbox: [-4, 50, -3, 51] });
+    const item = makeItem({ thumbnailHref: null, bbox: [-4, 50, -3, 51] });
     render(<ExerciseListItemRow item={item} thumbnailSize="large" />);
 
     const spatial = screen.getByTestId('spatial-thumbnail');

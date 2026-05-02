@@ -1,8 +1,10 @@
 {
   "type": "Feature",
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "id": "core--freqtracksquantized",
   "geometry": {
@@ -41,7 +43,7 @@
   "properties": {
     "title": "Saxon Warrior: Freqtracksquantized",
     "datetime": "2009-07-22T03:50:04+00:00",
-    "description": "Saxon Warrior: Freqtracksquantized — Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
+    "description": "Saxon Warrior: Freqtracksquantized \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Fridtjof Nansen.",
     "start_datetime": "2009-07-22T03:50:04+00:00",
     "end_datetime": "2009-07-22T05:40:04+00:00",
     "debrief:platforms": [
@@ -62,6 +64,19 @@
     ],
     "debrief:feature_tags": [
       "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
     ]
   },
   "links": [
@@ -109,23 +124,41 @@
         "source_path": "/tmp/debrief-regen-4x2tftum/FreqTracksQuantized.dpf",
         "load_timestamp": "2026-04-13T23:12:31.833063Z",
         "tool_version": "0.1.0"
-      }
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.833Z",
+      "file:size": 333688,
+      "file:checksum": "122081395ae72843a3884ef3da7ac580d0bea503158bfafaf39d3e1649699f150f2e"
     },
     "thumbnail": {
       "href": "./thumbnail.png",
       "type": "image/png",
-      "title": "Plot thumbnail",
+      "title": "Plot thumbnail (200x150)",
       "roles": [
         "thumbnail"
-      ]
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 13057,
+      "file:checksum": "1220008b64b5a13160432a9c8c90014a745cd3a2d126b2364803a74f246fdbe70e30"
     },
-    "thumbnail-sm": {
-      "href": "./thumbnail-sm.png",
+    "overview": {
+      "href": "./overview.png",
       "type": "image/png",
-      "title": "Plot thumbnail (small)",
+      "title": "Plot overview (800x600)",
       "roles": [
-        "thumbnail"
-      ]
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 36751,
+      "file:checksum": "1220870d7a33e137b4c19f9c0909cbb3ea2a2ba1587bb9b7c5f8643e1b7476a9b5ab"
     }
   }
 }

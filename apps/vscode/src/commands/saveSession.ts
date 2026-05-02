@@ -17,6 +17,7 @@ import type { DebriefFeature } from '@debrief/components';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import { parseStacUri } from '../types/stac';
+import { writePlotThumbnails } from '../services/plotThumbnailWriter';
 
 /**
  * Derive a session file path from a plot URI.
@@ -68,7 +69,13 @@ export function storeFeatureCollection(
 }
 
 /**
- * Write thumbnail PNG files and update the STAC item.json with thumbnail assets.
+ * Write plot thumbnails by delegating to the typed plotThumbnailWriter shim.
+ *
+ * Spec 241 (review decision 1B) — moves the actual file write + item.json
+ * mutation behind a typed surface so the VS Code extension stays out of
+ * STAC-shape decisions. The shim still runs in the extension process today;
+ * follow-up #242 promotes it to a fully service-mediated path
+ * (Article IV.1 closure).
  */
 function storeThumbnails(
   storePath: string,
@@ -81,33 +88,12 @@ function storeThumbnails(
     return;
   }
 
-  const itemDir = path.join(storePath, path.dirname(parsed.itemPath));
-  const itemJsonPath = path.join(storePath, parsed.itemPath);
-
-  // Write thumbnail files
-  const largePath = path.join(itemDir, 'thumbnail.png');
-  const smallPath = path.join(itemDir, 'thumbnail-sm.png');
-  fs.writeFileSync(largePath, Buffer.from(largePngBase64, 'base64'));
-  fs.writeFileSync(smallPath, Buffer.from(smallPngBase64, 'base64'));
-
-  // Update item.json with thumbnail asset entries
-  const itemData = JSON.parse(fs.readFileSync(itemJsonPath, 'utf-8')) as {
-    assets: Record<string, { href: string; type: string; title: string; roles: string[] }>;
-  };
-  itemData.assets = itemData.assets ?? {};
-  itemData.assets['thumbnail'] = {
-    href: './thumbnail.png',
-    type: 'image/png',
-    title: 'Plot thumbnail',
-    roles: ['thumbnail'],
-  };
-  itemData.assets['thumbnail-sm'] = {
-    href: './thumbnail-sm.png',
-    type: 'image/png',
-    title: 'Plot thumbnail (small)',
-    roles: ['thumbnail'],
-  };
-  fs.writeFileSync(itemJsonPath, JSON.stringify(itemData, null, 2));
+  writePlotThumbnails({
+    storePath,
+    itemPath: parsed.itemPath,
+    largePngBase64,
+    smallPngBase64,
+  });
 }
 
 /**

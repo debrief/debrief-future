@@ -101,11 +101,24 @@ export interface StacItemSummary {
   /** Feature-level tags from debrief:feature_tags */
   featureTags?: readonly string[];
 
-  /** Href to large thumbnail PNG (800x600), or null if not captured */
+  /**
+   * Href to small thumbnail PNG (200x150), or null if not captured.
+   *
+   * Spec 241 rename: the field name now follows STAC convention — the small
+   * variant (200x150) lives at `assets.thumbnail`, so `thumbnailHref`
+   * unambiguously points at the small image. The large 800x600 variant
+   * is exposed via the new `overviewHref` field below.
+   */
   thumbnailHref?: string | null;
 
-  /** Href to small thumbnail PNG (200x150), or null if not captured */
-  thumbnailSmHref?: string | null;
+  /**
+   * Href to large overview PNG (800x600), or null if not captured.
+   *
+   * Spec 241 rename: was `thumbnailHref` (which used to point at the
+   * 800x600). Now lives at `assets.overview` per STAC 1.1 conventions
+   * (`roles: ["overview"]`).
+   */
+  overviewHref?: string | null;
 }
 
 /**

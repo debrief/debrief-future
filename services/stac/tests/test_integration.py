@@ -31,7 +31,7 @@ class TestFullWorkflow:
         catalog = open_catalog(catalog_path)
         assert catalog["id"] == "integration-catalog"
         assert catalog["type"] == "Catalog"
-        assert catalog["stac_version"] == "1.0.0"
+        assert catalog["stac_version"] == "1.1.0"
 
         # Step 2: Create first plot
         metadata1 = PlotMetadata(
@@ -137,7 +137,7 @@ class TestFullWorkflow:
         item = read_plot(catalog_path, plot_id_1)
         assert item["id"] == "day1-analysis"
         assert item["type"] == "Feature"
-        assert item["stac_version"] == "1.0.0"
+        assert item["stac_version"] == "1.1.0"
         assert item["properties"]["title"] == "Track Analysis Day 1"
         assert item["properties"]["description"] == "Analysis of vessel tracks from exercise day 1"
 

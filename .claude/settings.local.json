@@ -93,7 +93,9 @@
       "Bash(git log *)",
       "Read(//Users/ian/git/worktrees/232-apply-archive-rebuild/specs/232-apply-archive-rebuild/**)",
       "Bash(git ls-tree *)",
-      "Bash(echo \"exit=$?\")"
+      "Bash(echo \"exit=$?\")",
+      "Bash(rm -rf /home/user/debrief-future/services/stac/tests/fixtures/stac-schemas/v1.1.0/*)",
+      "Bash(touch /home/user/debrief-future/services/stac/tests/fixtures/stac-schemas/v1.1.0/.gitkeep)"
     ]
   }
 }
