@@ -33,10 +33,10 @@ export interface CatalogOverviewItem {
     tags?: readonly string[];
     /** Feature-level tags from debrief:feature_tags */
     featureTags?: readonly string[];
-    /** Href to large thumbnail PNG (800x600), or null if not captured */
+    /** Href to small thumbnail PNG (200x150) — assets.thumbnail (spec 241). */
     thumbnailHref?: string | null;
-    /** Href to small thumbnail PNG (200x150), or null if not captured */
-    thumbnailSmHref?: string | null;
+    /** Href to large overview PNG (800x600) — assets.overview (spec 241). */
+    overviewHref?: string | null;
 }
 /** Fields on PlatformRecord that can be compared within array_filter */
 export type PlatformField = "id" | "name" | "nationality" | "vessel_class" | "vessel_type" | "vessel_role" | "domain";
