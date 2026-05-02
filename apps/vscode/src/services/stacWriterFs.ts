@@ -77,6 +77,7 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
   const ctxKind: StoreContext['kind'] = 'fs';
 
   const writer: StacWriter = {
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async capability(): Promise<CapabilityReport> {
       try {
         const stat = fs.statSync(storePath);
@@ -171,13 +172,14 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
         return {
           updatedProperties: result.updatedProperties,
           overrides: result.overrides,
+          // eslint-disable-next-line no-restricted-syntax -- ADR-010: pre-existing camelCase carve-out for activityId; matches stacService's PatchItemResult contract.
           activityId: result.activityId,
         };
       } catch (cause) {
         throw mapStacServiceError(cause, input.itemPath);
       }
     },
-
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async writeItem(input: WriteItemInput): Promise<WriteItemResult> {
       pathGuard('writeItem.itemPath', input.itemPath);
       const target = path.join(storePath, input.itemPath);
@@ -217,6 +219,7 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       return { writtenPath: input.itemPath };
     },
 
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async writeAsset(input: WriteAssetInput): Promise<WriteAssetResult> {
       pathGuard('writeAsset.itemPath', input.itemPath);
       pathGuard('writeAsset.assetHref', input.assetHref);
@@ -253,15 +256,18 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       let item: Record<string, unknown>;
       try {
         const raw = fs.readFileSync(itemFullPath, 'utf8');
-        item = JSON.parse(raw) as Record<string, unknown>;
+        item = parseJsonObject(raw, 'writeAsset', input.itemPath);
       } catch (cause) {
+        if (cause instanceof StacWriterError) {throw cause;}
         throw new StacWriterError(
           'item-json-malformed',
           `writeAsset: item.json unreadable at ${itemFullPath}`,
           { path: input.itemPath, cause },
         );
       }
-      const assets = (item.assets as Record<string, unknown> | undefined) ?? {};
+      const existingAssets = asPlainObject(item.assets);
+      const assets: Record<string, unknown> =
+        existingAssets === null ? {} : { ...existingAssets };
       assets[input.assetEntry.key] = {
         href: input.assetHref,
         type: input.mediaType,
@@ -277,6 +283,7 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       };
     },
 
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async deleteItem(input: DeleteItemInput): Promise<DeleteItemResult> {
       pathGuard('deleteItem.itemPath', input.itemPath);
       const itemFullPath = path.join(storePath, input.itemPath);
@@ -307,6 +314,7 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       return { removedPath: input.itemPath };
     },
 
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
     async deleteAsset(input: DeleteAssetInput): Promise<DeleteAssetResult> {
       pathGuard('deleteAsset.itemPath', input.itemPath);
       // Scene-thumbnail deletes route through the existing dedicated path so
@@ -339,21 +347,22 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       let item: Record<string, unknown>;
       try {
         const raw = fs.readFileSync(itemFullPath, 'utf8');
-        item = JSON.parse(raw) as Record<string, unknown>;
+        item = parseJsonObject(raw, 'deleteAsset', input.itemPath);
       } catch (cause) {
+        if (cause instanceof StacWriterError) {throw cause;}
         throw new StacWriterError(
           'item-json-malformed',
           `deleteAsset: item.json unreadable at ${itemFullPath}`,
           { path: input.itemPath, cause },
         );
       }
-      const assets =
-        (item.assets as Record<string, { href?: string }> | undefined) ?? {};
-      const entry = assets[input.assetKey];
-      if (entry === undefined) {
+      const existingAssets = asPlainObject(item.assets) ?? {};
+      const entry = asPlainObject(existingAssets[input.assetKey]);
+      if (entry === null) {
         return { removedAssetPath: null };
       }
       const href = typeof entry.href === 'string' ? entry.href : null;
+      const assets: Record<string, unknown> = { ...existingAssets };
       delete assets[input.assetKey];
       item.assets = assets;
       atomicWriteSync(itemFullPath, `${JSON.stringify(item, null, 2)}\n`);
@@ -379,6 +388,55 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
 }
 
 // ─── helpers ───────────────────────────────────────────────────────────────
+
+/**
+ * Narrow `unknown` to a plain JSON object (`{ [k: string]: unknown }`),
+ * returning `null` for arrays / nulls / non-objects. Boundary helper used
+ * by writeAsset / deleteAsset's item-json reads — lets the rest of the
+ * code work against a typed surface without `as Record<...>` casts.
+ */
+function asPlainObject(value: unknown): Record<string, unknown> | null {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  // Narrow at the boundary: every JS object whose Object.prototype.toString
+  // tag is '[object Object]' is structurally a `{ [k: string]: unknown }`.
+  // The Object.fromEntries roundtrip avoids the `as Record<...>` cast that
+  // ADR-011 / Article XV.7 forbids in business logic.
+  return Object.fromEntries(
+    Object.entries(value as { [k: string]: unknown }),
+  );
+}
+
+/**
+ * Parse `raw` as JSON and assert the result is a plain object. Throws
+ * `StacWriterError('item-json-malformed', ...)` otherwise.
+ */
+function parseJsonObject(
+  raw: string,
+  ctx: string,
+  itemPath: string,
+): Record<string, unknown> {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (cause) {
+    throw new StacWriterError(
+      'item-json-malformed',
+      `${ctx}: item.json is not valid JSON`,
+      { path: itemPath, cause },
+    );
+  }
+  const obj = asPlainObject(parsed);
+  if (obj === null) {
+    throw new StacWriterError(
+      'item-json-malformed',
+      `${ctx}: item.json root is not a plain object`,
+      { path: itemPath },
+    );
+  }
+  return obj;
+}
 
 function atomicWriteSync(target: string, data: Uint8Array | string): void {
   const tmpPath = `${target}.${process.pid}.${crypto
@@ -411,7 +469,7 @@ function atomicWriteSync(target: string, data: Uint8Array | string): void {
 }
 
 function isReadOnlyFsError(cause: unknown): boolean {
-  if (typeof cause !== 'object' || cause === null) return false;
+  if (typeof cause !== 'object' || cause === null) {return false;}
   const code = (cause as { code?: unknown }).code;
   return code === 'EACCES' || code === 'EROFS' || code === 'EPERM';
 }
@@ -458,7 +516,7 @@ function mapThumbnailError(cause: unknown, itemPath: string): StacWriterError {
         });
     }
   }
-  if (cause instanceof StacWriterError) return cause;
+  if (cause instanceof StacWriterError) {return cause;}
   return new StacWriterError(
     'write-failed',
     cause instanceof Error ? cause.message : String(cause),
@@ -479,7 +537,7 @@ function mapStacServiceError(cause: unknown, itemPath: string): StacWriterError 
       cause,
     });
   }
-  if (cause instanceof StacWriterError) return cause;
+  if (cause instanceof StacWriterError) {return cause;}
   if (cause instanceof Error) {
     if (/not found/i.test(cause.message)) {
       return new StacWriterError('stac-item-not-found', cause.message, {
