@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://debrief.info/specs/241/contracts/collection-shape.schema.json",
+  "title": "Debrief STAC Collection shape — 1.1.0 conformance contract",
+  "description": "Asserts the additional fields and constraints introduced by spec 241 on top of the official STAC 1.1 Collection Schema. Both contracts must validate.",
+  "type": "object",
+  "required": [
+    "type",
+    "stac_version",
+    "id",
+    "description",
+    "license",
+    "providers",
+    "extent",
+    "summaries",
+    "item_assets",
+    "links"
+  ],
+  "properties": {
+    "type": { "const": "Collection" },
+    "stac_version": { "const": "1.1.0" },
+    "license": {
+      "type": "string",
+      "not": { "enum": ["proprietary", "various"] }
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "roles"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "enum": ["licensor", "producer", "processor", "host"] }
+          },
+          "url": { "type": "string", "format": "uri" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "item_assets": {
+      "type": "object",
+      "required": ["features", "thumbnail", "overview", "source"],
+      "properties": {
+        "features": {
+          "type": "object",
+          "required": ["type", "roles"],
+          "properties": {
+            "type": { "const": "application/geo+json" },
+            "roles": { "const": ["data"] }
+          },
+          "not": { "required": ["href"] }
+        },
+        "thumbnail": {
+          "type": "object",
+          "required": ["type", "roles"],
+          "properties": {
+            "type": { "const": "image/png" },
+            "roles": { "const": ["thumbnail"] }
+          },
+          "not": { "required": ["href"] }
+        },
+        "overview": {
+          "type": "object",
+          "required": ["type", "roles"],
+          "properties": {
+            "type": { "const": "image/png" },
+            "roles": { "const": ["overview"] }
+          },
+          "not": { "required": ["href"] }
+        },
+        "source": {
+          "type": "object",
+          "required": ["roles"],
+          "properties": {
+            "roles": { "const": ["source"] }
+          },
+          "not": { "required": ["href"] }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "allOf": [
+        {
+          "comment": "When license == 'other', a rel='license' link MUST be present.",
+          "if": {
+            "type": "object",
+            "properties": { "license": { "const": "other" } },
+            "required": ["license"]
+          },
+          "then": {
+            "contains": {
+              "type": "object",
+              "properties": { "rel": { "const": "license" } },
+              "required": ["rel"]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
