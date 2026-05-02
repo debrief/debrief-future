@@ -636,9 +636,7 @@ class TestSpec241ItemFactoryShape:
         assert isinstance(props["providers"], list) and len(props["providers"]) >= 1
         for provider in props["providers"]:
             assert {"name", "roles"} <= set(provider.keys())
-            assert set(provider["roles"]).issubset(
-                {"licensor", "producer", "processor", "host"}
-            )
+            assert set(provider["roles"]).issubset({"licensor", "producer", "processor", "host"})
 
 
 class TestSpec241LifecycleTimestamps:
@@ -697,14 +695,10 @@ class TestSpec241LifecycleTimestamps:
 class TestSpec241SourceAssetCoPublishing:
     """T020 — processing:* + file:* mirror debrief:provenance for source assets."""
 
-    def test_source_asset_carries_processing_fields(
-        self, populated_item: tuple[Path, str]
-    ) -> None:
+    def test_source_asset_carries_processing_fields(self, populated_item: tuple[Path, str]) -> None:
         catalog_path, plot_id = populated_item
         item = read_plot(catalog_path, plot_id)
-        source_assets = {
-            k: v for k, v in item["assets"].items() if k.startswith("source")
-        }
+        source_assets = {k: v for k, v in item["assets"].items() if k.startswith("source")}
         assert source_assets, "expected at least one source-* asset"
         for _key, asset in source_assets.items():
             assert "debrief:provenance" in asset
@@ -734,23 +728,17 @@ class TestSpec241ThumbnailPair:
     """T021 — assets.thumbnail (200x150) + assets.overview (800x600) shape
     with proj:shape, file:size, file:checksum."""
 
-    def test_thumbnail_small_variant_proj_shape(
-        self, populated_item: tuple[Path, str]
-    ) -> None:
+    def test_thumbnail_small_variant_proj_shape(self, populated_item: tuple[Path, str]) -> None:
         catalog_path, plot_id = populated_item
         item = read_plot(catalog_path, plot_id)
         assert item["assets"]["thumbnail"]["proj:shape"] == [150, 200]
 
-    def test_overview_large_variant_proj_shape(
-        self, populated_item: tuple[Path, str]
-    ) -> None:
+    def test_overview_large_variant_proj_shape(self, populated_item: tuple[Path, str]) -> None:
         catalog_path, plot_id = populated_item
         item = read_plot(catalog_path, plot_id)
         assert item["assets"]["overview"]["proj:shape"] == [600, 800]
 
-    def test_both_have_file_size_and_checksum(
-        self, populated_item: tuple[Path, str]
-    ) -> None:
+    def test_both_have_file_size_and_checksum(self, populated_item: tuple[Path, str]) -> None:
         catalog_path, plot_id = populated_item
         item = read_plot(catalog_path, plot_id)
         for key in ("thumbnail", "overview"):
@@ -781,6 +769,7 @@ class TestSpec241SourceAssetMissingPath:
             "processing:datetime": "2026-05-02T10:00:00.000Z",
         }
         from debrief_stac.plot import _save_plot
+
         _save_plot(catalog_path, plot_id, item)
 
         item = read_plot(catalog_path, plot_id)

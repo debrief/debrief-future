@@ -30,9 +30,7 @@ def _make_legacy_item(item_dir: Path, item_id: str) -> None:
     item = {
         "type": "Feature",
         "stac_version": "1.0.0",
-        "stac_extensions": [
-            "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
-        ],
+        "stac_extensions": ["https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"],
         "id": item_id,
         "geometry": None,
         "properties": {
@@ -116,11 +114,7 @@ def _run_script(catalog_root: Path) -> subprocess.CompletedProcess[str]:
 
 
 def _snapshot(root: Path) -> dict[Path, bytes]:
-    return {
-        p.relative_to(root): p.read_bytes()
-        for p in sorted(root.rglob("*"))
-        if p.is_file()
-    }
+    return {p.relative_to(root): p.read_bytes() for p in sorted(root.rglob("*")) if p.is_file()}
 
 
 def test_regen_first_run_produces_spec_241_shape(_script_present: None, tmp_path: Path) -> None:
@@ -140,8 +134,7 @@ def test_regen_first_run_produces_spec_241_shape(_script_present: None, tmp_path
         item = json.load(f)
     assert item["stac_version"] == "1.1.0"
     assert (
-        "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
-        in item["stac_extensions"]
+        "https://stac-extensions.github.io/processing/v1.2.0/schema.json" in item["stac_extensions"]
     )
     assert item["properties"]["license"] == "other"
     assert item["assets"]["thumbnail"]["proj:shape"] == [150, 200]

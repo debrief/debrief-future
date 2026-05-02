@@ -20,15 +20,9 @@ from multiformats import multihash  # type: ignore[reportMissingImports]
 
 # --- STAC extension URI constants ---------------------------------------------
 
-STAC_EXTENSION_DEBRIEF: str = (
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
-)
-STAC_EXTENSION_PROCESSING: str = (
-    "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
-)
-STAC_EXTENSION_FILE: str = (
-    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
-)
+STAC_EXTENSION_DEBRIEF: str = "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+STAC_EXTENSION_PROCESSING: str = "https://stac-extensions.github.io/processing/v1.2.0/schema.json"
+STAC_EXTENSION_FILE: str = "https://stac-extensions.github.io/file/v2.1.0/schema.json"
 
 
 # --- Default providers --------------------------------------------------------

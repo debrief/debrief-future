@@ -2,7 +2,7 @@
 
 **Feature Branch**: `242-backlog-navigator`
 **Created**: 2026-05-02
-**Status**: Draft
+**Status**: Implemented (initial PR — real-write path covered by mocked-fetch unit + E2E; dry-run preview deployment surfaces the full reviewer flow)
 **Input**: User description: "Backlog Navigator — interactive UI for BACKLOG.md, with browsing (sort/filter/group-by-epic + epic progress), context-sensitive editing of all columns including ID, staged edits in localStorage, deliberate Push Changes action that opens a PR (or commits onto an in-flight PR via `?pr=NNN`), and an additive schema refactor adding `Epic` / `Created` / `Updated` columns plus an Epics-table normalisation."
 
 ## User Scenarios & Testing *(mandatory)*

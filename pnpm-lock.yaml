@@ -35,12 +35,24 @@ importers:
 
   apps/backlog-navigator:
     dependencies:
+      diff:
+        specifier: ^5.2.0
+        version: 5.2.2
       react:
         specifier: ^18.2.0
         version: 18.3.1
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-markdown:
+        specifier: ^9.0.1
+        version: 9.1.0(@types/react@18.3.27)(react@18.3.1)
+      remark-gfm:
+        specifier: ^4.0.0
+        version: 4.0.1
+      zod:
+        specifier: ^3.22.0
+        version: 3.25.76
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.8.5
@@ -57,6 +69,9 @@ importers:
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.3.1(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/diff':
+        specifier: ^5.2.0
+        version: 5.2.3
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.27
@@ -2710,6 +2725,9 @@ packages:
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
+  '@types/diff@5.2.3':
+    resolution: {integrity: sha512-K0Oqlrq3kQMaO2RhfrNQX5trmt+XLyom88zS0u84nnIcLvFnRUMRRHmrGny5GSM+kNO9IZLARsdQHDzkhAgmrQ==}
+
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
@@ -3905,6 +3923,10 @@ packages:
   diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+
+  diff@5.2.2:
+    resolution: {integrity: sha512-vtcDfH3TOjP8UekytvnHH1o1P4FcUdt4eQ1Y+Abap1tk/OB2MWQvcwS2ClCd1zuIhc3JKOx6p3kod8Vfys3E+A==}
+    engines: {node: '>=0.3.1'}
 
   dir-compare@3.3.0:
     resolution: {integrity: sha512-J7/et3WlGUCxjdnD3HAAzQ6nsnc0WL6DD7WcwJb7c39iH1+AWfg+9OqzJNaI6PkBwBvm1mhZNL9iY/nRiZXlPg==}
@@ -8674,8 +8696,8 @@ snapshots:
       '@storybook/theming': 8.6.15(storybook@8.6.15(prettier@3.8.0))
       better-opn: 3.0.2
       browser-assert: 1.2.1
-      esbuild: 0.24.2
-      esbuild-register: 3.6.0(esbuild@0.24.2)
+      esbuild: 0.19.12
+      esbuild-register: 3.6.0(esbuild@0.19.12)
       jsdoc-type-pratt-parser: 4.8.0
       process: 0.11.10
       recast: 0.23.11
@@ -9054,6 +9076,8 @@ snapshots:
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
+
+  '@types/diff@5.2.3': {}
 
   '@types/doctrine@0.0.9': {}
 
@@ -10477,6 +10501,8 @@ snapshots:
 
   diff-sequences@29.6.3: {}
 
+  diff@5.2.2: {}
+
   dir-compare@3.3.0:
     dependencies:
       buffer-equal: 1.0.1
@@ -10758,10 +10784,10 @@ snapshots:
   es6-error@4.1.1:
     optional: true
 
-  esbuild-register@3.6.0(esbuild@0.24.2):
+  esbuild-register@3.6.0(esbuild@0.19.12):
     dependencies:
       debug: 4.4.3
-      esbuild: 0.24.2
+      esbuild: 0.19.12
     transitivePeerDependencies:
       - supports-color
 

@@ -23,9 +23,7 @@ from debrief_stac._helpers import (
 
 # Known multihash for SHA-256("test"): prefix 0x12 (sha2-256), 0x20 (32 bytes),
 # then digest 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
-_TEST_MULTIHASH = (
-    "12209f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-)
+_TEST_MULTIHASH = "12209f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
 
 def test_multihash_sha256_bytes_matches_known_value() -> None:
@@ -34,9 +32,7 @@ def test_multihash_sha256_bytes_matches_known_value() -> None:
 
 def test_multihash_sha256_bytes_empty() -> None:
     # SHA-256("") = e3b0c44...; multihash prefix 1220
-    expected = (
-        "1220e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-    )
+    expected = "1220e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     assert multihash_sha256_bytes(b"") == expected
 
 
@@ -75,21 +71,15 @@ def test_normalise_to_utc_with_z_suffix() -> None:
 
 def test_normalise_to_utc_with_offset() -> None:
     # +02:00 → 08:23:14 UTC
-    assert (
-        normalise_to_utc("2026-05-02T10:23:14+02:00") == "2026-05-02T08:23:14.000Z"
-    )
+    assert normalise_to_utc("2026-05-02T10:23:14+02:00") == "2026-05-02T08:23:14.000Z"
 
 
 def test_normalise_to_utc_with_negative_offset() -> None:
-    assert (
-        normalise_to_utc("2026-05-02T10:23:14-05:00") == "2026-05-02T15:23:14.000Z"
-    )
+    assert normalise_to_utc("2026-05-02T10:23:14-05:00") == "2026-05-02T15:23:14.000Z"
 
 
 def test_normalise_to_utc_preserves_milliseconds() -> None:
-    assert (
-        normalise_to_utc("2026-05-02T10:23:14.456Z") == "2026-05-02T10:23:14.456Z"
-    )
+    assert normalise_to_utc("2026-05-02T10:23:14.456Z") == "2026-05-02T10:23:14.456Z"
 
 
 def test_normalise_to_utc_accepts_datetime_object() -> None:

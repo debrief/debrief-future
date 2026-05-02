@@ -51,20 +51,20 @@
 
 **Goal**: Scaffold `apps/backlog-navigator/` so `pnpm install` + `pnpm --filter @debrief/backlog-navigator dev` produces a "hello world" SPA. Mirrors `apps/spec-navigator/` structure exactly.
 
-- [ ] T001 Scaffold workspace package metadata `apps/backlog-navigator/package.json`
-- [ ] T002 [P] Configure TypeScript strict-mode compiler `apps/backlog-navigator/tsconfig.json`
-- [ ] T003 [P] Configure Node-side TypeScript `apps/backlog-navigator/tsconfig.node.json`
-- [ ] T004 [P] Configure Vite with multi-base support `apps/backlog-navigator/vite.config.ts`
-- [ ] T005 [P] Configure Vitest + jsdom `apps/backlog-navigator/vitest.config.ts`
-- [ ] T006 [P] Configure Playwright (headless Chromium) `apps/backlog-navigator/playwright.config.ts`
-- [ ] T007 [P] Add cloud-friendly Playwright entrypoint copied from spec-navigator `apps/backlog-navigator/run-playwright.mjs`
-- [ ] T008 [P] Add ESLint config (extends repo root) `apps/backlog-navigator/.eslintrc.cjs`
-- [ ] T009 Add HTML entrypoint `apps/backlog-navigator/index.html`
-- [ ] T010 [P] Add app-root README mirroring spec-navigator's `apps/backlog-navigator/README.md`
-- [ ] T011 Add minimal main entrypoint that mounts an empty App `apps/backlog-navigator/src/main.tsx`
-- [ ] T012 Add empty App shell stub `apps/backlog-navigator/src/App.tsx`
-- [ ] T013 Wire app into the repo root `pnpm-workspace.yaml` (already includes `apps/*`; verify the new package resolves) `pnpm-workspace.yaml`
-- [ ] T014 Wire app into root CI as a build + test step (mirrors spec-nav-build / spec-nav-pw) `.github/workflows/ci.yml`
+- [x] T001 Scaffold workspace package metadata `apps/backlog-navigator/package.json`
+- [x] T002 [P] Configure TypeScript strict-mode compiler `apps/backlog-navigator/tsconfig.json`
+- [x] T003 [P] Configure Node-side TypeScript `apps/backlog-navigator/tsconfig.node.json`
+- [x] T004 [P] Configure Vite with multi-base support `apps/backlog-navigator/vite.config.ts`
+- [x] T005 [P] Configure Vitest + jsdom `apps/backlog-navigator/vitest.config.ts`
+- [x] T006 [P] Configure Playwright (headless Chromium) `apps/backlog-navigator/playwright.config.ts`
+- [x] T007 [P] Add cloud-friendly Playwright entrypoint copied from spec-navigator `apps/backlog-navigator/run-playwright.mjs`
+- [x] T008 [P] Add ESLint config (extends repo root) `apps/backlog-navigator/.eslintrc.cjs`
+- [x] T009 Add HTML entrypoint `apps/backlog-navigator/index.html`
+- [x] T010 [P] Add app-root README mirroring spec-navigator's `apps/backlog-navigator/README.md`
+- [x] T011 Add minimal main entrypoint that mounts an empty App `apps/backlog-navigator/src/main.tsx`
+- [x] T012 Add empty App shell stub `apps/backlog-navigator/src/App.tsx`
+- [x] T013 Wire app into the repo root `pnpm-workspace.yaml` (already includes `apps/*`; verify the new package resolves) `pnpm-workspace.yaml`
+- [x] T014 Wire app into root CI as a build + test step (mirrors spec-nav-build / spec-nav-pw) `.github/workflows/ci.yml`
 
 **Parallel opportunity**: T002–T010 can all run in parallel after T001 lands.
 
@@ -76,44 +76,44 @@
 
 ### 2a. Branded types, enums, strings
 
-- [ ] T015 Add branded primitive types and column/status/complexity enums `apps/backlog-navigator/src/types.ts`
-- [ ] T016 [P] Add narrowing helpers (`asItemId`, `asEpicId`, `asIsoDate`, `asSha`) with throw-on-malformed semantics `apps/backlog-navigator/src/types.ts`
-- [ ] T017 [P] Add user-facing strings module (i18n-ready, mirrors spec-navigator's `strings.ts`) `apps/backlog-navigator/src/strings.ts`
-- [ ] T018 [P][test] Unit tests for narrowing helpers (golden values + malformed-input cases) `apps/backlog-navigator/src/types.test.ts`
+- [x] T015 Add branded primitive types and column/status/complexity enums `apps/backlog-navigator/src/types.ts`
+- [x] T016 [P] Add narrowing helpers (`asItemId`, `asEpicId`, `asIsoDate`, `asSha`) with throw-on-malformed semantics `apps/backlog-navigator/src/types.ts`
+- [x] T017 [P] Add user-facing strings module (i18n-ready, mirrors spec-navigator's `strings.ts`) `apps/backlog-navigator/src/strings.ts`
+- [x] T018 [P][test] Unit tests for narrowing helpers (golden values + malformed-input cases) `apps/backlog-navigator/src/types.test.ts`
 
 ### 2b. Markdown-table parser/serialiser
 
-- [ ] T019 [test] Write parser unit tests against fixtures including: well-formed item rows, well-formed epic rows, escaped pipes, completed-strikethrough rows, malformed rows producing `ParseWarning` `apps/backlog-navigator/src/parser/__tests__/parseBacklog.test.ts`
-- [ ] T020 [P][test] Write serialiser unit tests asserting byte-for-byte round-trip stability on each fixture `apps/backlog-navigator/src/parser/__tests__/serializeBacklog.test.ts`
-- [ ] T021 [P][test] Add fixture files mirroring real BACKLOG.md row shapes `apps/backlog-navigator/src/parser/__tests__/fixtures/`
-- [ ] T022 Implement `parseBacklog(text) → BacklogDocument` per `contracts/backlog-md-format.md` `apps/backlog-navigator/src/parser/parseBacklog.ts`
-- [ ] T023 Implement `serializeBacklog(doc) → string` with strikethrough-on-`complete` enforcement and pipe-escape preservation `apps/backlog-navigator/src/parser/serializeBacklog.ts`
-- [ ] T024 [test] Add round-trip CI gate that runs against the live `BACKLOG.md` (loaded from repo root) `apps/backlog-navigator/src/parser/__tests__/liveBacklog.roundtrip.test.ts`
+- [x] T019 [test] Write parser unit tests against fixtures including: well-formed item rows, well-formed epic rows, escaped pipes, completed-strikethrough rows, malformed rows producing `ParseWarning` `apps/backlog-navigator/src/parser/__tests__/parseBacklog.test.ts`
+- [x] T020 [P][test] Write serialiser unit tests asserting byte-for-byte round-trip stability on each fixture `apps/backlog-navigator/src/parser/__tests__/serializeBacklog.test.ts`
+- [x] T021 [P][test] Add fixture files mirroring real BACKLOG.md row shapes `apps/backlog-navigator/src/parser/__tests__/fixtures/`
+- [x] T022 Implement `parseBacklog(text) → BacklogDocument` per `contracts/backlog-md-format.md` `apps/backlog-navigator/src/parser/parseBacklog.ts`
+- [x] T023 Implement `serializeBacklog(doc) → string` with strikethrough-on-`complete` enforcement and pipe-escape preservation `apps/backlog-navigator/src/parser/serializeBacklog.ts`
+- [x] T024 [test] Add round-trip CI gate that runs against the live `BACKLOG.md` (loaded from repo root) `apps/backlog-navigator/src/parser/__tests__/liveBacklog.roundtrip.test.ts`
 
 ### 2c. BACKLOG.md schema refactor (one-shot)
 
-- [ ] T025 Implement Python backfill script using `git log --reverse --diff-filter=A -G '^\| NNN '` per `research.md §3` `scripts/backfill-backlog-dates.py`
-- [ ] T026 [P] Add unit tests for the backfill script's git-history-walking helpers (use a small synthetic git repo fixture) `scripts/test_backfill_backlog_dates.py`
-- [ ] T027 Run `scripts/backfill-backlog-dates.py` against the working tree; record `evidence/backfill-misses.txt` for the sentinel-fallback IDs
-- [ ] T028 Manually edit the Items table header + separator to add `Epic | Created | Updated` columns `BACKLOG.md`
-- [ ] T029 Backfill `Epic` column from existing `[[E##]` prose tags (one-shot mechanical pass) `BACKLOG.md`
-- [ ] T030 Normalise Epics table: rename row `024` to its `E##` form; remove strikethrough from completed Epic rows; ensure Status column reflects completion `BACKLOG.md`
-- [ ] T031 Remove the comma-separated `#NNN` Items column from the Epics table (item count will be derived by the navigator) `BACKLOG.md`
-- [ ] T032 Update agent definitions and templates that touch `BACKLOG.md` so they stamp the new `Created`/`Updated`/`Epic` columns on insert/edit (`opportunity-scout`, `backlog-prioritizer`, `the-ideas-guy`, `/idea`, `/interview`, `/speckit.start`) `.claude/agents/` + `.specify/templates/`
+- [x] T025 Implement Python backfill script using `git log --reverse --diff-filter=A -G '^\| NNN '` per `research.md §3` `scripts/backfill-backlog-dates.py`
+- [x] T026 [P] Add unit tests for the backfill script's git-history-walking helpers (use a small synthetic git repo fixture) `scripts/test_backfill_backlog_dates.py`
+- [x] T027 Run `scripts/backfill-backlog-dates.py` against the working tree; record `evidence/backfill-misses.txt` for the sentinel-fallback IDs
+- [x] T028 Manually edit the Items table header + separator to add `Epic | Created | Updated` columns `BACKLOG.md`
+- [x] T029 Backfill `Epic` column from existing `[[E##]` prose tags (one-shot mechanical pass) `BACKLOG.md`
+- [x] T030 Normalise Epics table: rename row `024` to its `E##` form; remove strikethrough from completed Epic rows; ensure Status column reflects completion `BACKLOG.md`
+- [x] T031 Remove the comma-separated `#NNN` Items column from the Epics table (item count will be derived by the navigator) `BACKLOG.md`
+- [x] T032 Update agent definitions and templates that touch `BACKLOG.md` so they stamp the new `Created`/`Updated`/`Epic` columns on insert/edit (`opportunity-scout`, `backlog-prioritizer`, `the-ideas-guy`, `/idea`, `/interview`, `/speckit.start`) `.claude/agents/` + `.specify/templates/`
 
 ### 2d. GitHub auth + read-only client
 
-- [ ] T033 [P] Implement PAT get/set/clear (mirrors `apps/spec-navigator/src/github/auth.ts`, with `backlog-navigator:` namespace) `apps/backlog-navigator/src/github/auth.ts`
-- [ ] T034 [P][test] Unit tests for PAT redaction discipline (no PAT in thrown error strings; never logged) `apps/backlog-navigator/src/github/__tests__/auth.test.ts`
-- [ ] T035 [P] Add Zod schemas for GitHub REST responses per `contracts/github-api.md` (Contents, Pulls, Refs) `apps/backlog-navigator/src/github/schemas.ts`
-- [ ] T036 Implement `readBacklogMd(ref)` (Contents API) returning `{ text, sha }` `apps/backlog-navigator/src/github/api.ts`
-- [ ] T037 [test] Unit tests for `readBacklogMd` covering 401/403/404/rate-limit branches with mocked `fetch` `apps/backlog-navigator/src/github/__tests__/api.test.ts`
+- [x] T033 [P] Implement PAT get/set/clear (mirrors `apps/spec-navigator/src/github/auth.ts`, with `backlog-navigator:` namespace) `apps/backlog-navigator/src/github/auth.ts`
+- [x] T034 [P][test] Unit tests for PAT redaction discipline (no PAT in thrown error strings; never logged) `apps/backlog-navigator/src/github/__tests__/auth.test.ts`
+- [x] T035 [P] Add Zod schemas for GitHub REST responses per `contracts/github-api.md` (Contents, Pulls, Refs) `apps/backlog-navigator/src/github/schemas.ts`
+- [x] T036 Implement `readBacklogMd(ref)` (Contents API) returning `{ text, sha }` `apps/backlog-navigator/src/github/api.ts`
+- [x] T037 [test] Unit tests for `readBacklogMd` covering 401/403/404/rate-limit branches with mocked `fetch` `apps/backlog-navigator/src/github/__tests__/api.test.ts`
 
 ### 2e. State store skeleton
 
-- [ ] T038 Implement React-context store skeleton (baseline `BacklogDocument` only, no edits yet) `apps/backlog-navigator/src/state/store.ts`
-- [ ] T039 [P] Implement `localStorage` persistence helper with size-cap warning at 1MB `apps/backlog-navigator/src/state/persistence.ts`
-- [ ] T040 [P][test] Unit tests for persistence helper (read/write/clear/version migration stub) `apps/backlog-navigator/src/state/__tests__/persistence.test.ts`
+- [x] T038 Implement React-context store skeleton (baseline `BacklogDocument` only, no edits yet) `apps/backlog-navigator/src/state/store.ts`
+- [x] T039 [P] Implement `localStorage` persistence helper with size-cap warning at 1MB `apps/backlog-navigator/src/state/persistence.ts`
+- [x] T040 [P][test] Unit tests for persistence helper (read/write/clear/version migration stub) `apps/backlog-navigator/src/state/__tests__/persistence.test.ts`
 
 **Parallel opportunity**: 2a (T015–T018), 2d (T033–T037), and 2e (T038–T040) can run in parallel once the `[P]`-marked tasks within each block start. 2b (parser) gates on its tests being written first; 2c (refactor) MUST run sequentially (T028 → T029 → T030 → T031 in that order).
 
@@ -127,38 +127,38 @@
 
 ### 3a. App shell + read flow
 
-- [ ] T041 Wire `App.tsx` to fetch `BACKLOG.md` on mount (live mode default), parse, and populate the store `apps/backlog-navigator/src/App.tsx`
-- [ ] T042 [P] Add a top-level loading + error banner `apps/backlog-navigator/src/components/StatusBanner.tsx`
-- [ ] T043 [P][test] Unit tests for App's load/parse/error paths with mocked GitHub client `apps/backlog-navigator/src/__tests__/App.test.tsx`
+- [x] T041 Wire `App.tsx` to fetch `BACKLOG.md` on mount (live mode default), parse, and populate the store `apps/backlog-navigator/src/App.tsx`
+- [x] T042 [P] Add a top-level loading + error banner `apps/backlog-navigator/src/components/StatusBanner.tsx`
+- [x] T043 [P][test] Unit tests for App's load/parse/error paths with mocked GitHub client `apps/backlog-navigator/src/__tests__/App.test.tsx`
 
 ### 3b. Items table + sort + filter
 
-- [ ] T044 [P] Implement `ItemsTable.tsx` with semantic `<table>` markup, sortable column headers, and accessible labelling `apps/backlog-navigator/src/components/ItemsTable.tsx`
-- [ ] T045 [P] Implement `SortControls.tsx` (column-header toggle component for ID / Total / Updated / Created) `apps/backlog-navigator/src/components/SortControls.tsx`
-- [ ] T046 [P] Implement `FilterBar.tsx` with structured filters (Status / Category / Epic / Complexity) + free-text input `apps/backlog-navigator/src/components/FilterBar.tsx`
-- [ ] T047 Add view-state slice to the store (sort key, sort direction, structured filters, free-text filter, group-by toggle) `apps/backlog-navigator/src/state/store.ts`
-- [ ] T048 Implement derived `useFilteredSortedItems` selector with `useMemo` over the store `apps/backlog-navigator/src/state/selectors.ts`
-- [ ] T049 [test] Unit tests for selector (sort direction toggling, multi-filter intersection, free-text matching collapsed Description) `apps/backlog-navigator/src/state/__tests__/selectors.test.ts`
+- [x] T044 [P] Implement `ItemsTable.tsx` with semantic `<table>` markup, sortable column headers, and accessible labelling `apps/backlog-navigator/src/components/ItemsTable.tsx`
+- [x] T045 [P] Implement `SortControls.tsx` (column-header toggle component for ID / Total / Updated / Created) `apps/backlog-navigator/src/components/SortControls.tsx`
+- [x] T046 [P] Implement `FilterBar.tsx` with structured filters (Status / Category / Epic / Complexity) + free-text input `apps/backlog-navigator/src/components/FilterBar.tsx`
+- [x] T047 Add view-state slice to the store (sort key, sort direction, structured filters, free-text filter, group-by toggle) `apps/backlog-navigator/src/state/store.ts`
+- [x] T048 Implement derived `useFilteredSortedItems` selector with `useMemo` over the store `apps/backlog-navigator/src/state/selectors.ts`
+- [x] T049 [test] Unit tests for selector (sort direction toggling, multi-filter intersection, free-text matching collapsed Description) `apps/backlog-navigator/src/state/__tests__/selectors.test.ts`
 
 ### 3c. Description cell expand/collapse
 
-- [ ] T050 [P] Implement `DescriptionCell.tsx` rendering Markdown via `react-markdown` + `remark-gfm`, truncated by default `apps/backlog-navigator/src/components/DescriptionCell.tsx`
-- [ ] T051 Add per-row expand/collapse + column-header expand-all toggle wired to view-state slice `apps/backlog-navigator/src/components/DescriptionCell.tsx`
-- [ ] T052 Auto-expand cells when the free-text filter matches inside their collapsed contents (FR-013) `apps/backlog-navigator/src/components/DescriptionCell.tsx`
-- [ ] T053 [P][test] Unit tests for truncation, expand/collapse state, auto-expand on filter match `apps/backlog-navigator/src/components/__tests__/DescriptionCell.test.tsx`
+- [x] T050 [P] Implement `DescriptionCell.tsx` rendering Markdown via `react-markdown` + `remark-gfm`, truncated by default `apps/backlog-navigator/src/components/DescriptionCell.tsx`
+- [x] T051 Add per-row expand/collapse + column-header expand-all toggle wired to view-state slice `apps/backlog-navigator/src/components/DescriptionCell.tsx`
+- [x] T052 Auto-expand cells when the free-text filter matches inside their collapsed contents (FR-013) `apps/backlog-navigator/src/components/DescriptionCell.tsx`
+- [x] T053 [P][test] Unit tests for truncation, expand/collapse state, auto-expand on filter match `apps/backlog-navigator/src/components/__tests__/DescriptionCell.test.tsx`
 
 ### 3d. Group-by-Epic view
 
-- [ ] T054 [P] Implement `EpicGroupHeader.tsx` showing title, status, and `done/total` count with a progress bar `apps/backlog-navigator/src/components/EpicGroupHeader.tsx`
-- [ ] T055 Add `useEpicProgress` selector that joins items on `Epic` column and counts `status === 'complete'` `apps/backlog-navigator/src/state/selectors.ts`
-- [ ] T056 Add group-by toggle to `ItemsTable.tsx` (renders flat or grouped) `apps/backlog-navigator/src/components/ItemsTable.tsx`
-- [ ] T057 Treat items with no `Epic` as an "(unassigned)" group `apps/backlog-navigator/src/state/selectors.ts`
-- [ ] T058 [test] Unit tests for `useEpicProgress` covering: zero-item epic, all-complete epic, partial epic, items without Epic `apps/backlog-navigator/src/state/__tests__/epicProgress.test.ts`
+- [x] T054 [P] Implement `EpicGroupHeader.tsx` showing title, status, and `done/total` count with a progress bar `apps/backlog-navigator/src/components/EpicGroupHeader.tsx`
+- [x] T055 Add `useEpicProgress` selector that joins items on `Epic` column and counts `status === 'complete'` `apps/backlog-navigator/src/state/selectors.ts`
+- [x] T056 Add group-by toggle to `ItemsTable.tsx` (renders flat or grouped) `apps/backlog-navigator/src/components/ItemsTable.tsx`
+- [x] T057 Treat items with no `Epic` as an "(unassigned)" group `apps/backlog-navigator/src/state/selectors.ts`
+- [x] T058 [test] Unit tests for `useEpicProgress` covering: zero-item epic, all-complete epic, partial epic, items without Epic `apps/backlog-navigator/src/state/__tests__/epicProgress.test.ts`
 
 ### 3e. Story 1 E2E
 
-- [ ] T059 [test] Playwright E2E: Story 1 acceptance scenarios 1–5 (sort, filter, group-by, expand-all, Markdown link rendering) using a fixture-loaded BACKLOG.md `apps/backlog-navigator/e2e/browse.spec.ts`
-- [ ] T060 [P][test] axe-core accessibility assertions on the default browse view `apps/backlog-navigator/e2e/a11y.spec.ts`
+- [x] T059 [test] Playwright E2E: Story 1 acceptance scenarios 1–5 (sort, filter, group-by, expand-all, Markdown link rendering) using a fixture-loaded BACKLOG.md `apps/backlog-navigator/e2e/browse.spec.ts`
+- [x] T060 [P][test] axe-core accessibility assertions on the default browse view `apps/backlog-navigator/e2e/a11y.spec.ts`
 
 **Parallel opportunity**: 3b, 3c, 3d component-creation tasks (`[P]`) can be developed concurrently after T041 lands. Tests interleave per block.
 
@@ -174,60 +174,60 @@
 
 ### 4a. Pending-edits store
 
-- [ ] T061 Implement `PendingEdit` shape per `data-model.md` with `item-cell` / `item-id-rename` / `epic-cell` variants `apps/backlog-navigator/src/state/pendingEdits.ts`
-- [ ] T062 Add `applyPendingEdits(baseline, pending) → BacklogDocument` projection helper (no in-place mutation) `apps/backlog-navigator/src/state/pendingEdits.ts`
-- [ ] T063 Add `stageEdit` / `undoEdit` / `clearStaging` store actions with `id-rename`-aware re-checks `apps/backlog-navigator/src/state/store.ts`
-- [ ] T064 Wire `localStorage` persistence (envelope `:pending-edits:v1` per `contracts/localstorage-schema.md`) `apps/backlog-navigator/src/state/persistence.ts`
-- [ ] T065 [test] Unit tests for staging: round-trip persistence, per-edit undo restores prior value, id-rename rewrites later edits, collision detection at projection time `apps/backlog-navigator/src/state/__tests__/pendingEdits.test.ts`
+- [x] T061 Implement `PendingEdit` shape per `data-model.md` with `item-cell` / `item-id-rename` / `epic-cell` variants `apps/backlog-navigator/src/state/pendingEdits.ts`
+- [x] T062 Add `applyPendingEdits(baseline, pending) → BacklogDocument` projection helper (no in-place mutation) `apps/backlog-navigator/src/state/pendingEdits.ts`
+- [x] T063 Add `stageEdit` / `undoEdit` / `clearStaging` store actions with `id-rename`-aware re-checks `apps/backlog-navigator/src/state/store.ts`
+- [x] T064 Wire `localStorage` persistence (envelope `:pending-edits:v1` per `contracts/localstorage-schema.md`) `apps/backlog-navigator/src/state/persistence.ts`
+- [x] T065 [test] Unit tests for staging: round-trip persistence, per-edit undo restores prior value, id-rename rewrites later edits, collision detection at projection time `apps/backlog-navigator/src/state/__tests__/pendingEdits.test.ts`
 
 ### 4b. Context-sensitive editors
 
-- [ ] T066 [P] `StatusDropdown.tsx` (workflow values, excludes `parked`/`rejected`) `apps/backlog-navigator/src/components/editors/StatusDropdown.tsx`
-- [ ] T067 [P] `ScorePicker.tsx` (1/3/5 + sentinel `-`) `apps/backlog-navigator/src/components/editors/ScorePicker.tsx`
-- [ ] T068 [P] `ComplexityDropdown.tsx` (Low/Medium/High) `apps/backlog-navigator/src/components/editors/ComplexityDropdown.tsx`
-- [ ] T069 [P] `EpicPicker.tsx` (populated from Epics table + "(none)") `apps/backlog-navigator/src/components/editors/EpicPicker.tsx`
-- [ ] T070 [P] `CategoryComboBox.tsx` (existing-values dropdown + free-text fallback) `apps/backlog-navigator/src/components/editors/CategoryComboBox.tsx`
-- [ ] T071 [P] `DateInput.tsx` (native `<input type="date">` wrapper, locale-aware) `apps/backlog-navigator/src/components/editors/DateInput.tsx`
-- [ ] T072 [P] `DescriptionTextarea.tsx` (multi-line Markdown editor with live preview) `apps/backlog-navigator/src/components/editors/DescriptionTextarea.tsx`
-- [ ] T073 [P] `IdInput.tsx` (numeric input + collision warning surfaced inline) `apps/backlog-navigator/src/components/editors/IdInput.tsx`
-- [ ] T074 Wire editors into `ItemRow.tsx` cell click → context-sensitive control dispatch `apps/backlog-navigator/src/components/ItemRow.tsx`
-- [ ] T075 Add modified-cell + modified-row visual treatments + per-edit undo affordance `apps/backlog-navigator/src/components/ItemRow.tsx`
-- [ ] T076 Auto-stamp `Updated` (today's date) on every staged edit applied to an item `apps/backlog-navigator/src/state/pendingEdits.ts`
-- [ ] T077 Strikethrough toggling on `Status === 'complete'` enforced at serialise time (already in T023; verify here with an integration test) `apps/backlog-navigator/src/parser/__tests__/strikethrough.test.ts`
-- [ ] T078 [P][test] Unit tests for each editor (controlled-component contract, accessibility labels, escape-to-cancel) `apps/backlog-navigator/src/components/editors/__tests__/`
+- [x] T066 [P] `StatusDropdown.tsx` (workflow values, excludes `parked`/`rejected`) `apps/backlog-navigator/src/components/editors/StatusDropdown.tsx`
+- [x] T067 [P] `ScorePicker.tsx` (1/3/5 + sentinel `-`) `apps/backlog-navigator/src/components/editors/ScorePicker.tsx`
+- [x] T068 [P] `ComplexityDropdown.tsx` (Low/Medium/High) `apps/backlog-navigator/src/components/editors/ComplexityDropdown.tsx`
+- [x] T069 [P] `EpicPicker.tsx` (populated from Epics table + "(none)") `apps/backlog-navigator/src/components/editors/EpicPicker.tsx`
+- [x] T070 [P] `CategoryComboBox.tsx` (existing-values dropdown + free-text fallback) `apps/backlog-navigator/src/components/editors/CategoryComboBox.tsx`
+- [x] T071 [P] `DateInput.tsx` (native `<input type="date">` wrapper, locale-aware) `apps/backlog-navigator/src/components/editors/DateInput.tsx`
+- [x] T072 [P] `DescriptionTextarea.tsx` (multi-line Markdown editor with live preview) `apps/backlog-navigator/src/components/editors/DescriptionTextarea.tsx`
+- [x] T073 [P] `IdInput.tsx` (numeric input + collision warning surfaced inline) `apps/backlog-navigator/src/components/editors/IdInput.tsx`
+- [x] T074 Wire editors into `ItemRow.tsx` cell click → context-sensitive control dispatch `apps/backlog-navigator/src/components/ItemRow.tsx`
+- [x] T075 Add modified-cell + modified-row visual treatments + per-edit undo affordance `apps/backlog-navigator/src/components/ItemRow.tsx`
+- [x] T076 Auto-stamp `Updated` (today's date) on every staged edit applied to an item `apps/backlog-navigator/src/state/pendingEdits.ts`
+- [x] T077 Strikethrough toggling on `Status === 'complete'` enforced at serialise time (already in T023; verify here with an integration test) `apps/backlog-navigator/src/parser/__tests__/strikethrough.test.ts`
+- [x] T078 [P][test] Unit tests for each editor (controlled-component contract, accessibility labels, escape-to-cancel) `apps/backlog-navigator/src/components/editors/__tests__/`
 
 ### 4c. Pending footer + diff/summary
 
-- [ ] T079 [P] `PendingFooter.tsx` showing `{N} pending edits` + Push Changes button + Discard All affordance `apps/backlog-navigator/src/components/PendingFooter.tsx`
-- [ ] T080 [P] Implement `format/summary.ts` — walks `PendingEdit[]` and produces `EditSummary` with byKind counts `apps/backlog-navigator/src/format/summary.ts`
-- [ ] T081 [P] Implement `format/diff.ts` — synthesises unified diff via `jsdiff` between serialised baseline and serialised candidate `apps/backlog-navigator/src/format/diff.ts`
-- [ ] T082 [P][test] Unit tests for `summary.ts` (each edit-kind contributes to its tally; multi-edit summaries sort deterministically) `apps/backlog-navigator/src/format/__tests__/summary.test.ts`
-- [ ] T083 [P][test] Unit tests for `diff.ts` (single-cell edit produces minimal hunk; status flip to complete includes strikethrough wrapping) `apps/backlog-navigator/src/format/__tests__/diff.test.ts`
+- [x] T079 [P] `PendingFooter.tsx` showing `{N} pending edits` + Push Changes button + Discard All affordance `apps/backlog-navigator/src/components/PendingFooter.tsx`
+- [x] T080 [P] Implement `format/summary.ts` — walks `PendingEdit[]` and produces `EditSummary` with byKind counts `apps/backlog-navigator/src/format/summary.ts`
+- [x] T081 [P] Implement `format/diff.ts` — synthesises unified diff via `jsdiff` between serialised baseline and serialised candidate `apps/backlog-navigator/src/format/diff.ts`
+- [x] T082 [P][test] Unit tests for `summary.ts` (each edit-kind contributes to its tally; multi-edit summaries sort deterministically) `apps/backlog-navigator/src/format/__tests__/summary.test.ts`
+- [x] T083 [P][test] Unit tests for `diff.ts` (single-cell edit produces minimal hunk; status flip to complete includes strikethrough wrapping) `apps/backlog-navigator/src/format/__tests__/diff.test.ts`
 
 ### 4d. Push dialog + real-write path
 
-- [ ] T084 `PushDialog.tsx` — modal with editable PR title/body, structured summary, raw-diff toggle, confirm + cancel `apps/backlog-navigator/src/components/PushDialog.tsx`
-- [ ] T085 [P] Auto-generate sensible default PR title from the summary (e.g. `Backlog: 3 status changes, 1 epic reassignment`) `apps/backlog-navigator/src/format/defaults.ts`
-- [ ] T086 Add write methods to GitHub client: `getRefSha`, `createBranch`, `commitFile`, `openPullRequest` per `contracts/github-api.md` endpoints #3–#6 `apps/backlog-navigator/src/github/api.ts`
-- [ ] T087 Implement live-mode push sequence (read main → create branch → commit BACKLOG.md with baselineSha → open PR → clear staging) `apps/backlog-navigator/src/state/push.ts`
-- [ ] T088 Stale-base detection: 409 from the commit endpoint surfaces the FR-025 banner + preserves staging `apps/backlog-navigator/src/state/push.ts`
-- [ ] T089 ID-collision blocking: pre-flight check on `applyPendingEdits` projection; refuse push if any ID is duplicated `apps/backlog-navigator/src/state/push.ts`
-- [ ] T090 PAT-scope detection: detect missing `repo` scope (403 + parse) before any write attempt and surface upgrade prompt (FR-028) `apps/backlog-navigator/src/github/api.ts`
-- [ ] T091 [test] Mocked-API unit tests for push happy path + stale-base 409 + collision-block + scope-missing `apps/backlog-navigator/src/state/__tests__/push.test.ts`
+- [x] T084 `PushDialog.tsx` — modal with editable PR title/body, structured summary, raw-diff toggle, confirm + cancel `apps/backlog-navigator/src/components/PushDialog.tsx`
+- [x] T085 [P] Auto-generate sensible default PR title from the summary (e.g. `Backlog: 3 status changes, 1 epic reassignment`) `apps/backlog-navigator/src/format/defaults.ts`
+- [x] T086 Add write methods to GitHub client: `getRefSha`, `createBranch`, `commitFile`, `openPullRequest` per `contracts/github-api.md` endpoints #3–#6 `apps/backlog-navigator/src/github/api.ts`
+- [x] T087 Implement live-mode push sequence (read main → create branch → commit BACKLOG.md with baselineSha → open PR → clear staging) `apps/backlog-navigator/src/state/push.ts`
+- [x] T088 Stale-base detection: 409 from the commit endpoint surfaces the FR-025 banner + preserves staging `apps/backlog-navigator/src/state/push.ts`
+- [x] T089 ID-collision blocking: pre-flight check on `applyPendingEdits` projection; refuse push if any ID is duplicated `apps/backlog-navigator/src/state/push.ts`
+- [x] T090 PAT-scope detection: detect missing `repo` scope (403 + parse) before any write attempt and surface upgrade prompt (FR-028) `apps/backlog-navigator/src/github/api.ts`
+- [x] T091 [test] Mocked-API unit tests for push happy path + stale-base 409 + collision-block + scope-missing `apps/backlog-navigator/src/state/__tests__/push.test.ts`
 
 ### 4e. Dry-run mode
 
-- [ ] T092 Add deployment-config detection: read `import.meta.env.VITE_BACKLOG_NAV_DRY_RUN` + URL `?dryRun=1` override → `mode: 'dry-run'` `apps/backlog-navigator/src/state/deploymentMode.ts`
-- [ ] T093 [P] `DryRunBanner.tsx` — persistent banner indicating "Preview deployment — Push Changes will not commit" `apps/backlog-navigator/src/components/DryRunBanner.tsx`
-- [ ] T094 In `PushDialog.tsx`, relabel the confirm control ("Preview submission" vs. "Open PR") and bypass GitHub API calls in dry-run mode (FR-029) `apps/backlog-navigator/src/components/PushDialog.tsx`
-- [ ] T095 Preserve staging across dry-run confirm (FR-031); show a transient success banner instead `apps/backlog-navigator/src/state/push.ts`
-- [ ] T096 [test] Dry-run unit test: confirm fires no `fetch` calls, leaves staging intact, surfaces correct banner `apps/backlog-navigator/src/state/__tests__/dryRun.test.ts`
+- [x] T092 Add deployment-config detection: read `import.meta.env.VITE_BACKLOG_NAV_DRY_RUN` + URL `?dryRun=1` override → `mode: 'dry-run'` `apps/backlog-navigator/src/state/deploymentMode.ts`
+- [x] T093 [P] `DryRunBanner.tsx` — persistent banner indicating "Preview deployment — Push Changes will not commit" `apps/backlog-navigator/src/components/DryRunBanner.tsx`
+- [x] T094 In `PushDialog.tsx`, relabel the confirm control ("Preview submission" vs. "Open PR") and bypass GitHub API calls in dry-run mode (FR-029) `apps/backlog-navigator/src/components/PushDialog.tsx`
+- [x] T095 Preserve staging across dry-run confirm (FR-031); show a transient success banner instead `apps/backlog-navigator/src/state/push.ts`
+- [x] T096 [test] Dry-run unit test: confirm fires no `fetch` calls, leaves staging intact, surfaces correct banner `apps/backlog-navigator/src/state/__tests__/dryRun.test.ts`
 
 ### 4f. Story 2 E2E
 
-- [ ] T097 [test] Playwright E2E: Story 2 acceptance scenarios 1–7 (PAT prompt, reload survival, dialog content, write round-trip with mocked GitHub, strikethrough toggle, ID collision block, network-failure preservation) `apps/backlog-navigator/e2e/edit.spec.ts`
+- [x] T097 [test] Playwright E2E: Story 2 acceptance scenarios 1–7 (PAT prompt, reload survival, dialog content, write round-trip with mocked GitHub, strikethrough toggle, ID collision block, network-failure preservation) `apps/backlog-navigator/e2e/edit.spec.ts`
 - [ ] T098 [test] Playwright E2E: Story 2 acceptance scenario 8 (dry-run round-trip — confirm fires no API calls, banner indicates preview, staging preserved) — capture `interaction.gif` from this run for evidence `apps/backlog-navigator/e2e/push-dryrun.spec.ts`
-- [ ] T099 [P][test] axe-core a11y assertions on the Push dialog `apps/backlog-navigator/e2e/a11y.spec.ts`
+- [x] T099 [P][test] axe-core a11y assertions on the Push dialog `apps/backlog-navigator/e2e/a11y.spec.ts`
 
 **Story 2 checkpoint**: Editing surface is fully wired with dry-run mode operational, real-write path implemented and behind the env flag, and the Push dialog is the verification surface for both modes.
 
@@ -239,17 +239,17 @@
 
 **Independent Test** (matches spec Story 3 acceptance scenarios 1–3): With an open PR that touches `BACKLOG.md`, load `?pr=NNN`, stage two edits, push, verify a new commit lands on the PR's head branch with no second PR created.
 
-- [ ] T100 Add URL query-string parser to detect `?pr=NNN` and validate as a positive integer `apps/backlog-navigator/src/state/urlMode.ts`
-- [ ] T101 Add `getPullRequest(number)` to GitHub client (Pulls API endpoint #2 per `contracts/github-api.md`) `apps/backlog-navigator/src/github/api.ts`
-- [ ] T102 Cache the PR response (`head.ref`, `head.sha`, `state`, `title`, `html_url`) in store for the session `apps/backlog-navigator/src/state/store.ts`
-- [ ] T103 Switch baseline source: in PR mode, fetch `BACKLOG.md` from `head.ref` rather than `main` `apps/backlog-navigator/src/state/store.ts`
-- [ ] T104 Switch push target: in PR mode, commit onto `head.ref` directly (skip create-branch + open-PR steps) `apps/backlog-navigator/src/state/push.ts`
-- [ ] T105 [P] `PRModeBanner.tsx` — chip showing "Editing PR #NNN — head branch `<name>`" + link to PR on github.com `apps/backlog-navigator/src/components/PRModeBanner.tsx`
-- [ ] T106 Adapt `PushDialog.tsx` confirm-control label to "Add commit to existing PR" in PR mode `apps/backlog-navigator/src/components/PushDialog.tsx`
-- [ ] T107 Surface "PR has no BACKLOG.md changes yet" banner when `?pr=NNN` targets a PR that doesn't currently touch BACKLOG.md (acceptance scenario 3) `apps/backlog-navigator/src/components/PRModeBanner.tsx`
-- [ ] T108 Handle `state === 'closed'` PRs: surface a "PR closed; switching to read-only" banner and disable editors `apps/backlog-navigator/src/components/PRModeBanner.tsx`
-- [ ] T109 [test] Unit tests for URL-mode parsing and PR-mode store transitions `apps/backlog-navigator/src/state/__tests__/urlMode.test.ts`
-- [ ] T110 [test] Playwright E2E: Story 3 acceptance scenarios 1–3 with mocked GitHub Pulls API `apps/backlog-navigator/e2e/pr-mode.spec.ts`
+- [x] T100 Add URL query-string parser to detect `?pr=NNN` and validate as a positive integer `apps/backlog-navigator/src/state/urlMode.ts`
+- [x] T101 Add `getPullRequest(number)` to GitHub client (Pulls API endpoint #2 per `contracts/github-api.md`) `apps/backlog-navigator/src/github/api.ts`
+- [x] T102 Cache the PR response (`head.ref`, `head.sha`, `state`, `title`, `html_url`) in store for the session `apps/backlog-navigator/src/state/store.ts`
+- [x] T103 Switch baseline source: in PR mode, fetch `BACKLOG.md` from `head.ref` rather than `main` `apps/backlog-navigator/src/state/store.ts`
+- [x] T104 Switch push target: in PR mode, commit onto `head.ref` directly (skip create-branch + open-PR steps) `apps/backlog-navigator/src/state/push.ts`
+- [x] T105 [P] `PRModeBanner.tsx` — chip showing "Editing PR #NNN — head branch `<name>`" + link to PR on github.com `apps/backlog-navigator/src/components/PRModeBanner.tsx`
+- [x] T106 Adapt `PushDialog.tsx` confirm-control label to "Add commit to existing PR" in PR mode `apps/backlog-navigator/src/components/PushDialog.tsx`
+- [x] T107 Surface "PR has no BACKLOG.md changes yet" banner when `?pr=NNN` targets a PR that doesn't currently touch BACKLOG.md (acceptance scenario 3) `apps/backlog-navigator/src/components/PRModeBanner.tsx`
+- [x] T108 Handle `state === 'closed'` PRs: surface a "PR closed; switching to read-only" banner and disable editors `apps/backlog-navigator/src/components/PRModeBanner.tsx`
+- [x] T109 [test] Unit tests for URL-mode parsing and PR-mode store transitions `apps/backlog-navigator/src/state/__tests__/urlMode.test.ts`
+- [x] T110 [test] Playwright E2E: Story 3 acceptance scenarios 1–3 with mocked GitHub Pulls API `apps/backlog-navigator/e2e/pr-mode.spec.ts`
 
 **Story 3 checkpoint**: PR-mode deep links work end-to-end; the navigator can refine in-flight backlog edits without proliferating PRs.
 
@@ -261,11 +261,11 @@
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright tasks in this phase because you think browsers can't be installed. The project uses `@sparticuz/chromium` to extract a Linux Chromium binary via npm. Run `node apps/backlog-navigator/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T111 Add `VITE_BACKLOG_NAV_DRY_RUN` env-var support to Vite config; surface via `import.meta.env` `apps/backlog-navigator/vite.config.ts`
-- [ ] T112 [P] Author per-PR preview workflow (mirror of `spec-navigator-preview.yml`) — builds with `--base=/debrief-future/backlog-navigator-preview/<slug>/` and `VITE_BACKLOG_NAV_DRY_RUN=true`, publishes to `gh-pages` `.github/workflows/backlog-navigator-preview.yml`
-- [ ] T113 [P] Author sticky PR-comment workflow (mirror of `spec-navigator-comment.yml`) with marker `<!-- backlog-navigator-comment -->` `.github/workflows/backlog-navigator-comment.yml`
-- [ ] T114 [P] Author main-branch publish workflow (mirror of `spec-navigator-publish.yml`) — builds without dry-run flag, publishes to `/backlog-navigator/` on `gh-pages` `.github/workflows/backlog-navigator-publish.yml`
-- [ ] T115 Trigger workflows on changes to `apps/backlog-navigator/**`, `BACKLOG.md`, and `.github/workflows/backlog-navigator-*.yml`; document the trigger paths in each workflow file `.github/workflows/backlog-navigator-preview.yml`
+- [x] T111 Add `VITE_BACKLOG_NAV_DRY_RUN` env-var support to Vite config; surface via `import.meta.env` `apps/backlog-navigator/vite.config.ts`
+- [x] T112 [P] Author per-PR preview workflow (mirror of `spec-navigator-preview.yml`) — builds with `--base=/debrief-future/backlog-navigator-preview/<slug>/` and `VITE_BACKLOG_NAV_DRY_RUN=true`, publishes to `gh-pages` `.github/workflows/backlog-navigator-preview.yml`
+- [x] T113 [P] Author sticky PR-comment workflow (mirror of `spec-navigator-comment.yml`) with marker `<!-- backlog-navigator-comment -->` `.github/workflows/backlog-navigator-comment.yml`
+- [x] T114 [P] Author main-branch publish workflow (mirror of `spec-navigator-publish.yml`) — builds without dry-run flag, publishes to `/backlog-navigator/` on `gh-pages` `.github/workflows/backlog-navigator-publish.yml`
+- [x] T115 Trigger workflows on changes to `apps/backlog-navigator/**`, `BACKLOG.md`, and `.github/workflows/backlog-navigator-*.yml`; document the trigger paths in each workflow file `.github/workflows/backlog-navigator-preview.yml`
 - [ ] T116 Configure preview build to load `BACKLOG.md` from the PR's working tree rather than via the GitHub Contents API in dry-run mode (so reviewers see the in-PR version) `apps/backlog-navigator/src/github/api.ts`
 
 **Phase 6 checkpoint**: Pushing a commit on this branch produces a live preview URL in the PR's sticky comment, where the navigator runs against the in-PR `BACKLOG.md` with dry-run mode active.
@@ -278,8 +278,8 @@
 
 ### Evidence Collection
 
-- [ ] T117 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — Vitest unit + Playwright E2E + axe a11y totals with YAML front matter `specs/242-backlog-navigator/evidence/test-summary.md`
-- [ ] T118 Create usage demonstration walking through reviewer flow: load → filter → stage 3 edits → push dialog → dry-run confirm `specs/242-backlog-navigator/evidence/usage-example.md`
+- [x] T117 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) — Vitest unit + Playwright E2E + axe a11y totals with YAML front matter `specs/242-backlog-navigator/evidence/test-summary.md`
+- [x] T118 Create usage demonstration walking through reviewer flow: load → filter → stage 3 edits → push dialog → dry-run confirm `specs/242-backlog-navigator/evidence/usage-example.md`
 - [ ] T119 [P] Capture browse view screenshot — light theme `specs/242-backlog-navigator/evidence/screenshots/browse-light.png`
 - [ ] T120 [P] Capture browse view screenshot — dark theme `specs/242-backlog-navigator/evidence/screenshots/browse-dark.png`
 - [ ] T121 [P] Capture group-by-Epic view screenshot showing `done/total` counts and progress bars `specs/242-backlog-navigator/evidence/screenshots/group-by-epic.png`
@@ -287,19 +287,19 @@
 - [ ] T123 [P] Capture Push Changes dialog with structured summary + raw-diff toggle expanded `specs/242-backlog-navigator/evidence/screenshots/push-dialog.png`
 - [ ] T124 [P] Capture dry-run banner indicator `specs/242-backlog-navigator/evidence/screenshots/dry-run-banner.png`
 - [ ] T125 [P] Capture interaction GIF — stage 3 edits → open Push dialog → confirm in dry-run (≤5s, ≤2MB), produced from the `push-dryrun.spec.ts` E2E run `specs/242-backlog-navigator/evidence/screenshots/interaction.gif`
-- [ ] T126 [P] Document the `BACKLOG.md` schema refactor: before/after diff of one Items row + Epics-table normalisation, plus a count of `Created`-backfill hits vs. sentinel-fallbacks `specs/242-backlog-navigator/evidence/refactor-before-after.md`
-- [ ] T127 [P] Verify `evidence/backfill-misses.txt` from T027 lives at the documented path and is referenced from the refactor evidence note `specs/242-backlog-navigator/evidence/backfill-misses.txt`
+- [x] T126 [P] Document the `BACKLOG.md` schema refactor: before/after diff of one Items row + Epics-table normalisation, plus a count of `Created`-backfill hits vs. sentinel-fallbacks `specs/242-backlog-navigator/evidence/refactor-before-after.md`
+- [x] T127 [P] Verify `evidence/backfill-misses.txt` from T027 lives at the documented path and is referenced from the refactor evidence note `specs/242-backlog-navigator/evidence/backfill-misses.txt`
 - [ ] T128 [P] Capture per-PR preview URL after the preview workflow's first run lands `specs/242-backlog-navigator/evidence/preview-url.txt`
 
 ### Polish
 
 - [ ] T129 [P] Audit `src/strings.ts` for completeness: every user-visible string in JSX comes from this module, no inline literals (Article XI / Constitution Check) `apps/backlog-navigator/src/strings.ts`
-- [ ] T130 [P] Update `CHANGELOG.md` with a 2-line summary of the new app + schema refactor `CHANGELOG.md`
+- [x] T130 [P] Update `CHANGELOG.md` with a 2-line summary of the new app + schema refactor `CHANGELOG.md`
 - [ ] T131 [P] Run `task verify` end-to-end and resolve any lint/typecheck/test failures before evidence capture finalises
 
 ### Media Content
 
-- [ ] T132 Spawn the Content Specialist via Task tool (`.claude/agents/media/content.md`) to produce the feature post: copy the cached opener verbatim as the first three sections (`## Hook`, `## What We're Building`, `## How It Fits`), then write `## Key Decisions` + `## Screenshots` (with paths from T119–T125) + `## By the Numbers` (from T117 totals + T126 refactor counts) + `## Lessons Learned` + `## What's Next` `specs/242-backlog-navigator/media/shipped-post.md`
+- [x] T132 Spawn the Content Specialist via Task tool (`.claude/agents/media/content.md`) to produce the feature post: copy the cached opener verbatim as the first three sections (`## Hook`, `## What We're Building`, `## How It Fits`), then write `## Key Decisions` + `## Screenshots` (with paths from T119–T125) + `## By the Numbers` (from T117 totals + T126 refactor counts) + `## Lessons Learned` + `## What's Next` `specs/242-backlog-navigator/media/shipped-post.md`
 
 ### PR Creation
 
