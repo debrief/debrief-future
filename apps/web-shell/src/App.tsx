@@ -128,6 +128,10 @@ import {
   setActiveStacItemPath,
   setActiveStacWriter,
 } from './services/stacWriterRegistry';
+import {
+  clearSceneThumbnailStore,
+  hydrateSceneThumbnailStoreFromIdb,
+} from './services/webSceneThumbnailAdapter';
 
 /**
  * Strip the catalog-relative `./<plot>/item.json` form down to the bare
@@ -213,6 +217,12 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
+  // Stable ref for the writer-init effect's hydration retry path
+  // (avoids re-running the init effect every time currentPlot changes).
+  const currentPlotRef = useRef<PlotState | null>(null);
+  useEffect(() => {
+    currentPlotRef.current = currentPlot;
+  }, [currentPlot]);
   // Result layers now live in session-state store (#109)
   const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
@@ -292,6 +302,13 @@ export default function App() {
           return;
         }
         setActiveStacWriter(writer, capability);
+        // If a plot was already selected before the writer became
+        // available (the URL ?plot= auto-open path can race the writer
+        // init), re-hydrate now that the IDB read path is ready.
+        const cp = currentPlotRef.current;
+        if (cp !== null) {
+          void hydrateSceneThumbnailStoreFromIdb(cp.features.features);
+        }
       } catch (err) {
         console.warn('[App] stacWriter init failed:', err);
         setActiveStacWriter(null, {
@@ -475,6 +492,11 @@ export default function App() {
       // #236 — register the active STAC item parent so scene-thumbnail
       // captures know which item.json overlay to land into.
       setActiveStacItemPath(stripItemPathToParent(itemPath));
+      // #236 FR-001 — re-hydrate the in-memory thumbnail store from IDB
+      // so previously-captured scenes show their thumbnails after reload.
+      // Best-effort; failures fall back to empty thumbnails.
+      clearSceneThumbnailStore();
+      void hydrateSceneThumbnailStoreFromIdb(plotData.features);
       freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
       freshStore.getState().setDrawingMode(null);

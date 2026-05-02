@@ -180,4 +180,58 @@ export function clearSceneThumbnailStore(): void {
   sharedStore.clear();
 }
 
+/**
+ * Re-hydrate the in-memory thumbnail store from IndexedDB after a plot
+ * load (#236 FR-001 — captures must survive a browser reload).
+ *
+ * Scans the freshly-loaded FeatureCollection for STORYBOARD_SCENE
+ * features, resolves each Scene's `thumbnail_asset_ref` to a blob URL
+ * via the writer's `readAssetBlob`, and populates the store. Failures
+ * are silent — the rail just shows an empty thumbnail rect for missing
+ * blobs (matches the existing pre-capture rendering).
+ */
+export async function hydrateSceneThumbnailStoreFromIdb(
+  features: ReadonlyArray<{
+    properties?: { kind?: string; id?: string; thumbnail_asset_ref?: string } | null;
+  }>,
+): Promise<void> {
+  const writer = getActiveStacWriter();
+  const stacItemPath = getActiveStacItemPath();
+  if (writer === null || stacItemPath === null) return;
+  const itemPath = `${stacItemPath}/item.json`;
+
+  for (const f of features) {
+    const props = f.properties;
+    if (
+      props === null ||
+      props === undefined ||
+      props.kind !== 'STORYBOARD_SCENE'
+    )
+      continue;
+    const sceneId = props.id;
+    const ref = props.thumbnail_asset_ref;
+    if (typeof sceneId !== 'string' || typeof ref !== 'string') continue;
+
+    try {
+      const [largeBlob, smallBlob] = await Promise.all([
+        writer.readAssetBlob(itemPath, ref),
+        writer.readAssetBlob(itemPath, `${ref}-sm`),
+      ]);
+      if (largeBlob === null && smallBlob === null) continue;
+      const largeUrl = largeBlob !== null ? URL.createObjectURL(largeBlob) : '';
+      const smallUrl = smallBlob !== null ? URL.createObjectURL(smallBlob) : '';
+      sharedStore.put(sceneId, {
+        assetKey: ref,
+        largeDataUrl: largeUrl,
+        smallDataUrl: smallUrl,
+      });
+    } catch (err) {
+      console.warn(
+        `[webSceneThumbnailAdapter] hydrate failed for scene ${sceneId}:`,
+        err,
+      );
+    }
+  }
+}
+
 export type { WebSceneThumbnailStore };
