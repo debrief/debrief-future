@@ -45,9 +45,14 @@ type MobileLayoutMode = 'desktop' | 'mobile';
 
 ### `BottomSheetState`
 
-The bottom-sheet editor's per-instance state. Lives in component-local
-`useState`, **not** the global reducer — sheets are short-lived and a
-dismissed sheet has no lingering state.
+The bottom-sheet editor's state. Lives in **`<EditorOverlayProvider>` React
+context** at App root — **not** in `<BottomSheet>` component-local
+`useState` (per Review §Issue 1A). The reason: the bottom sheet is rendered
+inside the mobile-only subtree, but iPad rotation across the 1024px
+breakpoint unmounts that entire subtree; component-local state would be
+silently destroyed mid-edit, violating Article I.3 ("no silent failures").
+Lifting the state above the layout-mode branch lets the provider catch the
+crossing and surface the FR-009 discard-confirm dialog.
 
 ```ts
 type BottomSheetEditorKind =
@@ -90,7 +95,9 @@ State transitions:
 ### `DescriptionEditorState`
 
 The full-screen Markdown editor's state. Same scope as `BottomSheetState`
-— component-local, ephemeral.
+— lives in the App-level `<EditorOverlayProvider>` context, **not**
+component-local (per Review §Issue 1A; same Article I.3 reasoning as
+above).
 
 ```ts
 type DescriptionEditorState =
@@ -169,10 +176,11 @@ for any UX decision.
 
 | Type | File | Exported? |
 |------|------|-----------|
-| `MobileLayoutMode` | `src/types.ts` | yes |
-| `BottomSheetEditorKind` | `src/types.ts` | yes |
-| `BottomSheetState` | `src/components/mobile/BottomSheet.tsx` (component-local) | no |
-| `DescriptionEditorState` | `src/components/mobile/DescriptionEditorScreen.tsx` (component-local) | no |
+| `MobileLayoutMode` | (REMOVED — Review §Issue 2A reuses `useIsMobile(1023): boolean` from `@debrief/components`) | n/a |
+| `BottomSheetEditorKind` | `src/editors/EditorOverlayContext.ts` | yes |
+| `BottomSheetState` | `src/editors/EditorOverlayContext.ts` (consumed via context) | yes |
+| `DescriptionEditorState` | `src/editors/EditorOverlayContext.ts` (consumed via context) | yes |
+| `EditorOverlayContextValue` | `src/editors/EditorOverlayContext.ts` (Review §Issue 1A — provider value with state + open/close/save/discard actions + dirty-cross-mode handler) | yes |
 | `ServiceWorkerUpdateState` | `src/pwa/registerSW.ts` | yes |
 | `PWAInstallState` | `src/pwa/registerSW.ts` | yes |
 

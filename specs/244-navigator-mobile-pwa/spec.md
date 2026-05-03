@@ -159,6 +159,7 @@ even with the device in airplane mode (data still requires network).
 - **Tablet portrait `768 x 1024`**: Renders the mobile card list, **not** the desktop table — viewport width is below 1024px. Bottom-sheet editors must accommodate the wider tablet width without stretching to absurd line lengths.
 - **Tablet landscape `1024 x 768`**: Renders the desktop table layout (≥1024px). Tap targets must remain ≥44×44 CSS pixels even though the layout is desktop-style.
 - **Rotation while a bottom sheet is open**: The sheet must reflow to the new viewport width; it must not leave the screen partially off-edge or cover content that's now a different size.
+- **Rotation that crosses the 1024px breakpoint while an editor is open with unsaved changes** (e.g. iPad portrait `768x1024` rotated to landscape `1024x768`): the system MUST surface the same FR-009 discard-confirm dialog instead of silently dropping the in-flight edit. (Per Review Outcome §Issue 1A; honours Article I.3 — no silent failures.)
 - **On-screen keyboard partially covers bottom sheet**: The active input remains visible (sheet content scrolls / sheet rises above keyboard); the sheet does not get "stuck" behind the keyboard.
 - **Card list with 230+ rows**: Scroll performance does not degrade with row count (virtualisation required); first-paint cost is not proportional to row count.
 - **Description with embedded Markdown table or escaped pipe (`\|`)**: Renders correctly in the card, opens correctly in the full-screen editor (raw source preserved), and round-trips byte-stable through the parser.
@@ -210,7 +211,7 @@ even with the device in airplane mode (data still requires network).
 - **FR-021**: Multi-viewport Playwright tests MUST exercise Story 1 + Story 2 acceptance scenarios at all three target viewports: `375 x 812`, `768 x 1024`, and `1024 x 768`.
 - **FR-022**: A Lighthouse PWA audit MUST be run as a CI gate against a representative deployed/preview build; the threshold is **≥ 90** for the PWA category.
 - **FR-023**: The desktop E2E suite from #242 (`browse / interaction / a11y / realWrite / prMode`) MUST continue to pass at `≥ 1024px` after this feature lands. No regressions to desktop behaviour.
-- **FR-024**: The build MUST not increase the desktop bundle's gzipped JavaScript payload by more than **15%** relative to the pre-244 baseline. (Carry-cost guard for the responsive logic.)
+- **FR-024**: The build MUST not increase the desktop bundle's gzipped JavaScript payload beyond a **measured-realistic budget** committed in `scripts/bundle-baseline-244.json`, set at the start of implementation per the protocol in plan.md §Review Outcomes Issue 4A. The **target** is +15% relative to the pre-244 baseline; the gate is permitted to be raised to +30% if the realistic floor (post-prototype-of-new-deps measurement) exceeds 15%, with rationale committed alongside the budget.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -272,7 +273,7 @@ even with the device in airplane mode (data still requires network).
 - **SC-007**: After installing the PWA, cold-start time from home-screen tap to the first interactive card list is **under 3 seconds** on a representative mid-tier device profile (network-permitting; offline cold-start to app-shell-ready is **under 1.5 seconds**).
 - **SC-008**: The desktop E2E suite from #242 continues to pass at 100% after this feature lands. **No regressions** in desktop behaviour, layout, or push semantics.
 - **SC-009**: Every mobile-originated change to `BACKLOG.md` produces output **byte-identical** to the same change made via the desktop UI, verified by the round-trip Vitest gate from #242 / #245.
-- **SC-010**: The desktop bundle's gzipped JS payload grows by **≤ 15%** relative to the pre-244 baseline.
+- **SC-010**: The desktop bundle's gzipped JS payload growth, relative to the pre-244 baseline, stays **within the budget committed in `scripts/bundle-baseline-244.json`** (target: +15%; cap: +30% with documented rationale per plan.md §Review Outcomes Issue 4A).
 - **SC-011**: When a new app version is deployed, an installed PWA surfaces an "update available" affordance within **one minute** of the next launch, and reloads to the new version on user confirmation. Zero observed cases of indefinite stale version.
 
 ## Assumptions

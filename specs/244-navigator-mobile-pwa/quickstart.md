@@ -117,22 +117,34 @@ above on every PR that touches `apps/backlog-navigator/**` or
 
 ## 5. Verify the bundle-size budget
 
+The budget is **measured-realistic**, not aspirational (Review Outcome §Issue 4A). The exact figure lives in `scripts/bundle-baseline-244.json` (committed at the start of implementation).
+
 ```sh
 pnpm --filter @debrief/backlog-navigator build
 node scripts/check-bundle-size.mjs
 ```
 
-Output:
+Output (illustrative — actual baseline TBD):
 ```
-Pre-244 baseline (gzipped):  87,410 bytes
+Pre-244 baseline (gzipped):  87,410 bytes (from main @ <commit-sha>)
 Current build (gzipped):     94,221 bytes
-Headroom:                    13,810 bytes (15.8% allowed; 7.8% used)
+Budget:                      +15% (target — see scripts/bundle-baseline-244.json)
+Headroom:                    13,810 bytes; 7.8% used
 PASS
 ```
 
-If the script fails, the `dist/assets/*.js` total has exceeded baseline ×
-1.15 — investigate in `dist/assets/` (Vite emits per-chunk filenames with
-content hashes; `du -h` ranks them by size).
+If the script fails, the `dist/assets/*.js` total has exceeded the
+committed budget — investigate in `dist/assets/` (Vite emits per-chunk
+filenames with content hashes; `du -h` ranks them by size). If the new
+code legitimately needs more headroom, raise the budget to the measured
+realistic floor (capped at +30%) and commit the baseline JSON change with
+rationale.
+
+### Bootstrap procedure (Implementation Task 1–3)
+
+1. Check out `main`. Run `pnpm --filter @debrief/backlog-navigator build`. Capture gzipped sum of `dist/assets/*.js`. Write to `scripts/bundle-baseline-244.json` with the commit SHA.
+2. Apply the minimal scaffold (empty new components + manifest + SW + react-virtual + `@debrief/components` subpath import). Re-run build. Measure delta.
+3. Set the budget. ≤ 15% → keep target. 15–30% → raise to (delta + 5pp), commit JSON change + amend SC-010 wording in the same commit, with one-line rationale.
 
 ## 6. Round-trip byte-stable check (regression guard)
 

@@ -2,6 +2,7 @@
 
 **Branch**: `claude/implement-speckit-244-KPwO3` (active feature: `244-navigator-mobile-pwa`) | **Date**: 2026-05-02 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `specs/244-navigator-mobile-pwa/spec.md`
+**Review pass**: 2026-05-02 — `/speckit.review` accepted all four recommendations. See § Review Outcomes near the end of this file.
 
 ## Summary
 
@@ -37,6 +38,7 @@ sibling package.
   - React 18.x, react-dom 18.x (existing)
   - Vite 5.x (existing — bundler + dev server)
   - `@tanstack/react-virtual` (already in monorepo workspace via #094) — **add as direct dep of `apps/backlog-navigator`** (currently consumed only via `shared/components`)
+  - `@debrief/components` (workspace dep, **new for backlog-navigator**) — added solely to consume `useIsMobile` via subpath import `@debrief/components/hooks/useIsMobile`. Tree-shake is verified at build time by inspecting `dist/assets/*.js` for absence of MapView / Leaflet / Vega bundles. (Per Review Outcome §Issue 2A — replaces the originally planned new `useLayoutMode.ts` hook.)
   - `vite-plugin-pwa` ^0.20.x (**new dev-dep** — see Article IX justification below) — emits manifest, registers a Workbox-based service worker, exposes the `vite/pwa-virtual` registration module
   - `react-markdown` ^9 + `remark-gfm` (existing) — reused unchanged for description rendering
   - `zod` ^3.22 (existing) — extended with one schema for the manifest output (see contracts/)
@@ -56,7 +58,7 @@ sibling package.
 **Constraints**:
   - **No sibling codebase** — single React app, single Vite build (FR-014)
   - **Byte-identical `BACKLOG.md` output** for any equivalent edit, mobile vs. desktop (FR-015, SC-009)
-  - **Desktop bundle gzipped JS payload growth ≤ 15%** vs. pre-#244 baseline (FR-024, SC-010)
+  - **Desktop bundle gzipped JS payload growth ≤ measured-realistic budget** vs. pre-#244 baseline. The +15% target in FR-024 / SC-010 is a **target**, not a fixed contract: per Review Outcome §Issue 4A, the implementation's first task is to capture the pre-#244 baseline from `main` and prototype the new deps. If the realistic budget proves to be +25–30%, the gate is set at that figure with rationale committed to `scripts/bundle-baseline-244.json`. The spec's SC-010 is amended in lockstep.
   - **Same conflict-detection** as desktop on push (FR-016)
   - **Strict TypeScript**, `any` forbidden (Article XV)
 **Scale/Scope**:
@@ -133,21 +135,25 @@ apps/backlog-navigator/
 │   ├── icon-512.png            # (+) PWA icon (512×512, maskable)
 │   └── apple-touch-icon.png    # (+) iOS install icon
 ├── src/
-│   ├── App.tsx                 # (M) branch on layoutMode → render <ItemsTable> or <CardList>; mount sticky push bar on mobile
-│   ├── main.tsx                # (M) registerSW() from virtual:pwa-register; surface update prompt
-│   ├── hooks/
-│   │   └── useLayoutMode.ts    # (+) matchMedia('(min-width: 1024px)') hook → 'desktop' | 'mobile'
+│   ├── App.tsx                 # (M) wrap in <EditorOverlayProvider>; branch on isMobile → render <ItemsTable> or <CardList>; mount sticky push bar on mobile; mount <UpdatePrompt> at root
+│   ├── main.tsx                # (M) startServiceWorker() from virtual:pwa-register; pipe state into context
+│   ├── editors/
+│   │   ├── EditorOverlayProvider.tsx          # (+) lifts BottomSheetState + DescriptionEditorState above the layout-mode branch (Review Outcome §Issue 1A); on layout-mode change with dirty=true, surfaces FR-009 discard-confirm modal
+│   │   ├── EditorOverlayContext.ts            # (+) typed React context surface
+│   │   └── __tests__/
+│   │       └── EditorOverlayProvider.test.tsx # (+) verifies dirty-edit survives intra-mode rotation; verifies discard-confirm fires on cross-mode rotation
 │   ├── pwa/
-│   │   ├── registerSW.ts       # (+) thin wrapper around virtual:pwa-register; emits update events
-│   │   └── UpdatePrompt.tsx    # (+) renders the "update available" affordance
+│   │   ├── registerSW.ts       # (+) thin wrapper around virtual:pwa-register; emits ServiceWorkerUpdateState
+│   │   ├── UpdatePrompt.tsx    # (+) renders the "update available" affordance at App root
+│   │   └── manifestSchema.ts   # (+) Zod schema validating the PWA manifest config consumed by VitePWA
 │   ├── components/
 │   │   ├── (existing desktop components — UNCHANGED)
 │   │   ├── mobile/
 │   │   │   ├── CardList.tsx                  # (+) virtualised card list (uses @tanstack/react-virtual)
-│   │   │   ├── ItemCard.tsx                  # (+) one row → one card
-│   │   │   ├── BottomSheet.tsx               # (+) sheet container with hand-rolled drag-down gesture
+│   │   │   ├── ItemCard.tsx                  # (+) one row → one card; opens editors via EditorOverlayContext (NOT local state)
+│   │   │   ├── BottomSheet.tsx               # (+) sheet container with hand-rolled drag-down gesture; receives state from EditorOverlayProvider, not own useState
 │   │   │   ├── BottomSheetEditor.tsx         # (+) wraps an editor with sheet header/save/cancel
-│   │   │   ├── DescriptionEditorScreen.tsx   # (+) full-screen Markdown editor
+│   │   │   ├── DescriptionEditorScreen.tsx   # (+) full-screen Markdown editor; receives state from EditorOverlayProvider, not own useState
 │   │   │   ├── StickyPushBar.tsx             # (+) bottom-fixed push bar with safe-area-inset padding
 │   │   │   ├── MobileFilterBar.tsx           # (+) phase dropdown + include-completed checkbox in mobile chrome
 │   │   │   └── __tests__/
@@ -155,6 +161,7 @@ apps/backlog-navigator/
 │   │   │       └── CardList.test.tsx         # (+) virtualisation + filter behaviour
 │   │   └── editors/
 │   │       └── (existing editor components reused inside <BottomSheetEditor> — UNCHANGED)
+│   └── (NOTE: no `hooks/useLayoutMode.ts` — Review Outcome §Issue 2A consumes `useIsMobile` from `@debrief/components` via subpath import)
 │   ├── styles/
 │   │   ├── (existing global styles — UNCHANGED)
 │   │   └── mobile.css                         # (+) mobile-only rules (cards, sheet, sticky bar, safe-area)
@@ -166,8 +173,12 @@ apps/backlog-navigator/
 ├── e2e/
 │   ├── (existing specs — UNCHANGED specs themselves; viewport assertion sites parameterised)
 │   ├── mobile/
-│   │   ├── browse.mobile.spec.ts             # (+) Story 1 acceptance at 3 viewports
-│   │   └── interaction.mobile.spec.ts        # (+) Story 2 acceptance at 3 viewports
+│   │   ├── browse.mobile.spec.ts             # (+) Story 1 acceptance at 3 viewports (FR-021 mandate)
+│   │   ├── interaction.mobile.spec.ts        # (+) Story 2 acceptance at 3 viewports (FR-021 mandate)
+│   │   ├── description-editor.mobile.spec.ts # (+) Story 3 acceptance at 375x812 only (Review Outcome §Issue 3A)
+│   │   ├── push.mobile.spec.ts               # (+) Story 4 acceptance at 375x812; mocks GitHub via page.route() (Review Outcome §Issue 3A)
+│   │   ├── pwa-offline.mobile.spec.ts        # (+) Story 5 AS2 + AS3 at 375x812 (offline shell + standalone display) (Review Outcome §Issue 3A)
+│   │   └── editor-rotation.mobile.spec.ts    # (+) verifies cross-breakpoint rotation surfaces discard-confirm (Review Outcome §Issue 1A regression guard)
 │   └── helpers/
 │       └── viewports.ts                       # (+) the three target viewports as exported constants
 ├── playwright.config.ts        # (M) add three Playwright projects: mobile-iphone, tablet-portrait, tablet-landscape
@@ -232,7 +243,11 @@ parity is exercised via that suite, extended with three viewport projects.
 | Workflow | Spec File | Viewports | Key Selectors |
 |----------|-----------|-----------|----------------|
 | Browse + filter (Story 1) | `e2e/mobile/browse.mobile.spec.ts` | `375x812`, `768x1024`, `1024x768` | `[data-testid=card-list]`, `[data-testid=item-card-{id}]`, `[data-testid=phase-filter]`, `[data-testid=include-completed-toggle]` |
-| Edit row (Story 2) | `e2e/mobile/interaction.mobile.spec.ts` | `375x812`, `768x1024`, `1024x768` | `[data-testid=status-chip]`, `[data-testid=bottom-sheet]`, `[data-testid=description-editor-screen]`, `[data-testid=sticky-push-bar]` |
+| Edit row (Story 2) | `e2e/mobile/interaction.mobile.spec.ts` | `375x812`, `768x1024`, `1024x768` | `[data-testid=status-chip]`, `[data-testid=bottom-sheet]`, `[data-testid=sticky-push-bar]` |
+| Description editor (Story 3) — Review §3A | `e2e/mobile/description-editor.mobile.spec.ts` | `375x812` | `[data-testid=item-card-description]`, `[data-testid=description-editor-screen]`, `[data-testid=description-editor-cancel]`, `[data-testid=discard-confirm]` |
+| Push from phone (Story 4) — Review §3A | `e2e/mobile/push.mobile.spec.ts` | `375x812` | `[data-testid=sticky-push-bar]`, `[data-testid=push-button]`; uses `page.route('**/api.github.com/**')` for mocked PUT |
+| PWA offline + standalone (Story 5 AS2/AS3) — Review §3A | `e2e/mobile/pwa-offline.mobile.spec.ts` | `375x812` | `[data-testid=offline-empty-state]`; uses `context.setOffline(true)` + `display-mode: standalone` matchMedia |
+| Cross-breakpoint rotation (Review §1A guard) | `e2e/mobile/editor-rotation.mobile.spec.ts` | `768x1024` → `1024x768` | `[data-testid=discard-confirm]`; verifies dirty-edit triggers FR-009 dialog on layout-mode crossing |
 | Lighthouse PWA gate | (separate workflow — not Playwright) | mobile profile | n/a |
 | Existing desktop browse/interaction/a11y/realWrite/prMode | (UNCHANGED — `≥ 1024px`) | `1280x720` (existing default) | (UNCHANGED) |
 
@@ -258,3 +273,64 @@ parity is exercised via that suite, extended with three viewport projects.
 | New dep: `vite-plugin-pwa` | Generates the manifest file from a typed config, registers a Workbox-backed service worker, exposes a `virtual:pwa-register` module that emits update events. Replaces ~200 lines of hand-rolled Workbox glue + manifest emitter + version-detection wiring. | **Hand-rolled SW + hand-emitted manifest** — rejected because the surface area (precaching, runtime caching for GitHub responses, update-detection lifecycle) is exactly what Workbox solves. Article IX requires "minimal, vetted dependencies" — Workbox is Google-maintained and ships at most browsers; vite-plugin-pwa is the standard wrapper for Vite. Recording the choice as ADR-029 at implementation time. |
 | New dev-dep: `@lhci/cli` | Provides the Lighthouse PWA score CI gate (FR-022, SC-006). | **Manual Lighthouse runs** — rejected because Article VI requires CI gates ("CI MUST pass"). A manual-only check is not a gate. `@lhci/cli` is the official Google tool. |
 | Direct dep promotion: `@tanstack/react-virtual` | Already a transitive dep via `shared/components` (#094). The mobile card list needs it directly. | **Hand-roll virtualisation** — rejected because @tanstack/react-virtual is already in the monorepo (zero new surface), the algorithm is non-trivial (sticky headers + variable heights + scroll restoration), and the project already pays the bundle cost via #094. |
+| New workspace dep: `@debrief/components` (subpath import only) | Reuses `useIsMobile` (Review §Issue 2A) instead of duplicating the hook. Subpath import keeps tree-shake honest. | **Duplicate hook** — rejected; DRY violation. **Extract `@debrief/hooks` package** — deferred (worth doing once a third app needs the hook; tracked as a new BACKLOG candidate, see Review Outcomes). |
+
+## Review Outcomes (`/speckit.review` 2026-05-02)
+
+The compressed review pass surfaced four issues. All four `A` recommendations were accepted by the spec author. The plan, data-model, and spec are amended accordingly.
+
+### §Issue 1A — Lift editor state to App-level provider
+
+**Problem**: Layout-mode crossing (e.g. iPad rotation `768x1024` ↔ `1024x768`) unmounted the entire mobile component tree, silently destroying any open `BottomSheetState` / `DescriptionEditorState` (Article I.3 — "no silent failures" — violation).
+
+**Resolution**:
+- New `src/editors/EditorOverlayProvider.tsx` mounts at App root, **above** the layout-mode branch. Holds `bottomSheetState` and `descriptionEditorState` in React context.
+- All mobile editor components (`BottomSheet`, `DescriptionEditorScreen`) consume state from the provider, not local `useState`. (Data-model.md amended.)
+- On layout-mode change with `dirty=true` in either editor, the provider surfaces the same FR-009 discard-confirm modal. The user explicitly chooses save or discard before the layout flips.
+- New regression test: `e2e/mobile/editor-rotation.mobile.spec.ts` — opens editor on iPad portrait, rotates to landscape, asserts discard-confirm fires.
+- New unit test: `src/editors/__tests__/EditorOverlayProvider.test.tsx` — verifies state survives intra-mode rotation; verifies discard-confirm fires on cross-mode rotation.
+
+### §Issue 2A — Subpath-import `useIsMobile` from `@debrief/components`
+
+**Problem**: Plan created a new `apps/backlog-navigator/src/hooks/useLayoutMode.ts` that duplicated `shared/components/src/hooks/useIsMobile.ts` (a parameterised matchMedia hook already exported from `@debrief/components` and consumed by `apps/web-shell`).
+
+**Resolution**:
+- Add `@debrief/components` as a workspace dependency of `apps/backlog-navigator/package.json`.
+- Consume via subpath import: `import { useIsMobile } from '@debrief/components/hooks/useIsMobile'`.
+- Use as `const isMobile = useIsMobile(1023);` (returns `boolean`; the `'mobile' | 'desktop'` union return type was a nice-to-have, not a requirement).
+- New verification step in implementation: after the first build, inspect `dist/assets/*.js` to confirm Vite tree-shook out MapView / Leaflet / Vega / FilterBar / FeatureList. Capture the bundle size delta as part of Issue 4A baseline-measurement.
+- The originally planned `src/hooks/useLayoutMode.ts` file is **removed** from the project structure.
+
+### §Issue 3A — Add three more E2E specs (Stories 3, 4, 5)
+
+**Problem**: Plan only committed to two specs (`browse.mobile.spec.ts`, `interaction.mobile.spec.ts`) — Stories 3 (Description editor), 4 (Push), and 5 (PWA install/offline) had no Playwright coverage. 7 acceptance scenarios from spec.md were verifiable only by manual smoke testing.
+
+**Resolution**: Three additional specs, each running at `375x812` only (the mandated 3-viewport matrix is for FR-021 parity gating; Stories 3/4/5 don't need the parity matrix because the underlying behaviour is layout-mode-naive once you're inside the editor/bar):
+
+- `description-editor.mobile.spec.ts` — US3 AS1/AS2/AS3.
+- `push.mobile.spec.ts` — US4 AS1/AS2/AS3. Uses Playwright's `page.route('**/api.github.com/**')` to mock the PUT response; covers success, conflict (HTTP 409), and network-failure paths.
+- `pwa-offline.mobile.spec.ts` — US5 AS2 + AS3. Uses Playwright's `context.setOffline(true)` after first load to assert the offline empty state; uses `display-mode: standalone` matchMedia override to simulate installed-PWA mode.
+
+US5 AS1 (install affordance) remains "PARTIAL — depends on browser state" — Playwright cannot reliably trigger the `beforeinstallprompt` event in the headless harness. Verified manually per quickstart.md §2 + via Lighthouse `installable-manifest` audit.
+
+US5 AS4 (Lighthouse ≥ 90) remains gated by `@lhci/cli`.
+
+### §Issue 4A — Measure bundle baseline before locking the budget
+
+**Problem**: SC-010 / FR-024 lock the gate at +15% gzipped JS growth. Realistic estimate from the review (vite-plugin-pwa runtime + Workbox precache + 8 new components + react-virtual direct + mobile.css minification miss + EditorOverlayProvider) is ~21 KB; if the baseline is ~87 KB, +15% = ~13 KB headroom — likely to fail CI.
+
+**Resolution** (implementation order):
+1. **Task 1 of implementation**: capture pre-#244 baseline. From the merge-base with `main`, run `pnpm --filter @debrief/backlog-navigator build`, sum gzipped sizes of `dist/assets/*.js`, write to `scripts/bundle-baseline-244.json` with the commit SHA.
+2. **Task 2 of implementation**: minimal scaffold of the new code paths (empty components + manifest + SW + react-virtual + @debrief/components subpath import). Re-run build, measure delta. This gives a realistic floor.
+3. **Task 3 of implementation**: set the gate. If delta is ≤ 15% → keep `+15%`. If delta is 15–30% → set the gate to `(measured delta + 5pp)` and update both `scripts/bundle-baseline-244.json` and the spec's SC-010 / FR-024 wording in the same commit, with a one-line rationale.
+4. The bundle-budget script (`scripts/check-bundle-size.mjs`) is unchanged — it reads the budget from the JSON file.
+
+This converts SC-010 from "may-fail-mid-implementation" into a gate that's set on **measured reality**, not aspiration. The commit that sets the budget is reviewable in isolation.
+
+### Test-coverage gap acknowledgements (no plan change)
+
+- **SC-001 (≥ 50 fps card list scroll)** — untestable in Playwright (no fps API). Documented as a manual check in quickstart.md / evidence; the underlying virtualisation correctness is unit-tested.
+- **SC-011 (update prompt < 60 s)** — requires a real network round-trip to the deployed SW; not feasible in CI. Verified manually during the deploy that ships #244.
+- **US2 AS3 (on-screen keyboard never covers input)** — Playwright's headless emulation cannot drive the iOS soft keyboard. Verified manually on a real iPhone during evidence capture; documented as a limitation.
+
+These three are **knowingly under-tested**; recorded here so future reviewers don't re-raise them.
