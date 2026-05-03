@@ -1,0 +1,39 @@
+{
+  "feature": "244-navigator-mobile-pwa",
+  "baseline_bytes": 121576,
+  "baseline_commit": "5ee4993819b04a5163cd9d6929d7e8749c002ebf",
+  "baseline_captured_at": "2026-05-03T00:00:00Z",
+  "phase2_measurement": {
+    "captured_at": "2026-05-03T07:03:00Z",
+    "current_bytes": 126902,
+    "delta_bytes": 5326,
+    "delta_pct": 4.38,
+    "files": {
+      "index-BzLORysw.js": 123867,
+      "virtual_pwa-register-B0bfv3rW.js": 640,
+      "workbox-window.prod.es5-vqzQaGvo.js": 2395
+    },
+    "tree_shake_verification": {
+      "method": "grep -c <symbol> dist/assets/*.js",
+      "verified_absent": [
+        "MapView",
+        "Leaflet",
+        "leaflet",
+        "Vega",
+        "vega",
+        "FilterBar",
+        "FeatureList",
+        "GoldenLayout",
+        "golden-layout"
+      ],
+      "outcome": "All confirmed absent — `@debrief/components/hooks/useIsMobile` subpath import tree-shakes cleanly."
+    }
+  },
+  "budget_decision": {
+    "decision": "Keep current_budget_pct: 15",
+    "rationale": "Phase 2 delta is +5,326 B (4.38%), well below the 15% target. Phases 3-7 will land virtualised CardList, BottomSheet, DescriptionEditor, StickyPushBar, and PWA runtime caching; total expected delta is likely to stay under 15%. If a later phase blows the budget, the Issue 4A protocol step 3 amends the budget JSON in the same commit.",
+    "current_budget_pct": 15,
+    "budget_bytes": 139812,
+    "headroom_bytes_phase2": 12910
+  }
+}

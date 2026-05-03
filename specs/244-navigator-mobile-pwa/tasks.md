@@ -73,44 +73,44 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### Types & state
 
-- [ ] T009 Add `MobileLayoutMode | BottomSheetEditorKind | BottomSheetState | DescriptionEditorState | ServiceWorkerUpdateState | PWAInstallState` exports `apps/backlog-navigator/src/types.ts`
-- [ ] T010 [P] Add `EditorOverlayContextValue` typed surface (state + open/close/save/discard actions + dirty-cross-mode handler) `apps/backlog-navigator/src/editors/EditorOverlayContext.ts`
+- [x] T009 Add `MobileLayoutMode | BottomSheetEditorKind | BottomSheetState | DescriptionEditorState | ServiceWorkerUpdateState | PWAInstallState` exports `apps/backlog-navigator/src/types.ts`
+- [x] T010 [P] Add `EditorOverlayContextValue` typed surface (state + open/close/save/discard actions + dirty-cross-mode handler) `apps/backlog-navigator/src/editors/EditorOverlayContext.ts`
 
 ### Editor overlay provider (Issue 1A — lifts state above the layout-mode branch)
 
-- [ ] T011 Implement `<EditorOverlayProvider>` — holds `bottomSheetState` + `descriptionEditorState`; subscribes to `useIsMobile(1023)`; on mode change with `dirty=true`, opens FR-009 discard-confirm modal `apps/backlog-navigator/src/editors/EditorOverlayProvider.tsx`
-- [ ] T012 [P][test] Vitest: `EditorOverlayProvider.test.tsx` — verifies (a) state survives intra-mode rotation, (b) discard-confirm fires on cross-mode rotation with dirty edit, (c) save path commits then dismisses `apps/backlog-navigator/src/editors/__tests__/EditorOverlayProvider.test.tsx`
+- [x] T011 Implement `<EditorOverlayProvider>` — holds `bottomSheetState` + `descriptionEditorState`; subscribes to `useIsMobile(1023)`; on mode change with `dirty=true`, opens FR-009 discard-confirm modal `apps/backlog-navigator/src/editors/EditorOverlayProvider.tsx`
+- [x] T012 [P][test] Vitest: `EditorOverlayProvider.test.tsx` — verifies (a) state survives intra-mode rotation, (b) discard-confirm fires on cross-mode rotation with dirty edit, (c) save path commits then dismisses `apps/backlog-navigator/src/editors/__tests__/EditorOverlayProvider.test.tsx`
 
 ### PWA wiring (manifest + SW registration; behaviour empty until Story 5)
 
-- [ ] T013 Wire `VitePWA` plugin in `vite.config.ts` — `registerType: 'prompt'`, `workbox.globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}']`, manifest config matches `contracts/pwa-manifest.md` `apps/backlog-navigator/vite.config.ts`
-- [ ] T014 [P] Add Zod schema validating the manifest config object before passing it to VitePWA (boundary validation per Article XV) `apps/backlog-navigator/src/pwa/manifestSchema.ts`
-- [ ] T015 [P] Add `<link rel="manifest">` + `<meta name="theme-color">` + `<link rel="apple-touch-icon">` to `apps/backlog-navigator/index.html`
-- [ ] T016 [P] Add PWA icons: `public/icon-192.png`, `public/icon-512.png` (both maskable), `public/apple-touch-icon.png` `apps/backlog-navigator/public/`
-- [ ] T017 Implement `registerSW.ts` thin wrapper around `virtual:pwa-register` — exports `startServiceWorker(): { onUpdateAvailable, onOfflineReady }` returning a `ServiceWorkerUpdateState` signal `apps/backlog-navigator/src/pwa/registerSW.ts`
-- [ ] T018 Mount `<UpdatePrompt>` at App root — empty placeholder for now (filled in Story 5) `apps/backlog-navigator/src/pwa/UpdatePrompt.tsx`
+- [x] T013 Wire `VitePWA` plugin in `vite.config.ts` — `registerType: 'prompt'`, `workbox.globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}']`, manifest config matches `contracts/pwa-manifest.md` `apps/backlog-navigator/vite.config.ts`
+- [x] T014 [P] Add Zod schema validating the manifest config object before passing it to VitePWA (boundary validation per Article XV) `apps/backlog-navigator/src/pwa/manifestSchema.ts`
+- [x] T015 [P] Add `<link rel="manifest">` + `<meta name="theme-color">` + `<link rel="apple-touch-icon">` to `apps/backlog-navigator/index.html`
+- [x] T016 [P] Add PWA icons: `public/icon-192.png`, `public/icon-512.png` (both maskable), `public/apple-touch-icon.png` `apps/backlog-navigator/public/`
+- [x] T017 Implement `registerSW.ts` thin wrapper around `virtual:pwa-register` — exports `startServiceWorker(): { onUpdateAvailable, onOfflineReady }` returning a `ServiceWorkerUpdateState` signal `apps/backlog-navigator/src/pwa/registerSW.ts`
+- [x] T018 Mount `<UpdatePrompt>` at App root — empty placeholder for now (filled in Story 5) `apps/backlog-navigator/src/pwa/UpdatePrompt.tsx`
 
 ### App-level branching
 
-- [ ] T019 Modify `App.tsx` — wrap children in `<EditorOverlayProvider>`; consume `useIsMobile(1023)` from `@debrief/components/hooks/useIsMobile`; branch render to `<ItemsTable>` (existing) or `<CardList>` (placeholder for now); mount `<UpdatePrompt>` unconditionally at root `apps/backlog-navigator/src/App.tsx`
-- [ ] T020 Modify `main.tsx` — call `startServiceWorker()` once at bootstrap; pipe its update signal into the `<UpdatePrompt>` mount path `apps/backlog-navigator/src/main.tsx`
+- [x] T019 Modify `App.tsx` — wrap children in `<EditorOverlayProvider>`; consume `useIsMobile(1023)` from `@debrief/components/hooks/useIsMobile`; branch render to `<ItemsTable>` (existing) or `<CardList>` (placeholder for now); mount `<UpdatePrompt>` unconditionally at root `apps/backlog-navigator/src/App.tsx`
+- [x] T020 Modify `main.tsx` — call `startServiceWorker()` once at bootstrap; pipe its update signal into the `<UpdatePrompt>` mount path `apps/backlog-navigator/src/main.tsx`
 
 ### Build-time tree-shake verification (Issue 2A)
 
-- [ ] T021 After first post-Phase-2 build, grep `dist/assets/*.js` for absence of `MapView`, `Leaflet`, `Vega`, `FilterBar`, `FeatureList`. Capture result alongside bundle delta in `evidence/bundle-baseline-244.json` notes (Implementation Task 2 of Issue 4A protocol; sets the realistic floor before Phase 3 begins) `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json`
+- [x] T021 After first post-Phase-2 build, grep `dist/assets/*.js` for absence of `MapView`, `Leaflet`, `Vega`, `FilterBar`, `FeatureList`. Capture result alongside bundle delta in `evidence/bundle-baseline-244.json` notes (Implementation Task 2 of Issue 4A protocol; sets the realistic floor before Phase 3 begins) `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json`
 
 ### Bundle budget gate decision (Issue 4A protocol step 3)
 
-- [ ] T022 If T021's measured delta is ≤ 15% → leave `current_budget_pct: 15` in `scripts/bundle-baseline-244.json`. If 15–30% → set `current_budget_pct` to `(measured_delta_pct + 5)`, edit spec.md SC-010 + FR-024 wording in lockstep with one-line rationale, commit baseline JSON + spec amend in the **same commit** `scripts/bundle-baseline-244.json`
+- [x] T022 If T021's measured delta is ≤ 15% → leave `current_budget_pct: 15` in `scripts/bundle-baseline-244.json`. If 15–30% → set `current_budget_pct` to `(measured_delta_pct + 5)`, edit spec.md SC-010 + FR-024 wording in lockstep with one-line rationale, commit baseline JSON + spec amend in the **same commit** `scripts/bundle-baseline-244.json`. **Outcome**: Phase 2 delta +4.38% (well below 15%); leaving budget at 15%.
 
 ### Mobile styles seed
 
-- [ ] T023 [P] Create `mobile.css` — `@media (max-width: 1023px)` block: card list grid, sheet positioning, sticky bar with `env(safe-area-inset-bottom)`, 44×44 tap-target floor `apps/backlog-navigator/src/styles/mobile.css`
-- [ ] T024 [P] Create shared `e2e/helpers/viewports.ts` with `IPHONE = { width: 375, height: 812 }`, `IPAD_PORTRAIT = { width: 768, height: 1024 }`, `IPAD_LANDSCAPE = { width: 1024, height: 768 }` exported constants `apps/backlog-navigator/e2e/helpers/viewports.ts`
+- [x] T023 [P] Create `mobile.css` — `@media (max-width: 1023px)` block: card list grid, sheet positioning, sticky bar with `env(safe-area-inset-bottom)`, 44×44 tap-target floor `apps/backlog-navigator/src/styles/mobile.css`
+- [x] T024 [P] Create shared `e2e/helpers/viewports.ts` with `IPHONE = { width: 375, height: 812 }`, `IPAD_PORTRAIT = { width: 768, height: 1024 }`, `IPAD_LANDSCAPE = { width: 1024, height: 768 }` exported constants `apps/backlog-navigator/e2e/helpers/viewports.ts`
 
 ### Playwright project config
 
-- [ ] T025 Modify `playwright.config.ts` — add three projects (`mobile-iphone`, `tablet-portrait`, `tablet-landscape`) using the constants from T024; existing default project unchanged `apps/backlog-navigator/playwright.config.ts`
+- [x] T025 Modify `playwright.config.ts` — add three projects (`mobile-iphone`, `tablet-portrait`, `tablet-landscape`) using the constants from T024; existing default project unchanged `apps/backlog-navigator/playwright.config.ts`
 
 **Phase 2 parallel example**: T010, T012, T014, T015, T016, T023, T024 are all independent file creations after T009; run concurrently. T011, T013, T017–T020 are sequential (provider before App; manifest plugin before icons consumed; registerSW before main.tsx wires it).
 
