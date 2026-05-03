@@ -24,6 +24,7 @@
     "pnpm": ">=8.0.0"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.13.0",
     "@playwright/test": "^1.58.0",
     "@sparticuz/chromium": "^143.0.4",
     "@types/node": "^20.10.0",

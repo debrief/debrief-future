@@ -59,6 +59,10 @@
     "./nl-cql2-node": {
       "types": "./src/nl-cql2/node.ts",
       "import": "./src/nl-cql2/node.ts"
+    },
+    "./hooks/useIsMobile": {
+      "types": "./src/hooks/useIsMobile.ts",
+      "import": "./src/hooks/useIsMobile.ts"
     }
   },
   "sideEffects": [

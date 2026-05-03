@@ -1212,3 +1212,58 @@ change to existing semantics).
 - `shared/eslint-rules/no-direct-persistence-in-frontend.cjs` (machine
   enforcement; sandbox-violation output captured at
   `specs/236-web-shell-stac-writes/evidence/eslint-enforcement-output.txt`).
+
+### ADR-030: vite-plugin-pwa adoption for Backlog Navigator (#244, 2026-05-03)
+
+**Status:** Accepted (open — to be closed at #244 merge with final wording + linked evidence path).
+
+**Context.** Spec #244 (Backlog Navigator — Full Mobile Parity) requires
+the existing Vite-built React app at `apps/backlog-navigator/` to be
+installable as a PWA on iOS and Android, with an offline app shell and an
+"update available" reload affordance. This is the project's first PWA
+surface; the choice of PWA tooling is therefore an architectural precedent.
+
+**Decision.** Adopt `vite-plugin-pwa@^0.20` (which wraps Google Workbox)
+as the PWA generator for `apps/backlog-navigator/`. The plugin handles:
+
+1. PWA manifest emission (typed config, validated by a Zod schema at
+   `apps/backlog-navigator/src/pwa/manifestSchema.ts` per Article XV).
+2. Service-worker generation via Workbox (precaching + runtime caching).
+3. The `virtual:pwa-register` module which exposes the update lifecycle
+   (`needRefresh`, `offlineReady`) for the in-app `<UpdatePrompt>`.
+
+**Consequences.**
+
+- ✅ Standard solution used by Vue, SvelteKit, and Astro communities;
+  Workbox is Google-maintained.
+- ✅ Replaces ~200 LoC of hand-rolled Workbox glue + manifest emitter +
+  version-detection wiring.
+- ✅ Subpath-importing `useIsMobile` from `@debrief/components/hooks/useIsMobile`
+  proves the workspace dep can be tree-shaken so the navigator doesn't pick
+  up MapView / Leaflet / Vega.
+- ⚠️ One new dev-dep: `vite-plugin-pwa@^0.20` (peer-deps `workbox-window`).
+  `@lhci/cli` added as a repo-root dev-dep for the Lighthouse PWA gate.
+  Both meet Article IX's "minimal, vetted" bar.
+- ⚠️ Workbox is pulled into the runtime bundle; budget impact is measured
+  in Phase 2 of the implementation per the Issue 4A protocol (see
+  `scripts/bundle-baseline-244.json`).
+
+**Alternatives considered.**
+
+- **Hand-rolled SW + manifest.** Rejected — the surface area (precaching,
+  runtime caching for GitHub responses, update-detection lifecycle) is
+  exactly what Workbox solves. Article IX prefers vetted deps over
+  hand-rolling well-understood infrastructure.
+- **`@vite-pwa/sveltekit` style alternative for React.** Rejected —
+  `vite-plugin-pwa` is the canonical Vite plugin; framework-specific
+  wrappers add no value here.
+
+**Originating issue:** Feature 244 (`specs/244-navigator-mobile-pwa/`).
+
+**Evidence (to be filled at merge):**
+- `specs/244-navigator-mobile-pwa/contracts/pwa-manifest.md` (manifest contract).
+- `specs/244-navigator-mobile-pwa/contracts/service-worker.md` (cache + update protocol).
+- `apps/backlog-navigator/vite.config.ts` (VitePWA wiring).
+- `apps/backlog-navigator/src/pwa/registerSW.ts` + `UpdatePrompt.tsx`.
+- `specs/244-navigator-mobile-pwa/evidence/lighthouse-pwa.html` (Lighthouse PWA score ≥ 90).
+- `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json` (final budget + delta).

@@ -52,14 +52,14 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 **Independent test**: From a fresh worktree on `main`, running `pnpm --filter @debrief/backlog-navigator build && node scripts/check-bundle-size.mjs` exits 0 and prints the baseline gzipped JS total.
 
-- [ ] T001 Capture pre-#244 baseline: from the merge-base with `main`, run `pnpm --filter @debrief/backlog-navigator build`, sum gzipped sizes of `dist/assets/*.js`, write JSON `{ baseline_bytes, commit_sha, captured_at, target_pct: 15, cap_pct: 30, current_budget_pct: 15 }` to `scripts/bundle-baseline-244.json`
-- [ ] T002 Add bundle-budget guard `scripts/check-bundle-size.mjs` — reads `scripts/bundle-baseline-244.json`, gzips every `apps/backlog-navigator/dist/assets/*.js`, fails if total > `baseline_bytes × (1 + current_budget_pct/100)`; prints baseline / current / headroom
-- [ ] T003 [P] Add `@tanstack/react-virtual` (existing monorepo dep) as direct dep of `apps/backlog-navigator/package.json`
-- [ ] T004 [P] Add `@debrief/components` workspace dep to `apps/backlog-navigator/package.json` (subpath import only — Review §Issue 2A)
-- [ ] T005 [P] Add `vite-plugin-pwa ^0.20.x` as dev-dep + `workbox-window` (peer) to `apps/backlog-navigator/package.json`
-- [ ] T006 [P] Add `@lhci/cli` as repo-root dev-dep (used by new CI workflow) `package.json`
-- [ ] T007 Run `pnpm install` and commit the lockfile changes `pnpm-lock.yaml`
-- [ ] T008 Record ADR-029 "vite-plugin-pwa adoption" (per plan.md Constitution Check Article VIII.3) `docs/project_notes/decisions.md`
+- [x] T001 Capture pre-#244 baseline: from the merge-base with `main`, run `pnpm --filter @debrief/backlog-navigator build`, sum gzipped sizes of `dist/assets/*.js`, write JSON `{ baseline_bytes, commit_sha, captured_at, target_pct: 15, cap_pct: 30, current_budget_pct: 15 }` to `scripts/bundle-baseline-244.json`
+- [x] T002 Add bundle-budget guard `scripts/check-bundle-size.mjs` — reads `scripts/bundle-baseline-244.json`, gzips every `apps/backlog-navigator/dist/assets/*.js`, fails if total > `baseline_bytes × (1 + current_budget_pct/100)`; prints baseline / current / headroom
+- [x] T003 [P] Add `@tanstack/react-virtual` (existing monorepo dep) as direct dep of `apps/backlog-navigator/package.json`
+- [x] T004 [P] Add `@debrief/components` workspace dep to `apps/backlog-navigator/package.json` (subpath import only — Review §Issue 2A)
+- [x] T005 [P] Add `vite-plugin-pwa ^0.20.x` as dev-dep + `workbox-window` (peer) to `apps/backlog-navigator/package.json`
+- [x] T006 [P] Add `@lhci/cli` as repo-root dev-dep (used by new CI workflow) `package.json`
+- [x] T007 Run `pnpm install` and commit the lockfile changes `pnpm-lock.yaml`
+- [x] T008 Record ADR-030 "vite-plugin-pwa adoption" (per plan.md Constitution Check Article VIII.3) `docs/project_notes/decisions.md`
 
 **Phase 1 parallel example**: T003, T004, T005, T006 are all `package.json` field edits with no inter-dependency once T001/T002 are landed; run them concurrently then T007 once.
 
