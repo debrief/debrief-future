@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/specs/243/contracts/scene-thumbnail-asset.schema.json",
+  "title": "Scene-thumbnail asset map fragment (spec 243)",
+  "description": "Layered overlay enforcing the patternProperties wrapper, ULID key format, and per-entry value shape for per-Scene thumbnail asset entries inside a STAC Item's `assets` map.\n\nThis contract is the **planning artefact** that the implementation will deliver as `shared/schemas/contracts/scene-thumbnail-asset.schema.json`. The shipped artefact will replace the inline ULID pattern with a `$ref` to the LinkML-generated SceneThumbnailAssetEntry value shape (single source of truth via Article II); this planning copy inlines the value shape so the contract can be reviewed standalone.\n\nPair invariant (scene-thumbnail-pair-rule-001) and orphan rule (scene-thumbnail-orphan-rule-001) are enforced by services/stac/src/debrief_stac/scene_thumbnail_audit.py — not by this schema.",
+  "type": "object",
+  "patternProperties": {
+    "^scene-thumbnail-[0-9A-HJKMNP-TV-Z]{26}(?:-sm)?$": {
+      "$comment": "In the shipped artefact this object is a single $ref to https://debrief.info/schemas/storyboard.schema.json#/$defs/SceneThumbnailAssetEntry. Inlined here for reviewability.",
+      "type": "object",
+      "required": ["href", "type", "roles"],
+      "properties": {
+        "href": {
+          "type": "string",
+          "minLength": 1,
+          "description": "URI-reference relative to the Item directory; conventionally `./scene-thumbnails/scene-{ULID}.png` (large) or `./scene-thumbnails/scene-{ULID}-sm.png` (small)."
+        },
+        "type": {
+          "const": "image/png",
+          "description": "Always `image/png` — Storyboarding capture writes PNGs only."
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "const": "thumbnail" },
+          "description": "Exactly `[\"thumbnail\"]`. Storyboarding-derived thumbnails are not declared as `overview` (which is reserved for plot-level overviews of dimensions 600×800)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Optional human label. Storyboarding writer emits `\"Scene thumbnail\"` (large) or `\"Scene thumbnail (small)\"` (small)."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "_validator_notes": {
+      "$comment": "Notes for validator integrators; not enforced.",
+      "ulid_alphabet": "Crockford base-32: digits 0-9 + uppercase A-Z minus I, L, O, U.",
+      "key_anchors": "Key MUST match the full pattern, not merely a prefix — `^...$` anchors are required so that `scene-thumbnail-foo` (non-ULID suffix) is rejected.",
+      "co_occurrence": "This overlay says nothing about plot-level `thumbnail` / `overview` / `features` / `source-*` keys; they are governed by the parent Item shape and may co-exist freely with scene-thumbnail entries."
+    }
+  }
+}
