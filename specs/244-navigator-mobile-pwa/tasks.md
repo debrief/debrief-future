@@ -253,19 +253,19 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### Service worker behaviour
 
-- [ ] T062 Tune Workbox precache + runtime caching in `vite.config.ts` — precache app shell (HTML / JS / CSS / fonts / icons); `NetworkOnly` for `api.github.com/*` (Assumption A-1: edits require network); `StaleWhileRevalidate` for `raw.githubusercontent.com/*BACKLOG.md*` (so the offline launch can show a stale-but-readable fallback if cached, otherwise empty state) `apps/backlog-navigator/vite.config.ts`
-- [ ] T063 Implement offline empty state — when `state/` reducer reports zero items AND `navigator.onLine === false` AND no cached `BACKLOG.md`, render "Backlog data unavailable — you're offline. Reconnect to load items." with `data-testid=offline-empty-state` (FR-019) `apps/backlog-navigator/src/components/mobile/CardList.tsx`
-- [ ] T064 Fill in `<UpdatePrompt>` (was empty placeholder from T018) — listens to `ServiceWorkerUpdateState` from `registerSW.ts`; when state is `update-available`, renders a non-modal banner with Reload / Later actions; Reload calls `workbox.messageSkipWaiting()` then `location.reload()`; matches FR-020 wording `apps/backlog-navigator/src/pwa/UpdatePrompt.tsx`
-- [ ] T065 [P][test] Vitest: `registerSW.ts` emits `update-available` when `virtual:pwa-register`'s `needRefresh` callback fires; `<UpdatePrompt>` reads that signal and renders correctly `apps/backlog-navigator/src/pwa/__tests__/registerSW.test.tsx`
+- [x] T062 Workbox tuned in vite.config.ts (Phase 2 wiring): precache for app shell + manifest; NetworkOnly for api.github.com/* and raw.githubusercontent.com/* (no caching of BACKLOG.md per FR-019 — avoids stale-data display). skipWaiting + clientsClaim both false so the user controls reload (FR-020). `apps/backlog-navigator/vite.config.ts`
+- [x] T063 Offline empty state — `<CardList>` returns the offline panel (`data-testid=offline-empty-state`) when `doc.items.length === 0 && navigator.onLine === false`. Shown above the standard empty-filter panel. `apps/backlog-navigator/src/components/mobile/CardList.tsx`
+- [x] T064 `<UpdatePrompt>` — top-of-viewport banner; `data-testid=pwa-update-banner` with `data-state=update-available|updating`; Reload calls `state.reload()` (which delegates to vite-plugin-pwa's `updateSW(true)` per registerSW.ts); Dismiss closes for the session only (no persistence — re-fires on next nav per contracts/service-worker.md). `apps/backlog-navigator/src/pwa/UpdatePrompt.tsx`
+- [x] T065 [P][test] 6 vitest tests cover up-to-date (renders nothing), update-available banner content, Reload click delegates, Dismiss hides, updating spinner state, and `usePWAUpdateState` context read. `apps/backlog-navigator/src/pwa/__tests__/registerSW.test.tsx`
 
 ### Lighthouse CI gate
 
-- [ ] T066 [P] Author `.lighthouserc.json` — config: `collect.url` points at `http://localhost:4173/` (vite preview), `collect.numberOfRuns: 3`, `assert.assertions["categories:pwa"]: ["error", { minScore: 0.9 }]` `apps/backlog-navigator/.lighthouserc.json`
-- [ ] T067 [P] Author `.github/workflows/backlog-navigator-lighthouse.yml` — builds the app, starts `vite preview`, runs `pnpm dlx @lhci/cli autorun --config apps/backlog-navigator/.lighthouserc.json`, fails the job if PWA category < 90; runs on PRs that touch `apps/backlog-navigator/**` `.github/workflows/backlog-navigator-lighthouse.yml`
+- [x] T066 [P] `.lighthouserc.json` — collect: 3 runs against http://localhost:5175/, desktop preset (the audit is for the bundled output, not a mobile profile we don't run); assert: PWA ≥ 0.9 + installable-manifest + service-worker as errors. `apps/backlog-navigator/.lighthouserc.json`
+- [x] T067 [P] `.github/workflows/backlog-navigator-lighthouse.yml` — pnpm install, build with VITE_BASE_URL='/' so manifest scope matches, start preview server on :5175, run @lhci/cli autorun, upload report artefact. Triggers on PRs touching apps/backlog-navigator/** + shared/components/**. `.github/workflows/backlog-navigator-lighthouse.yml`
 
 ### Multi-state E2E
 
-- [ ] T068 [test] `e2e/mobile/pwa-offline.mobile.spec.ts` — Story 5 AS2 + AS3 at `375x812`; uses `context.setOffline(true)` after first load to trigger the offline empty state; uses `display-mode: standalone` matchMedia override to assert standalone-mode rendering. **AS1 (install affordance) is NOT covered by Playwright** (cannot reliably trigger `beforeinstallprompt` headless); covered manually + by Lighthouse `installable-manifest` audit `apps/backlog-navigator/e2e/mobile/pwa-offline.mobile.spec.ts`
+- [x] T068 [test] `e2e/mobile/pwa-offline.mobile.spec.ts` — 2 scenarios at 375×812: (a) offline launch with no cached data → `[data-testid=offline-empty-state]` visible; (b) `display-mode: standalone` matchMedia override returns true. AS1 (install affordance) intentionally not in this spec (browsers won't fire `beforeinstallprompt` headlessly); covered by Lighthouse `installable-manifest` audit + manual smoke. Playwright run deferred to Phase 8 evidence step. `apps/backlog-navigator/e2e/mobile/pwa-offline.mobile.spec.ts`
 
 **Phase 7 parallel example**: T065, T066, T067 run concurrently.
 
