@@ -194,7 +194,7 @@ description: "Task list for feature 243 implementation"
 
 ### PR Creation
 
-- [ ] T051 Create PR and publish blog: run `/speckit.pr`
+- [x] T051 Created feature PR via `/speckit.pr`: https://github.com/debrief/debrief-future/pull/587 (navigator link populated post-create with `?pr=587`). BACKLOG.md row 243 struck through to `complete`.
 
 **Task T051 must run last. It depends on every preceding task being checked off — particularly T041 (CI green), T044 (test-summary), T046 (round-trip evidence), and T050 (shipped post). The slash command will create the feature PR in `debrief-future` and the cross-repo blog PR in `debrief.github.io` and return both URLs.**
 
