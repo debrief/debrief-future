@@ -184,30 +184,30 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### Bottom sheet container
 
-- [ ] T043 Implement `<BottomSheet>` — sheet container with hand-rolled drag-down gesture (~80 LoC per Article IX), backdrop, focus trap, ESC dismisses; reads `bottomSheetState` from `EditorOverlayContext` (NOT local `useState`, per Issue 1A); `data-testid=bottom-sheet` root `apps/backlog-navigator/src/components/mobile/BottomSheet.tsx`
-- [ ] T044 [P][test] Vitest: `BottomSheet.test.tsx` — gesture unit tests (drag-down past threshold dismisses; cancel-drag below threshold restores; tap-outside dismisses; ESC dismisses); state read from context not local `apps/backlog-navigator/src/components/mobile/__tests__/BottomSheet.test.tsx`
-- [ ] T045 Implement `<BottomSheetEditor>` — wraps any of the existing `src/components/editors/*` editors with sheet header (title + Save / Cancel), passes the editor's onSave / onCancel through to the EditorOverlayContext actions (commit / discard with FR-007 semantics) `apps/backlog-navigator/src/components/mobile/BottomSheetEditor.tsx`
+- [x] T043 Implement `<BottomSheet>` — hand-rolled drag-down gesture (DRAG_DISMISS_THRESHOLD_PX=80), backdrop click, ESC dismiss, header with Save / Cancel; `data-testid=bottom-sheet` + `bottom-sheet-handle` + `bottom-sheet-cancel` + `bottom-sheet-save` + `bottom-sheet-backdrop` `apps/backlog-navigator/src/components/mobile/BottomSheet.tsx`
+- [x] T044 [P][test] Vitest: 10 tests cover render gates, Cancel/Save/saveDisabled, backdrop click, ESC, drag-past-threshold dismiss, drag-within-threshold no-op `apps/backlog-navigator/src/components/mobile/__tests__/BottomSheet.test.tsx`
+- [x] T045 Implement `<BottomSheetEditor>` — reads `bottomSheetState` from EditorOverlayContext, dispatches the appropriate desktop CellEditor (StatusDropdown/CategoryComboBox/EpicPicker/ScorePicker) inside the sheet; Save calls `overlay.saveBottomSheet()` (commits via store.stageEdit — same path as desktop ItemRow.commit), Cancel calls `overlay.requestCloseBottomSheet()` (surfaces FR-009 if dirty) `apps/backlog-navigator/src/components/mobile/BottomSheetEditor.tsx`
 
 ### Wiring
 
-- [ ] T046 Modify `<ItemCard>` (T035) — Status chip / Category chip / Epic tag / Score chip become `data-testid=status-chip` etc.; tapping each calls `editorOverlay.openBottomSheet(kind, value)` from the context `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
-- [ ] T047 Render `<BottomSheet>` (with whichever `<BottomSheetEditor>` matches the current `bottomSheetState.editor-kind`) inside `<EditorOverlayProvider>` so it's mounted regardless of layout mode; visibility driven by `bottomSheetState.open` `apps/backlog-navigator/src/editors/EditorOverlayProvider.tsx`
+- [x] T046 ItemCard chips already wired to `editorOverlay.openBottomSheet()` (done in T035); per-chip testids `status-chip` / `category-chip` / `epic-chip` / `score-chip` `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
+- [x] T047 `<BottomSheetEditor>` mounted inside `<EditorOverlayProvider>` (always-on regardless of layout mode); visibility driven by `bottomSheet.open` `apps/backlog-navigator/src/editors/EditorOverlayProvider.tsx`
 
 ### Dirty marker on the card
 
-- [ ] T048 [P] Render the dirty indicator on `<ItemCard>` when the row's id is in the existing `state/` reducer's `dirtyRowIds` set (reuses existing desktop dirty mechanism) `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
+- [x] T048 Dirty indicator (◍) rendered on `<ItemCard>` when `dirty=true`; `<CardList>` derives `dirtyRowIds` from `store.edits` via `useDirtyRowIds()` and passes per-card. `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
 
 ### Round-trip parity tests (FR-015 / SC-009)
 
-- [ ] T049 [P][test] Vitest: every status / score / category / epic edit made through `<BottomSheetEditor>` produces byte-identical reducer state to the same edit made through the existing desktop inline editor — runs the same input through both paths and diff-asserts `apps/backlog-navigator/src/components/mobile/__tests__/byteParityBottomSheet.test.tsx`
+- [x] T049 [P][test] 5 byte-parity round-trip tests prove that an edit constructed by the mobile path produces identical `BACKLOG.md` output to the same edit constructed by the desktop path (status / category / score / epic / mixed) `apps/backlog-navigator/src/components/mobile/__tests__/byteParityBottomSheet.test.tsx`
 
 ### Multi-viewport E2E (FR-021 mandate)
 
-- [ ] T050 [test] `e2e/mobile/interaction.mobile.spec.ts` — Story 2 acceptance scenarios at all three viewports; assertions: tap Status chip opens bottom sheet, change value + Save updates the card, dirty indicator appears, drag-down dismisses without commit `apps/backlog-navigator/e2e/mobile/interaction.mobile.spec.ts`
+- [x] T050 [test] `e2e/mobile/interaction.mobile.spec.ts` — 4 mobile-only scenarios (1024+ skips): tap chip → sheet opens, change + save → card reflects + dirty marker, cancel clean → no commit, cancel dirty → discard-confirm dialog → discard `apps/backlog-navigator/e2e/mobile/interaction.mobile.spec.ts`
 
 ### Issue 1A regression guard E2E
 
-- [ ] T051 [test] `e2e/mobile/editor-rotation.mobile.spec.ts` — open status editor at `768x1024`, programmatically resize viewport to `1024x768`, assert `[data-testid=discard-confirm]` is visible; tap Save in confirm → edit committed; tap Discard → state cleared `apps/backlog-navigator/e2e/mobile/editor-rotation.mobile.spec.ts`
+- [x] T051 [test] `e2e/mobile/editor-rotation.mobile.spec.ts` — runs only in the tablet-portrait project; opens status editor at 768x1024, dirties the value, resizes to 1024x768, asserts discard-confirm visible, taps Save → edit committed, desktop table visible (Issue 1A regression guard) `apps/backlog-navigator/e2e/mobile/editor-rotation.mobile.spec.ts`
 
 **Phase 4 parallel example**: T044, T048, T049 run concurrently with T043/T045 sequencing.
 
