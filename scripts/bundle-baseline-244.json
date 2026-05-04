@@ -1,0 +1,13 @@
+{
+  "feature": "244-navigator-mobile-pwa",
+  "baseline_bytes": 121576,
+  "baseline_files": {
+    "apps/backlog-navigator/dist/assets/index-uTnvMpAz.js": 121576
+  },
+  "commit_sha": "5ee4993819b04a5163cd9d6929d7e8749c002ebf",
+  "captured_at": "2026-05-03T00:00:00Z",
+  "target_pct": 15,
+  "cap_pct": 30,
+  "current_budget_pct": 15,
+  "notes": "Pre-#244 baseline captured against the merge-base with main (commit 5ee4993, BACKLOG status update only — no code changes). Single JS chunk; one gzipped output. Will be re-measured after Phase 2 deps + scaffold to set the realistic budget per Issue 4A protocol."
+}

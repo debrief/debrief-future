@@ -1,0 +1,99 @@
+name: Backlog Navigator — Lighthouse PWA gate
+
+on:
+  pull_request:
+    paths:
+      - 'apps/backlog-navigator/**'
+      - 'shared/components/**'
+      - '.github/workflows/backlog-navigator-lighthouse.yml'
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chrome (required by Lighthouse CI)
+        # @lhci/cli shells out to Chrome to run the audit. The runner image
+        # ships Chrome at /opt/google/chrome, but install it explicitly so
+        # the workflow is self-contained and not dependent on image version.
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Build backlog-navigator
+        run: pnpm --filter @debrief/backlog-navigator build
+        env:
+          # Static-host base URL — override here so the manifest scope ('/')
+          # matches the served path during the audit.
+          VITE_BASE_URL: '/'
+
+      - name: Start preview server (detached)
+        run: |
+          # Run the preview server in the background but in a way that
+          # survives the end of this step's shell (nohup + disown). Write
+          # the PID for the kill step at the end. Logs go to a file so the
+          # 'wait for server' step can dump them on failure.
+          mkdir -p /tmp/preview
+          nohup pnpm --filter @debrief/backlog-navigator preview \
+            --port 5175 --host 0.0.0.0 \
+            > /tmp/preview/server.log 2>&1 &
+          echo $! > /tmp/preview/server.pid
+          disown
+        env:
+          NODE_ENV: production
+          # `vite preview` reads the same vite.config.ts as build, so the
+          # base URL has to match. Without this, preview defaults back to
+          # /debrief-future/backlog-navigator/ and Lighthouse loads `/`,
+          # gets nothing, and emits NO_FCP.
+          VITE_BASE_URL: '/'
+
+      - name: Wait for server
+        run: |
+          for i in {1..60}; do
+            if curl -sf http://localhost:5175/ > /dev/null; then
+              echo "Server is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Server did not start in 60s. Last 50 lines of /tmp/preview/server.log:"
+          tail -n 50 /tmp/preview/server.log || echo "(no log file)"
+          exit 1
+
+      - name: Run Lighthouse CI
+        run: pnpm dlx @lhci/cli@0.13.0 autorun --config apps/backlog-navigator/.lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f /tmp/preview/server.pid ]; then
+            kill "$(cat /tmp/preview/server.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            .lighthouseci/
+            apps/backlog-navigator/dist/manifest.webmanifest
+            /tmp/preview/server.log
+          retention-days: 7
