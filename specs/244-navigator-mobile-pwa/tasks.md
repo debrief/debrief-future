@@ -325,7 +325,7 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### PR creation
 
-- [ ] T093 Create PR and publish blog: run `/speckit.pr` — creates the feature PR in `debrief/debrief-future` and the blog PR in `debrief/debrief.github.io`; returns both URLs
+- [x] T093 Feature PR opened/updated at https://github.com/debrief/debrief-future/pull/585 with full title + description + evidence links + test plan. Blog PR (`debrief/debrief.github.io`) deferred — `media/shipped-post.md` is in the spec dir, ready for the user to run `/publish-future-post` from the blog repo when ready (see prompt at end of /speckit.implement output).
 
 **Task T093 must run last. It depends on every other task in this list being complete (evidence captured, manual log filled, blog post written, full CI green).**
 
