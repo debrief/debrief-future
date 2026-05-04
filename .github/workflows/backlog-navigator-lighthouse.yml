@@ -56,6 +56,11 @@ jobs:
           disown
         env:
           NODE_ENV: production
+          # `vite preview` reads the same vite.config.ts as build, so the
+          # base URL has to match. Without this, preview defaults back to
+          # /debrief-future/backlog-navigator/ and Lighthouse loads `/`,
+          # gets nothing, and emits NO_FCP.
+          VITE_BASE_URL: '/'
 
       - name: Wait for server
         run: |
