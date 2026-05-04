@@ -1087,7 +1087,8 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1131,7 +1132,8 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1175,7 +1177,8 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'LineString'} })
     coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1219,7 +1222,8 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Polygon'} })
     coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1263,7 +1267,8 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'MultiPoint'} })
     coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1307,7 +1312,8 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'MultiLineString'} })
     coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1351,7 +1357,8 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'MultiPolygon'} })
     coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1732,7 +1739,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1928,7 +1936,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2063,7 +2072,8 @@ class SystemState(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""State identifier (must start with 'state.')""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2231,7 +2241,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2394,7 +2405,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2677,7 +2689,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2836,7 +2849,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2991,7 +3005,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3146,7 +3161,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3290,7 +3306,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3451,7 +3468,8 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3608,7 +3626,8 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3787,7 +3806,8 @@ class ToolParameter(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature']} })
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry']} })
     description: str = Field(default=..., description="""Human-readable parameter description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
@@ -3910,7 +3930,8 @@ class FileProvEntry(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature']} })
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry']} })
     timestamp: datetime  = Field(default=..., description="""When the event occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
@@ -4151,7 +4172,8 @@ class PlotSummary(ConfiguredBaseModel):
     title: str = Field(default=..., description="""Plot title from STAC metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
                        'DatasetEntry',
-                       'SceneProperties']} })
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
     datetime: str = Field(default=..., description="""Creation/capture timestamp (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
@@ -4200,7 +4222,8 @@ class StacItemSummary(ConfiguredBaseModel):
     title: str = Field(default=..., description="""Item title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
                        'DatasetEntry',
-                       'SceneProperties']} })
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
     datetime: Optional[str] = Field(default=None, description="""Single datetime (ISO 8601) — fallback when start/end not available""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     item_path: str = Field(default=..., description="""Path to item.json relative to store root""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
     catalog_id: str = Field(default=..., description="""Parent catalog identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary', 'StacItemSummary']} })
@@ -4255,7 +4278,8 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: Optional[Union[int, str]] = Field(default=None, description="""Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion.""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'string'}, {'range': 'integer'}],
          'domain_of': ['TrackFeature',
@@ -4360,7 +4384,8 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'FeatureCollection'} })
     features: list[RawGeoJSONFeature] = Field(default=..., description="""The collection's features, in document order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box, shaped as in RawGeoJSONFeature.bbox.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -4681,7 +4706,8 @@ class ToolResultAnnotations(ConfiguredBaseModel):
                        'ToolResultAnnotations',
                        'DatasetAxisMetadata'],
          'slot_uri': 'debrief:label'} })
-    href: Optional[str] = Field(default=None, description="""Relative path to artifact file (REQUIRED for artifacts)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations'], 'slot_uri': 'debrief:href'} })
+    href: Optional[str] = Field(default=None, description="""Relative path to artifact file (REQUIRED for artifacts)""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations', 'SceneThumbnailAssetEntry'],
+         'slot_uri': 'debrief:href'} })
     deletedFeatures: Optional[list[str]] = Field(default=None, description="""IDs of features removed (REQUIRED for deletions)""", min_length=1, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations'], 'slot_uri': 'debrief:deletedFeatures'} })
 
     @field_validator('resultType')
@@ -4742,7 +4768,8 @@ class DatasetAxisMetadata(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature']} })
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry']} })
     units: Optional[str] = Field(default=None, description="""Units for the axis values (e.g., \"m\", \"°\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['DatasetAxisMetadata']} })
 
 
@@ -4826,11 +4853,13 @@ class DatasetEntry(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature']} })
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry']} })
     title: str = Field(default=..., description="""Human-readable chart title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
                        'DatasetEntry',
-                       'SceneProperties']} })
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
     metadata: DatasetMetadata = Field(default=..., description="""Axis definitions and display hints""", json_schema_extra = { "linkml_meta": {'domain_of': ['DatasetEntry']} })
     data_points: Optional[list[DatasetDataPoint]] = Field(default=[], description="""Flat array of structured data records for histograms and single-series charts. Corresponds to DatasetEnvelope.data (Record<string, unknown>[]). Absent when series is populated.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['DatasetSeries', 'DatasetEntry']} })
@@ -4989,7 +5018,8 @@ class SceneProperties(BaseFeatureProperties):
     title: str = Field(default=..., description="""Display title. Defaults to DTG of timestamp in DDHHmmZ MMM YY; falls back to ISO-8601 on parse failure.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
                        'DatasetEntry',
-                       'SceneProperties']} })
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
     description: Optional[str] = Field(default=None, description="""Markdown per-scene narrative""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
@@ -5089,7 +5119,8 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Stable identifier (equal to properties.id). ULID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -5178,7 +5209,8 @@ class SceneFeature(ConfiguredBaseModel):
                        'DatasetAxisMetadata',
                        'DatasetEntry',
                        'StoryboardFeature',
-                       'SceneFeature'],
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Stable identifier (equal to properties.id). ULID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -5233,6 +5265,74 @@ class SceneFeature(ConfiguredBaseModel):
                        'RawGeoJSONFeature',
                        'StoryboardFeature',
                        'SceneFeature']} })
+
+
+class SceneThumbnailAssetEntry(ConfiguredBaseModel):
+    """
+    A single STAC Item asset entry produced by Storyboarding (#216) for one
+    variant of one Scene's thumbnail. Always appears as part of a
+    pair in an Item's `assets` map: a large entry under the key
+    `scene-thumbnail-{ULID}` and a small entry under the key
+    `scene-thumbnail-{ULID}-sm`, where `{ULID}` is the owning Scene's
+    identifier (matches SceneProperties.id).
+
+    Why ULID: the owning Scene's id; lets every per-Scene asset be
+    traced back to its Scene without an explicit foreign-key field
+    in the asset payload.
+
+    Why pairs: the Storyboarding capture pipeline produces both
+    sizes atomically (800x600 large for inspection; 200x150 small
+    for timeline strips). A single-variant entry is a defect — see
+    schema rule scene-thumbnail-pair-rule-001.
+
+    Lifecycle: created when a Scene is captured. Deleted when the
+    Scene is deleted (garbage-collection invariant — see schema
+    rule scene-thumbnail-orphan-rule-001). Both rules are enforced
+    by the debrief-stac audit module; the JSON Schema layer
+    enforces the value shape and key format only (see schema rule
+    scene-thumbnail-key-format-rule-001).
+
+    Supersedes the spec-241 placeholder `item_assets[\"scene-thumbnail\"]`
+    and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/storyboard'})
+
+    href: str = Field(default=..., description="""URI-reference relative to the Item directory; conventionally ./scene-thumbnails/scene-{ULID}.png (large) or ./scene-thumbnails/scene-{ULID}-sm.png (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultAnnotations', 'SceneThumbnailAssetEntry']} })
+    type: Literal["image/png"] = Field(default=..., description="""Always image/png — Storyboarding capture writes PNGs only.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry'],
+         'equals_string': 'image/png'} })
+    roles: list[str] = Field(default=..., description="""Exactly [\"thumbnail\"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneThumbnailAssetEntry']} })
+    title: Optional[str] = Field(default=None, description="""Optional human label. Storyboarding writer emits \"Scene thumbnail\" (large) or \"Scene thumbnail (small)\" (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
+                       'StacItemSummary',
+                       'DatasetEntry',
+                       'SceneProperties',
+                       'SceneThumbnailAssetEntry']} })
 
 
 # Model rebuild
@@ -5334,3 +5434,4 @@ StoryboardProperties.model_rebuild()
 SceneProperties.model_rebuild()
 StoryboardFeature.model_rebuild()
 SceneFeature.model_rebuild()
+SceneThumbnailAssetEntry.model_rebuild()

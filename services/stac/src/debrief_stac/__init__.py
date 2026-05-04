@@ -15,6 +15,13 @@ from debrief_stac.exceptions import (
     PlotNotFoundError,
     ValidationError,
 )
+from debrief_stac.scene_thumbnail_audit import (
+    ORPHAN_RULE_ID,
+    PAIR_RULE_ID,
+    Violation,
+    audit_scene_thumbnail_orphans,
+    audit_scene_thumbnail_pairing,
+)
 
 __all__ = [
     "__version__",
@@ -23,4 +30,9 @@ __all__ = [
     "CatalogNotFoundError",
     "PlotNotFoundError",
     "ValidationError",
+    "ORPHAN_RULE_ID",
+    "PAIR_RULE_ID",
+    "Violation",
+    "audit_scene_thumbnail_orphans",
+    "audit_scene_thumbnail_pairing",
 ]

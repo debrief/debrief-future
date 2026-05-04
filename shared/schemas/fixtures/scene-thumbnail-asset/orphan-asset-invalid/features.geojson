@@ -1,0 +1,24 @@
+{
+  "_comment": "T031 — features.geojson for the orphan fixture. Lists Scenes A and B; the orphan asset pair carries ULID 01HORPH... which is NOT in this list.",
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "01HSCENA8M9N0P1Q2R3S4T5V6W",
+      "geometry": {"type": "Polygon", "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]},
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01HSCENA8M9N0P1Q2R3S4T5V6W"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "01HSCENB8M9N0P1Q2R3S4T5V6W",
+      "geometry": {"type": "Polygon", "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]},
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01HSCENB8M9N0P1Q2R3S4T5V6W"
+      }
+    }
+  ]
+}

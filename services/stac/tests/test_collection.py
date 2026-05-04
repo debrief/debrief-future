@@ -806,8 +806,17 @@ class TestSpec241CollectionShape:
     def test_item_assets_keys_match_contract(self, populated_collection: Path) -> None:
         catalog = open_catalog(populated_collection)
         item_assets = catalog["item_assets"]
-        for required_key in ("features", "thumbnail", "overview", "source", "scene-thumbnail"):
+        # Per-Scene storyboard thumbnails are NOT declared at the
+        # Collection item_assets level — they have their own first-class
+        # shape (LinkML SceneThumbnailAssetEntry, spec 243). Only the four
+        # logical asset types stable across every Item appear here.
+        for required_key in ("features", "thumbnail", "overview", "source"):
             assert required_key in item_assets
+        # The placeholder removed by spec 243 must not reappear.
+        assert "scene-thumbnail" not in item_assets, (
+            "scene-thumbnail placeholder removed in spec 243 — see "
+            "shared/schemas/contracts/scene-thumbnail-asset.schema.json"
+        )
         # item_assets entries must NOT carry href (they describe the contract).
         for key, asset in item_assets.items():
             assert "href" not in asset, f"item_assets.{key} must not include href"

@@ -1,6 +1,17 @@
 /**
  * Per-Scene thumbnail writer for Feature 216 (Storyboarding — Capture).
  *
+ * **Asset-key contract** documented at:
+ *   - `shared/schemas/src/linkml/storyboard.yaml` :: `SceneThumbnailAssetEntry`
+ *     (LinkML class — single source of truth for the per-key value shape)
+ *   - `shared/schemas/contracts/scene-thumbnail-asset.schema.json`
+ *     (JSON Schema overlay — patternProperties wrapper + ULID key format)
+ *
+ * Pairing and orphan invariants (`scene-thumbnail-pair-rule-001`,
+ * `scene-thumbnail-orphan-rule-001`) are enforced by
+ * `services/stac/src/debrief_stac/scene_thumbnail_audit.py`. See spec 243
+ * for the contract formalisation history.
+ *
  * Sits on the synchronous critical path between #174's
  * `MapPanel.requestThumbnailCapture()` (base64 PNG pair) and #215's
  * `createScene(…)` (CRUD boundary). Writes two PNGs into

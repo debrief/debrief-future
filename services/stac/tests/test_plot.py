@@ -547,20 +547,50 @@ from debrief_stac._helpers import (  # noqa: E402
     multihash_sha256_bytes,
 )
 
+_REPO_ROOT = Path(__file__).parent.parent.parent.parent
 _ITEM_SHAPE_CONTRACT_PATH = (
-    Path(__file__).parent.parent.parent.parent
+    _REPO_ROOT
     / "specs"
     / "241-stac-best-practices-upgrade"
     / "contracts"
     / "item-shape.schema.json"
 )
+_SCENE_THUMBNAIL_OVERLAY_PATH = (
+    _REPO_ROOT / "shared" / "schemas" / "contracts" / "scene-thumbnail-asset.schema.json"
+)
+_LINKML_BUNDLE_PATH = (
+    _REPO_ROOT
+    / "shared"
+    / "schemas"
+    / "src"
+    / "generated"
+    / "json-schema"
+    / "debrief.schema.json"
+)
 
 
 def _validate_against_contract(item: dict) -> None:
-    """Validate against contracts/item-shape.schema.json."""
+    """Validate against contracts/item-shape.schema.json.
+
+    The contract `$ref`s the scene-thumbnail overlay (spec 243), which in
+    turn `$ref`s the LinkML-generated SceneThumbnailAssetEntry. We register
+    both schemas in a `referencing.Registry` so the draft-07 validator can
+    resolve the chain at validation time.
+    """
+    from referencing import Registry, Resource  # type: ignore[import-untyped]
+
     with open(_ITEM_SHAPE_CONTRACT_PATH) as f:
         schema = json.load(f)
-    _jsonschema.validate(instance=item, schema=schema)
+    overlay = json.loads(_SCENE_THUMBNAIL_OVERLAY_PATH.read_text())
+    bundle = json.loads(_LINKML_BUNDLE_PATH.read_text())
+    registry: Registry = Registry().with_resources(  # type: ignore[type-arg]
+        [
+            (overlay["$id"], Resource.from_contents(overlay)),
+            (bundle["$id"], Resource.from_contents(bundle)),
+        ]
+    )
+    validator = _jsonschema.Draft7Validator(schema, registry=registry)
+    validator.validate(item)
 
 
 @pytest.fixture

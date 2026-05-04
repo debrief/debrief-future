@@ -1,0 +1,9 @@
+{
+  "_comment": "T019 — malformed ULID: key matches the literal scene-thumbnail- prefix but the suffix is not a valid 26-char Crockford ULID. Schema overlay rejects via scene-thumbnail-key-format-rule-001.",
+  "scene-thumbnail-foo": {
+    "href": "./scene-thumbnails/scene-foo.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail"
+  }
+}

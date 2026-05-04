@@ -3942,13 +3942,6 @@
         "source"
       ],
       "title": "Source data (placeholder; per-item keys are source-*)"
-    },
-    "scene-thumbnail": {
-      "type": "image/png",
-      "roles": [
-        "thumbnail"
-      ],
-      "title": "Storyboard scene thumbnail (placeholder; per-scene keys are scene-thumbnail-* and scene-thumbnail-*-sm)"
     }
   }
 }
