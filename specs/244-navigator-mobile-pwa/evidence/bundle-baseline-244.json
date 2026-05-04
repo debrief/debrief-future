@@ -29,11 +29,24 @@
       "outcome": "All confirmed absent — `@debrief/components/hooks/useIsMobile` subpath import tree-shakes cleanly."
     }
   },
+  "phase_progression": {
+    "phase3_browse": { "current_bytes": 133114, "delta_pct": 9.49 },
+    "phase4_edit": { "current_bytes": 133832, "delta_pct": 10.08 },
+    "phase5_description_plus_emergent": { "current_bytes": 134543, "delta_pct": 10.67 },
+    "phase6_push_bar": { "current_bytes": 134697, "delta_pct": 10.79 },
+    "phase7_pwa": { "current_bytes": 134979, "delta_pct": 10.96 }
+  },
+  "final_measurement": {
+    "captured_at": "2026-05-04T05:55:00Z",
+    "current_bytes": 134979,
+    "delta_bytes": 13403,
+    "delta_pct": 10.96,
+    "headroom_bytes": 4833,
+    "verdict": "Within budget (+10.96% vs. +15% target). No amendment needed."
+  },
   "budget_decision": {
-    "decision": "Keep current_budget_pct: 15",
-    "rationale": "Phase 2 delta is +5,326 B (4.38%), well below the 15% target. Phases 3-7 will land virtualised CardList, BottomSheet, DescriptionEditor, StickyPushBar, and PWA runtime caching; total expected delta is likely to stay under 15%. If a later phase blows the budget, the Issue 4A protocol step 3 amends the budget JSON in the same commit.",
+    "decision": "Keep current_budget_pct: 15 — final delta +10.96% well under the target.",
     "current_budget_pct": 15,
-    "budget_bytes": 139812,
-    "headroom_bytes_phase2": 12910
+    "budget_bytes": 139812
   }
 }

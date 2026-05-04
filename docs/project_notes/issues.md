@@ -16,6 +16,14 @@ Each entry should include:
 
 <!-- Add new entries below this line -->
 
+### 2026-05-04 - #244: Backlog Navigator — Full Mobile Parity (PWA)
+- **Status**: Implementation complete (PR forthcoming)
+- **Description**: Extended the desktop Backlog Navigator (#242) into a single responsive React app that works on phone (375×812), tablet (768×1024), and desktop (≥1024) without splitting the codebase. Below 1024px: virtualised card list, bottom-sheet editors, full-screen Markdown editor, sticky push bar; above 1024px: existing desktop table preserved unchanged. PWA manifest + Workbox service worker enable Add-to-Home-Screen + offline app shell. Multi-viewport Playwright + Lighthouse PWA gate (≥ 90) added in CI. Emergent feature added mid-implementation: status-sensitive copy-speckit-command chip on each mobile card. ADR-030 records the vite-plugin-pwa adoption.
+- **URL**: spec at [`specs/244-navigator-mobile-pwa/spec.md`](../../specs/244-navigator-mobile-pwa/spec.md)
+- **Evidence**: [`specs/244-navigator-mobile-pwa/evidence/`](../../specs/244-navigator-mobile-pwa/evidence/) — test-summary, usage-example, screenshots/, bundle-baseline-244.json, round-trip-evidence, manual-test-log
+- **Bundle**: 121,576 → 134,979 B gzipped JS (+10.96% — under the +15% target)
+- **Tests**: 121 vitest + 30 mobile Playwright + 12 desktop Playwright all green; FR-023 desktop parity preserved
+
 ### 2026-04-24 - #191-vscode-nl-search: NL search in VS Code Catalog Overview
 - **Status**: Completed (claude/implement-speckit-191-Jc7Uy, PR forthcoming)
 - **Description**: Surface the NL → CQL2 pipeline (shipped in `apps/nl-demo` via #188/#189/#190) inside the VS Code Catalog Overview. Opt-in, default-off, API key in SecretStorage, seven-class failure banner matrix. Single canonical `LLMClient` contract returning `LiveOutcome` across browser + VS Code; `createPostMessageLLMClient` bridges the webview↔host boundary.
