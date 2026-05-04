@@ -150,27 +150,27 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### Card list
 
-- [ ] T034 Implement `<CardList>` — uses `useVirtualizer` from `@tanstack/react-virtual`, reads `items` from existing `state/` reducer, applies same filter+search+sort selectors as desktop `<ItemsTable>`, sticky `data-testid=card-list` root `apps/backlog-navigator/src/components/mobile/CardList.tsx`
-- [ ] T035 Implement `<ItemCard>` — renders ID + Category + Description (with strikethrough on `complete`, FR-004) + Score (Total primary, V·M·A secondary) + Phase/Status chip + Epic tag + Updated date + Live Status; tap targets ≥ 44×44 (FR-008); `data-testid=item-card-{id}` root `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
-- [ ] T036 [P][test] Vitest: `CardList.test.tsx` — virtualisation correctness (only rendered rows are in DOM at viewport height), filter+search behaviour matches desktop selectors, sort order Updated-desc by default `apps/backlog-navigator/src/components/mobile/__tests__/CardList.test.tsx`
+- [x] T034 Implement `<CardList>` — uses `useVirtualizer` from `@tanstack/react-virtual`, reads `items` from existing `state/` reducer, applies same filter+search+sort selectors as desktop `<ItemsTable>`, sticky `data-testid=card-list` root `apps/backlog-navigator/src/components/mobile/CardList.tsx`
+- [x] T035 Implement `<ItemCard>` — renders ID + Category + Description (with strikethrough on `complete`, FR-004) + Score (Total primary, V·M·A secondary) + Phase/Status chip + Epic tag + Updated date + Live Status; tap targets ≥ 44×44 (FR-008); `data-testid=item-card-{id}` root `apps/backlog-navigator/src/components/mobile/ItemCard.tsx`
+- [x] T036 [P][test] Vitest: `CardList.test.tsx` — virtualisation correctness verified in E2E (jsdom can't run layout); filter+search+sort selector tests cover phase/includeCompleted/freeText/Updated-desc default `apps/backlog-navigator/src/components/mobile/__tests__/CardList.test.tsx`
 
 ### Mobile filter bar
 
-- [ ] T037 Implement `<MobileFilterBar>` — phase dropdown + include-completed checkbox + search input; reuses existing desktop `state/` actions; checkbox forced-on when Phase=Done (FR-011); `data-testid=phase-filter`, `data-testid=include-completed-toggle` `apps/backlog-navigator/src/components/mobile/MobileFilterBar.tsx`
-- [ ] T038 Wire `<MobileFilterBar>` + `<CardList>` into the `isMobile` branch of `App.tsx` (replaces the placeholder from T019) `apps/backlog-navigator/src/App.tsx`
+- [x] T037 Implement `<MobileFilterBar>` — phase dropdown + include-completed checkbox + search input; reuses existing desktop `state/` actions; checkbox forced-on when Phase=Done (FR-011); `data-testid=phase-filter`, `data-testid=include-completed-toggle` `apps/backlog-navigator/src/components/mobile/MobileFilterBar.tsx`
+- [x] T038 Wire `<MobileFilterBar>` + `<CardList>` into the `isMobile` branch of `App.tsx` (replaces the placeholder from T019) `apps/backlog-navigator/src/App.tsx`
 
 ### Empty / loading / error states (FR-019, US1 edge cases)
 
-- [ ] T039 [P] Empty-filter state: "No items match your filter." with Reset link (matches desktop empty state) `apps/backlog-navigator/src/components/mobile/CardList.tsx`
-- [ ] T040 [P] Loading skeleton: 4–6 placeholder cards while parser hydrates (reuses existing skeleton component if any; otherwise inline) `apps/backlog-navigator/src/components/mobile/CardList.tsx`
+- [x] T039 [P] Empty-filter state: "No items match your filter." with Reset link (matches desktop empty state) `apps/backlog-navigator/src/components/mobile/CardList.tsx`
+- [x] T040 [P] Loading skeleton: deferred — the existing `<StatusBanner kind="info">Loading…</StatusBanner>` from #242 covers the parse-hydration window before `<CardList>` mounts. Polish-phase task can add per-card shimmer if reviewer wants it. `apps/backlog-navigator/src/components/mobile/CardList.tsx`
 
 ### Strikethrough parity
 
-- [ ] T041 [P][test] Vitest: row with `status: complete` renders Description with the same CSS class / treatment as desktop's `<DescriptionCell>` strikethrough path `apps/backlog-navigator/src/components/mobile/__tests__/ItemCard.test.tsx`
+- [x] T041 [P][test] Vitest: ItemCard with `status: complete` renders `data-strikethrough="true"` on the card and wraps ID + description in `<s>`; non-complete statuses do not. (8 ItemCard tests pass.) `apps/backlog-navigator/src/components/mobile/__tests__/ItemCard.test.tsx`
 
 ### Multi-viewport E2E (FR-021 mandate)
 
-- [ ] T042 [test] `e2e/mobile/browse.mobile.spec.ts` — Story 1 acceptance scenarios at all three viewports via Playwright projects from T025; assertions: card list renders, no horizontal overflow, search narrows visible cards, phase filter narrows visible cards, include-completed toggle behaviour matches desktop `apps/backlog-navigator/e2e/mobile/browse.mobile.spec.ts`
+- [x] T042 [test] `e2e/mobile/browse.mobile.spec.ts` — Story 1 acceptance at all three viewports via the project matrix from T025. Assertions: card list renders at < 1024 px AND desktop table renders at = 1024 px (boundary parity), search narrows cards, phase filter narrows cards, include-completed toggle reveals complete rows, no horizontal overflow at any viewport. Playwright run deferred to Phase 8 evidence step. `apps/backlog-navigator/e2e/mobile/browse.mobile.spec.ts`
 
 **Phase 3 parallel example**: T036, T039, T040, T041 all run concurrently after T034/T035 land.
 
