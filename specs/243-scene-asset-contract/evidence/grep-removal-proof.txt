@@ -1,0 +1,59 @@
+============================================================================
+SC-004 grep evidence — captured at git_sha 4e3a0cc (2026-05-04T10:57:06Z)
+============================================================================
+
+Command:
+
+  git grep -nE 'scene-thumbnail\(-\.\+\)|"scene-thumbnail":' \
+      shared/schemas/ \
+      services/stac/ \
+      specs/241-stac-best-practices-upgrade/contracts/ \
+      preview/workspace/samples/local-store/
+
+Output:
+
+  shared/schemas/src/generated/json-schema/debrief.schema.json:2517:
+      ...Supersedes the spec-241 placeholder `item_assets["scene-thumbnail"]`
+         and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+
+  shared/schemas/src/generated/python/debrief_schemas/__init__.py:5296:
+      and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+
+  shared/schemas/src/generated/typescript/types.ts:2193:
+      and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+
+  shared/schemas/src/linkml/storyboard.yaml:237:
+      and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+
+============================================================================
+Analysis
+============================================================================
+
+All four matches are in the **same single sentence** of the new
+SceneThumbnailAssetEntry class docstring:
+
+    "Supersedes the spec-241 placeholder `item_assets["scene-thumbnail"]`
+     and the `^scene-thumbnail(-.+)?$` patternProperties rule."
+
+The sentence appears once in the LinkML source
+(shared/schemas/src/linkml/storyboard.yaml:237) and is propagated
+verbatim to the three generator outputs (Pydantic, JSON Schema, TS).
+This is the **deliberate migration-history reference** mandated by
+FR-014 — the class docstring must explain what was replaced so future
+contributors can navigate from the new shape back to its history.
+
+============================================================================
+What was removed (SC-004 verification)
+============================================================================
+
+  ✅ Production rule definitions of `^scene-thumbnail(-.+)?$`     — 0 hits
+  ✅ Production map entries `"scene-thumbnail": { ... }`           — 0 hits
+  ✅ ITEM_ASSETS_TEMPLATE placeholder in collection.py             — removed
+  ✅ Collection-shape contract `required: [..., "scene-thumbnail"]` — removed
+  ✅ Item-shape contract inline patternProperties block            — replaced by $ref
+  ✅ Sample catalog placeholder in catalog.json item_assets        — removed
+  ✅ factory-api.md documentation reference                        — rewritten
+
+The only surviving "matches" are the explanatory back-references inside
+the **new** shape's documentation. Net: SC-004 met (subject to the
+explicit FR-014 carve-out for migration-history documentation).
