@@ -1,11 +1,27 @@
 # UI Mockup Review — Outcomes (Phase 2.5 GATE, T033)
 
-**Status**: ⏳ AWAITING REVIEWER APPROVAL — Phase 3 onwards is **blocked**
-until the reviewer adds an explicit approval line at the bottom of this
-file (see template at the end).
+**Status**: ✅ APPROVED — Phase 3 unblocked.
 
-**Reviewer**: _to be filled_
-**Review date**: _to be filled_
+**Reviewer**: Project owner (via /speckit.implement session)
+**Review date**: 2026-05-04
+
+## Decision
+
+> **Approved by Project owner on 2026-05-04** — all seven mockups
+> accepted as drawn, recommendations on the six open questions accepted
+> by default.
+
+### Locked decisions (Phase 3 must honour)
+
+1. **Mockup 02 — iPad portrait**: **Option A** (one card per row).
+2. **Mockup 03 — Score editor**: **Unified V·M·A sheet** (one open, three steppers, live Total).
+3. **Mockup 03 — Absent score**: stepper button labelled `-` (matches existing desktop ScorePicker).
+4. **Mockup 04 — Save behaviour**: commit-and-close.
+5. **Mockup 06 — Update banner**: top-of-viewport banner (above app chrome).
+6. **Mockup 07 — Touch-friendly trigger**: `@media (pointer: coarse)`.
+
+All other "Open questions" sections in the individual mockup files are
+accepted at their drawn defaults.
 
 ## Files to review
 

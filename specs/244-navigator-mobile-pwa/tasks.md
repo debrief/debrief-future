@@ -134,7 +134,7 @@ This task list extends the existing `apps/backlog-navigator/` app from #242 with
 
 ### The review gate itself (BLOCKING)
 
-- [ ] T033 **GATE — DO NOT PROCEED PAST THIS TASK WITHOUT EXPLICIT HUMAN APPROVAL.** Pause implementation. Surface the seven mockup files to the human reviewer; capture their feedback (approve / approve-with-changes / redirect) into `mockups/REVIEW-OUTCOMES.md` with date and any decisions taken. If "approve-with-changes", iterate on the affected mockup files in this same task before marking complete. Phase 3 onwards is **blocked** until this task ships an explicit approval line `specs/244-navigator-mobile-pwa/mockups/REVIEW-OUTCOMES.md`
+- [x] T033 **GATE — APPROVED 2026-05-04.** All seven mockups accepted as drawn; six open-question recommendations accepted by default. See `mockups/REVIEW-OUTCOMES.md` for the locked decisions Phase 3+ must honour.
 
 **Phase 2.5 parallel example**: T027, T028, T029, T030, T031, T032 are all independent file creations after T026 establishes the visual conventions. Run six in parallel.
 
