@@ -207,3 +207,58 @@ classes:
         description: Scene properties
         range: SceneProperties
         required: true
+
+  SceneThumbnailAssetEntry:
+    description: |-
+      A single STAC Item asset entry produced by Storyboarding (#216) for one
+      variant of one Scene's thumbnail. Always appears as part of a
+      pair in an Item's `assets` map: a large entry under the key
+      `scene-thumbnail-{ULID}` and a small entry under the key
+      `scene-thumbnail-{ULID}-sm`, where `{ULID}` is the owning Scene's
+      identifier (matches SceneProperties.id).
+
+      Why ULID: the owning Scene's id; lets every per-Scene asset be
+      traced back to its Scene without an explicit foreign-key field
+      in the asset payload.
+
+      Why pairs: the Storyboarding capture pipeline produces both
+      sizes atomically (800x600 large for inspection; 200x150 small
+      for timeline strips). A single-variant entry is a defect — see
+      schema rule scene-thumbnail-pair-rule-001.
+
+      Lifecycle: created when a Scene is captured. Deleted when the
+      Scene is deleted (garbage-collection invariant — see schema
+      rule scene-thumbnail-orphan-rule-001). Both rules are enforced
+      by the debrief-stac audit module; the JSON Schema layer
+      enforces the value shape and key format only (see schema rule
+      scene-thumbnail-key-format-rule-001).
+
+      Supersedes the spec-241 placeholder `item_assets["scene-thumbnail"]`
+      and the `^scene-thumbnail(-.+)?$` patternProperties rule.
+    attributes:
+      href:
+        description: >-
+          URI-reference relative to the Item directory; conventionally
+          ./scene-thumbnails/scene-{ULID}.png (large) or
+          ./scene-thumbnails/scene-{ULID}-sm.png (small).
+        range: string
+        required: true
+      type:
+        description: Always image/png — Storyboarding capture writes PNGs only.
+        range: string
+        required: true
+        equals_string: "image/png"
+      roles:
+        description: >-
+          Exactly ["thumbnail"]. Storyboarding-derived thumbnails are
+          not declared as overview (which is reserved for plot-level
+          overviews of dimensions 600x800).
+        range: string
+        required: true
+        multivalued: true
+      title:
+        description: >-
+          Optional human label. Storyboarding writer emits
+          "Scene thumbnail" (large) or "Scene thumbnail (small)" (small).
+        range: string
+        required: false

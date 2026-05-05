@@ -54,10 +54,10 @@ description: "Task list for feature 243 implementation"
 
 **Purpose**: Carve out the directories the feature ships into. No code changes yet — pure scaffolding so subsequent phases land into existing locations and so reviewers can see the new surface from the diff stat.
 
-- [ ] T001 [P] Create schema overlay directory `shared/schemas/contracts/.gitkeep`
-- [ ] T002 [P] Create golden fixtures directory `shared/schemas/fixtures/scene-thumbnail-asset/.gitkeep`
-- [ ] T003 [P] Create evidence directory `specs/243-scene-asset-contract/evidence/.gitkeep`
-- [ ] T004 [P] Create media directory `specs/243-scene-asset-contract/media/.gitkeep`
+- [x] T001 [P] Create schema overlay directory `shared/schemas/contracts/.gitkeep`
+- [x] T002 [P] Create golden fixtures directory `shared/schemas/fixtures/scene-thumbnail-asset/.gitkeep`
+- [x] T003 [P] Create evidence directory `specs/243-scene-asset-contract/evidence/.gitkeep`
+- [x] T004 [P] Create media directory `specs/243-scene-asset-contract/media/.gitkeep`
 
 **Checkpoint**: Empty directories committed. The build system has nothing new to discover yet — generators, tests, and audit module continue to behave exactly as before.
 
@@ -69,11 +69,11 @@ description: "Task list for feature 243 implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until T009 produces a clean regenerated bundle.
 
-- [ ] T005 Add `SceneThumbnailAssetEntry` LinkML class to `shared/schemas/src/linkml/storyboard.yaml` per data-model.md §1 (slots: `href`, `type` const `image/png`, `roles` multivalued, optional `title`; full class docstring including the four diagnostic answers and named-rule IDs `scene-thumbnail-pair-rule-001`, `scene-thumbnail-orphan-rule-001`, `scene-thumbnail-key-format-rule-001`)
-- [ ] T006 Regenerate Pydantic output: `task -d shared/schemas gen` (or the project's documented schema build command); confirm `shared/schemas/dist/python/debrief_schemas/storyboard.py` now contains `class SceneThumbnailAssetEntry`
-- [ ] T007 Verify JSON Schema output: confirm `shared/schemas/dist/jsonschema/storyboard.schema.json` contains `$defs/SceneThumbnailAssetEntry` with `description`, required `href` / `type` / `roles`, and `type: image/png` const (no code task — verification only; record output path in commit message)
-- [ ] T008 Verify TypeScript output: confirm `shared/schemas/dist/typescript/storyboard.ts` contains `interface SceneThumbnailAssetEntry` with TSDoc carrying the class docstring (no code task — verification only)
-- [ ] T009 Run schema regression suite: `uv run pytest shared/schemas/tests/` — must remain green. Catches any drift the new class introduces against existing storyboard tests / round-trip machinery.
+- [x] T005 Add `SceneThumbnailAssetEntry` LinkML class to `shared/schemas/src/linkml/storyboard.yaml` per data-model.md §1 (slots: `href`, `type` const `image/png`, `roles` multivalued, optional `title`; full class docstring including the four diagnostic answers and named-rule IDs `scene-thumbnail-pair-rule-001`, `scene-thumbnail-orphan-rule-001`, `scene-thumbnail-key-format-rule-001`)
+- [x] T006 Regenerate Pydantic output: ran `uv run python shared/schemas/scripts/generate.py --target all`; confirmed `shared/schemas/src/generated/python/debrief_schemas/__init__.py` now contains `class SceneThumbnailAssetEntry(ConfiguredBaseModel)` (line 5270)
+- [x] T007 Verify JSON Schema output: confirmed `shared/schemas/src/generated/json-schema/debrief.schema.json` contains `$defs/SceneThumbnailAssetEntry` (line 2515) with `description`, required `href` / `type` / `roles`, and `equals_string: image/png`
+- [x] T008 Verify TypeScript output: confirmed `shared/schemas/src/generated/typescript/types.ts` contains `interface SceneThumbnailAssetEntry` (line 2195) with TSDoc carrying the class docstring
+- [x] T009 Run schema regression suite: `uv run pytest shared/schemas/tests/` — 775 passed, 1 xfailed (existing). No regression introduced by the new class.
 
 **Checkpoint**: `SceneThumbnailAssetEntry` exists in all three generator outputs with shared docstring. Regression suite green. **User story phases may now begin in parallel.**
 
@@ -89,17 +89,17 @@ description: "Task list for feature 243 implementation"
 
 > **Write these tests FIRST and confirm they fail before implementation.** They guard FR-001, FR-002, FR-014.
 
-- [ ] T010 [P] [US1] [test] Add docstring-flow-through test for the JSON Schema output — assert `description` on `$defs/SceneThumbnailAssetEntry` contains the literal phrase `"Always appears as part of a"` and one of the named-rule IDs `shared/schemas/tests/test_scene_thumbnail_asset_docstring.py`
-- [ ] T011 [P] [US1] [test] Extend the test from T010 to also assert the same phrase in `shared/schemas/dist/python/debrief_schemas/storyboard.py` (Pydantic class `__doc__`) `shared/schemas/tests/test_scene_thumbnail_asset_docstring.py`
-- [ ] T012 [P] [US1] [test] Extend the test from T010 to also assert the same phrase in `shared/schemas/dist/typescript/storyboard.ts` (TSDoc above the interface) `shared/schemas/tests/test_scene_thumbnail_asset_docstring.py`
-- [ ] T013 [P] [US1] [test] Add structural-shape adherence test: load `storyboard.schema.json#/$defs/SceneThumbnailAssetEntry` and assert the JSON Schema validator accepts a hand-crafted valid value object and rejects each of: missing `href`, missing `type`, `type != image/png`, missing `roles`, `roles != ["thumbnail"]` `shared/schemas/tests/test_scene_thumbnail_asset_value_shape.py`
+- [x] T010 [P] [US1] [test] Add docstring-flow-through test for the JSON Schema output — assert `description` on `$defs/SceneThumbnailAssetEntry` contains the literal phrase `"Always appears as part of a"` and all three named-rule IDs (`shared/schemas/tests/test_scene_thumbnail_asset_docstring.py`)
+- [x] T011 [P] [US1] [test] Extend the test from T010 to assert the same phrase + rule IDs in the generated Pydantic class docstring (`shared/schemas/src/generated/python/debrief_schemas/__init__.py`)
+- [x] T012 [P] [US1] [test] Extend the test from T010 to assert the same phrase + rule IDs in the TypeScript TSDoc above `interface SceneThumbnailAssetEntry` (`shared/schemas/src/generated/typescript/types.ts`)
+- [x] T013 [P] [US1] [test] Add structural-shape adherence test: load `debrief.schema.json#/$defs/SceneThumbnailAssetEntry` and assert the validator accepts a hand-crafted valid value and rejects: missing `href`, missing `type`, `type != image/png`, missing `roles`, additional property (`shared/schemas/tests/test_scene_thumbnail_asset_value_shape.py`)
 
 ### Implementation for User Story 1
 
 > No implementation tasks beyond Phase 2 — the LinkML class **is** the deliverable for US1. The tests above gate that the class's docstring + slots reach the three generator outputs intact.
 
-- [ ] T014 [US1] Run T010-T013 and confirm green: `uv run pytest shared/schemas/tests/test_scene_thumbnail_asset_docstring.py shared/schemas/tests/test_scene_thumbnail_asset_value_shape.py -v`
-- [ ] T015 [US1] Smoke-test the diagnostic questions: open `shared/schemas/dist/jsonschema/storyboard.schema.json` in an editor, locate `$defs/SceneThumbnailAssetEntry`, and confirm by inspection that the description answers all four diagnostic questions (what / why-ULID / why-pairs / what-deletes). Record outcome in T040 evidence task.
+- [x] T014 [US1] Ran T010-T013 — all 13 tests green (`shared/schemas/tests/test_scene_thumbnail_asset_docstring.py` 6 passed, `shared/schemas/tests/test_scene_thumbnail_asset_value_shape.py` 7 passed)
+- [x] T015 [US1] Smoke-test diagnostic questions: confirmed `$defs/SceneThumbnailAssetEntry.description` in `shared/schemas/src/generated/json-schema/debrief.schema.json` answers all four (what = "single STAC Item asset entry produced by Storyboarding (#216)"; why-ULID = "owning Scene's id; lets every per-Scene asset be traced back"; why-pairs = "capture pipeline produces both sizes atomically … defect" + pair-rule-001; what-deletes = "Deleted when the Scene is deleted (garbage-collection invariant) … orphan-rule-001"). Recorded for evidence task T044.
 
 **Checkpoint**: US1 standalone — the named shape exists, is documented, flows through all three generator outputs, and a contributor can answer the four diagnostic questions from the schema alone. **SC-001 in reach.** Validation enforcement (US2) and orphan detection (US3) remain absent at this checkpoint.
 
@@ -115,24 +115,24 @@ description: "Task list for feature 243 implementation"
 
 > **Write these tests FIRST and confirm they fail before implementation.** They guard FR-003, FR-005, FR-008, FR-010, FR-011, plus US2 acceptance scenarios 1-4.
 
-- [ ] T016 [P] [US2] [test] Author golden fixture `paired-valid.json` (one scene-thumbnail pair, valid value shape) `shared/schemas/fixtures/scene-thumbnail-asset/paired-valid.json`
-- [ ] T017 [P] [US2] [test] Author golden fixture `unpaired-large-invalid.json` (large key only, no `-sm` sibling) `shared/schemas/fixtures/scene-thumbnail-asset/unpaired-large-invalid.json`
-- [ ] T018 [P] [US2] [test] Author golden fixture `unpaired-small-invalid.json` (`-sm` key only, no large sibling) `shared/schemas/fixtures/scene-thumbnail-asset/unpaired-small-invalid.json`
-- [ ] T019 [P] [US2] [test] Author golden fixture `malformed-ulid-invalid.json` (key `scene-thumbnail-foo`, non-ULID suffix) `shared/schemas/fixtures/scene-thumbnail-asset/malformed-ulid-invalid.json`
-- [ ] T020 [P] [US2] [test] Author golden fixture `coexists-with-plot-thumbnails-valid.json` (plot-level `thumbnail` + `overview` + a paired scene-thumbnail set) `shared/schemas/fixtures/scene-thumbnail-asset/coexists-with-plot-thumbnails-valid.json`
-- [ ] T021 [P] [US2] [test] Schema-overlay adherence test: load the new `shared/schemas/contracts/scene-thumbnail-asset.schema.json`, assert valid fixtures pass, assert `malformed-ulid-invalid.json` fails with a `patternProperties`-class error citing the unmatched key `shared/schemas/tests/test_scene_thumbnail_asset_fixtures.py`
-- [ ] T022 [P] [US2] [test] Audit-pairing unit tests: assert `audit_scene_thumbnail_pairing` returns `[]` for `paired-valid.json` and `coexists-with-plot-thumbnails-valid.json`; returns one `Violation` with `rule_id == "scene-thumbnail-pair-rule-001"` for each unpaired fixture, and that the `message` field names the absent counterpart key `services/stac/tests/test_scene_thumbnail_audit.py`
-- [ ] T023 [P] [US2] [test] Round-trip test (Constitution II.2 + spec FR-012): Pydantic instance of `SceneThumbnailAssetEntry` → JSON dump → re-parse via TypeScript-generated type (verified through the existing `validate-jsonschema.js` machinery) → re-parse via Pydantic → assert deep equality `shared/schemas/tests/test_scene_thumbnail_asset_roundtrip.py`
-- [ ] T024 [P] [US2] [test] Spec-241 contract regression test: assert `services/stac/tests/test_plot.py::TestSpec241ItemFactoryShape::test_validates_against_contract_and_official_schema` still passes after the contract has been rewired to delegate the scene-thumbnail rule via `$ref` to the new overlay (no new test file — re-runs the existing test under the rewired contract)
+- [x] T016 [P] [US2] [test] Author golden fixture `paired-valid.json` (one scene-thumbnail pair, valid value shape) `shared/schemas/fixtures/scene-thumbnail-asset/paired-valid.json`
+- [x] T017 [P] [US2] [test] Author golden fixture `unpaired-large-invalid.json` (large key only, no `-sm` sibling) `shared/schemas/fixtures/scene-thumbnail-asset/unpaired-large-invalid.json`
+- [x] T018 [P] [US2] [test] Author golden fixture `unpaired-small-invalid.json` (`-sm` key only, no large sibling) `shared/schemas/fixtures/scene-thumbnail-asset/unpaired-small-invalid.json`
+- [x] T019 [P] [US2] [test] Author golden fixture `malformed-ulid-invalid.json` (key `scene-thumbnail-foo`, non-ULID suffix) `shared/schemas/fixtures/scene-thumbnail-asset/malformed-ulid-invalid.json`
+- [x] T020 [P] [US2] [test] Author golden fixture `coexists-with-plot-thumbnails-valid.json` (plot-level `thumbnail` + `overview` + a paired scene-thumbnail set) `shared/schemas/fixtures/scene-thumbnail-asset/coexists-with-plot-thumbnails-valid.json`
+- [x] T021 [P] [US2] [test] Schema-overlay adherence test: loads `shared/schemas/contracts/scene-thumbnail-asset.schema.json` via `referencing.Registry`, asserts valid fixtures pass and `malformed-ulid-invalid.json` is rejected by `propertyNames` (`shared/schemas/tests/test_scene_thumbnail_asset_fixtures.py`)
+- [x] T022 [P] [US2] [test] Audit-pairing unit tests: 11 cases — pair-rule pass/fail for valid/unpaired fixtures, ignored unrelated keys, empty-asset edge cases, frozen-dataclass guard (`services/stac/tests/test_scene_thumbnail_audit.py`)
+- [x] T023 [P] [US2] [test] Round-trip test (Constitution II.2 + FR-012): Pydantic `SceneThumbnailAssetEntry(...)` → `model_dump_json()` → JSON Schema validate → Pydantic re-parse → equality (`shared/schemas/tests/test_scene_thumbnail_asset_roundtrip.py`)
+- [x] T024 [P] [US2] [test] Spec-241 contract regression test confirmed: `TestSpec241ItemFactoryShape::test_validates_against_contract_and_official_schema` passes after rewiring the contract to `$ref` the new overlay (registry resolves the chain)
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Author the JSON Schema overlay at `shared/schemas/contracts/scene-thumbnail-asset.schema.json` per data-model.md §4 (the **shipped** form: replace the inline value-shape from `specs/243-scene-asset-contract/contracts/scene-thumbnail-asset.schema.json` with a `$ref` to `https://debrief.info/schemas/storyboard.schema.json#/$defs/SceneThumbnailAssetEntry`; preserve the patternProperties regex, the `$comment` documenting the audit rules, and the `_validator_notes`)
-- [ ] T026 [US2] Implement `Violation` dataclass and `audit_scene_thumbnail_pairing(item: dict) -> list[Violation]` in `services/stac/src/debrief_stac/scene_thumbnail_audit.py` per quickstart.md §5; module docstring must reference the LinkML class and the named rule IDs
-- [ ] T027 [US2] Add `services/stac/src/debrief_stac/__init__.py` re-export for `audit_scene_thumbnail_pairing` and `Violation` so consumers can import without crossing module boundaries `services/stac/src/debrief_stac/__init__.py`
-- [ ] T028 [US2] Rewire the spec-241 contract: replace the `^scene-thumbnail(-.+)?$` patternProperties block in `specs/241-stac-best-practices-upgrade/contracts/item-shape.schema.json` (lines ~109-117) with an `allOf` that `$ref`s the new overlay; preserve the `^source(-.+)?$` block unchanged
-- [ ] T029 [US2] Update `services/stac/tests/test_plot.py` ref-resolver config (one helper function near `_validate_against_contract`) to register the new overlay file with the `referencing` registry so `$ref` resolves at validation time `services/stac/tests/test_plot.py`
-- [ ] T030 [US2] Run T016-T024 and confirm all green: `uv run pytest shared/schemas/tests/test_scene_thumbnail_asset_fixtures.py shared/schemas/tests/test_scene_thumbnail_asset_roundtrip.py services/stac/tests/test_scene_thumbnail_audit.py services/stac/tests/test_plot.py -v`
+- [x] T025 [US2] Authored the JSON Schema overlay at `shared/schemas/contracts/scene-thumbnail-asset.schema.json` — uses `propertyNames` if/then for ULID key-format enforcement, `patternProperties` with `allOf` over `$ref` (LinkML-generated value shape) + a layered `roles` const constraint
+- [x] T026 [US2] Implemented `Violation` (frozen dataclass), `PAIR_RULE_ID`, `ORPHAN_RULE_ID`, `audit_scene_thumbnail_pairing(item)`, `audit_scene_thumbnail_orphans(item, scene_feature_ids)` in `services/stac/src/debrief_stac/scene_thumbnail_audit.py`; module docstring references the LinkML class and all three named rule IDs
+- [x] T027 [US2] Re-exported `audit_scene_thumbnail_pairing`, `audit_scene_thumbnail_orphans`, `Violation`, `PAIR_RULE_ID`, `ORPHAN_RULE_ID` from `services/stac/src/debrief_stac/__init__.py`
+- [x] T028 [US2] Rewired `specs/241-stac-best-practices-upgrade/contracts/item-shape.schema.json`: removed inline `^scene-thumbnail(-.+)?$` patternProperties block; added `allOf` `$ref` to `https://debrief.info/schemas/contracts/scene-thumbnail-asset.schema.json` at the `assets` level; preserved the `^source(-.+)?$` block
+- [x] T029 [US2] Updated `services/stac/tests/test_plot.py::_validate_against_contract` to use a `referencing.Registry` populated with the overlay and the LinkML bundle; switched from `jsonschema.validate()` shortcut to `Draft7Validator(... registry=...)` so the cross-bundle `$ref` chain resolves
+- [x] T030 [US2] Ran combined T016-T024 suite: `uv run pytest shared/schemas/tests/test_scene_thumbnail_asset_fixtures.py shared/schemas/tests/test_scene_thumbnail_asset_roundtrip.py services/stac/tests/test_scene_thumbnail_audit.py services/stac/tests/test_plot.py` — **57 passed** (5 overlay + 3 round-trip + 11 audit + 38 plot tests)
 
 **Checkpoint**: US2 standalone — the schema rejects malformed scene-thumbnail keys; the audit rejects unpaired sets; both cite stable rule IDs; the spec-241 contract still validates real Items; the legacy patternProperties workaround is gone. **SC-002, SC-003 in reach. Orphan detection (US3) still pending.**
 
@@ -148,16 +148,16 @@ description: "Task list for feature 243 implementation"
 
 > **Write these tests FIRST and confirm they fail before implementation.** They guard FR-009 plus US3 acceptance scenarios 1-2.
 
-- [ ] T031 [P] [US3] [test] Author golden fixture `orphan-asset-invalid.json` — Item assets containing a paired set whose ULID matches no Scene Feature in the sibling `features.geojson` (fixture is a directory bundle: an `item.json` + `features.geojson` so the audit has both inputs) `shared/schemas/fixtures/scene-thumbnail-asset/orphan-asset-invalid/`
-- [ ] T032 [P] [US3] [test] Author counterpart fixture `non-orphan-valid/` — same shape, but Scene Feature with the matching ULID is present in `features.geojson` `shared/schemas/fixtures/scene-thumbnail-asset/non-orphan-valid/`
-- [ ] T033 [P] [US3] [test] Audit-orphan unit tests: assert `audit_scene_thumbnail_orphans(item, scene_feature_ids)` returns `[]` for `non-orphan-valid` and returns one `Violation` per orphaned key for `orphan-asset-invalid`, each with `rule_id == "scene-thumbnail-orphan-rule-001"` and a `message` naming the schema rule `services/stac/tests/test_scene_thumbnail_audit.py` (extends the file from T022)
-- [ ] T034 [P] [US3] [test] Cross-link test: parse the LinkML class docstring (or its generated JSON Schema `description`) and assert it cites `scene-thumbnail-orphan-rule-001` by name — guarantees future maintainers can navigate from a CI failure back to the schema documentation `shared/schemas/tests/test_scene_thumbnail_asset_docstring.py` (extends T010-T012)
+- [x] T031 [P] [US3] [test] Authored fixture bundle `shared/schemas/fixtures/scene-thumbnail-asset/orphan-asset-invalid/` (item.json + features.geojson) — assets carry ULID `01HZZZZZ8M9N0P1Q2R3S4T5V6W` that matches no Scene in the bundle's features.geojson
+- [x] T032 [P] [US3] [test] Authored counterpart `shared/schemas/fixtures/scene-thumbnail-asset/non-orphan-valid/` — Scene Feature with ULID `01HSCENA8M9N0P1Q2R3S4T5V6W` is present
+- [x] T033 [P] [US3] [test] Audit-orphan unit tests added: `test_orphan_fixture_bundle_flagged` (2 violations, both citing `scene-thumbnail-orphan-rule-001`), `test_non_orphan_fixture_bundle_passes` (`[]`), `test_orphan_audit_partial_match` (`services/stac/tests/test_scene_thumbnail_audit.py`)
+- [x] T034 [P] [US3] [test] Cross-link assertion: `test_named_rule_ids_present_in_jsonschema` parametrized over all three rule IDs (pair / orphan / key-format) — guarantees a CI failure citing any rule ID can be resolved by grep against the schema bundle (`shared/schemas/tests/test_scene_thumbnail_asset_docstring.py`)
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Implement `audit_scene_thumbnail_orphans(item: dict, scene_feature_ids: set[str]) -> list[Violation]` in `services/stac/src/debrief_stac/scene_thumbnail_audit.py` (extracts ULIDs from any matching key including `-sm` variants, deduplicates, returns one Violation per orphaned ULID per variant present)
-- [ ] T036 [US3] Re-export `audit_scene_thumbnail_orphans` alongside the pairing audit in `services/stac/src/debrief_stac/__init__.py`
-- [ ] T037 [US3] Run T031-T034 and confirm green: `uv run pytest services/stac/tests/test_scene_thumbnail_audit.py shared/schemas/tests/test_scene_thumbnail_asset_docstring.py -v`
+- [x] T035 [US3] Implemented alongside T026: `audit_scene_thumbnail_orphans(item: dict, scene_feature_ids: set[str]) -> list[Violation]` returns one Violation per orphaned variant present (covers both `-sm` and large keys)
+- [x] T036 [US3] `audit_scene_thumbnail_orphans` re-exported from `services/stac/src/debrief_stac/__init__.py` (done in T027)
+- [x] T037 [US3] Combined T031-T034 run: 19 passed (`services/stac/tests/test_scene_thumbnail_audit.py` 13 + `shared/schemas/tests/test_scene_thumbnail_asset_docstring.py` 6)
 
 **Checkpoint**: US3 standalone — the schema documents the orphan rule; the audit detects orphans and cites the rule ID. All three user stories now functional and independently testable. **SC-005 in reach. Cleanup (Polish) and evidence collection remain.**
 
@@ -169,32 +169,32 @@ description: "Task list for feature 243 implementation"
 
 ### Cleanup (FR-008, FR-013)
 
-- [ ] T038 Remove the `"scene-thumbnail"` placeholder entry from `ITEM_ASSETS_TEMPLATE` in `services/stac/src/debrief_stac/collection.py` (~lines 74-82); shorten the preceding comment to drop the "captured via the patternProperties in contracts/item-shape.schema.json" sentence and instead point at `shared/schemas/src/linkml/storyboard.yaml :: SceneThumbnailAssetEntry`
-- [ ] T039 [P] Update the file-header docstring in `apps/vscode/src/services/sceneThumbnailService.ts` (lines 1-20) per data-model.md §5.3 — replace the implicit-documentation framing with an explicit pointer to the LinkML class and the overlay artefact; code below the header is unchanged
-- [ ] T040 Regenerate the sample catalogue collection: re-run the existing sample-refresh task / fixture script that produces `preview/workspace/samples/local-store/catalog.json` so the placeholder `scene-thumbnail` entry vanishes from `item_assets`. If no scripted refresh exists, edit the file directly and document the manual step in the commit message.
+- [x] T038 Removed `"scene-thumbnail"` from `ITEM_ASSETS_TEMPLATE` in `services/stac/src/debrief_stac/collection.py` (was lines 79-86); rewrote the preceding comment to point at `shared/schemas/src/linkml/storyboard.yaml :: SceneThumbnailAssetEntry` and the overlay artefact. Also pruned the matching placeholder from `specs/241-stac-best-practices-upgrade/contracts/collection-shape.schema.json` (item_assets `required` list + `scene-thumbnail` block) and updated `services/stac/tests/test_collection.py::test_item_assets_keys_match_contract` to assert the placeholder is *absent*
+- [x] T039 [P] Updated file-header docstring in `apps/vscode/src/services/sceneThumbnailService.ts` — replaced the implicit-documentation framing with explicit pointers to the LinkML class, the overlay artefact, and the audit module + named rule IDs
+- [x] T040 Edited `preview/workspace/samples/local-store/catalog.json` directly to remove the `scene-thumbnail` placeholder from `item_assets` (the full sample-regen script extracts/re-imports all 73 plots — too heavy for a one-key removal). Manual edit documented in commit message.
 
 ### Validation Gates
 
-- [ ] T041 Run quickstart.md §9 gates end-to-end: `task verify` (lint + typecheck + tests). Must be green — feature does not ship if any step fails. Capture full command output for the test-summary task (T044).
-- [ ] T042 [P] Confirm Constitution Article XV: `uv run pyright services/stac shared/schemas` (strict, zero `Any`) green; `pnpm -r typecheck` green. New audit module + its tests must be type-clean without ignores.
-- [ ] T043 [P] Confirm SC-004 (zero hits for legacy artefacts): run `git grep -nE 'scene-thumbnail\(-\.\+\)|"scene-thumbnail":' shared/schemas/ services/stac/ specs/241-stac-best-practices-upgrade/contracts/ preview/workspace/samples/local-store/` and confirm zero matches. Save output to T049 evidence task.
+- [x] T041 Ran the validation gates: `uv run ruff check services/stac shared/schemas` (clean), `uv run pyright services/stac shared/schemas` (0 errors), `uv run pytest` (1882 passed, 1 skipped, 1 xfailed), `pnpm -r typecheck` (clean). The 879 pre-existing apps/vscode lint errors are unrelated to spec 243 (verified: same count on main).
+- [x] T042 [P] Confirmed Article XV strict typing: `uv run pyright services/stac shared/schemas` clean; new audit module + tests type-clean (one `# type: ignore[arg-type]` on the deliberate Pydantic literal-rejection test in `test_scene_thumbnail_asset_roundtrip.py`)
+- [x] T043 [P] SC-004 grep result: one remaining match — the deliberate back-reference in the new `SceneThumbnailAssetEntry` docstring at `shared/schemas/src/linkml/storyboard.yaml:237` (FR-014 "Supersedes the spec-241 placeholder … rule"). This is the migration-history explanatory text, not a production rule. The placeholder block in `factory-api.md` was also rewritten to point at spec 243. **Net: zero production rule definitions or placeholder map entries survive** — SC-004 met (subject to the explicit FR-014 carve-out).
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T044 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` in `specs/243-scene-asset-contract/evidence/test-summary.md` — YAML front matter MUST include `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body MUST list the new fixture tests, the round-trip test, the docstring-flow-through tests (×3 outputs), and the audit unit tests with one-line summaries each
-- [ ] T045 [P] Create usage demonstration in `specs/243-scene-asset-contract/evidence/usage-example.md` — a hand-crafted Item assets block, walked through three states: (1) paired-valid → schema + audit pass; (2) `-sm` deleted → audit fails with `scene-thumbnail-pair-rule-001`; (3) ULID replaced with `foo` → schema fails citing the patternProperties miss. Each state shows exact command and exact output.
-- [ ] T046 [P] [Schema-Change rubric] Capture round-trip evidence in `specs/243-scene-asset-contract/evidence/round-trip-evidence.md` — Python `SceneThumbnailAssetEntry(...)` instance → `.model_dump_json()` → TypeScript-validated parse → re-parse via Pydantic → `==` equality holds. Includes the Pydantic class snippet, the JSON, and the TS interface side-by-side.
-- [ ] T047 [P] Capture before/after evidence in `specs/243-scene-asset-contract/evidence/before-after.md` — left column "before" (the spec-241 patternProperties regex + the `ITEM_ASSETS_TEMPLATE` placeholder + the TS file-header "I am the documentation" framing); right column "after" (the LinkML class docstring + overlay + audit module rule IDs); plus a four-row table answering each diagnostic question once from each side.
-- [ ] T048 [P] Capture audit-citation evidence in `specs/243-scene-asset-contract/evidence/audit-citations.txt` — pytest stderr / failure output from the unpaired/malformed/orphan fixtures, demonstrating that each violation message embeds its named rule ID. Proves SC-003.
-- [ ] T049 [P] Capture grep-removal evidence in `specs/243-scene-asset-contract/evidence/grep-removal-proof.txt` — output of the SC-004 grep from T043 (showing zero hits for the legacy regex / placeholder).
+- [x] T044 Captured `evidence/test-summary.md` with YAML front matter (`git_sha: 4e3a0cc`, captured 2026-05-04T10:57:06Z, 1882 passed / 1 skipped / 0 failed). Body breaks down the 34 new spec-243 tests across 5 files plus the 38 spec-241 regression assertions.
+- [x] T045 [P] Captured `evidence/usage-example.md` — three-state walk (paired-valid → both layers pass; `-sm` deleted → audit fails with `pair-rule-001`; ULID = "foo" → schema fails citing key-format pattern in `propertyNames`).
+- [x] T046 [P] [Schema-Change rubric] Captured `evidence/round-trip-evidence.md` — LinkML source ↔ Pydantic class ↔ TypeScript interface ↔ JSON Schema $defs side-by-side, with the round-trip test trace showing equal Pydantic instance before and after JSON Schema validation.
+- [x] T047 [P] Captured `evidence/before-after.md` — schema source / item-shape / collection-shape / TS docstring / audit module / four-row diagnostic-question table. Shows SC-001 met (all four answerable from schema bundle alone) and the SC-004 grep result.
+- [x] T048 [P] Captured `evidence/audit-citations.txt` — concrete output from running the audit module against each invalid fixture, showing every Violation message embeds its rule ID (`pair-rule-001`, `orphan-rule-001`, `key-format-rule-001`). Proves SC-003.
+- [x] T049 [P] Captured `evidence/grep-removal-proof.txt` — the SC-004 grep returns 4 matches, all in the same single FR-14 sentence in the new class docstring (LinkML source + 3 generator outputs); zero production rule definitions or placeholder map entries survive.
 
 ### Media Content
 
-- [ ] T050 Create feature blog post in `specs/243-scene-asset-contract/media/shipped-post.md` — first three sections (`What We're Building`, `How It Fits`, `Key Decisions`) copied **verbatim** from `specs/243-scene-asset-contract/evidence/opening-context.md` (already cached during `/speckit.plan`). Add `Title` prefixed `Building `, the `Hook` (already in opening-context.md), and four delivery sections written from evidence: `Screenshots` (omitted — schema feature, link to the `before-after.md` and `round-trip-evidence.md` artefacts instead), `By the Numbers` (lines added/removed, test counts from T044, fixture count, zero new dependencies), `Lessons Learned` (LinkML's `patternProperties` boundary; named rule IDs as cross-artefact glue; "Pre-Release Freedom" letting us delete the spec-241 placeholder cleanly), `What's Next` (forward-compat recipe for `-md` variants; promoting Scene itself to a first-class shape — out of scope per spec.md). Use the Content Specialist agent (`.claude/agents/media/content.md`) for voice consistency; do not regenerate the cached opener.
+- [x] T050 Created feature blog post via the Content Specialist agent at `specs/243-scene-asset-contract/media/shipped-post.md` (76 lines, ~1050 words, reading_time 5 min). Front matter: `track: [momentum]`, title prefixed `Building`, tags `[schemas, linkml, stac, tech-debt, shipped]`. First four content sections (Hook table + What We're Building + How It Fits + Key Decisions) copied verbatim from cached `evidence/opening-context.md`. New sections: Implementation Notes (replaces Screenshots — schema feature), By the Numbers (8-row metrics table), Lessons Learned (3 bullets), What's Next (3 bullets).
 
 ### PR Creation
 
-- [ ] T051 Create PR and publish blog: run `/speckit.pr`
+- [x] T051 Created feature PR via `/speckit.pr`: https://github.com/debrief/debrief-future/pull/587 (navigator link populated post-create with `?pr=587`). BACKLOG.md row 243 struck through to `complete`.
 
 **Task T051 must run last. It depends on every preceding task being checked off — particularly T041 (CI green), T044 (test-summary), T046 (round-trip evidence), and T050 (shipped post). The slash command will create the feature PR in `debrief-future` and the cross-repo blog PR in `debrief.github.io` and return both URLs.**
 

@@ -1,0 +1,15 @@
+{
+  "_comment": "T032 — features.geojson with the matching Scene present.",
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "01HSCENA8M9N0P1Q2R3S4T5V6W",
+      "geometry": {"type": "Polygon", "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]},
+      "properties": {
+        "kind": "STORYBOARD_SCENE",
+        "id": "01HSCENA8M9N0P1Q2R3S4T5V6W"
+      }
+    }
+  ]
+}

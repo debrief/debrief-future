@@ -1,0 +1,17 @@
+{
+  "_comment": "T031 — orphan asset bundle: assets contain a paired scene-thumbnail set whose ULID does NOT match any Scene in features.geojson. The audit's audit_scene_thumbnail_orphans function reports two Violations (one per variant) with rule_id == scene-thumbnail-orphan-rule-001.",
+  "type": "Feature",
+  "id": "plot-orphan-fixture",
+  "assets": {
+    "scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W": {
+      "href": "./scene-thumbnails/scene-01HZZZZZ8M9N0P1Q2R3S4T5V6W.png",
+      "type": "image/png",
+      "roles": ["thumbnail"]
+    },
+    "scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W-sm": {
+      "href": "./scene-thumbnails/scene-01HZZZZZ8M9N0P1Q2R3S4T5V6W-sm.png",
+      "type": "image/png",
+      "roles": ["thumbnail"]
+    }
+  }
+}

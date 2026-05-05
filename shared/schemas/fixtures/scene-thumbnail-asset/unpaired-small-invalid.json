@@ -1,0 +1,9 @@
+{
+  "_comment": "T018 — unpaired small: only scene-thumbnail-{ULID}-sm present. Schema overlay accepts (value shape valid); audit module rejects with scene-thumbnail-pair-rule-001.",
+  "scene-thumbnail-01HDEF3K8M9N0P1Q2R3S4T5V6W-sm": {
+    "href": "./scene-thumbnails/scene-01HDEF3K8M9N0P1Q2R3S4T5V6W-sm.png",
+    "type": "image/png",
+    "roles": ["thumbnail"],
+    "title": "Scene thumbnail (small)"
+  }
+}
