@@ -158,11 +158,12 @@ ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
         "roles": ["source"],
         "title": "Source data (placeholder; per-item keys are source-*)",
     },
-    "scene-thumbnail": {
-        "type": "image/png",
-        "roles": ["thumbnail"],
-        "title": "Storyboard scene thumbnail (placeholder; per-scene keys are scene-thumbnail-* and scene-thumbnail-*-sm)",
-    },
+    # NOTE: the original spec-241 ITEM_ASSETS_TEMPLATE included a
+    # `scene-thumbnail` placeholder entry (review decision 5A). Spec 243
+    # promoted scene-thumbnail to a first-class LinkML shape
+    # (SceneThumbnailAssetEntry) and removed the placeholder; per-Scene
+    # entries are now governed by
+    # shared/schemas/contracts/scene-thumbnail-asset.schema.json.
 }
 ```
 
@@ -337,4 +338,4 @@ Every consumer is updated in lockstep — tsc strict mode enforces complete migr
 | FR-028..FR-029 | Existing VS Code + web-shell unit tests pass with the renamed type fields (caught by tsc) |
 | Article IV.1 closure | New VS Code integration test (`saveSession` host path) asserts `saveSession.ts` no longer touches `item.json.assets` directly — research.md Decision 11 |
 | Article I.3 closure | `test_stac_validation.py` runs unconditionally against vendored schemas — no network probe, no silent skip — research.md Decision 9 |
-| `scene-thumbnail-*` validates | Item contract's `patternProperties` accepts `^scene-thumbnail(-.+)?$`; Collection's `item_assets` declares the placeholder — review decision 5A |
+| `scene-thumbnail-*` validates | Item contract delegates per-Scene asset keys to the dedicated overlay `shared/schemas/contracts/scene-thumbnail-asset.schema.json` (LinkML class `SceneThumbnailAssetEntry`); placeholder removed — see spec 243 (originally review decision 5A in this spec) |

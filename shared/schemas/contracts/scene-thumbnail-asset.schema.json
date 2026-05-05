@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/contracts/scene-thumbnail-asset.schema.json",
+  "title": "Scene-thumbnail asset map fragment",
+  "description": "Layered overlay enforcing the patternProperties wrapper, ULID key format, and per-entry value shape for per-Scene thumbnail asset entries inside a STAC Item's `assets` map. The value shape is sourced via $ref from the LinkML-generated SceneThumbnailAssetEntry — single source of truth via Constitution Article II.\n\nThis overlay covers schema rule scene-thumbnail-key-format-rule-001 (key format). Pair invariant (scene-thumbnail-pair-rule-001) and orphan rule (scene-thumbnail-orphan-rule-001) are enforced by services/stac/src/debrief_stac/scene_thumbnail_audit.py — not by this schema.\n\nSee specs/243-scene-asset-contract/ for migration history.",
+  "type": "object",
+  "propertyNames": {
+    "$comment": "scene-thumbnail-key-format-rule-001 — any key beginning with the literal `scene-thumbnail-` MUST match the full ULID-suffixed pattern. Non-matching keys (e.g. `thumbnail`, `overview`, `features`, `source-*`) are unaffected by this overlay.",
+    "if": { "pattern": "^scene-thumbnail-" },
+    "then": { "pattern": "^scene-thumbnail-[0-9A-HJKMNP-TV-Z]{26}(?:-sm)?$" }
+  },
+  "patternProperties": {
+    "^scene-thumbnail-[0-9A-HJKMNP-TV-Z]{26}(?:-sm)?$": {
+      "$comment": "Value shape sourced from the LinkML-generated SceneThumbnailAssetEntry. The `roles` constraint is tightened to exactly ['thumbnail'] (LinkML emits a generic array; the overlay layers the const).",
+      "allOf": [
+        { "$ref": "https://debrief.info/schemas/debrief-jsonschema#/$defs/SceneThumbnailAssetEntry" },
+        {
+          "type": "object",
+          "properties": {
+            "roles": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": { "const": "thumbnail" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

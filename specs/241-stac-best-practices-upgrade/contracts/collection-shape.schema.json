@@ -42,8 +42,9 @@
       }
     },
     "item_assets": {
+      "comment": "Per-Scene storyboard thumbnails are governed by their own first-class shape (LinkML class SceneThumbnailAssetEntry, overlay shared/schemas/contracts/scene-thumbnail-asset.schema.json). They are NOT declared at the Collection item_assets level — only the four logical asset types stable across all Items are listed here. See spec 243 for migration history.",
       "type": "object",
-      "required": ["features", "thumbnail", "overview", "source", "scene-thumbnail"],
+      "required": ["features", "thumbnail", "overview", "source"],
       "properties": {
         "features": {
           "type": "object",
@@ -77,16 +78,6 @@
           "required": ["roles"],
           "properties": {
             "roles": { "const": ["source"] }
-          },
-          "not": { "required": ["href"] }
-        },
-        "scene-thumbnail": {
-          "comment": "Placeholder declaration for storyboard-derived per-scene thumbnails. Per-scene keys at the Item level are `scene-thumbnail-{ulid}` and `scene-thumbnail-{ulid}-sm`; the Item contract's patternProperties accommodates both. This block declares the contract so the Collection self-documents the shape.",
-          "type": "object",
-          "required": ["type", "roles"],
-          "properties": {
-            "type": { "const": "image/png" },
-            "roles": { "const": ["thumbnail"] }
           },
           "not": { "required": ["href"] }
         }

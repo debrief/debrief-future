@@ -51,10 +51,13 @@ _SUMMARY_PROPERTIES = [
 _DEFAULT_LICENSE = "other"
 
 # Spec 241 — collection-level item_assets template (STAC 1.1 promoted to core).
-# Describes the asset shape every Item is expected to expose; per-item naming
-# variation (source-* per-file, scene-thumbnail-{ulid} per-scene) is captured
-# via the patternProperties in contracts/item-shape.schema.json — the
-# Collection block declares the contract, not specific instances.
+# Describes the asset shape every Item is expected to expose. Per-Scene
+# storyboard thumbnails (scene-thumbnail-{ULID} / scene-thumbnail-{ULID}-sm)
+# are governed by their own first-class shape:
+#   shared/schemas/src/linkml/storyboard.yaml :: SceneThumbnailAssetEntry
+#   shared/schemas/contracts/scene-thumbnail-asset.schema.json
+# (see spec 243 for the contract formalisation history). Per-source-file keys
+# (source-*) remain captured by the Item shape's patternProperties.
 ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
     "features": {
         "type": "application/geo+json",
@@ -75,14 +78,6 @@ ITEM_ASSETS_TEMPLATE: dict[str, dict[str, object]] = {
         "type": "application/octet-stream",
         "roles": ["source"],
         "title": ("Source data (placeholder; per-item keys are source-*)"),
-    },
-    "scene-thumbnail": {
-        "type": "image/png",
-        "roles": ["thumbnail"],
-        "title": (
-            "Storyboard scene thumbnail (placeholder; per-scene keys are "
-            "scene-thumbnail-* and scene-thumbnail-*-sm)"
-        ),
     },
 }
 

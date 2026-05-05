@@ -1,0 +1,58 @@
+============================================================================
+Audit citation evidence — every Violation message embeds its rule ID.
+Captured at git_sha 4e3a0cc (2026-05-04T10:57:06Z).
+Proves SC-003 (failure messages cite the violated rule by name).
+============================================================================
+
+# unpaired-large-invalid.json (audit module: pairing)
+  rule_id  : scene-thumbnail-pair-rule-001
+  asset_key: scene-thumbnail-01HABC2K8M9N0P1Q2R3S4T5V6W
+  message  : scene-thumbnail-pair-rule-001: missing small counterpart
+             'scene-thumbnail-01HABC2K8M9N0P1Q2R3S4T5V6W-sm' for asset key
+             'scene-thumbnail-01HABC2K8M9N0P1Q2R3S4T5V6W'
+
+# unpaired-small-invalid.json (audit module: pairing)
+  rule_id  : scene-thumbnail-pair-rule-001
+  asset_key: scene-thumbnail-01HDEF3K8M9N0P1Q2R3S4T5V6W-sm
+  message  : scene-thumbnail-pair-rule-001: missing large counterpart
+             'scene-thumbnail-01HDEF3K8M9N0P1Q2R3S4T5V6W' for asset key
+             'scene-thumbnail-01HDEF3K8M9N0P1Q2R3S4T5V6W-sm'
+
+# orphan-asset-invalid bundle (audit module: orphan)
+  rule_id  : scene-thumbnail-orphan-rule-001
+  asset_key: scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W
+  message  : scene-thumbnail-orphan-rule-001: asset key
+             'scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W' has no matching
+             Scene in the owning Plot (ULID '01HZZZZZ8M9N0P1Q2R3S4T5V6W'
+             not found in features.geojson)
+
+  rule_id  : scene-thumbnail-orphan-rule-001
+  asset_key: scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W-sm
+  message  : scene-thumbnail-orphan-rule-001: asset key
+             'scene-thumbnail-01HZZZZZ8M9N0P1Q2R3S4T5V6W-sm' has no
+             matching Scene in the owning Plot (ULID
+             '01HZZZZZ8M9N0P1Q2R3S4T5V6W' not found in features.geojson)
+
+# malformed-ulid-invalid.json (schema layer: key format)
+  schema-rule citation : scene-thumbnail-key-format-rule-001
+                         (overlay propertyNames if/then construct)
+  jsonschema error     : 'scene-thumbnail-foo' does not match
+                         '^scene-thumbnail-[0-9A-HJKMNP-TV-Z]{26}(?:-sm)?$'
+  json_path            : $
+
+============================================================================
+Cross-link verification
+============================================================================
+
+All three rule IDs above appear verbatim in the LinkML class docstring
+that flows through to the JSON Schema, Pydantic, and TypeScript outputs.
+Verified by `test_named_rule_ids_present_in_jsonschema` (parametrised over
+all three rule IDs) — green at this SHA.
+
+A future maintainer who sees any of these citations in a CI log can grep
+the rule ID against the schema bundle (or the LinkML source) and land
+directly inside the named-rule documentation.
+
+This satisfies SC-003 ("100% of the new golden-fixture invalid cases are
+rejected by the schema validator with a message that names the violated
+rule").
