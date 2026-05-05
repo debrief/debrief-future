@@ -26,9 +26,7 @@ from debrief_stac.scene_thumbnail_audit import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-FIXTURE_DIR = (
-    REPO_ROOT / "shared" / "schemas" / "fixtures" / "scene-thumbnail-asset"
-)
+FIXTURE_DIR = REPO_ROOT / "shared" / "schemas" / "fixtures" / "scene-thumbnail-asset"
 
 
 def _fixture_assets(name: str) -> dict:
@@ -142,7 +140,11 @@ def test_orphan_audit_ignores_unrelated_keys() -> None:
     item = _item(
         {
             "thumbnail": {"href": "t.png", "type": "image/png", "roles": ["thumbnail"]},
-            "features": {"href": "features.geojson", "type": "application/geo+json", "roles": ["data"]},
+            "features": {
+                "href": "features.geojson",
+                "type": "application/geo+json",
+                "roles": ["data"],
+            },
         }
     )
     assert audit_scene_thumbnail_orphans(item, set()) == []

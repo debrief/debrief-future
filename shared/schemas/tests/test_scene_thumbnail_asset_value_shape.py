@@ -19,13 +19,7 @@ from jsonschema import Draft202012Validator
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 GEN_JSON_SCHEMA = (
-    REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "debrief.schema.json"
+    REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "json-schema" / "debrief.schema.json"
 )
 
 

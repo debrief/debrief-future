@@ -26,13 +26,7 @@ sys.path.insert(
 from debrief_schemas import SceneThumbnailAssetEntry  # noqa: E402
 
 GEN_JSON_SCHEMA = (
-    REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "debrief.schema.json"
+    REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "json-schema" / "debrief.schema.json"
 )
 
 
@@ -76,10 +70,7 @@ def test_roundtrip_preserves_minimal_payload() -> None:
     payload = json.loads(baseline_json)
     _value_validator().validate(payload)
     final = SceneThumbnailAssetEntry(**payload)
-    assert (
-        json.loads(final.model_dump_json())
-        == json.loads(baseline_json)
-    )
+    assert json.loads(final.model_dump_json()) == json.loads(baseline_json)
 
 
 def test_pydantic_rejects_wrong_type() -> None:

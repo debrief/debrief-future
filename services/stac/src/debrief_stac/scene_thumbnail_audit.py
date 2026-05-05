@@ -94,9 +94,7 @@ def audit_scene_thumbnail_pairing(item: dict) -> list[Violation]:
     return violations
 
 
-def audit_scene_thumbnail_orphans(
-    item: dict, scene_feature_ids: set[str]
-) -> list[Violation]:
+def audit_scene_thumbnail_orphans(item: dict, scene_feature_ids: set[str]) -> list[Violation]:
     """Enforce ``scene-thumbnail-orphan-rule-001``.
 
     Returns one :class:`Violation` per asset key whose captured ULID does

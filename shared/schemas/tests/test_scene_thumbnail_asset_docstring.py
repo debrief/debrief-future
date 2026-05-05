@@ -27,23 +27,9 @@ GEN_PYTHON = (
     / "__init__.py"
 )
 GEN_JSON_SCHEMA = (
-    REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "debrief.schema.json"
+    REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "json-schema" / "debrief.schema.json"
 )
-GEN_TYPESCRIPT = (
-    REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "typescript"
-    / "types.ts"
-)
+GEN_TYPESCRIPT = REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "typescript" / "types.ts"
 
 # This phrase is unique to the SceneThumbnailAssetEntry class docstring and
 # anchors the docstring-flow-through assertions across all three outputs.
@@ -101,9 +87,7 @@ def test_docstring_in_typescript_tsdoc() -> None:
     block_open = head.rfind("/**", 0, block_close)
     assert block_open >= 0, "no opening /** found for preceding TSDoc block"
     block = head[block_open : block_close + 2]
-    assert SIGNATURE_PHRASE in block, (
-        f"signature phrase missing from TSDoc; got: {block!r}"
-    )
+    assert SIGNATURE_PHRASE in block, f"signature phrase missing from TSDoc; got: {block!r}"
     assert PAIR_RULE_ID in block
     assert ORPHAN_RULE_ID in block
     assert KEY_FORMAT_RULE_ID in block

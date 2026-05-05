@@ -559,13 +559,7 @@ _SCENE_THUMBNAIL_OVERLAY_PATH = (
     _REPO_ROOT / "shared" / "schemas" / "contracts" / "scene-thumbnail-asset.schema.json"
 )
 _LINKML_BUNDLE_PATH = (
-    _REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "debrief.schema.json"
+    _REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "json-schema" / "debrief.schema.json"
 )
 
 

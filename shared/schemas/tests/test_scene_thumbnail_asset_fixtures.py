@@ -18,21 +18,11 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-OVERLAY_PATH = (
-    REPO_ROOT / "shared" / "schemas" / "contracts" / "scene-thumbnail-asset.schema.json"
-)
+OVERLAY_PATH = REPO_ROOT / "shared" / "schemas" / "contracts" / "scene-thumbnail-asset.schema.json"
 BUNDLE_PATH = (
-    REPO_ROOT
-    / "shared"
-    / "schemas"
-    / "src"
-    / "generated"
-    / "json-schema"
-    / "debrief.schema.json"
+    REPO_ROOT / "shared" / "schemas" / "src" / "generated" / "json-schema" / "debrief.schema.json"
 )
-FIXTURE_DIR = (
-    REPO_ROOT / "shared" / "schemas" / "fixtures" / "scene-thumbnail-asset"
-)
+FIXTURE_DIR = REPO_ROOT / "shared" / "schemas" / "fixtures" / "scene-thumbnail-asset"
 
 
 @pytest.fixture(scope="module")
@@ -62,9 +52,7 @@ def _load(name: str) -> dict:
         "coexists-with-plot-thumbnails-valid.json",
     ],
 )
-def test_valid_fixture_passes(
-    overlay_validator: Draft202012Validator, name: str
-) -> None:
+def test_valid_fixture_passes(overlay_validator: Draft202012Validator, name: str) -> None:
     """T021 — valid fixtures must validate against the overlay."""
     overlay_validator.validate(_load(name))
 
@@ -76,9 +64,7 @@ def test_valid_fixture_passes(
         "unpaired-small-invalid.json",
     ],
 )
-def test_unpaired_fixtures_pass_overlay(
-    overlay_validator: Draft202012Validator, name: str
-) -> None:
+def test_unpaired_fixtures_pass_overlay(overlay_validator: Draft202012Validator, name: str) -> None:
     """Unpaired fixtures pass the schema overlay — pair-rule-001 is enforced
     by the audit module, not the JSON Schema. This test documents the layer
     boundary."""
@@ -91,12 +77,8 @@ def test_malformed_ulid_rejected(
     """T021 — `scene-thumbnail-foo` (non-ULID suffix) is rejected by
     scene-thumbnail-key-format-rule-001 via the propertyNames if/then.
     """
-    errs = list(
-        overlay_validator.iter_errors(_load("malformed-ulid-invalid.json"))
-    )
-    assert errs, (
-        "expected schema rejection for non-ULID suffix; overlay accepted it"
-    )
+    errs = list(overlay_validator.iter_errors(_load("malformed-ulid-invalid.json")))
+    assert errs, "expected schema rejection for non-ULID suffix; overlay accepted it"
     # The error should mention the offending property name.
     messages = " ".join(str(e.message) for e in errs)
     assert "scene-thumbnail-foo" in messages or "propertyNames" in messages
