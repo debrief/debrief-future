@@ -40,8 +40,8 @@
 
 **⚠️ BLOCKS ALL DOWNSTREAM PHASES** — no spec file can be updated until T001 is merged.
 
-- [ ] T001 Create shared mock helper module `apps/backlog-navigator/e2e/helpers/mock-github.ts`
-- [ ] T002 Verify TypeScript strict-mode compliance — run `pnpm typecheck` in `apps/backlog-navigator` (no `any`, explicit return types on exported function)
+- [x] T001 Create shared mock helper module `apps/backlog-navigator/e2e/helpers/mock-github.ts`
+- [x] T002 Verify TypeScript strict-mode compliance — run `pnpm typecheck` in `apps/backlog-navigator` (no `any`, explicit return types on exported function)
 
 **Checkpoint**: `apps/backlog-navigator/e2e/helpers/mock-github.ts` exists, exports `mockGithubBacklogFetch(page: Page, fixturePath?: string): Promise<void>`, and passes typecheck.
 
@@ -55,7 +55,7 @@
 
 ### Create the Fixture
 
-- [ ] T003 Create fixture directory and hand-author the 12-row fixture table `apps/backlog-navigator/e2e/fixtures/backlog-fixture.md`
+- [x] T003 Create fixture directory and hand-author the 12-row fixture table `apps/backlog-navigator/e2e/fixtures/backlog-fixture.md`
 
   The fixture MUST reproduce the full BACKLOG.md structure:
   - Scoring/legend table header (same preamble as the live file)
@@ -78,16 +78,16 @@
 
 ### Update Desktop Specs (can run in parallel after T003)
 
-- [ ] T004 [P] Update `browse.spec.ts`: remove local `BACKLOG_PATH` + `mockGithubBacklogFetch`; add import from `./helpers/mock-github.js` `apps/backlog-navigator/e2e/browse.spec.ts`
-- [ ] T005 [P] Update `interaction.spec.ts`: remove local definitions; add shared import; update `selectOption('clarified')` → use row 001 (`proposed`) as target row so transition is non-trivial `apps/backlog-navigator/e2e/interaction.spec.ts`
-- [ ] T006 [P] Update `a11y.spec.ts`: remove local definitions; add shared import; update any status assertions to use known fixture rows `apps/backlog-navigator/e2e/a11y.spec.ts`
-- [ ] T007 [P] Update `realWrite.spec.ts`: remove local definitions; add shared import; update status assertion to use row 001 as the deterministic target `apps/backlog-navigator/e2e/realWrite.spec.ts`
-- [ ] T008 [P] Update `prMode.spec.ts`: remove local definitions; add shared import `apps/backlog-navigator/e2e/prMode.spec.ts`
+- [x] T004 [P] Update `browse.spec.ts`: remove local `BACKLOG_PATH` + `mockGithubBacklogFetch`; add import from `./helpers/mock-github.js` `apps/backlog-navigator/e2e/browse.spec.ts`
+- [x] T005 [P] Update `interaction.spec.ts`: remove local definitions; add shared import; update `selectOption('clarified')` → use row 001 (`proposed`) as target row so transition is non-trivial `apps/backlog-navigator/e2e/interaction.spec.ts`
+- [x] T006 [P] Update `a11y.spec.ts`: remove local definitions; add shared import; update any status assertions to use known fixture rows `apps/backlog-navigator/e2e/a11y.spec.ts`
+- [x] T007 [P] Update `realWrite.spec.ts`: remove local definitions; add shared import; update status assertion to use row 001 as the deterministic target `apps/backlog-navigator/e2e/realWrite.spec.ts`
+- [x] T008 [P] Update `prMode.spec.ts`: remove local definitions; add shared import `apps/backlog-navigator/e2e/prMode.spec.ts`
 
 ### Verify
 
-- [ ] T009 Run desktop E2E suite: `cd apps/backlog-navigator && node run-playwright.mjs` — all desktop specs pass
-- [ ] T010 Confirm zero live references in desktop specs: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/*.spec.ts` returns no output
+- [x] T009 Run desktop E2E suite: `cd apps/backlog-navigator && node run-playwright.mjs` — all desktop specs pass
+- [x] T010 Confirm zero live references in desktop specs: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/*.spec.ts` returns no output
 
 **Checkpoint**: 5 desktop specs pass; no BACKLOG.md reference in any desktop spec file.
 
@@ -103,18 +103,18 @@
 
 ### Update Mobile Specs (can run in parallel — separate files)
 
-- [ ] T011 [P] Update `browse.mobile.spec.ts`: remove local `BACKLOG_PATH` + `mockGithubBacklogFetch`; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/browse.mobile.spec.ts`
-- [ ] T012 [P] Update `interaction.mobile.spec.ts`: remove local definitions; add shared import; **replace defensive conditional** (`includes('approved') ? 'specified' : 'approved'`) with `selectOption('approved')` on row 001 (guaranteed `proposed`) `apps/backlog-navigator/e2e/mobile/interaction.mobile.spec.ts`
-- [ ] T013 [P] Update `editor-rotation.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/editor-rotation.mobile.spec.ts`
-- [ ] T014 [P] Update `description-editor.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/description-editor.mobile.spec.ts`
-- [ ] T015 [P] Update `push.mobile.spec.ts`: remove local definitions; add shared import; **replace defensive conditional** with deterministic `selectOption('approved')` on row 001 `apps/backlog-navigator/e2e/mobile/push.mobile.spec.ts`
-- [ ] T016 [P] Update `pwa-offline.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/pwa-offline.mobile.spec.ts`
-- [ ] T017 [P] Update `screenshots.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/screenshots.mobile.spec.ts`
+- [x] T011 [P] Update `browse.mobile.spec.ts`: remove local `BACKLOG_PATH` + `mockGithubBacklogFetch`; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/browse.mobile.spec.ts`
+- [x] T012 [P] Update `interaction.mobile.spec.ts`: remove local definitions; add shared import; **replace defensive conditional** (`includes('approved') ? 'specified' : 'approved'`) with `selectOption('approved')` on row 001 (guaranteed `proposed`) `apps/backlog-navigator/e2e/mobile/interaction.mobile.spec.ts`
+- [x] T013 [P] Update `editor-rotation.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/editor-rotation.mobile.spec.ts`
+- [x] T014 [P] Update `description-editor.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/description-editor.mobile.spec.ts`
+- [x] T015 [P] Update `push.mobile.spec.ts`: remove local definitions; add shared import; **replace defensive conditional** with deterministic `selectOption('approved')` on row 001 `apps/backlog-navigator/e2e/mobile/push.mobile.spec.ts`
+- [x] T016 [P] Update `pwa-offline.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/pwa-offline.mobile.spec.ts`
+- [x] T017 [P] Update `screenshots.mobile.spec.ts`: remove local definitions; add shared import with explicit fixture path `apps/backlog-navigator/e2e/mobile/screenshots.mobile.spec.ts`
 
 ### Verify
 
-- [ ] T018 Run full E2E suite (desktop + mobile): `cd apps/backlog-navigator && node run-playwright.mjs` — all 14 specs pass
-- [ ] T019 Confirm zero live references across all e2e files: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/` returns no output (SC-005)
+- [x] T018 Run full E2E suite (desktop + mobile): `cd apps/backlog-navigator && node run-playwright.mjs` — all 14 specs pass
+- [x] T019 Confirm zero live references across all e2e files: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/` returns no output (SC-005)
 
 **Checkpoint**: All 14 Playwright specs pass; zero BACKLOG.md references anywhere in `e2e/`.
 
@@ -126,7 +126,7 @@
 
 **Prerequisite**: T003 (fixture file exists).
 
-- [ ] T020 Create fixtures README documenting each row's purpose, the coverage matrix, format-change instructions, and the "hand-curated only" warning `apps/backlog-navigator/e2e/fixtures/README.md`
+- [x] T020 Create fixtures README documenting each row's purpose, the coverage matrix, format-change instructions, and the "hand-curated only" warning `apps/backlog-navigator/e2e/fixtures/README.md`
 
 **Checkpoint**: README exists alongside the fixture; it documents all 12 rows and the coverage invariants (one per workflow state, one per category).
 
@@ -138,8 +138,8 @@
 
 **Prerequisite**: All Phase 2–4 tasks complete (so the refactor is done and we can verify no collateral damage).
 
-- [ ] T021 Verify `liveBacklog.roundtrip.test.ts` is unmodified: confirm it references `../../../../../BACKLOG.md` (not the fixture path) — `grep "BACKLOG" apps/backlog-navigator/src/parser/__tests__/liveBacklog.roundtrip.test.ts`
-- [ ] T022 Run Vitest unit tests: `cd apps/backlog-navigator && pnpm test` — `liveBacklog.roundtrip.test.ts` passes with the live `BACKLOG.md`
+- [x] T021 Verify `liveBacklog.roundtrip.test.ts` is unmodified: confirm it references `../../../../../BACKLOG.md` (not the fixture path) — `grep "BACKLOG" apps/backlog-navigator/src/parser/__tests__/liveBacklog.roundtrip.test.ts`
+- [x] T022 Run Vitest unit tests: `cd apps/backlog-navigator && pnpm test` — `liveBacklog.roundtrip.test.ts` passes with the live `BACKLOG.md`
 
 **Checkpoint**: Vitest passes; round-trip gate reads live file; no fixture reference appears in the source of that test.
 
@@ -151,24 +151,24 @@
 
 ### Final Verification
 
-- [ ] T023 Run `task verify` (lint + typecheck + test) and confirm all steps pass
-- [ ] T024 Confirm SC-005 one more time on the clean state: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/` — must return zero results `specs/245-navigator-e2e-fixture/evidence/validation-output.txt`
+- [x] T023 Run `task verify` (lint + typecheck + test) and confirm all steps pass
+- [x] T024 Confirm SC-005 one more time on the clean state: `grep -r "BACKLOG\.md" apps/backlog-navigator/e2e/` — must return zero results `specs/245-navigator-e2e-fixture/evidence/validation-output.txt`
 
 ### Evidence Collection
 
-- [ ] T025 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/245-navigator-e2e-fixture/evidence/test-summary.md`
+- [x] T025 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/245-navigator-e2e-fixture/evidence/test-summary.md`
 
   YAML front matter must include: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body must include: Playwright pass counts (by project: desktop / mobile), Vitest pass counts, key scenarios verified.
 
-- [ ] T026 Create usage demonstration showing before/after grep output (confirms no BACKLOG.md references in e2e/) and a sample `mockGithubBacklogFetch` call from the new shared helper `specs/245-navigator-e2e-fixture/evidence/usage-example.md`
+- [x] T026 Create usage demonstration showing before/after grep output (confirms no BACKLOG.md references in e2e/) and a sample `mockGithubBacklogFetch` call from the new shared helper `specs/245-navigator-e2e-fixture/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T027 Create feature blog post using cached opener from `evidence/opening-context.md` (copy Hook, What We're Building, How It Fits, Key Decisions verbatim; write By the Numbers from test-summary.md) `specs/245-navigator-e2e-fixture/media/shipped-post.md`
+- [x] T027 Create feature blog post using cached opener from `evidence/opening-context.md` (copy Hook, What We're Building, How It Fits, Key Decisions verbatim; write By the Numbers from test-summary.md) `specs/245-navigator-e2e-fixture/media/shipped-post.md`
 
 ### PR Creation
 
-- [ ] T028 Create PR and publish blog: run `/speckit.pr`
+- [x] T028 Create PR and publish blog: run `/speckit.pr`
 
 **Task T028 must run last. It depends on all evidence and media tasks being complete.**
 
