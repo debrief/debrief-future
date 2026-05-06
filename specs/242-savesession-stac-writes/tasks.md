@@ -40,9 +40,9 @@
 
 **Independent Test**: `pnpm --filter @debrief/stac-writer typecheck` passes; `pnpm -r typecheck` fails (expected — adaptors not yet updated).
 
-- [ ] T001 Add `WritePlotThumbnailPairInput` and `WritePlotThumbnailPairResult` types to the interface module `shared/stac-writer/src/interface.ts`
-- [ ] T002 Add `writePlotThumbnailPair(input: WritePlotThumbnailPairInput): Promise<WritePlotThumbnailPairResult>` method to the `StacWriter` interface `shared/stac-writer/src/interface.ts`
-- [ ] T003 [test] Confirm `pnpm --filter @debrief/stac-writer typecheck` passes; note expected downstream failures in commit message `shared/stac-writer/`
+- [x] T001 Add `WritePlotThumbnailPairInput` and `WritePlotThumbnailPairResult` types to the interface module `shared/stac-writer/src/interface.ts`
+- [x] T002 Add `writePlotThumbnailPair(input: WritePlotThumbnailPairInput): Promise<WritePlotThumbnailPairResult>` method to the `StacWriter` interface `shared/stac-writer/src/interface.ts`
+- [x] T003 [test] Confirm `pnpm --filter @debrief/stac-writer typecheck` passes; note expected downstream failures in commit message `shared/stac-writer/`
 
 ## Phase 2: VS Code Adaptor Implementation (Story 1 + Story 2)
 
@@ -50,14 +50,14 @@
 
 **Independent Test**: `pnpm --filter @debrief/vscode test` passes; `stacWriterFs.writePlotThumbnailPair.test.ts` covers all 5 error paths.
 
-- [ ] T004 Move `multihashSha256()` private helper from `plotThumbnailWriter.ts` into `stacWriterFs.ts` (module-level, unexported) `apps/vscode/src/services/stacWriterFs.ts`
-- [ ] T005 [P] Move `isoNowUtc()` private helper from `plotThumbnailWriter.ts` into `stacWriterFs.ts` (module-level, unexported) `apps/vscode/src/services/stacWriterFs.ts`
-- [ ] T006 Implement `writePlotThumbnailPair()` in the `createStacWriterFs` factory: pathGuard → base64 decode → atomicWriteSync PNGs → read/mutate/write item.json with title + proj:shape + file:size + file:checksum + thumbnail-sm removal + properties.updated `apps/vscode/src/services/stacWriterFs.ts`
-- [ ] T007 [test] Write happy-path test: files written, item.json assets correct shape (title, proj:shape, file:size, file:checksum), thumbnail-sm removed, properties.updated refreshed `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
-- [ ] T008 [P][test] Write `'empty-png'` test: zero-length large or small base64 payload throws `StacWriterError('empty-png')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
-- [ ] T009 [P][test] Write `'stac-item-not-found'` test: missing `item.json` throws `StacWriterError('stac-item-not-found')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
-- [ ] T010 [P][test] Write `'item-json-malformed'` test: corrupt `item.json` throws `StacWriterError('item-json-malformed')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
-- [ ] T011 [P][test] Write `'write-failed'` test: stubbed `atomicWriteSync` throws → `StacWriterError('write-failed')` propagated `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
+- [x] T004 Move `multihashSha256()` private helper from `plotThumbnailWriter.ts` into `stacWriterFs.ts` (module-level, unexported) `apps/vscode/src/services/stacWriterFs.ts`
+- [x] T005 [P] Move `isoNowUtc()` private helper from `plotThumbnailWriter.ts` into `stacWriterFs.ts` (module-level, unexported) `apps/vscode/src/services/stacWriterFs.ts`
+- [x] T006 Implement `writePlotThumbnailPair()` in the `createStacWriterFs` factory: pathGuard → base64 decode → atomicWriteSync PNGs → read/mutate/write item.json with title + proj:shape + file:size + file:checksum + thumbnail-sm removal + properties.updated `apps/vscode/src/services/stacWriterFs.ts`
+- [x] T007 [test] Write happy-path test: files written, item.json assets correct shape (title, proj:shape, file:size, file:checksum), thumbnail-sm removed, properties.updated refreshed `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
+- [x] T008 [P][test] Write `'empty-png'` test: zero-length large or small base64 payload throws `StacWriterError('empty-png')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
+- [x] T009 [P][test] Write `'stac-item-not-found'` test: missing `item.json` throws `StacWriterError('stac-item-not-found')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
+- [x] T010 [P][test] Write `'item-json-malformed'` test: corrupt `item.json` throws `StacWriterError('item-json-malformed')` `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
+- [x] T011 [P][test] Write `'write-failed'` test: stubbed `atomicWriteSync` throws → `StacWriterError('write-failed')` propagated `apps/vscode/tests/unit/stacWriterFs.writePlotThumbnailPair.test.ts`
 
 ## Phase 3: Web-Shell Adaptor Stub (Story 1)
 
@@ -65,8 +65,8 @@
 
 **Independent Test**: `pnpm --filter @debrief/web-shell test` passes; stub test asserts the throw.
 
-- [ ] T012 Add `writePlotThumbnailPair()` to `stacWriterIdb.ts` throwing `StacWriterError('validation-failed', 'writePlotThumbnailPair is not supported in the web-shell host')` `apps/web-shell/src/services/stacWriterIdb.ts`
-- [ ] T013 [test] Write unit test asserting `writePlotThumbnailPair()` throws `StacWriterError` with kind `'validation-failed'` `apps/web-shell/src/services/__tests__/stacWriterIdb.writePlotThumbnailPair.test.ts`
+- [x] T012 Add `writePlotThumbnailPair()` to `stacWriterIdb.ts` throwing `StacWriterError('validation-failed', 'writePlotThumbnailPair is not supported in the web-shell host')` `apps/web-shell/src/services/stacWriterIdb.ts`
+- [x] T013 [test] Write unit test asserting `writePlotThumbnailPair()` throws `StacWriterError` with kind `'validation-failed'` `apps/web-shell/src/services/__tests__/stacWriterIdb.writePlotThumbnailPair.test.ts`
 
 ## Phase 4: saveSession.ts Migration (Story 1 + Story 2)
 
@@ -74,13 +74,13 @@
 
 **Independent Test**: `pnpm -r typecheck` passes; `saveSession.createSaveSessionCommand.test.ts` passes with mock writer; `grep -r 'plotThumbnailWriter' apps/` is empty.
 
-- [ ] T014 Add `getStacWriter?: (storePath: string) => StacWriter` optional parameter to `createSaveSessionCommand()` signature `apps/vscode/src/commands/saveSession.ts`
-- [ ] T015 Replace `writePlotThumbnails(...)` call inside `storeThumbnails()` with `await getStacWriter(storePath).writePlotThumbnailPair({ ctx, stacItemPath: ..., largePngBase64, smallPngBase64 })` `apps/vscode/src/commands/saveSession.ts`
-- [ ] T016 Fix `catch` block around thumbnail capture: catch `StacWriterError` → `vscode.window.showErrorMessage(err.message)`; other errors remain `console.warn` (non-blocking capture failures) `apps/vscode/src/commands/saveSession.ts`
-- [ ] T017 Pass `getStacWriter` factory to `createSaveSessionCommand()` in the command registry: `(storePath) => createStacWriterFs({ storePath, stacService })` (`stacService` already in scope at line ~421) `apps/vscode/src/commands/index.ts`
-- [ ] T018 Delete `plotThumbnailWriter.ts` shim `apps/vscode/src/services/plotThumbnailWriter.ts`
-- [ ] T019 [test] Write mock-writer injection test: mock `getStacWriter` returns spy; mock `mapPanel.requestThumbnailCapture()` returns base64 payloads; assert spy called with correct args `apps/vscode/tests/unit/saveSession.createSaveSessionCommand.test.ts`
-- [ ] T020 [P][test] Write error-surface test: mock writer's `writePlotThumbnailPair` throws `StacWriterError`; assert `vscode.window.showErrorMessage()` called (not swallowed) `apps/vscode/tests/unit/saveSession.createSaveSessionCommand.test.ts`
+- [x] T014 Add `getStacWriter?: (storePath: string) => StacWriter` optional parameter to `createSaveSessionCommand()` signature `apps/vscode/src/commands/saveSession.ts`
+- [x] T015 Replace `writePlotThumbnails(...)` call inside `storeThumbnails()` with `await getStacWriter(storePath).writePlotThumbnailPair({ ctx, stacItemPath: ..., largePngBase64, smallPngBase64 })` `apps/vscode/src/commands/saveSession.ts`
+- [x] T016 Fix `catch` block around thumbnail capture: catch `StacWriterError` → `vscode.window.showErrorMessage(err.message)`; other errors remain `console.warn` (non-blocking capture failures) `apps/vscode/src/commands/saveSession.ts`
+- [x] T017 Pass `getStacWriter` factory to `createSaveSessionCommand()` in the command registry: `(storePath) => createStacWriterFs({ storePath, stacService })` (`stacService` already in scope at line ~421) `apps/vscode/src/commands/index.ts`
+- [x] T018 Delete `plotThumbnailWriter.ts` shim `apps/vscode/src/services/plotThumbnailWriter.ts`
+- [x] T019 [test] Write mock-writer injection test: mock `getStacWriter` returns spy; mock `mapPanel.requestThumbnailCapture()` returns base64 payloads; assert spy called with correct args `apps/vscode/tests/unit/saveSession.createSaveSessionCommand.test.ts`
+- [x] T020 [P][test] Write error-surface test: mock writer's `writePlotThumbnailPair` throws `StacWriterError`; assert `vscode.window.showErrorMessage()` called (not swallowed) `apps/vscode/tests/unit/saveSession.createSaveSessionCommand.test.ts`
 
 ## Phase 5: CI Gate + Catalog Parity (Story 3)
 
@@ -88,26 +88,26 @@
 
 **Independent Test**: `task verify` exits 0.
 
-- [ ] T021 Run `pnpm -r typecheck` and confirm zero type errors across all packages
-- [ ] T022 [P] Run `pnpm --filter '!@debrief/web-shell' test` — all Vitest unit tests pass (new stacWriterFs + saveSession + stacWriterIdb test suites included)
-- [ ] T023 [P] Run existing golden-fixture comparison: confirm SC-002 — no fixture updates required `apps/vscode/tests/`
-- [ ] T024 Run `task verify` full CI gate (lint + typecheck + test); confirm exit 0
+- [x] T021 Run `pnpm -r typecheck` and confirm zero type errors across all packages
+- [x] T022 [P] Run `pnpm --filter '!@debrief/web-shell' test` — all Vitest unit tests pass (new stacWriterFs + saveSession + stacWriterIdb test suites included)
+- [x] T023 [P] Run existing golden-fixture comparison: confirm SC-002 — no fixture updates required `apps/vscode/tests/`
+- [x] T024 Run `task verify` full CI gate (lint + typecheck + test); confirm exit 0
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 ### Evidence Collection
 
-- [ ] T025 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/242-savesession-stac-writes/evidence/test-summary.md`
-- [ ] T026 Create usage demonstration: TypeScript snippet showing `createSaveSessionCommand()` receiving the `getStacWriter` factory + annotated call-site in `commands/index.ts` `specs/242-savesession-stac-writes/evidence/usage-example.md`
-- [ ] T027 [P] Create integration-flow document: Before/After Mermaid sequence diagram (extension → shim → fs vs extension → StacWriter → stacWriterFs → fs) + prose summary of service boundary enforcement `specs/242-savesession-stac-writes/evidence/integration-flow.md`
+- [x] T025 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/242-savesession-stac-writes/evidence/test-summary.md`
+- [x] T026 Create usage demonstration: TypeScript snippet showing `createSaveSessionCommand()` receiving the `getStacWriter` factory + annotated call-site in `commands/index.ts` `specs/242-savesession-stac-writes/evidence/usage-example.md`
+- [x] T027 [P] Create integration-flow document: Before/After Mermaid sequence diagram (extension → shim → fs vs extension → StacWriter → stacWriterFs → fs) + prose summary of service boundary enforcement `specs/242-savesession-stac-writes/evidence/integration-flow.md`
 
 ### Media Content
 
-- [ ] T028 Create feature blog post using Content Specialist (reads `evidence/opening-context.md` verbatim for the first three sections; adds By the Numbers, Lessons Learned, What's Next from evidence) `specs/242-savesession-stac-writes/media/shipped-post.md`
+- [x] T028 Create feature blog post using Content Specialist (reads `evidence/opening-context.md` verbatim for the first three sections; adds By the Numbers, Lessons Learned, What's Next from evidence) `specs/242-savesession-stac-writes/media/shipped-post.md`
 
 ### PR Creation
 
-- [ ] T029 Create PR and publish blog: run /speckit.pr
+- [x] T029 Create PR and publish blog: run /speckit.pr
 
 **Task T029 must run last. It depends on all evidence and media tasks being complete.**
 
