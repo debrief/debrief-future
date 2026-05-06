@@ -1,0 +1,49 @@
+# SC-005 validation — zero local BACKLOG.md reads in apps/backlog-navigator/e2e/
+
+## Command
+
+```sh
+cd apps/backlog-navigator
+grep -rn "readFileSync.*BACKLOG\|join.*BACKLOG\.md" e2e/
+```
+
+## Output
+
+(empty — zero matches)
+
+## Wider sweep — any reference to `BACKLOG.md` in `e2e/`
+
+```sh
+grep -rn "BACKLOG\.md" e2e/
+```
+
+```
+e2e/realWrite.spec.ts:21:    await page.route('https://api.github.com/**/contents/BACKLOG.md*', async (route) => {
+e2e/realWrite.spec.ts:29:            content: { sha: 'newfilesha', path: 'BACKLOG.md' },
+e2e/realWrite.spec.ts:111:    const apiCalls = calls.filter((c) => !c.includes('contents/BACKLOG.md?ref=')); // exclude initial read
+e2e/realWrite.spec.ts:114:    expect(apiCalls.some((c) => c.startsWith('PUT') && c.includes('/contents/BACKLOG.md'))).toBe(
+e2e/prMode.spec.ts:2: * PR-mode E2E. `?pr=NNN` loads BACKLOG.md from the PR's head branch and
+e2e/prMode.spec.ts:10:  test('loads BACKLOG.md from the PR head branch and surfaces the PR-mode banner', async ({
+e2e/prMode.spec.ts:35:    await page.route('https://api.github.com/**/contents/BACKLOG.md*', async (route) => {
+e2e/helpers/mock-github.ts:14: * never depends on the live BACKLOG.md state.
+e2e/helpers/mock-github.ts:31:    path: 'BACKLOG.md',
+e2e/helpers/mock-github.ts:33:  await page.route('https://api.github.com/**/contents/BACKLOG.md*', async (route) => {
+e2e/fixtures/backlog-fixture.md:5:data so the E2E suite is decoupled from the live `BACKLOG.md` (see #245).
+e2e/fixtures/backlog-fixture.md:43:This fixture is hand-curated. Do not regenerate from the live `BACKLOG.md`.
+```
+
+All matches are either:
+
+- **The GitHub Contents API URL pattern** (`api.github.com/**/contents/BACKLOG.md*`)
+  — the navigator's runtime fetch target; the helper / specs intercept this
+  via `page.route()` and serve the fixture in response. None of these are
+  filesystem reads.
+- **Comments / docstrings** referencing `BACKLOG.md` to explain context.
+- **The fixture file's own banner** explaining why the fixture exists.
+- **The shared helper module** (`e2e/helpers/mock-github.ts`) which is the
+  *only* place that reads from disk — and it reads the **fixture**, not
+  the live `BACKLOG.md`.
+
+SC-005 is satisfied: zero E2E spec file reads `../../../BACKLOG.md` (or
+the deeper `../../../../BACKLOG.md` for the mobile specs). The earlier
+`grep "readFileSync.*BACKLOG"` gives the cleanest single-line proof.
