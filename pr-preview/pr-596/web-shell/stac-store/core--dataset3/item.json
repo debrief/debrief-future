@@ -1,0 +1,165 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--dataset3",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Dataset3",
+    "datetime": "2016-10-10T12:00:00+00:00",
+    "description": "Saxon Warrior: Dataset3 \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Portland.",
+    "start_datetime": "2016-10-10T12:00:00+00:00",
+    "end_datetime": "2016-10-12T10:20:56+00:00",
+    "debrief:platforms": [
+      {
+        "id": "DATA_THREE",
+        "name": "HMS Portland",
+        "nationality": "GB",
+        "vessel_class": "surface/warship/frigate/fremm",
+        "domain": "surface",
+        "vessel_type": "fremm",
+        "vessel_role": "frigate"
+      }
+    ],
+    "debrief:tags": [
+      "AAW",
+      "MCM",
+      "force-protection",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Dataset3 (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/Dataset3.rep",
+      "title": "Dataset3.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Dataset3": {
+      "href": "./assets/Dataset3.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Dataset3.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/Dataset3.rep",
+        "load_timestamp": "2026-04-13T23:12:31.752905Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.752Z",
+      "file:size": 1373139,
+      "file:checksum": "1220dc7915891273aac46d356b46a1e1075595e412b3b60adb7c96e0a60de80cdf50"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 3321,
+      "file:checksum": "1220e3e73816532cecae2931555012c4b55f4c4175a1a7dd8c431e226a6748a82ec0"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 9781,
+      "file:checksum": "12203ee6f49190aa5b56af27b8e1ff6289174d521f3597ef6afbf9878d0156079f7a"
+    }
+  }
+}

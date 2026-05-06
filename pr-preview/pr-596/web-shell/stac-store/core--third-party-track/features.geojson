@@ -1,0 +1,138 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "284c1779-9c84-4487-8d66-8750d21d869b",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            51.40026944444444,
+            27.425486111111113
+          ],
+          [
+            51.402169444444446,
+            27.422622222222223
+          ],
+          [
+            51.40407222222222,
+            27.419755555555557
+          ],
+          [
+            51.405975,
+            27.416891666666668
+          ],
+          [
+            51.407875,
+            27.414025
+          ],
+          [
+            51.40977777777778,
+            27.41116111111111
+          ],
+          [
+            51.411680555555556,
+            27.408294444444444
+          ],
+          [
+            51.413580555555555,
+            27.405430555555554
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "TP_Track",
+        "platform_name": "TP_Track",
+        "track_type": "CONTACT",
+        "start_time": "1970-01-03T01:44:25+00:00",
+        "end_time": "1970-01-03T01:51:25+00:00",
+        "positions": [
+          {
+            "time": "1970-01-03T01:44:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:45:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:46:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:47:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:48:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:49:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:50:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1970-01-03T01:51:25+00:00",
+            "course": 149.3,
+            "speed": 12.0,
+            "depth": 0.0
+          }
+        ],
+        "style": {
+          "line": {
+            "color": "#00FF00"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#00FF00",
+            "color": "#00FF00"
+          }
+        },
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "f51b7aa2-9eb0-4980-9c8b-d7d28179bb9a",
+            "timestamp": "2026-04-13T23:12:33.788748Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "284c1779-9c84-4487-8d66-8750d21d869b"
+            ],
+            "execution_duration": "PT0.000155S"
+          }
+        ]
+      }
+    }
+  ]
+}
