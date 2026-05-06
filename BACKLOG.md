@@ -156,6 +156,10 @@ Description formats:
 - New items from /idea: [Short title](github_issue_url) — links to detailed requirement
 - When specified: [Title](docs/specs/feature-name/spec.md) — links to spec
 - When complete: entire row gets ~~strikethrough~~
+
+⚠️  COLUMN STRUCTURE: If you add, remove, or reorder columns in this table,
+    update apps/backlog-navigator/e2e/fixtures/backlog-fixture.md to match.
+    Routine row additions and status changes do NOT require fixture updates.
 -->
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status | Epic | Created | Updated |
