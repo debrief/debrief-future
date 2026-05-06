@@ -222,11 +222,24 @@ describe('StacService.updateItemMetadata', () => {
   });
 
   it('T028: read-only filesystem throws ReadOnlyFilesystemError', async () => {
-    // Make the item's parent directory read-only so the temp write fails with
-    // EACCES. chmod on the item.json itself does NOT block temp creation in
-    // its parent; we need to lock the parent directory.
-    const parent = path.dirname(itemFull);
-    fs.chmodSync(parent, 0o555);
+    // Force the atomic temp-write to fail with EACCES. We can't rely on
+    // `chmod 0o555` of the parent directory because privileged runners
+    // (root, CAP_DAC_OVERRIDE) bypass DAC permission checks and write
+    // anyway — see #594. Mocking the underlying syscall is portable and
+    // exercises the same `isReadOnlyFsError` branch.
+    const realWriteFileSync = fs.writeFileSync;
+    const wrappedWriteFileSync = ((p: fs.PathOrFileDescriptor, ...rest: unknown[]) => {
+      // Only intercept the temp file the service writes next to item.json;
+      // everything else (e.g. test fixtures) keeps real semantics.
+      if (typeof p === 'string' && p.startsWith(`${itemFull}.`) && p.endsWith('.tmp')) {
+        const err = new Error('EACCES: permission denied') as NodeJS.ErrnoException;
+        err.code = 'EACCES';
+        throw err;
+      }
+      return (realWriteFileSync as (...args: unknown[]) => void)(p, ...rest);
+    }) as typeof fs.writeFileSync;
+    (fs as unknown as { writeFileSync: typeof fs.writeFileSync }).writeFileSync =
+      wrappedWriteFileSync;
 
     try {
       await expect(
@@ -243,7 +256,8 @@ describe('StacService.updateItemMetadata', () => {
         }),
       ).rejects.toBeInstanceOf(ReadOnlyFilesystemError);
     } finally {
-      fs.chmodSync(parent, 0o755);
+      (fs as unknown as { writeFileSync: typeof fs.writeFileSync }).writeFileSync =
+        realWriteFileSync;
     }
   });
 });
