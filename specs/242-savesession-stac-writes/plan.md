@@ -76,8 +76,9 @@ apps/
 
 # Tests
 apps/vscode/tests/unit/
-├── stacWriterFs.writePlotThumbnailPair.test.ts  ← NEW
-└── saveSession.storeFeatureCollection.test.ts    ← UPDATE
+├── stacWriterFs.writePlotThumbnailPair.test.ts  ← NEW (5 test cases)
+├── saveSession.createSaveSessionCommand.test.ts  ← NEW (mock StacWriter injection + error surface)
+└── saveSession.storeFeatureCollection.test.ts    ← unchanged
 
 apps/web-shell/src/services/__tests__/
 └── stacWriterIdb.writePlotThumbnailPair.test.ts ← NEW
@@ -102,17 +103,26 @@ apps/web-shell/src/services/__tests__/
 
 ### Phase 2 — VS Code Adaptor Implementation
 
-**Deliverable**: `stacWriterFs.ts:writePlotThumbnailPair()` implemented with the logic moved verbatim from `plotThumbnailWriter.ts`.
+**Deliverable**: `stacWriterFs.ts:writePlotThumbnailPair()` implemented with the logic from `plotThumbnailWriter.ts`, adapted to use `stacWriterFs.ts` conventions.
 
-**Key logic** (identical to shim, per research.md §8):
+**Key logic**:
 1. `pathGuard('writePlotThumbnailPair.stacItemPath', input.stacItemPath)`
-2. Decode base64 → `Buffer`; throw `'empty-png'` if zero-length
-3. Write `thumbnail.png` (small) + `overview.png` (large) atomically
-4. Read `item.json`; drop `thumbnail-sm` key; update `thumbnail` + `overview` asset entries with spec-241 shape
-5. Update `properties.updated`; write `item.json`
+2. Decode base64 → `Buffer`; throw `StacWriterError('empty-png', ...)` if zero-length (for either buffer)
+3. Write `thumbnail.png` (small) + `overview.png` (large) using **`atomicWriteSync()`** (not `fs.writeFileSync` — the shim was non-atomic; the adaptor must use its own atomic helper)
+4. Read `item.json` via `parseJsonObject()`; drop `thumbnail-sm` key; update `thumbnail` + `overview` asset entries with spec-241 shape including `title`, `proj:shape`, `file:size`, `file:checksum`
+5. Update `properties.updated`; write `item.json` via `atomicWriteSync()`
 6. Return `{ thumbnailPath, overviewPath }`
 
-**Multihash**: reuse existing `multihashSha256` helper already present in `stacWriterFs.ts`.
+**Helper migration**: `multihashSha256()` and `isoNowUtc()` are private to `plotThumbnailWriter.ts`. Move both as private module-level helpers into `stacWriterFs.ts` alongside the existing `atomicWriteSync`, `parseJsonObject` private helpers. Do not export them.
+
+**Asset `title` fields** (parity with shim): `thumbnail` asset → `title: 'Plot thumbnail (200x150)'`; `overview` asset → `title: 'Plot overview (800x600)'`.
+
+**Test cases for `stacWriterFs.writePlotThumbnailPair.test.ts`** (explicit):
+- Happy path: files written, item.json updated with correct asset shape, `thumbnail-sm` removed, `properties.updated` refreshed
+- `'empty-png'`: zero-length large or small payload throws
+- `'stac-item-not-found'`: missing `item.json` throws
+- `'item-json-malformed'`: corrupt `item.json` throws
+- `'write-failed'`: fs write error mapped correctly
 
 **Acceptance**: `pnpm --filter @debrief/vscode test` passes (new unit test + existing tests).
 
@@ -130,14 +140,35 @@ apps/web-shell/src/services/__tests__/
 
 **Deliverable**: `saveSession.ts` calls `writer.writePlotThumbnailPair()` instead of `writePlotThumbnails()`. `plotThumbnailWriter.ts` deleted.
 
-**Injection pattern**: `createSaveSessionCommand()` receives `stacWriter: StacWriter` alongside existing params. The extension activation code (which already constructs `stacWriterFs`) passes it in.
+**Injection pattern** (review decision 3A): `createSaveSessionCommand()` gains a new parameter:
 
-**Error handling**: `StacWriterError` caught → `vscode.window.showErrorMessage()` with the error message (same pattern as other writer-call failures in the extension).
+```typescript
+getStacWriter?: (storePath: string) => StacWriter
+```
+
+In `commands/index.ts`, pass:
+
+```typescript
+(storePath) => createStacWriterFs({ storePath, stacService })
+```
+
+`stacService` is already in scope at the registration site (line ~421). This matches the existing `getStorePath` factory pattern and handles the dynamic-store-path requirement cleanly.
+
+**Note**: `createStacWriterFs` is currently defined in `stacWriterFs.ts` but **never instantiated** in the VS Code app. This phase creates the first live instance.
+
+**Error handling**: The current `catch (err) { console.warn(...) }` block around thumbnail capture (lines 183–192) silently swallows errors — an Article I.3 violation. Replace with: catch `StacWriterError` → `vscode.window.showErrorMessage(err.message)`. Other errors remain `console.warn` (capture failures that are non-blocking by design).
+
+**New test** (`saveSession.createSaveSessionCommand.test.ts`):
+- Pass a mock `getStacWriter` returning a mock `StacWriter` with a spy on `writePlotThumbnailPair`
+- Mock `mapPanel.requestThumbnailCapture()` returning base64 payloads
+- Assert `writePlotThumbnailPair` was called with the correct `stacItemPath` + base64 args
+- Assert `StacWriterError` thrown by the mock → `vscode.window.showErrorMessage()` called (not swallowed)
 
 **Acceptance**:
 - `pnpm -r typecheck` passes
 - `grep -r 'plotThumbnailWriter' apps/` returns no matches
-- Updated `saveSession.storeFeatureCollection.test.ts` passes
+- `saveSession.createSaveSessionCommand.test.ts` passes (new)
+- Existing `saveSession.storeFeatureCollection.test.ts` continues to pass (no change needed)
 
 ---
 

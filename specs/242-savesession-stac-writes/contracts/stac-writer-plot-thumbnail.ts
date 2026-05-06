@@ -66,6 +66,7 @@ export interface StacWriterWithPlotThumbnail extends StacWriter {
 export interface PlotThumbnailAsset {
   readonly href: './thumbnail.png';
   readonly type: 'image/png';
+  readonly title: 'Plot thumbnail (200x150)';
   readonly roles: ['thumbnail'];
   readonly 'proj:shape': [150, 200]; // [height, width]
   readonly 'file:size': number;
@@ -75,6 +76,7 @@ export interface PlotThumbnailAsset {
 export interface PlotOverviewAsset {
   readonly href: './overview.png';
   readonly type: 'image/png';
+  readonly title: 'Plot overview (800x600)';
   readonly roles: ['overview'];
   readonly 'proj:shape': [600, 800]; // [height, width]
   readonly 'file:size': number;

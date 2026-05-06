@@ -28,6 +28,7 @@ The existing `item.json` on disk. After `writePlotThumbnailPair` completes, the 
 {
   "href": "./thumbnail.png",
   "type": "image/png",
+  "title": "Plot thumbnail (200x150)",
   "roles": ["thumbnail"],
   "proj:shape": [150, 200],
   "file:size": <bytes>,
@@ -40,6 +41,7 @@ The existing `item.json` on disk. After `writePlotThumbnailPair` completes, the 
 {
   "href": "./overview.png",
   "type": "image/png",
+  "title": "Plot overview (800x600)",
   "roles": ["overview"],
   "proj:shape": [600, 800],
   "file:size": <bytes>,
