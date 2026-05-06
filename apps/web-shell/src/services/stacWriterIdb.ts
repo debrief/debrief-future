@@ -53,6 +53,8 @@ import type {
   WriteAssetResult,
   WriteItemInput,
   WriteItemResult,
+  WritePlotThumbnailPairInput,
+  WritePlotThumbnailPairResult,
   WriteSceneThumbnailPairInput,
   WriteSceneThumbnailPairResult,
 } from '@debrief/stac-writer';
@@ -626,6 +628,16 @@ export async function createStacWriterIdb(
         largePath: largeHref,
         smallPath: smallHref,
       };
+    },
+
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this stub throws synchronously at the boundary.
+    async writePlotThumbnailPair(
+      _input: WritePlotThumbnailPairInput,
+    ): Promise<WritePlotThumbnailPairResult> {
+      throw new StacWriterError(
+        'validation-failed',
+        'writePlotThumbnailPair is not supported in the web-shell host',
+      );
     },
 
     async deleteItem(input: DeleteItemInput): Promise<DeleteItemResult> {

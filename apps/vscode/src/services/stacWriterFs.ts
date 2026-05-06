@@ -40,6 +40,8 @@ import type {
   WriteAssetResult,
   WriteItemInput,
   WriteItemResult,
+  WritePlotThumbnailPairInput,
+  WritePlotThumbnailPairResult,
   WriteSceneThumbnailPairInput,
   WriteSceneThumbnailPairResult,
 } from '@debrief/stac-writer';
@@ -140,6 +142,96 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
       } catch (cause) {
         throw mapThumbnailError(cause, input.stacItemPath);
       }
+    },
+
+    // eslint-disable-next-line @typescript-eslint/require-await -- StacWriter interface mandates Promise return; this adaptor wraps synchronous Node fs.
+    async writePlotThumbnailPair(
+      input: WritePlotThumbnailPairInput,
+    ): Promise<WritePlotThumbnailPairResult> {
+      pathGuard('writePlotThumbnailPair.stacItemPath', input.stacItemPath);
+
+      const smallBuffer = Buffer.from(input.smallPngBase64, 'base64');
+      const largeBuffer = Buffer.from(input.largePngBase64, 'base64');
+      if (smallBuffer.byteLength === 0) {
+        throw new StacWriterError(
+          'empty-png',
+          'writePlotThumbnailPair: smallPngBase64 decoded to zero bytes',
+          { path: input.stacItemPath },
+        );
+      }
+      if (largeBuffer.byteLength === 0) {
+        throw new StacWriterError(
+          'empty-png',
+          'writePlotThumbnailPair: largePngBase64 decoded to zero bytes',
+          { path: input.stacItemPath },
+        );
+      }
+
+      const itemJsonPath = path.join(storePath, input.stacItemPath);
+      const itemDir = path.dirname(itemJsonPath);
+      if (!fs.existsSync(itemJsonPath)) {
+        throw new StacWriterError(
+          'stac-item-not-found',
+          `writePlotThumbnailPair: item.json not found at ${itemJsonPath}`,
+          { path: input.stacItemPath },
+        );
+      }
+
+      const smallPath = path.join(itemDir, 'thumbnail.png');
+      const largePath = path.join(itemDir, 'overview.png');
+      atomicWriteSync(smallPath, smallBuffer);
+      atomicWriteSync(largePath, largeBuffer);
+
+      let item: Record<string, unknown>;
+      try {
+        const raw = fs.readFileSync(itemJsonPath, 'utf8');
+        item = parseJsonObject(raw, 'writePlotThumbnailPair', input.stacItemPath);
+      } catch (cause) {
+        if (cause instanceof StacWriterError) {throw cause;}
+        throw new StacWriterError(
+          'item-json-malformed',
+          `writePlotThumbnailPair: item.json unreadable at ${itemJsonPath}`,
+          { path: input.stacItemPath, cause },
+        );
+      }
+
+      const existingAssets = asPlainObject(item.assets) ?? {};
+      const assets: Record<string, unknown> = { ...existingAssets };
+      // Drop legacy spec-241 key — idempotent on fresh items.
+      delete assets['thumbnail-sm'];
+      assets['thumbnail'] = {
+        href: './thumbnail.png',
+        type: 'image/png',
+        title: 'Plot thumbnail (200x150)',
+        roles: ['thumbnail'],
+        'proj:shape': [150, 200],
+        'file:size': smallBuffer.byteLength,
+        'file:checksum': multihashSha256(smallBuffer),
+      };
+      assets['overview'] = {
+        href: './overview.png',
+        type: 'image/png',
+        title: 'Plot overview (800x600)',
+        roles: ['overview'],
+        'proj:shape': [600, 800],
+        'file:size': largeBuffer.byteLength,
+        'file:checksum': multihashSha256(largeBuffer),
+      };
+      item.assets = assets;
+
+      const properties = asPlainObject(item.properties) ?? {};
+      if (typeof properties['created'] !== 'string') {
+        properties['created'] = isoNowUtc();
+      }
+      properties['updated'] = isoNowUtc();
+      item.properties = properties;
+
+      atomicWriteSync(itemJsonPath, `${JSON.stringify(item, null, 2)}\n`);
+
+      return {
+        thumbnailPath: path.relative(storePath, smallPath),
+        overviewPath: path.relative(storePath, largePath),
+      };
     },
 
     async patchItem(input: PatchItemInput): Promise<PatchItemResult> {
@@ -466,6 +558,21 @@ function atomicWriteSync(target: string, data: Uint8Array | string): void {
       { path: target, cause },
     );
   }
+}
+
+/**
+ * Multihash-encoded SHA-256 of `buffer`. Returns the hex string
+ * `<varint algo=0x12><varint length=0x20><32-byte digest>`, matching the
+ * Python helper `multihash_sha256_bytes` in
+ * `services/stac/src/debrief_stac/_helpers.py`.
+ */
+function multihashSha256(buffer: Buffer): string {
+  const digest = crypto.createHash('sha256').update(buffer).digest();
+  return `1220${digest.toString('hex')}`;
+}
+
+function isoNowUtc(): string {
+  return new Date().toISOString();
 }
 
 function isReadOnlyFsError(cause: unknown): boolean {

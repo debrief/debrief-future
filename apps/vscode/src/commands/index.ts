@@ -38,6 +38,7 @@ import { createUndoCommand, createRedoCommand } from './undoRedo';
 import { createSaveSessionCommand } from './saveSession';
 import { createDeleteSelectionCommand } from './deleteSelection';
 import { createOpenCatalogOverviewCommand } from './openCatalogOverview';
+import { createStacWriterFs } from '../services/stacWriterFs';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -418,10 +419,17 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.saveSession',
-      createSaveSessionCommand(sessionManager, (storeId) => {
-        const store = configService.getStore(storeId);
-        return store?.path;
-      }, getMapPanel)
+      createSaveSessionCommand(
+        sessionManager,
+        (storeId) => {
+          const store = configService.getStore(storeId);
+          return store?.path;
+        },
+        getMapPanel,
+        // Spec 242 — saveSession routes thumbnail writes through the
+        // host-agnostic StacWriter boundary (Article IV.1 closure).
+        (storePath) => createStacWriterFs({ storePath, stacService }),
+      )
     )
   );
 
