@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/processing/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "core--gapstesttrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.8919782,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1585009
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.8919782,
+    5.1585009,
+    30.9332722,
+    5.1943915
+  ],
+  "properties": {
+    "title": "Saxon Warrior: Gapstesttrack",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Saxon Warrior: Gapstesttrack \u2014 Royal Navy training exercise in the English Channel / Western Approaches. 1 platform track(s) recorded including HMS Roosevelt.",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00",
+    "debrief:platforms": [
+      {
+        "id": "MAYO",
+        "name": "HMS Roosevelt",
+        "nationality": "GB",
+        "vessel_class": "subsurface/submarine/ssn/trafalgar",
+        "domain": "subsurface",
+        "vessel_type": "trafalgar",
+        "vessel_role": "ssn"
+      }
+    ],
+    "debrief:tags": [
+      "ASW",
+      "harbour-ops",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "prosecution",
+      "visual-sighting"
+    ],
+    "created": "2026-04-21T16:52:45.000Z",
+    "updated": "2026-05-02T08:43:29.281Z",
+    "license": "other",
+    "providers": [
+      {
+        "name": "Debrief",
+        "roles": [
+          "producer",
+          "host"
+        ],
+        "url": "https://debrief.info"
+      }
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "GapsTestTrack (core)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-regen-4x2tftum/GapsTestTrack.dpf",
+      "title": "GapsTestTrack.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-GapsTestTrack": {
+      "href": "./assets/GapsTestTrack.dpf",
+      "type": "application/octet-stream",
+      "title": "GapsTestTrack.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-regen-4x2tftum/GapsTestTrack.dpf",
+        "load_timestamp": "2026-04-13T23:12:31.861993Z",
+        "tool_version": "0.1.0"
+      },
+      "processing:software": {
+        "debrief-stac": "0.1.0"
+      },
+      "processing:datetime": "2026-04-13T23:12:31.861Z",
+      "file:size": 187298,
+      "file:checksum": "122002d45be69eb9acf8514b2fd635b3eb57feb66ce618d65adacd60262f13db66d7"
+    },
+    "thumbnail": {
+      "href": "./thumbnail.png",
+      "type": "image/png",
+      "title": "Plot thumbnail (200x150)",
+      "roles": [
+        "thumbnail"
+      ],
+      "proj:shape": [
+        150,
+        200
+      ],
+      "file:size": 12265,
+      "file:checksum": "122027355a5c42c358f4ab214dfe003b30a2e7eb4242f99b7aa2fcb14f52940c057e"
+    },
+    "overview": {
+      "href": "./overview.png",
+      "type": "image/png",
+      "title": "Plot overview (800x600)",
+      "roles": [
+        "overview"
+      ],
+      "proj:shape": [
+        600,
+        800
+      ],
+      "file:size": 46440,
+      "file:checksum": "1220ed705a4955e6e6c4440da22d090ed3991d698721b730ff860a4740bd5190942e"
+    }
+  }
+}
