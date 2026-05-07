@@ -268,4 +268,3 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 ## Recent Changes
 - 246-hooks-workspace-package: Added TypeScript 5.x (strict mode, per Article XV); React 18.x peer dependency. + React 18.x (peer only). devDeps: `typescript ^5.3.0`, `vitest ^1.0.0`, `jsdom ^24.0.0`, `@testing-library/react ^14.0.0`, `@types/react ^18.2.0`, ESLint + `@typescript-eslint/*` matching the rest of the monorepo. No new runtime deps anywhere in the repo.
 - 242-savesession-stac-writes: Added TypeScript 5.x (strict mode) + `@debrief/stac-writer` (writer interface/types), Node.js `node:crypto` + `node:fs/promises` (stacWriterFs adaptor)
-- 244-navigator-mobile-pwa: Added TypeScript 5.x (strict mode mandatory per Article XV)
