@@ -4,7 +4,7 @@ title: "Building Active-Storyboard Selection Persistence"
 date: 2026-05-07
 track: [credibility]
 author: Ian
-reading_time: 4
+reading_time: 6
 tags: [tracer-bullet, storyboarding, schema, vscode, web-shell]
 excerpt: "Reopen a multi-storyboard plot and you land back on the Storyboard you were working on, not whichever one was edited most recently."
 ---
@@ -35,13 +35,13 @@ The selection lives **inside the plot file itself**, as a `SystemState` GeoJSON 
 
 ## Screenshots
 
-Before — first open of a plot that's never been pinned. The panel shows `getActiveStoryboardDefault()`'s pick (the most-recently-modified Storyboard), exactly as today:
-
 ![Storyboard side rail header dropdown showing the default-fallback selection on a plot with no SystemState pin](../evidence/screenshots/before-default-fallback.png)
 
-After — same plot, after the analyst pinned a different Storyboard from the dropdown, closed it, and reopened it. The header lands on the pinned entry; the Scene list reflects it. No banner, no "restored" affordance — silence is the success state:
+*Before — first open of a plot that's never been pinned. The panel shows `getActiveStoryboardDefault()`'s pick (the most-recently-modified Storyboard), exactly as today.*
 
 ![Same plot reopened, side rail header now showing the persisted Storyboard selection with its Scene list](../evidence/screenshots/after-restored-selection.png)
+
+*After — same plot, after the analyst pinned a different Storyboard, closed it, and reopened it. The header lands on the pinned entry; the Scene list reflects it. No banner, no "restored" affordance — silence is the success state.*
 
 ## By the Numbers
 
@@ -53,24 +53,23 @@ After — same plot, after the analyst pinned a different Storyboard from the dr
 | Playwright E2E (US1 happy-path + US2 single-Storyboard guard) | 2 |
 | New schema fixture (`system-state-active-storyboard-01.json`) | 1 |
 | Existing schema fixtures regressed | 0 / 802 |
-| Total tests passing | 4577 / 4582 |
 | New runtime dependencies | 0 |
 
-The schema change is strictly additive — one enum value, one optional slot — so the existing 802 LinkML / Pydantic / round-trip / golden-fixture cases pass unchanged. The new fixture exercises the new variant on its own.
+The schema change is strictly additive — one enum value, one optional slot — so the existing 802 LinkML / Pydantic / round-trip / golden-fixture cases pass unchanged.
 
 ## Lessons Learned
 
-**The `SystemState` LinkML pattern was already there, defined but unconsumed.** When we first sketched the persistence layer we reached for the obvious tools — `@debrief/config` on VS Code, `localStorage` in the browser — and built a per-host adapter abstraction with a conformance suite around it. Then `/speckit.review` pointed at `shared/schemas/src/linkml/geojson.yaml` and asked the question that should have come first: where does `temporal` viewport state live today? It turned out the `SystemState` Feature class had been schema-defined since the earliest LinkML work, with permitted variants for `temporal`, `spatial`, and `selection`, and exactly zero runtime clients in production code. The active-Storyboard pin became its first. The lesson is uncomfortably cheap: grep the schema source before designing a new persistence backend.
+**The `SystemState` LinkML pattern was already there, defined but unconsumed.** Our first sketch reached for the obvious tools — `@debrief/config` on VS Code, `localStorage` in the browser — and built a per-host adapter abstraction around them. Then `/speckit.review` pointed at `shared/schemas/src/linkml/geojson.yaml` and asked where `temporal` viewport state lives today. The `SystemState` class had been schema-defined since the earliest LinkML work, with permitted variants for `temporal`, `spatial`, and `selection`, and zero runtime clients in production code. The active-Storyboard pin became its first. Lesson: grep the schema source before designing a new persistence backend.
 
-**Pure helpers + existing pipeline beats a new abstraction.** The previous draft introduced an `ActiveStoryboardSelectionStore` interface, two host adaptors implementing it, an ESLint exception for direct `localStorage` access, and a conformance test suite to keep the two implementations honest. Path D needed none of that — three pure functions on the FeatureCollection plus the `@debrief/stac-writer` pipeline that #236 / #242 already deliver. Every line of adapter scaffolding the previous draft proposed is a line that didn't get written, and the writer-boundary invariant (Article IV.4) is satisfied by reuse rather than by a new ESLint allowlist entry.
+**Pure helpers + existing pipeline beats a new abstraction.** The previous draft proposed an `ActiveStoryboardSelectionStore` interface, two host adaptors, an ESLint exception for direct `localStorage` access, and a conformance suite to keep the implementations honest. Path D needed none of it — three pure functions on the FeatureCollection plus the `@debrief/stac-writer` pipeline that #236 / #242 already deliver. The writer-boundary invariant (Article IV.4) is satisfied by reuse, not by a new allowlist entry.
 
-**Make state-pin acts inert in the provenance chain.** The first instinct on writing through the edit pipeline was to record a provenance entry, since every other Feature mutation does. We caught it in `data-model.md` and pinned it as FR-014: pinning the active Storyboard is a state-pin act, not a content edit. Treating it like one would have polluted plot diffs with selection churn that has nothing to do with the data. The `SystemState` feature has its own optional `provenance` slot in the schema; we leave it empty.
+**State-pin acts don't belong in the provenance chain.** First instinct was to record a provenance entry on every pin write, since other Feature mutations do. FR-014 pulled it back: pinning a view is a state-pin act, not a content edit, and treating it like one would pollute plot diffs with UI-state churn. The `SystemState` feature has its own optional `provenance` slot in the schema; we leave it empty.
 
 ## What's Next
 
 Two follow-ups already in the backlog:
 
-- **#249 — unify session-state with the `SystemState` pattern.** Now there's a runtime consumer of `SystemState`, the `@debrief/session-state` store can fold its `temporal` / `spatial` / `selection` slices into the same in-plot persistence path. The current Zustand-backed split was always a placeholder; the pattern was waiting for a proof point.
-- **#251 — per-user-within-shared-plot view memory.** Path D is deliberately per-plot SHARED. If a real workflow asks for "remember *my* last view of this plot, separately from the team's", that warrants the user-identity model the project doesn't yet have. Backlogged for separate evaluation rather than retrofitted into this feature.
+- **#249 — unify session-state with the `SystemState` pattern.** Now there's a runtime consumer of `SystemState`, the `@debrief/session-state` store can fold its `temporal` / `spatial` / `selection` slices into the same in-plot persistence path. The Zustand-backed split was always a placeholder; the pattern was waiting for a proof point.
+- **#251 — per-user-within-shared-plot view memory.** Path D is deliberately per-plot SHARED. If a workflow asks for "remember *my* last view of this plot, separately from the team's", that warrants a user-identity model the project doesn't yet have. Backlogged for separate evaluation rather than retrofitted here.
 
 → [See spec 237](https://github.com/debrief/debrief-future/tree/main/specs/237-active-storyboard-persistence)
