@@ -22,6 +22,8 @@ export type {
   WriteAssetResult,
   WriteItemInput,
   WriteItemResult,
+  WritePlotThumbnailPairInput,
+  WritePlotThumbnailPairResult,
   WriteSceneThumbnailPairInput,
   WriteSceneThumbnailPairResult,
 } from './interface.js';

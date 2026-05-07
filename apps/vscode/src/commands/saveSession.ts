@@ -14,10 +14,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { saveSession, type SessionStoreWithUndo } from '@debrief/session-state';
 import type { DebriefFeature } from '@debrief/components';
+import type { StacWriter } from '@debrief/stac-writer';
+import { StacWriterError } from '@debrief/stac-writer';
 import type { SessionManager } from '../services/sessionManager';
 import type { MapPanel } from '../webview/mapPanel';
 import { parseStacUri } from '../types/stac';
-import { writePlotThumbnails } from '../services/plotThumbnailWriter';
 
 /**
  * Derive a session file path from a plot URI.
@@ -69,28 +70,27 @@ export function storeFeatureCollection(
 }
 
 /**
- * Write plot thumbnails by delegating to the typed plotThumbnailWriter shim.
+ * Write plot thumbnails by delegating to the host-agnostic StacWriter.
  *
- * Spec 241 (review decision 1B) — moves the actual file write + item.json
- * mutation behind a typed surface so the VS Code extension stays out of
- * STAC-shape decisions. The shim still runs in the extension process today;
- * follow-up #242 promotes it to a fully service-mediated path
- * (Article IV.1 closure).
+ * Spec 242 closure of Article IV.1 — saveSession is a frontend command, so
+ * it must orchestrate persistence through the writer interface rather than
+ * touching the filesystem itself. The earlier (spec 241) `plotThumbnailWriter.ts`
+ * shim has been deleted; the FS-backed adaptor (`stacWriterFs`) now owns the
+ * write path and produces the spec-241 STAC 1.1 shape authoritatively.
  */
-function storeThumbnails(
-  storePath: string,
+async function storeThumbnails(
+  writer: StacWriter,
   plotUri: string,
   largePngBase64: string,
   smallPngBase64: string,
-): void {
+): Promise<void> {
   const parsed = parseStacUri(plotUri);
   if (!parsed) {
     return;
   }
-
-  writePlotThumbnails({
-    storePath,
-    itemPath: parsed.itemPath,
+  await writer.writePlotThumbnailPair({
+    ctx: { kind: 'fs', nowMs: () => Date.now(), randomId: () => '' },
+    stacItemPath: parsed.itemPath,
     largePngBase64,
     smallPngBase64,
   });
@@ -102,12 +102,14 @@ function storeThumbnails(
  * @param sessionManager - The session manager service
  * @param getStorePath - Function to get the store path for a store ID
  * @param getMapPanel - Function to get the current MapPanel (for thumbnail capture)
+ * @param getStacWriter - Factory returning a StacWriter for the supplied store path
  * @returns The command handler function
  */
 export function createSaveSessionCommand(
   sessionManager: SessionManager,
   getStorePath: (storeId: string) => string | undefined,
   getMapPanel?: () => MapPanel | undefined,
+  getStacWriter?: (storePath: string) => StacWriter,
 ): () => Promise<void> {
   return async () => {
     const session = sessionManager.getActiveSession();
@@ -180,14 +182,23 @@ export function createSaveSessionCommand(
       }
 
       // Capture thumbnails after successful save (#174)
-      if (mapPanel && parsed && storePath) {
+      if (mapPanel && parsed && storePath && getStacWriter) {
         try {
           const { largePngBase64, smallPngBase64 } = await mapPanel.requestThumbnailCapture(5000);
           if (largePngBase64 && smallPngBase64) {
-            storeThumbnails(storePath, plotUri, largePngBase64, smallPngBase64);
+            const writer = getStacWriter(storePath);
+            await storeThumbnails(writer, plotUri, largePngBase64, smallPngBase64);
           }
         } catch (err) {
-          console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
+          // Article I.3 — service-write failures must surface; capture
+          // failures (non-StacWriterError) remain best-effort.
+          if (err instanceof StacWriterError) {
+            void vscode.window.showErrorMessage(
+              `Thumbnail save failed: ${err.message}`,
+            );
+          } else {
+            console.warn('[debrief] Thumbnail capture failed (non-blocking):', err);
+          }
         }
       }
     } else {
