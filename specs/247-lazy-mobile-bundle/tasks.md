@@ -33,8 +33,8 @@
 - [x] T304 Run `task verify` (lint + typecheck + tests). All steps must pass.
 - [x] T305 Run Playwright suite via `cd apps/backlog-navigator && node run-playwright.mjs lazy-mobile-chunk` and capture the skeleton screenshot to `specs/247-lazy-mobile-bundle/evidence/screenshots/`.
 - [x] T306 Capture evidence: `specs/247-lazy-mobile-bundle/evidence/test-summary.md` (using `.specify/templates/evidence/test-summary-template.md`), `evidence/usage-example.md` (cold-mobile-load + bundle-guard transcript), `evidence/bundle-measurements.md` (pre/post entry-chunk gzipped numbers, drop %).
-- [ ] T307 Create feature blog post in `specs/247-lazy-mobile-bundle/media/shipped-post.md` via the Content Specialist agent, reusing the verbatim opener from `evidence/opening-context.md`.
-- [ ] T308 Commit work in two coherent commits — (a) bundle-guard contract change + new test fixtures, (b) lazy split + tests + evidence + post — and push to the branch.
+- [x] T307 Create feature blog post in `specs/247-lazy-mobile-bundle/media/shipped-post.md` via the Content Specialist agent, reusing the verbatim opener from `evidence/opening-context.md`.
+- [x] T308 Commit work in two coherent commits — (a) bundle-guard contract change + new test fixtures, (b) lazy split + tests + evidence + post — and push to the branch.
 - [ ] T309 Create PR + publish blog: run /speckit.pr
 
 ---
