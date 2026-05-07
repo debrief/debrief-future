@@ -190,7 +190,7 @@ US3 is structurally satisfied by Path D — the SystemState feature lives in eac
 
 ### PR Creation
 
-- [ ] T030 Create the PR and publish the blog post by running `/speckit.pr`. The command opens the feature PR in `debrief/debrief-future` (with the spec dir, evidence, and media all linked) and the cross-repo PR in `debrief/debrief.github.io` publishing `media/shipped-post.md`. Returns both PR URLs
+- [x] T030 Create the PR and publish the blog post by running `/speckit.pr`. The command opens the feature PR in `debrief/debrief-future` (with the spec dir, evidence, and media all linked) and the cross-repo PR in `debrief/debrief.github.io` publishing `media/shipped-post.md`. Returns both PR URLs
 
 **Task T030 must run last. It depends on every preceding task — every test passing, every evidence file written, and the feature post in place.**
 
