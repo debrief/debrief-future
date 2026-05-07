@@ -19,6 +19,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@test-data': path.resolve(__dirname, '../vscode/test-data'),
+      // #237 — alias the @debrief/components import to its source so unit
+      // tests don't load the bundled dist (which transitively pulls in
+      // leaflet / react-dom and breaks Node ESM resolution under jsdom).
+      // The pure helpers (storyboard/activeStoryboardSelection) work
+      // directly from source; runtime in the browser uses the bundle.
+      '@debrief/components': path.resolve(
+        __dirname,
+        '../../shared/components/src/index.ts',
+      ),
     },
   },
 });

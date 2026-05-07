@@ -622,7 +622,7 @@ classes:
         required: true
         equals_string: "SYSTEM"
       state_type:
-        description: Discriminator for state variant (temporal, spatial, selection)
+        description: Discriminator for state variant (temporal, spatial, selection, active_storyboard)
         range: SystemStateTypeEnum
         required: true
       # Temporal viewport fields (when state_type = temporal)
@@ -649,6 +649,10 @@ classes:
         description: Array of selected feature IDs - for selection state
         range: string
         multivalued: true
+      # Active-storyboard fields (when state_type = active_storyboard)
+      active_storyboard_id:
+        description: Storyboard properties.id the analyst last pinned for this plot (#237)
+        range: string
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry

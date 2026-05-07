@@ -20,11 +20,13 @@ import {
   renameStoryboard as crudRenameStoryboard,
   deleteStoryboard as crudDeleteStoryboard,
   detectMissingDataForScene,
+  getActiveStoryboardSelection,
   getMostRecentlyModifiedStoryboard,
   getScene,
   isSceneFeature,
   isStoryboardFeature,
   listScenesOrdered,
+  setActiveStoryboardSelection,
   validatePlot,
   type MissingDataClassification,
   type StoryboardPlot,
@@ -263,6 +265,32 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
     const active = getMostRecentlyModifiedStoryboard(plot);
     state.activeStoryboardId = active?.properties.id ?? null;
+
+    // #237 — restore the analyst's last-pinned active Storyboard from the
+    // in-plot SystemState feature, falling back to the default when the
+    // persisted ID is stale (Storyboard deleted in another session).
+    const persisted = getActiveStoryboardSelection(plot);
+    if (persisted !== null) {
+      const stillExists = plot.features.some(
+        (f) => isStoryboardFeature(f) && f.properties.id === persisted,
+      );
+      if (stillExists) {
+        state.activeStoryboardId = persisted;
+      } else if (state.activeStoryboardId !== null) {
+        // V-2 self-heal — overwrite the stale entry with the new default
+        // through the existing plot-edit pipeline. No banner, no toast.
+        const healed = setActiveStoryboardSelection(
+          plot,
+          state.activeStoryboardId,
+        );
+        this.mapPanel.setFeatures(featuresFromPlot(healed));
+      } else {
+        // No surviving Storyboards — clear the stale entry.
+        const healed = setActiveStoryboardSelection(plot, null);
+        this.mapPanel.setFeatures(featuresFromPlot(healed));
+      }
+    }
+
     this.recomputeSceneOrder(state, plot);
     this.applyScrubbableRange(state, plot);
     this.updateStoryboardActiveContext(state);
@@ -366,6 +394,25 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (state.activeStoryboardId === storyboardId) {return;}
     state.activeStoryboardId = storyboardId;
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
+
+    // #237 — persist the override through the existing plot-edit pipeline
+    // so the SystemState feature is written into the plot's
+    // FeatureCollection. Wrapped in try/catch as belt-and-braces; the
+    // helper is pure but the pipeline can fail (#236 / #242 failure UX).
+    try {
+      const persisted = setActiveStoryboardSelection(plot, storyboardId);
+      this.mapPanel.setFeatures(featuresFromPlot(persisted));
+      const persistedPlot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
+      this.recomputeSceneOrder(state, persistedPlot);
+      this.applyScrubbableRange(state, persistedPlot);
+      this.updateStoryboardActiveContext(state);
+      this.pushSceneRectangles(state, persistedPlot);
+      this.emitSnapshot(state, persistedPlot);
+      return;
+    } catch (err) {
+      this.showErrorMessage(err instanceof Error ? err.message : String(err));
+    }
+
     this.recomputeSceneOrder(state, plot);
     this.applyScrubbableRange(state, plot);
     this.updateStoryboardActiveContext(state);
