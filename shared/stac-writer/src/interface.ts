@@ -119,6 +119,22 @@ export interface WriteSceneThumbnailPairResult {
   readonly smallPath: string;
 }
 
+export interface WritePlotThumbnailPairInput {
+  readonly ctx: StoreContext;
+  /** Item path relative to the catalog root (e.g. `core--boat1/item.json`). */
+  readonly stacItemPath: string;
+  /** Base64-encoded PNG bytes for the 800x600 overview. */
+  readonly largePngBase64: string;
+  /** Base64-encoded PNG bytes for the 200x150 thumbnail. */
+  readonly smallPngBase64: string;
+}
+export interface WritePlotThumbnailPairResult {
+  /** Catalog-relative path of the written thumbnail PNG. */
+  readonly thumbnailPath: string;
+  /** Catalog-relative path of the written overview PNG. */
+  readonly overviewPath: string;
+}
+
 export interface DeleteItemInput {
   readonly ctx: StoreContext;
   readonly itemPath: string;
@@ -146,6 +162,9 @@ export interface StacWriter {
   writeSceneThumbnailPair(
     input: WriteSceneThumbnailPairInput,
   ): Promise<WriteSceneThumbnailPairResult>;
+  writePlotThumbnailPair(
+    input: WritePlotThumbnailPairInput,
+  ): Promise<WritePlotThumbnailPairResult>;
   deleteItem(input: DeleteItemInput): Promise<DeleteItemResult>;
   deleteAsset(input: DeleteAssetInput): Promise<DeleteAssetResult>;
 }
