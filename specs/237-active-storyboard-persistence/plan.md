@@ -1,52 +1,57 @@
 # Implementation Plan: Active-Storyboard Selection Persistence
 
 **Branch**: `237-active-storyboard-persistence` (work being delivered on `claude/speckit-specify-237-HIO9k`)
-**Date**: 2026-05-06
+**Date**: 2026-05-06 (rewritten 2026-05-07 after `/speckit.review` pivot to Path D)
 **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/237-active-storyboard-persistence/spec.md`
 
 ## Summary
 
-Persist the analyst's active-Storyboard pick per plot, so closing and
-reopening a plot restores the selection instead of falling back to
-`getActiveStoryboardDefault()`. The change is **host-side only**:
+Persist the analyst's active-Storyboard pick **inside the plot file
+itself**, as a `SystemState` GeoJSON Feature in the FeatureCollection.
+Closing and reopening a plot — by any analyst, on any host, on any
+machine that has the plot file — restores the most-recently-pinned
+Storyboard instead of falling back to `getActiveStoryboardDefault()`.
 
-- Each host owns a thin `ActiveStoryboardSelectionStore` adapter behind
-  a shared TypeScript interface in `@debrief/components`. VS Code's
-  adapter wraps `@debrief/config` (Node, XDG-backed). Web-shell's
-  adapter wraps `localStorage` (per-origin, per-browser-install) with
-  one targeted ESLint-rule exception (mirroring the
-  `stacWriterIdb` / `stacWriterCapability` pattern from #236).
-- The store keys by the existing `itemPath` (STAC `item.json` path)
-  that both hosts already thread to identify the open plot. A single
-  preference / `localStorage` entry holds a JSON-string-encoded
-  `{ [itemPath: string]: storyboardId }` map, so the
-  scalar-only `PreferenceValue` constraint in `@debrief/config` is not
-  violated and no schema change is required.
-- The shared `StoryboardPanel` React component is **untouched**.
-  Persistence is wired entirely in the host mount layers
-  (`apps/vscode/src/services/storyboardPlayback.ts` and
-  `apps/web-shell/src/StoryboardPanelMount.tsx`): each host reads the
-  store on plot open to seed the active selection, and writes on
-  every dropdown override.
-- Read failures fall back to `getActiveStoryboardDefault()` (today's
-  behaviour). Write failures degrade to session-only state. Stale
-  selections (Storyboard deleted in another session) self-heal on the
-  next override or fallback. The plot file itself is never touched —
-  zero schema impact, zero provenance impact, zero impact on plots
-  produced by hosts that haven't adopted this feature.
+- **LinkML extends, additively**:
+  `SystemStateTypeEnum` gains `active_storyboard`;
+  `SystemStateProperties` gains an optional `active_storyboard_id`
+  string slot. Both edits are non-breaking; existing plot fixtures
+  still validate.
+- **One pair of helpers in `@debrief/components/storyboard`** —
+  `getActiveStoryboardSelection(plot)` /
+  `setActiveStoryboardSelection(plot, id)` — produce / consume the
+  `SystemState` feature as a pure FeatureCollection transformation.
+  A new `isActiveStoryboardSelection` type-guard mirrors
+  `isStoryboardFeature` / `isSceneFeature`.
+- **Host wiring** in `apps/vscode/src/services/storyboardPlayback.ts`
+  and `apps/web-shell/src/StoryboardPanelMount.tsx` — read on mount
+  via the helper; write on every dropdown override through the
+  existing plot-edit pipeline (`@debrief/stac-writer` from #236 /
+  #242, identical to how Storyboard/Scene CRUD writes are emitted).
+- **No adapter abstraction, no per-host backend, no ESLint
+  exception**. Path D writes through the existing unified writer
+  abstraction (Article IV.4 satisfied by reuse).
+- **Per-plot SHARED semantics**: any analyst opening the plot lands
+  on the most-recently-pinned Storyboard. Per-user-within-shared-plot
+  view memory is explicitly out of scope and tracked as a separate
+  backlog item.
+- Read failures fall back to `getActiveStoryboardDefault()`. Stale
+  IDs (Storyboard deleted in another session) self-heal on the next
+  open via an open-time write through the same pipeline. Plot-save
+  failures inherit the existing `@debrief/stac-writer` failure UX.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x (strict mode mandatory per Article XV) for both hosts and the shared interface; Python 3.11 only insofar as the Python-side `debrief-config` is the current canonical store for desktop preferences (no Python code is added or modified in this feature).
-**Primary Dependencies**: `@debrief/components` (existing — `StoryboardPanel`, `getActiveStoryboardDefault`); `@debrief/config` TypeScript package (existing — `getPreference` / `setPreference` against `~/.config/debrief/config.json`, used by VS Code only); browser `localStorage` for the web-shell adapter. **No new runtime dependencies.**
-**Storage**: VS Code → `~/.config/debrief/config.json` (XDG-equivalent on macOS/Windows) via `@debrief/config`. Web-shell → browser `localStorage`, per-origin, per-browser-install. Neither host writes to the plot file. The two stores do not sync (per FR-008 — cross-host sync is not a requirement).
-**Testing**: Vitest unit tests for each adapter (mocking `@debrief/config` / `localStorage`); React-Testing-Library tests for the `StoryboardPanelMount` host component covering the load-on-mount and write-on-change behaviours; one Playwright E2E (`apps/web-shell/playwright/tests/`) covering the user-visible "open → switch → reload → still-switched" scenario, mirroring the existing storyboard E2E patterns.
-**Target Platform**: VS Code extension host (Node) and web-shell browser PWA (modern Chromium-class browsers, per existing project baseline). The feature must function offline — `@debrief/config` and `localStorage` are local stores, no network involved.
-**Project Type**: Web application — the existing monorepo split (VS Code extension + web-shell + shared components).
-**Performance Goals**: Adapter read on plot-open MUST complete within the same render cycle as a normal plot open (no flash of "loading" or "Storyboard not found" content per SC-004). A single `getPreference` / `localStorage.getItem` call is well below this budget; no new performance work required.
-**Constraints**: Plot files MUST remain byte-identical to today (SC-003). No new ESLint exceptions outside the new web-shell adapter file. No `any`. The shared `StoryboardPanel` interface MUST NOT change (the persistence wiring is host-private).
-**Scale/Scope**: A typical analyst keeps O(10) plots in active rotation; the JSON-encoded map fits comfortably in a single preference value (well under 64 KB). Two host mount layers, one shared interface, two adapter modules, three tests files plus one Playwright spec.
+**Language/Version**: Python 3.11 (LinkML schema source + Pydantic-generated models); TypeScript 5.x strict (helpers + host wiring). No new languages.
+**Primary Dependencies**: `LinkML >= 1.7.0` + `gen-pydantic` / `gen-json-schema` / `gen-typescript` (existing — used to regenerate the derived schema artefacts on schema change); `@debrief/components` (existing — `StoryboardPanel`, `getActiveStoryboardDefault`, `isStoryboardFeature`); `@debrief/stac-writer` (existing — plot-edit pipeline used for all Feature mutations across both hosts since #236 / #242). **No new runtime dependencies.**
+**Storage**: The plot's GeoJSON FeatureCollection (the same file `@debrief/stac-writer` already writes for every Storyboard / Scene CRUD edit). Selection is one Feature in that collection. No per-host store, no `localStorage`, no `@debrief/config`. The plot file IS the cross-host sync layer.
+**Testing**: Existing schema round-trip / golden-fixture suite (one new fixture added — covers the new `SystemState` variant); Vitest unit tests for the three new helpers; service-level test for `storyboardPlayback.ts`'s mount + write paths against an in-memory fake plot; component test for `StoryboardPanelMount.tsx` against a fake plot-edit pipeline; one Playwright E2E covering US1 happy-path + US2 stale fallback (mirrors existing storyboard E2E patterns).
+**Target Platform**: VS Code extension host (Node) and web-shell browser PWA. Both already wired to `@debrief/stac-writer`. Feature must function offline — schema is local, plot files are local, no network involved.
+**Project Type**: Web application — the existing monorepo split (VS Code extension + web-shell + shared components + LinkML schema package).
+**Performance Goals**: Mount-time read is an in-memory walk of `plot.features` (already loaded by the parser). Write is a single Feature upsert routed through the existing plot-edit pipeline — no new I/O characteristic versus today's storyboard CRUD writes. SC-003 ("fallback completes within the same render cycle") trivially satisfied.
+**Constraints**: Schema change MUST be additive (existing fixtures pass without modification); helpers MUST be pure (no I/O — the host owns I/O); no new ESLint exceptions; no `any`; the shared `StoryboardPanel` interface MUST NOT change (the persistence wiring is host-private); plot-edit writes MUST go through `@debrief/stac-writer`, not direct file/Storage calls.
+**Scale/Scope**: One LinkML enum addition + one optional slot addition; three helpers + their unit tests; two host-wiring edits; one Playwright spec; one schema fixture. No `localStorage` adapter, no `@debrief/config` adapter, no shared interface, no ESLint allowlist edit, no conformance suite — all of which the previous draft required.
 
 ## Constitution Check
 
@@ -54,23 +59,25 @@ reopening a plot restores the selection instead of falling back to
 
 | Article | Compliance |
 |---------|-----------|
-| I. Defence-Grade Reliability | ✅ Offline by default — both stores are local. No network. No silent failures: read/write errors fall back to today's ephemeral behaviour and at most write a single non-fatal log entry (FR-012). Reproducibility unaffected — the plot file is unchanged. |
-| II. Schema Integrity | ✅ **No schema change**. The LinkML Storyboard schema is not modified. `StoryboardFeature` gains no `is_active` slot (option (a) is explicitly out of scope). Plot files stay byte-identical (SC-003). |
-| III. Data Sovereignty | ✅ Active-Storyboard selection is per-user UI state, NOT a plot edit. Per FR-014 it does NOT enter the plot's `provenance` chain (so plot diffs stay noise-free, audit logs remain truthful, and one user's UI history never leaks into a shared plot). Source files preserved; data stays local; no telemetry. |
-| IV. Architectural Boundaries | ⚠️ See Complexity Tracking. The web-shell adapter touches `localStorage` directly, which currently triggers `no-direct-persistence-in-frontend`. Justified by treating the new adapter as the per-host write boundary for user-state — same pattern as #236 (`stacWriterIdb` / `stacWriterCapability`), and codified through the same ESLint-exception mechanism. |
-| V. Extensibility | ✅ N/A — feature is internal plumbing; no extension surface affected. |
-| VI. Testing | ✅ Each adapter has unit tests; both host mount layers gain component-level tests; one Playwright E2E covers the user-visible workflow. |
+| I. Defence-Grade Reliability | ✅ Offline by default — the plot file is local; no network. No silent failures: read errors fall back to `getActiveStoryboardDefault()` and at most write a single non-fatal log entry (FR-011). Write errors inherit the existing `@debrief/stac-writer` failure UX (FR-012). Reproducibility unaffected — the plot file is the single source of truth. |
+| II. Schema Integrity | ✅ **Additive LinkML change.** `SystemStateTypeEnum` gains one permitted value; `SystemStateProperties` gains one optional slot. Existing schema round-trip / golden-fixture suite passes without modification. One new fixture exercises the new variant. Article II.1 (LinkML as single source of truth) honoured; Article II.2 (derived-schema adherence tests mandatory on every schema change) honoured by the new fixture + existing infrastructure. |
+| III. Data Sovereignty | ✅ Active-Storyboard selection is a state-pin act, NOT a content edit. Per FR-014 it does NOT enter the plot's `provenance` chain (so plot diffs stay noise-free, audit logs remain truthful, and pin history doesn't leak into plot-level lineage). The `SystemState` feature has its own optional `provenance` slot which this feature leaves empty. Source files preserved; data stays local; no telemetry. |
+| IV. Architectural Boundaries | ✅ **No new direct-storage boundary opened.** All writes route through the existing `@debrief/stac-writer` plot-edit pipeline (already the unified writer abstraction Article IV.4 mandates, in use since #236 / #242). The previous draft's ESLint exception is no longer required and not introduced. |
+| V. Extensibility | ✅ N/A — feature is internal plumbing on the existing `SystemState` pattern. The schema extension itself is generic enough that future "system state" variants can slot in alongside `active_storyboard` without further schema gymnastics. |
+| VI. Testing | ✅ Schema round-trip via the existing infrastructure + one new fixture; helper unit tests; service- and component-level wiring tests; one Playwright E2E covering the user-visible workflow. |
 | VII. Test-Driven AI Collaboration | ✅ Acceptance scenarios in spec.md US1/US2/US3 are the executable spec; this plan ties each scenario to a specific test file and assertion (see quickstart.md §Testing). |
-| VIII. Documentation | ✅ Spec.md exists; plan, research, data-model, contracts, quickstart produced by this command. The single existing line in `specs/235-storyboard-capture-ux/research.md` §8 ("Active-Storyboard selection is session-scoped, not persisted") will be cross-referenced from this spec; #235 is a sibling spec, not amended. |
-| IX. Dependencies | ✅ **Zero new runtime dependencies.** `@debrief/components`, `@debrief/config`, browser `localStorage`, Vitest, Playwright — all already in use. |
-| X. Security | ✅ No secrets stored. Storyboard IDs and item paths are not classified data. `localStorage` is per-origin; no cross-site exposure. |
+| VIII. Documentation | ✅ Spec.md, plan, research, data-model, quickstart all rewritten on the Path D pivot. The pivot itself is recorded inline (each artefact has a "rewritten 2026-05-07 after `/speckit.review` pivot" note). #235 research §8 cross-reference unchanged ("active-Storyboard selection is now persisted per-plot via #237"). |
+| IX. Dependencies | ✅ **Zero new runtime dependencies.** LinkML, `@debrief/components`, `@debrief/stac-writer`, Vitest, Playwright — all already in use. |
+| X. Security | ✅ No secrets stored. Storyboard IDs are not classified data. The plot file is the existing trust boundary; nothing new is exposed. |
 | XI. Internationalisation | ✅ N/A — feature surfaces no new user-facing strings. |
-| XII. Community Engagement | ✅ Public PR, public review, includes a feature blog post (Phase 2 cached opener). |
+| XII. Community Engagement | ✅ Public PR, public review, includes a feature blog post (Phase 6 cached opener already exists from the previous draft and remains valid for Path D — the user-visible workflow is identical). |
 | XIII. Contribution Standards | ✅ Atomic commits, PR review, CI enforcement. |
-| XIV. Pre-Release Freedom | ✅ Pre-v4.0.0; this is a behaviour change with a documented user-visible upgrade path (silent restore on plot open). |
-| XV. Strict Type Safety | ✅ Adapter interface explicitly typed (see `contracts/active-storyboard-selection-store.ts`). All new code in TypeScript strict mode. No `any`. The boundary points (parsing JSON from `localStorage` / `@debrief/config`) validate before use. |
+| XIV. Pre-Release Freedom | ✅ Pre-v4.0.0; this is an additive schema extension with a documented user-visible upgrade path (silent restore on plot open). Older host versions opening a new-format plot file see the new feature gracefully ignored (additive schema, optional slot). |
+| XV. Strict Type Safety | ✅ All new code in TypeScript strict mode. The helpers and type-guards are explicitly typed; the new schema slot is statically typed via gen-typescript. No `any`. The `SystemState` parse boundary is governed by Pydantic / Zod-equivalent generated types. |
 
-**Result**: PASS, with one Article-IV justification recorded in Complexity Tracking. No ERROR conditions.
+**Result**: PASS. **No Complexity Tracking entries** (the previous draft's
+ESLint exception is dropped — Path D doesn't need it). No ERROR
+conditions.
 
 ## Project Structure
 
@@ -79,83 +86,96 @@ reopening a plot restores the selection instead of falling back to
 ```text
 specs/237-active-storyboard-persistence/
 ├── plan.md              # This file
-├── spec.md              # Feature specification (already written)
-├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output
-├── quickstart.md        # Phase 1 output
-├── contracts/
-│   └── active-storyboard-selection-store.ts   # Phase 1 output (typed interface)
+├── spec.md              # Feature specification (rewritten for Path D)
+├── research.md          # Phase 0 output (rewritten for Path D)
+├── data-model.md        # Phase 1 output (rewritten for Path D)
+├── quickstart.md        # Phase 1 output (rewritten for Path D)
 ├── checklists/
-│   └── requirements.md  # Already written by /speckit.specify
+│   └── requirements.md  # Already written by /speckit.specify (still valid — checklist semantics survive the pivot)
 ├── evidence/
-│   └── opening-context.md  # Phase 2 output (cached blog opener)
-└── tasks.md             # Created by /speckit.tasks (NOT created here)
+│   └── opening-context.md  # Phase 6 output (cached blog opener — already created, still valid since the user-visible flow is unchanged)
+└── tasks.md             # Created by /speckit.tasks (rewritten for Path D)
 ```
+
+> **Removed**: `contracts/active-storyboard-selection-store.ts` from
+> the previous draft. Path D does not have an adapter abstraction;
+> the contract surface is the LinkML schema itself, which is the
+> existing project pattern for cross-language data contracts.
 
 ### Source Code (repository root)
 
 ```text
+shared/schemas/src/linkml/
+├── common.yaml                                    # MODIFIED — add `active_storyboard` to
+│                                                    SystemStateTypeEnum permitted values.
+└── geojson.yaml                                   # MODIFIED — add optional
+                                                     `active_storyboard_id: string` to
+                                                     SystemStateProperties.
+
+shared/schemas/src/generated/                      # AUTO-REGENERATED by gen-pydantic /
+                                                     gen-json-schema / gen-typescript on
+                                                     the LinkML edits above. Not hand-edited.
+
+shared/schemas/src/fixtures/                       # MODIFIED — add one new fixture covering
+                                                     a plot with the new `SystemState`
+                                                     feature; existing fixtures still pass
+                                                     without modification (additive change).
+
 shared/components/src/storyboard/
-├── activeStoryboardSelectionStore.ts          # NEW — typed interface + key-encoding
-│                                                helpers; no impl, no React. Re-exported
-│                                                via shared/components/src/storyboard/index.ts.
+├── activeStoryboardSelection.ts                   # NEW — pure helpers:
+│                                                    `isActiveStoryboardSelection(f)`,
+│                                                    `getActiveStoryboardSelection(plot)`,
+│                                                    `setActiveStoryboardSelection(plot, id)`.
+│                                                    No I/O, no React, no host coupling.
+│                                                    Re-exported via the storyboard barrel.
+├── index.ts                                       # MODIFIED — re-export the three helpers.
 └── __tests__/
-    └── activeStoryboardSelectionStore.test.ts # NEW — unit tests for key-encoding /
-                                                JSON-map serialisation helpers.
+    └── activeStoryboardSelection.test.ts          # NEW — Vitest unit tests for all three
+                                                     helpers (V-1 through V-5 invariants).
 
 apps/vscode/src/services/
-├── storyboardPlayback.ts                      # MODIFIED — onPlotOpened reads the store
-│                                                and seeds state.activeStoryboardId
-│                                                BEFORE the default fallback;
-│                                                setActiveStoryboard writes the store.
-├── activeStoryboardSelectionStoreVscode.ts    # NEW — Node adapter wrapping
-│                                                @debrief/config getPreference /
-│                                                setPreference; implements the shared
-│                                                interface.
+├── storyboardPlayback.ts                          # MODIFIED — onPlotOpened reads via
+│                                                    getActiveStoryboardSelection; if stale,
+│                                                    self-heal write through plot-edit
+│                                                    pipeline. setActiveStoryboard writes
+│                                                    via setActiveStoryboardSelection +
+│                                                    plot-edit pipeline.
 └── __tests__/
-    └── activeStoryboardSelectionStoreVscode.test.ts # NEW — Vitest unit tests
-                                                       (mocks @debrief/config).
+    └── storyboardPlayback.persistence.test.ts     # NEW — service-level wiring test against
+                                                     in-memory fake plot + fake edit pipeline.
 
 apps/web-shell/src/
-├── App.tsx                                    # MODIFIED — pass currentPlot.itemPath
-│                                                as a prop to StoryboardPanelMount.
-├── StoryboardPanelMount.tsx                   # MODIFIED — accept itemPath prop;
-│                                                replace useState<null> with a
-│                                                load-from-store hook; write to store
-│                                                in onActiveStoryboardChange.
-└── services/
-    ├── activeStoryboardSelectionStoreWebShell.ts # NEW — localStorage adapter;
-                                                    listed in the ESLint
-                                                    no-restricted-globals exception
-                                                    overrides for `localStorage`.
-    └── __tests__/
-        └── activeStoryboardSelectionStoreWebShell.test.ts # NEW — Vitest unit
-                                                             tests (mocks localStorage).
+├── StoryboardPanelMount.tsx                       # MODIFIED — replace bare useState with a
+│                                                    plot-driven effect that reads via the
+│                                                    helper; in onActiveStoryboardChange,
+│                                                    write via the helper + plot-edit
+│                                                    pipeline.
+└── __tests__/
+    └── StoryboardPanelMount.persistence.test.tsx  # NEW — RTL component test against fake
+                                                     plot + fake edit pipeline.
 
 apps/web-shell/playwright/tests/
-└── active-storyboard-persistence.spec.ts      # NEW — single E2E covering
-                                                US1 happy path + US2 stale fallback.
+└── active-storyboard-persistence.spec.ts          # NEW — single E2E covering US1 happy
+                                                     path + US2 stale fallback.
 
-# ESLint configuration — single targeted edit
-apps/web-shell/eslint.config.js (or root .eslintrc) # MODIFIED — add
-                                                       activeStoryboardSelectionStoreWebShell.ts
-                                                       to the existing localStorage
-                                                       exception list (alongside
-                                                       stacWriterIdb.ts,
-                                                       stacWriterCapability.ts).
+# REMOVED versus the previous draft:
+#   - shared/components/src/storyboard/activeStoryboardSelectionStore.ts (adapter interface)
+#   - apps/vscode/src/services/activeStoryboardSelectionStoreVscode.ts
+#   - apps/web-shell/src/services/activeStoryboardSelectionStoreWebShell.ts
+#   - shared/eslint-rules/no-direct-persistence-in-frontend.cjs MODIFIED entry
+#   - The conformance test suite (no longer two adapter implementations to conform)
 ```
 
-**Structure Decision**: The split mirrors the writer-abstraction pattern
-proven by #236 (STAC writes): a typed interface lives in
-`@debrief/components` (the only place both hosts already share TS
-code), and each host implements its own adapter against its native
-backend. This (a) keeps the shared `StoryboardPanel` component free
-of host-specific persistence assumptions, (b) lets ESLint enforce the
-"no direct persistence outside the adapter" rule machine-wide via a
-single targeted exception, and (c) produces a single point of edit for
-each host's storyboard wiring (`storyboardPlayback.ts` for VS Code,
-`StoryboardPanelMount.tsx` for web-shell) instead of scattering reads
-and writes across the host code.
+**Structure Decision**: The split mirrors the existing storyboard
+helper pattern (`isStoryboardFeature` / `isSceneFeature` /
+`getActiveStoryboardDefault` all live together in
+`shared/components/src/storyboard/`). The helpers are pure; the host
+mount layers own I/O via the existing plot-edit pipeline. This (a)
+keeps the shared `StoryboardPanel` component free of host-specific
+persistence assumptions, (b) reuses the unified writer abstraction
+that Article IV.4 already mandates and #236 / #242 already deliver,
+and (c) puts the new persistence concept in the same file family as
+the type-guards and selection helpers it sits alongside.
 
 ## Media Components
 
@@ -163,7 +183,7 @@ None — backend/infrastructure feature. The user-visible UI from #235
 (side-rail header dropdown) is byte-for-byte unchanged. No new
 component, no new visual state, no new Storybook story is added by
 this feature. Article-XII community engagement is honoured via the
-feature blog post (Phase 2 cached opener) and the standard preview-app
+feature blog post (Phase 6 cached opener) and the standard preview-app
 deployment, neither of which require a Storybook bundle.
 
 ## Storybook E2E Testing
@@ -180,8 +200,8 @@ today.
 
 | Workflow | Panels/Components Involved | Key Selectors | Interactions |
 |----------|---------------------------|---------------|--------------|
-| Active-Storyboard selection persists across plot reload | Catalog picker → MapView → Storyboard side rail (header dropdown + scene list) | `[data-testid="catalog-item-row"]`, `[data-testid="storyboard-active-name"]`, `[data-testid="storyboard-dropdown"]`, `[data-testid="storyboard-option"]`, `[data-testid="storyboard-scene-row"]` | Open plot (≥2 storyboards); read default selection; pick a non-default storyboard from dropdown; reload page; assert dropdown still on the picked storyboard and scene list reflects it |
-| Stale-selection fallback (US2 — optional, gated on test fixture availability) | Same as above, with localStorage seeded to a Storyboard ID not in the fixture plot | Same selectors | Pre-seed `localStorage` with a stale selection ID via `page.addInitScript`; load the plot; assert the panel shows `getActiveStoryboardDefault()`'s pick and renders without an error banner |
+| Active-Storyboard selection persists across plot reload | Catalog picker → MapView → Storyboard side rail (header dropdown + scene list) | `[data-testid="catalog-item-row"]`, `[data-testid="storyboard-active-name"]`, `[data-testid="storyboard-dropdown"]`, `[data-testid="storyboard-option"]`, `[data-testid="storyboard-scene-row"]` | Open plot (≥2 storyboards); read default selection; pick a non-default storyboard from dropdown; reload page; assert dropdown still on the picked storyboard and scene list reflects it. Fixture plot is regenerated through the standard write pipeline so the new `SystemState` feature is naturally produced. |
+| Stale-selection fallback (US2) | Same as above, with the fixture plot's FeatureCollection pre-seeded with a `SystemState` feature whose `active_storyboard_id` is not in the plot | Same selectors | Load the pre-seeded fixture plot; assert the panel shows `getActiveStoryboardDefault()`'s pick and renders without an error banner; reload once more; assert the `SystemState` feature now points at the default Storyboard's ID (self-heal verified by reading the persisted plot via the existing `@debrief/stac-writer` test harness). |
 
 **Testing Strategy**:
 - [x] Workflow runs end-to-end in the web-shell
@@ -195,10 +215,10 @@ today.
 - Local: `pnpm --filter @debrief/web-shell test active-storyboard-persistence`
 
 **Optional — chrome-level VS Code Webview tests**:
-None for this feature. The VS Code path is exercised by Vitest component tests against `storyboardPlayback.ts` plus its existing service-level tests; the user-visible "reopen-on-pinned" behaviour is symmetric with the web-shell E2E and a parallel openvscode-server run would add cost without coverage value.
+None for this feature. The VS Code path is exercised by Vitest service tests against `storyboardPlayback.ts`; the user-visible "reopen-on-pinned" behaviour is symmetric with the web-shell E2E and a parallel openvscode-server run would add cost without coverage value.
 
 ## Complexity Tracking
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| Web-shell adapter touches `localStorage` directly, requiring an exception entry in the existing `no-restricted-globals` ESLint config (alongside `stacWriterIdb.ts` and `stacWriterCapability.ts`) | The web-shell has no ambient access to `@debrief/config` (which is Node-only today). The feature spec explicitly accepts per-host persistence (FR-008) and rejects cross-host sync infrastructure as out-of-scope (Out of Scope §). `localStorage` is the smallest adequate local store for a per-origin browser PWA: it satisfies SC-001 (selection survives reload), SC-005 (per-origin = per-user), and SC-006 (graceful failure when storage is full or disabled). | (a) Mounting `@debrief/config` into the browser would require a Vite-middleware HTTP adaptor to a Node-side config service — that adds a server dependency to the web-shell's static-deploy story (Heroku review apps, future PWA distribution). Out of proportion to the value. (b) Introducing IndexedDB matches the stac-writer choice but is heavier than needed for a single per-plot string and adds Promise-based async I/O where `localStorage`'s sync API matches the panel-mount lifecycle exactly. (c) Skipping the adapter and inlining `localStorage` calls into `StoryboardPanelMount` would scatter the persistence concern and weaken Article-IV.4 — the adapter file is the per-host write boundary. The ESLint exception is a single targeted entry, not a blanket carve-out, and the file is named to match the existing pattern (`*Store*` / `*Adapter*`), making review trivial. |
+*No entries.* Path D introduces no Article-IV.4 violation, no
+ESLint exception, and no architectural carve-out. The previous
+draft's `localStorage` exception is dropped.

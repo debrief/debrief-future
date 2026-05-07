@@ -1,122 +1,214 @@
 # Data Model — Active-Storyboard Selection Persistence
 
 **Feature**: #237
-**Date**: 2026-05-06
+**Date**: 2026-05-06 (rewritten 2026-05-07 after `/speckit.review` pivot to Path D)
 
-This feature introduces no new schema-level entities. The LinkML
-Storyboard schema is unchanged. The "data model" below describes the
-**runtime persistence shape** (what each host adapter writes and reads)
-and the **invariants** that hold across hosts.
+This feature introduces one schema-level entity (a new permitted
+variant of `SystemStateTypeEnum`) and one new optional slot on
+`SystemStateProperties`. Both are additive. The "data model" below
+describes the schema extension, the helper-enforced invariants, and
+the lifecycle of the new entity inside the plot's FeatureCollection.
+
+> **Note on history**: An earlier draft of this document described a
+> per-host JSON-map persistence model (`debrief-config` for VS Code,
+> `localStorage` for web-shell). On `/speckit.review` the user
+> directed in-plot persistence via the existing `SystemState` LinkML
+> pattern. This rewrite replaces the per-host model entirely.
 
 ---
 
-## Persistence Entity: `ActiveStoryboardSelectionMap`
+## Schema entity: `SystemState` feature with `state_type: active_storyboard`
 
-A single per-user, per-host-install JSON object that maps a plot's
-`itemPath` to the analyst's last-selected Storyboard ID for that plot.
+A single GeoJSON Feature inside the plot's FeatureCollection,
+defined by the existing LinkML `SystemState` class with the new
+permitted `state_type` value.
 
-### Logical shape
+### Schema diff
+
+**File**: `shared/schemas/src/linkml/common.yaml`
+
+```yaml
+  SystemStateTypeEnum:
+    description: Discriminator for system state variants
+    permissible_values:
+      temporal:
+        description: Time viewport state (start/end times)
+      spatial:
+        description: Map viewport state (bbox, zoom)
+      selection:
+        description: Feature selection state (selected IDs)
+      active_storyboard:                        # ← NEW
+        description: Per-plot active-Storyboard pin (#237)
+```
+
+**File**: `shared/schemas/src/linkml/geojson.yaml`
+
+```yaml
+  SystemStateProperties:
+    description: Properties for SYSTEM features storing application state
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "SYSTEM"
+      state_type:
+        description: Discriminator for state variant (temporal, spatial, selection, active_storyboard)
+        range: SystemStateTypeEnum
+        required: true
+      # Temporal viewport fields (when state_type = temporal) … unchanged
+      # Spatial viewport fields (when state_type = spatial) … unchanged
+      # Selection state fields (when state_type = selection) … unchanged
+      # Active-storyboard fields (when state_type = active_storyboard)
+      active_storyboard_id:                     # ← NEW
+        description: Storyboard properties.id the analyst last pinned for this plot (#237)
+        range: string
+      provenance:                                # … unchanged
+        …
+```
+
+Both edits are **strictly additive**. Existing fixtures still
+validate. Existing parsers continue to accept all
+currently-valid inputs.
+
+### Logical shape of the runtime feature
 
 ```ts
-type ItemPath = string;        // absolute STAC item.json path
-type StoryboardId = string;    // StoryboardFeature.properties.id
-
-type ActiveStoryboardSelectionMap = Record<ItemPath, StoryboardId>;
+type SystemStateFeature = {
+  type: "Feature";
+  id: "state.activestoryboard";          // matches existing ^state\.[a-z]+$ regex
+  geometry: { type: "Point", coordinates: [] };  // GeoJSONEmptyPoint
+  properties: {
+    kind: "SYSTEM";
+    state_type: "active_storyboard";
+    active_storyboard_id: string;        // the StoryboardFeature.properties.id
+    // (provenance: LogEntry[] is allowed by the schema but always empty for #237 — see FR-014)
+  };
+};
 ```
 
 ### Storage location
 
-| Host | Backend | Container | Container key |
-|------|---------|-----------|---------------|
-| VS Code extension | `@debrief/config` (Node, `~/.config/debrief/config.json` and OS-equivalents) | A single scalar string preference (because `PreferenceValue` is `string \| number \| boolean \| null`) | `activeStoryboardSelections` |
-| Web-shell | Browser `localStorage` (per-origin, per-browser-install) | A single string value | `debrief.activeStoryboardSelections` |
+Inside the plot's GeoJSON FeatureCollection, alongside Storyboard,
+Scene, Track, etc. features. The plot's STAC item points at this
+FeatureCollection via `assets.payload.href` per the existing
+plot-storage convention; the `SystemState` feature is persisted
+through the same `@debrief/stac-writer` pipeline that writes
+every other Feature mutation.
 
-The container value is a JSON-stringified `ActiveStoryboardSelectionMap`.
-The two container locations are **independent** — there is no replication
-or sync layer between them.
-
-### Field reference (logical)
+### Field reference
 
 | Field | Type | Description | Source of truth |
 |-------|------|-------------|-----------------|
-| `<itemPath>` | string (absolute STAC item.json path) | Stable per-plot key. Both hosts already use this same string to identify open plots. | VS Code: `EditSessionManager.resolveStoreContext(documentUri).itemPath`. Web-shell: `App.tsx → currentPlot.itemPath`. |
-| `<itemPath value>` | `StoryboardId` (string) | The `properties.id` of the Storyboard the analyst last selected for this plot. | The `StoryboardFeature.properties.id` field as defined by #215 schema. Stable across edits. |
+| `type` | `"Feature"` | GeoJSON discriminator (existing `SystemState` schema). | Schema constant. |
+| `id` | `"state.activestoryboard"` | Stable Feature ID. Matches the existing `^state\.[a-z]+$` regex on `SystemState.id`. Lowercased + no separator (per regex). | Helper constant. |
+| `geometry` | `GeoJSONEmptyPoint` (`Point` with empty coordinates) | Required by the existing `SystemState` schema for all SYSTEM features. | Schema constant. |
+| `properties.kind` | `"SYSTEM"` | Discriminator. Matches `FeatureKindEnum.SYSTEM`. | Schema constant. |
+| `properties.state_type` | `"active_storyboard"` | Discriminator. The new permitted value introduced by this feature. | Schema permitted value (NEW). |
+| `properties.active_storyboard_id` | `string` (Storyboard `properties.id`, ULID-shaped per #215) | The Storyboard the analyst last pinned for this plot. Optional in the schema; absent on first open. | `StoryboardFeature.properties.id` of the picked Storyboard. |
+| `properties.provenance` | `LogEntry[]` (optional) | Allowed by the existing `SystemStateProperties` schema. **Always empty for #237** per FR-014; any contrib code that populates it is documented as out-of-spec. | (unused — empty on every write). |
 
 ### Validation rules
 
-- **V-1: Map values are validated on read.** When the adapter parses
-  the JSON-stringified map, it MUST guard against:
-  - The container value not being a string (e.g. an old preference
-    of a different type) → treat as empty map.
-  - The string not being valid JSON → treat as empty map; log a single
-    non-fatal warning (FR-012).
-  - The parsed JSON not being a flat object whose every value is a
-    string → treat as empty map; log a single non-fatal warning.
-  Adapter MUST NOT throw to the caller in any of these cases.
-- **V-2: Adapter never returns a value if the recorded Storyboard ID
-  is not present in the plot.** This validation lives in the host
-  mount layer (see lifecycle below), NOT in the adapter — the
-  adapter doesn't know about plots. The host calls
-  `store.get(itemPath)`, then verifies the returned ID is present in
-  `plot.features` via the same iteration the existing
-  `getActiveStoryboardDefault` performs; if it isn't, the host
-  ignores the return value and lets the default fallback take over.
-- **V-3: `set(itemPath, null)` removes the entry.** Adapters MUST
-  treat a `null` second argument as "clear this plot's record",
-  not "store the literal string `'null'`".
+- **V-1 (schema)**: `state_type` MUST be one of the permitted values
+  (`temporal | spatial | selection | active_storyboard`). Enforced by
+  the LinkML-generated Pydantic / JSON Schema / TypeScript types.
+  Caught at parse time.
+- **V-2 (helper, on read)**: `getActiveStoryboardSelection(plot)`
+  returns the `active_storyboard_id` from the matching `SystemState`
+  feature **only if** that ID is the `properties.id` of an
+  `isStoryboardFeature` in `plot.features`. If the recorded ID is
+  not present, the helper returns `null` and signals "stale" to the
+  caller (so the host can self-heal per FR-007). This validation
+  lives in the helper, not the schema, because the schema cannot
+  express cross-feature integrity (LinkML cannot say "this string
+  must be the ID of another feature in the same FeatureCollection").
+- **V-3 (helper, on write — single-entry)**:
+  `setActiveStoryboardSelection(plot, id)` MUST produce a
+  FeatureCollection with **at most one** `SystemState` feature with
+  `state_type: active_storyboard`. If one exists, it is updated in
+  place; otherwise a new one is appended. If, due to upstream
+  corruption, more than one exists, the helper de-duplicates and
+  emits a non-fatal log warning.
+- **V-4 (helper, on null write)**:
+  `setActiveStoryboardSelection(plot, null)` removes the
+  `SystemState` feature with `state_type: active_storyboard` from
+  the FeatureCollection (rather than writing a feature with
+  `active_storyboard_id: null`). Treats null as "clear this plot's
+  pin", parallel to the "set null = remove entry" semantics of the
+  previous draft's adapter contract.
+- **V-5 (helper, on read — defensive de-dup)**: If multiple
+  `SystemState` features with `state_type: active_storyboard` are
+  present (e.g. from concurrent writes that bypassed V-3), the
+  helper returns the `active_storyboard_id` from the first one and
+  emits a non-fatal log warning. The next write through V-3 fixes
+  the FeatureCollection.
 
 ### Lifecycle
 
 | Trigger | Operation | Effect |
 |---------|-----------|--------|
-| Plot opens (host's `onPlotOpened` / `useEffect` on `(itemPath, plot)` change) | `store.get(itemPath)` | Returns `string \| null`. Host validates per V-2; if valid, seeds `state.activeStoryboardId` (VS Code) or `activeOverrideId` (web-shell). If invalid, falls back to `getActiveStoryboardDefault(plot)`. |
-| Analyst picks a different Storyboard from the side-rail dropdown | `store.set(itemPath, storyboardId)` | Persists immediately. No save dialog, no provenance entry, no plot-file write. |
-| Analyst creates a new Storyboard via the side rail and switches to it (existing behaviour from #235) | `store.set(itemPath, newStoryboardId)` (the existing `setActiveOverrideId` post-create call site already triggers this) | Same as the dropdown override path. |
-| The analyst's recorded Storyboard is deleted in another session (V-2 fails on next open) | Host falls back to default; on next override or default-acceptance, the stale record is overwritten or cleared | Self-heals over time. No banner, no toast (FR-007). |
-| Plot file is moved to a new path (`itemPath` changes) | (no operation — the new `itemPath` simply has no record yet) | Analyst sees the default selection on first open at the new path; this is the documented edge-case behaviour from spec §Edge Cases. |
-| Adapter read fails (corrupted file, file lock timeout, browser storage disabled) | Adapter returns `null` and logs once | Host falls back to default. Panel renders normally. |
-| Adapter write fails (disk full, quota exceeded) | Adapter swallows the exception and logs once | Selection stays in memory for the lifetime of the panel mount; next reopen of the same plot reverts to the previous record (or default). |
+| Plot opens (host's `onPlotOpened` / `useEffect` on `plot` change) | `getActiveStoryboardSelection(plot)` | Returns `string \| null`. Host applies V-2; if valid, seeds `state.activeStoryboardId` (VS Code) or `activeOverrideId` (web-shell). If invalid (stale ID), falls back to `getActiveStoryboardDefault(plot)` and queues a self-heal write. |
+| Analyst picks a different Storyboard from the side-rail dropdown | `setActiveStoryboardSelection(plot, storyboardId)` → emit Feature mutation through the host's plot-edit pipeline | The `SystemState` feature is upserted (V-3); the resulting FeatureCollection is persisted via `@debrief/stac-writer`. No save dialog, no provenance entry on the plot, no provenance entry on the `SystemState` feature itself. |
+| Analyst creates a new Storyboard via the side rail and switches to it (existing #235 behaviour) | Same as the dropdown override path. The existing `setActiveOverrideId` post-create call site already triggers this. | Same as the dropdown override path. |
+| The pinned Storyboard is deleted in another session (V-2 fails on next open) | Host falls back to default; the open-time self-heal write upserts the `SystemState` feature with the new default ID. | Self-heals on open. No banner, no toast (FR-007). |
+| Plot file is moved or copied | (no operation — the `SystemState` feature travels with the plot) | The pin "follows" the plot file. New analyst opening the moved plot lands on the previous pin. This is correct per Path D's per-plot semantics. |
+| `SystemState` parse fails or scan throws | Helper returns `null`, host falls back to default | Panel renders normally; one non-fatal log entry. |
+| Plot save fails through `@debrief/stac-writer` | Inherits existing `#236 / #242` failure UX (toast/banner) | Selection held in-memory only; next open reverts to the previously-saved value (or default). |
 
 ### Concurrency
 
-The map is read-modify-written as one container value. Two hosts on
-the same machine writing simultaneously may produce a last-writer-wins
-clobber — accepted per FR-013 / spec edge cases. No locking beyond
-what `@debrief/config` (file lock, atomic rename via temp file) and
-`localStorage` (single-threaded JS within an origin) already provide.
-
-The map is **not** shared between origins or user accounts (V-1 / FR-010
-guarantee independence at the storage-key level). The web-shell
-container key (`debrief.activeStoryboardSelections`) is per-origin,
-per-browser-install; the `@debrief/config` preference is per-user,
-per-machine.
+Two analysts writing to the same plot file simultaneously may
+produce a last-writer-wins clobber on the `SystemState` feature.
+Accepted per FR-013 / spec edge cases. The same concurrency model
+already governs every other Feature edit on the plot — this
+feature does not introduce a new concurrency mode.
 
 ### Sizing assumptions
 
-- A typical analyst has O(10) plots in active rotation at any time.
-- `itemPath` keys are bounded by the OS path-length limit (typically
-  ≤ 4 KB on Linux/macOS; ≤ 260 chars on Windows without long-path
-  support).
-- `StoryboardId` values are short (the existing schema produces
-  ULID-like strings, ~26 chars).
-- A 100-plot map is well under 64 KB — comfortably below `localStorage`
-  per-origin limits (typically 5–10 MB) and far below
-  `@debrief/config`'s atomic-write bandwidth.
+- One `SystemState` feature with `state_type: active_storyboard`
+  per plot (V-3 single-entry invariant).
+- Feature payload is small: `id` ~26 chars (`state.activestoryboard`),
+  empty geometry, three string properties. Total feature footprint
+  comfortably under 200 bytes.
+- No measurable impact on plot file size or load time.
 
 ### What is **not** in this entity
 
 The following are explicitly out of model:
 
-- **Timestamps** (e.g. "when did the analyst last switch?"). The spec
-  doesn't require staleness-based eviction or display, and adding
-  timestamps would inflate the value with no payoff.
-- **History** (e.g. "the previous selection before this one"). Spec
-  Out-of-Scope §: no "clear pin" affordance, no history viewer.
-- **User identity** (e.g. who picked this?). The map is per-user by
-  virtue of its container; recording user identity inside the map
-  would invent multi-user semantics the spec rejects (FR-010).
-- **Provenance** (e.g. an entry in the plot's `provenance` chain).
-  Per FR-014, this feature does not touch plot provenance.
+- **Per-user keying**: The `active_storyboard_id` is per-plot,
+  shared across analysts. Per-user view memory is captured as
+  backlog item #251 for separate evaluation.
+- **History** (e.g. "the previous selection before this one").
+  Spec Out-of-Scope §: no "clear pin" affordance, no history
+  viewer.
+- **Timestamps on the selection itself**. The `SystemState`
+  feature's `provenance` slot exists in the schema but is left
+  empty per FR-014. If this ever matters, a future feature can
+  populate it; today the plot save's mtime (already exposed by
+  `@debrief/stac-writer`) is sufficient context.
+- **Provenance entry on the plot**. Per FR-14, this feature
+  MUST NOT add a provenance entry to the plot's `provenance`
+  chain. Selection pinning is a state-pin act, not a content
+  edit.
+
+---
+
+## Helpers introduced by this feature
+
+Two pure functions on the FeatureCollection plus one type-guard,
+all in `shared/components/src/storyboard/` (the existing home for
+`isStoryboardFeature`, `isSceneFeature`, etc.):
+
+| Function | Signature | Behaviour |
+|---|---|---|
+| `isActiveStoryboardSelection(feature)` | `(f: Feature) => f is SystemStateFeature & { properties: { state_type: "active_storyboard" } }` | Type-guard. Returns true iff `feature.properties.kind === "SYSTEM"` and `feature.properties.state_type === "active_storyboard"`. Mirrors `isStoryboardFeature` / `isSceneFeature`. |
+| `getActiveStoryboardSelection(plot)` | `(plot: FeatureCollection) => string \| null` | Scans `plot.features` for the first `SystemState` feature with `state_type: active_storyboard`; returns its `active_storyboard_id` or `null`. Does **not** validate plot-membership of the recorded ID — that's V-2 in the host. Implements V-5 defensive de-dup logging. |
+| `setActiveStoryboardSelection(plot, id)` | `(plot: FeatureCollection, id: string \| null) => FeatureCollection` | Pure function. Returns a new FeatureCollection with the `SystemState` feature upserted (V-3) or removed (V-4). Caller (host) emits the mutation through the plot-edit pipeline. |
+
+These helpers do NOT touch I/O — they are pure transformations.
+The plot-edit pipeline owns the actual save.
 
 ---
 
@@ -124,24 +216,22 @@ The following are explicitly out of model:
 
 ```
 StoryboardFeature  (#215 LinkML schema, unchanged)
-  └─ properties.id  ◄─────────────────┐
-                                       │ stores
-SceneFeature (#215 LinkML, unchanged)  │ (by ID)
-                                       │
-Plot (a FeatureCollection of the above)│
-  └─ itemPath ─────────────────────────┤
-        ▲                              │
-        │ keys                         │
-        │                              │
-   ActiveStoryboardSelectionMap  ◄─────┘
-   (RUNTIME ONLY — not part of plot file)
-   ├─ host: VS Code → @debrief/config preference
-   └─ host: web-shell → browser localStorage
+  └─ properties.id  ◄──────────────────────────┐
+                                                │ stores
+SceneFeature (#215 LinkML, unchanged)           │ (by ID)
+                                                │
+Plot (a FeatureCollection of features)          │
+  ├─ StoryboardFeature[…]                       │
+  ├─ SceneFeature[…]                            │
+  ├─ TrackFeature[…]                            │
+  ├─ … other data features                      │
+  └─ SystemState[ state_type=active_storyboard ]│
+        └─ properties.active_storyboard_id ─────┘
+   (lives inside the FeatureCollection — travels with the plot file)
 ```
 
-The map references `StoryboardFeature.properties.id` and uses
-`itemPath` as a key; it never embeds copies of either entity. There
-is no foreign-key constraint at the storage layer — V-2 (host-side
-validation against the live plot on every read) is the only integrity
-guarantee, which is correct because the live plot is authoritative
-and the persisted map is hint data.
+The `SystemState` feature references
+`StoryboardFeature.properties.id` and lives in the same
+FeatureCollection. The host validates cross-reference integrity at
+read time (V-2); the helper enforces single-entry semantics at write
+time (V-3 / V-4). The plot file is the single source of truth.
