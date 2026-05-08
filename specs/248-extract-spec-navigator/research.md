@@ -1,10 +1,12 @@
 # Phase 0 Research: Extract spec-navigator into a Standalone Repository
 
 **Feature**: 248-extract-spec-navigator
-**Date**: 2026-05-08
+**Date**: 2026-05-08 (revised post-`/speckit.review`)
 **Inputs**: [spec.md](./spec.md), [docs/extraction-audit/spec-navigator/coupling-inventory.md](../../docs/extraction-audit/spec-navigator/coupling-inventory.md)
 
 This document resolves all technical unknowns surfaced during planning. Every clarification from `/speckit.specify` was already answered (FR-015/016/017); this research records *how* we will execute on those decisions.
+
+The `/speckit.review` pass on 2026-05-08 produced four follow-up decisions (1A, 2A, 3A, 5A) that materially simplify the plan — they're reflected throughout this document.
 
 ---
 
@@ -27,43 +29,57 @@ This document resolves all technical unknowns surfaced during planning. Every cl
 
 ---
 
-## R-002: Configuration seam — design and resolution order
+## R-002: Parameterising the hardcoded debrief literals (decision 2A)
 
-**Decision**: A single `Configuration` object loaded synchronously at app startup. Resolution order: **build-time environment variables (highest) → URL query-string parameters → bundled debrief default (lowest)**. Validated through a Zod schema; the validated object is the only way application code reads configuration values.
+**Decision**: Use the seams that already exist. Two production files change:
+
+1. `src/api/useFeature.ts` — the existing `ApiOptions` type already carries `repo` and `branch`. Today its defaults are hardcoded to `"debrief/debrief-future"` and the active branch resolution. Phase 1 threads those defaults through as values rather than literals, so a different deployment can supply different defaults at build time (env var) or request time (URL query string — see R-003).
+2. `src/strings.ts` — three vendor strings (application title, repo display name, releases-link host) become constants exported from this module rather than inlined in components. Components read them via the existing import path; nothing else moves.
+
+**No new module under `src/config/`. No new `Configuration` entity. No JSON Schema. No Zod boundary added.** The existing `ApiOptions` type is the boundary; URL-query parsing is a small parser function (existing pattern in `apps/spec-navigator/src/`) that returns a typed object accepted by `ApiOptions`.
 
 **Rationale**:
-- Build-time env vars support the "fork and re-skin for our org" path some adopters will prefer (FR-008).
-- Query-string parameters are the primary mode for the hosted GitHub Pages instance (FR-015): one deployment serves all consumers via `?repo=org/name&branch=feat/x`.
-- A bundled default keeps the behaviour identical to today's debrief-future experience when neither env nor query string is present.
-- Zod at the boundary satisfies Article XV.5 (typed boundaries) — the configuration type used in application code is the inferred Zod output, not `unknown` or `any`.
+- The review's design pass observed that the `Configuration` proposal in earlier drafts was a *new* abstraction layered on top of `ApiOptions` and `strings.ts`, not a replacement. Two seams for the same concern is worse than one. Decision 2A removes the duplication before it ships.
+- Three production files touched is enough to delete every audit-identified literal.
+- The contract for adopters is "fork the source and edit `strings.ts` + your `useFeature.ts` defaults", which is what most adopters of small SPAs do anyway.
+
+**Resolution order** (build-time env vars > URL query string > bundled defaults) is preserved — it's simply enacted inside `useFeature.ts`'s defaults function rather than in a new `src/config/load.ts`.
 
 **Alternatives considered**:
-- Runtime UI config switcher (mid-session repo change). Rejected as out of scope (Assumptions in spec); over-engineers FR-015.
-- A separate `config.json` fetched at runtime from a known URL. Rejected: adds a network round-trip on every load and a deployment artefact to manage; provides no benefit over query-string for the hosted-instance case.
-- Reading `<meta>` tags injected by the host. Rejected: requires server-side templating, defeats GitHub Pages' static-only model.
-
-**URL query-string design** (full contract in `contracts/hosted-url.md`):
-- `?repo=<org>/<name>` — required for non-default consumers
-- `?branch=<branch-name>` — optional, defaults to the consumer repo's default branch
-- `?pat=...` — **never** accepted via URL (PAT envelope stays in `localStorage` only)
+- A new `Configuration` entity with `src/config/schema.ts` + `default.ts` + `load.ts` + a JSON Schema mirror + a Zod-vs-JSON-Schema drift test — the previous design. Rejected (decision 2A): it duplicates the existing `ApiOptions` seam without earning its keep, adds a Zod boundary where one already exists for the GitHub REST surface, and obligates a drift test for a hand-mirrored pair.
+- Runtime UI config switcher (mid-session repo change). Rejected as out of scope (Assumptions in spec).
+- A separate `config.json` fetched at runtime. Rejected: extra round-trip, no benefit over query-string for the hosted-instance case.
 
 ---
 
 ## R-003: GitHub Pages deployment from a Vite SPA
 
-**Decision**: Single GitHub Pages site at `https://debrief.github.io/spec-navigator/`. Deploy via the standard `actions/deploy-pages` GitHub Action on merge to `main`. Vite `base` set to `/spec-navigator/` to keep asset paths correct.
+**Decision**: Single GitHub Pages site at `https://debrief.github.io/spec-navigator/`. Deploy via the standard `actions/deploy-pages` GitHub Action on merge to `main`. Vite `base` set to `/spec-navigator/` (overridable via `VITE_BASE`) to keep asset paths correct.
 
 **Rationale**:
 - Free, zero infrastructure to manage, fits the static-SPA character.
 - `actions/deploy-pages` is the official path; widely documented.
-- The `base` path is the only Vite-specific gotcha; setting it via env var (`VITE_BASE`) lets adopters re-host under different paths without rebuilding from a fork.
+- The `base` path is the only Vite-specific gotcha; setting it via env var lets adopters re-host under different paths without rebuilding from a fork.
 
-**Single-deployment, multi-consumer model**: A single Pages deployment renders any consumer via the URL contract from R-002. Per-PR previews on the *navigator* itself are not needed — the navigator is a static viewer, not a tested interactive surface; navigator PRs are previewed via local `vite preview` and the live-mode CI run. Per-PR previews of *consumer specs* are achieved through the `?branch=...` query parameter.
+**Multi-consumer URL contract — accept BOTH shapes (decision 1A)**:
+
+The hosted SPA accepts two URL contracts side-by-side:
+
+| Form | Origin | Example |
+|---|---|---|
+| Legacy `?pr=<n>` | The shape `spec-navigator-comment.yml` has emitted on every PR comment since #191. Resolves the PR number → branch via the existing GitHub API call. | `…/spec-navigator/?pr=512` |
+| New `?repo=<org>/<name>&branch=<branch>` | Added by this feature for non-debrief consumers. | `…/spec-navigator/?repo=acme/foo&branch=feat/x` |
+
+A small compat shim at the top of the URL parser detects `?pr=<n>` (no `?repo=`) and resolves it through the existing PR-to-branch flow against `debrief/debrief-future`, then proceeds as if `?repo=debrief/debrief-future&branch=<resolved>` had been supplied.
+
+`spec-navigator-comment.yml` is **not** modified in Phase 3 — its emitted URL form continues to work because of the compat shim. The comment template can be flipped to `?repo=&branch=` independently, later, with no time pressure.
+
+**Single-deployment, multi-consumer model**: A single Pages deployment renders any consumer via either URL contract above. Per-PR previews on the *navigator* itself are not needed — the navigator is a static viewer; navigator PRs are previewed via local `vite preview` and the live-mode CI run. Per-PR previews of *consumer specs* are achieved through `?branch=…` (or `?pr=<n>` for debrief-future).
 
 **Alternatives considered**:
-- Cloudflare Pages — better preview-per-PR for navigator changes, but adds a vendor account and DNS config; not worth it for an internal SPA whose own development cadence is slow. The `?branch=...` story handles consumer-PR previews regardless of host.
-- Vercel/Netlify — same trade-offs as Cloudflare; no advantage over GitHub Pages for this workload.
-- Heroku review apps — explicitly rejected in the spec (it's the legacy this work is leaving behind).
+- Cloudflare Pages / Vercel / Netlify — extra vendor account; no advantage.
+- Heroku review apps — explicitly rejected by the spec.
+- Replace `?pr=` with `?repo=&branch=` (no shim). Rejected (decision 1A): would break every comment historically posted by `spec-navigator-comment.yml`. The shim is a few lines; permanent backward compatibility is the better trade.
 
 ---
 
@@ -78,7 +94,7 @@ This document resolves all technical unknowns surfaced during planning. Every cl
 - A fixture re-record script (`pnpm fixtures:record`) regenerates fixtures by toggling `LIVE_GITHUB=1` and recording responses, so fixtures don't go stale.
 
 **Alternatives considered**:
-- MSW (Mock Service Worker) — common pattern, but it's an extra runtime dep and Playwright's `page.route` is already in the project. Rejected on dependency-minimalism grounds.
+- MSW (Mock Service Worker) — common pattern, but extra runtime dep and Playwright's `page.route` is already in the project. Rejected on dependency-minimalism grounds.
 - Polly.js — heavier; HAR-based recording is overkill for a thin GitHub-REST surface.
 - Live-only — rejected by FR-013 (contributors without org access must produce green builds).
 - Fully mocked TypeScript adapters (no HTTP at all) — fastest tests, but we lose realism on GitHub response shapes; fixtures balance speed and realism.
@@ -90,44 +106,51 @@ This document resolves all technical unknowns surfaced during planning. Every cl
 | `live.yml` | nightly + push to `main` | `LIVE_GITHUB=1` | `GITHUB_TOKEN` (read-only public scopes) |
 | `deploy.yml` | push to `main` (after `live.yml` green) | n/a (build only) | none beyond Pages permissions |
 
+(No `lighthouse.yml`. Spec-navigator carries no Lighthouse-PWA commitment — that is ADR-030 / #244 territory, owned by the **Backlog Navigator**, not this app.)
+
 ---
 
-## R-005: `specFormatVersion` declaration and discovery
+## R-005: ~~`specFormatVersion` declaration and discovery~~
 
-**Decision**: Consumers declare their format version in `.speckit/spec-format-version.json` at the repository root, with the shape `{ "version": "1.0.0" }`. The navigator fetches this file via the GitHub Contents API at startup; if absent, it defaults to `"1.0.0"`. The navigator publishes a supported range (e.g., `>=1.0.0 <2.0.0`) baked into its bundle and rendered in the footer.
+**Status**: **Deferred** (decision 3A — `/speckit.review` 2026-05-08).
 
-**Rationale**:
-- A single well-known path is discoverable without configuration.
-- JSON keeps it simple and avoids YAML dependencies.
-- The "absent → 1.0.0" default lets debrief-future adopt the navigator post-extraction with no upfront commit.
-- Baking the supported range into the bundle (rather than fetching it remotely) means a deployed navigator always knows what it can handle, even offline.
+The `specFormatVersion` contract introduced a 7-outcome behaviour matrix, a per-page-load GitHub Contents API call, a baked `SUPPORTED_FORMAT_RANGE` constant, and a UI surface (full-page errors and a non-blocking warning banner) — all to gate against drift between consumers' artefact format and the navigator's expectations. With debrief-future as the only consumer until a second one materialises, the contract has nothing to mediate.
 
-**Compatibility behaviour**:
-- Consumer version *within* navigator's supported range → render normally.
-- Consumer version *above* the supported range → display the "Upgrade your navigator" error (with both versions and a link to release notes).
-- Consumer version *below* the supported range → display the "Format too old" error (same components, different copy).
-- Malformed or fetch-failed → fail open with default `"1.0.0"` and a non-blocking warning banner; this prevents a transient GitHub blip from killing the page.
+Re-introduced when:
+- A second consumer (e.g. backlog-navigator extraction per backlog #255, or any third-party adopter) ships, **and**
+- That consumer's artefact format diverges meaningfully from debrief-future's.
 
-**Alternatives considered**:
-- Embed the version in `package.json` at the consumer's `specs/` root. Rejected: not all consumers are JS projects, and `package.json` parsing is implementation-y for a contract.
-- Use a header comment in `spec.md` files. Rejected: per-spec scope is wrong; the format is a repository-wide contract.
-- Calendar versioning (`2026.05`) — clearer cadence, but mismatched with the "breaking change → major bump" semantics this domain wants.
-- "Latest only" with no version field — punted by spec; rejected because it offloads the burden onto the navigator team forever.
+Until then, the navigator simply renders whatever it finds. Captured as backlog item for re-spike when triggered.
 
 ---
 
 ## R-006: Cutover strategy in debrief-future (Phase 3)
 
-**Decision**: A single atomic cutover PR that simultaneously deletes `apps/spec-navigator/`, removes its CI jobs, updates docs, swaps the review-app comment template to link the hosted URL, and lands the ADR-031 (extraction). Before merge, the hosted instance is verified live and a smoke-test PR confirms the review-app comment renders correctly.
+**Decision**: A single atomic cutover PR. Before merge, the hosted instance is verified live and a smoke-test PR confirms the review-app comment renders correctly.
+
+**Touch-set, corrected post-review (decision 5A)**:
+
+| Path | Action | Notes |
+|---|---|---|
+| `apps/spec-navigator/` | delete entirely | |
+| `.github/workflows/spec-navigator-preview.yml` | delete | Heroku review-app build for this app — superseded by hosted Pages instance |
+| `.github/workflows/spec-navigator-publish.yml` | delete | Currently publishes the in-monorepo build target; the new repo owns publishing |
+| `.github/workflows/spec-navigator-comment.yml` | keep, update URL | Continues to emit `?pr=<n>` (compat shim handles it). URL host swaps to `https://debrief.github.io/spec-navigator/`. Comment template can be flipped to `?repo=&branch=` independently, later. |
+| `.github/workflows/ci.yml` | remove 2 spec-navigator references | |
+| `heroku.yml`, `app.json`, `Dockerfile.preview` | **UNCHANGED** | Verified — no spec-navigator references exist today. The audit-derived plan claim that these need editing was wrong (corrected by 5A). |
+| `package.json` (root, `devDependencies`) | **UNCHANGED** | Verified — no root devDep is spec-navigator-only. Every entry (`@playwright/test`, `@sparticuz/chromium`, `vitest`, `typescript`, `@lhci/cli`, `knip`, `tsx`, `ajv`, `@types/node`) is shared with at least one other workspace. (5A correction.) |
+| `CLAUDE.md` "Before Pushing" Step 4 | remove the spec-navigator Playwright command | |
+| `CLAUDE.md` recent changes section | append a one-line note pointing at the new repo | |
+| `docs/project_notes/decisions.md` | add ADR-031 (extraction). **Do not** annotate ADR-030 — it belongs to the Backlog Navigator (#244), not spec-navigator. (5A correction.) | |
 
 **Rationale**:
 - A single PR avoids a "half-extracted" intermediate state where both the in-repo and hosted instances exist (violates SC-007).
-- Atomic delete + doc-swap in one commit guarantees `git bisect` will never land on a broken state.
+- Atomic delete + workflow updates in one commit guarantees `git bisect` will never land on a broken state.
 - Pre-merge smoke test ensures the hosted instance is healthy before the in-repo fallback is destroyed.
 
 **In-flight PR handling**: PRs open at the moment of merge will see a one-time merge conflict against `apps/spec-navigator/` paths. The cutover PR description includes a one-line rebase instruction; for any PR that *modifies* `apps/spec-navigator/`, the author redirects their change to the new repo. The audit's single-commit history observation suggests few such PRs in flight at any time.
 
-**Rollback path**: A `revert` of the cutover PR restores `apps/spec-navigator/`, the CI jobs, and the doc state in one commit. The hosted instance can remain live during a rollback (it does not depend on the in-repo path).
+**Rollback path**: A `revert` of the cutover PR restores `apps/spec-navigator/`, the deleted workflows, and the doc state in one commit. The hosted instance can remain live during a rollback (it does not depend on the in-repo path).
 
 **Alternatives considered**:
 - Staged cutover (delete source first, swap docs in a follow-up). Rejected: produces a window where docs reference the deleted path.
@@ -152,19 +175,11 @@ This document resolves all technical unknowns surfaced during planning. Every cl
 
 ---
 
-## R-008: Configuration validation strategy
+## R-008: ~~Configuration validation strategy~~
 
-**Decision**: Author a JSON Schema (`contracts/configuration.schema.json`) that is the source of truth for the configuration shape. Generate the runtime Zod schema directly in code (hand-authored to mirror the JSON Schema) and add a Vitest test that validates the JSON Schema and the Zod inference produce the same accepted/rejected fixture sets.
+**Status**: **Withdrawn** (decision 2A — `/speckit.review` 2026-05-08).
 
-**Rationale**:
-- JSON Schema is the publishable contract for adopters' tooling (editor autocomplete, validation in their CI).
-- Zod is the runtime validator at the application boundary (Article XV.5).
-- A round-trip test catches drift between the two without requiring a generator dependency. Article II's "single source of truth" applies to *domain* schemas (LinkML); application config is allowed to be hand-mirrored with a drift-detection test.
-
-**Alternatives considered**:
-- LinkML for the configuration schema. Rejected: heavy for a flat object; LinkML's value is in domain modelling and code generation, neither relevant here.
-- `zod-to-json-schema` package to derive JSON Schema from Zod. Rejected: introduces a runtime/build dep and a less-mature emitter for some Zod features. Round-trip test is simpler.
-- TypeScript types only, no runtime validation. Rejected: the configuration crosses an untrusted boundary (URL query string), so a runtime check is mandatory under Article XV.5.
+There is no `Configuration` entity to validate; defaults are values flowing through the existing `ApiOptions` typed seam. The only untrusted input is the URL query string, which is parsed by a small typed parser in the existing pattern — the same Zod surface that already validates the GitHub REST boundary covers any new field that crosses an untrusted edge. No JSON Schema is published. No drift test is required.
 
 ---
 
@@ -173,12 +188,12 @@ This document resolves all technical unknowns surfaced during planning. Every cl
 | ID | Topic | Decision (one line) |
 |---|---|---|
 | R-001 | History extraction | `git subtree split --prefix=apps/spec-navigator/` from a fresh clone |
-| R-002 | Configuration seam | Single object; build-env > query-string > bundled default; Zod-validated |
-| R-003 | Hosting | GitHub Pages, single deploy at `/spec-navigator/`, multi-consumer via query string |
+| R-002 | Parameterisation | Thread defaults through `useFeature.ts` `ApiOptions` + parameterise three strings in `strings.ts`; no new abstractions (decision 2A) |
+| R-003 | Hosting | GitHub Pages, single deploy at `/spec-navigator/`, multi-consumer via query string; legacy `?pr=` and new `?repo=&branch=` both accepted (decision 1A) |
 | R-004 | E2E mode | Bundled Playwright route fixtures by default; opt-in `LIVE_GITHUB=1` mode in CI |
-| R-005 | Format version | `.speckit/spec-format-version.json` at consumer repo root; SemVer; absent ⇒ `1.0.0` |
-| R-006 | Cutover | Single atomic PR in debrief-future; pre-merge hosted-instance smoke test |
+| R-005 | Format version | **Deferred** (decision 3A — backlog #255 re-spike trigger) |
+| R-006 | Cutover | Single atomic PR; touch-set corrected (no heroku/app.json/Dockerfile.preview/devDeps churn — none was needed) (decision 5A) |
 | R-007 | PAT scopes | Fine-grained service-identity PAT, public-read on debrief-future, `GITHUB_TOKEN` secret |
-| R-008 | Config validation | JSON Schema (publishable) mirrored by hand-authored Zod (runtime); drift test |
+| R-008 | Config validation | **Withdrawn** (decision 2A — no Configuration entity to validate) |
 
 All NEEDS CLARIFICATION items are resolved. Ready for Phase 1.

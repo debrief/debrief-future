@@ -6,6 +6,8 @@
 
 This document is a working entry point — what to do first, what to verify before each phase boundary, and where to find the contracts that govern the work. It is intentionally thin; the authoritative content lives in the artefacts above.
 
+`/speckit.review` on 2026-05-08 simplified the plan via decisions 1A (URL backward compatibility), 2A (no new `Configuration` entity), 3A (`specFormatVersion` deferred), and 5A (cutover touch-set corrected). This quickstart reflects the simplified plan.
+
 ---
 
 ## Where the active feature is recorded
@@ -20,30 +22,26 @@ So speckit commands resolve the active feature even though the branch name does 
 
 ---
 
-## Phase 1 — Configuration seam (this repo)
+## Phase 1 — Parameterise the existing seams (this repo)
 
-**Goal**: replace every hardcoded debrief literal in `apps/spec-navigator/src/` with a read from a single validated `Configuration` object. Default config = today's behaviour, byte-for-byte.
+**Goal**: replace every hardcoded debrief literal in `apps/spec-navigator/src/` by threading defaults through the existing `ApiOptions` typed seam in `useFeature.ts` and parameterising the three vendor strings in `strings.ts`. Default values reproduce today's behaviour byte-for-byte.
+
+**Decision 2A** explicitly rejected the previous proposal to introduce a new `Configuration` entity, a `src/config/` module, a JSON Schema, a Zod boundary for the configuration, and a Zod-vs-JSON-Schema drift test. None of those are part of Phase 1.
 
 ### Where to start
 
-1. Read [`docs/extraction-audit/spec-navigator/coupling-inventory.md`](../../docs/extraction-audit/spec-navigator/coupling-inventory.md) §2 ("Hardcoded debrief-isms") — the seven literals that must be removed.
-2. Create `apps/spec-navigator/src/config/`:
-   - `schema.ts` — Zod schema mirroring [`contracts/configuration.schema.json`](./contracts/configuration.schema.json).
-   - `default.ts` — the bundled debrief default values (matches `Configuration` defaults in [data-model.md](./data-model.md) Entity 1).
-   - `load.ts` — resolution: build-env → query-string → default; runs Zod parse; returns the typed `Configuration` (no `unknown` escapes).
-3. Replace each of the seven hardcoded literals with a `config.<field>` access. Run `pnpm test` and `pnpm test:e2e` against the default config; both must remain green.
-4. Add a test fixture pointing at a different repository (e.g., `octocat/hello-world`) and confirm the rendering smoke-test passes against it.
-
-### Verifying the JSON Schema ↔ Zod drift test
-
-Per R-008, a Vitest test loads `contracts/configuration.schema.json` and a small set of accept/reject fixtures and confirms both the Zod schema and the JSON Schema produce the same accepted/rejected verdicts. Add this test before merging the seam.
+1. Read [`docs/extraction-audit/spec-navigator/coupling-inventory.md`](../../docs/extraction-audit/spec-navigator/coupling-inventory.md) §2 ("Hardcoded debrief-isms") — the literals that must be removed.
+2. In `apps/spec-navigator/src/api/useFeature.ts`: replace the inline default repo literal with a read from `import.meta.env.VITE_DEFAULT_REPO ?? "debrief/debrief-future"`. Confirm the existing `ApiOptions` type is unchanged in shape.
+3. In `apps/spec-navigator/src/strings.ts` (create the file if it does not yet exist alongside the components): export three `const`s for the application title, repo display label, and releases-link host. Each is supplied from a `VITE_*` env var with a debrief-default fallback. Update the components that previously inlined these strings to import from `strings.ts`.
+4. Run `pnpm test` and `pnpm test:e2e` against the default values; both must remain green.
+5. Add a test fixture pointing at a different repository (e.g., `octocat/hello-world` via `VITE_DEFAULT_REPO`) and confirm the rendering smoke-test passes against it.
 
 ### Phase 1 done when
 
-- [ ] `grep -ri 'debrief\|debrief-future\|debrief.github.io' apps/spec-navigator/src/` returns zero matches.
-- [ ] All Vitest and Playwright suites pass against the default `Configuration`.
-- [ ] A non-default `Configuration` (pointing at any other public GitHub repo with a `specs/` directory) renders without error.
-- [ ] Drift test (R-008) is in CI and green.
+- [ ] `grep -ri 'debrief\|debrief-future\|debrief.github.io' apps/spec-navigator/src/` returns zero matches outside default-fallback expressions.
+- [ ] All Vitest and Playwright suites pass against the default values.
+- [ ] A non-default `VITE_DEFAULT_REPO` (pointing at any other public GitHub repo with a `specs/` directory) renders without error.
+- [ ] No new module under `src/config/`. No new JSON Schema. No new Zod schema. No drift test.
 - [ ] PR description references this spec dir (`specs/248-extract-spec-navigator/`).
 
 ---
@@ -77,7 +75,9 @@ git push new-repo spec-navigator-extracted:main
 
 ### Stand up CI
 
-Reproduce the workflow inventory in [`contracts/ci-surface.md`](./contracts/ci-surface.md) — `ci.yml`, `live.yml`, `deploy.yml`, `lighthouse.yml`. Branch-protect `main` against the listed gates.
+Reproduce the workflow inventory in [`contracts/ci-surface.md`](./contracts/ci-surface.md) — `ci.yml`, `live.yml`, `deploy.yml`. Branch-protect `main` against the listed gates.
+
+(There is no `lighthouse.yml`. ADR-030 / Lighthouse-PWA budgets are owned by the **Backlog Navigator** (#244), not by this app.)
 
 Add the `GITHUB_TOKEN` Actions secret per R-007: a fine-grained service-identity PAT, read-only on the public `debrief/debrief-future` repository.
 
@@ -87,8 +87,8 @@ Add `e2e/fixtures/` populated by running `pnpm fixtures:record` against live Git
 
 ### GitHub Pages (R-003)
 
-```yaml
-# vite.config.ts
+```ts
+// vite.config.ts
 export default defineConfig({
   base: process.env.VITE_BASE ?? "/spec-navigator/",
   // ...
@@ -97,64 +97,68 @@ export default defineConfig({
 
 Enable Pages in repository settings → Pages → Source: GitHub Actions. Wire `actions/deploy-pages` in `deploy.yml`.
 
+### URL backward-compatibility shim (decision 1A)
+
+Implement the legacy `?pr=<n>` resolution path in the new repo's URL parser — see `contracts/hosted-url.md`. Without it, every URL emitted by debrief-future's existing `spec-navigator-comment.yml` since #191 would 404 on consumer specs.
+
 ### Smoke test before announcing the URL
 
-1. Visit `https://debrief.github.io/spec-navigator/` — should render debrief-future specs (default config).
-2. Visit `https://debrief.github.io/spec-navigator/?repo=debrief/debrief-future&branch=claude/bold-noether-wWKle` — should render this branch's specs, including this spec dir.
-3. Visit `?repo=octocat/hello-world` — should render their (likely empty) specs view without crashing.
+1. Visit `https://debrief.github.io/spec-navigator/` — should render debrief-future specs (default values).
+2. Visit `https://debrief.github.io/spec-navigator/?pr=<some-open-pr-number>` — **legacy form**, should resolve to that PR's branch and render its specs (validates the 1A compat shim).
+3. Visit `https://debrief.github.io/spec-navigator/?repo=debrief/debrief-future&branch=claude/bold-noether-wWKle` — should render this branch's specs, including this spec dir.
+4. Visit `?repo=octocat/hello-world` — should render their (likely empty) specs view without crashing.
 
 ### Phase 2 done when
 
 - [ ] New repo exists and is public with the stated description and homepage.
 - [ ] CI workflows match `contracts/ci-surface.md`.
 - [ ] `https://debrief.github.io/spec-navigator/` is live and returns 200.
-- [ ] All three smoke-test URLs above render correctly.
+- [ ] All four smoke-test URLs above render correctly.
 - [ ] A first-time contributor (not in the debrief org) can clone, install, and run `pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e` to a green result.
 
 ---
 
 ## Phase 3 — Cutover (this repo)
 
-**Goal**: a single atomic PR that deletes `apps/spec-navigator/`, removes its CI jobs, swaps the review-app comment to link the hosted instance, drops root devDeps used only by it, and adds ADR-031.
+**Goal**: a single atomic PR that deletes `apps/spec-navigator/` and the two dedicated workflows that build/publish it, points the existing `spec-navigator-comment.yml` at the hosted instance, removes spec-navigator references from `ci.yml`, and adds ADR-031.
 
-### What to delete or update
-
-Use the audit inventory to drive a checklist. Concretely, the cutover PR touches:
+### What to delete or update (corrected per decision 5A)
 
 | Path | Action |
 |---|---|
 | `apps/spec-navigator/` | delete entirely |
-| `.github/workflows/*.yml` | remove every job that references `apps/spec-navigator/` |
-| `heroku.yml` | remove the spec-navigator preview build target |
-| `app.json` | remove the spec-navigator preview entry |
-| `Dockerfile.preview` | remove spec-navigator-only stages if any |
+| `.github/workflows/spec-navigator-preview.yml` | delete |
+| `.github/workflows/spec-navigator-publish.yml` | delete |
+| `.github/workflows/spec-navigator-comment.yml` | keep; swap URL host to `https://debrief.github.io/spec-navigator/` (continues to emit `?pr=<n>` — the compat shim handles it; the comment template can flip to `?repo=&branch=` later, independently) |
+| `.github/workflows/ci.yml` | remove the 2 spec-navigator references |
+| `heroku.yml`, `app.json`, `Dockerfile.preview` | **UNCHANGED** — verified no spec-navigator references exist today |
+| `package.json` (root, `devDependencies`) | **UNCHANGED** — no spec-navigator-only entries (every root devDep is shared with at least one other workspace) |
+| `pnpm-workspace.yaml` | the `apps/spec-navigator` glob is implicitly resolved; no edit needed |
 | `CLAUDE.md` "Before Pushing" Step 4 | remove the spec-navigator Playwright command |
 | `CLAUDE.md` recent changes section | append a one-line note pointing at the new repo |
-| `package.json` (root, `devDependencies`) | remove deps used only by spec-navigator (audit §7 lists these) |
-| `pnpm-workspace.yaml` | the `apps/spec-navigator` glob is implicitly resolved; no edit needed |
-| `docs/project_notes/decisions.md` | add ADR-031 — Extraction of spec-navigator. Annotate ADR-030 (vite-plugin-pwa) with a "now owned by `debrief/spec-navigator`" note |
-| Heroku review-app comment template (in `.github/workflows/`) | update to render the URL form from `contracts/hosted-url.md` |
+| `docs/project_notes/decisions.md` | add ADR-031 — Extraction of spec-navigator. **Do not** annotate ADR-030 — that ADR is owned by #244 (Backlog Navigator), not by this app |
 
 ### Pre-merge verification
 
 1. Open a draft cutover PR. CI must pass without spec-navigator's Playwright suite.
-2. The PR's review-app comment must include the new hosted URL parameterised with this PR's branch.
-3. Click the link in the comment; verify the hosted instance renders this PR's specs.
+2. The PR's review-app comment must include the new hosted URL parameterised with this PR's number (the existing `?pr=<n>` shape).
+3. Click the link in the comment; verify the hosted instance renders this PR's specs via the 1A compat shim.
 4. Only then mark the PR ready for review.
 
 ### Phase 3 done when
 
 - [ ] `apps/spec-navigator/` does not exist.
+- [ ] `.github/workflows/spec-navigator-preview.yml` and `spec-navigator-publish.yml` are deleted.
 - [ ] `task verify` (or the four-step fallback) passes; total runtime measurably faster (SC-003).
 - [ ] ADR-031 is committed.
-- [ ] Subsequent PR's review-app comment links to the hosted instance and works end-to-end.
+- [ ] Subsequent PR's review-app comment links to the hosted instance and works end-to-end via the legacy `?pr=` form.
 - [ ] `git grep -i 'apps/spec-navigator'` returns zero matches in tracked files.
 
 ---
 
 ## Rollback
 
-If Phase 3 reveals a regression, `git revert` of the cutover PR restores `apps/spec-navigator/`, the CI jobs, and the docs in a single commit. The hosted instance can stay live — it does not depend on the in-monorepo path. No data loss path exists in this migration; it is purely structural.
+If Phase 3 reveals a regression, `git revert` of the cutover PR restores `apps/spec-navigator/`, the two deleted workflows, and the docs in a single commit. The hosted instance can stay live — it does not depend on the in-monorepo path. No data loss path exists in this migration; it is purely structural.
 
 ---
 
@@ -162,9 +166,10 @@ If Phase 3 reveals a regression, `git revert` of the cutover PR restores `apps/s
 
 | Concern | Document |
 |---|---|
-| Configuration shape and validation | [data-model.md](./data-model.md), [contracts/configuration.schema.json](./contracts/configuration.schema.json) |
-| Hosted-URL query-string contract | [contracts/hosted-url.md](./contracts/hosted-url.md) |
-| `specFormatVersion` declaration & compatibility | [contracts/spec-format-version.md](./contracts/spec-format-version.md) |
+| Defaults via `ApiOptions` and `strings.ts` | [data-model.md](./data-model.md) |
+| Hosted-URL query-string contract (incl. legacy `?pr=`) | [contracts/hosted-url.md](./contracts/hosted-url.md) |
 | New-repo CI workflows | [contracts/ci-surface.md](./contracts/ci-surface.md) |
 | Acceptance scenarios per phase | [spec.md](./spec.md) §"User Stories" |
-| Audit input (the 7 literals etc.) | [docs/extraction-audit/spec-navigator/coupling-inventory.md](../../docs/extraction-audit/spec-navigator/coupling-inventory.md) |
+| Audit input (the hardcoded literals etc.) | [docs/extraction-audit/spec-navigator/coupling-inventory.md](../../docs/extraction-audit/spec-navigator/coupling-inventory.md) |
+
+`specFormatVersion` is deferred (decision 3A); when re-introduced, it gets its own contract document at that time. Backlog #255 tracks the trigger.

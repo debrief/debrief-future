@@ -9,7 +9,8 @@ This document defines the CI workflows the new repository must provide, their tr
 | `.github/workflows/ci.yml` | every PR + push to non-`main` branches | lint, typecheck, vitest, Playwright (bundled fixtures) | offline | none |
 | `.github/workflows/live.yml` | nightly (`cron: 0 3 * * *`) + push to `main` | Playwright E2E in live-GitHub mode against debrief-future | live | `GITHUB_TOKEN` |
 | `.github/workflows/deploy.yml` | push to `main` (after `live.yml` green) | build + publish to GitHub Pages | n/a | Pages permissions |
-| `.github/workflows/lighthouse.yml` | every PR (light) + push to `main` (full budget) | Lighthouse CI per ADR-030 | offline | none |
+
+(There is **no** `lighthouse.yml`. ADR-030 / Lighthouse-PWA budgets are owned by the **Backlog Navigator** (#244), not by spec-navigator. Earlier drafts incorrectly referenced a `lighthouse.yml` here; corrected per `/speckit.review` decision 5A.)
 
 ## Inputs (all workflows)
 
@@ -26,7 +27,6 @@ This document defines the CI workflows the new repository must provide, their tr
 | `ci.yml` | Pass/fail check; coverage report uploaded as a job artefact. |
 | `live.yml` | Pass/fail check; on failure, opens or updates an issue tagged `live-mode-failure` so flaky GitHub responses don't pile up unnoticed. |
 | `deploy.yml` | Public Pages deployment at `https://debrief.github.io/spec-navigator/`. Run once per merge to `main`. |
-| `lighthouse.yml` | Comment on PR with score deltas; on `main`, fails the build if budgets regressed. |
 
 ## Required gates for merge to `main`
 
@@ -36,7 +36,6 @@ The new repo's branch protection on `main` requires:
 - ✅ `ci.yml / typecheck`
 - ✅ `ci.yml / vitest`
 - ✅ `ci.yml / playwright-bundled`
-- ✅ `lighthouse.yml / pr` (advisory only — not blocking)
 
 `live.yml` is **not** a merge gate (it runs against real GitHub and would let upstream hiccups block unrelated work). Failures in `live.yml` are visible as the `live-mode-failure` issue.
 
