@@ -17,8 +17,8 @@ Alias: activity_id
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
 | [FileProvEntry](../classes/FileProvEntry.md) | File-level provenance event (snapshot or branch creation) |  no  |
+| [PropertiesProvenanceEntry](../classes/PropertiesProvenanceEntry.md) | Single entry in item |  no  |
 | [LogEntry](../classes/LogEntry.md) | A PROV-aligned provenance record stored on GeoJSON features |  no  |
 
 
