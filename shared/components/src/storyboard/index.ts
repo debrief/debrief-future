@@ -112,6 +112,17 @@ export {
 export { validatePlot } from "./validate";
 
 // ---------------------------------------------------------------------------
+// Active-storyboard selection persistence (#237)
+// ---------------------------------------------------------------------------
+export {
+  isActiveStoryboardSelection,
+  getActiveStoryboardSelection,
+  setActiveStoryboardSelection,
+  ACTIVE_STORYBOARD_FEATURE_ID,
+  ACTIVE_STORYBOARD_STATE_TYPE,
+} from "./activeStoryboardSelection";
+
+// ---------------------------------------------------------------------------
 // Migration hook
 // ---------------------------------------------------------------------------
 export { runPlotOpenMigrations, V1_MIGRATIONS } from "./migration";

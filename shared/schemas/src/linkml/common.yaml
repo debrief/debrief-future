@@ -263,6 +263,8 @@ enums:
         description: Map viewport state (bbox, zoom)
       selection:
         description: Feature selection state (selected IDs)
+      active_storyboard:
+        description: Per-plot active-Storyboard pin (#237)
 
   ArrayCentreModeEnum:
     description: Array centre calculation mode for towed array sensors
