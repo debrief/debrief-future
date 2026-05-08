@@ -17,11 +17,11 @@ Alias: color
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
 | [PointProperties](../classes/PointProperties.md) | Styling schema for Point and MultiPoint geometries |  no  |
-| [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
-| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
 | [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
+| [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
+| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
+| [LineProperties](../classes/LineProperties.md) | Styling schema for LineString and MultiLineString geometries |  no  |
 
 
 

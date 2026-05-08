@@ -17,9 +17,9 @@ Alias: center
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [CircleAnnotationProperties](../classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |  no  |
 | [SystemStateProperties](../classes/SystemStateProperties.md) | Properties for SYSTEM features storing application state |  no  |
 | [Viewport](../classes/Viewport.md) | Camera state sub-record inside a Scene |  no  |
+| [CircleAnnotationProperties](../classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |  no  |
 
 
 
