@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Three [NEEDS CLARIFICATION] markers remain in FR-015 (hosting target), FR-016 (versioning model), and FR-017 (PAT/test-fixture strategy). These are the maximum allowed and were explicitly flagged by the user as open questions. They must be resolved during `/speckit.clarify` before `/speckit.plan` can produce a useful plan.
-- Specification is otherwise complete and ready for clarification.
+- All three open questions resolved on 2026-05-08: FR-015 = GitHub Pages with query-string parameterisation; FR-016 = SemVer on a consumer-declared `specFormatVersion`; FR-017 = bundled fixtures by default with opt-in `LIVE_GITHUB=1` mode behind a Personal Access Token.
+- All checklist items pass. Specification is ready for `/speckit.plan`.

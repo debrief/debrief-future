@@ -66,7 +66,9 @@ A debrief-future contributor wants the monorepo to stop hosting and testing spec
 - **In-flight pull requests during cutover**: open PRs against debrief-future at the moment of cutover may have stale references to the deleted `apps/spec-navigator/` path. The cutover plan must define behaviour: rebase guidance, automated fix-up, or accept stale PRs need manual rebasing.
 - **Subtree split surfaces cross-cutting commits**: a commit in debrief-future may have touched both `apps/spec-navigator/` and unrelated paths (CI, root config). The extraction must define how those land in the new repo (full commit kept with non-app paths empty, or commit dropped, or commit content trimmed).
 - **Spec-artefact format drift**: after cutover, debrief-future may add a new convention to its spec format (a new artefact filename, a new front-matter field). The hosted spec-navigator must either accommodate it via configuration or fail gracefully with a clear error.
-- **Hosted-instance outage during a debrief-future PR review**: if the hosted instance is down, debrief-future loses the ability to preview specs in the review-app. The cutover plan must define a fallback (cached previous build, local `vite preview` instructions, or accepted risk window).
+- **Hosted-instance outage during a debrief-future PR review**: if GitHub Pages or the hosted instance is unavailable, debrief-future loses the ability to preview specs in the review-app. The cutover plan must define a fallback (cached previous build, local preview instructions, or accepted risk window).
+- **Spec-format version unsupported**: a consumer declares a `specFormatVersion` that the deployed navigator cannot render. The app must show a clear, branded error stating both versions, point to the release notes, and avoid leaving the user on a blank page.
+- **Live-mode E2E flake on consumer-side rate limit**: the new repository's continuous integration runs the live-GitHub mode against a real Personal Access Token; transient GitHub rate-limit responses must not produce flaky failures that block unrelated pull requests.
 - **Adopter PAT scope mismatch**: an adopter configures the app for a private repo and supplies a PAT with insufficient scopes. The app must surface the missing scope clearly rather than rendering a confusing blank state.
 - **No PAT / unauthenticated browse**: an anonymous visitor opens the hosted instance configured for a public repo. The app must work within GitHub's anonymous rate limits, with a graceful message when the limit is hit.
 - **Configuration schema evolution**: a future spec-navigator release adds a required configuration field. Existing adopters' deployments must either continue to work (backward-compatible defaults) or fail with a clear migration message.
@@ -96,9 +98,9 @@ A debrief-future contributor wants the monorepo to stop hosting and testing spec
 - **FR-012**: The new repository MUST publish a built bundle to a stable, public URL on every merge to its main branch.
 - **FR-013**: The new repository MUST be runnable end-to-end by a contributor who has no debrief organisation membership and no debrief-issued credentials. Tests requiring live GitHub data MUST either skip cleanly or use bundled fixtures.
 - **FR-014**: The new repository MUST include documentation that explains, without referring to debrief-future docs: configuration, local development, testing, and deployment.
-- **FR-015**: The new repository's hosting MUST support deploying a single bundle parameterised at request time (e.g., via URL query string or path segment) for the target repository, OR support per-deployment configuration (e.g., environment variable at build time). The chosen approach MUST be documented. [NEEDS CLARIFICATION: hosting target — GitHub Pages, Cloudflare Pages, or per-PR review apps?]
-- **FR-016**: The new repository MUST define and publish a versioning contract describing how it will signal compatibility with consumer spec-artefact formats. [NEEDS CLARIFICATION: versioning model — semantic versioning of a `specFormatVersion` field, calendar versioning, or "latest only, breaking changes announced"?]
-- **FR-017**: The new repository's end-to-end test suite MUST work for contributors without a debrief-issued GitHub Personal Access Token. [NEEDS CLARIFICATION: PAT/test-fixture strategy — bundled fixture mode + optional live mode behind a secret, or fully recorded HTTP fixtures, or live-only with per-contributor PAT instructions?]
+- **FR-015**: The new repository's hosting MUST be GitHub Pages, deploying a single static bundle of the main branch on every merge. The bundle MUST accept the target repository (and any PR-specific branch identifier) as a URL query-string parameter, so a single deployed instance can render specs for any consumer without rebuilding.
+- **FR-016**: The new repository MUST adopt semantic versioning of a `specFormatVersion` field that consumers declare. The application MUST read this field from the consumer's repository at load time, MUST render normally when its supported range covers the consumer's value, and MUST display a clear, actionable error (showing both versions and a link to the relevant release notes) when it does not.
+- **FR-017**: The new repository's end-to-end test suite MUST run by default against bundled fixtures so any contributor can produce a green build with no GitHub credential. A live-GitHub mode MUST also be available, opt-in behind an environment variable (e.g., `LIVE_GITHUB=1`) and a Personal Access Token, and MUST be the mode used by the new repository's own continuous integration on its main branch.
 
 #### Phase 3 — Cutover (in debrief-future)
 
@@ -118,6 +120,7 @@ A debrief-future contributor wants the monorepo to stop hosting and testing spec
 ### Key Entities
 
 - **Configuration**: The set of values that parameterise spec-navigator for a specific consumer. Includes target repository identifier, spec-directory path convention, artefact filename set, and label/status conventions. Has a single canonical default that reproduces today's debrief-future behaviour.
+- **Spec format version**: A semantic-version value declared by each consumer in a known location of their repository. Identifies which iteration of the spec-artefact contract their specs follow. Used by spec-navigator to decide whether it can render a consumer's specs and to surface a clear error when the consumer's version falls outside its supported range.
 - **Target repository**: The GitHub repository whose `specs/` content is being rendered. The application is agnostic to which repository this is.
 - **Hosted instance**: The deployed, publicly reachable build of spec-navigator, served from a stable URL controlled by the new repository's deploy pipeline.
 - **Source repository (new)**: The standalone GitHub repository created by Phase 2 that owns spec-navigator's source, tests, CI, and deploys.
@@ -141,7 +144,7 @@ A debrief-future contributor wants the monorepo to stop hosting and testing spec
 
 - The Phase 0 coupling audit at `docs/extraction-audit/spec-navigator/coupling-inventory.md` is exhaustive; any coupling not captured there is treated as out of scope for this work but acceptable to address opportunistically.
 - The new repository will be public, matching debrief-future's visibility.
-- Configuration is supplied at build or deploy time, not at runtime via end-user UI; runtime end-user configuration switching is out of scope for the migration. (Whether the hosted instance accepts a target repository as a request parameter is a hosting decision tracked in FR-015.)
+- Configuration is supplied via URL query-string parameters to a single GitHub Pages deployment; build-time configuration of a forked source tree is also supported (e.g., for an adopter who prefers to host their own branded instance) but is not the primary path. Runtime UI to switch target repository mid-session is out of scope.
 - The existing app's feature set is the baseline; this migration does not add or remove user-visible features.
 - The default new-repository name and organisation are `debrief/spec-navigator` unless explicitly changed; this is the lowest-friction default and preserves the existing GitHub auth, branding, and secret infrastructure. A neutral organisation can be chosen later without affecting any acceptance criterion in this spec.
 - Architectural Decision Record ADR-030 (vite-plugin-pwa) will be either re-stated in the new repository's own ADRs or replaced by an equivalent there; debrief-future's ADR-030 will be annotated to point at the new owner.
@@ -151,8 +154,6 @@ A debrief-future contributor wants the monorepo to stop hosting and testing spec
 ## Dependencies
 
 - The Phase 0 audit (`docs/extraction-audit/spec-navigator/coupling-inventory.md`) is complete and serves as the source of truth for what must be de-coupled in Phase 1.
-- A decision on the hosting target (FR-015) before Phase 2 begins.
-- A decision on the versioning contract (FR-016) before Phase 2 publishes its first release tag.
-- A decision on the PAT/test-fixture strategy (FR-017) before Phase 2 stands up CI.
 - Resolution of the new repository's organisation and name (default `debrief/spec-navigator`) before Phase 2 begins.
-- A maintainer with permission to create a new repository under the chosen GitHub organisation, configure its secrets, and configure its deploy target.
+- A maintainer with permission to create a new repository under the chosen GitHub organisation, enable GitHub Pages on it, and configure secrets for the live-GitHub continuous-integration mode.
+- A GitHub Personal Access Token (read-only public scopes sufficient for the default debrief consumer; private-repo scope only if a future adopter requires it) registered as a secret in the new repository for live-mode CI runs.
