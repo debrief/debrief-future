@@ -3316,6 +3316,13 @@
       "additionalProperties": false,
       "description": "Properties for SYSTEM features storing application state",
       "properties": {
+        "active_storyboard_id": {
+          "description": "Storyboard properties.id the analyst last pinned for this plot (#237)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "bbox": {
           "description": "Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state",
           "items": {
@@ -3379,7 +3386,7 @@
         },
         "state_type": {
           "$ref": "#/$defs/SystemStateTypeEnum",
-          "description": "Discriminator for state variant (temporal, spatial, selection)"
+          "description": "Discriminator for state variant (temporal, spatial, selection, active_storyboard)"
         },
         "zoom": {
           "description": "Map zoom level - for spatial state",
@@ -3401,7 +3408,8 @@
       "enum": [
         "temporal",
         "spatial",
-        "selection"
+        "selection",
+        "active_storyboard"
       ],
       "title": "SystemStateTypeEnum",
       "type": "string"

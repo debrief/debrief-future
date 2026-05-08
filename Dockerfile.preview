@@ -22,6 +22,7 @@ COPY shared/schemas/ ./shared/schemas/
 COPY shared/components/ ./shared/components/
 COPY shared/utils/ ./shared/utils/
 COPY shared/data/ ./shared/data/
+COPY shared/stac-writer/ ./shared/stac-writer/
 COPY shared/config-ts/package.json ./shared/config-ts/
 COPY services/session-state/ ./services/session-state/
 COPY apps/vscode/ ./apps/vscode/

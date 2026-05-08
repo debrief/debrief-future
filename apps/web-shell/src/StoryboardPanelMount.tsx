@@ -41,6 +41,10 @@ import {
   type StoryboardOptionViewModel,
   type StoryboardPlot,
 } from '@debrief/components';
+import {
+  persistActiveStoryboardId,
+  readPersistedActiveStoryboardId,
+} from './services/activeStoryboardPersistence';
 import type { SessionStoreApi } from '@debrief/session-state';
 import {
   captureSceneWeb,
@@ -186,9 +190,35 @@ export function StoryboardPanelMount({
   // most-recently-modified Storyboard (#215's getActiveStoryboardDefault),
   // can be overridden by clicking a different one in the header dropdown.
   // Reset to null when the override no longer exists in the plot.
+  //
+  // #237 — initial state seeds from the persisted SystemState feature in the
+  // plot, so a previously-pinned Storyboard re-opens with that selection
+  // instead of always falling back to getActiveStoryboardDefault.
   const [activeOverrideId, setActiveOverrideId] = React.useState<
     string | null
-  >(null);
+  >(() => readPersistedActiveStoryboardId(featureCollection).id);
+  // #237 — re-read when the plot changes (different document opened); also
+  // self-heals stale entries on open by writing the chosen fallback back
+  // through the edit pipeline (FR-007).
+  const lastSeenFcRef = useRef<FeatureCollection | null>(null);
+  useEffect(() => {
+    if (lastSeenFcRef.current === featureCollection) return;
+    lastSeenFcRef.current = featureCollection;
+    const verdict = readPersistedActiveStoryboardId(featureCollection);
+    if (verdict.kind === 'valid') {
+      setActiveOverrideId(verdict.id);
+      return;
+    }
+    if (verdict.kind === 'absent') {
+      setActiveOverrideId(null);
+      return;
+    }
+    // 'stale' — pick the default Storyboard and self-heal the SystemState.
+    const fallback = getActiveStoryboardDefault(packagePlot(featureCollection.features));
+    const fallbackId = fallback?.properties.id ?? null;
+    setActiveOverrideId(null);
+    persistActiveStoryboardId(featureCollection, fallbackId, setFeatureCollection);
+  }, [featureCollection, setFeatureCollection]);
   const activeStoryboard = useMemo(() => {
     if (activeOverrideId !== null) {
       const overridden = plot.features.find((f) => {
@@ -317,11 +347,18 @@ export function StoryboardPanelMount({
 
   // ─── Storyboard-level handlers (T068, T071) ──────────────────────
   // T071 — switch active Storyboard (panel-local override).
+  // #237 — persist the override into the plot's FeatureCollection via the
+  // existing edit pipeline so the choice survives close/reopen.
   const onActiveStoryboardChange = useCallback(
     (storyboardId: string) => {
       setActiveOverrideId(storyboardId);
+      persistActiveStoryboardId(
+        featureCollection,
+        storyboardId,
+        setFeatureCollection,
+      );
     },
-    [],
+    [featureCollection, setFeatureCollection],
   );
 
   // T068 — create new Storyboard via overflow menu reuses the inline
@@ -353,12 +390,16 @@ export function StoryboardPanelMount({
           name: reply.name.trim(),
           actor,
         });
-        setFeatureCollection({
+        const newId = result.storyboard.properties.id;
+        // #237 — persist the new Storyboard as the active selection
+        // alongside the create write, in a single edit-pipeline call.
+        const fcAfterCreate: FeatureCollection = {
           type: 'FeatureCollection',
           // eslint-disable-next-line no-restricted-syntax -- #235 web-shell mirror of #216 ADR-019.
           features: result.plot.features as unknown as Feature[],
-        });
-        setActiveOverrideId(result.storyboard.properties.id);
+        };
+        persistActiveStoryboardId(fcAfterCreate, newId, setFeatureCollection);
+        setActiveOverrideId(newId);
         sessionStore.getState().markDirty();
       } catch (err) {
         console.error('[StoryboardPanelMount] createStoryboard failed:', err);
