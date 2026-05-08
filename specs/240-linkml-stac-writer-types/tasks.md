@@ -4,7 +4,7 @@
 **Branch**: `claude/start-speckit-240-DixZc` (cloud session); spec dir `specs/240-linkml-stac-writer-types/`
 **Spec**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md) | **Research**: [research.md](./research.md) | **Quickstart**: [quickstart.md](./quickstart.md)
 
-This task list executes the post-`/speckit.review` plan. The originally-planned `StacItem.properties` typing has been deferred to backlog #255; this feature ships the `PropertiesProvenanceEntry` consolidation (via hybrid intersection) plus the CI drift gate.
+This task list executes the post-`/speckit.review` plan. The originally-planned `StacItem.properties` typing has been deferred to backlog #256; this feature ships the `PropertiesProvenanceEntry` consolidation (via hybrid intersection) plus the CI drift gate.
 
 ## Evidence Requirements
 
@@ -28,7 +28,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 | Artifact | Description | Created When |
 |----------|-------------|--------------|
 | `evidence/opening-context.md` | Cached opener (Hook + What We're Building + How It Fits + Key Decisions) | Already captured during `/speckit.plan` (commit `d1c50c5`) |
-| `media/shipped-post.md` | Feature post: copies the four sections from `evidence/opening-context.md` verbatim, adds Lessons Learned (any non-determinism findings, ESLint rule placement) and What's Next (links to backlog items #255 and #256) | Phase 5 |
+| `media/shipped-post.md` | Feature post: copies the four sections from `evidence/opening-context.md` verbatim, adds Lessons Learned (any non-determinism findings, ESLint rule placement) and What's Next (links to backlog items #256 and #257) | Phase 5 |
 
 **No screenshots, no interaction GIF.** This is a backend / type-derivation feature with zero visual surface.
 
@@ -201,12 +201,12 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 - [ ] T025 Create feature blog post via Content Specialist agent `specs/240-linkml-stac-writer-types/media/shipped-post.md`. Spawn the `content-specialist` subagent (`.claude/agents/media/content.md`) with:
   - The full contents of `specs/240-linkml-stac-writer-types/evidence/opening-context.md` (the cached opener — must be copied **verbatim** as the first four sections: Hook, What We're Building, How It Fits, Key Decisions).
-  - Pointers to: `evidence/before-after-types.md` (the consolidation proof), `evidence/drift-gate-evidence.md` (the CI gate proof), `evidence/test-summary.md` (the test results), and the two follow-up backlog items (#255 prefix-aware typing, #256 read-path validation).
+  - Pointers to: `evidence/before-after-types.md` (the consolidation proof), `evidence/drift-gate-evidence.md` (the CI gate proof), `evidence/test-summary.md` (the test results), and the two follow-up backlog items (#256 prefix-aware typing, #257 read-path validation).
   - Title: `Building LinkML-Derived `@debrief/stac-writer` Types`.
   - Required additional sections AFTER the cached opener:
     - **By the Numbers** — files modified, lines diff stats, generator runs, time-to-regenerate, count of pre-existing hand-written declarations consolidated.
     - **Lessons Learned** — at minimum: (a) the prefix-stripping discovery that surfaced during review and reshaped scope; (b) whether generator determinism required a normalisation pass (per T001 evidence). Honest about the deferral — this feature only consolidated half of what the original spec promised.
-    - **What's Next** — links to backlog items #255 (prefix-aware typing) and #256 (read-path validation).
+    - **What's Next** — links to backlog items #256 (prefix-aware typing) and #257 (read-path validation).
   - **No** screenshots, **no** interaction GIF, **no** "try it yourself in Storybook" CTA.
   - Front matter MUST include the standard Future Debrief blog YAML (title, date, tags). Use prior shipped posts (e.g. those at `debrief.github.io` linked from previous specs) as the template.
 
@@ -217,7 +217,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
   - Cross-publishes `media/shipped-post.md` to `debrief/debrief.github.io` as a paired PR.
   - Returns both PR URLs for review.
 
-  **Dependencies**: T001 through T025 must all be complete and committed before T026 runs. The PR description MUST link the BACKLOG.md follow-up entries for #255 and #256 so the deferred scope is durable.
+  **Dependencies**: T001 through T025 must all be complete and committed before T026 runs. The PR description MUST link the BACKLOG.md follow-up entries for #256 and #257 so the deferred scope is durable.
 
 ## Dependencies
 
@@ -277,7 +277,7 @@ This feature delivers value incrementally in two halves:
 
 2. **After Phase 4 (Story 2, P2)**: The drift gate locks the consolidation in place. Future contributors who hand-edit a generated file will find their PR fails CI before any test runs. This is the "long-term durability" half of the spec.
 
-3. **After Phase 5 (Polish)**: Evidence + blog post + PR. The blog post's "What's Next" section makes the deferred scope (#255 prefix-aware typing, #256 read-path validation) visible to readers, so the half-delivered promise is acknowledged honestly.
+3. **After Phase 5 (Polish)**: Evidence + blog post + PR. The blog post's "What's Next" section makes the deferred scope (#256 prefix-aware typing, #257 read-path validation) visible to readers, so the half-delivered promise is acknowledged honestly.
 
 ### Estimated effort
 

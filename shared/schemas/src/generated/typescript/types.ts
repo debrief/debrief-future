@@ -272,6 +272,8 @@ export enum SystemStateTypeEnum {
     spatial = "spatial",
     /** Feature selection state (selected IDs) */
     selection = "selection",
+    /** Per-plot active-Storyboard pin (#237) */
+    active_storyboard = "active_storyboard",
 };
 /**
 * Array centre calculation mode for towed array sensors
@@ -1008,7 +1010,7 @@ export interface ReferenceLocation {
 export interface SystemStateProperties {
     /** Feature type discriminator */
     kind: string,
-    /** Discriminator for state variant (temporal, spatial, selection) */
+    /** Discriminator for state variant (temporal, spatial, selection, active_storyboard) */
     state_type: string,
     /** Viewport start time (ISO8601) - for temporal state */
     start_time?: string,
@@ -1022,6 +1024,8 @@ export interface SystemStateProperties {
     center?: number[],
     /** Array of selected feature IDs - for selection state */
     selected_ids?: string[],
+    /** Storyboard properties.id the analyst last pinned for this plot (#237) */
+    active_storyboard_id?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }

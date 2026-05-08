@@ -549,6 +549,10 @@ class SystemStateTypeEnum(str, Enum):
     """
     Feature selection state (selected IDs)
     """
+    active_storyboard = "active_storyboard"
+    """
+    Per-plot active-Storyboard pin (#237)
+    """
 
 
 class ArrayCentreModeEnum(str, Enum):
@@ -2019,7 +2023,7 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'StoryboardProperties',
                        'SceneProperties'],
          'equals_string': 'SYSTEM'} })
-    state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection, active_storyboard)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     start_time: Optional[datetime ] = Field(default=None, description="""Viewport start time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     end_time: Optional[datetime ] = Field(default=None, description="""Viewport end time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2035,6 +2039,7 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'Viewport']} })
     selected_ids: Optional[list[str]] = Field(default=[], description="""Array of selected feature IDs - for selection state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
+    active_storyboard_id: Optional[str] = Field(default=None, description="""Storyboard properties.id the analyst last pinned for this plot (#237)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
                        'SystemRecordProperties']} })
