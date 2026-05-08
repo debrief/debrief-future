@@ -18,6 +18,7 @@ export { detectMissingDataForScene } from './missing-data';
 export type { MissingDataClassification, PlotTimeRange as StoryboardPlotTimeRange, } from './missing-data';
 export { canonicaliseVisibleFeatureIds, computeFeatureSetHash, } from './hash';
 export { validatePlot } from './validate';
+export { isActiveStoryboardSelection, getActiveStoryboardSelection, setActiveStoryboardSelection, ACTIVE_STORYBOARD_FEATURE_ID, ACTIVE_STORYBOARD_STATE_TYPE, } from './activeStoryboardSelection';
 export { runPlotOpenMigrations, V1_MIGRATIONS } from './migration';
 export type { MigrationFn } from './migration';
 export { formatDtg } from './dtg';
