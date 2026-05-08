@@ -20,27 +20,31 @@ Today exists in **three** divergent forms:
 | Hand-written TS #1 (writer's own) | `shared/stac-writer/src/interface.ts:42–49` | `tool: string`; `method: string`; **`source: 'user' \| 'tool' \| 'import'`** ← divergent; `fields: ReadonlyArray<string>`; all readonly. |
 | Hand-written TS #2 (Properties Panel) | `shared/components/src/PropertiesPanel/provenanceTypes.ts:9–22` | `tool: typeof PROPERTIES_PANEL_TOOL_SENTINEL` ← tighter; `method: \`properties-panel@${string}\`` ← tighter; `source: 'user'` ← matches LinkML; `fields: string[]`; `activity_id`, `timestamp` non-readonly. |
 
-**Target state**: The LinkML class stays canonical (no LinkML edit needed). The two hand-written TS sites collapse to **re-exports** of the generated type. The Properties Panel file keeps its constants (`PROPERTIES_PANEL_TOOL_SENTINEL`, etc.) and the runtime validator (`isValidPropertiesProvenanceEntry`); only the type alias is replaced. The writer's `interface.ts` removes its hand-written declaration entirely and re-exports from `@debrief/components/PropertiesPanel/provenanceTypes` (which now re-exports from `@debrief/schemas`).
+**Target state** *(revised after `/speckit.review` 2026-05-08)*:
+- The LinkML class stays canonical (no LinkML edit needed).
+- The components-side declaration becomes a **hybrid intersection** that re-exports the LinkML-generated type *and* statically narrows `tool`/`method`/`source` to the literal types they have today (preserving the compile-time guard at production write sites — see research R2 for why this is non-negotiable).
+- The writer's `interface.ts` deletes its hand-written declaration entirely and re-exports from `@debrief/components/PropertiesPanel/provenanceTypes`.
+- The Properties Panel file's constants (`PROPERTIES_PANEL_TOOL_SENTINEL`, etc.) and runtime validator (`isValidPropertiesProvenanceEntry`) stay verbatim.
 
-**Why route through `@debrief/components`, not directly from `@debrief/schemas`**: `@debrief/components` is the existing canonical TS-side home for the Properties Panel's runtime constraints (validator, constants). The writer already re-exports `PropertiesProvenanceEntry` for its own consumers; keeping that re-export in place means **zero changes to consumer import paths** outside the writer package. The writer becomes a passthrough re-exporter rather than a definer.
+**Why route through `@debrief/components`, not directly from `@debrief/schemas`**: The hybrid intersection is the *one* place that owns the literal-narrowing alongside the LinkML re-export. The writer needs the narrowed type (its consumers — `stacService.ts:1323`, `stacWriterIdb.ts:332` — depend on the literal `tool`/`method`/`source` for write-time typo detection). Routing through the components-side declaration centralises both the narrowing and the validator in one file. This introduces a new workspace dep edge `@debrief/stac-writer → @debrief/components` (type-only, via subpath leaf) — accepted per `/speckit.review` decision 3, with an ESLint rule banning *runtime* imports from `@debrief/components` in the writer to keep the leanness invariant durable.
 
-**Reconciliation: the `source` enum** (research R4): The hand-written `source: 'user' | 'tool' | 'import'` in the writer is dead code (no caller passes `'tool'` or `'import'`). It collapses to `'user'` (per LinkML). Generated TS sees `string`, runtime validator sees `e.source === 'user'`. Net effect: tighter than today on the runtime side, looser than today on the writer's TS-only narrowing. No behaviour change at runtime.
+**Reconciliation: the `source` enum** (research R4): The hand-written `source: 'user' | 'tool' | 'import'` in the writer is dead code (no caller passes `'tool'` or `'import'`). Under the hybrid intersection, the writer's hand-written declaration is *deleted entirely* and replaced by a re-export of the components-side `PropertiesProvenanceEntry`, which fixes `source: 'user'`. So R4 doesn't require a dedicated edit — it falls out of the R2 implementation as a side-effect.
 
-### 1.2 `StacItem`
+### 1.2 `StacItem` — out of scope for this feature
 
-LinkML class: **does not exist, and per research R1 will not be added.**
+*(Updated 2026-05-08 after `/speckit.review`.)*
+
+LinkML class: **does not exist, and will not be added.** The writer's `StacItem` interface stays exactly as today.
 
 | Site | File:Line | Today's shape | Target shape |
 |------|-----------|---------------|--------------|
-| Hand-written TS in writer | `shared/stac-writer/src/interface.ts:34–40` | `id: string`; `properties: Record<string, unknown>`; `assets?: Record<string, StacAsset>`; `links?: ReadonlyArray<{rel; href}>`; `[k: string]: unknown` | `id: string`; **`properties: StacExtensionProperties & Record<string, unknown>`** ← imports from `@debrief/schemas`; rest unchanged |
+| Hand-written TS in writer | `shared/stac-writer/src/interface.ts:34–40` | `id: string`; `properties: Record<string, unknown>`; `assets?: Record<string, StacAsset>`; `links?: ReadonlyArray<{rel; href}>`; `[k: string]: unknown` | **Unchanged** — same hand-written shape. |
 
-The change is one import + one type-position substitution. Behaviour at runtime is identical (`& Record<string, unknown>` permits all keys the previous `Record<string, unknown>` did). New `debrief:*` fields added to `stac-extension.yaml` flow into `StacExtensionProperties` and are visible to every consumer of `StacItem.properties`.
+**Why `StacItem` is deferred** (full rationale in research R1): The originally-planned `properties: StacExtensionProperties & Record<string, unknown>` would have delivered no value because LinkML's `gen-typescript` emits unprefixed field names (`provenance_log`) while the writer accesses by JSON key (`props['debrief:provenance_log']`). The named-slot typing would never resolve at the call sites that matter. Delivering the spec's "new `debrief:*` fields flow automatically" promise requires either a `gen-typescript` prefix-aware emitter or a repo-wide refactor of the writer's access pattern — both materially out of scope here. Captured as a backlog follow-up ("Prefix-aware TS typing for `StacExtensionProperties`").
 
-### 1.3 `StacExtensionProperties` (already canonical)
+### 1.3 `StacExtensionProperties` (already canonical, untouched)
 
-Today: declared in `shared/schemas/src/linkml/stac-extension.yaml:112–169`, generated into `shared/schemas/src/generated/typescript/types.ts:1625+`, exported from `@debrief/schemas`. **No change.**
-
-This is the existing entity that the writer's new `StacItem.properties` will reference — that's the whole point of the redesign.
+Today: declared in `shared/schemas/src/linkml/stac-extension.yaml:112–169`, generated into `shared/schemas/src/generated/typescript/types.ts:1625+`, exported from `@debrief/schemas`. **No change** — and per the §1.2 deferral, no new consumer is wired up to it by this feature.
 
 ## 2. Type-surface delta — before / after
 
@@ -70,28 +74,31 @@ This is the existing entity that the writer's new `StacItem.properties` will ref
 @debrief/schemas
 └── src/generated/typescript/types.ts
     └── export interface PropertiesProvenanceEntry   ← single source of truth (no change to file)
-    └── export interface StacExtensionProperties     ← existing, now imported by writer
 
 @debrief/components
 └── PropertiesPanel/provenanceTypes.ts
     ├── import type { PropertiesProvenanceEntry as Generated } from '@debrief/schemas';
     ├── export const PROPERTIES_PANEL_TOOL_SENTINEL                         ← unchanged
-    ├── export type PropertiesProvenanceEntry = Generated;                  ← re-export
+    ├── export type PropertiesProvenanceEntry =                             ← HYBRID INTERSECTION
+    │     Omit<Generated, 'tool' | 'method' | 'source'> & {
+    │       tool: typeof PROPERTIES_PANEL_TOOL_SENTINEL;
+    │       method: `properties-panel@${string}`;
+    │       source: 'user';
+    │     };
     ├── export function isValidPropertiesProvenanceEntry(...)               ← unchanged body
     └── export const PROVENANCE_LOG_CAP, PROVENANCE_LOG_ARCHIVE_FILENAME    ← unchanged
 
 @debrief/stac-writer
-└── interface.ts
-    ├── import type { StacExtensionProperties } from '@debrief/schemas';
-    ├── import type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';
-    ├── export interface StacItem {
-    │     readonly id: string;
-    │     readonly properties: StacExtensionProperties & Record<string, unknown>;   ← schema-derived part
-    │     readonly assets?: ...;
-    │     readonly links?: ...;
-    │     readonly [k: string]: unknown;
-    │   }
-    └── export type { PropertiesProvenanceEntry };                          ← re-export
+├── package.json
+│   └── dependencies: { "@debrief/components": "workspace:*" }              ← NEW (type-only consumer)
+└── src/interface.ts
+    ├── (no import from @debrief/schemas — writer doesn't see Generated directly)
+    ├── export interface StacItem { ... }                                    ← UNCHANGED (out of scope)
+    └── export type { PropertiesProvenanceEntry } from
+          '@debrief/components/PropertiesPanel/provenanceTypes';            ← re-export of narrowed type
+
+.eslintrc.* (writer-scoped override)
+└── no-restricted-imports: ban runtime imports from @debrief/components in shared/stac-writer/**
 ```
 
 ## 3. Consumer impact (all in-repo importers)
@@ -108,7 +115,7 @@ Grep-confirmed list of files that import either type today (from research):
 | `shared/stac-writer/src/index.ts:15` | `PropertiesProvenanceEntry` re-export | local interface.ts | re-routed | **automatic** (re-export updated in interface.ts) |
 | `specs/193-properties-panel/contracts/*.ts` | type references | spec contract files | unchanged | **none** (these are historical contract files frozen by their spec) |
 
-**Conclusion**: Zero call-site edits required outside the three modified files (`shared/stac-writer/src/interface.ts`, `shared/components/src/PropertiesPanel/provenanceTypes.ts`, and the LinkML enum reconciliation if R4 needs one). Consumers feel no change.
+**Conclusion**: Zero call-site edits required outside the two modified TS files (`shared/stac-writer/src/interface.ts`, `shared/components/src/PropertiesPanel/provenanceTypes.ts`). Consumers feel no change. R4 requires no dedicated edit — it falls out of R2 as a side-effect (the writer's hand-written declaration disappears entirely, taking the dead-code `'tool' | 'import'` enum members with it).
 
 ## 4. State transitions
 
@@ -118,12 +125,14 @@ None — this is a static type-derivation feature. No runtime state, no entity l
 
 All validation lives in `isValidPropertiesProvenanceEntry` (runtime, kept verbatim) and the LinkML class definition (build-time, unchanged). The migration adds **one new validation gate**: the CI drift check (research R3), which validates that the *type definitions themselves* match the schema source.
 
-## 6. CI / build artefacts changed
+## 6. Build / CI / config artefacts changed
 
 | Artefact | Change |
 |----------|--------|
-| `.github/workflows/schema-tests.yml` | Add a `Check generated artefacts are up-to-date` step after `Run schema generation`. |
+| `shared/stac-writer/package.json` | Add `@debrief/components` to `dependencies` (workspace `*`). |
+| ESLint config (workspace-level or writer-scoped override) | Add `no-restricted-imports` rule for `shared/stac-writer/**` banning runtime imports from `@debrief/components` (type-only imports remain allowed). |
+| `.github/workflows/schema-tests.yml` | Add a `Check generated artefacts are up-to-date` step after `Run schema generation`. **Gated on SC-007 — verified generator determinism** (run generator twice on a clean checkout; assert `git diff --quiet`; if non-deterministic, add a `prettier --write` normalisation pass before the diff). |
 | `Taskfile.yml` | Add `schema:generate` and `schema:check-drift` targets so contributors run the same check locally. |
 | `.gitattributes` | Add `shared/schemas/src/generated/** linguist-generated=true` (research R5). |
 
-No new packages, no new dependencies, no on-disk format changes.
+No new packages, no new external dependencies, no on-disk format changes. The single new internal dependency edge is `@debrief/stac-writer → @debrief/components` (workspace, type-only via subpath leaf).

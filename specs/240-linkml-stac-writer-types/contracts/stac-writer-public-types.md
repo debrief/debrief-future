@@ -10,7 +10,7 @@ This is the binding TypeScript public-surface contract for the migration. The na
 
 ## 1. Public TS surface — `@debrief/stac-writer` (export from `index.ts`)
 
-**No name additions, no name removals, no name renames.** Same set of exports as today; the underlying definitions of two of them (`StacItem`, `PropertiesProvenanceEntry`) re-route to schema-derived sources.
+**No name additions, no name removals, no name renames.** Same set of exports as today; one underlying definition (`PropertiesProvenanceEntry`) re-routes to a schema-derived source. `StacItem` is unchanged.
 
 ```typescript
 // shared/stac-writer/src/index.ts — export list (unchanged from today)
@@ -25,7 +25,7 @@ export type {
   PatchItemResult,
   PropertiesProvenanceEntry,        // ← now re-exported from @debrief/components/PropertiesPanel/provenanceTypes
   StacAsset,
-  StacItem,                          // ← now references StacExtensionProperties from @debrief/schemas
+  StacItem,                          // ← UNCHANGED (out of scope per /speckit.review)
   StacWriter,
   StoreContext,
   StoredItem,
@@ -42,32 +42,26 @@ export type {
 
 ## 2. `StacItem` after migration (normative)
 
-```typescript
-// shared/stac-writer/src/interface.ts — StacItem only
+**Out of scope for this feature.** `StacItem` remains exactly as today:
 
-import type { StacExtensionProperties } from '@debrief/schemas';
+```typescript
+// shared/stac-writer/src/interface.ts — StacItem unchanged
 
 export interface StacItem {
   readonly id: string;
-  readonly properties: StacExtensionProperties & Record<string, unknown>;
+  readonly properties: Record<string, unknown>;
   readonly assets?: Record<string, StacAsset>;
   readonly links?: ReadonlyArray<{ readonly rel: string; readonly href: string }>;
   readonly [k: string]: unknown;
 }
 ```
 
-**Diff from today**:
+The originally-planned typing of `properties` as `StacExtensionProperties & Record<string, unknown>` was rejected after `/speckit.review` (decision 1) — see research R1 for the full rationale. The "new `debrief:*` fields flow automatically to the writer's typed surface" promise is captured as a backlog follow-up.
 
-```diff
-- readonly properties: Record<string, unknown>;
-+ readonly properties: StacExtensionProperties & Record<string, unknown>;
-```
+**Behavioural invariants** (must hold — and do, since the type is unchanged):
 
-**Behavioural invariants** (must hold after migration):
-
-- `StacItem` accepts every value it accepts today (the `& Record<string, unknown>` clause keeps the open-extension semantics).
-- `StacItem` does **not** require any new field — `StacExtensionProperties` consists entirely of optional fields (verified at `shared/schemas/src/linkml/stac-extension.yaml:112–169` — every slot in the class has `required: false` or no `required:` attribute, defaulting to optional).
-- The TS type is structurally compatible with every JSON object the writer accepts on disk today, including those carrying *no* `debrief:*` extension fields.
+- Every value the writer accepts today, it accepts after the migration. (Trivially true.)
+- The TS type is structurally compatible with every JSON object the writer accepts on disk today.
 
 ## 3. `PropertiesProvenanceEntry` after migration (normative)
 
@@ -78,19 +72,26 @@ export type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPa
 ```
 
 ```typescript
-// shared/components/src/PropertiesPanel/provenanceTypes.ts — final shape
+// shared/components/src/PropertiesPanel/provenanceTypes.ts — final shape (HYBRID INTERSECTION)
 
-import type { PropertiesProvenanceEntry as GeneratedEntry } from '@debrief/schemas';
+import type { PropertiesProvenanceEntry as Generated } from '@debrief/schemas';
 
 export const PROPERTIES_PANEL_TOOL_SENTINEL = 'debrief.propertiesPanel' as const;
 
 /**
  * Per-commit provenance entry for the Properties Panel.
- * Type sourced from LinkML — see shared/schemas/src/linkml/stac-extension.yaml.
- * Constraints not expressible in TypeScript (literal `tool`/`source` values,
- * `method` template) are enforced at runtime by isValidPropertiesProvenanceEntry.
+ * Schema-derived contract via LinkML (see shared/schemas/src/linkml/stac-extension.yaml).
+ * Pattern constraints not expressible in TypeScript (literal `tool`/`source` values,
+ * `method` template) are reinstated here via a hybrid intersection so that
+ * compile-time typo-detection at production write sites continues to work.
  */
-export type PropertiesProvenanceEntry = GeneratedEntry;
+export type PropertiesProvenanceEntry =
+  Omit<Generated, 'tool' | 'method' | 'source'> &
+  {
+    tool: typeof PROPERTIES_PANEL_TOOL_SENTINEL;
+    method: `properties-panel@${string}`;
+    source: 'user';
+  };
 
 export function isValidPropertiesProvenanceEntry(
   entry: unknown,
@@ -113,11 +114,21 @@ export const PROVENANCE_LOG_ARCHIVE_FILENAME = 'provenance_log_archive.jsonl' as
 -   fields: string[];
 -   source: 'user';
 - }
-+ import type { PropertiesProvenanceEntry as GeneratedEntry } from '@debrief/schemas';
-+ export type PropertiesProvenanceEntry = GeneratedEntry;
++ import type { PropertiesProvenanceEntry as Generated } from '@debrief/schemas';
++ export type PropertiesProvenanceEntry =
++   Omit<Generated, 'tool' | 'method' | 'source'> &
++   {
++     tool: typeof PROPERTIES_PANEL_TOOL_SENTINEL;
++     method: `properties-panel@${string}`;
++     source: 'user';
++   };
 ```
 
-**Static-surface change** (research R2): `tool`, `method`, `source` go from literal/template-literal types to plain `string`. Runtime semantics unchanged.
+**Static-surface invariants** (must hold after migration):
+
+- `tool`, `method`, `source` retain their literal/template-literal types from today. A typo at the production write sites continues to fail tsc.
+- `activity_id`, `timestamp`, `fields` flow from the LinkML-generated `Generated` type. Any change to those slots in `stac-extension.yaml` propagates without a hand-edit here.
+- The runtime validator (`isValidPropertiesProvenanceEntry`) and the constants are bit-for-bit unchanged from today.
 
 ## 4. `@debrief/schemas` import surface (no change)
 
@@ -147,6 +158,8 @@ This file is auto-generated. The contract here pins the *expected output* of `ge
 
 ## 5. CI contract — drift check
 
+**Prerequisite**: SC-007 — generator-determinism verification. Before the drift check ships, the implementation MUST confirm that running `python scripts/generate.py` twice on a clean checkout produces zero `git diff` under `shared/schemas/src/generated/`. If non-deterministic, a normalisation pass (e.g. `prettier --write` on the generated `.ts`; equivalent for Pydantic if needed) MUST run between regeneration and the diff check, and the normalised output MUST itself be verified byte-stable.
+
 After this feature lands, `.github/workflows/schema-tests.yml` MUST contain a step semantically equivalent to:
 
 ```yaml
@@ -167,14 +180,24 @@ This step:
 
 ## 6. Behavioural contract — STAC Item round-trip
 
-**Invariant**: For every STAC Item file under `preview/workspace/samples/local-store/`, reading the file via `JSON.parse`, narrowing to the post-migration `StacItem` type, then serialising via `JSON.stringify` MUST produce a byte-equivalent string (modulo trailing newline normalisation already applied by today's writer).
+**Invariant**: For every STAC Item file under `preview/workspace/samples/local-store/`, reading the file via `JSON.parse`, narrowing to the (unchanged) `StacItem` type, then serialising via `JSON.stringify` MUST produce a byte-equivalent string (modulo trailing newline normalisation already applied by today's writer). Because `StacItem` is unchanged by this feature, the invariant is *trivially* preserved on the writer side; the round-trip walkthrough in quickstart.md still exists as a smoke test against accidental regression introduced by the workspace dep edge or the ESLint rule.
 
 This invariant is verified by the Phase-1 quickstart walkthrough and by the existing Python round-trip test (`shared/schemas/tests/test_roundtrip.py`).
 
-## 7. Out-of-scope (NOT covered by this contract)
+## 7. Workspace dependency contract
+
+**New edge** (added by this feature): `@debrief/stac-writer` depends on `@debrief/components` (workspace `*`).
+
+**Constraint**: The dependency is type-only via the `./PropertiesPanel/provenanceTypes` subpath leaf. No runtime code from `@debrief/components` may be imported by any file under `shared/stac-writer/`. This is enforced by an ESLint `no-restricted-imports` rule scoped to `shared/stac-writer/**`. Type-only imports (`import type { ... }`, `export type { ... }`) remain allowed.
+
+The provenanceTypes leaf module today has zero React/DOM/Leaflet dependencies (it contains only constants, the runtime validator, and the type alias). The ESLint rule keeps that property durable as the components package evolves.
+
+## 8. Out-of-scope (NOT covered by this contract)
 
 - Modifying `StacExtensionProperties` itself (the LinkML class).
 - Modifying any other LinkML class (`PlotSummary`, `StacItemSummary`, `PlatformRecord`, etc.).
+- Changing the writer's `StacItem` interface — explicitly deferred per `/speckit.review` decision 1.
 - Changing the writer's runtime behaviour (`writeItem`, `patchItem`, `writeAsset`, etc.).
 - Changing on-disk JSON format.
 - Adding new public type names to `@debrief/stac-writer`.
+- Adding runtime validator calls in production write paths (covered by the hybrid intersection's compile-time guard; deferred backlog item exists for read-path validation).

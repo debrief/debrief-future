@@ -4,65 +4,77 @@
 **Phase**: 0 (resolve unknowns before design)
 **Date**: 2026-05-07
 
-The spec contains zero `[NEEDS CLARIFICATION]` markers, so research here is *positive* (what we discovered while investigating the existing codebase) rather than question-resolution. Five outcomes (R1–R5) shape the design choices in `plan.md` and `data-model.md`.
+The spec contains zero `[NEEDS CLARIFICATION]` markers, so research here is *positive* (what we discovered while investigating the existing codebase) rather than question-resolution. Five outcomes (R1–R5) shape the design choices in `plan.md` and `data-model.md`. Outcomes R1 and R2 were materially revised after `/speckit.review` on 2026-05-08 — see the revision notes inline.
 
 ---
 
-## R1: Should `StacItem` be added to LinkML?
+## R1: Should `StacItem` be added to LinkML, or its `properties` typed via `StacExtensionProperties`?
 
-**Decision**: **No.** Keep `StacItem` as a TypeScript-only interface in `@debrief/stac-writer/src/interface.ts`, but type its `properties` as `StacExtensionProperties & Record<string, unknown>`, importing `StacExtensionProperties` from `@debrief/schemas`.
+**Decision** *(revised after `/speckit.review` 2026-05-08)*: **Neither — leave `StacItem` entirely out of scope for this feature.** The writer's `StacItem` interface stays exactly as today (`properties: Record<string, unknown>`). The original plan to type `properties` as `StacExtensionProperties & Record<string, unknown>` was found to deliver no value (see "Why the originally-planned approach fails" below) and is captured as a follow-up backlog item ("Prefix-aware TS typing for `StacExtensionProperties`").
 
-**Rationale**:
+**Why the originally-planned approach fails**:
 
-The writer's `StacItem` is the bare STAC 1.1 Item shape (`id`, `properties`, `assets`, `links`, plus arbitrary top-level keys via `[k: string]: unknown`) with the Debrief extension layered into `properties`. The bare STAC 1.1 shape is **not authored here** — it is a stable upstream contract owned by the STAC working group, with its own canonical JSON Schema at `https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json`. Re-modelling that shape in this repo's LinkML would:
+The on-disk JSON keys carry the `debrief:` prefix:
+- `props['debrief:provenance_log']` — `apps/vscode/src/services/stacService.ts:1333`, `apps/web-shell/src/services/stacWriterIdb.ts:341`
+- `props['debrief:overrides']` — `apps/vscode/src/services/stacService.ts:1319`
+- `props['debrief:platforms']`, `props['debrief:tags']`, etc.
 
-1. Introduce a second source-of-truth for STAC 1.1 (the LinkML re-model) without removing the upstream one. This *creates* schema drift (between our re-model and the canonical STAC schema) instead of eliminating it.
-2. Force tracking of upstream STAC 1.1 evolutions in our LinkML — work without value.
-3. Force LinkML to express "any top-level key passes through" (`[k: string]: unknown`) — possible via `additionalProperties: true` on the JSON Schema side, but awkward in LinkML's class model and lossy after generation.
+LinkML's `gen-typescript` strips the `debrief:` prefix when emitting field names. The generated TS interface is:
 
-The *meaningful* part of the writer's `StacItem` — the part that the spec actually cares about, where new `debrief:*` extension fields land — is `properties`. That portion is already modelled in LinkML as `StacExtensionProperties`. Importing that single class into the writer's `StacItem` definition delivers the spec's intent (new extension fields propagate automatically) without re-modelling STAC 1.1.
+```typescript
+export interface StacExtensionProperties {
+    platforms?: PlatformRecord[],
+    tags?: string[],
+    feature_tags?: string[],
+    overrides?: string[],
+    provenance_log?: PropertiesProvenanceEntry[],
+}
+```
 
-After the migration, adding a new `debrief:*` field to `stac-extension.yaml` produces an updated `StacExtensionProperties` interface, which the writer's `StacItem.properties` references via `&`. Static type-checkers see the new field through the writer's surface immediately. ✅
+(See `shared/schemas/src/generated/typescript/types.ts:1625+`.) Names are unprefixed.
 
-**Alternatives considered**:
+If `StacItem.properties` were typed as `StacExtensionProperties & Record<string, unknown>`, then `props['debrief:provenance_log']` would resolve via the `Record<string, unknown>` index signature (yielding `unknown`), not via the `StacExtensionProperties.provenance_log` slot (which has a different name). The writer would gain *zero* additional type information for any of its real access patterns.
 
-- **Option A — full LinkML `StacItem` class**: Adds work without value (see above). Rejected.
-- **Option B — `StacItem.properties: any`**: Loses Article XV compliance. Rejected.
-- **Option C — `StacItem.properties: StacExtensionProperties`** (no `& Record<string, unknown>`): Tightens past today's behaviour — the writer would refuse unknown keys it currently accepts. This would break round-trip on already-emitted items that carry future-Debrief or unrelated extension fields. Rejected.
-- **Option D (chosen) — `properties: StacExtensionProperties & Record<string, unknown>`**: Known fields are typed and flow from LinkML; unknown fields still pass through. Matches today's runtime behaviour exactly. ✅
+Delivering the spec's "new `debrief:*` fields flow automatically" promise requires either:
+1. A `gen-typescript` extension that emits a parallel interface with prefixed JSON keys (e.g. `'debrief:provenance_log': PropertiesProvenanceEntry[]`), OR
+2. A repo-wide refactor of the writer's access pattern (`props['debrief:foo']` → `props.foo` plus a serialisation adapter that adds the prefix on write).
 
-**Spec-text reconciliation**: FR-001 reads "consume LinkML-generated TypeScript declarations for `StacItem` and `PropertiesProvenanceEntry`." Strictly, after this design only `PropertiesProvenanceEntry` is fully LinkML-derived; `StacItem` *references* a LinkML-derived type rather than being one itself. This satisfies the spec's *intent* (close the drift gap on the Debrief extension surface) while respecting an upstream-schema boundary the spec didn't explicitly call out. The spec's edge-case bullet *"Two `StacItem`s in the world: STAC's own Item shape (from the STAC 1.1 spec) and the Debrief-extended Item shape co-exist in the codebase"* implicitly endorses this distinction.
+Both are materially larger work than this feature can absorb. Captured as a backlog follow-up.
+
+**Alternatives considered (and rejected)**:
+
+- **Option A — Add `StacItem` as a full LinkML class**: Re-models bare STAC 1.1 in our LinkML. Creates a *new* drift surface (us vs. the upstream STAC working group's canonical JSON Schema). Rejected.
+- **Option B — Originally-planned `StacItem.properties: StacExtensionProperties & Record<string, unknown>`**: Doesn't deliver the promise (see above) — falls back to `Record<string, unknown>` for every real access. Misleading at best. Rejected.
+- **Option C (chosen) — Defer the entire `StacItem` typing improvement**: Smallest correct migration. Documents the gap honestly via a backlog entry. Lets this feature ship the consolidation half (`PropertiesProvenanceEntry`) without overpromising on the half it can't deliver. ✅
+
+**Spec-text reconciliation** *(applied 2026-05-08)*: Spec FR-001 was tightened to scope the LinkML-derivation requirement to `PropertiesProvenanceEntry` only. The Key Entities note for `StacItem` documents that it remains hand-written. SC-005 was reframed: the Article II.1 audit reports `PropertiesProvenanceEntry` as resolved while `StacItem` is a tracked deferral, not an open finding.
 
 ---
 
 ## R2: How do we handle the literal-string narrowness loss for `tool` / `method` / `source`?
 
-**Decision**: **Accept the looser static types.** Keep the runtime validator (`isValidPropertiesProvenanceEntry`) and the constants (`PROPERTIES_PANEL_TOOL_SENTINEL`, `PROVENANCE_LOG_CAP`, `PROVENANCE_LOG_ARCHIVE_FILENAME`) in `@debrief/components/src/PropertiesPanel/provenanceTypes.ts` exactly as they are today. Re-export the *type* from `@debrief/schemas`, but keep a hand-written **type-guard** that narrows generated `string` fields to literal types at the boundary.
+**Decision** *(revised after `/speckit.review` 2026-05-08)*: **Hybrid intersection.** Re-export the LinkML-generated type and immediately tighten the three pattern-constrained fields back to literal types via an intersection in the components-side declaration. The runtime validator (`isValidPropertiesProvenanceEntry`) and the constants (`PROPERTIES_PANEL_TOOL_SENTINEL`, `PROVENANCE_LOG_CAP`, `PROVENANCE_LOG_ARCHIVE_FILENAME`) stay verbatim.
 
-**Rationale**:
+**Why the originally-accepted "loose types" decision was wrong**:
 
-LinkML's `pattern` constraint generates JSON Schema `pattern` properties and Pydantic regex validators, but `gen-typescript` emits `string` (it has no general way to translate regex into TS literal types). The hand-written type today gets tighter static types via three TS-specific constructs (`typeof X`, template literals, `'user'` literal) that LinkML cannot express.
+The original R2 said the runtime validator was the enforcement gate, citing the immutable-audit-trail invariant in Article III.3. Review surfaced that **`isValidPropertiesProvenanceEntry()` is only called in tests** (`apps/vscode/tests/unit/stacService.provenanceRotation.test.ts:155`, `stacService.updateItemMetadata.test.ts:119`) — not in either production write site. The two production constructs at `apps/vscode/src/services/stacService.ts:1323` and `apps/web-shell/src/services/stacWriterIdb.ts:332` rely *exclusively* on the literal-string types in the components-side hand-written declaration to catch typos at the write boundary. Accepting looser strings would have left no compile-time guard *and* no runtime guard in production — a silent-failure path in violation of Article I.3.
 
-Three options:
-
-- **Option A — accept looser types** (chosen): Static surface becomes `tool: string`, `method: string`, `source: string`. Runtime validator stays. Trade-off: a typo at the call site won't be caught by `tsc`; it will be caught by the runtime validator and by tests. The trade-off is consistent across all existing `gen-typescript` consumers in this repo.
-- **Option B — branded narrow shim**: Re-export the generated type but wrap fields in `string & { __brand: 'PropertiesPanelTool' }` type aliases. Forces all callers to construct via the validator. Adds significant ergonomic cost (every caller needs the brand) for marginal type-safety gain.
-- **Option C — fork the generator**: Patch `gen-typescript` to emit literal types when a `pattern` matches a single literal. Out of scope; affects every other consumer of the generator.
-
-Option A is the least-invasive. The runtime validator + constants close the loop at the *write boundary* — where it matters most for an immutable audit trail (Article III.3).
-
-**Alternatives considered**: B and C above. Both rejected on cost-vs-value grounds.
-
-**Concrete migration shape** (final form):
+**The fix — five lines in `provenanceTypes.ts`**:
 
 ```typescript
 // shared/components/src/PropertiesPanel/provenanceTypes.ts
 
-import type { PropertiesProvenanceEntry as GeneratedEntry } from '@debrief/schemas';
+import type { PropertiesProvenanceEntry as Generated } from '@debrief/schemas';
 
 export const PROPERTIES_PANEL_TOOL_SENTINEL = 'debrief.propertiesPanel' as const;
 
-export type PropertiesProvenanceEntry = GeneratedEntry;
+export type PropertiesProvenanceEntry =
+  Omit<Generated, 'tool' | 'method' | 'source'> &
+  {
+    tool: typeof PROPERTIES_PANEL_TOOL_SENTINEL;
+    method: `properties-panel@${string}`;
+    source: 'user';
+  };
 
 export function isValidPropertiesProvenanceEntry(
   entry: unknown,
@@ -73,6 +85,22 @@ export function isValidPropertiesProvenanceEntry(
 export const PROVENANCE_LOG_CAP = 500 as const;
 export const PROVENANCE_LOG_ARCHIVE_FILENAME = 'provenance_log_archive.jsonl' as const;
 ```
+
+**What this delivers**:
+
+- The schema-driven invariant is preserved: `Omit<Generated, ...>` references the LinkML-generated type, so any change to the LinkML class flows through (e.g. adding a new attribute, tightening another pattern).
+- The compile-time guard is preserved: `tool`, `method`, `source` keep their literal/template-literal types. Today's typo-catching at the production write sites continues to work unchanged.
+- Cost: 5 lines of hand-written narrowing in *one place* — the components-side declaration. Same place a contributor would have hand-written the type today; same place they'll edit if the constraints change.
+
+**Alternatives considered**:
+
+- **Option A — accept looser types** (originally chosen, then rejected after review): Re-opens an Article I.3 silent-failure path because the runtime validator isn't called in production. Rejected.
+- **Option B — Hybrid intersection** (chosen, post-review): Closes the gap statically; one small file edit. ✅
+- **Option C — Add runtime validator calls in production write paths**: Closes the gap dynamically (throw on bad input). Adds 2-3 lines × 2 sites + matching test. Equally valid, but B is simpler and catches the bug earlier (compile time vs write time). Captured as a stricter follow-up if needed.
+- **Option D — Branded narrow shim**: Re-export the generated type but wrap fields in `string & { __brand: 'PropertiesPanelTool' }`. Forces all callers to construct via the validator. Significant ergonomic cost. Rejected.
+- **Option E — Fork the generator**: Patch `gen-typescript` to emit literal types when a `pattern` matches a single literal. Out of scope; affects every other consumer of the generator. Rejected.
+
+**Note on the read path**: The hybrid intersection guards *write*. On *read* paths (`stacService.ts:1334` casts `props['debrief:provenance_log']` to `PropertiesProvenanceEntry[]` without runtime validation), a malformed disk entry could still violate the contract silently. That's a separate residual concern — captured as a backlog follow-up ("Production read-path runtime validation of provenance entries") rather than addressed here, since the read-path issue predates this feature and is independent of the type-derivation work.
 
 ---
 
@@ -104,7 +132,14 @@ export const PROVENANCE_LOG_ARCHIVE_FILENAME = 'provenance_log_archive.jsonl' as
 - **Option B — pre-commit hook only** (no CI check): Pre-commit hooks can be skipped. Constitution Article VI.4 requires CI to enforce. Rejected.
 - **Option C — uncommit generated artefacts; generate on every install**: Changes the project's existing convention (artefacts ARE committed today, and the `package.json` `main` for `@debrief/schemas` points at them directly without a build step). Rejected — out of scope.
 
-**Caveat — generator non-determinism**: The drift check assumes `gen-typescript` and `gen-pydantic` produce byte-identical output for identical input. Spot-check this by running the generator twice on `main` before this feature lands; if the diff is non-empty, the migration includes a small normalisation pass (e.g. `prettier --write` on the generated TS) before the diff check. Today's generated files include the header `// AUTO-GENERATED — DO NOT EDIT`, suggesting the generator is already deterministic, but verifying this is a P0 task.
+**Caveat — generator non-determinism (gating, P0)**: The drift check assumes `gen-typescript` and `gen-pydantic` produce byte-identical output for identical input. **This is a P0 gating verification** captured as **SC-007** in spec.md (added 2026-05-08 after `/speckit.review`). The implementation must:
+
+1. Run `python scripts/generate.py` twice on a clean checkout.
+2. Assert `git diff --quiet shared/schemas/src/generated/`.
+3. **If quiet**: drift check ships as designed.
+4. **If not quiet**: investigate the source of non-determinism (likely candidates: dictionary key order, embedded timestamps in headers). Either fix at the generator level, or add a normalisation pass (`prettier --write` for `.ts`; equivalent for Pydantic) between regeneration and the diff check, and verify the normalised output is byte-stable.
+
+A non-deterministic gate is worse than no gate (Article VI.4 — CI MUST pass) because contributors learn to retry CI without investigation. Today's generated files include the header `// AUTO-GENERATED — DO NOT EDIT`, suggesting the generator is already deterministic, but the assumption is verified rather than trusted before the gate ships.
 
 ---
 
@@ -124,7 +159,9 @@ This is a textbook drift symptom — exactly the class of problem the spec exist
 
 **Migration impact**: A grep confirms no in-repo caller passes `'tool'` or `'import'` to a `PropertiesProvenanceEntry.source` field. Zero breakage.
 
-**If a future use case needs `'tool'` or `'import'`**: Add the value to LinkML (`pattern: "^(user|tool|import)$"` or — better — an explicit `permissible_values` enum), regenerate, and the writer surface picks it up automatically. That's exactly the workflow this feature is establishing.
+**Mechanical resolution under the hybrid intersection (R2)**: The writer's hand-written declaration (with the loose enum) is *deleted entirely* — replaced by a re-export of the components-side hybrid intersection, which fixes `source: 'user'`. So R4 doesn't require its own dedicated edit; it's resolved as a side-effect of the R2 implementation.
+
+**If a future use case needs `'tool'` or `'import'`**: Add the value to LinkML (`pattern: "^(user|tool|import)$"` or — better — an explicit `permissible_values` enum), regenerate, and update the components-side intersection's `source` literal to a union (`'user' | 'tool' | 'import'`) in the same change. That's exactly the workflow this feature is establishing.
 
 **Alternatives considered**:
 
@@ -152,10 +189,13 @@ This is a textbook drift symptom — exactly the class of problem the spec exist
 
 ## Summary of resolved decisions
 
+*(Updated 2026-05-08 after `/speckit.review` — R1 and R2 materially revised; R3–R5 substantively unchanged.)*
+
 | ID | Decision | Effect on plan |
 |----|----------|----------------|
-| R1 | No LinkML `StacItem` class; use `StacExtensionProperties & Record<string, unknown>` for `StacItem.properties` | Smallest possible LinkML surface; no upstream re-modelling |
-| R2 | Accept looser TS types from generator; keep runtime validator + constants | Three TS hand-writes collapse to one re-export plus an unchanged validator |
-| R3 | Drift check in `schema-tests.yml`; matching `task schema:check-drift` for local runs | Enforcement at CI; no new workflow file |
-| R4 | Narrow writer's `source` enum to LinkML's `'user'` only | One-line TS change; zero behaviour impact |
+| R1 | **`StacItem` typing dropped from this feature** — naive `StacExtensionProperties & Record<string, unknown>` doesn't deliver the spec's promise because LinkML strips the `debrief:` JSON-key prefix. Captured as a backlog follow-up. | Smaller scope; spec FR-001 narrowed to `PropertiesProvenanceEntry`. |
+| R2 | **Hybrid intersection** in `provenanceTypes.ts` — re-export the LinkML-generated type, intersect to keep `tool`/`method`/`source` as literal types. The runtime validator is *not* called in production write paths today, so accepting loose types would have introduced a silent-failure path. | One small file change preserves both the LinkML link and the compile-time guard. |
+| R3 | Drift check in `schema-tests.yml`; matching `task schema:check-drift` for local runs. **Gated on SC-007** — verified generator determinism (P0 verification before the gate ships; if non-deterministic, add a normalisation pass). | Enforcement at CI; no new workflow file. |
+| R4 | Narrow writer's `source` enum to LinkML's `'user'` only. Mechanically resolved as a side-effect of R2 (the writer's hand-written declaration disappears entirely). | Zero dedicated edit beyond R2. |
 | R5 | `linguist-generated=true` via `.gitattributes` for `shared/schemas/src/generated/**` | One-line `.gitattributes` change; PR diff ergonomics |
+| (review) | Workspace dep edge `@debrief/stac-writer` → `@debrief/components` accepted (type-only via subpath leaf; ESLint bans runtime imports). | One line in writer's `package.json`; one ESLint rule. |

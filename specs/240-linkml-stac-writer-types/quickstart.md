@@ -21,14 +21,32 @@ grep -nA 50 "^PropertiesProvenanceEntry:" shared/schemas/src/linkml/stac-extensi
 
 ---
 
-## Step 2 — Regenerate and confirm zero drift (FR-006, SC-003)
+## Step 2 — Verify generator determinism (SC-007, gates Step 3)
+
+This is the P0 gating verification added after `/speckit.review`. The drift check (Step 3) is unsafe to ship until the generator is proven byte-deterministic.
+
+```sh
+# On a clean checkout (no uncommitted changes under shared/schemas/src/generated/):
+git status --porcelain -- shared/schemas/src/generated/   # MUST be empty
+task schema:generate
+git diff --quiet -- shared/schemas/src/generated/         # MUST exit 0
+task schema:generate
+git diff --quiet -- shared/schemas/src/generated/         # MUST still exit 0
+```
+
+**Pass**: Both `git diff --quiet` invocations exit 0. Generator is deterministic; proceed to Step 3.
+**Fail**: A `git diff` call exits 1. Investigate — likely culprits: dictionary key ordering, embedded timestamps, version-string drift in headers. Fix at the generator level if possible; otherwise add a normalisation pass (e.g. `prettier --write` for `.ts`; equivalent for Pydantic) to `scripts/generate.py` after each emit, then re-run this step until both diffs are quiet. Do not proceed to Step 3 until this passes.
+
+---
+
+## Step 3 — Regenerate and confirm zero drift (FR-006, SC-003)
 
 ```sh
 task schema:generate                # or: cd shared/schemas && uv run python scripts/generate.py
 git status -- shared/schemas/src/generated/
 ```
 
-**Expected** (on a clean main / unchanged feature branch):
+**Expected** (on a clean main / unchanged feature branch, with Step 2 already passing):
 
 ```text
 On branch <…>
@@ -36,42 +54,54 @@ nothing to commit, working tree clean
 ```
 
 **Pass**: `git status` reports no modified files under `shared/schemas/src/generated/`.
-**Fail**: If files appear modified, the committed artefacts are stale relative to the LinkML source (or the generator is non-deterministic — research R3 caveat). Either commit the regenerated artefacts, or investigate whether the generator's output varies run-to-run.
+**Fail**: If files appear modified, the committed artefacts are stale relative to the LinkML source. Commit the regenerated artefacts. (If Step 2 was passing but this step fails, the upstream `main` shipped without a regeneration; the drift check this feature adds will catch the recurrence.)
 
 ---
 
-## Step 3 — Confirm `@debrief/stac-writer` re-routes to the schema (FR-001, FR-007)
+## Step 4 — Confirm `@debrief/stac-writer` re-routes to the components-side narrowed type (FR-001, FR-007)
 
 ```sh
-grep -n "PropertiesProvenanceEntry\|StacExtensionProperties" shared/stac-writer/src/interface.ts
+grep -n "PropertiesProvenanceEntry\|StacItem" shared/stac-writer/src/interface.ts
 ```
 
 **Expected**:
 
-- One `import type { StacExtensionProperties } from '@debrief/schemas';` line.
-- One `export type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';` line.
-- **No** local `interface PropertiesProvenanceEntry { ... }` declaration.
+- The hand-written `interface PropertiesProvenanceEntry { ... }` (lines 42–49 today) is **gone**.
+- Exactly one `export type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';` re-export.
+- The hand-written `interface StacItem { ... }` is **unchanged** (out of scope per `/speckit.review` — see research R1).
 
-**Pass**: The grep shows the import + re-export, with no local interface declaration.
-**Fail**: A local declaration of `PropertiesProvenanceEntry` is still present — the migration's TS-side work is incomplete.
+**Pass**: The grep shows `StacItem` interface intact, plus a re-export of `PropertiesProvenanceEntry` with no local interface for the latter.
+**Fail**: A local declaration of `PropertiesProvenanceEntry` is still present, OR `StacItem` has been accidentally rewritten — both indicate the migration is incomplete or has overshot scope.
+
+Also verify the workspace dep edge:
+
+```sh
+grep -nA 1 '"@debrief/components"' shared/stac-writer/package.json
+```
+
+**Expected**: `"@debrief/components": "workspace:*"` under `dependencies`.
 
 ---
 
-## Step 4 — Confirm the Properties Panel keeps its constants + validator (FR-007)
+## Step 5 — Confirm the Properties Panel uses the hybrid intersection (FR-007, R2)
 
 ```sh
-grep -nE "PROPERTIES_PANEL_TOOL_SENTINEL|isValidPropertiesProvenanceEntry|PROVENANCE_LOG_CAP|PROVENANCE_LOG_ARCHIVE_FILENAME" \
+grep -nE "PROPERTIES_PANEL_TOOL_SENTINEL|isValidPropertiesProvenanceEntry|PROVENANCE_LOG_CAP|PROVENANCE_LOG_ARCHIVE_FILENAME|Omit<.*Generated" \
   shared/components/src/PropertiesPanel/provenanceTypes.ts
 ```
 
-**Expected**: All four names appear as exported declarations.
+**Expected**:
 
-**Pass**: All four are present.
-**Fail**: If any are missing, downstream consumers (`apps/vscode/src/services/stacService.ts`, etc.) will fail to compile.
+- All four names (`PROPERTIES_PANEL_TOOL_SENTINEL`, `isValidPropertiesProvenanceEntry`, `PROVENANCE_LOG_CAP`, `PROVENANCE_LOG_ARCHIVE_FILENAME`) appear as exported declarations.
+- An `Omit<…Generated, 'tool' | 'method' | 'source'>` intersection appears in the `PropertiesProvenanceEntry` type alias.
+- The local `interface PropertiesProvenanceEntry { ... }` (lines 9–22 today) is **gone**.
+
+**Pass**: All four constants/validator present + intersection present + no local `interface` body.
+**Fail**: If any constant/validator is missing, downstream consumers will fail to compile. If the intersection is missing or only re-exports `Generated` directly, literal-string narrowing on `tool`/`method`/`source` is lost — re-introduces the Article I.3 silent-failure path R2 was designed to close.
 
 ---
 
-## Step 5 — Type-check the workspace (FR-007, SC-002)
+## Step 6 — Type-check the workspace (FR-007, SC-002)
 
 ```sh
 pnpm -r typecheck
@@ -79,19 +109,16 @@ pnpm -r typecheck
 
 **Expected**: All packages pass `tsc --noEmit`. Particularly `@debrief/components`, `@debrief/stac-writer`, `apps/vscode`, `apps/web-shell`.
 
-**Pass**: Zero TypeScript errors.
-**Fail**: A consumer somewhere broke. Likely culprits:
-
-- A caller relies on the *literal-string* nature of `tool` / `method` / `source` (research R2). Add a runtime `isValidPropertiesProvenanceEntry()` narrowing call before the assignment.
-- A caller passes `'tool'` or `'import'` as `source` (research R4 — should not happen, but if it does, investigate whether it was meaningful or accidental).
+**Pass**: Zero TypeScript errors. Note specifically that `stacService.ts:1326` (`tool: PROPERTIES_PANEL_TOOL_SENTINEL`) and `stacWriterIdb.ts:335` continue to type-check — the hybrid intersection preserves their literal-string acceptance.
+**Fail**: Most likely a consumer started passing a non-`'user'` value to `source`, or a non-template-conforming string to `method`, or a non-`PROPERTIES_PANEL_TOOL_SENTINEL` string to `tool`. The hybrid intersection is doing its job — investigate whether the offending caller was always wrong, or whether the schema needs widening (in which case adjust the LinkML pattern AND the components-side intersection in lock-step).
 
 ---
 
-## Step 6 — Confirm the writer's `StacItem` accepts existing items (FR-008, SC-004)
+## Step 7 — Confirm STAC Item round-trip still passes (FR-008, SC-004)
 
-This is the byte-equivalence round-trip. Two execution paths:
+`StacItem` is unchanged by this feature, so the round-trip invariant is trivially preserved on the writer side. Run the existing tests as a smoke check that the workspace dep edge / ESLint rule didn't accidentally break the writer:
 
-### 6a — Python (existing test, just run it)
+### 7a — Python (existing test)
 
 ```sh
 cd shared/schemas
@@ -100,9 +127,9 @@ uv run pytest tests/test_roundtrip.py -v
 
 **Pass**: All round-trip tests pass.
 
-### 6b — TypeScript (writer side, smoke test)
+### 7b — Optional TS-side smoke test
 
-A small smoke test goes here once `tasks.md` lays out test files. The semantics:
+A small smoke test belongs in `tasks.md` as a hedge against future workspace-dep / ESLint regressions. The semantics:
 
 ```typescript
 import type { StacItem } from '@debrief/stac-writer';
@@ -113,17 +140,16 @@ const root = 'preview/workspace/samples/local-store';
 for (const entry of readdirSync(root)) {
   const itemPath = join(root, entry, 'item.json');
   const raw = readFileSync(itemPath, 'utf8');
-  const item = JSON.parse(raw) as StacItem;          // must compile
+  const item = JSON.parse(raw) as StacItem;          // must compile against the unchanged StacItem
   const reSerialised = JSON.stringify(item, null, 2); // structural equivalence test
-  // (Strict byte-equivalence is verified by the Python test above; this is the TS-surface smoke test.)
 }
 ```
 
-**Pass**: Every sample item parses into the post-migration `StacItem` type without TypeScript narrowing errors and without runtime exceptions.
+**Pass**: Every sample item parses against the (unchanged) `StacItem` and re-serialises without exception.
 
 ---
 
-## Step 7 — Confirm the drift CI gate is wired (FR-006)
+## Step 8 — Confirm the drift CI gate is wired (FR-006)
 
 ```sh
 grep -nA 5 "Check generated artefacts are up-to-date" .github/workflows/schema-tests.yml
@@ -136,7 +162,7 @@ grep -nA 5 "Check generated artefacts are up-to-date" .github/workflows/schema-t
 
 ---
 
-## Step 8 — Provoke the drift check (negative test, SC-003)
+## Step 9 — Provoke the drift check (negative test, SC-003)
 
 This is the *deliberate-drift* acceptance walkthrough referenced in spec SC-003 and FR-006. Run on a throwaway branch only.
 
@@ -160,7 +186,7 @@ gh pr create --fill --base main
 
 ---
 
-## Step 9 — Confirm Article II.1 audit cleared (SC-005)
+## Step 10 — Confirm Article II.1 audit cleared for `PropertiesProvenanceEntry` (SC-005)
 
 Manual review:
 
@@ -174,18 +200,18 @@ grep -rn "interface PropertiesProvenanceEntry\b\|type PropertiesProvenanceEntry 
   shared apps services
 ```
 
-**Expected**: The only matches are the **re-exports** in:
+**Expected**: The only matches are:
 
-- `shared/schemas/src/generated/typescript/types.ts` (canonical `interface`)
-- `shared/components/src/PropertiesPanel/provenanceTypes.ts` (re-export `type` alias)
-- `shared/stac-writer/src/interface.ts` (re-export `type` alias)
+- `shared/schemas/src/generated/typescript/types.ts` — canonical `interface` (LinkML-generated).
+- `shared/components/src/PropertiesPanel/provenanceTypes.ts` — `type` alias as the hybrid intersection.
+- `shared/stac-writer/src/interface.ts` — `export type` re-export from the components-side declaration.
 
-**Pass**: No additional `interface PropertiesProvenanceEntry { ... }` *body* declarations exist outside the generated file.
-**Fail**: A new hand-write has crept in.
+**Pass**: No additional `interface PropertiesProvenanceEntry { ... }` *body* declarations exist outside the generated file. (Intersection / re-export aliases are fine — they delegate to the canonical body.)
+**Fail**: A new hand-write has crept in. *(Note: `StacItem` remaining hand-written is expected — it's tracked as a separate backlog deferral, not a Step-10 failure.)*
 
 ---
 
-## Step 10 — End-to-end (full `task verify`)
+## Step 11 — End-to-end (full `task verify`)
 
 ```sh
 task verify
@@ -201,8 +227,9 @@ task verify
 
 | Symptom | Likely cause | First fix |
 |---------|--------------|-----------|
-| `tsc` errors about `tool`, `method`, `source` no longer being literal types | A caller relied on literal-string narrowing (research R2) | Add `isValidPropertiesProvenanceEntry(entry)` narrowing before the assignment, or compare to `PROPERTIES_PANEL_TOOL_SENTINEL` directly |
-| `tsc` errors about `StacExtensionProperties` not exported from `@debrief/schemas` | Generated TS is stale | `task schema:generate` then commit |
-| `git status` shows generated files modified after `task schema:generate` even on main | Generator non-determinism, or someone committed hand-edited artefacts upstream | Investigate; add `prettier --write` normalisation pass to the generator script if needed |
-| Round-trip test fails on a specific sample item | New required field accidentally added to `StacExtensionProperties` | Roll back the LinkML change; required fields on `StacExtensionProperties` are forbidden by FR-008 |
-| Drift check passes on a hand-edit PR | Path filter excluded `shared/schemas/src/generated/**` from the workflow | Update `paths:` filter in `.github/workflows/schema-tests.yml` to include the generated path |
+| `tsc` errors about `'foo'` not assignable to `'user'` (or to `typeof PROPERTIES_PANEL_TOOL_SENTINEL`) | The hybrid intersection is doing its job — a caller is passing a non-canonical value | Investigate whether the caller was always wrong (typo), or whether the schema needs widening (in which case adjust the LinkML pattern AND the components-side intersection in lock-step) |
+| `tsc` errors about `Generated` (the imported alias) not having a property | Generated TS is stale or the LinkML class shape changed | `task schema:generate` then commit |
+| `git status` shows generated files modified after `task schema:generate` even on main | Generator non-determinism (Step 2 was skipped or regressed) | Re-run Step 2 verification; add a normalisation pass to `scripts/generate.py` if needed |
+| ESLint error: "Runtime imports from `@debrief/components` are banned in `shared/stac-writer/`" | A non-type import sneaked in past the writer's lean-package boundary | Convert to `import type { ... }`; if a runtime symbol is genuinely needed, route it through a different path or add an explicit ESLint disable with justification |
+| Round-trip test fails on a specific sample item | Likely unrelated to this feature (`StacItem` is unchanged); could be a side-effect of the workspace dep edge breaking the writer's build | Re-check Step 4 (workspace dep edge in `package.json`) and Step 6 (full typecheck) before suspecting the round-trip |
+| Drift check passes on a hand-edit PR | Path filter excluded `shared/schemas/src/generated/**` from the workflow, OR the generator is non-deterministic so the diff is "expected" noise | Confirm path filter; re-run Step 2 verification |
