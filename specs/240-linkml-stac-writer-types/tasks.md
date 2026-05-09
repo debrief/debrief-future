@@ -199,7 +199,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 ### Media Content
 
-- [ ] T025 Create feature blog post via Content Specialist agent `specs/240-linkml-stac-writer-types/media/shipped-post.md`. Spawn the `content-specialist` subagent (`.claude/agents/media/content.md`) with:
+- [x] T025 Create feature blog post via Content Specialist agent `specs/240-linkml-stac-writer-types/media/shipped-post.md`. Spawn the `content-specialist` subagent (`.claude/agents/media/content.md`) with:
   - The full contents of `specs/240-linkml-stac-writer-types/evidence/opening-context.md` (the cached opener — must be copied **verbatim** as the first four sections: Hook, What We're Building, How It Fits, Key Decisions).
   - Pointers to: `evidence/before-after-types.md` (the consolidation proof), `evidence/drift-gate-evidence.md` (the CI gate proof), `evidence/test-summary.md` (the test results), and the two follow-up backlog items (#256 prefix-aware typing, #257 read-path validation).
   - Title: `Building LinkML-Derived `@debrief/stac-writer` Types`.
