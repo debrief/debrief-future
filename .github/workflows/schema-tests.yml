@@ -38,6 +38,20 @@ jobs:
       - name: Run schema generation
         run: uv run python scripts/generate.py
 
+      - name: Check generated artefacts are up-to-date
+        # Spec 240 / T013 — drift gate. The generator runs in the previous
+        # step on a fresh checkout; if its output differs from what the PR
+        # author committed, an artefact has drifted from the LinkML source.
+        # Generator determinism is verified by SC-007 (see specs/240-…/
+        # evidence/generator-determinism-evidence.md), so a non-empty diff
+        # here is always a real drift, never generator flakiness.
+        run: |
+          if ! git diff --exit-code -- src/generated/; then
+            echo "::error::Generated artefacts under shared/schemas/src/generated/ have drifted from the LinkML source."
+            echo "::error::Run 'task schema:generate' (or 'cd shared/schemas && uv run python scripts/generate.py') and commit the result."
+            exit 1
+          fi
+
       - name: Run golden fixture tests
         run: uv run pytest tests/test_golden.py -v
 

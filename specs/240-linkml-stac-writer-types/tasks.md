@@ -122,7 +122,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 ### Independent file edits — run in parallel
 
-- [ ] T013 [P] Add `Check generated artefacts are up-to-date` step to `.github/workflows/schema-tests.yml`. Insert after the existing `- name: Run schema generation` step (line ~38) and before the `- name: Run golden fixture tests` step. Use the contract in `contracts/stac-writer-public-types.md` §5:
+- [x] T013 [P] Add `Check generated artefacts are up-to-date` step to `.github/workflows/schema-tests.yml`. Insert after the existing `- name: Run schema generation` step (line ~38) and before the `- name: Run golden fixture tests` step. Use the contract in `contracts/stac-writer-public-types.md` §5:
    ```yaml
    - name: Check generated artefacts are up-to-date
      run: |
@@ -133,7 +133,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
        fi
    ```
    The step inherits `working-directory: shared/schemas` from the `defaults` block at the top of the workflow, so `-- src/generated/` resolves correctly relative to that directory.
-- [ ] T014 [P] Add `schema:generate` and `schema:check-drift` Taskfile targets `Taskfile.yml`. Add to the existing `tasks:` map (alphabetised — fits between `schema:docs:*` (line 149) and any later schema tasks). The targets MUST be runnable from repo root:
+- [x] T014 [P] Add `schema:generate` and `schema:check-drift` Taskfile targets `Taskfile.yml`. Add to the existing `tasks:` map (alphabetised — fits between `schema:docs:*` (line 149) and any later schema tasks). The targets MUST be runnable from repo root:
    ```yaml
    schema:generate:
      desc: "Regenerate Pydantic, JSON Schema, and TypeScript artefacts from LinkML"
@@ -154,7 +154,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 ### Verification
 
-- [ ] T015 Confirm Taskfile targets work locally `task schema:generate` followed by `task schema:check-drift`. Both must exit 0 on a clean checkout. If `schema:check-drift` fails, T001's determinism guarantee has regressed — investigate and fix before continuing.
+- [x] T015 Confirm Taskfile targets work locally `task schema:generate` followed by `task schema:check-drift`. Both must exit 0 on a clean checkout. If `schema:check-drift` fails, T001's determinism guarantee has regressed — investigate and fix before continuing.
 - [ ] T016 Provoke the drift check (negative-path acceptance walkthrough — quickstart Step 9) on a throwaway branch. Steps:
    1. `git checkout -b throwaway/240-drift-check-probe`.
    2. Hand-edit any generated file under `shared/schemas/src/generated/typescript/types.ts` (e.g. flip a property type via `sed`).
