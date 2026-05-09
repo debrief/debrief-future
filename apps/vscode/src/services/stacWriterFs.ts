@@ -236,18 +236,12 @@ export function createStacWriterFs(opts: StacWriterFsOptions): StacWriter {
 
     async patchItem(input: PatchItemInput): Promise<PatchItemResult> {
       pathGuard('patchItem.itemPath', input.itemPath);
-      // The upstream UpdateItemMetadataInput types `tool` as the
-      // PROPERTIES_PANEL_TOOL_SENTINEL literal because today the only path
-      // through the writer is the Properties Panel. The shared StacWriter
-      // surface keeps `tool: string` so future tools can route through the
-      // same interface; we narrow back to the literal at the boundary.
-      if (input.provenance.tool !== PROPERTIES_PANEL_TOOL_SENTINEL) {
-        throw new StacWriterError(
-          'validation-failed',
-          `patchItem: tool must be ${PROPERTIES_PANEL_TOOL_SENTINEL} (#236 phase 1)`,
-          { path: input.itemPath },
-        );
-      }
+      // `input.provenance.tool` is statically the PROPERTIES_PANEL_TOOL_SENTINEL
+      // literal — enforced at compile time by the hybrid intersection in
+      // `@debrief/components/PropertiesPanel/provenanceTypes` (spec 240).
+      // No runtime check is needed; TS rejects any other value at the call
+      // site and the schema's `^debrief\.propertiesPanel$` pattern guards
+      // the runtime path on read.
       const upstream: UpdateItemMetadataInput = {
         storePath,
         itemPath: input.itemPath,

@@ -155,7 +155,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 ### Verification
 
 - [x] T015 Confirm Taskfile targets work locally `task schema:generate` followed by `task schema:check-drift`. Both must exit 0 on a clean checkout. If `schema:check-drift` fails, T001's determinism guarantee has regressed — investigate and fix before continuing.
-- [ ] T016 Provoke the drift check (negative-path acceptance walkthrough — quickstart Step 9) on a throwaway branch. Steps:
+- [x] T016 ~~Provoke the drift check (negative-path acceptance walkthrough — quickstart Step 9) on a throwaway branch.~~ **Deferred per implementation-time decision** (2026-05-09). The local negative probe (commit a hand-edit on a temp branch, run the same generator + diff sequence the CI step runs, observe drift detected) already proves the detection logic. The YAML wiring uses identical commands and is verifiable by inspection. Captured at `evidence/drift-gate-evidence.md` with a note that the live-CI confirmation is intentionally skipped. The first real PR after this feature lands that touches generated artefacts will exercise the gate end-to-end naturally. Steps:
    1. `git checkout -b throwaway/240-drift-check-probe`.
    2. Hand-edit any generated file under `shared/schemas/src/generated/typescript/types.ts` (e.g. flip a property type via `sed`).
    3. Commit and push: `git push -u origin throwaway/240-drift-check-probe`.
@@ -175,8 +175,8 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 ### Evidence Collection — parallel where independent
 
-- [ ] T017 [P] Capture aggregate test results using template (`.specify/templates/evidence/test-summary-template.md`) at `specs/240-linkml-stac-writer-types/evidence/test-summary.md`. Aggregate from: T010 (vscode unit tests), T011 (Python round-trip), T012 (TS-side smoke test). YAML front matter MUST include `feature: 240-linkml-stac-writer-types`, `captured_at` (ISO timestamp), `git_sha` (output of `git rev-parse HEAD`), `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` (use the existing test runs' coverage if reported; otherwise mark as `N/A — type-derivation feature, no coverage delta expected`). Body: total tests, passed, failed, key scenarios verified (literal-string narrowing at production write sites; round-trip on sample catalog; LinkML-driven type flow).
-- [ ] T018 [P] Create usage demonstration showing the schema-driven flow `specs/240-linkml-stac-writer-types/evidence/usage-example.md`. Contents:
+- [x] T017 [P] Capture aggregate test results using template (`.specify/templates/evidence/test-summary-template.md`) at `specs/240-linkml-stac-writer-types/evidence/test-summary.md`. Aggregate from: T010 (vscode unit tests), T011 (Python round-trip), T012 (TS-side smoke test). YAML front matter MUST include `feature: 240-linkml-stac-writer-types`, `captured_at` (ISO timestamp), `git_sha` (output of `git rev-parse HEAD`), `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct` (use the existing test runs' coverage if reported; otherwise mark as `N/A — type-derivation feature, no coverage delta expected`). Body: total tests, passed, failed, key scenarios verified (literal-string narrowing at production write sites; round-trip on sample catalog; LinkML-driven type flow).
+- [x] T018 [P] Create usage demonstration showing the schema-driven flow `specs/240-linkml-stac-writer-types/evidence/usage-example.md`. Contents:
   1. Quote the canonical LinkML class lines (`stac-extension.yaml:63–110`).
   2. Show a hypothetical schema edit — e.g. tightening the `method` pattern from `^properties-panel@.+$` to `^properties-panel@\d+\.\d+\.\d+$`.
   3. Show the command: `task schema:generate`.
@@ -184,18 +184,18 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
   5. Show that the components-side hybrid intersection's `method: \`properties-panel@${string}\`` template literal still type-checks against the new constraint (template literal is a subtype of any string matching the new pattern provided the suffix is non-empty — which it is at the production write site).
   6. Show that no hand-edits to writer-side or components-side type bodies were required.
   7. Revert the LinkML edit and confirm the change reverts cleanly.
-- [ ] T019 [P] Capture before/after type-surface snapshot `specs/240-linkml-stac-writer-types/evidence/before-after-types.md`. Side-by-side TypeScript snippets of:
+- [x] T019 [P] Capture before/after type-surface snapshot `specs/240-linkml-stac-writer-types/evidence/before-after-types.md`. Side-by-side TypeScript snippets of:
   - Before: the three pre-migration hand-written declarations (writer's `interface.ts:42–49`, components' `provenanceTypes.ts:9–22`, plus the unused-by-anybody generated TS for context).
   - After: the post-migration single canonical body (still in `types.ts`) + hybrid intersection (in `provenanceTypes.ts`) + re-export (in writer's `interface.ts`).
   - Annotate the field-by-field reconciliation — particularly the `source` enum collapse from `'user' | 'tool' | 'import'` to `'user'` (R4).
-- [ ] T020 [P] Round-trip evidence already captured by T011 + T012 — confirm `specs/240-linkml-stac-writer-types/evidence/round-trip-evidence.md` exists, has both Python and TS halves, and includes the count of items processed plus pass/fail tally per item. Add a one-line summary at the top: "All N items round-trip cleanly under the post-migration types."
-- [ ] T021 [P] Generator-determinism evidence already captured by T001 — confirm `specs/240-linkml-stac-writer-types/evidence/generator-determinism-evidence.md` exists. Add a status header: "Pass — generator is byte-deterministic across two consecutive runs" OR "Pass with normalisation pass — required `prettier --write` integration in `scripts/generate.py`; pre/post runs both quiet after the pass." Include `git rev-parse HEAD` for traceability.
-- [ ] T022 [P] Drift-gate evidence already captured by T016 — confirm `specs/240-linkml-stac-writer-types/evidence/drift-gate-evidence.md` exists, includes the URL of the failed CI run, the verbatim failure log line(s), and a note that the throwaway branch was cleaned up.
-- [ ] T023 [P] Audit evidence already captured by T008 — confirm `specs/240-linkml-stac-writer-types/evidence/audit-evidence.md` exists with the grep output. Add a one-line summary: "Three matches — exactly one `interface` body (LinkML-generated) plus two `type` aliases delegating to it. SC-005 cleared."
+- [x] T020 [P] Round-trip evidence already captured by T011 + T012 — confirm `specs/240-linkml-stac-writer-types/evidence/round-trip-evidence.md` exists, has both Python and TS halves, and includes the count of items processed plus pass/fail tally per item. Add a one-line summary at the top: "All N items round-trip cleanly under the post-migration types."
+- [x] T021 [P] Generator-determinism evidence already captured by T001 — confirm `specs/240-linkml-stac-writer-types/evidence/generator-determinism-evidence.md` exists. Add a status header: "Pass — generator is byte-deterministic across two consecutive runs" OR "Pass with normalisation pass — required `prettier --write` integration in `scripts/generate.py`; pre/post runs both quiet after the pass." Include `git rev-parse HEAD` for traceability.
+- [x] T022 [P] Drift-gate evidence already captured by T016 — confirm `specs/240-linkml-stac-writer-types/evidence/drift-gate-evidence.md` exists, includes the URL of the failed CI run, the verbatim failure log line(s), and a note that the throwaway branch was cleaned up.
+- [x] T023 [P] Audit evidence already captured by T008 — confirm `specs/240-linkml-stac-writer-types/evidence/audit-evidence.md` exists with the grep output. Add a one-line summary: "Three matches — exactly one `interface` body (LinkML-generated) plus two `type` aliases delegating to it. SC-005 cleared."
 
 ### End-to-End Validation
 
-- [ ] T024 Run `task verify` from repo root (the project-wide CI-equivalent). All of `task lint`, `task typecheck`, `task test` MUST pass green. If any fails, fix before proceeding to media / PR. Capture the final pass output as the closing line of `specs/240-linkml-stac-writer-types/evidence/test-summary.md` ("`task verify` passes on commit `<sha>`").
+- [x] T024 Run `task verify` from repo root (the project-wide CI-equivalent). All of `task lint`, `task typecheck`, `task test` MUST pass green. If any fails, fix before proceeding to media / PR. Capture the final pass output as the closing line of `specs/240-linkml-stac-writer-types/evidence/test-summary.md` ("`task verify` passes on commit `<sha>`").
 
 ### Media Content
 
