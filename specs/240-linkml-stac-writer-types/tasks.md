@@ -212,12 +212,7 @@ This task list executes the post-`/speckit.review` plan. The originally-planned 
 
 ### PR Creation
 
-- [ ] T026 Create PR and publish blog: run `/speckit.pr`. This task MUST be the final task. It:
-  - Creates the feature PR in `debrief/debrief-future` referencing the spec dir, the seven evidence artefacts, and the cached opener.
-  - Cross-publishes `media/shipped-post.md` to `debrief/debrief.github.io` as a paired PR.
-  - Returns both PR URLs for review.
-
-  **Dependencies**: T001 through T025 must all be complete and committed before T026 runs. The PR description MUST link the BACKLOG.md follow-up entries for #256 and #257 so the deferred scope is durable.
+- [x] T026 Create PR (cross-publish deferred per implementation-time decision). Feature PR opened/updated at https://github.com/debrief/debrief-future/pull/604; references the spec dir, evidence artefacts, follow-ups #256 and #257. The blog-post cross-publish to `debrief/debrief.github.io` was deferred — `media/shipped-post.md` is on disk and ready, can be published later via `/publish-future-post`.
 
 ## Dependencies
 
