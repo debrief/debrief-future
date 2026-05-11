@@ -20,6 +20,7 @@ import {
   renameStoryboard as crudRenameStoryboard,
   deleteStoryboard as crudDeleteStoryboard,
   detectMissingDataForScene,
+  getActiveStoryboardDefault,
   getActiveStoryboardSelection,
   getMostRecentlyModifiedStoryboard,
   getScene,
@@ -236,43 +237,6 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const features = this.mapPanel.getCurrentFeatures();
     const plot = plotFromFeatures(features);
 
-    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
-    const storyboardFeatures = plot.features.filter((f) =>
-      f.properties !== null &&
-      typeof f.properties === 'object' &&
-      (f.properties as { feature_type?: unknown }).feature_type === 'storyboard',
-    );
-    const sceneFeatures = plot.features.filter((f) =>
-      f.properties !== null &&
-      typeof f.properties === 'object' &&
-      (f.properties as { feature_type?: unknown }).feature_type === 'scene',
-    );
-    console.warn('[storyboard][diag] onPlotOpened fired', {
-      documentUri,
-      totalFeatures: plot.features.length,
-      storyboardCount: storyboardFeatures.length,
-      sceneCount: sceneFeatures.length,
-      storyboardSummaries: storyboardFeatures.map((f) => {
-        const props = f.properties as {
-          id?: unknown;
-          name?: unknown;
-          provenance?: unknown;
-        };
-        return {
-          id: props.id,
-          name: props.name,
-          provenanceLen: Array.isArray(props.provenance) ? props.provenance.length : 'not-array',
-        };
-      }),
-      distinctFeatureTypes: Array.from(new Set(plot.features.map((f) => {
-        if (f.properties === null || typeof f.properties !== 'object') {
-          return '(none)';
-        }
-        const ft = (f.properties as { feature_type?: unknown }).feature_type;
-        return typeof ft === 'string' ? ft : `(${typeof ft})`;
-      }))),
-    });
-
     // Validate plot; on throw disable transport + surface a single error.
     let plotValid = true;
     try {
@@ -302,12 +266,6 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
     const active = getMostRecentlyModifiedStoryboard(plot);
     state.activeStoryboardId = active?.properties.id ?? null;
-    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
-    console.warn('[storyboard][diag] onPlotOpened: seeded activeStoryboardId', {
-      documentUri,
-      seeded: state.activeStoryboardId,
-      pickedFromMostRecentlyModified: active !== null,
-    });
 
     // #237 — restore the analyst's last-pinned active Storyboard from the
     // in-plot SystemState feature, falling back to the default when the
@@ -361,31 +319,6 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (!state.plotValid) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
 
-    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
-    const storyboardFeatures = plot.features.filter((f) =>
-      f.properties !== null &&
-      typeof f.properties === 'object' &&
-      (f.properties as { feature_type?: unknown }).feature_type === 'storyboard',
-    );
-    console.warn('[storyboard][diag] onPlotFeaturesChanged fired', {
-      documentUri,
-      activeBefore: state.activeStoryboardId,
-      totalFeatures: plot.features.length,
-      storyboardCount: storyboardFeatures.length,
-      storyboardSummaries: storyboardFeatures.map((f) => {
-        const props = f.properties as {
-          id?: unknown;
-          name?: unknown;
-          provenance?: unknown;
-        };
-        return {
-          id: props.id,
-          name: props.name,
-          provenanceLen: Array.isArray(props.provenance) ? props.provenance.length : 'not-array',
-        };
-      }),
-    });
-
     // Check whether the active Storyboard still exists.
     if (state.activeStoryboardId !== null) {
       const stillExists = plot.features.some(
@@ -425,6 +358,7 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const state = this.states.get(documentUri);
     if (!state || !state.plotValid) {return;}
     if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     if (state.currentSceneIndex >= state.sceneOrder.length - 1) {return;}
     await this.stepTo(state, state.currentSceneIndex + 1, 'forward');
   }
@@ -433,31 +367,18 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const state = this.states.get(documentUri);
     if (!state || !state.plotValid) {return;}
     if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     if (state.currentSceneIndex <= 0) {return;}
     await this.stepTo(state, state.currentSceneIndex - 1, 'backward');
   }
 
   public async goToScene(documentUri: string, sceneId: string): Promise<void> {
     const state = this.states.get(documentUri);
-    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
-    if (!state) {
-      console.warn('[storyboard][diag] goToScene: no transport state for documentUri', { documentUri, sceneId, knownUris: Array.from(this.states.keys()) });
-      return;
-    }
-    if (!state.plotValid) {
-      console.warn('[storyboard][diag] goToScene: plot invalid', { documentUri, sceneId });
-      return;
-    }
-    if (state.transitionId !== null) {
-      console.warn('[storyboard][diag] goToScene: transition already in flight', { documentUri, sceneId, transitionId: state.transitionId });
-      return;
-    }
+    if (!state || !state.plotValid) {return;}
+    if (state.transitionId !== null) {return;}
+    this.ensureSceneOrderSeeded(state);
     const index = state.sceneOrder.indexOf(sceneId);
-    if (index < 0) {
-      console.warn('[storyboard][diag] goToScene: sceneId not in active sceneOrder', { documentUri, sceneId, activeStoryboardId: state.activeStoryboardId, sceneOrder: state.sceneOrder });
-      return;
-    }
-    console.warn('[storyboard][diag] goToScene: dispatching stepTo', { documentUri, sceneId, index });
+    if (index < 0) {return;}
     // Re-fly even when the click target equals `currentSceneIndex`. The
     // map may have been panned/zoomed since the Scene was captured (or
     // the user just landed on the storyboard with `currentSceneIndex=0`
@@ -466,6 +387,38 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const direction: 'forward' | 'backward' =
       index >= state.currentSceneIndex ? 'forward' : 'backward';
     await this.stepTo(state, index, direction);
+  }
+
+  /**
+   * Lazy-seed `state.activeStoryboardId` + `sceneOrder` from the current
+   * plot when no seeding event has populated them yet.
+   *
+   * Background: `onPlotOpened` and `onPlotFeaturesChanged` are the
+   * normal seeding paths, but they are not guaranteed to have fired by
+   * the time the user clicks a Scene row — the panel's row list is
+   * sourced independently via `StoryboardPanelView.refresh()`
+   * (`getActiveStoryboardDefault`), so the panel can display Scenes
+   * while transport state is still empty. Without this fallback,
+   * `goToScene` silently no-ops and clicks appear dead.
+   *
+   * Priority mirrors the existing fallbacks in `onPlotOpened` /
+   * `onPlotFeaturesChanged`: most-recently-modified Storyboard first,
+   * then the alphabetic default used by the panel.
+   */
+  private ensureSceneOrderSeeded(state: TransportState): void {
+    if (state.activeStoryboardId !== null && state.sceneOrder.length > 0) {
+      return;
+    }
+    const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
+    if (state.activeStoryboardId === null) {
+      const candidate =
+        getMostRecentlyModifiedStoryboard(plot) ??
+        getActiveStoryboardDefault(plot);
+      if (candidate === null) {return;}
+      state.activeStoryboardId = candidate.properties.id;
+    }
+    this.recomputeSceneOrder(state, plot);
+    this.applyScrubbableRange(state, plot);
   }
 
   public setActiveStoryboard(
