@@ -21,6 +21,9 @@
   "files": [
     "dist"
   ],
+  "dependencies": {
+    "@debrief/components": "workspace:*"
+  },
   "scripts": {
     "build": "tsup",
     "test": "vitest run",

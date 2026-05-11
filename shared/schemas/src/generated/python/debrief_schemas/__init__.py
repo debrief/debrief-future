@@ -106,7 +106,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': 'src/linkml/debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
