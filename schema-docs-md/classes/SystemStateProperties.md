@@ -20,6 +20,8 @@ URI: [debrief:class/SystemStateProperties](https://debrief.info/schemas/class/Sy
  classDiagram
     class SystemStateProperties
     click SystemStateProperties href "../../classes/SystemStateProperties/"
+      SystemStateProperties : active_storyboard_id
+        
       SystemStateProperties : bbox
         
       SystemStateProperties : center
@@ -79,13 +81,14 @@ URI: [debrief:class/SystemStateProperties](https://debrief.info/schemas/class/Sy
 | Name | Cardinality and Range | Description | Inheritance |
 | ---  | --- | --- | --- |
 | [kind](../slots/kind.md) | 1 <br/> [FeatureKindEnum](../enums/FeatureKindEnum.md) | Feature type discriminator | direct |
-| [state_type](../slots/state_type.md) | 1 <br/> [SystemStateTypeEnum](../enums/SystemStateTypeEnum.md) | Discriminator for state variant (temporal, spatial, selection) | direct |
+| [state_type](../slots/state_type.md) | 1 <br/> [SystemStateTypeEnum](../enums/SystemStateTypeEnum.md) | Discriminator for state variant (temporal, spatial, selection, active_storybo... | direct |
 | [start_time](../slots/start_time.md) | 0..1 <br/> [datetime](../slots/datetime.md) | Viewport start time (ISO8601) - for temporal state | direct |
 | [end_time](../slots/end_time.md) | 0..1 <br/> [datetime](../slots/datetime.md) | Viewport end time (ISO8601) - for temporal state | direct |
 | [bbox](../slots/bbox.md) | * <br/> [Float](../types/Float.md) | Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state | direct |
 | [zoom](../slots/zoom.md) | 0..1 <br/> [Float](../types/Float.md) | Map zoom level - for spatial state | direct |
 | [center](../slots/center.md) | * <br/> [Float](../types/Float.md) | Map center [longitude, latitude] - for spatial state | direct |
 | [selected_ids](../slots/selected_ids.md) | * <br/> [String](../types/String.md) | Array of selected feature IDs - for selection state | direct |
+| [active_storyboard_id](../slots/active_storyboard_id.md) | 0..1 <br/> [String](../types/String.md) | Storyboard properties | direct |
 | [provenance](../slots/provenance.md) | * <br/> [LogEntry](../classes/LogEntry.md) | PROV-aligned provenance records (append-only log of tool operations) | direct |
 
 
@@ -171,7 +174,7 @@ attributes:
     equals_string: SYSTEM
   state_type:
     name: state_type
-    description: Discriminator for state variant (temporal, spatial, selection)
+    description: Discriminator for state variant (temporal, spatial, selection, active_storyboard)
     from_schema: https://debrief.info/schemas/geojson
     rank: 1000
     domain_of:
@@ -241,6 +244,14 @@ attributes:
     - SystemStateProperties
     range: string
     multivalued: true
+  active_storyboard_id:
+    name: active_storyboard_id
+    description: Storyboard properties.id the analyst last pinned for this plot (#237)
+    from_schema: https://debrief.info/schemas/geojson
+    rank: 1000
+    domain_of:
+    - SystemStateProperties
+    range: string
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)
@@ -294,7 +305,7 @@ attributes:
     equals_string: SYSTEM
   state_type:
     name: state_type
-    description: Discriminator for state variant (temporal, spatial, selection)
+    description: Discriminator for state variant (temporal, spatial, selection, active_storyboard)
     from_schema: https://debrief.info/schemas/geojson
     rank: 1000
     alias: state_type
@@ -378,6 +389,16 @@ attributes:
     - SystemStateProperties
     range: string
     multivalued: true
+  active_storyboard_id:
+    name: active_storyboard_id
+    description: Storyboard properties.id the analyst last pinned for this plot (#237)
+    from_schema: https://debrief.info/schemas/geojson
+    rank: 1000
+    alias: active_storyboard_id
+    owner: SystemStateProperties
+    domain_of:
+    - SystemStateProperties
+    range: string
   provenance:
     name: provenance
     description: PROV-aligned provenance records (append-only log of tool operations)

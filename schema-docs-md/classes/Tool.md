@@ -20,6 +20,17 @@ URI: [debrief:class/Tool](https://debrief.info/schemas/class/Tool)
  classDiagram
     class Tool
     click Tool href "../../classes/Tool/"
+      Tool : category
+        
+          
+    
+        
+        
+        Tool --> "0..1" ToolCategoryEnum : category
+        click ToolCategoryEnum href "../../enums/ToolCategoryEnum/"
+    
+
+        
       Tool : description
         
       Tool : id
@@ -57,6 +68,7 @@ URI: [debrief:class/Tool](https://debrief.info/schemas/class/Tool)
 | [description](../slots/description.md) | 0..1 <br/> [String](../types/String.md) | Brief description of what the tool does | direct |
 | [version](../slots/version.md) | 0..1 <br/> [String](../types/String.md) | Tool version string for provenance tracking | direct |
 | [requirements](../slots/requirements.md) | * <br/> [SelectionRequirement](../classes/SelectionRequirement.md) | List of selection requirements | direct |
+| [category](../slots/category.md) | 0..1 <br/> [ToolCategoryEnum](../enums/ToolCategoryEnum.md) | Visual category for Log Panel icon rendering | direct |
 
 
 
@@ -198,6 +210,18 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  category:
+    name: category
+    description: Visual category for Log Panel icon rendering. Null / absent tools
+      render with the neutral-grey "Other" icon. First-party tools MUST declare a
+      value (enforced by test policy; see specs/207-tool-manifest-categories/research.md
+      §R5). Feature 207.
+    from_schema: https://debrief.info/schemas/tool
+    rank: 1000
+    domain_of:
+    - Tool
+    range: ToolCategoryEnum
+    required: false
 
 ```
 </details>
@@ -311,6 +335,20 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  category:
+    name: category
+    description: Visual category for Log Panel icon rendering. Null / absent tools
+      render with the neutral-grey "Other" icon. First-party tools MUST declare a
+      value (enforced by test policy; see specs/207-tool-manifest-categories/research.md
+      §R5). Feature 207.
+    from_schema: https://debrief.info/schemas/tool
+    rank: 1000
+    alias: category
+    owner: Tool
+    domain_of:
+    - Tool
+    range: ToolCategoryEnum
+    required: false
 
 ```
 </details>

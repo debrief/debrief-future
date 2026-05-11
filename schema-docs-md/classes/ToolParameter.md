@@ -162,6 +162,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   description:
@@ -276,6 +277,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   description:

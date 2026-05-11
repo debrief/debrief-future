@@ -16,6 +16,7 @@ URI: [debrief:enum/SystemStateTypeEnum](https://debrief.info/schemas/enum/System
 | temporal | None | Time viewport state (start/end times) |
 | spatial | None | Map viewport state (bbox, zoom) |
 | selection | None | Feature selection state (selected IDs) |
+| active_storyboard | None | Per-plot active-Storyboard pin (#237) |
 
 
 
@@ -24,7 +25,7 @@ URI: [debrief:enum/SystemStateTypeEnum](https://debrief.info/schemas/enum/System
 
 | Name | Description |
 | ---  | --- |
-| [state_type](../slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection) |
+| [state_type](../slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection, active_storybo... |
 
 
 
@@ -65,6 +66,9 @@ permissible_values:
   selection:
     text: selection
     description: Feature selection state (selected IDs)
+  active_storyboard:
+    text: active_storyboard
+    description: Per-plot active-Storyboard pin (#237)
 
 ```
 </details>

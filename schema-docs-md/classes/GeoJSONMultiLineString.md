@@ -129,6 +129,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
     equals_string: MultiLineString
@@ -194,6 +195,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
     equals_string: MultiLineString

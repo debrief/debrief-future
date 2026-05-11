@@ -3,13 +3,8 @@
 # Slot: href 
 
 
-_Relative path to artifact file (REQUIRED for artifacts)_
 
-
-
-
-
-URI: [debrief:href](https://debrief.info/schemas/href)
+URI: [debrief:slot/href](https://debrief.info/schemas/slot/href)
 Alias: href
 
 <!-- no inheritance hierarchy -->
@@ -23,6 +18,7 @@ Alias: href
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
 | [ToolResultAnnotations](../classes/ToolResultAnnotations.md) | Annotations for MCP tool result content items |  no  |
+| [SceneThumbnailAssetEntry](../classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |  no  |
 
 
 
@@ -43,13 +39,6 @@ Alias: href
 
 
 
-### Schema Source
-
-
-* from schema: https://debrief.info/schemas/debrief
-
-
-
 
 ## Mappings
 
@@ -66,14 +55,10 @@ Alias: href
 <details>
 ```yaml
 name: href
-description: Relative path to artifact file (REQUIRED for artifacts)
-from_schema: https://debrief.info/schemas/debrief
-rank: 1000
-slot_uri: debrief:href
 alias: href
-owner: ToolResultAnnotations
 domain_of:
 - ToolResultAnnotations
+- SceneThumbnailAssetEntry
 range: string
 
 ```

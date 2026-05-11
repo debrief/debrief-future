@@ -155,6 +155,7 @@ attributes:
     slot_uri: debrief:href
     domain_of:
     - ToolResultAnnotations
+    - SceneThumbnailAssetEntry
     range: string
   deletedFeatures:
     name: deletedFeatures
@@ -242,6 +243,7 @@ attributes:
     owner: ToolResultAnnotations
     domain_of:
     - ToolResultAnnotations
+    - SceneThumbnailAssetEntry
     range: string
   deletedFeatures:
     name: deletedFeatures

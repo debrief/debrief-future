@@ -130,6 +130,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [ResultsSlice](classes/ResultsSlice.md) | Accumulated tool result layers and last-execution record for undo support |
 | [ResultTypePath](classes/ResultTypePath.md) | Slash-delimited hierarchical type path |
 | [SceneFeature](classes/SceneFeature.md) | GeoJSON Feature representing a Scene child entity |
+| [SceneThumbnailAssetEntry](classes/SceneThumbnailAssetEntry.md) | A single STAC Item asset entry produced by Storyboarding (#216) for one |
 | [SegmentMetadata](classes/SegmentMetadata.md) | Per-segment metadata for compound tracks |
 | [SelectionRequirement](classes/SelectionRequirement.md) | A constraint specifying which feature kinds a tool accepts, with minimum and ... |
 | [SensorContact](classes/SensorContact.md) | Single sensor measurement record |
@@ -172,6 +173,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | Slot | Description |
 | --- | --- |
 | [$schema](slots/$schema.md) | JSON Schema URI |
+| [active_storyboard_id](slots/active_storyboard_id.md) | Storyboard properties |
 | [activity_id](slots/activity_id.md) | Unique operation identifier (UUID v4) |
 | [activity_type](slots/activity_type.md) | Semantic kind of this provenance record |
 | [addressingMode](slots/addressingMode.md) | How addresses at this level are interpreted |
@@ -190,6 +192,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [branched_from](slots/branched_from.md) | Activity ID of the branch point |
 | [branches](slots/branches.md) | Branch records |
 | [catalog_id](slots/catalog_id.md) | Parent catalog identifier |
+| [category](slots/category.md) | Visual category for Log Panel icon rendering |
 | [center](slots/center.md) | Map center [longitude, latitude] - for spatial state |
 | [centre_lat](slots/centre_lat.md) | Absolute latitude (mutual exclusive with bearing/range) |
 | [centre_lon](slots/centre_lon.md) | Absolute longitude (mutual exclusive with bearing/range) |
@@ -313,6 +316,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [result_layer_ids](slots/result_layer_ids.md) | IDs of the result layers produced by the tool |
 | [result_layers](slots/result_layers.md) | Accumulated tool result features |
 | [resultType](slots/resultType.md) | Hierarchical result type (e |
+| [roles](slots/roles.md) | Exactly ["thumbnail"] |
 | [rotation](slots/rotation.md) | Map rotation in degrees 0-360 (FR-013) |
 | [savedAt](slots/savedAt.md) | When the session was saved (ISO 8601) |
 | [savePath](slots/savePath.md) | Last save location |
@@ -343,7 +347,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [start](slots/start.md) | Start of time extent (ISO 8601) |
 | [start_datetime](slots/start_datetime.md) | Range start datetime (ISO 8601) |
 | [start_time](slots/start_time.md) | Segment start timestamp (ISO8601) |
-| [state_type](slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection) |
+| [state_type](slots/state_type.md) | Discriminator for state variant (temporal, spatial, selection, active_storybo... |
 | [stepSize](slots/stepSize.md) | Step size for discrete navigation (FR-008) |
 | [store_id](slots/store_id.md) | Parent store identifier (needed for URI construction) |
 | [storyboard_id](slots/storyboard_id.md) | Foreign key to parent Storyboard |
@@ -432,6 +436,7 @@ How Debrief identifies vessels and discovers their metadata from STAC catalogs.
 | [SegmentTypeEnum](enums/SegmentTypeEnum.md) | Discriminator for track segment types within compound tracks |
 | [SystemStateTypeEnum](enums/SystemStateTypeEnum.md) | Discriminator for system state variants |
 | [TimeUnitEnum](enums/TimeUnitEnum.md) | Units for time step navigation |
+| [ToolCategoryEnum](enums/ToolCategoryEnum.md) | Visual category for Log Panel icon rendering |
 | [TrackTypeEnum](enums/TrackTypeEnum.md) | Type of track feature |
 | [VesselDomainEnum](enums/VesselDomainEnum.md) | Top-level vessel domain classification |
 

@@ -1,16 +1,16 @@
 
 
-# Slot: state_type 
+# Slot: active_storyboard_id 
 
 
-_Discriminator for state variant (temporal, spatial, selection, active_storyboard)_
+_Storyboard properties.id the analyst last pinned for this plot (#237)_
 
 
 
 
 
-URI: [debrief:slot/state_type](https://debrief.info/schemas/slot/state_type)
-Alias: state_type
+URI: [debrief:slot/active_storyboard_id](https://debrief.info/schemas/slot/active_storyboard_id)
+Alias: active_storyboard_id
 
 <!-- no inheritance hierarchy -->
 
@@ -31,9 +31,7 @@ Alias: state_type
 
 ## Properties
 
-* Range: [SystemStateTypeEnum](../enums/SystemStateTypeEnum.md)
-
-* Required: True
+* Range: [String](../types/String.md)
 
 
 
@@ -57,8 +55,8 @@ Alias: state_type
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | debrief:state_type |
-| native | debrief:state_type |
+| self | debrief:active_storyboard_id |
+| native | debrief:active_storyboard_id |
 
 
 
@@ -67,16 +65,15 @@ Alias: state_type
 
 <details>
 ```yaml
-name: state_type
-description: Discriminator for state variant (temporal, spatial, selection, active_storyboard)
+name: active_storyboard_id
+description: Storyboard properties.id the analyst last pinned for this plot (#237)
 from_schema: https://debrief.info/schemas/debrief
 rank: 1000
-alias: state_type
+alias: active_storyboard_id
 owner: SystemStateProperties
 domain_of:
 - SystemStateProperties
-range: SystemStateTypeEnum
-required: true
+range: string
 
 ```
 </details>

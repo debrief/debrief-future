@@ -131,6 +131,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
     equals_string: LineString
@@ -196,6 +197,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
     equals_string: LineString

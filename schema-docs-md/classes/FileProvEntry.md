@@ -168,6 +168,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: FileProvEventTypeEnum
     required: true
   timestamp:
@@ -269,6 +270,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: FileProvEventTypeEnum
     required: true
   timestamp:

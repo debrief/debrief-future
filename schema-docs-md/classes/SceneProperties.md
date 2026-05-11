@@ -242,6 +242,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   description:
@@ -431,6 +432,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   description:

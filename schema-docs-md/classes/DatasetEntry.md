@@ -164,6 +164,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   title:
@@ -175,6 +176,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   metadata:
@@ -268,6 +270,7 @@ attributes:
     - DatasetEntry
     - StoryboardFeature
     - SceneFeature
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   title:
@@ -281,6 +284,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   metadata:

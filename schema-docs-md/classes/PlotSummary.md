@@ -167,6 +167,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   datetime:
@@ -314,6 +315,7 @@ attributes:
     - StacItemSummary
     - DatasetEntry
     - SceneProperties
+    - SceneThumbnailAssetEntry
     range: string
     required: true
   datetime:
