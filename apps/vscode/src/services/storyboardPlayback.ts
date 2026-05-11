@@ -265,7 +265,9 @@ export class StoryboardPlaybackService implements vscode.Disposable {
         };
       }),
       distinctFeatureTypes: Array.from(new Set(plot.features.map((f) => {
-        if (f.properties === null || typeof f.properties !== 'object') return '(none)';
+        if (f.properties === null || typeof f.properties !== 'object') {
+          return '(none)';
+        }
         const ft = (f.properties as { feature_type?: unknown }).feature_type;
         return typeof ft === 'string' ? ft : `(${typeof ft})`;
       }))),
