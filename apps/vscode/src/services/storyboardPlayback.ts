@@ -236,6 +236,41 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     const features = this.mapPanel.getCurrentFeatures();
     const plot = plotFromFeatures(features);
 
+    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+    const storyboardFeatures = plot.features.filter((f) =>
+      f.properties !== null &&
+      typeof f.properties === 'object' &&
+      (f.properties as { feature_type?: unknown }).feature_type === 'storyboard',
+    );
+    const sceneFeatures = plot.features.filter((f) =>
+      f.properties !== null &&
+      typeof f.properties === 'object' &&
+      (f.properties as { feature_type?: unknown }).feature_type === 'scene',
+    );
+    console.warn('[storyboard][diag] onPlotOpened fired', {
+      documentUri,
+      totalFeatures: plot.features.length,
+      storyboardCount: storyboardFeatures.length,
+      sceneCount: sceneFeatures.length,
+      storyboardSummaries: storyboardFeatures.map((f) => {
+        const props = f.properties as {
+          id?: unknown;
+          name?: unknown;
+          provenance?: unknown;
+        };
+        return {
+          id: props.id,
+          name: props.name,
+          provenanceLen: Array.isArray(props.provenance) ? props.provenance.length : 'not-array',
+        };
+      }),
+      distinctFeatureTypes: Array.from(new Set(plot.features.map((f) => {
+        if (f.properties === null || typeof f.properties !== 'object') return '(none)';
+        const ft = (f.properties as { feature_type?: unknown }).feature_type;
+        return typeof ft === 'string' ? ft : `(${typeof ft})`;
+      }))),
+    });
+
     // Validate plot; on throw disable transport + surface a single error.
     let plotValid = true;
     try {
@@ -265,6 +300,12 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
     const active = getMostRecentlyModifiedStoryboard(plot);
     state.activeStoryboardId = active?.properties.id ?? null;
+    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+    console.warn('[storyboard][diag] onPlotOpened: seeded activeStoryboardId', {
+      documentUri,
+      seeded: state.activeStoryboardId,
+      pickedFromMostRecentlyModified: active !== null,
+    });
 
     // #237 — restore the analyst's last-pinned active Storyboard from the
     // in-plot SystemState feature, falling back to the default when the
