@@ -318,6 +318,31 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     if (!state.plotValid) {return;}
     const plot = plotFromFeatures(this.mapPanel.getCurrentFeatures());
 
+    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+    const storyboardFeatures = plot.features.filter((f) =>
+      f.properties !== null &&
+      typeof f.properties === 'object' &&
+      (f.properties as { feature_type?: unknown }).feature_type === 'storyboard',
+    );
+    console.warn('[storyboard][diag] onPlotFeaturesChanged fired', {
+      documentUri,
+      activeBefore: state.activeStoryboardId,
+      totalFeatures: plot.features.length,
+      storyboardCount: storyboardFeatures.length,
+      storyboardSummaries: storyboardFeatures.map((f) => {
+        const props = f.properties as {
+          id?: unknown;
+          name?: unknown;
+          provenance?: unknown;
+        };
+        return {
+          id: props.id,
+          name: props.name,
+          provenanceLen: Array.isArray(props.provenance) ? props.provenance.length : 'not-array',
+        };
+      }),
+    });
+
     // Check whether the active Storyboard still exists.
     if (state.activeStoryboardId !== null) {
       const stillExists = plot.features.some(
