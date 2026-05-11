@@ -371,10 +371,25 @@ export class StoryboardPlaybackService implements vscode.Disposable {
 
   public async goToScene(documentUri: string, sceneId: string): Promise<void> {
     const state = this.states.get(documentUri);
-    if (!state || !state.plotValid) {return;}
-    if (state.transitionId !== null) {return;}
+    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+    if (!state) {
+      console.warn('[storyboard][diag] goToScene: no transport state for documentUri', { documentUri, sceneId, knownUris: Array.from(this.states.keys()) });
+      return;
+    }
+    if (!state.plotValid) {
+      console.warn('[storyboard][diag] goToScene: plot invalid', { documentUri, sceneId });
+      return;
+    }
+    if (state.transitionId !== null) {
+      console.warn('[storyboard][diag] goToScene: transition already in flight', { documentUri, sceneId, transitionId: state.transitionId });
+      return;
+    }
     const index = state.sceneOrder.indexOf(sceneId);
-    if (index < 0) {return;}
+    if (index < 0) {
+      console.warn('[storyboard][diag] goToScene: sceneId not in active sceneOrder', { documentUri, sceneId, activeStoryboardId: state.activeStoryboardId, sceneOrder: state.sceneOrder });
+      return;
+    }
+    console.warn('[storyboard][diag] goToScene: dispatching stepTo', { documentUri, sceneId, index });
     // Re-fly even when the click target equals `currentSceneIndex`. The
     // map may have been panned/zoomed since the Scene was captured (or
     // the user just landed on the storyboard with `currentSceneIndex=0`

@@ -177,6 +177,8 @@ function StoryboardPanelApp(): React.ReactElement {
   }, []);
 
   const onSceneRowClick = useCallback((sceneId: string) => {
+    // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+    console.warn('[storyboard][diag] scene row clicked, posting message', { sceneId });
     vscode.postMessage({ type: 'scene-row-clicked', sceneId });
   }, []);
 

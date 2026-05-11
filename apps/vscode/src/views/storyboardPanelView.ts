@@ -547,6 +547,8 @@ export class StoryboardPanelViewProvider implements vscode.WebviewViewProvider {
         // is missing features or out of range, the native VS Code modal
         // surfaces. Rows themselves carry no pre-computed `blocked`
         // state (design-fix 1).
+        // DIAGNOSTIC (claude/fix-scene-selection-rnHe0) — remove after triage.
+        console.warn('[storyboard][diag] host received scene-row-clicked, dispatching clickScene', message.sceneId);
         void vscode.commands.executeCommand('debrief.storyboard.clickScene', message.sceneId);
         break;
       case 'transport-forward-clicked':
