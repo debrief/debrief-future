@@ -74,6 +74,21 @@ def generate_pydantic() -> bool:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         content = result.stdout
 
+        # Post-process: gen-pydantic embeds the source YAML's *absolute* path in
+        # the LinkMLMeta `source_file` field. That path differs between a
+        # developer's machine (`/home/<user>/…/shared/schemas/src/linkml/debrief.yaml`)
+        # and the GitHub Actions runner (`/home/runner/work/debrief-future/debrief-future/…`),
+        # which trips the CI drift gate (spec 240 / T013) even though the
+        # schema content is byte-identical. Normalise to a stable repo-relative
+        # form so the committed artefact is environment-independent.
+        import re as _re_src
+
+        content = _re_src.sub(
+            r"'source_file':\s*'[^']*src/linkml/([^']+)'",
+            r"'source_file': 'src/linkml/\1'",
+            content,
+        )
+
         # Post-process: gen-pydantic emits dict[str, Any] in boilerplate classes
         # (ConfiguredBaseModel, LinkMLMeta). Replace with dict[str, object] to
         # eliminate Any from generated code. These are infrastructure classes,
