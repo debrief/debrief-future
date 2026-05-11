@@ -7,6 +7,10 @@
  * normative contract.
  */
 
+// PropertiesProvenanceEntry is LinkML-derived (spec 240). Imported here for
+// local use in PatchItemInput; re-exported below for downstream consumers.
+import type { PropertiesProvenanceEntry } from '@debrief/components/PropertiesPanel/provenanceTypes';
+
 // ─── Core context ──────────────────────────────────────────────────────────
 
 export interface StoreContext {
@@ -39,14 +43,10 @@ export interface StacItem {
   readonly [k: string]: unknown;
 }
 
-export interface PropertiesProvenanceEntry {
-  readonly activity_id: string;
-  readonly timestamp: string;
-  readonly tool: string;
-  readonly method: string;
-  readonly source: 'user' | 'tool' | 'import';
-  readonly fields: ReadonlyArray<string>;
-}
+// Re-export the LinkML-derived PropertiesProvenanceEntry so downstream
+// consumers see no change — same name, same import path, plus the schema
+// contract underneath. See spec 240 / research R2 for the migration rationale.
+export type { PropertiesProvenanceEntry };
 
 // ─── Capability ────────────────────────────────────────────────────────────
 
