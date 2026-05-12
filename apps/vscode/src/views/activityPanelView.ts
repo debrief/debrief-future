@@ -248,15 +248,6 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Handle temporal state changes from session
    */
   private _handleTemporalChange(temporal: TemporalSlice): void {
-    // DIAGNOSTIC (PR #606) — track whether the visible time controller
-    // (hosted inside ActivityPanel) receives temporal updates. Remove after triage.
-    console.warn('[activityPanel][diag] _handleTemporalChange fired', {
-      hasView: this._view !== undefined,
-      isWebviewReady: this._isWebviewReady,
-      currentTime: temporal.currentTime,
-      hasTimeRange: temporal.timeRange !== null,
-      willEarlyReturn: temporal.timeRange === null || temporal.timeRange === undefined,
-    });
     if (!temporal.timeRange) {
       return;
     }

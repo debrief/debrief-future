@@ -340,4 +340,49 @@ describe('useTimePlayback', () => {
       expect(result.current.atEnd).toBe(false);
     });
   });
+
+  describe('initialTime prop changes (PR #606)', () => {
+    it('updates currentTime when initialTime prop changes after mount', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const t0 = NOW + 10 * 60 * 1000; // 10 min
+      const t1 = NOW + 30 * 60 * 1000; // 30 min
+
+      const { result, rerender } = renderHook(
+        ({ initialTime }: { initialTime: number }) =>
+          useTimePlayback({ timeExtent, initialTime }),
+        { initialProps: { initialTime: t0 } },
+      );
+
+      expect(result.current.currentTime).toBe(t0);
+
+      // Simulate the host pushing a new currentTime (e.g. storyboard click).
+      rerender({ initialTime: t1 });
+
+      expect(result.current.currentTime).toBe(t1);
+    });
+
+    it('ignores stale initialTime when state was advanced internally', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const t0 = NOW;
+
+      const { result, rerender } = renderHook(
+        ({ initialTime }: { initialTime: number }) =>
+          useTimePlayback({ timeExtent, initialTime }),
+        { initialProps: { initialTime: t0 } },
+      );
+
+      // Internal increment (as would happen during playback or a step).
+      act(() => {
+        result.current.setCurrentTime(NOW + 5 * 60 * 1000);
+      });
+      expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
+
+      // Parent re-renders with the SAME initialTime as before. We must
+      // NOT clobber the internally-advanced state — only honour the
+      // prop when the prop itself changes.
+      rerender({ initialTime: t0 });
+
+      expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
+    });
+  });
 });

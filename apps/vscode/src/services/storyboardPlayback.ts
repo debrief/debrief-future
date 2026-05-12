@@ -643,23 +643,9 @@ export class StoryboardPlaybackService implements vscode.Disposable {
     // panel drives the in-between frames visually).
     const targetEpoch = new Date(targetScene.properties.timestamp).getTime();
     const session = this.sessionManager.getSession(state.documentUri);
-    // DIAGNOSTIC (PR #606) — investigating why setCurrentTime doesn't
-    // propagate after the viewport fly succeeds. Remove after triage.
-    const beforeTime = session?.getState().currentTime ?? '(no-session)';
     if (session && !Number.isNaN(targetEpoch)) {
       session.getState().setCurrentTime(targetEpoch);
     }
-    const afterTime = session?.getState().currentTime ?? '(no-session)';
-    console.warn('[storyboard][diag] executeTransition: time update', {
-      documentUri: state.documentUri,
-      sceneId: targetScene.properties.id,
-      sceneTimestamp: targetScene.properties.timestamp,
-      targetEpoch,
-      targetEpochIsNaN: Number.isNaN(targetEpoch),
-      sessionResolved: session !== undefined && session !== null,
-      currentTimeBefore: beforeTime,
-      currentTimeAfter: afterTime,
-    });
 
     // Safety timer (R8).
     if (state.transitionSafetyTimer !== null) {
