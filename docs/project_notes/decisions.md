@@ -1267,3 +1267,30 @@ as the PWA generator for `apps/backlog-navigator/`. The plugin handles:
 - `apps/backlog-navigator/src/pwa/registerSW.ts` + `UpdatePrompt.tsx`.
 - `specs/244-navigator-mobile-pwa/evidence/lighthouse-pwa.html` (Lighthouse PWA score ≥ 90).
 - `specs/244-navigator-mobile-pwa/evidence/bundle-baseline-244.json` (final budget + delta).
+
+
+---
+
+### Phase-3 deferred ADRs (placeholder, #249)
+
+The cutover PR for spec #249 (Extract `apps/backlog-navigator/` into a
+standalone repository) will land two ADR updates that are intentionally
+NOT in this Phase 0/1/2 PR:
+
+- **ADR-032 (new)** — Backlog Navigator extraction. Records the
+  three-phase shape, the gh-pages + JamesIves/github-pages-deploy-action
+  hosting decision (R-003 / FR-011), the destination slug as operator
+  input (R-009), the cutover gate (≥7 days green CI), and the
+  cross-reference to ADR-030 + ADR-031 (#248 extraction).
+- **ADR-030 amendment** — Owner-moved annotation. Appends a closing
+  note: "Owner moved to standalone repo `<org>/<repo>` as of #249. PWA
+  tooling decision unchanged, executes there now." Status stays unchanged
+  (decision is unchanged; only the executing repo moves).
+
+Both ADR updates land in the same cutover PR that deletes
+`apps/backlog-navigator/`, removes the three dedicated workflows, and
+removes `@lhci/cli` from the root `devDependencies`. This placeholder
+exists so a future-me grepping `decisions.md` for `#249` finds the
+hand-off path documented even before the cutover PR opens.
+
+Reference: `specs/249-extract-backlog-navigator/extraction-kit/PHASE3-RUNBOOK.md`.
