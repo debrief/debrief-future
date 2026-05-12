@@ -552,9 +552,7 @@ def generate_typescript() -> bool:
         if _polygon_source_sentinel in content and "export type PolygonSource" not in content:
             enum_start = content.index(_polygon_source_sentinel)
             enum_end = content.index("};\n", enum_start)
-            content = (
-                content[:enum_end] + _polygon_source_decl + content[enum_end + len("};\n") :]
-            )
+            content = content[:enum_end] + _polygon_source_decl + content[enum_end + len("};\n") :]
 
         _scene_props_start = content.find("export interface SceneProperties ")
         if _scene_props_start == -1:
@@ -565,9 +563,7 @@ def generate_typescript() -> bool:
         _scene_props_block = content[_scene_props_start:_scene_props_end]
         _new_scene_props_block = _scene_props_block.replace(
             "    display_mode?: string,\n", "    display_mode?: DisplayMode,\n", 1
-        ).replace(
-            "    _polygon_source?: string,\n", "    _polygon_source?: PolygonSource,\n", 1
-        )
+        ).replace("    _polygon_source?: string,\n", "    _polygon_source?: PolygonSource,\n", 1)
         if _new_scene_props_block == _scene_props_block:
             raise RuntimeError(
                 "generate.py: SceneProperties enum-slot post-processor had no "
@@ -575,11 +571,7 @@ def generate_typescript() -> bool:
                 "`display_mode?: string` / `_polygon_source?: string` tokens. Update "
                 "generate.py (Feature 258)."
             )
-        content = (
-            content[:_scene_props_start]
-            + _new_scene_props_block
-            + content[_scene_props_end:]
-        )
+        content = content[:_scene_props_start] + _new_scene_props_block + content[_scene_props_end:]
 
         # Narrow the two TemporalSlice fields from string → template-literal type.
         _temporal_slice_start = content.find("export interface TemporalSlice {\n")
