@@ -17,14 +17,31 @@ export function getFeatureLabel(feature: DebriefFeature): string {
   } else if (isReferenceLocation(feature)) {
     return feature.properties.name || feature.id || 'Unnamed Feature';
   } else {
+    // Storyboards (Spec #258) and Scenes carry their label on `name`/`title`.
+    // No dedicated `isStoryboardFeature` import here — keep `labels.ts` free
+    // of the storyboard subgraph (Article IV.1).
+    // eslint-disable-next-line no-restricted-syntax -- Annotation-union properties type does not include storyboard slots; structural read at this boundary.
+    const props = feature.properties as unknown as {
+      kind?: string;
+      name?: string;
+      title?: string;
+      label?: string;
+      text?: string;
+    };
+    if (props.kind === 'STORYBOARD' && typeof props.name === 'string' && props.name) {
+      return props.name;
+    }
+    if (props.kind === 'STORYBOARD_SCENE' && typeof props.title === 'string' && props.title) {
+      return props.title;
+    }
     // Annotation union: label is optional on most types, absent on NarrativeEntry/TextAnnotation
-    if ('label' in feature.properties && typeof feature.properties.label === 'string' && feature.properties.label) {
-      return feature.properties.label;
+    if (typeof props.label === 'string' && props.label) {
+      return props.label;
     }
-    if ('text' in feature.properties && typeof feature.properties.text === 'string' && feature.properties.text) {
-      return feature.properties.text;
+    if (typeof props.text === 'string' && props.text) {
+      return props.text;
     }
-    return feature.properties.kind || feature.id || 'Unnamed Feature';
+    return props.kind || feature.id || 'Unnamed Feature';
   }
 }
 

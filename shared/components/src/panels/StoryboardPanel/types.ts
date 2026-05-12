@@ -11,6 +11,8 @@
  * #216 consumers keep compiling unchanged (plan.md design-fix 3).
  */
 
+import type { SceneFeature } from "@debrief/schemas";
+
 export interface SceneRowViewModel {
   /** ULID of the Scene. */
   readonly sceneId: string;
@@ -285,4 +287,18 @@ export interface StoryboardPanelProps {
   onCollisionOffset?(): void;
   /** Fires when the analyst clicks Cancel in the collision banner. */
   onCollisionCancel?(): void;
+
+  // ── NEW in #258 — display-mode capture & restore ──────────────────────
+  /**
+   * Fires whenever a Scene becomes the "current" Scene — panel-row click,
+   * map-rectangle click, transport advance, or playback step (Spec #258 /
+   * FR-002). Hosts wire this to `session.setDisplayMode(scene.properties
+   * .display_mode)` so the captured display mode is restored alongside
+   * the viewport flyTo. Legacy scenes without `display_mode` leave the
+   * time controller untouched (FR-003).
+   *
+   * Article IV.1 — the panel only signals which Scene is now active; the
+   * host applies any time-controller mutation at its own boundary.
+   */
+  onSceneActivated?(scene: SceneFeature): void;
 }
