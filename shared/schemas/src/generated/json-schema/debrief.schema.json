@@ -355,6 +355,15 @@
       "title": "DatasetSeries",
       "type": "object"
     },
+    "DisplayModeEnum": {
+      "description": "Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml \u2014 see comment above.",
+      "enum": [
+        "full",
+        "trail"
+      ],
+      "title": "DisplayModeEnum",
+      "type": "string"
+    },
     "DurationPresetEnum": {
       "description": "Common ISO 8601 duration presets for interval parameters",
       "enum": [
@@ -1899,6 +1908,16 @@
       "title": "PolygonProperties",
       "type": "object"
     },
+    "PolygonSourceEnum": {
+      "description": "Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').",
+      "enum": [
+        "bounds",
+        "placeholder",
+        "manual"
+      ],
+      "title": "PolygonSourceEnum",
+      "type": "string"
+    },
     "PositionStyle": {
       "additionalProperties": false,
       "description": "Default styling configuration for track positions. Applied as baseline before interval rules and overrides.",
@@ -2413,12 +2432,20 @@
       "additionalProperties": false,
       "description": "Properties class for a Scene child Feature. A Scene is a single captured moment in a Storyboard \u2014 viewport, timestamp, and per-feature visibility.",
       "properties": {
+        "_polygon_source": {
+          "$ref": "#/$defs/PolygonSourceEnum",
+          "description": "Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation)."
+        },
         "description": {
           "description": "Markdown per-scene narrative",
           "type": [
             "string",
             "null"
           ]
+        },
+        "display_mode": {
+          "$ref": "#/$defs/DisplayModeEnum",
+          "description": "Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created."
         },
         "feature_set_hash": {
           "description": "SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.",

@@ -794,7 +794,7 @@ class PlaybackStateEnum(str, Enum):
 
 class DisplayModeEnum(str, Enum):
     """
-    Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+    Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml — see comment above.
     """
     full = "full"
     """
@@ -883,6 +883,24 @@ class ErrorCategory(str, Enum):
     resource_not_found = "resource_not_found"
     """
     Required feature or data not found
+    """
+
+
+class PolygonSourceEnum(str, Enum):
+    """
+    Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+    """
+    bounds = "bounds"
+    """
+    Polygon was computed from real Leaflet map bounds at capture time (post-#258 norm). Renderers trust the on-disk geometry.
+    """
+    placeholder = "placeholder"
+    """
+    Pre-#258 ~100m placeholder square or otherwise non-bounds-derived. Renderers recompute from (viewport, map dimensions); the on-disk value is preserved (Article III.2 source preservation).
+    """
+    manual = "manual"
+    """
+    Reserved for future user-drawn rectangles. Renderers recompute (current behaviour) until manual editing of scene geometry ships.
     """
 
 
@@ -5045,6 +5063,8 @@ class SceneProperties(BaseFeatureProperties):
     feature_set_hash: str = Field(default=..., description="""SHA-256 hex (lowercase, 64 chars) of JSON.stringify(canonical visible_feature_ids). Recomputed on every create/update touching visible_feature_ids.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     thumbnail_asset_ref: str = Field(default=..., description="""STAC asset key (path + name within the plot's STAC item). Populated by #216 at capture time via #174 helpers.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     transition_duration_ms: int = Field(default=..., description="""Playback transition duration in milliseconds. Default 500.""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
+    display_mode: Optional[DisplayModeEnum] = Field(default=None, description="""Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
+    polygon_source: Optional[PolygonSourceEnum] = Field(default=None, alias="_polygon_source", description="""Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'StacExtensionProperties',
                        'StacItemSummary']} })
