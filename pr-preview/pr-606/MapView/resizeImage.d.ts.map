@@ -1,1 +1,0 @@
-{"version":3,"file":"resizeImage.d.ts","sourceRoot":"","sources":["../../src/MapView/resizeImage.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAMH,MAAM,WAAW,gBAAgB;IAC/B,4CAA4C;IAC5C,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,6CAA6C;IAC7C,MAAM,CAAC,EAAE,MAAM,CAAC;CACjB;AAED;;;;;;GAMG;AACH,wBAAsB,gBAAgB,CACpC,OAAO,EAAE,MAAM,EACf,OAAO,GAAE,gBAAqB,GAC7B,OAAO,CAAC,MAAM,CAAC,CAoBjB"}
