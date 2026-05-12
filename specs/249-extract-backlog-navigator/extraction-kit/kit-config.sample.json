@@ -1,0 +1,16 @@
+{
+  "_comment": "Sample kit configuration. Copy to kit-config.json and adjust. Either pass --destination / --host to the scripts, OR populate this file once and re-run.",
+  "destination": {
+    "org": "deepbluecltd",
+    "repo": "backlog-navigator"
+  },
+  "host": "deepbluecltd.github.io",
+  "source": {
+    "repo": "debrief/debrief-future",
+    "prefix": "apps/backlog-navigator"
+  },
+  "options": {
+    "smokeTestAfterExtract": true,
+    "abortOnSmokeFailure": true
+  }
+}
