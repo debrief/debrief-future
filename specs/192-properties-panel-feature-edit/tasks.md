@@ -1,8 +1,15 @@
 # Tasks: Properties Panel — Feature & Sub-feature Editing
 
-**Feature**: 192 | **Branch**: `claude/start-speckit-192-SXMBK` (active feature dir `192-properties-panel-feature-edit`)
+**Feature**: 192 | **Branch**: `claude/implement-speckit-192-W9XHH` (active feature dir `192-properties-panel-feature-edit`)
 **Spec**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md) | **Research**: [research.md](./research.md) | **Data Model**: [data-model.md](./data-model.md) | **Contracts**: [contracts/](./contracts/)
-**Stories**: 7 (4× P1, 3× P2) | **Schema change**: 1 LinkML class + 1 slot (inherited across 8 classes)
+**Stories**: 7 (4× P1, 3× P2) | **Schema change**: 1 LinkML class + 1 slot (inherited across 13 concrete classes — see plan re-baseline notes for the class list and adherence-scope split)
+
+> **Re-baseline 2026-05-12 (second pass)**: This task list was updated
+> after `/speckit.implement` surveyed actual code state. See
+> `plan.md` § "Plan Refresh Notes (re-baseline 2026-05-12, second pass)"
+> for the eight discrepancies between the design and the code, and the
+> resulting task wording corrections. No tasks were dropped; one new
+> task (`T011a`) was added.
 
 ## Evidence Requirements
 
@@ -64,17 +71,18 @@ read-only signal on the plot slice, (e) the mode dispatcher in
 
 ### LinkML schema change (R-008, vertex-metadata-slot.md)
 
-- [ ] T005 [test] Author golden fixtures for `vertex_metadata` per the contract (9 files: empty-omitted, track-positions, polygon-rings, linestring-vertices, multipoint-vertices, point-vertex-zero, invalid-duplicate-path, invalid-mismatched-path-for-geometry, invalid-malformed-path) `shared/schemas/fixtures/vertex_metadata.*.json`
-- [ ] T006 [test] Author pytest adherence suite covering round-trip + inheritance across the 8 concrete classes + pattern validation per geometry `shared/schemas/tests/test_vertex_metadata.py`
+- [ ] T005 [test] Author golden fixtures for `vertex_metadata` per the contract (9 files: empty-omitted, track-positions, polygon-rings, linestring-vertices, multipoint-vertices, point-vertex-zero, invalid-duplicate-path, invalid-mismatched-path-for-geometry, invalid-malformed-path) `shared/schemas/fixtures/vertex_metadata.*.json`. Inheriting class set covered by fixtures: **TrackProperties** (positions), **CircleAnnotationProperties / RectangleAnnotationProperties / PolyAnnotationProperties / MultiPolygonFeatureProperties** (polygon rings), **LineAnnotationProperties / VectorAnnotationProperties** (LineString vertices), **MultiPointFeatureProperties** (MultiPoint vertices), **TextAnnotationProperties / ReferenceLocationProperties** (Point vertex/0). `NarrativeEntryProperties`, `StoryboardProperties`, `SceneProperties` get the empty-omitted fixture only.
+- [ ] T006 [test] Author pytest adherence suite covering round-trip + inheritance across the **13 concrete classes that inherit `BaseFeatureProperties`** (the seven annotation classes in `annotations.yaml` — `NarrativeEntryProperties`, `CircleAnnotationProperties`, `RectangleAnnotationProperties`, `LineAnnotationProperties`, `TextAnnotationProperties`, `VectorAnnotationProperties`, `PolyAnnotationProperties`; the four geojson classes in `geojson.yaml` — `TrackProperties`, `ReferenceLocationProperties`, `MultiPointFeatureProperties`, `MultiPolygonFeatureProperties`; the two storyboard classes — `StoryboardProperties`, `SceneProperties`) + pattern validation per geometry `shared/schemas/tests/test_vertex_metadata.py`
 - [ ] T007 Add `VertexMetadata` class to LinkML `shared/schemas/src/linkml/common.yaml`
 - [ ] T008 Add `vertex_metadata` slot to `BaseFeatureProperties` (so every inheriting class gets it for free) `shared/schemas/src/linkml/common.yaml`
 - [ ] T009 Regenerate Pydantic, JSON Schema, TypeScript bindings `shared/schemas/Makefile`
-- [ ] T010 [P] Confirm regenerated `@debrief/schemas` TS bindings export `VertexMetadata` and that `BaseFeatureProperties.vertex_metadata` is reachable on every concrete subclass `shared/schemas/dist/` (verification — not a write)
+- [ ] T010 [P] Confirm regenerated `@debrief/schemas` TS bindings export `VertexMetadata` and that `BaseFeatureProperties.vertex_metadata` is reachable on every of the **13 concrete subclasses** (see T006 list) `shared/schemas/dist/` (verification — not a write)
 
 ### Selection-mode resolver (selection-mode.md)
 
 - [ ] T011 [test] Author Vitest cases for `resolveEditingMode` per the contract (16 cases incl. all four vertex-path shapes + stale branches) `shared/components/src/PropertiesPanel/__tests__/selectionMode.test.ts`
-- [ ] T012 Implement `resolveEditingMode` using existing `parsePath` from `services/session-state/src/utils/selectionPath.ts:96` `shared/components/src/PropertiesPanel/selectionMode.ts`
+- [ ] T011a [test] **NEW (re-baseline)**: Extend the path-level registry in `selectionPath.ts` with `rings` (index), `vertices` (index), and `vertex` (index, valid only with the literal address `0`); update `validatePathSemantics` to accept the new levels; add Vitest cases for each `services/session-state/src/utils/selectionPath.ts` + `services/session-state/src/utils/__tests__/selectionPath.test.ts`. **Without this**, the resolver in T012 will fail semantic validation on every Polygon / LineString / MultiPoint / Point vertex path.
+- [ ] T012 Implement `resolveEditingMode` using `parsePath` from `services/session-state/src/utils/selectionPath.ts:96` (after the registry extension in T011a) `shared/components/src/PropertiesPanel/selectionMode.ts`
 
 ### Staged-edits buffer hook (staged-edits-store.md, R-002a, R-011)
 
@@ -83,14 +91,14 @@ read-only signal on the plot slice, (e) the mode dispatcher in
 
 ### Read-only signal on plot slice (read-only-signal.md, R-003)
 
-- [ ] T015 [test] Author Vitest for the plot slice `isReadOnly`/`readOnlyReason` producer rules (default, openPlot writable, openPlot non-writable via `CapabilityReport.persistent`, post-write `ReadOnlyFilesystemError`, post-write Node `EACCES`, reset on re-open) `services/session-state/src/store/slices/__tests__/plot.readOnly.test.ts`
-- [ ] T016 Extend the plot slice state with `isReadOnly: boolean` and `readOnlyReason: string | null`, plus producer logic in `openPlot` action `services/session-state/src/store/slices/plot.ts`
-- [ ] T017 Wire `saveSession` to escalate `ReadOnlyFilesystemError` and `EACCES`/`EPERM` Node errors into the plot slice via the existing dispatch surface — the producer reads the `SaveResult` from `saveSession` (`services/session-state/src/persistence/save.ts:57–102`) and updates the slice via a new action `services/session-state/src/persistence/save.ts`
-- [ ] T018 [P] Add named selectors `selectIsReadOnly` and `selectReadOnlyReason` to the plot slice for consumers `services/session-state/src/store/slices/plot.ts`
+- [ ] T015 [test] Author Vitest for the **new** plot slice `isReadOnly`/`readOnlyReason` producer rules (default, `setReadOnly(false)` writable, `setReadOnly(true, reason)` non-writable, post-write `ReadOnlyFilesystemError` propagated via the same action, post-write Node `EACCES`, reset on re-open) `services/session-state/src/store/slices/__tests__/plot.readOnly.test.ts`
+- [ ] T016 **Create the new `plot` slice** (`isReadOnly: boolean`, `readOnlyReason: string | null`, action `setReadOnly(isReadOnly, reason)`) and wire it into `services/session-state/src/store/index.ts` and `services/session-state/src/types/index.ts` (compose `PlotSlice` + `PlotActions` into `SessionStore` and `SessionState` alongside `document`, `temporal`, etc.). **Files**: `services/session-state/src/store/slices/plot.ts` (NEW), `services/session-state/src/types/plot.ts` (NEW), plus edits to `store/index.ts` and `types/index.ts`. **Re-baseline note**: there is no existing `plot.ts` slice and no `openPlot` action — both are net-new in this task.
+- [ ] T017 Wire `saveSession` (`services/session-state/src/persistence/save.ts:57–102`) to detect `ReadOnlyFilesystemError` / Node `EACCES` / Node `EPERM` in its catch block and dispatch the new `setReadOnly(true, reason)` action. **Re-baseline note**: producer rule 1 from `contracts/read-only-signal.md` ("when a plot is opened") is satisfied by the host (VS Code extension or web-shell) calling `stacWriterFs.capability()` after open and dispatching `setReadOnly` accordingly; add the call site in `apps/vscode/src/extension.ts` (where `debrief.openPlot` is registered) and the web-shell equivalent. Track the host wiring as part of this task.
+- [ ] T018 [P] Add named selectors `selectIsReadOnly` and `selectReadOnlyReason` to the new plot slice for consumers `services/session-state/src/store/slices/plot.ts`
 
 ### Mode dispatcher + bare mode shells (no behaviour yet)
 
-- [ ] T019 Extend `PropertiesForm` with an `editingMode: EditingMode` prop; route to four sibling mode components based on `mode.kind`; preserve existing plot-mode pathway unchanged `shared/components/src/PropertiesPanel/PropertiesForm.tsx`
+- [ ] T019 **Wrap, don't modify** `PropertiesForm`. The shipped `PropertiesForm.tsx` is wired to STAC item-level fields via the `fields: PropertiesFormField[]` prop and is the plot-mode branch. Introduce a new mode-aware parent that takes `editingMode: EditingMode` plus the existing item-fields surface, and dispatches: `kind: 'plot'` → existing `PropertiesForm`; `feature` / `subfeature` / `multi` → the three new mode components from T020–T022. **Files**: keep `PropertiesForm.tsx` untouched as the plot branch; add new dispatcher (e.g., `PropertiesPanelDispatch.tsx`) at `shared/components/src/PropertiesPanel/`; update the consumer in `ActivityPanel.tsx`'s "Properties" `PaneSection` (line ~570) to render the dispatcher instead of `PropertiesForm` directly. **Re-baseline note**: the previous wording ("extend PropertiesForm with mode prop") implied a single-file edit; that would either regress plot mode or duplicate widget code.
 - [ ] T020 [P] Add empty `FeatureEditorMode` shell (renders header + delegates to the existing widget set; behaviour comes in Phase 3) `shared/components/src/PropertiesPanel/modes/FeatureEditorMode.tsx`
 - [ ] T021 [P] Add empty `SubFeatureEditorMode` shell (renders header; vertex form comes in Phase 4) `shared/components/src/PropertiesPanel/modes/SubFeatureEditorMode.tsx`
 - [ ] T022 [P] Add empty `MultiSelectSummaryMode` shell (renders count; derivation comes in Phase 7) `shared/components/src/PropertiesPanel/modes/MultiSelectSummaryMode.tsx`
@@ -158,7 +166,7 @@ exactly. SC-010 + FR-021 + FR-022.
 
 - [ ] T039 [test] Vitest for the glue function `applyClickToSelection({ target, modifier })` per the contract's transition table (8 cases) `shared/components/src/MapView/__tests__/applyClickToSelection.test.ts`
 - [ ] T040 Implement `applyClickToSelection` (pure function) and the modifier-key detection helper that reads `navigator.platform` at app boot (Mac → `metaKey`, else `ctrlKey`); export both `shared/components/src/utils/applyClickToSelection.ts`
-- [ ] T041 Extend `MapView.tsx` `onSelect` to surface `{ target, modifier, shift }` instead of `(featureId, event)`; route through `applyClickToSelection` → `setSelection` on the features slice `shared/components/src/MapView/MapView.tsx`
+- [ ] T041 Extend `MapView.tsx` `onSelect` to surface `{ target, modifier, shift }` instead of `(featureId, event)`; route through `applyClickToSelection` → `setSelection` on the features slice `shared/components/src/MapView/MapView.tsx`. **Re-baseline note**: this is a breaking change to the `onSelect` signature (`shared/components/src/MapView/MapView.tsx:46` today is `(featureId, event)`). Update the two host call-sites as part of this task: `apps/web-shell/` and `apps/vscode/` (`grep -rn "onSelect=" apps/ shared/` to confirm — keep existing single-feature semantics on plain clicks).
 - [ ] T042 Converge `FeatureList.tsx` onto the same `applyClickToSelection` glue (replace its inline modifier logic at FeatureList.tsx:154–179 with a call to the shared helper) — DRY per Issue 2's engineering preference `shared/components/src/FeatureList/FeatureList.tsx`
 - [ ] T043 [P][test] Playwright web-shell: map two plain → modifier → modifier-toggle → plain sequence; assert selection shape + panel mode at each step `apps/web-shell/playwright/tests/properties-multi-select.spec.ts`
 - [ ] T044 [P][test] Playwright web-shell: Layers panel equivalent of T043, asserting identical resulting selection shape `apps/web-shell/playwright/tests/properties-multi-select.spec.ts` (extend file from T043)

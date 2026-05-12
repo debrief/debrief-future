@@ -243,6 +243,136 @@ no new app, no new build target.
 
 **Run Commands** unchanged: `cd apps/web-shell && node run-playwright.mjs properties-feature-edit`, etc.
 
+## Plan Refresh Notes (re-baseline 2026-05-12, second pass)
+
+Triggered when `/speckit.implement` (run #2) surveyed actual code state
+against the design and surfaced eight gaps that affect the task list and
+several contract owner-file paths. Treated as **plan corrections**, not
+scope changes — the spec, decisions, and acceptance criteria stand.
+
+### Discrepancies discovered and how to read them
+
+1. **No `plot` slice exists yet.** `services/session-state/src/store/slices/`
+   currently contains `temporal.ts`, `spatial.ts`, `features.ts`,
+   `document.ts`, `results.ts`, `browser-filter.ts` — and the `SessionState`
+   composition (`services/session-state/src/types/index.ts:63`) lists
+   `document` (with `dirty`, `savePath`) but no `plot`. The "plot slice"
+   referenced by `contracts/read-only-signal.md` and tasks T015–T018 must
+   be **created** as a brand-new slice (file + slice creator + type +
+   selectors + DEFAULT_PLOT_SLICE + wire-in to `store/index.ts` and
+   `types/index.ts`). It is NOT an "extension" of an existing slice.
+
+2. **No `openPlot` action exists.** Plot opening today is a VS Code
+   *command* (`debrief.openPlot`, registered in `apps/vscode/src/extension.ts`)
+   which goes through `apps/vscode/src/services/stacService.ts` and
+   `apps/vscode/src/services/stacWriterFs.ts`. Inside session-state the
+   only persistence entry points are `loadSession` and `saveSession`. The
+   plan's "producer rule 1 — when a plot is opened, by `openPlot` action
+   in the plot slice" should be interpreted as: introduce a new
+   `setReadOnly(isReadOnly, reason)` action on the new plot slice; have
+   `apps/vscode/src/extension.ts` (or the appropriate panel/provider)
+   call `stacWriterFs.capability()` after opening a plot and dispatch
+   `setReadOnly` with the result. Likewise the web-shell calls its own
+   writer's `capability()` on plot open.
+
+3. **Selection-path level registry is missing the new levels.** Today's
+   `LEVEL_REGISTRY` (`services/session-state/src/utils/selectionPath.ts:44`)
+   only registers `positions`, `segments`, `points`, `polygons`. The
+   contract requires `rings`, `vertices`, and `vertex` for Polygon /
+   LineString / MultiPoint / Point sub-feature paths. **Add a new task**
+   to extend the registry alongside T011/T012 — without it, `parsePath`
+   will fail semantic validation on every new sub-feature path.
+
+4. **`PropertiesForm` is currently wired to STAC item-level properties,
+   not feature properties.** The shipped `PropertiesForm.tsx` accepts a
+   `fields: PropertiesFormField[]` prop populated by the VS Code host
+   from `item.json` properties — there is no feature-mode pathway today.
+   The plan's "extend `PropertiesForm` with an `editingMode` prop"
+   (T019) should be read as **wrap, not modify**: keep the existing
+   `PropertiesForm` as the plot-mode branch and add a new mode-aware
+   parent (or extend `ActivityPanel`'s "Properties" section so it
+   dispatches between the existing `PropertiesForm` for plot mode and
+   the three new mode components for feature/sub-feature/multi-select).
+   This avoids regressing #447's plot-editor behaviour (FR-012, SC-008).
+
+5. **There are 13 concrete classes that inherit `BaseFeatureProperties`,
+   not 8.** Confirmed by `grep -B1 "is_a: BaseFeatureProperties"`:
+   - `annotations.yaml`: `NarrativeEntryProperties`, `CircleAnnotationProperties`,
+     `RectangleAnnotationProperties`, `LineAnnotationProperties`,
+     `TextAnnotationProperties`, `VectorAnnotationProperties`,
+     `PolyAnnotationProperties` (7)
+   - `geojson.yaml`: `TrackProperties`, `ReferenceLocationProperties`,
+     `MultiPointFeatureProperties`, `MultiPolygonFeatureProperties` (4)
+   - `storyboard.yaml`: `StoryboardProperties`, `SceneProperties` (2)
+
+   The contract names `PolygonAnnotationProperties` and "the 8 classes"
+   imprecisely; the actual class is `PolyAnnotationProperties` and the
+   real count is 13. Adherence-test scope should:
+   - **In scope (geometry-bearing, vertex-addressable)**: `TrackProperties`
+     (positions), `LineAnnotationProperties` + `VectorAnnotationProperties`
+     (LineString vertices), `MultiPointFeatureProperties` (MultiPoint
+     vertices), `CircleAnnotationProperties` + `RectangleAnnotationProperties`
+     + `PolyAnnotationProperties` + `MultiPolygonFeatureProperties` (Polygon
+     rings/vertices), `TextAnnotationProperties` + `ReferenceLocationProperties`
+     (Point vertex/0).
+   - **Out of meaningful vertex scope** (still inherit the slot, but
+     don't normally carry vertices): `NarrativeEntryProperties` (no
+     geometry), `StoryboardProperties` + `SceneProperties` (storyboard
+     polygons used as panel hulls, not analyst-edited vertices). For
+     these, the round-trip test should assert "empty `vertex_metadata` →
+     slot omitted on serialisation" rather than a populated fixture.
+
+6. **`FeatureList` already reads `ctrlKey` / `metaKey` / `shiftKey`
+   inline** (`shared/components/src/FeatureList/FeatureList.tsx:154–179`).
+   Project Structure says "✅ already passes event flags; no change
+   required", but T042 asks to converge the inline logic onto
+   `applyClickToSelection`. Both statements are reconcilable: keep the
+   click-handling local but route the selection-set computation through
+   the shared helper. T042 stays as-written; Project Structure's
+   FeatureList annotation is slightly optimistic.
+
+7. **`MapView.onSelect` signature today is `(featureId, event)`** (line
+   46 of `shared/components/src/MapView/MapView.tsx`). T041 changes it
+   to `{ target, modifier, shift }`. That is a **breaking change** for
+   every consumer — including the web-shell and VS Code hosts. The task
+   stays, but call-site updates need to be folded in (one in
+   `apps/web-shell/`, one in `apps/vscode/`). Add explicit subtasks
+   under T041 for those.
+
+8. **Tasks.md branch banner is stale.** `tasks.md` header still names
+   `claude/start-speckit-192-SXMBK` (the original cookie). Current
+   working branch is `claude/implement-speckit-192-W9XHH`. Cosmetic;
+   update at the next tasks-file edit pass.
+
+### Net effect on phases
+
+- **No tasks dropped.** All 91 tasks remain in scope.
+- **One new task** required: `T011a` — extend the selectionPath level
+  registry with `rings`, `vertices`, `vertex` and update its semantic
+  validator. Tracked in the updated tasks.md.
+- **Several tasks reworded for accuracy**, mainly T015–T018 ("plot
+  slice" → "new plot slice"), T005/T006/T010 (class counts and names),
+  T019 (wrap, not modify), T017 (no `openPlot` action; use new
+  `setReadOnly` action invoked by the host after `capability()`), T041
+  (add subtasks for host call-site updates). Tracked in the updated
+  tasks.md.
+- **Foundation work is larger than the plan first suggested.** Phase 2
+  was scoped at 21 tasks; the corrections push effort up modestly (new
+  slice file + registry extension) but the scope expressed by the spec
+  is unchanged.
+
+### What this re-baseline does NOT change
+
+- The spec, acceptance criteria, success metrics.
+- The seven user stories.
+- The contract files in `contracts/`.
+- The evidence/media artefact list.
+- The implementation strategy (Phase 2 first, P1 stories next, P2
+  stories last, Polish at the end).
+
+The next `/speckit.implement` run can start from Phase 1 / T001 against
+the corrected task list with no further re-baseline expected.
+
 ## Complexity Tracking
 
 *No violations. Section intentionally empty.*
