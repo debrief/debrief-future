@@ -61,12 +61,12 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 **Purpose**: Create the new schema file scaffolding, fixture directories, and test-file stubs so subsequent phases just fill them in. No consumer code changes here.
 
-- [ ] T001 Create empty LinkML source file with frontmatter only (id, name, title, prefixes, default_prefix, default_range, imports: `linkml:types` + `tool` — per `contracts/mcp.linkml.yaml.draft.md` lines 14–36) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T002 [P] Create fixture directory tree for the cluster (`valid/`, `invalid/` subdirs per class group) `shared/schemas/fixtures/mcp/.gitkeep`
-- [ ] T003 [P] Create empty test module stub for round-trip tests (imports `pytest` + helpers from `shared/schemas/tests/helpers/`, one placeholder test marked `xfail` to anchor collection) `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T004 [P] Create empty test module stub for golden + negative fixture tests `shared/schemas/tests/test_mcp_fixtures.py`
-- [ ] T005 Verify `task schemas:build` still completes successfully (sanity baseline before adding classes — establishes pre-feature build time for NFR-001 comparison; record duration in shell scratch)
-- [ ] T006 Update backlog row for #222 from `specified` → `implementing` and commit `chore(backlog): mark item 222 as implementing` `BACKLOG.md`
+- [x] T001 Create empty LinkML source file with frontmatter only (id, name, title, prefixes, default_prefix, default_range, imports: `linkml:types` + `tool` — per `contracts/mcp.linkml.yaml.draft.md` lines 14–36) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T002 [P] Create fixture directory tree for the cluster (`valid/`, `invalid/` subdirs per class group) `shared/schemas/fixtures/mcp/.gitkeep`
+- [x] T003 [P] Create empty test module stub for round-trip tests (imports `pytest` + helpers from `shared/schemas/tests/helpers/`, one placeholder test marked `xfail` to anchor collection) `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T004 [P] Create empty test module stub for golden + negative fixture tests `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T005 Verify `task schemas:build` still completes successfully (sanity baseline before adding classes — establishes pre-feature build time for NFR-001 comparison; record duration in shell scratch)
+- [x] T006 Update backlog row for #222 from `specified` → `implementing` and commit `chore(backlog): mark item 222 as implementing` `BACKLOG.md`
 
 **Checkpoint**: New `mcp.yaml` file exists (empty class set), fixture + test scaffolding in place, schema build still green.
 
@@ -80,16 +80,16 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 **⚠️ CRITICAL**: No user-story phase can begin until Phase 2 is complete — every class references at least one enum or the aliases module.
 
-- [ ] T010 Add `SessionMCPToolName` permissible-values enum (11 entries — see `data-model.md` §"Permissible-value enums") to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T011 [P] Add `MCPContentItemTypeEnum` permissible-values enum (`text`, `resource_link`, `image`, `structured`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T012 [P] Add `MCPParamTypeEnum` permissible-values enum (`string`, `number`, `integer`, `boolean`, `array`, `object`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T013 [P] Add `ReplayStatusEnum` permissible-values enum (`unchanged`, `version_drift`, `tool_removed`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T014 Run `task schemas:build` and verify generated artefacts `shared/schemas/src/generated/python/mcp.py`, `shared/schemas/src/generated/typescript/mcp.ts`, `shared/schemas/src/generated/json-schema/mcp.schema.json` are emitted with the four enums
-- [ ] T015 [P] Extend `@debrief/schemas` TS export barrel to re-export the new enums and (forward-declared) classes `shared/schemas/src/typescript/index.ts`
-- [ ] T016 [P] Extend `debrief_schemas` Python re-export module to expose the new enums and (forward-declared) classes `shared/schemas/src/python/debrief_schemas/__init__.py`
-- [ ] T017 [P] Create empty TS-only function-alias module (no aliases yet — populated in Phase 5; see research R-002) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
-- [ ] T018 [P] [test] Extend the schema-comparison helper to register the new file so `test_schema_compare.py` discovers it `shared/schemas/tests/test_schema_compare.py`
-- [ ] T019 Run `uv run pytest shared/schemas/tests/test_regen_idempotent.py shared/schemas/tests/test_schema_compare.py -v` and confirm green (build wiring sound, no classes asserted yet)
+- [x] T010 Add `SessionMCPToolName` permissible-values enum (11 entries — see `data-model.md` §"Permissible-value enums") to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T011 [P] Add `MCPContentItemTypeEnum` permissible-values enum (`text`, `resource_link`, `image`, `structured`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T012 [P] Add `MCPParamTypeEnum` permissible-values enum (`string`, `number`, `integer`, `boolean`, `array`, `object`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T013 [P] Add `ReplayStatusEnum` permissible-values enum (`unchanged`, `version_drift`, `tool_removed`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T014 Run `task schemas:build` and verify generated artefacts `shared/schemas/src/generated/python/mcp.py`, `shared/schemas/src/generated/typescript/mcp.ts`, `shared/schemas/src/generated/json-schema/mcp.schema.json` are emitted with the four enums
+- [x] T015 [P] Extend `@debrief/schemas` TS export barrel to re-export the new enums and (forward-declared) classes `shared/schemas/src/typescript/index.ts`
+- [x] T016 [P] Extend `debrief_schemas` Python re-export module to expose the new enums and (forward-declared) classes `shared/schemas/src/python/debrief_schemas/__init__.py`
+- [x] T017 [P] Create empty TS-only function-alias module (no aliases yet — populated in Phase 5; see research R-002) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
+- [x] T018 [P] [test] Extend the schema-comparison helper to register the new file so `test_schema_compare.py` discovers it `shared/schemas/tests/test_schema_compare.py`
+- [x] T019 Run `uv run pytest shared/schemas/tests/test_regen_idempotent.py shared/schemas/tests/test_schema_compare.py -v` and confirm green (build wiring sound, no classes asserted yet)
 
 **Checkpoint**: All four enums generated for both Python and TypeScript; build is reproducible; re-export barrels surface the new symbols; aliases module file in place.
 

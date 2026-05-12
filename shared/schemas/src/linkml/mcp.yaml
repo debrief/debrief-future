@@ -19,3 +19,53 @@ default_range: string
 imports:
   - linkml:types
   - tool          # for ToolCategoryEnum, ToolParameter (canonical)
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+
+  SessionMCPToolName:
+    description: >-
+      Authoritative list of session-state MCP tool names. Must mirror the
+      `TOOLS` const at services/session-state/src/server/mcp.ts. Research
+      R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS`
+      projection with a cross-language permissible-values enum.
+    permissible_values:
+      session.getState: {}
+      session.getTemporalState: {}
+      session.getSpatialState: {}
+      session.getFeaturesState: {}
+      session.getDocumentState: {}
+      session.setCurrentTime: {}
+      session.setViewport: {}
+      session.setSelection: {}
+      session.setHiddenFeatures: {}
+      session.setPlaybackRate: {}
+      session.setRotation: {}
+
+  MCPContentItemTypeEnum:
+    description: Discriminator for MCPContentItem variants.
+    permissible_values:
+      text: {}
+      resource_link: {}
+      image: {}
+      structured: {}
+
+  MCPParamTypeEnum:
+    description: JSON-Schema-compatible primitive types for tool parameters.
+    permissible_values:
+      string: {}
+      number: {}
+      integer: {}
+      boolean: {}
+      array: {}
+      object: {}
+
+  ReplayStatusEnum:
+    description: Outcome of resolving a logged tool invocation at replay time.
+    permissible_values:
+      unchanged: {}
+      version_drift: {}
+      tool_removed: {}

@@ -1001,6 +1001,30 @@
       "title": "LogEntry",
       "type": "object"
     },
+    "MCPContentItemTypeEnum": {
+      "description": "Discriminator for MCPContentItem variants.",
+      "enum": [
+        "text",
+        "resource_link",
+        "image",
+        "structured"
+      ],
+      "title": "MCPContentItemTypeEnum",
+      "type": "string"
+    },
+    "MCPParamTypeEnum": {
+      "description": "JSON-Schema-compatible primitive types for tool parameters.",
+      "enum": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "array",
+        "object"
+      ],
+      "title": "MCPParamTypeEnum",
+      "type": "string"
+    },
     "MarkerSymbolEnum": {
       "description": "Marker shapes for tool parameter choices (superset of PointShapeEnum)",
       "enum": [
@@ -2340,6 +2364,16 @@
       "title": "ReferencePointPatternEnum",
       "type": "string"
     },
+    "ReplayStatusEnum": {
+      "description": "Outcome of resolving a logged tool invocation at replay time.",
+      "enum": [
+        "unchanged",
+        "version_drift",
+        "tool_removed"
+      ],
+      "title": "ReplayStatusEnum",
+      "type": "string"
+    },
     "ResultCategoryEnum": {
       "description": "Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.",
       "enum": [
@@ -2923,6 +2957,24 @@
       ],
       "title": "SensorData",
       "type": "object"
+    },
+    "SessionMCPToolName": {
+      "description": "Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.",
+      "enum": [
+        "session.getState",
+        "session.getTemporalState",
+        "session.getSpatialState",
+        "session.getFeaturesState",
+        "session.getDocumentState",
+        "session.setCurrentTime",
+        "session.setViewport",
+        "session.setSelection",
+        "session.setHiddenFeatures",
+        "session.setPlaybackRate",
+        "session.setRotation"
+      ],
+      "title": "SessionMCPToolName",
+      "type": "string"
     },
     "SnapshotLinks": {
       "additionalProperties": false,

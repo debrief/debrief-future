@@ -506,6 +506,54 @@ export enum ErrorCategory {
     /** Required feature or data not found */
     resource_not_found = "resource_not_found",
 };
+/**
+* Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.
+*/
+export enum SessionMCPToolName {
+    
+    sessionFULL_STOPgetState = "session.getState",
+    sessionFULL_STOPgetTemporalState = "session.getTemporalState",
+    sessionFULL_STOPgetSpatialState = "session.getSpatialState",
+    sessionFULL_STOPgetFeaturesState = "session.getFeaturesState",
+    sessionFULL_STOPgetDocumentState = "session.getDocumentState",
+    sessionFULL_STOPsetCurrentTime = "session.setCurrentTime",
+    sessionFULL_STOPsetViewport = "session.setViewport",
+    sessionFULL_STOPsetSelection = "session.setSelection",
+    sessionFULL_STOPsetHiddenFeatures = "session.setHiddenFeatures",
+    sessionFULL_STOPsetPlaybackRate = "session.setPlaybackRate",
+    sessionFULL_STOPsetRotation = "session.setRotation",
+};
+/**
+* Discriminator for MCPContentItem variants.
+*/
+export enum MCPContentItemTypeEnum {
+    
+    text = "text",
+    resource_link = "resource_link",
+    image = "image",
+    structured = "structured",
+};
+/**
+* JSON-Schema-compatible primitive types for tool parameters.
+*/
+export enum MCPParamTypeEnum {
+    
+    string = "string",
+    number = "number",
+    integer = "integer",
+    boolean = "boolean",
+    array = "array",
+    object = "object",
+};
+/**
+* Outcome of resolving a logged tool invocation at replay time.
+*/
+export enum ReplayStatusEnum {
+    
+    unchanged = "unchanged",
+    version_drift = "version_drift",
+    tool_removed = "tool_removed",
+};
 
 
 /**

@@ -98,7 +98,8 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                  'raw-geojson',
                  'session-state',
                  'tool-result',
-                 'storyboard'],
+                 'storyboard',
+                 'mcp'],
      'name': 'debrief',
      'prefixes': {'debrief': {'prefix_prefix': 'debrief',
                               'prefix_reference': 'https://debrief.info/schemas/'},
@@ -884,6 +885,54 @@ class ErrorCategory(str, Enum):
     """
     Required feature or data not found
     """
+
+
+class SessionMCPToolName(str, Enum):
+    """
+    Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.
+    """
+    sessionFULL_STOPgetState = "session.getState"
+    sessionFULL_STOPgetTemporalState = "session.getTemporalState"
+    sessionFULL_STOPgetSpatialState = "session.getSpatialState"
+    sessionFULL_STOPgetFeaturesState = "session.getFeaturesState"
+    sessionFULL_STOPgetDocumentState = "session.getDocumentState"
+    sessionFULL_STOPsetCurrentTime = "session.setCurrentTime"
+    sessionFULL_STOPsetViewport = "session.setViewport"
+    sessionFULL_STOPsetSelection = "session.setSelection"
+    sessionFULL_STOPsetHiddenFeatures = "session.setHiddenFeatures"
+    sessionFULL_STOPsetPlaybackRate = "session.setPlaybackRate"
+    sessionFULL_STOPsetRotation = "session.setRotation"
+
+
+class MCPContentItemTypeEnum(str, Enum):
+    """
+    Discriminator for MCPContentItem variants.
+    """
+    text = "text"
+    resource_link = "resource_link"
+    image = "image"
+    structured = "structured"
+
+
+class MCPParamTypeEnum(str, Enum):
+    """
+    JSON-Schema-compatible primitive types for tool parameters.
+    """
+    string = "string"
+    number = "number"
+    integer = "integer"
+    boolean = "boolean"
+    array = "array"
+    object = "object"
+
+
+class ReplayStatusEnum(str, Enum):
+    """
+    Outcome of resolving a logged tool invocation at replay time.
+    """
+    unchanged = "unchanged"
+    version_drift = "version_drift"
+    tool_removed = "tool_removed"
 
 
 
