@@ -60,20 +60,39 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
   // scene click). Without this sync the slider stays where it was on
   // mount.
   //
-  // During playback the RAF loop also advances `currentTime` and fires
-  // `onTimeChange`, which the host may round-trip back to us as a new
-  // `initialTime` value. Naively syncing every prop change would
-  // continuously roll state back to a stale RAF tick. So:
-  //   - skip the sync while playbackState === 'playing'
-  //   - track the last seen prop value so an unrelated re-render with
-  //     the same `initialTime` doesn't re-trigger
+  // Two hazards to avoid:
+  //   1. During playback the RAF loop advances currentTime internally
+  //      and fires onTimeChange, which the host round-trips back to
+  //      us as a new initialTime. Naively syncing would roll state
+  //      back to a stale RAF tick.
+  //   2. During drag scrubbing every step calls our internal
+  //      setCurrentTime, fires onTimeChange, and the host round-trips
+  //      each one. The echoes arrive lagging behind the latest drag
+  //      position, so naive sync would visibly jitter / roll back.
+  //
+  // Fix: maintain a FIFO of values we've recently emitted via
+  // onTimeChange. When an incoming `initialTime` matches the head of
+  // the queue, treat it as an echo and pop without writing state.
+  // Anything that doesn't match the queue (or arrives when the queue
+  // is empty) is genuinely external and is applied.
   const lastInitialTimeRef = useRef(initialTime);
+  const echoQueueRef = useRef<number[]>([]);
   useEffect(() => {
     if (initialTime === undefined) {return;}
     if (initialTime === lastInitialTimeRef.current) {return;}
     lastInitialTimeRef.current = initialTime;
-    // Don't clobber RAF-driven advancement while the user is playing —
-    // host round-trips would otherwise constantly drag us backwards.
+    // Echo accounting — drop any older queue entries that arrive
+    // out-of-order or got dropped, until we find a match (or empty).
+    while (
+      echoQueueRef.current.length > 0 &&
+      echoQueueRef.current[0] !== initialTime
+    ) {
+      echoQueueRef.current.shift();
+    }
+    if (echoQueueRef.current[0] === initialTime) {
+      echoQueueRef.current.shift();
+      return;
+    }
     if (playbackState === 'playing') {return;}
     setCurrentTimeState(initialTime);
   }, [initialTime, playbackState]);
@@ -106,6 +125,14 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
 
       const clampedTime = clampTime(time, timeExtent[0], timeExtent[1]);
       setCurrentTimeState(clampedTime);
+      // PR #606: record the value we're about to emit so the prop-sync
+      // effect can recognise the eventual round-trip as an echo and
+      // not roll state back to it. Cap to bound memory if the host
+      // ever drops messages.
+      echoQueueRef.current.push(clampedTime);
+      if (echoQueueRef.current.length > 100) {
+        echoQueueRef.current = echoQueueRef.current.slice(-100);
+      }
       onTimeChange?.(clampedTime);
 
       // Auto-pause if we hit the end
@@ -150,6 +177,13 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
           const newTime = prev + timeAdvance;
           const clampedTime = clampTime(newTime, timeExtent[0], timeExtent[1]);
 
+          // PR #606: record outgoing time so the prop-sync effect can
+          // recognise the host's round-trip as an echo. See note in
+          // setCurrentTime above.
+          echoQueueRef.current.push(clampedTime);
+          if (echoQueueRef.current.length > 100) {
+            echoQueueRef.current = echoQueueRef.current.slice(-100);
+          }
           // Notify of time change
           onTimeChange?.(clampedTime);
 

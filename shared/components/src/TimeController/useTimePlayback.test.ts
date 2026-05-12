@@ -385,6 +385,53 @@ describe('useTimePlayback', () => {
       expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
     });
 
+    it('ignores stale echo from lagged host round-trip during drag (PR #606)', () => {
+      // Real-world hazard: when the user drags the slider, each drag
+      // step calls setCurrentTime → onTimeChange → host → temporal:update
+      // → new initialTime prop. The echoes lag behind the latest drag
+      // position. The sync effect must NOT roll state back to a stale
+      // echo while the user is still dragging ahead of it.
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const t0 = NOW;
+      const onTimeChange = vi.fn();
+
+      const { result, rerender } = renderHook(
+        ({ initialTime }: { initialTime: number }) =>
+          useTimePlayback({ timeExtent, initialTime, onTimeChange }),
+        { initialProps: { initialTime: t0 } },
+      );
+
+      const t1 = NOW + 10 * 60 * 1000;
+      const t2 = NOW + 20 * 60 * 1000;
+      const t3 = NOW + 30 * 60 * 1000;
+
+      // Simulate fast drag: three setCurrentTime calls in quick
+      // succession before any echo lands.
+      act(() => {
+        result.current.setCurrentTime(t1);
+        result.current.setCurrentTime(t2);
+        result.current.setCurrentTime(t3);
+      });
+      expect(result.current.currentTime).toBe(t3);
+      expect(onTimeChange).toHaveBeenCalledTimes(3);
+
+      // Now the host's echoes arrive, in order, with lagging values.
+      // Each must be recognised as an echo and dropped, NOT applied
+      // to state.
+      rerender({ initialTime: t1 });
+      expect(result.current.currentTime).toBe(t3); // not rolled back
+      rerender({ initialTime: t2 });
+      expect(result.current.currentTime).toBe(t3); // not rolled back
+      rerender({ initialTime: t3 });
+      expect(result.current.currentTime).toBe(t3); // still t3
+
+      // After the queue drains, a genuinely external prop change is
+      // applied as expected.
+      const t4 = NOW + 5 * 60 * 1000; // earlier — like a storyboard click
+      rerender({ initialTime: t4 });
+      expect(result.current.currentTime).toBe(t4);
+    });
+
     it('does not roll back internal advancement while playing (PR #606)', () => {
       // Real-world hazard: during playback the RAF loop advances
       // currentTime and fires onTimeChange, which the host round-trips
