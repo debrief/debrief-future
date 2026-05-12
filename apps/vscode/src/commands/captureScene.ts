@@ -156,20 +156,37 @@ async function defaultWriteFeatureCollection(
 function sceneBoundsFromViewport(
   viewport: SessionStoreWithUndo['viewport'],
 ): SceneBounds | undefined {
-  if (viewport === null) return undefined;
+  if (viewport === null) {
+    return undefined;
+  }
   const corners = viewport.coordinates;
-  if (!corners || corners.length === 0) return undefined;
+  if (corners === null || corners === undefined || corners.length === 0) {
+    return undefined;
+  }
   let west = Number.POSITIVE_INFINITY;
   let east = Number.NEGATIVE_INFINITY;
   let south = Number.POSITIVE_INFINITY;
   let north = Number.NEGATIVE_INFINITY;
   for (const c of corners) {
-    if (c.longitude < west) west = c.longitude;
-    if (c.longitude > east) east = c.longitude;
-    if (c.latitude < south) south = c.latitude;
-    if (c.latitude > north) north = c.latitude;
+    if (c.longitude < west) {
+      west = c.longitude;
+    }
+    if (c.longitude > east) {
+      east = c.longitude;
+    }
+    if (c.latitude < south) {
+      south = c.latitude;
+    }
+    if (c.latitude > north) {
+      north = c.latitude;
+    }
   }
-  if (!Number.isFinite(west) || !Number.isFinite(east) || !Number.isFinite(south) || !Number.isFinite(north)) {
+  if (
+    !Number.isFinite(west) ||
+    !Number.isFinite(east) ||
+    !Number.isFinite(south) ||
+    !Number.isFinite(north)
+  ) {
     return undefined;
   }
   return { west, south, east, north };

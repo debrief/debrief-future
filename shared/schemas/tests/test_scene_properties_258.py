@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from debrief_schemas import (
     DisplayModeEnum,
@@ -81,7 +82,7 @@ def test_display_mode_enum_membership() -> None:
     """display_mode rejects values outside DisplayModeEnum."""
     raw = _load("scene-258-with-display-mode.json")
     raw["properties"]["display_mode"] = "blink"
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         SceneFeature.model_validate(raw)
 
 
@@ -89,5 +90,5 @@ def test_polygon_source_enum_membership() -> None:
     """_polygon_source rejects values outside PolygonSourceEnum."""
     raw = _load("scene-258-with-display-mode.json")
     raw["properties"]["_polygon_source"] = "telemetry"
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         SceneFeature.model_validate(raw)

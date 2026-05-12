@@ -302,6 +302,7 @@ export function StoryboardPanelMount({
   const handleSceneRowClick = useCallback(
     (sceneId: string) => {
       for (const f of featureCollection.features) {
+        // eslint-disable-next-line no-restricted-syntax -- #258 GeoJSON Feature ↔ PlotFeature boundary; mirrors the existing pattern at packagePlot().
         const sceneTest = f as unknown as Parameters<typeof isSceneFeature>[0];
         if (!isSceneFeature(sceneTest)) continue;
         if (sceneTest.properties.id !== sceneId) continue;
