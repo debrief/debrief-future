@@ -1,0 +1,21 @@
+id: https://debrief.info/schemas/mcp
+name: mcp
+title: Debrief MCP Transport Envelopes
+description: >-
+  LinkML schema for MCP / tool-system transport envelopes between
+  Python services and TypeScript consumers. Resolves audit #206 §3.1
+  cluster attributed to #222 — 17 hand-typed declarations across
+  six source files. Article XV exception: several free-form payload
+  fields retain `range: Any` — see spec.md §Edge Cases #3 and the
+  `raw-geojson.yaml` `JsonObject` precedent.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - tool          # for ToolCategoryEnum, ToolParameter (canonical)
