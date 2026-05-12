@@ -295,6 +295,26 @@ export function StoryboardPanelMount({
     [state],
   );
 
+  // ─── Scene-row click handler — Spec #258 ───────────────────────────
+  // When the user clicks a scene in the panel, restore its captured
+  // display mode alongside any future flyTo wiring (FR-002, FR-003).
+  // Legacy scenes (no display_mode) leave the time controller untouched.
+  const handleSceneRowClick = useCallback(
+    (sceneId: string) => {
+      for (const f of featureCollection.features) {
+        const sceneTest = f as unknown as Parameters<typeof isSceneFeature>[0];
+        if (!isSceneFeature(sceneTest)) continue;
+        if (sceneTest.properties.id !== sceneId) continue;
+        const mode = sceneTest.properties.display_mode;
+        if (mode === 'full' || mode === 'trail') {
+          sessionStore.getState().setDisplayMode(mode);
+        }
+        return;
+      }
+    },
+    [featureCollection, sessionStore],
+  );
+
   // ─── Capture handler ─────────────────────────────────────────────
   const handleCaptureClick = useCallback(() => {
     void captureSceneWeb(
@@ -551,7 +571,7 @@ export function StoryboardPanelMount({
           activeStoryboardName={activeStoryboardName}
           captureInFlight={state.captureInFlight}
           onCaptureClick={handleCaptureClick}
-          onSceneRowClick={noopWithLog('onSceneRowClick')}
+          onSceneRowClick={handleSceneRowClick}
           storyboards={
             storyboardOptions.length > 0 ? storyboardOptions : undefined
           }

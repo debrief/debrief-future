@@ -22,6 +22,7 @@ import {
   DuplicateStoryboardNameError,
   type StoryboardPlot,
   type SceneFeature,
+  type SceneBounds,
   type CreateSceneInput,
 } from '@debrief/components';
 type StoryboardPlotFeature = StoryboardPlot['features'][number];
@@ -143,6 +144,35 @@ async function defaultWriteFeatureCollection(
     path.join(stacItemPath, 'features.geojson'),
     `${JSON.stringify(fc, null, 2)}\n`,
   );
+}
+
+/**
+ * Spec #258 / FR-004 — derive a {@link SceneBounds} from the session-state
+ * `ViewportPolygon` (four corners in `[NW, NE, SE, SW]` order). Returns
+ * `undefined` if the viewport is missing or has no corners (the caller then
+ * falls back to the legacy placeholder path and records
+ * `_polygon_source: 'placeholder'`).
+ */
+function sceneBoundsFromViewport(
+  viewport: SessionStoreWithUndo['viewport'],
+): SceneBounds | undefined {
+  if (viewport === null) return undefined;
+  const corners = viewport.coordinates;
+  if (!corners || corners.length === 0) return undefined;
+  let west = Number.POSITIVE_INFINITY;
+  let east = Number.NEGATIVE_INFINITY;
+  let south = Number.POSITIVE_INFINITY;
+  let north = Number.NEGATIVE_INFINITY;
+  for (const c of corners) {
+    if (c.longitude < west) west = c.longitude;
+    if (c.longitude > east) east = c.longitude;
+    if (c.latitude < south) south = c.latitude;
+    if (c.latitude > north) north = c.latitude;
+  }
+  if (!Number.isFinite(west) || !Number.isFinite(east) || !Number.isFinite(south) || !Number.isFinite(north)) {
+    return undefined;
+  }
+  return { west, south, east, north };
 }
 
 function resolveDeps(input: CaptureCommandDeps | undefined): ResolvedDeps {
@@ -326,9 +356,15 @@ async function captureSceneInner(
   const assetKey = `scene-thumbnail-${sceneId}`;
 
   // Step 9 — call #215 createScene on the latest features, then push back.
+  // Spec #258: pass the captured display_mode + real viewport bounds so the
+  // scene's stored polygon matches what the author saw (FR-001, FR-004).
+  const bounds = sceneBoundsFromViewport(viewport);
   const sceneInput: CreateSceneInput = {
     storyboardId: activeStoryboardId,
     viewport: { center, zoom, bearing: 0 },
+    bounds,
+    polygonSource: bounds !== undefined ? 'bounds' : 'placeholder',
+    displayMode: state.displayMode,
     timestamp: timestampIso,
     visibleFeatureIds: visibleIds,
     thumbnailAssetRef: assetKey,

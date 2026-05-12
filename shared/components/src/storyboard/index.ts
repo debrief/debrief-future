@@ -64,6 +64,9 @@ export {
   describeStoryboard,
   restoreScene,
   checkSceneTimestamp,
+  // #258 — bounds-derived polygon helper exposed for the host capture
+  // commands that have a Leaflet map handle.
+  bboxToPolygon,
 } from "./crud";
 export type {
   CreateStoryboardInput,
@@ -78,6 +81,8 @@ export type {
   // #218 additive extensions
   DescribeStoryboardInput,
   RestoreSceneInput,
+  // #258 additive extensions
+  SceneBounds,
 } from "./crud";
 
 // ---------------------------------------------------------------------------
