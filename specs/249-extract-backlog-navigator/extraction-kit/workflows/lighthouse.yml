@@ -10,6 +10,12 @@ on:
       - '.github/workflows/lighthouse.yml'
   workflow_dispatch:
 
+# Minimum-scope GITHUB_TOKEN. Lighthouse-CI only needs to read source; the
+# optional LHCI_GITHUB_APP_TOKEN handles PR status checks via a separate
+# auth path. See SECURITY.md "Workflow security baseline".
+permissions:
+  contents: read
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest

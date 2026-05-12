@@ -86,6 +86,49 @@ if [[ -z "$EXTRACT_PATH" || ! -d "$EXTRACT_PATH" ]]; then
   exit 70
 fi
 
+# Track machine-readable metrics for the JSON report written at the end.
+FILES_RENDERED=0
+TOKENS_REPLACED=0
+SMOKE_EXIT_CODE="skipped"   # set to integer (0/non-zero) if the smoke runs
+PLACEHOLDER_CHECK="not-run" # "ok" / "fail" / "not-run"
+REPORT_PATH="$EXTRACT_PATH/bootstrap-report.json"
+
+# Count {{ORG}}/{{REPO}}/{{HOST}} occurrences in a file; used to tally
+# tokensReplaced for the JSON report. Uses awk so a file with zero
+# matches doesn't trip `set -o pipefail` (grep would exit 1).
+count_tokens() {
+  awk 'BEGIN { n = 0 }
+       {
+         line = $0
+         while (match(line, /\{\{(ORG|REPO|HOST)\}\}/)) {
+           n++
+           line = substr(line, RSTART + RLENGTH)
+         }
+       }
+       END { print n }' "$1" 2>/dev/null || echo 0
+}
+
+write_report() {
+  # Emit the JSON report at $REPORT_PATH for machine-readable
+  # Phase-2 evidence. Never let report failure cascade into the script
+  # exit code.
+  {
+    cat <<EOF
+{
+  "destination": "$DESTINATION",
+  "host": "$HOST",
+  "mode": "$(if [[ $DRY_RUN -eq 1 ]]; then echo 'dry-run'; else echo 'live'; fi)",
+  "filesRendered": $FILES_RENDERED,
+  "tokensReplaced": $TOKENS_REPLACED,
+  "placeholderCheck": "$PLACEHOLDER_CHECK",
+  "smokeTestExitCode": $(if [[ "$SMOKE_EXIT_CODE" == "skipped" ]]; then echo '"skipped"'; else echo "$SMOKE_EXIT_CODE"; fi),
+  "extractPath": "$EXTRACT_PATH"
+}
+EOF
+  } > "$REPORT_PATH" 2>/dev/null || true
+}
+trap write_report EXIT
+
 echo "==> bootstrap-new-repo.sh"
 echo "    Destination:   $DESTINATION"
 echo "    Host:          $HOST"
@@ -102,11 +145,11 @@ if [[ $DRY_RUN -eq 0 ]]; then
   REMOTE_URL="git@github.com:$DESTINATION.git"
   if git ls-remote --exit-code "$REMOTE_URL" HEAD >/dev/null 2>&1; then
     if [[ $MERGE_UNRELATED -eq 1 ]]; then
-      echo "    Target non-empty; --merge-unrelated-histories supplied; will merge."
+      echo "    OK — target non-empty; --merge-unrelated-histories supplied; will merge."
     else
       cat <<EOF >&2
 
-ERROR: destination repo ($DESTINATION) is NOT empty.
+FAIL — destination repo ($DESTINATION) is NOT empty.
 
 The first push will fail because GitHub's web UI defaults to creating
 README/.gitignore/LICENSE files. To recover:
@@ -124,7 +167,7 @@ EOF
       exit 75
     fi
   else
-    echo "    Target appears empty (or unreachable — proceeding)."
+    echo "    OK — target appears empty (or unreachable — proceeding)."
   fi
 fi
 
@@ -159,19 +202,26 @@ for tmpl in "${TEMPLATE_FILES[@]}"; do
       ;;
   esac
 
+  # Count tokens before substitution for machine-readable evidence
+  PRE_TOKENS="$(count_tokens "$SRC")"
+  TOKENS_REPLACED=$((TOKENS_REPLACED + PRE_TOKENS))
+
   # Substitute placeholders
   sed -e "s|{{ORG}}|$DEST_ORG|g" \
       -e "s|{{REPO}}|$DEST_REPO|g" \
       -e "s|{{HOST}}|$HOST|g" \
     "$SRC" > "$DEST"
+  FILES_RENDERED=$((FILES_RENDERED + 1))
   echo "    -> $DEST"
 done
+echo "    OK — $FILES_RENDERED template files rendered"
 
 # -- Step 3: copy workflows --------------------------------------------------
 
 echo "==> Step 3: copy workflows into .github/workflows/"
 mkdir -p .github/workflows
 
+WF_COUNT=0
 for wf in "$KIT_ROOT/workflows/"*.yml; do
   [[ -f "$wf" ]] || continue
   BASENAME="$(basename "$wf")"
@@ -179,10 +229,14 @@ for wf in "$KIT_ROOT/workflows/"*.yml; do
   if [[ "$BASENAME" == "live.yml.template" ]]; then
     continue
   fi
+  PRE_TOKENS="$(count_tokens "$wf")"
+  TOKENS_REPLACED=$((TOKENS_REPLACED + PRE_TOKENS))
   sed -e "s|{{ORG}}|$DEST_ORG|g" \
       -e "s|{{REPO}}|$DEST_REPO|g" \
       -e "s|{{HOST}}|$HOST|g" \
     "$wf" > ".github/workflows/$BASENAME"
+  FILES_RENDERED=$((FILES_RENDERED + 1))
+  WF_COUNT=$((WF_COUNT + 1))
   echo "    -> .github/workflows/$BASENAME"
 done
 
@@ -192,6 +246,7 @@ if [[ -f "$KIT_ROOT/workflows/live.yml.template" ]]; then
   cp "$KIT_ROOT/workflows/live.yml.template" .github/workflows-optional/live.yml
   echo "    -> .github/workflows-optional/live.yml (NOT enabled by default)"
 fi
+echo "    OK — $WF_COUNT workflows installed"
 
 # -- Step 4: copy bundled dummy spec dirs ------------------------------------
 
@@ -200,9 +255,8 @@ if [[ -d "$KIT_ROOT/templates/specs-dummy" ]]; then
   mkdir -p specs
   cp -r "$KIT_ROOT/templates/specs-dummy/"* specs/
   echo "    -> specs/ populated from templates/specs-dummy/"
+  echo "    OK — bundled dummy dataset in place"
 fi
-
-# -- Step 5: commit + push ---------------------------------------------------
 
 # -- Step 4.5: smoke build (full) -------------------------------------------
 #
@@ -216,14 +270,15 @@ if [[ $DRY_RUN -eq 0 ]]; then
   echo "==> Step 4.5: smoke (pnpm install && pnpm test && pnpm build)"
   SMOKE_FAILED=0
   if ! pnpm install --frozen-lockfile --silent; then
-    echo "    SMOKE FAIL: pnpm install" >&2; SMOKE_FAILED=1
+    echo "    FAIL — pnpm install" >&2; SMOKE_FAILED=1
   fi
   if [[ $SMOKE_FAILED -eq 0 ]] && ! pnpm test --silent; then
-    echo "    SMOKE FAIL: pnpm test" >&2; SMOKE_FAILED=1
+    echo "    FAIL — pnpm test" >&2; SMOKE_FAILED=1
   fi
   if [[ $SMOKE_FAILED -eq 0 ]] && ! pnpm build; then
-    echo "    SMOKE FAIL: pnpm build" >&2; SMOKE_FAILED=1
+    echo "    FAIL — pnpm build" >&2; SMOKE_FAILED=1
   fi
+  SMOKE_EXIT_CODE=$SMOKE_FAILED
   if [[ $SMOKE_FAILED -eq 1 ]]; then
     echo "==> Aborting bootstrap. Working tree at $EXTRACT_PATH left for inspection." >&2
     exit 75
@@ -241,12 +296,15 @@ if [[ $DRY_RUN -eq 1 ]]; then
   echo "==> Placeholder leakage check:"
   if git diff --cached | grep -E '\{\{(ORG|REPO|HOST)\}\}'; then
     echo "    FAIL — unsubstituted placeholders remain (see lines above)"
+    PLACEHOLDER_CHECK="fail"
     exit 75
   else
     echo "    OK — no remaining {{ORG}}/{{REPO}}/{{HOST}} markers"
+    PLACEHOLDER_CHECK="ok"
   fi
   echo
   echo "==> Dry run complete. Working tree: $EXTRACT_PATH"
+  echo "    Report:        $REPORT_PATH"
   exit 0
 fi
 
@@ -261,7 +319,7 @@ PUSH_OUTPUT="$(git push "git@github.com:$DESTINATION.git" extracted:main 2>&1 ||
 if echo "$PUSH_OUTPUT" | grep -qE '403|permission denied'; then
   cat <<EOF >&2
 
-ERROR: push returned 403.
+FAIL — push returned 403.
 
 This almost always means the agent's GitHub App is not authorised on
 the destination repo. Resolve via the GitHub web UI:
@@ -280,9 +338,13 @@ if [[ -n "$PUSH_OUTPUT" ]]; then
   echo "$PUSH_OUTPUT"
 fi
 
+PLACEHOLDER_CHECK="ok"
+
 echo
 echo "==> bootstrap-new-repo.sh complete"
+echo "    OK — pushed and report written"
 echo "    Pushed to:     git@github.com:$DESTINATION.git (main)"
+echo "    Report:        $REPORT_PATH"
 echo "    Next steps:"
 echo "      1. Settings → Pages → Source: 'Deploy from a branch' → gh-pages → /"
 echo "         (wait for the first deploy to create the branch first)"

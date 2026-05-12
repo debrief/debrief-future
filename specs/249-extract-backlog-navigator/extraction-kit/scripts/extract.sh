@@ -100,6 +100,7 @@ if [[ $DRY_RUN -eq 1 ]]; then
 else
   git clone --quiet "https://github.com/$SOURCE_REPO.git" "$WORK_DIR/repo"
 fi
+echo "    OK — source clone ready"
 
 cd "$WORK_DIR/repo"
 
@@ -108,6 +109,7 @@ cd "$WORK_DIR/repo"
 echo "==> Step 2: git subtree split --prefix=$SOURCE_PREFIX -b extracted"
 git subtree split --prefix="$SOURCE_PREFIX" -b extracted >/dev/null
 git checkout --quiet extracted
+echo "    OK — extracted branch checked out"
 
 # -- Step 3: sed-replace vite.config.ts base default -------------------------
 
@@ -121,26 +123,47 @@ if [[ -f vite.config.ts ]]; then
   if grep -q "'/$DEST_REPO/'" vite.config.ts; then
     echo "    OK — base default now /$DEST_REPO/"
   else
-    echo "    WARNING — sed substitution may not have matched. Verify vite.config.ts manually." >&2
+    echo "    FAIL — sed substitution did not match. Verify vite.config.ts manually." >&2
+    exit 75
   fi
 else
-  echo "    WARNING — vite.config.ts not found at expected location" >&2
+  echo "    FAIL — vite.config.ts not found at expected location" >&2
+  exit 75
 fi
+
+# -- Step 3b: refuse to carry any .env* secrets into the extracted tree -----
+#
+# git subtree split shouldn't carry .env files out of the source tree because
+# they're gitignored at the monorepo root, but a stray committed .env (or a
+# .env.local that snuck in via a hotfix) would otherwise travel. Refuse to
+# proceed if any .env* file is present anywhere in the working tree.
+
+echo "==> Step 3b: scan for stray .env* files"
+ENV_FILES="$(find . -path ./node_modules -prune -o -type f \( -name '.env' -o -name '.env.*' \) -print 2>/dev/null || true)"
+if [[ -n "$ENV_FILES" ]]; then
+  echo "    FAIL — extracted tree contains .env* file(s):" >&2
+  echo "$ENV_FILES" | sed 's/^/      /' >&2
+  echo "    Remove them from the source repo (and rotate any secrets they contain)" >&2
+  echo "    before re-running. The kit refuses to carry .env* into the standalone tree." >&2
+  exit 75
+fi
+echo "    OK — no .env* files in extracted tree"
 
 # -- Step 4: regenerate pnpm-lock.yaml --------------------------------------
 
 echo "==> Step 4: pnpm install --lockfile-only"
 if ! command -v pnpm >/dev/null 2>&1; then
-  echo "ERROR: pnpm not on PATH. Install pnpm to continue." >&2
+  echo "    FAIL — pnpm not on PATH. Install pnpm to continue." >&2
   exit 70
 fi
 
 pnpm install --lockfile-only --silent
 
 if [[ ! -f pnpm-lock.yaml ]]; then
-  echo "ERROR: pnpm-lock.yaml was not generated" >&2
+  echo "    FAIL — pnpm-lock.yaml was not generated" >&2
   exit 70
 fi
+echo "    OK — pnpm-lock.yaml generated"
 
 git add pnpm-lock.yaml vite.config.ts 2>/dev/null || true
 if ! git diff --cached --quiet; then
@@ -165,7 +188,7 @@ fi
 
 echo "==> Step 5: validate lockfile"
 if ! pnpm install --frozen-lockfile --ignore-scripts --silent >/dev/null 2>&1; then
-  echo "    LOCKFILE-VALIDATION FAIL: pnpm install --frozen-lockfile rejected the regenerated lockfile" >&2
+  echo "    FAIL — pnpm install --frozen-lockfile rejected the regenerated lockfile" >&2
   echo "==> Working tree left at $WORK_DIR/repo for inspection." >&2
   exit 75
 fi
@@ -175,6 +198,7 @@ echo "    OK — lockfile parseable, deps resolve"
 
 echo
 echo "==> extract.sh complete"
+echo "    OK — extract phase done"
 echo "    Working tree:  $WORK_DIR/repo"
 echo "    Branch:        extracted"
 if [[ $DRY_RUN -eq 1 ]]; then

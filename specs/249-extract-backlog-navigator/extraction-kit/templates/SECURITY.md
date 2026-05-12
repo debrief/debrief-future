@@ -44,13 +44,76 @@ the user's behalf.
 
 ---
 
+## Workflow security baseline
+
+Threats specific to a public GitHub Pages SPA driven by Actions:
+
+1. **`GITHUB_TOKEN` declared at minimum scope per workflow.**
+   The default permissions for `GITHUB_TOKEN` were tightened in 2023; even
+   so, every workflow in `.github/workflows/` should pin its `permissions:`
+   block to exactly what it needs. The kit's defaults:
+
+   | Workflow | `permissions` |
+   |---|---|
+   | `ci.yml` | (default — read-only; no writes needed) |
+   | `lighthouse.yml` | (default) |
+   | `deploy.yml` | `contents: write` (gh-pages push only) |
+   | `pr-preview.yml` | `contents: write`, `pull-requests: write` (sticky comment) |
+   | `pr-preview-cleanup.yml` | `contents: write` |
+
+   If you add a workflow, set its `permissions:` at workflow level (not
+   job level) and grant only what's needed. Avoid `permissions: write-all`.
+
+2. **Do not use `pull_request_target` against the head ref.**
+   `pull_request_target` runs in the *base* repo context and has access to
+   secrets — using it to check out the PR head ref means executing
+   attacker-controlled code with secret access. The kit's `pr-preview.yml`
+   triggers on plain `pull_request` (no secret access; builds run in a
+   sandbox per the GitHub Actions security model) and renders against the
+   bundled `VITE_DEFAULT_OWNER`/`VITE_DEFAULT_REPO`, not against the PR's
+   own GitHub history. If you need to act on a PR with elevated scopes,
+   use a `workflow_run`-triggered follow-up that reads the artifact
+   produced by the `pull_request` job rather than the head ref directly.
+
+3. **Pin third-party actions to a commit SHA.**
+   `@v4` resolves to whatever the action's maintainer points the `v4` tag
+   at — including, in some past supply-chain incidents, an altered
+   commit. Pin to a SHA for the actions you don't control:
+
+   ```yaml
+   uses: JamesIves/github-pages-deploy-action@<full-40-char-sha>  # v4.5.0
+   ```
+
+   First-party `actions/*` (`actions/checkout`, `actions/setup-node`,
+   `actions/github-script`) are GitHub-maintained and conventionally
+   pinned to `@v4` major-version tags; pinning these to SHAs is best
+   practice but lower priority than pinning third-party actions.
+
+4. **`.env*` files never enter source control.**
+   The kit's `.gitignore` includes `.env` and `.env.local`. `extract.sh`
+   has a Step 3b guard that refuses to proceed if a `.env*` file is
+   present anywhere in the extracted tree — protecting against a stray
+   committed env file travelling out of the monorepo. If extract.sh
+   reports an `.env*` file: rotate any secrets it contains immediately,
+   remove the file from the source repo's history (`git filter-repo` or
+   BFG), then re-run.
+
+5. **Service-worker scope confined to the app's base path.**
+   `vite-plugin-pwa` is configured so the service worker registers at
+   the `VITE_BASE_URL` scope (e.g., `/<repo>/`). It cannot intercept
+   requests outside that path on the same origin. If a future build
+   moves the app to the origin root (`VITE_BASE_URL=/`), audit the
+   scope before deploying.
+
+---
+
 ## CI secrets
 
 This repo uses the following Actions secrets:
 
 | Secret | Required? | Scope | Used by |
 |---|---|---|---|
-| `GITHUB_TOKEN` | Auto-provided | Default permissions | `deploy.yml`, `pr-preview.yml`, `pr-preview-cleanup.yml` |
+| `GITHUB_TOKEN` | Auto-provided | Per-workflow `permissions:` block | `deploy.yml`, `pr-preview.yml`, `pr-preview-cleanup.yml` |
 | `LHCI_GITHUB_APP_TOKEN` | Optional | PR status checks | `lighthouse.yml` |
 | `LIVE_GITHUB_TOKEN` | Optional (opt-in) | Read-only on target repo | `live.yml` (if enabled) |
 
