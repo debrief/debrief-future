@@ -1001,6 +1001,58 @@
       "title": "LogEntry",
       "type": "object"
     },
+    "MCPContentItem": {
+      "additionalProperties": false,
+      "description": "A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit \u00a73.1 row 15.",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names."
+        },
+        "data": {
+          "description": "Base64-encoded payload when type=image.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mimeType": {
+          "description": "IANA media type when type=image or type=resource.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors)."
+        },
+        "text": {
+          "description": "Body text when type=text.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "annotations"
+      ],
+      "title": "MCPContentItem",
+      "type": "object"
+    },
     "MCPContentItemTypeEnum": {
       "description": "Discriminator for MCPContentItem variants.",
       "enum": [
@@ -1011,6 +1063,28 @@
       ],
       "title": "MCPContentItemTypeEnum",
       "type": "string"
+    },
+    "MCPErrorResponse": {
+      "additionalProperties": false,
+      "description": "MCP error response envelope. Closes audit \u00a73.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).",
+      "properties": {
+        "duration_ms": {
+          "description": "Wall-clock duration before failure.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax."
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "MCPErrorResponse",
+      "type": "object"
     },
     "MCPParamTypeEnum": {
       "description": "JSON-Schema-compatible primitive types for tool parameters.",
@@ -1024,6 +1098,67 @@
       ],
       "title": "MCPParamTypeEnum",
       "type": "string"
+    },
+    "MCPRequest": {
+      "additionalProperties": false,
+      "description": "MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit \u00a73.1 row 13.",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Any",
+          "description": "Free-form per-tool input payload (Article XV.2 exception \u2014 narrowed by per-tool Pydantic input model at dispatch)."
+        },
+        "tool": {
+          "description": "Tool name (one of SessionMCPToolName for the session-state server).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool",
+        "input"
+      ],
+      "title": "MCPRequest",
+      "type": "object"
+    },
+    "MCPToolResponse": {
+      "additionalProperties": false,
+      "description": "Successful MCP tool response. Closes audit \u00a73.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.",
+      "properties": {
+        "content": {
+          "description": "Ordered list of content items returned by the tool.",
+          "items": {
+            "$ref": "#/$defs/MCPContentItem"
+          },
+          "type": "array"
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "is_error": {
+          "description": "Reserved for streaming partial-error responses (additive over the live wire format).",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "structured_content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Reserved for top-level free-form payload (e.g. vega-spec) \u2014 Article XV.2 exception. Additive over the live wire format."
+        }
+      },
+      "required": [
+        "content",
+        "duration_ms"
+      ],
+      "title": "MCPToolResponse",
+      "type": "object"
     },
     "MarkerSymbolEnum": {
       "description": "Marker shapes for tool parameter choices (superset of PointShapeEnum)",

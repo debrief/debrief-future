@@ -650,6 +650,24 @@ def generate_typescript() -> bool:
             content,
         )
 
+        # Post-process: any remaining `Any`-typed slot fields (`: Any,`,
+        # `?: Any,`, `: Any[]`, etc.) come from LinkML `range: Any` slots
+        # that did not get a per-field post-processor (the RawGeoJSONFeature
+        # block above handles RawGeoJSON.properties specifically; this is
+        # the general fallback used by the MCP envelope cluster (#222) and
+        # any future schemas that use `range: Any`).
+        #
+        # Mapping rule: `Any` becomes `unknown` so consumers MUST narrow
+        # before reading (Article XV.2 spirit). `unknown` is preferred over
+        # `Record<string, unknown>` because not every `Any` slot is an
+        # object — some carry primitives or arrays (e.g. tool result
+        # payloads).
+        content = _re_any.sub(
+            r"(?<![A-Za-z_])Any(?![A-Za-z_])",
+            "unknown",
+            content,
+        )
+
         # Prepend DO NOT EDIT header
         content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 

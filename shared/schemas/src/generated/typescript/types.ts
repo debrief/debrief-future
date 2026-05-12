@@ -2256,4 +2256,60 @@ export interface SceneThumbnailAssetEntry {
 }
 
 
+/**
+ * MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit §3.1 row 13.
+ */
+export interface MCPRequest {
+    /** Tool name (one of SessionMCPToolName for the session-state server). */
+    tool: string,
+    /** Free-form per-tool input payload (Article XV.2 exception — narrowed by per-tool Pydantic input model at dispatch). */
+    input: unknown,
+}
+
+
+/**
+ * A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit §3.1 row 15.
+ */
+export interface MCPContentItem {
+    /** Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types. */
+    type: string,
+    /** Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors). */
+    resource?: unknown,
+    /** Body text when type=text. */
+    text?: string,
+    /** Base64-encoded payload when type=image. */
+    data?: string,
+    /** IANA media type when type=image or type=resource. */
+    mimeType?: string,
+    /** Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names. */
+    annotations: unknown,
+}
+
+
+/**
+ * Successful MCP tool response. Closes audit §3.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.
+ */
+export interface MCPToolResponse {
+    /** Ordered list of content items returned by the tool. */
+    content: MCPContentItem[],
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Reserved for streaming partial-error responses (additive over the live wire format). */
+    is_error?: boolean,
+    /** Reserved for top-level free-form payload (e.g. vega-spec) — Article XV.2 exception. Additive over the live wire format. */
+    structured_content?: unknown,
+}
+
+
+/**
+ * MCP error response envelope. Closes audit §3.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).
+ */
+export interface MCPErrorResponse {
+    /** Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax. */
+    error: unknown,
+    /** Wall-clock duration before failure. */
+    duration_ms?: number,
+}
+
+
 

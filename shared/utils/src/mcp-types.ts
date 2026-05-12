@@ -5,7 +5,12 @@
  * and TypeScript frontends. Consolidated from apps/vscode and @debrief/components.
  */
 
-import type { ToolCategoryEnum } from '@debrief/schemas';
+import type {
+  MCPContentItem as MCPContentItemBase,
+  MCPErrorResponse as MCPErrorResponseBase,
+  MCPToolResponse as MCPToolResponseSchema,
+  ToolCategoryEnum,
+} from '@debrief/schemas';
 
 /**
  * String-literal form of `ToolCategoryEnum`. Feature 207.
@@ -56,28 +61,39 @@ export interface DebriefAnnotations {
 
 /**
  * A single MCP content item (resource, text, or image).
+ *
+ * Schema-rooted on `MCPContentItem` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the Debrief-specific `type` discriminator
+ * literal union, the inner `resource` shape, and the `DebriefAnnotations`
+ * payload. The narrowing is a consumer-side type projection — no new
+ * fields are added on the wire. See spec 222 §FR-004 (R4 import-based
+ * schema rooting).
  */
-export interface MCPContentItem {
+export type MCPContentItem = Omit<MCPContentItemBase, 'type' | 'resource' | 'annotations'> & {
   type: 'resource' | 'text' | 'image';
   resource?: { uri: string; mimeType: string; text: string };
-  text?: string;
-  data?: string;
-  mimeType?: string;
   annotations: DebriefAnnotations;
-}
+};
 
 /**
- * Successful MCP tool response with content array.
+ * Successful MCP tool response with content array. Re-exported from
+ * `@debrief/schemas` and narrowed so that each content item carries the
+ * `DebriefAnnotations` payload via the local `MCPContentItem` projection.
  */
-export interface MCPToolResponse {
+export type MCPToolResponse = Omit<MCPToolResponseSchema, 'content'> & {
   content: MCPContentItem[];
-  duration_ms: number;
-}
+};
 
 /**
  * MCP error response with structured error data.
+ *
+ * Schema-rooted on `MCPErrorResponse` from `@debrief/schemas` and narrowed
+ * with the Debrief-specific nested error payload shape (matches the
+ * JSON-RPC convention used by the live MCP server). The inner `data` map
+ * uses colon-bearing keys (`debrief:errorCategory`, `debrief:affectedFeatures`)
+ * which LinkML cannot constrain as slot names — see spec 222 §Edge Cases #3.
  */
-export interface MCPErrorResponse {
+export type MCPErrorResponse = Omit<MCPErrorResponseBase, 'error'> & {
   error: {
     code: number;
     message: string;
@@ -86,8 +102,7 @@ export interface MCPErrorResponse {
       'debrief:affectedFeatures': string[];
     };
   };
-  duration_ms?: number;
-}
+};
 
 /**
  * Selection requirement in MCP annotation format.

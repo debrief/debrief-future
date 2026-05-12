@@ -69,3 +69,112 @@ enums:
       unchanged: {}
       version_drift: {}
       tool_removed: {}
+
+# ============================================================================
+# Group 1 — Envelopes (P1)
+# ============================================================================
+#
+# Slot names match the live wire format used by current consumers
+# (apps/vscode/src/services/calcService.ts, apps/web-shell/src/services/toolService.ts,
+# services/session-state/src/server/mcp.ts). Several fields are `range: Any`
+# — see spec §Edge Cases #3 (Article XV.2 free-form-payload exception)
+# and the `raw-geojson.yaml` `JsonObject` precedent.
+
+classes:
+
+  MCPRequest:
+    description: >-
+      MCP tool invocation envelope. Sent by consumers (VS Code, web-shell)
+      to the MCP server. Closes audit §3.1 row 13.
+    attributes:
+      tool:
+        description: Tool name (one of SessionMCPToolName for the session-state server).
+        range: string
+        required: true
+      input:
+        description: >-
+          Free-form per-tool input payload (Article XV.2 exception — narrowed
+          by per-tool Pydantic input model at dispatch).
+        range: Any
+        required: true
+
+  MCPContentItem:
+    description: >-
+      A single MCP content item (resource, text, or image). Carries
+      Debrief-specific annotations (debrief:* keys) on every item.
+      Closes audit §3.1 row 15.
+    attributes:
+      type:
+        description: >-
+          Content-item discriminator. Current consumers emit `resource`,
+          `text`, `image`. Kept as string to remain additive over any
+          future MCP content-item types.
+        range: string
+        required: true
+      resource:
+        description: >-
+          Nested resource descriptor `{ uri, mimeType, text }` when
+          type=resource. Free-form per Article XV.2 (the inner shape is
+          driven by individual tool authors).
+        range: Any
+      text:
+        description: Body text when type=text.
+        range: string
+      data:
+        description: Base64-encoded payload when type=image.
+        range: string
+      mimeType:
+        description: IANA media type when type=image or type=resource.
+        range: string
+      annotations:
+        description: >-
+          Debrief-specific annotations (`debrief:resultType`, `debrief:label`,
+          `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because
+          the key set is open-ended and uses colons (`debrief:*`) that LinkML
+          cannot constrain as slot names.
+        range: Any
+        required: true
+
+  MCPToolResponse:
+    description: >-
+      Successful MCP tool response. Closes audit §3.1 row 16. The
+      `duration_ms` slot preserves the wire format used by the live
+      MCP server and replay subsystem.
+    attributes:
+      content:
+        description: Ordered list of content items returned by the tool.
+        range: MCPContentItem
+        multivalued: true
+        required: true
+      duration_ms:
+        description: Wall-clock duration of the tool invocation in milliseconds.
+        range: integer
+        required: true
+      is_error:
+        description: >-
+          Reserved for streaming partial-error responses (additive over
+          the live wire format).
+        range: boolean
+      structured_content:
+        description: >-
+          Reserved for top-level free-form payload (e.g. vega-spec) — Article
+          XV.2 exception. Additive over the live wire format.
+        range: Any
+
+  MCPErrorResponse:
+    description: >-
+      MCP error response envelope. Closes audit §3.1 row 17. The error
+      payload is nested (matches the JSON-RPC convention used by the live
+      server).
+    attributes:
+      error:
+        description: >-
+          Nested error object `{ code, message, data: { debrief:errorCategory,
+          debrief:affectedFeatures } }`. Free-form per Article XV.2 because
+          the inner `data` map uses colon-bearing keys outside LinkML slot
+          syntax.
+        range: Any
+        required: true
+      duration_ms:
+        description: Wall-clock duration before failure.
+        range: integer

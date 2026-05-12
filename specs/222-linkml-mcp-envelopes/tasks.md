@@ -107,28 +107,28 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 > Tests are authored first as failing assertions against the generated types, then turn green as the LinkML classes appear and consumer sites migrate.
 
-- [ ] T020 [P] [US1] [test] Golden + negative fixtures for `MCPRequest` (1 valid, 2 invalid — unknown tool name, missing input) `shared/schemas/fixtures/mcp/MCPRequest/valid/example.json` + `invalid/unknown-tool.json` + `invalid/missing-input.json`
-- [ ] T021 [P] [US1] [test] Golden + negative fixtures for `MCPContentItem` (1 valid per type variant, 1 invalid missing `type`) `shared/schemas/fixtures/mcp/MCPContentItem/`
-- [ ] T022 [P] [US1] [test] Golden + negative fixtures for `MCPToolResponse` (1 valid with mixed content array, 1 invalid empty-content) `shared/schemas/fixtures/mcp/MCPToolResponse/`
-- [ ] T023 [P] [US1] [test] Golden + negative fixtures for `MCPErrorResponse` (1 valid, 1 invalid missing `code`) `shared/schemas/fixtures/mcp/MCPErrorResponse/`
-- [ ] T024 [P] [US1] [test] Add round-trip + schema-compare assertions for the four envelope classes `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T025 [P] [US1] [test] Add golden + negative fixture assertions parameterised over the four envelopes `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T020 [P] [US1] [test] Golden + negative fixtures for `MCPRequest` (1 valid, 2 invalid — unknown tool name, missing input) `shared/schemas/fixtures/mcp/MCPRequest/valid/example.json` + `invalid/unknown-tool.json` + `invalid/missing-input.json`
+- [x] T021 [P] [US1] [test] Golden + negative fixtures for `MCPContentItem` (1 valid per type variant, 1 invalid missing `type`) `shared/schemas/fixtures/mcp/MCPContentItem/`
+- [x] T022 [P] [US1] [test] Golden + negative fixtures for `MCPToolResponse` (1 valid with mixed content array, 1 invalid empty-content) `shared/schemas/fixtures/mcp/MCPToolResponse/`
+- [x] T023 [P] [US1] [test] Golden + negative fixtures for `MCPErrorResponse` (1 valid, 1 invalid missing `code`) `shared/schemas/fixtures/mcp/MCPErrorResponse/`
+- [x] T024 [P] [US1] [test] Add round-trip + schema-compare assertions for the four envelope classes `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T025 [P] [US1] [test] Add golden + negative fixture assertions parameterised over the four envelopes `shared/schemas/tests/test_mcp_fixtures.py`
 
 ### Implementation for User Story 1
 
-- [ ] T030 [US1] Add `MCPRequest` class (slots: `tool`, `input` — see `data-model.md` Group 1 and `contracts/mcp.linkml.yaml.draft.md` lines 89–99) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T031 [US1] Add `MCPContentItem` class (6 slots, discriminator `type`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T032 [US1] Add `MCPToolResponse` class (multivalued `content`, optional `is_error`, free-form `structured_content`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T033 [US1] Add `MCPErrorResponse` class (`code`, `message`, free-form `data`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T034 [US1] Run `task schemas:build`; confirm `mcp.py`, `mcp.ts`, `mcp.schema.json` regenerate with four new classes and that `$defs` count increases by 4
-- [ ] T035 [P] [US1] Delete hand-typed `MCPRequest` interface at `services/session-state/src/server/mcp.ts:23` and replace consumer imports with `import { MCPRequest } from '@debrief/schemas'`
-- [ ] T036 [P] [US1] Delete hand-typed `MCPContentItem` interface at `shared/utils/src/mcp-types.ts:30` and replace with re-export from `@debrief/schemas`
-- [ ] T037 [P] [US1] Delete hand-typed `MCPToolResponse` interface at `shared/utils/src/mcp-types.ts:42` and replace with re-export from `@debrief/schemas`
-- [ ] T038 [P] [US1] Delete hand-typed `MCPErrorResponse` interface at `shared/utils/src/mcp-types.ts:50` and replace with re-export from `@debrief/schemas`
-- [ ] T039 [US1] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all envelope tests green
-- [ ] T040 [US1] Run `pnpm -r typecheck` and `pnpm lint` and confirm no consumer site broke (each migrated import resolves to a generated type identical in shape to the deleted hand-type)
-- [ ] T041 [US1] Run the type-audit scanner (per `quickstart.md` Step 3) and confirm §3.1 rows for `MCPRequest`/`MCPContentItem`/`MCPToolResponse`/`MCPErrorResponse` are gone; record before/after counts in shell scratch (input to Phase 6 evidence task)
-- [ ] T042 [US1] Commit P1 slice: `feat(schemas): promote MCP envelope shapes to LinkML (P1)` — single commit per research R-005 (bisect-friendliness)
+- [x] T030 [US1] Add `MCPRequest` class (slots: `tool`, `input` — see `data-model.md` Group 1 and `contracts/mcp.linkml.yaml.draft.md` lines 89–99) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T031 [US1] Add `MCPContentItem` class (6 slots, discriminator `type`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T032 [US1] Add `MCPToolResponse` class (multivalued `content`, optional `is_error`, free-form `structured_content`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T033 [US1] Add `MCPErrorResponse` class (`code`, `message`, free-form `data`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T034 [US1] Run `task schemas:build`; confirm `mcp.py`, `mcp.ts`, `mcp.schema.json` regenerate with four new classes and that `$defs` count increases by 4
+- [x] T035 [P] [US1] Delete hand-typed `MCPRequest` interface at `services/session-state/src/server/mcp.ts:23` and replace consumer imports with `import { MCPRequest } from '@debrief/schemas'`
+- [x] T036 [P] [US1] Delete hand-typed `MCPContentItem` interface at `shared/utils/src/mcp-types.ts:30` and replace with re-export from `@debrief/schemas`
+- [x] T037 [P] [US1] Delete hand-typed `MCPToolResponse` interface at `shared/utils/src/mcp-types.ts:42` and replace with re-export from `@debrief/schemas`
+- [x] T038 [P] [US1] Delete hand-typed `MCPErrorResponse` interface at `shared/utils/src/mcp-types.ts:50` and replace with re-export from `@debrief/schemas`
+- [x] T039 [US1] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all envelope tests green
+- [x] T040 [US1] Run `pnpm -r typecheck` and `pnpm lint` and confirm no consumer site broke (each migrated import resolves to a generated type identical in shape to the deleted hand-type)
+- [x] T041 [US1] Run the type-audit scanner (per `quickstart.md` Step 3) and confirm §3.1 rows for `MCPRequest`/`MCPContentItem`/`MCPToolResponse`/`MCPErrorResponse` are gone; record before/after counts in shell scratch (input to Phase 6 evidence task)
+- [x] T042 [US1] Commit P1 slice: `feat(schemas): promote MCP envelope shapes to LinkML (P1)` — single commit per research R-005 (bisect-friendliness)
 
 **Checkpoint**: Four envelope classes generated, six consumer sites migrated, all tests green, audit shows four fewer rows attributed to #222.
 

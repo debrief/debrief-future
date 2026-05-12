@@ -6,6 +6,7 @@
  */
 
 import type { Request, Response } from 'express';
+import type { MCPRequest } from '@debrief/schemas';
 import type { SessionStoreApi } from '../store/index.js';
 import {
   getState,
@@ -16,14 +17,6 @@ import {
   setPlaybackRate,
   setRotation,
 } from './tools/index.js';
-
-/**
- * MCP tool request format.
- */
-interface MCPRequest {
-  tool: string;
-  input: Record<string, unknown>;
-}
 
 /**
  * Available MCP tools.

@@ -1,0 +1,13 @@
+{
+  "type": "resource",
+  "resource": {
+    "uri": "debrief://tool-result/track-length/12345",
+    "mimeType": "application/geo+json",
+    "text": "{\"type\":\"FeatureCollection\",\"features\":[]}"
+  },
+  "annotations": {
+    "debrief:resultType": "addition/geojson",
+    "debrief:label": "Track-length result",
+    "debrief:sourceFeatures": ["track-1"]
+  }
+}
