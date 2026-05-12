@@ -1,133 +1,171 @@
-# Quickstart — Properties Panel Feature & Sub-feature Editing
+# Quickstart — Properties Panel Feature & Sub-feature Editing (refreshed)
 
-**Feature**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md) | **Date**: 2026-05-12
+**Feature**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md) | **Date**: 2026-05-12 (refresh)
 
-This is the five-minute "is the feature working?" check. Run it after
-`/speckit.implement` finishes, before opening the PR.
+Ten-minute "is the feature working?" check across all seven user stories.
+Run after `/speckit.implement` completes, before opening the PR.
 
 Pre-requisites:
 
-- Repo at the implementation branch.
+- Repo on branch `claude/start-speckit-192-SXMBK` (or local-equivalent).
 - `pnpm install`, `uv sync` complete.
-- Sample plot containing at least one track with ≥ 50 positions
-  (the bundled `preview/workspace/samples/local-store/` catalog has
-  one — open the first item).
+- The bundled sample plot in `preview/workspace/samples/local-store/`
+  contains at least one track AND one drawn annotation (polygon or
+  line) with > 1 vertex.
 
 ---
 
-## 1. Edit a single feature's metadata
+## 1. Edit a single feature's metadata (US-1)
 
-1. Start the web-shell: `pnpm --filter @debrief/web-shell dev`.
+1. `pnpm --filter @debrief/web-shell dev`.
 2. Open the sample plot.
-3. Open the Properties panel (4th section of `ActivityPanel`).
-4. Click one track on the map.
-5. **Expect** the panel header to change to the track's display name
-   and the form to show editable fields (tags, per-platform overrides
-   from #181, etc.).
-6. Add a tag (`acceptance-test`) and change the vessel role override.
-7. Click Save (or the `saveSession` keybinding).
-8. **Expect** the dirty indicator to clear and a NarrativeLog entry
-   stamped `properties-panel@<version>` to appear listing the edited
-   field paths.
-9. Reload the plot. Re-select the same track.
-10. **Expect** the tag and role override to be restored.
+3. Click one track on the map.
+4. Properties panel header switches to the track name; form populated
+   with editable fields (tags, per-platform overrides).
+5. Add a tag (`acceptance-test`). Save.
+6. Dirty indicator clears; NarrativeLog shows a `properties-panel@<version>`
+   entry listing the edited path.
+7. Reload, re-select the same track — tag is restored.
 
-Acceptance reference: US-1 AS-1, AS-2, FR-004, FR-005, FR-013, SC-001.
+Acceptance ref: US-1 AS-1/AS-2, FR-004/005, SC-001.
 
 ---
 
-## 2. Annotate a single track point
+## 2. Revert an override back to its auto-derived value (US-6)
 
-1. With the same plot open, click any point along a track (the dot,
-   not the line).
-2. **Expect** the panel header to change to "<track name> — point N"
-   and the form to show the new fields: `label`, `tags`, `note`.
-3. Set `label = "intercept"`, add tag `foxtrot`, type a one-sentence
-   note.
-4. Click Save.
-5. **Expect** the dirty indicator to clear and a provenance entry whose
-   `inputs[]` includes paths starting with `position_metadata[N]/`.
-6. Reload, re-click the same point.
-7. **Expect** the form to be pre-populated with the saved values.
-8. Open the saved STAC item JSON; **expect** the parent track's
-   `properties.position_metadata` to contain exactly one entry with
-   `index = N`.
+1. With the same track selected, edit `vessel_role` to a value that
+   differs from the registry resolution.
+2. Save. A "Revert" affordance appears beside the field.
+3. Click Revert. The field reverts to the auto-derived value; dirty
+   indicator returns; the field's visual treatment switches back to
+   "auto-derived".
+4. Save. Inspect the saved item — the `vessel_role` slot is absent.
 
-Acceptance reference: US-2 AS-1, AS-2, AS-3, FR-007, FR-009, FR-010, SC-002, SC-005.
+Acceptance ref: US-6 AS-1/AS-2/AS-3, FR-023/024, SC-011.
 
 ---
 
-## 3. Selection-driven mode swap preserves staged edits
+## 3. Annotate a single track point (US-2)
 
-1. With the plot open and no selection, **expect** the panel to show
-   the plot-editor mode (#447 behaviour) — header is the plot title.
-2. Select track A. Add a tag — **don't save**.
-3. Select a point on track A. **Expect** the sub-feature mode to
-   render with empty point fields.
-4. Type a label — **don't save**.
-5. Select track B. **Expect** the feature mode to render for B,
-   no tag in the input.
-6. Select track A again. **Expect** the tag added in step 2 still
-   present in the form.
-7. Select the point you edited in step 4. **Expect** the label still
-   present.
-8. Save. Reload. Re-select. **Expect** both edits restored.
+1. Click any point along a track.
+2. Header reads "<track name> — `positions/N`".
+3. Set `label = "intercept"`, add tag `foxtrot`, type a note.
+4. Save. Provenance entry lists `vertex_metadata[positions/N]/...`.
+5. Reload, re-click same point — restored.
 
-Acceptance reference: US-3 AS-1, AS-3, FR-001, FR-002, FR-006, FR-009.
+Acceptance ref: US-2 AS-1/AS-2/AS-3, FR-007/008/009/010, SC-002, SC-005.
 
 ---
 
-## 4. Multi-select shows a read-only summary
+## 4. Annotate a single annotation vertex (US-7, Polygon)
 
-1. Hold the modifier key and click two tracks.
-2. **Expect** the panel header to read "2 features selected".
-3. **Expect** every input to be disabled.
-4. **Expect** any field whose value differs across the two tracks to
-   render `(differs)`; common fields render their shared value.
+1. Click a single vertex of a drawn polygon (the corner dot, not the
+   fill).
+2. Header reads "<polygon name> — `rings/0/vertices/N`".
+3. Same field set: `label`, `tags`, `note`. Fill and save.
+4. Provenance entry uses the polygon vertex path prefix.
+5. Reload, re-click same vertex — restored.
+6. Repeat once with a LineString feature (header reads `vertices/N`) to
+   confirm cross-geometry parity.
 
-Acceptance reference: US-3 AS-2, FR-011.
-
----
-
-## 5. Plot-editor mode unchanged
-
-1. Click empty space to clear the selection.
-2. **Expect** the panel to revert to the plot-editor mode from #447
-   with the same fields, the same Save behaviour, and the same
-   provenance shape — no regression.
-
-Acceptance reference: US-3 AS-1, FR-012, SC-008.
+Acceptance ref: US-7 AS-1/AS-2/AS-4, FR-025/026/027, SC-012.
 
 ---
 
-## 6. Verify provenance and round-trip from the command line
+## 5. Multi-feature selection via map and Layers panel (US-4)
+
+1. Plain-click track A — panel shows feature-editor mode for A.
+2. Hold Ctrl/Cmd and click track B — panel shows multi-select summary
+   mode, header "2 features selected".
+3. Repeat using Ctrl/Cmd-click in the Layers panel rows; result is
+   identical.
+4. Plain-click track C — selection collapses to C; feature-editor mode
+   for C.
+
+Acceptance ref: US-4 AS-1/AS-2/AS-3/AS-4, FR-021/022, SC-010.
+
+---
+
+## 6. Selection-driven mode swap preserves staged edits (US-3)
+
+1. Edit a tag on A — don't save.
+2. Click a point on A — sub-feature mode; staged tag still in buffer
+   (verify via dev-tools or wait until step 7).
+3. Type a label on the point — don't save.
+4. Select B — feature-editor mode for B; no tag in the input.
+5. Re-select A — staged tag still present.
+6. Re-select the same point on A — staged label still present.
+7. Save. Reload. Re-select. Both edits restored from disk.
+
+Acceptance ref: US-3 AS-1/AS-2/AS-3, FR-006/009.
+
+---
+
+## 7. Read-only plot disables every editing path (US-5)
+
+1. Mark a sample plot read-only: `chmod 0444 <plot-item-path>` (or use
+   the read-only fixture if shipped).
+2. Open the plot.
+3. The read-only banner appears immediately (pre-flight from
+   `CapabilityReport.persistent`); every panel mode renders with
+   `aria-disabled="true"` inputs; the Save action is unavailable.
+4. Attempt to type — input rejects.
+5. Re-open the writable copy — banner disappears; editing resumes.
+6. To exercise post-write escalation: open a writable plot, stage an
+   edit, then `chmod 0444` it before saving. Save fails; banner
+   appears; **staged edits remain in the buffer** (verify by reverting
+   permissions and saving again — the same edits flush).
+
+Acceptance ref: US-5 AS-1/AS-2/AS-3, FR-015/018/019/020, SC-009.
+
+---
+
+## 8. Plot-editor mode unchanged (regression)
+
+1. Click empty space to clear selection.
+2. Panel reverts to plot-editor mode from #447 — same fields, same
+   Save behaviour, same provenance shape.
+
+Acceptance ref: US-3 AS-1, FR-012, SC-008.
+
+---
+
+## 9. Verify provenance and round-trip from the command line
 
 ```sh
-# Inspect the saved item — it should now carry position_metadata
-jq '.features[] | select(.id == "<track-id>") | .properties.position_metadata' \
+# Inspect a saved item — confirm vertex_metadata exists on the feature(s) you edited
+jq '.features[].properties.vertex_metadata' \
   preview/workspace/samples/local-store/items/<plot-id>.json
 
-# Inspect the narrative log — every save should have a properties-panel@ entry
-jq '.features[] | select(.id == "<track-id>") | .properties.provenance' \
-  preview/workspace/samples/local-store/items/<plot-id>.json | tail -20
+# Inspect provenance — one properties-panel@ entry per affected feature per save
+jq '.features[].properties.provenance' \
+  preview/workspace/samples/local-store/items/<plot-id>.json | tail -40
 ```
 
-**Expect** one provenance entry per save with
-`tool = "debrief.propertiesPanel"`, `method = "properties-panel@<version>"`,
-and `inputs[]` listing the edited field paths (sub-feature paths
-prefixed with `position_metadata[N]/`).
+Confirm:
 
-Acceptance reference: FR-013, SC-004, R-006.
+- `tool === 'debrief.propertiesPanel'`
+- `method` matches `^properties-panel@`
+- `inputs[]` lists edited paths (vertex paths prefixed with
+  `vertex_metadata[<path>]/`)
+- Reverted slots are absent from `feature.properties` AND appear in
+  `inputs[]` with `op: 'revert'`
+
+Acceptance ref: FR-013, SC-004, R-006, R-011.
 
 ---
 
-## 7. Run the gates
+## 10. Run the gates
 
 ```sh
 task verify
 cd apps/web-shell && node run-playwright.mjs properties-feature-edit
 cd apps/web-shell && node run-playwright.mjs properties-subfeature-edit
 cd apps/web-shell && node run-playwright.mjs properties-mode-swap
+cd apps/web-shell && node run-playwright.mjs properties-multi-select
+cd apps/web-shell && node run-playwright.mjs properties-read-only
+cd apps/web-shell && node run-playwright.mjs properties-revert
+cd apps/web-shell && node run-playwright.mjs properties-annotation-vertex
 ```
 
-All four MUST pass before opening the PR.
+All eight commands MUST pass before opening the PR.

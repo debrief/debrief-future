@@ -1,15 +1,8 @@
-# Contract — Selection → Editing-mode resolver
+# Contract — Selection → Editing-mode resolver (refreshed)
 
 **Owner**: `shared/components/src/PropertiesPanel/selectionMode.ts` (NEW)
 **Consumers**: `PropertiesForm.tsx` (mode dispatch), Vitest unit tests
-**Source of truth**: `services/session-state/src/utils/selectionPath.ts`
-
-This contract defines the pure function the panel uses to translate the
-current selection into an editing mode. The function is the single
-behavioural anchor for FR-001, FR-002, FR-012, and the stale-selection
-edge cases.
-
----
+**Source of truth**: `services/session-state/src/utils/selectionPath.ts` (`parsePath`)
 
 ## Type signature
 
@@ -20,7 +13,7 @@ import type { Feature } from '@debrief/schemas';
 export type EditingMode =
   | { kind: 'plot' }
   | { kind: 'feature'; featureId: string }
-  | { kind: 'subfeature'; featureId: string; index: number }
+  | { kind: 'subfeature'; featureId: string; path: string }
   | { kind: 'multi'; featureIds: string[] }
   | { kind: 'stale' };
 
@@ -30,27 +23,23 @@ export function resolveEditingMode(
 ): EditingMode;
 ```
 
-No `any`, no implicit fallbacks, no async. Total over its inputs.
-
----
+Total over its inputs. No `any`. No async. No side effects.
 
 ## Resolution rules (in order)
 
 | # | Condition | Result |
-|---|-----------|--------|
-| 1 | `selection.primary` is a string AND it parses (via `parseSelectionPath`) as a `positions`-level path AND its featureId resolves in `featuresById` AND its index is in `[0, coords.length)` | `{ kind: 'subfeature', featureId, index }` |
-| 2 | `selection.primary` is a string AND it parses as a `positions`-level path AND **either** featureId not in map **or** index out of range | `{ kind: 'stale' }` |
-| 3 | `selection.featureIds.length === 1` AND that id resolves in `featuresById` | `{ kind: 'feature', featureId }` |
-| 4 | `selection.featureIds.length === 1` AND that id does **not** resolve | `{ kind: 'stale' }` |
-| 5 | `selection.featureIds.length >= 2` (filter to those that resolve) | If 2+ remain → `{ kind: 'multi', featureIds }`; if 1 remains → rule 3; if 0 remain → `{ kind: 'stale' }` |
-| 6 | Otherwise (`featureIds.length === 0` AND `primary` is null) | `{ kind: 'plot' }` |
+|---|---|---|
+| 1 | `selection.primary` parses (via `parsePath`) into root + ≥1 vertex-bearing level (`positions` for Track, `rings` for Polygon, `vertices` for LineString/MultiPoint, `vertex` for Point) AND its featureId resolves AND the indices are in range for the parent geometry | `{ kind: 'subfeature', featureId, path }` (`path` = the levels portion, e.g., `positions/4`) |
+| 2 | as (1) but featureId not in map OR any index out of range | `{ kind: 'stale' }` |
+| 3 | `selection.featureIds.length === 1` AND that id resolves | `{ kind: 'feature', featureId }` |
+| 4 | `selection.featureIds.length === 1` AND that id does NOT resolve | `{ kind: 'stale' }` |
+| 5 | `selection.featureIds.length >= 2` — filter to resolved IDs: 2+ → `multi`; 1 → rule 3; 0 → `stale` |
+| 6 | otherwise (`featureIds.length === 0` AND `primary` is null) | `{ kind: 'plot' }` |
 
-The function MUST NOT mutate either input. The caller (the panel)
-reacts to a `stale` result by dispatching `clearSelection()`.
+The resolver MUST NOT mutate either input. Callers react to `stale` by
+dispatching `clearSelection()`.
 
----
-
-## Tests (Vitest, must accompany implementation)
+## Vitest cases (must accompany impl)
 
 ```text
 resolveEditingMode
@@ -60,21 +49,14 @@ resolveEditingMode
   ├── two valid feature ids → multi (preserves order)
   ├── two ids, one missing → feature (the surviving one)
   ├── two missing ids → stale
-  ├── valid positions path → subfeature with the same index
-  ├── positions path with unknown featureId → stale
-  ├── positions path with index === coords.length → stale (boundary)
-  ├── positions path with index === -1 → stale (defensive)
-  ├── positions path mixed with featureIds=[other] → subfeature wins
-  └── non-positions structured path (e.g., segments) → falls through to feature/multi rules using selection.featureIds
+  ├── valid positions path → subfeature (path = "positions/N")
+  ├── valid polygon rings path → subfeature (path = "rings/R/vertices/V")
+  ├── valid LineString vertices path → subfeature
+  ├── valid MultiPoint vertices path → subfeature
+  ├── valid single-Point vertex/0 path → subfeature
+  ├── positions path with index === coords.length → stale
+  ├── polygon rings path with ring out of range → stale
+  ├── polygon rings path with vertex out of range in a valid ring → stale
+  ├── non-vertex structured path (e.g., segments) → falls through to feature/multi rules
+  └── path with unknown featureId → stale
 ```
-
----
-
-## Out-of-contract
-
-- This function does NOT decide what the form looks like — it only
-  picks the mode. Form contents are owned by the mode components.
-- This function does NOT touch the store. Side effects live in the
-  panel.
-- It does NOT handle "selection refers to a feature in a different
-  plot" — by construction, `featuresById` is the open plot's index.

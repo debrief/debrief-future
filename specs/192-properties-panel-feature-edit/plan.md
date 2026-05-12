@@ -1,86 +1,90 @@
-# Implementation Plan: Properties Panel — Feature & Sub-feature Editing
+# Implementation Plan: Properties Panel — Feature & Sub-feature Editing (refreshed)
 
-**Branch**: `192-properties-panel-feature-edit` | **Date**: 2026-05-12 | **Spec**: [spec.md](./spec.md)
+**Branch**: `192-properties-panel-feature-edit` | **Date**: 2026-05-12 (refresh) | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/192-properties-panel-feature-edit/spec.md`
-
-> **⚠️ STALE — needs `/speckit.plan` refresh.**
-> This plan was written before the `/speckit.review` scope expansion. The
-> spec now covers seven user stories (US-1 through US-7) including read-
-> only plot detection, FeatureList multi-select emitter, override→auto-
-> derived revert UX, and vertex-metadata generalisation to non-track
-> annotation geometries (FR-018 through FR-028, SC-009 through SC-012).
-> Plan also needs the agreed corrections from `/speckit.review`:
-> (1A) mark the staging buffer / save→flush / provenance call site /
-> mode extraction as net-new, not extensions; (2A) host the staging
-> buffer in `ActivityPanel` React state, not a new Zustand store;
-> (3A) add an integrated save-path Vitest. Re-run `/speckit.plan` to
-> regenerate research.md (incl. R-008 on cross-geometry vertex-metadata
-> shape), data-model.md, contracts/, and quickstart.md against the
-> updated spec before running `/speckit.tasks`.
 
 ## Summary
 
-Extend the Properties Panel shell shipped in #447 so the in-plot section
-edits a single selected feature, or a single track-point sub-feature,
-based on `FeatureSelection`. When the primary selection resolves to a
-position path (e.g., `track-001/positions/4` per #053), render a form for
-new point-level metadata (`label`, `tags`, `note`); when exactly one
-feature is selected, render the existing schema-driven form against that
-feature's editable `TrackProperties`/`BaseFeatureProperties` slots; when
-two or more features are selected, render a read-only field summary;
-otherwise fall through to the plot-editor mode that #447 already
-delivers.
+Extend the #447 Properties Panel shell across four selection-driven modes
+(plot, feature, sub-feature, multi-select read-only summary) AND ship four
+prerequisites that the original plan deferred: an upstream multi-select
+emitter on the map and Layers panel (US-4), a read-only plot signal
+sourced from filesystem-write capability with `ReadOnlyFilesystemError`
+escalation (US-5), a per-field "revert" affordance on the six
+`TrackProperties` per-platform override slots (US-6), and a single
+cross-geometry vertex-metadata slot reachable from every annotation
+feature class via `BaseFeatureProperties` (US-7).
 
-The technical approach reuses the #447 stack untouched: `PropertiesForm`
-as the dispatcher, the existing `ParameterEditor`/`ArrayWidget` family as
-widgets, the existing session-state staging buffer (extended with a
-`(featureId, positionIndex)` key for point-level edits), and the existing
-`appendProvenance(method = 'properties-panel@<version>')` plumbing on
-plot save. The only schema change is a new optional `position_metadata`
-slot on `TrackProperties` carrying a sparse map keyed by the position
-index — chosen over inlining metadata into `TimestampedPosition` so
-existing kinematic round-trips stay unchanged.
+The technical approach commits to the three corrections from `/speckit.review`:
+
+1. The staging buffer, save→flush wiring, and provenance call site are
+   **net-new** — not extensions of #447. `PropertiesForm` is a monolithic
+   widget dispatcher today; the mode-aware controller is part of this
+   feature, not a prerequisite.
+2. The staging buffer lives in **`ActivityPanel` React state** (a
+   `useReducer` hook colocated with the existing `onCommitField`
+   controller), not in a new Zustand store. DRY-friendliest of the three
+   options; survives selection changes; cleared on successful save;
+   preserved on failed save.
+3. The integrated save path — staged edits → writer call → provenance
+   append → buffer clear → dirty clear — is covered by a dedicated
+   Vitest integration test that mocks only the writer, closing the
+   silent-provenance failure mode (Article I.3).
+
+For the vertex-metadata slot (the heaviest design choice of the
+expansion), research selects the **single-class-on-`BaseFeatureProperties`**
+shape with a string `path` slot following the `selectionPath` convention
+(`positions/N`, `rings/R/vertices/V`, `vertices/N`, `vertex/0`). All
+seven annotation classes plus `TrackProperties` inherit it for free via
+LinkML inheritance.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x (strict, panel + selection wiring); Python 3.11 (LinkML schema + Pydantic regeneration tests)
-**Primary Dependencies**: existing `@debrief/components` (`PropertiesForm`, `ActivityPanel`, `ParameterEditor`, `ArrayWidget`, `BboxWidget`, `DateTimeWidget`, `PlatformArrayWidget`); `@debrief/session-state` (Zustand store, `features` slice, `selectionPath` utils); `@debrief/schemas` (LinkML-generated TS + Pydantic types); LinkML ≥ 1.7.0 with `gen-pydantic` / `gen-typescript` / `gen-json-schema`
-**Storage**: GeoJSON Features inside STAC Items on the local filesystem; no new persistence backend (per Constitution IV.4 — frontends never persist directly; saves continue to flow through the existing `saveSession` writer interface)
-**Testing**: Vitest + `@testing-library/react` for the panel unit tests; pytest + LinkML adherence harness for the schema change; Playwright in `apps/web-shell/` for end-to-end selection-driven swap, point-edit, and provenance checks
-**Target Platform**: VS Code extension host (Node 20.x) and web-shell (browser); both render the same `@debrief/components` panel
-**Project Type**: Monorepo (pnpm + uv workspaces) — no new package, only edits to existing packages
-**Performance Goals**: Panel mode swap completes within one render cycle on selection change (FR-002 — no perceptible delay; budget < 16 ms swap latency on a representative plot of 50 features × 200 points)
-**Constraints**: Offline-only (Constitution I.1); strict types (Constitution XV — no `any`); no new selection store (FR-017); no new form library (FR-016); zero regressions to #447 plot-editor mode (FR-012, SC-008)
-**Scale/Scope**: Targets analyst-scale plots (≤ 200 features, ≤ 5 000 total positions); SC-005 requires lossless round-trip across at least 100 edits in one session; the new `position_metadata` slot must round-trip Python ↔ JSON ↔ TypeScript per Constitution II.2
+**Language/Version**: TypeScript 5.x (strict — panel + selection wiring + click handlers + read-only signal consumer); Python 3.11 (LinkML schema + Pydantic adherence)
+**Primary Dependencies**: `@debrief/components` (`PropertiesForm`, `ActivityPanel`, widget library — extended in this feature); `@debrief/session-state` (Zustand store, `features` slice — extended with `isReadOnly`; click-handler glue extended for modifier-aware emission); `@debrief/schemas` (LinkML-generated types — regenerated after schema change); `@debrief/stac-writer` (`CapabilityReport.persistent` consumed by the read-only signal source); LinkML ≥ 1.7.0 with the existing `Makefile` generators
+**Storage**: GeoJSON Features inside STAC Items on the local filesystem; no new persistence backend (Constitution IV.4). The read-only signal is **derived** state held in session-state; it is not persisted to disk
+**Testing**: Vitest + `@testing-library/react` for panel + selection-resolver + integrated save-path; pytest + LinkML adherence for the new `vertex_metadata` slot and its inheritance into all seven annotation classes; Playwright in `apps/web-shell/` for the four end-to-end workflows (US-1, US-2, US-5, US-6 + the multi-select swap from US-4 + a representative annotation-vertex flow from US-7)
+**Target Platform**: VS Code extension host (Node 20.x) and web-shell (browser); both render the same `@debrief/components`
+**Project Type**: Monorepo (pnpm + uv workspaces) — no new package
+**Performance Goals**: Mode swap < 16 ms on a plot of 200 features × 5 000 positions (FR-002); multi-select summary derivation memoised on the selection tuple (O(features × fields), well under the 16 ms budget at the spec's caps); vertex-metadata lookup O(1) at form-load time (memoised Map by `path`)
+**Constraints**: Offline-only (Article I.1); strict types, no `any` (Article XV); no new selection store (FR-017); no new form library (FR-016); zero regression to #447 plot-editor mode (FR-012, SC-008); writer abstraction is the only persistence boundary (Article IV.4)
+**Scale/Scope**: Up to 200 features × 5 000 positions; expansion now also covers seven annotation feature classes inherited from `BaseFeatureProperties`. SC-005 lossless round-trip across ≥ 100 edits/session; SC-012 lossless round-trip across ≥ 50 vertex edits across all four geometry kinds in one session
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 | Article | Clause | Compliance | Notes |
-|---------|--------|------------|-------|
-| I. Defence-Grade Reliability | I.1 Offline by default | PASS | All editing flows are local DOM + Zustand + filesystem write through the existing writer (FR-014). |
-| I. Defence-Grade Reliability | I.3 No silent failures | PASS | Schema-validation errors surface inline next to the offending field; save state is reflected in the existing dirty indicator (Edge Cases §"Schema validation rejects a value"). |
-| II. Schema Integrity | II.1 Single source of truth | PASS | New `position_metadata` slot added to LinkML; Pydantic + TS + JSON Schema **regenerated** (FR-007); no hand-written types. |
-| II. Schema Integrity | II.2 Schema tests mandatory | PASS | Adherence tests for the new slot land alongside the schema change (round-trip, golden fixtures, structural comparison) — see `tests/` plan in this document. |
-| III. Data Sovereignty | III.1 Provenance always | PASS | Every save with feature- or point-level edits appends a provenance entry via `appendProvenance(method = 'properties-panel@<version>')` (FR-013). |
-| III. Data Sovereignty | III.2 Source preservation | PASS | Edits modify metadata only; geometry/coordinates/timestamps are untouched (Out of Scope: editing geometry). |
-| III. Data Sovereignty | III.3 Audit trail immutable | PASS | Provenance entries are appended only — `LogEntry[]` model unchanged. |
-| IV. Architectural Boundaries | IV.2 Frontends never persist | PASS | Panel stages edits in Zustand only; persistence remains in the existing writer abstraction reached via the existing `saveSession` flow. |
-| IV. Architectural Boundaries | IV.4 Persistence-host abstraction | PASS | No direct write code paths added; all writes still flow through the unified writer. ESLint `no-direct-persistence-in-frontend` continues to pass. |
-| V. Extensibility | V.2 Schema compliance | PASS | `position_metadata` is a normal LinkML slot — extensions and downstream consumers see it through the regenerated types automatically. |
-| VI. Testing | VI.2 Services require unit tests; VI.3 Integration tests | PASS | Panel changes covered by Vitest; schema by adherence harness; selection-driven swap and point-edit by Playwright web-shell tests. |
-| VII. Test-Driven AI Collaboration | VII.1 Tests before implementation | PASS | Acceptance scenarios in `spec.md` map 1:1 to Vitest + Playwright cases listed in this plan; tasks (`/speckit.tasks`) will land tests before implementation. |
-| VIII. Documentation | VIII.1 Specs before code | PASS | `spec.md` shipped before this plan; this plan precedes any code. |
-| IX. Dependencies | IX.1 Minimal, vetted dependencies | PASS | **No new runtime dependencies.** All work uses existing `@debrief/components`, `@debrief/session-state`, `@debrief/schemas`. |
-| XV. Strict Type Safety | XV.1–XV.6 | PASS | All new TS code in strict mode; no `any`; LinkML-generated types are canonical for `position_metadata`; ESLint + pyright remain CI-required. |
+|---|---|---|---|
+| I. Defence-Grade Reliability | I.1 Offline by default | PASS | Every edit, signal, and emitter is local — no network. |
+| I. Defence-Grade Reliability | I.3 No silent failures | PASS | Read-only attempted writes surface a single notice (FR-020). The integrated save-path Vitest (R-007 refresh) closes the silent-provenance gap flagged in `/speckit.review`. |
+| II. Schema Integrity | II.1 Single source of truth | PASS | `vertex_metadata` is a new LinkML slot on `BaseFeatureProperties`; all 7 annotation classes + `TrackProperties` inherit it. Pydantic/TS/JSON Schema regenerated; no hand-written types. |
+| II. Schema Integrity | II.2 Schema tests mandatory | PASS | Adherence harness covers the new slot on every concrete class (round-trip + golden fixtures + duplicate-path rejection). |
+| III. Data Sovereignty | III.1 Provenance always | PASS | Every save with staged edits appends one `LogEntry` per affected feature (FR-013). Vertex paths use the existing `path` convention from #053. |
+| III. Data Sovereignty | III.2 Source preservation | PASS | Edits modify metadata only; geometry untouched (Out of Scope). |
+| III. Data Sovereignty | III.3 Audit trail immutable | PASS | Provenance entries append-only. |
+| IV. Architectural Boundaries | IV.2 Frontends never persist | PASS | Staging is in-memory React state; all writes route through `saveSession` → writer abstraction. |
+| IV. Architectural Boundaries | IV.4 Persistence-host abstraction | PASS | The read-only signal **reads from** the writer's `CapabilityReport.persistent` (the existing typed interface) — it does not bypass the abstraction. No new write code paths introduced. |
+| V. Extensibility | V.2 Schema compliance | PASS | `vertex_metadata` flows through normal LinkML generation to every consumer. |
+| VI. Testing | VI.2 Services require unit tests; VI.3 Integration tests | PASS | Vitest covers resolver + staging buffer + integrated save path. Schema covered by adherence. Playwright covers the workflows. |
+| VII. Test-Driven AI Collaboration | VII.1 Tests before implementation | PASS | Spec acceptance scenarios → contract tests → implementation; ordering enforced by task graph. |
+| VIII. Documentation | VIII.1 Specs before code | PASS | Spec ships before plan; plan re-baselined after `/speckit.review` corrections. |
+| IX. Dependencies | IX.1 Minimal, vetted dependencies | PASS | **No new runtime dependencies.** Read-only signal piggy-backs on existing `CapabilityReport`. |
+| XV. Strict Type Safety | XV.1–XV.6 | PASS | All new TS code strict, no `any`; LinkML-generated `vertex_metadata` is canonical; ESLint + pyright CI gates unchanged. |
 
-**Result**: All gates PASS. No entries required in Complexity Tracking.
+**Result**: All gates PASS pre-design. Complexity Tracking remains empty.
 
-The single architectural call worth flagging in research is the
-**storage shape of point-level metadata** (parallel sparse map vs.
-inline on `TimestampedPosition`). This is a schema-modelling choice, not
-a constitutional violation; it is resolved in `research.md` R-001.
+The two architectural decisions worth highlighting (and resolved in
+research):
+
+- **R-008** picks the single-class-on-`BaseFeatureProperties` shape for
+  `vertex_metadata` over per-geometry classes or a polymorphic address
+  slot. Inheritance from the base gives all 7 annotation classes the
+  slot for free with one definition.
+- **R-009** sources the read-only signal from `CapabilityReport.persistent`
+  + `ReadOnlyFilesystemError` post-write escalation, with most-restrictive
+  precedence. No new schema field for "locked" — would otherwise duplicate
+  what the writer abstraction already reports.
 
 ## Project Structure
 
@@ -88,18 +92,22 @@ a constitutional violation; it is resolved in `research.md` R-001.
 
 ```text
 specs/192-properties-panel-feature-edit/
-├── plan.md              # This file
-├── research.md          # Phase 0 — schema modelling + selection-path contract
-├── data-model.md        # Phase 1 — staged-edit shape + new schema slot
-├── quickstart.md        # Phase 1 — verify the feature in 5 minutes
+├── plan.md                                # This file
+├── research.md                            # R-001..R-011 (refreshed)
+├── data-model.md                          # vertex_metadata + read-only signal + staging + multi-select
+├── quickstart.md                          # 7-story walkthrough
 ├── contracts/
-│   ├── selection-mode.md          # Mode-resolution rules (selection → mode)
-│   ├── staged-edits-store.md      # Zustand staging buffer surface
-│   └── position-metadata-slot.md  # LinkML slot definition + JSON Schema
+│   ├── selection-mode.md                  # Mode resolver (cross-geometry, with stale)
+│   ├── staged-edits-store.md              # In-ActivityPanel hook + helpers
+│   ├── vertex-metadata-slot.md            # LinkML slot + per-geometry path format
+│   ├── read-only-signal.md                # Sources, precedence, consumer surface
+│   ├── multi-select-emitter.md            # Map + Layers click semantics
+│   ├── revert-action.md                   # Per-field revert semantics on the staging buffer
+│   └── save-integration.md                # Integrated save-path contract (closes silent-provenance)
 ├── checklists/
-│   └── requirements.md  # (already created by /speckit.specify)
+│   └── requirements.md                    # Refreshed in /speckit.specify pass
 └── evidence/
-    └── opening-context.md  # Phase 2 cached opener
+    └── opening-context.md                 # Phase 2 cached opener (refreshed)
 ```
 
 ### Source Code (repository root)
@@ -108,67 +116,88 @@ specs/192-properties-panel-feature-edit/
 shared/
 ├── schemas/
 │   └── src/linkml/
-│       ├── common.yaml          # +PositionMetadata class, +position_metadata slot
-│       └── geojson.yaml         # TrackProperties references position_metadata
+│       ├── common.yaml                    # +VertexMetadata class, +vertex_metadata slot on BaseFeatureProperties
+│       └── geojson.yaml                   # untouched (slot inherits via BaseFeatureProperties)
 └── components/
     └── src/
         ├── PropertiesPanel/
-        │   ├── PropertiesForm.tsx              # +mode dispatch (existing dispatcher extended)
+        │   ├── PropertiesForm.tsx          # extend dispatcher with mode prop (no new file)
         │   ├── modes/
-        │   │   ├── PlotEditorMode.tsx          # extracted from #447 (no behaviour change)
         │   │   ├── FeatureEditorMode.tsx       # NEW
-        │   │   ├── SubFeatureEditorMode.tsx    # NEW
-        │   │   └── MultiSelectSummaryMode.tsx  # NEW (read-only)
-        │   ├── selectionMode.ts                # NEW — pure mode resolver
-        │   ├── stagedEditsStore.ts             # touch — extend keying for (featureId, positionIndex)
-        │   └── provenanceTypes.ts              # unchanged
-        └── ActivityPanel/
-            └── ActivityPanel.tsx               # unchanged
+        │   │   ├── SubFeatureEditorMode.tsx    # NEW (vertex-metadata form for all geometries)
+        │   │   └── MultiSelectSummaryMode.tsx  # NEW (read-only summary)
+        │   ├── selectionMode.ts                # NEW pure resolver
+        │   ├── revertControl.tsx               # NEW per-field affordance (FR-023, FR-024)
+        │   ├── readOnlyBanner.tsx              # NEW banner for the read-only state
+        │   └── provenanceTypes.ts              # unchanged (types/sentinel)
+        ├── ActivityPanel/
+        │   ├── ActivityPanel.tsx               # extend: stagedEdits via useReducer (R-002a); read-only consumer
+        │   └── useStagedEdits.ts               # NEW colocated hook owning the staging buffer
+        ├── MapView/
+        │   └── MapView.tsx                     # extend onSelect to surface modifier flags (FR-021/022)
+        └── FeatureList/
+            └── FeatureList.tsx                 # ✅ already passes event flags; no change required
 
 services/
 └── session-state/
-    └── src/store/slices/features.ts            # touch — selectors for resolving selection → mode
+    └── src/
+        ├── store/slices/features.ts            # ✅ existing selection slice (no change)
+        ├── store/slices/plot.ts                # extend: derived `isReadOnly` field
+        ├── persistence/save.ts                 # consume CapabilityReport + escalate ReadOnlyFilesystemError → isReadOnly
+        └── utils/selectionPath.ts              # ✅ existing parser (used by selectionMode)
 
 apps/
-├── vscode/                  # no source changes; consumes the same @debrief/components
+├── vscode/                                     # no source changes; consumes @debrief/components
 └── web-shell/
-    └── playwright/tests/
-        ├── properties-feature-edit.spec.ts     # NEW
-        ├── properties-subfeature-edit.spec.ts  # NEW
-        └── properties-mode-swap.spec.ts        # NEW
+    └── playwright/
+        ├── pages/AnalysisPage.ts               # extend: selectFeature/selectFeatures (modifier+click) + selectVertex
+        └── tests/
+            ├── properties-feature-edit.spec.ts       # NEW
+            ├── properties-subfeature-edit.spec.ts    # NEW (track point)
+            ├── properties-mode-swap.spec.ts          # NEW
+            ├── properties-read-only.spec.ts          # NEW (US-5)
+            ├── properties-multi-select.spec.ts       # NEW (US-4)
+            ├── properties-revert.spec.ts             # NEW (US-6)
+            └── properties-annotation-vertex.spec.ts  # NEW (US-7 — one geometry: Polygon)
 
-shared/components/src/PropertiesPanel/__tests__/  # NEW Vitest suite
-shared/schemas/tests/                            # +position_metadata adherence tests
+shared/components/src/PropertiesPanel/__tests__/
+├── selectionMode.test.ts                       # NEW (resolver, all geometry kinds)
+├── useStagedEdits.test.ts                      # NEW (staging buffer behaviour)
+├── saveSession-integration.test.ts             # NEW (3A — closes silent-provenance)
+└── revertControl.test.tsx                      # NEW (FR-023, FR-024)
+
+shared/schemas/tests/
+└── vertex_metadata_*.py                        # NEW adherence: round-trip, inheritance across 7 classes, duplicate-path rejection
 ```
 
-**Structure Decision**: Reuse the existing monorepo layout. All UI work
-lands in `shared/components/src/PropertiesPanel/`; the schema change
-lands in `shared/schemas/src/linkml/`; selection-resolver work lands in
-`services/session-state/`. **No new package, no new app, no new build
-target.** This keeps the change reviewable as a layered diff and
-preserves the #447 plot-editor mode by extracting it into its own mode
-component before touching anything else (a no-op refactor that is its
-own first task — see `tasks.md` to be generated by `/speckit.tasks`).
+**Structure Decision**: Continue the existing monorepo layout. All UI work
+lives in `shared/components/src/`; the schema change lives in
+`shared/schemas/src/linkml/common.yaml` (a single edit to
+`BaseFeatureProperties` — the new slot inherits everywhere); session-state
+extensions are confined to `services/session-state/src/`. No new package,
+no new app, no new build target.
 
 ## Media Components
 
 | Component | Story Source | Bundle Name | Purpose |
 |-----------|--------------|-------------|---------|
-| `PropertiesForm` (Feature mode) | `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx` (extend existing) | `properties-feature.js` | Show editing one feature's tags + a per-platform override |
-| `PropertiesForm` (Sub-feature mode) | `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx` (new story) | `properties-subfeature.js` | Show editing point-level `label` + `tags` + `note` |
-| `PropertiesForm` (Multi-select summary) | `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx` (new story) | `properties-multiselect.js` | Show read-only "differs"/common-value summary |
+| `PropertiesForm` — Feature mode | `shared/components/src/PropertiesPanel/PropertiesForm.stories.tsx` (NEW) | `properties-feature.js` | Show editing a track's tags + a per-platform override **with the revert control** visible |
+| `PropertiesForm` — Sub-feature mode (track) | same file | `properties-subfeature-track.js` | Show editing point-level `label`/`tags`/`note` on a track position |
+| `PropertiesForm` — Sub-feature mode (polygon vertex) | same file | `properties-subfeature-polygon.js` | Show the same field set on a polygon ring vertex — drives the cross-geometry narrative |
+| `PropertiesForm` — Multi-select summary | same file | `properties-multiselect.js` | Show the read-only "differs"/common-value summary |
+| `PropertiesForm` — Read-only state | same file | `properties-read-only.js` | Show the lock banner + disabled inputs across modes |
 
 **Inclusion Criteria Applied**:
 
-- [x] New visual component
-- [x] Significant visual change
-- [x] Interactive demo adds narrative value
+- [x] New visual component (revert control, read-only banner, mode siblings)
+- [x] Significant visual change (mode-aware swap, header changes)
+- [x] Interactive demo adds narrative value (revert + vertex annotation are visually compelling)
 
 **Bundleability Verified**:
 
-- [x] Stories exist in Storybook (extend existing `PropertiesForm.stories.tsx`)
-- [x] Components render standalone (no app context required — feed mock selection + mock features as story args)
-- [x] Reasonable bundle size expected (< 500 KB — same shape as the existing #447 stories already bundled)
+- [x] Stories exist in Storybook (NEW file — counted as such)
+- [x] Components render standalone (story args feed mock selection + mock features)
+- [x] Reasonable bundle size expected (< 500 KB)
 
 **Storybook Link**: `https://debrief.github.io/debrief-future/storybook/?path=/story/propertiespanel-propertiesform`
 
@@ -176,56 +205,44 @@ own first task — see `tasks.md` to be generated by `/speckit.tasks`).
 
 | Story | Test Coverage | Theme Variants | Interactions |
 |-------|--------------|----------------|--------------|
-| `PropertiesForm.stories.tsx` — Feature mode | Rendering, dirty-indicator on edit, accessibility | light, dark, vscode | fill tag input, blur, assert dirty + value persisted in store mock |
-| `PropertiesForm.stories.tsx` — Sub-feature mode | Rendering point header (track + index), label + tag + note inputs | light, dark, vscode | type label, add tag, type note, assert all three staged |
-| `PropertiesForm.stories.tsx` — Multi-select summary | Rendering disabled state + "(differs)" indicator | light, dark, vscode | hover indicator, assert tooltip; assert all inputs disabled |
+| Feature mode | Render, dirty on edit, revert control toggles override state, a11y | light, dark, vscode | fill tag, click revert, assert auto-derived value restored + dirty=true |
+| Sub-feature mode (track) | Render header (track + index), label/tags/note inputs | light, dark, vscode | type label, add tag, type note; assert all staged |
+| Sub-feature mode (polygon vertex) | Render header (parent feature + `rings/0/vertices/3`), same field set | light, dark, vscode | same interactions; assert same field set as track |
+| Multi-select summary | Render disabled state + "(differs)" indicator | light, dark, vscode | hover indicator tooltip; assert `aria-disabled` |
+| Read-only state | Render lock banner + disabled inputs across modes | light, dark, vscode | attempt to type → input rejects; banner reads the source reason |
 
 **Testing Strategy**:
 
 - [x] Component renders correctly in all theme variants
 - [x] Interactive elements respond to user input
-- [x] Accessibility attributes present (`data-testid` on each mode container, `aria-label` on the differs indicator, `aria-disabled` on multi-select inputs)
-- [x] Screenshots captured for evidence (one per mode × theme)
+- [x] Accessibility attributes present (`data-testid` per mode container, `aria-disabled`, `aria-label` on revert/lock)
+- [x] Screenshots captured for evidence
 
 **Test File Location**: `shared/components/e2e/PropertiesForm.spec.ts`
 
-**Theme Variant URLs** (for Storybook):
-
-```text
-/iframe.html?id=propertiespanel-propertiesform--feature-mode&globals=theme:light
-/iframe.html?id=propertiespanel-propertiesform--feature-mode&globals=theme:dark
-/iframe.html?id=propertiespanel-propertiesform--feature-mode&globals=theme:vscode
-/iframe.html?id=propertiespanel-propertiesform--sub-feature-mode&globals=theme:light
-/iframe.html?id=propertiespanel-propertiesform--sub-feature-mode&globals=theme:dark
-/iframe.html?id=propertiespanel-propertiesform--sub-feature-mode&globals=theme:vscode
-/iframe.html?id=propertiespanel-propertiesform--multiselect-summary&globals=theme:light
-/iframe.html?id=propertiespanel-propertiesform--multiselect-summary&globals=theme:dark
-/iframe.html?id=propertiespanel-propertiesform--multiselect-summary&globals=theme:vscode
-```
+**Theme Variant URLs**: see existing pattern; one URL per `(story, theme)` combination — 15 total (5 stories × 3 themes).
 
 ## Web-Shell E2E Testing
 
 | Workflow | Panels/Components Involved | Key Selectors | Interactions |
 |----------|---------------------------|---------------|--------------|
-| Edit one feature's tags + an override, save, reload | MapView, ActivityPanel, PropertiesPanel | `.leaflet-container`, `[data-testid="properties-panel"]`, `[data-testid="properties-mode-feature"]` | load plot, click feature on map, edit tag input, edit override, click Save, reload, re-select, assert values restored + provenance entry visible in NarrativeLog |
-| Edit one track-point's metadata, save, reload | MapView, ActivityPanel, PropertiesPanel, NarrativeLog | `.leaflet-container`, `[data-testid="properties-mode-subfeature"]`, `[data-testid="point-label-input"]`, `[data-testid="point-tags-input"]`, `[data-testid="point-note-input"]` | load plot, click a track point on map, fill label/tags/note, save, reload, re-click same point, assert values restored |
-| Selection-driven mode swap with staged edits preserved | MapView, FeatureList, ActivityPanel, PropertiesPanel | `[data-testid="feature-list"]`, `[data-testid="properties-panel"]`, `[data-testid="properties-mode-{plot,feature,subfeature,multiselect}"]` | cycle: no selection → 1 feature → point on it → 2 features → no selection; at each step assert mode container present and previously-staged edits not lost |
+| Edit one feature + override + save → reload (US-1, US-6) | MapView, ActivityPanel, PropertiesPanel, NarrativeLog | `.leaflet-container`, `[data-testid="properties-panel"]`, `[data-testid="properties-mode-feature"]`, `[data-testid="revert-vessel_role"]` | open plot, click feature, edit tag + override, click revert, save, reload, re-select, assert values |
+| Edit a track-point's metadata, save, reload (US-2) | MapView, ActivityPanel, PropertiesPanel | as above + `[data-testid="properties-mode-subfeature"]`, `[data-testid="vertex-label-input"]` | click point, fill, save, reload, re-click point, assert restored |
+| Selection-driven mode swap preserves staged edits (US-3) | MapView, FeatureList, ActivityPanel, PropertiesPanel | `[data-testid="feature-list"]`, `[data-testid="properties-mode-*"]` | cycle no→1→point→2→0; assert mode + staged-edit preservation |
+| Multi-feature selection from map + Layers (US-4) | MapView, FeatureList, PropertiesPanel | `.leaflet-container`, `[data-testid="feature-list-row-*"]` | Ctrl/Cmd-click two features on map; same in Layers; assert multi-select summary in both paths |
+| Read-only plot disables every editing path (US-5) | ActivityPanel, PropertiesPanel | `[data-testid="read-only-banner"]`, `[data-testid="properties-panel"]` | open a read-only fixture plot; assert banner visible in every mode; assert save action unavailable |
+| Annotation vertex metadata, save, reload (US-7) | MapView (Polygon layer), ActivityPanel, PropertiesPanel | `[data-testid="properties-mode-subfeature"]` | click a polygon ring vertex; fill label/tags/note; save; reload; re-click same vertex; assert restored |
 
 **Testing Strategy**:
 
 - [x] Workflow runs end-to-end in the web-shell
-- [x] Page objects in `apps/web-shell/playwright/pages/` extended (extend `AnalysisPage` with `propertiesPanel` accessors and `selectFeature(id)` / `selectPosition(featureId, positionIndex)` helpers; do not duplicate)
-- [x] Screenshots and/or interaction GIF written **directly** into `specs/192-properties-panel-feature-edit/evidence/screenshots/` from the spec file (follow the `properties-screenshots.spec.ts` path-resolution pattern from #447)
+- [x] `AnalysisPage` extended with `selectFeature(id, { modifier })`, `selectFeatures(ids)`, `selectVertex(featureId, path)`
+- [x] Screenshots written into `specs/192-properties-panel-feature-edit/evidence/screenshots/`
 
-**Test File Location**: `apps/web-shell/playwright/tests/properties-{feature,subfeature,mode-swap}.spec.ts`
+**Test File Location**: `apps/web-shell/playwright/tests/properties-*.spec.ts` (seven files — see Project Structure)
 
-**Run Commands**:
-
-- Cloud: `cd apps/web-shell && node run-playwright.mjs properties-feature-edit`
-- Local: `pnpm --filter @debrief/web-shell test properties-feature-edit`
+**Run Commands** unchanged: `cd apps/web-shell && node run-playwright.mjs properties-feature-edit`, etc.
 
 ## Complexity Tracking
-
-> **Fill ONLY if Constitution Check has violations that must be justified**
 
 *No violations. Section intentionally empty.*

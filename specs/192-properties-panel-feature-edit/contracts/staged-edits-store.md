@@ -1,128 +1,118 @@
-# Contract — Staged-edits store
+# Contract — Staged-edits buffer (refreshed: in-ActivityPanel hook)
 
-**Owner**: `shared/components/src/PropertiesPanel/stagedEditsStore.ts`
-(extends the buffer introduced in #447)
-**Consumers**: `FeatureEditorMode.tsx`, `SubFeatureEditorMode.tsx`,
-`PlotEditorMode.tsx`, `saveSession` flush hook
+**Owner**: `shared/components/src/ActivityPanel/useStagedEdits.ts` (NEW)
+**Consumers**: `FeatureEditorMode`, `SubFeatureEditorMode`,
+`MultiSelectSummaryMode` (read-only consumer), `saveSession` flush hook,
+`revertControl`
 
-This contract pins the in-memory shape of un-flushed edits and the
-operations the mode components use to read and mutate it. It is the
-single anchor for FR-006, FR-009, FR-010, FR-013, and SC-005.
-
----
+Per `/speckit.review` decision 2A: the staging buffer is a `useReducer`
+hook colocated with `ActivityPanel`. **Not** a Zustand store. **Not** a
+new session-state slice.
 
 ## State shape
 
 ```ts
-type PlotEditableProperties     = /* generated from STAC item LinkML */;
-type FeatureEditableProperties  = /* generated subset of TrackProperties */;
-type PositionEditableProperties = Pick<PositionMetadata, 'label' | 'tags' | 'note'>;
+import type { VertexMetadata, BaseFeatureProperties, TrackProperties } from '@debrief/schemas';
+
+type PlotEditableProperties     = /* generated subset of STAC item LinkML */;
+type FeatureEditableProperties  = /* generated subset of feature properties */;
+type VertexEditableProperties   = Pick<VertexMetadata, 'label' | 'tags' | 'note'>;
+type FieldKey                   = keyof FeatureEditableProperties;
 
 interface StagedEdits {
   plot?: Partial<PlotEditableProperties>;
   byFeature: Record<string /* featureId */, Partial<FeatureEditableProperties>>;
-  byPosition: Record<
+  byVertex: Record<
     string /* featureId */,
-    Record<number /* index */, Partial<PositionEditableProperties>>
+    Record<string /* path: positions/N | rings/R/vertices/V | vertices/N | vertex/0 */, Partial<VertexEditableProperties>>
   >;
+  revertedFields: Record<string /* featureId */, Set<FieldKey>>;
 }
 ```
 
-Every field key MUST be a known LinkML slot name. No string-keyed
-escape hatches; no `any`.
-
----
-
-## Operations
-
-### Read
+## Hook surface
 
 ```ts
-getStagedFeatureEdit(state, featureId): Partial<FeatureEditableProperties> | undefined
-getStagedPositionEdit(state, featureId, index): Partial<PositionEditableProperties> | undefined
-isDirty(state): boolean
+export function useStagedEdits(): {
+  state: StagedEdits;
+  isDirty: () => boolean;
+  setFeatureField:  (featureId: string, slot: FieldKey, next: unknown, current: unknown) => void;
+  setVertexField:   (featureId: string, path: string, slot: keyof VertexEditableProperties, next: unknown, current: unknown) => void;
+  revertField:      (featureId: string, slot: FieldKey) => void;
+  unrevertField:    (featureId: string, slot: FieldKey) => void;  // analyst undoes a revert before save
+  applyEditsToFeatures: (features: Feature[]) => { nextFeatures: Feature[]; editedPaths: ProvenancePath[] };
+  clearAll: () => void;   // invoked by saveSession on successful flush
+};
 ```
 
-`isDirty` returns true iff at least one entry survives sparse pruning.
-Equivalent to "the save button should be active".
+## Setter semantics
 
-### Write
+- **`setFeatureField`** / **`setVertexField`**: compute `equal(next, current)`
+  via a deep-equality helper keyed off the LinkML slot type. If equal,
+  prune the entry (and the per-feature / per-vertex partial if it
+  becomes empty). Synchronous reducer updates only.
+- **`revertField`** (FR-024): drop any staged entry for `(featureId, slot)`
+  from `byFeature`; add `slot` to `revertedFields[featureId]`. The
+  `applyEditsToFeatures` flush translates "reverted" into "slot
+  absent from the saved feature" (NOT `null`/empty).
+- **`unrevertField`**: removes `slot` from `revertedFields[featureId]`
+  (used when the analyst undoes a revert in the same session before
+  saving).
 
-```ts
-setFeatureField(featureId, slotName, nextValue, currentValue): void
-setPositionField(featureId, index, slotName, nextValue, currentValue): void
-clearAll(): void  // called by saveSession after a successful flush
-```
+## Flush
 
-Both setters MUST:
+`applyEditsToFeatures(features)` is **pure** in `state`. Behaviour:
 
-1. Compute `equal(nextValue, currentValue)` via a deep equality helper
-   keyed off the LinkML slot type. If equal, **prune** the entry
-   (the field is no longer "edited").
-2. After pruning, if a feature's partial becomes empty, prune the
-   feature's entry too. Same for the position's entry.
-3. Never block on I/O — they are synchronous Zustand updates.
+1. **Plot-level edits** apply to the STAC item's properties (the #447
+   plot-editor path, untouched here).
+2. **Feature-level edits**: shallow-merge `byFeature[id]` into
+   `feature.properties`.
+3. **Reverted fields**: remove every `slot` in `revertedFields[id]` from
+   `feature.properties` (slot becomes absent — sparse-storage rule).
+4. **Vertex-level edits**: merge into `feature.properties.vertex_metadata`:
+   - find an entry by `path`; if exists, merge field-by-field; otherwise
+     append a new `VertexMetadata` entry with that `path`;
+   - after merge, if the entry has no populated fields (label/tags/note
+     all absent), remove the entry (FR-010);
+   - if the resulting `vertex_metadata` array is empty, omit the slot
+     entirely.
+5. **`editedPaths`**: list of LinkML field paths used by
+   `appendProvenance` (R-006). Feature-level paths use the slot name;
+   reverted slots use `<slot>` (no decoration — the LogEntry's source
+   is `user revert`); vertex-level paths use `vertex_metadata[<path>]/<slot>`.
 
-### Flush (called by `saveSession` immediately before write)
-
-```ts
-applyEditsToFeatures(features: Feature[], state: StagedEdits): {
-  nextFeatures: Feature[];
-  editedPaths: ProvenancePath[];
-}
-```
-
-Behaviour:
-
-- **Plot-level edits** apply to the STAC item's properties (existing
-  #447 behaviour, untouched).
-- **Feature-level edits** spread into `feature.properties` for each
-  edited feature.
-- **Position-level edits** are merged into `feature.properties.position_metadata`:
-  - If an entry with the same `index` exists, merge field-by-field.
-  - Otherwise append a new `PositionMetadata` entry.
-  - After merge, if the entry has no populated fields (label/tags/note
-    all empty), **remove** it (FR-010 — sparse storage).
-  - If the resulting `position_metadata` array is empty, omit the slot
-    entirely (no `"position_metadata": []`).
-- `editedPaths` is the list of LinkML field paths used by
-  `appendProvenance` (R-006). Position-level paths use the prefix
-  `position_metadata[<index>]/`.
-
-Flush is **pure** in `state` (does not mutate it); the caller invokes
-`clearAll()` after a successful write to the writer abstraction
-(Constitution IV.4).
-
----
+Flush does not mutate `state`; `clearAll()` is invoked by the caller
+after the writer succeeds.
 
 ## Invariants
 
-1. **Sparse pruning is total.** After every setter, the store contains
-   no empty partials.
-2. **No persistence.** The buffer is in-memory only; never written to
-   disk except via `applyEditsToFeatures` + the existing writer.
-3. **Survives selection changes.** Selection actions (`setSelection`,
-   `clearSelection`) MUST NOT touch the staged-edits store.
-4. **One write path.** All flushes go through `applyEditsToFeatures` —
-   no per-mode component writes directly to features.
+1. **Sparse pruning is total.** After every setter/reverter the buffer
+   contains no empty partials.
+2. **No persistence.** In-memory only; never serialised; cleared on
+   successful save; **preserved on failed save** (US-5 AS-3).
+3. **Selection-independent.** Selection actions (`setSelection`,
+   `clearSelection`) MUST NOT touch the buffer.
+4. **One write path.** All flushes go through `applyEditsToFeatures` →
+   `saveSession` → writer abstraction (Article IV.4).
 
----
-
-## Tests (Vitest)
+## Vitest cases
 
 ```text
-stagedEditsStore
-  ├── setFeatureField stores the value
+useStagedEdits
+  ├── setFeatureField stores value
   ├── setFeatureField with value === current prunes the entry
-  ├── setFeatureField pruning removes empty feature partials
-  ├── setPositionField stores per-(featureId, index)
-  ├── isDirty true after setFeatureField, false after pruning back
-  ├── selection change does not touch the store
+  ├── pruning removes empty feature partials
+  ├── setVertexField stores per-(featureId, path)
+  ├── isDirty true after any setter; false after pruning to empty
+  ├── revertField adds slot to revertedFields and prunes staged override
+  ├── unrevertField removes slot from revertedFields
+  ├── selection change does not touch the buffer
   ├── applyEditsToFeatures merges feature-level edits
-  ├── applyEditsToFeatures appends a new PositionMetadata entry
-  ├── applyEditsToFeatures merges into an existing PositionMetadata entry by index
-  ├── applyEditsToFeatures removes an entry that becomes empty
-  ├── applyEditsToFeatures omits position_metadata entirely if the array becomes empty
-  ├── applyEditsToFeatures returns the correct editedPaths for provenance
-  └── clearAll wipes the buffer (only called after a successful save)
+  ├── applyEditsToFeatures DROPS reverted slots from saved feature.properties
+  ├── applyEditsToFeatures appends a new VertexMetadata entry by path
+  ├── applyEditsToFeatures merges into an existing VertexMetadata entry by path
+  ├── applyEditsToFeatures prunes entries that become empty
+  ├── applyEditsToFeatures omits vertex_metadata entirely when array empty
+  ├── applyEditsToFeatures returns correct editedPaths for provenance
+  └── clearAll wipes the buffer
 ```
