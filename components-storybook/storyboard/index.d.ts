@@ -9,8 +9,8 @@ export type { Plot as StoryboardPlot, SceneFeature, StoryboardFeature, Ulid, Sto
 export { isStoryboardFeature, isSceneFeature, asUlid, asStoryboardId, asSceneId, } from './types';
 export { StoryboardError, DuplicateTimestampError, OrphanSceneError, UnknownStoryboardError, UnknownSceneError, ReservedSlotViolationError, DuplicateStoryboardNameError, ThumbnailDeepCopyFailedError, SchemaMigrationFailedError, InvariantViolationError, } from './errors';
 export type { StoryboardErrorCode } from './errors';
-export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, checkSceneTimestamp, } from './crud';
-export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, DescribeStoryboardInput, RestoreSceneInput, } from './crud';
+export { createStoryboard, renameStoryboard, deleteStoryboard, createScene, updateScene, deleteScene, duplicateScene, copySceneToOtherStoryboard, describeStoryboard, restoreScene, checkSceneTimestamp, bboxToPolygon, } from './crud';
+export type { CreateStoryboardInput, RenameStoryboardInput, DeleteStoryboardInput, CreateSceneInput, UpdateScenePatch, UpdateSceneInput, DeleteSceneInput, DuplicateSceneInput, CopySceneToOtherStoryboardInput, DescribeStoryboardInput, RestoreSceneInput, SceneBounds, } from './crud';
 export { listScenesOrdered } from './ordering';
 export { getStoryboard, getScene, getActiveStoryboardDefault, getMostRecentlyModifiedStoryboard, readSceneWithStaleness, } from './queries';
 export type { StaleReadResult } from './queries';

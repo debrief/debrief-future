@@ -1,6 +1,28 @@
-import { LogEntry, Viewport, WasGeneratedBy } from '../../../schemas/src/generated/typescript/index.ts';
+import { GeoJSONPolygon, LogEntry, PolygonSource, SceneProperties, Viewport, WasGeneratedBy } from '../../../schemas/src/generated/typescript/index.ts';
 import { Plot, SceneFeature, StoryboardFeature } from './types';
 
+/**
+ * Structural bounds-shape used by Spec #258 scene capture. Keeps `crud.ts`
+ * platform-agnostic — callers convert Leaflet's `LatLngBounds` (or any other
+ * source) to this POJO before invoking `createScene` / `updateScene`.
+ */
+export interface SceneBounds {
+    /** Western longitude in degrees (-180 to 180). */
+    readonly west: number;
+    /** Southern latitude in degrees (-90 to 90). */
+    readonly south: number;
+    /** Eastern longitude in degrees (-180 to 180). */
+    readonly east: number;
+    /** Northern latitude in degrees (-90 to 90). */
+    readonly north: number;
+}
+/**
+ * Convert a four-corner bounding box to a closed GeoJSON Polygon ring
+ * `[SW, NW, NE, SE, SW]`. The `source` value is informational — callers
+ * persist it on the scene's `_polygon_source` slot for render-side
+ * provenance (Spec #258 / FR-006).
+ */
+export declare function bboxToPolygon(bounds: SceneBounds, source: PolygonSource): GeoJSONPolygon;
 export interface CreateStoryboardInput {
     name: string;
     description?: string;
@@ -42,6 +64,24 @@ export interface CreateSceneInput {
     title?: string;
     description?: string;
     viewport: Viewport;
+    /**
+     * Real map bounds at capture time (Spec #258 / FR-004). When supplied, the
+     * scene's stored polygon is `bboxToPolygon(bounds, polygonSource ?? 'bounds')`
+     * and `_polygon_source` is recorded so the renderer trusts the on-disk
+     * geometry. When omitted, the scene falls back to the pre-#258 placeholder
+     * polygon and `_polygon_source` defaults to `'placeholder'` — the renderer
+     * then recomputes the rectangle from `(viewport, map dimensions)` at draw
+     * time (FR-006).
+     */
+    bounds?: SceneBounds;
+    /** Polygon provenance — defaults to `'bounds'` when `bounds` is provided,
+     *  `'placeholder'` otherwise. Explicit override permitted for restore /
+     *  migrate paths that preserve historical provenance. */
+    polygonSource?: PolygonSource;
+    /** Time-controller display mode at capture time (Spec #258 / FR-001).
+     *  Optional — legacy capture call sites omit it; readers tolerate the
+     *  slot being absent on playback (FR-003). */
+    displayMode?: SceneProperties["display_mode"];
     timestamp: string;
     visibleFeatureIds: string[];
     thumbnailAssetRef: string;
@@ -60,6 +100,13 @@ export interface UpdateScenePatch {
     title?: string;
     description?: string;
     viewport?: Viewport;
+    /** Spec #258 — see {@link CreateSceneInput.bounds}. When supplied alongside
+     *  a viewport change, the polygon is regenerated from these bounds and
+     *  `_polygon_source` is set to `'bounds'`. */
+    bounds?: SceneBounds;
+    polygonSource?: PolygonSource;
+    /** Spec #258 — see {@link CreateSceneInput.displayMode}. */
+    displayMode?: SceneProperties["display_mode"];
     timestamp?: string;
     visibleFeatureIds?: string[];
     thumbnailAssetRef?: string;

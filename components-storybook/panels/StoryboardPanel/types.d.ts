@@ -1,15 +1,5 @@
-/**
- * Types for the presentational Storyboard panel (Features 216 + 217).
- *
- * These types cross the extension → webview boundary. The panel itself is
- * headless of VS Code — consumers marshal `SceneRowViewModel` from their
- * own sources (e.g. #215's CRUD module in the VS Code extension, fixture
- * data in Storybook).
- *
- * #217 adds the multi-Storyboard dropdown, overflow menu, transport row,
- * and current-Scene highlight. All new fields are optional + defaulted so
- * #216 consumers keep compiling unchanged (plan.md design-fix 3).
- */
+import { SceneFeature } from '../../../../schemas/src/generated/typescript/index.ts';
+
 export interface SceneRowViewModel {
     /** ULID of the Scene. */
     readonly sceneId: string;
@@ -257,5 +247,17 @@ export interface StoryboardPanelProps {
     onCollisionOffset?(): void;
     /** Fires when the analyst clicks Cancel in the collision banner. */
     onCollisionCancel?(): void;
+    /**
+     * Fires whenever a Scene becomes the "current" Scene — panel-row click,
+     * map-rectangle click, transport advance, or playback step (Spec #258 /
+     * FR-002). Hosts wire this to `session.setDisplayMode(scene.properties
+     * .display_mode)` so the captured display mode is restored alongside
+     * the viewport flyTo. Legacy scenes without `display_mode` leave the
+     * time controller untouched (FR-003).
+     *
+     * Article IV.1 — the panel only signals which Scene is now active; the
+     * host applies any time-controller mutation at its own boundary.
+     */
+    onSceneActivated?(scene: SceneFeature): void;
 }
 //# sourceMappingURL=types.d.ts.map

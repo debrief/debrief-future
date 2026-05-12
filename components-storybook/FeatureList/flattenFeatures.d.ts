@@ -1,6 +1,6 @@
 import { DebriefFeature } from '../utils/types';
 
-export type DisplayItemType = 'feature' | 'position' | 'point' | 'polygon' | 'segment' | 'group' | 'sensor' | 'contact';
+export type DisplayItemType = 'feature' | 'storyboard' | 'position' | 'point' | 'polygon' | 'segment' | 'group' | 'sensor' | 'contact';
 export interface DisplayItem {
     /** Discriminator for the row kind */
     type: DisplayItemType;
@@ -20,6 +20,13 @@ export interface DisplayItem {
     feature: DebriefFeature | null;
     /** Child index within parent (null for top-level features) */
     index: number | null;
+    /**
+     * Scene count for `'storyboard'` rows (Spec #258 / FR-013). Always
+     * present on storyboard rows (including empty storyboards, which carry
+     * `childCount: 0` and `isExpandable: false`). Absent on every other row
+     * type.
+     */
+    childCount?: number;
 }
 /**
  * Flatten features + expansion state into a flat array of display items.
