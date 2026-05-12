@@ -3,6 +3,21 @@
 **Branch**: `192-properties-panel-feature-edit` | **Date**: 2026-05-12 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/192-properties-panel-feature-edit/spec.md`
 
+> **⚠️ STALE — needs `/speckit.plan` refresh.**
+> This plan was written before the `/speckit.review` scope expansion. The
+> spec now covers seven user stories (US-1 through US-7) including read-
+> only plot detection, FeatureList multi-select emitter, override→auto-
+> derived revert UX, and vertex-metadata generalisation to non-track
+> annotation geometries (FR-018 through FR-028, SC-009 through SC-012).
+> Plan also needs the agreed corrections from `/speckit.review`:
+> (1A) mark the staging buffer / save→flush / provenance call site /
+> mode extraction as net-new, not extensions; (2A) host the staging
+> buffer in `ActivityPanel` React state, not a new Zustand store;
+> (3A) add an integrated save-path Vitest. Re-run `/speckit.plan` to
+> regenerate research.md (incl. R-008 on cross-geometry vertex-metadata
+> shape), data-model.md, contracts/, and quickstart.md against the
+> updated spec before running `/speckit.tasks`.
+
 ## Summary
 
 Extend the Properties Panel shell shipped in #447 so the in-plot section
