@@ -17,8 +17,8 @@ Alias: fill_color
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
 | [PointProperties](../classes/PointProperties.md) | Styling schema for Point and MultiPoint geometries |  no  |
+| [PolygonProperties](../classes/PolygonProperties.md) | Styling schema for Polygon and MultiPolygon geometries |  no  |
 
 
 

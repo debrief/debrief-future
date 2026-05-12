@@ -17,8 +17,8 @@ Alias: value
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TimeStep](../classes/TimeStep.md) | Step size for discrete time navigation (FR-008) |  no  |
 | [ParameterValue](../classes/ParameterValue.md) | A typed parameter value with replay metadata |  no  |
+| [TimeStep](../classes/TimeStep.md) | Step size for discrete time navigation (FR-008) |  no  |
 
 
 

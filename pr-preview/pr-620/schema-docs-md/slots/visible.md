@@ -17,8 +17,8 @@ Alias: visible
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 | [SensorData](../classes/SensorData.md) | Named sensor with contact measurements |  no  |
+| [SensorContact](../classes/SensorContact.md) | Single sensor measurement record |  no  |
 
 
 

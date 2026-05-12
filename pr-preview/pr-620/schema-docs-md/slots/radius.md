@@ -17,8 +17,8 @@ Alias: radius
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [CircleAnnotationProperties](../classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |  no  |
 | [PointProperties](../classes/PointProperties.md) | Styling schema for Point and MultiPoint geometries |  no  |
+| [CircleAnnotationProperties](../classes/CircleAnnotationProperties.md) | Properties for a CircleAnnotation |  no  |
 
 
 
