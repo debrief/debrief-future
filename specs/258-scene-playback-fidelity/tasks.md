@@ -141,7 +141,7 @@ This feature touches three evidence categories simultaneously:
 
 - [ ] T026 [US1] In `captureScene.ts`, read `session.getState().displayMode` and pass it via the `createScene` input; depends on T025 `apps/vscode/src/commands/captureScene.ts`
 - [ ] T027 [US1] In `storyboardPlayback.executeTransition` (line 621), after `flyToViewport`, conditionally call `session.setDisplayMode(scene.properties.display_mode)` ONLY when slot is present; depends on T023 `apps/vscode/src/services/storyboardPlayback.ts`
-- [ ] T028 [US1] Wire `StoryboardPanel.onSceneActivated` from the VS Code panel host so it routes into `executeTransition` (or a dedicated thin handler that owns the setDisplayMode call); exact host-wiring file discovered during impl; depends on T024, T027 `apps/vscode/src/panels/`
+- [ ] T028 [US1] Wire `StoryboardPanel.onSceneActivated` from the VS Code panel host. The shared panel is instantiated webview-side; the new callback should fire either a new webview→host postMessage OR (simpler) leverage the existing scene-click message path so the host-side `transitionToScene` flow always runs `setDisplayMode` via T027. The two files involved are the webview-side panel mount (`apps/vscode/src/webview/web/storyboardPanel.tsx`) and the host-side message receiver / view holder (`apps/vscode/src/views/storyboardPanelView.ts`). If T027's inline `setDisplayMode` in `executeTransition` is sufficient for all VS Code activation paths (panel click, map click, transport advance), this task collapses to a no-op verification + comment for symmetry with the web-shell. Depends on T024, T027 `apps/vscode/src/webview/web/storyboardPanel.tsx`
 
 #### Web-shell host
 
@@ -161,6 +161,7 @@ This feature touches three evidence categories simultaneously:
 ### Tests for User Story 2 ⚠️
 
 - [ ] T031 [P][test][US2] Unit test: `bboxToPolygon(bounds, 'bounds')` produces a closed `[SW, NW, NE, SE, SW]` ring whose four corners equal `bounds.getSouthWest/getNorthWest/getNorthEast/getSouthEast`. Reject degenerate inputs `shared/components/src/storyboard/__tests__/crud.test.ts`
+- [ ] T031a [P][test][US2] Unit test: extreme-zoom polygon validity (spec.md Edge Case 3). Two fixtures: (i) viewport at zoom 0 / world-wrap (whole-earth bounds — SW≈[-180,-85], NE≈[180,85]); (ii) viewport at max zoom (single tile, sub-meter bounds). For both, assert: closed valid GeoJSON polygon, four distinct corners, non-degenerate area, rendering does not throw `shared/components/src/storyboard/__tests__/crud.test.ts`
 - [ ] T032 [P][test][US2] Unit test: `createScene` populates `_polygon_source: 'bounds'` when called via the new path `shared/components/src/storyboard/__tests__/crud.test.ts`
 - [ ] T033 [P][test][US2] Unit test: `updateScene` (line 643 caller) also routes through `bboxToPolygon` and sets `_polygon_source: 'bounds'` `shared/components/src/storyboard/__tests__/crud.test.ts`
 - [ ] T034 [P][test][US2] Unit test: the third `crud.ts` caller at line 1020 (`restoreScene` / migrate path) propagates `_polygon_source` correctly — legacy scenes keep their `placeholder` / absent value; updates set `'bounds'` `shared/components/src/storyboard/__tests__/crud.test.ts`
@@ -201,6 +202,7 @@ This feature touches three evidence categories simultaneously:
 
 - [ ] T046 [test][US3] Unit test: `SceneRectangleLayer` adds the `debrief-map-feature--selected` className to the polygon when `scene.id === currentSceneId`; omits it otherwise. Existing `debrief-scene-rect--current` class still composed alongside `shared/components/src/MapView/__tests__/SceneRectangleLayer.test.tsx`
 - [ ] T047 [test][US3] Unit test: changing `currentSceneId` removes the halo from the previous scene and applies it to the new one in a single render pass `shared/components/src/MapView/__tests__/SceneRectangleLayer.test.tsx`
+- [ ] T047a [test][US3] Unit test: className composition with simultaneous hover and edit-mode states respects the documented priority order `editing > active > hover > neutral` (spec.md Edge Case 4). E.g. when a rectangle is both active AND being edited, the editing treatment takes visual precedence; when active AND hovered, the halo dominates over the hover style. `shared/components/src/MapView/__tests__/SceneRectangleLayer.test.tsx`
 
 ### Storybook E2E Tests for User Story 3 🎭
 

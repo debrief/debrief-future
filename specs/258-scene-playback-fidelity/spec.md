@@ -102,7 +102,7 @@ A scenario typically contains one (sometimes two) storyboards, each with several
 
 **Active-scene highlight (c):**
 
-- **FR-007**: When a scene becomes the active scene (via panel click, map click, or playback transport advancing to it), its rectangle on the map MUST display the same selection-halo styling that is applied to selected tracks elsewhere in the application (visual parity: same outer-glow colour token, same approximate stroke weight).
+- **FR-007**: When a scene becomes the active scene (via panel click, map click, or playback transport advancing to it), its rectangle on the map MUST display the same selection-halo visual treatment that selected tracks already use elsewhere in the application (visual parity with the existing track-selection halo — implementation-wise this is the shared `debrief-map-feature--selected` CSS class, which composes a drop-shadow + pulse animation; FR-007's intent is *parity with whatever halo treatment tracks currently use*, not a specific colour-token or stroke-weight prescription).
 - **FR-008**: At most one scene rectangle MUST be highlighted at any time; when the active scene changes, the previous highlight MUST be removed before the new one is applied.
 - **FR-009**: When no scene is active, no scene rectangle MUST display the highlight.
 
