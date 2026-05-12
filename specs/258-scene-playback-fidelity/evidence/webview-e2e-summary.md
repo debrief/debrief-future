@@ -20,9 +20,50 @@ The four user-stories in #258 land their behaviour at three layers:
    `StoryboardPanelMount.handleSceneRowClick` restores it on scene-row
    click. VS Code unit tests + web-shell typecheck pass.
 
+## Playwright runs ✅
+
+A new spec at `shared/components/e2e/spec258-screenshots.spec.ts` captures
+seven screenshots driving the new Storybook stories at full theme coverage:
+
+| Test | Pass | Output |
+|---|---|---|
+| FeatureList grouping — collapsed `(N)` badge — light | ✅ | `evidence/screenshots/featurelist-grouping-light.png` |
+| FeatureList grouping — collapsed `(N)` badge — dark | ✅ | `evidence/screenshots/featurelist-grouping-dark.png` |
+| FeatureList grouping — collapsed `(N)` badge — vscode | ✅ | `evidence/screenshots/featurelist-grouping-vscode.png` |
+| FeatureList grouping — expanded children + empty-storyboard disabled chevron — light | ✅ | `evidence/screenshots/featurelist-grouping-expanded-light.png` |
+| Scene rectangle halo on current scene — light | ✅ | `evidence/screenshots/scene-rect-halo-light.png` |
+| Scene rectangle halo on current scene — dark | ✅ | `evidence/screenshots/scene-rect-halo-dark.png` |
+| Scene rectangle halo on current scene — vscode | ✅ | `evidence/screenshots/scene-rect-halo-vscode.png` |
+
+The halo test asserts at the DOM level that exactly one path carries
+`debrief-map-feature--selected` — confirming the screenshot is honest
+(single active scene, FR-008 invariant intact).
+
+**Bug found during screenshot pass**: the original #258 implementation
+passed the halo class via `pathOptions.className`, but react-leaflet v4
+delivers `pathOptions` to Leaflet via `setStyle()` AFTER construction,
+and Leaflet's `setStyle()` does NOT honour the `className` option (it's
+applied only in `_initPath()` at construction). Result: in the rendered
+SVG, scene rectangles had only the default `leaflet-interactive` class —
+no `debrief-scene-rect--current`, no `debrief-map-feature--selected`,
+nowhere for the halo CSS to attach. Fixed by introducing a
+`SceneRectanglePolygon` inner component with a `useEffect`-on-ref that
+writes the class directly to the live SVG `<path>` element (mirrors the
+pattern already used by `TemporalTrackLayer` for selected tracks, just
+adapted from the GeoJSON `onEachFeature` path to react-leaflet's
+`Polygon` ref). Unit tests against the mocked Polygon already passed —
+the mock captured the className prop and asserted on it; the real DOM
+output went unchecked. The Playwright DOM assertion now plugs that gap.
+
+Cloud runner: `shared/components/run-playwright.mjs` (new) extracts
+`@sparticuz/chromium`, starts a static `http-server` for the freshly
+built Storybook, runs Playwright with `CLAUDE_CODE=1`, and tears down
+the server. Mirrors the pattern at
+`apps/web-shell/run-playwright.mjs`.
+
 ## Playwright suites NOT run during this evidence pass
 
-The headline storyboard E2E test files (`storyboard-capture.spec.ts`,
+The web-shell suites (`storyboard-capture.spec.ts`,
 `storyboard-playback-fidelity.spec.ts`) were not regenerated or executed
 as part of this commit. Rationale:
 

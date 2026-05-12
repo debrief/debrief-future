@@ -13,11 +13,20 @@ feature: 258-scene-playback-fidelity
 | The currently-playing scene's rectangle was visually indistinguishable from the others on a busy map | The active scene picks up the same drop-shadow and pulse halo that selected tracks already use |
 | Scenes rendered as peer leaves in the feature list, scattered between tracks and other features | Each Storyboard folds its child Scenes under a single collapsible parent row, mirroring how Tracks group their Positions |
 
+![Active scene rectangle with halo (dark theme)](../evidence/screenshots/scene-rect-halo-dark.png)
+*The currently-playing scene's rectangle picks up the same drop-shadow halo that selected tracks already use. The non-current rectangle (bottom) has no glow.*
+
 ## What We're Building
 
 A storyboard is only as good as the moments it captures. If I frame a wide view of three vessels converging and then a tight close-up on the interception, I want the rectangles on the map to *look* like that — wide, then tight — and I want clicking each one to put the audience back exactly where I left them, including whether they were watching full tracks or just trailing wakes. Four small gaps surfaced during field testing of PR #606 broke that promise in different ways, and this change closes all four together.
 
 Concretely: scenes now carry a `display_mode` (Full or Trail) and restore it on playback alongside the viewport; scene rectangles are computed from the real Leaflet bounds at capture time instead of a placeholder square; the active scene gets the canonical track-selection halo so it's unambiguous on a busy map; and the feature list groups each storyboard's scenes under a collapsible parent row instead of mixing them in with tracks.
+
+![FeatureList collapsed — storyboard parent with (5) scene-count badge](../evidence/screenshots/featurelist-grouping-light.png)
+*The new Storyboard row in `FeatureList` — one collapsible parent with a `(5)` scene-count badge, sitting alongside tracks instead of cluttered between them.*
+
+![FeatureList expanded — five scene children + empty-storyboard disabled chevron](../evidence/screenshots/featurelist-grouping-expanded-light.png)
+*Expanded, the parent reveals its five scene children indented one level. An empty storyboard (bottom) still renders with `(0)` and a disabled chevron — FR-013 — so authors never lose track of a storyboard whose contents they're about to capture.*
 
 ## How It Fits
 

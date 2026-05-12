@@ -9,9 +9,14 @@
  * for the authoritative contract.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Polygon, useMap } from 'react-leaflet';
-import L, { type LatLngTuple, type LeafletMouseEvent, type Map as LeafletMap } from 'leaflet';
+import L, {
+  type LatLngTuple,
+  type LeafletMouseEvent,
+  type Map as LeafletMap,
+  type Polygon as LeafletPolygon,
+} from 'leaflet';
 import type { SceneFeature } from '@debrief/schemas';
 import { useTheme } from '../hooks/useTheme';
 import { getThemeTokens, mergeThemeTokens } from '../ThemeProvider/defaultTheme';
@@ -322,26 +327,94 @@ export function SceneRectangleLayer({
           .filter(Boolean)
           .join(' ');
         return (
-          <Polygon
+          <SceneRectanglePolygon
             key={sceneId}
+            sceneId={sceneId}
             positions={positions}
-            pathOptions={{
-              color: strokeColor,
-              fillColor,
-              fillOpacity: computeFillOpacity(scene, overlapRank, isCurrent),
-              weight: isCurrent ? 2 : 1,
-              opacity: isCurrent ? 0.9 : 0.5,
-              className,
-            }}
-            eventHandlers={{
-              click: (event: LeafletMouseEvent) => {
-                L.DomEvent.stopPropagation(event);
-                onSceneRectangleClick(sceneId);
-              },
-            }}
+            strokeColor={strokeColor}
+            fillColor={fillColor}
+            fillOpacity={computeFillOpacity(scene, overlapRank, isCurrent)}
+            weight={isCurrent ? 2 : 1}
+            opacity={isCurrent ? 0.9 : 0.5}
+            className={className}
+            onSceneRectangleClick={onSceneRectangleClick}
           />
         );
       })}
     </>
+  );
+}
+
+interface SceneRectanglePolygonProps {
+  sceneId: string;
+  positions: LatLngTuple[];
+  strokeColor: string;
+  fillColor: string;
+  fillOpacity: number;
+  weight: number;
+  opacity: number;
+  className: string;
+  onSceneRectangleClick(sceneId: string): void;
+}
+
+/**
+ * Inner component — owns the Leaflet `Polygon` ref so it can apply the
+ * `className` directly to the SVG path element. Spec #258 fix: react-leaflet
+ * v4's `pathOptions.className` is consumed by Leaflet's `setStyle()` which
+ * does NOT propagate `className` to the rendered SVG (Leaflet honours it
+ * only at construction time, but react-leaflet sets style post-construction).
+ * Mutating `path.options.className` + the live SVG element's class attribute
+ * gives the halo CSS something to attach to.
+ */
+function SceneRectanglePolygon({
+  sceneId,
+  positions,
+  strokeColor,
+  fillColor,
+  fillOpacity,
+  weight,
+  opacity,
+  className,
+  onSceneRectangleClick,
+}: SceneRectanglePolygonProps): JSX.Element {
+  const polygonRef = useRef<LeafletPolygon | null>(null);
+
+  useEffect(() => {
+    const layer = polygonRef.current;
+    if (!layer) return;
+    // Persist the class via `layer.options.className` so subsequent Leaflet
+    // redraws (e.g. on style updates) re-emit it.
+    layer.options.className = className;
+    // Apply directly to the rendered SVG path so the change is visible
+    // without waiting for the next Leaflet redraw.
+    const path = (layer as unknown as { _path?: SVGPathElement })._path;
+    if (path) {
+      const existing = path.getAttribute('class') ?? '';
+      const interactive = existing.includes('leaflet-interactive')
+        ? 'leaflet-interactive'
+        : '';
+      path.setAttribute('class', `${interactive} ${className}`.trim());
+    }
+  }, [className]);
+
+  return (
+    <Polygon
+      ref={polygonRef}
+      positions={positions}
+      pathOptions={{
+        color: strokeColor,
+        fillColor,
+        fillOpacity,
+        weight,
+        opacity,
+        className,
+      }}
+      eventHandlers={{
+        click: (event: LeafletMouseEvent) => {
+          L.DomEvent.stopPropagation(event);
+          onSceneRectangleClick(sceneId);
+        },
+      }}
+    />
   );
 }
