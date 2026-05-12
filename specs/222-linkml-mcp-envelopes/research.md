@@ -177,6 +177,8 @@ test that exercises ToolMatch → invoke → LogPanel in
 
 - E11 phase 4 — Tool-result-typing: per-tool input/output shapes;
   expected to open as #228+ after #222–#227 complete.
-- Pre-existing `MCPRequest` in `mcp-common`: A-001 assumes already
-  schema-rooted; if /speckit.tasks discovers otherwise, spawns new
-  backlog item per the assumption's fallback clause.
+- MCP framing site (`services/session-state/src/server/mcp.ts`):
+  `MCPRequest` is hand-typed there today and is migrated to LinkML
+  in scope under FR-001 (see updated A-001). The surrounding
+  framing **logic** (dispatch, correlation) is not refactored —
+  only the envelope shapes move. No follow-up item needed.

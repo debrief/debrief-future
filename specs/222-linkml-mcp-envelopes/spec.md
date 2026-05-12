@@ -390,13 +390,17 @@ phase ledger (`docs/type-audit-2026.md` §5) to record completion.
 
 ## Assumptions
 
-- **A-001**: The MCP JSON-RPC framing layer (method dispatch,
-  request/response correlation, error envelopes) is **already
-  schema-rooted** in `services/mcp-common/` — this feature treats
-  that boundary as a given and only promotes the **payload** shapes
-  inside the JSON-RPC envelope. If `services/mcp-common/` is found
-  to also hand-type envelope framing during planning, that work is
-  **out of scope** and a separate item will be opened.
+- **A-001**: The MCP JSON-RPC framing layer lives at
+  `services/session-state/src/server/mcp.ts` and is **in scope** for
+  this migration — `MCPRequest` (defined as a hand-typed TypeScript
+  interface at that site today) is one of the four envelope classes
+  being promoted to LinkML under FR-001. There is no separate
+  `services/mcp-common/` package: framing and payload shapes co-exist
+  in the same file, so promoting the envelope classes necessarily
+  promotes framing. Method dispatch and request/response correlation
+  logic itself remains TS-only (LinkML describes data shapes, not
+  control flow); only the request/response/error envelope **shapes**
+  move to LinkML.
 - **A-002**: There is no need to preserve backwards compatibility
   with previously-recorded log files that pre-date the audit. If
   fixture-loading widens the schema (per FR-011), the resulting
@@ -448,8 +452,12 @@ phase ledger (`docs/type-audit-2026.md` §5) to record completion.
 - **OOS-003**: Loader↔main IPC envelopes (#225).
 - **OOS-004**: Drift clusters other than `ToolParameter` (#226).
 - **OOS-005**: Storybook / React-component Props rollups (#227).
-- **OOS-006**: Any change to the MCP JSON-RPC framing itself (per
-  A-001) — only the payload shapes are in scope.
+- **OOS-006**: Any change to the MCP JSON-RPC framing **logic**
+  (method dispatch, request/response correlation, transport-layer
+  error handling) at `services/session-state/src/server/mcp.ts`.
+  The envelope **shapes** at that site (e.g. `MCPRequest`) are
+  promoted to LinkML per FR-001 / A-001; the surrounding control
+  flow that consumes them is not refactored here.
 - **OOS-007**: Performance optimisation of the MCP transport. The
   migration MUST NOT regress runtime performance, but no new
   optimisation work is undertaken under this feature.
