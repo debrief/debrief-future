@@ -56,7 +56,12 @@ function MapViewApp(): React.ReactElement {
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number } | undefined>();
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
-  // Drawing state — wired to session-state via message bridge (#108)
+  // Drawing state — host-driven mirror (#108). Authoritative value lives in
+  // the session-state spatial slice on the extension host. These useState
+  // values are seeded by the `webviewReady` flush in mapPanel.ts and kept
+  // fresh by the host's change-subscription push (setDrawingMode /
+  // setDrawingPaletteIndex messages). Do not promote them back to "source
+  // of truth" — write paths go via `drawingModeChanged` to the host.
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
   const [paletteIndex, setPaletteIndex] = useState(0);

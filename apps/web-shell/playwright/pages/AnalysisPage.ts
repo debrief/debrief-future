@@ -390,4 +390,30 @@ export class AnalysisPage {
     // Allow the map to animate to the new bounds
     await this.page.waitForTimeout(500);
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Drawing state introspection (#108)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Read the current drawingMode from the session-state store via the
+   * test-introspection handle exposed at `window.__sessionStore`. Used by
+   * Playwright specs that need to assert the store value directly without
+   * scraping toolbar DOM state.
+   */
+  async getDrawingMode(): Promise<string | null> {
+    return await this.page.evaluate(
+      () => window.__sessionStore.getState().drawingMode,
+    );
+  }
+
+  /**
+   * Read the current drawingPaletteIndex from the session-state store via
+   * the same test-introspection handle.
+   */
+  async getDrawingPaletteIndex(): Promise<number> {
+    return await this.page.evaluate(
+      () => window.__sessionStore.getState().drawingPaletteIndex,
+    );
+  }
 }
