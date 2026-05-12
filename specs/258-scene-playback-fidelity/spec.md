@@ -70,13 +70,14 @@ A scenario typically contains one (sometimes two) storyboards, each with several
 2. **Given** a storyboard parent node is collapsed, **When** the user clicks the disclosure chevron, **Then** its scene children are revealed; clicking again hides them.
 3. **Given** two storyboards in the same document, **When** the Layers panel renders, **Then** each storyboard is its own collapsible parent and scenes never appear under the wrong parent.
 4. **Given** a scene is the currently active scene, **When** its storyboard parent is collapsed, **Then** the author has an unambiguous indication that an active scene exists inside the collapsed group (e.g., the parent inherits the active-state styling).
+5. **Given** a storyboard with N scenes, **When** the storyboard's parent row is rendered (collapsed or expanded), **Then** the row displays the scene count (e.g., `My Scenario (5)`) so the author can compare storyboard sizes at a glance without expanding each one.
 
 ---
 
 ### Edge Cases
 
 - **Legacy scenes without `display_mode`** — must play back without error; the time controller is left untouched (no implicit reset).
-- **Legacy scenes with the placeholder ~100 m polygon** — when next viewed, the rectangle must not appear as a degenerate square. Either the polygon is recomputed from the stored viewport on read, or the saved polygon is migrated on the next storyboard edit. (Acceptable approach: derive the polygon from `viewport.center + viewport.zoom + current map pixel dimensions` on render whenever the stored polygon is detected as the placeholder.)
+- **Legacy scenes with the placeholder ~100 m polygon** — when next viewed, the rectangle must not appear as a degenerate square. Resolution mechanism is metadata-based: each scene records a `_polygon_source` provenance value (`bounds` for new scenes captured from the real viewport, absent or `placeholder` for legacy scenes). When `_polygon_source` is anything other than `bounds`, the rectangle is recomputed from the stored viewport plus current map dimensions at render time. The on-disk geometry is left intact (source preservation); the recompute is read-only.
 - **Viewport captured at an extreme zoom level** (e.g., zoomed out past world wrap, or zoomed in to a single tile) — the polygon must remain a valid four-corner GeoJSON polygon with non-degenerate area; rendering must not crash.
 - **Selection halo collides with other styling** — if the scene rectangle is already styled (hover, edit mode), the active-scene halo composes cleanly with those states (priority order: editing > active > hover > neutral).
 - **Multiple storyboards both expanded** — Layers panel does not double-list a scene; each scene belongs to exactly one storyboard parent.
@@ -97,7 +98,7 @@ A scenario typically contains one (sometimes two) storyboards, each with several
 
 - **FR-004**: When a scene is captured, the system MUST compute the scene-bounds polygon from the actual map viewport's four corners (i.e., the world coordinates of the on-screen top-left, top-right, bottom-right, bottom-left pixels) at the captured zoom.
 - **FR-005**: The computed polygon MUST be a valid closed GeoJSON polygon with non-degenerate area at all supported zoom levels.
-- **FR-006**: When a stored polygon is detected as the legacy ~100 m placeholder, the system MUST recompute it from the stored viewport on next render (or migrate it on next edit), so authors never see a placeholder square for a captured scene.
+- **FR-006**: A scene whose stored polygon is **not** the result of "real bounds at capture time" — either because it's a legacy pre-#258 placeholder, or because its provenance is explicitly not "bounds" — MUST be re-drawn from the stored viewport plus the current map dimensions, so authors never see a placeholder square for a captured scene. Provenance is tracked explicitly (not inferred by geometric heuristic).
 
 **Active-scene highlight (c):**
 
@@ -110,7 +111,7 @@ A scenario typically contains one (sometimes two) storyboards, each with several
 - **FR-010**: The Layers panel MUST render each storyboard as a single collapsible parent row whose children are that storyboard's scenes; scenes MUST NOT appear as peer rows alongside tracks or other features.
 - **FR-011**: The Layers panel MUST support expanding and collapsing each storyboard parent independently, with state persisting for the duration of the session.
 - **FR-012**: When a scene is the active scene and its storyboard parent is collapsed, the parent row MUST indicate that an active scene exists within it (so the author is never "lost" looking for the highlight).
-- **FR-013**: An empty storyboard (no scenes) MUST still render as a parent row, so authors can locate it in the tree.
+- **FR-013**: An empty storyboard (no scenes) MUST still render as a parent row, so authors can locate it in the tree. The row MUST display the scene count (e.g., `(0)`, `(5)`) next to the storyboard name regardless of collapsed/expanded state — empty storyboards show `(0)`.
 
 **Cross-cutting:**
 

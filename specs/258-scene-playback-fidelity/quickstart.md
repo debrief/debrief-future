@@ -23,20 +23,22 @@ pnpm --filter @debrief/schemas test         # generated TS round-trip
 
 **Pass criterion**: a new fixture covering `SceneProperties.display_mode` (both present and absent) loads through both code-paths. Failure here blocks every other step — the rest depends on the regenerated types.
 
-## 2. Unit tests (component library)
+## 2. Unit tests (component library + VS Code service)
 
 ```sh
 pnpm --filter @debrief/components test storyboard/__tests__/crud.test.ts
 pnpm --filter @debrief/components test MapView/__tests__/SceneRectangleLayer.test.tsx
 pnpm --filter @debrief/components test FeatureList/flattenFeatures.test.ts
 pnpm --filter @debrief/components test FeatureList/FeatureList.test.tsx
+pnpm --filter @debrief/vscode test services/__tests__/storyboardPlayback.test.ts
 ```
 
 **Pass criteria**:
-- `crud.test.ts`: `viewportToPolygon` (or its successor `bboxToPolygon`) returns a polygon matching `map.getBounds()`, not a 100 m placeholder.
-- `SceneRectangleLayer.test.tsx`: when `currentSceneId === scene.id`, the rendered polygon carries both `debrief-scene-rect--current` and `debrief-map-feature--selected` CSS classes. Legacy-placeholder polygons are recomputed at render time.
-- `flattenFeatures.test.ts`: a fixture with `STORYBOARD` + 3 × `STORYBOARD_SCENE` produces exactly one row of `type: 'storyboard'` plus 3 child rows (when expanded), zero scene rows at depth 0.
-- `FeatureList.test.tsx`: clicking the chevron on a storyboard parent collapses/expands its children; `hasChildSelected` propagates to the parent when one child is active.
+- `crud.test.ts`: `bboxToPolygon(bounds, 'bounds')` returns a polygon matching `map.getBounds()` corners (not a 100m placeholder); the resulting scene has `_polygon_source: 'bounds'`. All three call sites in `crud.ts` are exercised (`createScene`, `updateScene`, the third caller).
+- `SceneRectangleLayer.test.tsx`: when `currentSceneId === scene.id`, the rendered polygon carries both `debrief-scene-rect--current` and `debrief-map-feature--selected` CSS classes. When `_polygon_source !== 'bounds'` (or absent), the polygon is recomputed at render; when `'bounds'`, the stored geometry is used as-is.
+- `flattenFeatures.test.ts`: a fixture with `STORYBOARD` + 3 × `STORYBOARD_SCENE` produces exactly one row of `type: 'storyboard'` plus 3 child rows (when expanded), zero scene rows at depth 0. The storyboard row has `childCount: 3`. An empty storyboard produces a row with `childCount: 0` and `isExpandable: false`. An orphan scene (no matching parent) is emitted as top-level with a `console.warn`.
+- `FeatureList.test.tsx`: clicking the chevron on a storyboard parent collapses/expands its children; `hasChildSelected` propagates to the parent when one child is active; the `(N)` badge is rendered after the storyboard name regardless of collapse state.
+- `storyboardPlayback.test.ts` (NEW, VS Code): given a scene with `display_mode: 'trail'`, `executeTransition` calls `session.setDisplayMode('trail')` exactly once after `flyToViewport`. Given a scene without `display_mode`, no `setDisplayMode` call is made and no exception is raised. The setter is NOT called from any of the other six `pushSceneRectangles` invocation sites.
 
 ## 3. Web-shell workflow E2E
 
@@ -86,6 +88,9 @@ All three CI steps (lint, typecheck, test — including Playwright) must pass be
 |---|---|
 | `SceneProperties` TS type lacks `display_mode` | Schema regeneration didn't run; rerun `task schemas:regen`. |
 | New Playwright test times out clicking the storyboard parent chevron | The chevron may not be rendered when the parent has zero scenes (FR-013 disabled state); confirm the test's fixture has ≥1 scene. |
-| Scene rectangle is still a tiny square after capture | `captureScene.ts` is still calling the legacy `viewportToPolygon(viewport)` rather than the new `bboxToPolygon(map.getBounds())`; check the diff. |
+| Scene rectangle is still a tiny square after capture | (i) `captureScene.ts` is still calling the legacy `viewportToPolygon(viewport)` rather than the new `bboxToPolygon(map.getBounds(), 'bounds')`; (ii) `_polygon_source` is not being set to `'bounds'` at write time, so the renderer is recomputing from viewport instead of trusting the (correct) stored polygon. Inspect the scene's properties in the saved file. |
 | Halo doesn't appear on the active scene | The class merge in `SceneRectangleLayer.tsx` is missing `debrief-map-feature--selected`. |
-| Time controller doesn't restore Trail | `executeTransition` (or its web equivalent) is missing the `setDisplayMode(scene.properties.display_mode)` call after `flyToViewport`. |
+| Time controller doesn't restore Trail | (i) `StoryboardPanel.onSceneActivated` is not being wired by the host; or (ii) the host's callback handler is missing the `session.setDisplayMode(scene.properties.display_mode)` call. Confirm both VS Code (`storyboardPlayback.executeTransition`) and web-shell (`App.tsx` temporal handler block) subscribe to the new callback. |
+| Updating an existing scene resets it to placeholder polygon | `updateScene` in `crud.ts` still calls the legacy helper. All three call sites (`createScene` line 538, `updateScene` line 643, the third caller around line 1020) must use `bboxToPolygon(bounds, source)`. TypeScript strict-mode should make this a compile error rather than runtime; check that `viewportToPolygon` was deleted, not deprecated. |
+| Storyboard parent row missing the `(N)` badge | `FeatureRow.tsx` is checking `item.type === 'storyboard'` but `flattenFeatures.ts` isn't populating `childCount`. Both ends of the contract are needed. |
+| Empty storyboard's chevron is still active | `flattenFeatures.ts` should set `isExpandable: children.length > 0` on the storyboard row (FR-013). |

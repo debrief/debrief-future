@@ -27,37 +27,63 @@ Schema-level entities touched (one slot added; one tree-row type added). Everyth
 | `thumbnail_asset_ref` | string | ✓ | STAC asset key |
 | `transition_duration_ms` | integer ≥0 | ✓ | Default 500 |
 
-### NEW slot
+### NEW slots
 
 | Slot | Type | Required | Default | Notes |
 |---|---|---|---|---|
 | `display_mode` | `DisplayModeEnum` (`full` \| `trail`) | **false** | _none_ | Reuses enum from `session-state.yaml`. Writers MUST populate; readers MUST tolerate absence (FR-003). |
+| `_polygon_source` | `PolygonSourceEnum` (`bounds` \| `placeholder` \| `manual`) | **false** | _none_ | Provenance of `scene.geometry`. `'bounds'` = computed from real map bounds at capture (post-#258 norm). Absent / `'placeholder'` = legacy pre-#258. `'manual'` reserved for future user-drawn rectangles. Render-side recomputes the polygon when value ≠ `'bounds'`. |
 
 ### LinkML excerpt (intended)
 
 ```yaml
-SceneProperties:
-  is_a: BaseFeatureProperties
-  description: >-
-    Properties class for a Scene child Feature. ...
-  attributes:
-    # ... existing slots unchanged ...
-    display_mode:
-      description: >-
-        Time-controller display mode at capture time (full = entire track
-        history; trail = only the tail behind each platform). Reuses
-        DisplayModeEnum from session-state.yaml. Optional for legacy
-        compatibility; the reader leaves the time controller untouched
-        when this slot is absent.
-      range: DisplayModeEnum
-      required: false
+enums:
+  # ... existing enums unchanged ...
+  PolygonSourceEnum:
+    description: Provenance of a Scene's stored polygon geometry.
+    permissible_values:
+      bounds:
+        description: Polygon computed from real Leaflet map bounds at capture time.
+      placeholder:
+        description: Pre-#258 ~100m placeholder square. Rendered by recomputation.
+      manual:
+        description: Reserved for future user-drawn rectangles.
+
+classes:
+  SceneProperties:
+    is_a: BaseFeatureProperties
+    description: >-
+      Properties class for a Scene child Feature. ...
+    attributes:
+      # ... existing slots unchanged ...
+      display_mode:
+        description: >-
+          Time-controller display mode at capture time (full = entire track
+          history; trail = only the tail behind each platform). Reuses
+          DisplayModeEnum from session-state.yaml. Optional for legacy
+          compatibility; the reader leaves the time controller untouched
+          when this slot is absent.
+        range: DisplayModeEnum
+        required: false
+      _polygon_source:
+        description: >-
+          Provenance of the scene's stored polygon geometry. Render-side
+          consumers recompute the polygon from (viewport, map dimensions)
+          when this value is anything other than 'bounds' (including when
+          the slot is absent, for legacy scenes). The stored geometry is
+          NEVER rewritten on read (Article III.2 source preservation).
+        range: PolygonSourceEnum
+        required: false
 ```
 
 ### Validation rules
 
-- **Enum membership**: `display_mode ∈ {full, trail}` when present (FR-001).
-- **Absence**: a missing `display_mode` is valid and does not raise (FR-003).
-- **Capture invariant** (enforced by callers, not the schema): `display_mode == session.getState().displayMode` at the moment the scene is created.
+- **`display_mode` enum membership**: `display_mode ∈ {full, trail}` when present (FR-001).
+- **`display_mode` absence**: a missing `display_mode` is valid and does not raise (FR-003).
+- **`display_mode` capture invariant** (enforced by callers, not the schema): `display_mode == session.getState().displayMode` at the moment the scene is created.
+- **`_polygon_source` enum membership**: `_polygon_source ∈ {bounds, placeholder, manual}` when present.
+- **`_polygon_source` capture invariant**: a scene created by `bboxToPolygon(map.getBounds(), 'bounds')` MUST have `_polygon_source: 'bounds'`. The two are populated together — they cannot disagree.
+- **`_polygon_source` render contract**: render-side consumers MUST recompute the polygon when `_polygon_source` is absent or ≠ `'bounds'`. They MUST NOT rewrite the stored value (Article III.2).
 
 ### State transitions (playback)
 
@@ -126,23 +152,32 @@ export type DisplayItemType =
 
 A row of type `'storyboard'` is generated when a top-level feature has `kind === 'STORYBOARD'`. Its children are the Scene features (top-level `kind === 'STORYBOARD_SCENE'` features) whose `storyboard_id === parent.id`. Scene rows use type `'feature'` (they are themselves features) but with `parentId === storyboard.id` and `depth === 1`.
 
+Storyboard rows additionally carry a `childCount: number` field (added to the existing `DisplayItem` interface as `childCount?: number`) populated with the number of matching scene features. The count is rendered as a badge after the storyboard name (e.g. `My Scenario (5)`) regardless of expand/collapse state — empty storyboards display `(0)`. The count is recomputed on each `flattenFeatures` call (O(features); negligible at typical scale).
+
 ### Flattening rule (new)
 
 ```
 For each top-level feature f:
   if f.properties.kind === 'STORYBOARD':
+    children = features where kind === 'STORYBOARD_SCENE' AND storyboard_id === f.properties.id
     emit DisplayItem{ type: 'storyboard', id: f.id, depth: 0,
-                       isExpandable: true, parentId: null,
-                       feature: f, label: f.properties.name }
-    if expanded:
-      for each top-level feature s where
-        s.properties.kind === 'STORYBOARD_SCENE'
-        AND s.properties.storyboard_id === f.properties.id:
+                       isExpandable: children.length > 0,         // disabled chevron when empty
+                       parentId: null, feature: f,
+                       label: f.properties.name,
+                       childCount: children.length }              // NEW — drives `(N)` badge
+    if expanded AND children.length > 0:
+      for each s in children (sorted by timestamp ascending):
         emit DisplayItem{ type: 'feature', id: s.id, depth: 1,
                            isExpandable: false, parentId: f.id,
                            feature: s, label: s.properties.title }
   else if f.properties.kind === 'STORYBOARD_SCENE':
-    skip (consumed by the storyboard branch above)
+    if a matching STORYBOARD parent exists in this feature list:
+      skip (consumed by the storyboard branch above)
+    else:
+      // Orphan scene fallback (FR-014 edge case): emit as top-level with a
+      // logged warning. Discoverable, not silent (Article I.3).
+      emit DisplayItem{ type: 'feature', id: s.id, depth: 0, ... }
+      console.warn('Scene with orphan storyboard_id', s.id, s.properties.storyboard_id)
   else:
     [unchanged existing behaviour]
 ```
@@ -162,26 +197,29 @@ For each top-level feature f:
 
 ### Invariants
 
-- **Capture-time**: polygon corners are derived from `map.getBounds()` at the moment of capture. Coordinate order: `[SW, NW, NE, SE, SW]` (closed ring; outer ring only, no holes).
-- **Render-time fallback**: if the stored polygon matches the legacy-placeholder heuristic (C-6 in research.md — both bbox dimensions <0.005° and centre within 0.001° of `viewport.center`), the layer recomputes corners on-the-fly from `(viewport, map.getSize())`. The on-disk value is **not** rewritten.
-- **Validity**: every polygon MUST be a valid closed GeoJSON `Polygon` with non-degenerate area at all supported zoom levels (FR-005).
+- **Capture-time**: polygon corners are derived from `map.getBounds()` at the moment of capture by `bboxToPolygon(bounds, 'bounds')`. Coordinate order: `[SW, NW, NE, SE, SW]` (closed ring; outer ring only, no holes). The scene's `_polygon_source` slot is set to `'bounds'` in the same operation.
+- **Render-time recompute**: `SceneRectangleLayer` checks `_polygon_source`. If `'bounds'`, render `scene.geometry` as-is (the fast path). If absent or any other value, recompute corners from `(viewport, map.getSize())` using `containerPointToLatLng({x:0,y:0})` and `containerPointToLatLng(map.getSize())`. Memoised by `(scene.id, mapZoom)` so a stable pan/zoom doesn't trigger repeated recomputes.
+- **Source preservation**: the on-disk geometry is NEVER rewritten on read. The recomputed polygon is transient — only what's drawn this frame.
+- **Validity**: every polygon (stored or recomputed) MUST be a valid closed GeoJSON `Polygon` with non-degenerate area at all supported zoom levels (FR-005).
 
-### Legacy detection (pseudocode, render-side only)
+### Metadata-driven render decision (pseudocode, render-side)
 
 ```ts
-function isLegacyPlaceholder(polygon: GeoJSONPolygon, viewport: Viewport): boolean {
-  const bbox = computeBbox(polygon);                       // [minLon, minLat, maxLon, maxLat]
-  const widthDeg  = bbox[2] - bbox[0];
-  const heightDeg = bbox[3] - bbox[1];
-  if (widthDeg >= 0.005 || heightDeg >= 0.005) return false;
-
-  const cx = (bbox[0] + bbox[2]) / 2;
-  const cy = (bbox[1] + bbox[3]) / 2;
-  const dx = Math.abs(cx - viewport.center[0]);
-  const dy = Math.abs(cy - viewport.center[1]);
-  return dx < 0.001 && dy < 0.001;
+function pickPolygonForRender(
+  scene: SceneFeature,
+  map: LeafletMap,
+): GeoJSONPolygon {
+  if (scene.properties._polygon_source === 'bounds') {
+    return scene.geometry as GeoJSONPolygon;        // trust capture-time value
+  }
+  // Legacy ('placeholder', 'manual', or absent) — recompute from viewport.
+  return recomputeFromViewport(scene.properties.viewport, map.getSize(), map);
 }
+
+// Memoised in SceneRectangleLayer via useMemo keyed on (scene.id, map.getZoom()).
 ```
+
+No geometric heuristic is used at any point. The decision is explicit and audit-trail-friendly (Article III.1).
 
 ---
 
@@ -233,4 +271,23 @@ Pydantic + TS types  ──▶  @debrief/schemas
                   temporal.ts: displayMode, setDisplayMode
 ```
 
-No new arrows — every consumer relationship is pre-existing. The feature adds payload (one slot + one tree row type) without rewiring the graph.
+One new arrow added by this feature: `StoryboardPanel` now emits an `onSceneActivated(scene)` callback that each host (VS Code and web-shell) wires to its own session.setDisplayMode call. This honours Article IV.1 (shared panel signals; host applies) and resolves the original plan's vague "(web playback service)" handwave.
+
+```
+                                    StoryboardPanel
+                                        │
+                                        │ onSceneActivated(scene)
+                                        │ (NEW callback — both hosts subscribe)
+                ┌───────────────────────┼───────────────────────┐
+                ▼                       │                       ▼
+   apps/vscode (storyboardPlayback     │           apps/web-shell (App.tsx
+     wires callback)                   │              temporal handler wires callback)
+                │                       │                       │
+                └───────────────────────┴───────────────────────┘
+                                        │
+                                        ▼
+                          session.setDisplayMode(scene.properties.display_mode)
+                          (skipped when display_mode is absent — FR-003)
+```
+
+Payload additions: one new SceneProperties slot (`display_mode`), one new SceneProperties provenance slot (`_polygon_source`), one new DisplayItemType (`'storyboard'`), one new DisplayItem field (`childCount`).

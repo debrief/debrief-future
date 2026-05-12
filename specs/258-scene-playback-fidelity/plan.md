@@ -7,10 +7,10 @@
 
 Close four tightly-coupled gaps in the storyboard-scene workflow exposed by PR #606 field testing:
 
-- **(a) Display mode persistence** — add `display_mode` (`full | trail`) to `SceneProperties` in `shared/schemas/src/linkml/storyboard.yaml`; have both capture commands (`apps/vscode/src/commands/captureScene.ts`, `apps/web-shell/src/commands/captureSceneWeb.ts`) read it from the session-state Zustand slice and pass it into `createScene`; have `storyboardPlayback.executeTransition` (and its web equivalent) call `session.getState().setDisplayMode(scene.properties.display_mode)` alongside the existing `flyToViewport`. Legacy scenes (no `display_mode`) leave the time controller untouched.
-- **(b) Viewport polygon fidelity** — replace the `±0.001°` placeholder in `shared/components/src/storyboard/crud.ts:111-123` with a four-corner polygon derived from the actual Leaflet map bounds at capture time. Render-side fallback: when `SceneRectangleLayer` detects the placeholder shape (heuristic: square of ~0.002° side at scene centre), recompute from `(viewport, map.getSize())` so legacy scenes never display the placeholder again.
+- **(a) Display mode persistence** — add `display_mode` (`full | trail`) to `SceneProperties` in `shared/schemas/src/linkml/storyboard.yaml`; have both capture commands (`apps/vscode/src/commands/captureScene.ts`, `apps/web-shell/src/commands/captureSceneWeb.ts`) read it from the session-state Zustand slice and pass it into `createScene`. Restoration on playback uses a new `onSceneActivated(scene)` callback prop on `StoryboardPanel` — the panel emits, each host wires the callback at its boundary: VS Code routes it into `storyboardPlayback.executeTransition`, web-shell routes it into the `App.tsx` temporal handler. Both hosts call `session.getState().setDisplayMode(scene.properties.display_mode)` only when the slot is present; legacy scenes (no `display_mode`) leave the time controller untouched.
+- **(b) Viewport polygon fidelity** — replace the `±0.001°` placeholder in `shared/components/src/storyboard/crud.ts:111-123` with a four-corner polygon derived from the actual Leaflet map bounds at capture time. The legacy helper `viewportToPolygon(viewport)` is replaced by `bboxToPolygon(bounds: LatLngBounds, source: PolygonSource)` and propagated to **all three** call sites in `crud.ts` (`createScene` line 538, `updateScene` line 643, the third caller around line 1020). Every scene records its polygon provenance in a new `_polygon_source` slot (`bounds` | `placeholder` | `manual`); legacy scenes (slot absent) are treated as `placeholder` and recomputed at render time from `(viewport, map.getSize())`. No fragile geometric heuristic.
 - **(c) Active-scene halo** — extend the existing `debrief-scene-rect--current` class in `SceneRectangleLayer` so it applies the same `debrief-map-feature--selected` styling already used by `TemporalTrackLayer` (drop-shadow + pulse animation in `MapView.css`). Single-active invariant maintained by the existing `currentSceneId` prop pipeline.
-- **(d) FeatureList grouping** — extend `shared/components/src/FeatureList/flattenFeatures.ts` so `STORYBOARD` features become collapsible parent rows whose children are their `STORYBOARD_SCENE` features (matching the same parent/child pattern already used for `Track → Position` rows). Active-scene state propagates to a collapsed parent via the existing `hasChildSelected` helper.
+- **(d) FeatureList grouping** — extend `shared/components/src/FeatureList/flattenFeatures.ts` so `STORYBOARD` features become collapsible parent rows whose children are their `STORYBOARD_SCENE` features (matching the same parent/child pattern already used for `Track → Position` rows). Active-scene state propagates to a collapsed parent via the existing `hasChildSelected` helper. The storyboard parent row displays a scene-count badge (e.g. `My Scenario (5)`) so authors can compare storyboard sizes without expanding.
 
 The work crosses LinkML schema, Pydantic + TypeScript regeneration, two frontends (VS Code + web-shell), and one component-library tree. All four gaps ship together (SC-006).
 
@@ -94,25 +94,29 @@ shared/schemas/src/
 
 shared/components/src/
 ├── storyboard/
-│   ├── crud.ts                        # REPLACE viewportToPolygon with real corner math; thread display_mode through createScene
-│   └── __tests__/crud.test.ts         # extend with display_mode + polygon-from-bounds cases
+│   ├── crud.ts                        # REPLACE viewportToPolygon(viewport) with bboxToPolygon(bounds, source); update ALL 3 call sites (createScene 538, updateScene 643, line 1020 caller)
+│   └── __tests__/crud.test.ts         # extend with display_mode + polygon-from-bounds + _polygon_source cases
 ├── MapView/
-│   ├── SceneRectangleLayer.tsx        # apply debrief-map-feature--selected to current; legacy-placeholder recompute on render
+│   ├── SceneRectangleLayer.tsx        # apply debrief-map-feature--selected to current; metadata-driven recompute (when _polygon_source !== 'bounds') memoised by (scene.id, mapZoom)
 │   ├── MapView.css                    # (existing) selection-halo CSS — reused, no edit needed
-│   └── __tests__/SceneRectangleLayer.test.tsx   # extend with halo + recompute cases
-└── FeatureList/
-    ├── flattenFeatures.ts             # ADD 'storyboard' DisplayItemType; group STORYBOARD_SCENE under STORYBOARD parent
-    ├── FeatureRow.tsx                 # if needed: render storyboard parent + indented scene children
-    ├── flattenFeatures.test.ts        # extend with grouping cases
-    └── FeatureList.test.tsx           # extend with collapse/expand of storyboard parent
+│   └── __tests__/SceneRectangleLayer.test.tsx   # extend with halo + metadata-recompute cases
+├── FeatureList/
+│   ├── flattenFeatures.ts             # ADD 'storyboard' DisplayItemType; group STORYBOARD_SCENE under STORYBOARD parent; compute childCount for badge
+│   ├── FeatureRow.tsx                 # render storyboard parent + indented scene children; render `(N)` scene-count badge on storyboard rows
+│   ├── flattenFeatures.test.ts        # extend with grouping + childCount cases
+│   ├── FeatureList.test.tsx           # extend with collapse/expand + count badge
+│   └── FeatureList.stories.tsx        # extend with Storyboard Grouping story
+└── panels/StoryboardPanel/
+    └── types.ts + StoryboardPanel.tsx  # ADD onSceneActivated?: (scene: SceneFeature) => void callback prop — emitted whenever scene becomes the current scene
 
 apps/vscode/src/
-├── commands/captureScene.ts           # READ session.displayMode; pass through to createScene
-└── services/storyboardPlayback.ts     # in executeTransition, after flyToViewport: session.setDisplayMode(scene.properties.display_mode)
+├── commands/captureScene.ts           # READ session.displayMode; pass through to createScene with bboxToPolygon(map.getBounds(), 'bounds')
+├── services/storyboardPlayback.ts     # in executeTransition: after flyToViewport, forward to host-bound onSceneActivated which calls session.setDisplayMode (when present)
+└── services/__tests__/storyboardPlayback.test.ts   # NEW (targeted): assert setDisplayMode fires once per transition when display_mode present; skipped when absent
 
 apps/web-shell/src/
-├── commands/captureSceneWeb.ts        # mirror of captureScene.ts
-└── (services that own the web playback equivalent — same pattern)
+├── commands/captureSceneWeb.ts        # mirror of captureScene.ts (display_mode + bboxToPolygon)
+└── App.tsx                            # subscribe to StoryboardPanel.onSceneActivated; route to session.setDisplayMode in the temporal handler block
 
 apps/web-shell/playwright/
 ├── pages/StoryboardEditPage.ts        # extend with display-mode toggle accessor + rectangle-bounds assertion helpers
@@ -179,3 +183,23 @@ apps/web-shell/playwright/
 ## Complexity Tracking
 
 *No Constitution Check violations — section intentionally empty.*
+
+## Review Outcomes (2026-05-12, compressed `/speckit.review`)
+
+Four review issues resolved + three previously-deferred items absorbed back into scope. NEW-D (drag-to-reorder scenes) explicitly rejected — temporal order is the only logical ordering for scenes.
+
+| # | Issue / Item | Decision | Where applied |
+|---|---|---|---|
+| 1A | Web-shell playback integration point undefined | Add `onSceneActivated?: (scene) => void` callback prop on `StoryboardPanel`; both hosts wire setDisplayMode at host boundary (Article IV.1 — panel signals, host applies) | `panels/StoryboardPanel/types.ts`, VS Code `storyboardPlayback.ts`, web-shell `App.tsx` |
+| 2A | `viewportToPolygon` has 3 call sites, plan addressed 1 | Change signature → `bboxToPolygon(bounds, source)`; TypeScript enforces update at all 3 sites (createScene 538, updateScene 643, line 1020) | `shared/components/src/storyboard/crud.ts` |
+| 3A | VS Code `executeTransition` had no unit coverage | Add one targeted unit test asserting `setDisplayMode` fires-with-value when slot present, skipped when absent (~20 LOC) | `apps/vscode/src/services/__tests__/storyboardPlayback.test.ts` (new) |
+| 4A | (Obsoleted by NEW-A + NEW-B below) | Render-side heuristic dropped entirely; performance question moot | — |
+| NEW-A | Render-side legacy-polygon recompute, but metadata-driven not geometric | `SceneRectangleLayer` consults `_polygon_source`; recomputes from `(viewport, map.getSize())` when value ≠ `bounds`. Memoised by `(scene.id, mapZoom)` | `shared/components/src/MapView/SceneRectangleLayer.tsx` |
+| NEW-B | Add `_polygon_source` provenance slot (`bounds` \| `placeholder` \| `manual`) on `SceneProperties` | New LinkML slot; required: false (legacy scenes treated as `placeholder` when absent). Article III.1 — provenance always | `shared/schemas/src/linkml/storyboard.yaml`; regenerated types + tests |
+| NEW-C | Scene-count badge on Storyboard parent row | `FeatureRow` renders `name (N)` on storyboard rows; counts include scenes whether expanded or collapsed; empty storyboards show `(0)` | `shared/components/src/FeatureList/FeatureRow.tsx` + `flattenFeatures.ts` (computes `childCount`) |
+| NEW-D | Drag-to-reorder scenes inside parent | **REJECTED** — temporal order is the only logical ordering for scenes | — |
+
+**Files touched by absorbed items (delta from original plan)**: +1 (StoryboardPanel types/callback wiring), +1 (VS Code `storyboardPlayback.test.ts`), +0 (the FeatureRow / flattenFeatures edits already in scope). Net: ~18 files (still above the 8-file smell threshold, but the original spec.md's tight-coupling rationale + SC-006 make this the deliberate envelope, not creep).
+
+**Constitution Check post-review**: still PASS. NEW-B reinforces Article III.1 (provenance always) and NEW-A consolidates Article IV.1 (panel doesn't reach into the time-controller; host does).
+
