@@ -162,6 +162,15 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
    * Handle temporal state changes from session
    */
   private _handleTemporalChange(temporal: TemporalSlice): void {
+    // DIAGNOSTIC (PR #606) — investigating why slider doesn't move
+    // when storyboard click updates session.currentTime. Remove after.
+    console.warn('[timeRangeView][diag] _handleTemporalChange fired', {
+      hasView: this._view !== undefined,
+      isWebviewReady: this._isWebviewReady,
+      currentTime: temporal.currentTime,
+      timeRange: temporal.timeRange,
+      scrubbableOverride: this._scrubbableOverride,
+    });
     // Update time extent if changed
     if (temporal.timeRange) {
       const newExtent = {
@@ -386,6 +395,17 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
    * Post message to webview, queueing if not ready
    */
   private _postMessage(message: Record<string, unknown>): void {
+    // DIAGNOSTIC (PR #606) — track every outbound message + queueing.
+    // Remove after triage.
+    if (message['type'] === 'setCurrentTime' || message['type'] === 'updateTimeExtent') {
+      console.warn('[timeRangeView][diag] _postMessage', {
+        type: message['type'],
+        willQueue: !(this._isWebviewReady && this._view),
+        isWebviewReady: this._isWebviewReady,
+        hasView: this._view !== undefined,
+        message,
+      });
+    }
     if (this._isWebviewReady && this._view) {
       void this._view.webview.postMessage(message);
     } else {
