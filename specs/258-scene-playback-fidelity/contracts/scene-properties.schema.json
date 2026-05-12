@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.dev/schemas/258/scene-properties.diff.json",
+  "title": "SceneProperties — incremental contract for spec #258",
+  "description": "JSON Schema fragment showing the additive change to SceneProperties contributed by feature #258. The final generated schema (emitted from storyboard.yaml by gen-json-schema) will subsume this; this file is the authoritative human-readable contract for the slot added by this feature.",
+  "type": "object",
+  "properties": {
+    "display_mode": {
+      "title": "Time-controller display mode at capture time",
+      "description": "Captured value of the session-state Zustand store's displayMode at the moment the scene was created. On playback, the host calls session.setDisplayMode(display_mode) as part of executeTransition (alongside flyToViewport). The slot is OPTIONAL to permit legacy scenes (pre-#258) to load without modification; the reader leaves the time-controller untouched when the slot is absent.",
+      "type": "string",
+      "enum": ["full", "trail"]
+    }
+  },
+  "required": [],
+  "x-debrief-contract": {
+    "feature": "258-scene-playback-fidelity",
+    "linkml_source": "shared/schemas/src/linkml/storyboard.yaml#/classes/SceneProperties/attributes/display_mode",
+    "enum_source": "shared/schemas/src/linkml/session-state.yaml#/enums/DisplayModeEnum",
+    "writer_invariant": "display_mode === session.getState().displayMode at the moment of createScene",
+    "reader_invariant_present": "executeTransition MUST call session.setDisplayMode(display_mode)",
+    "reader_invariant_absent": "executeTransition MUST NOT change the current displayMode and MUST NOT raise"
+  }
+}
