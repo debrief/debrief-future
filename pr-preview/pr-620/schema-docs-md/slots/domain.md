@@ -17,8 +17,8 @@ Alias: domain
 
 | Name | Description | Modifies Slot |
 | --- | --- | --- |
-| [TrackProperties](../classes/TrackProperties.md) | Properties for a TrackFeature |  no  |
 | [PlatformRecord](../classes/PlatformRecord.md) | Fully-resolved metadata for a single platform within a STAC item |  no  |
+| [TrackProperties](../classes/TrackProperties.md) | Properties for a TrackFeature |  no  |
 
 
 
