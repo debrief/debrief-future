@@ -384,5 +384,38 @@ describe('useTimePlayback', () => {
 
       expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
     });
+
+    it('does not roll back internal advancement while playing (PR #606)', () => {
+      // Real-world hazard: during playback the RAF loop advances
+      // currentTime and fires onTimeChange, which the host round-trips
+      // back to us as a new initialTime. If we naively synced every
+      // prop change, we'd continuously roll state back to a stale tick.
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const t0 = NOW;
+
+      const { result, rerender } = renderHook(
+        ({ initialTime }: { initialTime: number }) =>
+          useTimePlayback({ timeExtent, initialTime }),
+        { initialProps: { initialTime: t0 } },
+      );
+
+      act(() => {
+        result.current.play();
+      });
+      expect(result.current.playbackState).toBe('playing');
+
+      // Internal advancement simulates a few RAF ticks ahead of where
+      // the host's round-trip will eventually catch up to.
+      act(() => {
+        result.current.setCurrentTime(NOW + 5 * 60 * 1000);
+      });
+      expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
+
+      // Host round-trip lands with a stale (older) time value — must
+      // be ignored because playbackState === 'playing'.
+      rerender({ initialTime: NOW + 2 * 60 * 1000 });
+
+      expect(result.current.currentTime).toBe(NOW + 5 * 60 * 1000);
+    });
   });
 });

@@ -45,24 +45,6 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
 
   // State
   const [currentTime, setCurrentTimeState] = useState(defaultInitialTime);
-
-  // PR #606: `initialTime` is named after the uncontrolled-component
-  // convention, but in practice the host pushes time updates through
-  // it whenever the session's currentTime changes (e.g. a storyboard
-  // scene click). Without this sync the slider stays where it was on
-  // mount and only the internal time advances during playback. We
-  // track the last seen prop value in a ref so internal playback
-  // increments (which also flow back through onTimeChange → host
-  // session → temporal:update → new initialTime) don't fight
-  // user-driven playback: the effect only writes state when the
-  // *prop* actually changes, not when state already matches.
-  const lastInitialTimeRef = useRef(initialTime);
-  useEffect(() => {
-    if (initialTime === undefined) {return;}
-    if (initialTime === lastInitialTimeRef.current) {return;}
-    lastInitialTimeRef.current = initialTime;
-    setCurrentTimeState(initialTime);
-  }, [initialTime]);
   // Feature 205 / FR-024: the hook's internal state is initialised to 'paused'
   // and only ever written as 'playing' or 'paused' — 'stopped' is not reachable
   // from the hook's own setters. The public PlaybackState surface accepts all
@@ -71,6 +53,30 @@ export function useTimePlayback(options: UseTimePlaybackOptions): UseTimePlaybac
   // is rendered identically to 'paused'. See docs/project_notes/decisions.md.
   const [playbackState, setPlaybackStateInternal] = useState<PlaybackState>('paused');
   const [speed, setSpeedState] = useState<PlaybackSpeed>(initialSpeed);
+
+  // PR #606: `initialTime` is named after the uncontrolled-component
+  // convention, but in practice the host pushes time updates through
+  // it whenever the session's currentTime changes (e.g. a storyboard
+  // scene click). Without this sync the slider stays where it was on
+  // mount.
+  //
+  // During playback the RAF loop also advances `currentTime` and fires
+  // `onTimeChange`, which the host may round-trip back to us as a new
+  // `initialTime` value. Naively syncing every prop change would
+  // continuously roll state back to a stale RAF tick. So:
+  //   - skip the sync while playbackState === 'playing'
+  //   - track the last seen prop value so an unrelated re-render with
+  //     the same `initialTime` doesn't re-trigger
+  const lastInitialTimeRef = useRef(initialTime);
+  useEffect(() => {
+    if (initialTime === undefined) {return;}
+    if (initialTime === lastInitialTimeRef.current) {return;}
+    lastInitialTimeRef.current = initialTime;
+    // Don't clobber RAF-driven advancement while the user is playing —
+    // host round-trips would otherwise constantly drag us backwards.
+    if (playbackState === 'playing') {return;}
+    setCurrentTimeState(initialTime);
+  }, [initialTime, playbackState]);
 
   // Refs for animation loop
   const animationFrameRef = useRef<number | null>(null);
