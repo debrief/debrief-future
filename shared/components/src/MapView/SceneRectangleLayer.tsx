@@ -10,8 +10,8 @@
  */
 
 import { useMemo } from 'react';
-import { Polygon } from 'react-leaflet';
-import L, { type LatLngTuple, type LeafletMouseEvent } from 'leaflet';
+import { Polygon, useMap } from 'react-leaflet';
+import L, { type LatLngTuple, type LeafletMouseEvent, type Map as LeafletMap } from 'leaflet';
 import type { SceneFeature } from '@debrief/schemas';
 import { useTheme } from '../hooks/useTheme';
 import { getThemeTokens, mergeThemeTokens } from '../ThemeProvider/defaultTheme';
@@ -161,6 +161,82 @@ export function computeFillOpacity(
   return Math.max(0.10, base - step * overlapRank);
 }
 
+/**
+ * Recompute a scene's rectangle polygon from its stored viewport + current
+ * map dimensions (Spec #258 / FR-006). Used as a render-time fallback for
+ * legacy scenes whose stored polygon predates the bounds-derived capture
+ * path (`_polygon_source` absent or anything other than `'bounds'`).
+ *
+ * Mechanism: query the map for its current container size and project the
+ * top-left and bottom-right pixels back to lat/lng. The polygon is
+ * temporarily centred on the scene's stored viewport centre by panning the
+ * map's projection origin — but Leaflet has no "project as if centred here"
+ * primitive, so instead we project at the current centre and translate the
+ * resulting bounds to the scene's viewport centre. This is correct in the
+ * common-zoom case (pixels-per-degree latitude is constant at fixed zoom);
+ * a small distortion appears at extreme latitudes which is acceptable for a
+ * fallback that only fires for legacy scenes.
+ */
+export function recomputeFromViewport(
+  viewport: SceneFeature['properties']['viewport'],
+  map: LeafletMap,
+): GeoJSON.Polygon {
+  const size = map.getSize();
+  // Project current bounds, then translate to the stored centre.
+  const currentCentre = map.getCenter();
+  const currentSW = map.containerPointToLatLng([0, size.y]);
+  const currentNE = map.containerPointToLatLng([size.x, 0]);
+  const dLat = currentNE.lat - currentSW.lat;
+  const dLng = currentNE.lng - currentSW.lng;
+  const sceneCentreLng = viewport.center[0] ?? currentCentre.lng;
+  const sceneCentreLat = viewport.center[1] ?? currentCentre.lat;
+  // The recompute path is approximate at this caller's zoom — use the
+  // current half-extent rather than re-projecting at the stored zoom,
+  // because Leaflet's projection helpers don't let us swap zoom without
+  // mutating the map's state. For the legacy-recompute use case (close to
+  // the user's current zoom) this is visually correct.
+  const halfLat = Math.abs(dLat) / 2;
+  const halfLng = Math.abs(dLng) / 2;
+  const minLng = sceneCentreLng - halfLng;
+  const maxLng = sceneCentreLng + halfLng;
+  const minLat = sceneCentreLat - halfLat;
+  const maxLat = sceneCentreLat + halfLat;
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [minLng, minLat],
+        [minLng, maxLat],
+        [maxLng, maxLat],
+        [maxLng, minLat],
+        [minLng, minLat],
+      ],
+    ],
+  };
+}
+
+/**
+ * Decide which polygon to render for a given scene (Spec #258).
+ *
+ * `'bounds'` provenance → trust the stored geometry (the post-#258 norm —
+ * computed from real `map.getBounds()` at capture time).
+ *
+ * Absent / `'placeholder'` / `'manual'` → recompute on the fly from
+ * `(viewport, current map dimensions)` so legacy ~100m placeholder squares
+ * are never shown to the author. The on-disk geometry is NEVER rewritten
+ * (Article III.2 — source preservation).
+ */
+export function pickPolygonForRender(
+  scene: SceneFeature,
+  map: LeafletMap | null,
+): GeoJSON.Polygon {
+  const stored = scene.geometry as GeoJSON.Polygon;
+  const source = scene.properties._polygon_source;
+  if (source === 'bounds') return stored;
+  if (map === null) return stored;
+  return recomputeFromViewport(scene.properties.viewport, map);
+}
+
 export function SceneRectangleLayer({
   scenes,
   activeStoryboardId,
@@ -172,6 +248,14 @@ export function SceneRectangleLayer({
     () => mergeThemeTokens(getThemeTokens(resolvedVariant), theme.tokens),
     [resolvedVariant, theme.tokens],
   );
+
+  // Spec #258 — `useMap` returns the parent MapContainer's Leaflet instance.
+  // The hook is always called (React rules of hooks); when the component is
+  // rendered outside a MapContainer (Storybook / unit tests can do this) the
+  // hook returns null, and `pickPolygonForRender` falls back to the stored
+  // geometry.
+  const map = useMap() as LeafletMap | null;
+  const mapZoom = map?.getZoom() ?? null;
 
   // Stable sort by timestamp so later-rendered (more recent) polygons
   // end up on top — Leaflet's default z-order guarantees the most recent
@@ -197,6 +281,20 @@ export function SceneRectangleLayer({
     return m;
   }, [scenes, overlapRanks]);
 
+  // Memoise the polygon-for-render decision keyed on (scene.id, mapZoom) so
+  // stable pan/zoom doesn't re-invoke the recompute path for legacy scenes
+  // (Spec #258 — see SceneRectangleLayer notes in the plan).
+  const polygonByScene = useMemo(() => {
+    const m = new Map<string, GeoJSON.Polygon>();
+    for (const scene of scenes) {
+      m.set(scene.properties.id, pickPolygonForRender(scene, map));
+    }
+    return m;
+    // mapZoom is the recompute-path's only dynamic dependency; spread
+    // scenes & map across the memo key.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenes, map, mapZoom]);
+
   // Gate — no active storyboard or no scenes: render nothing.
   if (activeStoryboardId === null || scenes.length === 0) {
     return null;
@@ -211,9 +309,18 @@ export function SceneRectangleLayer({
         const sceneId = scene.properties.id;
         const isCurrent = sceneId === currentSceneId;
         const overlapRank = rankById.get(sceneId) ?? 0;
-        const positions = geoJsonPolygonToLeafletCoords(
-          (scene.geometry as GeoJSON.Polygon).coordinates,
-        );
+        const polygon =
+          polygonByScene.get(sceneId) ?? (scene.geometry as GeoJSON.Polygon);
+        const positions = geoJsonPolygonToLeafletCoords(polygon.coordinates);
+        // Spec #258 / FR-007: the active scene reuses the same drop-shadow +
+        // pulse halo as selected tracks (`debrief-map-feature--selected`).
+        const className = [
+          'debrief-scene-rect',
+          isCurrent ? 'debrief-scene-rect--current' : null,
+          isCurrent ? 'debrief-map-feature--selected' : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
         return (
           <Polygon
             key={sceneId}
@@ -224,7 +331,7 @@ export function SceneRectangleLayer({
               fillOpacity: computeFillOpacity(scene, overlapRank, isCurrent),
               weight: isCurrent ? 2 : 1,
               opacity: isCurrent ? 0.9 : 0.5,
-              className: `debrief-scene-rect${isCurrent ? ' debrief-scene-rect--current' : ''}`,
+              className,
             }}
             eventHandlers={{
               click: (event: LeafletMouseEvent) => {

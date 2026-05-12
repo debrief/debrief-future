@@ -37,6 +37,7 @@ setUseStrictShallowCopy(false);
 import type {
   GeoJSONPolygon,
   LogEntry,
+  PolygonSource,
   SceneProperties,
   StoryboardProperties,
   Viewport,
@@ -108,11 +109,44 @@ function makeBoundingPolygon(
   };
 }
 
-function viewportToPolygon(viewport: Viewport): GeoJSONPolygon {
-  // MVP: derive a minimal square around the center using a tiny delta in
-  // degrees. Downstream specs (#217) will replace this with a true bbox
-  // computation from zoom. We keep a non-degenerate polygon so schema
-  // validation passes.
+/**
+ * Structural bounds-shape used by Spec #258 scene capture. Keeps `crud.ts`
+ * platform-agnostic — callers convert Leaflet's `LatLngBounds` (or any other
+ * source) to this POJO before invoking `createScene` / `updateScene`.
+ */
+export interface SceneBounds {
+  /** Western longitude in degrees (-180 to 180). */
+  readonly west: number;
+  /** Southern latitude in degrees (-90 to 90). */
+  readonly south: number;
+  /** Eastern longitude in degrees (-180 to 180). */
+  readonly east: number;
+  /** Northern latitude in degrees (-90 to 90). */
+  readonly north: number;
+}
+
+/**
+ * Convert a four-corner bounding box to a closed GeoJSON Polygon ring
+ * `[SW, NW, NE, SE, SW]`. The `source` value is informational — callers
+ * persist it on the scene's `_polygon_source` slot for render-side
+ * provenance (Spec #258 / FR-006).
+ */
+export function bboxToPolygon(
+  bounds: SceneBounds,
+  _source: PolygonSource,
+): GeoJSONPolygon {
+  return makeBoundingPolygon(bounds.west, bounds.south, bounds.east, bounds.north);
+}
+
+/**
+ * Legacy fallback when callers do not supply real bounds (e.g. headless
+ * callers that only have a `Viewport`). Synthesises a non-degenerate ~100m
+ * square around the viewport centre — schema-valid but visually misleading.
+ * Spec #258 / FR-006 expects render-side consumers to recompute the polygon
+ * when `_polygon_source !== 'bounds'`, so this fallback is no longer the
+ * audience-facing rectangle.
+ */
+function placeholderPolygonFromViewport(viewport: Viewport): GeoJSONPolygon {
   const lon = viewport.center[0];
   const lat = viewport.center[1];
   if (lon === undefined || lat === undefined) {
@@ -450,6 +484,24 @@ export interface CreateSceneInput {
   title?: string;
   description?: string;
   viewport: Viewport;
+  /**
+   * Real map bounds at capture time (Spec #258 / FR-004). When supplied, the
+   * scene's stored polygon is `bboxToPolygon(bounds, polygonSource ?? 'bounds')`
+   * and `_polygon_source` is recorded so the renderer trusts the on-disk
+   * geometry. When omitted, the scene falls back to the pre-#258 placeholder
+   * polygon and `_polygon_source` defaults to `'placeholder'` — the renderer
+   * then recomputes the rectangle from `(viewport, map dimensions)` at draw
+   * time (FR-006).
+   */
+  bounds?: SceneBounds;
+  /** Polygon provenance — defaults to `'bounds'` when `bounds` is provided,
+   *  `'placeholder'` otherwise. Explicit override permitted for restore /
+   *  migrate paths that preserve historical provenance. */
+  polygonSource?: PolygonSource;
+  /** Time-controller display mode at capture time (Spec #258 / FR-001).
+   *  Optional — legacy capture call sites omit it; readers tolerate the
+   *  slot being absent on playback (FR-003). */
+  displayMode?: SceneProperties["display_mode"];
   timestamp: string;
   visibleFeatureIds: string[];
   thumbnailAssetRef: string;
@@ -517,6 +569,12 @@ export async function createScene(
     activityId,
     rationale: input.rationale,
   });
+  const polygonSource: PolygonSource =
+    input.polygonSource ?? (input.bounds !== undefined ? "bounds" : "placeholder");
+  const geometry =
+    input.bounds !== undefined
+      ? bboxToPolygon(input.bounds, polygonSource)
+      : placeholderPolygonFromViewport(input.viewport);
   const props: SceneProperties = {
     kind: "STORYBOARD_SCENE",
     id: newId,
@@ -529,13 +587,15 @@ export async function createScene(
     feature_set_hash: hash,
     thumbnail_asset_ref: input.thumbnailAssetRef,
     transition_duration_ms: input.transitionDurationMs ?? 500,
+    ...(input.displayMode !== undefined && { display_mode: input.displayMode }),
+    _polygon_source: polygonSource,
     tags: [],
     provenance: [logEntry],
   };
   const sceneFeature: SceneFeature = {
     type: "Feature",
     id: newId,
-    geometry: viewportToPolygon(input.viewport),
+    geometry,
     properties: props,
   };
   const nextPlot = appendFeatureAndRecomputeHull(
@@ -550,6 +610,13 @@ export interface UpdateScenePatch {
   title?: string;
   description?: string;
   viewport?: Viewport;
+  /** Spec #258 — see {@link CreateSceneInput.bounds}. When supplied alongside
+   *  a viewport change, the polygon is regenerated from these bounds and
+   *  `_polygon_source` is set to `'bounds'`. */
+  bounds?: SceneBounds;
+  polygonSource?: PolygonSource;
+  /** Spec #258 — see {@link CreateSceneInput.displayMode}. */
+  displayMode?: SceneProperties["display_mode"];
   timestamp?: string;
   visibleFeatureIds?: string[];
   thumbnailAssetRef?: string;
@@ -619,6 +686,16 @@ export async function updateScene(
   // and reuse every other Feature reference. This bypasses immer's per-
   // Feature draft proxy creation, which dominates p95 at 100k+ positions
   // (FR-TEST-024).
+  let nextPolygonSource: PolygonSource | undefined;
+  let nextGeometry: GeoJSONPolygon | undefined;
+  if (patch.viewport !== undefined) {
+    nextPolygonSource =
+      patch.polygonSource ?? (patch.bounds !== undefined ? "bounds" : "placeholder");
+    nextGeometry =
+      patch.bounds !== undefined
+        ? bboxToPolygon(patch.bounds, nextPolygonSource)
+        : placeholderPolygonFromViewport(patch.viewport);
+  }
   const nextScene: SceneFeature = {
     ...existing,
     properties: {
@@ -637,11 +714,11 @@ export async function updateScene(
       ...(patch.transitionDurationMs !== undefined && {
         transition_duration_ms: patch.transitionDurationMs,
       }),
+      ...(patch.displayMode !== undefined && { display_mode: patch.displayMode }),
+      ...(nextPolygonSource !== undefined && { _polygon_source: nextPolygonSource }),
       provenance: [...(existing.properties.provenance ?? []), logEntry],
     },
-    ...(patch.viewport !== undefined && {
-      geometry: viewportToPolygon(patch.viewport),
-    }),
+    ...(nextGeometry !== undefined && { geometry: nextGeometry }),
   };
   const newFeatures = plot.features.slice();
   newFeatures[idx] = nextScene as unknown as PlotFeature;
@@ -999,6 +1076,15 @@ export async function restoreScene(
     activityId,
     rationale: input.rationale,
   });
+  // `restoreScene` is a byte-identical recreation of a previously-deleted
+  // Scene; honour the input's `polygonSource` provenance verbatim if given,
+  // else fall back to the same defaults as `createScene`.
+  const restorePolygonSource: PolygonSource =
+    input.polygonSource ?? (input.bounds !== undefined ? "bounds" : "placeholder");
+  const restoreGeometry =
+    input.bounds !== undefined
+      ? bboxToPolygon(input.bounds, restorePolygonSource)
+      : placeholderPolygonFromViewport(input.viewport);
   const props: SceneProperties = {
     kind: "STORYBOARD_SCENE",
     id: newId,
@@ -1011,13 +1097,15 @@ export async function restoreScene(
     feature_set_hash: hash,
     thumbnail_asset_ref: input.thumbnailAssetRef,
     transition_duration_ms: input.transitionDurationMs ?? 500,
+    ...(input.displayMode !== undefined && { display_mode: input.displayMode }),
+    _polygon_source: restorePolygonSource,
     tags: [],
     provenance: [...input.preservedProvenance, restoreEntry],
   };
   const sceneFeature: SceneFeature = {
     type: "Feature",
     id: newId,
-    geometry: viewportToPolygon(input.viewport),
+    geometry: restoreGeometry,
     properties: props,
   };
   const nextPlot = appendFeatureAndRecomputeHull(
