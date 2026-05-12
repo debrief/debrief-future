@@ -133,8 +133,13 @@ export interface SceneBounds {
  */
 export function bboxToPolygon(
   bounds: SceneBounds,
-  _source: PolygonSource,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  source: PolygonSource,
 ): GeoJSONPolygon {
+  // `source` is part of the helper's contract — callers always tell us why
+  // they're computing the polygon — but the geometry itself is the same;
+  // the provenance value is persisted separately on `_polygon_source` by
+  // the caller. Keeping the param surfaces the intent at every call site.
   return makeBoundingPolygon(bounds.west, bounds.south, bounds.east, bounds.north);
 }
 

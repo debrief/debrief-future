@@ -42,8 +42,9 @@ vi.mock('react-leaflet', () => ({
   useMap: () => mockMapInstance,
 }));
 
-// Mutable so individual tests can swap in different sizes / centres.
-let mockMapInstance: {
+// Mutable in shape — individual tests can swap in different sizes / centres
+// at runtime; the binding itself stays constant.
+const mockMapInstance: {
   getZoom: () => number;
   getCenter: () => { lat: number; lng: number };
   getSize: () => { x: number; y: number };
