@@ -664,11 +664,19 @@ export class MapPanel {
                   ring.map((pt) => [pt[0] as number, pt[1] as number] as const),
                 )
               : [[]];
+          // Spec #258 / FR-006 — preserve polygon provenance across the
+          // host→webview message boundary. Without this, the webview's
+          // `pickPolygonForRender` never sees `'bounds'` and falls back to
+          // the legacy recompute path even for newly-captured scenes,
+          // shrinking rectangles to whatever `map.getSize()` happened to
+          // return at memo time.
+          const polygonSource = s.properties._polygon_source;
           return {
             sceneId: s.properties.id,
             viewport: s.properties.viewport,
             timestamp: s.properties.timestamp,
             polygon,
+            ...(polygonSource !== undefined && { polygonSource }),
           };
         });
     this.postMessage({

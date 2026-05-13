@@ -201,6 +201,13 @@ export interface SceneRectangleSnapshot {
   readonly timestamp: string;
   /** GeoJSON Polygon coordinates — outer ring + optional holes. */
   readonly polygon: readonly (readonly (readonly [number, number])[])[];
+  /**
+   * Spec #258 / FR-006 — provenance of `polygon`. Threaded through the
+   * snapshot so the webview's `SceneRectangleLayer.pickPolygonForRender`
+   * trusts captured-bounds polygons (`'bounds'`) instead of falling into the
+   * legacy recompute path. Optional because pre-#258 scenes don't carry it.
+   */
+  readonly polygonSource?: 'bounds' | 'placeholder' | 'manual';
 }
 
 /**

@@ -172,6 +172,44 @@ describe('MapPanel.setSceneRectangles', () => {
       currentSceneId: null,
     });
   });
+
+  it('threads `_polygon_source` provenance through the snapshot (Spec #258 / FR-006)', () => {
+    const { panel, postMessage } = makePanel(makePlot(), []);
+    const scene = makeScene('scene-bounds', [
+      [-5, 50],
+      [-4, 50],
+      [-4, 51],
+      [-5, 51],
+      [-5, 50],
+    ]);
+    (scene.properties as { _polygon_source?: string })._polygon_source = 'bounds';
+
+    panel.setSceneRectangles([scene], 'sb-1', 'scene-bounds');
+
+    const msg = postMessage.mock.calls[0]![0] as {
+      scenes: Array<{ sceneId: string; polygonSource?: string }>;
+    };
+    expect(msg.scenes[0]!.polygonSource).toBe('bounds');
+  });
+
+  it('omits `polygonSource` when the Scene has no provenance (legacy)', () => {
+    const { panel, postMessage } = makePanel(makePlot(), []);
+    const scene = makeScene('scene-legacy', [
+      [-5, 50],
+      [-4, 50],
+      [-4, 51],
+      [-5, 51],
+      [-5, 50],
+    ]);
+    // `_polygon_source` intentionally absent — mirrors pre-#258 scenes.
+
+    panel.setSceneRectangles([scene], 'sb-1', 'scene-legacy');
+
+    const msg = postMessage.mock.calls[0]![0] as {
+      scenes: Array<{ sceneId: string; polygonSource?: string }>;
+    };
+    expect(msg.scenes[0]).not.toHaveProperty('polygonSource');
+  });
 });
 
 describe('MapPanel event emitters', () => {

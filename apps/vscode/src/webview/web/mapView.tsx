@@ -352,6 +352,12 @@ function MapViewApp(): React.ReactElement {
         thumbnail_asset_ref: '',
         transition_duration_ms: 500,
         schema_version: 1,
+        // Spec #258 / FR-006 — restore provenance so `pickPolygonForRender`
+        // trusts the stored polygon for `'bounds'` captures and only
+        // recomputes for legacy / placeholder scenes.
+        ...(snap.polygonSource !== undefined && {
+          _polygon_source: snap.polygonSource,
+        }),
       },
     }));
     // Cast once at the boundary — the synthetic object is structurally
