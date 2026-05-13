@@ -102,6 +102,28 @@ export class MapPanel {
   private viewportUpdateTimeout?: NodeJS.Timeout;
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
 
+  /**
+   * PR #625 — echo-suppression key for the spatial→webview push.
+   *
+   * The spatial subscription posts `setViewport(center, zoom)` to the webview
+   * whenever session-state's viewport changes. `center` is computed as
+   * `avg(corners.lat), avg(corners.lng)` — which is NOT the same as
+   * Leaflet's `map.getCenter()` in Mercator projection (the lat-midpoint of
+   * a bounds rectangle differs from the screen-pixel-centre lat by the
+   * projection's non-linearity). So when the user pans, the chain is:
+   *   1. webview moveend → host viewportChanged → debounce → setViewport(corners).
+   *   2. Subscription fires → posts setViewport(avg-centre) BACK to webview.
+   *   3. Webview map.setView(avg-centre) → map shifts off Leaflet's
+   *      original pixel-centre.
+   *
+   * That shift is the "jump to one side" reported on PR #623's preview. To
+   * suppress it, `handleViewportChanged` records the key it is about to
+   * write into session-state; the subscription then sees the matching key
+   * and skips the echo. Programmatic viewport changes (session load,
+   * scene navigation) still push, because they don't pre-set the key.
+   */
+  private lastSentViewportKey = '';
+
   private constructor(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri
@@ -771,22 +793,28 @@ export class MapPanel {
     this.activeSession = session ?? undefined;
 
     if (session) {
-      // Subscribe to spatial (viewport) changes
-      // Track last viewport sent to map to avoid redundant messages
-      let lastSentViewportKey = '';
+      // Subscribe to spatial (viewport) changes.
+      //
+      // The key is shared with `handleViewportChanged` (member field
+      // `lastSentViewportKey`) so the host can mark a viewport "already
+      // sent to the webview" *before* the round-trip starts — see the
+      // field's doc-comment for the rationale.
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
         const zoom = spatial.viewport?.zoom;
         if (spatial.viewport !== null && zoom !== undefined) {
-          // Calculate center from coordinates: [NW, NE, SE, SW] in object form
-          // { longitude, latitude } after feature 203.
-          const coords = spatial.viewport.coordinates;
-          const centerLng = (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) / 4;
-          const centerLat = (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
-          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
+          const viewportKey = this.viewportPolygonKey(
+            spatial.viewport.coordinates,
+            zoom,
+          );
 
-          // Only send if actually different from last sent
-          if (viewportKey !== lastSentViewportKey) {
-            lastSentViewportKey = viewportKey;
+          if (viewportKey !== this.lastSentViewportKey) {
+            this.lastSentViewportKey = viewportKey;
+            const coords = spatial.viewport.coordinates;
+            const centerLng =
+              (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) /
+              4;
+            const centerLat =
+              (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
             this.postMessage({
               type: 'setViewport',
               viewport: {
@@ -902,10 +930,39 @@ export class MapPanel {
         if (!currentViewport ||
             JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
             currentViewport.zoom !== newViewport.zoom) {
+          // PR #625 — prime the echo-suppression key BEFORE the state
+          // mutation so the synchronous spatial-subscription callback
+          // sees the matching key and skips the host→webview push.
+          // Without this, the subscription posts setViewport(avg-centre,
+          // zoom) back to the webview, and Leaflet's `setView` shifts
+          // the map off the user's original pixel-centre by the Mercator
+          // distortion between `avg(corners.lat)` and `getCenter().lat`.
+          this.lastSentViewportKey = this.viewportPolygonKey(
+            newViewport.coordinates,
+            newViewport.zoom,
+          );
           state.setViewport(newViewport);
         }
       }
     }, MapPanel.VIEWPORT_DEBOUNCE_MS);
+  }
+
+  /**
+   * Build the canonical key used by the spatial echo-suppression logic.
+   * Centred on the same `avg(corners)` value the subscription would
+   * post to the webview, so the two sites agree on what "already sent"
+   * means.
+   */
+  private viewportPolygonKey(
+    coords: ReadonlyArray<{ longitude: number; latitude: number }>,
+    zoom: number,
+  ): string {
+    const centerLng =
+      (coords[0]!.longitude + coords[1]!.longitude + coords[2]!.longitude + coords[3]!.longitude) /
+      4;
+    const centerLat =
+      (coords[0]!.latitude + coords[1]!.latitude + coords[2]!.latitude + coords[3]!.latitude) / 4;
+    return `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
   }
 
   /**
