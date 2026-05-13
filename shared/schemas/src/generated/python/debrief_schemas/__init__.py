@@ -1144,7 +1144,8 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1191,7 +1192,8 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1238,7 +1240,8 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'LineString'} })
     coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1285,7 +1288,8 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Polygon'} })
     coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1332,7 +1336,8 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'MultiPoint'} })
     coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1379,7 +1384,8 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'MultiLineString'} })
     coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1426,7 +1432,8 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'MultiPolygon'} })
     coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
@@ -1817,7 +1824,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2025,7 +2033,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2166,7 +2175,8 @@ class SystemState(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""State identifier (must start with 'state.')""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2342,7 +2352,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2513,7 +2524,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2598,7 +2610,7 @@ class LogEntry(ConfiguredBaseModel):
     execution_duration: str = Field(default=..., description="""Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     generated_result_id: Optional[str] = Field(default=None, description="""Stable logical identity for artifact-producing tools. Null for non-artifact tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     tune: Optional[TuneAnnotation] = Field(default=None, description="""Parameter tuning record. Null until a tuning operation modifies this entry.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
-    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'ToolResultForLog']} })
     disabled: Optional[bool] = Field(default=False, description="""Whether this entry is skipped during replay. Toggled via the flip-card edit face.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry'], 'ifabsent': 'false'} })
     rationale: Optional[str] = Field(default=None, description="""Free-text analyst annotation explaining the reasoning for this operation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     agent: Optional[str] = Field(default=None, description="""Human actor (e.g. analyst username) who triggered the operation. Added by #215 for Storyboarding CRUD provenance; optional and useful to any tool emitting LogEntry records.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
@@ -2625,7 +2637,7 @@ class WasGeneratedBy(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
 
     tool: str = Field(default=..., description="""Tool identifier (kebab-case, e.g., calculate-range).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'PropertiesProvenanceEntry', 'MCPRequest']} })
-    tool_version: str = Field(default=..., description="""Semantic version of the tool (e.g., 1.2.0).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy']} })
+    tool_version: str = Field(default=..., description="""Semantic version of the tool (e.g., 1.2.0).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'ToolExecutionResultForReplay']} })
     parameters: list[ParameterValue] = Field(default=..., description="""Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict.""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'ToolResult']} })
 
 
@@ -2803,7 +2815,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2967,7 +2980,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3127,7 +3141,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3287,7 +3302,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3438,7 +3454,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3604,7 +3621,8 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3766,7 +3784,8 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -3958,7 +3977,8 @@ class ToolParameter(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     description: str = Field(default=..., description="""Human-readable parameter description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
@@ -4089,7 +4109,8 @@ class FileProvEntry(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     timestamp: datetime  = Field(default=..., description="""When the event occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry',
                        'TuneAnnotation',
                        'FileProvEntry',
@@ -4444,7 +4465,8 @@ class RawGeoJSONFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: Optional[Union[int, str]] = Field(default=None, description="""Optional feature identifier. RFC 7946 permits either a string or an integer; both are retained without coercion.""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'string'}, {'range': 'integer'}],
          'domain_of': ['TrackFeature',
@@ -4553,9 +4575,14 @@ class RawGeoJSONFeatureCollection(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'FeatureCollection'} })
-    features: list[RawGeoJSONFeature] = Field(default=..., description="""The collection's features, in document order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
+    features: list[RawGeoJSONFeature] = Field(default=..., description="""The collection's features, in document order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
+                       'SessionState',
+                       'SessionFile',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Optional bounding box, shaped as in RawGeoJSONFeature.bbox.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
@@ -4750,8 +4777,8 @@ class LastToolExecution(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/session-state'})
 
-    tool_id: str = Field(default=..., description="""Identifier of the tool that was executed""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution']} })
-    source_feature_ids: list[str] = Field(default=..., description="""IDs of the source features the tool operated on""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution']} })
+    tool_id: str = Field(default=..., description="""Identifier of the tool that was executed""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
+    source_feature_ids: list[str] = Field(default=..., description="""IDs of the source features the tool operated on""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
     result_layer_ids: list[str] = Field(default=..., description="""IDs of the result layers produced by the tool""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution']} })
 
 
@@ -4790,7 +4817,11 @@ class SessionState(ConfiguredBaseModel):
     schemaVersion: str = Field(default=..., description="""Schema version for persistence compatibility (FR-026)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
     temporal: TemporalSlice = Field(default=..., description="""Time-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     spatial: SpatialSlice = Field(default=..., description="""Geographic view state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
+    features: FeaturesSlice = Field(default=..., description="""Feature-related state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
+                       'SessionState',
+                       'SessionFile',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
     document: DocumentSlice = Field(default=..., description="""Editor state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState']} })
 
     @field_validator('schemaVersion')
@@ -4818,7 +4849,11 @@ class SessionFile(ConfiguredBaseModel):
     savedAt: str = Field(default=..., description="""When the session was saved (ISO 8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionFile']} })
     temporal: TemporalSlice = Field(default=..., description="""Temporal state (excluding ephemeral playbackState)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
     spatial: SpatialSlice = Field(default=..., description="""Spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SessionState', 'SessionFile']} })
-    features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection', 'SessionState', 'SessionFile']} })
+    features: FeaturesSlice = Field(default=..., description="""Features state""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
+                       'SessionState',
+                       'SessionFile',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
 
     @field_validator('version')
     def pattern_version(cls, v):
@@ -4944,7 +4979,8 @@ class DatasetAxisMetadata(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     units: Optional[str] = Field(default=None, description="""Units for the axis values (e.g., \"m\", \"°\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['DatasetAxisMetadata']} })
 
 
@@ -5033,7 +5069,8 @@ class DatasetEntry(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     title: str = Field(default=..., description="""Human-readable chart title""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
                        'StacItemSummary',
                        'DatasetEntry',
@@ -5313,7 +5350,8 @@ class StoryboardFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Stable identifier (equal to properties.id). ULID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -5406,7 +5444,8 @@ class SceneFeature(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Stable identifier (equal to properties.id). ULID.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -5524,7 +5563,8 @@ class SceneThumbnailAssetEntry(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema'],
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
          'equals_string': 'image/png'} })
     roles: list[str] = Field(default=..., description="""Exactly [\"thumbnail\"]. Storyboarding-derived thumbnails are not declared as overview (which is reserved for plot-level overviews of dimensions 600x800).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SceneThumbnailAssetEntry']} })
     title: Optional[str] = Field(default=None, description="""Optional human label. Storyboarding writer emits \"Scene thumbnail\" (large) or \"Scene thumbnail (small)\" (small).""", json_schema_extra = { "linkml_meta": {'domain_of': ['PlotSummary',
@@ -5579,7 +5619,8 @@ class MCPContentItem(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     resource: Optional[dict[str, object]] = Field(default=None, description="""Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors).""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPContentItem']} })
     text: Optional[str] = Field(default=None, description="""Body text when type=text.""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties',
                        'TextAnnotationProperties',
@@ -5596,7 +5637,10 @@ class MCPToolResponse(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
 
     content: list[MCPContentItem] = Field(default=..., description="""Ordered list of content items returned by the tool.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse']} })
-    duration_ms: int = Field(default=..., description="""Wall-clock duration of the tool invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse', 'MCPErrorResponse']} })
+    duration_ms: int = Field(default=..., description="""Wall-clock duration of the tool invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
+                       'MCPErrorResponse',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
     is_error: Optional[bool] = Field(default=None, description="""Reserved for streaming partial-error responses (additive over the live wire format).""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse']} })
     structured_content: Optional[dict[str, object]] = Field(default=None, description="""Reserved for top-level free-form payload (e.g. vega-spec) — Article XV.2 exception. Additive over the live wire format.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse']} })
 
@@ -5608,7 +5652,10 @@ class MCPErrorResponse(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
 
     error: Any = Field(default=..., description="""Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPErrorResponse']} })
-    duration_ms: Optional[int] = Field(default=None, description="""Wall-clock duration before failure.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse', 'MCPErrorResponse']} })
+    duration_ms: Optional[int] = Field(default=None, description="""Wall-clock duration before failure.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
+                       'MCPErrorResponse',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
 
 
 class MCPParamSchema(ConfiguredBaseModel):
@@ -5646,7 +5693,8 @@ class MCPParamSchema(ConfiguredBaseModel):
                        'SceneFeature',
                        'SceneThumbnailAssetEntry',
                        'MCPContentItem',
-                       'MCPParamSchema']} })
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage']} })
     description: Optional[str] = Field(default=None, description="""Human-readable parameter description.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
@@ -5796,12 +5844,103 @@ class ToolResult(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
 
-    success: bool = Field(default=..., description="""Whether the tool succeeded.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult']} })
+    success: bool = Field(default=..., description="""Whether the tool succeeded.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
     message: str = Field(default=..., description="""Status / explanation message.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult']} })
     resultLayer: Optional[dict[str, object]] = Field(default=None, description="""Optional single result layer (e.g. bounding-box polygon).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult']} })
     resultLayers: Optional[list[Any]] = Field(default=[], description="""Optional multiple result layers (e.g. buffer-zone polygons).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult']} })
     parameters: Optional[dict[str, object]] = Field(default=None, description="""Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out — keeping it free-form preserves the live wire shape).""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'ToolResult']} })
     datasets: Optional[list[Any]] = Field(default=[], description="""Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult']} })
+
+
+class ToolResultForLog(ConfiguredBaseModel):
+    """
+    Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit §3.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
+
+    success: bool = Field(default=..., description="""Whether the tool succeeded.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    features: Optional[dict[str, object]] = Field(default=None, description="""GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract).""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
+                       'SessionState',
+                       'SessionFile',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    duration_ms: int = Field(default=..., description="""Wall-clock duration of the tool invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
+                       'MCPErrorResponse',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    result_type: Optional[str] = Field(default=None, description="""Hierarchical result type (e.g. mutation/track/smoothed).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultForLog']} })
+    source_feature_ids: Optional[list[str]] = Field(default=[], description="""IDs of input features used to generate this result.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
+    artifact_href: Optional[str] = Field(default=None, description="""Path to an exported artifact (for non-GeoJSON tool results).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultForLog', 'ToolExecutionResultForReplay']} })
+    tool_id: Optional[str] = Field(default=None, description="""Tool identifier (mirrors LogEntry.was_generated_by.tool).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LastToolExecution', 'ToolResultForLog']} })
+    input_state: Optional[list[Any]] = Field(default=[], description="""Pre-tool geometry snapshot for mutation tools — passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'ToolResultForLog']} })
+
+
+class ToolExecutionResultForReplay(ConfiguredBaseModel):
+    """
+    Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit §3.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower — see services/session-state/src/log/types.ts:373.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
+
+    success: bool = Field(default=..., description="""Whether the tool succeeded.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResult',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    features: Optional[dict[str, object]] = Field(default=None, description="""GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2.""", json_schema_extra = { "linkml_meta": {'domain_of': ['RawGeoJSONFeatureCollection',
+                       'SessionState',
+                       'SessionFile',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    duration_ms: int = Field(default=..., description="""Wall-clock duration of the replay invocation in milliseconds.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MCPToolResponse',
+                       'MCPErrorResponse',
+                       'ToolResultForLog',
+                       'ToolExecutionResultForReplay']} })
+    tool_version: Optional[str] = Field(default=None, description="""Tool version observed at replay time.""", json_schema_extra = { "linkml_meta": {'domain_of': ['WasGeneratedBy', 'ToolExecutionResultForReplay']} })
+    artifact_href: Optional[str] = Field(default=None, description="""Path to an exported artifact (for non-GeoJSON tool results).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolResultForLog', 'ToolExecutionResultForReplay']} })
+    result_id: Optional[str] = Field(default=None, description="""Stable result identifier (used by the activity panel).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolExecutionResultForReplay']} })
+
+
+class ToolsUpdateMessage(ConfiguredBaseModel):
+    """
+    Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit §3.1 row 28. `payload` is free-form per Article XV.2 — its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/mcp'})
+
+    type: Literal["tools:update"] = Field(default=..., description="""Discriminator — always the literal `tools:update`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry',
+                       'RawGeoJSONFeature',
+                       'RawGeoJSONFeatureCollection',
+                       'DatasetAxisMetadata',
+                       'DatasetEntry',
+                       'StoryboardFeature',
+                       'SceneFeature',
+                       'SceneThumbnailAssetEntry',
+                       'MCPContentItem',
+                       'MCPParamSchema',
+                       'ToolsUpdateMessage'],
+         'equals_string': 'tools:update'} })
+    payload: Any = Field(default=..., description="""Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolsUpdateMessage']} })
 
 
 # Model rebuild
@@ -5914,3 +6053,6 @@ MCPToolDefinition.model_rebuild()
 ToolParameterMeta.model_rebuild()
 ToolDefinition.model_rebuild()
 ToolResult.model_rebuild()
+ToolResultForLog.model_rebuild()
+ToolExecutionResultForReplay.model_rebuild()
+ToolsUpdateMessage.model_rebuild()

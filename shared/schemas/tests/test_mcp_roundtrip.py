@@ -38,9 +38,12 @@ from debrief_schemas import (  # noqa: E402
     MCPToolDefinition,
     MCPToolResponse,
     ToolDefinition,
+    ToolExecutionResultForReplay,
     ToolParameter,
     ToolParameterMeta,
     ToolResult,
+    ToolResultForLog,
+    ToolsUpdateMessage,
 )
 
 FIXTURES_ROOT = Path(__file__).parent.parent / "fixtures" / "mcp"
@@ -146,6 +149,56 @@ def test_discovery_schema_required_slots() -> None:
         ToolParameterMeta: {"value", "default", "tunable"},
         ToolDefinition: {"id", "name", "description"},
         ToolResult: {"success", "message"},
+    }
+    for cls, required in expected_required.items():
+        schema = cls.model_json_schema()
+        actual = set(schema.get("required", []))
+        assert actual == required, (
+            f"{cls.__name__} required slots: expected {required}, got {actual}"
+        )
+
+
+# --------------------------------------------------------------------------
+# P3 — Replay / Logging
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "model_cls,fixture",
+    [
+        (ToolResultForLog, FIXTURES_ROOT / "ToolResultForLog" / "valid" / "success.json"),
+        (ToolResultForLog, FIXTURES_ROOT / "ToolResultForLog" / "valid" / "failure.json"),
+        (
+            ToolExecutionResultForReplay,
+            FIXTURES_ROOT / "ToolExecutionResultForReplay" / "valid" / "unchanged.json",
+        ),
+        (ToolsUpdateMessage, FIXTURES_ROOT / "ToolsUpdateMessage" / "valid" / "update.json"),
+    ],
+)
+def test_replay_roundtrip(model_cls: type, fixture: Path) -> None:
+    """Py → JSON → Py preserves all fields for each replay class."""
+    raw = json.loads(fixture.read_text())
+    instance = model_cls.model_validate(raw)
+    dumped = instance.model_dump(exclude_unset=True)
+    re_instance = model_cls.model_validate(dumped)
+    re_dumped = re_instance.model_dump(exclude_unset=True)
+    assert dumped == re_dumped, (
+        f"Round-trip for {model_cls.__name__} mutated fields: "
+        f"original={dumped}, re-dumped={re_dumped}"
+    )
+    for key, value in raw.items():
+        assert key in dumped, f"{model_cls.__name__} dropped slot {key!r} on round-trip"
+        assert dumped[key] == value, (
+            f"{model_cls.__name__} mutated slot {key!r}: was {value!r}, became {dumped[key]!r}"
+        )
+
+
+def test_replay_schema_required_slots() -> None:
+    """Required-slot set for each replay class matches the LinkML source."""
+    expected_required = {
+        ToolResultForLog: {"success", "duration_ms"},
+        ToolExecutionResultForReplay: {"success", "duration_ms"},
+        ToolsUpdateMessage: {"type", "payload"},
     }
     for cls, required in expected_required.items():
         schema = cls.model_json_schema()

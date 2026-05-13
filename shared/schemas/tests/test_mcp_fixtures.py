@@ -29,9 +29,12 @@ from debrief_schemas import (  # noqa: E402
     MCPToolDefinition,
     MCPToolResponse,
     ToolDefinition,
+    ToolExecutionResultForReplay,
     ToolParameter,
     ToolParameterMeta,
     ToolResult,
+    ToolResultForLog,
+    ToolsUpdateMessage,
 )
 
 FIXTURES_ROOT = Path(__file__).parent.parent / "fixtures" / "mcp"
@@ -52,6 +55,10 @@ CLASS_MAP: dict[str, type] = {
     "ToolParameterMeta": ToolParameterMeta,
     "ToolDefinition": ToolDefinition,
     "ToolResult": ToolResult,
+    # P3 — Replay / Logging
+    "ToolResultForLog": ToolResultForLog,
+    "ToolExecutionResultForReplay": ToolExecutionResultForReplay,
+    "ToolsUpdateMessage": ToolsUpdateMessage,
 }
 
 

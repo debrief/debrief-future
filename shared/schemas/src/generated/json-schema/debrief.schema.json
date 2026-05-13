@@ -4039,6 +4039,58 @@
       "title": "ToolDefinition",
       "type": "object"
     },
+    "ToolExecutionResultForReplay": {
+      "additionalProperties": false,
+      "description": "Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit \u00a73.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower \u2014 see services/session-state/src/log/types.ts:373.",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the replay invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2."
+        },
+        "result_id": {
+          "description": "Stable result identifier (used by the activity panel).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_version": {
+          "description": "Tool version observed at replay time.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolExecutionResultForReplay",
+      "type": "object"
+    },
     "ToolParameter": {
       "additionalProperties": false,
       "description": "A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.",
@@ -4225,6 +4277,99 @@
         "label"
       ],
       "title": "ToolResultAnnotations",
+      "type": "object"
+    },
+    "ToolResultForLog": {
+      "additionalProperties": false,
+      "description": "Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit \u00a73.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract)."
+        },
+        "input_state": {
+          "description": "Pre-tool geometry snapshot for mutation tools \u2014 passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "result_type": {
+          "description": "Hierarchical result type (e.g. mutation/track/smoothed).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_feature_ids": {
+          "description": "IDs of input features used to generate this result.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_id": {
+          "description": "Tool identifier (mirrors LogEntry.was_generated_by.tool).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolResultForLog",
+      "type": "object"
+    },
+    "ToolsUpdateMessage": {
+      "additionalProperties": false,
+      "description": "Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit \u00a73.1 row 28. `payload` is free-form per Article XV.2 \u2014 its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.",
+      "properties": {
+        "payload": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2."
+        },
+        "type": {
+          "const": "tools:update",
+          "description": "Discriminator \u2014 always the literal `tools:update`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "payload"
+      ],
+      "title": "ToolsUpdateMessage",
       "type": "object"
     },
     "TrackFeature": {

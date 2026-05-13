@@ -188,29 +188,29 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Tests for User Story 3 (REQUIRED — FR-006 + FR-011) ⚠️
 
-- [ ] T080 [P] [US3] [test] Fixtures for `ToolResultForLog` (1 success-path with `result`, 1 error-path with `error`, 1 negative violating `result XOR error`) `shared/schemas/fixtures/mcp/ToolResultForLog/`
-- [ ] T081 [P] [US3] [test] Fixtures for `ToolExecutionResultForReplay` covering each `ReplayStatusEnum` value `shared/schemas/fixtures/mcp/ToolExecutionResultForReplay/`
-- [ ] T082 [P] [US3] [test] Fixtures for `ToolsUpdateMessage` (1 valid `type=tools:update`, 1 invalid `type=other`) `shared/schemas/fixtures/mcp/ToolsUpdateMessage/`
-- [ ] T083 [US3] [test] Extend `test_mcp_roundtrip.py` with replay-class assertions plus a Pydantic `model_validator` assertion for `result XOR error` on `ToolResultForLog` `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T084 [US3] [test] Add a fixture-replay-compatibility test that loads every JSON file under `services/session-state/**/__fixtures__/` matching `*tool*log*.json` / `*replay*.json` and validates it against the new generated Pydantic class — proves FR-011 (schema is a superset of all currently-shipped log shapes) `shared/schemas/tests/test_mcp_log_fixture_compat.py`
+- [x] T080 [P] [US3] [test] Fixtures for `ToolResultForLog` (1 success-path with `result`, 1 error-path with `error`, 1 negative violating `result XOR error`) `shared/schemas/fixtures/mcp/ToolResultForLog/`
+- [x] T081 [P] [US3] [test] Fixtures for `ToolExecutionResultForReplay` covering each `ReplayStatusEnum` value `shared/schemas/fixtures/mcp/ToolExecutionResultForReplay/`
+- [x] T082 [P] [US3] [test] Fixtures for `ToolsUpdateMessage` (1 valid `type=tools:update`, 1 invalid `type=other`) `shared/schemas/fixtures/mcp/ToolsUpdateMessage/`
+- [x] T083 [US3] [test] Extend `test_mcp_roundtrip.py` with replay-class assertions plus a Pydantic `model_validator` assertion for `result XOR error` on `ToolResultForLog` `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T084 [US3] [test] Add a fixture-replay-compatibility test that loads every JSON file under `services/session-state/**/__fixtures__/` matching `*tool*log*.json` / `*replay*.json` and validates it against the new generated Pydantic class — proves FR-011 (schema is a superset of all currently-shipped log shapes) `shared/schemas/tests/test_mcp_log_fixture_compat.py`
 
 ### Implementation for User Story 3
 
-- [ ] T090 [US3] Add `ToolResultForLog` class (8 slots — see data-model Group 3) with Pydantic `model_validator` enforcing `result XOR error` (post-generation hook in `shared/schemas/scripts/` if the generator does not emit validators directly — fall back to a thin wrapper in `shared/schemas/src/python/debrief_schemas/validators/mcp.py`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T091 [US3] Add `ToolExecutionResultForReplay` class (inherits from `ToolResultForLog` via `is_a:`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T092 [US3] Add `ToolsUpdateMessage` class with `equals_string: tools:update` on the `type` slot `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T093 [US3] Run `task schemas:build` and confirm three new classes + the enum-derived imports regenerate cleanly
-- [ ] T094 [US3] Add `ToolExecutor` and `ToolVersionResolver` function-type aliases (one-line TS expressions importing generated parameter/return types from `@debrief/schemas`; module is treated as schema-rooted by audit R4) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
-- [ ] T095 [P] [US3] Delete `ToolResultForLog` interface at `services/session-state/src/log/types.ts:89` and import from `@debrief/schemas`
-- [ ] T096 [P] [US3] Delete `ToolExecutionResultForReplay` interface at `services/session-state/src/log/types.ts:271` and import from `@debrief/schemas`
-- [ ] T097 [P] [US3] Delete `ToolExecutor` function-type alias at `services/session-state/src/log/types.ts:281` and import from `@debrief/schemas`
-- [ ] T098 [P] [US3] Delete `ToolVersionResolver` function-type alias at `services/session-state/src/log/types.ts:299` and import from `@debrief/schemas`
-- [ ] T099 [P] [US3] Delete `ToolsUpdateMessage` interface at `apps/vscode/src/webview/web/activityPanel.tsx:52` and import from `@debrief/schemas`
-- [ ] T100 [US3] Retype the `TOOLS` const at `services/session-state/src/server/mcp.ts:31-47` as `Record<SessionMCPToolName, ToolHandler>` and delete the local `type ToolName = keyof typeof TOOLS` at `:49` — replace consumer imports with `import type { SessionMCPToolName as ToolName } from '@debrief/schemas'` where needed `services/session-state/src/server/mcp.ts`
-- [ ] T101 [US3] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py shared/schemas/tests/test_mcp_log_fixture_compat.py -v` and confirm all replay tests green AND every existing log fixture validates
-- [ ] T102 [US3] Run `pnpm --filter @debrief/session-state test` and confirm replay-engine unit tests still pass
-- [ ] T103 [US3] Run the type-audit scanner and confirm §3.1 rows attributed to #222 are now **zero** (SC-001) AND §3.2 `ToolParameter` is zero (SC-002); capture the full report excerpt for evidence
-- [ ] T104 [US3] Commit P3 slice: `feat(schemas): promote MCP replay/log shapes to LinkML and close #222 cluster (P3)`
+- [x] T090 [US3] Add `ToolResultForLog` class (8 slots — see data-model Group 3) with Pydantic `model_validator` enforcing `result XOR error` (post-generation hook in `shared/schemas/scripts/` if the generator does not emit validators directly — fall back to a thin wrapper in `shared/schemas/src/python/debrief_schemas/validators/mcp.py`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T091 [US3] Add `ToolExecutionResultForReplay` class (inherits from `ToolResultForLog` via `is_a:`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T092 [US3] Add `ToolsUpdateMessage` class with `equals_string: tools:update` on the `type` slot `shared/schemas/src/linkml/mcp.yaml`
+- [x] T093 [US3] Run `task schemas:build` and confirm three new classes + the enum-derived imports regenerate cleanly
+- [x] T094 [US3] Add `ToolExecutor` and `ToolVersionResolver` function-type aliases (one-line TS expressions importing generated parameter/return types from `@debrief/schemas`; module is treated as schema-rooted by audit R4) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
+- [x] T095 [P] [US3] Delete `ToolResultForLog` interface at `services/session-state/src/log/types.ts:89` and import from `@debrief/schemas`
+- [x] T096 [P] [US3] Delete `ToolExecutionResultForReplay` interface at `services/session-state/src/log/types.ts:271` and import from `@debrief/schemas`
+- [x] T097 [P] [US3] Delete `ToolExecutor` function-type alias at `services/session-state/src/log/types.ts:281` and import from `@debrief/schemas`
+- [x] T098 [P] [US3] Delete `ToolVersionResolver` function-type alias at `services/session-state/src/log/types.ts:299` and import from `@debrief/schemas`
+- [x] T099 [P] [US3] Delete `ToolsUpdateMessage` interface at `apps/vscode/src/webview/web/activityPanel.tsx:52` and import from `@debrief/schemas`
+- [x] T100 [US3] Retype the `TOOLS` const at `services/session-state/src/server/mcp.ts:31-47` as `Record<SessionMCPToolName, ToolHandler>` and delete the local `type ToolName = keyof typeof TOOLS` at `:49` — replace consumer imports with `import type { SessionMCPToolName as ToolName } from '@debrief/schemas'` where needed `services/session-state/src/server/mcp.ts`
+- [x] T101 [US3] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py shared/schemas/tests/test_mcp_log_fixture_compat.py -v` and confirm all replay tests green AND every existing log fixture validates
+- [x] T102 [US3] Run `pnpm --filter @debrief/session-state test` and confirm replay-engine unit tests still pass
+- [x] T103 [US3] Run the type-audit scanner and confirm §3.1 rows attributed to #222 are now **zero** (SC-001) AND §3.2 `ToolParameter` is zero (SC-002); capture the full report excerpt for evidence
+- [x] T104 [US3] Commit P3 slice: `feat(schemas): promote MCP replay/log shapes to LinkML and close #222 cluster (P3)`
 
 **Checkpoint**: All three slices complete; audit cluster fully resolved; replay subsystem still loads every committed log fixture.
 

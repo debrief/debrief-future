@@ -674,10 +674,15 @@ def generate_typescript() -> bool:
         output_file.write_text(content, encoding="utf-8", newline="\n")
         print(f"  [OK] Generated: {output_file}")
 
-        # Create index.ts that re-exports everything
+        # Create index.ts that re-exports everything (generated types,
+        # union helpers, and the TS-only function aliases for the MCP
+        # cluster — spec 222 Research R-002).
         index_file = TYPESCRIPT_OUT / "index.ts"
         index_file.write_text(
-            'export * from "./types.js";\nexport * from "./unions.js";\n',
+            'export * from "./types.js";\n'
+            'export * from "./unions.js";\n'
+            'export type { ToolExecutor, ToolVersionResolver } '
+            'from "../../typescript/aliases/mcp-functions.js";\n',
             encoding="utf-8",
             newline="\n",
         )

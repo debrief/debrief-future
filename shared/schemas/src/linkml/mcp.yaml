@@ -342,3 +342,100 @@ classes:
           `{ filename: string, envelope: Record<string, unknown> }`.
         range: Any
         multivalued: true
+
+# ============================================================================
+# Group 3 — Replay / Logging (P3)
+# ============================================================================
+
+  ToolResultForLog:
+    description: >-
+      Persisted tool-result shape written by the live tool-result logger
+      and read back by the replay subsystem. Closes audit §3.1 row 4.
+      Slot names match `services/session-state/src/log/types.ts:97`
+      verbatim so existing log fixtures under the session-state
+      fixtures directories continue to deserialise unchanged (FR-011).
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      features:
+        description: >-
+          GeoJSON FeatureCollection produced by the tool. Free-form per
+          Article XV.2 (the tool's output shape is its own contract).
+        range: Any
+      duration_ms:
+        description: Wall-clock duration of the tool invocation in milliseconds.
+        range: integer
+        required: true
+      result_type:
+        description: Hierarchical result type (e.g. mutation/track/smoothed).
+        range: string
+      source_feature_ids:
+        description: IDs of input features used to generate this result.
+        range: string
+        multivalued: true
+      artifact_href:
+        description: Path to an exported artifact (for non-GeoJSON tool results).
+        range: string
+      tool_id:
+        description: Tool identifier (mirrors LogEntry.was_generated_by.tool).
+        range: string
+      input_state:
+        description: >-
+          Pre-tool geometry snapshot for mutation tools — passed through
+          to LogEntry. Free-form per Article XV.2 (the inner
+          InputFeatureState shape is owned by #224 session-state).
+        range: Any
+        multivalued: true
+
+  ToolExecutionResultForReplay:
+    description: >-
+      Minimal tool-execution result returned by the Replay Engine's
+      `execute_tool` callback. Closes audit §3.1 row 6. Distinct from
+      `ToolResultForLog` (no inheritance) because the replay path's
+      observable surface is intentionally narrower — see
+      services/session-state/src/log/types.ts:373.
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      features:
+        description: >-
+          GeoJSON FeatureCollection produced by the tool during replay.
+          Free-form per Article XV.2.
+        range: Any
+      duration_ms:
+        description: Wall-clock duration of the replay invocation in milliseconds.
+        range: integer
+        required: true
+      tool_version:
+        description: Tool version observed at replay time.
+        range: string
+      artifact_href:
+        description: Path to an exported artifact (for non-GeoJSON tool results).
+        range: string
+      result_id:
+        description: Stable result identifier (used by the activity panel).
+        range: string
+
+  ToolsUpdateMessage:
+    description: >-
+      Push notification from the extension host to the activity-panel
+      webview when the tool catalogue changes. Closes audit §3.1 row 28.
+      `payload` is free-form per Article XV.2 — its inner shape
+      `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }`
+      is narrowed at the activity-panel consumer.
+    attributes:
+      type:
+        description: Discriminator — always the literal `tools:update`.
+        range: string
+        required: true
+        equals_string: tools:update
+      payload:
+        description: >-
+          Nested payload `{ tools, hasToolInventory?, hasSelection? }`.
+          Free-form per Article XV.2.
+        range: Any
+        required: true

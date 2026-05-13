@@ -2404,4 +2404,57 @@ export interface ToolResult {
 }
 
 
+/**
+ * Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit §3.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).
+ */
+export interface ToolResultForLog {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract). */
+    features?: unknown,
+    /** Wall-clock duration of the tool invocation in milliseconds. */
+    duration_ms: number,
+    /** Hierarchical result type (e.g. mutation/track/smoothed). */
+    result_type?: string,
+    /** IDs of input features used to generate this result. */
+    source_feature_ids?: string[],
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Tool identifier (mirrors LogEntry.was_generated_by.tool). */
+    tool_id?: string,
+    /** Pre-tool geometry snapshot for mutation tools — passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state). */
+    input_state?: unknown[],
+}
+
+
+/**
+ * Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit §3.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower — see services/session-state/src/log/types.ts:373.
+ */
+export interface ToolExecutionResultForReplay {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2. */
+    features?: unknown,
+    /** Wall-clock duration of the replay invocation in milliseconds. */
+    duration_ms: number,
+    /** Tool version observed at replay time. */
+    tool_version?: string,
+    /** Path to an exported artifact (for non-GeoJSON tool results). */
+    artifact_href?: string,
+    /** Stable result identifier (used by the activity panel). */
+    result_id?: string,
+}
+
+
+/**
+ * Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit §3.1 row 28. `payload` is free-form per Article XV.2 — its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.
+ */
+export interface ToolsUpdateMessage {
+    /** Discriminator — always the literal `tools:update`. */
+    type: string,
+    /** Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2. */
+    payload: unknown,
+}
+
+
 
