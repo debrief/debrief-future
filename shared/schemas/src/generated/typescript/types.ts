@@ -438,7 +438,7 @@ export enum PlaybackStateEnum {
 */
 export type PlaybackState = `${PlaybackStateEnum}`;
 /**
-* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time.
+* Track visualization display mode. `full` renders the entire track regardless of current time; `trail` renders a snail-trail from track start up to current time. Mirrors session-state.yaml — see comment above.
 */
 export enum DisplayModeEnum {
     
@@ -506,6 +506,25 @@ export enum ErrorCategory {
     /** Required feature or data not found */
     resource_not_found = "resource_not_found",
 };
+/**
+* Provenance of a Scene's stored polygon geometry. Render-side consumers use this to decide whether to trust the on-disk polygon ('bounds') or recompute it from (viewport, map dimensions) when the stored polygon pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+*/
+export enum PolygonSourceEnum {
+    
+    /** Polygon was computed from real Leaflet map bounds at capture time (post-#258 norm). Renderers trust the on-disk geometry. */
+    bounds = "bounds",
+    /** Pre-#258 ~100m placeholder square or otherwise non-bounds-derived. Renderers recompute from (viewport, map dimensions); the on-disk value is preserved (Article III.2 source preservation). */
+    placeholder = "placeholder",
+    /** Reserved for future user-drawn rectangles. Renderers recompute (current behaviour) until manual editing of scene geometry ships. */
+    manual = "manual",
+};
+/**
+* Template-literal derivation of the permissible polygon-source values
+* from PolygonSourceEnum. Narrows the `_polygon_source` field on
+* SceneProperties so TypeScript rejects an unknown provenance value at
+* compile time (Feature 258).
+*/
+export type PolygonSource = `${PolygonSourceEnum}`;
 /**
 * Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.
 */
@@ -2186,6 +2205,10 @@ export interface SceneProperties extends BaseFeatureProperties {
     thumbnail_asset_ref: string,
     /** Playback transition duration in milliseconds. Default 500. */
     transition_duration_ms: number,
+    /** Time-controller display mode at capture time (full = entire track history; trail = only the tail behind each platform). Reuses DisplayModeEnum from session-state.yaml. Optional for legacy compatibility (Spec #258): readers MUST leave the time controller untouched when this slot is absent (FR-003). Writers populate it from session.displayMode at the moment the scene is created. */
+    display_mode?: DisplayMode,
+    /** Provenance of the scene's stored polygon geometry (Spec #258). 'bounds' = computed from real Leaflet map bounds at capture time; 'placeholder' = pre-#258 ~100m square; 'manual' = reserved for future user-drawn rectangles. Render-side consumers recompute the polygon from (viewport, map dimensions) when this value is anything other than 'bounds' (including absent, for legacy scenes). The stored geometry is NEVER rewritten on read (Article III.2 source preservation). */
+    _polygon_source?: PolygonSource,
 }
 
 

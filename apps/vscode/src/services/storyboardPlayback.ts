@@ -647,6 +647,14 @@ export class StoryboardPlaybackService implements vscode.Disposable {
       session.getState().setCurrentTime(targetEpoch);
     }
 
+    // Spec #258 / FR-002: restore the captured display mode alongside the
+    // viewport flyTo. Legacy scenes that pre-date #258 do not carry the
+    // slot — leave the time controller untouched in that case (FR-003).
+    const capturedDisplayMode = targetScene.properties.display_mode;
+    if (session && capturedDisplayMode !== undefined && capturedDisplayMode !== null) {
+      session.getState().setDisplayMode(capturedDisplayMode);
+    }
+
     // Safety timer (R8).
     if (state.transitionSafetyTimer !== null) {
       clearTimeout(state.transitionSafetyTimer);

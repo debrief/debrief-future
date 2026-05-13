@@ -29,6 +29,49 @@ imports:
   - geojson
   - log-entry
 
+enums:
+  # NB: DisplayModeEnum is canonical in session-state.yaml (Article II.1 —
+  # single source of truth for the time-controller's display mode). It is
+  # mirrored here because session-state.yaml cannot be imported into
+  # storyboard.yaml without also importing it into debrief-jsonschema.yaml,
+  # which is excluded from JSON Schema generation due to a gen-json-schema
+  # bug with `Coordinate as multivalued class range` (see comment in
+  # debrief-jsonschema.yaml). The canonical declaration stays in
+  # session-state.yaml; this mirror is kept in lock-step manually. Update
+  # both files together if a new display mode ships.
+  DisplayModeEnum:
+    description: >-
+      Track visualization display mode. `full` renders the entire track
+      regardless of current time; `trail` renders a snail-trail from
+      track start up to current time. Mirrors session-state.yaml — see
+      comment above.
+    permissible_values:
+      full:
+        description: Render the entire track regardless of current time
+      trail:
+        description: Render a snail-trail from track start up to current time
+
+  PolygonSourceEnum:
+    description: >-
+      Provenance of a Scene's stored polygon geometry. Render-side consumers
+      use this to decide whether to trust the on-disk polygon ('bounds') or
+      recompute it from (viewport, map dimensions) when the stored polygon
+      pre-dates Spec #258 ('placeholder') or was hand-drawn ('manual').
+    permissible_values:
+      bounds:
+        description: >-
+          Polygon was computed from real Leaflet map bounds at capture time
+          (post-#258 norm). Renderers trust the on-disk geometry.
+      placeholder:
+        description: >-
+          Pre-#258 ~100m placeholder square or otherwise non-bounds-derived.
+          Renderers recompute from (viewport, map dimensions); the on-disk
+          value is preserved (Article III.2 source preservation).
+      manual:
+        description: >-
+          Reserved for future user-drawn rectangles. Renderers recompute
+          (current behaviour) until manual editing of scene geometry ships.
+
 classes:
   Viewport:
     description: >-
@@ -162,6 +205,28 @@ classes:
         range: integer
         required: true
         minimum_value: 0
+      display_mode:
+        description: >-
+          Time-controller display mode at capture time (full = entire track
+          history; trail = only the tail behind each platform). Reuses
+          DisplayModeEnum from session-state.yaml. Optional for legacy
+          compatibility (Spec #258): readers MUST leave the time controller
+          untouched when this slot is absent (FR-003). Writers populate it
+          from session.displayMode at the moment the scene is created.
+        range: DisplayModeEnum
+        required: false
+      _polygon_source:
+        description: >-
+          Provenance of the scene's stored polygon geometry (Spec #258).
+          'bounds' = computed from real Leaflet map bounds at capture time;
+          'placeholder' = pre-#258 ~100m square; 'manual' = reserved for
+          future user-drawn rectangles. Render-side consumers recompute the
+          polygon from (viewport, map dimensions) when this value is
+          anything other than 'bounds' (including absent, for legacy
+          scenes). The stored geometry is NEVER rewritten on read
+          (Article III.2 source preservation).
+        range: PolygonSourceEnum
+        required: false
 
   StoryboardFeature:
     description: GeoJSON Feature representing a Storyboard parent entity

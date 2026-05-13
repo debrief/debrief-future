@@ -532,6 +532,47 @@ def generate_typescript() -> bool:
             enum_end = content.index("};\n", enum_start)
             content = content[:enum_end] + _display_mode_decl + content[enum_end + len("};\n") :]
 
+        # Post-process (Feature 258 / FR-001, FR-006): narrow
+        # `SceneProperties.display_mode` and `SceneProperties._polygon_source`
+        # from `string` to the corresponding template-literal types. Same
+        # post-processing rationale as the TemporalSlice case above:
+        # gen-typescript collapses enum-ranged slots to bare `string`, and the
+        # spec only "means" what it says once these are narrowed.
+        _polygon_source_decl = (
+            "};\n"
+            "/**\n"
+            "* Template-literal derivation of the permissible polygon-source values\n"
+            "* from PolygonSourceEnum. Narrows the `_polygon_source` field on\n"
+            "* SceneProperties so TypeScript rejects an unknown provenance value at\n"
+            "* compile time (Feature 258).\n"
+            "*/\n"
+            "export type PolygonSource = `${PolygonSourceEnum}`;\n"
+        )
+        _polygon_source_sentinel = "export enum PolygonSourceEnum {"
+        if _polygon_source_sentinel in content and "export type PolygonSource" not in content:
+            enum_start = content.index(_polygon_source_sentinel)
+            enum_end = content.index("};\n", enum_start)
+            content = content[:enum_end] + _polygon_source_decl + content[enum_end + len("};\n") :]
+
+        _scene_props_start = content.find("export interface SceneProperties ")
+        if _scene_props_start == -1:
+            raise RuntimeError(
+                "generate.py: gen-typescript did not emit `export interface SceneProperties`."
+            )
+        _scene_props_end = content.index("}\n", _scene_props_start) + 2
+        _scene_props_block = content[_scene_props_start:_scene_props_end]
+        _new_scene_props_block = _scene_props_block.replace(
+            "    display_mode?: string,\n", "    display_mode?: DisplayMode,\n", 1
+        ).replace("    _polygon_source?: string,\n", "    _polygon_source?: PolygonSource,\n", 1)
+        if _new_scene_props_block == _scene_props_block:
+            raise RuntimeError(
+                "generate.py: SceneProperties enum-slot post-processor had no "
+                "effect — gen-typescript output no longer contains the expected "
+                "`display_mode?: string` / `_polygon_source?: string` tokens. Update "
+                "generate.py (Feature 258)."
+            )
+        content = content[:_scene_props_start] + _new_scene_props_block + content[_scene_props_end:]
+
         # Narrow the two TemporalSlice fields from string → template-literal type.
         _temporal_slice_start = content.find("export interface TemporalSlice {\n")
         if _temporal_slice_start == -1:
