@@ -257,7 +257,7 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### PR Creation
 
-- [ ] T160 Create PR and publish blog: run /speckit.pr
+- [x] T160 Create PR and publish blog: run /speckit.pr
 
 **Task T160 must run last. It depends on T100–T150 being complete.**
 
