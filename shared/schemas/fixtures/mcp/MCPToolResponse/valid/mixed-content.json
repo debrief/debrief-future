@@ -1,0 +1,27 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Computed 1 result.",
+      "annotations": {
+        "debrief:resultType": "artifact/text",
+        "debrief:label": "Summary",
+        "debrief:sourceFeatures": ["track-1"]
+      }
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "debrief://tool-result/track-length/12345",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"FeatureCollection\",\"features\":[]}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/geojson",
+        "debrief:label": "Track-length result",
+        "debrief:sourceFeatures": ["track-1"]
+      }
+    }
+  ],
+  "duration_ms": 42
+}

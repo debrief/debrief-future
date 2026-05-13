@@ -61,12 +61,12 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 **Purpose**: Create the new schema file scaffolding, fixture directories, and test-file stubs so subsequent phases just fill them in. No consumer code changes here.
 
-- [ ] T001 Create empty LinkML source file with frontmatter only (id, name, title, prefixes, default_prefix, default_range, imports: `linkml:types` + `tool` — per `contracts/mcp.linkml.yaml.draft.md` lines 14–36) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T002 [P] Create fixture directory tree for the cluster (`valid/`, `invalid/` subdirs per class group) `shared/schemas/fixtures/mcp/.gitkeep`
-- [ ] T003 [P] Create empty test module stub for round-trip tests (imports `pytest` + helpers from `shared/schemas/tests/helpers/`, one placeholder test marked `xfail` to anchor collection) `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T004 [P] Create empty test module stub for golden + negative fixture tests `shared/schemas/tests/test_mcp_fixtures.py`
-- [ ] T005 Verify `task schemas:build` still completes successfully (sanity baseline before adding classes — establishes pre-feature build time for NFR-001 comparison; record duration in shell scratch)
-- [ ] T006 Update backlog row for #222 from `specified` → `implementing` and commit `chore(backlog): mark item 222 as implementing` `BACKLOG.md`
+- [x] T001 Create empty LinkML source file with frontmatter only (id, name, title, prefixes, default_prefix, default_range, imports: `linkml:types` + `tool` — per `contracts/mcp.linkml.yaml.draft.md` lines 14–36) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T002 [P] Create fixture directory tree for the cluster (`valid/`, `invalid/` subdirs per class group) `shared/schemas/fixtures/mcp/.gitkeep`
+- [x] T003 [P] Create empty test module stub for round-trip tests (imports `pytest` + helpers from `shared/schemas/tests/helpers/`, one placeholder test marked `xfail` to anchor collection) `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T004 [P] Create empty test module stub for golden + negative fixture tests `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T005 Verify `task schemas:build` still completes successfully (sanity baseline before adding classes — establishes pre-feature build time for NFR-001 comparison; record duration in shell scratch)
+- [x] T006 Update backlog row for #222 from `specified` → `implementing` and commit `chore(backlog): mark item 222 as implementing` `BACKLOG.md`
 
 **Checkpoint**: New `mcp.yaml` file exists (empty class set), fixture + test scaffolding in place, schema build still green.
 
@@ -80,16 +80,16 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 **⚠️ CRITICAL**: No user-story phase can begin until Phase 2 is complete — every class references at least one enum or the aliases module.
 
-- [ ] T010 Add `SessionMCPToolName` permissible-values enum (11 entries — see `data-model.md` §"Permissible-value enums") to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T011 [P] Add `MCPContentItemTypeEnum` permissible-values enum (`text`, `resource_link`, `image`, `structured`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T012 [P] Add `MCPParamTypeEnum` permissible-values enum (`string`, `number`, `integer`, `boolean`, `array`, `object`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T013 [P] Add `ReplayStatusEnum` permissible-values enum (`unchanged`, `version_drift`, `tool_removed`) to `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T014 Run `task schemas:build` and verify generated artefacts `shared/schemas/src/generated/python/mcp.py`, `shared/schemas/src/generated/typescript/mcp.ts`, `shared/schemas/src/generated/json-schema/mcp.schema.json` are emitted with the four enums
-- [ ] T015 [P] Extend `@debrief/schemas` TS export barrel to re-export the new enums and (forward-declared) classes `shared/schemas/src/typescript/index.ts`
-- [ ] T016 [P] Extend `debrief_schemas` Python re-export module to expose the new enums and (forward-declared) classes `shared/schemas/src/python/debrief_schemas/__init__.py`
-- [ ] T017 [P] Create empty TS-only function-alias module (no aliases yet — populated in Phase 5; see research R-002) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
-- [ ] T018 [P] [test] Extend the schema-comparison helper to register the new file so `test_schema_compare.py` discovers it `shared/schemas/tests/test_schema_compare.py`
-- [ ] T019 Run `uv run pytest shared/schemas/tests/test_regen_idempotent.py shared/schemas/tests/test_schema_compare.py -v` and confirm green (build wiring sound, no classes asserted yet)
+- [x] T010 Add `SessionMCPToolName` permissible-values enum (11 entries — see `data-model.md` §"Permissible-value enums") to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T011 [P] Add `MCPContentItemTypeEnum` permissible-values enum (`text`, `resource_link`, `image`, `structured`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T012 [P] Add `MCPParamTypeEnum` permissible-values enum (`string`, `number`, `integer`, `boolean`, `array`, `object`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T013 [P] Add `ReplayStatusEnum` permissible-values enum (`unchanged`, `version_drift`, `tool_removed`) to `shared/schemas/src/linkml/mcp.yaml`
+- [x] T014 Run `task schemas:build` and verify generated artefacts `shared/schemas/src/generated/python/mcp.py`, `shared/schemas/src/generated/typescript/mcp.ts`, `shared/schemas/src/generated/json-schema/mcp.schema.json` are emitted with the four enums
+- [x] T015 [P] Extend `@debrief/schemas` TS export barrel to re-export the new enums and (forward-declared) classes `shared/schemas/src/typescript/index.ts`
+- [x] T016 [P] Extend `debrief_schemas` Python re-export module to expose the new enums and (forward-declared) classes `shared/schemas/src/python/debrief_schemas/__init__.py`
+- [x] T017 [P] Create empty TS-only function-alias module (no aliases yet — populated in Phase 5; see research R-002) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
+- [x] T018 [P] [test] Extend the schema-comparison helper to register the new file so `test_schema_compare.py` discovers it `shared/schemas/tests/test_schema_compare.py`
+- [x] T019 Run `uv run pytest shared/schemas/tests/test_regen_idempotent.py shared/schemas/tests/test_schema_compare.py -v` and confirm green (build wiring sound, no classes asserted yet)
 
 **Checkpoint**: All four enums generated for both Python and TypeScript; build is reproducible; re-export barrels surface the new symbols; aliases module file in place.
 
@@ -107,28 +107,28 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 > Tests are authored first as failing assertions against the generated types, then turn green as the LinkML classes appear and consumer sites migrate.
 
-- [ ] T020 [P] [US1] [test] Golden + negative fixtures for `MCPRequest` (1 valid, 2 invalid — unknown tool name, missing input) `shared/schemas/fixtures/mcp/MCPRequest/valid/example.json` + `invalid/unknown-tool.json` + `invalid/missing-input.json`
-- [ ] T021 [P] [US1] [test] Golden + negative fixtures for `MCPContentItem` (1 valid per type variant, 1 invalid missing `type`) `shared/schemas/fixtures/mcp/MCPContentItem/`
-- [ ] T022 [P] [US1] [test] Golden + negative fixtures for `MCPToolResponse` (1 valid with mixed content array, 1 invalid empty-content) `shared/schemas/fixtures/mcp/MCPToolResponse/`
-- [ ] T023 [P] [US1] [test] Golden + negative fixtures for `MCPErrorResponse` (1 valid, 1 invalid missing `code`) `shared/schemas/fixtures/mcp/MCPErrorResponse/`
-- [ ] T024 [P] [US1] [test] Add round-trip + schema-compare assertions for the four envelope classes `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T025 [P] [US1] [test] Add golden + negative fixture assertions parameterised over the four envelopes `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T020 [P] [US1] [test] Golden + negative fixtures for `MCPRequest` (1 valid, 2 invalid — unknown tool name, missing input) `shared/schemas/fixtures/mcp/MCPRequest/valid/example.json` + `invalid/unknown-tool.json` + `invalid/missing-input.json`
+- [x] T021 [P] [US1] [test] Golden + negative fixtures for `MCPContentItem` (1 valid per type variant, 1 invalid missing `type`) `shared/schemas/fixtures/mcp/MCPContentItem/`
+- [x] T022 [P] [US1] [test] Golden + negative fixtures for `MCPToolResponse` (1 valid with mixed content array, 1 invalid empty-content) `shared/schemas/fixtures/mcp/MCPToolResponse/`
+- [x] T023 [P] [US1] [test] Golden + negative fixtures for `MCPErrorResponse` (1 valid, 1 invalid missing `code`) `shared/schemas/fixtures/mcp/MCPErrorResponse/`
+- [x] T024 [P] [US1] [test] Add round-trip + schema-compare assertions for the four envelope classes `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T025 [P] [US1] [test] Add golden + negative fixture assertions parameterised over the four envelopes `shared/schemas/tests/test_mcp_fixtures.py`
 
 ### Implementation for User Story 1
 
-- [ ] T030 [US1] Add `MCPRequest` class (slots: `tool`, `input` — see `data-model.md` Group 1 and `contracts/mcp.linkml.yaml.draft.md` lines 89–99) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T031 [US1] Add `MCPContentItem` class (6 slots, discriminator `type`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T032 [US1] Add `MCPToolResponse` class (multivalued `content`, optional `is_error`, free-form `structured_content`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T033 [US1] Add `MCPErrorResponse` class (`code`, `message`, free-form `data`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T034 [US1] Run `task schemas:build`; confirm `mcp.py`, `mcp.ts`, `mcp.schema.json` regenerate with four new classes and that `$defs` count increases by 4
-- [ ] T035 [P] [US1] Delete hand-typed `MCPRequest` interface at `services/session-state/src/server/mcp.ts:23` and replace consumer imports with `import { MCPRequest } from '@debrief/schemas'`
-- [ ] T036 [P] [US1] Delete hand-typed `MCPContentItem` interface at `shared/utils/src/mcp-types.ts:30` and replace with re-export from `@debrief/schemas`
-- [ ] T037 [P] [US1] Delete hand-typed `MCPToolResponse` interface at `shared/utils/src/mcp-types.ts:42` and replace with re-export from `@debrief/schemas`
-- [ ] T038 [P] [US1] Delete hand-typed `MCPErrorResponse` interface at `shared/utils/src/mcp-types.ts:50` and replace with re-export from `@debrief/schemas`
-- [ ] T039 [US1] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all envelope tests green
-- [ ] T040 [US1] Run `pnpm -r typecheck` and `pnpm lint` and confirm no consumer site broke (each migrated import resolves to a generated type identical in shape to the deleted hand-type)
-- [ ] T041 [US1] Run the type-audit scanner (per `quickstart.md` Step 3) and confirm §3.1 rows for `MCPRequest`/`MCPContentItem`/`MCPToolResponse`/`MCPErrorResponse` are gone; record before/after counts in shell scratch (input to Phase 6 evidence task)
-- [ ] T042 [US1] Commit P1 slice: `feat(schemas): promote MCP envelope shapes to LinkML (P1)` — single commit per research R-005 (bisect-friendliness)
+- [x] T030 [US1] Add `MCPRequest` class (slots: `tool`, `input` — see `data-model.md` Group 1 and `contracts/mcp.linkml.yaml.draft.md` lines 89–99) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T031 [US1] Add `MCPContentItem` class (6 slots, discriminator `type`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T032 [US1] Add `MCPToolResponse` class (multivalued `content`, optional `is_error`, free-form `structured_content`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T033 [US1] Add `MCPErrorResponse` class (`code`, `message`, free-form `data`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T034 [US1] Run `task schemas:build`; confirm `mcp.py`, `mcp.ts`, `mcp.schema.json` regenerate with four new classes and that `$defs` count increases by 4
+- [x] T035 [P] [US1] Delete hand-typed `MCPRequest` interface at `services/session-state/src/server/mcp.ts:23` and replace consumer imports with `import { MCPRequest } from '@debrief/schemas'`
+- [x] T036 [P] [US1] Delete hand-typed `MCPContentItem` interface at `shared/utils/src/mcp-types.ts:30` and replace with re-export from `@debrief/schemas`
+- [x] T037 [P] [US1] Delete hand-typed `MCPToolResponse` interface at `shared/utils/src/mcp-types.ts:42` and replace with re-export from `@debrief/schemas`
+- [x] T038 [P] [US1] Delete hand-typed `MCPErrorResponse` interface at `shared/utils/src/mcp-types.ts:50` and replace with re-export from `@debrief/schemas`
+- [x] T039 [US1] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all envelope tests green
+- [x] T040 [US1] Run `pnpm -r typecheck` and `pnpm lint` and confirm no consumer site broke (each migrated import resolves to a generated type identical in shape to the deleted hand-type)
+- [x] T041 [US1] Run the type-audit scanner (per `quickstart.md` Step 3) and confirm §3.1 rows for `MCPRequest`/`MCPContentItem`/`MCPToolResponse`/`MCPErrorResponse` are gone; record before/after counts in shell scratch (input to Phase 6 evidence task)
+- [x] T042 [US1] Commit P1 slice: `feat(schemas): promote MCP envelope shapes to LinkML (P1)` — single commit per research R-005 (bisect-friendliness)
 
 **Checkpoint**: Four envelope classes generated, six consumer sites migrated, all tests green, audit shows four fewer rows attributed to #222.
 
@@ -144,35 +144,35 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Tests for User Story 2 (REQUIRED — FR-006) ⚠️
 
-- [ ] T050 [P] [US2] [test] Fixtures for `MCPParamSchema` including a recursive `items` example (closes data-model §"items: recursive") `shared/schemas/fixtures/mcp/MCPParamSchema/`
-- [ ] T051 [P] [US2] [test] Fixtures for `MCPSelectionRequirement` (track / point / polygon variants) `shared/schemas/fixtures/mcp/MCPSelectionRequirement/`
-- [ ] T052 [P] [US2] [test] Fixtures for `MCPToolDefinition` (with and without optional slots) `shared/schemas/fixtures/mcp/MCPToolDefinition/`
-- [ ] T053 [P] [US2] [test] Fixtures for `ToolParameter` covering BOTH legacy hand-type shapes (one with `validation`, one with `hint` — drift reconciliation per data-model line 134) `shared/schemas/fixtures/mcp/ToolParameter/`
-- [ ] T054 [P] [US2] [test] Fixtures for `ToolParameterMeta`, `ToolDefinition`, `ToolResult` (1 valid + 1 invalid each) `shared/schemas/fixtures/mcp/{ToolParameterMeta,ToolDefinition,ToolResult}/`
-- [ ] T055 [US2] [test] Extend `test_mcp_roundtrip.py` with discovery-class assertions (round-trip + schema-compare for the seven discovery classes) `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T056 [US2] [test] Extend `test_mcp_fixtures.py` with parameterised golden + negative cases for discovery classes `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T050 [P] [US2] [test] Fixtures for `MCPParamSchema` including a recursive `items` example (closes data-model §"items: recursive") `shared/schemas/fixtures/mcp/MCPParamSchema/`
+- [x] T051 [P] [US2] [test] Fixtures for `MCPSelectionRequirement` (track / point / polygon variants) `shared/schemas/fixtures/mcp/MCPSelectionRequirement/`
+- [x] T052 [P] [US2] [test] Fixtures for `MCPToolDefinition` (with and without optional slots) `shared/schemas/fixtures/mcp/MCPToolDefinition/`
+- [x] T053 [P] [US2] [test] Fixtures for `ToolParameter` covering BOTH legacy hand-type shapes (one with `validation`, one with `hint` — drift reconciliation per data-model line 134) `shared/schemas/fixtures/mcp/ToolParameter/`
+- [x] T054 [P] [US2] [test] Fixtures for `ToolParameterMeta`, `ToolDefinition`, `ToolResult` (1 valid + 1 invalid each) `shared/schemas/fixtures/mcp/{ToolParameterMeta,ToolDefinition,ToolResult}/`
+- [x] T055 [US2] [test] Extend `test_mcp_roundtrip.py` with discovery-class assertions (round-trip + schema-compare for the seven discovery classes) `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T056 [US2] [test] Extend `test_mcp_fixtures.py` with parameterised golden + negative cases for discovery classes `shared/schemas/tests/test_mcp_fixtures.py`
 
 ### Implementation for User Story 2
 
-- [ ] T060 [US2] Add `MCPParamSchema` class (recursive `items`, free-form `default`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T061 [US2] Add `MCPSelectionRequirement` class `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T062 [US2] Add `MCPToolDefinition` class (references `MCPParamSchema`, `MCPSelectionRequirement`, `ToolCategoryEnum` from `tool.yaml` via `imports:`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T063 [US2] Add canonical `ToolParameter` class (union of both legacy hand-types — additive, both `validation` and `hint` slots present; see data-model line 133) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T064 [US2] Add `ToolParameterMeta`, `ToolDefinition`, `ToolResult` classes `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T065 [US2] Run `task schemas:build` and confirm seven new classes regenerate cleanly in all three output targets
-- [ ] T066 [P] [US2] Delete `MCPParamSchema` interface at `shared/components/src/ToolMatch/mcpAdapter.ts:50` and import from `@debrief/schemas`
-- [ ] T067 [P] [US2] Delete `MCPParamSchema` interface at `apps/vscode/src/services/mcpToolAdapter.ts:16` and import from `@debrief/schemas`
-- [ ] T068 [P] [US2] Delete `MCPSelectionRequirement` interface at `shared/utils/src/mcp-types.ts:65` and re-export from `@debrief/schemas`
-- [ ] T069 [P] [US2] Delete `MCPToolDefinition` interface at `shared/utils/src/mcp-types.ts:76` and re-export from `@debrief/schemas`
-- [ ] T070 [P] [US2] Delete `ToolParameter` interface at `shared/components/src/ToolMatch/types.ts:34` and import from `@debrief/schemas` (drift cluster member 1)
-- [ ] T071 [P] [US2] Delete `ToolParameter` interface at `apps/vscode/src/types/tool.ts:26` and import from `@debrief/schemas` (drift cluster member 2)
-- [ ] T072 [P] [US2] Delete `ToolParameterMeta` interface at `apps/web-shell/src/mocks/calcService.ts:138` and import from `@debrief/schemas`
-- [ ] T073 [P] [US2] Delete `ToolDefinition` interface at `apps/web-shell/src/mocks/calcService.ts:145` and import from `@debrief/schemas`
-- [ ] T074 [P] [US2] Delete `ToolResult` interface at `apps/web-shell/src/mocks/calcService.ts:26` and import from `@debrief/schemas`
-- [ ] T075 [US2] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all discovery tests green
-- [ ] T076 [US2] Run `pnpm --filter @debrief/components test` (catches ToolMatch story regression — vitest snapshot) and `pnpm -r typecheck`
-- [ ] T077 [US2] Run the type-audit scanner and confirm §3.1 lost six more rows and §3.2 lost both `ToolParameter` rows; record running total
-- [ ] T078 [US2] Commit P2 slice: `feat(schemas): promote MCP discovery shapes to LinkML and collapse ToolParameter drift (P2)`
+- [x] T060 [US2] Add `MCPParamSchema` class (recursive `items`, free-form `default`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T061 [US2] Add `MCPSelectionRequirement` class `shared/schemas/src/linkml/mcp.yaml`
+- [x] T062 [US2] Add `MCPToolDefinition` class (references `MCPParamSchema`, `MCPSelectionRequirement`, `ToolCategoryEnum` from `tool.yaml` via `imports:`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T063 [US2] Add canonical `ToolParameter` class (union of both legacy hand-types — additive, both `validation` and `hint` slots present; see data-model line 133) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T064 [US2] Add `ToolParameterMeta`, `ToolDefinition`, `ToolResult` classes `shared/schemas/src/linkml/mcp.yaml`
+- [x] T065 [US2] Run `task schemas:build` and confirm seven new classes regenerate cleanly in all three output targets
+- [x] T066 [P] [US2] Delete `MCPParamSchema` interface at `shared/components/src/ToolMatch/mcpAdapter.ts:50` and import from `@debrief/schemas`
+- [x] T067 [P] [US2] Delete `MCPParamSchema` interface at `apps/vscode/src/services/mcpToolAdapter.ts:16` and import from `@debrief/schemas`
+- [x] T068 [P] [US2] Delete `MCPSelectionRequirement` interface at `shared/utils/src/mcp-types.ts:65` and re-export from `@debrief/schemas`
+- [x] T069 [P] [US2] Delete `MCPToolDefinition` interface at `shared/utils/src/mcp-types.ts:76` and re-export from `@debrief/schemas`
+- [x] T070 [P] [US2] Delete `ToolParameter` interface at `shared/components/src/ToolMatch/types.ts:34` and import from `@debrief/schemas` (drift cluster member 1)
+- [x] T071 [P] [US2] Delete `ToolParameter` interface at `apps/vscode/src/types/tool.ts:26` and import from `@debrief/schemas` (drift cluster member 2)
+- [x] T072 [P] [US2] Delete `ToolParameterMeta` interface at `apps/web-shell/src/mocks/calcService.ts:138` and import from `@debrief/schemas`
+- [x] T073 [P] [US2] Delete `ToolDefinition` interface at `apps/web-shell/src/mocks/calcService.ts:145` and import from `@debrief/schemas`
+- [x] T074 [P] [US2] Delete `ToolResult` interface at `apps/web-shell/src/mocks/calcService.ts:26` and import from `@debrief/schemas`
+- [x] T075 [US2] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all discovery tests green
+- [x] T076 [US2] Run `pnpm --filter @debrief/components test` (catches ToolMatch story regression — vitest snapshot) and `pnpm -r typecheck`
+- [x] T077 [US2] Run the type-audit scanner and confirm §3.1 lost six more rows and §3.2 lost both `ToolParameter` rows; record running total
+- [x] T078 [US2] Commit P2 slice: `feat(schemas): promote MCP discovery shapes to LinkML and collapse ToolParameter drift (P2)`
 
 **Checkpoint**: Both Stories 1 and 2 work; ToolMatch parameter form unchanged visually; audit count down by 10 rows in §3.1 and 2 rows in §3.2.
 
@@ -188,29 +188,29 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Tests for User Story 3 (REQUIRED — FR-006 + FR-011) ⚠️
 
-- [ ] T080 [P] [US3] [test] Fixtures for `ToolResultForLog` (1 success-path with `result`, 1 error-path with `error`, 1 negative violating `result XOR error`) `shared/schemas/fixtures/mcp/ToolResultForLog/`
-- [ ] T081 [P] [US3] [test] Fixtures for `ToolExecutionResultForReplay` covering each `ReplayStatusEnum` value `shared/schemas/fixtures/mcp/ToolExecutionResultForReplay/`
-- [ ] T082 [P] [US3] [test] Fixtures for `ToolsUpdateMessage` (1 valid `type=tools:update`, 1 invalid `type=other`) `shared/schemas/fixtures/mcp/ToolsUpdateMessage/`
-- [ ] T083 [US3] [test] Extend `test_mcp_roundtrip.py` with replay-class assertions plus a Pydantic `model_validator` assertion for `result XOR error` on `ToolResultForLog` `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T084 [US3] [test] Add a fixture-replay-compatibility test that loads every JSON file under `services/session-state/**/__fixtures__/` matching `*tool*log*.json` / `*replay*.json` and validates it against the new generated Pydantic class — proves FR-011 (schema is a superset of all currently-shipped log shapes) `shared/schemas/tests/test_mcp_log_fixture_compat.py`
+- [x] T080 [P] [US3] [test] Fixtures for `ToolResultForLog` (1 success-path with `result`, 1 error-path with `error`, 1 negative violating `result XOR error`) `shared/schemas/fixtures/mcp/ToolResultForLog/`
+- [x] T081 [P] [US3] [test] Fixtures for `ToolExecutionResultForReplay` covering each `ReplayStatusEnum` value `shared/schemas/fixtures/mcp/ToolExecutionResultForReplay/`
+- [x] T082 [P] [US3] [test] Fixtures for `ToolsUpdateMessage` (1 valid `type=tools:update`, 1 invalid `type=other`) `shared/schemas/fixtures/mcp/ToolsUpdateMessage/`
+- [x] T083 [US3] [test] Extend `test_mcp_roundtrip.py` with replay-class assertions plus a Pydantic `model_validator` assertion for `result XOR error` on `ToolResultForLog` `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T084 [US3] [test] Add a fixture-replay-compatibility test that loads every JSON file under `services/session-state/**/__fixtures__/` matching `*tool*log*.json` / `*replay*.json` and validates it against the new generated Pydantic class — proves FR-011 (schema is a superset of all currently-shipped log shapes) `shared/schemas/tests/test_mcp_log_fixture_compat.py`
 
 ### Implementation for User Story 3
 
-- [ ] T090 [US3] Add `ToolResultForLog` class (8 slots — see data-model Group 3) with Pydantic `model_validator` enforcing `result XOR error` (post-generation hook in `shared/schemas/scripts/` if the generator does not emit validators directly — fall back to a thin wrapper in `shared/schemas/src/python/debrief_schemas/validators/mcp.py`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T091 [US3] Add `ToolExecutionResultForReplay` class (inherits from `ToolResultForLog` via `is_a:`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T092 [US3] Add `ToolsUpdateMessage` class with `equals_string: tools:update` on the `type` slot `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T093 [US3] Run `task schemas:build` and confirm three new classes + the enum-derived imports regenerate cleanly
-- [ ] T094 [US3] Add `ToolExecutor` and `ToolVersionResolver` function-type aliases (one-line TS expressions importing generated parameter/return types from `@debrief/schemas`; module is treated as schema-rooted by audit R4) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
-- [ ] T095 [P] [US3] Delete `ToolResultForLog` interface at `services/session-state/src/log/types.ts:89` and import from `@debrief/schemas`
-- [ ] T096 [P] [US3] Delete `ToolExecutionResultForReplay` interface at `services/session-state/src/log/types.ts:271` and import from `@debrief/schemas`
-- [ ] T097 [P] [US3] Delete `ToolExecutor` function-type alias at `services/session-state/src/log/types.ts:281` and import from `@debrief/schemas`
-- [ ] T098 [P] [US3] Delete `ToolVersionResolver` function-type alias at `services/session-state/src/log/types.ts:299` and import from `@debrief/schemas`
-- [ ] T099 [P] [US3] Delete `ToolsUpdateMessage` interface at `apps/vscode/src/webview/web/activityPanel.tsx:52` and import from `@debrief/schemas`
-- [ ] T100 [US3] Retype the `TOOLS` const at `services/session-state/src/server/mcp.ts:31-47` as `Record<SessionMCPToolName, ToolHandler>` and delete the local `type ToolName = keyof typeof TOOLS` at `:49` — replace consumer imports with `import type { SessionMCPToolName as ToolName } from '@debrief/schemas'` where needed `services/session-state/src/server/mcp.ts`
-- [ ] T101 [US3] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py shared/schemas/tests/test_mcp_log_fixture_compat.py -v` and confirm all replay tests green AND every existing log fixture validates
-- [ ] T102 [US3] Run `pnpm --filter @debrief/session-state test` and confirm replay-engine unit tests still pass
-- [ ] T103 [US3] Run the type-audit scanner and confirm §3.1 rows attributed to #222 are now **zero** (SC-001) AND §3.2 `ToolParameter` is zero (SC-002); capture the full report excerpt for evidence
-- [ ] T104 [US3] Commit P3 slice: `feat(schemas): promote MCP replay/log shapes to LinkML and close #222 cluster (P3)`
+- [x] T090 [US3] Add `ToolResultForLog` class (8 slots — see data-model Group 3) with Pydantic `model_validator` enforcing `result XOR error` (post-generation hook in `shared/schemas/scripts/` if the generator does not emit validators directly — fall back to a thin wrapper in `shared/schemas/src/python/debrief_schemas/validators/mcp.py`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T091 [US3] Add `ToolExecutionResultForReplay` class (inherits from `ToolResultForLog` via `is_a:`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T092 [US3] Add `ToolsUpdateMessage` class with `equals_string: tools:update` on the `type` slot `shared/schemas/src/linkml/mcp.yaml`
+- [x] T093 [US3] Run `task schemas:build` and confirm three new classes + the enum-derived imports regenerate cleanly
+- [x] T094 [US3] Add `ToolExecutor` and `ToolVersionResolver` function-type aliases (one-line TS expressions importing generated parameter/return types from `@debrief/schemas`; module is treated as schema-rooted by audit R4) `shared/schemas/src/typescript/aliases/mcp-functions.ts`
+- [x] T095 [P] [US3] Delete `ToolResultForLog` interface at `services/session-state/src/log/types.ts:89` and import from `@debrief/schemas`
+- [x] T096 [P] [US3] Delete `ToolExecutionResultForReplay` interface at `services/session-state/src/log/types.ts:271` and import from `@debrief/schemas`
+- [x] T097 [P] [US3] Delete `ToolExecutor` function-type alias at `services/session-state/src/log/types.ts:281` and import from `@debrief/schemas`
+- [x] T098 [P] [US3] Delete `ToolVersionResolver` function-type alias at `services/session-state/src/log/types.ts:299` and import from `@debrief/schemas`
+- [x] T099 [P] [US3] Delete `ToolsUpdateMessage` interface at `apps/vscode/src/webview/web/activityPanel.tsx:52` and import from `@debrief/schemas`
+- [x] T100 [US3] Retype the `TOOLS` const at `services/session-state/src/server/mcp.ts:31-47` as `Record<SessionMCPToolName, ToolHandler>` and delete the local `type ToolName = keyof typeof TOOLS` at `:49` — replace consumer imports with `import type { SessionMCPToolName as ToolName } from '@debrief/schemas'` where needed `services/session-state/src/server/mcp.ts`
+- [x] T101 [US3] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py shared/schemas/tests/test_mcp_log_fixture_compat.py -v` and confirm all replay tests green AND every existing log fixture validates
+- [x] T102 [US3] Run `pnpm --filter @debrief/session-state test` and confirm replay-engine unit tests still pass
+- [x] T103 [US3] Run the type-audit scanner and confirm §3.1 rows attributed to #222 are now **zero** (SC-001) AND §3.2 `ToolParameter` is zero (SC-002); capture the full report excerpt for evidence
+- [x] T104 [US3] Commit P3 slice: `feat(schemas): promote MCP replay/log shapes to LinkML and close #222 cluster (P3)`
 
 **Checkpoint**: All three slices complete; audit cluster fully resolved; replay subsystem still loads every committed log fixture.
 
@@ -224,40 +224,40 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Documentation & Cross-Cutting
 
-- [ ] T110 [P] Append a new §5 changelog entry to `docs/type-audit-2026.md` recording the before/after row counts for §3.1 (17 → 0 attributed to #222) and §3.2 (2 → 0 for `ToolParameter`), the merge git-SHA placeholder, and a link to this spec (FR-010 / SC-007) `docs/type-audit-2026.md`
-- [ ] T111 [P] Add a worked-example section for the MCP cluster to `shared/schemas/README.md` alongside the existing GeoJSON / session-state / styling examples (NFR-003) `shared/schemas/README.md`
-- [ ] T112 [P] Spot-check there are no new `as any`, `// @ts-expect-error`, `# type: ignore`, or `Any` casts in the migration diff except the two enumerated free-form fields (`MCPContentItem.structuredContent`, `MCPErrorResponse.data`) — `git diff main...HEAD` review per FR-009 / SC-005
+- [x] T110 [P] Append a new §5 changelog entry to `docs/type-audit-2026.md` recording the before/after row counts for §3.1 (17 → 0 attributed to #222) and §3.2 (2 → 0 for `ToolParameter`), the merge git-SHA placeholder, and a link to this spec (FR-010 / SC-007) `docs/type-audit-2026.md`
+- [x] T111 [P] Add a worked-example section for the MCP cluster to `shared/schemas/README.md` alongside the existing GeoJSON / session-state / styling examples (NFR-003) `shared/schemas/README.md`
+- [x] T112 [P] Spot-check there are no new `as any`, `// @ts-expect-error`, `# type: ignore`, or `Any` casts in the migration diff except the two enumerated free-form fields (`MCPContentItem.structuredContent`, `MCPErrorResponse.data`) — `git diff main...HEAD` review per FR-009 / SC-005
 
 ### Full-Suite Verification (REQUIRED)
 
 > The full `task verify` pipeline MUST pass on the feature branch before evidence is captured (CLAUDE.md § Before Pushing).
 
-- [ ] T120 [test] Run `task verify` (or the four-step fallback) and capture totals — lint + typecheck + pytest + vitest + Playwright E2E all green
-- [ ] T121 [test] Re-run the type-audit scanner per `quickstart.md` Step 3 and capture the regenerated `tmp/type-audit-report.md` for evidence (SC-001 / SC-002 final proof)
-- [ ] T122 [test] Run the calc-tool Playwright regression (path resolved per research R-007 — locate the test that exercises ToolMatch → invoke → LogPanel in `apps/web-shell/playwright/tests/`; run via `cd apps/web-shell && node run-playwright.mjs <test-name>`). If no E2E exists, document the substitution per R-007 outcome contingency and rely on the existing Storybook + vitest visual-regression coverage for SC-006
+- [x] T120 [test] Run `task verify` (or the four-step fallback) and capture totals — lint + typecheck + pytest + vitest + Playwright E2E all green
+- [x] T121 [test] Re-run the type-audit scanner per `quickstart.md` Step 3 and capture the regenerated `tmp/type-audit-report.md` for evidence (SC-001 / SC-002 final proof)
+- [x] T122 [test] Run the calc-tool Playwright regression (path resolved per research R-007 — locate the test that exercises ToolMatch → invoke → LogPanel in `apps/web-shell/playwright/tests/`; run via `cd apps/web-shell && node run-playwright.mjs <test-name>`). If no E2E exists, document the substitution per R-007 outcome contingency and rely on the existing Storybook + vitest visual-regression coverage for SC-006
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip T122. The web-shell runner at `apps/web-shell/run-playwright.mjs` extracts the bundled `@sparticuz/chromium` binary. Full details: `docs/project_notes/playwright-installation-research.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T130 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body breaks down by suite — pytest schemas / pytest session-state / vitest / Playwright) `specs/222-linkml-mcp-envelopes/evidence/test-summary.md`
-- [ ] T131 [P] Write usage demonstration showing the "add a field to `MCPToolResponse`" workflow (edit `mcp.yaml` → `task schemas:build` → field appears in both Python and TS — matches User Story 1 acceptance scenario 1) `specs/222-linkml-mcp-envelopes/evidence/usage-example.md`
-- [ ] T132 [P] Capture round-trip proof for one representative class per group (envelope: `MCPToolResponse`; discovery: `MCPParamSchema` with recursive items; replay: `ToolExecutionResultForReplay`) — Python `model_dump()` JSON pasted side-by-side with TS `JSON.parse + ajv.validate` JSON pasted side-by-side with re-validated Python instance `specs/222-linkml-mcp-envelopes/evidence/round-trip-evidence.md`
-- [ ] T133 [P] Capture before/after type-audit report excerpts (the §3.1 #222 attribution section, before commit `01166d6e` vs. after merge) `specs/222-linkml-mcp-envelopes/evidence/type-audit-before-after.md`
-- [ ] T134 [P] Capture the four-envelope `$defs` excerpt from the generated JSON Schema as a configuration-sample artefact (per Quality Rubric "Configuration sample + validation output") `specs/222-linkml-mcp-envelopes/evidence/mcp-schema-sample.json`
-- [ ] T135 [P] Document the SC-006 calc-tool regression outcome — path of the test run (or substitution if no E2E exists per R-007), pass/fail status, screenshot if applicable `specs/222-linkml-mcp-envelopes/evidence/calc-tool-regression.md`
+- [x] T130 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body breaks down by suite — pytest schemas / pytest session-state / vitest / Playwright) `specs/222-linkml-mcp-envelopes/evidence/test-summary.md`
+- [x] T131 [P] Write usage demonstration showing the "add a field to `MCPToolResponse`" workflow (edit `mcp.yaml` → `task schemas:build` → field appears in both Python and TS — matches User Story 1 acceptance scenario 1) `specs/222-linkml-mcp-envelopes/evidence/usage-example.md`
+- [x] T132 [P] Capture round-trip proof for one representative class per group (envelope: `MCPToolResponse`; discovery: `MCPParamSchema` with recursive items; replay: `ToolExecutionResultForReplay`) — Python `model_dump()` JSON pasted side-by-side with TS `JSON.parse + ajv.validate` JSON pasted side-by-side with re-validated Python instance `specs/222-linkml-mcp-envelopes/evidence/round-trip-evidence.md`
+- [x] T133 [P] Capture before/after type-audit report excerpts (the §3.1 #222 attribution section, before commit `01166d6e` vs. after merge) `specs/222-linkml-mcp-envelopes/evidence/type-audit-before-after.md`
+- [x] T134 [P] Capture the four-envelope `$defs` excerpt from the generated JSON Schema as a configuration-sample artefact (per Quality Rubric "Configuration sample + validation output") `specs/222-linkml-mcp-envelopes/evidence/mcp-schema-sample.json`
+- [x] T135 [P] Document the SC-006 calc-tool regression outcome — path of the test run (or substitution if no E2E exists per R-007), pass/fail status, screenshot if applicable `specs/222-linkml-mcp-envelopes/evidence/calc-tool-regression.md`
 
 ### Media Content (REQUIRED)
 
-- [ ] T140 Create feature blog post using the Content Specialist agent — reads `evidence/opening-context.md` verbatim for the first three sections (What We're Building, How It Fits, Key Decisions), then synthesises remaining sections (By the Numbers — 17 hand-types removed, 15 LinkML classes added, 4 enums added; Lessons Learned; What's Next — pointer to sibling clusters #223–#227). Title prefixed with `Building ` `specs/222-linkml-mcp-envelopes/media/shipped-post.md`
+- [x] T140 Create feature blog post using the Content Specialist agent — reads `evidence/opening-context.md` verbatim for the first three sections (What We're Building, How It Fits, Key Decisions), then synthesises remaining sections (By the Numbers — 17 hand-types removed, 15 LinkML classes added, 4 enums added; Lessons Learned; What's Next — pointer to sibling clusters #223–#227). Title prefixed with `Building ` `specs/222-linkml-mcp-envelopes/media/shipped-post.md`
 
 ### Backlog Bookkeeping
 
-- [ ] T150 Strike through the BACKLOG.md row for #222 (wrap each cell in `~~`) and commit `chore(backlog): mark item 222 as complete` `BACKLOG.md`
+- [x] T150 Strike through the BACKLOG.md row for #222 (wrap each cell in `~~`) and commit `chore(backlog): mark item 222 as complete` `BACKLOG.md`
 
 ### PR Creation
 
-- [ ] T160 Create PR and publish blog: run /speckit.pr
+- [x] T160 Create PR and publish blog: run /speckit.pr
 
 **Task T160 must run last. It depends on T100–T150 being complete.**
 

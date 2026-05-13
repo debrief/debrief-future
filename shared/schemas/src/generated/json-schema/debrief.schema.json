@@ -1010,6 +1010,244 @@
       "title": "LogEntry",
       "type": "object"
     },
+    "MCPContentItem": {
+      "additionalProperties": false,
+      "description": "A single MCP content item (resource, text, or image). Carries Debrief-specific annotations (debrief:* keys) on every item. Closes audit \u00a73.1 row 15.",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:resultType`, `debrief:label`, `debrief:sourceFeatures`, etc). Free-form per Article XV.2 because the key set is open-ended and uses colons (`debrief:*`) that LinkML cannot constrain as slot names."
+        },
+        "data": {
+          "description": "Base64-encoded payload when type=image.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mimeType": {
+          "description": "IANA media type when type=image or type=resource.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Nested resource descriptor `{ uri, mimeType, text }` when type=resource. Free-form per Article XV.2 (the inner shape is driven by individual tool authors)."
+        },
+        "text": {
+          "description": "Body text when type=text.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "Content-item discriminator. Current consumers emit `resource`, `text`, `image`. Kept as string to remain additive over any future MCP content-item types.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "annotations"
+      ],
+      "title": "MCPContentItem",
+      "type": "object"
+    },
+    "MCPContentItemTypeEnum": {
+      "description": "Discriminator for MCPContentItem variants.",
+      "enum": [
+        "text",
+        "resource_link",
+        "image",
+        "structured"
+      ],
+      "title": "MCPContentItemTypeEnum",
+      "type": "string"
+    },
+    "MCPErrorResponse": {
+      "additionalProperties": false,
+      "description": "MCP error response envelope. Closes audit \u00a73.1 row 17. The error payload is nested (matches the JSON-RPC convention used by the live server).",
+      "properties": {
+        "duration_ms": {
+          "description": "Wall-clock duration before failure.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested error object `{ code, message, data: { debrief:errorCategory, debrief:affectedFeatures } }`. Free-form per Article XV.2 because the inner `data` map uses colon-bearing keys outside LinkML slot syntax."
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "MCPErrorResponse",
+      "type": "object"
+    },
+    "MCPParamSchema": {
+      "additionalProperties": false,
+      "description": "JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit \u00a73.1 rows 1 and 27 (two-site drift). Open at the wire level \u2014 consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.",
+      "properties": {
+        "description": {
+          "description": "Human-readable parameter description.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "JSON-Schema primitive type (string / number / integer / boolean / array / object).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "MCPParamSchema",
+      "type": "object"
+    },
+    "MCPParamTypeEnum": {
+      "description": "JSON-Schema-compatible primitive types for tool parameters.",
+      "enum": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "array",
+        "object"
+      ],
+      "title": "MCPParamTypeEnum",
+      "type": "string"
+    },
+    "MCPRequest": {
+      "additionalProperties": false,
+      "description": "MCP tool invocation envelope. Sent by consumers (VS Code, web-shell) to the MCP server. Closes audit \u00a73.1 row 13.",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Any",
+          "description": "Free-form per-tool input payload (Article XV.2 exception \u2014 narrowed by per-tool Pydantic input model at dispatch)."
+        },
+        "tool": {
+          "description": "Tool name (one of SessionMCPToolName for the session-state server).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool",
+        "input"
+      ],
+      "title": "MCPRequest",
+      "type": "object"
+    },
+    "MCPSelectionRequirement": {
+      "additionalProperties": false,
+      "description": "Predicate describing what feature selection a tool needs (e.g. \"at least one Track\", \"exactly one Point\"). Closes audit \u00a73.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).",
+      "properties": {
+        "kind": {
+          "description": "Feature kind this requirement applies to. Supports flat values (e.g. \"TRACK\", \"POINT\") and dot-delimited hierarchical paths (e.g. \"TRACK.SEGMENT\").",
+          "type": "string"
+        },
+        "max": {
+          "description": "Maximum number of features of this kind allowed.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "min": {
+          "description": "Minimum number of features of this kind required.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "min"
+      ],
+      "title": "MCPSelectionRequirement",
+      "type": "object"
+    },
+    "MCPToolDefinition": {
+      "additionalProperties": false,
+      "description": "Static catalogue entry advertised by the MCP server. Closes audit \u00a73.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 \u2014 `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2."
+        },
+        "description": {
+          "description": "Human-readable tool description.",
+          "type": "string"
+        },
+        "input_schema": {
+          "$ref": "#/$defs/Any",
+          "description": "JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 \u2014 consumers narrow at point of use."
+        },
+        "name": {
+          "description": "Tool identifier.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "input_schema",
+        "annotations"
+      ],
+      "title": "MCPToolDefinition",
+      "type": "object"
+    },
+    "MCPToolResponse": {
+      "additionalProperties": false,
+      "description": "Successful MCP tool response. Closes audit \u00a73.1 row 16. The `duration_ms` slot preserves the wire format used by the live MCP server and replay subsystem.",
+      "properties": {
+        "content": {
+          "description": "Ordered list of content items returned by the tool.",
+          "items": {
+            "$ref": "#/$defs/MCPContentItem"
+          },
+          "type": "array"
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "is_error": {
+          "description": "Reserved for streaming partial-error responses (additive over the live wire format).",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "structured_content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Reserved for top-level free-form payload (e.g. vega-spec) \u2014 Article XV.2 exception. Additive over the live wire format."
+        }
+      },
+      "required": [
+        "content",
+        "duration_ms"
+      ],
+      "title": "MCPToolResponse",
+      "type": "object"
+    },
     "MarkerSymbolEnum": {
       "description": "Marker shapes for tool parameter choices (superset of PointShapeEnum)",
       "enum": [
@@ -2359,6 +2597,16 @@
       "title": "ReferencePointPatternEnum",
       "type": "string"
     },
+    "ReplayStatusEnum": {
+      "description": "Outcome of resolving a logged tool invocation at replay time.",
+      "enum": [
+        "unchanged",
+        "version_drift",
+        "tool_removed"
+      ],
+      "title": "ReplayStatusEnum",
+      "type": "string"
+    },
     "ResultCategoryEnum": {
       "description": "Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.",
       "enum": [
@@ -2950,6 +3198,24 @@
       ],
       "title": "SensorData",
       "type": "object"
+    },
+    "SessionMCPToolName": {
+      "description": "Authoritative list of session-state MCP tool names. Must mirror the `TOOLS` const at services/session-state/src/server/mcp.ts. Research R-001: replaces the TS-only `type ToolName = keyof typeof TOOLS` projection with a cross-language permissible-values enum.",
+      "enum": [
+        "session.getState",
+        "session.getTemporalState",
+        "session.getSpatialState",
+        "session.getFeaturesState",
+        "session.getDocumentState",
+        "session.setCurrentTime",
+        "session.setViewport",
+        "session.setSelection",
+        "session.setHiddenFeatures",
+        "session.setPlaybackRate",
+        "session.setRotation"
+      ],
+      "title": "SessionMCPToolName",
+      "type": "string"
     },
     "SnapshotLinks": {
       "additionalProperties": false,
@@ -3754,10 +4020,118 @@
       "title": "ToolCategoryEnum",
       "type": "string"
     },
+    "ToolDefinition": {
+      "additionalProperties": false,
+      "description": "Consumer-facing flattened view of a tool catalogue entry. Closes audit \u00a73.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` \u2014 preserved as-is).",
+      "properties": {
+        "description": {
+          "description": "Brief description.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique tool identifier.",
+          "type": "string"
+        },
+        "maxTracks": {
+          "description": "Maximum number of tracks (absent = no upper limit).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minFeatures": {
+          "description": "Minimum number of features required (any type).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minTracks": {
+          "description": "Minimum number of tracks required.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "ToolDefinition",
+      "type": "object"
+    },
+    "ToolExecutionResultForReplay": {
+      "additionalProperties": false,
+      "description": "Minimal tool-execution result returned by the Replay Engine's `execute_tool` callback. Closes audit \u00a73.1 row 6. Distinct from `ToolResultForLog` (no inheritance) because the replay path's observable surface is intentionally narrower \u2014 see services/session-state/src/log/types.ts:373.",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the replay invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool during replay. Free-form per Article XV.2."
+        },
+        "result_id": {
+          "description": "Stable result identifier (used by the activity panel).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_version": {
+          "description": "Tool version observed at replay time.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolExecutionResultForReplay",
+      "type": "object"
+    },
     "ToolParameter": {
       "additionalProperties": false,
       "description": "A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.",
       "properties": {
+        "choices": {
+          "description": "Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit \u00a73.2 rows 37 and 86).",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "default_value": {
           "description": "Default value if not provided",
           "type": [
@@ -3795,6 +4169,93 @@
         "description"
       ],
       "title": "ToolParameter",
+      "type": "object"
+    },
+    "ToolParameterMeta": {
+      "additionalProperties": false,
+      "description": "Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit \u00a73.1 row 21. Matches the live web-shell mock shape \u2014 three slots tracking value, default-ness, and whether the parameter is operator-tunable.",
+      "properties": {
+        "default": {
+          "description": "Whether the parameter took its default value.",
+          "type": "boolean"
+        },
+        "tunable": {
+          "description": "Whether the parameter is operator-tunable.",
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/Any",
+          "description": "Parameter value used during the invocation."
+        }
+      },
+      "required": [
+        "value",
+        "default",
+        "tunable"
+      ],
+      "title": "ToolParameterMeta",
+      "type": "object"
+    },
+    "ToolResult": {
+      "additionalProperties": false,
+      "description": "Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit \u00a73.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` \u2014 includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).",
+      "properties": {
+        "datasets": {
+          "description": "Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`.",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "message": {
+          "description": "Status / explanation message.",
+          "type": "string"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out \u2014 keeping it free-form preserves the live wire shape)."
+        },
+        "resultLayer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional single result layer (e.g. bounding-box polygon)."
+        },
+        "resultLayers": {
+          "description": "Optional multiple result layers (e.g. buffer-zone polygons).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "message"
+      ],
+      "title": "ToolResult",
       "type": "object"
     },
     "ToolResultAnnotations": {
@@ -3843,6 +4304,99 @@
         "label"
       ],
       "title": "ToolResultAnnotations",
+      "type": "object"
+    },
+    "ToolResultForLog": {
+      "additionalProperties": false,
+      "description": "Persisted tool-result shape written by the live tool-result logger and read back by the replay subsystem. Closes audit \u00a73.1 row 4. Slot names match `services/session-state/src/log/types.ts:97` verbatim so existing log fixtures under the session-state fixtures directories continue to deserialise unchanged (FR-011).",
+      "properties": {
+        "artifact_href": {
+          "description": "Path to an exported artifact (for non-GeoJSON tool results).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "description": "Wall-clock duration of the tool invocation in milliseconds.",
+          "type": "integer"
+        },
+        "features": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "GeoJSON FeatureCollection produced by the tool. Free-form per Article XV.2 (the tool's output shape is its own contract)."
+        },
+        "input_state": {
+          "description": "Pre-tool geometry snapshot for mutation tools \u2014 passed through to LogEntry. Free-form per Article XV.2 (the inner InputFeatureState shape is owned by #224 session-state).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "result_type": {
+          "description": "Hierarchical result type (e.g. mutation/track/smoothed).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_feature_ids": {
+          "description": "IDs of input features used to generate this result.",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        },
+        "tool_id": {
+          "description": "Tool identifier (mirrors LogEntry.was_generated_by.tool).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "success",
+        "duration_ms"
+      ],
+      "title": "ToolResultForLog",
+      "type": "object"
+    },
+    "ToolsUpdateMessage": {
+      "additionalProperties": false,
+      "description": "Push notification from the extension host to the activity-panel webview when the tool catalogue changes. Closes audit \u00a73.1 row 28. `payload` is free-form per Article XV.2 \u2014 its inner shape `{ tools: ToolsPanelItem[], hasToolInventory?, hasSelection? }` is narrowed at the activity-panel consumer.",
+      "properties": {
+        "payload": {
+          "$ref": "#/$defs/Any",
+          "description": "Nested payload `{ tools, hasToolInventory?, hasSelection? }`. Free-form per Article XV.2."
+        },
+        "type": {
+          "const": "tools:update",
+          "description": "Discriminator \u2014 always the literal `tools:update`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "payload"
+      ],
+      "title": "ToolsUpdateMessage",
       "type": "object"
     },
     "TrackFeature": {

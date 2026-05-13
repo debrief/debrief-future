@@ -10,16 +10,22 @@
 
 import { fromMCPTool as sharedFromMCPTool } from '@debrief/components/ToolMatch';
 import type { Tool as SharedTool } from '@debrief/components/ToolMatch';
+import type { MCPParamSchema as MCPParamSchemaBase } from '@debrief/schemas';
 import type { MCPToolDefinition, Tool, ToolParameter } from '../types/tool';
 
-/** JSON Schema property shape inside inputSchema.properties.params.properties */
-interface MCPParamSchema {
-  type?: string;
-  description?: string;
+/**
+ * JSON Schema property shape inside inputSchema.properties.params.properties.
+ *
+ * Schema-rooted on `MCPParamSchema` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the consumer-side `enum`, `default`,
+ * and `x-debrief-param-type` extensions. Per FR-004 (R4 import-based
+ * schema rooting) the audit treats this file as schema-rooted.
+ */
+type MCPParamSchema = MCPParamSchemaBase & {
   enum?: unknown[];
   default?: unknown;
   'x-debrief-param-type'?: string;
-}
+};
 
 function mapParamType(schema: MCPParamSchema): ToolParameter['valueType'] {
   if (schema.enum) { return 'enum'; }

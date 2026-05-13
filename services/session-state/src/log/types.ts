@@ -5,7 +5,13 @@
 
 // LogEntry types (PROV-aligned, mirrors Phase 0 LinkML schema)
 // Field names use snake_case to match the wire format (ADR-010).
-import type { ActivityType } from '@debrief/schemas';
+import type {
+  ActivityType,
+  ToolExecutionResultForReplay as ToolExecutionResultForReplaySchema,
+  ToolExecutor as ToolExecutorSchema,
+  ToolResultForLog as ToolResultForLogSchema,
+  ToolVersionResolver as ToolVersionResolverSchema,
+} from '@debrief/schemas';
 export type { ActivityType };
 
 export interface ParameterValue {
@@ -93,18 +99,18 @@ export interface TimelineOptions {
   loadFromSnapshot?: string;
 }
 
-// Minimal ToolResult shape the Log Service needs (avoids importing vscode types)
-export interface ToolResultForLog {
-  success: boolean;
+// Minimal ToolResult shape the Log Service needs (avoids importing vscode types).
+//
+// Schema-rooted on `ToolResultForLog` from `@debrief/schemas` (LinkML
+// `mcp.yaml`) and narrowed with the live GeoJSON `features` shape and
+// the `input_state` array typed as `InputFeatureState[]` (the inner
+// shape is owned by #224 session-state). Per FR-004 (R4 import-based
+// schema rooting) the audit treats this file as schema-rooted.
+export type ToolResultForLog = Omit<ToolResultForLogSchema, 'features' | 'input_state'> & {
   features?: { type: 'FeatureCollection'; features: unknown[] };
-  duration_ms: number;
-  result_type?: string;
-  source_feature_ids?: string[];
-  artifact_href?: string;
-  tool_id?: string;
   /** Pre-tool geometry snapshot for mutation tools (passed through to LogEntry). */
   input_state?: InputFeatureState[];
-}
+};
 
 // Feature provenance entry for stacService
 export interface FeatureProvenance {
@@ -369,25 +375,26 @@ export interface ReplayResult {
   artifacts_created: ArtifactVersion[];
 }
 
-/** Minimal tool execution result for the Replay Engine. */
-export interface ToolExecutionResultForReplay {
-  success: boolean;
+/**
+ * Minimal tool execution result for the Replay Engine.
+ *
+ * Schema-rooted on `ToolExecutionResultForReplay` from `@debrief/schemas`
+ * (LinkML `mcp.yaml`) and narrowed with the live GeoJSON `features`
+ * shape. Per FR-004 the audit treats this file as schema-rooted.
+ */
+export type ToolExecutionResultForReplay = Omit<ToolExecutionResultForReplaySchema, 'features'> & {
   features?: { type: 'FeatureCollection'; features: unknown[] };
-  duration_ms: number;
-  tool_version?: string;
-  artifact_href?: string;
-  result_id?: string;
-}
+};
 
-/** Callback to execute a single tool during replay. */
+/**
+ * Callback to execute a single tool during replay.
+ *
+ * Schema-rooted on `ToolExecutor` from `@debrief/schemas` (the TS-only
+ * function-alias module — Research R-002) and narrowed so the return
+ * type uses the locally-narrowed `ToolExecutionResultForReplay`.
+ */
 export type ToolExecutor = (
-  tool_id: string,
-  feature_ids: string[],
-  params: Record<string, unknown>,
-  /** Original activity_id — callee should stamp this on output provenance. */
-  activity_id?: string,
-  /** Original timestamp — callee should stamp this on output provenance to preserve ordering. */
-  timestamp?: string
+  ...args: Parameters<ToolExecutorSchema>
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Callback to load a snapshot GeoJSON for cross-snapshot replay. */
@@ -397,8 +404,13 @@ export type SnapshotLoader = (
   asset_filename: string
 ) => Promise<GeoJsonFeatureCollection | null>;
 
-/** Callback to get the installed version of a tool. */
-export type ToolVersionResolver = (tool_id: string) => Promise<string | null>;
+/**
+ * Callback to get the installed version of a tool.
+ *
+ * Re-exported directly from `@debrief/schemas` (the TS-only
+ * function-alias module — Research R-002).
+ */
+export type ToolVersionResolver = ToolVersionResolverSchema;
 
 /** Callback to report progress to the UI. */
 export type ProgressReporter = (progress: ReplayProgress) => void;
