@@ -29,6 +29,7 @@ export type SelectionRequirement = SchemaSelectionRequirement;
  * §3.2 rows 37 and 86). Per FR-004 (R4 import-based schema rooting) the
  * audit treats this file as schema-rooted.
  */
+// eslint-disable-next-line no-restricted-syntax -- consumer-narrowing of @debrief/schemas.ToolParameter via Omit + intersection — schema-rooted per spec 222 §FR-004 (R4 import-based classification); replaces the pre-existing camelCase adapter (#214 scope-adjacent)
 export type ToolParameter = Omit<ToolParameterSchema, 'type' | 'default_value' | 'param_type'> & {
   /** Value type (mapped from schema's "type" field) */
   valueType: 'string' | 'number' | 'boolean' | 'enum';

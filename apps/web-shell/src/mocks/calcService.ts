@@ -33,6 +33,7 @@ interface IdentifiableFeature extends Feature {
  * result layers and the dataset envelope shape used by the web-shell
  * Results panel.
  */
+// eslint-disable-next-line no-restricted-syntax -- consumer-narrowing of @debrief/schemas.ToolResult via Omit + intersection — schema-rooted per spec 222 §FR-004 (R4 import-based classification)
 export type ToolResult = Omit<ToolResultBase, 'resultLayer' | 'resultLayers' | 'parameters' | 'datasets'> & {
   /** Optional result layer (e.g., bounding box polygon) */
   resultLayer?: Feature;
@@ -148,6 +149,7 @@ function bboxToPolygon(bbox: [number, number, number, number]): Feature<Polygon>
  * generated shape `{ value: unknown, default: boolean, tunable: boolean }`
  * matches the live wire format byte-for-byte.
  */
+// eslint-disable-next-line no-restricted-syntax -- thin re-export alias of @debrief/schemas.ToolParameterMeta — schema-rooted per spec 222 §FR-004 (R4 import-based classification)
 export type ToolParameterMeta = ToolParameterMetaSchema;
 
 /**

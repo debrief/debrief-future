@@ -224,36 +224,36 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Documentation & Cross-Cutting
 
-- [ ] T110 [P] Append a new §5 changelog entry to `docs/type-audit-2026.md` recording the before/after row counts for §3.1 (17 → 0 attributed to #222) and §3.2 (2 → 0 for `ToolParameter`), the merge git-SHA placeholder, and a link to this spec (FR-010 / SC-007) `docs/type-audit-2026.md`
-- [ ] T111 [P] Add a worked-example section for the MCP cluster to `shared/schemas/README.md` alongside the existing GeoJSON / session-state / styling examples (NFR-003) `shared/schemas/README.md`
-- [ ] T112 [P] Spot-check there are no new `as any`, `// @ts-expect-error`, `# type: ignore`, or `Any` casts in the migration diff except the two enumerated free-form fields (`MCPContentItem.structuredContent`, `MCPErrorResponse.data`) — `git diff main...HEAD` review per FR-009 / SC-005
+- [x] T110 [P] Append a new §5 changelog entry to `docs/type-audit-2026.md` recording the before/after row counts for §3.1 (17 → 0 attributed to #222) and §3.2 (2 → 0 for `ToolParameter`), the merge git-SHA placeholder, and a link to this spec (FR-010 / SC-007) `docs/type-audit-2026.md`
+- [x] T111 [P] Add a worked-example section for the MCP cluster to `shared/schemas/README.md` alongside the existing GeoJSON / session-state / styling examples (NFR-003) `shared/schemas/README.md`
+- [x] T112 [P] Spot-check there are no new `as any`, `// @ts-expect-error`, `# type: ignore`, or `Any` casts in the migration diff except the two enumerated free-form fields (`MCPContentItem.structuredContent`, `MCPErrorResponse.data`) — `git diff main...HEAD` review per FR-009 / SC-005
 
 ### Full-Suite Verification (REQUIRED)
 
 > The full `task verify` pipeline MUST pass on the feature branch before evidence is captured (CLAUDE.md § Before Pushing).
 
-- [ ] T120 [test] Run `task verify` (or the four-step fallback) and capture totals — lint + typecheck + pytest + vitest + Playwright E2E all green
-- [ ] T121 [test] Re-run the type-audit scanner per `quickstart.md` Step 3 and capture the regenerated `tmp/type-audit-report.md` for evidence (SC-001 / SC-002 final proof)
-- [ ] T122 [test] Run the calc-tool Playwright regression (path resolved per research R-007 — locate the test that exercises ToolMatch → invoke → LogPanel in `apps/web-shell/playwright/tests/`; run via `cd apps/web-shell && node run-playwright.mjs <test-name>`). If no E2E exists, document the substitution per R-007 outcome contingency and rely on the existing Storybook + vitest visual-regression coverage for SC-006
+- [x] T120 [test] Run `task verify` (or the four-step fallback) and capture totals — lint + typecheck + pytest + vitest + Playwright E2E all green
+- [x] T121 [test] Re-run the type-audit scanner per `quickstart.md` Step 3 and capture the regenerated `tmp/type-audit-report.md` for evidence (SC-001 / SC-002 final proof)
+- [x] T122 [test] Run the calc-tool Playwright regression (path resolved per research R-007 — locate the test that exercises ToolMatch → invoke → LogPanel in `apps/web-shell/playwright/tests/`; run via `cd apps/web-shell && node run-playwright.mjs <test-name>`). If no E2E exists, document the substitution per R-007 outcome contingency and rely on the existing Storybook + vitest visual-regression coverage for SC-006
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip T122. The web-shell runner at `apps/web-shell/run-playwright.mjs` extracts the bundled `@sparticuz/chromium` binary. Full details: `docs/project_notes/playwright-installation-research.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T130 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body breaks down by suite — pytest schemas / pytest session-state / vitest / Playwright) `specs/222-linkml-mcp-envelopes/evidence/test-summary.md`
-- [ ] T131 [P] Write usage demonstration showing the "add a field to `MCPToolResponse`" workflow (edit `mcp.yaml` → `task schemas:build` → field appears in both Python and TS — matches User Story 1 acceptance scenario 1) `specs/222-linkml-mcp-envelopes/evidence/usage-example.md`
-- [ ] T132 [P] Capture round-trip proof for one representative class per group (envelope: `MCPToolResponse`; discovery: `MCPParamSchema` with recursive items; replay: `ToolExecutionResultForReplay`) — Python `model_dump()` JSON pasted side-by-side with TS `JSON.parse + ajv.validate` JSON pasted side-by-side with re-validated Python instance `specs/222-linkml-mcp-envelopes/evidence/round-trip-evidence.md`
-- [ ] T133 [P] Capture before/after type-audit report excerpts (the §3.1 #222 attribution section, before commit `01166d6e` vs. after merge) `specs/222-linkml-mcp-envelopes/evidence/type-audit-before-after.md`
-- [ ] T134 [P] Capture the four-envelope `$defs` excerpt from the generated JSON Schema as a configuration-sample artefact (per Quality Rubric "Configuration sample + validation output") `specs/222-linkml-mcp-envelopes/evidence/mcp-schema-sample.json`
-- [ ] T135 [P] Document the SC-006 calc-tool regression outcome — path of the test run (or substitution if no E2E exists per R-007), pass/fail status, screenshot if applicable `specs/222-linkml-mcp-envelopes/evidence/calc-tool-regression.md`
+- [x] T130 Capture test results using the template at `.specify/templates/evidence/test-summary-template.md` (YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`; body breaks down by suite — pytest schemas / pytest session-state / vitest / Playwright) `specs/222-linkml-mcp-envelopes/evidence/test-summary.md`
+- [x] T131 [P] Write usage demonstration showing the "add a field to `MCPToolResponse`" workflow (edit `mcp.yaml` → `task schemas:build` → field appears in both Python and TS — matches User Story 1 acceptance scenario 1) `specs/222-linkml-mcp-envelopes/evidence/usage-example.md`
+- [x] T132 [P] Capture round-trip proof for one representative class per group (envelope: `MCPToolResponse`; discovery: `MCPParamSchema` with recursive items; replay: `ToolExecutionResultForReplay`) — Python `model_dump()` JSON pasted side-by-side with TS `JSON.parse + ajv.validate` JSON pasted side-by-side with re-validated Python instance `specs/222-linkml-mcp-envelopes/evidence/round-trip-evidence.md`
+- [x] T133 [P] Capture before/after type-audit report excerpts (the §3.1 #222 attribution section, before commit `01166d6e` vs. after merge) `specs/222-linkml-mcp-envelopes/evidence/type-audit-before-after.md`
+- [x] T134 [P] Capture the four-envelope `$defs` excerpt from the generated JSON Schema as a configuration-sample artefact (per Quality Rubric "Configuration sample + validation output") `specs/222-linkml-mcp-envelopes/evidence/mcp-schema-sample.json`
+- [x] T135 [P] Document the SC-006 calc-tool regression outcome — path of the test run (or substitution if no E2E exists per R-007), pass/fail status, screenshot if applicable `specs/222-linkml-mcp-envelopes/evidence/calc-tool-regression.md`
 
 ### Media Content (REQUIRED)
 
-- [ ] T140 Create feature blog post using the Content Specialist agent — reads `evidence/opening-context.md` verbatim for the first three sections (What We're Building, How It Fits, Key Decisions), then synthesises remaining sections (By the Numbers — 17 hand-types removed, 15 LinkML classes added, 4 enums added; Lessons Learned; What's Next — pointer to sibling clusters #223–#227). Title prefixed with `Building ` `specs/222-linkml-mcp-envelopes/media/shipped-post.md`
+- [x] T140 Create feature blog post using the Content Specialist agent — reads `evidence/opening-context.md` verbatim for the first three sections (What We're Building, How It Fits, Key Decisions), then synthesises remaining sections (By the Numbers — 17 hand-types removed, 15 LinkML classes added, 4 enums added; Lessons Learned; What's Next — pointer to sibling clusters #223–#227). Title prefixed with `Building ` `specs/222-linkml-mcp-envelopes/media/shipped-post.md`
 
 ### Backlog Bookkeeping
 
-- [ ] T150 Strike through the BACKLOG.md row for #222 (wrap each cell in `~~`) and commit `chore(backlog): mark item 222 as complete` `BACKLOG.md`
+- [x] T150 Strike through the BACKLOG.md row for #222 (wrap each cell in `~~`) and commit `chore(backlog): mark item 222 as complete` `BACKLOG.md`
 
 ### PR Creation
 
