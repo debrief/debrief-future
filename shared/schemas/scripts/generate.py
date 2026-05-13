@@ -722,7 +722,7 @@ def generate_typescript() -> bool:
         index_file.write_text(
             'export * from "./types.js";\n'
             'export * from "./unions.js";\n'
-            'export type { ToolExecutor, ToolVersionResolver } '
+            "export type { ToolExecutor, ToolVersionResolver } "
             'from "../../typescript/aliases/mcp-functions.js";\n',
             encoding="utf-8",
             newline="\n",
