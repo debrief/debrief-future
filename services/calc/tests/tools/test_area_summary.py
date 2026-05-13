@@ -219,7 +219,12 @@ class TestAreaSummaryInputContract:
 
         tool_meta = fn.tool  # type: ignore[attr-defined]
         assert set(tool_meta.input_kinds) == {
-            "TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "POLY",
+            "TRACK",
+            "POINT",
+            "RECTANGLE",
+            "CIRCLE",
+            "ZONE",
+            "POLY",
         }
 
     def test_bounds_take_precedence_over_features(self) -> None:
