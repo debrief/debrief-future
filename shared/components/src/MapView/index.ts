@@ -7,7 +7,6 @@ export type { UseGeomanOptions, UseGeomanReturn } from './GeomanControl';
 export {
   SceneRectangleLayer,
   geoJsonPolygonToLeafletCoords,
-  computeFillOpacity,
   computeOverlapRanks,
 } from './SceneRectangleLayer';
 export type { SceneRectangleLayerProps } from './SceneRectangleLayer';

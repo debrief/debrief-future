@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
-import { SceneRectangleLayer, computeFillOpacity, computeOverlapRanks } from '../SceneRectangleLayer';
+import { SceneRectangleLayer, computeOverlapRanks } from '../SceneRectangleLayer';
 import type { SceneFeature } from '@debrief/schemas';
 
 // Capture rendered polygon props so tests can assert on them.
@@ -207,8 +207,11 @@ describe('SceneRectangleLayer', () => {
     expect(nonCurrent!.pathOptions.opacity).toBe(0.5);
   });
 
-  it('overlapping rectangles get distinct opacity values, all >= 0.10', () => {
-    // Three scenes with near-identical centroids → overlap rank 0/1/2.
+  it('rectangles render without fill so the underlying track data stays visible (PR #624)', () => {
+    // Three scenes with near-identical centroids — previously each would get
+    // a distinct gradient of fill opacity (FR-PLAY-018). The product decision
+    // after PR #623 was that fill obscures tracks the analyst is composing
+    // into, so all rectangles now render with fillOpacity 0.
     const scenes = [
       makeScene('s1', [[0, 0], [1, 0], [1, 1], [0, 1]], '2026-04-20T10:00:00Z'),
       makeScene('s2', [[0.01, 0.01], [1.01, 0.01], [1.01, 1.01], [0.01, 1.01]], '2026-04-20T11:00:00Z'),
@@ -218,15 +221,12 @@ describe('SceneRectangleLayer', () => {
       <SceneRectangleLayer
         scenes={scenes}
         activeStoryboardId="sb-1"
-        currentSceneId={null}
+        currentSceneId="s3"
         onSceneRectangleClick={vi.fn()}
       />,
     );
     const opacities = capturedPolygons.map((p) => p.pathOptions.fillOpacity as number);
-    // All distinct.
-    expect(new Set(opacities).size).toBe(3);
-    // All >= 0.10 floor.
-    opacities.forEach((o) => expect(o).toBeGreaterThanOrEqual(0.10));
+    opacities.forEach((o) => expect(o).toBe(0));
   });
 
   it('click fires onSceneRectangleClick with the correct sceneId and stops propagation', () => {
@@ -305,19 +305,6 @@ describe('SceneRectangleLayer', () => {
       />,
     );
     expect(queryAllByTestId('polygon')).toHaveLength(1);
-  });
-});
-
-describe('computeFillOpacity', () => {
-  it('floors at 0.10', () => {
-    const dummyScene = {} as unknown as SceneFeature;
-    expect(computeFillOpacity(dummyScene, 100, false)).toBe(0.10);
-  });
-  it('higher base for current vs non-current', () => {
-    const dummyScene = {} as unknown as SceneFeature;
-    expect(computeFillOpacity(dummyScene, 0, true)).toBeGreaterThan(
-      computeFillOpacity(dummyScene, 0, false),
-    );
   });
 });
 

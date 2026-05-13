@@ -399,6 +399,15 @@ async function captureSceneInner(
     await persistFeatureCollection(context, deps, mapPanel.getCurrentFeatures());
     const withUndo = sessionStore.getState();
     withUndo.markDirty();
+    // PR #624 — restore the captured viewport on the live map. Adding a new
+    // STORYBOARD_SCENE polygon to the feature list expands the overall
+    // bounding box, which (depending on host config) can re-trigger
+    // fit-to-features behaviour and snap the analyst away from the
+    // composition they just captured. Jumping back to (center, zoom) with
+    // animate:false is idempotent when nothing reset the view and corrective
+    // when something did, so we issue it unconditionally on the success
+    // path.
+    mapPanel.flyToViewport({ center, zoom, bearing: 0 }, 0);
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {
@@ -619,6 +628,9 @@ async function retryCreateScene(
     await persistFeatureCollection(context, deps, context.mapPanel.getCurrentFeatures());
     const withUndo = context.sessionStore.getState();
     withUndo.markDirty();
+    // PR #624 — mirror the viewport-restore on the offset/replace retry path
+    // so duplicate-timestamp resolutions also preserve the analyst's view.
+    context.mapPanel.flyToViewport(inputs.viewport, 0);
     void deps.executeCommand('debrief.storyboardPanel.focus');
     return { status: 'captured', scene: result.scene };
   } catch (err) {

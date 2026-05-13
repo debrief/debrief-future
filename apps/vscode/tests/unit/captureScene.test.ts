@@ -34,17 +34,32 @@ import type { SessionStoreApi } from '@debrief/session-state';
 
 // ─── Test doubles ────────────────────────────────────────────────────
 
+interface FlyToCall {
+  readonly viewport: {
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+  };
+  readonly durationMs: number;
+}
+
 interface StubMapPanel {
   features: DebriefFeature[];
   thumbnail: { largePngBase64: string | null; smallPngBase64: string | null };
   setFeaturesCalls: DebriefFeature[][];
   requestThumbnailCaptureCalls: number;
+  flyToCalls: FlyToCall[];
+  flyToTokenCounter: number;
   getCurrentFeatures(): DebriefFeature[];
   setFeatures(features: DebriefFeature[]): void;
   requestThumbnailCapture(timeoutMs: number): Promise<{
     largePngBase64: string | null;
     smallPngBase64: string | null;
   }>;
+  flyToViewport(
+    viewport: { center: [number, number]; zoom: number; bearing: number },
+    durationMs: number,
+  ): number;
 }
 
 function makeMapPanel(
@@ -62,6 +77,8 @@ function makeMapPanel(
     thumbnail,
     setFeaturesCalls: [],
     requestThumbnailCaptureCalls: 0,
+    flyToCalls: [],
+    flyToTokenCounter: 0,
     getCurrentFeatures() {
       return this.features.slice();
     },
@@ -72,6 +89,10 @@ function makeMapPanel(
     async requestThumbnailCapture(_ms: number) {
       this.requestThumbnailCaptureCalls += 1;
       return this.thumbnail;
+    },
+    flyToViewport(viewport, durationMs) {
+      this.flyToCalls.push({ viewport, durationMs });
+      return ++this.flyToTokenCounter;
     },
   };
   return panel;
@@ -364,6 +385,46 @@ describe('captureScene — happy paths', () => {
         (f.properties as { kind?: string }).kind === 'STORYBOARD_SCENE',
     );
     expect(scenes).toHaveLength(2);
+  });
+
+  it('restores the captured viewport on the live map after success (PR #624)', async () => {
+    // The captured scene's stored viewport is correct, but the live map can
+    // drift if anything (host-side fit-to-features behaviour, panel reveal
+    // resize, etc.) recomputes bounds while the new STORYBOARD_SCENE polygon
+    // is being added. captureScene issues a no-animation flyTo to (center,
+    // zoom) at the end of the success path so the analyst is left looking at
+    // the composition they captured.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    const session = makeSession({
+      viewport: {
+        coordinates: [
+          { longitude: -3, latitude: 51 },
+          { longitude: -1, latitude: 51 },
+          { longitude: -1, latitude: 49 },
+          { longitude: -3, latitude: 49 },
+        ],
+        zoom: 12,
+      },
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.flyToCalls).toHaveLength(1);
+    const fly = mapPanel.flyToCalls[0]!;
+    expect(fly.durationMs).toBe(0);
+    // captured viewport: center is the average of the 4 corners, zoom = 12.
+    expect(fly.viewport.center[0]).toBeCloseTo(-2, 6);
+    expect(fly.viewport.center[1]).toBeCloseTo(50, 6);
+    expect(fly.viewport.zoom).toBe(12);
+    expect(fly.viewport.bearing).toBe(0);
   });
 
   it('scene title defaults to the DTG of the current timestamp', async () => {
