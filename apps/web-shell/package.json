@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
+    "@debrief/schemas": "workspace:*",
     "@debrief/session-state": "workspace:*",
     "@debrief/stac-writer": "workspace:*",
     "@debrief/utils": "workspace:*",

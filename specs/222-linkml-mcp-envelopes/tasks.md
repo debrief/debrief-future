@@ -144,35 +144,35 @@ It is **not** a UI component feature — no theme screenshots / interaction GIF 
 
 ### Tests for User Story 2 (REQUIRED — FR-006) ⚠️
 
-- [ ] T050 [P] [US2] [test] Fixtures for `MCPParamSchema` including a recursive `items` example (closes data-model §"items: recursive") `shared/schemas/fixtures/mcp/MCPParamSchema/`
-- [ ] T051 [P] [US2] [test] Fixtures for `MCPSelectionRequirement` (track / point / polygon variants) `shared/schemas/fixtures/mcp/MCPSelectionRequirement/`
-- [ ] T052 [P] [US2] [test] Fixtures for `MCPToolDefinition` (with and without optional slots) `shared/schemas/fixtures/mcp/MCPToolDefinition/`
-- [ ] T053 [P] [US2] [test] Fixtures for `ToolParameter` covering BOTH legacy hand-type shapes (one with `validation`, one with `hint` — drift reconciliation per data-model line 134) `shared/schemas/fixtures/mcp/ToolParameter/`
-- [ ] T054 [P] [US2] [test] Fixtures for `ToolParameterMeta`, `ToolDefinition`, `ToolResult` (1 valid + 1 invalid each) `shared/schemas/fixtures/mcp/{ToolParameterMeta,ToolDefinition,ToolResult}/`
-- [ ] T055 [US2] [test] Extend `test_mcp_roundtrip.py` with discovery-class assertions (round-trip + schema-compare for the seven discovery classes) `shared/schemas/tests/test_mcp_roundtrip.py`
-- [ ] T056 [US2] [test] Extend `test_mcp_fixtures.py` with parameterised golden + negative cases for discovery classes `shared/schemas/tests/test_mcp_fixtures.py`
+- [x] T050 [P] [US2] [test] Fixtures for `MCPParamSchema` including a recursive `items` example (closes data-model §"items: recursive") `shared/schemas/fixtures/mcp/MCPParamSchema/`
+- [x] T051 [P] [US2] [test] Fixtures for `MCPSelectionRequirement` (track / point / polygon variants) `shared/schemas/fixtures/mcp/MCPSelectionRequirement/`
+- [x] T052 [P] [US2] [test] Fixtures for `MCPToolDefinition` (with and without optional slots) `shared/schemas/fixtures/mcp/MCPToolDefinition/`
+- [x] T053 [P] [US2] [test] Fixtures for `ToolParameter` covering BOTH legacy hand-type shapes (one with `validation`, one with `hint` — drift reconciliation per data-model line 134) `shared/schemas/fixtures/mcp/ToolParameter/`
+- [x] T054 [P] [US2] [test] Fixtures for `ToolParameterMeta`, `ToolDefinition`, `ToolResult` (1 valid + 1 invalid each) `shared/schemas/fixtures/mcp/{ToolParameterMeta,ToolDefinition,ToolResult}/`
+- [x] T055 [US2] [test] Extend `test_mcp_roundtrip.py` with discovery-class assertions (round-trip + schema-compare for the seven discovery classes) `shared/schemas/tests/test_mcp_roundtrip.py`
+- [x] T056 [US2] [test] Extend `test_mcp_fixtures.py` with parameterised golden + negative cases for discovery classes `shared/schemas/tests/test_mcp_fixtures.py`
 
 ### Implementation for User Story 2
 
-- [ ] T060 [US2] Add `MCPParamSchema` class (recursive `items`, free-form `default`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T061 [US2] Add `MCPSelectionRequirement` class `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T062 [US2] Add `MCPToolDefinition` class (references `MCPParamSchema`, `MCPSelectionRequirement`, `ToolCategoryEnum` from `tool.yaml` via `imports:`) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T063 [US2] Add canonical `ToolParameter` class (union of both legacy hand-types — additive, both `validation` and `hint` slots present; see data-model line 133) `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T064 [US2] Add `ToolParameterMeta`, `ToolDefinition`, `ToolResult` classes `shared/schemas/src/linkml/mcp.yaml`
-- [ ] T065 [US2] Run `task schemas:build` and confirm seven new classes regenerate cleanly in all three output targets
-- [ ] T066 [P] [US2] Delete `MCPParamSchema` interface at `shared/components/src/ToolMatch/mcpAdapter.ts:50` and import from `@debrief/schemas`
-- [ ] T067 [P] [US2] Delete `MCPParamSchema` interface at `apps/vscode/src/services/mcpToolAdapter.ts:16` and import from `@debrief/schemas`
-- [ ] T068 [P] [US2] Delete `MCPSelectionRequirement` interface at `shared/utils/src/mcp-types.ts:65` and re-export from `@debrief/schemas`
-- [ ] T069 [P] [US2] Delete `MCPToolDefinition` interface at `shared/utils/src/mcp-types.ts:76` and re-export from `@debrief/schemas`
-- [ ] T070 [P] [US2] Delete `ToolParameter` interface at `shared/components/src/ToolMatch/types.ts:34` and import from `@debrief/schemas` (drift cluster member 1)
-- [ ] T071 [P] [US2] Delete `ToolParameter` interface at `apps/vscode/src/types/tool.ts:26` and import from `@debrief/schemas` (drift cluster member 2)
-- [ ] T072 [P] [US2] Delete `ToolParameterMeta` interface at `apps/web-shell/src/mocks/calcService.ts:138` and import from `@debrief/schemas`
-- [ ] T073 [P] [US2] Delete `ToolDefinition` interface at `apps/web-shell/src/mocks/calcService.ts:145` and import from `@debrief/schemas`
-- [ ] T074 [P] [US2] Delete `ToolResult` interface at `apps/web-shell/src/mocks/calcService.ts:26` and import from `@debrief/schemas`
-- [ ] T075 [US2] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all discovery tests green
-- [ ] T076 [US2] Run `pnpm --filter @debrief/components test` (catches ToolMatch story regression — vitest snapshot) and `pnpm -r typecheck`
-- [ ] T077 [US2] Run the type-audit scanner and confirm §3.1 lost six more rows and §3.2 lost both `ToolParameter` rows; record running total
-- [ ] T078 [US2] Commit P2 slice: `feat(schemas): promote MCP discovery shapes to LinkML and collapse ToolParameter drift (P2)`
+- [x] T060 [US2] Add `MCPParamSchema` class (recursive `items`, free-form `default`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T061 [US2] Add `MCPSelectionRequirement` class `shared/schemas/src/linkml/mcp.yaml`
+- [x] T062 [US2] Add `MCPToolDefinition` class (references `MCPParamSchema`, `MCPSelectionRequirement`, `ToolCategoryEnum` from `tool.yaml` via `imports:`) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T063 [US2] Add canonical `ToolParameter` class (union of both legacy hand-types — additive, both `validation` and `hint` slots present; see data-model line 133) `shared/schemas/src/linkml/mcp.yaml`
+- [x] T064 [US2] Add `ToolParameterMeta`, `ToolDefinition`, `ToolResult` classes `shared/schemas/src/linkml/mcp.yaml`
+- [x] T065 [US2] Run `task schemas:build` and confirm seven new classes regenerate cleanly in all three output targets
+- [x] T066 [P] [US2] Delete `MCPParamSchema` interface at `shared/components/src/ToolMatch/mcpAdapter.ts:50` and import from `@debrief/schemas`
+- [x] T067 [P] [US2] Delete `MCPParamSchema` interface at `apps/vscode/src/services/mcpToolAdapter.ts:16` and import from `@debrief/schemas`
+- [x] T068 [P] [US2] Delete `MCPSelectionRequirement` interface at `shared/utils/src/mcp-types.ts:65` and re-export from `@debrief/schemas`
+- [x] T069 [P] [US2] Delete `MCPToolDefinition` interface at `shared/utils/src/mcp-types.ts:76` and re-export from `@debrief/schemas`
+- [x] T070 [P] [US2] Delete `ToolParameter` interface at `shared/components/src/ToolMatch/types.ts:34` and import from `@debrief/schemas` (drift cluster member 1)
+- [x] T071 [P] [US2] Delete `ToolParameter` interface at `apps/vscode/src/types/tool.ts:26` and import from `@debrief/schemas` (drift cluster member 2)
+- [x] T072 [P] [US2] Delete `ToolParameterMeta` interface at `apps/web-shell/src/mocks/calcService.ts:138` and import from `@debrief/schemas`
+- [x] T073 [P] [US2] Delete `ToolDefinition` interface at `apps/web-shell/src/mocks/calcService.ts:145` and import from `@debrief/schemas`
+- [x] T074 [P] [US2] Delete `ToolResult` interface at `apps/web-shell/src/mocks/calcService.ts:26` and import from `@debrief/schemas`
+- [x] T075 [US2] Run `uv run pytest shared/schemas/tests/test_mcp_roundtrip.py shared/schemas/tests/test_mcp_fixtures.py -v` and confirm all discovery tests green
+- [x] T076 [US2] Run `pnpm --filter @debrief/components test` (catches ToolMatch story regression — vitest snapshot) and `pnpm -r typecheck`
+- [x] T077 [US2] Run the type-audit scanner and confirm §3.1 lost six more rows and §3.2 lost both `ToolParameter` rows; record running total
+- [x] T078 [US2] Commit P2 slice: `feat(schemas): promote MCP discovery shapes to LinkML and collapse ToolParameter drift (P2)`
 
 **Checkpoint**: Both Stories 1 and 2 work; ToolMatch parameter form unchanged visually; audit count down by 10 rows in §3.1 and 2 rows in §3.2.
 

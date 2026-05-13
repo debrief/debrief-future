@@ -1531,6 +1531,8 @@ export interface ToolParameter {
     default_value?: string,
     /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
     param_type?: string,
+    /** Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit §3.2 rows 37 and 86). */
+    choices?: string[],
 }
 
 
@@ -2309,6 +2311,96 @@ export interface MCPErrorResponse {
     error: unknown,
     /** Wall-clock duration before failure. */
     duration_ms?: number,
+}
+
+
+/**
+ * JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit §3.1 rows 1 and 27 (two-site drift). Open at the wire level — consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.
+ */
+export interface MCPParamSchema {
+    /** JSON-Schema primitive type (string / number / integer / boolean / array / object). */
+    type?: string,
+    /** Human-readable parameter description. */
+    description?: string,
+}
+
+
+/**
+ * Predicate describing what feature selection a tool needs (e.g. "at least one Track", "exactly one Point"). Closes audit §3.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).
+ */
+export interface MCPSelectionRequirement {
+    /** Feature kind this requirement applies to. Supports flat values (e.g. "TRACK", "POINT") and dot-delimited hierarchical paths (e.g. "TRACK.SEGMENT"). */
+    kind: string,
+    /** Minimum number of features of this kind required. */
+    min: number,
+    /** Maximum number of features of this kind allowed. */
+    max?: number,
+}
+
+
+/**
+ * Static catalogue entry advertised by the MCP server. Closes audit §3.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 — `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).
+ */
+export interface MCPToolDefinition {
+    /** Tool identifier. */
+    name: string,
+    /** Human-readable tool description. */
+    description: string,
+    /** JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 — consumers narrow at point of use. */
+    input_schema: unknown,
+    /** Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2. */
+    annotations: unknown,
+}
+
+
+/**
+ * Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit §3.1 row 21. Matches the live web-shell mock shape — three slots tracking value, default-ness, and whether the parameter is operator-tunable.
+ */
+export interface ToolParameterMeta {
+    /** Parameter value used during the invocation. */
+    value: unknown,
+    /** Whether the parameter took its default value. */
+    default: boolean,
+    /** Whether the parameter is operator-tunable. */
+    tunable: boolean,
+}
+
+
+/**
+ * Consumer-facing flattened view of a tool catalogue entry. Closes audit §3.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` — preserved as-is).
+ */
+export interface ToolDefinition {
+    /** Unique tool identifier. */
+    id: string,
+    /** Human-readable name. */
+    name: string,
+    /** Brief description. */
+    description: string,
+    /** Minimum number of tracks required. */
+    minTracks?: number,
+    /** Maximum number of tracks (absent = no upper limit). */
+    maxTracks?: number,
+    /** Minimum number of features required (any type). */
+    minFeatures?: number,
+}
+
+
+/**
+ * Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit §3.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` — includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).
+ */
+export interface ToolResult {
+    /** Whether the tool succeeded. */
+    success: boolean,
+    /** Status / explanation message. */
+    message: string,
+    /** Optional single result layer (e.g. bounding-box polygon). */
+    resultLayer?: unknown,
+    /** Optional multiple result layers (e.g. buffer-zone polygons). */
+    resultLayers?: unknown[],
+    /** Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out — keeping it free-form preserves the live wire shape). */
+    parameters?: unknown,
+    /** Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`. */
+    datasets?: unknown[],
 }
 
 

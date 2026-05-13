@@ -1086,6 +1086,28 @@
       "title": "MCPErrorResponse",
       "type": "object"
     },
+    "MCPParamSchema": {
+      "additionalProperties": false,
+      "description": "JSON-Schema-like parameter fragment used inside MCPToolDefinition.input_schema. Closes audit \u00a73.1 rows 1 and 27 (two-site drift). Open at the wire level \u2014 consumers narrow with additional fields (`enum`, `default`, `x-debrief-param-type`) via intersection in the local adapter modules.",
+      "properties": {
+        "description": {
+          "description": "Human-readable parameter description.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "JSON-Schema primitive type (string / number / integer / boolean / array / object).",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "MCPParamSchema",
+      "type": "object"
+    },
     "MCPParamTypeEnum": {
       "description": "JSON-Schema-compatible primitive types for tool parameters.",
       "enum": [
@@ -1117,6 +1139,63 @@
         "input"
       ],
       "title": "MCPRequest",
+      "type": "object"
+    },
+    "MCPSelectionRequirement": {
+      "additionalProperties": false,
+      "description": "Predicate describing what feature selection a tool needs (e.g. \"at least one Track\", \"exactly one Point\"). Closes audit \u00a73.1 row 18. Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).",
+      "properties": {
+        "kind": {
+          "description": "Feature kind this requirement applies to. Supports flat values (e.g. \"TRACK\", \"POINT\") and dot-delimited hierarchical paths (e.g. \"TRACK.SEGMENT\").",
+          "type": "string"
+        },
+        "max": {
+          "description": "Maximum number of features of this kind allowed.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "min": {
+          "description": "Minimum number of features of this kind required.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "min"
+      ],
+      "title": "MCPSelectionRequirement",
+      "type": "object"
+    },
+    "MCPToolDefinition": {
+      "additionalProperties": false,
+      "description": "Static catalogue entry advertised by the MCP server. Closes audit \u00a73.1 row 19. `input_schema` and `annotations` are free-form per Article XV.2 \u2014 `input_schema` is a JSON-Schema fragment and `annotations` carries open-ended `debrief:*` keys (colons in key names cannot be slot-modelled).",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/Any",
+          "description": "Debrief-specific annotations (`debrief:selectionRequirements`, `debrief:category`, `debrief:version`, `debrief:outputKind`, `debrief:uiCategory`). Free-form per Article XV.2."
+        },
+        "description": {
+          "description": "Human-readable tool description.",
+          "type": "string"
+        },
+        "input_schema": {
+          "$ref": "#/$defs/Any",
+          "description": "JSON-Schema fragment describing the tool's input payload. Free-form per Article XV.2 \u2014 consumers narrow at point of use."
+        },
+        "name": {
+          "description": "Tool identifier.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "input_schema",
+        "annotations"
+      ],
+      "title": "MCPToolDefinition",
       "type": "object"
     },
     "MCPToolResponse": {
@@ -3914,10 +3993,66 @@
       "title": "ToolCategoryEnum",
       "type": "string"
     },
+    "ToolDefinition": {
+      "additionalProperties": false,
+      "description": "Consumer-facing flattened view of a tool catalogue entry. Closes audit \u00a73.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts` (`min_tracks`, `max_tracks`, `min_features` \u2014 preserved as-is).",
+      "properties": {
+        "description": {
+          "description": "Brief description.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique tool identifier.",
+          "type": "string"
+        },
+        "maxTracks": {
+          "description": "Maximum number of tracks (absent = no upper limit).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minFeatures": {
+          "description": "Minimum number of features required (any type).",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minTracks": {
+          "description": "Minimum number of tracks required.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "ToolDefinition",
+      "type": "object"
+    },
     "ToolParameter": {
       "additionalProperties": false,
       "description": "A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.",
       "properties": {
+        "choices": {
+          "description": "Explicit choice list for enum-typed parameters when the client cannot (or chooses not to) resolve a schema-defined `param_type`. Used by both the ToolMatch picker (shared/components) and the VS Code activity-panel adapter (apps/vscode/src/services/mcpToolAdapter.ts). Added under spec 222 (P2) to collapse the drift cluster attributed to ToolParameter (audit \u00a73.2 rows 37 and 86).",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "default_value": {
           "description": "Default value if not provided",
           "type": [
@@ -3955,6 +4090,93 @@
         "description"
       ],
       "title": "ToolParameter",
+      "type": "object"
+    },
+    "ToolParameterMeta": {
+      "additionalProperties": false,
+      "description": "Tunable parameter metadata recorded alongside a tool result for provenance. Closes audit \u00a73.1 row 21. Matches the live web-shell mock shape \u2014 three slots tracking value, default-ness, and whether the parameter is operator-tunable.",
+      "properties": {
+        "default": {
+          "description": "Whether the parameter took its default value.",
+          "type": "boolean"
+        },
+        "tunable": {
+          "description": "Whether the parameter is operator-tunable.",
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/Any",
+          "description": "Parameter value used during the invocation."
+        }
+      },
+      "required": [
+        "value",
+        "default",
+        "tunable"
+      ],
+      "title": "ToolParameterMeta",
+      "type": "object"
+    },
+    "ToolResult": {
+      "additionalProperties": false,
+      "description": "Logical tool invocation result as seen by the consumer (after the MCP layer has unwrapped MCPToolResponse). Closes audit \u00a73.1 row 20. Slot names match `apps/web-shell/src/mocks/calcService.ts` \u2014 includes `resultLayer`, `resultLayers`, `parameters`, `datasets` which are free-form per Article XV.2 (their inner shapes are tool-specific).",
+      "properties": {
+        "datasets": {
+          "description": "Optional dataset results for the Results panel (range-bearing charts, etc). Each entry shaped like `{ filename: string, envelope: Record<string, unknown> }`.",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "message": {
+          "description": "Status / explanation message.",
+          "type": "string"
+        },
+        "parameters": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional record of operator-tunable parameters and their values (keyed by parameter name, values shaped like ToolParameterMeta). Free-form per Article XV.2 (a LinkML `inlined_as_dict` of ToolParameterMeta would express it, but consumers already build a plain `Record<string, ToolParameterMeta>` and narrow on the way out \u2014 keeping it free-form preserves the live wire shape)."
+        },
+        "resultLayer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Any"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional single result layer (e.g. bounding-box polygon)."
+        },
+        "resultLayers": {
+          "description": "Optional multiple result layers (e.g. buffer-zone polygons).",
+          "items": {
+            "$ref": "#/$defs/Any"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "success": {
+          "description": "Whether the tool succeeded.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "message"
+      ],
+      "title": "ToolResult",
       "type": "object"
     },
     "ToolResultAnnotations": {

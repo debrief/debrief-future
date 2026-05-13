@@ -178,3 +178,167 @@ classes:
       duration_ms:
         description: Wall-clock duration before failure.
         range: integer
+
+# ============================================================================
+# Group 2 — Discovery (P2)
+# ============================================================================
+#
+# Tool catalogue advertised by the MCP server and consumed by the
+# ToolMatch UI, the VS Code tool adapter, and the web-shell mock service.
+# Slot names match live wire format (snake_case where it's already
+# snake_case, camelCase where the live shape uses camelCase).
+
+  MCPParamSchema:
+    description: >-
+      JSON-Schema-like parameter fragment used inside
+      MCPToolDefinition.input_schema. Closes audit §3.1 rows 1 and 27
+      (two-site drift). Open at the wire level — consumers narrow with
+      additional fields (`enum`, `default`, `x-debrief-param-type`) via
+      intersection in the local adapter modules.
+    attributes:
+      type:
+        description: JSON-Schema primitive type (string / number / integer / boolean / array / object).
+        range: string
+      description:
+        description: Human-readable parameter description.
+        range: string
+
+  MCPSelectionRequirement:
+    description: >-
+      Predicate describing what feature selection a tool needs (e.g. "at
+      least one Track", "exactly one Point"). Closes audit §3.1 row 18.
+      Slot names match shared/utils/src/mcp-types.ts (`kind`, `min`, `max`).
+    attributes:
+      kind:
+        description: >-
+          Feature kind this requirement applies to. Supports flat values
+          (e.g. "TRACK", "POINT") and dot-delimited hierarchical paths
+          (e.g. "TRACK.SEGMENT").
+        range: string
+        required: true
+      min:
+        description: Minimum number of features of this kind required.
+        range: integer
+        required: true
+      max:
+        description: Maximum number of features of this kind allowed.
+        range: integer
+
+  MCPToolDefinition:
+    description: >-
+      Static catalogue entry advertised by the MCP server. Closes audit
+      §3.1 row 19. `input_schema` and `annotations` are free-form per
+      Article XV.2 — `input_schema` is a JSON-Schema fragment and
+      `annotations` carries open-ended `debrief:*` keys (colons in key
+      names cannot be slot-modelled).
+    attributes:
+      name:
+        description: Tool identifier.
+        range: string
+        required: true
+      description:
+        description: Human-readable tool description.
+        range: string
+        required: true
+      input_schema:
+        description: >-
+          JSON-Schema fragment describing the tool's input payload.
+          Free-form per Article XV.2 — consumers narrow at point of use.
+        range: Any
+        required: true
+      annotations:
+        description: >-
+          Debrief-specific annotations (`debrief:selectionRequirements`,
+          `debrief:category`, `debrief:version`, `debrief:outputKind`,
+          `debrief:uiCategory`). Free-form per Article XV.2.
+        range: Any
+        required: true
+
+  ToolParameterMeta:
+    description: >-
+      Tunable parameter metadata recorded alongside a tool result for
+      provenance. Closes audit §3.1 row 21. Matches the live web-shell
+      mock shape — three slots tracking value, default-ness, and
+      whether the parameter is operator-tunable.
+    attributes:
+      value:
+        description: Parameter value used during the invocation.
+        range: Any
+        required: true
+      default:
+        description: Whether the parameter took its default value.
+        range: boolean
+        required: true
+      tunable:
+        description: Whether the parameter is operator-tunable.
+        range: boolean
+        required: true
+
+  ToolDefinition:
+    description: >-
+      Consumer-facing flattened view of a tool catalogue entry. Closes
+      audit §3.1 row 22. Slot names match `apps/web-shell/src/mocks/calcService.ts`
+      (`min_tracks`, `max_tracks`, `min_features` — preserved as-is).
+    attributes:
+      id:
+        description: Unique tool identifier.
+        range: string
+        required: true
+      name:
+        description: Human-readable name.
+        range: string
+        required: true
+      description:
+        description: Brief description.
+        range: string
+        required: true
+      minTracks:
+        description: Minimum number of tracks required.
+        range: integer
+      maxTracks:
+        description: Maximum number of tracks (absent = no upper limit).
+        range: integer
+      minFeatures:
+        description: Minimum number of features required (any type).
+        range: integer
+
+  ToolResult:
+    description: >-
+      Logical tool invocation result as seen by the consumer (after the
+      MCP layer has unwrapped MCPToolResponse). Closes audit §3.1 row 20.
+      Slot names match `apps/web-shell/src/mocks/calcService.ts` —
+      includes `resultLayer`, `resultLayers`, `parameters`, `datasets`
+      which are free-form per Article XV.2 (their inner shapes are
+      tool-specific).
+    attributes:
+      success:
+        description: Whether the tool succeeded.
+        range: boolean
+        required: true
+      message:
+        description: Status / explanation message.
+        range: string
+        required: true
+      resultLayer:
+        description: Optional single result layer (e.g. bounding-box polygon).
+        range: Any
+      resultLayers:
+        description: Optional multiple result layers (e.g. buffer-zone polygons).
+        range: Any
+        multivalued: true
+      parameters:
+        description: >-
+          Optional record of operator-tunable parameters and their values
+          (keyed by parameter name, values shaped like ToolParameterMeta).
+          Free-form per Article XV.2 (a LinkML `inlined_as_dict` of
+          ToolParameterMeta would express it, but consumers already build
+          a plain `Record<string, ToolParameterMeta>` and narrow on the way
+          out — keeping it free-form preserves the live wire shape).
+        range: Any
+      datasets:
+        description: >-
+          Optional dataset results for the Results panel (range-bearing
+          charts, etc). Each entry shaped like
+          `{ filename: string, envelope: Record<string, unknown> }`.
+        range: Any
+        multivalued: true

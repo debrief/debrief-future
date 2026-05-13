@@ -23,8 +23,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "pyt
 from debrief_schemas import (  # noqa: E402
     MCPContentItem,
     MCPErrorResponse,
+    MCPParamSchema,
     MCPRequest,
+    MCPSelectionRequirement,
+    MCPToolDefinition,
     MCPToolResponse,
+    ToolDefinition,
+    ToolParameter,
+    ToolParameterMeta,
+    ToolResult,
 )
 
 FIXTURES_ROOT = Path(__file__).parent.parent / "fixtures" / "mcp"
@@ -32,10 +39,19 @@ FIXTURES_ROOT = Path(__file__).parent.parent / "fixtures" / "mcp"
 # Map fixture-directory name → generated Pydantic class.
 # Expanded across phases as new classes land.
 CLASS_MAP: dict[str, type] = {
+    # P1 — Envelopes
     "MCPRequest": MCPRequest,
     "MCPContentItem": MCPContentItem,
     "MCPToolResponse": MCPToolResponse,
     "MCPErrorResponse": MCPErrorResponse,
+    # P2 — Discovery
+    "MCPParamSchema": MCPParamSchema,
+    "MCPSelectionRequirement": MCPSelectionRequirement,
+    "MCPToolDefinition": MCPToolDefinition,
+    "ToolParameter": ToolParameter,
+    "ToolParameterMeta": ToolParameterMeta,
+    "ToolDefinition": ToolDefinition,
+    "ToolResult": ToolResult,
 }
 
 

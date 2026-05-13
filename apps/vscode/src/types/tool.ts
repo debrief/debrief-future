@@ -9,6 +9,7 @@
 import type {
   SelectionRequirement as SchemaSelectionRequirement,
   Tool as SchemaTool,
+  ToolParameter as ToolParameterSchema,
 } from '@debrief/schemas';
 
 /**
@@ -19,26 +20,23 @@ export type SelectionRequirement = SchemaSelectionRequirement;
 
 /**
  * A configurable parameter for a tool, extracted from MCP annotations.
- * Uses view-layer field names (valueType, defaultValue) adapted from
- * the schema's snake_case conventions (type, default_value).
+ *
+ * Schema-rooted on `ToolParameter` from `@debrief/schemas` (LinkML
+ * `tool.yaml`) and narrowed with the VS Code camelCase view-layer field
+ * names (`valueType`, `defaultValue`, `paramType`). The schema base
+ * contributes `name`, `description`, `required`, and the new `choices`
+ * slot (added under spec 222 P2 to collapse the drift cluster — audit
+ * §3.2 rows 37 and 86). Per FR-004 (R4 import-based schema rooting) the
+ * audit treats this file as schema-rooted.
  */
-// eslint-disable-next-line no-restricted-syntax -- camelCase VS Code-local adapter over @debrief/schemas.ToolParameter (snake_case); follow-up to consolidate, #214 scope-adjacent
-export interface ToolParameter {
-  /** Parameter identifier */
-  name: string;
+export type ToolParameter = Omit<ToolParameterSchema, 'type' | 'default_value' | 'param_type'> & {
   /** Value type (mapped from schema's "type" field) */
   valueType: 'string' | 'number' | 'boolean' | 'enum';
-  /** Human-readable description */
-  description: string;
-  /** Whether parameter is required */
-  required?: boolean;
   /** Default value (mapped from schema's "default_value" field) */
   defaultValue?: unknown;
-  /** Explicit choices (for enum type) */
-  choices?: string[];
   /** Schema-defined parameter type name (from x-debrief-param-type) */
   paramType?: string;
-}
+};
 
 /**
  * Tool definition — extends schema's Tool with VS Code-specific fields.

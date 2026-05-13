@@ -8,6 +8,8 @@
 import type {
   MCPContentItem as MCPContentItemBase,
   MCPErrorResponse as MCPErrorResponseBase,
+  MCPSelectionRequirement as MCPSelectionRequirementSchema,
+  MCPToolDefinition as MCPToolDefinitionBase,
   MCPToolResponse as MCPToolResponseSchema,
   ToolCategoryEnum,
 } from '@debrief/schemas';
@@ -106,21 +108,24 @@ export type MCPErrorResponse = Omit<MCPErrorResponseBase, 'error'> & {
 
 /**
  * Selection requirement in MCP annotation format.
+ *
+ * Re-exported directly from `@debrief/schemas` (LinkML `mcp.yaml`); the
+ * generated shape `{ kind: string, min: number, max?: number }` matches
+ * the live wire format byte-for-byte.
  */
-export interface MCPSelectionRequirement {
-  kind: string;
-  min: number;
-  max?: number;
-}
+export type MCPSelectionRequirement = MCPSelectionRequirementSchema;
 
 /**
  * MCP tool definition with Debrief-specific annotations.
- * Represents a tool as returned by MCP tools/list response.
- * Both Python and TypeScript tool libraries produce this format.
+ *
+ * Schema-rooted on `MCPToolDefinition` from `@debrief/schemas` (LinkML
+ * `mcp.yaml`) and narrowed with the camelCase `inputSchema` projection
+ * and the Debrief annotations payload. The schema base treats
+ * `input_schema` and `annotations` as `range: Any` (free-form per
+ * Article XV.2); this projection materialises the wire shape used by
+ * the live MCP server.
  */
-export interface MCPToolDefinition {
-  name: string;
-  description: string;
+export type MCPToolDefinition = Omit<MCPToolDefinitionBase, 'input_schema' | 'annotations'> & {
   inputSchema: {
     type: 'object';
     properties: Record<string, unknown>;
@@ -145,4 +150,4 @@ export interface MCPToolDefinition {
      */
     'debrief:uiCategory'?: ToolUICategory;
   };
-}
+};
