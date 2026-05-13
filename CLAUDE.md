@@ -67,6 +67,7 @@ decision (the project previously ran a single persistent Fly.io demo at
 - **Services never touch UI** — return data only
 - **Tests required** — no service code merged without tests
 - **Specs before code** — no implementation without written specification
+- **Boundary types are derived, not rewritten** — when defining a DTO, message payload, snapshot, persistence record, or any cross-boundary type that mirrors a *subset* of an existing typed source (LinkML-generated, schema-derived, or another module's exported type), use `Pick<T, K>` / `Omit<T, K>` / `Partial<T>` — never re-list the fields by name. Re-listing fields is the known root cause of silently-dropped data when the source type grows (see ADR-031 / PR #623). If structural derivation is genuinely impossible, include a compile-time exhaustiveness guard: `type _Exhaustive = Exclude<keyof Source, keyof Dto | 'intentionally_omitted'> extends never ? true : never`. Apply this check **before** writing the type declaration, not in review — Constitution Article IV.5.
 
 ## Tooling (Planned)
 
