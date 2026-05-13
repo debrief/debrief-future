@@ -249,12 +249,24 @@ function MapController({
     }
   }, [map, viewport]);
 
-  // Handle programmatic fit bounds trigger
+  // Handle programmatic fit bounds trigger.
+  //
+  // PR #625: the previous implementation depended on `bounds` and only
+  // gated on `fitBoundsTrigger > 0`, which meant that *any* feature-set
+  // change (e.g. a new STORYBOARD_SCENE polygon during capture)
+  // recomputed `bounds`, re-ran this effect, and re-fired `fitBounds` —
+  // snapping the map back to fit-to-all-features even though the host
+  // explicitly sent `refitBounds: false`. Track the last value we
+  // fired on and only fire when the trigger has actually advanced.
+  const lastFiredFitTrigger = useRef<number | undefined>(undefined);
   useEffect(() => {
-    if (fitBoundsTrigger !== undefined && fitBoundsTrigger > 0 && bounds) {
-      const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
-      map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
-    }
+    if (fitBoundsTrigger === undefined) return;
+    if (fitBoundsTrigger <= 0) return;
+    if (fitBoundsTrigger === lastFiredFitTrigger.current) return;
+    if (!bounds) return;
+    lastFiredFitTrigger.current = fitBoundsTrigger;
+    const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
+    map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
   }, [map, fitBoundsTrigger, bounds]);
 
   // Handle animated flyTo (#217 FR-PLAY-004). Fires on token change so

@@ -253,6 +253,14 @@ async function captureSceneInner(
 ): Promise<CaptureResult> {
   const { mapPanel, sessionStore, stacItemPath, actor } = context;
 
+  // PR #625 — drain any in-flight viewport-debounce so the read of
+  // `state.viewport` below sees the analyst's latest pan/zoom. Without
+  // this, a fresh pan that hasn't yet cleared the 100 ms
+  // `handleViewportChanged` debounce is invisible to capture, and the
+  // first scene gets stamped with the initial-fit viewport instead of
+  // what the analyst composed.
+  mapPanel.flushPendingViewportUpdate();
+
   // Step 3 — read snapshot
   const state: SessionStoreWithUndo = sessionStore.getState();
   const viewport = state.viewport;

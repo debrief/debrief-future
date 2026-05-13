@@ -50,6 +50,7 @@ interface StubMapPanel {
   requestThumbnailCaptureCalls: number;
   flyToCalls: FlyToCall[];
   flyToTokenCounter: number;
+  flushPendingViewportUpdateCalls: number;
   getCurrentFeatures(): DebriefFeature[];
   setFeatures(features: DebriefFeature[]): void;
   requestThumbnailCapture(timeoutMs: number): Promise<{
@@ -60,6 +61,7 @@ interface StubMapPanel {
     viewport: { center: [number, number]; zoom: number; bearing: number },
     durationMs: number,
   ): number;
+  flushPendingViewportUpdate(): void;
 }
 
 function makeMapPanel(
@@ -79,6 +81,7 @@ function makeMapPanel(
     requestThumbnailCaptureCalls: 0,
     flyToCalls: [],
     flyToTokenCounter: 0,
+    flushPendingViewportUpdateCalls: 0,
     getCurrentFeatures() {
       return this.features.slice();
     },
@@ -93,6 +96,9 @@ function makeMapPanel(
     flyToViewport(viewport, durationMs) {
       this.flyToCalls.push({ viewport, durationMs });
       return ++this.flyToTokenCounter;
+    },
+    flushPendingViewportUpdate() {
+      this.flushPendingViewportUpdateCalls += 1;
     },
   };
   return panel;
@@ -385,6 +391,32 @@ describe('captureScene — happy paths', () => {
         (f.properties as { kind?: string }).kind === 'STORYBOARD_SCENE',
     );
     expect(scenes).toHaveLength(2);
+  });
+
+  it('flushes the viewport debounce before reading state.viewport (PR #625)', async () => {
+    // The host debounces webview→host viewportChanged messages by 100 ms.
+    // If the analyst pans and clicks Capture within that window, the
+    // debounced write to session-state hasn't fired yet and `captureScene`
+    // would otherwise read the stale viewport (typically the initial-fit
+    // value from plot load). The flush call at the top of `captureSceneInner`
+    // forces the pending write to apply synchronously, so the capture sees
+    // the analyst's actual composition.
+    const mapPanel = makeMapPanel([trackFeature('t1')]);
+    const session = makeSession({
+      viewport: defaultViewport(),
+      currentTime: 1713623700000,
+      timeRange: null,
+      hiddenFeatureIds: [],
+      markDirty: () => undefined,
+    });
+    const result = await captureScene(
+      mkContext({ mapPanel, session: session.session, panelView: makePanelSurface() }),
+      null,
+      depsFor(),
+    );
+
+    expect(result.status).toBe('captured');
+    expect(mapPanel.flushPendingViewportUpdateCalls).toBe(1);
   });
 
   it('restores the captured viewport on the live map after success (PR #624)', async () => {

@@ -100,6 +100,19 @@ export class MapPanel {
   private drawingUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
+  /**
+   * PR #625 — webview-reported viewport waiting to be written into
+   * session-state. Kept as a field (not a closure inside the timer
+   * callback) so `flushPendingViewportUpdate` can apply it synchronously
+   * — `captureScene` calls flush at the top of every capture so the
+   * read of `state.viewport` always sees the latest user pan, even if
+   * the debounce timer is still in flight (otherwise the first scene
+   * is captured at the *previous* viewport, the initial-fit value).
+   */
+  private pendingViewportUpdate?: {
+    coordinates: { longitude: number; latitude: number }[];
+    zoom: number;
+  };
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
 
   /**
@@ -902,49 +915,76 @@ export class MapPanel {
   }
 
   /**
-   * Handle viewport change from webview with debouncing (Feature: 029)
+   * Handle viewport change from webview with debouncing (Feature: 029).
+   * PR #625 — keeps the pending viewport in a field so
+   * `flushPendingViewportUpdate` can apply it synchronously from
+   * `captureScene` (kills the first-scene-captured-at-initial-fit race).
    */
   private handleViewportChanged(viewport: {
     center: [number, number];
     zoom: number;
     bounds?: [[number, number], [number, number], [number, number], [number, number]];
   }): void {
-    // Clear existing timeout
+    if (!viewport.bounds) return;
+    this.pendingViewportUpdate = {
+      // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
+      // feature 203 consolidated ViewportPolygon on the canonical
+      // object form, so convert at this boundary via fromGeoJSONCoord.
+      coordinates: viewport.bounds.map(fromGeoJSONCoord),
+      zoom: viewport.zoom,
+    };
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
     }
-
-    // Debounce viewport updates to session state
     this.viewportUpdateTimeout = setTimeout(() => {
-      if (this.activeSession && viewport.bounds) {
-        // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
-        // feature 203 consolidated ViewportPolygon on the canonical
-        // object form, so convert at this boundary via fromGeoJSONCoord.
-        const newViewport = {
-          coordinates: viewport.bounds.map(fromGeoJSONCoord),
-          zoom: viewport.zoom,
-        };
-        // Only update if viewport actually changed (avoid feedback loop)
-        const state: SessionStoreWithUndo = this.activeSession.getState();
-        const currentViewport = state.viewport;
-        if (!currentViewport ||
-            JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
-            currentViewport.zoom !== newViewport.zoom) {
-          // PR #625 — prime the echo-suppression key BEFORE the state
-          // mutation so the synchronous spatial-subscription callback
-          // sees the matching key and skips the host→webview push.
-          // Without this, the subscription posts setViewport(avg-centre,
-          // zoom) back to the webview, and Leaflet's `setView` shifts
-          // the map off the user's original pixel-centre by the Mercator
-          // distortion between `avg(corners.lat)` and `getCenter().lat`.
-          this.lastSentViewportKey = this.viewportPolygonKey(
-            newViewport.coordinates,
-            newViewport.zoom,
-          );
-          state.setViewport(newViewport);
-        }
-      }
+      this.viewportUpdateTimeout = undefined;
+      this.applyPendingViewportUpdate();
     }, MapPanel.VIEWPORT_DEBOUNCE_MS);
+  }
+
+  /**
+   * Synchronously force any in-flight viewport debounce to apply now.
+   * Called by `captureScene` so a fresh user pan that has not yet
+   * cleared the 100 ms debounce is still written into session-state
+   * before the capture reads `state.viewport`. Without this, the very
+   * first scene after a pan gets the initial-fit viewport, not what the
+   * analyst composed.
+   */
+  public flushPendingViewportUpdate(): void {
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+      this.viewportUpdateTimeout = undefined;
+    }
+    this.applyPendingViewportUpdate();
+  }
+
+  /**
+   * Write the latest pending viewport into session-state.
+   * Echo-suppresses the host→webview round-trip by priming
+   * `lastSentViewportKey` before the state mutation — the spatial
+   * subscription's synchronous callback then sees a matching key and
+   * skips the redundant `setViewport` push (the push would shift the
+   * map off pixel-centre by Mercator distortion, see PR #625 commit).
+   */
+  private applyPendingViewportUpdate(): void {
+    const pending = this.pendingViewportUpdate;
+    if (!pending || !this.activeSession) return;
+    this.pendingViewportUpdate = undefined;
+
+    const state: SessionStoreWithUndo = this.activeSession.getState();
+    const currentViewport = state.viewport;
+    if (
+      currentViewport &&
+      JSON.stringify(currentViewport.coordinates) === JSON.stringify(pending.coordinates) &&
+      currentViewport.zoom === pending.zoom
+    ) {
+      return;
+    }
+    this.lastSentViewportKey = this.viewportPolygonKey(
+      pending.coordinates,
+      pending.zoom,
+    );
+    state.setViewport(pending);
   }
 
   /**
