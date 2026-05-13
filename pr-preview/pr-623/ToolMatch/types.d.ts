@@ -1,4 +1,4 @@
-import { Tool, SelectionRequirement } from '../../../schemas/src/generated/typescript/index.ts';
+import { Tool, SelectionRequirement, ToolParameter as ToolParameterSchema } from '../../../schemas/src/generated/typescript/index.ts';
 
 export type { Tool, SelectionRequirement };
 /**
@@ -19,23 +19,23 @@ export interface MatchResult {
 }
 /**
  * A configurable parameter for a tool, extracted from MCP annotations.
+ *
+ * Schema-rooted on `ToolParameter` from `@debrief/schemas` (LinkML
+ * `tool.yaml`) and narrowed with the camelCase view-layer field names
+ * used by the ToolMatch picker (`valueType`, `defaultValue`, `paramType`).
+ * The schema base contributes `name`, `description`, `required`, and the
+ * new `choices` slot (added under spec 222 P2 to collapse the drift
+ * cluster — audit §3.2 rows 37 and 86). Per FR-004 (R4 import-based
+ * schema rooting) the audit treats this file as schema-rooted.
  */
-export interface ToolParameter {
-    /** Parameter identifier */
-    name: string;
+export type ToolParameter = Omit<ToolParameterSchema, 'type' | 'default_value' | 'param_type'> & {
     /** Value type: string, number, boolean, enum, duration */
     valueType: 'string' | 'number' | 'boolean' | 'enum' | 'duration';
-    /** Human-readable description */
-    description: string;
-    /** Whether parameter is required */
-    required?: boolean;
     /** Default value */
     defaultValue?: unknown;
-    /** Explicit choices (for enum type) */
-    choices?: string[];
     /** Schema-defined parameter type name (from x-debrief-param-type) */
     paramType?: string;
-}
+};
 /**
  * Creates a Selection map from an array of feature kinds.
  *
