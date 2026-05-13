@@ -925,7 +925,9 @@ export class MapPanel {
     zoom: number;
     bounds?: [[number, number], [number, number], [number, number], [number, number]];
   }): void {
-    if (!viewport.bounds) return;
+    if (!viewport.bounds) {
+      return;
+    }
     this.pendingViewportUpdate = {
       // bounds is [NW, NE, SE, SW] in GeoJSON tuple order [lng, lat];
       // feature 203 consolidated ViewportPolygon on the canonical
@@ -968,7 +970,9 @@ export class MapPanel {
    */
   private applyPendingViewportUpdate(): void {
     const pending = this.pendingViewportUpdate;
-    if (!pending || !this.activeSession) return;
+    if (!pending || !this.activeSession) {
+      return;
+    }
     this.pendingViewportUpdate = undefined;
 
     const state: SessionStoreWithUndo = this.activeSession.getState();
