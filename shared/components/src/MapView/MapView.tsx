@@ -303,6 +303,18 @@ function MapController({
       onZoomChange?.(map.getZoom());
     },
     moveend: () => {
+      // PR #626 — fire `onZoomChange` BEFORE `onBoundsChange`.
+      // For animated `setView`/`fitBounds` calls Leaflet fires
+      // `moveend` *before* `zoomend`, so a webview that tracks zoom in
+      // a ref updated only by `onZoomChange` ends up posting the
+      // PREVIOUS zoom alongside the new bounds. On the next capture
+      // the host reads that stale zoom from `state.viewport`, and the
+      // post-capture `flyToViewport` restores to (correct centre,
+      // STALE wide zoom) — visible as the map panning out at the end
+      // of the first capture. Fire `onZoomChange` first so the ref is
+      // fresh by the time `onBoundsChange` triggers the
+      // `viewportChanged` post.
+      onZoomChange?.(map.getZoom());
       const mapBounds = map.getBounds();
       onBoundsChange?.([
         mapBounds.getWest(),
