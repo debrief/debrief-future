@@ -1,7 +1,9 @@
 /**
  * Area Summary tool — TypeScript implementation.
- * Summarizes the geographic extent and area of selected features.
- * Returns a bounding-box polygon with area statistics.
+ *
+ * Summarises the geographic extent and area of either an explicit bounding
+ * box (`params.bounds`) or the coordinates of the selected features.
+ * Aligned with the Python `area_summary` tool (#107).
  */
 
 import type { DebriefFeature } from '@debrief/schemas';
@@ -36,6 +38,14 @@ export const toolDefinition: MCPToolDefinition = {
             default: true,
             description: 'Include centroid point in output',
           },
+          bounds: {
+            type: 'array',
+            items: { type: 'number' },
+            minItems: 4,
+            maxItems: 4,
+            description: 'Explicit bounding box [minx, miny, maxx, maxy]. ' +
+              'When provided, takes precedence over feature-coordinate extraction.',
+          },
         },
       },
     },
@@ -46,6 +56,8 @@ export const toolDefinition: MCPToolDefinition = {
       { kind: 'POINT', min: 1 },
       { kind: 'RECTANGLE', min: 1 },
       { kind: 'CIRCLE', min: 1 },
+      { kind: 'ZONE', min: 1 },
+      { kind: 'POLY', min: 1 },
     ],
     'debrief:category': 'region/analysis',
     'debrief:version': '1.0.0',
@@ -60,14 +72,18 @@ function flattenCoords(coords: unknown): Position[] {
   return coords.flatMap(flattenCoords);
 }
 
-export function execute(
+/** Validate a 4-element numeric bounding box, returning it normalised or null. */
+function parseBoundsParam(raw: unknown): [number, number, number, number] | null {
+  if (!Array.isArray(raw) || raw.length !== 4) return null;
+  const nums = raw.map(Number);
+  if (nums.some((n) => !Number.isFinite(n))) return null;
+  return [nums[0], nums[1], nums[2], nums[3]];
+}
+
+/** Extract a bounding box from feature coordinates, or null when none have valid coords. */
+function boundsFromFeatures(
   features: DebriefFeature[],
-  params: Record<string, unknown>,
-): GeoJSONFeature[] {
-  const includeCentroid = params?.include_centroid !== false;
-
-  if (features.length === 0) throw new Error('No features selected');
-
+): [number, number, number, number] | null {
   let minLon = Infinity, minLat = Infinity;
   let maxLon = -Infinity, maxLat = -Infinity;
 
@@ -81,7 +97,23 @@ export function execute(
     }
   }
 
-  if (!isFinite(minLon)) throw new Error('No valid coordinates found');
+  if (!isFinite(minLon)) return null;
+  return [minLon, minLat, maxLon, maxLat];
+}
+
+export function execute(
+  features: DebriefFeature[],
+  params: Record<string, unknown>,
+): GeoJSONFeature[] {
+  const includeCentroid = params?.include_centroid !== false;
+
+  // Try explicit bounds first (mirrors Python REGION-context behaviour),
+  // then fall back to feature-coordinate extraction. Returns [] if neither
+  // yields a valid bbox — aligning with the Python implementation (#107).
+  const bounds = parseBoundsParam(params?.bounds) ?? boundsFromFeatures(features);
+  if (!bounds) return [];
+
+  const [minLon, minLat, maxLon, maxLat] = bounds;
 
   // Area calculation with latitude correction
   const avgLat = (minLat + maxLat) / 2;
@@ -98,7 +130,10 @@ export function execute(
   };
 
   if (includeCentroid) {
-    statistics.centroid = [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
+    statistics.centroid = [
+      Math.round((minLon + maxLon) / 2 * 10000) / 10000,
+      Math.round((minLat + maxLat) / 2 * 10000) / 10000,
+    ];
   }
 
   // Build a DatasetEnvelope for tabular display (#177)

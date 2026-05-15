@@ -179,3 +179,106 @@ class TestAreaSummaryFromFeatures:
         assert len(results) == 1
         stats = results[0]["properties"]["statistics"]
         assert stats["area_sq_nm"] > 0
+
+    def test_multi_context_with_zone_polygon(self) -> None:
+        """MULTI context accepts ZONE-kinded polygons (#107 alignment with TS)."""
+        features = [
+            {
+                "type": "Feature",
+                "id": "zone-1",
+                "properties": {"kind": "ZONE"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [[-5.0, 49.5], [-3.0, 49.5], [-3.0, 51.0], [-5.0, 51.0], [-5.0, 49.5]]
+                    ],
+                },
+            }
+        ]
+        context = SelectionContext(type=ContextType.MULTI, features=features)
+        results = area_summary(context, {})
+
+        assert len(results) == 1
+        assert results[0]["properties"]["bounds"] == [-5.0, 49.5, -3.0, 51.0]
+
+
+class TestAreaSummaryInputContract:
+    """
+    Regression tests for the input-contract alignment with the TypeScript
+    implementation (apps/web-shell/src/tools/region/analysis/areaSummary.ts).
+    See #107 (F-2.6).
+    """
+
+    def test_input_kinds_match_typescript(self) -> None:
+        """
+        Python ``input_kinds`` and the TS ``selectionRequirements`` must list
+        the same set of canonical FeatureKindEnum values. Drift here is the
+        root cause of #107.
+        """
+        from debrief_calc.tools.area_summary import area_summary as fn
+
+        tool_meta = fn.tool  # type: ignore[attr-defined]
+        assert set(tool_meta.input_kinds) == {
+            "TRACK",
+            "POINT",
+            "RECTANGLE",
+            "CIRCLE",
+            "ZONE",
+            "POLY",
+        }
+
+    def test_bounds_take_precedence_over_features(self) -> None:
+        """
+        When ``context.bounds`` is supplied, it is used regardless of any
+        coordinates present in ``context.features`` — mirroring the TS
+        ``params.bounds`` precedence rule.
+        """
+        # Bounds and features deliberately disagree.
+        features = [
+            {
+                "type": "Feature",
+                "id": "noise",
+                "properties": {"kind": "POINT"},
+                "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            }
+        ]
+        context = SelectionContext(
+            type=ContextType.REGION,
+            bounds=[-5.0, 49.5, -3.0, 51.0],
+            features=features,
+        )
+        results = area_summary(context, {})
+
+        assert len(results) == 1
+        assert results[0]["properties"]["bounds"] == [-5.0, 49.5, -3.0, 51.0]
+
+    def test_no_bounds_and_unusable_features_returns_empty(self) -> None:
+        """
+        Aligns with the TS implementation: when neither bounds nor feature
+        coordinates yield a valid bbox, return ``[]`` rather than raising.
+        """
+        features = [
+            # Feature has no usable geometry.
+            {
+                "type": "Feature",
+                "id": "narr-1",
+                "properties": {"kind": "NARRATIVE"},
+            }
+        ]
+        context = SelectionContext(type=ContextType.MULTI, features=features)
+        results = area_summary(context, {})
+        assert results == []
+
+    def test_centroid_rounded_to_four_decimals(self) -> None:
+        """
+        Centroid coordinates are rounded to 4 decimals — matches the TS
+        implementation post-#107 so callers comparing the two outputs see
+        identical values.
+        """
+        # Bounds chosen so the midpoints have many decimal places.
+        context = SelectionContext(
+            type=ContextType.REGION, bounds=[-5.12345, 49.11111, -3.98765, 51.22222]
+        )
+        results = area_summary(context, {})
+        centroid = results[0]["properties"]["statistics"]["centroid"]
+        assert centroid == [-4.5556, 50.1667]

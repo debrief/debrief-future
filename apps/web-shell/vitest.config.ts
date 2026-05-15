@@ -28,6 +28,13 @@ export default defineConfig({
         __dirname,
         '../../shared/components/src/index.ts',
       ),
+      // #107 — mirror the schemas alias from vite.config.ts so unit tests
+      // can resolve **value** imports from @debrief/schemas (e.g.
+      // OutputKindEnum), not just type-only imports.
+      '@debrief/schemas': path.resolve(
+        __dirname,
+        '../../shared/schemas/src/generated/typescript/index.ts',
+      ),
     },
   },
 });
