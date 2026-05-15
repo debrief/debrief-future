@@ -87,37 +87,52 @@ parser; sticking to it is straightforward.
 
 ### Top-level shape
 
+The parser is strict about section order: **Epics first, then Items.**
+
 ```markdown
 # Title (optional preamble)
 
 Free text introduction.
 
-## Items
-
-| ID | Category | Description | V | M | A | V·M·A | Complexity | Status | Epic | Created | Updated |
-|----|----------|-------------|---|---|---|-------|------------|--------|------|---------|---------|
-| 001 | Feature | First item — ... | 4 | 3 | 2 | 9 | Medium | proposed | E01 | 2026-01-01 | 2026-01-15 |
-...
-
 ## Epics
 
-| Epic | Title | Description |
-|------|-------|-------------|
-| E01 | Epic name | What this epic covers |
+| ID | Title | Description | Status |
+|----|-------|-------------|--------|
+| E01 | Epic name | What this epic covers | active |
+...
+
+## Items
+
+| ID | Category | Description | V | M | A | Total | Complexity | Status | Epic | Created | Updated |
+|----|----------|-------------|---|---|---|-------|------------|--------|------|---------|---------|
+| 001 | Feature | First item — ... See [[E01]]. | 4 | 3 | 2 | 9 | Medium | proposed | E01 | 2026-01-01 | 2026-01-15 |
 ...
 ```
 
+### Column reference (Epics table)
+
+The Epics table must have **exactly these four columns in this order**:
+
+| Column | Required | Format | Example | Notes |
+|---|---|---|---|---|
+| ID | yes | `E00`–`E99` | `E01` | Two-digit zero-padded; uniqueness enforced |
+| Title | yes | free text | `Epic name` | Shown in group-by-epic headers |
+| Description | yes | free text | `What this epic covers` | Multi-sentence OK |
+| Status | yes | free text | `active`, `complete`, `parked` | No enforced enum; you pick the labels |
+
 ### Column reference (Items table)
+
+The Items table must have **exactly these twelve columns in this order**:
 
 | Column | Required | Format | Example | Notes |
 |---|---|---|---|---|
 | ID | yes | digits | `001` | Must be unique; reused on strikethrough |
 | Category | yes | free text | `Feature`, `Bug`, `Tech Debt`, `Enhancement`, `Documentation` | No enforced taxonomy; you pick the labels |
-| Description | yes | Markdown | `[Title](specs/001/spec.md) — short summary [[E01]]` | Supports Markdown links, bold/italic, `[[E##]]` epic tags, and escaped `\|` for literal pipes |
+| Description | yes | Markdown | `[Title](specs/001/spec.md) — short summary. See [[E01]].` | Supports Markdown links, bold/italic, `[[E##]]` epic tags, and escaped `\|` for literal pipes |
 | V | optional | 1, 3, 5, or `-` | `4` | "Value" score |
 | M | optional | 1, 3, 5, or `-` | `3` | "Media" score |
 | A | optional | 1, 3, 5, or `-` | `2` | "Autonomy" score |
-| V·M·A | optional | sum of V+M+A | `9` | If absent, the navigator computes from V/M/A; if all three are `-`, leave `-` |
+| Total | optional | sum of V+M+A | `9` | Column header **must be exactly `Total`**. If absent, the navigator computes from V/M/A; if all three are `-`, leave `-` |
 | Complexity | optional | `Low`, `Medium`, `High`, or `-` | `Medium` | Hand-assigned |
 | Status | yes | enum (see below) | `proposed` | |
 | Epic | optional | `E00`–`E99` or blank | `E01` | Refers to an epic in the Epics table |
@@ -152,14 +167,19 @@ custom taxonomy, fork (Path 2) and edit `src/types.ts`.
 
 Epic IDs match the regex `^E\d{2}$` — i.e., `E00` through `E99`.
 Reference an epic from an item's Description via `[[E01]]`, which the
-navigator renders as a coloured pill.
+navigator renders as a coloured pill. The recommended convention is
+to put the tag at the **end** of the Description (e.g.,
+`Short summary. See [[E01]].`) and also populate the item's dedicated
+`Epic` column with the same ID. The parser accepts inline tags
+anywhere in the Description, but the dedicated column is what
+group-by-epic uses.
 
 ### Strikethrough (completed rows)
 
 Wrap **every** cell value in a row in `~~` to mark it complete:
 
 ```markdown
-| ~~007~~ | ~~Feature~~ | ~~[Title](spec.md)~~ | ~~3~~ | ~~3~~ | ~~3~~ | ~~9~~ | ~~Medium~~ | ~~complete~~ | ~~E01~~ | ~~2026-02-10~~ | ~~2026-02-20~~ |
+| ~~007~~ | ~~Feature~~ | ~~[Title](spec.md). See [[E01]].~~ | ~~3~~ | ~~3~~ | ~~3~~ | ~~9~~ | ~~Medium~~ | ~~complete~~ | ~~E01~~ | ~~2026-02-10~~ | ~~2026-02-20~~ |
 ```
 
 The navigator's "show / hide completed" toggle filters on this
