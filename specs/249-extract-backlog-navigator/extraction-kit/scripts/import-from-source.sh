@@ -292,6 +292,36 @@ fi
 
 git remote remove backlog-source-tmp
 
+# -- Step 4b: drop debrief-future-specific tests ----------------------------
+#
+# `src/parser/__tests__/liveBacklog.roundtrip.test.ts` is a debrief-future
+# production gate — it parses the *monorepo's* live BACKLOG.md and asserts
+# items.length > 50 + epics.length > 5. Both bits assume the monorepo
+# layout (path walks `../../../../..` from the test file) and the
+# production data shape. Neither holds standalone.
+#
+# Coverage isn't lost: `src/parser/__tests__/parseBacklog.test.ts:87`
+# already verifies byte-for-byte round-trip against a curated fixture
+# (`e2e/fixtures/backlog-fixture.md`) which DOES travel with the subtree
+# split and is the right round-trip gate for the standalone repo.
+
+echo "==> Step 4b: drop debrief-future-specific tests"
+DROPPED=()
+for stale in \
+  src/parser/__tests__/liveBacklog.roundtrip.test.ts \
+; do
+  if [[ -f "$stale" ]]; then
+    rm -f "$stale"
+    DROPPED+=("$stale")
+  fi
+done
+if [[ ${#DROPPED[@]} -gt 0 ]]; then
+  printf "    -> dropped: %s\n" "${DROPPED[@]}"
+  echo "    OK — debrief-future production gates removed"
+else
+  echo "    OK — no stale tests to drop"
+fi
+
 # -- Step 5: sed-replace vite.config.ts base default ------------------------
 
 echo "==> Step 5: rewrite vite.config.ts base default → /$DEST_REPO/"
